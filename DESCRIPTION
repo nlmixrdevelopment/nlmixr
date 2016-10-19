@@ -1,0 +1,30 @@
+Package: nlmixr
+Type: Package
+Title: What the package does (short line)
+Imports: Rcpp (>= 0.11.5), brew, lattice, parallel, lbfgs
+Depends: RxODE, nlme
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+Version: 0.9.0-1
+Date: 2016-09-20
+Authors@R: c(
+   person("Yuan", "Xiong", 
+      role = "aut", email = "yuan.xiong@gmail.com"),
+   person("Rik", "Schoemaker", 
+      role = "aut", email = "rik.schoemaker@occams.eu"),
+   person("Justin", "Wilkins", 
+      role = "aut", email = "justin.wilkins@occams.eu"),
+   person("Wenping", "Wang", 
+      role = c("aut", "cre"), email = "wwang8198@gmail.com")
+   )
+Author: Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut], 
+  Wenping Wang [aut, cre]
+Maintainer: Wenping Wang <wwang8198@gmail.com>
+Description: nlmixr is an R package for fitting population pharmacokinetic (PK) 
+  models and population pharmacokinetic-pharmacosynamic (PKPD) models.
+License: GPL (>= 2)
+LinkingTo: Rcpp, RcppEigen
+URL: https://github.com/wwang-at-github/nlmixr
+Packaged: 2016-09-27 17:32:47 UTC; Wenping.Wang
+NeedsCompilation: yes
+RoxygenNote: 5.0.1

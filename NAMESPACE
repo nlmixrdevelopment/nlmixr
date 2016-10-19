@@ -1,0 +1,55 @@
+useDynLib(nlmixr)
+importFrom(Rcpp, evalCpp)
+importFrom(brew, brew)
+importFrom(lattice, xyplot)
+importFrom(lattice, trellis.par.get)
+importFrom(nlme, nlme)
+importFrom(nlme, groupedData)
+importFrom(nlme, getData)
+importFrom(nlme, pdDiag)
+import(RxODE)
+importFrom("graphics", "abline", "lines", "matplot", "plot", "points", "title")
+importFrom("stats", "as.formula", "nlminb", "optimHess", "rnorm", "terms", predict)
+importFrom("stats", "anova", "optim", "sd", "var")
+importFrom(parallel, mclapply)
+importFrom(lbfgs, lbfgs)
+
+
+#export(RxODE, eventTable)
+export(
+nlme_lin_cmpt,
+nlme_ode,
+nlme_gof,
+vpc,
+dynmodel,
+dynmodel.mcmc,
+print.dyn.ID,
+summary.dyn.ID,
+plot.dyn.ID,
+bootdata,
+frwd_selection,
+print.dyn.mcmc,
+summary.dyn.mcmc,
+plot.dyn.mcmc,
+nmsimplex,
+gauss.quad,
+gnlmm,
+prediction,
+print.gnlmm.fit,
+gen_saem_user_fn,
+configsaem,
+#instant.stan.extension,
+lincmt,
+calcCov,
+getOMEGA,
+
+plot.saemFit,
+print.saemFit,
+summary.saemFit,
+
+lin_cmt
+)
+
+S3method(print, dyn.ID)
+S3method(summary, dyn.ID)
+S3method(plot, dyn.ID)
