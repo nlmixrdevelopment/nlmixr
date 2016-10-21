@@ -1,4 +1,4 @@
-nlmixr: an R package for population PKPD modeling
+# nlmixr: an R package for population PKPD modeling
 ***  
 
 #####Authors: Yuan Xiong, Rik Schoemaker, Justin Wilkins, Wenping Wang
