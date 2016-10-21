@@ -1,0 +1,45 @@
+nlmixr_0.8.0-3:
+	add Ruser_function
+nlmixr_0.8.0-1:
+	add saem back
+nlmixr_0.7.0-4:
+	code cleaning per Rcheck
+nlmixr_0.7.0-4:
+	combined previous gnlmm & gnlmm00
+	add intermediate parameter print to neldermead
+	fixed multi.core bug with resetting "starts"
+nlmixr_0.7.0-3:
+    code cleaning with nelder & more docs w/ roxygen2
+nlmixr_0.7.0-2:
+    trim dead code (esp'ly in utils.R)
+nlmixr_0.7.0-1:
+    start roxygen2
+nlmixr_0.7.0:
+    gnlmm
+nlmixr_0.6.2-9:
+    gauss.quad
+nlmixr_0.6.2-8:
+    add option trace to mymin & export it as nelder
+nlmixr_0.6.2-7:
+    mclapply
+nlmixr_0.6.2-6:
+    add transit_abs option in nlme_ode
+    model arg can be an RxODE obj in nlme_ode
+nlmixr_0.6.2-5:
+    fix TLAG bug
+nlmixr_0.6.2-4:
+    incompatible EVID warning
+    add debugODE
+    add large par warning
+
+nlmixr_0.6.2-3:
+    generic vpc to handle formula (using nlme.predict) & varFunc
+    
+nlmixr_0.6.2-2:
+    add the following in nlme_lin_cmt:
+    dat$DUR <- NULL
+    
+    note that when using weight=varPower() or weight=varConstPower(), ANY missing value or ANY variable in the input dataset
+    will cause nlme() to fail.
+
+roxygen2::roxygenise()

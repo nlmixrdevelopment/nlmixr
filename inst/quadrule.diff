@@ -1,0 +1,989 @@
+Index: quadrule.c
+===================================================================
+--- quadrule.c	(revision 333)
++++ quadrule.c	(working copy)
+@@ -1,5 +1,10 @@
++#ifndef __STANDALONE__
++#include <R.h>
++#define printf Rprintf
++#else
++#include <stdio.h>
++#endif
+ #include <math.h>
+-#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <time.h>
+@@ -167,25 +172,25 @@
+ */
+ {
+   int i;
+-  int key;
+-  int m;
+-  int mex;
++  //int key;  //commented it by WW
++  //int m;
++  //int mex;
+   int *mlt;
+-  int mmex;
+-  int mop;
++  //int mmex;  //commented it by WW
++  //int mop;
+   int *ndx;
+ /*
+   Check that there is enough workspace and assign it.
+ */
+-  key = 1;
+-  mop = 2 * nt;
+-  m = mop + 1;
+-  mex = m + 2;
+-  mmex = i4_max ( mex, 1 );
++  //key = 1;
++  //mop = 2 * nt;
++  //m = mop + 1;
++  //mex = m + 2;  //commented it by WW
++  //mmex = i4_max ( mex, 1 );  //commented it by WW
+ 
+   if ( lo <= 0 )
+   {
+-    mex = 0;
++    //mex = 0;  //commented it by WW
+   }
+ /*
+   Compute the Gauss quadrature formula for default values of A and B.
+@@ -344,11 +349,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr,"\n" );
+-    fprintf ( stderr, "CHEBYSHEV_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 through 7, and 9.\n" );
+-    exit ( 1 );
++    warning("\n" );
++    warning( "CHEBYSHEV_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 through 7, and 9.\n" );
++    error("");
+   }
+ 
+   for ( i = 0; i < n; i++ )
+@@ -414,10 +419,10 @@
+ 
+   if ( n < 1 )
+   {
+-    fprintf ( stderr,"\n" );
+-    fprintf ( stderr, "CHEBYSHEV1_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    exit ( 1 );
++    warning("\n" );
++    warning( "CHEBYSHEV1_COMPUTE - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    error("");
+   }
+ 
+   for ( i = 0; i < n; i++ )
+@@ -678,11 +683,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "CHEBYSHEV1_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 through 10.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "CHEBYSHEV1_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 through 10.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -744,10 +749,10 @@
+ 
+   if ( n < 1 )
+   {
+-    fprintf ( stderr,"\n" );
+-    fprintf ( stderr, "CHEBYSHEV2_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    exit ( 1 );
++    warning("\n" );
++    warning( "CHEBYSHEV2_COMPUTE - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    error("");
+   }
+ 
+   for ( i = 0; i < n; i++ )
+@@ -1006,11 +1011,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "CHEBYSHEV2_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 through 10.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "CHEBYSHEV2_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 through 10.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -1089,11 +1094,11 @@
+ 
+   if ( n < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "CHEBYSHEV3_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  N must be at least 1.\n" );
+-    fprintf ( stderr, "  The input value was N = %d\n", n );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "CHEBYSHEV3_COMPUTE - Fatal error!\n" );
++    warning( "  N must be at least 1.\n" );
++    warning( "  The input value was N = %d\n", n );
++    error("");
+   }
+ /*
+   Take care of the special case N = 1.
+@@ -1366,11 +1371,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "CHEBYSHEV3_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 through 10.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "CHEBYSHEV3_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 through 10.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -1468,7 +1473,7 @@
+     printf ( "\n" );
+     printf ( "CLASS_MATRIX - Fatal error!\n" );
+     printf ( "  Gamma function does not match machine parameters.\n" );
+-    exit ( 1 );
++    error("");
+   }
+ 
+   if ( kind == 1 )
+@@ -1615,7 +1620,7 @@
+     printf ( "\n" );
+     printf ( "CLASS_MATRIX - Fatal error!\n" );
+     printf ( "  Illegal value of KIND = %d.\n", kind );
+-    exit ( 1 );
++    error("");
+   }
+ 
+   return zemu;
+@@ -1709,10 +1714,10 @@
+ 
+   if ( n < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "CLENSHAW_CURTIS_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  N < 1.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "CLENSHAW_CURTIS_COMPUTE - Fatal error!\n" );
++    warning( "  N < 1.\n" );
++    error("");
+   }
+ 
+   if ( n == 1 )
+@@ -2676,11 +2681,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "CLENSHAW_CURTIS_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", order );
+-    fprintf ( stderr, "  Legal values are 1 to 17, 33, 65 or 129.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "CLENSHAW_CURTIS_SET - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", order );
++    warning( "  Legal values are 1 to 17, 33, 65 or 129.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -2746,10 +2751,10 @@
+ 
+   if ( n < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "FEJER1_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr,"  N < 1.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "FEJER1_COMPUTE - Fatal error!\n" );
++    warning("  N < 1.\n" );
++    error("");
+   }
+ 
+   if ( n == 1 )
+@@ -2992,11 +2997,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "FEJER1_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", order );
+-    fprintf ( stderr, "  Legal values are 1 through 10.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "FEJER1_SET - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", order );
++    warning( "  Legal values are 1 through 10.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -3064,10 +3069,10 @@
+ 
+   if ( n < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "FEJER2_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  N < 1.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "FEJER2_COMPUTE - Fatal error!\n" );
++    warning( "  N < 1.\n" );
++    error("");
+   }
+ 
+   if ( n == 1 )
+@@ -3327,11 +3332,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "FEJER2_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", order );
+-    fprintf ( stderr, "  Legal values are 1 through 10.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "FEJER2_SET - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", order );
++    warning( "  Legal values are 1 through 10.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -3378,7 +3383,7 @@
+   double arg3;
+   double arg4;
+   double c;
+-  double s;
++  //double s;  //commented it by WW
+   double value;
+   double value1;
+ 
+@@ -3467,10 +3472,10 @@
+ */
+   if ( n < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "GEGENBAUER_EK_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  1 <= N is required.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "GEGENBAUER_EK_COMPUTE - Fatal error!\n" );
++    warning( "  1 <= N is required.\n" );
++    error("");
+   }
+ /*
+   Check ALPHA.
+@@ -3477,10 +3482,10 @@
+ */
+   if ( alpha <= -1.0 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "GEGENBAUER_EK_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  -1.0 < ALPHA is required.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "GEGENBAUER_EK_COMPUTE - Fatal error!\n" );
++    warning( "  -1.0 < ALPHA is required.\n" );
++    error("");
+   }
+ /*
+   Call the general Gauss quadrature routine to get X and W.
+@@ -3566,10 +3571,10 @@
+ */
+   if ( order < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "GEGENBAUER_SS_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  1 <= ORDER is required.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "GEGENBAUER_SS_COMPUTE - Fatal error!\n" );
++    warning( "  1 <= ORDER is required.\n" );
++    error("");
+   }
+ 
+   c = ( double * ) malloc ( order * sizeof ( double ) );
+@@ -3578,10 +3583,10 @@
+ */
+   if ( alpha <= -1.0 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "GEGENBAUER_SS_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  -1.0 < ALPHA is required.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "GEGENBAUER_SS_COMPUTE - Fatal error!\n" );
++    warning( "  -1.0 < ALPHA is required.\n" );
++    error("");
+   }
+ /*
+   Set the recursion coefficients.
+@@ -5155,11 +5160,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "HERMITE_GK16_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal input value of N.\n" );
+-    fprintf ( stderr, "  N must be 1, 3, 7, 9, 17, 19, 31, 33 or 35.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "HERMITE_GK16_SET - Fatal error!\n" );
++    warning( "  Illegal input value of N.\n" );
++    warning( "  N must be 1, 3, 7, 9, 17, 19, 31, 33 or 35.\n" );
++    error("");
+   }
+   return;
+ }
+@@ -5393,11 +5398,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "HERMITE_GK18_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal input value of N.\n" );
+-    fprintf ( stderr, "  N must be 1, 3, 9, 19, or 37.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "HERMITE_GK18_SET - Fatal error!\n" );
++    warning( "  Illegal input value of N.\n" );
++    warning( "  N must be 1, 3, 9, 19, or 37.\n" );
++    error("");
+   }
+   return;
+ }
+@@ -5634,11 +5639,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "HERMITE_GK22_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal input value of N.\n" );
+-    fprintf ( stderr, "  N must be 1, 3, 9, 19, or 41.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "HERMITE_GK22_SET - Fatal error!\n" );
++    warning( "  Illegal input value of N.\n" );
++    warning( "  N must be 1, 3, 9, 19, or 41.\n" );
++    error("");
+   }
+   return;
+ }
+@@ -5879,11 +5884,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "HERMITE_GK24_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal input value of N.\n" );
+-    fprintf ( stderr, "  N must be 1, 3, 9, 19, or 43.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "HERMITE_GK24_SET - Fatal error!\n" );
++    warning( "  Illegal input value of N.\n" );
++    warning( "  N must be 1, 3, 9, 19, or 43.\n" );
++    error("");
+   }
+   return;
+ }
+@@ -6147,11 +6152,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "HERMITE_PROBABILIST_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 to 10,\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "HERMITE_PROBABILIST_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 to 10,\n" );
++    error("");
+   }
+ 
+   return;
+@@ -8186,11 +8191,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "HERMITE_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1:20, 31/32/33, 63/64/65, 127/128/129.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "HERMITE_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1:20, 31/32/33, 63/64/65, 127/128/129.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -8384,11 +8389,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "HERMITE_1_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 to 10.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "HERMITE_1_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 to 10.\n" );
++    error("");
+   }
+   return;
+ }
+@@ -8828,10 +8833,10 @@
+     }
+     else if ( i == 0 )
+     {
+-      fprintf ( stderr, "\n" );
+-      fprintf ( stderr, "I4_POWER - Fatal error!\n" );
+-      fprintf ( stderr, "  I^J requested, with I = 0 and J negative.\n" );
+-      exit ( 1 );
++      warning( "\n" );
++      warning( "I4_POWER - Fatal error!\n" );
++      warning( "  I^J requested, with I = 0 and J negative.\n" );
++      error("");
+     }
+     else
+     {
+@@ -8842,10 +8847,10 @@
+   {
+     if ( i == 0 )
+     {
+-      fprintf ( stderr, "\n" );
+-      fprintf ( stderr, "I4_POWER - Fatal error!\n" );
+-      fprintf ( stderr, "  I^J requested, with I = 0 and J = 0.\n" );
+-      exit ( 1 );
++      warning( "\n" );
++      warning( "I4_POWER - Fatal error!\n" );
++      warning( "  I^J requested, with I = 0 and J = 0.\n" );
++      error("");
+     }
+     else
+     {
+@@ -8941,7 +8946,7 @@
+   int j;
+   int k;
+   int l;
+-  int m;
++  int m=0;
+   int mml;
+   double p;
+   double prec;
+@@ -8981,10 +8986,10 @@
+       }
+       if ( itn <= j )
+       {
+-        fprintf ( stderr, "\n" );
+-        fprintf ( stderr, "IMTQLX - Fatal error!\n" );
+-        fprintf ( stderr, "  Iteration limit exceeded\n" );
+-        exit ( 1 );
++        warning( "\n" );
++        warning( "IMTQLX - Fatal error!\n" );
++        warning( "  Iteration limit exceeded\n" );
++        error("");
+       }
+       j = j + 1;
+       g = ( d[l] - p ) / ( 2.0 * e[l-1] );
+@@ -9331,18 +9336,18 @@
+ */
+   if ( alpha <= -1.0 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "JACOBI_SS_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  -1.0 < ALPHA is required.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "JACOBI_SS_COMPUTE - Fatal error!\n" );
++    warning( "  -1.0 < ALPHA is required.\n" );
++    error("");
+   }
+ 
+   if ( beta <= -1.0 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "JACOBI_SS_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  -1.0 < BETA is required.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "JACOBI_SS_COMPUTE - Fatal error!\n" );
++    warning( "  -1.0 < BETA is required.\n" );
++    error("");
+   }
+ 
+   b = ( double * ) malloc ( order * sizeof ( double ) );
+@@ -9922,11 +9927,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "KRONROD_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", order );
+-    fprintf ( stderr, "  Legal values are 15, 21, 31 or 41.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "KRONROD_SET - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", order );
++    warning( "  Legal values are 15, 21, 31 or 41.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -10121,8 +10126,8 @@
+   double p1;
+   double prod;
+   double r1;
+-  double r2;
+-  double ratio;
++  //double r2;  //commented it by WW
++  //double ratio;  //commented it by WW
+   double x;
+ 
+   b = ( double * ) malloc ( order * sizeof ( double ) );
+@@ -12296,11 +12301,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "LAGUERRE_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 to 20, 31/32/33, 63/64/65 or 127/128/129.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "LAGUERRE_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 to 20, 31/32/33, 63/64/65 or 127/128/129.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -12498,11 +12503,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "LAGUERRE_1_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 to 10.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "LAGUERRE_1_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 to 10.\n" );
++    error("");
+   }
+   return;
+ }
+@@ -12591,10 +12596,10 @@
+ 
+   if ( order < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "LAGUERRE_SUM - Fatal error!\n" );
+-    fprintf ( stderr, "  Nonpositive ORDER = %d\n", order );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "LAGUERRE_SUM - Fatal error!\n" );
++    warning( "  Nonpositive ORDER = %d\n", order );
++    error("");
+   }
+ 
+   result = 0.0;
+@@ -12687,10 +12692,10 @@
+ 
+   if ( order < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "LEGENDRE_DR_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", order );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "LEGENDRE_DR_COMPUTE - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", order );
++    error("");
+   }
+ 
+   e1 = ( double ) ( order * ( order + 1 ) );
+@@ -17052,11 +17057,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "LEGENDRE_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1:33, 63/64/65, 127/128/129, 255/256/257\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "LEGENDRE_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1:33, 63/64/65, 127/128/129, 255/256/257\n" );
++    error("");
+   }
+   return;
+ }
+@@ -17778,11 +17783,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "LOBATTO_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are between 1 and 20.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "LOBATTO_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are between 1 and 20.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -18866,11 +18871,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "NCC_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", order );
+-    fprintf ( stderr, "  Legal values are 1 through 21.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "NCC_SET - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", order );
++    warning( "  Legal values are 1 through 21.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -19107,11 +19112,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "NCO_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 to 10.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "NCO_SET - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", n );
++    warning( "  Legal values are 1 to 10.\n" );
++    error("");
+   }
+ /*
+   Set the abscissas.
+@@ -19487,11 +19492,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "NCOH_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of N = %d\n", n );
+-    fprintf ( stderr, "  Legal values are 1 to 17.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "NCOH_SET - Fatal error!\n" );
++    warning( "  Illegal value of N = %d\n", n );
++    warning( "  Legal values are 1 to 17.\n" );
++    error("");
+   }
+ /*
+   Set the abscissas.
+@@ -19565,7 +19570,7 @@
+     printf ( "\n" );
+     printf ( "PARCHK - Fatal error!\n" );
+     printf ( "  KIND <= 0.\n" );
+-    exit ( 1 );
++    error("");
+   }
+ /*
+   Check ALPHA for Gegenbauer, Jacobi, Laguerre, Hermite, Exponential.
+@@ -19575,7 +19580,7 @@
+     printf ( "\n" );
+     printf ( "PARCHK - Fatal error!\n" );
+     printf ( "  3 <= KIND and ALPHA <= -1.\n" );
+-    exit ( 1 );
++    error("");
+   }
+ /*
+   Check BETA for Jacobi.
+@@ -19585,7 +19590,7 @@
+     printf ( "\n" );
+     printf ( "PARCHK - Fatal error!\n" );
+     printf ( "  KIND == 4 and BETA <= -1.0.\n" );
+-    exit ( 1 );
++    error("");
+   }
+ /*
+   Check ALPHA and BETA for rational.
+@@ -19598,7 +19603,7 @@
+       printf ( "\n" );
+       printf ( "PARCHK - Fatal error!\n" );
+       printf ( "  KIND == 8 but condition on ALPHA and BETA fails.\n" );
+-      exit ( 1 );
++      error("");
+     }
+   }
+   return;
+@@ -20706,11 +20711,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "PATTERSON_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal input value of ORDER.\n" );
+-    fprintf ( stderr, "  Order must be 1, 3, 7, 15, 31, 63, 127 or 255.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "PATTERSON_SET - Fatal error!\n" );
++    warning( "  Illegal input value of ORDER.\n" );
++    warning( "  Order must be 1, 3, 7, 15, 31, 63, 127 or 255.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -21400,7 +21405,7 @@
+   int l4;
+   int l5;
+   int m;
+-  int nm;
++  int nm=0;
+   double pa;
+   double pb;
+   const double r8_pi = 3.141592653589793;
+@@ -21424,10 +21429,10 @@
+   if ( l0 || l1 )
+   {
+     hf = 0.0;
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "R8_HYPER_2F1 - Fatal error!\n" );
+-    fprintf ( stderr, "  The hypergeometric series is divergent.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "R8_HYPER_2F1 - Fatal error!\n" );
++    warning( "  The hypergeometric series is divergent.\n" );
++    error("");
+   }
+ 
+   if ( 0.95 < x )
+@@ -21742,10 +21747,10 @@
+ 
+   if ( 120 < k )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "R8_HYPER_2F1 - Warning!\n" );
+-    fprintf ( stderr, "  A large number of iterations were needed.\n" );
+-    fprintf ( stderr, "  The accuracy of the results should be checked.\n" );
++    warning( "\n" );
++    warning( "R8_HYPER_2F1 - Warning!\n" );
++    warning( "  A large number of iterations were needed.\n" );
++    warning( "  The accuracy of the results should be checked.\n" );
+   }
+ 
+   return hf;
+@@ -22251,12 +22256,12 @@
+ {
+   int i;
+ 
+-  fprintf ( stdout, "\n" );
+-  fprintf ( stdout, "%s\n", title );
+-  fprintf ( stdout, "\n" );
++  printf( "\n" );
++  printf( "%s\n", title );
++  printf( "\n" );
+   for ( i = 0; i < n; i++ )
+   {
+-    fprintf ( stdout, "  %8d: %14g\n", i, a[i] );
++    printf( "  %8d: %14g\n", i, a[i] );
+   }
+ 
+   return;
+@@ -22407,11 +22412,11 @@
+ 
+   if ( n < 1 )
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "RADAU_COMPUTE - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", n );
+-    fprintf ( stderr, "  ORDER must be at least 1.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "RADAU_COMPUTE - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", n );
++    warning( "  ORDER must be at least 1.\n" );
++    error("");
+   }
+ 
+   tolerance = 100.0 * r8_epsilon ( );
+@@ -22848,11 +22853,11 @@
+   }
+   else
+   {
+-    fprintf ( stderr, "\n" );
+-    fprintf ( stderr, "RADAU_SET - Fatal error!\n" );
+-    fprintf ( stderr, "  Illegal value of ORDER = %d\n", order );
+-    fprintf ( stderr, "  Legal values are 1 to 15.\n" );
+-    exit ( 1 );
++    warning( "\n" );
++    warning( "RADAU_SET - Fatal error!\n" );
++    warning( "  Illegal value of ORDER = %d\n", order );
++    warning( "  Legal values are 1 to 15.\n" );
++    error("");
+   }
+ 
+   return;
+@@ -22932,14 +22937,14 @@
+     Input, double A, B, the interval endpoints.
+ */
+ {
+-  double al;
+-  double be;
++  double al=0.0;
++  double be=0.0;
+   int i;
+   int k;
+   int l;
+   double p;
+-  double shft;
+-  double slp;
++  double shft=0.0;
++  double slp=0.0;
+   double temp;
+   double tmp;
+ 
+@@ -22953,12 +22958,12 @@
+     be = 0.0;
+     if ( ( b - a ) <= temp )
+     {
+-      fprintf ( stderr, "\n" );
+-      fprintf ( stderr, "SCQF - Fatal error!\n" );
+-      fprintf ( stderr, "  B - A too small.\n" );
+-      fprintf ( stderr, "  A = %g\n", a );
+-      fprintf ( stderr, "  B = %g\n", b );
+-      exit ( 1 );
++      warning( "\n" );
++      warning( "SCQF - Fatal error!\n" );
++      warning( "  B - A too small.\n" );
++      warning( "  A = %g\n", a );
++      warning( "  B = %g\n", b );
++      error("");
+     }
+     shft = ( a + b ) / 2.0;
+     slp = ( b - a ) / 2.0;
+@@ -22972,7 +22977,7 @@
+       printf ( "\n" );
+       printf ( "SCQF - Fatal error!\n" );
+       printf ( "  B - A too small.\n" );
+-      exit ( 1 );
++      error("");
+     }
+     shft = ( a + b ) / 2.0;
+     slp = ( b - a ) / 2.0;
+@@ -22986,7 +22991,7 @@
+       printf ( "\n" );
+       printf ( "SCQF - Fatal error!\n" );
+       printf ( "  B - A too small.\n" );
+-      exit ( 1 );
++      error("");
+     }
+     shft = ( a + b ) / 2.0;
+     slp = ( b - a ) / 2.0;
+@@ -23001,7 +23006,7 @@
+       printf ( "\n" );
+       printf ( "SCQF - Fatal error!\n" );
+       printf ( "  B - A too small.\n" );
+-      exit ( 1 );
++      error("");
+     }
+     shft = ( a + b ) / 2.0;
+     slp = ( b - a ) / 2.0;
+@@ -23013,7 +23018,7 @@
+       printf ( "\n" );
+       printf ( "SCQF - Fatal error!\n" );
+       printf ( "  B <= 0\n" );
+-      exit ( 1 );
++      error("");
+     }
+     shft = a;
+     slp = 1.0 / b;
+@@ -23027,7 +23032,7 @@
+       printf ( "\n" );
+       printf ( "SCQF - Fatal error!\n" );
+       printf ( "  B <= 0.\n" );
+-      exit ( 1 );
++      error("");
+     }
+     shft = a;
+     slp = 1.0 / sqrt ( b );
+@@ -23043,7 +23048,7 @@
+       printf ( "\n" );
+       printf ( "SCQF - Fatal error!\n" );
+       printf ( "  B - A too small.\n" );
+-      exit ( 1 );
++      error("");
+     }
+     shft = ( a + b ) / 2.0;
+     slp = ( b - a ) / 2.0;
+@@ -23055,7 +23060,7 @@
+       printf ( "\n" );
+       printf ( "SCQF - Fatal error!\n" );
+       printf ( "  A + B <= 0.\n" );
+-      exit ( 1 );
++      error("");
+     }
+     shft = a;
+     slp = a + b;
+@@ -23145,7 +23150,7 @@
+     printf ( "\n" );
+     printf ( "SGQF - Fatal error!\n" );
+     printf ( "  ZEMU <= 0.\n" );
+-    exit ( 1 );
++    error("");
+   }
+ /*
+   Set up vectors for IMTQLX.
+@@ -23213,6 +23218,7 @@
+   tm = localtime ( &now );
+ 
+   len = strftime ( time_buffer, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm );
++  len++;  //inserted it by WW
+ 
+   printf ( "%s\n", time_buffer );
+ 

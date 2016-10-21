@@ -1,0 +1,121 @@
+void jex(const double tn,
+         ADBL  *x,
+         Eigen::Matrix<ADBL, Eigen::Dynamic, Eigen::Dynamic>& wm) {
+}
+void jex(const double tn,
+         AVAR  *x,
+         Eigen::Matrix<AVAR, Eigen::Dynamic, Eigen::Dynamic>& wm) {
+}
+
+template <class T, class T0>
+Eigen::Matrix<T,Eigen::Dynamic,1>
+generic_ode_interface(Eigen::Matrix<T,Eigen::Dynamic,1>& params,
+                      const Eigen::VectorXd& inits,
+                      const Eigen::VectorXd& time,
+                      const Eigen::VectorXd& evid,
+                      const Eigen::VectorXd& amt,
+                      const T0& absolute_tolerance,
+                      const T0& relative_tolerance,
+                      const int nobs,
+                      const int which) {
+  const char *err_msg[] = {
+    "excess work done on this call (perhaps wrong jt).",
+    "excess accuracy requested (tolerances too small).",
+    "illegal input detected (see printed message).",
+    "repeated error test failures (check all inputs).",
+    "repeated convergence failures (perhaps bad jacobian supplied or wrong choice of jt or tolerances).",
+    "error weight became zero during problem. (solution component i vanished, and atol or atol(i) = 0.)",
+    "work space insufficient to finish (see messages)."
+  };
+
+#ifdef __TRACK_ELAPSE__
+  std::clock_t start;
+  double duration;
+
+  start = std::clock();
+#endif
+    
+    
+  for (int i = 0; i < params.size(); i++) {
+	if (std::isinf(params[i]) || params[i] > 1.0E200 || params[i] < -1.0E200) {
+	  std::cerr 
+	    << "WARNING!!!\n"
+	    << "extreme parameter value:  "
+	    << "parameter " << i+1
+	    << ", value = " << params[i] 
+	    << std::endl;
+	}
+  }
+  
+    
+  typedef Eigen::Matrix<T, Eigen::Dynamic, 1> VectorXd;
+  VectorXd state(neq+1);
+  LSODA<T> ode_solver;
+
+  for (size_t i = 0; i < neq; i++)
+  {
+    state[i+1] = inits[i];
+  }
+  for (size_t i = 0; i < npar; i++)
+  {
+    pars_var[i] = params[i];
+    pars_dbl[i] = pars_var[i].val();
+  }
+
+  VectorXd C(nobs);
+  double t0, t1;
+  double rwork1, rwork5, rwork6, rwork7;
+  double atol=absolute_tolerance, rtol=relative_tolerance;
+  int    iwork1, iwork2, iwork5, iwork6, iwork7, iwork8, iwork9;
+  int    itol=1, itask=1, istate=1, iopt=0, jt=2;
+  iwork1 = iwork2 = iwork5 = iwork6 = iwork7 = iwork8 = iwork9 = 0;
+  rwork1 = rwork5 = rwork6 = rwork7 = 0.0;
+  int wh, cmt;
+
+  t0 = time[0];
+  for (int i = 0, n = 0; i < time.size(); i++) {
+    t1 = time[i];
+
+    if(t1>t0) {
+      ode_solver.lsoda(dydt, neq, state, &t0, t1, itol, &rtol-1, &atol-1,
+             itask, &istate, iopt, jt, jex, iwork1, iwork2, iwork5, iwork6,
+             iwork7, iwork8, iwork9, rwork1, rwork5, rwork6, rwork7, 0);
+      if (istate<0) {
+        std::cerr << "LSODA exception: " << err_msg[-istate-1] << std::endl;
+        std::cerr << params << std::endl;
+        std::cerr << time << std::endl;
+        std::cerr << amt << std::endl;
+        std::cerr << evid << std::endl;
+	  }
+    }
+
+    wh = evid[i];
+
+    if (wh) {    //dosing events
+      cmt = (wh % 10000) / 100 - 1;
+      if (wh > 10000)
+        InfusionRate[cmt] += amt[i];
+      else
+        state[cmt+1] += amt[i];    //dosing before obs
+      istate = 1;
+    }
+    else {      //observation events
+      C[n] = state[which];
+      n++;
+    }
+
+    t0 = t1;
+  }
+
+
+#ifdef __TRACK_ELAPSE__
+  duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+  if (duration>__TRACK_ELAPSE__) {
+    std::cout<<"lsoda duration: " << duration <<'\n';
+    std::cout<<"params:\n" << params <<'\n';
+  }
+#endif
+
+  //ode_solver.n_lsoda_terminate();
+  return C;
+}

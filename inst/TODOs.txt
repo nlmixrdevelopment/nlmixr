@@ -1,0 +1,20 @@
+- nm2nlmixr data
+- shrinkage estimate
+- user-defined tol
+- stiff flag
+- efficient handling of ev in user_fn
+- F
+- WAM
+- auto model selection (forward or backward)
+- multi endpoints (talk to Jose)
+- prop error
+- xpose plots & summary
+- rpt generation w/ knitr
+- lme4 multi endpoints
+- audo-diff & lme4
+
+
+- add allometric scaling model to vignette
+- add mag pbpk example
+- add adapt 5 seq pop pk-pd
+
