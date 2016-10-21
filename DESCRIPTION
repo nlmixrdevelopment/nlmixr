@@ -24,7 +24,7 @@ Description: nlmixr is an R package for fitting population pharmacokinetic (PK)
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)
 LinkingTo: Rcpp, RcppEigen
-URL: https://github.com/wwang-at-github/nlmixr
+URL: https://github.com/nlmixrdevelopment/nlmixr
 Packaged: 2016-09-27 17:32:47 UTC; Wenping.Wang
 NeedsCompilation: yes
 RoxygenNote: 5.0.1
