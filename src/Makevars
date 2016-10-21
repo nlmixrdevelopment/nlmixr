@@ -1,0 +1,14 @@
+PKG_LIBS = d/libdparse.a
+PKG_CPPFLAGS = -Id 
+
+SOURCES_C = jj.c jj.g.d_parser.c quadrule.c
+SOURCES_CPP = neldermead.cpp slice.cpp RcppExport.cpp
+OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o)
+
+all: libdparse $(SHLIB)
+$(SHLIB): $(OBJECTS)
+
+libdparse:
+	echo "make libdparse.a ..."
+	(cd d; $(MAKE) CC="$(CC)" CFLAGS="$(CFLAGS) -fPIC" libdparse.a)
+
