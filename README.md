@@ -8,7 +8,7 @@
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-For a brief instllation guide, please see: https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing%20nlmixr%20for%20Windows%20161019.docx
+For a brief installation guide, please see: https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing%20nlmixr%20for%20Windows%20161019.docx
 
 For a brief vigenette, please see: 
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
