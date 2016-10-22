@@ -2,7 +2,7 @@
 % Please edit documentation in R/gnlmm.R
 \name{calcCov}
 \alias{calcCov}
-\title{calculate variance-covariance matrix}
+\title{Calculate gnlmm variance-covariance matrix of fixed effects}
 \usage{
 calcCov(fit, method = 1, trace = FALSE)
 }
@@ -17,7 +17,7 @@ calcCov(fit, method = 1, trace = FALSE)
 variance-covariance matrix of model parameters
 }
 \description{
-calculate variance-covariance matrix after a gnlmm() fit
+Calculate variance-covariance matrix of fixed effects after a gnlmm() fit
 }
 \examples{
 \dontrun{
