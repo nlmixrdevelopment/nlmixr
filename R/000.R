@@ -1,6 +1,6 @@
-#' GOF plots
+#' GOF plots for nlme-based mixed-effect models
 #'
-#' Do goodness-of-fit plots
+#' Generates basic goodness-of-fit plots for nlme-based mixed-effect models
 #' 
 #' @param fit nlme fit object
 #' @param ... optional additional arguments

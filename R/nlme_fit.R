@@ -64,32 +64,32 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 "
 
 
-#' fit linear compartment model
+#' Fit nlme-based linear compartment mixed-effect model using closed form solution
 #'
-#' `nlme_lin_cmpt` fits a linear one to three compartment model with
+#' 'nlme_lin_cmpt' fits a linear one to three compartment model with
 #' either first order absorption, or i.v. bolus, or i.v. infusion.  A
-#' user speficies the number of compartments, route of drug
+#' user specifies the number of compartments, route of drug
 #' administrations, and the model parameterization. `nlmixr` supports
-#' the clearance/valume parameterization and the micro constant
-#' parameterization, with the former as the default.  Speficication of
+#' the clearance/volume parameterization and the micro constant
+#' parameterization, with the former as the default.  Specification of
 #' fixed effects, random effects and intial values follows the standard
 #' nlme notations.
 #' 
 #' @param dat data to be fitted
-#' @param par_model list: model for fixed effects, randoms effects and initial values.
+#' @param par_model list: model for fixed effects, randoms effects and initial values using nlme-type syntax.
 #' @param ncmt numerical: number of compartments: 1-3
 #' @param oral logical
 #' @param infusion logical
 #' @param tlag logical
-#' @param parameterization numerical: parameterization type 1-2
+#' @param parameterization numerical: type of parameterization, 1=clearance/volume, 2=micro-constants
 #' @param par_trans function: calculation of PK parameters
-#' @param mc.cores number of cores used in fitting
+#' @param mc.cores number of cores used in fitting (only for Linux)
 #' @param ... additional nlme options
 #' @return NULL
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
-#' library(nlme)
+#' library(nlmixr)
 #' 
 #' dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
 #' specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
@@ -220,9 +220,12 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 }
 "
 
-#' fit a population dynamic model
+#' Fit nlme-based mixed-effect model using ODE implementation
 #'
-#' fit a population dynamic model
+#' 'nlme_ode' fits a mixed-effect model described using ordinary differential
+#' equation (ODEs). The ODE-definition follows RxODE syntax.
+#' Specification of fixed effects, random effects and intial values follows 
+#' the standard nlme notations.
 #' 
 #' @param dat.o data to be fitted
 #' @param model a string containing the set of ordinary differential equations (ODE) and other expressions defining the changes in the dynamic  system. For details, see the sections \dQuote{Details} and  \dQuote{\code{RxODE Syntax}} below.
@@ -231,10 +234,10 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #' @param response names of the response variable
 #' @param response.scaler optional response variable scaler. default is NULL
 #' @param transit_abs a logical if transit absorption model is enabled
-#' @param atol atol
-#' @param rtol rtol 
+#' @param atol atol (absolute tolerance for ODE-solver)
+#' @param rtol rtol (relative tolerance for ODE-solver) 
 #' @param debugODE a logical if debugging is enabled 
-#' @param mc.cores numer of cores used in fitting
+#' @param mc.cores number of cores used in fitting (only for Linux)
 #' @param ... additional nlme options
 #' @return NULL
 #' @details
@@ -255,11 +258,11 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #'    end-of-line marker).  \strong{NB:} Comments are not allowed 
 #'    inside statements.
 #' 
-#'    A block of statements is a set of statements delimeted by
+#'    A block of statements is a set of statements delimited by
 #'    curly braces, \sQuote{\code{\{ ... \}}}.
 #'    Statements can be either assignments or conditional \code{if}
 #'    statements. Assignment statements can be either \dQuote{simple}
-#'    assignmets, where the left hand is an identifier (i.e., variable), or 
+#'    assignments, where the left hand is an identifier (i.e., variable), or 
 #'    special \dQuote{time-derivative} assignments, where the left hand
 #'    specifies the change of that variable with respect to time  
 #'    e.g., \code{d/dt(depot)}.
@@ -271,13 +274,13 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #'    \sQuote{\code{/}}, \sQuote{\code{^}}),   and
 #'    those mathematical functions defined in the C or the
 #'    R math libraries (e.g., \code{fabs}, \code{exp}, \code{log}, \code{sin}).
-#'    (Notice that the modulo operator \sQuote{\code{\%}} is currently
+#'    (Note that the modulo operator \sQuote{\code{\%}} is currently
 #'    not supported.)
 #' 
 #'    Identifiers in an \code{RxODE} model specification can refer to:
 #'    \itemize{
 #'       \item state variables in the dynamic system (e.g., compartments in a
-#'       pharmacokinetics/pharamcodynamics model);
+#'       pharmacokinetic/pharmacodynamic model);
 #'       \item implied input variable, \code{t} (time), 
 #'       \code{podo} (oral dose, for absorption models), and
 #'       \code{tlast} (last time point);
@@ -287,7 +290,7 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #'       specification.
 #'    }
 #' 
-#'    Identifiers consists of case-sensitive alphanumeric characters, 
+#'    Identifiers consist of case-sensitive alphanumeric characters, 
 #'    plus the underscore \sQuote{_} character.  \strong{NB:} the
 #'    dot \sQuote{.} character is \strong{not} a valid character
 #'    identifier.
@@ -296,14 +299,14 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #'    saved as part of the fitted/integrated/solved model (see
 #'    \code{\link{eventTable}}, in particular its member function 
 #'    \code{add.sampling} that defines a set of time points at which
-#'    to capture a snapshot of the syste via the values of these variables).
+#'    to capture a snapshot of the system via the values of these variables).
 #' 
 #'    The ODE specification mini-language is parsed with the help of
 #'    the open source tool \emph{DParser}, Plevyak (2015).
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
-#' library(nlme)
+#' library(nlmixr)
 #' ode <- "
 #' d/dt(depot) =-KA*depot;
 #' d/dt(centr) = KA*depot - KE*centr;

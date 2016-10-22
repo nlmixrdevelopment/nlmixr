@@ -44,9 +44,9 @@ sim.one = function(zz, x) {
 }
 
 
-#' Visual predictive check (VPC).
+#' Visual predictive check (VPC)
 #'
-#' Do visual predictive check (VPC) plots
+#' Do visual predictive check (VPC) plots for nlme-base non-linear mixed effect models
 #' 
 #' @param fit nlme fit object
 #' @param nsim number of simulations
@@ -95,12 +95,12 @@ multi2 <- function (mu, vmat, n)
 }
 
 
-#' bootstrap data
+#' Bootstrap data
 #'
-#' bootstrap data by re-sampling
+#' Bootstrap data by sampling the same number of subjects from the original dataset by sampling with replacement.
 #' 
 #' @param dat model data to be bootstrapped
-#' @return bootstrapped data
+#' @return Bootstrapped data
 #' @examples
 #' \dontrun{
 #' 
@@ -139,9 +139,9 @@ bootdata = function(dat)
 }
 
 
-#' forward covariate selection
+#' Forward covariate selection for nlme-base non-linear mixed effect models
 #'
-#' forward covariate selection
+#' Implements forward covariate selection for nlme-based non-linear mixed effect models
 #' 
 #' @param base base model
 #' @param cv a list of candidate covariate to model parameters

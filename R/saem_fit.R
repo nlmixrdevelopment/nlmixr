@@ -307,27 +307,32 @@ END_RCPP
 }
 '
 
-#' generate a saem model
+#' Generate an SAEM model
 #'
-#' generate a saem model
+#' Generate an SAEM model using either closed-form solutions or ODE-based model definitions
 #' 
-#' @param model aa compiled saem model by gen_saem_user_fn()
+#' @param model a compiled SAEM model by gen_saem_user_fn()
 #' @param PKpars PKpars function
 #' @param pred  pred function
 #' @details
-#'    fit a generalized nonlinear mixed-effect model by he Stochastic 
+#'    Fit a generalized nonlinear mixed-effect model using the Stochastic 
 #'    Approximation Expectation-Maximization (SAEM) algorithm
 #' 
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
-#' #ode <- "d/dt(depot) =-KA*depot; d/dt(centr) = KA*depot - KE*centr;"; m1 = RxODE(ode, modName="m1")
-#' #ode <- "C2 = centr/V; d/dt(depot) =-KA*depot; d/dt(centr) = KA*depot - KE*centr;"; m2 = RxODE(ode, modName="m2")
+#' #ode <- "d/dt(depot) =-KA*depot; 
+#' #        d/dt(centr) = KA*depot - KE*centr;" 
+#' #m1 = RxODE(ode, modName="m1")
+#' #ode <- "C2 = centr/V; 
+#' #      d/dt(depot) =-KA*depot; 
+#' #      d/dt(centr) = KA*depot - KE*centr;" 
+#' #m2 = RxODE(ode, modName="m2")
 #' 
 #' PKpars = function()
 #' {
 #'   CL = exp(lCL)
-#'   V = exp(lV)
+#'   V  = exp(lV)
 #'   KA = exp(lKA)
 #'   KE = CL / V
 #'   #initCondition = c(0, KE - CL/V)
@@ -457,15 +462,15 @@ parfn.list = c(
 	par.3cmt.micro.oral.tlag
 )
 
-#' Parameters for a linear compartment model
+#' Parameters for a linear compartment model for SAEM
 #'
-#' Parameters for a linear compartment model by close-form solutions
+#' Parameters for a linear compartment model using closed-form solutions and the SAEM algorithm.
 #' 
 #' @param ncmt number of compartments
 #' @param oral logical, whether oral absorption is true
 #' @param tlag logical, whether lag time is present
 #' @param infusion logical, whether infusion is true
-#' @param parameterization type of parameterization, 1=clearance/volumn, 2=micro-constants
+#' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
 #' @return parameters for a linear compartment model
 lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #ncmt=1; oral=T; tlag=F; parameterization=1
@@ -499,9 +504,9 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 }
 
 
-#' plot a saem fit
+#' Plot an SAEM model fit
 #'
-#' plot a saem fit
+#' Plot an SAEM model fit
 #' 
 #' @param x a saemFit object
 #' @param ... others
@@ -530,30 +535,39 @@ plot.saemFit = function(x, ...)
 }
 
 
-#' configure a saem model
+#' Configure an SAEM model
 #'
-#' configure a saem model by generating an input list to saem model function
+#' Configure an SAEM model by generating an input list to the SAEM model function
 #' 
-#' @param model aa compiled saem model by gen_saem_user_fn()
+#' @param model a compiled saem model by gen_saem_user_fn()
 #' @param data input data 
 #' @param inits initial values 
 #' @param mcmc a list of various mcmc options
 #' @param ODEopt optional ODE solving options
 #' @param seed seed for random number generator
 #' @details
-#'    fit a generalized nonlinear mixed-effect model by he Stochastic 
+#'    Fit a generalized nonlinear mixed-effect model by he Stochastic 
 #'    Approximation Expectation-Maximization (SAEM) algorithm
 #' 
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
-#' #ode <- "d/dt(depot) =-KA*depot; d/dt(centr) = KA*depot - KE*centr;"; m1 = RxODE(ode, modName="m1")
-#' #ode <- "C2 = centr/V; d/dt(depot) =-KA*depot; d/dt(centr) = KA*depot - KE*centr;"; m2 = RxODE(ode, modName="m2")
+#' library(nlmixr)
+#' 
+#' #ode <- "d/dt(depot) =-KA*depot; 
+#' #        d/dt(centr) = KA*depot - KE*centr;" 
+#' #m1 = RxODE(ode, modName="m1")
+#' #ode <- "C2 = centr/V; 
+#' #      d/dt(depot) =-KA*depot; 
+#' #      d/dt(centr) = KA*depot - KE*centr;" 
+#' #m2 = RxODE(ode, modName="m2")
+#' 
+#' #Note: only use the '=' assignment, not the '<-' at this point
 #' 
 #' PKpars = function()
 #' {
 #'   CL = exp(lCL)
-#'   V = exp(lV)
+#'   V  = exp(lV)
 #'   KA = exp(lKA)
 #'   KE = CL / V
 #'   #initCondition = c(0, KE - CL/V)
@@ -888,9 +902,9 @@ getInits = function(x, re, collapse=TRUE) {
 	else s
 }
 
-#' print a saem fit
+#' Print an SAEM model fit summary
 #'
-#' print a saem fit
+#' Print an SAEM model fit summary
 #' 
 #' @param object a saemFit object
 #' @param ... others
@@ -923,9 +937,9 @@ summary.saemFit = function(object, ...)
 	invisible(list(theta=th, se=se, H=H, omega=fit$Gamma2_phi1, eta=fit$mpost_phi))
 }
 
-#' print a saem fit
+#' Print an SAEM model fit summary
 #'
-#' print a saem fit
+#' Print an SAEM model fit summary
 #' 
 #' @param x a saemFit object
 #' @param ... others

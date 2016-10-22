@@ -63,18 +63,18 @@ gof = function(x, ...)
 }
 
 
-#' plot of a dynamodel fit
+#' Plot of a non-population dynamic model fit
 #'
-#' plot of a dynamodel fit
+#' Plot of a non-population dynamic model fit
 #' 
 #' @param x a dynamodel fit object
 #' @param ... additional arguments
 #' @return NULL
 plot.dyn.ID = gof
 
-#' print a dynmodel fit object
+#' Print a non-population dynamic model fit object
 #'
-#' print of a dynmodel fit object
+#' Print a non-population dynamic model fit object
 #' 
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
@@ -89,9 +89,9 @@ print.dyn.ID = function(x, ...)
 	cat("\n")
 }
 
-#' summary of a dynmodel fit
+#' Summary of a non-population dynamic model fit
 #'
-#' summary of a dynmodel fit
+#' Summary of a non-population dynamic model fit
 #' 
 #' @param object a dynmodel fit object
 #' @param ... additional arguments
@@ -160,17 +160,17 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 }
 
 
-#' fit non-population dynamic model
+#' Fit a non-population dynamic model
 #'
-#' fit non-population dynamic model
+#' Fit a non-population dynamic model
 #' 
 #' @param system an RxODE object
 #' @param model a list of statistical meaurement models
 #' @param evTable an Event Table object
 #' @param inits initial values of system parameters
 #' @param data input data
-#' @param fixPars fixed system paraameters
-#' @param method estimation method. choice of Nelder-Mead, L-BFGS-B, and PORT.
+#' @param fixPars fixed system parameters
+#' @param method estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.
 #' @param control optional minimization control parameters
 #' @param squared if parameters be squared during estimation
 #' @return NULL
@@ -472,9 +472,9 @@ do.slice = function(pars, fr0)
 }
 
 
-#' fit non-population dynamic model
+#' Fit a non-population dynamic model using mcmc
 #'
-#' fit non-population dynamic model by mcmc
+#' Fit a non-population dynamic model using mcmc
 #' 
 #' @param system an RxODE object
 #' @param model a list of statistical meaurement models
@@ -542,9 +542,9 @@ dynmodel.mcmc = function(system, model, evTable, inits, data,
 	s
 }
 
-#' summary of a dynmodel fit
+#' Summary of a non-population dynamic model fit using mcmc
 #'
-#' summary of a dynmodel fit
+#' Summary of a non-population dynamic model fit using mcmc
 #' 
 #' @param object a dynmodel fit object
 #' @param ... additional arguments
@@ -557,9 +557,9 @@ summary.dyn.mcmc = function(object, ...)
 	cat("\n# samples:", dim(object)[1], "\n")
 }
 
-#' summary of a dynmodel fit
+#' Summary of a non-population dynamic model fit using mcmc
 #'
-#' summary of a dynmodel fit
+#' Summary of a non-population dynamic model fit using mcmc
 #' 
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
@@ -572,9 +572,9 @@ print.dyn.mcmc = function(x, ...)
 	cat("\n# samples:", dim(x)[1], "\n")
 }
 
-#' plot a dynmodel fit
+#' Plot of a non-population dynamic model fit using mcmc
 #'
-#' plot a dynmodel fit
+#' Plot of a non-population dynamic model fit using mcmc
 #' 
 #' @param x a dynmodel fit object
 #' @param ... additional arguments

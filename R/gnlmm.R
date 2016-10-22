@@ -76,9 +76,9 @@ genOMinv.5 = function(s)
 }
 
 
-#' print a gnlmm fit
+#' Print a gnlmm fit
 #'
-#' print a gnlmm fit
+#' Print a generalized non-linear mixed effect model fit
 #' 
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
@@ -108,14 +108,14 @@ multi2 = function (mu, vmat, n)
     sweep(para, 1, mu, "+")
 }
 
-#' prediction after a gnlmm fit
+#' Prediction after a gnlmm fit
 #'
-#' prediction after a gnlmm fit
+#' Generate predictions after a generalized non-linear mixed effect model fit
 #' 
 #' @param fit a dynmodel fit object
 #' @param pred prediction function
 #' @param data new data
-#' @param mc.cores number of cores
+#' @param mc.cores number of cores (for Linux only)
 #' @return observed and predicted 
 #' @examples
 #' \dontrun{
@@ -242,9 +242,9 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 }
 
 
-#' fit a generalized nonlinear mixed-effect model
+#' Fit a generalized nonlinear mixed-effect model
 #'
-#' fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
+#' Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
 #' 
 #' @param llik log-likelihood function
 #' @param data data to be fitted
@@ -256,7 +256,7 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #' @param control additional optimization options
 #' @return NULL
 #' @details
-#'    fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
+#'    Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AGQ)
 #' 
 #' @author Wenping Wang
 #' @examples
@@ -619,9 +619,9 @@ linesearch_secant = function(f,d,x,maxIter=5,trace=F) {
 	alpha
 }
 
-#' calculate variance-covariance matrix 
+#' Calculate gnlmm variance-covariance matrix of fixed effects
 #'
-#' calculate variance-covariance matrix after a gnlmm() fit
+#' Calculate variance-covariance matrix of fixed effects after a gnlmm() fit
 #' 
 #' @param fit a gnlmm fit object
 #' @param method method for calculating variance-covariance matrix
@@ -708,9 +708,9 @@ calcCov = function(fit, method=1, trace=FALSE) {
 }
 
 
-#' calculate variance-covariance matrix of random effects
+#' Calculate gnlmm variance-covariance matrix of random effects
 #'
-#' calculate variance-covariance matrix of random effects after a gnlmm() fit
+#' Calculate variance-covariance matrix of random effects after a gnlmm() fit
 #' 
 #' @param fit a gnlmm fit object
 #' @return variance-covariance matrix of random effects

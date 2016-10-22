@@ -18,9 +18,9 @@
 ## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
 
 
-#' nodes and weigts of Gauss-Hermite quadrature
+#' Sets nodes and weigts of Gauss-Hermite quadrature
 #'
-#' nodes and weigts of Gauss-Hermite quadrature
+#' Sets nodes and weigts of Gauss-Hermite quadrature
 #' 
 #' @param n numbr of nodes
 #' @return a list of nodes and weigts of Gauss-Hermite quadrature
