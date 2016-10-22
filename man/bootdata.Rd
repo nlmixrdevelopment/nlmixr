@@ -2,7 +2,7 @@
 % Please edit documentation in R/vpc.R
 \name{bootdata}
 \alias{bootdata}
-\title{bootstrap data}
+\title{Bootstrap data}
 \usage{
 bootdata(dat)
 }
@@ -10,10 +10,10 @@ bootdata(dat)
 \item{dat}{model data to be bootstrapped}
 }
 \value{
-bootstrapped data
+Bootstrapped data
 }
 \description{
-bootstrap data by re-sampling
+Bootstrap data by sampling the same number of subjects from the original dataset by sampling with replacement.
 }
 \examples{
 \dontrun{

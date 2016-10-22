@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{summary.dyn.mcmc}
 \alias{summary.dyn.mcmc}
-\title{summary of a dynmodel fit}
+\title{Summary of a non-population dynamic model fit using mcmc}
 \usage{
 \method{summary}{dyn.mcmc}(object, ...)
 }
@@ -12,6 +12,6 @@
 \item{...}{additional arguments}
 }
 \description{
-summary of a dynmodel fit
+Summary of a non-population dynamic model fit using mcmc
 }
 

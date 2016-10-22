@@ -2,7 +2,7 @@
 % Please edit documentation in R/saem_fit.R
 \name{lincmt}
 \alias{lincmt}
-\title{Parameters for a linear compartment model}
+\title{Parameters for a linear compartment model for SAEM}
 \usage{
 lincmt(ncmt, oral = T, tlag = F, infusion = F, parameterization = 1)
 }
@@ -15,12 +15,12 @@ lincmt(ncmt, oral = T, tlag = F, infusion = F, parameterization = 1)
 
 \item{infusion}{logical, whether infusion is true}
 
-\item{parameterization}{type of parameterization, 1=clearance/volumn, 2=micro-constants}
+\item{parameterization}{type of parameterization, 1=clearance/volume, 2=micro-constants}
 }
 \value{
 parameters for a linear compartment model
 }
 \description{
-Parameters for a linear compartment model by close-form solutions
+Parameters for a linear compartment model using closed-form solutions and the SAEM algorithm.
 }
 

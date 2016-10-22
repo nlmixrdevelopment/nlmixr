@@ -2,7 +2,7 @@
 % Please edit documentation in R/saem_fit.R
 \name{plot.saemFit}
 \alias{plot.saemFit}
-\title{plot a saem fit}
+\title{Plot an SAEM model fit}
 \usage{
 \method{plot}{saemFit}(x, ...)
 }
@@ -15,6 +15,6 @@
 a list
 }
 \description{
-plot a saem fit
+Plot an SAEM model fit
 }
 

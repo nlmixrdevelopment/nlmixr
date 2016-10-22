@@ -2,33 +2,38 @@
 % Please edit documentation in R/saem_fit.R
 \name{gen_saem_user_fn}
 \alias{gen_saem_user_fn}
-\title{generate a saem model}
+\title{Generate an SAEM model}
 \usage{
 gen_saem_user_fn(model, PKpars = attr(model, "default.pars"), pred = NULL)
 }
 \arguments{
-\item{model}{aa compiled saem model by gen_saem_user_fn()}
+\item{model}{a compiled SAEM model by gen_saem_user_fn()}
 
 \item{PKpars}{PKpars function}
 
 \item{pred}{pred function}
 }
 \description{
-generate a saem model
+Generate an SAEM model using either closed-form solutions or ODE-based model definitions
 }
 \details{
-fit a generalized nonlinear mixed-effect model by he Stochastic 
+Fit a generalized nonlinear mixed-effect model using the Stochastic 
    Approximation Expectation-Maximization (SAEM) algorithm
 }
 \examples{
 \dontrun{
-#ode <- "d/dt(depot) =-KA*depot; d/dt(centr) = KA*depot - KE*centr;"; m1 = RxODE(ode, modName="m1")
-#ode <- "C2 = centr/V; d/dt(depot) =-KA*depot; d/dt(centr) = KA*depot - KE*centr;"; m2 = RxODE(ode, modName="m2")
+#ode <- "d/dt(depot) =-KA*depot; 
+#        d/dt(centr) = KA*depot - KE*centr;" 
+#m1 = RxODE(ode, modName="m1")
+#ode <- "C2 = centr/V; 
+#      d/dt(depot) =-KA*depot; 
+#      d/dt(centr) = KA*depot - KE*centr;" 
+#m2 = RxODE(ode, modName="m2")
 
 PKpars = function()
 {
   CL = exp(lCL)
-  V = exp(lV)
+  V  = exp(lV)
   KA = exp(lKA)
   KE = CL / V
   #initCondition = c(0, KE - CL/V)

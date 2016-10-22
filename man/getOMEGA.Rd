@@ -2,7 +2,7 @@
 % Please edit documentation in R/gnlmm.R
 \name{getOMEGA}
 \alias{getOMEGA}
-\title{calculate variance-covariance matrix of random effects}
+\title{Calculate gnlmm variance-covariance matrix of random effects}
 \usage{
 getOMEGA(fit)
 }
@@ -13,7 +13,7 @@ getOMEGA(fit)
 variance-covariance matrix of random effects
 }
 \description{
-calculate variance-covariance matrix of random effects after a gnlmm() fit
+Calculate variance-covariance matrix of random effects after a gnlmm() fit
 }
 \examples{
 \dontrun{

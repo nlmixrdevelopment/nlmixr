@@ -2,7 +2,7 @@
 % Please edit documentation in R/vpc.R
 \name{frwd_selection}
 \alias{frwd_selection}
-\title{forward covariate selection}
+\title{Forward covariate selection for nlme-base non-linear mixed effect models}
 \usage{
 frwd_selection(base, cv, dat, cutoff = 0.05)
 }
@@ -19,7 +19,7 @@ frwd_selection(base, cv, dat, cutoff = 0.05)
 an nlme object of the final model
 }
 \description{
-forward covariate selection
+Implements forward covariate selection for nlme-based non-linear mixed effect models
 }
 \examples{
 \dontrun{

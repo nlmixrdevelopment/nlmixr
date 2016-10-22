@@ -2,7 +2,7 @@
 % Please edit documentation in R/gauss.quad.R
 \name{gauss.quad}
 \alias{gauss.quad}
-\title{nodes and weigts of Gauss-Hermite quadrature}
+\title{Sets nodes and weigts of Gauss-Hermite quadrature}
 \usage{
 gauss.quad(n)
 }
@@ -13,7 +13,7 @@ gauss.quad(n)
 a list of nodes and weigts of Gauss-Hermite quadrature
 }
 \description{
-nodes and weigts of Gauss-Hermite quadrature
+Sets nodes and weigts of Gauss-Hermite quadrature
 }
 \examples{
 \dontrun{

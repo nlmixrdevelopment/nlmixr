@@ -2,7 +2,7 @@
 % Please edit documentation in R/vpc.R
 \name{vpc}
 \alias{vpc}
-\title{Visual predictive check (VPC).}
+\title{Visual predictive check (VPC)}
 \usage{
 vpc(fit, nsim = 100, condition = NULL)
 }
@@ -14,7 +14,7 @@ vpc(fit, nsim = 100, condition = NULL)
 \item{condition}{conditional variable}
 }
 \description{
-Do visual predictive check (VPC) plots
+Do visual predictive check (VPC) plots for nlme-base non-linear mixed effect models
 }
 \examples{
 \dontrun{

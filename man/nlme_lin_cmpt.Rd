@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlme_fit.R
 \name{nlme_lin_cmpt}
 \alias{nlme_lin_cmpt}
-\title{fit linear compartment model}
+\title{Fit nlme-based linear compartment mixed-effect model using closed form solution}
 \usage{
 nlme_lin_cmpt(dat, par_model, ncmt, oral = TRUE, infusion = FALSE,
   tlag = FALSE, parameterization = 1, par_trans = get.parfn(oral, ncmt,
@@ -11,7 +11,7 @@ nlme_lin_cmpt(dat, par_model, ncmt, oral = TRUE, infusion = FALSE,
 \arguments{
 \item{dat}{data to be fitted}
 
-\item{par_model}{list: model for fixed effects, randoms effects and initial values.}
+\item{par_model}{list: model for fixed effects, randoms effects and initial values using nlme-type syntax.}
 
 \item{ncmt}{numerical: number of compartments: 1-3}
 
@@ -21,27 +21,27 @@ nlme_lin_cmpt(dat, par_model, ncmt, oral = TRUE, infusion = FALSE,
 
 \item{tlag}{logical}
 
-\item{parameterization}{numerical: parameterization type 1-2}
+\item{parameterization}{numerical: type of parameterization, 1=clearance/volume, 2=micro-constants}
 
 \item{par_trans}{function: calculation of PK parameters}
 
-\item{mc.cores}{number of cores used in fitting}
+\item{mc.cores}{number of cores used in fitting (only for Linux)}
 
 \item{...}{additional nlme options}
 }
 \description{
-`nlme_lin_cmpt` fits a linear one to three compartment model with
+'nlme_lin_cmpt' fits a linear one to three compartment model with
 either first order absorption, or i.v. bolus, or i.v. infusion.  A
-user speficies the number of compartments, route of drug
+user specifies the number of compartments, route of drug
 administrations, and the model parameterization. `nlmixr` supports
-the clearance/valume parameterization and the micro constant
-parameterization, with the former as the default.  Speficication of
+the clearance/volume parameterization and the micro constant
+parameterization, with the former as the default.  Specification of
 fixed effects, random effects and intial values follows the standard
 nlme notations.
 }
 \examples{
 \dontrun{
-library(nlme)
+library(nlmixr)
 
 dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
 specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))

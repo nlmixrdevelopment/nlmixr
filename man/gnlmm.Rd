@@ -2,7 +2,7 @@
 % Please edit documentation in R/gnlmm.R
 \name{gnlmm}
 \alias{gnlmm}
-\title{fit a generalized nonlinear mixed-effect model}
+\title{Fit a generalized nonlinear mixed-effect model}
 \usage{
 gnlmm(llik, data, inits, syspar = NULL, system = NULL,
   diag.xform = c("sqrt", "log", "identity"), ..., control = list())
@@ -25,10 +25,10 @@ gnlmm(llik, data, inits, syspar = NULL, system = NULL,
 \item{control}{additional optimization options}
 }
 \description{
-fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
+Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
 }
 \details{
-fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
+Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AGQ)
 }
 \examples{
 \dontrun{

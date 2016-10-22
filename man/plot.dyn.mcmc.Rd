@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{plot.dyn.mcmc}
 \alias{plot.dyn.mcmc}
-\title{plot a dynmodel fit}
+\title{Plot of a non-population dynamic model fit using mcmc}
 \usage{
 \method{plot}{dyn.mcmc}(x, ...)
 }
@@ -12,6 +12,6 @@
 \item{...}{additional arguments}
 }
 \description{
-plot a dynmodel fit
+Plot of a non-population dynamic model fit using mcmc
 }
 

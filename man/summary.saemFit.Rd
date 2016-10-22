@@ -2,7 +2,7 @@
 % Please edit documentation in R/saem_fit.R
 \name{summary.saemFit}
 \alias{summary.saemFit}
-\title{print a saem fit}
+\title{Print an SAEM model fit summary}
 \usage{
 \method{summary}{saemFit}(object, ...)
 }
@@ -15,6 +15,6 @@
 a list
 }
 \description{
-print a saem fit
+Print an SAEM model fit summary
 }
 

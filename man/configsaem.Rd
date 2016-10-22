@@ -2,14 +2,14 @@
 % Please edit documentation in R/saem_fit.R
 \name{configsaem}
 \alias{configsaem}
-\title{configure a saem model}
+\title{Configure an SAEM model}
 \usage{
 configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
   c(2, 2, 2)), ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1,
   transit_abs = 0), seed = 99)
 }
 \arguments{
-\item{model}{aa compiled saem model by gen_saem_user_fn()}
+\item{model}{a compiled saem model by gen_saem_user_fn()}
 
 \item{data}{input data}
 
@@ -22,21 +22,30 @@ configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
 \item{seed}{seed for random number generator}
 }
 \description{
-configure a saem model by generating an input list to saem model function
+Configure an SAEM model by generating an input list to the SAEM model function
 }
 \details{
-fit a generalized nonlinear mixed-effect model by he Stochastic 
+Fit a generalized nonlinear mixed-effect model by he Stochastic 
    Approximation Expectation-Maximization (SAEM) algorithm
 }
 \examples{
 \dontrun{
-#ode <- "d/dt(depot) =-KA*depot; d/dt(centr) = KA*depot - KE*centr;"; m1 = RxODE(ode, modName="m1")
-#ode <- "C2 = centr/V; d/dt(depot) =-KA*depot; d/dt(centr) = KA*depot - KE*centr;"; m2 = RxODE(ode, modName="m2")
+library(nlmixr)
+
+#ode <- "d/dt(depot) =-KA*depot; 
+#        d/dt(centr) = KA*depot - KE*centr;" 
+#m1 = RxODE(ode, modName="m1")
+#ode <- "C2 = centr/V; 
+#      d/dt(depot) =-KA*depot; 
+#      d/dt(centr) = KA*depot - KE*centr;" 
+#m2 = RxODE(ode, modName="m2")
+
+#Note: only use the '=' assignment, not the '<-' at this point
 
 PKpars = function()
 {
   CL = exp(lCL)
-  V = exp(lV)
+  V  = exp(lV)
   KA = exp(lKA)
   KE = CL / V
   #initCondition = c(0, KE - CL/V)

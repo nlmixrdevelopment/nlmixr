@@ -2,7 +2,7 @@
 % Please edit documentation in R/gnlmm.R
 \name{print.gnlmm.fit}
 \alias{print.gnlmm.fit}
-\title{print a gnlmm fit}
+\title{Print a gnlmm fit}
 \usage{
 \method{print}{gnlmm.fit}(x, ...)
 }
@@ -12,6 +12,6 @@
 \item{...}{additional arguments}
 }
 \description{
-print a gnlmm fit
+Print a generalized non-linear mixed effect model fit
 }
 

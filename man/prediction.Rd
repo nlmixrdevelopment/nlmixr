@@ -2,7 +2,7 @@
 % Please edit documentation in R/gnlmm.R
 \name{prediction}
 \alias{prediction}
-\title{prediction after a gnlmm fit}
+\title{Prediction after a gnlmm fit}
 \usage{
 prediction(fit, pred, data = NULL, mc.cores = 1)
 }
@@ -13,13 +13,13 @@ prediction(fit, pred, data = NULL, mc.cores = 1)
 
 \item{data}{new data}
 
-\item{mc.cores}{number of cores}
+\item{mc.cores}{number of cores (for Linux only)}
 }
 \value{
 observed and predicted
 }
 \description{
-prediction after a gnlmm fit
+Generate predictions after a generalized non-linear mixed effect model fit
 }
 \examples{
 \dontrun{

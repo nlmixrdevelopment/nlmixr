@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{plot.dyn.ID}
 \alias{plot.dyn.ID}
-\title{plot of a dynamodel fit}
+\title{Plot of a non-population dynamic model fit}
 \usage{
 \method{plot}{dyn.ID}(x, ...)
 }
@@ -12,6 +12,6 @@
 \item{...}{additional arguments}
 }
 \description{
-plot of a dynamodel fit
+Plot of a non-population dynamic model fit
 }
 

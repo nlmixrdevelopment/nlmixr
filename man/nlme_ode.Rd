@@ -2,7 +2,7 @@
 % Please edit documentation in R/nlme_fit.R
 \name{nlme_ode}
 \alias{nlme_ode}
-\title{fit a population dynamic model}
+\title{Fit nlme-based mixed-effect model using ODE implementation}
 \usage{
 nlme_ode(dat.o, model, par_model, par_trans, response, response.scaler = NULL,
   transit_abs = FALSE, atol = 1e-08, rtol = 1e-08, debugODE = FALSE,
@@ -23,18 +23,21 @@ nlme_ode(dat.o, model, par_model, par_trans, response, response.scaler = NULL,
 
 \item{transit_abs}{a logical if transit absorption model is enabled}
 
-\item{atol}{atol}
+\item{atol}{atol (absolute tolerance for ODE-solver)}
 
-\item{rtol}{rtol}
+\item{rtol}{rtol (relative tolerance for ODE-solver)}
 
 \item{debugODE}{a logical if debugging is enabled}
 
-\item{mc.cores}{numer of cores used in fitting}
+\item{mc.cores}{number of cores used in fitting (only for Linux)}
 
 \item{...}{additional nlme options}
 }
 \description{
-fit a population dynamic model
+'nlme_ode' fits a mixed-effect model described using ordinary differential
+equation (ODEs). The ODE-definition follows RxODE syntax.
+Specification of fixed effects, random effects and intial values follows 
+the standard nlme notations.
 }
 \details{
 The ODE-based model specification may be coded inside a character
@@ -55,11 +58,11 @@ The ODE-based model specification may be coded inside a character
    end-of-line marker).  \strong{NB:} Comments are not allowed 
    inside statements.
 
-   A block of statements is a set of statements delimeted by
+   A block of statements is a set of statements delimited by
    curly braces, \sQuote{\code{\{ ... \}}}.
    Statements can be either assignments or conditional \code{if}
    statements. Assignment statements can be either \dQuote{simple}
-   assignmets, where the left hand is an identifier (i.e., variable), or 
+   assignments, where the left hand is an identifier (i.e., variable), or 
    special \dQuote{time-derivative} assignments, where the left hand
    specifies the change of that variable with respect to time  
    e.g., \code{d/dt(depot)}.
@@ -71,13 +74,13 @@ The ODE-based model specification may be coded inside a character
    \sQuote{\code{/}}, \sQuote{\code{^}}),   and
    those mathematical functions defined in the C or the
    R math libraries (e.g., \code{fabs}, \code{exp}, \code{log}, \code{sin}).
-   (Notice that the modulo operator \sQuote{\code{\%}} is currently
+   (Note that the modulo operator \sQuote{\code{\%}} is currently
    not supported.)
 
    Identifiers in an \code{RxODE} model specification can refer to:
    \itemize{
       \item state variables in the dynamic system (e.g., compartments in a
-      pharmacokinetics/pharamcodynamics model);
+      pharmacokinetic/pharmacodynamic model);
       \item implied input variable, \code{t} (time), 
       \code{podo} (oral dose, for absorption models), and
       \code{tlast} (last time point);
@@ -87,7 +90,7 @@ The ODE-based model specification may be coded inside a character
       specification.
    }
 
-   Identifiers consists of case-sensitive alphanumeric characters, 
+   Identifiers consist of case-sensitive alphanumeric characters, 
    plus the underscore \sQuote{_} character.  \strong{NB:} the
    dot \sQuote{.} character is \strong{not} a valid character
    identifier.
@@ -96,14 +99,14 @@ The ODE-based model specification may be coded inside a character
    saved as part of the fitted/integrated/solved model (see
    \code{\link{eventTable}}, in particular its member function 
    \code{add.sampling} that defines a set of time points at which
-   to capture a snapshot of the syste via the values of these variables).
+   to capture a snapshot of the system via the values of these variables).
 
    The ODE specification mini-language is parsed with the help of
    the open source tool \emph{DParser}, Plevyak (2015).
 }
 \examples{
 \dontrun{
-library(nlme)
+library(nlmixr)
 ode <- "
 d/dt(depot) =-KA*depot;
 d/dt(centr) = KA*depot - KE*centr;

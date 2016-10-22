@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{dynmodel.mcmc}
 \alias{dynmodel.mcmc}
-\title{fit non-population dynamic model}
+\title{Fit a non-population dynamic model using mcmc}
 \usage{
 dynmodel.mcmc(system, model, evTable, inits, data, fixPars = NULL,
   nsim = 500, squared = T, seed = NULL)
@@ -27,7 +27,7 @@ dynmodel.mcmc(system, model, evTable, inits, data, fixPars = NULL,
 \item{seed}{random number seed}
 }
 \description{
-fit non-population dynamic model by mcmc
+Fit a non-population dynamic model using mcmc
 }
 \examples{
 \dontrun{

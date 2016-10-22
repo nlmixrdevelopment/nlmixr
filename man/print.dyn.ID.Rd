@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{print.dyn.ID}
 \alias{print.dyn.ID}
-\title{print a dynmodel fit object}
+\title{Print a non-population dynamic model fit object}
 \usage{
 \method{print}{dyn.ID}(x, ...)
 }
@@ -12,6 +12,6 @@
 \item{...}{additional arguments}
 }
 \description{
-print of a dynmodel fit object
+Print a non-population dynamic model fit object
 }
 

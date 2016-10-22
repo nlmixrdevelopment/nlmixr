@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{dynmodel}
 \alias{dynmodel}
-\title{fit non-population dynamic model}
+\title{Fit a non-population dynamic model}
 \usage{
 dynmodel(system, model, evTable, inits, data, fixPars = NULL,
   method = c("Nelder-Mead", "L-BFGS-B", "PORT"), control = list(ftol_rel =
@@ -19,16 +19,16 @@ dynmodel(system, model, evTable, inits, data, fixPars = NULL,
 
 \item{data}{input data}
 
-\item{fixPars}{fixed system paraameters}
+\item{fixPars}{fixed system parameters}
 
-\item{method}{estimation method. choice of Nelder-Mead, L-BFGS-B, and PORT.}
+\item{method}{estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.}
 
 \item{control}{optional minimization control parameters}
 
 \item{squared}{if parameters be squared during estimation}
 }
 \description{
-fit non-population dynamic model
+Fit a non-population dynamic model
 }
 \examples{
 \dontrun{

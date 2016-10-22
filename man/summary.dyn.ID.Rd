@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{summary.dyn.ID}
 \alias{summary.dyn.ID}
-\title{summary of a dynmodel fit}
+\title{Summary of a non-population dynamic model fit}
 \usage{
 \method{summary}{dyn.ID}(object, ...)
 }
@@ -12,6 +12,6 @@
 \item{...}{additional arguments}
 }
 \description{
-summary of a dynmodel fit
+Summary of a non-population dynamic model fit
 }
 
