@@ -12,3 +12,5 @@ For a brief installation guide, please see: https://github.com/nlmixrdevelopment
 
 For a brief vigenette, please see:
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
+
+For PKPD modeling (with ODE and dosing hsitory) with Stan, check out Yuan's package PMXStan: https://github.com/yxiong1/pmxstan
