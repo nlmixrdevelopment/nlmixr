@@ -8,9 +8,12 @@
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-For a brief Windows installation guide, please see: https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr_for_Windows_161023.docx
+For a brief Windows/OS X installation guide, please see: https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.docx
 
 For a brief vignette, please see:
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
+
+The examples in the vignette can be run using VignetteDemo.R and the associated data files available at:
+https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes
 
 For PKPD modeling (with ODE and dosing history) with Stan, check out Yuan's package PMXStan: https://github.com/yxiong1/pmxstan
