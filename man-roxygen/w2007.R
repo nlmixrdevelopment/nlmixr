@@ -1,0 +1,21 @@
+##' @title NONMEM estimated data using <%=est.method%> for <%=est.err%>
+##' @description
+##'
+##' The simulated dataset from \code{\link{Wang2007}} where various NONMEM
+##' estimation methods (Lapclace FO, FOCE with and without
+##' interaction) are described.
+##'
+##' @format A data frame with 20 rows and 8 rows
+##'
+##' \describe{
+##'   \item{ID}{Siumlated Subject ID}
+##'   \item{TIME}{Simulated Time}
+##'   \item{ETA1}{Individual ETAs}
+##'   \item{IPRE}{Individual Predictions}
+##'   \item{DV}{Observations}
+##'   \item{PRED}{Population Predictions}
+##'   \item{RES}{Residuals}
+##'   \item{WRES}{Weighted Residuals}
+##' }
+##'
+##' @source Table 1 from Wang, Y \emph{Derivation of Various NONMEM estimation methods}. J Pharmacokinet Pharmacodyn (2007) 34:575-593.
