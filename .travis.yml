@@ -1,5 +1,29 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+language: r
+r:
+  - 3.2
+  - 3.3
+  - devel
+  
+os:
+  - linux
+  - osx
 
-language: R
-sudo: false
-cache: packages
+matrix:
+  exclude:
+  - r: 3.3
+    os: osx
+  - r: devel
+    os: osx
+  allow_failures:
+  - r: devel
+    os: linux
+
+r_github_packages:
+  - jimhester/covr
+  - mattfidler/dparser-R
+  - mattfidler/RxODE
+
+after_success:
+  - Rscript -e 'covr::codecov()'
+

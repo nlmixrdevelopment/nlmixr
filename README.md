@@ -1,3 +1,8 @@
+y[![Build Status](https://travis-ci.org/mattfidler/nlmixr.svg?branch=master)](https://travis-ci.org/mattfidler/nlmixr)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mattfidler/nlmixr?branch=master&svg=true)](https://ci.appveyor.com/project/mattfidler/nlmixr)
+[![codecov.io](https://codecov.io/github/mattfidler/nlmixr/coverage.svg?branch=master)](https://codecov.io/github/mattfidler/nlmixr?branch=master)
+[![CRAN version](http://www.r-pkg.org/badges/version/nlmixr)](https://cran.r-project.org/package=nlmixr)
+
 ![alt tag](https://github.com/nlmixrdevelopment/nlmixr/blob/master/logo.png)
 
 # nlmixr: an R package for population PKPD modeling
@@ -13,7 +18,9 @@ A few utilities to facilitate population model building are also included in `nl
 For a brief Windows/OS X installation guide, please see: https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.pdf or  https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.rtf
 
 For a brief vignette, please see:
-https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
+
+
+
 
 The examples in the vignette can be run using VignetteDemo.R and the associated data files available at:
 https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes
