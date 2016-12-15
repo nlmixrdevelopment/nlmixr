@@ -17,4 +17,3 @@ a list
 \description{
 Plot an SAEM model fit
 }
-

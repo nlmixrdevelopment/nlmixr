@@ -39,4 +39,3 @@ print(summary(fit))
 
 }
 }
-

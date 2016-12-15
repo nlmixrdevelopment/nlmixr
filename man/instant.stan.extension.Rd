@@ -14,4 +14,3 @@ instant.stan.extension(ode_str = NULL, covar = NULL)
 \description{
 instant.stan.extension
 }
-
