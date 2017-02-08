@@ -14,6 +14,8 @@ Authors@R: c(
       role = "aut", email = "rik.schoemaker@occams.eu"),
    person("Justin", "Wilkins", 
       role = "aut", email = "justin.wilkins@occams.eu"),
+   person("Matthew","Fidler",
+      role = "aut", email = "matthew.fidler@gmail.com"),      
    person("Wenping", "Wang", 
       role = c("aut", "cre"), email = "wwang8198@gmail.com")
    )
