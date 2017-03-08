@@ -8,7 +8,7 @@
 # nlmixr: an R package for population PKPD modeling
 ***
 
-#####Authors: Yuan Xiong, Rik Schoemaker, Justin Wilkins, Wenping Wang
+#####Authors: Yuan Xiong, Rik Schoemaker, Justin Wilkins, Matthew Fidler, Wenping Wang
 
 ***
 
