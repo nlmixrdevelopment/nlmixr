@@ -104,6 +104,7 @@ The ODE-based model specification may be coded inside a character
    The ODE specification mini-language is parsed with the help of
    the open source tool \emph{DParser}, Plevyak (2015).
 }
+
 \examples{
 \dontrun{
 library(nlmixr)
@@ -130,4 +131,3 @@ fit <- nlme_ode(dat, model=ode, par_model=specs, par_trans=mypar,
 \author{
 Wenping Wang
 }
-

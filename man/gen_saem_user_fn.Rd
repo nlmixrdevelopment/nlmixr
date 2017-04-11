@@ -64,4 +64,3 @@ fit
 \author{
 Wenping Wang
 }
-

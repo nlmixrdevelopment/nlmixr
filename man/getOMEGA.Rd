@@ -20,4 +20,3 @@ Calculate variance-covariance matrix of random effects after a gnlmm() fit
 getOMEGA(fit)
 }
 }
-

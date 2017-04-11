@@ -23,17 +23,18 @@
 #' concentrations from a linear compartment model
 #'
 #' concentrations from a linear compartment model by close-form solutions
-#' 
+#'
 #' @param obs_time times at which an observation is desired
 #' @param dose_time times at which doses are given
-#' @param dose a vector of doses 
-#' @param Tinf a vector of infusion duration 
+#' @param dose a vector of doses
+#' @param Tinf a vector of infusion duration
 #' @param params model-appropriate parameters per parameterization
 #' @param ncmt number of compartments
 #' @param oral logical, whether oral absorption is true
 #' @param infusion logical, whether infusion is true
 #' @param parameterization type of parameterization, 1=clearance/volumn, 2=micro-constants
 #' @return calculated concentrations
+#' @export lin_cmt
 lin_cmt <- function(obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization) {
     .Call('lin_cmt', PACKAGE = 'nlmixr', obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization)
 }

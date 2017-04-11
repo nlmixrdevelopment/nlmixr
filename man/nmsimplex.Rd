@@ -21,4 +21,3 @@ a list of ...
 \description{
 Nelder-Mead of simplex search
 }
-
