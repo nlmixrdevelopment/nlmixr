@@ -30,5 +30,5 @@ LinkingTo: Rcpp, RcppEigen, RcppArmadillo
 URL: https://github.com/nlmixrdevelopment/nlmixr
 Packaged: 2016-09-27 17:32:47 UTC; Wenping.Wang
 NeedsCompilation: yes
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 6.0.1
 LazyData: true
