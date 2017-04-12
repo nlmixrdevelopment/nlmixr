@@ -2,11 +2,12 @@ Package: nlmixr
 Type: Package
 Title: nlmixr fits population PK and PKPD non-linear mixed effects models.
 Imports: Rcpp (>= 0.11.5), brew, lattice, parallel, lbfgs
-Depends: RxODE, nlme, Rcpp, RcppEigen, RcppArmadillo, BH, brew, inline, lbfgs
+Depends: RxODE, nlme, Rcpp, RcppEigen, RcppArmadillo, BH, brew, inline, lbfgs, lbfgsb3, Deriv,
+        madness, minqa
 Suggests: knitr, rmarkdown,
     testthat
 VignetteBuilder: knitr
-Version: 0.9.0-1
+Version: 0.9.2-0
 Date: 2016-09-20
 Authors@R: c(
    person("Yuan", "Xiong", 
