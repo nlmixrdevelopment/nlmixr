@@ -13,7 +13,10 @@ importFrom("stats", "as.formula", "nlminb", "optimHess", "rnorm", "terms", predi
 importFrom("stats", "anova", "optim", "sd", "var")
 importFrom(parallel, mclapply)
 importFrom(lbfgs, lbfgs)
-
+importFrom(lbfgsb3, lbfgsb3)
+importFrom(madness, madness)
+importFrom(Deriv, Deriv)
+importFrom(minqa, newuoa)
 
 #export(RxODE, eventTable)
 export(
@@ -47,7 +50,9 @@ plot.saemFit,
 print.saemFit,
 summary.saemFit,
 
-lin_cmt
+lin_cmt,
+
+focei.fit
 )
 
 S3method(print, dyn.ID)
