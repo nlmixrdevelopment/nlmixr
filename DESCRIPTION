@@ -1,27 +1,25 @@
 Package: nlmixr
 Type: Package
 Title: nlmixr fits population PK and PKPD non-linear mixed effects models.
-Imports: Rcpp (>= 0.11.5), brew, lattice, parallel, lbfgs
-Depends: RxODE, nlme, Rcpp, RcppEigen, RcppArmadillo, BH, brew, inline, lbfgs, lbfgsb3, Deriv,
-        madness, minqa
-Suggests: knitr, rmarkdown,
-    testthat
+Imports: Rcpp (>= 0.11.5), brew, lattice, parallel, lbfgs, lbfgsb3, 
+         Deriv, madness, minqa, StanHeaders
+Suggests: knitr, rmarkdown, testthat
 VignetteBuilder: knitr
 Version: 0.9.2-0
 Date: 2016-09-20
 Authors@R: c(
+   person("Matthew","Fidler",
+      role = "aut", email = "matthew.fidler@gmail.com"),      
    person("Yuan", "Xiong", 
       role = "aut", email = "yuan.xiong@gmail.com"),
    person("Rik", "Schoemaker", 
       role = "aut", email = "rik.schoemaker@occams.eu"),
    person("Justin", "Wilkins", 
       role = "aut", email = "justin.wilkins@occams.eu"),
-   person("Matthew","Fidler",
-      role = "aut", email = "matthew.fidler@gmail.com"),      
    person("Wenping", "Wang", 
       role = c("aut", "cre"), email = "wwang8198@gmail.com")
    )
-Author: Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut], 
+Author: Matthew Fidler [aut], Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut], 
   Wenping Wang [aut, cre]
 Maintainer: Wenping Wang <wwang8198@gmail.com>
 Description: nlmixr is an R package for fitting population pharmacokinetic (PK) 
