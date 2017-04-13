@@ -16,6 +16,39 @@ using namespace Rcpp;
 #endif
 
 #include <stan/math.hpp>
+#include "PKPDLib_WW.hpp"
+
+
+RcppExport SEXP lin_cmt_stan( SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP,
+	SEXP paramsSEXP, SEXP oralSEXP, SEXP infusionSEXP, SEXP ncmtSEXP, SEXP parameterizationSEXP ) {
+BEGIN_RCPP
+
+    using Eigen::VectorXd;
+    Rcpp::traits::input_parameter< const VectorXd& >::type obs_time_(obs_timeSEXP);
+    Rcpp::traits::input_parameter< const VectorXd& >::type dose_time_(dose_timeSEXP);
+    Rcpp::traits::input_parameter< const VectorXd& >::type dose_(doseSEXP);
+    Rcpp::traits::input_parameter< const VectorXd& >::type Tinf_(TinfSEXP);
+    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
+    Rcpp::traits::input_parameter< const int >::type ncmt(ncmtSEXP);
+    Rcpp::traits::input_parameter< const int >::type infusion(infusionSEXP);
+    Rcpp::traits::input_parameter< const int >::type oral(oralSEXP);
+    Rcpp::traits::input_parameter< const int >::type parameterization(parameterizationSEXP);
+
+    const VectorXd obs_time(obs_time_);
+    const VectorXd dose_time(dose_time_);
+    const VectorXd dose(dose_);
+    const VectorXd Tinf(Tinf_);
+    const VectorXd params(params_);
+
+	stan::math::lin_cmt_fun f(obs_time, dose_time, dose, Tinf, ncmt, oral, infusion, parameterization);
+    VectorXd fx;
+	Eigen::Matrix<double, -1, -1> J;
+	stan::math::jacobian(f, params, fx, J);
+
+    return Rcpp::List::create(Rcpp::Named("fx") = fx,
+	                          Rcpp::Named("J") = J);
+END_RCPP
+}
 
 
 //===============================================================
@@ -331,9 +364,9 @@ END_RCPP
 #if 0
 
 require(Rcpp)
-dyn.load("ode_cmt1.dll")
+dyn.load("nlmixr.so")
 lin_cmt <- function(obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization)
-   .Call('lin_cmt', obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization)
+   .Call('lin_cmt_stan', obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization)
 a = lin_cmt(0:72*1.0, 0:1*24*1.0, rep(10.0,2), 0, c(.1, 1, .2, 0), 1, 0, 1, 1)
 b = matrix(scan("1"),  nrow=73)
 range(b[,1] - a$fx)
