@@ -54,6 +54,7 @@ summary.saemFit,
 lin_cmt,
 
 gnlmm2,
+nlminb2,
 focei.fit,
 print.focei.fit,
 plot.focei.fit
