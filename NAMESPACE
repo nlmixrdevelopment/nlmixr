@@ -18,6 +18,7 @@ importFrom(madness, madness)
 importFrom(Deriv, Deriv)
 importFrom(minqa, newuoa)
 
+
 #export(RxODE, eventTable)
 export(
 nlme_lin_cmpt,
@@ -52,9 +53,15 @@ summary.saemFit,
 
 lin_cmt,
 
-focei.fit
+gnlmm2,
+focei.fit,
+print.focei.fit,
+plot.focei.fit
 )
 
 S3method(print, dyn.ID)
 S3method(summary, dyn.ID)
 S3method(plot, dyn.ID)
+
+S3method(print, focei.fit)
+S3method(plot, focei.fit)
