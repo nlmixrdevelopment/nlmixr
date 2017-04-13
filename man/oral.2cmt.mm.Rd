@@ -3,7 +3,7 @@
 \docType{data}
 \name{oral.2cmt.mm}
 \alias{oral.2cmt.mm}
-\title{Oral 2 compartment model with Michelis Menton Elimination}
+\title{Oral 2 compartment model with Michelis Menton Eliminationn}
 \format{An object of class \code{data.frame} with 7920 rows and 16 columns.}
 \source{
 AcOP7 nlmixr poster
