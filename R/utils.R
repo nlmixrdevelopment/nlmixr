@@ -70,6 +70,7 @@ gof = function(x, ...)
 #' @param x a dynamodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 plot.dyn.ID = gof
 
 #' Print a non-population dynamic model fit object
@@ -79,6 +80,7 @@ plot.dyn.ID = gof
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 print.dyn.ID = function(x, ...)
 {
 	print(x$res[, c(1,3)])
@@ -96,6 +98,7 @@ print.dyn.ID = function(x, ...)
 #' @param object a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 summary.dyn.ID = function(object, ...)
 {
 	print(object$res)
@@ -142,6 +145,7 @@ mymin = function(start, fr, rho=NULL, control=list())
 #' @param rho evaluation environment
 #' @param control additional optimization options
 #' @return a list of ...
+#' @export
 nmsimplex = function(start, fr, rho=NULL, control=list())
 {
 	if (is.null(rho)) rho = environment(fr)
@@ -206,6 +210,7 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #' (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
 #'
 #' }
+#' @export
 dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 	method=c("Nelder-Mead", "L-BFGS-B", "PORT"),
 	control=list(ftol_rel=1e-6, maxeval=999), squared=T)
@@ -304,7 +309,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 		fit = mymin(as.vector(inits), obj, control=control)
 		fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
 	} else if (method=="L-BFGS-B") {
-		fit = lbfgs(as.vector(inits), obj, control=control)
+		fit = lbfgs::lbfgs(as.vector(inits), obj, control=control)
 	} else {
 		if ("ftol_rel" %in% names(control)) {
 			control$rel.tol = control$ftol_rel
@@ -518,6 +523,7 @@ do.slice = function(pars, fr0)
 #' (fit <- dynmodel.mcmc(sys1, mod, ev, inits, dat, fixPars))
 #'
 #' }
+#' @export
 dynmodel.mcmc = function(system, model, evTable, inits, data,
 	fixPars=NULL, nsim = 500, squared=T, seed=NULL)
 {
@@ -549,6 +555,7 @@ dynmodel.mcmc = function(system, model, evTable, inits, data,
 #' @param object a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 summary.dyn.mcmc = function(object, ...)
 {
 	s <- t(apply(object, 2, function(x) c(mean(x), sd(x), sd(x)/mean(x)*100)))
@@ -564,6 +571,7 @@ summary.dyn.mcmc = function(object, ...)
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 print.dyn.mcmc = function(x, ...)
 {
 	s <- t(apply(x, 2, function(x) c(mean(x), sd(x), sd(x)/mean(x)*100)))
@@ -579,6 +587,7 @@ print.dyn.mcmc = function(x, ...)
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 plot.dyn.mcmc = function(x, ...)
 {
 	fit = list(obj=attr(x, "obj"), par=apply(x, 2, mean))

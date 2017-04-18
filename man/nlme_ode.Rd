@@ -36,7 +36,7 @@ nlme_ode(dat.o, model, par_model, par_trans, response, response.scaler = NULL,
 \description{
 'nlme_ode' fits a mixed-effect model described using ordinary differential
 equation (ODEs). The ODE-definition follows RxODE syntax.
-Specification of fixed effects, random effects and intial values follows 
+Specification of fixed effects, random effects and intial values follows
 the standard nlme notations.
 }
 \details{
@@ -51,25 +51,25 @@ The ODE-based model specification may be coded inside a character
 }
 \section{RxODE Syntax}{
 
-   
-   An \code{RxODE} model specification consists of one or more 
+
+   An \code{RxODE} model specification consists of one or more
    statements terminated by semi-colons, \sQuote{\code{;}}, and
-   optional comments (comments are delimited by \code{#} and an 
-   end-of-line marker).  \strong{NB:} Comments are not allowed 
+   optional comments (comments are delimited by \code{#} and an
+   end-of-line marker).  \strong{NB:} Comments are not allowed
    inside statements.
 
    A block of statements is a set of statements delimited by
    curly braces, \sQuote{\code{\{ ... \}}}.
    Statements can be either assignments or conditional \code{if}
    statements. Assignment statements can be either \dQuote{simple}
-   assignments, where the left hand is an identifier (i.e., variable), or 
+   assignments, where the left hand is an identifier (i.e., variable), or
    special \dQuote{time-derivative} assignments, where the left hand
-   specifies the change of that variable with respect to time  
+   specifies the change of that variable with respect to time
    e.g., \code{d/dt(depot)}.
 
-   Expressions in assignment and \sQuote{\code{if}} statements can be 
+   Expressions in assignment and \sQuote{\code{if}} statements can be
    numeric or logical (no character expressions are currently supported).
-   Numeric expressions can include the following numeric operators 
+   Numeric expressions can include the following numeric operators
    (\sQuote{\code{+}}, \sQuote{\code{-}}, \sQuote{\code{*}},
    \sQuote{\code{/}}, \sQuote{\code{^}}),   and
    those mathematical functions defined in the C or the
@@ -81,23 +81,23 @@ The ODE-based model specification may be coded inside a character
    \itemize{
       \item state variables in the dynamic system (e.g., compartments in a
       pharmacokinetic/pharmacodynamic model);
-      \item implied input variable, \code{t} (time), 
+      \item implied input variable, \code{t} (time),
       \code{podo} (oral dose, for absorption models), and
       \code{tlast} (last time point);
-      \item model parameters, (\code{ka} rate of absorption, \code{CL} 
+      \item model parameters, (\code{ka} rate of absorption, \code{CL}
       clearance, etc.);
       \item others, as created by assignments as part of the model
       specification.
    }
 
-   Identifiers consist of case-sensitive alphanumeric characters, 
+   Identifiers consist of case-sensitive alphanumeric characters,
    plus the underscore \sQuote{_} character.  \strong{NB:} the
    dot \sQuote{.} character is \strong{not} a valid character
    identifier.
 
    The values of these variables at pre-specified time points are
    saved as part of the fitted/integrated/solved model (see
-   \code{\link{eventTable}}, in particular its member function 
+   \code{\link{eventTable}}, in particular its member function
    \code{add.sampling} that defines a set of time points at which
    to capture a snapshot of the system via the values of these variables).
 
@@ -115,15 +115,15 @@ d/dt(centr) = KA*depot - KE*centr;
 dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
 mypar <- function(lKA, lKE, lCL)
 {
-    KA=exp(lKA) 
-    KE=exp(lKE) 
+    KA=exp(lKA)
+    KE=exp(lKE)
     CL=exp(lCL)
     V = CL/KE
 }
 
-specs <- list(fixed=lKA+lKE+lCL~1, random = pdDiag(lKA+lCL~1), 
+specs <- list(fixed=lKA+lKE+lCL~1, random = pdDiag(lKA+lCL~1),
 	start=c(lKA=0.5, lKE=-2.5, lCL=-3.2))
-fit <- nlme_ode(dat, model=ode, par_model=specs, par_trans=mypar, 
+fit <- nlme_ode(dat, model=ode, par_model=specs, par_trans=mypar,
 	response="centr", response.scaler="V")
 
 }

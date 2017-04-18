@@ -359,6 +359,7 @@ END_RCPP
 #' xyplot(DV~TIME|ID, df, type=c("p","l"), lwd=c(NA,1), pch=c(1,NA), groups=grp)
 #' fit
 #' }
+#' @export
 gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL) {
   is.ode = class(model) == "RxODE"
   is.win <- .Platform$OS.type=="windows"
@@ -413,7 +414,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE))
   nrhs = x[[3]]
   foo = paste(readLines("foo__.txt"), collapse="\n")
-  brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output="saem_main.cpp")
+  brew::brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output="saem_main.cpp")
   unlink(c("eqn__.txt", "foo__.txt"))
 
   #gen Markevars
@@ -472,6 +473,7 @@ parfn.list = c(
 #' @param infusion logical, whether infusion is true
 #' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
 #' @return parameters for a linear compartment model
+#' @export
 lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #ncmt=1; oral=T; tlag=F; parameterization=1
 	#print(as.list(match.call()))
@@ -511,6 +513,7 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @param x a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 plot.saemFit = function(x, ...)
 {
 	fit = x ##Rcheck hack
@@ -525,7 +528,7 @@ plot.saemFit = function(x, ...)
 	df$DV[df$grp==2] = yp
 
 	#require(lattice)
-	p = xyplot(DV~TIME|ID, df, type=c("p", "l"),
+	p = lattice::xyplot(DV~TIME|ID, df, type=c("p", "l"),
 		lwd=c(NA,1), pch = c(1, NA), groups=grp)
 	print(p)
 	plot(yp, dat$DV); abline(0, 1, col="red")
@@ -594,6 +597,7 @@ plot.saemFit = function(x, ...)
 #' xyplot(DV~TIME|ID, df, type=c("p","l"), lwd=c(NA,1), pch=c(1,NA), groups=grp)
 #' fit
 #' }
+#' @export
 configsaem = function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
 	ODEopt = list(atol=1e-8, rtol=1e-6, stiff=1, transit_abs=0),
@@ -909,6 +913,7 @@ getInits = function(x, re, collapse=TRUE) {
 #' @param object a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 summary.saemFit = function(object, ...)
 {
 	fit = object ##Rcheck hack
@@ -944,6 +949,7 @@ summary.saemFit = function(object, ...)
 #' @param x a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 print.saemFit = function(x, ...)
 {
 	fit = x ##Rcheck hack

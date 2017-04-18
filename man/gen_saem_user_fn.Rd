@@ -17,17 +17,17 @@ gen_saem_user_fn(model, PKpars = attr(model, "default.pars"), pred = NULL)
 Generate an SAEM model using either closed-form solutions or ODE-based model definitions
 }
 \details{
-Fit a generalized nonlinear mixed-effect model using the Stochastic 
+Fit a generalized nonlinear mixed-effect model using the Stochastic
    Approximation Expectation-Maximization (SAEM) algorithm
 }
 \examples{
 \dontrun{
-#ode <- "d/dt(depot) =-KA*depot; 
-#        d/dt(centr) = KA*depot - KE*centr;" 
+#ode <- "d/dt(depot) =-KA*depot;
+#        d/dt(centr) = KA*depot - KE*centr;"
 #m1 = RxODE(ode, modName="m1")
-#ode <- "C2 = centr/V; 
-#      d/dt(depot) =-KA*depot; 
-#      d/dt(centr) = KA*depot - KE*centr;" 
+#ode <- "C2 = centr/V;
+#      d/dt(depot) =-KA*depot;
+#      d/dt(centr) = KA*depot - KE*centr;"
 #m2 = RxODE(ode, modName="m2")
 
 PKpars = function()

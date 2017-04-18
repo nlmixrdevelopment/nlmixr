@@ -72,7 +72,7 @@ getModelVars = function(blik, bpar, m1) {
 		), collapse="\n"
 	)
 	blik.new = parse(text=blik.new.text)
-	
+
 	dist.df = NULL
 	if (dist=="dbinom") dist.df=s[2]	#binomial size
 	if (dist=="dt") dist.df=s[2]		#t df
@@ -105,15 +105,15 @@ getModelVars = function(blik, bpar, m1) {
 	pars.llik=intersect(s[lhs], rhs)	#pars used in llik
 	vars.par = s[lhs]					#vars def'ed in pars
 
-	list(state.llik=state.llik, pars.llik=pars.llik, 
+	list(state.llik=state.llik, pars.llik=pars.llik,
 		 vars.par=vars.par, #prob=prob, ixLlik=ixLlik,
-		 dist=dist, dist.df=dist.df, 
+		 dist=dist, dist.df=dist.df,
 		 blik.new=blik.new, blik.new.text=blik.new.text,
 		 args.dvdx=args.dvdx)
 }
 
-
-gnlmm2 <- function(llik, data, inits, syspar=NULL, 
+#' @export
+gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	system=NULL, diag.xform=c("sqrt", "log", "identity"),
 	..., control=list()) {
     #data
@@ -122,7 +122,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	data.obs = subset(data, data$EVID == 0)
 	data.sav = data
 	names(data) <- tolower(names(data))		#needed in ev
-    
+
     #model
     if (is.null(system)) {}
     else if (class(system) == "RxODE") {}
@@ -132,12 +132,12 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
     }
     else {
         stop("invalid system input")
-    }    
+    }
 
     #options
-    con <- list(trace = 0, 
-    	maxit = 100L, 
-        atol.ode=1e-08, 
+    con <- list(trace = 0,
+    	maxit = 100L,
+        atol.ode=1e-08,
         rtol.ode=1e-08,
         reltol.inner = 1.0e-4,
         reltol.outer = 1.0e-3,
@@ -159,7 +159,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
         )
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
-    if (length(noNms <- namc[!namc %in% nmsC])) 
+    if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
 	square = function(x) x*x
@@ -183,7 +183,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 		mi = tryCatch(
 			backsolve(chol(m), diag(nr)),
 			error = function(e) {
-				stop("OMEGA not positive-definite") 
+				stop("OMEGA not positive-definite")
 			}
 		)
 		diag(mi) = eval(call(diag.xform, diag(mi)))
@@ -207,14 +207,14 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	)
 	nij = nrow(mij)
 
-	
+
 	#obj fn by AQD
 	if (!is.null(syspar)) {
 		bpar = body(syspar)
 	}
 	blik = body(llik)
 	modVars = getModelVars(blik, bpar, system)
-	
+
 
 	#=== start of dvdx code
 	proc.deriv = function() {
@@ -232,7 +232,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 			m = sapply(1:nrow(ix), function(k) {
 				i = ix[k,1]
 				j = ix[k,2]
-				s1 = c("Deriv(~", s, pars[i], sprintf("}, \"ETA%d\")", j))
+				s1 = c("Deriv::Deriv(~", s, pars[i], sprintf("}, \"ETA%d\")", j))
 				a = paste(s1, collapse="\n")
 				e = eval(parse(text=a))
 				s = if (class(e)=="call") {
@@ -249,7 +249,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 		dati = data.sav[data.sav$ID==ID.all[1], ]
 		list2env(dati, env)
 		THETA = tapply(inits.vec, nsplt, identity)[[1]]
-		ETA <- madness(array(0, c(nETA,1))) 
+		ETA <- madness::madness(array(0, c(nETA,1)))
 		eval(bpar)
 
 		px = as.list(env)
@@ -268,11 +268,11 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 		matode = getDeriv(pars)
 		pars = setdiff(madVars, c(pars, "ETA"))
 		matllk = getDeriv(pars)
-		
+
 		list(matode=matode, madIx=madIx, matllk=matllk, madllk=pars)	#deriv expr for ode pars
 		                                                                #idx of ode pars that need deriv
 		                                                                #llik pars that need deriv
-		                                                                #deriv expr llik pars 
+		                                                                #deriv expr llik pars
 	}
 	s = proc.deriv()
 
@@ -299,9 +299,9 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	npar = length(pars)
 	lexpr = unlist(lapply(modVars$args.dvdx, function(arg) {
 		s = sprintf("{\n%s\n%s", modVars$blik.new.text, arg)	#FIXME
-		 
+
 		expr.dldp = lapply(1:npar, function(k) {
-			s1 = c("Deriv(~", s, sprintf("}, \"%s\")", pars[k]))
+			s1 = c("Deriv::Deriv(~", s, sprintf("}, \"%s\")", pars[k]))
 			a = paste(s1, collapse="\n")
 			e = eval(parse(text=a))
 			e
@@ -309,14 +309,14 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 		names(expr.dldp) = pars
 		expr.dldp
 	}))
-	
+
 	llik.narg = length(modVars$args.dvdx)	#llik.narg = # of args in density that need dvdx
 											#may have efficiency gain to rm args that do not need dvdx
 	llik.npar = npar
 	m = matrix(lexpr, llik.npar, llik.narg)
 	dadp.expr = c(t(m))						#chg the order of args & pars in llik; see dldp in ..fg()
-	#=== ends of dvdx code 
-	
+	#=== ends of dvdx code
+
 
 	starts = matrix(0., nSUB, nETA)
 	omga_save = NULL; update_starts=TRUE
@@ -370,7 +370,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 
 			#d(State)/d(ETA)
 			whState = modVars$state.llik
-			senState = paste0(whState, "_", pars[madIx]) 
+			senState = paste0(whState, "_", pars[madIx])
 			fxJ = list(fx=x[, whState], J=x[, senState])		#FIXME, t()
 
 			dvdx = sapply(expr.dpde.ode, eval, envir=env)		#FIXME
@@ -391,7 +391,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 			dpde.llk = NULL
 			}
 
-			#d(args)/d(pars) 
+			#d(args)/d(pars)
 			ni = dim(x)[1]
 			dadp = sapply(1:length(dadp.expr), function(k) {	#why lapply(m, eval) doesn't work?
 				s = eval(dadp.expr[[k]])
@@ -406,7 +406,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 			})
 			#dade = t(s)										#FIXME: t() can be rm'ed?
 			dim(dade) = c(llik.narg, nETA, ni)
-			
+
 
 			#d(llik)/d(ETA) = d(llik)/d(args) * d(args)/d(ETA)
 			if (modVars$dist=="dt") {
@@ -461,16 +461,16 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 			dim(s$J) = c(ni, llik.narg)
 			dlde = sapply(1:ni, function(k) {					#FIXME: vectorize?
 				s$J[k,] %*% dade[,,k]							#FIXME: need t()?
-			})		                                            
+			})
 			s = rbind(s$fx, dlde)								#FIXME t()?
 			s = apply(s, 1, sum)								#FIXME sum index; chg'ed w/ vec stan call
 
-			#llik.dat = madness(val=matrix(s[1], 1, 1), dvdx=matrix(s[-1], 1, nETA))	
+			#llik.dat = madness::madness(val=matrix(s[1], 1, 1), dvdx=matrix(s[-1], 1, nETA))
 			#llik.eta = -crossprod(Dinv.5 %*% ETA)/2 -nETA/2*log(2*pi)+log(detDinv.5)
-			#llik.eta = madness(val=val(llik.eta), dvdx=dvdx(llik.eta))
+			#llik.eta = madness::madness(val=val(llik.eta), dvdx=dvdx(llik.eta))
 			llik.eta.val = -crossprod(Dinv.5 %*% ETA)/2 -nETA/2*log(2*pi)+log(detDinv.5)
 			llik.eta.dvd = -t(ETA) %*% crossprod(Dinv.5)
-			
+
 			r = s[1] + c(llik.eta.val)
 			attr(r, "dvdx") = s[-1] + c(llik.eta.dvd)
 			r
@@ -482,7 +482,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 		}
 		f = function(ETA)  -as.vector(fg(ETA)[[2]])
 		g = function(ETA) -as.vector(attr(fg(ETA)[[2]],"dvdx"))
-		
+
 		pvd = NULL
 
 		.wh = ID.ord[as.character(ix)]
@@ -535,7 +535,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	}
 	s = mclapply(ID.all, llik2.subj, mc.cores = con$mc.cores)	#FIXME
     m = matrix(unlist(s), ncol = 2 + nETA, byrow = T)
-		
+
 		if (update_starts) starts[m[, 2], ] <<- m[, 3:(2+nETA)]
 		m[, 1]
 	}
@@ -558,7 +558,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	np = length(inits.vec)
 	start = rep(1, np)
 	args = list(start, obj, control=list(trace=con$trace, reltol=con$reltol.outer))
-	
+
   if (!con$NOTRUN) {
 	fit = if (con$optim.outer=="nmsimplex") do.call("nmsimplex", args)
 	else if (con$optim.outer=="Nelder-Mead") {
@@ -572,10 +572,10 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	else {
 		if (!is.null(con$npt)) npt=con$npt
 		else npt = 2*np+1
-		newuoa(start, obj, control=list(rhobeg=con$rhobeg, rhoend=con$rhoend, npt=npt, iprint=con$iprint))
+		minqa::newuoa(start, obj, control=list(rhobeg=con$rhobeg, rhoend=con$rhoend, npt=npt, iprint=con$iprint))
 	}
   } else fit=NULL
-	
+
 	fit = c(fit, obj=obj, list(ETA=starts, con=con, diag.xform=diag.xform, nsplt=nsplt, osplt=osplt, calls=list(data=data.sav, system=system, syspar=syspar)))
 	fit$par.unscaled = fit$par*inits.vec
 	attr(fit, "class") <- "gnlmm.fit"
@@ -585,14 +585,14 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 
 #------------------
 mat.indices = function(nETA){
-	idx = do.call("rbind", 
+	idx = do.call("rbind",
 		lapply(1:nETA, function(k) cbind(k:nETA, k)))
 	H = matrix(1:(nETA^2), nETA, nETA)
 	Hlo.idx = row(H)>=col(H)
 	lo.idx = H[row(H)>col(H)]
 	hi.idx = t(H)[row(H)>col(H)]
 
-	list(idx=idx,			# (r, c) of lo-half 
+	list(idx=idx,			# (r, c) of lo-half
 	     Hlo.idx=Hlo.idx, 	# index of lo-half
 	     lo.idx=lo.idx, 	# index of strict lo-half
 	     hi.idx=hi.idx)		# index of strict hi-half
@@ -602,10 +602,11 @@ mat.indices = function(nETA){
 #' Print a gnlmm fit
 #'
 #' Print a generalized non-linear mixed effect model fit
-#' 
+#'
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 print.focei.fit = function(fit) {
 	attr(fit, "data") = NULL
 	attr(fit, "ofv.FOCEi") = NULL
@@ -617,29 +618,30 @@ print.focei.fit = function(fit) {
 #' Print a gnlmm fit
 #'
 #' Print a generalized non-linear mixed effect model fit
-#' 
+#'
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 plot.focei.fit = function(fit) {
 	ofv.FOCEi = attr(fit, "ofv.FOCEi")
 	dat = attr(fit, "data")
-	
+
 	x = ofv.FOCEi(fit$par)
 	df = cbind(dat, IPRED=unlist(
 		lapply(attr(x,"subj"), function(s) attr(s,"fitted"))
 	))
 
 	require(ggplot2)
-	p1 = ggplot(df, 
+	p1 = ggplot(df,
 	  aes(x=IPRED, y=DV)) +
 	  geom_point() +
 	  geom_abline(slope=1, intercept=0, col="red")
-	p2 = ggplot(df, 
+	p2 = ggplot(df,
 	  aes(x=IPRED, y=DV-IPRED)) +
 	  geom_point() +
 	  geom_abline(slope=0, intercept=0, col="red")
-	p3 = ggplot(df, 
+	p3 = ggplot(df,
 	  aes(x=TIME, y=DV)) +
 	  geom_point() +
 	  geom_line(aes(x=TIME, y=IPRED), data=df, col="red") +
@@ -654,16 +656,16 @@ proc.err = function(f) {
     s = sapply(s, deparse)
     ix.add = match("add", s, nomatch = 0)
     ix.pro = match("prop", s, nomatch = 0)
-    err.type = c("add", "prop", "combo")[(ix.add > 0) + 2 * 
+    err.type = c("add", "prop", "combo")[(ix.add > 0) + 2 *
         (ix.pro > 0)]
-    sig.add = if (ix.add > 0) 
+    sig.add = if (ix.add > 0)
         as.numeric(s[ix.add + 1])
     else NULL
-    sig.pro = if (ix.pro > 0) 
+    sig.pro = if (ix.pro > 0)
         as.numeric(s[ix.pro + 1])
     else NULL
     inits.err <- c(sig.add, sig.pro)
-    if (any(is.na(inits.err) | inits.err <= 0)) 
+    if (any(is.na(inits.err) | inits.err <= 0))
         stop("error model misspecification")
     inits.err
 }
@@ -675,12 +677,12 @@ require(RxODE)
 ode = "
 d/dt(depot) = -KA*depot;
 d/dt(C2   ) = KA/V*depot - CL/V*C2;
-d/dt(depot_KA) = (-KA) * (depot_KA) + -depot; 
-d/dt(C2_KA) = (KA/V) * (depot_KA) + (-(CL/V)) * (C2_KA) + 1/V*depot; 
-d/dt(depot_V) = (-KA) * (depot_V); 
-d/dt(C2_V) = (KA/V) * (depot_V) + (-(CL/V)) * (C2_V) + -(KA/V^2*depot-CL/V^2*C2); 
-d/dt(depot_CL) = (-KA) * (depot_CL); 
-d/dt(C2_CL) = (KA/V) * (depot_CL) + (-(CL/V)) * (C2_CL) + -(1/V*C2); 
+d/dt(depot_KA) = (-KA) * (depot_KA) + -depot;
+d/dt(C2_KA) = (KA/V) * (depot_KA) + (-(CL/V)) * (C2_KA) + 1/V*depot;
+d/dt(depot_V) = (-KA) * (depot_V);
+d/dt(C2_V) = (KA/V) * (depot_V) + (-(CL/V)) * (C2_V) + -(KA/V^2*depot-CL/V^2*C2);
+d/dt(depot_CL) = (-KA) * (depot_CL);
+d/dt(C2_CL) = (KA/V) * (depot_CL) + (-(CL/V)) * (C2_CL) + -(1/V*C2);
 "
 
 #FIXME
@@ -696,10 +698,10 @@ solveODE = function(parsODE, ev) {
 #' Fit a generalized nonlinear mixed-effect model
 #'
 #' Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
-#' 
+#'
 #' @param llik log-likelihood function
 #' @param data data to be fitted
-#' @param inits initial values 
+#' @param inits initial values
 #' @param system an optional (compiled) RxODE object
 #' @param syspar function: calculation of PK parameters
 #' @param diag.xform transformation to diagonal elements of OMEGA during fitting
@@ -708,7 +710,7 @@ solveODE = function(parsODE, ev) {
 #' @return NULL
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AGQ)
-#' 
+#'
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
@@ -720,17 +722,17 @@ solveODE = function(parsODE, ev) {
 #' 	dpois(y, lam, log=TRUE)
 #' }
 #' inits = list(THTA=c(1,1,1,1), OMGA=list(ETA[1]~1))
-#' 
-#' fit = gnlmm(llik, pump, inits, 
+#'
+#' fit = gnlmm(llik, pump, inits,
 #' 	control=list(
 #' 	    reltol.outer=1e-4,
 #' 		optim.outer="nmsimplex",
 #' 		nAQD=5
 #' 	)
 #' )
-#' 
-#' 
-#' 
+#'
+#'
+#'
 #' llik <- function()
 #' {
 #' 	lp = THETA[1]*x1+THETA[2]*x2+(x1+x2*THETA[3])*ETA[1]
@@ -738,16 +740,16 @@ solveODE = function(parsODE, ev) {
 #' 	dbinom(x, m, p, log=TRUE)
 #' }
 #' inits = list(THTA=c(1,1,1), OMGA=list(ETA[1]~1))
-#' 
+#'
 #' gnlmm(llik, rats, inits, control=list(nAQD=7))
-#' 
-#' 
+#'
+#'
 #' ode <- "
 #' d/dt(depot) =-KA*depot;
 #' d/dt(centr) = KA*depot - KE*centr;
 #' "
 #' sys1 = RxODE(ode)
-#' 
+#'
 #' pars <- function()
 #' {
 #' 	CL = exp(THETA[1] + ETA[1])#; if (CL>100) CL=100
@@ -764,21 +766,21 @@ solveODE = function(parsODE, ev) {
 #' inits$OMGA=list(ETA[1]~.027, ETA[2]~.37)
 #' #inits$OMGA=list(ETA[1]+ETA[2]~c(.027, .01, .37))
 #' theo <- read.table("theo_md.txt", head=TRUE)
-#' 
-#' fit = gnlmm(llik, theo, inits, pars, sys1, 
+#'
+#' fit = gnlmm(llik, theo, inits, pars, sys1,
 #' 	control=list(trace=TRUE, nAQD=5))
-#' 
+#'
 #' cv = calcCov(fit)
 #' cbind(fit$par[fit$nsplt==1], sqrt(diag(cv)))
-#' 
+#'
 #' }
 focei.fit = function(
-	data, 
-	inits, 
-	PKpars, 
-	diag.xform=c("sqrt", "log", "identity"), 
-	optim=c("newuoa", "lbfgsb3", "nlminb", "nelder-mead"), 
-	model=list(), 
+	data,
+	inits,
+	PKpars,
+	diag.xform=c("sqrt", "log", "identity"),
+	optim=c("newuoa", "lbfgsb3", "nlminb", "nelder-mead"),
+	model=list(),
 	control=list()
 ){
     #data = dat; PKpars=mypars; diag.xform="sqrt"; model=list(); control=list()
@@ -799,7 +801,7 @@ focei.fit = function(
 		)
 		nmsC <- names(mod)
 		mod[(namc <- names(model))] <- model
-		if (length(noNms <- namc[!namc %in% nmsC])) 
+		if (length(noNms <- namc[!namc %in% nmsC]))
 			warning("unknown names in model: ", paste(noNms, collapse = ", "))
 	}
 	else {
@@ -821,13 +823,13 @@ focei.fit = function(
     data$DUR <- NULL
     data <- data[data$EVID == 0, ]
 	names(data.sav) <- tolower(names(data.sav))		#needed in ev
-        
+
     #options
     con <- list(
         DEBUG.ODE = F,
         DEBUG = F, RESET.INITS.MAT = T, TRACE.INNER=F, TOL.INNER=1e-4,
-        trace = 0, 
-        atol.ode=1e-08, 
+        trace = 0,
+        atol.ode=1e-08,
         rtol.ode=1e-08,
         reltol.outer = 1.0e-2,
         mc.cores=1,
@@ -839,13 +841,13 @@ focei.fit = function(
         factr=1e10,
         eps = c(sqrt(.Machine$double.eps),1e-6),
         mc.cores=1,
-        rhobeg=.2, 
+        rhobeg=.2,
         rhoend=1e-2,
         npt=NULL
         )
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
-    if (length(noNms <- namc[!namc %in% nmsC])) 
+    if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
 	square = function(x) x*x
@@ -855,7 +857,7 @@ focei.fit = function(
 
 	#process inits
 	inits$SGMA = proc.err(inits$ERROR[[1]])
-	
+
 	lh = parseOM(inits$OMGA)
 	nlh = sapply(lh, length)
 	osplt = rep(1:length(lh), nlh)
@@ -872,7 +874,7 @@ focei.fit = function(
 		mi = tryCatch(
 			backsolve(chol(m), diag(nr)),
 			error = function(e) {
-				stop("OMEGA not positive-definite") 
+				stop("OMEGA not positive-definite")
 			}
 		)
 		diag(mi) = eval(call(diag.xform, diag(mi)))
@@ -889,7 +891,7 @@ focei.fit = function(
 	names(ID.ord) = ID.all
 	nSUB  = length(ID.all)
 	Hidx = mat.indices(nETA)
-	
+
 
 	#proc pars deriv
 	pm <- list(
@@ -901,10 +903,10 @@ focei.fit = function(
 		c("KE", "V", "K12", "K21", "K13", "K31", "KA", "TLAG")
 	)
 	dim(pm)<-c(3,2)
-	
+
 	if (is.list(mod)) {
-	ncmt=mod$ncmt; 
-	oral=mod$oral; 
+	ncmt=mod$ncmt;
+	oral=mod$oral;
 	parameterization=mod$parameterization
 	pars = pm[[ncmt, parameterization]]
 	npar = 2*(ncmt+oral)
@@ -924,7 +926,7 @@ focei.fit = function(
 	m = sapply(1:nrow(ix), function(k) {
 		i = ix[k,1]
 		j = ix[k,2]
-		s1 = c("Deriv(~", s, pars[i], sprintf("}, \"ETA%d\")", j))
+		s1 = c("Deriv::Deriv(~", s, pars[i], sprintf("}, \"ETA%d\")", j))
 		a = paste(s1, collapse="\n")
 		e = eval(parse(text=a))
 		s = if (class(e)=="call") {
@@ -939,7 +941,7 @@ focei.fit = function(
 	expr.save = lapply(m[idx.save], function(k) parse(text=k))
 	mat.save = matrix(0, npar, nETA)
 
-	#algo starts	
+	#algo starts
 	ofv.FOCEi.ind = function(pars, NONMEM=con$NONMEM) {
 
 		if(con$PRINT.PARS) print(pars)
@@ -953,18 +955,18 @@ focei.fit = function(
 		log.det.OMGAinv.5 = sum(log(diag(OMGAinv.5)))
 		OMGAinv   = crossprod(OMGAinv.5)
 
-		
+
 		env = environment()
 		PKpars__ = PKpars
-		environment(PKpars__) = env 
+		environment(PKpars__) = env
 
 
 		#------------------------------
-		llik.subj = mclapply(ID.all, function(subj) 
+		llik.subj = mclapply(ID.all, function(subj)
 		{
 
 			env = environment()
-			
+
 			if (ODEmodel) {
 				dati = data.sav[data.sav$id==subj, ]
 			}
@@ -999,20 +1001,20 @@ focei.fit = function(
 					assign("DV", dv[ev$get.obs.rec()], envir=env)
 					parsODE = as.vector(val(pm))
 					names(parsODE) = c("CL", "V", "KA", "TLAG")	#FIXME
-					fxJ = solveODE(parsODE, ev)	#FIXME 
+					fxJ = solveODE(parsODE, ev)	#FIXME
 					if (con$DEBUG.ODE) print("i'm here :)")
 				}
 				else {
 				   #fxJ = lin_cmt(TIME, dsi$TIME, dsi$AMT, dsi$DUR, val(pm), mod$oral, mod$infusion, mod$ncmt, mod$parameterization)
 					fxJ = lin_cmt_stan(TIME, dsi$TIME, dsi$AMT, dsi$DUR, pm, mod$oral, mod$infusion, mod$ncmt, mod$parameterization)
-				}				
+				}
 
 				f = fxJ$fx
 			   #fp = t(fxJ$J) %*% dvdx(pm)
 				fp = fxJ$J[,1:npar] %*% mat.save		#FIXME: t() or not depending on stan version
 				eps = DV - f
 				c = 2*fp/f
-				B = 2/(f^2*sig2)	
+				B = 2/(f^2*sig2)
 
 			   #lp = .5*apply(2*eps*fp/(f^2*sig2) + eps^2*2*fp/(f^3*sig2) - c, 2, sum) - OMGAinv %*% ETA
 				lp = .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
@@ -1070,18 +1072,18 @@ focei.fit = function(
 			llik.lapl =llik - log.det.H.neg.5		#note no 1/2
 			attr(llik.lapl, "fitted") = pvd$f
 			attr(llik.lapl, "posthoc") = fit$par
-			attr(llik.lapl, "wh") = .wh 
-			
+			attr(llik.lapl, "wh") = .wh
+
 			llik.lapl
 
 		}, mc.cores=con$mc.cores)
-		
+
 		m = t(sapply(llik.subj, function(x) {
 			c(attr(x, "wh"), attr(x, "posthoc"))
 		}))
 		if(con$RESET.INITS.MAT) inits.mat[m[,1],] <<- m[,-1]
-		
-		
+
+
 		llik.subj
 	}
 
@@ -1089,7 +1091,7 @@ focei.fit = function(
 		llik.subj = ofv.FOCEi.ind(pars)
 		unlist(llik.subj)
 	}
-	
+
 	ofv.FOCEi = function(pars) {
 		llik.subj = ofv.FOCEi.ind(pars)
 		llik = -2*do.call("sum", llik.subj)
@@ -1112,7 +1114,7 @@ focei.fit = function(
 
 
 	inits.mat = matrix(0, nSUB, nETA)
-	np = length(inits.vec) 
+	np = length(inits.vec)
 	start = rep(1, np)
 	if (con$NOTRUN) {
 		fit = list()
@@ -1123,15 +1125,15 @@ focei.fit = function(
 	}
 	else {
 		if (optim.method=="lbfgsb3") {
-			fit = lbfgsb3(start, f, g, control=list(trace=T, factr = con$factr, pgtol = con$reltol.outer))
+			fit = lbfgsb3::lbfgsb3(start, f, g, control=list(trace=T, factr = con$factr, pgtol = con$reltol.outer))
 			fit$par = fit$prm
-			fit$prm = NULL 
+			fit$prm = NULL
 		}
 		else if (optim.method=="nlminb") {
-			fit = nlminb2(start, ofv.FOCEi, 
+			fit = nlminb2(start, ofv.FOCEi,
 				control=list(trace=con$trace, rel.tol=con$reltol.outer))
 			m = diag(inits.vec)
-			if (con$cov.method=="hessian") { 
+			if (con$cov.method=="hessian") {
 				fit$cov = 2*m %*% fit$Hessian.inv %*% m
 				fit$Hessian.inv = NULL
 			}
@@ -1144,7 +1146,7 @@ focei.fit = function(
 		else if (optim.method=="newuoa") {
 			if (!is.null(con$npt)) npt=con$npt
 			else npt = 2*np+1
-			fit = newuoa(start, ofv.FOCEi, 
+			fit = minqa::newuoa(start, ofv.FOCEi,
 				control=list(rhobeg=con$rhobeg, rhoend=con$rhoend, npt=npt, iprint=2*con$trace))
 		}
 		else
@@ -1153,6 +1155,6 @@ focei.fit = function(
 	fit$par.unscaled = fit$par*inits.vec
 	attr(fit, "data") = data	#FIXME
 	attr(fit, "ofv.FOCEi") = ofv.FOCEi	#FIXME
-	attr(fit, "class") = "focei.fit"	
+	attr(fit, "class") = "focei.fit"
 	fit
 }
