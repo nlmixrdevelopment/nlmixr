@@ -21,3 +21,4 @@ Do visual predictive check (VPC) plots for nlme-base non-linear mixed effect mod
 vpc(fit, nsim = 100, condition = NULL)
 }
 }
+

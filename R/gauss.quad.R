@@ -21,14 +21,13 @@
 #' Sets nodes and weigts of Gauss-Hermite quadrature
 #'
 #' Sets nodes and weigts of Gauss-Hermite quadrature
-#'
+#' 
 #' @param n numbr of nodes
 #' @return a list of nodes and weigts of Gauss-Hermite quadrature
 #' @examples
 #' \dontrun{
 #' gauss.quad(5)
 #' }
-#' @export
 gauss.quad = function(n)
 {#n = 5
 	s = .C("hermite_ek_compute_", as.integer(n), double(n), double(n))

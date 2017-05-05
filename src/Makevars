@@ -1,11 +1,8 @@
-STANHEADERS_SRC = `"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" --vanilla -e "cat(system.file('include', package = 'StanHeaders'))"`
-BOOST_SRC = `"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" --vanilla -e "cat(system.file('include', package = 'BH'))"`
-
 PKG_LIBS = d/libdparse.a
-PKG_CPPFLAGS = -Id -I"$(STANHEADERS_SRC)" -I"$(BOOST_SRC)" 
+PKG_CPPFLAGS = -Id 
 
 SOURCES_C = jj.c jj.g.d_parser.c quadrule.c
-SOURCES_CPP = neldermead.cpp slice.cpp RcppExport.cpp ode_cmt1.cpp
+SOURCES_CPP = neldermead.cpp slice.cpp RcppExport.cpp
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o)
 
 all: libdparse $(SHLIB)

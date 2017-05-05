@@ -20,17 +20,16 @@
 #' instant.stan.extension.
 #'
 #' instant.stan.extension
-#'
+#' 
 #' @param ode_str ODE equations in a string
 #' @param covar a character vector of covariates
 #' @return NULL
-#' @export
 instant.stan.extension <- function(ode_str=NULL, covar=NULL)
 {
     if (is.null(ode_str)) {
       stop("please provide ODE string")
     }
-
+    
     if (is.null(covar)) {
 		.tmpl <- system.file("include/generic_ode_interface_template.txt", package = "nlmixr")
 		cat(ode_str, file="model.txt")

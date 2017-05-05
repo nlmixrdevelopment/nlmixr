@@ -25,19 +25,19 @@ configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
 Configure an SAEM model by generating an input list to the SAEM model function
 }
 \details{
-Fit a generalized nonlinear mixed-effect model by he Stochastic
+Fit a generalized nonlinear mixed-effect model by he Stochastic 
    Approximation Expectation-Maximization (SAEM) algorithm
 }
 \examples{
 \dontrun{
 library(nlmixr)
 
-#ode <- "d/dt(depot) =-KA*depot;
-#        d/dt(centr) = KA*depot - KE*centr;"
+#ode <- "d/dt(depot) =-KA*depot; 
+#        d/dt(centr) = KA*depot - KE*centr;" 
 #m1 = RxODE(ode, modName="m1")
-#ode <- "C2 = centr/V;
-#      d/dt(depot) =-KA*depot;
-#      d/dt(centr) = KA*depot - KE*centr;"
+#ode <- "C2 = centr/V; 
+#      d/dt(depot) =-KA*depot; 
+#      d/dt(centr) = KA*depot - KE*centr;" 
 #m2 = RxODE(ode, modName="m2")
 
 #Note: only use the '=' assignment, not the '<-' at this point
@@ -76,3 +76,4 @@ fit
 \author{
 Wenping Wang
 }
+

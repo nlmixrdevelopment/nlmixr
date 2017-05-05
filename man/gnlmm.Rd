@@ -41,7 +41,7 @@ llik <- function()
 }
 inits = list(THTA=c(1,1,1,1), OMGA=list(ETA[1]~1))
 
-fit = gnlmm(llik, pump, inits,
+fit = gnlmm(llik, pump, inits, 
 	control=list(
 	    reltol.outer=1e-4,
 		optim.outer="nmsimplex",
@@ -85,7 +85,7 @@ inits$OMGA=list(ETA[1]~.027, ETA[2]~.37)
 #inits$OMGA=list(ETA[1]+ETA[2]~c(.027, .01, .37))
 theo <- read.table("theo_md.txt", head=TRUE)
 
-fit = gnlmm(llik, theo, inits, pars, sys1,
+fit = gnlmm(llik, theo, inits, pars, sys1, 
 	control=list(trace=TRUE, nAQD=5))
 
 cv = calcCov(fit)
@@ -96,3 +96,4 @@ cbind(fit$par[fit$nsplt==1], sqrt(diag(cv)))
 \author{
 Wenping Wang
 }
+

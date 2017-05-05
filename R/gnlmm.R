@@ -79,11 +79,10 @@ genOMinv.5 = function(s)
 #' Print a gnlmm fit
 #'
 #' Print a generalized non-linear mixed effect model fit
-#'
+#' 
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
-#' @export
 print.gnlmm.fit = function(x, ...)
 {
 	x$ETA = NULL
@@ -99,7 +98,7 @@ print.gnlmm.fit = function(x, ...)
 
 
 
-multi2 = function (mu, vmat, n)
+multi2 = function (mu, vmat, n) 
 {
     eta <- matrix(rnorm(length(mu) * n), ncol = n, nrow = length(mu))
     Q <- chol(vmat, pivot = TRUE)
@@ -112,21 +111,21 @@ multi2 = function (mu, vmat, n)
 #' Prediction after a gnlmm fit
 #'
 #' Generate predictions after a generalized non-linear mixed effect model fit
-#'
+#' 
 #' @param fit a dynmodel fit object
 #' @param pred prediction function
 #' @param data new data
 #' @param mc.cores number of cores (for Linux only)
-#' @return observed and predicted
+#' @return observed and predicted 
 #' @examples
 #' \dontrun{
-#'
+#' 
 #' ode <- "
 #' d/dt(depot) =-KA*depot;
 #' d/dt(centr) = KA*depot - KE*centr;
 #' "
 #' sys1 = RxODE(ode)
-#'
+#' 
 #' pars <- function()
 #' {
 #' 	CL = exp(THETA[1] + ETA[1])#; if (CL>100) CL=100
@@ -142,19 +141,18 @@ multi2 = function (mu, vmat, n)
 #' inits = list(THTA=c(-3.22, 0.47, -2.45, 0))
 #' inits$OMGA=list(ETA[1]~.027, ETA[2]~.37)
 #' theo <- read.table("theo_md.txt", head=TRUE)
-#'
-#' fit = gnlmm(llik, theo, inits, pars, sys1,
+#' 
+#' fit = gnlmm(llik, theo, inits, pars, sys1, 
 #' 	control=list(trace=TRUE, nAQD=5))
-#'
+#' 
 #' pred = function() {
 #' 	pred = centr/V
 #' }
-#'
+#' 
 #' s = prediction(fit, pred)
 #' plot(s$p, s$dv); abline(0,1,col="red")
-#'
+#' 
 #' }
-#' @export
 #new prediction function with new data
 prediction = function(fit, pred, data=NULL, mc.cores=1)
 {
@@ -162,8 +160,8 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 	  fit$ETA = NULL
 	} else {
 	  data = fit$calls$data
-    }
-	syspar = fit$calls$syspar
+    }	
+	syspar = fit$calls$syspar 
 	system = fit$calls$system
 	th = fit$par
     con <- fit$con
@@ -200,7 +198,7 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 	blik = body(pred)
 
 	ep = environment()
-	..lik.sub = parallel::mclapply(ID.all, function(ix) {
+	..lik.sub = mclapply(ID.all, function(ix) {
 		#-- data
 		if (!is.null(system))
 		{
@@ -232,14 +230,14 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 				names(df) = dimnames(m)[[2]][-1]
 				list2env(df, envir=ep)
 			}
-
+			
 			eval(blik)
 		}
-
+		
 		.wh = ID.ord[as.character(ix)]
 		..g.fn(fit$ETA[.wh,])
 	}, mc.cores=mc.cores)
-
+	
 	list(p=unlist(..lik.sub), dv=data.obs$DV)
 }
 
@@ -247,10 +245,10 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #' Fit a generalized nonlinear mixed-effect model
 #'
 #' Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
-#'
+#' 
 #' @param llik log-likelihood function
 #' @param data data to be fitted
-#' @param inits initial values
+#' @param inits initial values 
 #' @param system an optional (compiled) RxODE object
 #' @param syspar function: calculation of PK parameters
 #' @param diag.xform transformation to diagonal elements of OMEGA during fitting
@@ -259,7 +257,7 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #' @return NULL
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AGQ)
-#'
+#' 
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
@@ -271,17 +269,17 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #' 	dpois(y, lam, log=TRUE)
 #' }
 #' inits = list(THTA=c(1,1,1,1), OMGA=list(ETA[1]~1))
-#'
-#' fit = gnlmm(llik, pump, inits,
+#' 
+#' fit = gnlmm(llik, pump, inits, 
 #' 	control=list(
 #' 	    reltol.outer=1e-4,
 #' 		optim.outer="nmsimplex",
 #' 		nAQD=5
 #' 	)
 #' )
-#'
-#'
-#'
+#' 
+#' 
+#' 
 #' llik <- function()
 #' {
 #' 	lp = THETA[1]*x1+THETA[2]*x2+(x1+x2*THETA[3])*ETA[1]
@@ -289,16 +287,16 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #' 	dbinom(x, m, p, log=TRUE)
 #' }
 #' inits = list(THTA=c(1,1,1), OMGA=list(ETA[1]~1))
-#'
+#' 
 #' gnlmm(llik, rats, inits, control=list(nAQD=7))
-#'
-#'
+#' 
+#' 
 #' ode <- "
 #' d/dt(depot) =-KA*depot;
 #' d/dt(centr) = KA*depot - KE*centr;
 #' "
 #' sys1 = RxODE(ode)
-#'
+#' 
 #' pars <- function()
 #' {
 #' 	CL = exp(THETA[1] + ETA[1])#; if (CL>100) CL=100
@@ -315,18 +313,17 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #' inits$OMGA=list(ETA[1]~.027, ETA[2]~.37)
 #' #inits$OMGA=list(ETA[1]+ETA[2]~c(.027, .01, .37))
 #' theo <- read.table("theo_md.txt", head=TRUE)
-#'
-#' fit = gnlmm(llik, theo, inits, pars, sys1,
+#' 
+#' fit = gnlmm(llik, theo, inits, pars, sys1, 
 #' 	control=list(trace=TRUE, nAQD=5))
-#'
+#' 
 #' cv = calcCov(fit)
 #' cbind(fit$par[fit$nsplt==1], sqrt(diag(cv)))
-#'
+#' 
 #' }
-#' @export
 #this version uses lbfgs instead of optim(); ~ 1/3+ improvement in speed
 #require(lbfgs)
-gnlmm <- function(llik, data, inits, syspar=NULL,
+gnlmm <- function(llik, data, inits, syspar=NULL, 
 	system=NULL, diag.xform=c("sqrt", "log", "identity"),
 	..., control=list())
 #TODO:
@@ -345,22 +342,22 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 	data.obs = subset(data, data$EVID == 0)
 	data.sav = data
 	names(data) <- tolower(names(data))		#needed in ev
-
+    
     #model
     if (is.null(system)) {}
     else if (class(system) == "RxODE") {}
     else if (class(system) == "character") {
         obj <- basename(tempfile())
-        system <- RxODE::RxODE(model = system, modName = obj)
+        system <- RxODE(model = system, modName = obj)
     }
     else {
         stop("invalid system input")
-    }
+    }    
 
     #options
-    con <- list(trace = 0,
-    	maxit = 100L,
-        atol.ode=1e-08,
+    con <- list(trace = 0, 
+    	maxit = 100L, 
+        atol.ode=1e-08, 
         rtol.ode=1e-08,
         reltol.inner = 1.0e-6,
         reltol.outer = 1.0e-3,
@@ -375,7 +372,7 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
         )
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
-    if (length(noNms <- namc[!namc %in% nmsC]))
+    if (length(noNms <- namc[!namc %in% nmsC])) 
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
 	square = function(x) x*x
@@ -399,7 +396,7 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 		mi = tryCatch(
 			backsolve(chol(m), diag(nr)),
 			error = function(e) {
-				stop("OMEGA not positive-definite")
+				stop("OMEGA not positive-definite") 
 			}
 		)
 		diag(mi) = eval(call(diag.xform, diag(mi)))
@@ -423,7 +420,7 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 	)
 	nij = nrow(mij)
 
-
+	
 	#obj fn by AQD
 	if (!is.null(syspar)) {
 		bpar = body(syspar)
@@ -444,7 +441,7 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 		detDinv.5 = prod(diag(Dinv.5))
 
 		ep = environment()
-		..lik.sub = parallel::mclapply(ID.all, function(ix) {
+		..lik.sub = mclapply(ID.all, function(ix) {
 			#-- data
 			if (!is.null(system))
 			{
@@ -489,7 +486,7 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 					names(df) = dimnames(m)[[2]][-1]
 					list2env(df, envir=ep)
 				}
-
+				
 				llik.dat = sum(eval(blik))
 				llik.eta = -crossprod(Dinv.5 %*% ETA)/2 -nETA/2*log(2*pi)+log(detDinv.5)
 				llik = llik.dat+llik.eta
@@ -526,10 +523,10 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 			}
 
 			pvd = NULL; nfcall = 0
-			..fit.inner = lbfgs::lbfgs(f, g, starts[.wh,], invisible=T, epsilon=10000*con$reltol.inner)
+			..fit.inner = lbfgs(f, g, starts[.wh,], invisible=T, epsilon=10000*con$reltol.inner)
 			..fit.inner$hessian = optimHess(..fit.inner$par, f, g)
 			} else {
-			..fit.inner = optim(par=starts[.wh,], ..g.fn, method=con$optim.inner,
+			..fit.inner = optim(par=starts[.wh,], ..g.fn, method=con$optim.inner, 
 				control=list(reltol=con$reltol.inner), hessian=T)
 			}
 
@@ -552,7 +549,7 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 			det.Ginv.5 = prod(diag(Ginv.5))
 
 			#-- AQD
-			..lik.ij = parallel::mclapply(1:nij, function(ix) {
+			..lik.ij = mclapply(1:nij, function(ix) {
 				ij = mij[ix,]
 				w = nw$weights[ij]
 				z = nw$nodes[ij]
@@ -561,13 +558,13 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 				f2 = prod(w*exp(z^2))
 				f1*f2
 			}, mc.cores=1)
-
+			
 			..lik = 2^(nETA/2)*det.Ginv.5*do.call("sum", ..lik.ij)
 			c(-2*log(..lik), .wh, ..fit.inner$par)
 		}, mc.cores=con$mc.cores)
-
+		
 		m = matrix(unlist(..lik.sub), ncol=2+nETA, byrow=T)
-
+		
 		if (update_starts) starts[m[, 2], ] <<- m[, 3:(2+nETA)]
 		r = sum(m[, 1])
 		attr(r, "subj") = m[, 1]
@@ -575,13 +572,13 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 	}
 
 	args = list(inits.vec, obj, control=list(trace=con$trace, reltol=con$reltol.outer))
-
+	
 	fit = if (con$optim.outer=="nmsimplex") do.call("nmsimplex", args)
 	else {
 		args = c(args, method=con$optim.outer)
 		do.call("optim", args)
 	}
-
+	
 	fit = c(fit, obj=obj, list(ETA=starts, con=con, diag.xform=diag.xform, nsplt=nsplt, osplt=osplt, calls=list(data=data.sav, system=system, syspar=syspar)))
 	attr(fit, "class") <- "gnlmm.fit"
 	fit
@@ -599,7 +596,7 @@ linesearch_secant = function(f,d,x,maxIter=5,trace=F) {
 	s=f(x); y = s$y; grad = s$grad
 	dphi_zero=crossprod(grad,d);
 	dphi_curr=dphi_zero;
-
+	 
 	i=0;
 	while ( all(abs(dphi_curr)>epsilon*abs(dphi_zero)) ) {
 	  alpha_old=alpha_curr;
@@ -625,7 +622,7 @@ linesearch_secant = function(f,d,x,maxIter=5,trace=F) {
 #' Calculate gnlmm variance-covariance matrix of fixed effects
 #'
 #' Calculate variance-covariance matrix of fixed effects after a gnlmm() fit
-#'
+#' 
 #' @param fit a gnlmm fit object
 #' @param method method for calculating variance-covariance matrix
 #' @param trace logical whether to trace the iterations
@@ -634,7 +631,6 @@ linesearch_secant = function(f,d,x,maxIter=5,trace=F) {
 #' \dontrun{
 #' calcCov(fit)
 #' }
-#' @export
 calcCov = function(fit, method=1, trace=FALSE) {
 	lth = tapply(fit$par, fit$nsplt, identity)
 	e1 =environment(fit$obj)
@@ -675,17 +671,17 @@ calcCov = function(fit, method=1, trace=FALSE) {
 		list(y = f(x), grad=g(x))
 	}
 
-	x=lth[[1]];lx=length(x);
+	x=lth[[1]];lx=length(x); 
 	lx = length(x)
 	pvd = NULL; nfcall = 0	##CHECKME
-	x = g(x); x = attr(x, "subj")
+	x = g(x); x = attr(x, "subj") 
 	sm = matrix(apply(apply(x, 2, function(y) y %*% t(y)), 1, sum), lx,lx)
 	sinv = solve(sm)
 	H = 2*diag(diag(sinv))
 	#H = pmax(2*diag(diag(sinv)), diag(lx));
 	H = 2*sinv;
 	x=lth[[1]];
-
+	
 	for(k in 1:10) {
 		if (trace) print(k)
 		l=FuncGrad(x); value = l$y; grad = l$grad
@@ -703,7 +699,7 @@ calcCov = function(fit, method=1, trace=FALSE) {
 		if (trace) print(diag(H))
 		if(dist<.01) break
 	}
-
+	
 	cv = if (method==1) 2*H
 	else if (method==2) 4*sinv
 	else (H %*% sinv %*% H)
@@ -715,14 +711,13 @@ calcCov = function(fit, method=1, trace=FALSE) {
 #' Calculate gnlmm variance-covariance matrix of random effects
 #'
 #' Calculate variance-covariance matrix of random effects after a gnlmm() fit
-#'
+#' 
 #' @param fit a gnlmm fit object
 #' @return variance-covariance matrix of random effects
 #' @examples
 #' \dontrun{
 #' getOMEGA(fit)
 #' }
-#' @export
 getOMEGA = function(fit)
 {
 	th = fit$par
@@ -743,7 +738,7 @@ getOMEGA = function(fit)
 
 	shrinkageETA=100*(1-apply(fit$ETA, 2, var)/diag(D))
 	shrinkageETA = ifelse(shrinkageETA>0, shrinkageETA, 0)
-
+	
 	list(OMEGA=D, shrinkageETA=shrinkageETA)
 }
 

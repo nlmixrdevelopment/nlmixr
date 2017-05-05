@@ -2,15 +2,16 @@
 % Please edit documentation in R/000.R
 \name{nlme_gof}
 \alias{nlme_gof}
-\title{GOF plots for nlme::nlme-based mixed-effect models}
+\title{GOF plots for nlme-based mixed-effect models}
 \usage{
 nlme_gof(fit, ...)
 }
 \arguments{
-\item{fit}{nlme::nlme fit object}
+\item{fit}{nlme fit object}
 
 \item{...}{optional additional arguments}
 }
 \description{
-Generates basic goodness-of-fit plots for nlme::nlme-based mixed-effect models
+Generates basic goodness-of-fit plots for nlme-based mixed-effect models
 }
+
