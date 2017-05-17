@@ -19,13 +19,16 @@
 
 #ifndef __STANDALONE__
 #include <R.h>
+#include <Rinternals.h>
+#include <R_ext/Rdynload.h>
+#include <Rmath.h>
 #define printf Rprintf
 #else
 #include <stdio.h>
 #endif
+#include <dparser.h>
 
-#include <string.h>
-#include "dparse_tree.h"
+
 #define max(a,b) (a)>(b) ? (a):(b)
 #define MXSYM 5000
 #define MXDER 500
@@ -33,9 +36,59 @@
 #define MXBUF 2400
 #define SBPTR sb.s+sb.o
 
+// Taken from dparser and changed to use R_alloc
+int r_buf_read(const char *pathname, char **buf, int *len) {
+  struct stat sb;
+  int fd;
 
-char *dup_str(const char *str, const char *end);
-char *sbuf_read(char *pathname);  /* defined in util.h */
+  *buf = 0;
+  *len = 0;
+  fd = open(pathname, O_RDONLY);
+  if (fd <= 0) 
+    return -1;
+  memset(&sb, 0, sizeof(sb));
+  fstat(fd, &sb);
+  *len = sb.st_size;
+  *buf = (char*)R_alloc(*len + 2,sizeof(char));
+  // MINGW likes to convert cr lf => lf which messes with the size
+  size_t real_size = read(fd, *buf, *len);
+  (*buf)[real_size] = 0;
+  (*buf)[real_size + 1] = 0;
+  *len = real_size;
+  close(fd);
+  return *len;
+}
+
+// Taken from dparser and changed to use R_alloc
+char * r_sbuf_read(const char *pathname) {
+  char *buf;
+  int len;
+  if (r_buf_read(pathname, &buf, &len) < 0)
+    return NULL;
+  return buf;
+}
+
+
+// Taken from dparser and changed to use Calloc
+char * rc_dup_str(const char *s, const char *e) {
+  int l = e ? e-s : strlen(s);
+  char *ss = Calloc(l+1,char);
+  memcpy(ss, s, l);
+  ss[l] = 0;
+  return ss;
+}
+
+// Taken from dparser and changed to use R_alloc
+char * r_dup_str(const char *s, const char *e) {
+  int l = e ? e-s : strlen(s);
+  char *ss = (char*)R_alloc(l+1,sizeof(char));
+  memcpy(ss, s, l);
+  ss[l] = 0;
+  return ss;
+}
+
+typedef void (print_node_fn_t)(int depth, char *token_name, char *token_value, void *client_data);
+
 extern D_ParserTables parser_tables_gram;
 
 
@@ -96,7 +149,7 @@ void wprint_node(int depth, char *name, char *value, void *client_data) {
 void wprint_parsetree(D_ParserTables pt, D_ParseNode *pn, int depth, print_node_fn_t fn, void *client_data) {
   char *name = (char*)pt.symbols[pn->symbol].name;
   int nch = d_get_number_of_children(pn), i;
-  char *value = (char*)dup_str(pn->start_loc.s, pn->end);
+  char *value = (char*)r_dup_str(pn->start_loc.s, pn->end);
 
   if (!strcmp("identifier", name) && new_or_ith(value)) {
     sprintf(symtab.symb_str+symstr_offset, "%s,", value);
@@ -127,10 +180,12 @@ void wprint_parsetree(D_ParserTables pt, D_ParseNode *pn, int depth, print_node_
     !strcmp(">", name) ||
 
     !strcmp("=", name)
-  )
-  fn(depth, name, value, client_data);
-  free(value);
-
+      ){
+    fn(depth, name, value, client_data);
+  } else {
+    /* Free(value); */
+  }
+  
   depth++;
   if (nch != 0) {
 
@@ -174,23 +229,23 @@ void wprint_parsetree(D_ParserTables pt, D_ParseNode *pn, int depth, print_node_
         sprintf(sb.s, "dxdt[%d] = InfusionRate[%d] +", symtab.nder, symtab.nder);
         sb.o = strlen(sb.s);
 
-        char *v = (char*)dup_str(xpn->start_loc.s, xpn->end);
+        char *v = (char*)r_dup_str(xpn->start_loc.s, xpn->end);
         new_or_ith(v);
         symtab.is_lhs[symtab.var_ix] = 9;
         symtab.der_ix[symtab.nder] = symtab.var_ix;
         symtab.nder++;
-        free(v);
+        /* Free(v); */
         continue;
       }
 
       if (!strcmp("assignment", name) && i==0) {
-        char *v = (char*)dup_str(xpn->start_loc.s, xpn->end);
+        char *v = (char*)r_dup_str(xpn->start_loc.s, xpn->end);
         sprintf(sb.s, "%s", v);
         sb.o = strlen(v);
 
         new_or_ith(v);
         symtab.is_lhs[symtab.var_ix] = 1;
-        free(v);
+        /* Free(v); */
       }
     } // end for
 
@@ -422,13 +477,15 @@ void parse_pars(char **model_file, char **result_file, int *nrhs, int *dosep) {
     return;
   }
   else {
-    buf = sbuf_read(argv[1]);
+    buf = r_sbuf_read(argv[1]);
     err_msg((long) buf, "error: empty buf\n", -2);
   }
 
   if ((pn=dparse(p, buf, strlen(buf))) && !p->syntax_errors) {
     inits();
     fpIO = fopen( "out2.txt", "w" );
+    
+
     err_msg((long) fpIO, "error opening out2.txt\n", -2);
     wprint_parsetree(parser_tables_gram, pn, 0, wprint_node, NULL);
     fclose(fpIO);
@@ -482,7 +539,7 @@ void parse_ode(char **tmplt_file, char **model_file, char **result_file, char **
     return;
   }
   else {
-    buf = sbuf_read(argv[2]);
+    buf = r_sbuf_read(argv[2]);
     err_msg((long) buf, "error: empty buf\n", -2);
   }
 

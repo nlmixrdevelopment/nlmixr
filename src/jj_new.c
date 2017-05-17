@@ -6,7 +6,7 @@
 #endif
 
 #include <string.h>
-#include "dparse_tree.h"
+#include <dparser.h>
 #define max(a,b) (a)>(b) ? (a):(b)
 #define MXSYM 5000
 #define MXDER 500
