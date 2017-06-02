@@ -1,5 +1,5 @@
 library(nlmixr, quietly = TRUE)
-source("print.summary.lme.R")	  #suppress data printout
+##source("print.summary.lme.R")	  #suppress data printout
 
 ## -- nlme examples
 dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
@@ -10,8 +10,8 @@ plot(augPred(fit,level=0:1))
 
 ## ---------------------
 specs <- list(
-	fixed=list(lKA~1, lCL+lV~WT), 
-	random = pdDiag(lKA+lCL~1), 
+	fixed=list(lKA~1, lCL+lV~WT),
+	random = pdDiag(lKA+lCL~1),
 	start=c(0.5, -3.2, 0, -1, 0))
 fit <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1)
 #plot(augPred(fit,level=0:1))
@@ -21,18 +21,18 @@ fit <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1)
 ## ---------------------
 mypar <- function(lKA, lKE, lCL)
 {
-    KA <- exp(lKA) 
-    KE <- exp(lKE) 
+    KA <- exp(lKA)
+    KE <- exp(lKE)
     CL <- exp(lCL)
     V  <- CL/KE
 }
 specs <- list(
-	fixed=lKA+lCL+lKE~1, 
-	random = pdDiag(lKA+lCL~1), 
+	fixed=lKA+lCL+lKE~1,
+	random = pdDiag(lKA+lCL~1),
 	start=c(0.5, -2.5, -3.2)
 )
 fit <- nlme_lin_cmpt(
-	dat, par_model=specs, 
+	dat, par_model=specs,
 	ncmt=1, parameterization=2, par_trans=mypar)
 #plot(augPred(fit,level=0:1))
 fit
@@ -49,8 +49,8 @@ dat <- read.table("theo_md.txt", head=TRUE)
 dat$WG <- dat$WT>70
 mypar <- function(lKA, lKE, lCL)
 {
-    KA <- exp(lKA) 
-    KE <- exp(lKE) 
+    KA <- exp(lKA)
+    KE <- exp(lKE)
     CL <- exp(lCL)
     V  <- CL/KE
 }
@@ -98,8 +98,8 @@ dat$LOGWT <- log(dat$WT)
 dat$TG <- (dat$ID < 6) + 0    #dummy covariate
 
 specs <- list(
-	fixed=list(lKA=lKA~1, lCL=lCL~1, lV=lV~1), 
-	random = pdDiag(lKA+lCL~1), 
+	fixed=list(lKA=lKA~1, lCL=lCL~1, lV=lV~1),
+	random = pdDiag(lKA+lCL~1),
 	start=c(0.5, -3.2, -1))
 fit0 <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1)
 cv <- list(lCL=c("WT", "TG", "LOGWT"), lV=c("WT", "TG", "LOGWT"))
@@ -138,8 +138,8 @@ df = plot(fit)
 
 
 #ODE implementation:
-ode <- 
-    "d/dt(depot) =-KA*depot; 
+ode <-
+    "d/dt(depot) =-KA*depot;
      d/dt(centr) = KA*depot - KE*centr;"
 PRED = function() centr / V
 m1 = RxODE(ode, modName="m1")
@@ -165,9 +165,9 @@ df = plot(fit)
 
 
 #Calculate C2 inside the ODE:
-ode <- 
-  "C2 = centr/V; 
-  d/dt(depot) =-KA*depot; 
+ode <-
+  "C2 = centr/V;
+  d/dt(depot) =-KA*depot;
   d/dt(centr) = KA*depot - KE*centr;"
 m2 = RxODE(ode, modName="m2")
 PRED2 = function() C2
@@ -204,7 +204,7 @@ llik <- function()
 }
 inits = list(THTA=c(1,1,1,1), OMGA=list(ETA[1]~1))
 
-fit = gnlmm(llik, pump, inits, 
+fit = gnlmm(llik, pump, inits,
 	control=list(
 	    reltol.outer=1e-4,
 		optim.outer="nmsimplex",
@@ -216,7 +216,7 @@ cv = calcCov(fit)
 Rinv = attr(cv,"RinvS")$Rinv
 S    = attr(cv,"RinvS")$S
 Rinv*2					#inverse hessian matrix
-solve(S)*4			    #inverse of score function product sum	
+solve(S)*4			    #inverse of score function product sum
 Rinv %*% S %*% Rinv		#sandwich estimate
 
 
@@ -240,7 +240,7 @@ d/dt(centr) = KA*depot - KE*centr;
 
 #same model as the one run above for SAEM generated using
 # m1 = RxODE(ode, modName="m1")
-#and so if run above, will not need to be run again, 
+#and so if run above, will not need to be run again,
 # but if not, do run the line below:
 #m1 = RxODE(ode)
 
@@ -261,7 +261,7 @@ inits$OMGA=list(ETA[1]~.027, ETA[2]~.37)
 #inits$OMGA=list(ETA[1]+ETA[2]~c(.027, .01, .37))
 theo <- read.table("theo_md.txt", head=TRUE)
 
-fit = gnlmm(llik, theo, inits, pars, m1, 
+fit = gnlmm(llik, theo, inits, pars, m1,
 	control=list(trace=TRUE, nAQD=5))
 
 pred = function() centr/V
@@ -330,6 +330,7 @@ mod <- list(y1 ~ Cp+prop(.1), y2 ~ Cm+prop(.15))
 (fit <- dynmodel.mcmc(sys2, mod, ev, inits, dat))
 
 par(mfrow=c(4,2), mar=c(2,4,1,1))
-s <- lapply(1:dim(fit)[2], function(k) 
+s <- lapply(1:dim(fit)[2], function(k)
      plot(fit[,k], type="l", col="red", ylab=dimnames(fit)[[2]][k]))
 
+s
