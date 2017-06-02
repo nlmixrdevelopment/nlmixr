@@ -556,3 +556,32 @@ augPred.nlmixr_nlme <- function(object, ...){
   class(tmp) <- class(tmp)[-1]
   augPred(tmp, ...);
 }
+
+##'@export
+predict.nlmixr_nlme <- function(object, ...){
+  nlmeModList(object$env);
+  on.exit({nlmeModList(new.env())})
+  tmp <- object;
+  class(tmp) <- class(tmp)[-1]
+  predict(tmp, ...);
+}
+
+##' @export
+ACF.nlmixr_nlme <- function(object, ...){
+  nlmeModList(object$env);
+  on.exit({nlmeModList(new.env())})
+  tmp <- object;
+  class(tmp) <- class(tmp)[-1]
+  ACF(tmp, ...);
+}
+
+##' @export
+anova.nlmixr_nlme <- function(object, ...){
+  nlmeModList(object$env);
+  on.exit({nlmeModList(new.env())})
+  tmp <- object;
+  class(tmp) <- class(tmp)[-1]
+  anova(tmp, ...);
+}
+
+## comparePred should work because predict should work...

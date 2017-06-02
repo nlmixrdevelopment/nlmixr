@@ -16,7 +16,7 @@ importFrom(lbfgs, lbfgs)
 
 
 #export(RxODE, eventTable)
-export(print.nlmixr_nlme, summary.nlmixr_nlme, print.summary_nlmixr_nlme, nlmeModList, augPred.nlmixr_nlme,
+export(print.nlmixr_nlme, summary.nlmixr_nlme, print.summary_nlmixr_nlme, nlmeModList, augPred.nlmixr_nlme, predict.nlmixr_nlme, ACF.nlmixr_nlme, anova.nlmixr_nlme,
 nlme_lin_cmpt,
 nlme_ode,
 nlme_gof,
