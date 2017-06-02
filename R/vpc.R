@@ -39,7 +39,7 @@ sim.one = function(zz, x) {
 	m = m[r,]
 	m = cbind(m, TIME=..ModList$dat.g$TIME, ID=..ModList$dat.g$ID)
 	m = as.data.frame(m)
-	res = do.call(..ModList$user_fn, m)
+    res = do.call(..ModList$user_fn, m)
 	res+rnorm(res, 0, x$sigma)
 }
 
@@ -64,7 +64,7 @@ vpc = function(fit, nsim=100, condition=NULL)
 
 	options(warn=-1)
 
-	s = sapply(1:nsim, sim.one, x=fit)
+    s = sapply(1:nsim, sim.one, x=fit)
 
 	cond.var = if(is.null(condition)) rep(1, dim(..ModList$dat.g)[1]) else ..ModList$dat.g[, condition]
 	levels = sort(unique(cond.var))
@@ -230,16 +230,18 @@ sim.one = function (zz, x)
     dimnames(eta)[[1]] = dimnames(x$coefficients$random$ID)[[1]]
     x$coefficients$random$ID = eta
     pred = predict(x, getData(x))
-    if (is.null(x$call$weights)) sd = 1
-    else if (class(x$call$weights)[1] == "varPower") {
-        sd = abs(pred)^as.double(x$modelStruct$varStruct)
+    if (is.null(x$call$weights)){
+        sd = 1
+    }
+    else if (is(x$call$weights, "varPower")) {
+        sd = abs(pred)^as.double(coef(x$modelStruct$varStruct, allCoef=TRUE))
     }
     else if (class(x$call$weights)[1] == "varConstPower") {
         sd = exp(x$modelStruct$varStruct$const) + abs(pred)^x$modelStruct$varStruct$power
     } else {
         stop("residual model not implemented")
     }
-    #pred + rnorm(pred, 0, x$sigma)
+    ##pred + rnorm(pred, 0, x$sigma)
     pred + rnorm(pred, 0, sd*x$sigma)
 }
 
