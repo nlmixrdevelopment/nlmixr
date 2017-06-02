@@ -78,14 +78,6 @@ char * rc_dup_str(const char *s, const char *e) {
   return ss;
 }
 
-// Taken from dparser and changed to use R_alloc
-char * r_dup_str(const char *s, const char *e) {
-  int l = e ? e-s : strlen(s);
-  char *ss = (char*)R_alloc(l+1,sizeof(char));
-  memcpy(ss, s, l);
-  ss[l] = 0;
-  return ss;
-}
 
 typedef void (print_node_fn_t)(int depth, char *token_name, char *token_value, void *client_data);
 
@@ -149,7 +141,7 @@ void wprint_node(int depth, char *name, char *value, void *client_data) {
 void wprint_parsetree(D_ParserTables pt, D_ParseNode *pn, int depth, print_node_fn_t fn, void *client_data) {
   char *name = (char*)pt.symbols[pn->symbol].name;
   int nch = d_get_number_of_children(pn), i;
-  char *value = (char*)r_dup_str(pn->start_loc.s, pn->end);
+  char *value = (char*)rc_dup_str(pn->start_loc.s, pn->end);
 
   if (!strcmp("identifier", name) && new_or_ith(value)) {
     sprintf(symtab.symb_str+symstr_offset, "%s,", value);
@@ -229,23 +221,23 @@ void wprint_parsetree(D_ParserTables pt, D_ParseNode *pn, int depth, print_node_
         sprintf(sb.s, "dxdt[%d] = InfusionRate[%d] +", symtab.nder, symtab.nder);
         sb.o = strlen(sb.s);
 
-        char *v = (char*)r_dup_str(xpn->start_loc.s, xpn->end);
+        char *v = (char*)rc_dup_str(xpn->start_loc.s, xpn->end);
         new_or_ith(v);
         symtab.is_lhs[symtab.var_ix] = 9;
         symtab.der_ix[symtab.nder] = symtab.var_ix;
         symtab.nder++;
-        /* Free(v); */
+        Free(v);
         continue;
       }
 
       if (!strcmp("assignment", name) && i==0) {
-        char *v = (char*)r_dup_str(xpn->start_loc.s, xpn->end);
+        char *v = (char*)rc_dup_str(xpn->start_loc.s, xpn->end);
         sprintf(sb.s, "%s", v);
         sb.o = strlen(v);
 
         new_or_ith(v);
         symtab.is_lhs[symtab.var_ix] = 1;
-        /* Free(v); */
+        Free(v);
       }
     } // end for
 
