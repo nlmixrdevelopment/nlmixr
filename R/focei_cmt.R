@@ -125,10 +125,11 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 
     #model
     if (is.null(system)) {}
-    else if (class(system) == "RxODE") {}
+    else if (class(system) == "RxODE") {
+        system <- RxODE(system, calcSens=TRUE);
+    }
     else if (class(system) == "character") {
-        obj <- basename(tempfile())
-        system <- RxODE(model = system, modName = obj)
+        system <- RxODE(model = system, calcSens=TRUE);
     }
     else {
         stop("invalid system input")
@@ -370,7 +371,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 
 			#d(State)/d(ETA)
 			whState = modVars$state.llik
-			senState = paste0(whState, "_", pars[madIx])
+			senState = paste0("rx__sens_", whState, "_BY_", pars[madIx], "__");
 			fxJ = list(fx=x[, whState], J=x[, senState])		#FIXME, t()
 
 			dvdx = sapply(expr.dpde.ode, eval, envir=env)		#FIXME
