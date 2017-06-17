@@ -1,7 +1,7 @@
 PKG_CPPFLAGS = -Id 
 
 SOURCES_C = jj.c jj.g.d_parser.c quadrule.c
-SOURCES_CPP = neldermead.cpp slice.cpp RcppExport.cpp
+SOURCES_CPP = neldermead.cpp slice.cpp RcppExportMod.cpp
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o)
 
 all: $(SHLIB)

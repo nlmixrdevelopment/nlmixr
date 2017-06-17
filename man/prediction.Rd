@@ -7,7 +7,7 @@
 prediction(fit, pred, data = NULL, mc.cores = 1)
 }
 \arguments{
-\item{fit}{a dynmodel fit object}
+\item{fit}{a gnlmm fit object}
 
 \item{pred}{prediction function}
 
@@ -46,7 +46,7 @@ inits = list(THTA=c(-3.22, 0.47, -2.45, 0))
 inits$OMGA=list(ETA[1]~.027, ETA[2]~.37)
 theo <- read.table("theo_md.txt", head=TRUE)
 
-fit = gnlmm(llik, theo, inits, pars, sys1, 
+fit = gnlmm(llik, theo, inits, pars, sys1,
 	control=list(trace=TRUE, nAQD=5))
 
 pred = function() {
@@ -58,4 +58,3 @@ plot(s$p, s$dv); abline(0,1,col="red")
 
 }
 }
-

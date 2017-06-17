@@ -14,4 +14,3 @@
 \description{
 Summary of a non-population dynamic model fit
 }
-

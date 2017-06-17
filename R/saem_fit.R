@@ -17,8 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
 
-utils::globalVariables(c("dopred"))
-
 saem_ode_str = '#include <RcppArmadillo.h>
 #include "saem_class_rcpp.hpp"
 
@@ -378,6 +376,7 @@ nmxInclude <- function(pkg="nlmixr"){
 #' xyplot(DV~TIME|ID, df, type=c("p","l"), lwd=c(NA,1), pch=c(1,NA), groups=grp)
 #' fit
 #' }
+#' @export
 gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL) {
   is.ode = class(model) == "RxODE"
   is.win <- .Platform$OS.type=="windows"
@@ -492,6 +491,7 @@ parfn.list = c(
 #' @param infusion logical, whether infusion is true
 #' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
 #' @return parameters for a linear compartment model
+#' @export
 lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #ncmt=1; oral=T; tlag=F; parameterization=1
 	#print(as.list(match.call()))
@@ -531,6 +531,7 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @param x a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 plot.saemFit = function(x, ...)
 {
 	fit = x ##Rcheck hack
@@ -614,6 +615,7 @@ plot.saemFit = function(x, ...)
 #' xyplot(DV~TIME|ID, df, type=c("p","l"), lwd=c(NA,1), pch=c(1,NA), groups=grp)
 #' fit
 #' }
+#' @export
 configsaem = function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
 	ODEopt = list(atol=1e-8, rtol=1e-6, stiff=1, transit_abs=0),
@@ -646,7 +648,7 @@ configsaem = function(model, data, inits,
 
   ###  FIXME: chk vars in input
   ###  FIXME: chk covars as char vec
-  s = subset(data$nmdat, EVID==0)
+  s = data$nmdat[EVID==0, ];
   data$data = as.matrix(s[,c("ID", "TIME", "DV", model$covars)])
 
   nphi = model$N.eta
@@ -929,6 +931,7 @@ getInits = function(x, re, collapse=TRUE) {
 #' @param object a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 summary.saemFit = function(object, ...)
 {
 	fit = object ##Rcheck hack
@@ -964,6 +967,7 @@ summary.saemFit = function(object, ...)
 #' @param x a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 print.saemFit = function(x, ...)
 {
 	fit = x ##Rcheck hack
@@ -999,5 +1003,5 @@ print.saemFit = function(x, ...)
 #FIXME: g = gc = 1
 #FIXME: ODE inits
 #FIXME: Tinf for ODE
-#FIXME: chk infusion poor fit
+                                        #FIXME: chk infusion poor fit
 

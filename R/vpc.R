@@ -17,9 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
 
-#to suppress Rcheck warning
-utils::globalVariables(c("ID"))
-
 
 sim.one = function(zz, x) {
     ..ModList <- nlmeModList();
@@ -56,6 +53,7 @@ sim.one = function(zz, x) {
 #' \dontrun{
 #' vpc(fit, nsim = 100, condition = NULL)
 #' }
+#' @export
 vpc = function(fit, nsim=100, condition=NULL)
 {
     nlmeModList(fit$env);
@@ -123,9 +121,10 @@ multi2 <- function (mu, vmat, n)
 #' print(head(cmat))
 #'
 #' }
+#' @export
 bootdata = function(dat)
 {
-	id = unique(dat$ID)
+    id = unique(dat$ID)
 	nsub = length(id)
 	s = sample(id, nsub, replace=TRUE)
 
@@ -133,7 +132,7 @@ bootdata = function(dat)
 		lapply(1:nsub, function(ix)
 		{
 			k = s[ix]
-			d = subset(dat, ID==k)
+			d = dat[dat$ID == k, ];
 			d$ID = ix
 			d
 		})
@@ -167,6 +166,7 @@ bootdata = function(dat)
 #' print(summary(fit))
 #'
 #' }
+#' @export
 frwd_selection = function(base, cv, dat, cutoff=.05)
 {
 	#dat = getData(base)

@@ -23,10 +23,12 @@ nlmeModListEnv <- new.env();
 ##' Access the model list information for nlmixr's nlme user functions
 ##'
 ##' @param x Parameter to get or set.  If this parameter is an
-##'   environment, change the nlme model environment to this
-##'   environment.
-##' @param value Parameter to
-##' @return
+##'     environment, change the nlme model environment to this
+##'     environment.
+##' @param value Value of the parameter that is being set.
+##' @return When both x and value are missing, this is the
+##'     nlmeModListEnv.  When x is present and value is missing,
+##'     return the value x in the current nlmeModListEnv.
 ##' @author Matthew L. Fidler
 ##' @keywords internal
 ##' @export
@@ -45,15 +47,15 @@ nlmeModList <- function(x, value){
 }
 
 fmt_infusion_data <- function(dat) {
-	x1 <- subset(dat, dat$EVID>10000 & dat$AMT>0)
-	x2 <- subset(dat, dat$EVID>10000 & dat$AMT<0)
-	x1$DUR <- x2$TIME - x1$TIME
-	x1$AMT <- x1$AMT * x1$DUR
-	x <- subset(dat, dat$EVID < 10000)
-	x$DUR <- NA
-	x <- rbind(x, x1)
-	ord <- order(x$ID, x$TIME, -x$EVID)
-	x[ord,]
+    x1 <- dat[dat$EVID>10000 & dat$AMT>0, ]
+    x2 <- dat[dat$EVID>10000 & dat$AMT<0, ]
+    x1$DUR <- x2$TIME - x1$TIME
+    x1$AMT <- x1$AMT * x1$DUR
+    x <- dat[dat$EVID < 10000, ]
+    x$DUR <- NA
+    x <- rbind(x, x1)
+    ord <- order(x$ID, x$TIME, -x$EVID)
+    x[ord,]
 }
 
 cmt_fn_templ <- "
@@ -126,6 +128,7 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #' summary(fit)
 #'
 #' }
+#' @export
 nlme_lin_cmpt <- function(dat, par_model,
 	ncmt, oral=TRUE, infusion=FALSE, tlag=FALSE, parameterization=1,
 	par_trans=get.parfn(oral, ncmt, parameterization, tlag),
@@ -358,6 +361,7 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #' 	response="centr", response.scaler="V")
 #'
 #' }
+#' @export
 nlme_ode <- function(dat.o, model, par_model, par_trans,
 	response, response.scaler=NULL,
 	transit_abs = FALSE,
@@ -416,6 +420,7 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
   return(ret);
 }
 
+##' @export
 print.nlmixr_nlme <- function (x, ..., print.data=FALSE)
 {
   dd <- x$dims
@@ -465,6 +470,7 @@ print.nlmixr_nlme <- function (x, ..., print.data=FALSE)
   invisible(x)
 }
 
+##' @export
 summary.nlmixr_nlme <- function(x, ...){
   tmp <- x;
   class(x) <- class(x)[-1];
@@ -473,7 +479,7 @@ summary.nlmixr_nlme <- function(x, ...){
   return(tmp);
 }
 
-
+##' @export
 print.summary_nlmixr_nlme <- function (x, verbose = FALSE, ..., print.data=FALSE)
 {
   dd <- x$dims
@@ -547,7 +553,7 @@ print.summary_nlmixr_nlme <- function (x, verbose = FALSE, ..., print.data=FALSE
   invisible(x)
 }
 
-
+##' @importFrom nlme augPred
 ##' @export
 augPred.nlmixr_nlme <- function(object, ...){
   nlmeModList(object$env);
@@ -565,7 +571,7 @@ predict.nlmixr_nlme <- function(object, ...){
   class(tmp) <- class(tmp)[-1]
   predict(tmp, ...);
 }
-
+##' @importFrom nlme ACF
 ##' @export
 ACF.nlmixr_nlme <- function(object, ...){
   nlmeModList(object$env);

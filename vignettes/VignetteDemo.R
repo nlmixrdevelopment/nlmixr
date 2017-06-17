@@ -1,9 +1,10 @@
-library(nlmixr, quietly = TRUE)
-##source("print.summary.lme.R")	  #suppress data printout
+library(nlmixr)
 
 ## -- nlme examples
 dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
+
 specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
+
 fit <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1)
 summary(fit)
 plot(augPred(fit,level=0:1))
@@ -27,7 +28,7 @@ mypar <- function(lKA, lKE, lCL)
     V  <- CL/KE
 }
 specs <- list(
-	fixed=lKA+lCL+lKE~1,
+    fixed=lKA+lCL+lKE~1,
 	random = pdDiag(lKA+lCL~1),
 	start=c(0.5, -2.5, -3.2)
 )
