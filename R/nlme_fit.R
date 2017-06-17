@@ -471,10 +471,10 @@ print.nlmixr_nlme <- function (x, ..., print.data=FALSE)
 }
 
 ##' @export
-summary.nlmixr_nlme <- function(x, ...){
-  tmp <- x;
-  class(x) <- class(x)[-1];
-  tmp <- summary(x);
+summary.nlmixr_nlme <- function(object, ...){
+  tmp <- object;
+  class(object) <- class(object)[-1];
+  tmp <- summary(object);
   class(tmp) <- c("summary_nlmixr_nlme", class(tmp));
   return(tmp);
 }

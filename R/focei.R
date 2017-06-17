@@ -277,8 +277,8 @@ genOM <- function(s)
 #' @return NULL
 #' @author Wenping Wang & Matthew Fidler
 #' @export
-plot.focei.fit <- function(object, ...) {
-    dat <- as.data.frame(object);
+plot.focei.fit <- function(x, ...) {
+    dat <- as.data.frame(x);
     d1 <- data.frame(DV=dat$DV, stack(dat[, c("PRED", "IPRED")]))
 
     p1 <- ggplot2::ggplot(d1,ggplot2::aes(values,DV)) +

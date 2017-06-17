@@ -4,12 +4,12 @@
 \alias{plot.focei.fit}
 \title{Plot a focei.fit plot}
 \usage{
-\method{plot}{focei.fit}(object, ...)
+\method{plot}{focei.fit}(x, ...)
 }
 \arguments{
-\item{...}{additional arguments}
-
 \item{x}{a focei fit object}
+
+\item{...}{additional arguments}
 }
 \description{
 Plot some standard goodness of fit plots for the focei fitted object

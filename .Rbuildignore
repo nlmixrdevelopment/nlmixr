@@ -20,3 +20,6 @@ RxODE.*\.(zip|pdf)$
 ^/?src/dparser/.*$
 ^/?build/$
 ^/?build/.*$
+^.*\.pdf$
+^.*\.rtf$
+^.*ODE_PARS\.txt$
