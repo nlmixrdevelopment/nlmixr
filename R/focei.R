@@ -313,8 +313,24 @@ plot.focei.fit <- function(x, ...) {
 ##- NM opt
 ##- AGQ
 
-focei.fit <- function(
-                      data,
+##' FOCEI Fit for nlmixr
+##'
+##' @param data Data to fit
+##' @param inits Initilization list
+##' @param PKpars Pk Parameters
+##' @param diag.xform
+##' @param optim
+##' @param model
+##' @param pred
+##' @param err
+##' @param lower
+##' @param upper
+##' @param control
+##' @param calculate.vars
+##' @return
+##' @author Matthew L. Fidler
+##' @export
+focei.fit <- function(data,
                       inits,
                       PKpars,
                       diag.xform=c("sqrt", "log", "identity"),
@@ -346,7 +362,6 @@ focei.fit <- function(
                       err=NULL,
                       lower= -Inf,
                       upper= Inf,
-                      upper.fac=10,
                       control=list(),
                       calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres")){
     data <- data;
@@ -520,7 +535,9 @@ focei.fit <- function(
     ##FIXME
     ##data
     if (is.null(data$ID)) stop('"ID" not found in data')
+    if (is.null(data$DV)) stop('"DV" not found in data')
     if (is.null(data$EVID)) data$EVID = 0
+    if (is.null(data$AMT)) data$AMT = 0
     data.sav = data
     ds <- data[data$EVID > 0, c("ID", "TIME", "AMT", cov.names)]
     data <- data[data$EVID == 0, ]
@@ -1099,12 +1116,12 @@ focei.fit <- function(
         ## Taken from https://github.com/nathanvan/mcmc-in-irt/blob/master/post-10-mclapply-hack.R
 
         this.env <- environment()
-        while( identical( this.env, globalenv() ) == FALSE ) {
+        ## while( identical( this.env, globalenv() ) == FALSE ) {
             parallel::clusterExport(cl,
                                     ls(all.names=TRUE, envir=this.env),
                                     envir=this.env)
-            this.env <- parent.env(environment())
-        }
+        ##     this.env <- parent.env(environment())
+        ## }
         parallel::clusterExport(cl,
                                 ls(all.names=TRUE, envir=globalenv()),
                                 envir=globalenv())
