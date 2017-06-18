@@ -38,6 +38,17 @@ constructLinCmt <- function(fun){
     return(ret)
 }
 
+is.focei <- function(x){
+    env <- attr(x, ".focei.env");
+    fit <- env$fit;
+    if (length(names(x)) == length(fit$data.names)){
+        return(all(names(x) == fit$data.names) &&
+               length(x[, 1]) == fit$data.len)
+    } else {
+        return(FALSE)
+    }
+}
+
 #' Print a focei fit
 #'
 #' Print a first-order conditional non-linear mixed effect model with
@@ -48,38 +59,39 @@ constructLinCmt <- function(fun){
 #' @return NULL
 #' @export
 print.focei.fit <- function(x, ...) {
-    args <- as.list(match.call(expand.dots = TRUE));
-    if (any(names(args) == "n")){
-        n <- args$n;
+    if (is.focei(x)){
+        env <- attr(x, ".focei.env");
+        fit <- env$fit;
+        args <- as.list(match.call(expand.dots = TRUE));
+        if (any(names(args) == "n")){
+            n <- args$n;
+        } else {
+            n <- 6L;
+        }
+        if (any(names(args) == "width")){
+            width <- args$width;
+        } else {
+            width <- NULL;
+        }
+        cat(sprintf("nlmixr FOCEI fit (%s)\n\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
+        print(data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Condition Number"=fit$condition.number,
+                         row.names="", check.names=FALSE))
+        cat("\nTime (sec):\n");
+        print(fit$time);
+        cat("\nParameters:\n")
+        print(fit$par.data.frame);
+        cat("\nOmega:\n");
+        print(fit$omega);
+        is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
+        if (!is.dplyr){
+            cat("\nFit Data (head):\n")
+            print(head(as.matrix(x), n = n));
+        } else {
+            cat("\nFit Data:\n")
+            print(dplyr::as.tbl(x), n = n, width = width);
+        }
     } else {
-        n <- 6L;
-    }
-    if (any(names(args) == "width")){
-        width <- args$width;
-    } else {
-        width <- NULL;
-    }
-    env <- attr(x, ".focei.env");
-    fit <- env$fit;
-    cat(sprintf("nlmixr FOCEI fit (%s)\n\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
-    cat(sprintf("Objective Function: %s\n", fit$objective));
-    cat(sprintf("AIC: %s\n", AIC(x)));
-    cat(sprintf("BIC: %s\n", BIC(x)));
-    cat("\nParameters:\n")
-    print(fit$theta);
-    cat("\nStandard Error:\n");
-    se <- fit$se[1:length(fit$theta)];
-    names(se) <- names(fit$theta)
-    print(se);
-    cat("\nOmega:\n");
-    print(fit$omega);
-    is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
-    if (!is.dplyr){
-        cat("\nFit Data (head):\n")
-        print(head(as.matrix(x), n = n));
-    } else {
-        cat("\nFit Data:\n")
-        print(dplyr::as.tbl(x), n = n, width = width);
+        print(rm.focei.class(x));
     }
 }
 
@@ -1295,8 +1307,8 @@ focei.fit <- function(data,
                 tmp <- sapply(fit$eigen, abs)
                 fit$condition.number <- max(tmp) / min(tmp);
             }
-            fit$se = sqrt(diag(fit$cov))
-            fit$last.penalty = last.penalty;
+            fit$se <- sqrt(diag(fit$cov))
+            fit$last.penalty <- last.penalty;
             fit$cov.time <- proc.time() - pt;
             fit$sigdig <- last.sigdig;
         }
@@ -1316,7 +1328,9 @@ focei.fit <- function(data,
         lD <- fit$par.unscaled[-seq_along(nms)];
         rxSymEnv <-  RxODE::rxSymInv(rxSym, lD);
         fit$omega <- rxSymEnv$omega;
-
+        w <- seq_along(nms)
+        fit$par.data.frame <- data.frame(est=fit$theta, se=fit$se[w], "%cv"=fit$se[w] / fit$theta * 100,
+                                         check.names=FALSE, row.names=nms);
         env <- environment(ofv.FOCEi);
         attr(data, ".focei.env") <- env;
         class(data) <- c("focei.fit", "data.frame")
@@ -1348,6 +1362,27 @@ focei.fit <- function(data,
     }
     table.time <- proc.time() - pt;
     fit$table.time <- table.time;
+    fit$data.names <- names(data);
+    fit$data.len <- length(data[, 1]);
+    fit$time <- data.frame(setup=setup.time["elapsed"],
+                           optimize=optim.time["elapsed"],
+                           covariance=fit$cov.time["elapsed"],
+                           table=fit$table.time["elapsed"],
+                           row.names="");
     cat("done\n")
     data
+}
+
+
+##' @export
+`$.focei.fit` <-  function(obj, arg, exact = TRUE){
+    m <- as.data.frame(obj);
+    ret <- m[[arg, exact = exact]];
+    if (is.null(ret)){
+        env <- attr(obj, ".focei.env");
+        fit <- env$fit;
+        return(fit[[arg, exact = exact]])
+    } else {
+        return(ret)
+    }
 }
