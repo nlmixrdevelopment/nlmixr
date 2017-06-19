@@ -344,7 +344,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 		dati = data.sav[data.sav$ID==ix, ]
 		evi = dati[, c("TIME", "EVID", "AMT")]
 		names(evi) = tolower(names(evi))
-		ev = eventTable()
+		ev = RxODE::eventTable()
 		ev$import.EventTable(evi)
 		dati = dati[dati$EVID==0, ]
 

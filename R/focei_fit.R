@@ -41,6 +41,8 @@ constructLinCmt <- function(fun){
 is.focei <- function(x){
     env <- attr(x, ".focei.env");
     fit <- env$fit;
+    print(names(x));
+    print(fit$data.names);
     if (length(names(x)) == length(fit$data.names)){
         return(all(names(x) == fit$data.names) &&
                length(x[, 1]) == fit$data.len)
@@ -152,7 +154,7 @@ vcov.focei.fit <- function(object, ...){
 ##' @author Matthew L. Fidler
 ##' @export
 fitted.focei.fit <- function(object, ..., population=FALSE,
-                             type=c("fitted", "Vi", "Vfo")){
+                             type=c("fitted", "Vi", "Vfo", "posthoc")){
     env <- attr(object, ".focei.env");
     fit <- env$fit;
     type <- match.arg(type);
@@ -160,7 +162,7 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
     dat <- object
     env <- environment(ofv.FOCEi);
     if (class(population) == "logical"){
-        if (population){
+        if (population && type == "posthoc"){
             old.mat <- env$inits.mat
             assign("inits.mat", matrix(0, env$nSUB, env$nETA), env)
             on.exit({assign("inits.mat", old.mat, env)});
@@ -176,7 +178,14 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
     }
     x <- ofv.FOCEi(fit$par)
     ## print(attr(x,"subj"))
-    unlist(lapply(attr(x,"subj"), function(s) attr(s, type)))
+    if (type == "posthoc"){
+        d1 <- data.frame(do.call("rbind", lapply(attr(x,"subj"), function(s) attr(s, type))));
+        names(d1) <- paste0("ETA", seq_along(d1[1, ]))
+        d1 <- data.frame(ID=unique(object$ID), d1)
+        return(d1)
+    } else {
+        return(unlist(lapply(attr(x,"subj"), function(s) attr(s, type))))
+    }
 }
 
 ##' Extract residuals from the FOCEI fit
@@ -460,6 +469,7 @@ focei.fit <- function(data,
         rhoend=1e-2,
         npt=NULL,
         est.chol.omegaInv=TRUE,
+        add.posthoc=TRUE,
         extra.output=TRUE ## Display extra output on each iteration
     )
 
@@ -486,6 +496,7 @@ focei.fit <- function(data,
                       "tnewton_precond", "tnewton", "var1", "var2")
     print.grad <- any(optim.method == grad.methods);
     if (con$grad && !print.grad){
+        cat("Warning; You selected a gradient method, but the optimization procedure doesn't require the gradient.\nIgnoring gradient\n")
         con$grad <- FALSE;
     }
     if(class(model)=="RxODE") {
@@ -553,7 +564,7 @@ focei.fit <- function(data,
         data[[v]] <- as.double(data[[v]]);
     data.sav = data
     ds <- data[data$EVID > 0, c("ID", "TIME", "AMT", cov.names)]
-    data <- data[data$EVID == 0, c("ID", "TIME", "AMT", "DV", cov.names)]
+    data <- data[data$EVID == 0, c("ID", "TIME", "DV", cov.names)]
     ## keep the covariate names the same as in the model
     w <- which(!(names(data.sav) %in% cov.names))
     names(data.sav)[w] <- tolower(names(data.sav[w]))         #needed in ev
@@ -1368,6 +1379,13 @@ focei.fit <- function(data,
             data[, toupper(v)] <- resid(data, type=v);
         }
     }
+    if (con$add.posthoc){
+        data <- merge(data, fitted(data, type="posthoc"));
+        ## Drops the class/environment; Put back in.
+        attr(data, ".focei.env") <- env;
+        class(data) <- c("focei.fit", "data.frame")
+    }
+    ## data <- merge(data, m);
     table.time <- proc.time() - pt;
     fit$table.time <- table.time;
     fit$data.names <- names(data);

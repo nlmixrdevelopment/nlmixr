@@ -157,7 +157,7 @@ multi2 = function (mu, vmat, n)
 #new prediction function with new data
 prediction = function(fit, pred, data=NULL, mc.cores=1)
 {
-	if (!is.null(data)) {	#new data
+    if (!is.null(data)) {	#new data
 	  fit$ETA = NULL
 	} else {
 	  data = fit$calls$data
@@ -203,7 +203,7 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 		#-- data
 		if (!is.null(system))
 		{
-			ev <- eventTable()
+			ev <- RxODE::eventTable()
 			ev$import.EventTable(data[data$id == ix, ])
 		}
 

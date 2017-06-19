@@ -1,7 +1,8 @@
 Package: nlmixr
 Type: Package
 Title: nlmixr fits population PK and PKPD non-linear mixed effects models.
-Depends: nlme,
+Depends: R (>= 3.2),
+	 nlme,
 	 RxODE
 Imports: Rcpp (>= 0.11.5),
 	 brew,

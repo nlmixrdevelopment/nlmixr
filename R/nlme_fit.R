@@ -449,7 +449,7 @@ print.nlmixr_nlme <- function (x, ..., print.data=FALSE)
     cat("  Fixed:", deparse(lapply(fixF, function(el) as.name(deparse(el)))),
         "\n")
   }
-  print(fixef(x))
+  print(nlme::fixef(x))
   cat("\n")
   print(summary(x$modelStruct), sigma = x$sigma)
   cat("Number of Observations:", dd[["N"]])
