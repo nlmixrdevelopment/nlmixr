@@ -5,7 +5,7 @@
 ##' @author Hadley Wickham and Matthew L. Fidler
 ##' @keywords internal
 ##' @export
-findLhs <- function(x) {
+nlmixrfindLhs <- function(x) {
     ## Modified from http://adv-r.had.co.nz/Expressions.html find_assign4
     if (is.atomic(x) || is.name(x)) {
         character()
@@ -17,9 +17,9 @@ findLhs <- function(x) {
         } else {
             lhs <- character()
         }
-        unique(c(lhs, unlist(lapply(x, findLhs))))
+        unique(c(lhs, unlist(lapply(x, nlmixrfindLhs))))
     } else if (is.pairlist(x)) {
-        unique(unlist(lapply(x, findLhs)))
+        unique(unlist(lapply(x, nlmixrfindLhs)))
     } else {
         stop("Don't know how to handle type ", typeof(x),
              call. = FALSE)
@@ -33,7 +33,7 @@ findLhs <- function(x) {
 ##' @keywords internal
 ##' @export
 constructLinCmt <- function(fun){
-    pars <- findLhs(body(fun));
+    pars <- nlmixrfindLhs(body(fun));
     ret <- RxODE::rxLinCmtTrans(sprintf("Central=linCmt(%s);\n", paste(pars, collapse=", ")));
     return(ret)
 }
@@ -91,7 +91,7 @@ print.focei.fit <- function(x, ...) {
             print(dplyr::as.tbl(x), n = n, width = width);
         }
     } else {
-        print(rm.focei.class(x));
+        print(as.data.frame(x));
     }
 }
 
@@ -121,7 +121,7 @@ logLik.focei.fit <- function(object, ...){
 nobs.focei.fit <- function(object,...){
     ## nobs and logLik are needed for BIC
     data <- object
-    return(length(data[data$EVID == 0, 1]))
+    return(length(data[, 1]))
 }
 ##' Extract variance/covariance matrix for FOCEI fit
 ##'
@@ -349,16 +349,14 @@ focei.fit <- function(data,
                       optim=c(
                           "bobyqa",
                           "lbfgsb3",
-                          "nlminb",
                           "newuoa",
                           "nlminb",
-                          "bobyqa",
                           "uobyqa",
                           ## These are nlopt functions...
                           "praxis",
-                          "mma",
-                          "slsqp",
-                          "lbfgs-nlopt",
+                          "mma", ## Errors (Grad method)
+                          "slsqp", ## Errors
+                          "lbfgs-nlopt", ## Errors
                           "tnewton_precond_restart",
                           "tnewton_precond",
                           "tnewton",
@@ -552,7 +550,7 @@ focei.fit <- function(data,
     if (is.null(data$AMT)) data$AMT = 0
     data.sav = data
     ds <- data[data$EVID > 0, c("ID", "TIME", "AMT", cov.names)]
-    data <- data[data$EVID == 0, ]
+    data <- data[data$EVID == 0, c("ID", "TIME", "AMT", "DV", cov.names)]
     ## keep the covariate names the same as in the model
     w <- which(!(names(data.sav) %in% cov.names))
     names(data.sav)[w] <- tolower(names(data.sav[w]))         #needed in ev
@@ -1002,13 +1000,20 @@ focei.fit <- function(data,
                                                      "print_level"=2,
                                                      ftol_rel=con$reltol.outer))})
             } else {
-                fit <- try({nloptr::nloptr(rep(1, length(inits.vec)),
-                                           ofv.FOCEi,
-                                           lb=par.lower,
-                                           ub=par.upper,
-                                           opts=list(algorithm=meth[optim.method],
-                                                     "print_level"=2,
-                                                     ftol_rel=con$reltol.outer))});
+                if (any(optim.method == c("bobyqa-nlopt"))){
+                    local <- list("step1"=con$rhobeg);
+                } else {
+                    local <- c();
+                }
+                fit <- nloptr::nloptr(rep(1, length(inits.vec)),
+                               ofv.FOCEi,
+                               lb=par.lower,
+                               ub=par.upper,
+                               opts=list(algorithm=meth[optim.method],
+                                         "print_level"=2,
+                                         ftol_rel=con$reltol.outer,
+                                         "local_opts"=local))
+                ## fit <- try({});
             }
             if (inherits(fit, "try-error") && !is.null(sigdig.fit)){
                 if (attr(fit, "condition")$message == "sigidig exit"){
