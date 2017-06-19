@@ -548,6 +548,9 @@ focei.fit <- function(data,
     if (is.null(data$DV)) stop('"DV" not found in data')
     if (is.null(data$EVID)) data$EVID = 0
     if (is.null(data$AMT)) data$AMT = 0
+    ## Make sure they are all double amounts.
+    for (v in c("TIME", "AMT", "DV", cov.names))
+        data[[v]] <- as.double(data[[v]]);
     data.sav = data
     ds <- data[data$EVID > 0, c("ID", "TIME", "AMT", cov.names)]
     data <- data[data$EVID == 0, c("ID", "TIME", "AMT", "DV", cov.names)]
