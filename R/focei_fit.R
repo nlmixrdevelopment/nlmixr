@@ -127,12 +127,46 @@ nobs.focei.fit <- function(object,...){
 ##'
 ##' @param object Focei fit object
 ##' @param ... ignored parameters
+##' @param type covariance type == blank for current. "r.s" for the
+##'     sandwich matrix, "s" for the S matrix, "r" for the R matrix.
+##'     When requesting another matrix, the model is updated assuming
+##'     that covariance matrix is correct.
 ##' @return variance/covariance matrix
 ##' @author Matthew L. Fidler
 ##' @export
-vcov.focei.fit <- function(object, ...){
-    env <- attr(object, ".focei.env");
-    fit <- env$fit;
+vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
+    type <- match.arg(type);
+    if (type == ""){
+        env <- attr(object, ".focei.env");
+        fit <- env$fit;
+        return(fit$cov);
+    } else if (type == "r.s"){
+        env <- attr(object, ".focei.env");
+        fit <- env$fit;
+        fit$cov <- fit$cov.r.s;
+        fit$se <- sqrt(diag(fit$cov))
+    } else if (type == "s"){
+        env <- attr(object, ".focei.env");
+        fit <- env$fit;
+        fit$cov <- fit$cov.s;
+        fit$se <- sqrt(diag(fit$cov))
+    } else if (type == "r"){
+        env <- attr(object, ".focei.env");
+        fit <- env$fit;
+        fit$cov <- fit$cov.r;
+        fit$se <- sqrt(diag(fit$cov));
+    }
+    nms <- names(fit$theta);
+    w <- seq_along(nms)
+    fit$par.data.frame <- data.frame(est=fit$theta, se=fit$se[w], "%cv"=fit$se[w] / fit$theta * 100,
+                                     check.names=FALSE, row.names=nms);
+    if (env$con$eigen){
+        fit$eigen <- eigen(fit$cov,TRUE,TRUE)$values;
+        tmp <- sapply(fit$eigen, abs)
+        print(tmp);
+        fit$condition.number <- max(tmp) / min(tmp);
+    }
+    assign("fit", fit, env);
     return(fit$cov);
 }
 
@@ -601,6 +635,10 @@ focei.fit <- function(data,
     par.lower <- lower / inits.vec;
     par.upper <- upper / inits.vec;
     cat("Scaled Boundaries:\n");
+    w.neg <- which(par.lower > par.upper);
+    tmp <- par.lower[w.neg];
+    par.lower[w.neg] <- par.upper[w.neg];
+    par.upper[w.neg] <- tmp;
     print(data.frame(par.lower,rep(1, length(inits.vec)),par.upper))
     if (do.sink){
         cat("\nKey:\n")
@@ -640,7 +678,7 @@ focei.fit <- function(data,
             ev <- RxODE::eventTable()
             dati <- data.sav[data.sav$id==subj, ]
             if (length(cov.names) > 0){
-                cur.cov <- dati[, cov.names];
+                cur.cov <- dati[, cov.names, drop = FALSE];
             } else {
                 cur.cov <- NULL;
             }
@@ -1256,7 +1294,11 @@ focei.fit <- function(data,
             } else if (any(con$cov.method==c("hessian", "grad")) && con$grad){
                 message("Calulate covariance...")
                 sink.start();
+                ## Use First Order condition for covariance
+                old.mat <- inits.mat;
+                inits.mat <- matrix(0, nSUB, nETA)
                 R1 <- optimHess(fit$par, ofv.FOCEi, gr.FOCEi);
+                inits.mat <- old.mat;
                 Rinv <- RxODE::rxInv(R1)
             } else {
                 message("Calulate covariance...")
@@ -1378,7 +1420,8 @@ focei.fit <- function(data,
         }
     }
     if (con$add.posthoc){
-        data <- merge(data, fitted(data, type="posthoc"));
+        etas <- fitted(data, type="posthoc")
+        data <- merge(data, etas);
         ## Drops the class/environment; Put back in.
         attr(data, ".focei.env") <- env;
         class(data) <- c("focei.fit", "data.frame")
@@ -1411,6 +1454,7 @@ focei.fit <- function(data,
     }
 }
 
+##' @importFrom utils str
 ##' @export
 str.focei.fit <- function(object, ...){
     cat('FOCEI combined dataset and list\n');
