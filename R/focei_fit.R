@@ -41,8 +41,6 @@ constructLinCmt <- function(fun){
 is.focei <- function(x){
     env <- attr(x, ".focei.env");
     fit <- env$fit;
-    print(names(x));
-    print(fit$data.names);
     if (length(names(x)) == length(fit$data.names)){
         return(all(names(x) == fit$data.names) &&
                length(x[, 1]) == fit$data.len)
@@ -1411,4 +1409,14 @@ focei.fit <- function(data,
     } else {
         return(ret)
     }
+}
+
+##' @export
+str.focei.fit <- function(object, ...){
+    cat('FOCEI combined dataset and list\n');
+    m <- as.data.frame(object);
+    str(m)
+    env <- attr(object, ".focei.env");
+    fit <- env$fit;
+    str(fit)
 }
