@@ -74,8 +74,13 @@ print.focei.fit <- function(x, ...) {
             width <- NULL;
         }
         cat(sprintf("nlmixr FOCEI fit (%s)\n\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
-        print(data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Condition Number"=fit$condition.number,
-                         row.names="", check.names=FALSE))
+        if (any(names(fit) == "condition.number")){
+            print(data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Condition Number"=fit$condition.number,
+                             row.names="", check.names=FALSE))
+        } else {
+            print(data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x),
+                             row.names="", check.names=FALSE))
+        }
         cat("\nTime (sec):\n");
         print(fit$time);
         cat("\nParameters:\n")
@@ -1196,11 +1201,15 @@ focei.fit <- function(data,
     setup.time <- proc.time() - pt;
     pt <- proc.time()
     if (con$NOTRUN) {
+        pt <- proc.time()
         fit = list()
         fit$par = rep(1, length(inits.vec))
         fit$value = as.vector(ofv.FOCEi(rep(1, length(inits.vec))))
         fit$convergence = -99
         fit$message = "notrun"
+        optim.time <- proc.time() - pt;
+        fit$cov.time <- proc.time() - proc.time();
+        fit$objective <- fit$value;
     }
     else {
         if (con$grad){
@@ -1388,8 +1397,12 @@ focei.fit <- function(data,
         rxSymEnv <-  RxODE::rxSymInv(rxSym, lD);
         fit$omega <- rxSymEnv$omega;
         w <- seq_along(nms)
-        fit$par.data.frame <- data.frame(est=fit$theta, se=fit$se[w], "%cv"=fit$se[w] / fit$theta * 100,
-                                         check.names=FALSE, row.names=nms);
+        if (con$NOTRUN){
+            fit$par.data.frame <- data.frame(est=fit$theta, row.names=nms);
+        } else {
+            fit$par.data.frame <- data.frame(est=fit$theta, se=fit$se[w], "%cv"=fit$se[w] / fit$theta * 100,
+                                             check.names=FALSE, row.names=nms);
+        }
         env <- environment(ofv.FOCEi);
         attr(data, ".focei.env") <- env;
         class(data) <- c("focei.fit", "data.frame")
