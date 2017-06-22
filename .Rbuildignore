@@ -13,7 +13,8 @@ RxODE.*\.(zip|pdf)$
 ^/?vignettes/RxODE-intro.md
 ^/?vignettes/figure/.*$
 ^/?inst/Install-windows.md
-^/?inst/examples/.*$
+^/?inst/examples/ACoP7poster/.*$
+^/?inst/examples/LiveDemo/.*$
 ^/?.Rhistory
 ^/?R/.Rhistory
 ^/?src/.Rhistory

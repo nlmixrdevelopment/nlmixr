@@ -648,7 +648,7 @@ configsaem = function(model, data, inits,
 
   ###  FIXME: chk vars in input
   ###  FIXME: chk covars as char vec
-  s = data$nmdat[EVID==0, ];
+  s = data$nmdat[data$nmdat$EVID==0, ];
   data$data = as.matrix(s[,c("ID", "TIME", "DV", model$covars)])
 
   nphi = model$N.eta
