@@ -1,2 +1,0 @@
-PKG_CPPFLAGS=-IC:/Users/justin/DOCUME~1/R/WIN-LI~1/3.3/RxODE/include
-PKG_LIBS=-LC:/Users/justin/DOCUME~1/R/WIN-LI~1/3.3/RxODE/libs/x64 -lodeaux $(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)
