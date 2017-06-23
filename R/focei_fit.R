@@ -199,7 +199,7 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
     dat <- object
     env <- environment(ofv.FOCEi);
     if (class(population) == "logical"){
-        if (population && type == "posthoc"){
+        if (population && type != "posthoc"){
             old.mat <- env$inits.mat
             assign("inits.mat", matrix(0, env$nSUB, env$nETA), env)
             on.exit({assign("inits.mat", old.mat, env)});
