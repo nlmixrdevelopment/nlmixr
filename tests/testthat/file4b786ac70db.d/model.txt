@@ -1,0 +1,5 @@
+
+    d/dt(abs)    = -KA*abs;
+    d/dt(centr)  =  KA*abs+K21*periph-K12*centr-K10*centr;
+    d/dt(periph) =        -K21*periph+K12*centr;
+     

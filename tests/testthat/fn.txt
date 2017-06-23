@@ -1,0 +1,34 @@
+
+require(parallel)
+
+user_fn <- function(lVM, lKM, lV, lCLD, lVT, lKA, TIME, ID)
+{
+	z <- mclapply(as.character(unique(ID)), function(subj)
+	{
+		ev <- eventTable()
+		ev$import.EventTable(subset(..ModList$dat.o, id==as.integer(subj)))
+		#obs.rec <- ev$get.obs.rec()
+
+		sel <- ID==subj
+		plist <- ..ModList$PKpars(lVM=lVM[sel][1], lKM=lKM[sel][1], lV=lV[sel][1], lCLD=lCLD[sel][1], lVT=lVT[sel][1], lKA=lKA[sel][1])
+		inits <- plist$initCondition
+		plist$initCondition <- NULL
+		theta <- unlist(plist)
+		
+		if (any(theta>1e38)) {
+		    warning('large parameter values. may rewrite par_trans.')
+		    print(theta)
+		}
+		if (..ModList$debugODE) {
+		    print(subj)
+		    print(theta)
+		}
+
+		m <- ..ModList$m1$run(theta, ev, inits, transit_abs=FALSE, atol=1e-08, rtol=1e-08)
+		if (is.null(dim(m))) m = t(as.matrix(m))
+		den <- if(is.null(..ModList$response.scaler)) 1 else theta[..ModList$response.scaler]
+		m[, ..ModList$response]/den
+	}, mc.cores=1)
+	unlist(z)
+}
+

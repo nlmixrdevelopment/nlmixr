@@ -1,0 +1,33 @@
+
+require(parallel)
+
+user_fn <- function(lCL, lV, lCLD, lVT, TIME, ID)
+{
+    unlist(mclapply(as.character(unique(ID)), function(subj)
+    {
+        sel.d <- ..ModList$ds$ID==as.integer(subj)
+        dose<-..ModList$ds[sel.d, "AMT"]
+        dstm<-..ModList$ds[sel.d, "TIME"]
+        Tinf<-..ModList$ds[sel.d, "DUR"]
+
+        sel <- ID==subj
+        time.subj <- TIME[sel]
+        s <- ..ModList$PKpars(lCL=lCL[sel][1], lV=lV[sel][1], lCLD=lCLD[sel][1], lVT=lVT[sel][1])
+        pkpars <- toupper(names(s))
+        names(s) <- pkpars
+
+        if (..ModList$oral) {
+            if (is.element("TLAG", pkpars)) {
+                theta <- s[..ModList$refpars]
+            } else {
+                theta <- c(s[..ModList$refpars[1:(2*..ModList$ncmt+1)]], 0)    #no TLAG, set to 0
+            }
+        } else {
+            theta <- c(s[..ModList$refpars[1:(2*..ModList$ncmt)]], 0, 0)
+        }
+        
+        cp <- lin_cmt(time.subj, dstm, dose, Tinf, theta, ..ModList$oral, ..ModList$infusion, ..ModList$ncmt, ..ModList$parameterization)
+        cp
+    }, mc.cores=1))
+}
+
