@@ -507,7 +507,7 @@ focei.fit <- function(data,
         rhobeg=.2,
         rhoend=1e-2,
         npt=NULL,
-        est.chol.omegaInv=TRUE,
+        est.chol.omegaInv=RxODE::rxSymPyVersion() >= 1,
         add.posthoc=TRUE,
         extra.output=TRUE ## Display extra output on each iteration
     )
