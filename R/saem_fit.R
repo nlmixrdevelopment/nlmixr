@@ -316,7 +316,7 @@ END_RCPP
 nmxInclude <- function(pkg="nlmixr"){
     if  (length(pkg) == 1){
         x <- system.file("", package = pkg)
-        if(.Platform$OS.type=="windows") x <- gsub("\\\\", "/", shortPathName(x))
+        if(.Platform$OS.type=="windows") x <- gsub("\\\\", "/", utils::shortPathName(x))
         x <- paste0("-I", x, "/include");
         return(x);
     } else {
@@ -436,7 +436,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   unlink(c("eqn__.txt", "foo__.txt"))
 
   ##gen Markevars
-  ## if(is.win) x = gsub("\\\\", "/", shortPathName(x))
+  ## if(is.win) x = gsub("\\\\", "/", utils::shortPathName(x))
   ## x = sub("/nlmixr", "", x)
   .lib=  if(is.ode) model$cmpMgr$dllfile else ""
 

@@ -13,7 +13,7 @@
 ##' @importFrom RxODE RxODE
 ##' @importFrom graphics abline lines matplot plot points title
 ##' @importFrom stats as.formula nlminb optimHess rnorm terms predict anova optim sd var AIC BIC asOneSidedFormula coef end fitted resid setNames start
-##' @importFrom utils assignInMyNamespace getFromNamespace head shortPathName stack
+##' @importFrom utils assignInMyNamespace getFromNamespace head stack
 ##' @importFrom parallel mclapply
 ##' @importFrom lbfgs lbfgs
 ##' @importFrom methods is
