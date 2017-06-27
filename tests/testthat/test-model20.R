@@ -1,8 +1,7 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: one-compartment infusion, single-dose, Michaelis-Menten")
+context("NLME20: one-compartment infusion, single-dose, Michaelis-Menten")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
@@ -13,11 +12,14 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
-    datIV <- datr[AMT > 0][, TIME := TIME + AMT / RATE][, AMT := -1 * AMT]
+
+    datr <- subset(datr, EVID != 2)
+    datIV <- subset(datr, AMT>0)
+    datIV$TIME <- datIV$TIME + (datIV$AMT/datIV$RATE)
+    datIV$AMT  <- -1*datIV$AMT
+    #datIV <- datr[AMT > 0][, TIME := TIME + AMT / RATE][, AMT := -1 * AMT]
     datr <- rbind(datr, datIV)
-    setkey(datr, ID, TIME)
+    datr <- datr[order(datr$ID, datr$TIME),]
     
     ode1MM <- "
 d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
@@ -38,7 +40,7 @@ d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
     
     runno <- "N020"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
 
     fit <-
       nlme_ode(

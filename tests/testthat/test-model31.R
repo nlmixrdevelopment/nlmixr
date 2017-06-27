@@ -1,8 +1,7 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: oral, Michaelis-Menten, multiple-dose")
+context("NLME31: one-compartment oral, Michaelis-Menten, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   
@@ -22,25 +21,25 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
       
     }
     
-    specs5 <-
+    specs5i <-
       list(
         fixed = lVM + lKM + lV + lKA ~ 1,
-        random = pdDiag(lVM + lKM + lV + lKA ~ 1),
+        random = pdDiag(value = diag(c(2, 2, 2, 2)), form = lVM + lKM + lV + lKA ~
+                          1),
         start = c(
           lVM = 7,
-          lKM = 6,
-          lV = 4,
-          lKA = 0
+          lKM = 6.2,
+          lV = 4.5,
+          lKA = -0.2
         )
       )
     
     datr <-
-      read.csv("ORAL_1CPTMM.csv",
+      read.csv("Oral_1CPTMM.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     runno <- "N031"
     dat <- datr

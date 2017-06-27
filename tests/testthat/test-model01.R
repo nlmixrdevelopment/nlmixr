@@ -1,7 +1,7 @@
 library(testthat)
 library(nlmixr)
 
-context("NLME: one-compartment bolus, single-dose")
+context("NLME01: one-compartment bolus, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   test_that("Closed-form", {

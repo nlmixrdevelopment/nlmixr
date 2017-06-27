@@ -1,20 +1,18 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment oral Michaelis-Menten, multiple-dose")
+context("NLME70: two-compartment oral Michaelis-Menten, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   
   test_that("ODE", {
 
     datr <-
-      read.csv("ORAL_2CPTMM.csv",
+      read.csv("Oral_2CPTMM.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode2MMKA <- "
     d/dt(abs)    =-KA*abs;

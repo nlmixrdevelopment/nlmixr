@@ -2,7 +2,7 @@ library(testthat)
 library(nlmixr)
 library(reshape2)
 
-context("NLME: one-compartment bolus, steady-state")
+context("NLME03: one-compartment bolus, steady-state")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   

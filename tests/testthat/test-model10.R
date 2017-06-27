@@ -1,7 +1,7 @@
 library(testthat)
 library(nlmixr)
 
-context("NLME: one-compartment bolus, Michaelis-Menten, multiple-dose")
+context("NLME10: one-compartment bolus, Michaelis-Menten, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   

@@ -1,19 +1,17 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment oral, single-dose")
+context("NLME60: two-compartment oral, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
   test_that("Closed-form", {
     
-    datr <- read.csv("ORAL_2CPT.csv",
+    datr <- read.csv("Oral_2CPT.csv",
                      header = TRUE,
                      stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     
     ode2KA <- "
@@ -49,7 +47,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N060"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
     
     fit <-
       nlme_lin_cmpt(
@@ -77,20 +75,19 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.309)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.267)
     expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.440)
-    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.319)
-    expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.310)
+    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.226)
+    expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.319)
     
     expect_equal(signif(fit$sigma, 3), 0.2)
   })
   
   test_that("ODE", {
     
-    datr <- read.csv("ORAL_2CPT.csv",
+    datr <- read.csv("Oral_2CPT.csv",
                      header = TRUE,
                      stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     
     ode2KA <- "
@@ -126,7 +123,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N060"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
     
     fitODE <-
       nlme_ode(
@@ -159,7 +156,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.258)
     expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.310)
     
-    expect_equal(signif(fit$sigma, 3), 0.2)
+    expect_equal(signif(fitODE$sigma, 3), 0.199)
   })
   
 }

@@ -1,27 +1,28 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment infusion Michaelis-Menten, single-dose")
+context("NLME54: two-compartment infusion Michaelis-Menten, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
   test_that("ODE", {
 
     datr <-
-      read.csv("INFUSION_2CPTMM.csv",
+      read.csv("Infusion_2CPTMM.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
-    datIV <- datr[AMT > 0][, TIME := TIME + AMT / RATE][, AMT := -1 * AMT]
+
+    datr <- datr[datr$EVID != 2,]
+    datIV <- datr[datr$AMT > 0,]
+    datIV$TIME <- datIV$TIME + (datIV$AMT/datIV$RATE)
+    datIV$AMT <- -1*datIV$AMT
     datr <- rbind(datr, datIV)
-    setkey(datr, ID, TIME)
+    datr <- datr[order(datr$ID, datr$TIME),]
     
     runno <- "N054"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
     
     ode2MM <- "
     d/dt(centr)  = K21*periph-K12*centr-(VM*centr/V)/(KM+centr/V);

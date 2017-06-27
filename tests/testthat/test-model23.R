@@ -1,20 +1,18 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: one-compartment oral, single-dose")
+context("NLME23: one-compartment oral, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
   test_that("Closed-form", {
     
     datr <-
-      read.csv("ORAL_1CPT.csv",
+      read.csv("Oral_1CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode1KA <- "
     d/dt(abs)    = -KA*abs;
@@ -37,7 +35,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N023"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
 
     fit <-
       nlme_lin_cmpt(
@@ -69,12 +67,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   test_that("ODE", {
     
     datr <-
-      read.csv("ORAL_1CPT.csv",
+      read.csv("Oral_1CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode1KA <- "
     d/dt(abs)    = -KA*abs;
@@ -97,8 +94,8 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N023"
     
-    dat <- datr[SD == 1]
-
+    dat <- datr[datr$SD == 1,]
+    
     fitODE <-
       nlme_ode(
         dat,

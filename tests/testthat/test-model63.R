@@ -1,19 +1,17 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment oral, multiple-dose")
+context("NLME63: two-compartment oral, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   
   test_that("Closed-form", {
     
-    datr <- read.csv("ORAL_2CPT.csv",
+    datr <- read.csv("Oral_2CPT.csv",
                      header = TRUE,
                      stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     
     ode2KA <- "
@@ -85,12 +83,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   
   test_that("ODE", {
     
-    datr <- read.csv("ORAL_2CPT.csv",
+    datr <- read.csv("Oral_2CPT.csv",
                      header = TRUE,
                      stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     
     ode2KA <- "
@@ -159,7 +156,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
     expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.282)
     expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.319)
     
-    expect_equal(signif(fit$sigma, 3), 0.2)
+    expect_equal(signif(fitODE$sigma, 3), 0.2)
   })
   
 }

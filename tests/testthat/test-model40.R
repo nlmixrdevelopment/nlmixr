@@ -1,20 +1,18 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment bolus Michaelis-Menten, single-dose")
+context("NLME40: two-compartment bolus Michaelis-Menten, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
   test_that("ODE", {
 
     datr <-
-      read.csv("BOLUS_2CPTMM.csv",
+      read.csv("Bolus_2CPTMM.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode2MM <- "
     d/dt(centr)  = K21*periph-K12*centr-(VM*centr/V)/(KM+centr/V);
@@ -46,7 +44,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N040"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
     
     fit <-
       nlme_ode(
@@ -70,7 +68,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 6.65)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 5.02)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.25)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.42)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.46)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.96)
     
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.33)

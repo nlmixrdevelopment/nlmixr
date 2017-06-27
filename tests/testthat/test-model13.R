@@ -1,7 +1,7 @@
 library(testthat)
 library(nlmixr)
 
-context("NLME: one-compartment infusion, multiple-dose")
+context("NLME13: one-compartment infusion, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
@@ -77,12 +77,22 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     datr <- rbind(datr, datIV)
     datr <- datr[order(datr$ID, datr$TIME), ]
     
-    specs1m <-
+    specs1 <-
       list(
         fixed = lCL + lV ~ 1,
         random = pdDiag(lCL + lV ~ 1),
-        start = c(lCL = 1.3, lV = 4)
+        start = c(lCL = 1.5, lV = 4)
       )
+    
+    ode1 <- "
+    d/dt(centr)  = -(CL/V)*centr;
+    "
+    
+    mypar1 <- function(lCL, lV)
+    {
+      CL <- exp(lCL)
+      V <- exp(lV)
+    }
     
     runno <- "N013"
     

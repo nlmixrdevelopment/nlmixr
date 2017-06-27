@@ -1,7 +1,7 @@
 library(testthat)
 library(nlmixr)
 
-context("NLME: one-compartment infusion, multiple-dose")
+context("NLME15: one-compartment infusion, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   
@@ -28,7 +28,6 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
         random = pdDiag(lCL + lV ~ 1),
         start = c(lCL = 1.5, lV = 4)
       )
-    
     
     runno <- "N015"
     
@@ -83,6 +82,16 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
         start = c(lCL = 1.3, lV = 4)
       )
     
+    ode1 <- "
+    d/dt(centr)  = -(CL/V)*centr;
+    "
+    
+    mypar1 <- function(lCL, lV)
+    {
+      CL <- exp(lCL)
+      V <- exp(lV)
+    }
+    
     runno <- "N015"
     
     dat <- datr
@@ -100,7 +109,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
         control = nlmeControl(pnlsTol = .1, msVerbose = TRUE)
       )
     
-    z <- summary(fit)
+    z <- summary(fitODE)
     
     expect_equal(signif(as.numeric(fitODE$logLik),6), -37861.1)
     expect_equal(signif(AIC(fitODE), 6), 75732.3)

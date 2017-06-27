@@ -1,7 +1,7 @@
 library(testthat)
 library(nlmixr)
 
-context("NLME: one-compartment bolus, Michaelis-Menten, single-dose")
+context("NLME09: one-compartment bolus, Michaelis-Menten, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
@@ -55,7 +55,7 @@ d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
     expect_equal(signif(BIC(fit), 6), 25186.5)
     
     expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 6.80)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 5.34)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 5.33)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.18)
     
     expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.300)

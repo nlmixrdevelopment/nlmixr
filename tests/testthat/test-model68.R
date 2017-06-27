@@ -1,20 +1,18 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment oral Michaelis-Menten, single-dose")
+context("NLME68: two-compartment oral Michaelis-Menten, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
   test_that("ODE", {
 
     datr <-
-      read.csv("ORAL_2CPTMM.csv",
+      read.csv("Oral_2CPTMM.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode2MMKA <- "
     d/dt(abs)    =-KA*abs;
@@ -49,7 +47,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N068"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
     
     fit <-
       nlme_ode(
@@ -75,7 +73,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.27)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.28)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.76)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[6]), 3), 0.0069)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[6]), 3), 0.00609)
     
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.202)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.315)

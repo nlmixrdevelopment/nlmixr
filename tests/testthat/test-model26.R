@@ -1,20 +1,18 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: one-compartment oral, multiple-dose")
+context("NLME26: one-compartment oral, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   
   test_that("Closed-form", {
     
     datr <-
-      read.csv("ORAL_1CPT.csv",
+      read.csv("Oral_1CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode1KA <- "
     d/dt(abs)    = -KA*abs;
@@ -69,12 +67,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   test_that("ODE", {
     
     datr <-
-      read.csv("ORAL_1CPT.csv",
+      read.csv("Oral_1CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode1KA <- "
     d/dt(abs)    = -KA*abs;
@@ -88,11 +85,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
       KA <- exp(lKA)
     }
     
-    specs4 <-
+    specs4i <-
       list(
         fixed = lCL + lV + lKA ~ 1,
         random = pdDiag(lCL + lV + lKA ~ 1),
-        start = c(lCL = 1, lV = 4, lKA = 0)
+        start = c(lCL = 1.6, lV = 4.5, lKA = 0.2)
       )
     
     runno <- "N026"

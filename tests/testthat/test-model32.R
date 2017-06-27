@@ -1,20 +1,18 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment bolus, single-dose")
+context("NLME32: two-compartment bolus, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
   test_that("Closed-form", {
     
     datr <-
-      read.csv("BOLUS_2CPT.csv",
+      read.csv("Bolus_2CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     
     ode2 <- "
@@ -47,7 +45,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N032"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
     
     fit <-
       nlme_lin_cmpt(
@@ -81,12 +79,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   test_that("ODE", {
     
     datr <-
-      read.csv("BOLUS_2CPT.csv",
+      read.csv("Bolus_2CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode2 <- "
     d/dt(centr)  = K21*periph-K12*centr-K10*centr;
@@ -118,7 +115,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N032"
     
-    dat <- datr[SD == 1]
+    dat <- datr[datr$SD == 1,]
     
     fitODE <-
       nlme_ode(

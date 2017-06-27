@@ -1,20 +1,16 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment bolus, steady-state")
+context("NLME34: two-compartment bolus, steady-state")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
-  
   test_that("Closed-form", {
-    
     datr <-
-      read.csv("BOLUS_2CPT.csv",
+      read.csv("Bolus_2CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2, ]
     
     
     ode2 <- "
@@ -47,42 +43,36 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N034"
     
-    datSS <- datr[SS == 0]
-    datSD <- datr[SS == 1]
+    datSS <- datr[datr$SS == 0, ]
+    datSD <- datr[datr$SS == 1, ]
     
     #general solution to allow different times of SS dose and different II values per subject:
-    datSSD <- datr[SS == 1, .(ID, TIME, II)]
+    datSSD <- datr[datr$SS == 1, c("ID", "TIME", "II")]
     
-    nvar <- function(TIME, II) {
-      for (i in seq(1, 7)) {
-        r = TIME - (i - 1) * II
-        assign(paste("ret", i, sep = ""), r)
-      }
-      return(list(
-        r1 = ret1,
-        r2 = ret2,
-        r3 = ret3,
-        r4 = ret4,
-        r5 = ret5,
-        r6 = ret6,
-        r7 = ret7
-      ))
-    }
+    datSSD$V0 <- datSSD$TIME
+    datSSD$V1 <- datSSD$TIME - datSSD$II
+    datSSD$V2 <- datSSD$TIME - 2 * datSSD$II
+    datSSD$V3 <- datSSD$TIME - 3 * datSSD$II
+    datSSD$V4 <- datSSD$TIME - 4 * datSSD$II
+    datSSD$V5 <- datSSD$TIME - 5 * datSSD$II
+    datSSD$V6 <- datSSD$TIME - 6 * datSSD$II
+    datSSD$TIME <- NULL
+    datSSD$II <- NULL
     
-    #updates datSSD with 7 columns to account for the new dosing times
-    datSSD[, (paste("V", seq(1, 7) - 1, sep = "")) := nvar(TIME, II)][, TIME :=
-                                                                        NULL][, II := NULL]
-    index <- melt(datSSD, id.vars = "ID", value.name = "TIMED")
-    index[, variable := NULL]
-    index <- index[TIMED > 0]
+    index <- melt(datSSD, id.vars = c("ID"), value.name = "TIMED")
+    index$variable <- NULL
+    index <- index[index$TIMED > 0, ]
+    index <- index[order(index$ID, index$TIMED), ]
     
     #much easier solution if you know the time of SS dose and the II and if it is the same for all
     #index<-CJ(ID=datSSD$ID,TIMED=seq(192,0,-24))
     
-    datSD2 <- merge(datSD, index, by = c("ID"), all = TRUE)
-    datSD2[, TIME := TIMED][, TIMED := NULL]
+    datSD2 <- merge(datSD, index, by = c("ID"), all = T)
+    datSD2$TIME <- datSD2$TIMED
+    datSD2$TIMED <- NULL
+    
     datSS <- rbind(datSS, datSD2)
-    setkey(datSS, ID, TIME)
+    datSS <- datSS[order(datSS$ID, datSS$TIME), ]
     dat <- datSS
     
     fit <-
@@ -97,14 +87,14 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     z <- VarCorr(fit)
     
-    expect_equal(signif(as.numeric(fit$logLik),6), -13468.5)
+    expect_equal(signif(as.numeric(fit$logLik), 6),-13468.5)
     expect_equal(signif(AIC(fit), 6), 26955)
-    expect_equal(signif(BIC(fit), 6), 27006.5)  
+    expect_equal(signif(BIC(fit), 6), 27006.5)
     
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]),3), 1.34)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]),3), 4.18)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[3]),3), 1.31)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]),3), 3.89)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 1.34)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 4.18)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 1.31)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 3.89)
     
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.340)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.319)
@@ -115,14 +105,12 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   })
   
   test_that("ODE", {
-    
     datr <-
-      read.csv("BOLUS_2CPT.csv",
+      read.csv("Bolus_2CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2, ]
     
     ode2 <- "
     d/dt(centr)  = K21*periph-K12*centr-K10*centr;
@@ -154,42 +142,36 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N034"
     
-    datSS <- datr[SS == 0]
-    datSD <- datr[SS == 1]
+    datSS <- datr[datr$SS == 0, ]
+    datSD <- datr[datr$SS == 1, ]
     
     #general solution to allow different times of SS dose and different II values per subject:
-    datSSD <- datr[SS == 1, .(ID, TIME, II)]
+    datSSD <- datr[datr$SS == 1, c("ID", "TIME", "II")]
     
-    nvar <- function(TIME, II) {
-      for (i in seq(1, 7)) {
-        r = TIME - (i - 1) * II
-        assign(paste("ret", i, sep = ""), r)
-      }
-      return(list(
-        r1 = ret1,
-        r2 = ret2,
-        r3 = ret3,
-        r4 = ret4,
-        r5 = ret5,
-        r6 = ret6,
-        r7 = ret7
-      ))
-    }
+    datSSD$V0 <- datSSD$TIME
+    datSSD$V1 <- datSSD$TIME - datSSD$II
+    datSSD$V2 <- datSSD$TIME - 2 * datSSD$II
+    datSSD$V3 <- datSSD$TIME - 3 * datSSD$II
+    datSSD$V4 <- datSSD$TIME - 4 * datSSD$II
+    datSSD$V5 <- datSSD$TIME - 5 * datSSD$II
+    datSSD$V6 <- datSSD$TIME - 6 * datSSD$II
+    datSSD$TIME <- NULL
+    datSSD$II <- NULL
     
-    #updates datSSD with 7 columns to account for the new dosing times
-    datSSD[, (paste("V", seq(1, 7) - 1, sep = "")) := nvar(TIME, II)][, TIME :=
-                                                                        NULL][, II := NULL]
-    index <- melt(datSSD, id.vars = "ID", value.name = "TIMED")
-    index[, variable := NULL]
-    index <- index[TIMED > 0]
+    index <- melt(datSSD, id.vars = c("ID"), value.name = "TIMED")
+    index$variable <- NULL
+    index <- index[index$TIMED > 0, ]
+    index <- index[order(index$ID, index$TIMED), ]
     
     #much easier solution if you know the time of SS dose and the II and if it is the same for all
     #index<-CJ(ID=datSSD$ID,TIMED=seq(192,0,-24))
     
-    datSD2 <- merge(datSD, index, by = c("ID"), all = TRUE)
-    datSD2[, TIME := TIMED][, TIMED := NULL]
+    datSD2 <- merge(datSD, index, by = c("ID"), all = T)
+    datSD2$TIME <- datSD2$TIMED
+    datSD2$TIMED <- NULL
+    
     datSS <- rbind(datSS, datSD2)
-    setkey(datSS, ID, TIME)
+    datSS <- datSS[order(datSS$ID, datSS$TIME), ]
     dat <- datSS
     
     fitODE <-
@@ -207,14 +189,14 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     z <- VarCorr(fitODE)
     
-    expect_equal(signif(as.numeric(fitODE$logLik),6), -13466.2)
+    expect_equal(signif(as.numeric(fitODE$logLik), 6),-13466.2)
     expect_equal(signif(AIC(fitODE), 6), 26950.3)
-    expect_equal(signif(BIC(fitODE), 6), 27001.9)  
+    expect_equal(signif(BIC(fitODE), 6), 27001.9)
     
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]),3), 1.34)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.18)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), 1.29)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[4]),3), 3.91)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]), 3), 1.34)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]), 3), 4.18)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]), 3), 1.29)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[4]), 3), 3.91)
     
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.338)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.318)

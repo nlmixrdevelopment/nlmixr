@@ -1,7 +1,7 @@
 
 require(parallel)
 
-user_fn <- function(lCL, lV, lCLD, lVT, TIME, ID)
+user_fn <- function(lCL, lV, TIME, ID)
 {
     unlist(mclapply(as.character(unique(ID)), function(subj)
     {
@@ -12,7 +12,7 @@ user_fn <- function(lCL, lV, lCLD, lVT, TIME, ID)
 
         sel <- ID==subj
         time.subj <- TIME[sel]
-        s <- ..ModList$PKpars(lCL=lCL[sel][1], lV=lV[sel][1], lCLD=lCLD[sel][1], lVT=lVT[sel][1])
+        s <- ..ModList$PKpars(lCL=lCL[sel][1], lV=lV[sel][1])
         pkpars <- toupper(names(s))
         names(s) <- pkpars
 

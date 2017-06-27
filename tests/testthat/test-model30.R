@@ -1,8 +1,7 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: one-compartment oral, Michaelis-Menten, multiple-dose")
+context("NLME30: one-compartment oral, Michaelis-Menten, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
@@ -35,15 +34,14 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
       )
     
     datr <-
-      read.csv("ORAL_1CPTMM.csv",
+      read.csv("Oral_1CPTMM.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     runno <- "N030"
-    dat <- datr[SD == 0]
+    dat <- datr[datr$SD == 0,]
     
     fit <-
       nlme_ode(

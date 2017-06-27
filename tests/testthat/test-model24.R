@@ -1,20 +1,18 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: one-compartment oral, multiple-dose")
+context("NLME24: one-compartment oral, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
   test_that("Closed-form", {
     
     datr <-
-      read.csv("ORAL_1CPT.csv",
+      read.csv("Oral_1CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode1KA <- "
     d/dt(abs)    = -KA*abs;
@@ -37,7 +35,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N024"
     
-    dat <- datr[SD == 0]
+    dat <- datr[datr$SD == 0,]
 
     fit <-
       nlme_lin_cmpt(
@@ -69,12 +67,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   test_that("ODE", {
     
     datr <-
-      read.csv("ORAL_1CPT.csv",
+      read.csv("Oral_1CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
+    datr <- datr[datr$EVID != 2,]
     
     ode1KA <- "
     d/dt(abs)    = -KA*abs;
@@ -88,7 +85,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
       KA <- exp(lKA)
     }
     
-    specs4 <-
+    specs4i <-
       list(
         fixed = lCL + lV + lKA ~ 1,
         random = pdDiag(lCL + lV + lKA ~ 1),
@@ -97,7 +94,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     runno <- "N024"
     
-    dat <- datr[SD == 0]
+    dat <- datr[datr$SD == 0,]
     
     fitODE <-
       nlme_ode(
@@ -114,19 +111,19 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     
     z <- VarCorr(fitODE)
     
-    expect_equal(signif(as.numeric(fitODE$logLik),6), -26145.9)
-    expect_equal(signif(AIC(fitODE), 6), 52305.7)
-    expect_equal(signif(BIC(fitODE), 6), 52350.9)  
+    expect_equal(signif(as.numeric(fitODE$logLik),6), -26145.7)
+    expect_equal(signif(AIC(fitODE), 6), 52305.4)
+    expect_equal(signif(BIC(fitODE), 6), 52350.6)  
     
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]),3), 1.39)
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.2)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), -0.0129)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), -0.00808)
     
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.264)
-    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.282)
-    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.338)
+    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.281)
+    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.339)
     
-    expect_equal(signif(fitODE$sigma, 3), 0.198)
+    expect_equal(signif(fitODE$sigma, 3), 0.197)
   })
   
 }

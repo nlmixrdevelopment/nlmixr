@@ -1,23 +1,26 @@
 library(testthat)
 library(nlmixr)
-library(data.table)
 
-context("NLME: two-compartment infusion, multiple-dose")
+context("NLME49: two-compartment infusion, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   
   test_that("Closed-form", {
     
     datr <-
-      read.csv("INFUSION_2CPT.csv",
+      read.csv("Infusion_2CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
-    datIV <- datr[AMT > 0][, TIME := TIME + AMT / RATE][, AMT := -1 * AMT]
+    
+    datr <- datr[datr$EVID != 2,]
+    
+    datIV <- datr[datr$AMT > 0,]
+    datIV$TIME <- datIV$TIME + (datIV$AMT/datIV$RATE)
+    datIV$AMT  <- -1*datIV$AMT
+    
     datr <- rbind(datr, datIV)
-    setkey(datr, ID, TIME)
+    datr <- datr[order(datr$ID, datr$TIME),]
     
     specs6 <-
       list(
@@ -73,16 +76,19 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   test_that("ODE", {
     
     datr <-
-      read.csv("INFUSION_2CPT.csv",
+      read.csv("Infusion_2CPT.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
-    datr <- data.table(datr)
-    datr <- datr[EVID != 2]
-    datIV <-
-      datr[AMT > 0][, TIME := TIME + AMT / RATE][, AMT := -1 * AMT]
+    
+    datr <- datr[datr$EVID != 2,]
+    
+    datIV <- datr[datr$AMT > 0,]
+    datIV$TIME <- datIV$TIME + (datIV$AMT/datIV$RATE)
+    datIV$AMT  <- -1*datIV$AMT
+    
     datr <- rbind(datr, datIV)
-    setkey(datr, ID, TIME)
+    datr <- datr[order(datr$ID, datr$TIME),]
     
     ode2 <- "
     d/dt(centr)  = K21*periph-K12*centr-K10*centr;

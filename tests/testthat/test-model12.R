@@ -1,7 +1,7 @@
 library(testthat)
 library(nlmixr)
 
-context("NLME: one-compartment infusion, single-dose")
+context("NLME12: one-compartment infusion, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
   
@@ -77,6 +77,16 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     datr <- rbind(datr, datIV)
     datr <- datr[order(datr$ID, datr$TIME), ]
     
+    ode1 <- "
+    d/dt(centr)  = -(CL/V)*centr;
+    "
+    
+    mypar1 <- function(lCL, lV)
+    {
+      CL <- exp(lCL)
+      V <- exp(lV)
+    }
+    
     specs1m <-
       list(
         fixed = lCL + lV ~ 1,
@@ -101,16 +111,16 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
         control = nlmeControl(pnlsTol = .1, msVerbose = TRUE)
       )
     
-    z <- summary(fit)
+    z <- summary(fitODE)
     
-    expect_equal(signif(as.numeric(fit$logLik),6), -11867.4)
-    expect_equal(signif(AIC(fit), 6), 23744.7)
-    expect_equal(signif(BIC(fit), 6), 23773.4)  
+    expect_equal(signif(as.numeric(fitODE$logLik),6), -11867.2)
+    expect_equal(signif(AIC(fitODE), 6), 23744.4)
+    expect_equal(signif(BIC(fitODE), 6), 23773.1)  
     
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]),3), 1.39)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]),3), 4.27)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]),3), 1.39)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.27)
     
-    expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.276)
+    expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.277)
     expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.307)
     expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[3], 3)), 0.201)
     

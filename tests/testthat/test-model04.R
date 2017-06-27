@@ -1,7 +1,7 @@
 library(testthat)
 library(nlmixr)
 
-context("NLME: one-compartment bolus, multiple-dose")
+context("NLME04: one-compartment bolus, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
   
@@ -91,12 +91,12 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
     
     z <- summary(fitODE)
     
-    expect_equal(signif(as.numeric(fit$logLik),6), -38528.5)
-    expect_equal(signif(AIC(fit), 6), 77067)
-    expect_equal(signif(BIC(fit), 6), 77101.2)   
+    expect_equal(signif(as.numeric(fitODE$logLik),6), -38528.5)
+    expect_equal(signif(AIC(fitODE), 6), 77066.9)
+    expect_equal(signif(BIC(fitODE), 6), 77101.2)   
     
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]),3), 1.36)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]),3), 4.20)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]),3), 1.36)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.20)
     
     expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.270)
     expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.310)
