@@ -17,6 +17,7 @@
 ##' @importFrom parallel mclapply
 ##' @importFrom lbfgs lbfgs
 ##' @importFrom methods is
+##' @importFrom Rcpp evalCpp
 ##' @useDynLib nlmixr
 "_PACKAGE"
 

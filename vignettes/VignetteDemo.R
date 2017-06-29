@@ -125,7 +125,7 @@ PKpars = function()
 #closed form solution:
 saem_fit <- gen_saem_user_fn(model=lincmt(ncmt=1, oral=T))
 
-#--- saem cfg
+                                        #--- saem cfg
 nmdat = read.table("theo_sd.dat",  head=T)
 model = list(saem_mod=saem_fit, covars="WT")
 inits = list(theta=c(.05, .5, 2))
@@ -144,9 +144,6 @@ ode <-
      d/dt(centr) = KA*depot - KE*centr;"
 PRED = function() centr / V
 m1 = RxODE(ode, modName="m1")
-
-#cannot overwrite existing dll and so remove prior to running:
-dyn.unload("saem_main.dll")
 
 saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
 
@@ -173,7 +170,6 @@ ode <-
 m2 = RxODE(ode, modName="m2")
 PRED2 = function() C2
 
-dyn.unload("saem_main.dll")
 saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
 
 

@@ -24,3 +24,4 @@ RxODE.*\.(zip|pdf)$
 ^.*\.pdf$
 ^.*\.rtf$
 ^.*ODE_PARS\.txt$
+^logo.png$

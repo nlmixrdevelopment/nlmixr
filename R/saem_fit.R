@@ -381,6 +381,14 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   is.ode = class(model) == "RxODE"
   is.win <- .Platform$OS.type=="windows"
   env = environment()
+  saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
+  saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
+  saem.cpp <- paste0(saem.cpp, ".cpp");
+  lwd <- getwd();
+  .wd <- tempfile()
+  dir.create(.wd, recursive = TRUE)
+  setwd(.wd)
+  on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
 
   if (is.ode) {
     modelVars = model$cmpMgr$get.modelVars()
@@ -428,11 +436,12 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   len = length(x)
   cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
   nrhs = integer(1)
+  RxODE::rxReq("dparser");
   x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE))
   nrhs = x[[3]]
   foo = paste(readLines("foo__.txt"), collapse="\n")
   nm = system.file("", package = "nlmixr");
-  brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output="saem_main.cpp")
+  brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
   unlink(c("eqn__.txt", "foo__.txt"))
 
   ##gen Markevars
@@ -444,20 +453,45 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), .lib)
   cat(make_str, file="Makevars")
 
-  shlib = 'R CMD SHLIB saem_main.cpp %s -o saem_main.dll'
+  shlib = sprintf('R CMD SHLIB %s %%s -o %s', saem.cpp, saem.dll)
   shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
   system(shlib)
+  file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
+  setwd(lwd);
+  saem.dll <- file.path(lwd, saem.dll);
 
   if(is.ode) dyn.load(model$cmpMgr$dllfile)
-  `.DLL` <- dyn.load('saem_main.dll')
-  assign("dopred", sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred'), .GlobalEnv)
-  fn = sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
+  `.DLL` <- dyn.load(saem.dll);
+  fn.pred <- sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred')
+  fn1 <- sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
+  fn <- eval(bquote(function(a, b, c){
+      if (missing(b) && missing(c)){
+          cur.fn <- .(fn1)
+          ret <- cur.fn(a)
+          attr(ret, "dopred") <- .(fn.pred);
+          return(ret);
+      } else {
+          cur.fn <- .(fn.pred)
+          return(cur.fn(a, b, c));
+      }
+  }))
   attr(fn, "form") = if (is.ode) "ode" else "cls"
   attr(fn, "neq") = neq
   attr(fn, "nlhs") = nlhs
   attr(fn, "nrhs") = nrhs
+  reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
+}
 
+##' Cleanup saem_fit environment by removing dll after the object is no logner used by R.
+##'
+##' @param env Environment where cleanup needs to occur.
+##' @return
+##' @author Matthew L. Fidler
+##' @export
+saem.cleanup <- function(env){
+    try({dyn.unload(env$saem.dll)}, silent=TRUE);
+    unlink(env$saem.dll);
 }
 
 parfn.list = c(
@@ -542,6 +576,7 @@ plot.saemFit = function(x, ...)
 		cbind(dat, grp=1),
 		cbind(dat, grp=2)
 	)
+        dopred <- attr(x, "dopred");
 	yp = dopred(fit$mpost_phi, saem.cfg$evt, saem.cfg$opt)
 	df$DV[df$grp==2] = yp
 
@@ -942,8 +977,8 @@ summary.saemFit = function(object, ...)
 	se = sqrt(diag(H))
 
 	m =  cbind(exp(th), th, se)	#FIXME
-	lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
-	if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
+	## lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
+	## if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
 	dimnames(m)[[2]] = c("th", "log(th)", "se(log_th)")
 	cat("THETA:\n")
 	print(m)
@@ -978,8 +1013,8 @@ print.saemFit = function(x, ...)
 	se = sqrt(diag(H))
 
 	m =  cbind(exp(th), th, se)	#FIXME
-	lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
-	if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
+	## lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
+	## if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
 	dimnames(m)[[2]] = c("th", "log(th)", "se(log_th)")
 	cat("THETA:\n")
 	print(m)
