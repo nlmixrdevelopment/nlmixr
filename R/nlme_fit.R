@@ -378,8 +378,7 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
     #prep ode
     if (class(model)=="RxODE") nlmeModList("m1", model)
     else if (class(model)=="character") {
-      obj <- basename(tempfile())
-      nlmeModList("m1", RxODE(model = model, modName = obj));
+        nlmeModList("m1", RxODE(model = model));
     } else {
       stop('invalid model input')
     }
