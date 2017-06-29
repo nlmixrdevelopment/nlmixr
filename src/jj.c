@@ -263,7 +263,7 @@ void retieve_var(int i, char *buf) {
   buf[len] = 0;
 }
 
-void err_msg(long chk, const char *msg, int code)
+void err_msg(int chk, const char *msg, int code)
 {
   if(!chk) {
     if (symtab.symb_str)
@@ -283,7 +283,7 @@ void prnt_aux_files(char *prefix) {
   sprintf(buf, "%sODE_PARS.txt",   prefix); fp[0] = fopen(buf, "w");
   sprintf(buf, "%sLHS_VARS.txt",   prefix); fp[1] = fopen(buf, "w");
   sprintf(buf, "%sSTATE_VARS.txt", prefix); fp[2] = fopen(buf, "w");
-  i = (long) fp[0] * (long) fp[1] * (long) fp[2];
+  i =  (intptr_t)fp[0] * (intptr_t)fp[1] *  (intptr_t) fp[2];
   err_msg(i, "Coudln't open file to write.\n", -1);
 
   for (i=0; i<symtab.nvar; i++) {
@@ -347,7 +347,7 @@ void codegen(FILE *outpt, int dosep) {
 
     ncov = 0;
     fpIO = fopen("out2.txt", "r");
-    err_msg((long) fpIO, "Coudln't access out2.txt.\n", -1);
+    err_msg((intptr_t)fpIO, "Coudln't access out2.txt.\n", -1);
     while(fgets(sLine, MXLEN, fpIO)) {        /* parsed eqns */
 	  char *s;
 	  s = strstr(sLine, "= 9999.999 + - 9999.999;");
@@ -408,7 +408,8 @@ void codegen_stanode(FILE *outpt, const char* template_file) {
 
     ncov = 0;
     fpIO = fopen("out2.txt", "r");
-    err_msg((long) fpIO, "Coudln't access out2.txt.\n", -1);
+    err_msg((intptr_t)
+	    fpIO, "Coudln't access out2.txt.\n", -1);
     while(fgets(sLine, MXLEN, fpIO)) {        /* parsed eqns */
 	  char *s;
 	  s = strstr(sLine, "= 9999.999 + - 9999.999;");
@@ -425,7 +426,7 @@ void codegen_stanode(FILE *outpt, const char* template_file) {
   }
 
   fpIO = fopen(template_file, "r");
-  err_msg((long) fpIO, "Couldn't access template file.\n", -1);
+  err_msg((intptr_t)fpIO, "Couldn't access template file.\n", -1);
   while(fgets(sLine, MXLEN, fpIO)) {
     fprintf(outpt, "%s", sLine);
   }
@@ -437,7 +438,7 @@ void codegen_stanode(FILE *outpt, const char* template_file) {
 
 void inits() {
   symtab.symb_str = (char *) malloc(64*MXSYM);
-  err_msg((long) symtab.symb_str, "error allocating vars", 1);
+  err_msg((intptr_t)symtab.symb_str, "error allocating vars", 1);
 
   symtab.offset[0]=0;
   memset(symtab.is_lhs, 0, MXSYM);
@@ -470,7 +471,7 @@ void parse_pars(char **model_file, char **result_file, int *nrhs, int *dosep) {
   }
   else {
     buf = r_sbuf_read(argv[1]);
-    err_msg((long) buf, "error: empty buf\n", -2);
+    err_msg((intptr_t)buf, "error: empty buf\n", -2);
   }
 
   if ((pn=dparse(p, buf, strlen(buf))) && !p->syntax_errors) {
@@ -478,7 +479,7 @@ void parse_pars(char **model_file, char **result_file, int *nrhs, int *dosep) {
     fpIO = fopen( "out2.txt", "w" );
     
 
-    err_msg((long) fpIO, "error opening out2.txt\n", -2);
+    err_msg((intptr_t)fpIO, "error opening out2.txt\n", -2);
     wprint_parsetree(parser_tables_gram, pn, 0, wprint_node, NULL);
     fclose(fpIO);
     if (fp_inits)
@@ -532,13 +533,13 @@ void parse_ode(char **tmplt_file, char **model_file, char **result_file, char **
   }
   else {
     buf = r_sbuf_read(argv[2]);
-    err_msg((long) buf, "error: empty buf\n", -2);
+    err_msg((intptr_t)buf, "error: empty buf\n", -2);
   }
 
   if ((pn=dparse(p, buf, strlen(buf))) && !p->syntax_errors) {
     inits();
     fpIO = fopen( "out2.txt", "w" );
-    err_msg((long) fpIO, "error opening out2.txt\n", -2);
+    err_msg((intptr_t)fpIO, "error opening out2.txt\n", -2);
     wprint_parsetree(parser_tables_gram, pn, 0, wprint_node, NULL);
     fclose(fpIO);
     if (fp_inits)
