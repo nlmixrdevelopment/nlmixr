@@ -58,41 +58,41 @@ fmt_infusion_data <- function(dat) {
     x[ord,]
 }
 
-cmt_fn_templ <- "
-require(parallel)
+nlme_cmt_gen_usr_fn <- function(arg1, arg2, mc.cores){
+    fun <- eval(parse(text=sprintf("function(%s, TIME, ID){NULL;}", arg1)))
+    pkpars <- eval(parse(text=sprintf("bquote((nlmeModList(\"PKpars\"))(%s))", arg2)));
+    body <- bquote({
+        unlist(parallel::mclapply(as.character(unique(ID)), function(subj)
+            {
+                sel.d <- nlmeModList("ds")$ID==as.integer(subj)
+                dose  <- nlmeModList("ds")[sel.d, "AMT"]
+                dstm  <- nlmeModList("ds")[sel.d, "TIME"]
+                Tinf  <- nlmeModList("ds")[sel.d, "DUR"]
 
-user_fn <- function(<%=arg1%>, TIME, ID)
-{
-    unlist(mclapply(as.character(unique(ID)), function(subj)
-    {
-        sel.d <- nlmeModList(\"ds\")$ID==as.integer(subj)
-        dose  <- nlmeModList(\"ds\")[sel.d, \"AMT\"]
-        dstm  <- nlmeModList(\"ds\")[sel.d, \"TIME\"]
-        Tinf  <- nlmeModList(\"ds\")[sel.d, \"DUR\"]
+                sel <- ID==subj
+                time.subj <- TIME[sel]
+                s <- .(pkpars)
+                pkpars <- toupper(names(s))
+                names(s) <- pkpars
 
-        sel <- ID==subj
-        time.subj <- TIME[sel]
-        s <- nlmeModList(\"PKpars\");
-        s <- s(<%=arg2%>);
-        pkpars <- toupper(names(s))
-        names(s) <- pkpars
+                if (nlmeModList("oral")) {
+                    if (is.element("TLAG", pkpars)) {
+                        theta <- s[nlmeModList("refpars")]
+                    } else {
+                        theta <- c(s[nlmeModList("refpars")[1:(2*nlmeModList("ncmt")+1)]], 0)    #no TLAG, set to 0
+                    }
+                } else {
+                    theta <- c(s[nlmeModList("refpars")[1:(2*nlmeModList("ncmt"))]], 0, 0)
+                }
 
-        if (nlmeModList(\"oral\")) {
-            if (is.element(\"TLAG\", pkpars)) {
-                theta <- s[nlmeModList(\"refpars\")]
-            } else {
-                theta <- c(s[nlmeModList(\"refpars\")[1:(2*nlmeModList(\"ncmt\")+1)]], 0)    #no TLAG, set to 0
-            }
-        } else {
-            theta <- c(s[nlmeModList(\"refpars\")[1:(2*nlmeModList(\"ncmt\"))]], 0, 0)
-        }
+                cp <- lin_cmt(time.subj, dstm, dose, Tinf, theta, nlmeModList("oral"), nlmeModList("infusion"), nlmeModList("ncmt"), nlmeModList("parameterization"))
+                cp
+            }, mc.cores=.(mc.cores)))
 
-        cp <- lin_cmt(time.subj, dstm, dose, Tinf, theta, nlmeModList(\"oral\"), nlmeModList(\"infusion\"), nlmeModList(\"ncmt\"), nlmeModList(\"parameterization\"))
-        cp
-    }, mc.cores=<%=mc.cores%>))
+    });
+    body(fun) <- body;
+    return(fun);
 }
-"
-
 
 #' Fit nlme-based linear compartment mixed-effect model using closed form solution
 #'
@@ -168,9 +168,9 @@ nlme_lin_cmpt <- function(dat, par_model,
     arg1 <- paste(names(s), collapse=", ")
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
     arg3 <- sprintf("list(%s)", paste(names(s), "=.1", collapse=", "))
-    brew(text=cmt_fn_templ, output="fn.txt")
-    source("fn.txt", local=nlmeModList())
-
+    ## brew(text=cmt_fn_templ, output="fn.txt")
+    ## source("fn.txt", local=nlmeModList())
+    nlmeModList("user_fn", nlme_cmt_gen_usr_fn(arg1, arg2, mc.cores))
 
     refpars <- pm[[ncmt, parameterization]]
     npars <- length(refpars)
@@ -219,41 +219,41 @@ nlme_lin_cmpt <- function(dat, par_model,
     return(ret);
 }
 
+nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
+    fun <- eval(parse(text=sprintf("function(%s, TIME, ID){NULL;}", arg1)))
+    pkpars <- eval(parse(text=sprintf("bquote((nlmeModList(\"PKpars\"))(%s))", arg2)));
+    body <- bquote({
+        z <- parallel::mclapply(as.character(unique(ID)), function(subj)
+                       {
+                           ev <- eventTable()
+                           ev$import.EventTable(subset(nlmeModList("dat.o"), id==as.integer(subj)))
+                                        #obs.rec <- ev$get.obs.rec()
 
-ode_fn_templ = "
-require(parallel)
+                           sel <- ID==subj
+                           plist <- .(pkpars)
+                           inits <- plist$initCondition
+                           plist$initCondition <- NULL
+                           theta <- unlist(plist)
 
-user_fn <- function(<%=arg1%>, TIME, ID)
-{
-	z <- mclapply(as.character(unique(ID)), function(subj)
-	{
-		ev <- eventTable()
-		ev$import.EventTable(subset(nlmeModList(\"dat.o\"), id==as.integer(subj)))
-		#obs.rec <- ev$get.obs.rec()
+                           if (any(theta>1e38)) {
+                               warning('large parameter values. may rewrite par_trans.')
+                               print(theta)
+                           }
+                           if (nlmeModList("debugODE")) {
+                               print(subj)
+                               print(theta)
+                           }
 
-		sel <- ID==subj
-		plist <- (nlmeModList(\"PKpars\"))(<%=arg2%>)
-		inits <- plist$initCondition
-		plist$initCondition <- NULL
-		theta <- unlist(plist)
-
-		if (any(theta>1e38)) {
-		    warning('large parameter values. may rewrite par_trans.')
-		    print(theta)
-		}
-		if (nlmeModList(\"debugODE\")) {
-		    print(subj)
-		    print(theta)
-		}
-
-		m <- nlmeModList(\"m1\")$run(theta, ev, inits, transit_abs=<%=transit_abs%>, atol=<%=atol%>, rtol=<%=rtol%>)
-		if (is.null(dim(m))) m = t(as.matrix(m))
-		den <- if(is.null(nlmeModList(\"response.scaler\"))) 1 else theta[nlmeModList(\"response.scaler\")]
-		m[, nlmeModList(\"response\")]/den
-	}, mc.cores=<%=mc.cores%>)
+                           m <- nlmeModList("m1")$run(theta, ev, inits, transit_abs=.(transit_abs), atol=.(atol), rtol=.(rtol));
+                           if (is.null(dim(m))) m = t(as.matrix(m))
+                           den <- if(is.null(nlmeModList("response.scaler"))) 1 else theta[nlmeModList("response.scaler")]
+                           m[, nlmeModList("response")]/den
+                       }, mc.cores=.(mc.cores))
 	unlist(z)
+    });
+    body(fun) <- body;
+    return(fun);
 }
-"
 
 #' Fit nlme-based mixed-effect model using ODE implementation
 #'
@@ -395,8 +395,8 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
     s <- formals(PKpars)
     arg1 <- paste(names(s), collapse=", ")
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
-    brew(text=ode_fn_templ, output="fn.txt")
-    source("fn.txt", local=nlmeModList())
+
+    nlmeModList("user_fn", nlme_ode_gen_usr_fn(arg1, arg2, transit_abs, atol, rtol, mc.cores));
 
     #data prep
     dat.g <- groupedData(DV~TIME|ID, subset(dat.o, dat.o$EVID==0))
