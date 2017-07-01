@@ -26,7 +26,7 @@ TRUE), label = c("A", NA, NA, NA, "e", NA, NA, NA, NA, NA, NA,
 NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
 NA, NA, "labels", NA, NA, NA)), .Names = c("theta", "eta1", "eta2",
 "name", "lower", "est", "upper", "fix", "label"), row.names = c(NA,
--33L), class = "data.frame");
+-33L), class = c("nlmixrBounds", "data.frame"));
 
 
 testbounds <- function(){
@@ -60,6 +60,7 @@ testbounds <- function(){
     a6 = c(9, 10, fixed)
     a7 = c(11, 12, 13, fixed)
 }
+
 test_that("bounds are extracted correctly", {
     expect_equal(nlmixrBounds(testbounds), ref);
 })
@@ -95,4 +96,82 @@ test_that("Theta Bounds above 4 don't work", {
     expect_error(nlmixrBounds(bnd), rex::rex("c(1, 2, 3, 4) syntax is not supported for thetas") )
     expect_error(nlmixrBounds(bnda), rex::rex("a = c(1, 2, 3, 4) syntax is not supported for thetas"))
     expect_error(nlmixrBounds(bndb), rex::rex("a <- c(1, 2, 3, 4) syntax is not supported for thetas"))
+})
+
+bnd1 <- function(){
+     ~ c(1)
+}
+ref1 <- structure(list(theta = NA, eta1 = 1, eta2 = 1, name = NA, lower = -Inf,     est = 1, upper = Inf, fix = FALSE, label = NA), .Names = c("theta", "eta1", "eta2", "name", "lower", "est", "upper", "fix", "label"), row.names = c(NA, -1L), class = c("nlmixrBounds", "data.frame"));
+
+bnd2 <- function(){
+     ~ c(1, 2)
+}
+
+bnd3 <- function(){
+    ~ c(1,
+        2, 3)
+}
+
+ref3 <- structure(list(theta = c(NA, NA, NA), eta1 = c(1, 2, 2), eta2 = c(1, 1, 2), name = c(NA, NA, NA), lower = c(-Inf, -Inf, -Inf), est = c(1, 2, 3), upper = c(Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE),     label = c(NA, NA, NA)), .Names = c("theta", "eta1", "eta2", "name", "lower", "est", "upper", "fix", "label"), row.names = c(NA, -3L), class = c("nlmixrBounds", "data.frame"))
+
+bnd4  <- function(){
+    ~ c(1,
+        2, 3,
+        4)
+}
+
+bnd5  <- function(){
+    ~ c(1,
+        2, 3,
+        4, 5)
+}
+
+bnd6  <- function(){
+    ~ c(1,
+        2, 3,
+        4, 5, 6)
+}
+
+ref6 <- structure(list(theta = c(NA, NA, NA, NA, NA, NA), eta1 = c(1, 2, 2, 3, 3, 3), eta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA, NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(1, 2, 3, 4, 5, 6), upper = c(Inf, Inf, Inf, Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), label = c(NA, NA, NA, NA, NA, NA)), .Names = c("theta", "eta1", "eta2", "name", "lower", "est", "upper", "fix", "label"), row.names = c(NA, -6L), class = c("nlmixrBounds", "data.frame"))
+
+
+bnd7  <- function(){
+    ~ c(1,
+        2, 3,
+        4, 5, 6,
+        7)
+}
+bnd8  <- function(){
+    ~ c(1,
+        2, 3,
+        4, 5, 6,
+        7, 8)
+}
+bnd9  <- function(){
+    ~ c(1,
+        2, 3,
+        4, 5, 6,
+        7, 8, 9)
+}
+bnd10  <- function(){
+    ~ c(1,
+        2, 3,
+        4, 5, 6,
+        7, 8, 9, 10)
+}
+
+ref10 <- structure(list(theta = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), eta1 = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4), eta2 = c(1, 1, 2, 1, 2, 3, 1, 2, 3, 4), name = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), upper = c(Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), label = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)), .Names = c("theta", "eta1", "eta2", "name", "lower", "est", "upper", "fix", "label"), row.names = c(NA, -10L), class = c("nlmixrBounds", "data.frame"))
+
+
+test_that("Bad Lower trianglar matrices throw errors.", {
+    expect_equal(nlmixrBounds(bnd1), ref1);
+    expect_error(nlmixrBounds(bnd2), rex::rex("~c(1, 2) does not have the right dimensions for a lower triangular matrix."))
+    expect_equal(nlmixrBounds(bnd3), ref3);
+    expect_error(nlmixrBounds(bnd4), rex::rex("~c(1, 2, 3, 4) does not have the right dimensions for a lower triangular matrix."))
+    expect_error(nlmixrBounds(bnd5), rex::rex("~c(1, 2, 3, 4, 5) does not have the right dimensions for a lower triangular matrix."))
+    expect_equal(nlmixrBounds(bnd6), ref6);
+    expect_error(nlmixrBounds(bnd7), rex::rex("~c(1, 2, 3, 4, 5, 6, 7) does not have the right dimensions for a lower triangular matrix."))
+    expect_error(nlmixrBounds(bnd8), rex::rex("~c(1, 2, 3, 4, 5, 6, 7, 8) does not have the right dimensions for a lower triangular matrix."))
+    expect_error(nlmixrBounds(bnd9), rex::rex("~c(1, 2, 3, 4, 5, 6, 7, 8, 9) does not have the right dimensions for a lower triangular matrix."))
+    expect_equal(nlmixrBounds(bnd10), ref10)
 })

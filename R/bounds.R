@@ -299,7 +299,7 @@ nlmixrBounds <- function(fun){
                                     stop("The left handed side of the expression must match the number of ETAs in the lower triangular matrix.");
                                 }
                             } else {
-                                stop(sprintf("%s does not have the right dimensions for a lower triangular matrix.", as.character(x[[2]])))
+                                stop(sprintf("~c(%s) does not have the right dimensions for a lower triangular matrix.", paste(sapply(x[[2]][-1], as.character), collapse=", ")))
                             }
                         }
                     }
@@ -345,7 +345,7 @@ nlmixrBounds <- function(fun){
                                 }
                                 eta1 <<- eta1 + num;
                             } else {
-                                stop(sprintf("%s does not have the right dimensions for a lower triangular matrix.", as.character(x[[2]])))
+                                stop(sprintf("~c(%s) does not have the right dimensions for a lower triangular matrix.", paste(sapply(x[[2]][-1], as.character), collapse=", ")))
                             }
                         }
                     }
@@ -386,5 +386,6 @@ nlmixrBounds <- function(fun){
     if (length(df$theta) == 0){
         stop("Could not find any parameter information.")
     }
+    class(df) <- c("nlmixrBounds", "data.frame");
     df
 }
