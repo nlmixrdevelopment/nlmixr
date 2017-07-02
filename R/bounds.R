@@ -561,6 +561,8 @@ print.nlmixrBounds <- function(x, ...){
             return(nlmixrBoundsPred(obj))
         } else if (arg == "random"){
             return(nlmixrBoundsOmega(obj, TRUE));
+        } else if (arg == "fixed.form"){
+            return(nlmixrBoundsTheta(obj, formula=TRUE))
         } else {
             return(NULL)
         }
@@ -577,13 +579,15 @@ str.nlmixrBounds <- function(x){
     message(" $ omega     : matrix ... (omega matrix)")
     message(" $ pred      : function ... (Prediction function based on error specification)")
     message(" $ random    : matrix class ... (Based on Between Subject Random effects)")
+    message(" $ fixed.form: formula  ... (Fixed effect parameters based on theta.)")
 }
 
-nlmixrBoundsTheta <- function(x, full=TRUE){
+nlmixrBoundsTheta <- function(x, full=TRUE, formula=FALSE){
     if (is.nlmixrBounds(x)){
+        if (formula) full <- FALSE;
         w <- which(!is.na(x$ntheta));
         tmp <- x[w, ];
-        nm <- sprintf("theta[%d]", seq_along(w));
+        nm <- sprintf(ifelse(formula, ".theta.%d", "theta[%d]"), seq_along(w));
         w <- which(!is.na(tmp$name));
         nm[w] <- as.character(tmp$name[w]);
         w <- which(!is.na(tmp$err));
@@ -594,7 +598,15 @@ nlmixrBoundsTheta <- function(x, full=TRUE){
             nm <- nm[-w];
             theta <- theta[-w];
         }
-        names(theta) <- nm;
+        if (formula){
+            if (any(duplicated(nm))){
+                stop("Duplicated names for thetas; Cannot figure out formula");
+            } else {
+                return(as.formula(sprintf("%s ~ 1", paste(nm, collapse=" + "))))
+            }
+        } else {
+            names(theta) <- nm;
+        }
         return(theta)
     } else {
         return(NULL)
