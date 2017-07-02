@@ -456,6 +456,7 @@ nlmixrBounds <- function(fun){
                 }
             } else if (identical(x[[1]], quote(`label`))) {
                 lab <- as.character(x[[2]]);
+                lab <- gsub(";+", "", lab)
                 len <- length(env$df$ntheta);
                 if (!is.na(env$df$ntheta[len])){
                     tmp <- as.character(env$df$label);
@@ -466,6 +467,7 @@ nlmixrBounds <- function(fun){
                 }
             } else if (identical(x[[1]], quote(`condition`))){
                 lab <- as.character(x[[2]]);
+                lab <- gsub(";+", "", lab)
                 len <- length(env$df$ntheta);
                 if (!is.na(env$df$ntheta[len]) && is.na(env$df$err[len])){
                     stop("Currently only etas/errs can be conditioned on...");
@@ -511,4 +513,150 @@ nlmixrBounds <- function(fun){
     }
     class(df) <- c("nlmixrBounds", "data.frame");
     df
+}
+
+is.nlmixrBounds <- function(x){
+    should <- c("ntheta", "neta1", "neta2", "name", "lower", "est", "upper",  "fix", "err", "label", "condition");
+    what <- names(x)
+    if (length(should) == length(what)){
+        return(all(what == should))
+    } else {
+        return(FALSE)
+    }
+}
+
+##' @export
+as.data.frame.nlmixrBounds <- function(x, row.names = NULL, optional = FALSE, ...){
+    cls <- class(x)
+    cls <- cls[cls != "nlmixrBounds"]
+    tmp <- x;
+    class(tmp) <- cls;
+    return(tmp);
+}
+
+##' @export
+print.nlmixrBounds <- function(x, ...){
+    cat("nlmixr bounds object\n\n")
+    cat("Fixed Effects ($theta):\n");
+    print(x$theta);
+    omega <- x$omega;
+    if (!is.null(omega)){
+        cat("\nOmega ($omega):\n");
+        print(omega)
+    }
+}
+
+##'@export
+`$.nlmixrBounds` <- function(obj, arg, exact = TRUE){
+    m <- as.data.frame(obj);
+    ret <- m[[arg, exact = exact]];
+    if (is.null(ret)){
+        if (arg == "theta"){
+            return(nlmixrBoundsTheta(obj, full=FALSE))
+        } else if (arg == "theta.full"){
+            return(nlmixrBoundsTheta(obj, full=TRUE))
+        } else if (arg == "omega"){
+            return(nlmixrBoundsOmega(obj));
+        } else if (arg == "pred"){
+            return(nlmixrBoundsPred(obj))
+        } else if (arg == "random"){
+            return(nlmixrBoundsOmega(obj, TRUE));
+        } else {
+            return(NULL)
+        }
+    } else {
+        return(ret)
+    }
+}
+
+##'@export
+str.nlmixrBounds <- function(x){
+    str(as.data.frame(x))
+    message(" $ theta     : num ... (theta estimates)")
+    message(" $ theta.full: num ... (theta estimates, including error terms)")
+    message(" $ omega     : matrix ... (omega matrix)")
+    message(" $ pred      : function ... (Prediction function based on error specification)")
+    message(" $ random    : matrix class ... (Based on Between Subject Random effects)")
+}
+
+nlmixrBoundsTheta <- function(x, full=TRUE){
+    if (is.nlmixrBounds(x)){
+        w <- which(!is.na(x$ntheta));
+        tmp <- x[w, ];
+        nm <- sprintf("theta[%d]", seq_along(w));
+        w <- which(!is.na(tmp$name));
+        nm[w] <- as.character(tmp$name[w]);
+        w <- which(!is.na(tmp$err));
+        theta <-  tmp$est
+        if (full){
+            nm[w] <- sprintf("err[%d]", seq_along(w));
+        } else {
+            nm <- nm[-w];
+            theta <- theta[-w];
+        }
+        names(theta) <- nm;
+        return(theta)
+    } else {
+        return(NULL)
+    }
+}
+
+nlmixrBoundsOmega <- function(x, nlme=FALSE){
+    if (is.nlmixrBounds(x)){
+        w <- which(!is.na(x$neta1));
+        d <- max(x$neta1);
+        df <- x[w, ];
+        mx <- max(df$neta1);
+        mat <- matrix(rep(0, mx * mx), mx, mx);
+        diag <- TRUE;
+        for (i in seq_along(df$neta1)){
+            neta1 <- df$neta1[i];
+            neta2 <- df$neta2[i];
+            if (neta1 == neta2){
+                mat[neta1, neta2] <- df$est[i];
+            } else {
+                diag <- FALSE
+                mat[neta1, neta2] <- mat[neta2, neta1]<- df$est[i];
+            }
+        }
+        if (nlme){
+            df.diag <- df[df$neta1 == df$neta2, ];
+            n2 <- sprintf(".eta.%d", seq_along(df.diag$name));
+            w <- which(!is.na(df.diag$name))
+            n2[w] <- as.character(df.diag$name[w])
+            frm <- as.formula(paste(paste(n2, collapse=" + "), "~ 1"))
+            if (diag){
+                return(nlme::pdDiag(mat, form=frm))
+            } else {
+                return(nlme::pdSymm(as.matrix(Matrix::nearPD(mat)$mat), form=frm))
+            }
+        }
+        return(mat);
+    } else {
+        return(NULL);
+    }
+}
+
+nlmixrBoundsPred <- function(x){
+    if (is.nlmixrBounds(x)){
+        w <- which(!is.na(x$err));
+        if (length(w) > 0){
+            df <- as.data.frame(x[w, ]);
+            df <- df[, c("name", "condition")]
+            df <- df[!duplicated(df), ];
+            if (all(df$name == df$name[1])){
+                return(eval(parse(text=sprintf("function(){\nreturn(%s)\n}", df$name[1]))))
+            } else if (!any(is.na(df$condition))) {
+                df$el <- "else ";
+                df$el[1] <- "";
+                return(eval(parse(text=sprintf("function(){\n%s\n}", paste(sprintf("%sif (%s) {\n return(%s);\n} ", df$el, df$condition, df$name), collapse="\n")))));
+            } else {
+                stop("If you have multiple variables for prediction, you need to specify the condition with the | operator. (like y ~ prop(1) | CMT==3)")
+            }
+        } else {
+            stop("No errors are specified in the nlmixr bound object; Cant' create pred function")
+        }
+    } else {
+        stop("Cannot create pred function since this isn't a nlmixr bounds object!");
+    }
 }

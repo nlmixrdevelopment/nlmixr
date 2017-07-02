@@ -1,6 +1,6 @@
 context("Test bounds extraction")
 
-ref <- structure(list(ntheta = c(1, 2, 3, 4, 5, 6, 7, 8, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 9, 10, 11, 12, 13, 14), neta1 = c(NA, NA, NA, NA, NA, NA, NA, NA, 1, 2, 3, 4, 5, 6, 6, 7, 8, 8, 9, 9, 9, 10, 11, 11, 12, 12, 12, NA, NA, NA, NA, NA, NA), neta2 = c(NA, NA, NA, NA, NA, NA, NA, NA, 1, 2, 3, 4, 5, 5, 6, 7, 7, 8, 7, 8, 9, 10, 10, 11, 10, 11, 12, NA, NA, NA, NA, NA, NA), name = structure(c(1L, 2L, 3L, 4L, NA, NA, NA, NA, 5L, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 6L, 7L, 8L, 9L, 10L, 11L, NA, NA, NA, 12L, 13L, 14L), .Label = c("a", "b", "c", "d", "et1", "et2", "(et3,et2)", "et3", "(et4,et2)", "(et4,et3)", "et4", "a5", "a6", "a7"), class = "factor"), lower = c(0, 0, -Inf, -Inf, 0, 0, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, 9, 11, -Inf, 9, 11), est = c(1, 3, 4, 4, 1, 1, 1, 1, 10, 20, 30, 40, 40, 0.1, 20, 40, 0.1, 20, 0.1, 0.1, 30, 40, 0.1, 20, 0.1, 0.1, 30, 8, 10, 12, 8, 10, 12), upper = c(2, Inf, Inf, Inf, 2, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, 13, Inf, Inf, 13), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE), err = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), label = c("A", NA, NA, NA, "e", NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "labels", NA, NA, NA), condition = c(NA, NA, NA, NA, NA, NA, NA, NA, "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", NA, NA, NA, NA, NA, NA)), .Names = c("ntheta", "neta1", "neta2", "name", "lower", "est", "upper", "fix", "err", "label", "condition"), row.names = c(NA, -33L), class = c("nlmixrBounds", "data.frame"))
+ref <-structure(list(ntheta = c(1, 2, 3, 4, 5, 6, 7, 8, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19), neta1 = c(NA, NA, NA, NA, NA, NA, NA, NA, 1, 2, 3, 4, 5, 6, 6, 7, 8, 8, 9, 9, 9, 10, 11, 11, 12, 12, 12, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), neta2 = c(NA, NA, NA, NA, NA, NA, NA, NA, 1, 2, 3, 4, 5, 5, 6, 7, 7, 8, 7, 8, 9, 10, 10, 11, 10, 11, 12, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), name = structure(c(1L, 2L, 3L, 4L, NA, NA, NA, NA, 5L, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 6L, 7L, 8L, 9L, 10L, 11L, NA, NA, NA, 12L, 13L, 14L, 15L, 15L, 15L, 15L, 15L), .Label = c("a", "b", "c", "d", "et1", "et2", "(et3,et2)", "et3", "(et4,et2)", "(et4,et3)", "et4", "a5", "a6", "a7", "err"), class = "factor"), lower = c(0, 0, -Inf, -Inf, 0, 0, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf, 9, 11, -Inf, 9, 11, 0, 0, 0, 0, 0), est = c(1, 3, 4, 4, 1, 1, 1, 1, 10, 20, 30, 40, 40, 0.1, 20, 40, 0.1, 20, 0.1, 0.1, 30, 40, 0.1, 20, 0.1, 0.1, 30, 8, 10, 12, 8, 10, 12, 0.1, 0.2, 0.3, 0.4, 0.5), upper = c(2, Inf, Inf, Inf, 2, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, 13, Inf, Inf, 13, Inf, Inf, Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE), err = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "prop", "add", "add", "prop", "add"), label = c("A", NA, NA, NA, "e", NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "labels", NA, NA, NA, NA, NA, NA, NA, NA), condition = c(NA, NA, NA, NA, NA, NA, NA, NA, "ID", "ID", "ID", "ID", "STUD", "STUD", "STUD", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", NA, NA, NA, NA, NA, NA, "NVS == 1", "NVS == 1", "NVS == 2", "NVS == 2", "NVS == 3")), .Names = c("ntheta", "neta1", "neta2", "name", "lower", "est", "upper", "fix", "err", "label", "condition"), row.names = c(NA, -38L), class = c("nlmixrBounds", "data.frame"))
 
 testbounds <- function(){
     a = c(0, 1, 2) # A
@@ -16,7 +16,7 @@ testbounds <- function(){
     ~ 30
     ~ c(40)
     ~ c(40,
-        0.1, 20);
+        0.1, 20) | STUD;
     ~ c(40,
         0.1, 20,
         0.1, 0.1, 30);
@@ -32,6 +32,10 @@ testbounds <- function(){
     a5 = c(8, fixed)
     a6 = c(9, 10, fixed)
     a7 = c(11, 12, 13, fixed)
+
+    err ~ prop(0.1) + add(0.2) | NVS == 1
+    err ~ add(0.3) + prop(0.4) | NVS == 2
+    err ~ add(0.5)   | NVS == 3
 }
 
 test_that("bounds are extracted correctly", {
