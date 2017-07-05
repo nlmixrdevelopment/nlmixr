@@ -219,7 +219,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 
 	#=== start of dvdx code
 	proc.deriv = function() {
-		getDeriv = function(pars) {
+            getDeriv = function(pars) {
 			npar = length(pars)
 			s = deparse(bpar)
 			for (i in 1:nETA) {
@@ -250,7 +250,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 		dati = data.sav[data.sav$ID==ID.all[1], ]
 		list2env(dati, env)
 		THETA = tapply(inits.vec, nsplt, identity)[[1]]
-		ETA <- madness::madness(array(0, c(nETA,1)))
+		ETA <- madness::madness(array(0, c(nETA,1)))  ## Is madness still needed...?
 		eval(bpar)
 
 		px = as.list(env)
@@ -488,17 +488,17 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 
 		.wh = ID.ord[as.character(ix)]
 		ETA.val = starts[.wh, ]
-		..fit.inner = nlminb2(ETA.val, f, g, control=list(trace=FALSE, rel.tol=1e-4))
+		..fit.inner = nlminb(ETA.val, f, g, control=list(trace=FALSE, rel.tol=1e-4))
 		#..fit.inner = lbfgs(f, g, ETA.val, invisible=T, ftol=1e-4) # epsilon=1e-3)
 		if (con$do.optimHess) {
 			..fit.inner$hessian = optimHess(..fit.inner$par, f, g)
 		}
-		if (con$DEBUG.INNER) {
+            if (con$DEBUG.INNER) {
 			#print(..fit.inner$message)
 		}
 
 		#=========================================================
-		if (con$do.optimHess) {
+            if (con$do.optimHess) {
 			Ginv.5 = tryCatch({
 					.m <- chol(..fit.inner$hessian)
 					backsolve(.m, diag(nETA))

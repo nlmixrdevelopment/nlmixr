@@ -1086,13 +1086,17 @@ focei.fit <- function(data,
             }
         } else if (optim.method=="lbfgsb3"){
             prm <- rep(1, length(inits.vec));
-            fit <- try({lbfgsb3:::lbfgsb3(prm=prm,
-                                          fn=ofv.FOCEi, gr=gr.FOCEi,
-                                          control=list(trace=1## , pgtol = con$reltol.outer
-                                                       ),
-                                          lower=par.lower,
-                                          upper=par.upper
-                                          )})
+            if (requireNamespace("lbfgsb3", quietly = TRUE)){
+                fit <- try({lbfgsb3::lbfgsb3(prm=prm,
+                                             fn=ofv.FOCEi, gr=gr.FOCEi,
+                                             control=list(trace=1## , pgtol = con$reltol.outer
+                                                          ),
+                                             lower=par.lower,
+                                             upper=par.upper
+                                             )})
+            } else {
+                stop("This requires lbfgsb3 to be installed;  Please install it.")
+            }
             if (inherits(fit, "try-error") && !is.null(sigdig.fit)){
                 if (attr(fit, "condition")$message == "sigidig exit"){
                     fit <- sigdig.fit
@@ -1165,7 +1169,7 @@ focei.fit <- function(data,
                 }
             }
         } else if (optim.method=="nlminb") {
-            fit <- try({nlminb2(rep(1, length(inits.vec)),
+            fit <- try({nlminb(rep(1, length(inits.vec)),
                                 ofv.FOCEi, gradient=gr.FOCEi,
                                 control=list(trace=1, rel.tol=con$reltol.outer),
                                 lower=par.lower,

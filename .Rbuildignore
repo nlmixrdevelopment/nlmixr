@@ -25,3 +25,4 @@ RxODE.*\.(zip|pdf)$
 ^.*\.rtf$
 ^.*ODE_PARS\.txt$
 ^logo.png$
+^/?man-roxygen/.*$

@@ -16,7 +16,7 @@ using namespace Rcpp;
 #endif
 
 #include <stan/math.hpp>
-#include "PKPDLib_WW.hpp"
+#include "PKPDLib_WW.h"
 
 
 RcppExport SEXP lin_cmt_stan( SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP,

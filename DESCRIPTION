@@ -23,7 +23,8 @@ Imports: Rcpp (>= 0.11.5),
     numDeriv
 Suggests: knitr,
 	  rmarkdown,
-    dplyr
+    dplyr,
+    lbfgsb3
 VignetteBuilder: knitr
 Version: 0.9.0-1
 Date: 2016-09-20

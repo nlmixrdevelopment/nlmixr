@@ -1,5 +1,5 @@
 #include "evaluate.h"
-#include "lin_cmt.hpp"
+#include "lin_cmt.h"
 
 Rcpp::EvalBase *ev = NULL;                  // pointer to abstract base class
 int NPAR=0;

@@ -173,7 +173,7 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 	square = function(x) x*x
 	diag.xform.inv = c("sqrt"="square", "log"="exp", "identity"="identity")[diag.xform]
 
-	data.obs = subset(data, data$EVID == 0)
+    data.obs = subset(data, data$EVID == 0)
 	names(data) <- tolower(names(data))		#needed in ev
 
     #options
@@ -447,7 +447,7 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 			#-- data
 			if (!is.null(system))
 			{
-				ev <- eventTable()
+				ev <- RxODE::eventTable()
 				ev$import.EventTable(data[data$id == ix, ])
 			}
 

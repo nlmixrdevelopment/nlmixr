@@ -1,4 +1,4 @@
-// lin_cmt.hpp: population PK/PD modeling library
+// lin_cmt.h: population PK/PD modeling library
 //
 // Copyright (C) 2014 - 2016  Wenping Wang
 //

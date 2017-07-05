@@ -572,8 +572,8 @@ print.nlmixrBounds <- function(x, ...){
 }
 
 ##'@export
-str.nlmixrBounds <- function(x){
-    str(as.data.frame(x))
+str.nlmixrBounds <- function(object, ...){
+    str(as.data.frame(object), ...);
     message(" $ theta     : num ... (theta estimates)")
     message(" $ theta.full: num ... (theta estimates, including error terms)")
     message(" $ omega     : matrix ... (omega matrix)")
