@@ -73,7 +73,7 @@ print.focei.fit <- function(x, ...) {
         } else {
             width <- NULL;
         }
-        cat(sprintf("nlmixr FOCEI fit (%s)\n\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
+        message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
         if (any(names(fit) == "condition.number")){
             print(data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Condition Number"=fit$condition.number,
                              row.names="", check.names=FALSE))
@@ -81,18 +81,18 @@ print.focei.fit <- function(x, ...) {
             print(data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x),
                              row.names="", check.names=FALSE))
         }
-        cat("\nTime (sec):\n");
+        message("\nTime (sec):");
         print(fit$time);
-        cat("\nParameters:\n")
+        message("\nParameters:")
         print(fit$par.data.frame);
-        cat("\nOmega:\n");
+        message("\nOmega:");
         print(fit$omega);
         is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
         if (!is.dplyr){
-            cat("\nFit Data (head):\n")
+            message("\nFit Data (head):")
             print(head(as.matrix(x), n = n));
         } else {
-            cat("\nFit Data:\n")
+            message("\nFit Data:")
             print(dplyr::as.tbl(x), n = n, width = width);
         }
     } else {
@@ -433,14 +433,14 @@ focei.fit <- function(data,
                 sink();
             }
         }
-        ## cat("Closed sink\n");
+        ## message("Closed sink");
         ## unlink(sink.file);
     }
     sink.start <- function(do.it=TRUE){
         ## sink.close();
         if (do.sink){
             if (do.it){
-                ## cat("Starting Sink to", sink.file, "\n");
+                ## message("Starting Sink to", sink.file);
                 sink(sink.file);
             }
         }
@@ -461,8 +461,8 @@ focei.fit <- function(data,
         lines <- sink.get();
         unlink(sink.file);
         if (!is.null(lines)){
-            cat("After Error:\n");
-            cat(paste(paste("##", lines), collapse="\n"), "\n");
+            message("After Error:");
+            message(paste(paste("##", lines), collapse="\n"));
         }
         options(RxODE.warn.on.assign=oldAssign);
         running <- FALSE})
@@ -535,7 +535,7 @@ focei.fit <- function(data,
                       "tnewton_precond", "tnewton", "var1", "var2")
     print.grad <- any(optim.method == grad.methods);
     if (con$grad && !print.grad){
-        cat("Warning; You selected a gradient method, but the optimization procedure doesn't require the gradient.\nIgnoring gradient\n")
+        message("Warning; You selected a gradient method, but the optimization procedure doesn't require the gradient.\nIgnoring gradient")
         con$grad <- FALSE;
     }
     if(class(model)=="RxODE") {
@@ -563,8 +563,14 @@ focei.fit <- function(data,
     model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad, pred.minus.dv=con$pred.minus.dv, run.internal=TRUE);
     cov.names <- RxODE::rxParams(model$inner);
     cov.names <- cov.names[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), cov.names) == -1];
+    lhs <- c(names(RxODE::rxInits(model$inner)), RxODE::rxLhs(model$inner))
+    if (length(lhs) > 0){
+        cov.names <- cov.names[regexpr(rex::rex(start, or(lhs), end), cov.names) == -1];
+    }
     if (length(cov.names) > 0){
         if (!all(cov.names %in% names(data))){
+            message("Needed Covariates:")
+            rxPrint(cov.names)
             stop("Not all the covariates are in the dataset.")
         }
     }
@@ -636,28 +642,28 @@ focei.fit <- function(data,
         warning("Some of the initial conditions were 0, chainging to 0.0001");
         inits.vec[inits.vec == 0] <- 0.0001;
     }
-    cat("Boundaries:\n");
-    print(data.frame(lower,inits.vec,upper))
+    message("Boundaries:");
+    RxODE::rxPrint(data.frame(lower,inits.vec,upper));
     names(inits.vec) = NULL
     par.lower <- lower / inits.vec;
     par.upper <- upper / inits.vec;
-    cat("Scaled Boundaries:\n");
+    message("Scaled Boundaries:");
     w.neg <- which(par.lower > par.upper);
     tmp <- par.lower[w.neg];
     par.lower[w.neg] <- par.upper[w.neg];
     par.upper[w.neg] <- tmp;
-    print(data.frame(par.lower,rep(1, length(inits.vec)),par.upper))
+    RxODE::rxPrint(data.frame(par.lower,rep(1, length(inits.vec)),par.upper))
     if (do.sink){
-        cat("\nKey:\n")
-        cat(" S: Scaled Parameter values\n");
-        cat(" U: Unscaled Parameter values\n");
+        message("\nKey:")
+        message(" S: Scaled Parameter values");
+        message(" U: Unscaled Parameter values");
         if(print.grad){
-            cat(" G: Gradient\n");
+            message(" G: Gradient");
         }
-        cat(" D: Significant Figures\n");
-        cat(" Optimization output displayed with comments, i.e. ##\n\n");
+        message(" D: Significant Figures");
+        message(" Optimization output displayed with comments, i.e. ##\n");
     } else {
-        cat("\n");
+        message("");
     }
     nTHTA = nlini[1]
     nETA  = nrow(om0)
@@ -842,7 +848,7 @@ focei.fit <- function(data,
         w <- which(regexpr(rex::rex("Warning: Hessian (H) seems singular; Using pseudo-inverse"), lines) != -1);
         if (length(w) > 0){
             lines <- lines[-w];
-            cat("## Hessian(s)  inverted with pinv()\n");
+            message("## Hessian(s)  inverted with pinv()");
         }
         lines <- lines[regexpr(rex::rex(start, any_spaces, end),
                                lines) == -1];
@@ -850,19 +856,19 @@ focei.fit <- function(data,
         lines <- lines[regexpr(rex::rex(start, any_spaces, end),
                                lines) == -1];
         if (cor.det || cor.nearPD){
-            cat("## Hessian(s) corrected by ");
+            message("## Hessian(s) corrected by ", appendLF=FALSE);
             if (cor.det && cor.nearPD){
-                cat("both det and nearPD\n");
+                message("both det and nearPD");
             } else if (cor.nearPD){
-                cat("nearPD\n");
+                message("nearPD");
             } else {
-                cat("det\n");
+                message("det");
             }
         }
         if (bad.inv.H2){
-            cat("## Hessian(s) from second order derivatives inverted with pinv()\n");
+            message("## Hessian(s) from second order derivatives inverted with pinv()");
         }
-        cat(paste(paste(paste0("## ", lines), collapse="\n"), "\n"));
+        message(paste(paste0("## ", lines), collapse="\n"));
         return(lines);
     }
 
@@ -885,21 +891,21 @@ focei.fit <- function(data,
                 if (last != ""){
                     if (exists(last, envir=ofv.cache, inherits=FALSE)){
                         last.info <- get(last, envir=ofv.cache, inherits=FALSE);
-                        cat(sprintf("Step %s: %s", curi, substr(last, 3, nchar(last))));
+                        message(sprintf("Step %s: %s", curi, substr(last, 3, nchar(last))), appendLF=FALSE);
                         curi <<- curi + 1;
                         if (is.null(ofv.cache$last)){
                         } else if (ofv.cache$last$ofv > last.info$ofv){
-                            cat(sprintf(" (%s reduction)", format(ofv.cache$last$ofv - last.info$ofv)))
+                            message(sprintf(" (%s reduction)", format(ofv.cache$last$ofv - last.info$ofv)), appendLF=FALSE)
                             reset <- TRUE;
                         } else {
-                            cat(sprintf(" (%s increase)", format(last.info$ofv - ofv.cache$last$ofv)))
+                            message(sprintf(" (%s increase)", format(last.info$ofv - ofv.cache$last$ofv)), appendLF=FALSE)
                         }
-                        cat(paste0("\n S: ", paste(sapply(last.info$pars, function(x){sprintf("%#8g", x)}), collapse=" "), "\n"))
-                        cat(paste0(" U: ", paste(sapply(last.info$pars*inits.vec, function(x){sprintf("%#8g", x)}), collapse=" "), "\n"))
+                        message(paste0("\n S: ", paste(sapply(last.info$pars, function(x){sprintf("%#8g", x)}), collapse=" ")))
+                        message(paste0(" U: ", paste(sapply(last.info$pars*inits.vec, function(x){sprintf("%#8g", x)}), collapse=" ")))
                             grad.txt <- optim.obj(last.info$llik, "l");
                         if (exists(grad.txt, envir=ofv.cache, inherits=FALSE)){
                             last.grad <- get(grad.txt, envir=ofv.cache, inherits=FALSE);
-                            cat(paste0(" G: ", paste(sapply(last.grad, function(x){sprintf("%#8g", x)}), collapse=" "), "\n"))
+                            message(paste0(" G: ", paste(sapply(last.grad, function(x){sprintf("%#8g", x)}), collapse=" ")))
                             }
                         if (is.null(ofv.cache$last)){
                             reset <- TRUE;
@@ -907,7 +913,7 @@ focei.fit <- function(data,
                             last.pars <- ofv.cache$last$pars
                             cur.pars <- last.info$pars
                             if (all(last.pars == cur.pars) && !is.null(ofv.cache$last1)){
-                                cat("## Parameters the same, use last iteration for sigdig caluclation...\n");
+                                message("## Parameters the same, use last iteration for sigdig caluclation...");
                                 last.pars <- ofv.cache$last1$pars;
                                 ofv.cache$last <- ofv.cache$last1;
                             }
@@ -915,7 +921,7 @@ focei.fit <- function(data,
                             ## NONMEM's sigdigs as per http://cognigencorp.com/nonmem/current/2012-October/3654.html
                             ##
                             sdig <- -log10(abs(cur.pars - last.pars)) - 1;
-                            cat(paste0(" D: ", paste(sapply(sdig, function(x){sprintf("%f", x)}), collapse=" "), "\n"))
+                            message(paste0(" D: ", paste(sapply(sdig, function(x){sprintf("%f", x)}), collapse=" ")))
                             if (con$sigdig > 0 && all(sdig > con$sigdig)){
                                 sigdig.exit <- TRUE
                             }
@@ -925,10 +931,10 @@ focei.fit <- function(data,
                             cur.diff <<- (ofv.cache$first - llik);
                         }
                     } else {
-                        cat("Warning: Prior objective function not found...\n");
+                        message("Warning: Prior objective function not found...");
                         reset <- TRUE;
                     }
-                    cat("\n");
+                    message("");
                 }
             }
         }
@@ -942,7 +948,7 @@ focei.fit <- function(data,
         ## ridge penalty llik - 0.5*(sum(pars)^2*con$precision):
         last.penalty <<- 0.5 * sum( pars * pars * con$precision) * extra;
         if (reset && con$ridge.decay != 0 && ofv.cache$echo.ridge){
-            cat(sprintf("Current ridge penalty: %s\n", last.penalty));
+            message(sprintf("Current ridge penalty: %s", last.penalty));
             if (sprintf("%s", last.penalty) == "0"){
                 assign("echo.ridge", FALSE, envir=ofv.cache, inherits=FALSE)
             }
@@ -1365,13 +1371,13 @@ focei.fit <- function(data,
                 if (length(w) > 0)
                     cor.det <- TRUE
                 if (cor.det || cor.nearPD){
-                    cat("## Hessian(s) corrected by ");
+                    message("## Hessian(s) corrected by ", appendLF=FALSE);
                     if (cor.det && cor.nearPD){
-                        cat("both det and nearPD\n");
+                        message("both det and nearPD");
                     } else if (cor.nearPD){
-                        cat("nearPD\n");
+                        message("nearPD");
                     } else {
-                        cat("det\n");
+                        message("det");
                     }
                 }
             }
@@ -1423,7 +1429,7 @@ focei.fit <- function(data,
     sink.close()
     con$cores <- 1; ## don't run parallel for extracting infomration
     find.best.eta <- FALSE;
-    cat("Calculating Table Variables...\n")
+    message("Calculating Table Variables...")
     pt <- proc.time();
     if (any("ipred" == calculate.vars)){
         data$IPRED <- fitted(data, population=FALSE);
@@ -1455,7 +1461,7 @@ focei.fit <- function(data,
                            covariance=fit$cov.time["elapsed"],
                            table=fit$table.time["elapsed"],
                            row.names="");
-    cat("done\n")
+    message("done")
     data
 }
 
@@ -1476,7 +1482,7 @@ focei.fit <- function(data,
 ##' @importFrom utils str
 ##' @export
 str.focei.fit <- function(object, ...){
-    cat('FOCEI combined dataset and list\n');
+    message('FOCEI combined dataset and list');
     m <- as.data.frame(object);
     str(m)
     env <- attr(object, ".focei.env");
