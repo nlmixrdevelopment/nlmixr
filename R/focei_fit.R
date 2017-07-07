@@ -778,7 +778,7 @@ focei.fit <- function(data,
         ## I believe this is the same as format(#)
         return(sprintf("%s.%s", prefix, format(last.ofv)));
     } else {
-        ## The R interface uses Rprintf("%f") for nloptr
+        ## The R interface uses Rprintf("%f")
         return(sprintf("%s.%s", prefix, sprintf("%f", last.ofv)));
     }
         } else {
@@ -1031,66 +1031,10 @@ focei.fit <- function(data,
     }
     np <- length(inits.vec)
     meth <- c();
-    nlopt.gradient <- c("mma", "slsqp", "nlopt_lbfgs",
-                        "tnewton_precond_restart", "tnewton_precond", "nlopt_ld_tnewton_restart",
-                        "tnewton", "var2", "var1")
-    meth["mma"] <- "NLOPT_LD_MMA";
-    meth["slsqp"] <- "NLOPT_LD_SLSQP";
-    meth["lbfgs-nlopt"] <-  "NLOPT_LD_LBFGS";
-    meth["tnewton_precond_restart"] <- "NLOPT_LD_TNEWTON_PRECOND_RESTART"
-    meth["tnewton_precond"] <- "NLOPT_LD_TNEWTON_PRECOND"
-    meth["tnewton_restart"] <- "NLOPT_LD_TNEWTON_RESTART"
-    meth["tnewton"] <- "NLOPT_LD_TNEWTON"
-    meth["var2"] <- "NLOPT_LD_VAR2"
-    meth["var1"]  <- "NLOPT_LD_VAR1"
-    nlopt.gradient.free <- c("cobyla-nlopt", "bobyqa-nlopt", "newuoa-nlopt", "praxis", "nelder-mead-nlopt", "sbplx");
-    meth["cobyla-nlopt"] <- "NLOPT_LN_COBYLA";
-    meth["newuoa-nlopt"] <- "NLOPT_LN_NEWUOA_BOUND";
-    meth["bobyqa-nlopt"] <- "NLOPT_LN_BOBYQA";
-    meth["praxis"] <- "NLOPT_LN_PRAXIS";
-    meth["nelder-mead-nlopt"] <- "NLOPT_LN_NELDERMEAD";
-    meth["sbplx"] <- "NLOPT_LN_SBPLX"
+
     opt <- function(){
         fit <- NULL;
-        if (any(optim.method == c(nlopt.gradient.free, nlopt.gradient))){
-            if (any(optim.method == nlopt.gradient)){
-                fit <- try({nloptr::nloptr(rep(1, length(inits.vec)),
-                                           ofv.FOCEi,
-                                           gr.FOCEi,
-                                           lb=par.lower,
-                                           ub=par.upper,
-                                           opts=list(algorithm=meth[optim.method],
-                                                     "print_level"=2,
-                                                     ftol_rel=con$reltol.outer))})
-            } else {
-                if (any(optim.method == c("bobyqa-nlopt"))){
-                    local <- list("step1"=con$rhobeg);
-                } else {
-                    local <- c();
-                }
-                fit <- nloptr::nloptr(rep(1, length(inits.vec)),
-                               ofv.FOCEi,
-                               lb=par.lower,
-                               ub=par.upper,
-                               opts=list(algorithm=meth[optim.method],
-                                         "print_level"=2,
-                                         ftol_rel=con$reltol.outer,
-                                         "local_opts"=local))
-                ## fit <- try({});
-            }
-            if (inherits(fit, "try-error") && !is.null(sigdig.fit)){
-                if (attr(fit, "condition")$message == "sigidig exit"){
-                    fit <- sigdig.fit
-                } else {
-                    lines <- sink.get();
-                    if (!is.null(lines))
-                        message(paste0(lines, collapse="\n"), "\n");
-                    fit <- NULL;
-                }
-            } else {
-                fit$par <- fit$solution
-            }
-        } else if (optim.method=="lbfgsb3"){
+        if (optim.method=="lbfgsb3"){
             prm <- rep(1, length(inits.vec));
             if (requireNamespace("lbfgsb3", quietly = TRUE)){
                 fit <- try({lbfgsb3::lbfgsb3(prm=prm,
