@@ -9,7 +9,7 @@
 ##' \describe{
 ##'   \item{ID}{Siumlated Subject ID}
 ##'   \item{Time}{Simulated Time}
-##'   \item{Time}{Simulated Objective Function}
+##'   \item{Y}{Simulated Objective Function}
 ##' }
 ##'
 ##' @source Table 1 from Wang, Y \emph{Derivation of Various NONMEM estimation methods}. J Pharmacokinet Pharmacodyn (2007) 34:575-593.

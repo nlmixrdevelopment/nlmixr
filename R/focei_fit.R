@@ -570,7 +570,7 @@ focei.fit <- function(data,
     if (length(cov.names) > 0){
         if (!all(cov.names %in% names(data))){
             message("Needed Covariates:")
-            rxPrint(cov.names)
+            RxODE::rxPrint(cov.names)
             stop("Not all the covariates are in the dataset.")
         }
     }
