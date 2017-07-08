@@ -7,7 +7,9 @@
 \method{logLik}{focei.fit}(object, ...)
 }
 \arguments{
-\item{fit}{focei fit object}
+\item{object}{focei fit object}
+
+\item{...}{Additional arguments (currently ignored)}
 }
 \value{
 logLik object

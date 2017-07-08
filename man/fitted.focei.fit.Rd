@@ -20,6 +20,14 @@
     number of ETAs in model, and the number of rows equals to the
     number of subjects in the dataset, then these etas will be
     used to fit the data.}
+
+\item{type}{The type of fitted object to be extracted.  When the
+value is "fitted", this gives the individual or population
+fitted values. The "Vi" option gives the variance estimate for
+the indivdiual.  The "Vfo" gives the Variance under the fo
+assumption when population=FALSE, and the FOCE assumption when
+population=TRUE. When "posthoc", this extracts the posthoc
+deviations from the typical values or ETAs.}
 }
 \value{
 Individual predictions

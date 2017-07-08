@@ -486,7 +486,6 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 ##' Cleanup saem_fit environment by removing dll after the object is no logner used by R.
 ##'
 ##' @param env Environment where cleanup needs to occur.
-##' @return
 ##' @author Matthew L. Fidler
 ##' @export
 saem.cleanup <- function(env){

@@ -5,13 +5,10 @@
 \title{FOCEI Fit for nlmixr}
 \usage{
 focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
-  optim = c("bobyqa", "lbfgsb3", "newuoa", "nlminb", "uobyqa", "praxis",
-  "mma", "slsqp", "lbfgs-nlopt", "tnewton_precond_restart", "tnewton_precond",
-  "tnewton", "var2", "var1", "cobyla-nlopt", "bobyqa-nlopt", "newuoa-nlopt",
-  "nelder-mead-nlopt", "sbplx"), model = NULL, pred = NULL, err = NULL,
-  lower = -Inf, upper = Inf, control = list(),
-  calculate.vars = c("pred", "ipred", "ires", "res", "iwres", "wres",
-  "cwres"))
+  optim = c("bobyqa", "lbfgsb3", "newuoa", "nlminb", "uobyqa"),
+  model = NULL, pred = NULL, err = NULL, lower = -Inf, upper = Inf,
+  control = list(), calculate.vars = c("pred", "ipred", "ires", "res",
+  "iwres", "wres", "cwres"))
 }
 \arguments{
 \item{data}{Data to fit}
@@ -19,10 +16,33 @@ focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
 \item{inits}{Initilization list}
 
 \item{PKpars}{Pk Parameters}
+
+\item{diag.xform}{The form of the diagonal of the Omega matrix to
+be estimated.  This can be "sqrt" "log" or "identity".}
+
+\item{optim}{The optimization method to be used}
+
+\item{model}{The RxODE model to use}
+
+\item{pred}{The Prediction function}
+
+\item{err}{The Error function}
+
+\item{lower}{Lower bounds}
+
+\item{upper}{Upper Bounds}
+
+\item{control}{Control list}
+
+\item{calculate.vars}{is a list of variables that will be
+calculated after the FOCEI estimation is complete.}
+}
+\value{
+A focei fit object
 }
 \description{
 FOCEI Fit for nlmixr
 }
 \author{
-Matthew L. Fidler
+Matthew L. Fidler and Wenping Wang
 }

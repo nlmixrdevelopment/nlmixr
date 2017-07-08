@@ -102,7 +102,8 @@ print.focei.fit <- function(x, ...) {
 
 ##' Extract log likelihood for focei fit
 ##'
-##' @param fit focei fit object
+##' @param object focei fit object
+##' @param ... Additional arguments (currently ignored)
 ##' @return logLik object
 ##' @author Matthew L. Fidler
 ##' @export
@@ -178,7 +179,7 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
 ##' Extract the fitted values from the model
 ##'
 ##' @param object Fit object
-##' @param ...  other parameters
+##' @param ... other parameters
 ##' @param population when true (default false), calculate the
 ##'     population predictions; When false, calculate the individual
 ##'     predictions.
@@ -187,6 +188,13 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
 ##'     number of ETAs in model, and the number of rows equals to the
 ##'     number of subjects in the dataset, then these etas will be
 ##'     used to fit the data.
+##' @param type The type of fitted object to be extracted.  When the
+##'     value is "fitted", this gives the individual or population
+##'     fitted values. The "Vi" option gives the variance estimate for
+##'     the indivdiual.  The "Vfo" gives the Variance under the fo
+##'     assumption when population=FALSE, and the FOCE assumption when
+##'     population=TRUE. When "posthoc", this extracts the posthoc
+##'     deviations from the typical values or ETAs.
 ##' @return Individual predictions
 ##' @author Matthew L. Fidler
 ##' @export
@@ -378,17 +386,19 @@ plot.focei.fit <- function(x, ...) {
 ##' @param data Data to fit
 ##' @param inits Initilization list
 ##' @param PKpars Pk Parameters
-##' @param diag.xform
-##' @param optim
-##' @param model
-##' @param pred
-##' @param err
-##' @param lower
-##' @param upper
-##' @param control
-##' @param calculate.vars
-##' @return
-##' @author Matthew L. Fidler
+##' @param diag.xform The form of the diagonal of the Omega matrix to
+##'     be estimated.  This can be "sqrt" "log" or "identity".
+##' @param optim The optimization method to be used
+##' @param model The RxODE model to use
+##' @param pred The Prediction function
+##' @param err The Error function
+##' @param lower Lower bounds
+##' @param upper Upper Bounds
+##' @param control Control list
+##' @param calculate.vars is a list of variables that will be
+##'     calculated after the FOCEI estimation is complete.
+##' @return A focei fit object
+##' @author Matthew L. Fidler and Wenping Wang
 ##' @export
 focei.fit <- function(data,
                       inits,
@@ -399,22 +409,7 @@ focei.fit <- function(data,
                           "lbfgsb3",
                           "newuoa",
                           "nlminb",
-                          "uobyqa",
-                          ## These are nlopt functions...
-                          "praxis",
-                          "mma", ## Errors (Grad method)
-                          "slsqp", ## Errors
-                          "lbfgs-nlopt", ## Errors
-                          "tnewton_precond_restart",
-                          "tnewton_precond",
-                          "tnewton",
-                          "var2",
-                          "var1",
-                          "cobyla-nlopt",
-                          "bobyqa-nlopt",
-                          "newuoa-nlopt",
-                          "nelder-mead-nlopt",
-                          "sbplx"),
+                          "uobyqa"),
                       model=NULL,
                       pred=NULL,
                       err=NULL,
