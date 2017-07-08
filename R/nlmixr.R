@@ -18,7 +18,7 @@
 ##' @importFrom lbfgs lbfgs
 ##' @importFrom methods is
 ##' @importFrom Rcpp evalCpp
-##' @useDynLib nlmixr
+##' @useDynLib nlmixr, .registration=TRUE
 "_PACKAGE"
 
 rex::register_shortcuts("nlmixr");

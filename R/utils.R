@@ -595,3 +595,12 @@ plot.dyn.mcmc = function(x, ...)
 	gof(fit)
 }
 
+
+
+## Utilities for building nlmixr
+
+refresh <- function(){
+    ## nocov start
+    source(devtools::package_file("build/refresh.R"))
+    ## nocov end
+}

@@ -45,7 +45,7 @@ Maintainer: Matthew Fidler <matthew.fidler@gmail.com>
 Description: nlmixr is an R package for fitting population pharmacokinetic (PK) 
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)
-LinkingTo: RcppArmadillo, dparser, Rcpp, RcppEigen
+LinkingTo: RcppArmadillo, dparser, Rcpp, RcppEigen, StanHeaders, BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 NeedsCompilation: yes

@@ -25,21 +25,12 @@
 ## require(parallel)
 ## require(minqa)
 ## require(Deriv)
-lin_cmt_stan <- function(obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization)
-   .Call('lin_cmt_stan', obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization)
 
 llik_binomial <- function(y,n,params) {
-	r = .Call('llik_binomial', y,n,params)
-	r$J = diag(r$J)
-	r
+    r <- llik_binomial_c(y, n, params)
+    r$J <- diag(r$J);
+    return(r)
 }
-llik_normal <- function(y,params) .Call('llik_normal', y,params)
-llik_beta <- function(y,params) .Call('llik_beta', y,params)
-llik_neg_binomial <- function(y,params) .Call('llik_neg_binomial', y,params)
-llik_poisson <- function(y,params) .Call('llik_poisson', y,params)
-llik_betabinomial <- function(y,n,params) .Call('llik_betabinomial', y,n,params)
-llik_student_t <- function(y,params) .Call('llik_student_t', y,params)
-
 
 
 #-- for new gnlmm

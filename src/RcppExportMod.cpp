@@ -88,7 +88,7 @@ END_RCPP
 }
 
 
-RcppExport SEXP lin_cmt( SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP,
+RcppExport SEXP nlmixr_lin_cmt( SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP,
 	SEXP paramsSEXP, SEXP oralSEXP, SEXP infusionSEXP, SEXP ncmtSEXP, SEXP parameterizationSEXP ) {
 BEGIN_RCPP
 
