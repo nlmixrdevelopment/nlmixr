@@ -1,10 +1,12 @@
 ---
-title: 'nlmixr: an R package for fitting PK and PKPD models'
+title: "nlmixr: an R package for fitting PK and PKPD models"
 author: "Wenping Wang"
 date: '`r Sys.Date()`'
-output: html_document
-vignette: |
-  %\VignetteIndexEntry{nlmixr: an R package for fitting PK and PKPD models} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nlmixr: an R package for fitting PK and PKPD models} 
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
@@ -13,30 +15,59 @@ library(knitr)
 
 
 ### Introduction
-'nlmixr' is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. `nlmixr` has five main modules:  1) `dynmodel()` and its mcmc cousin `dynmodel.mcmc()` for nonlinear dynamic models of individual data; 2) `nlme_lin_cmpt()`for one to three linear compartment models of population data with first order absorption, or i.v. bolus, or i.v. infusion; 3) `nlme_ode()` for general dynamic models defined by ordinary differential equations (ODEs) of population data; 4) `saem_fit()` for general dynamic models defined by closed-form solutions or ordinary differential equations (ODEs) of population data by the Stochastic Approximation Expectation-Maximization (SAEM) algorithm;  5) `gnlmm()` for generalized non-linear mixed-models (optionally defined by ordinary differential equations) of population data by adaptive Gaussian quadrature algorithm. 
+'nlmixr' is an R package for fitting general dynamic models,
+pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD)
+models in particular, with either individual data or population
+data. `nlmixr` has five main modules: 
 
-A few utilities to facilitate population model building are also included in `nlmixr`.
+1. `dynmodel()` and its mcmc cousin `dynmodel.mcmc()` for nonlinear
+    dynamic models of individual data;
+2. `nlme_lin_cmpt()`for one to three linear compartment models of
+   population data with first order absorption, or i.v. bolus, or
+   i.v. infusion;
+3. `nlme_ode()` for general dynamic models defined by ordinary
+   differential equations (ODEs) of population data; 
+4. `saem_fit()` for general dynamic models defined by closed-form
+   solutions or ordinary differential equations (ODEs) of population
+   data by the Stochastic Approximation Expectation-Maximization
+   (SAEM) algorithm; 5) `gnlmm()` for generalized non-linear
+   mixed-models (optionally defined by ordinary differential
+   equations) of population data by adaptive Gaussian quadrature
+   algorithm.
+
+A few utilities to facilitate population model building are also
+included in `nlmixr`.
 
 ```{r}
 library(nlmixr, quietly = TRUE)
-source("print.summary.lme.R")	  #suppress data printout
 ```
-
-
 
 ### Non-population dynamic model 
 
-The `dynmodel()` module fits general dynamic models, often expressed as a set of ODEs, of individual data with possible multiple endpoints.  This module has similar functionality as the `ID` module of `ADAPT 5`.
+The `dynmodel()` module fits general dynamic models, often expressed
+as a set of ODEs, of individual data with possible multiple endpoints.
+This module has similar functionality as the `ID` module of `ADAPT 5`.
 
-We use two examples from the ADAPT 5 User's Guide to illustrate the usage of non-population dynamic model with `dynmodel()`.
+We use two examples from the ADAPT 5 User's Guide to illustrate the
+usage of non-population dynamic model with `dynmodel()`.
 
 #### Inverse Gaussian Absorption Model
 
-> This example illustrates the use of the inverse Gaussian (IG) function to model the oral absorption process of a delayed release compound. It is assumed that the plasma drug concentration following oral administration of the drug can be decomposed into an independent input process (representing dissolution, transit and absorption processes) followed by the disposition process. It is further assumed that the parameters of a linear two compartment model used to describe the disposition
-process have been estimated following intravenous drug administration to an individual. The model shown in Figure 1 will then be used to describe the plasma kinetics of an oral formulation of the drug delivered to the individual.
+> This example illustrates the use of the inverse Gaussian (IG)
+> function to model the oral absorption process of a delayed release
+> compound. It is assumed that the plasma drug concentration following
+> oral administration of the drug can be decomposed into an
+> independent input process (representing dissolution, transit and
+> absorption processes) followed by the disposition process. It is
+> further assumed that the parameters of a linear two compartment
+> model used to describe the disposition process have been estimated
+> following intravenous drug administration to an individual. The
+> model shown in Figure 1 will then be used to describe the plasma
+> kinetics of an oral formulation of the drug delivered to the
+> individual.
 
 ![Figure 1. igab](igab.png)  
-**Figure 1. Two compartment disposition model with IG function input**  
+**Figure 1. Two compartment disposition model with IG function input**
 
 
 This system of a two-compartment disposition model with IG absorption is defined in the following string:
@@ -60,15 +91,29 @@ sys1 <- RxODE(model = ode)
 
 ```
 
-> In the model above the systemic drug input function, $f_i(t)$, is assumed to be a single inverse Gaussian function defined as:
-$$ f_i(t) = D\cdot F\sqrt{\frac{MIT}{2\pi CV_t^2 t^3}} \exp\left[-\frac{(t-MIT)^2}{2CV_t^2 MIT t}\right]$$
-where `MIT` represents the mean input time and $CV^2$ is a normalized variance ( is the standard deviation of the density function $f_i(t)/(D\cdot F)$ divided by `MIT`, i.e., the relative dispersion of input times). The factor `F` is the bioavailability of the orally administered dose .
+> In the model above the systemic drug input function, $f_i(t)$, is
+assumed to be a single inverse Gaussian function defined as: $$ f_i(t)
+= D\cdot F\sqrt{\frac{MIT}{2\pi CV_t^2 t^3}}
+\exp\left[-\frac{(t-MIT)^2}{2CV_t^2 MIT t}\right]$$ where `MIT`
+represents the mean input time and $CV^2$ is a normalized variance (
+is the standard deviation of the density function $f_i(t)/(D\cdot F)$
+divided by `MIT`, i.e., the relative dispersion of input times). The
+factor `F` is the bioavailability of the orally administered dose .
 
-In this example, disposition parameters are assumed known.  The three parameters related to the delayed absorption, `MIT`, `CVI2` and `F`, are to be estimated.
+In this example, disposition parameters are assumed known.  The three
+parameters related to the delayed absorption, `MIT`, `CVI2` and `F`,
+are to be estimated.
 
-`dynmodel()` takes the following arguments: an RxODE object (compiled ODE solver), a list of formulae that relates system defined quantities and measurement(s) with either or both additive error `add()` and proportional error `prop()`, an event table object that defines the inputs and observation schedule, a named vector with initial values of system parameters, a `data.frame` contains the data, optional known system parameters (`fixPars`) not to be estimated, and other optional control parameters for optimization routines.
+`dynmodel()` takes the following arguments: an RxODE object (compiled
+ODE solver), a list of formulae that relates system defined quantities
+and measurement(s) with either or both additive error `add()` and
+proportional error `prop()`, an event table object that defines the
+inputs and observation schedule, a named vector with initial values of
+system parameters, a `data.frame` contains the data, optional known
+system parameters (`fixPars`) not to be estimated, and other optional
+control parameters for optimization routines.
 ```{r}
-dat <- read.table("invgaussian.txt", header=TRUE)
+dat <- invgaussian;
 mod <- cp ~ C2 + prop(.1)
 inits <- c(MIT=190, CVI2=.65, F=.92)
 fixPars <- c(CL=.0793, V2=.64, Q=.292, V3=9.63)
@@ -77,7 +122,11 @@ ev$add.sampling(c(0, dat$time))
 (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
 ```
 
-More information about the model (convergence information and number of function evulation of the optimization process) is displayed by calling the `summary()` function.  Basic goodness-of-fit plots are generated by calling `plot()`.
+More information about the model (convergence information and number
+of function evulation of the optimization process) is displayed by
+calling the `summary()` function.  Basic goodness-of-fit plots are
+generated by calling `plot()`.
+
 ```{r, fig.width=12, fig.height=4}
 summary(fit)
 par(mar=c(4,4,1,1), mfrow=c(1,3))
@@ -89,13 +138,19 @@ plot(fit, cex=2)
 
 #### Parent/Metabolite (multiple endpoints)
 
-> Figure 2 shows the model used to describe the kinetics of a parent compound and its metabolite used in this example. The model relating dose of the parent compound to the plasma concentrations of parent drug and its metabolite can be rewritten in terms of the ratio $Vm/fm$ along with the other model parameters $Kp, Vp, K_{12}, K_{21}$ and $fm$.
+> Figure 2 shows the model used to describe the kinetics of a parent
+> compound and its metabolite used in this example. The model relating
+> dose of the parent compound to the plasma concentrations of parent
+> drug and its metabolite can be rewritten in terms of the ratio
+> $Vm/fm$ along with the other model parameters $Kp, Vp, K_{12},
+> K_{21}$ and $fm$.
 
 
 ![Figure 2. pmeta](pmetab.png)
 **Figure 2. Model for example pmetab. Kp is the total elimination rate of the parent compound, while fm represent the fraction metabolized.**  
 
-Note the list that specifies the statistical measurement models for concentrations of both parent and its metabite.
+Note the list that specifies the statistical measurement models for
+concentrations of both parent and its metabolite.
 ```{r}
 ode <- "
 Cp = centr/Vp;
@@ -106,7 +161,7 @@ d/dt(meta)  =                        kp*centr - km*meta;
 "
 sys2 <- RxODE(model = ode)
 
-dat <- read.table("metabolite.txt", header=TRUE)
+dat <- metabolite
 mod <- list(y1 ~ Cp+prop(.1), y2 ~ Cm+prop(.15))
 inits <- c(kp=0.4, Vp=10., k12=0.2, k21=0.1, km=0.2, Vm=30.)
 ev <- eventTable()
@@ -115,39 +170,63 @@ ev$add.sampling(c(0, dat$time))
 (fit <- dynmodel(sys2, mod, ev, inits, dat))
 ```
 
-Alternative error models can be tested and compared without re-compilation of the system.  For instance, a combined error structure with both additive and proportional errors for the parent compound concentration is easily re-fitted with the following code:
+Alternative error models can be tested and compared without
+re-compilation of the system.  For instance, a combined error
+structure with both additive and proportional errors for the parent
+compound concentration is easily re-fitted with the following code:
 ```{r}
 mod <- list(y1 ~ Cp+add(.2)+prop(.1), y2 ~ Cm+prop(.15))
 (fit <- dynmodel(sys2, mod, ev, inits, dat))
 ```
 
-Although the combined error produces a slightly higher likelihood, the previous proportional error model has smaller AIC and BIC, and is hence preferred.
+Although the combined error produces a slightly higher likelihood, the
+previous proportional error model has smaller AIC and BIC, and is
+hence preferred.
 
 
 #### Parent/Metabolite (continued - mcmc estimation)
 
-The `dynmodel.mcmc()` has a similar functionality and user interface as `dynmodel()` for general dynamic models, except it uses Bayesian Markov Chain Monte-Carlo (mcmc) for estimation.  The underlying sampling algorithm is Neal's efficient slice sampling algorithm.
+The `dynmodel.mcmc()` has a similar functionality and user interface
+as `dynmodel()` for general dynamic models, except it uses Bayesian
+Markov Chain Monte-Carlo (mcmc) for estimation.  The underlying
+sampling algorithm is Neal's efficient slice sampling algorithm.
 
 ```{r}
 mod <- list(y1 ~ Cp+prop(.1), y2 ~ Cm+prop(.15))
 (fit <- dynmodel.mcmc(sys2, mod, ev, inits, dat))
 ```
 
-`dynmodel.mcmc()` returns a matrix of raw mcmc samples.  This matrix can be further manipulated for further plots and inferences.  For instances, trace plots can be easily generated by the following:
+`dynmodel.mcmc()` returns a matrix of raw mcmc samples.  This matrix
+can be further manipulated for further plots and inferences.  For
+instances, trace plots can be easily generated by the following:
 ```{r}
 par(mfrow=c(4,2), mar=c(2,4,1,1))
 s <- lapply(1:dim(fit)[2], function(k) 
      plot(fit[,k], type="l", col="red", ylab=dimnames(fit)[[2]][k]))
 ```
 
-
-
 ### Linear compartment models 
-`nlme_lin_cmpt()` fits a linear compartment model with either first order absorption, or i.v. bolus, or i.v. infusion using the estimation algorithm implemented in the 'nlme' package.  A user specifies the number of compartments (up to three), route of drug administrations, and the model parameterization. `nlmixr` supports the clearance/volume parameterization and the micro constant parameterization, with the former as the default.  Specification of fixed effects, random effects and intial values follows the nlme notations.
+`nlme_lin_cmpt()` fits a linear compartment model with either first
+order absorption, or i.v. bolus, or i.v. infusion using the estimation
+algorithm implemented in the 'nlme' package.  A user specifies the
+number of compartments (up to three), route of drug administrations,
+and the model parameterization. `nlmixr` supports the clearance/volume
+parameterization and the micro constant parameterization, with the
+former as the default.  Specification of fixed effects, random effects
+and intial values follows the nlme notations.
 
-We use an extended version of the Theophiline PK data [^1] accompanied with the NONMEM distribution (also an example in the nlme documentation) as an illustration of `nlme_lin_cmpt`.  We model the Theophiline PK by a one-compartment model with first order absorption and with default clearance/volume parameterization.  All model parameters are log-transformed; random effects are added to `KA` and `CL`.
+We use an extended version of the Theophiline PK data [^1] accompanied
+with the NONMEM distribution (also an example in the nlme
+documentation) as an illustration of `nlme_lin_cmpt`.  We model the
+Theophiline PK by a one-compartment model with first order absorption
+and with default clearance/volume parameterization.  All model
+parameters are log-transformed; random effects are added to `KA` and
+`CL`.
 
-[^1]: To demonstrate/test the capability of handling multiple doses by `nlme_lin_cmpt`, we simulated the Day 7 concentrations with a once daily (*q.d.*) regimen for 7 days, in addition to the Day 1 concentrations of the original Theophiline data.
+[^1]: To demonstrate/test the capability of handling multiple doses by
+    `nlme_lin_cmpt`, we simulated the Day 7 concentrations with a once
+    daily (*q.d.*) regimen for 7 days, in addition to the Day 1
+    concentrations of the original Theophiline data.
 
 ```{r}
 dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
@@ -374,7 +453,7 @@ load("/home/wangwez/nlmixr/vignettes/.RData")
 
 #### Count data
 
-This example uses the pump failure data of Gaver and O’Muircheartaigh (1987). The number of failures 
+This example uses the pump failure data of Gaver and OMuircheartaigh (1987). The number of failures 
 and the time of operation are recorded for 10 pumps. Each of the pumps is classified into one of 
 two groups corresponding to either continuous or intermittent operation.
 
@@ -485,13 +564,13 @@ plot(s$p, s$dv); abline(0,1,col="red")
 - D'Argenio DZ, Schumitzky A, and Wang X (2009). "ADAPT 5 User's Guide: Pharmacokinetic/Pharmacodynamic Systems Analysis Software".
 - Neal, RM (2003) "Slice sampling" (with discussion), Annals of Statistics, vol. 31, no. 3, pp. 705-767.
 - Karlsson, M. O. and Savic, R. M. (2007), Diagnosing Model Diagnostics. Clinical Pharmacology & Therapeutics, 82: 17-20.
-- Gaver, D. P. and O’Muircheartaigh, I. G. (1987), "Robust Empirical Bayes Analysis of Event Rates," Technometrics, 29, 1–15.
-- McCulloch, C. E. (1994), "Maximum Likelihood Variance Components Estimation for Binary Data," Journal of the American Statistical Association, 89, 330–335.
-- Ochi, Y. and Prentice, R. L. (1984), "Likelihood Inference in a Correlated Probit Regression Model," Biometrika, 71, 531–543.
-- Weil, C. S. (1970), "Selection of the Valid Number of Sampling Units and Consideration of Their Combination in Toxicological Studies Involving Reproduction, Teratogenesis, or Carcinogenesis," Food and Cosmetic Toxicology, 8, 177–182.
-- Williams, D. A. (1975), "The Analysis of Binary Responses from Toxicological Experiments Involving Reproduction and Teratogenicity," Biometrics, 31, 949–952.
-- Kuhn, E., and Lavielle, M. Coupling a stochastic approximation version of EM with a MCMC procedure. ESAIM P&S 8 (2004), 115–131.
-- Kuhn, E., and Lavielle, M. Maximum likelihood estimation in nonlinear mixed effects models. Computational Statistics and Data Analysis 49 (2005), 1020–1038.
+- Gaver, D. P. and OMuircheartaigh, I. G. (1987), "Robust Empirical Bayes Analysis of Event Rates," Technometrics, 29, 115.
+- McCulloch, C. E. (1994), "Maximum Likelihood Variance Components Estimation for Binary Data," Journal of the American Statistical Association, 89, 330335.
+- Ochi, Y. and Prentice, R. L. (1984), "Likelihood Inference in a Correlated Probit Regression Model," Biometrika, 71, 531543.
+- Weil, C. S. (1970), "Selection of the Valid Number of Sampling Units and Consideration of Their Combination in Toxicological Studies Involving Reproduction, Teratogenesis, or Carcinogenesis," Food and Cosmetic Toxicology, 8, 177182.
+- Williams, D. A. (1975), "The Analysis of Binary Responses from Toxicological Experiments Involving Reproduction and Teratogenicity," Biometrics, 31, 949952.
+- Kuhn, E., and Lavielle, M. Coupling a stochastic approximation version of EM with a MCMC procedure. ESAIM P&S 8 (2004), 115131.
+- Kuhn, E., and Lavielle, M. Maximum likelihood estimation in nonlinear mixed effects models. Computational Statistics and Data Analysis 49 (2005), 10201038.
 
 
 ### Appendix: Technical notes

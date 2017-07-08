@@ -13,5 +13,6 @@
 ##' }
 ##'
 ##' @source Table 1 from Wang, Y \emph{Derivation of Various NONMEM estimation methods}. J Pharmacokinet Pharmacodyn (2007) 34:575-593.
+##' @export
 "Wang2007"
 

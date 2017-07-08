@@ -10,8 +10,6 @@ rx_.*\.(so|dll)$
 testthat/.*\.(so|dll)$
 BinaryFiles$
 RxODE.*\.(zip|pdf)$
-^/?vignettes/RxODE-intro.md
-^/?vignettes/figure/.*$
 ^/?inst/Install-windows.md
 ^/?inst/examples/ACoP7poster/.*$
 ^/?inst/examples/LiveDemo/.*$
