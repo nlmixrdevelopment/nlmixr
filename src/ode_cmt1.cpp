@@ -265,6 +265,7 @@ struct neg_binomial_llik {
 	}
 };
 
+//[[Rcpp::export]]
 SEXP llik_neg_binomial(Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> params) {
   neg_binomial_llik f(y);
   Eigen::VectorXd fx;

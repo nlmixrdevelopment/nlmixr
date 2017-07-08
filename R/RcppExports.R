@@ -29,3 +29,7 @@ llik_beta <- function(y, params) {
     .Call(nlmixr_llik_beta, y, params)
 }
 
+llik_neg_binomial <- function(y, params) {
+    .Call(nlmixr_llik_neg_binomial, y, params)
+}
+

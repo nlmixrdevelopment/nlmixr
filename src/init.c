@@ -20,6 +20,7 @@ extern SEXP nlmixr_llik_betabinomial(SEXP, SEXP, SEXP);
 extern SEXP nlmixr_llik_student_t(SEXP, SEXP);
 extern SEXP nlmixr_llik_beta(SEXP, SEXP);
 extern SEXP nlmixr_lin_cmt_stan(SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP);
+extern SEXP nlmixr_llik_neg_binomial(SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"hermite_ek_compute_",     (DL_FUNC) &hermite_ek_compute_,      3},
@@ -38,6 +39,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"nlmixr_llik_betabinomial", (DL_FUNC) &nlmixr_llik_betabinomial, 3},
     {"nlmixr_llik_student_t",  (DL_FUNC) &nlmixr_llik_student_t, 2},
     {"nlmixr_llik_beta",     (DL_FUNC) &nlmixr_llik_beta, 2},
+    {"nlmixr_llik_neg_binomial", (DL_FUNC) &nlmixr_llik_neg_binomial, 2},
     {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
     {NULL, NULL, 0}
 };

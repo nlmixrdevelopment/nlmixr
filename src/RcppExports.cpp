@@ -100,3 +100,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// llik_neg_binomial
+SEXP llik_neg_binomial(Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> params);
+RcppExport SEXP nlmixr_llik_neg_binomial(SEXP ySEXP, SEXP paramsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type y(ySEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type params(paramsSEXP);
+    rcpp_result_gen = Rcpp::wrap(llik_neg_binomial(y, params));
+    return rcpp_result_gen;
+END_RCPP
+}
