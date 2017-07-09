@@ -584,9 +584,22 @@ ACF.nlmixr_nlme <- function(object, ...){
 anova.nlmixr_nlme <- function(object, ...){
   nlmeModList(object$env);
   on.exit({nlmeModList(new.env())})
-  tmp <- object;
-  class(tmp) <- class(tmp)[-1]
-  anova(tmp, ...);
+  args <- lapply(list(object, ...),
+                 function(x){
+      if (class(x)[1L] == "nlmixr_nlme"){
+          tmp <- x;
+          class(tmp) <- class(tmp)[-1L];
+          return(tmp)
+      } else {
+          return(x)
+      }
+  });
+  ret <- do.call(getFromNamespace("anova.lme","nlme"),
+                 args);
+  if (class(ret)[1L] == "nlme"){
+      class(ret) <- c("nlmixr_nlme", class(ret))
+  }
+  return(ret)
 }
 
 ## comparePred should work because predict should work...
