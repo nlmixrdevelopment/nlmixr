@@ -11,6 +11,9 @@
   \item{y1}{Parent Concentration}
   \item{y2}{Metabolite Concentration}
 }}
+\source{
+D'Argenio DZ, Schumitzky A, and Wang X (2009). "ADAPT 5 User's Guide: Pharmacokinetic/Pharmacodynamic Systems Analysis Software".
+}
 \usage{
 metabolite
 }

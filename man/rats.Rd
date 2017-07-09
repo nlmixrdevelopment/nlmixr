@@ -35,5 +35,14 @@ Weil, C.S., 1970. Selection of the valid number of
 Williams, D.A., 1975. The analysis of binary responses
     from toxicological experiments involving reproduction and
     teratogenicity. Biometrics 31, 949-952.
+
+McCulloch, C. E. (1994),
+    "Maximum Likelihood Variance Components Estimation for Binary Data,"
+    Journal of the American Statistical Association, 89, 330 -
+    335.
+
+Ochi, Y. and Prentice, R. L. (1984),
+    "Likelihood Inference in a Correlated Probit Regression Model,"
+    Biometrika, 71, 531-543.
 }
 \keyword{datasets}
