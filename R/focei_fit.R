@@ -509,17 +509,18 @@ focei.fit <- function(data,
 
     curi <- 0;
 
-    cl <- NULL;
-    if (.Platform$OS.type == "windows" && con$cores > 1){
-        cl <- parallel::makePSOCKcluster(con$cores)
-        on.exit({parallel::stopCluster(cl)}, add=TRUE);
-    }
-
     pt <- proc.time()
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
     if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
+
+
+    cl <- NULL;
+    if (.Platform$OS.type == "windows" && con$cores > 1){
+        cl <- parallel::makePSOCKcluster(con$cores)
+        on.exit({parallel::stopCluster(cl)}, add=TRUE);
+    }
 
     if (con$sigdig == 0 & con$ridge.decay == 0 && !con$extra.output){
         do.sink <- FALSE
@@ -1133,14 +1134,14 @@ focei.fit <- function(data,
         return(fit);
     }
     inits.mat <- matrix(0, nSUB, nETA)
-    if (.Platform$OS.type == "windows"){
+    if (.Platform$OS.type == "windows" && con$cores > 1){
         ## Copy over all of the objects within scope to
         ## all clusters.
         ## Taken from https://github.com/nathanvan/mcmc-in-irt/blob/master/post-10-mclapply-hack.R
 
         this.env <- environment()
         ## while( identical( this.env, globalenv() ) == FALSE ) {
-            parallel::clusterExport(cl,
+        parallel::clusterExport(cl,
                                     ls(all.names=TRUE, envir=this.env),
                                     envir=this.env)
         ##     this.env <- parent.env(environment())

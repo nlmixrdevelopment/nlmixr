@@ -11,6 +11,7 @@
 ##'   \item{DV}{Dependant Variable, Theophiline Concentration}
 ##'   \item{AMT}{Dose Amount}
 ##'   \item{EVID}{RxODE/nlmixr event ID (not NONMEM's)}
+##'   \item{CMT}{Compartment Number}
 ##'   \item{WT}{Weight (kg)}
 ##' }
 ##'
