@@ -130,7 +130,7 @@ mymin = function(start, fr, rho=NULL, control=list())
     if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
-	.Call("neldermead_wrap", fr, rho, length(start), start, step,
+	.Call(neldermead_wrap, fr, rho, length(start), start, step,
 		  as.integer(con$maxeval), con$ftol_rel, con$rcoeff, con$ecoeff, con$ccoeff,
 		  as.integer(con$trace),
 		  PACKAGE = 'nlmixr')
@@ -157,7 +157,7 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
     if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
-	.Call("neldermead_wrap", fr, rho, length(start), start, step,
+	.Call(neldermead_wrap, fr, rho, length(start), start, step,
 		  as.integer(con$maxeval), con$reltol, con$rcoeff, con$ecoeff, con$ccoeff,
 		  as.integer(con$trace),
 		  PACKAGE = 'nlmixr')
@@ -350,7 +350,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
 {
 	if (is.null(rho)) rho = environment(fr)
-	.Call("slice_wrap", fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
+	.Call(slice_wrap, fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
 }
 
 genobj = function(system, model, evTable, inits, data, fixPars=NULL,

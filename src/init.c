@@ -48,4 +48,5 @@ void R_init_nlmixr(DllInfo *dll)
 {
     R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
+    R_forceSymbols(dll,TRUE);
 }
