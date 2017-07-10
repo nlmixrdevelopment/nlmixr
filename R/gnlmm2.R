@@ -61,7 +61,8 @@ getModelVars = function(blik, bpar, m1) {
 		blik.txt[2:(len-2)],
 		paste0(".arg", 1:narg, "=", s[args.ix])
 		), collapse="\n"
-	)
+                )
+        cat(blik.new.text)
 	blik.new = parse(text=blik.new.text)
 
 	dist.df = NULL
@@ -103,7 +104,7 @@ getModelVars = function(blik, bpar, m1) {
 		 args.dvdx=args.dvdx)
 }
 
-#' @export
+# dont export yet...
 gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	system=NULL, diag.xform=c("sqrt", "log", "identity"),
 	..., control=list()) {
@@ -252,7 +253,7 @@ gnlmm2 <- function(llik, data, inits, syspar=NULL,
 
 		pars = system$get.modelVars()$params
 		px = as.list(env)[pars]
-		madIx <- sapply(px, function(x) {
+            madIx <- sapply(px, function(x) {
 				if (class(x)=="madness") TRUE else FALSE
 		})
 

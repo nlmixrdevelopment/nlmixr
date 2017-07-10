@@ -205,9 +205,7 @@ fit = gnlmm(llik, pump, inits,
 	control=list(
 	    reltol.outer=1e-4,
 		optim.outer="nmsimplex",
-		nAQD=5
-	)
-)
+            nAQD=5 ))
 
 cv = calcCov(fit)
 Rinv = attr(cv,"RinvS")$Rinv

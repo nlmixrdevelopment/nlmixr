@@ -25,7 +25,9 @@ Suggests: knitr,
     rmarkdown,
     dplyr,
     lbfgsb3,
-    testthat
+    testthat,
+    madness,
+    devtools
 Version: 0.9.0-1
 Date: 2016-09-20
 Authors@R: c(person("Matthew","Fidler",
@@ -45,10 +47,9 @@ Maintainer: Matthew Fidler <matthew.fidler@gmail.com>
 Description: nlmixr is an R package for fitting population pharmacokinetic (PK) 
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)
-NeedsCompilation: yes
+NeedsCompilation: NeedsCompilation: yes
 LinkingTo: RcppArmadillo, dparser, Rcpp, RcppEigen, StanHeaders, BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
-NeedsCompilation: yes
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
