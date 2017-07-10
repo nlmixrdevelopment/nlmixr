@@ -1,5 +1,47 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: R
-sudo: false
+language: r
+
 cache: packages
+
+r:
+  - 3.2
+  - 3.3
+  - 3.4
+  - devel
+  
+os:
+  - linux
+  - osx
+  
+matrix:
+  exclude:
+  allow_failures:
+  - r: devel
+    os: linux
+  - r: devel
+    os: osx
+  - r: 3.3
+    os: osx
+  - r: 3.2
+    os: osx
+
+before_install:
+- sudo apt-get update -qq
+- sudo apt-get install -qq python python-sympy
+
+r_github_packages:
+  - jimhester/covr
+  - nlmixrdevelopment/dparser-R
+  - nlmixrdevelopment/RxODE
+  
+script: 
+  - |
+    R CMD build .
+    travis_wait 40 R CMD check RxODE*tar.gz
+    
+after_failure:
+- find *Rcheck -name '*.fail' -print -exec cat '{}' \;
+
+after_success:
+  - travis_wait 20 Rscript -e 'covr::codecov(line_exclusions=c("R/RxODE-win-setup.R", "src/errmsg.f", "src/rprint.c"))'

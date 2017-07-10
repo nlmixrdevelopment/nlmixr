@@ -62,7 +62,6 @@ getModelVars = function(blik, bpar, m1) {
 		paste0(".arg", 1:narg, "=", s[args.ix])
 		), collapse="\n"
                 )
-        cat(blik.new.text)
 	blik.new = parse(text=blik.new.text)
 
 	dist.df = NULL
