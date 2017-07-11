@@ -67,7 +67,6 @@ nlmixrBounds <- function(fun){
             if ((identical(x[[1]], quote(`<-`)) ||
                  identical(x[[1]], quote(`=`))) &&
                 is.name(x[[2]])) {
-                ## These are theta assignments
                 if (length(x[[3]]) > 5){
                     stop(sprintf("%s %s c(%s) syntax is not supported for thetas",
                     as.character(x[[2]]), as.character(x[[1]]), paste(sapply(x[[3]][-1], as.character), collapse=", ")))
@@ -81,9 +80,9 @@ nlmixrBounds <- function(fun){
                                                    neta1=NA,
                                                    neta2=NA,
                                                    name=as.character(x[[2]]),
-                                                   lower=as.numeric(x[[3]][[2]]),
-                                                   est=as.numeric(x[[3]][[3]]),
-                                                   upper=as.numeric(x[[3]][[4]]),
+                                                   lower=as.numeric(eval(x[[3]][[2]])),
+                                                   est=as.numeric(eval(x[[3]][[3]])),
+                                                   upper=as.numeric(eval(x[[3]][[4]])),
                                                    fix=TRUE,
                                                    err=NA,
                                                    label=NA,
@@ -101,8 +100,8 @@ nlmixrBounds <- function(fun){
                                                     neta1=NA,
                                                     neta2=NA,
                                                     name=as.character(x[[2]]),
-                                                    lower=as.numeric(x[[3]][[2]]),
-                                                    est=as.numeric(x[[3]][[3]]),
+                                                    lower=as.numeric(eval(x[[3]][[2]])),
+                                                    est=as.numeric(eval(x[[3]][[3]])),
                                                     upper=Inf,
                                                     fix=TRUE,
                                                     err=NA,
@@ -116,9 +115,9 @@ nlmixrBounds <- function(fun){
                                                    neta1=NA,
                                                    neta2=NA,
                                                    name=as.character(x[[2]]),
-                                                   lower=as.numeric(x[[3]][[2]]),
-                                                   est=as.numeric(x[[3]][[3]]),
-                                                   upper=as.numeric(x[[3]][[4]]),
+                                                   lower=as.numeric(eval(x[[3]][[2]])),
+                                                   est=as.numeric(eval(x[[3]][[3]])),
+                                                   upper=as.numeric(eval(x[[3]][[4]])),
                                                    fix=FALSE,
                                                    err=NA,
                                                    label=NA,
@@ -135,7 +134,7 @@ nlmixrBounds <- function(fun){
                                                    neta2=NA,
                                                    name=as.character(x[[2]]),
                                                    lower= -Inf,
-                                                   est=as.numeric(x[[3]][[2]]),
+                                                   est=as.numeric(eval(x[[3]][[2]])),
                                                    upper=Inf,
                                                    fix=TRUE,
                                                    err=NA,
@@ -149,8 +148,8 @@ nlmixrBounds <- function(fun){
                                                    neta1=NA,
                                                    neta2=NA,
                                                    name=as.character(x[[2]]),
-                                                   lower=as.numeric(x[[3]][[2]]),
-                                                   est=as.numeric(x[[3]][[3]]),
+                                                   lower=as.numeric(eval(x[[3]][[2]])),
+                                                   est=as.numeric(eval(x[[3]][[3]])),
                                                    upper=Inf,
                                                    fix=FALSE,
                                                    err=NA,
@@ -167,7 +166,7 @@ nlmixrBounds <- function(fun){
                                                neta2=NA,
                                                name=as.character(x[[2]]),
                                                lower=-Inf,
-                                               est=as.numeric(x[[3]][[2]]),
+                                               est=as.numeric(eval(x[[3]][[2]])),
                                                upper=Inf,
                                                fix=FALSE,
                                                err=NA,
@@ -182,12 +181,29 @@ nlmixrBounds <- function(fun){
                                                 neta2=NA,
                                                 name=as.character(x[[2]]),
                                                 lower=-Inf,
-                                                est=as.numeric(x[[3]][[1]]),
+                                                est=as.numeric(eval(x[[3]][[1]])),
                                                 upper=Inf,
                                                 fix=FALSE,
                                                 err=NA,
                                                 label=NA,
                                                 condition=NA))
+                } else {
+                    num <- try(eval(x[[3]]), silent=TRUE)
+                    if (is.numeric(num)){
+                        env$theta <- env$theta + 1;
+                        env$df <- rbind(env$df,
+                                        data.frame(ntheta=env$theta,
+                                                   neta1=NA,
+                                                   neta2=NA,
+                                                   name=as.character(x[[2]]),
+                                                   lower= -Inf,
+                                                   est=num,
+                                                   upper=Inf,
+                                                   fix=FALSE,
+                                                   err=NA,
+                                                   label=NA,
+                                                   condition=NA))
+                    }
                 }
             } else if (identical(x[[1]], quote(`c`))){
                 if (length(x) > 5){
@@ -201,9 +217,9 @@ nlmixrBounds <- function(fun){
                                                    neta1=NA,
                                                    neta2=NA,
                                                    name=NA,
-                                                   lower=as.numeric(x[[2]]),
-                                                   est=as.numeric(x[[3]]),
-                                                   upper=as.numeric(x[[4]]),
+                                                   lower=as.numeric(eval(x[[2]])),
+                                                   est=as.numeric(eval(x[[3]])),
+                                                   upper=as.numeric(eval(x[[4]])),
                                                    fix=TRUE,
                                                    err=NA,
                                                    label=NA,
@@ -221,8 +237,8 @@ nlmixrBounds <- function(fun){
                                                    neta1=NA,
                                                    neta2=NA,
                                                    name=NA,
-                                                   lower=as.numeric(x[[2]]),
-                                                   est=as.numeric(x[[3]]),
+                                                   lower=as.numeric(eval(x[[2]])),
+                                                   est=as.numeric(eval(x[[3]])),
                                                    upper=Inf,
                                                    fix=TRUE,
                                                    err=NA,
@@ -236,9 +252,9 @@ nlmixrBounds <- function(fun){
                                                 neta1=NA,
                                                 neta2=NA,
                                                 name=NA,
-                                                lower=as.numeric(x[[2]]),
-                                                est=as.numeric(x[[3]]),
-                                                upper=as.numeric(x[[4]]),
+                                                lower=as.numeric(eval(x[[2]])),
+                                                est=as.numeric(eval(x[[3]])),
+                                                upper=as.numeric(eval(x[[4]])),
                                                 fix=FALSE,
                                                 err=NA,
                                                 label=NA,
@@ -254,7 +270,7 @@ nlmixrBounds <- function(fun){
                                                 neta2=NA,
                                                 name=NA,
                                                 lower= -Inf,
-                                                est=as.numeric(x[[2]]),
+                                                est=as.numeric(eval(x[[2]])),
                                                 upper=Inf,
                                                 fix=TRUE,
                                                 err=NA,
@@ -268,8 +284,8 @@ nlmixrBounds <- function(fun){
                                                 neta1=NA,
                                                 neta2=NA,
                                                 name=NA,
-                                                lower=as.numeric(x[[2]]),
-                                                est=as.numeric(x[[3]]),
+                                                lower=as.numeric(eval(x[[2]])),
+                                                est=as.numeric(eval(x[[3]])),
                                                 upper=Inf,
                                                 fix=FALSE,
                                                 err=NA,
@@ -285,7 +301,7 @@ nlmixrBounds <- function(fun){
                                             neta2=NA,
                                             name=NA,
                                             lower=-Inf,
-                                            est=as.numeric(x[[2]]),
+                                            est=as.numeric(eval(x[[2]])),
                                             upper=Inf,
                                             fix=FALSE,
                                             err=NA,
@@ -304,7 +320,7 @@ nlmixrBounds <- function(fun){
                                                 neta2=env$eta1,
                                                 name=as.character(x[[2]]),
                                                 lower=-Inf,
-                                                est=as.numeric(x[[3]]),
+                                                est=as.numeric(eval(x[[3]])),
                                                 upper=Inf,
                                                 fix=FALSE,
                                                 err=NA,
@@ -320,7 +336,7 @@ nlmixrBounds <- function(fun){
                                 n <- n[n != "+"];
                                 if(length(n) == num){
                                     r <- x[[3]][-1];
-                                    r <- sapply(r, as.numeric);
+                                    r <- sapply(r, function(expr){as.numeric(eval(expr))});
                                     i <- 0
                                     j <- 1;
                                     for (v in r){
@@ -365,7 +381,7 @@ nlmixrBounds <- function(fun){
                                                        neta2=NA,
                                                        name=as.character(x[[2]]),
                                                        lower=0,
-                                                       est=as.numeric(x[[3]][[2]]),
+                                                       est=as.numeric(eval(x[[3]][[2]])),
                                                        upper=Inf,
                                                        fix=TRUE,
                                                        err=as.character(x[[3]][[1]]),
@@ -380,7 +396,7 @@ nlmixrBounds <- function(fun){
                                                        neta2=NA,
                                                        name=as.character(x[[2]]),
                                                        lower=0,
-                                                       est=as.numeric(x[[3]][[2]][[2]]),
+                                                       est=as.numeric(eval(x[[3]][[2]][[2]])),
                                                        upper=Inf,
                                                        fix=TRUE,
                                                        err=as.character(x[[3]][[2]][[1]]),
@@ -393,7 +409,7 @@ nlmixrBounds <- function(fun){
                                                        neta2=NA,
                                                        name=as.character(x[[2]]),
                                                        lower=0,
-                                                       est=as.numeric(x[[3]][[3]][[2]]),
+                                                       est=as.numeric(eval(x[[3]][[3]][[2]])),
                                                        upper=Inf,
                                                        fix=TRUE,
                                                        err=as.character(x[[3]][[3]][[1]]),
@@ -412,7 +428,7 @@ nlmixrBounds <- function(fun){
                                                 neta2=env$eta1,
                                                 name=NA,
                                                 lower=-Inf,
-                                                est=as.numeric(x[[2]]),
+                                                est=as.numeric(eval(x[[2]])),
                                                 upper=Inf,
                                                 fix=FALSE,
                                                 err=NA,
@@ -425,7 +441,7 @@ nlmixrBounds <- function(fun){
                             num <- sqrt(1+env$netas*8)/2-1/2
                             if (round(num) == num){
                                 r <- x[[2]][-1];
-                                r <- sapply(r, as.numeric);
+                                r <- sapply(r, function(x){as.numeric(eval(x))});
                                 i <- 0
                                 j <- 1;
                                 for (v in r){
@@ -495,7 +511,7 @@ nlmixrBounds <- function(fun){
                                     neta2=NA,
                                     name=NA,
                                     lower= -Inf,
-                                    est=as.numeric(x),
+                                    est=as.numeric(eval(x)),
                                     upper=Inf,
                                     fix=FALSE,
                                     err=NA,
@@ -584,19 +600,22 @@ str.nlmixrBounds <- function(object, ...){
 
 nlmixrBoundsTheta <- function(x, full=TRUE, formula=FALSE){
     if (is.nlmixrBounds(x)){
+        x <- as.data.frame(x)
         if (formula) full <- FALSE;
         w <- which(!is.na(x$ntheta));
-        tmp <- x[w, ];
+        tmp <- (x[w, ]);
         nm <- sprintf(ifelse(formula, ".theta.%d", "theta[%d]"), seq_along(w));
         w <- which(!is.na(tmp$name));
         nm[w] <- as.character(tmp$name[w]);
         w <- which(!is.na(tmp$err));
         theta <-  tmp$est
-        if (full){
-            nm[w] <- sprintf("err[%d]", seq_along(w));
-        } else {
-            nm <- nm[-w];
-            theta <- theta[-w];
+        if (length(w) > 0){
+            if (full){
+                nm[w] <- sprintf("err[%d]", seq_along(w));
+            } else {
+                nm <- nm[-w];
+                theta <- theta[-w];
+            }
         }
         if (formula){
             if (any(duplicated(nm))){
