@@ -2,3 +2,4 @@
 *.a
 *.dll
 inst/doc
+.Rproj.user

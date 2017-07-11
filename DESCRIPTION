@@ -20,14 +20,17 @@ Imports: Rcpp (>= 0.11.5),
     rex,
     minqa,
     Matrix,
-    numDeriv
+    numDeriv,
 Suggests: knitr,
     rmarkdown,
     dplyr,
     lbfgsb3,
     testthat,
     madness,
-    devtools
+    devtools,
+    expm,
+    matrixcalc,
+    reshape2
 Version: 0.9.0-1
 Date: 2016-09-20
 Authors@R: c(person("Matthew","Fidler",
@@ -35,15 +38,21 @@ Authors@R: c(person("Matthew","Fidler",
    person("Yuan", "Xiong", 
       role = "aut", email = "yuan.xiong@gmail.com"),
    person("Rik", "Schoemaker", 
-      role = "aut", email = "rik.schoemaker@occams.eu"),
+      role = "aut", email = "rik.schoemaker@occams.com"),
    person("Justin", "Wilkins", 
       role = "aut", email = "justin.wilkins@occams.eu"),
+   person("Matthew","Fidler",
+      role = "aut", email = "matthew.fidler@gmail.com"),      
+   person("Mirjam","Trame",
+      role = "aut", email = "mirjam.trame@gmail.com"),   
    person("Wenping", "Wang", 
       role = "aut", email = "wwang8198@gmail.com")
    )
 Author: Matthew Fidler [aut, cre], Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut], 
   Wenping Wang [aut]
 Maintainer: Matthew Fidler <matthew.fidler@gmail.com>
+Author: Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut], Matt Fidler [aut], Mirjam Trame [aut],
+  Wenping Wang [aut, cre]
 Description: nlmixr is an R package for fitting population pharmacokinetic (PK) 
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)
