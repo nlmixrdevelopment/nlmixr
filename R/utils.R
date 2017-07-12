@@ -604,3 +604,16 @@ refresh <- function(){
     source(devtools::package_file("build/refresh.R"))
     ## nocov end
 }
+##' Collect warnings and just warn once.
+##'
+##' @param expr R expression
+##' @return The value of the expression
+##' @author Matthew L. Fidler
+collectWarnings <- function(expr){
+    ws <- c();
+    ret <- suppressWarnings(withCallingHandlers(expr,warning=function(w){ws <<- unique(c(w$message, ws))}))
+    for (w in ws){
+        warning(w)
+    }
+    return(ret);
+}

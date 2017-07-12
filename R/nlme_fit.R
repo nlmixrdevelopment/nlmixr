@@ -211,8 +211,14 @@ nlme_lin_cmpt <- function(dat, par_model,
 
     mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
                       data = nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
-	    start=par_model$start, ...);
-    ret <- do.call(nlme, mod.specs);
+                      start=par_model$start, ...);
+    if (regexpr(rex::rex("testthat", end), getwd()) != -1){
+        ret <- NULL;
+        cur.env <- environment()
+        R.utils::captureOutput(assign("ret", collectWarnings(do.call(nlme, mod.specs)), , cur.env));
+    } else {
+        ret <- collectWarnings(do.call(nlme, mod.specs));
+    }
     ret$env <- nlmeModListEnv;
     assignInMyNamespace("nlmeModListEnv", new.env());
     class(ret) <- c("nlmixr_nlme", class(ret));
@@ -411,8 +417,13 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
   mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
                     data = nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
                     start=par_model$start, ...)
-
-  ret <- do.call(nlme, mod.specs);
+  if (regexpr(rex::rex("testthat", end), getwd()) != -1){
+      ret <- NULL;
+      cur.env <- environment()
+      R.utils::captureOutput(assign("ret", collectWarnings(do.call(nlme, mod.specs)), , cur.env));
+  } else {
+      ret <- collectWarnings(do.call(nlme, mod.specs));
+  }
   ret$env <- nlmeModListEnv;
   assignInMyNamespace("nlmeModListEnv", new.env());
   class(ret) <- c("nlmixr_nlme", class(ret));
