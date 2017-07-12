@@ -1,30 +1,3 @@
-##' Find the assignments in R expression
-##'
-##' @param x R expression
-##' @return list of assigned parameters
-##' @author Hadley Wickham and Matthew L. Fidler
-##' @keywords internal
-##' @export
-nlmixrfindLhs <- function(x) {
-    ## Modified from http://adv-r.had.co.nz/Expressions.html find_assign4
-    if (is.atomic(x) || is.name(x)) {
-        character()
-    } else if (is.call(x)) {
-        if ((identical(x[[1]], quote(`<-`)) ||
-             identical(x[[1]], quote(`=`))) &&
-            is.name(x[[2]])) {
-            lhs <- as.character(x[[2]])
-        } else {
-            lhs <- character()
-        }
-        unique(c(lhs, unlist(lapply(x, nlmixrfindLhs))))
-    } else if (is.pairlist(x)) {
-        unique(unlist(lapply(x, nlmixrfindLhs)))
-    } else {
-        stop("Don't know how to handle type ", typeof(x),
-             call. = FALSE)
-    }
-}
 ##' Construct RxODE linCmt function
 ##'
 ##' @param fun function to convert to solveC syntax

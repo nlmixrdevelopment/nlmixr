@@ -23,8 +23,10 @@ Useful links:
 Authors:
 \itemize{
   \item Yuan Xiong \email{yuan.xiong@gmail.com}
-  \item Rik Schoemaker \email{rik.schoemaker@occams.eu}
+  \item Rik Schoemaker \email{rik.schoemaker@occams.com}
   \item Justin Wilkins \email{justin.wilkins@occams.eu}
+  \item Matthew Fidler \email{matthew.fidler@gmail.com}
+  \item Mirjam Trame \email{mirjam.trame@gmail.com}
   \item Wenping Wang \email{wwang8198@gmail.com}
 }
 
