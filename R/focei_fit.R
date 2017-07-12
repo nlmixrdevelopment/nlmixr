@@ -379,10 +379,11 @@ focei.fit <- function(data,
                       diag.xform=c("sqrt", "log", "identity"),
                       optim=c(
                           "bobyqa",
-                          "lbfgsb3",
-                          "newuoa",
-                          "nlminb",
-                          "uobyqa"),
+                          ## "lbfgsb3",
+                          ## "newuoa",
+                          "nlminb"##,
+                          ## "uobyqa"
+                      ),
                       model=NULL,
                       pred=NULL,
                       err=NULL,
@@ -475,7 +476,8 @@ focei.fit <- function(data,
         rhobeg=.2,
         rhoend=1e-2,
         npt=NULL,
-        est.chol.omegaInv=RxODE::rxSymPyVersion() >= 1,
+        ## FIXME bounds need to be changed.. They aren't working
+        est.chol.omegaInv=FALSE, ##RxODE::rxSymPyVersion() >= 1,
         add.posthoc=TRUE,
         extra.output=TRUE ## Display extra output on each iteration
     )
@@ -604,6 +606,7 @@ focei.fit <- function(data,
     lower.om <- rep(-Inf, length(th0.om));
     upper.om <- rep(Inf, length(th0.om));
     lower.om[w] <- con$atol.ode * 10;
+    upper.om[w] <- th0.om[w] * 1e4;
     lower <- c(lower, lower.om);
     upper <- c(upper, upper.om);
     inits.vec = c(inits$THTA, th0.om)
