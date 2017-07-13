@@ -5,7 +5,7 @@
 \title{Extract residuals from the FOCEI fit}
 \usage{
 \method{residuals}{focei.fit}(object, ..., type = c("ires", "res", "iwres",
-  "wres", "cwres"))
+  "wres", "cwres", "cwres0"), etas = NULL)
 }
 \arguments{
 \item{object}{focei.fit object}
@@ -13,6 +13,8 @@
 \item{...}{Additional arguments}
 
 \item{type}{Type of resduals fitted.}
+
+\item{etas}{ETAs matrix to use for the calculation.}
 }
 \value{
 residuals

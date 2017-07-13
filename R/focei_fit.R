@@ -212,25 +212,52 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
 ##' @param object focei.fit object
 ##' @param ... Additional arguments
 ##' @param type Type of resduals fitted.
+##' @param etas ETAs matrix to use for the calculation.
 ##' @return residuals
 ##' @author Matthew L. Fidler
 ##' @export
-residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wres", "cwres")){
+residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wres", "cwres", "cwres0"),
+                                etas=NULL){
+    env <- attr(object, ".focei.env");
+    if (!is.null(etas)){
+        if (class(etas) == "matrix" && nrow(etas) == env$nSUB && ncol(etas) == env$nETA){
+            old.mat <- env$inits.mat
+            assign("inits.mat", etas, env)
+            on.exit({assign("inits.mat", old.mat, env)});
+        } else {
+            stop(sprintf("The matrix of etas specified by etas needs to be %s rows by %s columns", env$nSUB, env$nETA))
+        }
+    }
     dat <- object;
     DV <- dat$DV;
     type <- match.arg(type);
-    up.type <- toupper(type)
-    if (any(up.type == names(object))){
-        return(dat[, object]);
-    }
-    if (any(type == c("res", "wres", "cwres"))){
+    ## up.type <- toupper(type)
+    ## if (any(up.type == names(object))){
+    ##     return(dat[, ]);
+    ## }
+    if (any(type == c("res", "wres", "cwres", "cwres0"))){
         pred <- fitted(object, population=TRUE);
         if (type == "wres"){
             ## population=TRUE => eta=0
             W <- sqrt(fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi"))
             return((DV - pred) / W);
-        } else if (type == "cwres"){
+        } else if (type == "cwres0"){
+            ## According to Hooker 2007, the Vi (or the
+            ## dh/deta*Sigma*dh/deta) should be calculated under eta=0
+            ## conditions.  However, etas really shouldn't effect the
+            ## residuals (in theory).  However, the variances may be
+            ## slightly different due to rounding errors and other
+            ## similiar numerical issues.  Therefore, when comparing
+            ## cwres0 and cwres to NONMEM from Wang2007, the cwres is
+            ## closer.
             W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=TRUE, type="Vi"))
+            return((DV - pred) / W);
+        } else if (type == "cwres"){
+            ## While this isn't exactly the residuals defined in
+            ## Hooker 2007, they more closely match NONMEM's CWRES.
+            ##
+            ## In the proportional case, it is likely that the variance depends on individual ETAs.
+            W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
             return((DV - pred) / W);
         } else {
             return(DV - pred);
