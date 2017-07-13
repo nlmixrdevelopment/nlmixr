@@ -195,9 +195,10 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
         }
     }
     x <- ofv.FOCEi(fit$par)
-    ## print(attr(x,"subj"))
     if (type == "posthoc"){
-        d1 <- data.frame(do.call("rbind", lapply(attr(x,"subj"), function(s) attr(s, type))));
+        d1 <- data.frame(do.call("rbind", lapply(attr(x,"subj"), function(s) {
+                                              matrix(as.vector(attr(s, type)), nrow=1)
+                                          })));
         names(d1) <- paste0("ETA", seq_along(d1[1, ]))
         d1 <- data.frame(ID=unique(object$ID), d1)
         return(d1)

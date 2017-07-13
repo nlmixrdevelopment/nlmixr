@@ -1,5 +1,6 @@
 *.o
 *.a
 *.dll
+.*/.Rhistory
 inst/doc
 .Rproj.user
