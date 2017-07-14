@@ -166,13 +166,14 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
 ##'     fitted values. The "Vi" option gives the variance estimate for
 ##'     the indivdiual.  The "Vfo" gives the Variance under the fo
 ##'     assumption when population=FALSE, and the FOCE assumption when
-##'     population=TRUE. When "posthoc", this extracts the posthoc
-##'     deviations from the typical values or ETAs.
-##' @return Individual predictions
+##'     population=TRUE. "dErr_dEta" gives the df/deta*eta. When
+##'     "posthoc", this extracts the posthoc deviations from the
+##'     typical values or ETAs.
+##' @return Individual/population predictions
 ##' @author Matthew L. Fidler
 ##' @export
 fitted.focei.fit <- function(object, ..., population=FALSE,
-                             type=c("fitted", "Vi", "Vfo", "posthoc")){
+                             type=c("fitted", "Vi", "Vfo", "dErr_dEta", "posthoc")){
     env <- attr(object, ".focei.env");
     fit <- env$fit;
     type <- match.arg(type);
@@ -216,7 +217,7 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
 ##' @return residuals
 ##' @author Matthew L. Fidler
 ##' @export
-residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wres", "cwres", "cwres0"),
+residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
                                 etas=NULL){
     env <- attr(object, ".focei.env");
     if (!is.null(etas)){
@@ -235,31 +236,34 @@ residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wre
     ## if (any(up.type == names(object))){
     ##     return(dat[, ]);
     ## }
-    if (any(type == c("res", "wres", "cwres", "cwres0"))){
-        pred <- fitted(object, population=TRUE);
+    if (any(type == c("res", "wres", "cwres", "cres", "cpred"))){
+        ## population=TRUE => eta=0
         if (type == "wres"){
-            ## population=TRUE => eta=0
+            ## Efo= f(|eta=0)
+            ## cov = Vfo|eta=0+Vi|eta=0
+            ## pred <- fitted(object, population=TRUE);
+
+            ## These WRES are calculated the same as Hooker 2007, but don't seem to match NONMEM.
+            pred <- fitted(object, population=TRUE)
             W <- sqrt(fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi"))
             return((DV - pred) / W);
-        } else if (type == "cwres0"){
+        } else if (type == "cwres"){
             ## According to Hooker 2007, the Vi (or the
             ## dh/deta*Sigma*dh/deta) should be calculated under eta=0
-            ## conditions.  However, etas really shouldn't effect the
-            ## residuals (in theory).  However, the variances may be
-            ## slightly different due to rounding errors and other
-            ## similiar numerical issues.  Therefore, when comparing
-            ## cwres0 and cwres to NONMEM from Wang2007, the cwres is
-            ## closer.
-            W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=TRUE, type="Vi"))
-            return((DV - pred) / W);
-        } else if (type == "cwres"){
-            ## While this isn't exactly the residuals defined in
-            ## Hooker 2007, they more closely match NONMEM's CWRES.
-            ##
-            ## In the proportional case, it is likely that the variance depends on individual ETAs.
+            ## conditions.  However, I don't think this is correct;
+            ## Neither does NONMEM; They use Vi under the post-hoc
+            ## predicted conditions
+            pred <- fitted(object, population=FALSE) - fitted(object, population=FALSE, type="dErr_dEta");
             W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
             return((DV - pred) / W);
+        } else if (type == "cpred"){
+            pred <- fitted(object, population=FALSE) - fitted(object, population=FALSE, type="dErr_dEta");
+            return(pred);
+        } else if (type == "cres"){
+            pred <- fitted(object, population=FALSE) - fitted(object, population=FALSE, type="dErr_dEta");
+            return(DV - pred);
         } else {
+            pred <- fitted(object, population=TRUE);
             return(DV - pred);
         }
     } else if (any(type == c("ires", "iwres"))){
@@ -418,7 +422,7 @@ focei.fit <- function(data,
                       lower= -Inf,
                       upper= Inf,
                       control=list(),
-                      calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres")){
+                      calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres", "cpred", "cres")){
     data <- data;
     colnames(data) <- toupper(names(data));
     sink.file <- tempfile();
@@ -1380,11 +1384,11 @@ focei.fit <- function(data,
         calculate.vars <- calculate.vars[calculate.vars != "ipred"];
     }
     if (any("pred" == calculate.vars)){
-        data$PRED <- fitted(data, population=TRUE);
+        data$PRED <- fitted(data, population=TRUE)
         calculate.vars <- calculate.vars[calculate.vars != "pred"];
     }
     for (v in calculate.vars){
-        if (any(v == c("ires", "res", "iwres", "wres", "cwres"))){
+        if (v != "pred"){
             data[, toupper(v)] <- resid(data, type=v);
         }
     }

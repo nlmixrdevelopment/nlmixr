@@ -5,7 +5,7 @@
 \title{Extract residuals from the FOCEI fit}
 \usage{
 \method{residuals}{focei.fit}(object, ..., type = c("ires", "res", "iwres",
-  "wres", "cwres", "cwres0"), etas = NULL)
+  "wres", "cwres", "cpred", "cres"), etas = NULL)
 }
 \arguments{
 \item{object}{focei.fit object}

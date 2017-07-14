@@ -7,8 +7,8 @@
 focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
   optim = c("bobyqa", "nlminb"), model = NULL, pred = NULL, err = NULL,
   lower = -Inf, upper = Inf, control = list(),
-  calculate.vars = c("pred", "ipred", "ires", "res", "iwres", "wres",
-  "cwres"))
+  calculate.vars = c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres",
+  "cpred", "cres"))
 }
 \arguments{
 \item{data}{Data to fit}

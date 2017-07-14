@@ -5,7 +5,7 @@
 \title{Extract the fitted values from the model}
 \usage{
 \method{fitted}{focei.fit}(object, ..., population = FALSE,
-  type = c("fitted", "Vi", "Vfo", "posthoc"))
+  type = c("fitted", "Vi", "Vfo", "dErr_dEta", "posthoc"))
 }
 \arguments{
 \item{object}{Fit object}
@@ -26,11 +26,12 @@ value is "fitted", this gives the individual or population
 fitted values. The "Vi" option gives the variance estimate for
 the indivdiual.  The "Vfo" gives the Variance under the fo
 assumption when population=FALSE, and the FOCE assumption when
-population=TRUE. When "posthoc", this extracts the posthoc
-deviations from the typical values or ETAs.}
+population=TRUE. "dErr_dEta" gives the df/deta*eta. When
+"posthoc", this extracts the posthoc deviations from the
+typical values or ETAs.}
 }
 \value{
-Individual predictions
+Individual/population predictions
 }
 \description{
 Extract the fitted values from the model
