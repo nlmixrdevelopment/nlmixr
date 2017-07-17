@@ -77,6 +77,9 @@ vec get_sig2(){
   sig2 << ares << bres;
   return sig2;
 }
+mat get_par_hist(){
+  return par_hist;
+}
 
 void inits(List x) {
   nmc = as<int>(x["nmc"]);
@@ -159,6 +162,7 @@ void inits(List x) {
   sigma2 = max(ares*ares, 10.0); //FIXME
 
   print = as<int>(x["print"]);
+  par_hist = as<mat>(x["par.hist"]);
 
   L  = zeros<vec>(nb_param);
   Ha = zeros<mat>(nb_param,nb_param);
@@ -179,7 +183,7 @@ void inits(List x) {
 
 void saem_fit() {
   //arma_rng::set_seed(99);
-  for (int kiter=0; kiter<niter; kiter++) {
+  for (unsigned int kiter=0; kiter<niter; kiter++) {
     gamma2_phi1=Gamma2_phi1.diag();
     IGamma2_phi1=inv_sympd(Gamma2_phi1);
     D1Gamma21=LCOV1*IGamma2_phi1;
@@ -382,13 +386,11 @@ void saem_fit() {
 
     Plambda = join_cols(Plambda1, Plambda0);
 
+    par_hist.row(kiter) = join_cols(join_cols(Plambda, Gamma2_phi1.diag()), vcsig2).t();
     if (print>0 && (kiter==0 || (kiter+1)%print==0))
     Rcout << kiter+1
           << ": "
-          << join_cols(
-             join_cols(Plambda,
-                       Gamma2_phi1.diag()),
-                       vcsig2).t();
+          << par_hist.row(kiter);
   }//kiter
 }
 
@@ -449,6 +451,7 @@ private:
   mcmcaux mx;
 
   int print;
+  mat par_hist;
 
 void set_mcmcphi(mcmcphi &mphi1,
                  const uvec i1,

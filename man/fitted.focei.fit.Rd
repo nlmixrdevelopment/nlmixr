@@ -5,7 +5,7 @@
 \title{Extract the fitted values from the model}
 \usage{
 \method{fitted}{focei.fit}(object, ..., population = FALSE,
-  type = c("fitted", "Vi", "Vfo", "dErr_dEta", "posthoc"))
+  type = c("fitted", "Vi", "Vfo", "dErr_dEta", "dR_dEta", "posthoc"))
 }
 \arguments{
 \item{object}{Fit object}

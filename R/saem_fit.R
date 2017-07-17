@@ -160,7 +160,8 @@ BEGIN_RCPP
     Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),
     Named("Plambda") = saem.get_Plambda(),
     Named("Ha") = saem.get_Ha(),
-    Named("sig2") = saem.get_sig2()
+    Named("sig2") = saem.get_sig2(),
+    Named("par_hist") = saem.get_par_hist()
   );
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";
@@ -296,7 +297,8 @@ BEGIN_RCPP
     Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),
     Named("Plambda") = saem.get_Plambda(),
     Named("Ha") = saem.get_Ha(),
-    Named("sig2") = saem.get_sig2()
+    Named("sig2") = saem.get_sig2(),
+    Named("par_hist") = saem.get_par_hist()
   );
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";
@@ -567,26 +569,49 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @export
 plot.saemFit = function(x, ...)
 {
-	fit = x ##Rcheck hack
-	saem.cfg = attr(fit, "saem.cfg")
-	dat = as.data.frame(saem.cfg$evt)
-	dat = cbind(dat[dat$EVID==0,], DV=saem.cfg$y)
-	df = rbind(
-		cbind(dat, grp=1),
-		cbind(dat, grp=2)
-	)
-        dopred <- attr(x, "dopred");
-	yp = dopred(fit$mpost_phi, saem.cfg$evt, saem.cfg$opt)
-	df$DV[df$grp==2] = yp
+    require(ggplot2)
 
-	#require(lattice)
-	p = xyplot(DV~TIME|ID, df, type=c("p", "l"),
-		lwd=c(NA,1), pch = c(1, NA), groups=grp)
-	print(p)
-	plot(yp, dat$DV); abline(0, 1, col="red")
-	plot(yp, dat$DV-yp); abline(0, 0, col="red")
+    fit = x
+    saem.cfg = attr(fit, "saem.cfg")
+    dat = as.data.frame(saem.cfg$evt)
+    dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
 
-	df
+    df = rbind(cbind(dat, grp = 1), cbind(dat, grp = 2))
+    dopred <- attr(x, "dopred");
+    yp = dopred(fit$mpost_phi, saem.cfg$evt, saem.cfg$opt)
+    df$DV[df$grp == 2] = yp
+
+    p4 = ggplot(subset(df, grp==1), aes(TIME, DV)) +
+      geom_point() +
+      facet_wrap(~ID) +
+      geom_line(aes(TIME, DV), subset(df, grp==2), col='red')
+
+    df = cbind(dat, IPRED=yp)
+    df$IRES = df$DV - df$IPRED
+
+    p2 = ggplot(df, aes(IPRED, DV)) +
+      geom_point() +
+      geom_abline(intercept = 0, slope=1, col='red')
+
+    p3 = ggplot(df, aes(IPRED, IRES)) +
+      geom_point() +
+      geom_abline(intercept = 0, slope=0, col='red')
+
+    m = x$par_hist
+    df = data.frame(
+      val=as.vector(m),
+      par=rep(1:ncol(m), each=nrow(m)),
+      iter=rep(1:nrow(m), ncol(m))
+    )
+
+    p1 = ggplot(df, aes(iter, val)) +
+      geom_line() +
+      facet_wrap(~par, scales = "free_y")
+
+    print(p1)
+    print(p2)
+    print(p3)
+    print(p4)
 }
 
 
@@ -676,13 +701,18 @@ configsaem = function(model, data, inits,
   data$N.covar=nrow(inits$theta)-1
   inits$theta[is.na(inits$theta)]=0
 
+
   ###  FIXME
   mcmc$stepsize=0:1;
   mcmc$burn.in=300
 
-  ###  FIXME: chk vars in input
   ###  FIXME: chk covars as char vec
-  s = data$nmdat[data$nmdat$EVID==0, ];
+  wh = setdiff(model$covars, names(data$nmdat))
+  if (length(wh)) {
+  	msg = paste0("covariate(s) not found: ", paste(wh, collapse=", "))
+  	stop(msg)
+  }
+  s = subset(data$nmdat, EVID==0)
   data$data = as.matrix(s[,c("ID", "TIME", "DV", model$covars)])
 
   nphi = model$N.eta
@@ -734,7 +764,7 @@ configsaem = function(model, data, inits,
   id = data$data[,"ID"]
   ntotal = length(id)
   N = length(unique(id))
-  covariables = tapply(data$data[,model$covars], id, unique)
+  covariables = if(is.null(model$covars)) NULL else tapply(data$data[, model$covars], id, unique)
   nb_measures = table(id)
   ncov = data$N.covar + 1
   nmc = mcmc$nmc
@@ -771,7 +801,7 @@ configsaem = function(model, data, inits,
   nd1 =nphi1+nlambda1+1;
   nd2 =nphi1+nlambda1+nlambda0;
   nb_param = nd2+1
-  Mcovariables = cbind(1, covariables)[,1:nrow(mcov)]
+  Mcovariables = cbind(rep(1, N), covariables)[,1:nrow(mcov)]
   dim(Mcovariables) = c(length(Mcovariables)/nrow(mcov), nrow(mcov))	#FIXME
 
   jlog1 = grep(T, model$log.eta)
@@ -936,7 +966,8 @@ configsaem = function(model, data, inits,
     bres=inits$bres,
     opt=opt,
     optM=optM,
-    print=mcmc$print
+    print=mcmc$print,
+    par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2))
   )
 }
 
@@ -1030,6 +1061,68 @@ print.saemFit = function(x, ...)
 	invisible(list(theta=th, se=se, H=H, omega=fit$Gamma2_phi1, eta=fit$mpost_phi))
 }
 
+
+#' Fit an SAEM model
+#'
+#' Fit an SAEM model using either closed-form solutions or ODE-based model definitions
+#'
+#' @param model an RxODE model or lincmt()
+#' @param data input data
+#' @param inits initial values
+#' @param PKpars PKpars function
+#' @param pred  pred function
+#' @param mcmc a list of various mcmc options
+#' @param ODEopt optional ODE solving options
+#' @param seed seed for random number generator
+#' @details
+#'    Fit a generalized nonlinear mixed-effect model using the Stochastic
+#'    Approximation Expectation-Maximization (SAEM) algorithm
+#'
+#' @author Wenping Wang
+#' @export
+#' @examples
+#' \dontrun{
+#' #ode <- "C2 = centr/V;
+#' #      d/dt(depot) =-KA*depot;
+#' #      d/dt(centr) = KA*depot - KE*centr;"
+#' #m1 = RxODE(ode, modName="m2")
+#'
+#' PKpars = function()
+#' {
+#'   CL = exp(lCL)
+#'   V  = exp(lV)
+#'   KA = exp(lKA)
+#'   KE = CL / V
+#'   #initCondition = c(0, KE - CL/V)
+#' }
+#' PRED = function() centr / V
+#' PRED2 = function() C2
+#'
+#' dat = theo_sd
+#' inits = list(theta=c(.05, .5, 2))
+#' fit = saem.fit(model=lincmt(ncmt=1, oral=T), dat, inits)
+#' #fit = saem.fit(model=m1, dat, inits, PKpars, pred=PRED)
+#' #fit = saem.fit(model=m1, dat, inits, PKpars, pred=PRED2)
+#'
+#' fit
+#' df = plot(fit)
+#' }
+saem.fit = function(
+model, data, inits,
+PKpars=NULL, pred=NULL,
+covars=NULL,
+mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+seed = 99)
+{
+    is.ode = class(model) == "RxODE"
+    saem_fit = if (!is.ode) gen_saem_user_fn(model) else gen_saem_user_fn(model, PKpars, pred)
+    model = list(saem_mod=saem_fit, covars=covars)
+    cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed)
+    fit = saem_fit(cfg)
+    #dyn.unload("saem_main.dll")
+    fit
+}
 
 #FIXME: coef_phi0, rmcmc, coef_sa
 #FIXME: Klog, rho, sa, nmc
