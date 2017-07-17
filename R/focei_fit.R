@@ -173,7 +173,7 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
 ##' @author Matthew L. Fidler
 ##' @export
 fitted.focei.fit <- function(object, ..., population=FALSE,
-                             type=c("fitted", "Vi", "Vfo", "dErr_dEta", "posthoc")){
+                             type=c("fitted", "Vi", "Vfo", "dErr_dEta", "dR_dEta", "posthoc")){
     env <- attr(object, ".focei.env");
     fit <- env$fit;
     type <- match.arg(type);
@@ -236,13 +236,12 @@ residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wre
     ## if (any(up.type == names(object))){
     ##     return(dat[, ]);
     ## }
-    if (any(type == c("res", "wres", "cwres", "cres", "cpred"))){
+    if (any(type == c("res", "wres", "cwres", "cres", "cpred", "cpredi"))){
         ## population=TRUE => eta=0
         if (type == "wres"){
             ## Efo= f(|eta=0)
             ## cov = Vfo|eta=0+Vi|eta=0
             ## pred <- fitted(object, population=TRUE);
-
             ## These WRES are calculated the same as Hooker 2007, but don't seem to match NONMEM.
             pred <- fitted(object, population=TRUE)
             W <- sqrt(fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi"))
@@ -296,6 +295,34 @@ as.data.frame.focei.fit <- function(x, row.names = NULL, optional = FALSE, ...){
 }
 
 ## FIXME: simulate function
+
+##' Simulate response based on FOCEi model's datathe fitted object's dataset
+##'
+##'
+##'
+##' @param object
+##' @param nsim
+##' @param seed
+##' @param ...
+##' @return New dataset based on original dataset
+##' @export
+##' @author Matthew L. Fidler
+simulate.focei.fit <- function(object, nsim=1, seed=NULL, ...){
+    if(!is.null(seed)){
+        set.seed(seed);
+    }
+    nsub <- length(unique(object$ID));
+    nobs <- length(object$ID);
+    do.call("rbind",
+            lapply(seq(1, nsim),
+                   function(x){
+                eta.mat <- mvtnorm::rmvnorm(nsub, sigma = object$omega, ...)
+                ipred <- fitted(object, population=eta.mat);
+                dv <- ipred + sapply(fitted(object, population=eta.mat, type="Vi"),
+                                     function(r){ return(rnorm(1, sd=sqrt(r)))});
+                return(data.frame(SIMID=x, ID=object$ID, TIME=object$TIME, DV=dv, IPRED=ipred))
+            }))
+}
 ## FIXME: show?
 ## FIXME: qqnorm?
 ## FIXME: family?

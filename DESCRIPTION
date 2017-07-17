@@ -21,7 +21,8 @@ Imports: Rcpp (>= 0.11.5),
     minqa,
     Matrix,
     numDeriv,
-    R.utils
+    R.utils,
+    mvtnorm
 Suggests: knitr,
     rmarkdown,
     dplyr,
