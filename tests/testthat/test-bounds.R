@@ -319,15 +319,14 @@ test_that("Error parsing is reasonable", {
 
 ## Now try a fixed parameter block
 
+ref1 <- structure(list(ntheta = c(1, 2, 3, 4), neta1 = c(NA, NA, NA, NA), neta2 = c(NA, NA, NA, NA), name = structure(1:4, .Label = c("a", "b", "c", "d"), class = "factor"), lower = c(0, 0, -Inf, -Inf), est = c(1, 3, 4, 4), upper = c(2, Inf, Inf, Inf), fix = c(TRUE, TRUE, FALSE, TRUE), err = c(NA, NA, NA, NA), label = c("A", NA, NA, NA), condition = c(NA, NA, NA, NA)), .Names = c("ntheta", "neta1", "neta2", "name", "lower", "est", "upper", "fix", "err", "label", "condition"), row.names = c(NA, -4L), class = c("nlmixrBounds", "data.frame"))
+
 bnd1 <- function(){
     a = fix(0, 1, 2) # A
     b = fix(0, 3);
     c <- 4
     d <- fix(4);
 }
-
-ref1 <- structure(list(ntheta = c(1, 2, 3, 4), neta1 = c(NA, NA, NA, NA), neta2 = c(NA, NA, NA, NA), name = structure(1:4, .Label = c("a", "b", "c", "d"), class = "factor"), lower = c(0, 0, -Inf, -Inf), est = c(1, 3, 4, 4), upper = c(2, Inf, Inf, Inf), fix = c(TRUE, TRUE, FALSE, TRUE), err = c(NA, NA, NA, NA), label = c("A", NA, NA, NA), condition = c(NA, NA, NA, NA)), .Names = c("ntheta", "neta1", "neta2", "name", "lower", "est", "upper", "fix", "err", "label", "condition"), row.names = c(NA, -4L), class = c("nlmixrBounds", "data.frame"))
-
 
 bnd2 <- function(){
     a = FIX(0, 1, 2) # A
@@ -349,11 +348,41 @@ bnd4 <- function(){
     c <- 4
     d <- FIXED(4);
 }
+
+bnd5 <- function(){
+    a = c(0, fix(1), 2) # A
+    b = c(0, fix(3));
+    c <- 4
+    d <- fix(4);
+}
+
+bnd6 <- function(){
+    a = c(0, FIX(1), 2) # A
+    b = c(0, FIX(3));
+    c <- 4
+    d <- FIX(4);
+}
+
+bnd7 <- function(){
+    a = c(0, fixed(1), 2) # A
+    b = c(0, fixed(3));
+    c <- 4
+    d <- fixed(4);
+}
+
+bnd8 <- function(){
+    a = c(0, FIXED(1), 2) # A
+    b = c(0, FIXED(3));
+    c <- 4
+    d <- FIXED(4);
+}
 test_that("Theta fix fixed are reasonable", {
     expect_equal(nlmixrBounds(bnd1), ref1)
     expect_equal(nlmixrBounds(bnd2), ref1)
     expect_equal(nlmixrBounds(bnd3), ref1)
     expect_equal(nlmixrBounds(bnd4), ref1)
+    expect_equal(nlmixrBounds(bnd5), ref1)
+    expect_equal(nlmixrBounds(bnd6), ref1)
+    expect_equal(nlmixrBounds(bnd7), ref1)
+    expect_equal(nlmixrBounds(bnd8), ref1)
 })
-
-nlmixrBounds(bnd1)
