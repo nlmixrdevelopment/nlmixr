@@ -51,7 +51,7 @@ PKpars = function()
 PRED = function() centr / V
 PRED2 = function() C2
 
-dat = read.table("theo_sd.dat",  head=T)
+dat = theo_sd
 inits = list(theta=c(.05, .5, 2))
 fit = saem.fit(model=lincmt(ncmt=1, oral=T), dat, inits)
 #fit = saem.fit(model=m1, dat, inits, PKpars, pred=PRED)
