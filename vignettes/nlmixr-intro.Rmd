@@ -2,7 +2,7 @@
 title: 'nlmixr: an R package for fitting PK and PKPD models'
 author: "Wenping Wang"
 date: '`r Sys.Date()`'
-output: html_document
+output: pdf_document
 vignette: |
   %\VignetteIndexEntry{nlmixr: an R package for fitting PK and PKPD models} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 ---

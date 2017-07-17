@@ -1,4 +1,4 @@
-                                        #dyn.load("portsrc.so")
+#dyn.load("portsrc.so")
 
 port_msg <- function(iv1) {
     switch(as.character(iv1),
@@ -48,7 +48,7 @@ port_get_named_v <- function(v) {
     setNames(v[port_v_nms], names(port_v_nms))
 }
 
-##' @export
+
 nlminb2 <-
     function(start, objective, gradient = NULL, hessian = NULL, ...,
              scale = 1, control = list(), lower =  - Inf, upper = Inf)

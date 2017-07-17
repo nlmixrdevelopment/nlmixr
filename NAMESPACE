@@ -13,6 +13,10 @@ importFrom("stats", "as.formula", "nlminb", "optimHess", "rnorm", "terms", predi
 importFrom("stats", "anova", "optim", "sd", "var")
 importFrom(parallel, mclapply)
 importFrom(lbfgs, lbfgs)
+importFrom(lbfgsb3, lbfgsb3)
+importFrom(madness, madness)
+importFrom(Deriv, Deriv)
+importFrom(minqa, newuoa)
 
 
 #export(RxODE, eventTable)
@@ -38,6 +42,7 @@ prediction,
 print.gnlmm.fit,
 gen_saem_user_fn,
 configsaem,
+saem.fit,
 #instant.stan.extension,
 lincmt,
 calcCov,
@@ -47,9 +52,18 @@ plot.saemFit,
 print.saemFit,
 summary.saemFit,
 
-lin_cmt
+lin_cmt,
+
+nlminb2,
+gnlmm2,
+focei.fit,
+print.focei.fit,
+plot.focei.fit
 )
 
 S3method(print, dyn.ID)
 S3method(summary, dyn.ID)
 S3method(plot, dyn.ID)
+
+S3method(print, focei.fit)
+S3method(plot, focei.fit)
