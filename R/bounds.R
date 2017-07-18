@@ -74,7 +74,7 @@ nlmixrBounds <- function(fun){
                 is.name(x[[2]])) {
                 if (length(x[[3]]) > 5){
                     stop(sprintf("%s %s c(%s) syntax is not supported for thetas",
-                    as.character(x[[2]]), as.character(x[[1]]), paste(sapply(x[[3]][-1], as.character), collapse=", ")))
+                                 as.character(x[[2]]), as.character(x[[1]]), paste(sapply(x[[3]][-1], as.character), collapse=", ")))
                 } else if (length(x[[3]]) == 5){
                     if (as.character(x[[3]][[1]]) == "c" &&
                         any(tolower(as.character(x[[3]][[5]])) == c("fix", "fixed")) &&
@@ -104,17 +104,17 @@ nlmixrBounds <- function(fun){
                         length(x[[3]][[4]]) == 1){
                         env$theta <- env$theta + 1;
                         env$df <- rbind(env$df,
-                                         data.frame(ntheta=env$theta,
-                                                    neta1=NA,
-                                                    neta2=NA,
-                                                    name=as.character(x[[2]]),
-                                                    lower=as.numeric(eval(x[[3]][[2]])),
-                                                    est=as.numeric(eval(x[[3]][[3]])),
-                                                    upper=Inf,
-                                                    fix=TRUE,
-                                                    err=NA,
-                                                    label=NA,
-                                                    condition=NA));
+                                        data.frame(ntheta=env$theta,
+                                                   neta1=NA,
+                                                   neta2=NA,
+                                                   name=as.character(x[[2]]),
+                                                   lower=as.numeric(eval(x[[3]][[2]])),
+                                                   est=as.numeric(eval(x[[3]][[3]])),
+                                                   upper=Inf,
+                                                   fix=TRUE,
+                                                   err=NA,
+                                                   label=NA,
+                                                   condition=NA));
                     } else {
                         ## a = c(1,2,3)
                         env$theta <- env$theta + 1;
@@ -135,7 +135,7 @@ nlmixrBounds <- function(fun){
                            any(tolower(as.character(x[[3]][[1]])) == c("c", "fix", "fixed"))){
                     nenv$do.fixed <- any(tolower(as.character(x[[3]][[1]])) == c("fix", "fixed"));
                     if  (any(tolower(as.character(x[[3]][[3]])) == c("fix", "fixed"))
-                            && length(x[[3]][[3]]) == 1) {
+                         && length(x[[3]][[3]]) == 1) {
                         ## a = c(1,fixed)
                         env$theta <- env$theta + 1;
                         env$df <- rbind(env$df,
@@ -187,17 +187,17 @@ nlmixrBounds <- function(fun){
                     ## a = 1
                     env$theta <- env$theta + 1;
                     env$df <- rbind(env$df,
-                                     data.frame(ntheta=env$theta,
-                                                neta1=NA,
-                                                neta2=NA,
-                                                name=as.character(x[[2]]),
-                                                lower=-Inf,
-                                                est=as.numeric(eval(x[[3]][[1]])),
-                                                upper=Inf,
-                                                fix=nenv$do.fixed,
-                                                err=NA,
-                                                label=NA,
-                                                condition=NA))
+                                    data.frame(ntheta=env$theta,
+                                               neta1=NA,
+                                               neta2=NA,
+                                               name=as.character(x[[2]]),
+                                               lower=-Inf,
+                                               est=as.numeric(eval(x[[3]][[1]])),
+                                               upper=Inf,
+                                               fix=nenv$do.fixed,
+                                               err=NA,
+                                               label=NA,
+                                               condition=NA))
                 } else {
                     num <- try(eval(x[[3]]), silent=TRUE)
                     if (is.numeric(num)){
@@ -262,17 +262,17 @@ nlmixrBounds <- function(fun){
                         ## c(1,2,3)
                         env$theta <- env$theta + 1
                         env$df <- rbind(env$df,
-                                     data.frame(ntheta=env$theta,
-                                                neta1=NA,
-                                                neta2=NA,
-                                                name=NA,
-                                                lower=as.numeric(eval(x[[2]])),
-                                                est=as.numeric(eval(x[[3]])),
-                                                upper=as.numeric(eval(x[[4]])),
-                                                fix=nenv$do.fixed,
-                                                err=NA,
-                                                label=NA,
-                                                condition=NA));
+                                        data.frame(ntheta=env$theta,
+                                                   neta1=NA,
+                                                   neta2=NA,
+                                                   name=NA,
+                                                   lower=as.numeric(eval(x[[2]])),
+                                                   est=as.numeric(eval(x[[3]])),
+                                                   upper=as.numeric(eval(x[[4]])),
+                                                   fix=nenv$do.fixed,
+                                                   err=NA,
+                                                   label=NA,
+                                                   condition=NA));
                     }
                 } else if (length(x) == 3){
                     if (any(tolower(as.character(x[[3]])) == c("fix", "fixed")) &&
@@ -280,48 +280,48 @@ nlmixrBounds <- function(fun){
                         ## c(1, fixed)
                         env$theta <- env$theta + 1
                         env$df <- rbind(env$df,
-                                     data.frame(ntheta=env$theta,
-                                                neta1=NA,
-                                                neta2=NA,
-                                                name=NA,
-                                                lower= -Inf,
-                                                est=as.numeric(eval(x[[2]])),
-                                                upper=Inf,
-                                                fix=TRUE,
-                                                err=NA,
-                                                label=NA,
-                                                condition=NA));
+                                        data.frame(ntheta=env$theta,
+                                                   neta1=NA,
+                                                   neta2=NA,
+                                                   name=NA,
+                                                   lower= -Inf,
+                                                   est=as.numeric(eval(x[[2]])),
+                                                   upper=Inf,
+                                                   fix=TRUE,
+                                                   err=NA,
+                                                   label=NA,
+                                                   condition=NA));
                     } else {
                         ## c(1,2)
                         env$theta <- env$theta + 1
                         env$df <- rbind(env$df,
-                                     data.frame(ntheta=env$theta,
-                                                neta1=NA,
-                                                neta2=NA,
-                                                name=NA,
-                                                lower=as.numeric(eval(x[[2]])),
-                                                est=as.numeric(eval(x[[3]])),
-                                                upper=Inf,
-                                                fix=nenv$do.fixed,
-                                                err=NA,
-                                                label=NA,
-                                                condition=NA));
+                                        data.frame(ntheta=env$theta,
+                                                   neta1=NA,
+                                                   neta2=NA,
+                                                   name=NA,
+                                                   lower=as.numeric(eval(x[[2]])),
+                                                   est=as.numeric(eval(x[[3]])),
+                                                   upper=Inf,
+                                                   fix=nenv$do.fixed,
+                                                   err=NA,
+                                                   label=NA,
+                                                   condition=NA));
                     }
                 } else if (length(x) == 2){
                     ## c(1)
                     env$theta <- env$theta + 1
                     env$df <- rbind(env$df,
-                                 data.frame(ntheta=env$theta,
-                                            neta1=NA,
-                                            neta2=NA,
-                                            name=NA,
-                                            lower=-Inf,
-                                            est=as.numeric(eval(x[[2]])),
-                                            upper=Inf,
-                                            fix=FALSE,
-                                            err=NA,
-                                            label=NA,
-                                            condition=NA));
+                                    data.frame(ntheta=env$theta,
+                                               neta1=NA,
+                                               neta2=NA,
+                                               name=NA,
+                                               lower=-Inf,
+                                               est=as.numeric(eval(x[[2]])),
+                                               upper=Inf,
+                                               fix=FALSE,
+                                               err=NA,
+                                               label=NA,
+                                               condition=NA));
                 }
             } else if (identical(x[[1]], quote(`~`))){
                 if (length(x) == 3){
@@ -330,17 +330,17 @@ nlmixrBounds <- function(fun){
                         env$netas <- 1;
                         env$eta1 <- env$eta1 + 1;
                         env$df <- rbind(env$df,
-                                     data.frame(ntheta=NA,
-                                                neta1=env$eta1,
-                                                neta2=env$eta1,
-                                                name=as.character(x[[2]]),
-                                                lower=-Inf,
-                                                est=as.numeric(eval(x[[3]])),
-                                                upper=Inf,
-                                                fix=FALSE,
-                                                err=NA,
-                                                label=NA,
-                                                condition="ID"));
+                                        data.frame(ntheta=NA,
+                                                   neta1=env$eta1,
+                                                   neta2=env$eta1,
+                                                   name=as.character(x[[2]]),
+                                                   lower=-Inf,
+                                                   est=as.numeric(eval(x[[3]])),
+                                                   upper=Inf,
+                                                   fix=FALSE,
+                                                   err=NA,
+                                                   label=NA,
+                                                   condition="ID"));
                     } else {
                         ## et1+et2+et3~c() lower triangular matrix
                         if (any(tolower(as.character(x[[3]][[1]])) == c("c", "fix", "fixed"))){
@@ -371,17 +371,17 @@ nlmixrBounds <- function(fun){
                                             nm <- sprintf("(%s,%s)", n[j], n[i]);
                                         }
                                         env$df <- rbind(env$df,
-                                                     data.frame(ntheta=NA,
-                                                                neta1=env$eta1 + j,
-                                                                neta2=env$eta1 + i,
-                                                                name=nm,
-                                                                lower=-Inf,
-                                                                est=v,
-                                                                upper=Inf,
-                                                                fix=full.fixed | do.fixed,
-                                                                err=NA,
-                                                                label=NA,
-                                                                condition="ID"))
+                                                        data.frame(ntheta=NA,
+                                                                   neta1=env$eta1 + j,
+                                                                   neta2=env$eta1 + i,
+                                                                   name=nm,
+                                                                   lower=-Inf,
+                                                                   est=v,
+                                                                   upper=Inf,
+                                                                   fix=full.fixed | do.fixed,
+                                                                   err=NA,
+                                                                   label=NA,
+                                                                   condition="ID"))
                                         if (i == j){
                                             j <- j + 1;
                                             i <- 0;
@@ -447,17 +447,17 @@ nlmixrBounds <- function(fun){
                         env$netas <- 1;
                         env$eta1 <- env$eta1 + 1;
                         env$df <- rbind(env$df,
-                                     data.frame(ntheta=NA,
-                                                neta1=env$eta1,
-                                                neta2=env$eta1,
-                                                name=NA,
-                                                lower=-Inf,
-                                                est=as.numeric(eval(x[[2]])),
-                                                upper=Inf,
-                                                fix=FALSE,
-                                                err=NA,
-                                                label=NA,
-                                                condition="ID"))
+                                        data.frame(ntheta=NA,
+                                                   neta1=env$eta1,
+                                                   neta2=env$eta1,
+                                                   name=NA,
+                                                   lower=-Inf,
+                                                   est=as.numeric(eval(x[[2]])),
+                                                   upper=Inf,
+                                                   fix=FALSE,
+                                                   err=NA,
+                                                   label=NA,
+                                                   condition="ID"))
                     } else {
                         ## ~c() lower triangular matrix
                         if (any(tolower(as.character(x[[2]][[1]])) == c("c", "fix", "fixed"))){
@@ -480,17 +480,17 @@ nlmixrBounds <- function(fun){
                                     do.fixed <- r$do.fixed[k]
                                     i <- i + 1;
                                     env$df <- rbind(env$df,
-                                                 data.frame(ntheta=NA,
-                                                            neta1=eta1 + j,
-                                                            neta2=eta1 + i,
-                                                            name=NA,
-                                                            lower=-Inf,
-                                                            est=v,
-                                                            upper=Inf,
-                                                            fix=full.fixed | do.fixed,
-                                                            err=NA,
-                                                            label=NA,
-                                                            condition="ID"))
+                                                    data.frame(ntheta=NA,
+                                                               neta1=eta1 + j,
+                                                               neta2=eta1 + i,
+                                                               name=NA,
+                                                               lower=-Inf,
+                                                               est=v,
+                                                               upper=Inf,
+                                                               fix=full.fixed | do.fixed,
+                                                               err=NA,
+                                                               label=NA,
+                                                               condition="ID"))
                                     if (i == j){
                                         j <- j + 1;
                                         i <- 0;
@@ -539,17 +539,17 @@ nlmixrBounds <- function(fun){
             ## 1
             env$theta <- env$theta + 1
             env$df <- rbind(env$df,
-                         data.frame(ntheta=env$theta,
-                                    neta1=NA,
-                                    neta2=NA,
-                                    name=NA,
-                                    lower= -Inf,
-                                    est=as.numeric(eval(x)),
-                                    upper=Inf,
-                                    fix=FALSE,
-                                    err=NA,
-                                    label=NA,
-                                    condition=NA))
+                            data.frame(ntheta=env$theta,
+                                       neta1=NA,
+                                       neta2=NA,
+                                       name=NA,
+                                       lower= -Inf,
+                                       est=as.numeric(eval(x)),
+                                       upper=Inf,
+                                       fix=FALSE,
+                                       err=NA,
+                                       label=NA,
+                                       condition=NA))
         } else {
             stop("Don't know how to handle type ", typeof(x),
                  call. = FALSE)
@@ -561,7 +561,7 @@ nlmixrBounds <- function(fun){
         stop("Could not find any parameter information.")
     }
     class(df) <- c("nlmixrBounds", "data.frame");
-    df
+    return(df)
 }
 
 is.nlmixrBounds <- function(x){
@@ -585,7 +585,6 @@ as.data.frame.nlmixrBounds <- function(x, row.names = NULL, optional = FALSE, ..
 
 ##' @export
 print.nlmixrBounds <- function(x, ...){
-    cat("nlmixr bounds object\n\n")
     cat("Fixed Effects ($theta):\n");
     print(x$theta);
     omega <- x$omega;
@@ -626,7 +625,6 @@ str.nlmixrBounds <- function(object, ...){
     message(" $ theta     : num ... (theta estimates)")
     message(" $ theta.full: num ... (theta estimates, including error terms)")
     message(" $ omega     : matrix ... (omega matrix)")
-    message(" $ pred      : function ... (Prediction function based on error specification)")
     message(" $ random    : matrix class ... (Based on Between Subject Random effects)")
     message(" $ fixed.form: formula  ... (Fixed effect parameters based on theta.)")
 }
@@ -702,29 +700,5 @@ nlmixrBoundsOmega <- function(x, nlme=FALSE){
         }
     } else {
         return(matrix(double(), 0, 0));
-    }
-}
-
-nlmixrBoundsPred <- function(x){
-    if (is.nlmixrBounds(x)){
-        w <- which(!is.na(x$err));
-        if (length(w) > 0){
-            df <- as.data.frame(x[w, ]);
-            df <- df[, c("name", "condition")]
-            df <- df[!duplicated(df), ];
-            if (all(df$name == df$name[1])){
-                return(eval(parse(text=sprintf("function(){\nreturn(%s)\n}", df$name[1]))))
-            } else if (!any(is.na(df$condition))) {
-                df$el <- "else ";
-                df$el[1] <- "";
-                return(eval(parse(text=sprintf("function(){\n%s\n}", paste(sprintf("%sif (%s) {\n return(%s);\n} ", df$el, df$condition, df$name), collapse="\n")))));
-            } else {
-                stop("If you have multiple variables for prediction, you need to specify the condition with the | operator. (like y ~ prop(1) | CMT==3)")
-            }
-        } else {
-            stop("No errors are specified in the nlmixr bound object; Cant' create pred function")
-        }
-    } else {
-        stop("Cannot create pred function since this isn't a nlmixr bounds object!");
     }
 }
