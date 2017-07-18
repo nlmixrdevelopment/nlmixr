@@ -343,7 +343,8 @@ nlmixrBounds <- function(fun){
                                                 condition="ID"));
                     } else {
                         ## et1+et2+et3~c() lower triangular matrix
-                        if (as.character(x[[3]][[1]]) == "c"){
+                        if (any(tolower(as.character(x[[3]][[1]])) == c("c", "fix", "fixed"))){
+                            full.fixed <- any(tolower(as.character(x[[3]][[1]])) == c("fix", "fixed"));
                             env$netas <- length(x[[3]]) - 1;
                             num <- sqrt(1+env$netas*8)/2-1/2
                             if (round(num) == num){
@@ -351,10 +352,18 @@ nlmixrBounds <- function(fun){
                                 n <- n[n != "+"];
                                 if(length(n) == num){
                                     r <- x[[3]][-1];
-                                    r <- sapply(r, function(expr){as.numeric(eval(expr))});
+                                    r <- t(sapply(r, function(x){
+                                        nenv$do.fixed <- FALSE;
+                                        ret <- as.numeric(eval(x));
+                                        return(c(v=ret, do.fixed=nenv$do.fixed));
+                                    }));
+                                    r <- data.frame(r)
+                                    r$do.fixed <- as.logical(r$do.fixed);
                                     i <- 0
                                     j <- 1;
-                                    for (v in r){
+                                    for (k in seq_along(r$do.fixed)){
+                                        v <- r$v[k];
+                                        do.fixed <- r$do.fixed[k]
                                         i <- i + 1;
                                         if (i == j){
                                             nm <- n[i];
@@ -369,7 +378,7 @@ nlmixrBounds <- function(fun){
                                                                 lower=-Inf,
                                                                 est=v,
                                                                 upper=Inf,
-                                                                fix=FALSE,
+                                                                fix=full.fixed | do.fixed,
                                                                 err=NA,
                                                                 label=NA,
                                                                 condition="ID"))
@@ -451,15 +460,24 @@ nlmixrBounds <- function(fun){
                                                 condition="ID"))
                     } else {
                         ## ~c() lower triangular matrix
-                        if (as.character(x[[2]][[1]]) == "c"){
+                        if (any(tolower(as.character(x[[2]][[1]])) == c("c", "fix", "fixed"))){
+                            full.fixed <- any(tolower(as.character(x[[2]][[1]])) == c("fix", "fixed"))
                             env$netas <- length(x[[2]]) - 1;
                             num <- sqrt(1+env$netas*8)/2-1/2
                             if (round(num) == num){
                                 r <- x[[2]][-1];
-                                r <- sapply(r, function(x){as.numeric(eval(x))});
+                                r <- t(sapply(r, function(x){
+                                    nenv$do.fixed <- FALSE;
+                                    ret <- as.numeric(eval(x));
+                                    return(c(v=ret, do.fixed=nenv$do.fixed));
+                                }));
+                                r <- data.frame(r)
+                                r$do.fixed <- as.logical(r$do.fixed);
                                 i <- 0
                                 j <- 1;
-                                for (v in r){
+                                for (k in seq_along(r$do.fixed)){
+                                    v <- r$v[k];
+                                    do.fixed <- r$do.fixed[k]
                                     i <- i + 1;
                                     env$df <- rbind(env$df,
                                                  data.frame(ntheta=NA,
@@ -469,7 +487,7 @@ nlmixrBounds <- function(fun){
                                                             lower=-Inf,
                                                             est=v,
                                                             upper=Inf,
-                                                            fix=FALSE,
+                                                            fix=full.fixed | do.fixed,
                                                             err=NA,
                                                             label=NA,
                                                             condition="ID"))
