@@ -17,7 +17,7 @@ nlmixrUI <- function(fun){
     fun2 <- gsub(rex::rex(boundary, "ini(",any_spaces,"{"), "ini <- function()({", fun2)
     fun2 <- gsub(rex::rex(boundary, "model(",any_spaces,"{"), "model <- function()({", fun2)
     if (fun2[length(fun2)] == "}"){
-        fun2[length(fun2)] <- "return(list(ini=nlmixrBounds(ini),model=model))\n}"
+        fun2[length(fun2)] <- "return(list(ini=nlmixrBounds(ini),model=nlmixrUIModel(model)))\n}"
     }
     fun2 <- try(eval(parse(text=paste0(fun2, collapse = "\n"))), silent=TRUE);
     if (inherits(fun2, "try-error")){
@@ -34,9 +34,24 @@ nlmixrUI <- function(fun){
 ##' @author Matthew L. Fidler
 ##' @export
 print.nlmixrUI <- function(x, ...){
+    message("################################################################################")
     message("## Initial Conditions:")
     message("################################################################################")
     print(x$ini)
+    message("################################################################################")
+    message("## Model:")
+    message("################################################################################")
+    temp <- tempfile();
+    on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
+    sink(temp);
+    print(x$model$fun);
+    sink();
+    fun2 <- readLines(temp);
+    unlink(temp);
+    fun2 <- fun2[-1];
+    fun2 <- fun2[-length(fun2)]
+    fun2 <- fun2[-length(fun2)]
+    message(paste0(fun2, collapse="\n"));
 }
 
 ## This is a list of supported distributions with the number of arguments they currently support.
@@ -70,8 +85,8 @@ unsupported.dists <- c("dchisq", "chisq", "dexp", "df", "f", "dgeom", "geom",
 
 add.dists <- c("add", "prop");
 
-nlmixrUIModelPredErr <- function(fun){
-    do.pred <- TRUE;
+nlmixrUIModel <- function(fun){
+    rxode <- FALSE
     f <- function(x) {
         if (is.name(x)) {
             return(x)
@@ -84,16 +99,22 @@ nlmixrUIModelPredErr <- function(fun){
                 }
                 nargs <- dists[[ch.dist[1]]]
                 if (any((length(ch.dist) - 1) == nargs)){
-                    if (do.pred){
+                    if (do.pred == 1){
                         return(bquote(return(.(x[[2]]))));
-                    } else {
+                    } else if (do.pred == 0){
                         return(bquote(return(.(x[[3]]))));
+                    } else {
+                        return(quote(nlmixrIgnore()))
                     }
                 } else {
-                    if (length(nargs) == 1){
-                        stop(sprintf("The %s distribution requires %s arguments.", ch.dist[1], nargs))
+                    if (do.pred == 2){
+                        return(x);
                     } else {
-                        stop(sprintf("The %s distribution requires %s-%s arguments.", ch.dist[1], min(nargs), max(nargs)))
+                        if (length(nargs) == 1){
+                            stop(sprintf("The %s distribution requires %s arguments.", ch.dist[1], nargs))
+                        } else {
+                            stop(sprintf("The %s distribution requires %s-%s arguments.", ch.dist[1], min(nargs), max(nargs)))
+                        }
                     }
                 }
             } else if (identical(x[[1]], quote(`~`)) &&
@@ -101,16 +122,16 @@ nlmixrUIModelPredErr <- function(fun){
                        length(as.character(x[[3]])) == 3  &&
                        any(as.character(x[[3]][[2]][[1]]) == add.dists) &&
                        any(as.character(x[[3]][[2]][[1]]) == add.dists)){
-                if (do.pred){
+                if (do.pred == 1){
                     return(bquote(return(.(x[[2]]))));
                 } else {
                     return(bquote(return(.(x[[3]]))));
                 }
-            } else if (identical(x[[1]], quote(`~`))){
+            } else if (identical(x[[1]], quote(`~`)) && do.pred != 2){
                 return(quote(nlmixrIgnore()))
-            } else if (identical(x[[1]], quote(`<-`))){
+            } else if (identical(x[[1]], quote(`<-`)) && do.pred != 2){
                 return(quote(nlmixrIgnore()))
-            } else if (identical(x[[1]], quote(`=`))){
+            } else if (identical(x[[1]], quote(`=`)) && do.pred != 2){
                 return(quote(nlmixrIgnore()))
             } else {
                 return(as.call(lapply(x, f)));
@@ -124,16 +145,57 @@ nlmixrUIModelPredErr <- function(fun){
                  call. = FALSE)
         }
     }
-    pred <- deparse(f(body(fun)))
-    pred <- pred[regexpr(rex::rex(any_spaces, "nlmixrIgnore()", any_spaces), pred, perl=TRUE) == -1];
-    pred[1] <- paste0("function()", pred[1]);
-    pred <- eval(parse(text=paste(pred, collapse="\n")))
-    do.pred <- FALSE;
-    err <- deparse(f(body(fun)));
-    err <- err[regexpr(rex::rex(any_spaces, "nlmixrIgnore()", any_spaces), err, perl=TRUE) == -1];
-    err[1] <- paste0("function()", err[1]);
-    err <- eval(parse(text=paste(err, collapse="\n")))
-    ret <- list(pred=pred, err=err)
+    rm.empty <- function(x){
+        ## empty if/else
+        x <- x[regexpr(rex::rex(any_spaces, "nlmixrIgnore()", any_spaces), x, perl=TRUE) == -1];
+        w1 <- which(regexpr(rex::rex(start, any_spaces, or("if", "else"), anything, "{", end), x) != -1)
+        if (length(w1) > 0){
+            w2 <- w1 + 1;
+            w3 <- which(regexpr(rex::rex(start, any_spaces, "}", end), x[w2]) != -1);
+            if (length(w3) > 0){
+                w1 <- w1[w3];
+                w2 <- w2[w3];
+                return(x[-c(w1, w2)])
+            } else {
+                return(x);
+            }
+        } else {
+            return(x)
+        }
+    }
+    new.fn <- function(x){
+        x <- rm.empty(x);
+        if (do.pred == 2){
+            rxode <- any(regexpr(rex::rex(start, any_spaces, "d/dt(", anything, ")", any_spaces, or("=", "<-")), x) != -1)
+        }
+        x[1] <- paste0("function(){");
+        x[length(x)] <- "}"
+        x <- eval(parse(text=paste(x, collapse="\n")))
+        return(x)
+    }
+    do.pred <- 1;
+    pred <- new.fn(deparse(f(body(fun))))
+    do.pred <- 0;
+    err <- new.fn(deparse(f(body(fun))));
+    do.pred <- 2;
+    rest <- new.fn(deparse(f(body(fun))));
+    temp <- tempfile();
+    on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
+    sink(temp);
+    print(fun);
+    sink();
+    fun2 <- readLines(temp);
+    unlink(temp);
+    if (regexpr("^<.*>$", fun2[length(fun2)]) != -1){
+        fun2 <- fun2[-length(fun2)];
+    }
+    fun2[1] <- "function(){"
+    fun2[length(fun2)] <- "}";
+    fun2 <- try(eval(parse(text=paste0(fun2, collapse = "\n"))), silent=TRUE);
+    if (inherits(fun2, "try-error")){
+        stop("Error parsing model")
+    }
+    ret <- list(fun=fun2, pred=pred, err=err, rest=rest, rxode=rxode)
     return(ret)
 }
 
