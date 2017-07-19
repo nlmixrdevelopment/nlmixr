@@ -17,7 +17,7 @@ nlmixrUI <- function(fun){
     fun2 <- gsub(rex::rex(boundary, "ini(",any_spaces,"{"), "ini <- function()({", fun2)
     fun2 <- gsub(rex::rex(boundary, "model(",any_spaces,"{"), "model <- function()({", fun2)
     if (fun2[length(fun2)] == "}"){
-        fun2[length(fun2)] <- "return(list(ini=nlmixrBounds(ini),model=nlmixrUIModel(model)))\n}"
+        fun2[length(fun2)] <- "ini <- nlmixrBounds(ini);return(nlmixrUIModel(model,ini,fun))\n}"
     }
     fun2 <- try(eval(parse(text=paste0(fun2, collapse = "\n"))), silent=TRUE);
     if (inherits(fun2, "try-error")){
@@ -34,24 +34,15 @@ nlmixrUI <- function(fun){
 ##' @author Matthew L. Fidler
 ##' @export
 print.nlmixrUI <- function(x, ...){
-    message("################################################################################")
-    message("## Initial Conditions:")
-    message("################################################################################")
+    ##nlmixrLogo("Model")
+    ##message("################################################################################")
+
     print(x$ini)
-    message("################################################################################")
+    ##message("################################################################################")
     message("## Model:")
     message("################################################################################")
-    temp <- tempfile();
-    on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
-    sink(temp);
-    print(x$model$fun);
-    sink();
-    fun2 <- readLines(temp);
-    unlink(temp);
-    fun2 <- fun2[-1];
-    fun2 <- fun2[-length(fun2)]
-    fun2 <- fun2[-length(fun2)]
-    message(paste0(fun2, collapse="\n"));
+    message(x$fun.txt)
+
 }
 
 ## This is a list of supported distributions with the number of arguments they currently support.
@@ -74,6 +65,59 @@ dists <- list("dpois"=1,
               "norm"=1,
               "dnorm"=1
               )
+
+allVars <- function(x){
+    if (is.atomic(x)) {
+        character()
+    } else if (is.name(x)) {
+        as.character(x)
+    } else if (is.call(x) || is.pairlist(x)) {
+        if (identical(x[[1]], quote(`~`)) ||
+            identical(x[[1]], quote(`=`)) ||
+            identical(x[[1]], quote(`=`))){
+            if (is.call(x[[3]])){
+                unique(unlist(lapply(x[[3]][-1], allVars)));
+            } else {
+                unique(unlist(lapply(x[[3]], allVars)));
+            }
+        } else {
+            children <- lapply(x[-1], allVars)
+            unique(unlist(children))
+        }
+    } else {
+        stop("Don't know how to handle type ", typeof(x),
+             call. = FALSE)
+    }
+}
+
+allNames <- function(x) {
+    if (is.atomic(x)) {
+        character()
+    } else if (is.name(x)) {
+        as.character(x)
+    } else if (is.call(x) || is.pairlist(x)) {
+        children <- lapply(x[-1], allNames)
+        unique(unlist(children))
+    } else {
+        stop("Don't know how to handle type ", typeof(x),
+             call. = FALSE)
+    }
+}
+
+allCalls <- function(x) {
+    if (is.atomic(x) || is.name(x)) {
+        character()
+    } else if (is.call(x)) {
+        fname <- as.character(x[[1]])
+        children <- lapply(x[-1], allCalls)
+        unique(c(fname, unlist(children)))
+    } else if (is.pairlist(x)) {
+        unique(unlist(lapply(x[-1], allCalls), use.names = FALSE))
+    } else {
+        stop("Don't know how to handle type ", typeof(x), call. = FALSE)
+    }
+}
+
 ## cauchy = t w/df=1; Support?
 ## dgeom is a special negative binomial; Support?
 ## fixme
@@ -85,8 +129,12 @@ unsupported.dists <- c("dchisq", "chisq", "dexp", "df", "f", "dgeom", "geom",
 
 add.dists <- c("add", "prop");
 
-nlmixrUIModel <- function(fun){
+nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     rxode <- FALSE
+    all.names <- allNames(body(fun));
+    all.vars <- allVars(body(fun));
+    all.funs <- allCalls(body(fun));
+    all.lhs <- nlmixrfindLhs(body(fun));
     f <- function(x) {
         if (is.name(x)) {
             return(x)
@@ -195,7 +243,55 @@ nlmixrUIModel <- function(fun){
     if (inherits(fun2, "try-error")){
         stop("Error parsing model")
     }
-    ret <- list(fun=fun2, pred=pred, err=err, rest=rest, rxode=rxode)
+    temp <- tempfile();
+    on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
+    sink(temp);
+    print(fun2);
+    sink();
+    fun3 <- readLines(temp);
+    unlink(temp);
+    fun3 <- fun3[-1];
+    fun3 <- fun3[-length(fun3)]
+    fun3 <- fun3[-length(fun3)]
+    fun3 <- paste0(fun3, collapse="\n");
+    all.covs <- setdiff(all.vars,paste0(ini$name))
+    rest.funs <- allCalls(body(rest));
+    misplaced.dists <- intersect(rest.funs, c(names(dists), unsupported.dists));
+    if (length(misplaced.dists) > 0){
+        stop(sprintf("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): %s", paste(misplaced.dists, collapse=", ")))
+    }
+    ret <- list(ini=ini, model=bigmodel,
+                nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, err=err, rest=rest, rxode=rxode,
+                            all.vars=all.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
+                            all.covs=all.covs))
     return(ret)
 }
 
+##' @export
+`$.nlmixrUI` <- function(obj, arg, exact = TRUE){
+    x <- obj;
+    class(x) <- "list"
+    if (arg == "ini"){
+        return(x$ini);
+    } else if (arg == "nmodel"){
+        return(x$nmodel);
+    } else if (arg == "model"){
+        return(x$model);
+    }
+    m <- x$ini;
+    ret <- `$.nlmixrBounds`(m, arg, exact=exact)
+    if (is.null(ret)){
+        m <- x$nmodel;
+        return(m[[arg, exact = exact]]);
+    } else {
+        return(ret)
+    }
+}
+
+##' @export
+str.nlmixrUI <- function(object, ...){
+    obj <- object;
+    class(obj) <- "list";
+    str(obj$ini);
+    str(obj$nmodel)
+}

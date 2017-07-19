@@ -193,6 +193,18 @@ fn31 <- function(){
     linCmt() ~ nlmixrDist(0.1, 0.1);
 }
 
+fn32 <- function(){
+    KA = KA + eta.KA
+    CL <- CL + eta.CL + add(0.1)
+    linCmt() ~ pois(0.1)
+}
+
+fn33 <- function(){
+    KA = KA + eta.KA
+    CL <- CL + eta.CL
+    linCmt() ~ add(0.1) + pois(0.1)
+}
+
 context("Improperly specified residuals distributions throw errors")
 
 test_that("Improper distribution functions throw errors", {
@@ -227,4 +239,5 @@ test_that("Improper distribution functions throw errors", {
     expect_error(nlmixrUIModel(fn29), "The dnorm distribution requires 1 arguments.")
     expect_error(nlmixrUIModel(fn30), "The dnorm distribution requires 1 arguments.")
     expect_error(nlmixrUIModel(fn31), "The nlmixrDist distribution is currently unsupported.")
+    expect_error(nlmixrUIModel(fn32), rex::rex("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): add"));
 })
