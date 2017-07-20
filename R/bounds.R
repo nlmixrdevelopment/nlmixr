@@ -605,8 +605,6 @@ print.nlmixrBounds <- function(x, ...){
             return(nlmixrBoundsTheta(obj, full=TRUE))
         } else if (arg == "omega"){
             return(nlmixrBoundsOmega(obj));
-        } else if (arg == "pred"){
-            return(nlmixrBoundsPred(obj))
         } else if (arg == "random"){
             return(nlmixrBoundsOmega(obj, TRUE));
         } else if (arg == "fixed.form"){

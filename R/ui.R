@@ -34,15 +34,17 @@ nlmixrUI <- function(fun){
 ##' @author Matthew L. Fidler
 ##' @export
 print.nlmixrUI <- function(x, ...){
-    ##nlmixrLogo("Model")
-    ##message("################################################################################")
-
+    ## nlmixrLogo("", "Model")
+    message("\n##Initialization:")
+    message("################################################################################")
     print(x$ini)
-    ##message("################################################################################")
-    message("## Model:")
+    if (length(x$all.covs) > 0){
+        message("\n Covariates or Uninitialized Parameters ($all.covs)")
+        print(x$all.covs);
+    }
+    message("\n## Model:")
     message("################################################################################")
     message(x$fun.txt)
-
 }
 
 ## This is a list of supported distributions with the number of arguments they currently support.
@@ -74,7 +76,7 @@ allVars <- function(x){
     } else if (is.call(x) || is.pairlist(x)) {
         if (identical(x[[1]], quote(`~`)) ||
             identical(x[[1]], quote(`=`)) ||
-            identical(x[[1]], quote(`=`))){
+            identical(x[[1]], quote(`<-`))){
             if (is.call(x[[3]])){
                 unique(unlist(lapply(x[[3]][-1], allVars)));
             } else {
@@ -126,10 +128,140 @@ unsupported.dists <- c("dchisq", "chisq", "dexp", "df", "f", "dgeom", "geom",
                        "dweibull", "weibull",
                        ## for testing...
                        "nlmixrDist")
-
 add.dists <- c("add", "prop");
 
+##' Build linear solved information based on defined parameters.
+##'
+##' @param lhs List of defined parameters
+##' @return List containing the translation parmateres (extra lines)
+##'     to give what nlmixr expects, and model properties
+##'     (parameterization, ncmt, oral, and tlag).  The infusion needs
+##'     to be guessed from the data and is not included in this function's output
+##' @author Matthew L. Fidler
+nlmixrUILinCmt <- function(lhs){
+    par1 <- list(CL  =c("CL"),
+                 V   =c("V", "VC"),
+                 CLD =c("Q", "CLD"),
+                 VT  =c("VT", "VP"),
+                 CLD2=c("CLD2", "Q2"),
+                 VT2 =c("VT2", "VP2"));
+    ## If Cmt #1 is the central depot compartment then
+    ## K12, K21 = 2 cmt model
+    ## K13, K31 = 3 compartment model
+    ## K10 = elimination
+    ## K01 = absoprtion
+    ##
+    ## If Cmt #2 is the central compartment then
+    ## K23, K32 = 2 cmt model
+    ## K24, K42 = 3 cmt model
+    ## K20 = elimination
+    ## K12 = absorption
+    ##
+    ## Both ways completely identify the 2/3 compartment model and are unique.
+    par2 <- list(KE=c("KE", "KEL", "K", "K10", "K20"),
+                 K12=c("K12", "K23"),
+                 K21=c("K21", "K32"),
+                 K13=c("K13", "K24"),
+                 K31=c("K31", "K42"));
+    oral.pars <- c("KA", "K12", "K01");
+    tlag.pars <- c("TLAG");
+    lhs.up <- toupper(lhs);
+    npars <- 0;
+    extra.lines <- c();
+    for (i in seq_along(par1)){
+        possible <- par1[[i]];
+        val <- intersect(possible, lhs.up);
+        if (length(val) == 1){
+            npars <- npars + 1;
+            if (i == 2 && npars == 1){
+                stop(sprintf("Clearance (%s) and Volume (%s) both have to be specified in this 1-cmt solved paramterization.",
+                             paste(par1[["CL"]], collapse=", "), paste(par1[["V"]], collapse=", ")));
+            }
+            if (i == 4 && npars < 4){
+                stop(sprintf("Distribtuional Clearance (%s) and Peripheral Volume (%s) both have to be specified in this 2-cmt solved paramterization.",
+                             paste(par1[["CLD"]], collapse=", "), paste(par1[["VT"]], collapse=", ")))
+            }
+            if (i == 6 && npars < 6){
+                stop(sprintf("Distribtuional Clearance #2 (%s) and Peripheral Volume #2 (%s) both have to be specified in 3-cmt this solved paramterization.",
+                             paste(par1[["CLD"]], collapse=", "), paste(par1[["VT"]], collapse=", ")))
+            }
+            cur <- names(par1)[i]
+            w <- which(lhs.up == val);
+            cur.lhs <- lhs[w];
+            if (cur != cur.lhs){
+                extra.lines[length(extra.lines) + 1] <- sprintf("%s <- %s;", cur, cur.lhs);
+            }
+        } else if (length(val) > 2){
+            stop(sprintf("Need clearer paramterization for %s; Currently defined these similiar parameters: %s",
+                         names(par)[i], paste(val, collapse=", ")))
+        }
+    }
+    param <- 0;
+    if (npars > 1){
+        param <- 1;
+        ncmt <- npars / 2;
+    } else {
+        for (i in seq_along(par2)){
+            possible <- par2[i];
+            val <- intersect(possible, lhs.up);
+            if (length(val) == 1){
+                npars <- npars + 1;
+                if ((i == 2 && npars == 1) ||
+                    (i == 4 && npars < 4) ||
+                    (i == 6 && npars < 6)){
+                    stop("Not all the appropriate micro-constants have been specified this solved paramterization.");
+                }
+                cur <- names(par2)[i]
+                w <- which(lhs.up == val);
+                cur.lhs <- lhs[w];
+                if (cur != cur.lhs){
+                    extra.lines[length(extra.lines) +1] <- sprintf("%s <- %s;", cur, cur.lhs);
+                }
+            }
+        }
+        if (npars > 1){
+            param <- 2;
+            ncmt <- npars / 2;
+        }
+    }
+    if (param == 0){
+        return(NULL);
+    }
+    ## Now get oral / tlag
+    oral <- FALSE;
+    val <- intersect(oral.pars, lhs.up);
+    if (length(val) == 1){
+        w <- which(oral.pars == lhs.up);
+        cur.lhs <- lhs[w]
+        if (cur.lhs != "KA"){
+            extra.lines[length(extra.lines) +1] <- sprintf("KA <- %s;", cur.lhs)
+        }
+        oral <- TRUE
+    } else if (length(val) == 2){
+        stop(sprintf("Ambiguous Absorption constant; Could be: %s", paste(val, collapse=", ")));
+    }
+    tlag <- FALSE
+    val <- intersect(tlag.pars, lhs.up);
+    if (length(val) == 1){
+        w <- which(tlag.pars == lhs.up);
+        cur.lhs <- lhs[w]
+        if (cur.lhs != "TLAG"){
+            extra.lines[length(extra.lines) +1] <- sprintf("TLAG <- %s;", cur.lhs)
+        }
+        if (!oral){
+            stop("Absorpation lag time requires an solved oral compartmental model.");
+        }
+        tlag <- TRUE
+    } else if (length(val) == 2){
+        stop(sprintf("Ambiguous Lag-time constant; Could be: %s", paste(val, collapse=", ")));
+    }
+    extra.lines <- paste(extra.lines, collapse="\n");
+    return(list(extra.lines=extra.lines,
+                ncmt=ncmt, parameterization=param, oral=oral, tlag=tlag))
+}
+
 nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
+    ## Parses the UI function to extract predictions and errors, and the other model specification.
     rxode <- FALSE
     all.names <- allNames(body(fun));
     all.vars <- allVars(body(fun));
@@ -167,13 +299,29 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 }
             } else if (identical(x[[1]], quote(`~`)) &&
                        identical(x[[3]][[1]], quote(`+`)) &&
+                       identical(x[[3]][[2]][[1]], quote(`+`)) &&
+                       any(as.character(x[[3]][[2]][[2]][[1]]) == c(names(dists), unsupported.dists))){
+                stop(sprintf("Only 2 distributions can be combined.\nCurrently can combine: %s",
+                             paste(add.dists, collapse=", ")))
+            } else if (identical(x[[1]], quote(`~`)) &&
+                       identical(x[[3]][[1]], quote(`+`)) &&
                        length(as.character(x[[3]])) == 3  &&
-                       any(as.character(x[[3]][[2]][[1]]) == add.dists) &&
-                       any(as.character(x[[3]][[2]][[1]]) == add.dists)){
-                if (do.pred == 1){
-                    return(bquote(return(.(x[[2]]))));
+                       any(as.character(x[[3]][[2]][[1]]) == c(names(dists), unsupported.dists)) &&
+                       any(as.character(x[[3]][[3]][[1]]) == c(names(dists), unsupported.dists))){
+                if (any(as.character(x[[3]][[2]][[1]]) == add.dists) &&
+                    any(as.character(x[[3]][[3]][[1]]) == add.dists)){
+                    if (do.pred == 2){
+                        return(quote(nlmixrIgnore()));
+                    }
+                    else if (do.pred == 1){
+                        return(bquote(return(.(x[[2]]))));
+                    } else {
+                        return(bquote(return(.(x[[3]]))));
+                    }
                 } else {
-                    return(bquote(return(.(x[[3]]))));
+                    stop(sprintf("The %s and %s distributions cannot be combined\nCurrently can combine: %s",
+                                 as.character(x[[3]][[2]][[1]]), as.character(x[[3]][[3]][[1]]),
+                                 paste(add.dists, collapse=", ")))
                 }
             } else if (identical(x[[1]], quote(`~`)) && do.pred != 2){
                 return(quote(nlmixrIgnore()))
@@ -260,11 +408,40 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (length(misplaced.dists) > 0){
         stop(sprintf("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): %s", paste(misplaced.dists, collapse=", ")))
     }
+    lin.solved <- NULL;
+    tmp <- deparse(pred);
+    tmp <- tmp[regexpr(rex::rex("return("), tmp) != -1];
+    if (all(regexpr(rex::rex("return(linCmt())"), tmp) != -1)){
+        lin.solved <- nlmixrUILinCmt(all.lhs)
+    }
     ret <- list(ini=ini, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, err=err, rest=rest, rxode=rxode,
                             all.vars=all.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
-                            all.covs=all.covs))
+                            all.covs=all.covs, lin.solved=lin.solved))
     return(ret)
+}
+
+nlmixrUI.nlme.specs <- function(object){
+    return(list(fixed=object$fixed.form,
+                random=object$random,
+                start=object$theta))
+}
+
+nlmixrUI.nlmefun <- function(object){
+    ## create nlme function
+    if (!is.null(object$lin.solved)){
+        ## This is only a solved system.
+        bod <- deparse(body(object$rest));
+        bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
+        bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
+        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$all.vars, collapse=", "))));
+        body(fn) <- bod
+        return(fn);
+    } else {
+        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$all.vars, collapse=", "))))
+        body(fn) <- body(object$rest);
+    }
+    return(fn)
 }
 
 ##' @export
@@ -277,6 +454,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         return(x$nmodel);
     } else if (arg == "model"){
         return(x$model);
+    } else if (arg == "nlme.fun"){
+        return(nlmixrUI.nlmefun(obj))
+    } else if (arg == "nlme.specs"){
+        return(nlmixrUI.nlme.specs(obj))
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -293,5 +474,10 @@ str.nlmixrUI <- function(object, ...){
     obj <- object;
     class(obj) <- "list";
     str(obj$ini);
+    message(" $ ini       : Model initilizations/bounds object");
+    message(" $ model     : Original Model");
+    message(" $ nmodel    : Parsed Model List");
+    message(" $ nlme.fun  : The nlme model function.");
+    message(" $ nlme.specs: The nlme model specs.");
     str(obj$nmodel)
 }
