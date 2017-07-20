@@ -379,18 +379,18 @@ plot.focei.fit <- function(x, ...) {
     dat <- as.data.frame(x);
     d1 <- data.frame(DV=dat$DV, stack(dat[, c("PRED", "IPRED")]))
 
-    p1 <- ggplot2::ggplot(d1,ggplot2::aes(values,DV)) +
-        ggplot2::facet_wrap(~ind) +
-        ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
-        ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
-        ggplot2::geom_point() +
-        ggplot2::xlab("Predictions");
+    p1 <- ggplot(d1,aes(values,DV)) +
+        facet_wrap(~ind) +
+        geom_abline(slope=1, intercept=0, col="red", size=1.2) +
+        geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
+        geom_point() +
+        xlab("Predictions");
 
     print(p1)
 
-    p2 <- ggplot2::ggplot(dat, ggplot2::aes(x=IPRED, y=IRES)) +
-        ggplot2::geom_point() +
-        ggplot2::geom_abline(slope=0, intercept=0, col="red")
+    p2 <- ggplot(dat, aes(x=IPRED, y=IRES)) +
+        geom_point() +
+        geom_abline(slope=0, intercept=0, col="red")
     print(p2)
 
     ids <- unique(dat$ID)
@@ -399,11 +399,11 @@ plot.focei.fit <- function(x, ...) {
         tmp <- tmp[!is.na(tmp)];
         d1 <- dat[dat$ID %in% tmp, ];
 
-        p3 <- ggplot2::ggplot(d1, ggplot2::aes(x=TIME, y=DV)) +
-            ggplot2::geom_point() +
-            ggplot2::geom_line(ggplot2::aes(x=TIME, y=IPRED), col="red", size=1.2) +
-            ggplot2::geom_line(ggplot2::aes(x=TIME, y=PRED), col="blue", size=1.2) +
-            ggplot2::facet_wrap(~ID)
+        p3 <- ggplot(d1, aes(x=TIME, y=DV)) +
+            geom_point() +
+            geom_line(aes(x=TIME, y=IPRED), col="red", size=1.2) +
+            geom_line(aes(x=TIME, y=PRED), col="blue", size=1.2) +
+            facet_wrap(~ID)
         print(p3)
     }
 }

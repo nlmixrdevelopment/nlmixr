@@ -569,8 +569,6 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @export
 plot.saemFit = function(x, ...)
 {
-    require(ggplot2)
-
     fit = x
     saem.cfg = attr(fit, "saem.cfg")
     dat = as.data.frame(saem.cfg$evt)
@@ -582,20 +580,20 @@ plot.saemFit = function(x, ...)
     df$DV[df$grp == 2] = yp
 
     p4 = ggplot(subset(df, grp==1), aes(TIME, DV)) +
-      geom_point() +
-      facet_wrap(~ID) +
-      geom_line(aes(TIME, DV), subset(df, grp==2), col='red')
+        geom_point() +
+        facet_wrap(~ID) +
+        geom_line(aes(TIME, DV), subset(df, grp==2), col='red')
 
     df = cbind(dat, IPRED=yp)
     df$IRES = df$DV - df$IPRED
 
     p2 = ggplot(df, aes(IPRED, DV)) +
-      geom_point() +
-      geom_abline(intercept = 0, slope=1, col='red')
+        geom_point() +
+        geom_abline(intercept = 0, slope=1, col='red')
 
     p3 = ggplot(df, aes(IPRED, IRES)) +
-      geom_point() +
-      geom_abline(intercept = 0, slope=0, col='red')
+        geom_point() +
+        geom_abline(intercept = 0, slope=0, col='red')
 
     m = x$par_hist
     df = data.frame(
@@ -604,9 +602,9 @@ plot.saemFit = function(x, ...)
       iter=rep(1:nrow(m), ncol(m))
     )
 
-    p1 = ggplot(df, aes(iter, val)) +
-      geom_line() +
-      facet_wrap(~par, scales = "free_y")
+    p1 = ggplot2::ggplot(df, aes(iter, val)) +
+        ggplot2::geom_line() +
+        ggplot2::facet_wrap(~par, scales = "free_y")
 
     print(p1)
     print(p2)

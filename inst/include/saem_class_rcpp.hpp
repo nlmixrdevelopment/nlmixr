@@ -183,7 +183,7 @@ void inits(List x) {
 
 void saem_fit() {
   //arma_rng::set_seed(99);
-  for (unsigned int kiter=0; kiter<niter; kiter++) {
+  for (unsigned int kiter=0; kiter<(unsigned int)(niter); kiter++) {
     gamma2_phi1=Gamma2_phi1.diag();
     IGamma2_phi1=inv_sympd(Gamma2_phi1);
     D1Gamma21=LCOV1*IGamma2_phi1;
@@ -322,7 +322,7 @@ void saem_fit() {
     mprior_phi0.set_size(N, nphi0);		// deal w/ nphi0=0
 
     mat G1=statphi12/N+mprior_phi1.t()*mprior_phi1/N - statphi11.t()*mprior_phi1/N - mprior_phi1.t()*statphi11/N;
-    if (kiter<=nb_sa)
+    if (kiter<=(unsigned int)(nb_sa))
       Gamma2_phi1=max(Gamma2_phi1*coef_sa, diagmat(G1));
     else
       Gamma2_phi1=G1;
@@ -331,11 +331,11 @@ void saem_fit() {
     uvec jDmin=find(Gamma2_phi1.diag()<Gmin);
     for(unsigned int jm=0; jm<jDmin.n_elem; jm++)
       Gamma2_phi1(jDmin(jm),jDmin(jm))=Gmin(jDmin(jm));
-    if (kiter<=nb_correl)
+    if (kiter<=(unsigned int)(nb_correl))
     Gamma2_phi1 = diagmat(Gamma2_phi1);
 
     if (nphi0>0) {
-      if (kiter<=niter_phi0) {
+      if (kiter<=(unsigned int)(niter_phi0)) {
       Gamma2_phi0=statphi02/N+mprior_phi0.t()*mprior_phi0/N - statphi01.t()*mprior_phi0/N - mprior_phi0.t()*statphi01/N;
       Gmin=minv(i0);
       jDmin=find(Gamma2_phi0.diag()<Gmin);

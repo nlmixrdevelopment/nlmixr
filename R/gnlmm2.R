@@ -35,15 +35,15 @@ llik_binomial <- function(y,n,params) {
 
 #-- for new gnlmm
 getModelVars = function(blik, bpar, m1) {
-	argsList = list(
-		dpois = list(ix=2, dvdx=".arg1"),
-		dbinom= list(ix=2:3, dvdx=".arg2"),
-		dnorm = list(ix=2:3, dvdx=c(".arg1", ".arg2")),
-		dbeta = list(ix=2:3, dvdx=c(".arg1", ".arg2")),
-		dneg_binomial = list(ix=2:3, dvdx=c(".arg1", ".arg2")),
-		dbetabinomial = list(ix=2:4, dvdx=c(".arg2", ".arg3")),
-		dt = list(ix=2:4, dvdx=c(".arg1", ".arg2", ".arg3"))
-	)
+    argsList = list(
+        dpois = list(ix=2, dvdx=".arg1"),
+        dbinom= list(ix=2:3, dvdx=".arg2"),
+        dnorm = list(ix=2:3, dvdx=c(".arg1", ".arg2")),
+        dbeta = list(ix=2:3, dvdx=c(".arg1", ".arg2")),
+        dneg_binomial = list(ix=2:3, dvdx=c(".arg1", ".arg2")),
+        dbetabinomial = list(ix=2:4, dvdx=c(".arg2", ".arg3")),
+        dt = list(ix=2:4, dvdx=c(".arg1", ".arg2", ".arg3"))
+    )
 
 	blik.txt = deparse(blik)
 	len = length(blik.txt)
@@ -103,11 +103,12 @@ getModelVars = function(blik, bpar, m1) {
 		 args.dvdx=args.dvdx)
 }
 
-# dont export yet...
+##' @rdname gnlmm
+##' @export
 gnlmm2 <- function(llik, data, inits, syspar=NULL,
 	system=NULL, diag.xform=c("sqrt", "log", "identity"),
 	..., control=list()) {
-    #data
+    ##data
 	if (is.null(data$ID)) stop('"ID" not found in data')
 	if (is.null(data$EVID)) data$EVID = 0
         data.obs = data[data$EVID == 0, ]
