@@ -4,7 +4,10 @@
 \alias{nlmixrLogo}
 \title{Messages the nlmixr logo...}
 \usage{
-nlmixrLogo()
+nlmixrLogo(str = "", version = sessionInfo()$otherPkgs$nlmixr$Version)
+}
+\arguments{
+\item{str}{String to print}
 }
 \description{
 Messages the nlmixr logo...
