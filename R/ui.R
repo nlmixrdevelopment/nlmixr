@@ -33,14 +33,14 @@ nlmixrUI <- function(fun){
 ##' @export
 print.nlmixrUI <- function(x, ...){
     ## nlmixrLogo("", "Model")
-    message("\n##Initialization:")
+    message("\n## Initialization:")
     message("################################################################################")
     print(x$ini)
     if (length(x$all.covs) > 0){
         message("\n Covariates or Uninitialized Parameters ($all.covs)")
         print(x$all.covs);
     }
-    message("\n## Model:")
+    message(sprintf("\n## Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))
     message("################################################################################")
     message(x$fun.txt)
 }
@@ -67,27 +67,34 @@ dists <- list("dpois"=1,
               )
 
 allVars <- function(x){
-    if (is.atomic(x)) {
-        character()
-    } else if (is.name(x)) {
-        as.character(x)
-    } else if (is.call(x) || is.pairlist(x)) {
-        if (identical(x[[1]], quote(`~`)) ||
-            identical(x[[1]], quote(`=`)) ||
-            identical(x[[1]], quote(`<-`))){
-            if (is.call(x[[3]])){
-                unique(unlist(lapply(x[[3]][-1], allVars)));
+    defined <- character()
+    f <- function(x){
+        if (is.atomic(x)) {
+            character()
+        } else if (is.name(x)) {
+            as.character(x)
+        } else if (is.call(x) || is.pairlist(x)) {
+            if (identical(x[[1]], quote(`~`)) ||
+                identical(x[[1]], quote(`=`)) ||
+                identical(x[[1]], quote(`<-`))){
+                if (is.call(x[[3]])){
+                    ret <- unique(unlist(lapply(x[[3]][-1], f)));
+                } else {
+                    ret <- unique(unlist(lapply(x[[3]], f)));
+                }
+                ret <- ret[!(ret %in% defined)]
+                defined <<- unique(c(defined, x[[2]]))
+                return(ret)
             } else {
-                unique(unlist(lapply(x[[3]], allVars)));
+                children <- lapply(x[-1], f)
+                unique(unlist(children))
             }
         } else {
-            children <- lapply(x[-1], allVars)
-            unique(unlist(children))
+            stop("Don't know how to handle type ", typeof(x),
+                 call. = FALSE)
         }
-    } else {
-        stop("Don't know how to handle type ", typeof(x),
-             call. = FALSE)
     }
+    f(x);
 }
 
 allNames <- function(x) {
@@ -298,6 +305,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     all.lhs <- nlmixrfindLhs(body(fun));
     errs.specified <- c()
     add.prop.errs <- data.frame(y=character(), add=logical(), prop=logical());
+    bounds <- ini;
     errn <- 0
     f <- function(x) {
         if (is.name(x)) {
@@ -314,10 +322,20 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                     errs.specified <<- unique(errs.specified,
                                               as.character(x[[3]][[1]]))
                     if (do.pred == 1){
-                        return(bquote(return(.(x[[2]]))));
+                        return(bquote(nlmixr_pred <- .(x[[2]])));
                     } else if (do.pred == 0){
-                        return(bquote(return(.(x[[3]]))));
-                    } else if (do.pred == 3){ ## Dataset preparation function for nlme
+                        dist.name <- ch.dist[1];
+                        dist.args <- ch.dist[-1];
+                        for (i in seq_along(dist.args)){
+                            tmp <- suppressWarnings(as.numeric(dist.args[i]))
+                            errn <- errn + 1;
+                            if (!is.na(tmp)){
+                                ## FIXME: allow numeric estimates...?
+                                stop("Distribution parameters cannot be numeric, but need to be estimated.")
+                            }
+                            w <- which(bounds$name == dist.args[i]);
+                            bounds$err[w] <<- dist.name;
+                        }
                         if (any(ch.dist[1] == c("add", "norm"))){
                             errn <<- errn + 1;
                             add.prop.errs <<- rbind(add.prop.errs,
@@ -327,6 +345,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             add.prop.errs <<- rbind(add.prop.errs,
                                                     data.frame(y=sprintf("Y%02d", errn), add=FALSE, prop=TRUE))
                         }
+                        return(bquote(return(.(eval(parse(text=sprintf("quote(%s(%s))", dist.name, paste(dist.args, collapse=", "))))))));
+                    } else if (do.pred == 3){ ## Dataset preparation function for nlme
                         return(bquote(return(.(sprintf("Y%02d", errn)))))
                     } else {
                         return(quote(nlmixrIgnore()))
@@ -353,17 +373,31 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                        length(as.character(x[[3]])) == 3  &&
                        any(as.character(x[[3]][[2]][[1]]) == c(names(dists), unsupported.dists)) &&
                        any(as.character(x[[3]][[3]][[1]]) == c(names(dists), unsupported.dists))){
-                if (any(as.character(x[[3]][[2]][[1]]) == add.dists) &&
-                    any(as.character(x[[3]][[3]][[1]]) == add.dists)){
-                    tmp <- paste(sort(c(as.character(x[[3]][[2]][[1]]), as.character(x[[3]][[3]][[1]]))), collapse="+");
+                err1 <- as.character(x[[3]][[2]][[1]]);
+                err1.v <- as.character(x[[3]][[2]][[2]])
+                err2 <- as.character(x[[3]][[3]][[1]]);
+                err2.v <- as.character(x[[3]][[3]][[2]])
+                if (!is.na(suppressWarnings(as.numeric(err1.v)))){
+                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
+                }
+                if (!is.na(suppressWarnings(as.numeric(err2.v)))){
+                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
+                }
+                if (any(err1 == add.dists) &&
+                    any(err2 == add.dists)){
+                    tmp <- paste(sort(c(err1, err2)), collapse="+");
                     errs.specified <<- unique(errs.specified, tmp);
                     if (do.pred == 2){
                         return(quote(nlmixrIgnore()));
                     }
                     else if (do.pred == 1){
-                        return(bquote(return(.(x[[2]]))));
+                        return(bquote(nlmixr_pred <- .(x[[2]]))) ;
                     } else if (do.pred == 3){
-                        if (tmp == "add+prop"){
+                        w <- which(bounds$name == err1.v);
+                        bounds$err[w] <<- err1;
+                        w <- which(bounds$name == err2.v);
+                        bounds$err[w] <<- err2;
+                        if (any(tmp == c("norm+prop", "add+prop"))){
                             errn <<- errn + 1;
                             add.prop.errs <<- rbind(add.prop.errs,
                                                     data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE))
@@ -416,7 +450,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     new.fn <- function(x){
         x <- rm.empty(x);
         if (do.pred == 2){
-            rxode <- any(regexpr(rex::rex(start, any_spaces, "d/dt(", anything, ")", any_spaces, or("=", "<-")), x) != -1)
+            rxode <<- any(regexpr(rex::rex(start, any_spaces, "d/dt(", anything, ")", any_spaces, or("=", "<-")), x) != -1)
         }
         x[1] <- paste0("function(){");
         x[length(x)] <- "}"
@@ -431,6 +465,22 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     rest <- new.fn(deparse(f(body(fun))));
     do.pred <- 3;
     grp.fn <- new.fn(deparse(f(body(fun))));
+    rest.funs <- allCalls(body(rest));
+    rest.vars <- allVars(body(rest));
+    if (rxode){
+        rx.txt <- deparse(body(rest))[-1]
+        rx.txt <- rx.txt[-length(rx.txt)];
+        ## now parse ode
+        w <- seq(which(regexpr(rex::rex("d/dt("), rx.txt) != -1)[1], length(rx.txt));
+        rx.ode <- rx.txt[w];
+        rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[-w], "}"), collapse="\n")))
+        rxode <- paste(rx.ode, collapse="\n")
+        rest <- rx.pred;
+        all.vars <- all.vars[!(all.vars %in% RxODE::rxState(rxode))]
+        rest.vars <- rest.vars[!(rest.vars %in% RxODE::rxState(rxode))]
+    } else {
+        rxode <- NULL
+    }
     temp <- tempfile();
     on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
     sink(temp);
@@ -458,17 +508,23 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     fun3 <- fun3[-length(fun3)]
     fun3 <- fun3[-length(fun3)]
     fun3 <- paste0(fun3, collapse="\n");
-    all.covs <- setdiff(all.vars,paste0(ini$name))
-    rest.funs <- allCalls(body(rest));
+    all.covs <- setdiff(rest.vars,paste0(bounds$name))
     misplaced.dists <- intersect(rest.funs, c(names(dists), unsupported.dists));
+    if (length(misplaced.dists) == 1){
+        if (misplaced.dists == "dt"){
+            if (!any(regexpr("[^/]\\bdt[(]", deparse(rest), perl=TRUE) != -1)){
+                misplaced.dists <- character();
+            }
+        }
+    }
     if (length(misplaced.dists) > 0){
         stop(sprintf("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): %s", paste(misplaced.dists, collapse=", ")))
     }
     lin.solved <- NULL;
     tmp <- deparse(pred);
-    tmp <- tmp[regexpr(rex::rex("return("), tmp) != -1];
+    tmp <- tmp[regexpr(rex::rex("nlmixr_pred <- "), tmp) != -1];
     if (length(tmp) > 0){
-        if (all(regexpr(rex::rex("return(linCmt())"), tmp) != -1)){
+        if (all(regexpr(rex::rex("nlmixr_pred <- linCmt()"), tmp) != -1)){
             lin.solved <- nlmixrUILinCmt(all.lhs)
         }
     } else {
@@ -479,22 +535,32 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         add.prop.errs <- data.frame(y="Y1", add=TRUE, prop=FALSE);
         lin.solved <- nlmixrUILinCmt(all.lhs)
     }
-    ret <- list(ini=ini, model=bigmodel,
+
+    ret <- list(ini=bounds, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
-                            all.vars=all.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
+                            all.vars=all.vars, rest.vars=rest.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
                             all.covs=all.covs, lin.solved=lin.solved,
                             errs.specified=errs.specified,
                             add.prop.errs=add.prop.errs,
                             grp.fn=grp.fn))
     return(ret)
 }
-
+##' Create the nlme specs list for nlmixr nlme solving
+##'
+##' @param object UI object
+##' @return specs list for nlme
+##' @author Matthew L. Fidler
 nlmixrUI.nlme.specs <- function(object){
     return(list(fixed=object$fixed.form,
                 random=object$random,
                 start=object$theta))
 }
-
+##' Create the nlme parameter transform function from the UI object.
+##'
+##' @param object UI object
+##' @return parameter function for nlme
+##' @author Matthew L. Fidler
+##' @keywords internal
 nlmixrUI.nlmefun <- function(object){
     ## create nlme function
     if (!is.null(object$lin.solved)){
@@ -502,16 +568,21 @@ nlmixrUI.nlmefun <- function(object){
         bod <- deparse(body(object$rest));
         bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
         bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
-        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$all.vars, collapse=", "))));
+        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))));
         body(fn) <- bod
         return(fn);
     } else {
-        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$all.vars, collapse=", "))))
+        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))))
         body(fn) <- body(object$rest);
     }
     return(fn)
 }
-
+##' Get the variance for the nlme fit process based on UI
+##'
+##' @param object UI object
+##' @return nlme/lme variance object
+##' @author Matthew L. Fidler
+##' @keywords internal
 nlmixrUI.nlme.var <- function(object){
     ## Get the variance for the nlme object
     add.prop.errs <- object$add.prop.errs;
@@ -536,6 +607,20 @@ nlmixrUI.nlme.var <- function(object){
     }
     return(eval(parse(text=tmp)))
 }
+##' Return RxODE model with predictions appended
+##'
+##' @param object UI object
+##' @return String or NULL if RxODE is not specified by UI.
+##' @author Matthew L. Fidler
+nlmixrUI.rxode.pred <- function(object){
+    if (is.null(object$rxode)){
+        return(NULL)
+    } else {
+        tmp <- deparse(body(object$pred))[-1]
+        tmp <- tmp[-length(tmp)]
+        return(paste(c(object$rxode, tmp), collapse="\n"));
+    }
+}
 
 ##' @export
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
@@ -553,6 +638,8 @@ nlmixrUI.nlme.var <- function(object){
         return(nlmixrUI.nlme.specs(obj))
     } else if (arg == "nlme.var"){
         return(nlmixrUI.nlme.var(obj))
+    } else if (arg == "rxode.pred"){
+        return(nlmixrUI.rxode.pred(obj))
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -575,5 +662,6 @@ str.nlmixrUI <- function(object, ...){
     message(" $ nlme.fun  : The nlme model function.");
     message(" $ nlme.specs: The nlme model specs.");
     message(" $ nlme.var  : The nlme model varaince.")
+    message(" $ rxode.pred: The RxODE block with pred attached (final pred is nlmixr_pred)")
     str(obj$nmodel)
 }

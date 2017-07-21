@@ -72,23 +72,35 @@ nlmixr.fit <- function(uif, data, est="nlme", ...){
         fun <- uif$nlme.fun;
         specs <- uif$nlme.specs;
         grp.fn <- uif$grp.fn
+        dat <- data;
+        dat$nlmixr.grp <- factor(apply(data, 1, function(x){
+            cur <- x;
+            names(cur) <- names(dat);
+            with(as.list(cur), {
+                return(grp.fn())
+            })
+        }));
+        weight <- uif$nlme.var
         if (!is.null(uif$nmodel$lin.solved)){
-            dat <- data;
-            dat$nlmixr.grp <- factor(apply(data, 1, function(x){
-                cur <- x;
-                names(cur) <- names(dat);
-                with(as.list(cur), {
-                    return(grp.fn())
-                })
-            }));
             fit <- nlme_lin_cmpt(dat, par_model=specs,
                                  ncmt=uif$nmodel$lin.solved$ncmt,
                                  oral=uif$nmodel$lin.solved$oral,
                                  tlag=uif$nmodel$lin.solved$tlag,
                                  parameterization=uif$nmodel$lin.solved$parameterization,
                                  par_trans=fun,
-                                 weight=uif$nlme.var,
-                                 verbose=TRUE)
+                                 weight=weight,
+                                 verbose=TRUE, ...)
+            return(fit)
+        } else {
+            fit <- nlme_ode(dat,
+                            model=uif$rxode.pred,
+                            par_model=specs,
+                            par_trans=fun,
+                            response="nlmixr_pred",
+                            weight=uif$nlme.var,
+                            verbose=TRUE,
+                            control = nlmeControl(pnlsTol = .01, msVerbose = TRUE),
+                            ...)
             return(fit)
         }
     }
