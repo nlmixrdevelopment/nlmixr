@@ -621,6 +621,75 @@ nlmixrUI.rxode.pred <- function(object){
         return(paste(c(object$rxode, tmp), collapse="\n"));
     }
 }
+##' Get the Parameter  function with THETA/ETAs defined
+##'
+##' @param obj UI object
+##' @return parameters function defined in THETA[#] and ETA[#]s.
+##' @author Matthew L. Fidler
+nlmixrUI.theta.pars <- function(obj){
+    df <- as.data.frame(obj$ini)
+    dft <- df[!is.na(df$ntheta), ];
+    dft.fixed <- dft[dft$fix, ];
+    dft.unfixed <- dft[!dft$fix, ];
+    fixed <- with(dft.fixed, sprintf("%s=%s", name, est))
+    unfixed <- with(dft.unfixed, sprintf("%s=THETA[%d]", name, seq_along(dft.unfixed$name)))
+    eta <- df[!is.na(df$neta1), ];
+    eta <- eta[eta$neta1 == eta$neta2, ];
+    eta <- with(eta, sprintf("%s=ETA[%d]", name, eta$neta1))
+    f <- deparse(body(obj$rest))[-1]
+    f <- eval(parse(text=paste(c("function(){", unfixed, eta, fixed, f[-length(f)], "}"), collapse="\n")))
+    return(f)
+}
+
+##' Get the FOCEi initilizations
+##'
+##' @param obj UI object
+##' @return list with FOCEi style initilizations
+##' @author Matthew L. Fidler
+nlmixrUI.focei.inits <- function(obj){
+    df <- as.data.frame(obj$ini);
+    dft <- df[!is.na(df$ntheta), ];
+    dft.unfixed <- dft[!dft$fix, ];
+    eta <- df[!is.na(df$neta1), ];
+    len <- length(eta$name)
+    cur.lhs <- character()
+    cur.rhs <- numeric()
+    ome <- character()
+    for (i in seq_along(eta$name)){
+        last.block <- FALSE;
+        if (i == len){
+            last.block <- TRUE
+        } else if (eta$neta1[i + 1] == eta$neta2[i + 1]){
+            last.block <- TRUE
+        }
+        if (eta$neta1[i] == eta$neta2[i]){
+            cur.lhs <- c(cur.lhs, sprintf("ETA[%d]", eta$neta1[i]));
+            cur.rhs <- c(cur.rhs, eta$est[i]);
+            if (last.block){
+                ome[length(ome) + 1] <- sprintf("%s ~ %s", paste(cur.lhs, collapse=" + "),
+                                                paste(deparse(cur.rhs), collapse=" "));
+                cur.lhs <- character();
+                cur.rhs <- numeric()
+            }
+        } else {
+            cur.rhs <- c(cur.rhs, eta$est[i]);
+        }
+    }
+    ome <- eval(parse(text=sprintf("list(%s)", paste(ome, collapse=","))))
+    return(list(THTA=dft.unfixed$est,
+                OMGA=ome));
+}
+
+nlmixrUI.focei.upper.lower <- function(obj, upper=TRUE){
+    df <- as.data.frame(obj$ini);
+    dft <- df[!is.na(df$ntheta), ];
+    dft.unfixed <- dft[!dft$fix, ];
+    if (upper){
+        return(dft.unfixed$upper);
+    } else {
+        return(dft.unfixed$lower);
+    }
+}
 
 ##' @export
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
@@ -640,6 +709,14 @@ nlmixrUI.rxode.pred <- function(object){
         return(nlmixrUI.nlme.var(obj))
     } else if (arg == "rxode.pred"){
         return(nlmixrUI.rxode.pred(obj))
+    } else if (arg == "theta.pars"){
+        return(nlmixrUI.theta.pars(obj))
+    } else if (arg == "focei.inits"){
+        return(nlmixrUI.focei.inits(obj));
+    } else if (arg == "focei.upper"){
+        return(nlmixrUI.focei.upper.lower(obj))
+    } else if (arg == "focei.lower"){
+        return(nlmixrUI.focei.upper.lower(obj, FALSE))
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -656,6 +733,7 @@ str.nlmixrUI <- function(object, ...){
     obj <- object;
     class(obj) <- "list";
     str(obj$ini);
+    str(obj$nmodel)
     message(" $ ini       : Model initilizations/bounds object");
     message(" $ model     : Original Model");
     message(" $ nmodel    : Parsed Model List");
@@ -663,5 +741,9 @@ str.nlmixrUI <- function(object, ...){
     message(" $ nlme.specs: The nlme model specs.");
     message(" $ nlme.var  : The nlme model varaince.")
     message(" $ rxode.pred: The RxODE block with pred attached (final pred is nlmixr_pred)")
-    str(obj$nmodel)
+    message(" $ theta.pars: Parameters in terms of THETA[#] and ETA[#]")
+    message(" $ focei.inits: Initilization for FOCEi style blocks")
+    message(" $ focei.upper: Upper bounds for FOCEi")
+    message(" $ focei.lower: Lower bounds for FOCEi")
+
 }

@@ -97,11 +97,22 @@ nlmixr.fit <- function(uif, data, est="nlme", ...){
                             par_model=specs,
                             par_trans=fun,
                             response="nlmixr_pred",
-                            weight=uif$nlme.var,
+                            weight=weight,
                             verbose=TRUE,
                             control = nlmeControl(pnlsTol = .01, msVerbose = TRUE),
                             ...)
             return(fit)
         }
+    } else if (est == "focei"){
+        fit <- focei.fit(dat,
+                         inits=uif$focei.inits,
+                         PKpars=uif$theta.pars,
+                         ## par_trans=fun,
+                         model=uif$rxode.pred,
+                         pred=function(){return(nlmixr_pred)},
+                         err=uif$error,
+                         lower=uif$focei.lower,
+                         upper=uif$focei.upper,
+                         ...)
     }
 }

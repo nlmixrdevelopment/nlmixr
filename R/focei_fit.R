@@ -612,8 +612,12 @@ focei.fit <- function(data,
     }
 
     ## RxODE(rxNorm(model$inner), modName="test");
-    nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)),
-             sprintf("ERR[%s]", seq_along(model$extra.pars)))
+    if (is.null(model$extra.pars)){
+        nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)))
+    } else {
+        nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)),
+                 sprintf("ERR[%s]", seq_along(model$extra.pars)))
+    }
     if (length(lower) == 1){
         lower <- rep(lower, length(inits$THTA));
     } else if (length(lower) != length(inits$THTA)){
@@ -625,13 +629,16 @@ focei.fit <- function(data,
         stop("Upper must be a single constant for all the THETA lower bounds, or match the dimension of THETA.")
     }
 
-    extra.pars <- eval(call(diag.xform, model$extra.pars))
-    if (length(model$extra.pars) > 0){
-        inits$THTA <- c(inits$THTA, extra.pars);
-        lower.err <- rep(con$atol.ode * 10, length(model$extra.pars));
-        upper.err <- rep(Inf, length(model$extra.pars));
-        lower <-c(lower, lower.err);
-        upper <- c(upper, upper.err);
+    extra.pars <- c();
+    if (!is.null(extra.pars)){
+        eval(call(diag.xform, model$extra.pars))
+        if (length(model$extra.pars) > 0){
+            inits$THTA <- c(inits$THTA, extra.pars);
+            lower.err <- rep(con$atol.ode * 10, length(model$extra.pars));
+            upper.err <- rep(Inf, length(model$extra.pars));
+            lower <-c(lower, lower.err);
+            upper <- c(upper, upper.err);
+        }
     }
 
     ##FIXME
