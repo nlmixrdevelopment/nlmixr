@@ -208,6 +208,12 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
     }
 }
 
+##' @importFrom nlme ranef
+##' @export
+ranef.focei.fit <- function(object, ...){
+    fitted.focei.fit(object, ..., type="posthoc")
+}
+
 ##' Extract residuals from the FOCEI fit
 ##'
 ##' @param object focei.fit object
