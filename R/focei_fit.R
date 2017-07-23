@@ -22,6 +22,27 @@ is.focei <- function(x){
     }
 }
 
+##' Return composite nlme/focei to nlme
+##'
+##' @param x nlme/focei object from common UI.
+##' @return nlme object or NULL
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+as.nlme <- function(x){
+    if (is.focei(x)){
+        env <- attr(x, ".focei.env");
+        fit <- env$fit;
+        nlme <- NULL;
+        uif <- NULL
+        if (is(x, "nlmixr.ui.nlme")){
+            nlme <- fit$nlme;
+            return(nlme);
+        }
+    }
+    return(NULL);
+}
+
 #' Print a focei fit
 #'
 #' Print a first-order conditional non-linear mixed effect model with
@@ -46,18 +67,39 @@ print.focei.fit <- function(x, ...) {
         } else {
             width <- NULL;
         }
-        message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
-        if (any(names(fit) == "condition.number")){
-            print(data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Condition Number"=fit$condition.number,
-                             row.names="", check.names=FALSE))
+        nlme <- NULL;
+        uif <- NULL
+        if (is(x, "nlmixr.ui.nlme")){
+            nlme <- fit$nlme;
+            uif <- env$uif;
+            message(sprintf("nlmixr nlme fit by %s (%s)\n", ifelse(nlme$method == "REML", "REML", "maximum likelihood"),
+                            ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")));
         } else {
-            print(data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x),
-                             row.names="", check.names=FALSE))
+            message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
         }
+        if (any(names(fit) == "condition.number")){
+            df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Condition Number"=fit$condition.number,
+                             row.names="", check.names=FALSE)
+        } else {
+            df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x),
+                                  row.names="", check.names=FALSE)
+        }
+        if (!is.null(nlme)){
+            message("FOCEi-based goodnees of fit metrics:")
+        }
+        print(df.objf)
         message("\nTime (sec):");
         print(fit$time);
         message("\nParameters:")
-        print(fit$par.data.frame);
+        if (!is.null(nlme)){
+            ttab <- summary(nlme)$tTable;
+            print(ttab)
+            tmp <- fit$par.data.frame
+            message("\nResidual Errors")
+            print(tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]);
+        } else {
+            print(fit$par.data.frame);
+        }
         message("\nOmega:");
         print(fit$omega);
         is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
@@ -201,6 +243,12 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
                                               matrix(as.vector(attr(s, type)), nrow=1)
                                           })));
         names(d1) <- paste0("ETA", seq_along(d1[1, ]))
+        eta.names <- fit$eta.names;
+        if (!is.null(eta.names)){
+            if (length(names(d1)) == length(eta.names)){
+                names(d1) <- eta.names;
+            }
+        }
         d1 <- data.frame(ID=unique(object$ID), d1)
         return(d1)
     } else {
@@ -212,6 +260,12 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
 ##' @export
 ranef.focei.fit <- function(object, ...){
     fitted.focei.fit(object, ..., type="posthoc")
+}
+
+##' @importFrom nlme ranef
+##' @export
+fixef.focei.fit <- function(object, ...){
+    return(object$theta)
 }
 
 ##' Extract residuals from the FOCEI fit
@@ -455,7 +509,9 @@ focei.fit <- function(data,
                       lower= -Inf,
                       upper= Inf,
                       control=list(),
-                      calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres", "cpred", "cres")){
+                      calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
+                      theta.names=NULL,
+                      eta.names=NULL){
     data <- data;
     colnames(data) <- toupper(names(data));
     sink.file <- tempfile();
@@ -544,7 +600,9 @@ focei.fit <- function(data,
         ## FIXME bounds need to be changed.. They aren't working
         est.chol.omegaInv=FALSE, ##RxODE::rxSymPyVersion() >= 1,
         add.posthoc=TRUE,
-        extra.output=TRUE ## Display extra output on each iteration
+        extra.output=TRUE, ## Display extra output on each iteration
+        inits.mat=NULL,
+        find.best.eta=TRUE
     )
 
     curi <- 0;
@@ -571,7 +629,9 @@ focei.fit <- function(data,
                       "tnewton_precond", "tnewton", "var1", "var2")
     print.grad <- any(optim.method == grad.methods);
     if (con$grad && !print.grad){
-        message("Warning; You selected a gradient method, but the optimization procedure doesn't require the gradient.\nIgnoring gradient")
+        if (!con$NOTRUN){
+            message("Warning; You selected a gradient method, but the optimization procedure doesn't require the gradient.\nIgnoring gradient")
+        }
         con$grad <- FALSE;
     }
     if(class(model)=="RxODE") {
@@ -596,7 +656,7 @@ focei.fit <- function(data,
     }
 
     ## print(th0.om)
-    model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad, pred.minus.dv=con$pred.minus.dv, run.internal=TRUE);
+    model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad, pred.minus.dv=con$pred.minus.dv);
     cov.names <- RxODE::rxParams(model$inner);
     cov.names <- cov.names[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), cov.names) == -1];
     lhs <- c(names(RxODE::rxInits(model$inner)), RxODE::rxLhs(model$inner))
@@ -612,11 +672,15 @@ focei.fit <- function(data,
     }
 
     ## RxODE(rxNorm(model$inner), modName="test");
-    if (is.null(model$extra.pars)){
-        nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)))
+    if (!is.null(theta.names) && length(inits$THTA) == length(theta.names)){
+        nms <- theta.names;
     } else {
-        nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)),
-                 sprintf("ERR[%s]", seq_along(model$extra.pars)))
+        if (is.null(model$extra.pars)){
+            nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)))
+        } else {
+            nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)),
+                     sprintf("ERR[%s]", seq_along(model$extra.pars)))
+        }
     }
     if (length(lower) == 1){
         lower <- rep(lower, length(inits$THTA));
@@ -686,28 +750,34 @@ focei.fit <- function(data,
         warning("Some of the initial conditions were 0, chainging to 0.0001");
         inits.vec[inits.vec == 0] <- 0.0001;
     }
-    message("Boundaries:");
-    RxODE::rxPrint(data.frame(lower,inits.vec,upper));
+    if (!con$NOTRUN){
+        message("Boundaries:");
+        RxODE::rxPrint(data.frame(lower,inits.vec,upper));
+    }
     names(inits.vec) = NULL
     par.lower <- lower / inits.vec;
     par.upper <- upper / inits.vec;
-    message("Scaled Boundaries:");
+    if (!con$NOTRUN){
+        message("Scaled Boundaries:");
+    }
     w.neg <- which(par.lower > par.upper);
     tmp <- par.lower[w.neg];
     par.lower[w.neg] <- par.upper[w.neg];
     par.upper[w.neg] <- tmp;
-    RxODE::rxPrint(data.frame(par.lower,rep(1, length(inits.vec)),par.upper))
-    if (do.sink){
-        message("\nKey:")
-        message(" S: Scaled Parameter values");
-        message(" U: Unscaled Parameter values");
-        if(print.grad){
-            message(" G: Gradient");
+    if (!con$NOTRUN){
+        RxODE::rxPrint(data.frame(par.lower,rep(1, length(inits.vec)),par.upper))
+        if (do.sink){
+            message("\nKey:")
+            message(" S: Scaled Parameter values");
+            message(" U: Unscaled Parameter values");
+            if(print.grad){
+                message(" G: Gradient");
+            }
+            message(" D: Significant Figures");
+            message(" Optimization output displayed with comments, i.e. ##\n");
+        } else {
+            message("");
         }
-        message(" D: Significant Figures");
-        message(" Optimization output displayed with comments, i.e. ##\n");
-    } else {
-        message("");
     }
     nTHTA = nlini[1]
     nETA  = nrow(om0)
@@ -716,7 +786,7 @@ focei.fit <- function(data,
     names(ID.ord) = ID.all
     nSUB  = length(ID.all)
 
-    find.best.eta <- TRUE;
+    find.best.eta <- con$find.best.eta;
 
     ofv.FOCEi.ind.slow <- function(pars) {
         cur.diff <<- NULL;
@@ -1181,7 +1251,11 @@ focei.fit <- function(data,
         }
         return(fit);
     }
-    inits.mat <- matrix(0, nSUB, nETA)
+    if (is.null(con$inits.mat)){
+        inits.mat <- matrix(0, nSUB, nETA)
+    } else if (sum(dim(con$inits.mat) - c(nSUB, nETA)) == 0){
+        inits.mat <- con$inits.mat;
+    }
     if (.Platform$OS.type == "windows" && con$cores > 1){
         ## Copy over all of the objects within scope to
         ## all clusters.
@@ -1396,6 +1470,7 @@ focei.fit <- function(data,
         lD <- fit$par.unscaled[-seq_along(nms)];
         rxSymEnv <-  RxODE::rxSymInv(rxSym, lD);
         fit$omega <- rxSymEnv$omega;
+        fit$eta.names <- eta.names;
         w <- seq_along(nms)
         if (con$NOTRUN){
             fit$par.data.frame <- data.frame(est=fit$theta, row.names=nms);
@@ -1449,6 +1524,7 @@ focei.fit <- function(data,
                            covariance=fit$cov.time["elapsed"],
                            table=fit$table.time["elapsed"],
                            row.names="");
+    fit$model <- model;
     message("done")
     data
 }
