@@ -79,7 +79,7 @@ print.focei.fit <- function(x, ...) {
         }
         if (any(names(fit) == "condition.number")){
             df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Condition Number"=fit$condition.number,
-                             row.names="", check.names=FALSE)
+                                  row.names="", check.names=FALSE)
         } else {
             df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x),
                                   row.names="", check.names=FALSE)
@@ -634,7 +634,7 @@ focei.fit <- function(data,
         }
         con$grad <- FALSE;
     }
-    if(class(model)=="RxODE") {
+    if(is(model, "RxODE") || is(model, "character")) {
         ODEmodel = TRUE
         if (class(pred) != "function"){
             stop("pred must be a function specifying the prediction variables in this model.")

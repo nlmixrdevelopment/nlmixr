@@ -100,7 +100,6 @@ nlmixr.fit <- function(uif, data, est="nlme", ...){
                             response="nlmixr_pred",
                             weight=weight,
                             verbose=TRUE,
-                            control = nlmeControl(pnlsTol = .01, msVerbose = TRUE),
                             ...);
         }
         ## Run FOCEi using same ETAs and THETA estimates to get
