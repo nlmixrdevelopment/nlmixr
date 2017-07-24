@@ -65,13 +65,13 @@ fn10 <- function(){
 fn11 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ dbeta(0.1);
+    linCmt() ~ dbeta(par1);
 }
 
 fn12 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ dbeta(0.1, 0.1, 0.3, 0.1);
+    linCmt() ~ dbeta(par1, par2, par3, par4);
 }
 
 fn13 <- function(){
@@ -83,7 +83,7 @@ fn13 <- function(){
 fn14 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ dt(0.1, 0.1, 0.2);
+    linCmt() ~ dt(par1, par2, par3);
 }
 
 
@@ -96,13 +96,13 @@ fn15 <- function(){
 fn16 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ binom(13);
+    linCmt() ~ binom(par1);
 }
 
 fn17 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ binom(13, 0.5, 32);
+    linCmt() ~ binom(par1, par2, par3);
 }
 
 fn18 <- function(){
@@ -114,13 +114,13 @@ fn18 <- function(){
 fn19 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ beta(0.1);
+    linCmt() ~ beta(par1);
 }
 
 fn20 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ beta(0.1, 0.1, 0.3, 0.1);
+    linCmt() ~ beta(par1, par2, par3, par4);
 }
 
 ## Should ~ t() be supported?
@@ -135,7 +135,7 @@ fn21 <- function(){
 fn22 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ t(0.1, 0.1, 0.2);
+    linCmt() ~ t(par1, par2, par3);
 }
 
 
@@ -148,7 +148,7 @@ fn23 <- function(){
 fn24 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ add(0.1, 0.1);
+    linCmt() ~ add(par1, par2);
 }
 
 fn25 <- function(){
@@ -160,7 +160,7 @@ fn25 <- function(){
 fn26 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ prop(0.1, 0.1);
+    linCmt() ~ prop(par1, par2);
 }
 
 fn27 <- function(){
@@ -172,7 +172,7 @@ fn27 <- function(){
 fn28 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ norm(0.1, 0.1);
+    linCmt() ~ norm(par1, par2);
 }
 
 fn29 <- function(){
@@ -184,44 +184,44 @@ fn29 <- function(){
 fn30 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ dnorm(0.1, 0.1);
+    linCmt() ~ dnorm(par1, par2);
 }
 
 fn31 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ nlmixrDist(0.1, 0.1);
+    linCmt() ~ nlmixrDist(par1, par2);
 }
 
 fn32 <- function(){
     KA = KA + eta.KA
-    CL <- CL + eta.CL + add(0.1)
-    linCmt() ~ pois(0.1)
+    CL <- CL + eta.CL + add(par1)
+    linCmt() ~ pois(par2)
 }
 
 fn33 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ add(0.1) + pois(0.1)
+    linCmt() ~ add(par1) + pois(par2)
 }
 
 fn34 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~ add(0.1) + prop(0.1)
+    linCmt() ~ add(par1) + prop(par2)
 }
 
 fn35 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~  prop(0.1) + add(0.1)
+    linCmt() ~  prop(par1) + add(par2)
 }
 
 
 fn36 <- function(){
     KA = KA + eta.KA
     CL <- CL + eta.CL
-    linCmt() ~  prop(0.1) + add(0.1) + pois(0.1)
+    linCmt() ~  prop(par1) + add(par2) + pois(par3)
 }
 
 context("Improperly specified residuals distributions throw errors")
