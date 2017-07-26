@@ -25,7 +25,7 @@ thresh = function(x, cut=.Machine$double.xmin)
 
 gof = function(x, ...)
 {
-	gof_str = "
+    gof_str = "
 {
     theta = th[1:npar]
     names(theta) = names(inits)[1:npar]
@@ -616,4 +616,43 @@ collectWarnings <- function(expr){
         warning(w)
     }
     return(ret);
+}
+
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title
+##' @param f Objective function
+##' @param g Gradient Function
+##' @param rho Environment where f/g are evaluated.
+##' @param x Initial starting point for line search
+##' @param eps
+##' @param niter Number of iterations
+##' @param nsim Number of function evaluations
+##' @param imp Verbosity of messages.
+##' @param zm Prior Hessian (in compressed format)
+##' @param restart Is this an estimation restart?
+##' @return
+##' @author C. Lemarechal, Wenping Wang & Matthew L. Fidler
+##' @export
+n1qn1 <- function(f, g, x, rho=parent.frame(1), eps=.Machine$double.eps, niter=100, nsim=100, imp=0, zm=NULL, restart=FALSE){
+    n <- as.integer(length(x));
+    imp <- as.integer(imp);
+    niter <- as.integer(niter)
+    nsim <- as.integer(nsim)
+    nzm <- as.integer(n * (n + 13) / 2)
+    nsim <- as.integer(nsim);
+    eps <- as.double(eps)
+    if (is.null(zm)){
+        mode <- 1L
+        zm <- double(nzm);
+    } else {
+        mode <- 2L
+        if (restart) model <- 3L
+        if (length(zm) != nzm){
+            stop(sprintf("Compressed Hessian not the right length for this problem.  It should be %d.", nzm))
+        }
+    }
+    .Call(n1qn1_wrap, f, g, rho,
+          x, eps, n, mode, niter, nsim, imp, nzm, zm);
 }

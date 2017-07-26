@@ -6,7 +6,7 @@ int NPAR=0;
 
 typedef void (*S_fp) (double *, double *);
 void nelder_(S_fp func, int n, double *start, double *step,
-  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
+	     int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
   int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
   int *iprint);
 
@@ -124,6 +124,70 @@ BEGIN_RCPP
 END_RCPP
 }
 
+Rcpp::EvalBase *fev = NULL;                  // pointer to abstract base class
+Rcpp::EvalBase *gev = NULL;                  // pointer to abstract base class
+
+typedef void (*S2_fp) (int *, int *, double *, double *, double *, int *, float *, double *);
+extern "C" void n1qn1_ (S2_fp simul, int n[], double x[], double f[], double g[], double var[], double eps[],
+                        int mode[], int niter[], int nsim[], int imp[], int lp[], double zm[], int izs[], float rzs[], double dzs[]);
+
+static void fwrap(int *ind, int *n, double *x, double *f, double *g, int *ti, float *tr, double *td)
+{
+  int i;
+  Rcpp::NumericVector par(*n), ret(*n);
+  for (i = 0; i < *n; i++) par[i] = x[i];
+        
+  if (*ind==2 || *ind==4) {
+    ret = fev->eval(par);
+    *f = ret[0];
+  }
+  if (*ind==3 || *ind==4) {
+    ret = gev->eval(par);
+    for (i = 0; i < *n; i++) g[i] = ret[i];
+  }
+}
+
+
+RcppExport SEXP
+n1qn1_wrap(
+           SEXP fSEXP, SEXP gSEXP, SEXP rhoSEXP, SEXP xSEXP, SEXP epsSEXP, 
+           SEXP nSEXP, SEXP modeSEXP, SEXP niterSEXP, SEXP nsimSEXP, SEXP impSEXP,
+           SEXP nzmSEXP, SEXP zmSEXP) {
+  BEGIN_RCPP
+  
+    fev = new Rcpp::EvalStandard(fSEXP, rhoSEXP);    // assign R function and environment
+  gev = new Rcpp::EvalStandard(gSEXP, rhoSEXP);    // assign R function and environment
+  int i;
+    
+  int n, mode, niter, nsim, imp, lp=6, nzm;
+  n = INTEGER(nSEXP)[0];
+  mode = INTEGER(modeSEXP)[0];
+  niter = INTEGER(niterSEXP)[0];
+  nsim = INTEGER(nsimSEXP)[0];
+  imp = INTEGER(impSEXP)[0];
+  nzm = INTEGER(nzmSEXP)[0];
+  double x[n], f, g[n], var[n], eps, zm[nzm];
+  int izs[1]; float rzs[1]; double dzs[1];
+  for (i=0; i<n; i++) x[i] = REAL(xSEXP)[i];
+  for (i=0; i<nzm; i++) zm[i] = REAL(zmSEXP)[i];
+  eps = REAL(epsSEXP)[0];
+  for (i=0; i<n; i++) var[i] = .1;
+
+  n1qn1_(fwrap,&n,x,&f,g,var,&eps,
+         &mode,&niter,&nsim,&imp,&lp,zm,izs,rzs,dzs);
+        
+  Rcpp::NumericVector par(n);
+  for (i=0; i<n; i++) par[i] = x[i];
+  Rcpp::NumericVector hess(nzm);
+  for (i=0; i<nzm; i++) hess[i] = zm[i];
+  return Rcpp::List::create(
+                            Rcpp::Named("convergence") = 0,
+                            Rcpp::Named("value") = f,
+                            Rcpp::Named("par") = par,
+			    Rcpp::Named("hess") = hess);
+        
+  END_RCPP
+    }
 
 
 /*
