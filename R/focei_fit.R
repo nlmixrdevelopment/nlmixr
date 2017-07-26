@@ -43,6 +43,13 @@ as.nlme <- function(x){
     return(NULL);
 }
 
+
+##' @importFrom nlme VarCorr
+##' @export
+VarCorr.nlmixr.ui.nlme <- function(x, sigma = 1, ...){
+    VarCorr(as.nlme(x), sigma=sigma, ...)
+}
+
 #' Print a focei fit
 #'
 #' Print a first-order conditional non-linear mixed effect model with
@@ -78,16 +85,23 @@ print.focei.fit <- function(x, ...) {
             message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
         }
         if (any(names(fit) == "condition.number")){
-            df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Condition Number"=fit$condition.number,
+            df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Log-likelihood"=as.numeric(logLik(x)),
+                                  "Condition Number"=fit$condition.number,
                                   row.names="", check.names=FALSE)
         } else {
-            df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x),
+            df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x),"Log-likelihood"=as.numeric(logLik(x)),
                                   row.names="", check.names=FALSE)
         }
         if (!is.null(nlme)){
-            message("FOCEi-based goodnees of fit metrics:")
+            message("FOCEi-based goodness of fit metrics:")
         }
-        print(df.objf)
+        RxODE::rxPrint(df.objf)
+        if (!is.null(nlme)){
+            message("\nnlme-based goodness of fit metrics:")
+            df.objf <- data.frame(AIC=AIC(as.nlme(x)), BIC=BIC(as.nlme(x)),"Log-likelihood"=as.numeric(logLik(as.nlme(x))),
+                                  row.names="", check.names=FALSE)
+            RxODE::rxPrint(df.objf)
+        }
         message("\nTime (sec):");
         print(fit$time);
         message("\nParameters:")
@@ -1470,6 +1484,9 @@ focei.fit <- function(data,
         lD <- fit$par.unscaled[-seq_along(nms)];
         rxSymEnv <-  RxODE::rxSymInv(rxSym, lD);
         fit$omega <- rxSymEnv$omega;
+        if (length(eta.names) == dim(fit$omega)[1]){
+            dimnames(fit$omega) <- list(eta.names, eta.names);
+        }
         fit$eta.names <- eta.names;
         w <- seq_along(nms)
         if (con$NOTRUN){
@@ -1552,4 +1569,26 @@ str.focei.fit <- function(object, ...){
     env <- attr(object, ".focei.env");
     fit <- env$fit;
     str(fit)
+}
+
+##' Convert fit to FOCEi style fit
+##'
+##' @param object Fit object to convert to FOCEi-style fit.
+##' @param uif Unified Interface Function
+##' @param pt Proc time object
+##' @param ...  Other Parameters
+##' @return A FOCEi fit style object.
+##' @author Matthew L. Fidler
+as.focei <- function(object, uif, pt=proc.time(), ...){
+    UseMethod("as.focei");
+}
+
+##' Get the FOCEi eta specification for model.
+##'
+##' @param object Fit object
+##' @param ... Other parameters
+##' @return A list for the OMGA list in FOCEi
+##' @author Matthew L. Fidler
+focei.eta <- function(object,  ...){
+    UseMethod("focei.eta");
 }

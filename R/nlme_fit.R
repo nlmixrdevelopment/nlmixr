@@ -163,7 +163,7 @@ nlme_lin_cmpt <- function(dat, par_model,
     dim(pm)<-c(3,2)
 
 
-    #gen user_fn
+    #gen user_fn
     s <- formals(PKpars)
     arg1 <- paste(names(s), collapse=", ")
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
@@ -611,6 +611,75 @@ anova.nlmixr_nlme <- function(object, ...){
       class(ret) <- c("nlmixr_nlme", class(ret))
   }
   return(ret)
+}
+
+##' @rdname focei.eta
+focei.eta.nlmixr_nlme <- function(object, ...){
+    mat <- as.matrix(VarCorr(object))
+    dn <- dimnames(mat);
+    d <- dim(mat);
+    is.cov <- (d[2] >= 3);
+    mat <- suppressWarnings(matrix(as.numeric(mat), d[1], d[2]));
+    dimnames(mat) <- dn
+    len <- length(mat[, 1]);
+    mat <- mat[-len, ]
+    est <- as.numeric(mat[-len,1]);
+    etas <- sprintf("ETA[%d]", seq_along(row.names(mat)))
+    if (!is.cov)
+        return(eval(parse(text=sprintf("list(%s)", paste(sprintf("ETA[%d] ~ %s", seq_along(est), est), collapse=", ")))));
+    sd <- as.numeric(mat[-len, 2]);
+    cor <- apply(mat[-c(1, len), -(1:2), drop = FALSE], 1, function(x){as.numeric(x)})
+    ome <- diag(est)
+    ## Now fill in the diagionals
+    if (class(cor) == "matrix"){
+        stop("Haven't handled covariance translation for this model yet...")
+    } else {
+        ome[1, 2] <- ome[2, 1] <- cor[1] * sd[1] * sd[2]
+        eval(parse(text=sprintf("list(%s ~ c(%s))", paste(etas, collapse="+"),
+                           paste(ome[lower.tri(ome, diag=TRUE)], collapse=", "))))
+    }
+}
+
+
+##' @rdname as.focei
+as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    fit <- object;
+    mat <- as.matrix(random.effects(fit));
+    mat <- mat[order(as.numeric(row.names(mat))), ]
+    th <- c(fixed.effects(fit), fit$sigma)
+    est <- as.matrix(VarCorr(fit))[,1]
+    est1 <- est[uif$eta.names]
+    ome <- focei.eta(fit);
+    init <- list(THTA=th,
+                 OMGA=ome)
+    nlme.time <- proc.time() - pt;
+    fit.f <- focei.fit(data=dat,
+                       inits=init,
+                       PKpars=uif$theta.pars,
+                       ## par_trans=fun,
+                       model=uif$rxode.pred,
+                       pred=function(){return(nlmixr_pred)},
+                       err=uif$error,
+                       lower=uif$focei.lower,
+                       upper=uif$focei.upper,
+                       theta.names=uif$focei.names,
+                       eta.names=uif$eta.names,
+                       control=list(NOTRUN=TRUE,
+                                    inits.mat=mat,
+                                    cores=1,
+                                    find.best.eta=FALSE));
+    ## enclose the nlme fit in the .focei.env
+    env <- attr(fit.f, ".focei.env");
+    env$fit$nlme <- fit
+    tmp <- cbind(data.frame(nlme=nlme.time["elapsed"]), env$fit$time);
+    names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
+    env$fit$time <- tmp;
+    env$uif <- uif;
+    class(fit.f) <- c("nlmixr.ui.nlme", class(fit.f))
+    return(fit.f)
 }
 
 ## comparePred should work because predict should work...

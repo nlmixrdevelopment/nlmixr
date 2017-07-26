@@ -35,6 +35,13 @@ nlmixr.logo <- "         _             _             \n        | | %9s (_) %s\n 
 nlmixrLogo <- function(str="", version=sessionInfo()$otherPkgs$nlmixr$Version){
     message(sprintf(nlmixr.logo, str, version));
 }
+##' Dispaly nlmixr's version
+##'
+##' @author Matthew L. Fidler
+##' @export
+nlmixrVersion <- function(){
+    nlmixrLogo()
+}
 ##' nlmixr generalized function
 ##'
 ##' @param object Fitted object or
@@ -105,39 +112,7 @@ nlmixr.fit <- function(uif, data, est="nlme", ...){
         ## Run FOCEi using same ETAs and THETA estimates to get
         ## comaparible OBJFs and also extract table entries like
         ## CWRES.
-        mat <- as.matrix(random.effects(fit));
-        mat <- mat[order(as.numeric(row.names(mat))), ]
-        th <- c(fixed.effects(fit), fit$sigma)
-        est <- as.matrix(VarCorr(fit))[,1]
-        est1 <- est[uif$eta.names]
-        ome <- eval(parse(text=sprintf("list(%s)", paste(sprintf("ETA[%d] ~ %s", seq_along(est1), est1), collapse=", "))))
-        init <- list(THTA=th,
-                     OMGA=ome)
-        nlme.time <- proc.time() - pt;
-        fit.f <- focei.fit(data=dat,
-                           inits=init,
-                           PKpars=uif$theta.pars,
-                           ## par_trans=fun,
-                           model=uif$rxode.pred,
-                           pred=function(){return(nlmixr_pred)},
-                           err=uif$error,
-                           lower=uif$focei.lower,
-                           upper=uif$focei.upper,
-                           theta.names=uif$focei.names,
-                           eta.names=uif$eta.names,
-                           control=list(NOTRUN=TRUE,
-                                        inits.mat=mat,
-                                        cores=1,
-                                        find.best.eta=FALSE));
-        ## enclose the nlme fit in the .focei.env
-        env <- attr(fit.f, ".focei.env");
-        env$fit$nlme <- fit
-        tmp <- cbind(data.frame(nlme=nlme.time["elapsed"]), env$fit$time);
-        names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
-        env$fit$time <- tmp;
-        env$uif <- uif;
-        class(fit.f) <- c("nlmixr.ui.nlme", class(fit.f))
-        return(fit.f)
+        return(as.focei(fit, uif, pt))
     } else if (est == "focei"){
         fit <- focei.fit(dat,
                          inits=uif$focei.inits,
