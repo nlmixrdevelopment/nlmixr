@@ -710,7 +710,7 @@ focei.fit <- function(data,
 
     extra.pars <- c();
     if (!is.null(model$extra.pars)){
-        eval(call(diag.xform, model$extra.pars))
+        model$extra.pars <- eval(call(diag.xform, model$extra.pars))
         if (length(model$extra.pars) > 0){
             inits$THTA <- c(inits$THTA, model$extra.pars);
             lower.err <- rep(con$atol.ode * 10, length(model$extra.pars));
