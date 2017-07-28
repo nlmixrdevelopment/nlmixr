@@ -27,7 +27,7 @@ rxPermissive({
     dat <- Wang2007
     dat$DV <- dat$Y
 
-    fit.prop <- focei.fit(data=dat, inits, mypar1, model=mod,pred=pred, optim="bobyqa", control=list(NOTRUN=TRUE, cores=1))
+    fit.prop <- focei.fit(data=dat, inits, mypar1, model=mod,pred=pred, optim="bobyqa", control=list(NOTRUN=TRUE, cores=1, inner.opt="lbfgs"))
 
     ## expect_equal(fit.prop$WRES, out.focei.prop$WRES) ## For some reason these do not match...
 

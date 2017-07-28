@@ -618,31 +618,47 @@ collectWarnings <- function(expr){
     return(ret);
 }
 
-##' .. content for \description{} (no empty lines) ..
+##' n1qn1 optimization
 ##'
-##' .. content for \details{} ..
-##' @title
-##' @param f Objective function
-##' @param g Gradient Function
-##' @param rho Environment where f/g are evaluated.
-##' @param x Initial starting point for line search
-##' @param eps
-##' @param niter Number of iterations
+##' @param call_eval Objective function
+##' @param call_grad Gradient Function
+##' @param vars Initial starting point for line search
+##' @param environment Environment where call_eval/call_grad are evaluated.
+##' @param epsilon
+##' @param max_iterations Number of iterations
 ##' @param nsim Number of function evaluations
 ##' @param imp Verbosity of messages.
 ##' @param zm Prior Hessian (in compressed format)
 ##' @param restart Is this an estimation restart?
+##' @param assign Assign hessian to c.hess in environment environment? (Default FALSE)
 ##' @return
 ##' @author C. Lemarechal, Wenping Wang & Matthew L. Fidler
 ##' @export
-n1qn1 <- function(f, g, x, rho=parent.frame(1), eps=.Machine$double.eps, niter=100, nsim=100, imp=0, zm=NULL, restart=FALSE){
-    n <- as.integer(length(x));
+n1qn1 <- function(call_eval, call_grad, vars, environment=parent.frame(1), ...,
+                  epsilon=.Machine$double.eps, max_iterations=100, nsim=100,
+                  imp=0,
+                  invisible=NULL,
+                  zm=NULL, restart=FALSE,
+                  assign=FALSE,
+                  print.functions=FALSE){
+    if (!is.null(invisible)){
+        if (invisible == 1){
+            imp <- 0;
+            print.functions <- FALSE
+        } else {
+            print.functions <- TRUE
+        }
+    }
+    if (!missing(max_iterations) && missing(nsim)){
+        nsim <- max_iterations * 10;
+    }
+    n <- as.integer(length(vars));
     imp <- as.integer(imp);
-    niter <- as.integer(niter)
+    max_iterations <- as.integer(max_iterations)
     nsim <- as.integer(nsim)
-    nzm <- as.integer(n * (n + 13) / 2)
+    nzm <- as.integer(n * (n + 13) / 2);
     nsim <- as.integer(nsim);
-    eps <- as.double(eps)
+    epsilon <- as.double(epsilon)
     if (is.null(zm)){
         mode <- 1L
         zm <- double(nzm);
@@ -653,6 +669,8 @@ n1qn1 <- function(f, g, x, rho=parent.frame(1), eps=.Machine$double.eps, niter=1
             stop(sprintf("Compressed Hessian not the right length for this problem.  It should be %d.", nzm))
         }
     }
-    .Call(n1qn1_wrap, f, g, rho,
-          x, eps, n, mode, niter, nsim, imp, nzm, zm);
+    ret <- .Call(n1qn1_wrap, call_eval, call_grad, environment,
+                 vars, epsilon, n, mode, max_iterations, nsim, imp, nzm, zm, as.integer(print.functions));
+    if (assign) environment$c.hess <- ret$hess;
+    return(ret)
 }

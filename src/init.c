@@ -10,7 +10,7 @@ extern void parse_pars(void *, void *, void *, void *);
 
 /* .Call calls */
 extern SEXP neldermead_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP n1qn1_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP n1qn1_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP nlmixr_lin_cmt(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _nlmixr_llik_binomial_c(SEXP, SEXP, SEXP);
 extern SEXP slice_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -32,7 +32,7 @@ static const R_CMethodDef CEntries[] = {
 
 static const R_CallMethodDef CallEntries[] = {
     {"neldermead_wrap",      (DL_FUNC) &neldermead_wrap,      11},
-    {"n1qn1_wrap",           (DL_FUNC) &n1qn1_wrap,           12},
+    {"n1qn1_wrap",           (DL_FUNC) &n1qn1_wrap,           13},
     {"nlmixr_lin_cmt",       (DL_FUNC) &nlmixr_lin_cmt,        9},
     {"_nlmixr_lin_cmt_stan",  (DL_FUNC) &_nlmixr_lin_cmt_stan,   9},
     {"_nlmixr_llik_binomial_c", (DL_FUNC) &_nlmixr_llik_binomial_c,  3},

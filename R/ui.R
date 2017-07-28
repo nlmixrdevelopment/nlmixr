@@ -590,6 +590,7 @@ nlmixrUI.nlme.var <- function(object){
     w.no.prop <- which(!add.prop.errs$prop);
     const <- grp <- ""
     power <- ", fixed=c(1)"
+    powera <- ", fixed=list(power=1)"
     if (length(add.prop.errs$y) > 1){
         grp <- " | nlmixr.grp";
     }
@@ -598,10 +599,15 @@ nlmixrUI.nlme.var <- function(object){
     }
     if (length(w.no.prop) > 0){
         power <- sprintf(", fixed=list(%s)", paste(paste0(add.prop.errs$y, "=", ifelse(add.prop.errs$prop, 1, 0)), collapse=", "))
+        powera <- sprintf(", fixed=list(power=list(%s))", paste(paste0(add.prop.errs$y, "=", ifelse(add.prop.errs$prop, 1, 0)), collapse=", "))
     }
-    tmp <- sprintf("varComb(varIdent(form = ~ 1%s%s), varPower(form=~fitted(.)$s%s))", grp, const, grp, power)
+    tmp <- sprintf("varConstPower(form=~fitted(.)%s%s)", grp, powera)
     if (all(!add.prop.errs$prop)){
         tmp <- sprintf("varIdent(form = ~ 1%s)", grp);
+        if (tmp == "varIdent(form = ~ 1)"){
+            warning("Initial condition for additive error ignored with nlme")
+            return(NULL)
+        }
     } else if (all(!add.prop.errs$add)){
         tmp <- sprintf("varPower(form = ~ fitted(.)%s%s)", grp, power);
     }

@@ -112,6 +112,7 @@ nlmixr.fit <- function(uif, data, est="nlme", ...){
         ## Run FOCEi using same ETAs and THETA estimates to get
         ## comaparible OBJFs and also extract table entries like
         ## CWRES.
+        ## return(fit)
         return(as.focei(fit, uif, pt))
     } else if (est == "focei"){
         fit <- focei.fit(dat,

@@ -1,4 +1,5 @@
-c Scilab ( http://www.scilab.org/ ) - This file is part of Scilab
+c     Modified by Matthew Fidler in 2017 for different outputs to the R console
+c     Scilab ( http://www.scilab.org/ ) - This file is part of Scilab
 c Copyright (C) 1987 - INRIA - Claude LEMARECHAL
 c 
 c This file must be used under the terms of the CeCILL.
@@ -580,13 +581,14 @@ c
  999  continue
       return
       end
-      subroutine basout (io, lp, str)
-      character str*(*)
-      write(*,*) str
-      end
-      integer function vfinite(n,v)
-      implicit double precision (a-h,o-z)
-      dimension v(n)
-      vfinite = 1
-      end
+c$$$      subroutine basout (io, lp, str)
+c$$$      character str*(*)
+c$$$c$$$  write(*,*) str
+c$$$      call rprintf(str)
+c$$$      end
+c$$$      integer function vfinite(n,v)
+c$$$      implicit double precision (a-h,o-z)
+c$$$      dimension v(n)
+c$$$      vfinite = 1
+c$$$      end
        

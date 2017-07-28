@@ -276,7 +276,7 @@ ranef.focei.fit <- function(object, ...){
     fitted.focei.fit(object, ..., type="posthoc")
 }
 
-##' @importFrom nlme ranef
+##' @importFrom nlme fixef
 ##' @export
 fixef.focei.fit <- function(object, ...){
     return(object$theta)
@@ -511,6 +511,7 @@ focei.fit <- function(data,
                       PKpars,
                       diag.xform=c("sqrt", "log", "identity"),
                       optim=c(
+                          ## "n1qn1",
                           "bobyqa",
                           ## "lbfgsb3",
                           ## "newuoa",
@@ -568,10 +569,7 @@ focei.fit <- function(data,
             message("After Error:");
             message(paste(paste("##", lines), collapse="\n"));
         }
-        options(RxODE.warn.on.assign=oldAssign);
         running <- FALSE})
-    oldAssign <- getOption("RxODE.warn.on.assign");
-    options(RxODE.warn.on.assign=FALSE);
     running <- TRUE
     ##data = dat; PKpars=mypars; diag.xform="sqrt"; model=list(); control=list()
     ##model options
@@ -600,7 +598,7 @@ focei.fit <- function(data,
         switch.solver=FALSE,
         cov.method="grad",
         factr=1e10,
-        grad=TRUE,
+        grad=FALSE,
         accept.eta.size=1.5,
         sigdig=0,
         precision=0, ## 0 = No ridge penalty.
@@ -616,7 +614,9 @@ focei.fit <- function(data,
         add.posthoc=TRUE,
         extra.output=TRUE, ## Display extra output on each iteration
         inits.mat=NULL,
-        find.best.eta=TRUE
+        find.best.eta=TRUE,
+        inner.opt="n1qn1",
+        save.curve=TRUE
     )
 
     curi <- 0;
@@ -640,7 +640,7 @@ focei.fit <- function(data,
 
     optim.method <- match.arg(optim);
     grad.methods <- c("lbfgs", "lbfgsb3", "nlminb", "mma", "slsqp", "lbfgs-nlopt", "tnewton_precond_restart",
-                      "tnewton_precond", "tnewton", "var1", "var2")
+                      "tnewton_precond", "tnewton", "var1", "var2", "n1qn1")
     print.grad <- any(optim.method == grad.methods);
     if (con$grad && !print.grad){
         if (!con$NOTRUN){
@@ -686,19 +686,20 @@ focei.fit <- function(data,
     }
 
     ## RxODE(rxNorm(model$inner), modName="test");
-    if (!is.null(theta.names) && length(inits$THTA) == length(theta.names)){
-        nms <- theta.names;
+    if (is.null(model$extra.pars)){
+        nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)))
     } else {
-        if (is.null(model$extra.pars)){
-            nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)))
-        } else {
-            nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)),
-                     sprintf("ERR[%s]", seq_along(model$extra.pars)))
-        }
+        nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)),
+                 sprintf("ERR[%s]", seq_along(model$extra.pars)))
+    }
+    if (!is.null(theta.names) && (length(inits$THTA) + length(model$extra.pars)) == length(theta.names)){
+        nms <- theta.names;
     }
     if (length(lower) == 1){
         lower <- rep(lower, length(inits$THTA));
     } else if (length(lower) != length(inits$THTA)){
+        print(inits$THTA)
+        print(lower)
         stop("Lower must be a single constant for all the THETA lower bounds, or match the dimension of THETA.")
     }
     if (length(upper) == 1){
@@ -708,10 +709,10 @@ focei.fit <- function(data,
     }
 
     extra.pars <- c();
-    if (!is.null(extra.pars)){
+    if (!is.null(model$extra.pars)){
         eval(call(diag.xform, model$extra.pars))
         if (length(model$extra.pars) > 0){
-            inits$THTA <- c(inits$THTA, extra.pars);
+            inits$THTA <- c(inits$THTA, model$extra.pars);
             lower.err <- rep(con$atol.ode * 10, length(model$extra.pars));
             upper.err <- rep(Inf, length(model$extra.pars));
             lower <-c(lower, lower.err);
@@ -801,6 +802,7 @@ focei.fit <- function(data,
     nSUB  = length(ID.all)
 
     find.best.eta <- con$find.best.eta;
+    first <- TRUE
 
     ofv.FOCEi.ind.slow <- function(pars) {
         cur.diff <<- NULL;
@@ -827,13 +829,16 @@ focei.fit <- function(data,
             .wh = ID.ord[as.character(subj)]
             if(con$DEBUG>10 && .wh==1) print(inits.mat[.wh,])               #FIXME
             if (con$DEBUG.ODE) print("i'm here :)")
-            args <- list(model, ev, theta=THETA, eta=inits.mat[.wh,],
-                         dv=dati$dv[ev$get.obs.rec()], inv.env=rxSymEnv,
+            c.hess <- NULL;
+            if (con$save.curve && !first && con$inner.opt == "n1qn1") c.hess <- inits.c.hess[.wh, ];
+            args <- list(model, ev, theta=THETA, eta=inits.mat[.wh,], c.hess=c.hess,
+                             dv=dati$dv[ev$get.obs.rec()], inv.env=rxSymEnv,
                          nonmem=con$NONMEM, invisible=1-con$TRACE.INNER, epsilon=con$TOL.INNER,
                          id=subj, inits.vec=inits.vec, cov=cur.cov, estimate=find.best.eta,
                          atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
                          atol.outer=con$atol.outer, rtol.outer=con$rtol.outer,
-                         pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver);
+                         pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver,
+                         inner.opt=con$inner.opt);
             if (!is.null(inits.mat.bak)){
                 args$eta.bak=inits.mat.bak[.wh, ];
             }
@@ -859,8 +864,13 @@ focei.fit <- function(data,
             c(attr(x, "wh"), attr(x, "posthoc"))
         }))
         if(con$RESET.INITS.MAT) inits.mat[m[,1],] <<- m[,-1]
-
-
+        ## Save last curvature
+        if (con$save.curve && con$inner.opt == "n1qn1" && !is.null(attr(llik.subj[[1]], "c.hess"))){
+            m <- t(sapply(llik.subj, function(x){
+                c(attr(x, "wh"), attr(x, "c.hess"))
+            }))
+            inits.c.hess[m[,1],] <<- m[,-1]
+        }
         if (con$grad && con$accept.eta.size != 0){
             last.pars <<- pars;
             last.dEta.dTheta <<- lapply(llik.subj, function(x){attr(x, "dEta.dTheta")});
@@ -897,7 +907,7 @@ focei.fit <- function(data,
     optim.obj <- function(lines, prefix="o"){
         if (class(lines) == "numeric"){
             ofv <- lines;
-            if (any(optim.method == c("nlminb", "newuoa", "bobyqa", "uobyqa"))){
+            if (any(optim.method == c("nlminb", "newuoa", "bobyqa", "uobyqa", "n1qn1"))){
                 return(paste0(prefix, ".", gsub("^ *", "", sprintf("%#14.8g",ofv))));
     } else if (optim.method == "lbfgsb3"){
         ## This uses dblepr("",)
@@ -910,7 +920,7 @@ focei.fit <- function(data,
         return(sprintf("%s.%s", prefix, sprintf("%f", last.ofv)));
     }
         } else {
-            if (any(optim.method == c("newuoa", "nlminb", "bobyqa", "uobyqa"))){
+            if (any(optim.method == c("newuoa", "nlminb", "bobyqa", "uobyqa", "n1qn1"))){
                 reg <- rex::rex(any_spaces, any_numbers, ":", any_spaces, capture(regNum), any_spaces, ":",anything);
             } else if  (optim.method == "lbfgsb3") {
                 reg <- rex::rex(anything, "f", any_spaces, "=", any_spaces,
@@ -999,9 +1009,9 @@ focei.fit <- function(data,
         message(paste(paste0("## ", lines), collapse="\n"));
         return(lines);
     }
-
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
+        first <<- FALSE
         llik <- -2*do.call("sum", llik.subj);
         corrected <- do.call("sum", (lapply(llik.subj, function(x){attr(x, "corrected")})))
         ofv <- llik;
@@ -1160,7 +1170,7 @@ focei.fit <- function(data,
     np <- length(inits.vec)
     meth <- c();
 
-    opt <- function(){
+    opt0 <- function(){
         fit <- NULL;
         if (optim.method=="lbfgsb3"){
             prm <- rep(1, length(inits.vec));
@@ -1246,6 +1256,20 @@ focei.fit <- function(data,
                     fit <- NULL;
                 }
             }
+        } else if (optim.method=="n1qn1"){
+            fit <- try({n1qn1(ofv.FOCEi, gr.FOCEi,
+                              rep(1, length(inits.vec)),
+                              invisible=0)});
+            if (inherits(fit, "try-error") && !is.null(sigdig.fit)){
+                if (attr(fit, "condition")$message == "sigidig exit"){
+                    fit <- sigdig.fit
+                } else {
+                    lines <- sink.get();
+                    if (!is.null(lines))
+                        message(paste0(lines, collapse="\n"), "\n");
+                    fit <- NULL;
+                }
+            }
         } else if (optim.method=="nlminb") {
             fit <- try({nlminb(rep(1, length(inits.vec)),
                                 ofv.FOCEi, gradient=gr.FOCEi,
@@ -1265,10 +1289,16 @@ focei.fit <- function(data,
         }
         return(fit);
     }
+    opt <- function(){
+        return(collectWarnings(opt0()));
+    }
     if (is.null(con$inits.mat)){
         inits.mat <- matrix(0, nSUB, nETA)
     } else if (sum(dim(con$inits.mat) - c(nSUB, nETA)) == 0){
         inits.mat <- con$inits.mat;
+    }
+    if (con$inner.opt == "n1qn1"){
+        inits.c.hess <- matrix(0, nSUB, nETA * (nETA + 13) / 2)
     }
     if (.Platform$OS.type == "windows" && con$cores > 1){
         ## Copy over all of the objects within scope to
@@ -1476,7 +1506,7 @@ focei.fit <- function(data,
         tmp <- fit$par.unscaled[seq_along(nms)];
         names(tmp) <- nms;
         fit$theta <- tmp;
-        for (n in c("fval")){
+        for (n in c("fval", "value")){
             if (any(names(fit) == n)){
                 fit$objective <- fit[[n]];
             }
