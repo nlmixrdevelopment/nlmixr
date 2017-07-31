@@ -315,11 +315,17 @@ residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wre
         if (type == "wres"){
             ## Efo= f(|eta=0)
             ## cov = Vfo|eta=0+Vi|eta=0
-            ## pred <- fitted(object, population=TRUE);
             ## These WRES are calculated the same as Hooker 2007, but don't seem to match NONMEM.
             pred <- fitted(object, population=TRUE)
-            W <- sqrt(fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi"))
-            return((DV - pred) / W);
+            ## In theory the decorrelation is done by eigenvector decomposition. However, it doens't seem to affect the WRES values.
+            ## W <- fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi")
+            ## tmp <- aggregate(W,by=list(object$ID),FUN=function(x){e <- eigen(diag(x)); return(diag(e$vectors %*% diag(sqrt(e$values)) %*% rxInv(e$vectors)))});
+            ## tmp <- data.frame(ID=tmp[,1],stack(data.frame(tmp[,-1])));
+            ## tmp <- tmp[order(tmp$ID,tmp$ind),];
+            ## tmp <- sqrt(tmp$values)
+            ## Even though it does not match NONMEM, it should be adequate metric for WRES...
+            W <- fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi")
+            return((DV - pred) / sqrt(W));
         } else if (type == "cwres"){
             ## According to Hooker 2007, the Vi (or the
             ## dh/deta*Sigma*dh/deta) should be calculated under eta=0
@@ -1613,12 +1619,19 @@ as.focei <- function(object, uif, pt=proc.time(), ...){
     UseMethod("as.focei");
 }
 
-##' Get the FOCEi eta specification for model.
+##' Get the FOCEi theta or eta specification for model.
 ##'
 ##' @param object Fit object
+##' @param uif User interface function or object
 ##' @param ... Other parameters
-##' @return A list for the OMGA list in FOCEi
+##' @return Parameter estimates for Theta or a list for the OMGA list
+##'     in FOCEi
 ##' @author Matthew L. Fidler
-focei.eta <- function(object,  ...){
+focei.eta <- function(object, uif, ...){
     UseMethod("focei.eta");
+}
+
+##' @rdname focei.eta
+focei.theta <- function(object, uif, ...){
+    UseMethod("focei.theta");
 }

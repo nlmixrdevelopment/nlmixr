@@ -562,39 +562,18 @@ print.summary_nlmixr_nlme <- function (x, verbose = FALSE, ..., print.data=FALSE
   }
   invisible(x)
 }
-
-##' @importFrom nlme augPred
 ##' @export
-augPred.nlmixr_nlme <- function(object, ...){
-  nlmeModList(object$env);
-  on.exit({nlmeModList(new.env())})
-  tmp <- object;
-  class(tmp) <- class(tmp)[-1]
-  augPred(tmp, ...);
+varWeights <- function(object, ...){
+    nlmeModList(object$env);
+    on.exit({nlmeModList(new.env())})
+    return(nlme::varWeights(object$modelStruct$varStruct))
 }
 
-##'@export
-predict.nlmixr_nlme <- function(object, ...){
-  nlmeModList(object$env);
-  on.exit({nlmeModList(new.env())})
-  tmp <- object;
-  class(tmp) <- class(tmp)[-1]
-  predict(tmp, ...);
-}
-##' @importFrom nlme ACF
-##' @export
-ACF.nlmixr_nlme <- function(object, ...){
-  nlmeModList(object$env);
-  on.exit({nlmeModList(new.env())})
-  tmp <- object;
-  class(tmp) <- class(tmp)[-1]
-  ACF(tmp, ...);
-}
 
 ##' @export
 anova.nlmixr_nlme <- function(object, ...){
-  nlmeModList(object$env);
-  on.exit({nlmeModList(new.env())})
+    nlmeModList(object$env);
+    on.exit({nlmeModList(new.env())})
   args <- lapply(list(object, ...),
                  function(x){
       if (class(x)[1L] == "nlmixr_nlme"){
@@ -640,6 +619,39 @@ focei.eta.nlmixr_nlme <- function(object, ...){
     }
 }
 
+##' @rdname focei.theta
+focei.theta.nlmixr_nlme <- function(object, uif, ...){
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    n <- uif$focei.names
+    thetas <- rep(NA, length(n));
+    names(thetas) <- n;
+    f <- fixed.effects(object)
+    for (n in names(f)){
+        thetas[n] <- f[n];
+    }
+    ## Handle variance classes.
+    err <- object$modelStruct$varStruct
+    err.type <- uif$focei.err.type;
+    if (is(err, "varConstPower")){
+        ## Addititive + proportional
+        add <- which(err.type == "add")
+        prop <- which(err.type == "prop")
+        thetas[prop] <- object$modelStruct$varStruct$const;
+        thetas[add] <- object$sigma;
+    } else if (is(err, "varPower")){
+        ## Proportional
+        prop <- which(err.type == "prop")
+        thetas[prop] <- object$sigma
+    } else {
+        ## Additive.
+        add <- which(err.type == "add")
+        thetas[add] <- object$sigma
+    }
+    return(thetas)
+}
+
 
 ##' @rdname as.focei
 as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
@@ -649,10 +661,8 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
     fit <- object;
     mat <- as.matrix(random.effects(fit));
     mat <- mat[order(as.numeric(row.names(mat))), ]
-    th <- c(fixed.effects(fit), fit$sigma)
-    est <- as.matrix(VarCorr(fit))[,1]
-    est1 <- est[uif$eta.names]
-    ome <- focei.eta(fit);
+    th <- focei.theta(fit, uif)
+    ome <- focei.eta(fit, uif);
     init <- list(THTA=th,
                  OMGA=ome)
     nlme.time <- proc.time() - pt;

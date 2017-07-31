@@ -71,10 +71,13 @@ nlmixr.function <- function(object, data, est="nlme", ...){
 ##' @param data Dataset to estimate
 ##' @param est Estimation method
 ##' @param ... Parameters passed to estimation method.
+##' @param focei.translate Translate the model to FOCEi and then run
+##'     the tables and objective function so that different estimation
+##'     methodologies are comparible through OBJF.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr.fit <- function(uif, data, est="nlme", ...){
+nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
     if (est == "nlme"){
         pt <- proc.time()
         fun <- uif$nlme.fun;
@@ -113,7 +116,12 @@ nlmixr.fit <- function(uif, data, est="nlme", ...){
         ## comaparible OBJFs and also extract table entries like
         ## CWRES.
         ## return(fit)
-        return(as.focei(fit, uif, pt))
+        if (focei.translate){
+            return(as.focei(fit, uif, pt))
+        } else  {
+            return(fit);
+        }
+
     } else if (est == "focei"){
         fit <- focei.fit(dat,
                          inits=uif$focei.inits,

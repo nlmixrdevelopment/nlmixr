@@ -691,7 +691,7 @@ nlmixrUI.focei.inits <- function(obj){
 ##' @param type type of object extracted
 ##' @return lower/upper/name vector
 ##' @author Matthew L. Fidler
-nlmixrUI.focei.upper.lower <- function(obj, type=c("upper", "lower", "name")){
+nlmixrUI.focei.upper.lower <- function(obj, type=c("upper", "lower", "name", "err")){
     type <- match.arg(type);
     df <- as.data.frame(obj$ini);
     dft <- df[!is.na(df$ntheta), ];
@@ -742,6 +742,8 @@ nlmixrUI.eta.names <- function(obj){
         return(nlmixrUI.focei.upper.lower(obj, "lower"))
     } else if (arg == "focei.names"){
         return(nlmixrUI.focei.upper.lower(obj, "name"))
+    } else if (arg == "focei.err.type"){
+        return(nlmixrUI.focei.upper.lower(obj, "err"))
     } else if (arg == "eta.names"){
         return(nlmixrUI.eta.names(obj))
     }
@@ -772,6 +774,7 @@ str.nlmixrUI <- function(object, ...){
     message(" $ focei.inits: Initilization for FOCEi style blocks")
     message(" $ focei.upper: Upper bounds for FOCEi")
     message(" $ focei.lower: Lower bounds for FOCEi")
+    message(" $ focei.err.type: Residual Error type for FOCEi thetas")
     message(" $ focei.names: Theta names for FOCEi")
     message(" $ eta.names: Eta names")
 }
