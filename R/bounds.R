@@ -560,6 +560,12 @@ nlmixrBounds <- function(fun){
     if (length(df$ntheta) == 0){
         stop("Could not find any parameter information.")
     }
+    n <- df$name
+    n <- n[!is.na(n)]
+    if (any(duplicated(n))){
+        dups <- unique(n[duplicated(n)])
+        stop(sprintf("The following parameter names were duplicated: %s.", paste(dups, collapse=", ")))
+    }
     class(df) <- c("nlmixrBounds", "data.frame");
     return(df)
 }

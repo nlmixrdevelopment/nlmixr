@@ -23,6 +23,16 @@ nlmixrUI <- function(fun){
     }
     fun2 <- fun2();
     class(fun2) <- "nlmixrUI";
+    var.ini <- c(fun2$focei.names, fun2$eta.names)
+    var.def <- fun2$all.vars;
+    diff <- setdiff(var.ini, var.def);
+    if (length(diff) > 0){
+        stop(sprintf("Model error: initial estimates provided without variables being used: %s", paste(diff, collapse=", ")))
+    }
+    ns <- fun2$name[which(!is.na(fun2$neta1) & !is.na(fun2$err))]
+    if (length(ns) > 0){
+        stop(sprintf("Residual error component(s) need to be defined with assignment ('=' or '<-') in ini block (not '~'): %s", paste(ns, collapse=", ")))
+    }
     return(fun2)
 }
 ##' Print UI function
@@ -306,6 +316,16 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     errs.specified <- c()
     add.prop.errs <- data.frame(y=character(), add=logical(), prop=logical());
     bounds <- ini;
+    if (!is.null(ini)){
+        unnamed.thetas <- ini$ntheta[(!is.na(ini$ntheta) & is.na(ini$name))];
+        if (length(unnamed.thetas) > 0){
+            stop(sprintf("The following THETAs are unnamed: %s", paste(sprintf("THETA[%d]", unnamed.thetas), collapse=", ")))
+        }
+        unnamed.etas <- ini$neta1[!is.na(ini$neta1) & (ini$neta1 == ini$neta2) & is.na(ini$name)];
+        if (length(unnamed.etas) > 0){
+            stop(sprintf("The following ETAs are unnamed: %s", paste(sprintf("ETA[%d]", unnamed.etas), collapse=", ")))
+        }
+    }
     errn <- 0
     f <- function(x) {
         if (is.name(x)) {
