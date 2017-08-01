@@ -33,6 +33,14 @@ nlmixrUI <- function(fun){
     if (length(ns) > 0){
         stop(sprintf("Residual error component(s) need to be defined with assignment ('=' or '<-') in ini block (not '~'): %s", paste(ns, collapse=", ")))
     }
+    ns <- fun2$name[is.na(fun2$est)];
+    if (length(ns) > 0){
+        stop(sprintf("The following parameters initial estimates are NA: %s", paste(ns, collapse=", ")))
+    }
+    ns <- fun2$name[is.infinite(fun2$est)];
+    if (length(ns) > 0){
+        stop(sprintf("The following parameters initial estimates are infinite: %s", paste(ns, collapse=", ")))
+    }
     return(fun2)
 }
 ##' Print UI function

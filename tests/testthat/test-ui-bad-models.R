@@ -152,4 +152,51 @@ test_that("Parameters need to be named", {
     expect_error(nlmixr(uif), rex::rex("The following ETAs are unnamed: ETA[2]"))
 })
 
+test_that("Parameters cannot be missing or Infinite", {
+    uif <- function(){
+        ini({
+            tka <- 1 / 0
+            tcl <- exp(-3.2)
+            tv <- exp(1)
+            eta.ka ~ 0.1
+            eta.cl ~ 0.2
+            ## Should be assign since it is a THETa, should I support it....?
+            add.err
+        })
+        model({
+            ka <- tka + eta.ka
+            cl <- tcl + eta.cl
+            v <- tv
+            d / dt(depot) = -ka * depot
+            d / dt(center) = ka * depot - cl / v * center
+            cp = center / v
+            cp ~ add(add.err)
+        })
+    }
+    expect_error(nlmixr(uif), rex::rex("The following parameters initial estimates are infinite: tka"))
+
+    uif <- function(){
+        ini({
+            tka <- NA
+            tcl <- exp(-3.2)
+            tv <- exp(1)
+            eta.ka ~ 0.1
+            eta.cl ~ 0.2
+            ## Should be assign since it is a THETa, should I support it....?
+            add.err
+        })
+        model({
+            ka <- tka + eta.ka
+            cl <- tcl + eta.cl
+            v <- tv
+            d / dt(depot) = -ka * depot
+            d / dt(center) = ka * depot - cl / v * center
+            cp = center / v
+            cp ~ add(add.err)
+        })
+    }
+    expect_error(nlmixr(uif), rex::rex("The following parameters initial estimates are NA: tka"))
+})
+
+
 
