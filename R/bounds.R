@@ -673,7 +673,7 @@ nlmixrBoundsTheta <- function(x, full=TRUE, formula=FALSE){
 nlmixrBoundsOmega <- function(x, nlme=FALSE){
     if (is.nlmixrBounds(x)){
         w <- which(!is.na(x$neta1));
-        if (length(w) > 1){
+        if (length(w) > 0){
             d <- max(x$neta1);
             df <- x[w, ];
             mx <- max(df$neta1);
