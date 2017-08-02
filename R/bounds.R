@@ -507,12 +507,15 @@ nlmixrBounds <- function(fun){
                 lab <- as.character(x[[2]]);
                 lab <- gsub(";+", "", lab)
                 len <- length(env$df$ntheta);
-                if (!is.na(env$df$ntheta[len])){
-                    tmp <- as.character(env$df$label);
-                    tmp[len] <- lab
-                    env$df$label <- tmp
-                } else {
-                    stop("Currently only thetas can be labeled");
+                if (len > 0){
+                    if (!is.na(env$df$ntheta[len])){
+                        tmp <- as.character(env$df$label);
+                        tmp[len] <- lab
+                        env$df$label <- tmp
+                    } else {
+                        ## stop("Currently only thetas can be labeled");
+                        warning("Currently only thetas can be labeled")
+                    }
                 }
             } else if (identical(x[[1]], quote(`condition`))){
                 lab <- as.character(x[[2]]);

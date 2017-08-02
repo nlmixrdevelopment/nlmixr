@@ -66,6 +66,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     })
 
     test_that("ODE", {
+
         datr <- Bolus_1CPT
         datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
         datr <- datr[datr$EVID != 2, ]
@@ -90,6 +91,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
                 cp ~ prop(prop.err)
             })
         }
+
         fitODE <- as.nlme(nlmixr(uif, dat, est="nlme"))
 
         z <- summary(fitODE)

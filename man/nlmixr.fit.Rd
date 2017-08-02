@@ -4,7 +4,7 @@
 \alias{nlmixr.fit}
 \title{Fit a nlmixr model}
 \usage{
-\method{nlmixr}{fit}(uif, data, est = "nlme", ...)
+\method{nlmixr}{fit}(uif, data, est = "nlme", ..., focei.translate = TRUE)
 }
 \arguments{
 \item{uif}{Parsed nlmixr model (by \code{nlmixr(mod.fn)}).}
@@ -14,6 +14,10 @@
 \item{est}{Estimation method}
 
 \item{...}{Parameters passed to estimation method.}
+
+\item{focei.translate}{Translate the model to FOCEi and then run
+the tables and objective function so that different estimation
+methodologies are comparible through OBJF.}
 }
 \value{
 nlmixr fit object

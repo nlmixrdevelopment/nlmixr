@@ -4,7 +4,7 @@
 \alias{nlmixrUI.focei.upper.lower}
 \title{Get upper/lower/names for THETAs}
 \usage{
-nlmixrUI.focei.upper.lower(obj, type = c("upper", "lower", "name"))
+nlmixrUI.focei.upper.lower(obj, type = c("upper", "lower", "name", "err"))
 }
 \arguments{
 \item{obj}{UI object}

@@ -9,7 +9,7 @@
 #ifndef Rcpp_DE_evaluate_h_
 #define Rcpp_DE_evaluate_h_
 
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 
 namespace Rcpp {
 

@@ -65,6 +65,17 @@ nlmixr.function <- function(object, data, est="nlme", ...){
     }
 }
 
+##' @rdname nlmixr
+##' @export
+nlmixr.nlmixrUI <- function(object, data, est="nlme", ...){
+    uif <- object
+    if (missing(data) && missing(est)){
+        return(uif)
+    } else {
+        nlmixr.fit(uif, data, est, ...);
+    }
+}
+
 ##' Fit a nlmixr model
 ##'
 ##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).

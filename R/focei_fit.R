@@ -533,6 +533,14 @@ focei.fit <- function(data,
                       calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
                       theta.names=NULL,
                       eta.names=NULL){
+    if ((is(data, "fuction") || is(data, "nlmixrUI")) &&
+        is(inits, "data.frame")){
+        call <- as.list(match.call(expand.dots=TRUE))[-1];
+        names(call)[1] <- "object"
+        names(call)[2] <- "data";
+        call$est <- "focei";
+        return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)));
+    }
     data <- data;
     colnames(data) <- toupper(names(data));
     sink.file <- tempfile();

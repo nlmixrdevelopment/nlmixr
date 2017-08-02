@@ -174,7 +174,7 @@ n1qn1_wrap(
   } else {
     gev = new Rcpp::EvalStandard(gSEXP, rhoSEXP); // Standard evaulation
   }
-  int i;
+  int i, j, k =0;
     
   int n, mode, niter, nsim, imp, lp=6, nzm;
   n = INTEGER(nSEXP)[0];
@@ -196,11 +196,44 @@ n1qn1_wrap(
   Rcpp::NumericVector par(n);
   for (i=0; i<n; i++) par[i] = x[i];
   Rcpp::NumericVector hess(nzm);
-  for (i=0; i<nzm; i++) hess[i] = zm[i];
-  return Rcpp::List::create(
-                            Rcpp::Named("convergence") = 0,
+  // On input this is hessian
+  // On output this is H = LDL'
+  // Triangular matrix is paramterized by column instead of row.
+  using namespace arma;
+  mat L = mat(n,n);
+  mat D = mat(n,n);
+  mat H = mat(n,n);
+  // NumericVector zms(nzm);
+  // for (i = 0; i < nzm; i++) zms[i]=zm[i];
+  L.zeros();
+  D.zeros();
+  k =0;
+  for (i=0; i<n; i++){
+    for (j=i; j<n; j++){
+      if (i == j){
+	D(i,i)=zm[k];
+	L(i,i)=1;
+      } else {
+	L(j,i)=zm[k];
+      }
+      k++;
+    }
+  }
+  H = L*D*L.t();
+  k = 0;
+  for (i=0; i<n; i++){
+    for (j=i; j<n; j++){
+      hess[k]=H(j,i);
+      k++;
+    }
+  }
+  return Rcpp::List::create(Rcpp::Named("convergence") = 0,
                             Rcpp::Named("value") = f,
                             Rcpp::Named("par") = par,
+			    // Rcpp::Named("L") = L,
+			    // Rcpp::Named("D") = D,
+			    Rcpp::Named("H") = H,
+			    // Rcpp::Named("zm")=zms,
 			    Rcpp::Named("c.hess") = hess);
         
   END_RCPP
