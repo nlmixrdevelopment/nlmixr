@@ -573,24 +573,29 @@ varWeights.nlmixr_nlme <- function(object, ...){
 
 ##' @export
 anova.nlmixr_nlme <- function(object, ...){
-    nlmeModList(object$env);
-    on.exit({nlmeModList(new.env())})
-  args <- lapply(list(object, ...),
-                 function(x){
-      if (class(x)[1L] == "nlmixr_nlme"){
-          tmp <- x;
-          class(tmp) <- class(tmp)[-1L];
-          return(tmp)
-      } else {
-          return(x)
-      }
-  });
-  ret <- do.call(getFromNamespace("anova.lme","nlme"),
-                 args);
-  if (class(ret)[1L] == "nlme"){
-      class(ret) <- c("nlmixr_nlme", class(ret))
-  }
-  return(ret)
+    args <- lapply(list(object, ...),
+                   function(x){
+        if (class(x)[1L] == "nlmixr_nlme"){
+            tmp <- x;
+            class(tmp) <- class(tmp)[-1L];
+            return(tmp)
+        } ## else if (is(x, "nlmixr.ui.nlme")){
+        ##     x <- as.nlme(x);
+        ##     if (class(x)[1L] == "nlmixr_nlme"){
+        ##         tmp <- x;
+        ##         class(tmp) <- class(tmp)[-1L];
+        ##         return(tmp)
+        ##     } else {
+        ##         return(x)
+        ##     }
+        ## }
+        else {
+            return(x)
+        }
+    });
+    ret <- do.call(getFromNamespace("anova.lme","nlme"), args);
+    row.names(ret) <- NULL;
+    return(ret);
 }
 
 ##' @rdname focei.eta

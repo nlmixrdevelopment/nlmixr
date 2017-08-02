@@ -2,6 +2,11 @@
 % Please edit documentation in R/focei_fit.R
 \name{focei.fit}
 \alias{focei.fit}
+\alias{focei.fit.nlmixr.ui.nlme}
+\alias{focei.fit.nlmixr.ui.focei.fit}
+\alias{focei.fit.nlmixrUI}
+\alias{focei.fit.function}
+\alias{focei.fit.data.frame}
 \title{FOCEI Fit for nlmixr}
 \usage{
 focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
@@ -9,6 +14,21 @@ focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
   lower = -Inf, upper = Inf, control = list(),
   calculate.vars = c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres",
   "cpred", "cres"), theta.names = NULL, eta.names = NULL)
+
+\method{focei.fit}{nlmixr.ui.nlme}(data, inits, ...)
+
+\method{focei.fit}{nlmixr.ui.focei.fit}(data, inits, ...)
+
+\method{focei.fit}{nlmixrUI}(data, inits, ...)
+
+\method{focei.fit}{function}(data, inits, ...)
+
+\method{focei.fit}{data.frame}(data, inits, PKpars, diag.xform = c("sqrt",
+  "log", "identity"), optim = c("bobyqa", "nlminb"), model = NULL,
+  pred = NULL, err = NULL, lower = -Inf, upper = Inf,
+  control = list(), calculate.vars = c("pred", "ipred", "ires", "res",
+  "iwres", "wres", "cwres", "cpred", "cres"), theta.names = NULL,
+  eta.names = NULL)
 }
 \arguments{
 \item{data}{Data to fit}
