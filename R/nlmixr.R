@@ -76,6 +76,21 @@ nlmixr.nlmixrUI <- function(object, data, est="nlme", ...){
     }
 }
 
+##' @rdname nlmixr
+##' @export
+nlmixr.nlmixr.ui.nlme <- function(object, data, est="nlme", ...){
+    env <- attr(object, ".focei.env")
+    uif <- env$uif.new;
+    if (missing(data) && missing(est)){
+        return(uif)
+    } else {
+        if (missing(data)){
+            data <- getData(object);
+        }
+        nlmixr.fit(uif, data, est, ...);
+    }
+}
+
 ##' Fit a nlmixr model
 ##'
 ##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).

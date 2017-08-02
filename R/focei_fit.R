@@ -270,6 +270,26 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
     }
 }
 
+## nlme/lme objects
+## getCovariate
+## getGroups
+## getResponse
+## getVarCov
+## logDet
+## pairs
+## pdConstruct?
+## qqnorm
+## VarCorr
+## augPred
+## comparePred
+
+##' @importFrom nlme getData
+##' @export
+getData.focei.fit <- function(object){
+    env <- attr(object, ".focei.env");
+    return(env$orig.data)
+}
+
 ##' @importFrom nlme ranef
 ##' @export
 ranef.focei.fit <- function(object, ...){
@@ -533,15 +553,24 @@ focei.fit <- function(data,
                       calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
                       theta.names=NULL,
                       eta.names=NULL){
-    if ((is(data, "fuction") || is(data, "nlmixrUI")) &&
+    name.data <- TRUE;
+    if (is(data, "nlmixr.ui.nlme") && missing(inits)){
+        inits <- getData(data);
+        name.data <- FALSE
+    }
+    if ((is(data, "fuction") || is(data, "nlmixrUI") || is(data, "nlmixr.ui.nlme")) &&
         is(inits, "data.frame")){
         call <- as.list(match.call(expand.dots=TRUE))[-1];
         names(call)[1] <- "object"
-        names(call)[2] <- "data";
+        if (name.data){
+            names(call)[2] <- "data";
+        } else {
+            call$data <- inits;
+        }
         call$est <- "focei";
         return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)));
     }
-    data <- data;
+    orig.data <- data;
     colnames(data) <- toupper(names(data));
     sink.file <- tempfile();
     orig.sink.number <- sink.number()
@@ -841,11 +870,11 @@ focei.fit <- function(data,
             }
             ev$import.EventTable(dati)
             .wh = ID.ord[as.character(subj)]
-            if(con$DEBUG>10 && .wh==1) print(inits.mat[.wh,])               #FIXME
+            if(con$DEBUG>10 && .wh==1) print(inits.mat[.wh,, drop = FALSE])               #FIXME
             if (con$DEBUG.ODE) print("i'm here :)")
             c.hess <- NULL;
             if (con$save.curve && !first && con$inner.opt == "n1qn1") c.hess <- inits.c.hess[.wh, ];
-            args <- list(model, ev, theta=THETA, eta=inits.mat[.wh,], c.hess=c.hess,
+            args <- list(model, ev, theta=THETA, eta=inits.mat[.wh,, drop = FALSE], c.hess=c.hess,
                              dv=dati$dv[ev$get.obs.rec()], inv.env=rxSymEnv,
                          nonmem=con$NONMEM, invisible=1-con$TRACE.INNER, epsilon=con$TOL.INNER,
                          id=subj, inits.vec=inits.vec, cov=cur.cov, estimate=find.best.eta,
@@ -1310,6 +1339,8 @@ focei.fit <- function(data,
         inits.mat <- matrix(0, nSUB, nETA)
     } else if (sum(dim(con$inits.mat) - c(nSUB, nETA)) == 0){
         inits.mat <- con$inits.mat;
+    } else {
+        stop("Mismatch of dimensions")
     }
     if (con$inner.opt == "n1qn1"){
         inits.c.hess <- matrix(0, nSUB, nETA * (nETA + 13) / 2)

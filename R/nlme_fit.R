@@ -562,8 +562,9 @@ print.summary_nlmixr_nlme <- function (x, verbose = FALSE, ..., print.data=FALSE
   }
   invisible(x)
 }
+##' @importFrom nlme varWeights
 ##' @export
-varWeights <- function(object, ...){
+varWeights.nlmixr_nlme <- function(object, ...){
     nlmeModList(object$env);
     on.exit({nlmeModList(new.env())})
     return(nlme::varWeights(object$modelStruct$varStruct))
@@ -600,10 +601,10 @@ focei.eta.nlmixr_nlme <- function(object, ...){
     is.cov <- (d[2] >= 3);
     mat <- suppressWarnings(matrix(as.numeric(mat), d[1], d[2]));
     dimnames(mat) <- dn
-    len <- length(mat[, 1]);
-    mat <- mat[-len, ]
-    est <- as.numeric(mat[-len,1]);
-    etas <- sprintf("ETA[%d]", seq_along(row.names(mat)))
+    len <- length(mat[, 1, drop = FALSE]);
+    mat <- mat[-len,, drop = FALSE]
+    est <- as.numeric(mat[, 1]);
+    etas <- sprintf("ETA[%d]", seq_along(row.names(est)))
     if (!is.cov)
         return(eval(parse(text=sprintf("list(%s)", paste(sprintf("ETA[%d] ~ %s", seq_along(est), est), collapse=", ")))));
     sd <- as.numeric(mat[-len, 2]);
@@ -658,14 +659,19 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
     }
+    uif.new <- uif;
     fit <- object;
     mat <- as.matrix(random.effects(fit));
-    mat <- mat[order(as.numeric(row.names(mat))), ]
+    mat <- mat[order(as.numeric(row.names(mat))),, drop = FALSE]
     th <- focei.theta(fit, uif)
+    for (n in names(th)){
+        uif.new$est[uif.new$name == n] <- th[n];
+    }
     ome <- focei.eta(fit, uif);
     init <- list(THTA=th,
                  OMGA=ome)
     nlme.time <- proc.time() - pt;
+    dat <- as.data.frame(getData(object));
     fit.f <- focei.fit(data=dat,
                        inits=init,
                        PKpars=uif$theta.pars,
@@ -681,6 +687,11 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
                                     inits.mat=mat,
                                     cores=1,
                                     find.best.eta=FALSE));
+    ome <- fit.f$omega;
+    w <- which(!is.na(uif.new$ini$neta1))
+    for (i in w){
+        uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
+    }
     ## enclose the nlme fit in the .focei.env
     env <- attr(fit.f, ".focei.env");
     env$fit$nlme <- fit
@@ -688,6 +699,7 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
     names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
     env$fit$time <- tmp;
     env$uif <- uif;
+    env$uif.new <- uif.new;
     class(fit.f) <- c("nlmixr.ui.nlme", class(fit.f))
     return(fit.f)
 }

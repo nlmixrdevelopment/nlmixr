@@ -4,12 +4,14 @@ library(nlmixr)
 context("UI-NLME01: one-compartment bolus, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
+
+    datr <- Bolus_1CPT
+    datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
+    datr <- datr[datr$EVID != 2, ]
+    dat <- datr[datr$SD == 1, ]
+
+
     test_that("Closed-form", {
-
-        datr <- Bolus_1CPT
-        datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-        datr <- datr[datr$EVID != 2, ]
-
         uif <- function(){
             ini({
                 lCl <- 1.6
@@ -27,7 +29,6 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
 
         runno <- "N001"
 
-        dat <- datr[datr$SD == 1, ]
 
         fit <- nlmixr(uif, dat, est="nlme")
 
@@ -67,13 +68,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
 
     test_that("ODE", {
 
-        datr <- Bolus_1CPT
-        datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-        datr <- datr[datr$EVID != 2, ]
-
         runno <- "N001"
-
-        dat <- datr[datr$SD == 1, ]
 
         uif <- function(){
             ini({
@@ -81,18 +76,18 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
                 lV <- 4.5
                 prop.err <- 0.1
                 eta.V ~ 0.1
-                eta.Cl ~ 0.1
+                eta.cl ~ 0.1
             })
             model({
-                v <- exp(lV + eta.V)
-                cl <- exp(lCl + eta.Cl)
+                v <- exp(lV+ eta.V)
+                cl <- exp(lCl)
                 d / dt(centr) = -(cl / v) * centr;
                 cp = centr / v;
                 cp ~ prop(prop.err)
             })
         }
 
-        fitODE <- as.nlme(nlmixr(uif, dat, est="nlme"))
+        fitODE <- nlmixr(uif, dat, est="nlme")
 
         z <- summary(fitODE)
 
