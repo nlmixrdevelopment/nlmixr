@@ -5,6 +5,7 @@
 \alias{nlmixr.function}
 \alias{nlmixr.nlmixrUI}
 \alias{nlmixr.nlmixr.ui.nlme}
+\alias{nlmixr.nlmixr.ui.focei.fit}
 \title{nlmixr generalized function}
 \usage{
 nlmixr(object, data, est = "nlme", ...)
@@ -14,6 +15,8 @@ nlmixr(object, data, est = "nlme", ...)
 \method{nlmixr}{nlmixrUI}(object, data, est = "nlme", ...)
 
 \method{nlmixr}{nlmixr.ui.nlme}(object, data, est = "nlme", ...)
+
+\method{nlmixr}{nlmixr.ui.focei.fit}(object, data, est = "nlme", ...)
 }
 \arguments{
 \item{object}{Fitted object or}

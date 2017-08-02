@@ -8,7 +8,6 @@
 \description{
 nlmixr is an R package for fitting population pharmacokinetic (PK)
 and pharmacokinetic-pharmacodynamic (PKPD) models.
-importFrom(Rcpp, evalCpp)
 }
 \seealso{
 Useful links:

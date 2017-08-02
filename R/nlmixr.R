@@ -2,7 +2,7 @@
 ##'
 ##' nlmixr is an R package for fitting population pharmacokinetic (PK)
 ##' and pharmacokinetic-pharmacodynamic (PKPD) models.
-##' importFrom(Rcpp, evalCpp)
+##'
 ##' @importFrom brew brew
 ##' @importFrom lattice xyplot
 ##' @importFrom lattice trellis.par.get

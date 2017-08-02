@@ -705,3 +705,55 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
 }
 
 ## comparePred should work because predict should work...
+
+##' @importFrom nlme nlme
+##' @export
+nlme.fit <- function(model, data, fixed, random = fixed,
+                     groups, start, correlation = NULL, weights = NULL, subset,
+                     method = c("ML", "REML"), na.action = na.fail, naPattern,
+                     control = list(), verbose = FALSE){
+    UseMethod("nlme")
+}
+
+##' @importFrom nlme nlme
+##' @export
+nlme.function <- function(model, data, fixed, random = fixed,
+                          groups, start, correlation = NULL, weights = NULL, subset,
+                          method = c("ML", "REML"), na.action = na.fail, naPattern,
+                          control = list(), verbose = FALSE){
+    uif <- nlmixr(model);
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    call$model <- uif;
+    return(do.call(getFromNamespace("nlme.nlmixrUI","nlmixr"), call, envir = parent.frame(1)))
+}
+
+##' @export
+nlme.nlmixrUI <- function(model, data, fixed, random = fixed,
+                          groups, start, correlation = NULL, weights = NULL, subset,
+                          method = c("ML", "REML"), na.action = na.fail, naPattern,
+                          control = list(), verbose = FALSE){
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    names(call)[1] <- "object";
+    call$est <- "nlme";
+    return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)))
+}
+##' @export
+nlme.nlmixr.ui.nlme <- function(model, data, fixed, random = fixed,
+                                groups, start, correlation = NULL, weights = NULL, subset,
+                                method = c("ML", "REML"), na.action = na.fail, naPattern,
+                                control = list(), verbose = FALSE){
+    env <- attr(model, ".focei.env")
+    uif <- env$uif.new;
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    names(call)[1] <- "object";
+    call$object <- uif
+    call$est <- "nlme";
+    if (missing(data)){
+        data <- getData(model);
+        call$data <- data
+    }
+    return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)))
+}
+
+##' @export
+nlme.nlmixr.ui.focei.fit <- nlme.nlmixr.ui.nlme
