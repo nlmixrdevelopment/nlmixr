@@ -91,6 +91,10 @@ nlmixr.nlmixr.ui.nlme <- function(object, data, est="nlme", ...){
     }
 }
 
+##' @rdname nlmixr
+##' @export
+nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
+
 ##' Fit a nlmixr model
 ##'
 ##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).
@@ -161,6 +165,20 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
                          theta.names=uif$focei.names,
                          eta.names=uif$eta.names,
                          ...)
+        env <- attr(fit, ".focei.env")
+        env$uif <- uif;
+        uif.new <- uif;
+        ns <- names(fit$theta);
+        for (n in ns){
+            uif.new$ini$est[uif.new$ini$name == n] <- fit$theta[n];
+        }
+        ome <- fit$omega;
+        w <- which(!is.na(uif.new$ini$neta1))
+        for (i in w){
+            uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
+        }
+        env$uif.new <- uif.new;
+        class(fit) <- c("nlmixr.ui.focei.fit", class(fit));
         return(fit);
     }
 }
