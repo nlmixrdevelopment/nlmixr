@@ -714,35 +714,6 @@ nlmixrUI.focei.inits <- function(obj){
     return(list(THTA=dft.unfixed$est,
                 OMGA=ome));
 }
-##' Get upper/lower/names for THETAs
-##'
-##' @param obj UI object
-##' @param type type of object extracted
-##' @return lower/upper/name vector
-##' @author Matthew L. Fidler
-nlmixrUI.focei.upper.lower <- function(obj, type=c("upper", "lower", "name", "err")){
-    type <- match.arg(type);
-    df <- as.data.frame(obj$ini);
-    dft <- df[!is.na(df$ntheta), ];
-    dft.unfixed <- dft[!dft$fix, ];
-    ret <- dft.unfixed[[type]]
-    if (is(ret, "factor")){
-        ret <- paste(ret);
-    }
-    return(ret)
-}
-##' Get ETA names
-##'
-##' @param obj UI object
-##' @return ETA names
-##' @author Matthew L. Fidler
-nlmixrUI.eta.names <- function(obj){
-    df <- as.data.frame(obj$ini);
-    df <- df[!is.na(df$neta1), ];
-    ## dft.unfixed <- dft[!dft$fix, ];
-    return(paste(df[df$neta1 == df$neta2, "name"]))
-}
-
 ##' @export
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
     x <- obj;
@@ -765,16 +736,6 @@ nlmixrUI.eta.names <- function(obj){
         return(nlmixrUI.theta.pars(obj))
     } else if (arg == "focei.inits"){
         return(nlmixrUI.focei.inits(obj));
-    } else if (arg == "focei.upper"){
-        return(nlmixrUI.focei.upper.lower(obj, "upper"))
-    } else if (arg == "focei.lower"){
-        return(nlmixrUI.focei.upper.lower(obj, "lower"))
-    } else if (arg == "focei.names"){
-        return(nlmixrUI.focei.upper.lower(obj, "name"))
-    } else if (arg == "focei.err.type"){
-        return(nlmixrUI.focei.upper.lower(obj, "err"))
-    } else if (arg == "eta.names"){
-        return(nlmixrUI.eta.names(obj))
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -801,9 +762,6 @@ str.nlmixrUI <- function(object, ...){
     message(" $ rxode.pred: The RxODE block with pred attached (final pred is nlmixr_pred)")
     message(" $ theta.pars: Parameters in terms of THETA[#] and ETA[#]")
     message(" $ focei.inits: Initilization for FOCEi style blocks")
-    message(" $ focei.upper: Upper bounds for FOCEi")
-    message(" $ focei.lower: Lower bounds for FOCEi")
-    message(" $ focei.err.type: Residual Error type for FOCEi thetas")
     message(" $ focei.names: Theta names for FOCEi")
     message(" $ eta.names: Eta names")
 }

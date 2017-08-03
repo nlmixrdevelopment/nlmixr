@@ -618,6 +618,16 @@ print.nlmixrBounds <- function(x, ...){
             return(nlmixrBoundsOmega(obj, TRUE));
         } else if (arg == "fixed.form"){
             return(nlmixrBoundsTheta(obj, formula=TRUE))
+        } else if (arg == "focei.upper"){
+            return(nlmixrBounds.focei.upper.lower(obj, "upper"))
+        } else if (arg == "focei.lower"){
+            return(nlmixrBounds.focei.upper.lower(obj, "lower"))
+        } else if (any(arg == c("theta.names", "focei.names"))){
+            return(nlmixrBounds.focei.upper.lower(obj, "name"))
+        } else if (arg == "focei.err.type"){
+            return(nlmixrBounds.focei.upper.lower(obj, "err"))
+        } else if (arg == "eta.names"){
+                return(nlmixrBounds.eta.names(obj))
         } else {
             return(NULL)
         }
@@ -625,6 +635,19 @@ print.nlmixrBounds <- function(x, ...){
         return(ret)
     }
 }
+
+##' Get ETA names
+##'
+##' @param obj UI object
+##' @return ETA names
+##' @author Matthew L. Fidler
+nlmixrBounds.eta.names <- function(obj){
+    df <- as.data.frame(obj);
+    df <- df[!is.na(df$neta1), ];
+    ## dft.unfixed <- dft[!dft$fix, ];
+    return(paste(df[df$neta1 == df$neta2, "name"]))
+}
+
 
 ##'@export
 str.nlmixrBounds <- function(object, ...){
@@ -634,6 +657,27 @@ str.nlmixrBounds <- function(object, ...){
     message(" $ omega     : matrix ... (omega matrix)")
     message(" $ random    : matrix class ... (Based on Between Subject Random effects)")
     message(" $ fixed.form: formula  ... (Fixed effect parameters based on theta.)")
+    message(" $ focei.upper: Upper bounds for FOCEi")
+    message(" $ focei.lower: Lower bounds for FOCEi")
+    message(" $ focei.err.type: Residual Error type for FOCEi thetas")
+}
+
+##' Get upper/lower/names for THETAs
+##'
+##' @param obj Bounds object
+##' @param type type of object extracted
+##' @return lower/upper/name vector
+##' @author Matthew L. Fidler
+nlmixrBounds.focei.upper.lower <- function(obj, type=c("upper", "lower", "name", "err")){
+    type <- match.arg(type);
+    df <- as.data.frame(obj);
+    dft <- df[!is.na(df$ntheta), ];
+    dft.unfixed <- dft[!dft$fix, ];
+    ret <- dft.unfixed[[type]]
+    if (is(ret, "factor")){
+        ret <- paste(ret);
+    }
+    return(ret)
 }
 
 nlmixrBoundsTheta <- function(x, full=TRUE, formula=FALSE){
