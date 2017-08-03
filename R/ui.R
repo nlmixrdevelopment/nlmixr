@@ -324,6 +324,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     errs.specified <- c()
     add.prop.errs <- data.frame(y=character(), add=logical(), prop=logical());
     bounds <- ini;
+    theta.names <-  c()
+    eta.names <- c();
+    mu.ref <- list();
+    log.theta <- c();
+    log.eta <- c();
     if (!is.null(ini)){
         unnamed.thetas <- ini$ntheta[(!is.na(ini$ntheta) & is.na(ini$name))];
         if (length(unnamed.thetas) > 0){
@@ -333,6 +338,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         if (length(unnamed.etas) > 0){
             stop(sprintf("The following ETAs are unnamed: %s", paste(sprintf("ETA[%d]", unnamed.etas), collapse=", ")))
         }
+        theta.names <- ini$theta.names;
+        eta.names <- ini$eta.names;
     }
     errn <- 0
     f <- function(x) {
@@ -441,10 +448,119 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 }
             } else if (identical(x[[1]], quote(`~`)) && do.pred != 2){
                 return(quote(nlmixrIgnore()))
-            } else if (identical(x[[1]], quote(`<-`)) && do.pred != 2){
+            } else if (identical(x[[1]], quote(`<-`)) && !any(do.pred == c(2, 4) )){
                 return(quote(nlmixrIgnore()))
-            } else if (identical(x[[1]], quote(`=`)) && do.pred != 2){
+            } else if (identical(x[[1]], quote(`=`)) && !any(do.pred == c(2, 4))){
                 return(quote(nlmixrIgnore()))
+            } else if (identical(x[[1]], quote(`<-`)) && do.pred == 4){
+                ## SAEM requires = instead of <-
+                x[[1]] <- quote(`=`);
+                return(as.call(lapply(x, f)))
+            } else if (identical(x[[1]], quote(`exp`)) && do.pred == 4){
+                ## Need traverse the parsing tree to get log theta/eta
+                ## parameters.
+                find.log <- function(x){
+                    if (is.atomic(x) || is.name(x)) {
+                        if (any(as.character(x) == theta.names)){
+                            log.theta <<- unique(c(log.theta, as.character(x)))
+                        } else if (any(as.character(x) == eta.names)){
+                            log.eta <<- unique(c(log.eta, as.character(x)))
+                        }
+                        return(x)
+                    } else if (is.pairlist(x)) {
+                        return(lapply(x, find.log));
+                    } else if (is.call(x)) {
+                        return(lapply(x, find.log));
+                    } else {
+                        stop("Don't know how to handle type ", typeof(x),
+                             call. = FALSE)
+                    }
+                }
+                find.log(x[[2]])
+                return(as.call(lapply(x, f)))
+            } else if (identical(x[[1]], quote(`+`))){
+                ## print(as.character(x))
+                if (do.pred == 4){
+                    if (any(as.character(x[[2]])  == eta.names) &&
+                        any(as.character(x[[3]]) == theta.names)){
+                        ## Found ETA+THETA
+                        mu.ref[[as.character(x[[2]])]] <<- as.character(x[[3]]);
+                        ## Collapse to THETA
+                        return(x[[3]])
+                    } else if (any(as.character(x[[3]])  == eta.names) &&
+                               any(as.character(x[[2]]) == theta.names)){
+                        ## Found THETA+ETA
+                        mu.ref[[as.character(x[[3]])]] <<- as.character(x[[2]]);
+                        ## Collapse to THETA
+                        ## model$omega=diag(c(1,1,0))
+                        ## 0 is not estimated.
+                        ## inits$omega has the initial estimate
+                        ## mod$res.mod = 1 = additive
+                        ## mod$res = 2 = proportional
+                        ## mod$res = 3 = additive + proportional
+                        ## a+b*f
+                        ## mod$ares = initial estimate of res
+                        ## mod$bres = initial estiamte of
+                        return(x[[2]])
+                    } else if (any(as.character(x[[3]])  == eta.names) &&
+                               length(x[[2]]) > 1){
+                        ## This allows 123 + Cl + 123 + eta.Cl + 123
+                        ## And collapses to 123 + Cl + 123 + 123
+                        ## Useful for covariates...
+                        eta <- as.character(x[[3]]);
+                        find.theta <- function(x){
+                            if  (identical(x[[1]], quote(`+`))){
+                                th <- c();
+                                if (any(as.character(x[[3]])  == theta.names)){
+                                    th <- as.character(x[[3]]);
+                                }
+                                if (length(x[[2]]) > 1){
+                                    return(c(th, find.theta(x[[2]])))
+                                } else {
+                                    if (any(as.character(x[[2]])  == theta.names)){
+                                        th <- c(th, as.character(x[[2]]));
+                                    }
+                                    return(th)
+                                }
+                            }
+                        }
+                        th <- find.theta(x[[2]]);
+                        if (length(th) == 1){
+                            mu.ref[[eta]] <<- th;
+                            return(x[[2]])
+                        }
+                    } else if (any(as.character(x[[3]])  == theta.names) &&
+                               length(x[[2]]) > 1){
+                        ## This allows 123 + eta.Cl + 123 + Cl + 123
+                        ## And collapses to 123  + 123 + Cl + 123
+                        ## Useful for covariates...
+                        theta <- as.character(x[[3]]);
+                        etas <- c();
+                        find.etas <- function(x){
+                            if (is.atomic(x) || is.name(x)) {
+                                return(x)
+                            } else if (is.pairlist(x)) {
+                                return(lapply(x, find.etas));
+                            } else if (is.call(x)) {
+                                if (identical(x[[1]], quote(`+`)) &&
+                                    any(as.character(x[[3]])  == eta.names)){
+                                    etas <<- c(etas,as.character(x[[3]]));
+                                    return(x[[2]]);
+                                }
+                                return(as.call(lapply(x, find.etas)));
+                            } else {
+                                stop("Don't know how to handle type ", typeof(x),
+                                     call. = FALSE)
+                            }
+                        }
+                        new <- find.etas(x[[2]]);
+                        if (length(etas) == 1){
+                            mu.ref[[etas]] <<- theta;
+                            x[[2]] <- new;
+                        }
+                    }
+                }
+                return(as.call(lapply(x, f)))
             } else {
                 return(as.call(lapply(x, f)));
             }
@@ -493,6 +609,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     rest <- new.fn(deparse(f(body(fun))));
     do.pred <- 3;
     grp.fn <- new.fn(deparse(f(body(fun))));
+    do.pred <- 4;
+    saem.pars <- new.fn(deparse(f(body(fun))));
     rest.funs <- allCalls(body(rest));
     rest.vars <- allVars(body(rest));
     if (rxode){
@@ -571,7 +689,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             all.covs=all.covs, lin.solved=lin.solved,
                             errs.specified=errs.specified,
                             add.prop.errs=add.prop.errs,
-                            grp.fn=grp.fn))
+                            grp.fn=grp.fn,
+                            mu.ref=mu.ref,
+                            saem.pars=saem.pars,
+                            log.theta=log.theta,
+                            log.eta=log.eta))
     return(ret)
 }
 ##' Create the nlme specs list for nlmixr nlme solving
@@ -762,6 +884,4 @@ str.nlmixrUI <- function(object, ...){
     message(" $ rxode.pred: The RxODE block with pred attached (final pred is nlmixr_pred)")
     message(" $ theta.pars: Parameters in terms of THETA[#] and ETA[#]")
     message(" $ focei.inits: Initilization for FOCEi style blocks")
-    message(" $ focei.names: Theta names for FOCEi")
-    message(" $ eta.names: Eta names")
 }

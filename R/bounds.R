@@ -660,6 +660,8 @@ str.nlmixrBounds <- function(object, ...){
     message(" $ focei.upper: Upper bounds for FOCEi")
     message(" $ focei.lower: Lower bounds for FOCEi")
     message(" $ focei.err.type: Residual Error type for FOCEi thetas")
+    message(" $ eta.names: Eta names")
+    message(" $ focei.names: Theta names for FOCEi")
 }
 
 ##' Get upper/lower/names for THETAs
