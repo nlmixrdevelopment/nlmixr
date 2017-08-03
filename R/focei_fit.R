@@ -1148,7 +1148,7 @@ focei.fit.data.frame <- function(data,
                             last.pars <- ofv.cache$last$pars
                             cur.pars <- last.info$pars
                             if (all(last.pars == cur.pars) && !is.null(ofv.cache$last1)){
-                                message("## Parameters the same, use last iteration for sigdig calcuclation...");
+                                message("## Parameters the same, use last iteration for sigdig calculation...");
                                 last.pars <- ofv.cache$last1$pars;
                                 ofv.cache$last <- ofv.cache$last1;
                             }
