@@ -106,17 +106,17 @@ nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
 ##' @param ... Parameters passed to estimation method.
 ##' @param focei.translate Translate the model to FOCEi and then run
 ##'     the tables and objective function so that different estimation
-##'     methodologies are comparible through OBJF.
+##'     methodologies are comparable through OBJF.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
+    dat <- data;
     if (est == "nlme"){
         pt <- proc.time()
         fun <- uif$nlme.fun;
         specs <- uif$nlme.specs;
         grp.fn <- uif$grp.fn
-        dat <- data;
         dat$nlmixr.grp <- factor(apply(data, 1, function(x){
             cur <- x;
             names(cur) <- names(dat);
@@ -146,7 +146,7 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
                             ...);
         }
         ## Run FOCEi using same ETAs and THETA estimates to get
-        ## comaparible OBJFs and also extract table entries like
+        ## comparable OBJFs and also extract table entries like
         ## CWRES.
         ## return(fit)
         if (focei.translate){

@@ -220,7 +220,7 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
 ##' @param type The type of fitted object to be extracted.  When the
 ##'     value is "fitted", this gives the individual or population
 ##'     fitted values. The "Vi" option gives the variance estimate for
-##'     the indivdiual.  The "Vfo" gives the Variance under the fo
+##'     the individual.  The "Vfo" gives the Variance under the fo
 ##'     assumption when population=FALSE, and the FOCE assumption when
 ##'     population=TRUE. "dErr_dEta" gives the df/deta*eta. When
 ##'     "posthoc", this extracts the posthoc deviations from the
@@ -306,7 +306,7 @@ fixef.focei.fit <- function(object, ...){
 ##'
 ##' @param object focei.fit object
 ##' @param ... Additional arguments
-##' @param type Type of resduals fitted.
+##' @param type Residuals type fitted.
 ##' @param etas ETAs matrix to use for the calculation.
 ##' @return residuals
 ##' @author Matthew L. Fidler
@@ -514,7 +514,7 @@ plot.focei.fit <- function(x, ...) {
 ##' FOCEI Fit for nlmixr
 ##'
 ##' @param data Data to fit
-##' @param inits Initilization list
+##' @param inits Initialization list
 ##' @param PKpars Pk Parameters
 ##' @param diag.xform The form of the diagonal of the Omega matrix to
 ##'     be estimated.  This can be "sqrt" "log" or "identity".
@@ -859,7 +859,7 @@ focei.fit.data.frame <- function(data,
     upper <- c(upper, upper.om);
     inits.vec = c(inits$THTA, th0.om)
     if (any(inits.vec == 0)){
-        warning("Some of the initial conditions were 0, chainging to 0.0001");
+        warning("Some of the initial conditions were 0, changing to 0.0001");
         inits.vec[inits.vec == 0] <- 0.0001;
     }
     if (!con$NOTRUN){
@@ -1148,7 +1148,7 @@ focei.fit.data.frame <- function(data,
                             last.pars <- ofv.cache$last$pars
                             cur.pars <- last.info$pars
                             if (all(last.pars == cur.pars) && !is.null(ofv.cache$last1)){
-                                message("## Parameters the same, use last iteration for sigdig caluclation...");
+                                message("## Parameters the same, use last iteration for sigdig calcuclation...");
                                 last.pars <- ofv.cache$last1$pars;
                                 ofv.cache$last <- ofv.cache$last1;
                             }
@@ -1513,12 +1513,12 @@ focei.fit.data.frame <- function(data,
                 find.best.eta <- FALSE; ## Keep etas.
             }
             if (con$cov.method=="hessian" && any(names(fit) == "Hessian.inv")) {
-                message("Calulate covariance...")
+                message("Calculate covariance...")
                 sink.start();
                 R2 <- fit$Hessian.inv;
                 fit$Hessian.inv = NULL
             } else if (any(con$cov.method==c("hessian", "grad")) && con$grad){
-                message("Calulate covariance...")
+                message("Calculate covariance...")
                 sink.start();
                 ## Use First Order condition for covariance
                 old.mat <- inits.mat;
@@ -1527,7 +1527,7 @@ focei.fit.data.frame <- function(data,
                 inits.mat <- old.mat;
                 Rinv <- RxODE::rxInv(R1)
             } else {
-                message("Calulate covariance...")
+                message("Calculate covariance...")
                 sink.start();
                 R1 <- optimHess(fit$par, ofv.FOCEi);
                 Rinv <- RxODE::rxInv(R1)
