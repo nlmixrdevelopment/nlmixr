@@ -3,34 +3,36 @@
 ##' nlmixr is an R package for fitting population pharmacokinetic (PK)
 ##' and pharmacokinetic-pharmacodynamic (PKPD) models.
 ##'
+##' @importFrom stats predict logLik na.fail pchisq
 ##' @importFrom brew brew
 ##' @importFrom lattice xyplot
 ##' @importFrom lattice trellis.par.get
-##' @importFrom nlme nlme
+##' @importFrom nlme nlme fixed.effects random.effects
 ##' @importFrom nlme groupedData
 ##' @importFrom nlme getData
 ##' @importFrom nlme pdDiag
 ##' @importFrom RxODE RxODE
 ##' @importFrom graphics abline lines matplot plot points title
 ##' @importFrom stats as.formula nlminb optimHess rnorm terms predict anova optim sd var AIC BIC asOneSidedFormula coef end fitted resid setNames start simulate
-##' @importFrom utils assignInMyNamespace getFromNamespace head stack sessionInfo
+##' @importFrom utils assignInMyNamespace getFromNamespace head stack sessionInfo tail
 ##' @importFrom parallel mclapply
 ##' @importFrom lbfgs lbfgs
 ##' @importFrom methods is
 ##' @importFrom Rcpp evalCpp
-##' @importFrom ggplot2 ggplot aes geom_point facet_wrap geom_line geom_abline
+##' @importFrom ggplot2 ggplot aes geom_point facet_wrap geom_line geom_abline xlab geom_smooth
 ##' @useDynLib nlmixr, .registration=TRUE
 "_PACKAGE"
 
 rex::register_shortcuts("nlmixr");
 ## GGplot use and other issues...
-utils::globalVariables(c("DV", "ID", "IPRED", "IRES", "PRED", "TIME", "grp", "initCondition", "values"));
+utils::globalVariables(c("DV", "ID", "IPRED", "IRES", "PRED", "TIME", "grp", "initCondition", "values", "nlmixr_pred", "iter", "val", "EVID"));
 
 nlmixr.logo <- "         _             _             \n        | | %9s (_) %s\n  _ __  | | _ __ ___   _ __  __ _ __\n | '_ \\ | || '_ ` _ \\ | |\\ \\/ /| '__|\n | | | || || | | | | || | >  < | |\n |_| |_||_||_| |_| |_||_|/_/\\_\\|_|\n"
 
 ##' Messages the nlmixr logo...
 ##'
 ##' @param str String to print
+##' @param version Version information (by default use package version)
 ##' @author Matthew L. Fidler
 nlmixrLogo <- function(str="", version=sessionInfo()$otherPkgs$nlmixr$Version){
     message(sprintf(nlmixr.logo, str, version));
@@ -47,6 +49,7 @@ nlmixrVersion <- function(){
 ##' @param object Fitted object or
 ##' @param data Data for fit.
 ##' @param est Estimation routine.
+##' @param ... Other parameters
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export

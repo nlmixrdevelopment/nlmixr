@@ -13,7 +13,7 @@ focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
   optim = c("bobyqa", "nlminb"), model = NULL, pred = NULL, err = NULL,
   lower = -Inf, upper = Inf, control = list(),
   calculate.vars = c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres",
-  "cpred", "cres"), theta.names = NULL, eta.names = NULL)
+  "cpred", "cres"), theta.names = NULL, eta.names = NULL, ...)
 
 \method{focei.fit}{nlmixr.ui.nlme}(data, inits, ...)
 
@@ -56,6 +56,12 @@ be estimated.  This can be "sqrt" "log" or "identity".}
 
 \item{calculate.vars}{is a list of variables that will be
 calculated after the FOCEI estimation is complete.}
+
+\item{theta.names}{Names of the thetas to be used in the final object}
+
+\item{eta.names}{Eta names to be used in the final object}
+
+\item{...}{Ignored parameters}
 }
 \value{
 A focei fit object

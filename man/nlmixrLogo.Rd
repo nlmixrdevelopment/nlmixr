@@ -8,6 +8,8 @@ nlmixrLogo(str = "", version = sessionInfo()$otherPkgs$nlmixr$Version)
 }
 \arguments{
 \item{str}{String to print}
+
+\item{version}{Version information (by default use package version)}
 }
 \description{
 Messages the nlmixr logo...

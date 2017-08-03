@@ -6,7 +6,7 @@ augPred.nlmixr_nlme <- function(object, ...){
   on.exit({nlmeModList(new.env())})
   tmp <- object;
   class(tmp) <- class(tmp)[-1]
-  nlme::augPred(tmp, ...);
+  augPred(tmp, ...);
 }
 ##' @importFrom stats predict
 ##' @export 
@@ -15,7 +15,7 @@ predict.nlmixr_nlme <- function(object, ...){
   on.exit({nlmeModList(new.env())})
   tmp <- object;
   class(tmp) <- class(tmp)[-1]
-  nlme::predict(tmp, ...);
+  predict(tmp, ...);
 }
 ##' @importFrom nlme ACF
 ##' @export 
@@ -24,5 +24,5 @@ ACF.nlmixr_nlme <- function(object, ...){
   on.exit({nlmeModList(new.env())})
   tmp <- object;
   class(tmp) <- class(tmp)[-1]
-  nlme::ACF(tmp, ...);
+  ACF(tmp, ...);
 }

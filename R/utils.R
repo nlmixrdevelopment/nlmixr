@@ -620,19 +620,35 @@ collectWarnings <- function(expr){
 
 ##' n1qn1 optimization
 ##'
+##' This is an R port of the n1qn1 optimization procedure in scilab.
+##'
 ##' @param call_eval Objective function
 ##' @param call_grad Gradient Function
 ##' @param vars Initial starting point for line search
-##' @param environment Environment where call_eval/call_grad are evaluated.
-##' @param epsilon
+##' @param environment Environment where call_eval/call_grad are
+##'     evaluated.
+##' @param ... Ignored additional parameters.
+##' @param epsilon Precision of estimate
 ##' @param max_iterations Number of iterations
 ##' @param nsim Number of function evaluations
 ##' @param imp Verbosity of messages.
+##' @param invisible boolean to control if the output of the minimizer
+##'     is suppressed.
 ##' @param zm Prior Hessian (in compressed format)
 ##' @param restart Is this an estimation restart?
-##' @param assign Assign hessian to c.hess in environment environment? (Default FALSE)
-##' @return
-##' @author C. Lemarechal, Wenping Wang & Matthew L. Fidler
+##' @param assign Assign hessian to c.hess in environment environment?
+##'     (Default FALSE)
+##' @param print.functions Boolean to control if the function value
+##'     and parameter estimates are echoed every time a function is
+##'     called.
+##' @return The return value is a list with the following elements:
+##'     \itemize{ \item \code{value} The value at the minimized
+##'     function \item \code{par} The parameter value that minimized
+##'     the function.  \item \code{H} The estimated Hessian at the
+##'     final parameter estimate \item \code{c.hess} Compressed
+##'     Hessian for saving curvature.  }
+##' @author C. Lemarechal, Stephen L. Campbell, Jean-Philippe
+##'     Chancelier, Ramine Nikoukhah, Wenping Wang & Matthew L. Fidler
 ##' @export
 n1qn1 <- function(call_eval, call_grad, vars, environment=parent.frame(1), ...,
                   epsilon=.Machine$double.eps, max_iterations=100, nsim=100,

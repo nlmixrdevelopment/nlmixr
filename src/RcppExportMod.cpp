@@ -227,8 +227,7 @@ n1qn1_wrap(
       k++;
     }
   }
-  return Rcpp::List::create(Rcpp::Named("convergence") = 0,
-                            Rcpp::Named("value") = f,
+  return Rcpp::List::create(Rcpp::Named("value") = f,
                             Rcpp::Named("par") = par,
 			    // Rcpp::Named("L") = L,
 			    // Rcpp::Named("D") = D,

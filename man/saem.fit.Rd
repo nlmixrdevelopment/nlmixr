@@ -20,6 +20,8 @@ saem.fit(model, data, inits, PKpars = NULL, pred = NULL, covars = NULL,
 
 \item{pred}{pred function}
 
+\item{covars}{Covariates in data}
+
 \item{mcmc}{a list of various mcmc options}
 
 \item{ODEopt}{optional ODE solving options}

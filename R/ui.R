@@ -556,6 +556,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             lin.solved <- nlmixrUILinCmt(all.lhs)
         }
     } else {
+        add <- linCmt <- function(...) NULL
         pred <- function(){return(linCmt())}
         err <- function(){return(add(0.1))}
         grp.fn <- function(){return("Y01")};

@@ -1069,6 +1069,7 @@ print.saemFit = function(x, ...)
 #' @param inits initial values
 #' @param PKpars PKpars function
 #' @param pred  pred function
+#' @param covars Covariates in data
 #' @param mcmc a list of various mcmc options
 #' @param ODEopt optional ODE solving options
 #' @param seed seed for random number generator

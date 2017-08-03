@@ -398,12 +398,10 @@ as.data.frame.focei.fit <- function(x, row.names = NULL, optional = FALSE, ...){
 
 ##' Simulate response based on FOCEi model's datathe fitted object's dataset
 ##'
-##'
-##'
-##' @param object
-##' @param nsim
-##' @param seed
-##' @param ...
+##' @param object Focei object
+##' @param nsim Number of simulated parameters
+##' @param seed Seed to start with (if specified)
+##' @param ... Other parameters
 ##' @return New dataset based on original dataset
 ##' @export
 ##' @author Matthew L. Fidler
@@ -529,6 +527,9 @@ plot.focei.fit <- function(x, ...) {
 ##' @param control Control list
 ##' @param calculate.vars is a list of variables that will be
 ##'     calculated after the FOCEI estimation is complete.
+##' @param theta.names Names of the thetas to be used in the final object
+##' @param eta.names Eta names to be used in the final object
+##' @param ... Ignored parameters
 ##' @return A focei fit object
 ##' @author Matthew L. Fidler and Wenping Wang
 ##' @export
@@ -552,7 +553,8 @@ focei.fit <- function(data,
                       control=list(),
                       calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
                       theta.names=NULL,
-                      eta.names=NULL){
+                      eta.names=NULL,
+                      ...){
     UseMethod("focei.fit");
 }
 ##' @export
@@ -1715,14 +1717,16 @@ as.focei <- function(object, uif, pt=proc.time(), ...){
 ##' @param object Fit object
 ##' @param uif User interface function or object
 ##' @param ... Other parameters
-##' @return Parameter estimates for Theta or a list for the OMGA list
-##'     in FOCEi
+##' @return List for the OMGA list in FOCEi
 ##' @author Matthew L. Fidler
 focei.eta <- function(object, uif, ...){
     UseMethod("focei.eta");
 }
 
-##' @rdname focei.eta
+##' Get the FOCEi theta specification for the model
+##'
+##' @inheritParams focei.eta
+##' @return Parameter estimates for Theta
 focei.theta <- function(object, uif, ...){
     UseMethod("focei.theta");
 }

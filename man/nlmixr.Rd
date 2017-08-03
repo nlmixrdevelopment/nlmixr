@@ -24,6 +24,8 @@ nlmixr(object, data, est = "nlme", ...)
 \item{data}{Data for fit.}
 
 \item{est}{Estimation routine.}
+
+\item{...}{Other parameters}
 }
 \value{
 Either a nlmixr model or a nlmixr fit object

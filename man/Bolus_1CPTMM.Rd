@@ -8,7 +8,7 @@
 
 \describe{
   \item{ID}{Siumlated Subject ID}
-  \item{Time}{Simulated Time}
+  \item{TIME}{Simulated Time}
   \item{DV}{Simulated Dependent Variable}
   \item{LNDV}{Simulated log(Dependent Variable)}
   \item{MDV}{Missing DV data item}

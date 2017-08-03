@@ -16,7 +16,12 @@ n1qn1(call_eval, call_grad, vars, environment = parent.frame(1), ...,
 
 \item{vars}{Initial starting point for line search}
 
-\item{environment}{Environment where call_eval/call_grad are evaluated.}
+\item{environment}{Environment where call_eval/call_grad are
+evaluated.}
+
+\item{...}{Ignored additional parameters.}
+
+\item{epsilon}{Precision of estimate}
 
 \item{max_iterations}{Number of iterations}
 
@@ -24,15 +29,32 @@ n1qn1(call_eval, call_grad, vars, environment = parent.frame(1), ...,
 
 \item{imp}{Verbosity of messages.}
 
+\item{invisible}{boolean to control if the output of the minimizer
+is suppressed.}
+
 \item{zm}{Prior Hessian (in compressed format)}
 
 \item{restart}{Is this an estimation restart?}
 
-\item{assign}{Assign hessian to c.hess in environment environment? (Default FALSE)}
+\item{assign}{Assign hessian to c.hess in environment environment?
+(Default FALSE)}
+
+\item{print.functions}{Boolean to control if the function value
+and parameter estimates are echoed every time a function is
+called.}
+}
+\value{
+The return value is a list with the following elements:
+    \itemize{ \item \code{value} The value at the minimized
+    function \item \code{par} The parameter value that minimized
+    the function.  \item \code{H} The estimated Hessian at the
+    final parameter estimate \item \code{c.hess} Compressed
+    Hessian for saving curvature.  }
 }
 \description{
-n1qn1 optimization
+This is an R port of the n1qn1 optimization procedure in scilab.
 }
 \author{
-C. Lemarechal, Wenping Wang & Matthew L. Fidler
+C. Lemarechal, Stephen L. Campbell, Jean-Philippe
+    Chancelier, Ramine Nikoukhah, Wenping Wang & Matthew L. Fidler
 }

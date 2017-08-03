@@ -6,6 +6,15 @@
 \usage{
 \method{simulate}{focei.fit}(object, nsim = 1, seed = NULL, ...)
 }
+\arguments{
+\item{object}{Focei object}
+
+\item{nsim}{Number of simulated parameters}
+
+\item{seed}{Seed to start with (if specified)}
+
+\item{...}{Other parameters}
+}
 \value{
 New dataset based on original dataset
 }

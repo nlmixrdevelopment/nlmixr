@@ -2,13 +2,10 @@
 % Please edit documentation in R/focei_fit.R, R/nlme_fit.R
 \name{focei.eta}
 \alias{focei.eta}
-\alias{focei.theta}
 \alias{focei.eta.nlmixr_nlme}
 \title{Get the FOCEi theta or eta specification for model.}
 \usage{
 focei.eta(object, uif, ...)
-
-focei.theta(object, uif, ...)
 
 \method{focei.eta}{nlmixr_nlme}(object, ...)
 }
@@ -20,8 +17,7 @@ focei.theta(object, uif, ...)
 \item{...}{Other parameters}
 }
 \value{
-Parameter estimates for Theta or a list for the OMGA list
-    in FOCEi
+List for the OMGA list in FOCEi
 }
 \description{
 Get the FOCEi theta or eta specification for model.

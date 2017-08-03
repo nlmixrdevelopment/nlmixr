@@ -20,7 +20,7 @@ for (f in c("augPred", "predict", "ACF")){
   on.exit({nlmeModList(new.env())})
   tmp <- object;
   class(tmp) <- class(tmp)[-1]
-  nlme::%s(tmp, ...);
+  %s(tmp, ...);
 }\n", ifelse(f == "predict", "stats", "nlme"), f, f, f))
 }
 sink()
