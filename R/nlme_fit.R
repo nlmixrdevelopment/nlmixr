@@ -710,7 +710,6 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
 }
 
 ## comparePred should work because predict should work...
-##' @import nlme nlme
 
 ##' This is an alias for nlme
 ##'

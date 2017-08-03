@@ -2,10 +2,28 @@
 % Please edit documentation in R/saem_fit.R
 \name{saem.fit}
 \alias{saem.fit}
+\alias{saem.fit.RxODE}
+\alias{saem.fit.character}
+\alias{saem.fit.default}
 \title{Fit an SAEM model}
 \usage{
 saem.fit(model, data, inits, PKpars = NULL, pred = NULL, covars = NULL,
   mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+  ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+  seed = 99)
+
+\method{saem.fit}{RxODE}(model, data, inits, PKpars = NULL, pred = NULL,
+  covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+  ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+  seed = 99)
+
+\method{saem.fit}{character}(model, data, inits, PKpars = NULL, pred = NULL,
+  covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+  ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+  seed = 99)
+
+\method{saem.fit}{default}(model, data, inits, PKpars = NULL, pred = NULL,
+  covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
   seed = 99)
 }
