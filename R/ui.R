@@ -893,10 +893,7 @@ nlmixrUI.saem.model.omega <- function(obj){
     dm <- sum(!is.na(obj$saem.theta.trans));
     et <- obj$saem.eta.trans;
     mat <- matrix(rep(0, dm * dm), dm);
-    for (i in et){
-        mat[i, i] <- 1;
-    }
-    etd <- which(obj$neta1 != obj$neta2 && !is.na(obj$neta1));
+    etd <- which(!is.na(obj$neta1));
     for (i in etd){
         mat[et[obj$neta1[i]], et[obj$neta2[i]]] <- mat[et[obj$neta2[i]], et[obj$neta1[i]]] <- 1;
     }
