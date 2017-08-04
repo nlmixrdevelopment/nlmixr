@@ -1512,6 +1512,18 @@ focei.fit.data.frame <- function(data,
             if (con$fix.eta.for.grad){
                 find.best.eta <- FALSE; ## Keep etas.
             }
+            ## Cov
+            ## - invert second derivative of the llik
+            ## - Lewis method
+            ## - Lineaize model
+            ## Easy to complete
+            ## Can I approximate the model
+            ## Stochastic estimation
+            ## Bootstrap
+            ## LLik are asymptotic.  Not likely asymptotic.
+            ## Psim assumes the fixed effects and random effects
+            ## - Assumed the random effects is zero.
+            ## - Not sure what is accepted as an input
             if (con$cov.method=="hessian" && any(names(fit) == "Hessian.inv")) {
                 message("Calculate covariance...")
                 sink.start();

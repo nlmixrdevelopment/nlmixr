@@ -112,7 +112,13 @@ nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
 ##' @export
 nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
     dat <- data;
-    if (est == "nlme"){
+    if (est == "saem"){
+        pt <- proc.time()
+        saem.fit <- uif$saem.fit
+        cfg   = configsaem(model=uif$saem.model, data=dat, inits=uif$saem.init, ...);
+        fit <- saem.fit(cfg);
+        return(fit)
+    } else if (est == "nlme"){
         pt <- proc.time()
         fun <- uif$nlme.fun;
         specs <- uif$nlme.specs;
@@ -154,7 +160,6 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
         } else  {
             return(fit);
         }
-
     } else if (est == "focei"){
         fit <- focei.fit(dat,
                          inits=uif$focei.inits,

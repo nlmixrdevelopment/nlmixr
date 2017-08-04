@@ -1,3 +1,10 @@
+## TODO:
+## Lincmt infusion checks...
+## High Covariance in Omgea for nlme
+## Multiple endpoints check.
+## Initial conditions between methods
+## Dots in variable names (especially THETAs for SAEM)
+
 ##' Prepares the UI function and returns a list.
 ##'
 ##' @param fun UI function
@@ -240,7 +247,7 @@ nlmixrUILinCmt <- function(lhs){
             w <- which(lhs.up == val);
             cur.lhs <- lhs[w];
             if (cur != cur.lhs){
-                extra.lines[length(extra.lines) + 1] <- sprintf("%s <- %s;", cur, cur.lhs);
+                extra.lines[length(extra.lines) + 1] <- sprintf("%s = %s;", cur, cur.lhs);
             }
         } else if (length(val) > 2){
             stop(sprintf("Need clearer paramterization for %s; Currently defined these similiar parameters: %s",
@@ -285,10 +292,12 @@ nlmixrUILinCmt <- function(lhs){
     oral <- FALSE;
     val <- intersect(oral.pars, lhs.up);
     if (length(val) == 1){
-        w <- which(oral.pars == lhs.up);
-        cur.lhs <- lhs[w]
-        if (cur.lhs != "KA"){
-            extra.lines[length(extra.lines) +1] <- sprintf("KA <- %s;", cur.lhs)
+        w <- which(val == lhs.up);
+        if (length(w) > 0){
+            cur.lhs <- lhs[w]
+            if (cur.lhs != "KA"){
+                extra.lines[length(extra.lines) +1] <- sprintf("KA <- %s;", cur.lhs)
+            }
         }
         oral <- TRUE
     } else if (length(val) == 2){
@@ -297,7 +306,7 @@ nlmixrUILinCmt <- function(lhs){
     tlag <- FALSE
     val <- intersect(tlag.pars, lhs.up);
     if (length(val) == 1){
-        w <- which(tlag.pars == lhs.up);
+        w <- which(val == lhs.up);
         cur.lhs <- lhs[w]
         if (cur.lhs != "TLAG"){
             extra.lines[length(extra.lines) +1] <- sprintf("TLAG <- %s;", cur.lhs)
@@ -325,6 +334,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     add.prop.errs <- data.frame(y=character(), add=logical(), prop=logical());
     bounds <- ini;
     theta.names <-  c()
+    theta.ord <- c();
     eta.names <- c();
     mu.ref <- list();
     log.theta <- c();
@@ -344,6 +354,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     errn <- 0
     f <- function(x) {
         if (is.name(x)) {
+            if (any(as.character(x) == theta.names)){
+                theta.ord <<- unique(c(theta.ord, as.character(x)))
+            }
             return(x)
         } else if (is.call(x)) {
             if (identical(x[[1]], quote(`~`)) &&
@@ -496,8 +509,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         ## 0 is not estimated.
                         ## inits$omega has the initial estimate
                         ## mod$res.mod = 1 = additive
-                        ## mod$res = 2 = proportional
-                        ## mod$res = 3 = additive + proportional
+                        ## mod$res.mod = 2 = proportional
+                        ## mod$res.mod = 3 = additive + proportional
                         ## a+b*f
                         ## mod$ares = initial estimate of res
                         ## mod$bres = initial estiamte of
@@ -610,7 +623,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     do.pred <- 3;
     grp.fn <- new.fn(deparse(f(body(fun))));
     do.pred <- 4;
-    saem.pars <- new.fn(deparse(f(body(fun))));
+    saem.pars <- deparse(f(body(fun)));
     rest.funs <- allCalls(body(rest));
     rest.vars <- allVars(body(rest));
     if (rxode){
@@ -672,6 +685,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (length(tmp) > 0){
         if (all(regexpr(rex::rex("nlmixr_pred <- linCmt()"), tmp) != -1)){
             lin.solved <- nlmixrUILinCmt(all.lhs)
+            old <- saem.pars[length(saem.pars)];
+            saem.pars[length(saem.pars)] <- lin.solved$extra.lines;
+            saem.pars[length(saem.pars) + 1] <- old
         }
     } else {
         add <- linCmt <- function(...) NULL
@@ -682,7 +698,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         add.prop.errs <- data.frame(y="Y1", add=TRUE, prop=FALSE);
         lin.solved <- nlmixrUILinCmt(all.lhs)
     }
+    saem.pars <- new.fn(saem.pars)
 
+    saem.theta.trans <- rep(NA, length(theta.names));
+    for (i in seq_along(theta.names)){
+        w <- which(theta.names[i] == theta.ord);
+        if (length(w) == 1)
+            saem.theta.trans[i] <- w;
+    }
     ret <- list(ini=bounds, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
                             all.vars=all.vars, rest.vars=rest.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
@@ -693,7 +716,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             mu.ref=mu.ref,
                             saem.pars=saem.pars,
                             log.theta=log.theta,
-                            log.eta=log.eta))
+                            log.eta=log.eta,
+                            theta.ord=theta.ord,
+                            saem.theta.trans=saem.theta.trans,
+                            env=new.env()))
     return(ret)
 }
 ##' Create the nlme specs list for nlmixr nlme solving
@@ -836,6 +862,210 @@ nlmixrUI.focei.inits <- function(obj){
     return(list(THTA=dft.unfixed$est,
                 OMGA=ome));
 }
+##' Get the eta->eta.trans for SAEM
+##'
+##' @param obj ui object
+##' @return list of eta to eta.trans
+##' @author Matthew L. Fidler
+nlmixrUI.saem.eta.trans <- function(obj){
+    eta.names <- obj$eta.names;
+    theta.names <- obj$theta.names;
+    theta.trans <- obj$saem.theta.trans;
+    mu.ref <- obj$mu.ref
+    trans <- rep(NA, length(eta.names))
+    for (i in seq_along(eta.names)){
+        ref <- mu.ref[[eta.names[i]]]
+        if (!is.null(ref)){
+            w <- which(ref == theta.names)
+            if (length(w) == 1){
+                trans[i] <- theta.trans[w];
+            }
+        }
+    }
+    return(trans)
+}
+##' Get the SAEM model Omega
+##'
+##' @param obj UI model
+##' @return SAEM model$omega spec
+##' @author Matthew L. Fidler
+nlmixrUI.saem.model.omega <- function(obj){
+    dm <- sum(!is.na(obj$saem.theta.trans));
+    et <- obj$saem.eta.trans;
+    mat <- matrix(rep(0, dm * dm), dm);
+    for (i in et){
+        mat[i, i] <- 1;
+    }
+    etd <- which(obj$neta1 != obj$neta2 && !is.na(obj$neta1));
+    for (i in etd){
+        mat[et[obj$neta1[i]], et[obj$neta2[i]]] <- mat[et[obj$neta2[i]], et[obj$neta1[i]]] <- 1;
+    }
+    return(mat)
+}
+##' Get the SAEM model$res.mod code
+##'
+##' @param obj UI model
+##' @return SAEM model$res.mod spec
+##' @author Matthew L. Fidler
+nlmixrUI.saem.res.mod <- function(obj){
+    obj <- obj$add.prop.errs
+    if (length(obj$add) == 1){
+        if (obj$add && !obj$prop){
+            return(1)
+        } else if (obj$add && obj$prop){
+            return(3)
+        } else {
+            return(2)
+        }
+    } else if (length(obj$add) == 0) {
+        ## Use default...
+        return(1)
+    } else {
+        stop("Currently SAEM only supports one type of residual error model.")
+    }
+}
+##' Get initial estimate for ares SAEM.
+##'
+##' @param obj UI model
+##' @return SAEM model$ares spec
+##' @author Matthew L. Fidler
+nlmixrUI.saem.ares <- function(obj){
+    w <- which(obj$err == "add");
+    if (length(w) == 1){
+        return(obj$est[w]);
+    } else {
+        return(10); ## SAME as SAEM
+    }
+}
+
+##' Get initial estimate for bres SAEM.
+##'
+##' @param obj UI model
+##' @return SAEM model$ares spec
+##' @author Matthew L. Fidler
+nlmixrUI.saem.bres <- function(obj){
+    w <- which(obj$err == "prop");
+    if (length(w) == 1){
+        return(obj$est[w]);
+    } else {
+        return(1); ## SAME as SAEM
+    }
+}
+##' Get model$log.eta for SAEM
+##'
+##' @param obj UI model
+##' @return SAEM model$log.eta
+##' @author Matthew L. Fidler
+nlmixrUI.saem.log.eta <- function(obj){
+    lt <- obj$log.theta;
+    dm <- sum(!is.na(obj$saem.theta.trans));
+    ret <- rep(FALSE, dm);
+    theta.trans <- obj$saem.theta.trans;
+    theta.names <- obj$theta.names;
+    for (n in lt){
+        w <- which(n == theta.names);
+        if (length(w) == 1){
+            ret[theta.trans[w]] <- TRUE
+        }
+    }
+    return(ret)
+}
+##' Generate saem.fit user function.
+##'
+##' @param obj UI object
+##' @param infusion is this an infusion solved system (default FALSE)
+##' @return saem user function
+##' @author Matthew L. Fidler
+nlmixrUI.saem.fit <- function(obj, infusion=FALSE){
+    if (any(ls(envir=obj$env) == "saem.fit")){
+        return(obj$env$saem.fit)
+    } else if (!is.null(obj$lin.solved)) {
+        message("Compiling SAEM user function...", appendLF=FALSE)
+        saem.fit <- gen_saem_user_fn(model=lincmt(ncmt=obj$lin.solved$ncmt,
+                                                  oral=obj$lin.solved$oral,
+                                                  tlag=obj$lin.solved$tlag,
+                                                  infusion = infusion,
+                                                  parameterization = obj$lin.solved$parameterization))
+        message("done.")
+        obj$env$saem.fit <- saem.fit;
+        return(saem.fit);
+    } else {
+        ## RxODE function
+        message("Compiling RxODE differential equations...", appendLF=FALSE)
+        rx <- RxODE(obj$rxode.pred);
+        message("done.")
+        message("Compiling SAEM user function...", appendLF=FALSE)
+        saem.fit <- gen_saem_user_fn(model=rx, obj$saem.pars, pred=function() nlmixr_pred)
+        message("done.")
+        obj$env$saem.fit <- saem.fit;
+        return(saem.fit);
+    }
+}
+##' Generate SAEM model list
+##'
+##' @param obj  nlmixr UI object
+##' @return SAEM model list
+##' @author Matthew L. Fidler
+nlmixrUI.saem.model <- function(obj){
+    mod <- list(saem_mod=obj$saem.fit);
+    if (length(obj$all.covs > 0)){
+        mod$covars <- obj$all.covs;
+    }
+    mod$res.mod <- obj$saem.res.mod;
+    mod$log.eta <- obj$saem.log.eta;
+    if (FALSE){ ## FIXME option/warning
+        mod$ares <- obj$saem.ares;
+        mod$bres <- obj$saem.bres;
+    }
+    mod$omega <- obj$saem.model.omega;
+    return(mod)
+}
+##' Generate SAEM initial estimates for THETA.
+##'
+##' @param obj nlmixr UI object
+##' @return SAEM theta initial estimates
+##' @author Matthew L. Fidler
+nlmixrUI.saem.init.theta <- function(obj){
+    theta.trans <- obj$saem.theta.trans;
+    theta.trans <- theta.trans[!is.na(theta.trans)];
+    theta <- rep(NA, length(theta.trans));
+    for (i in seq_along(theta.trans)){
+        w <- which(theta.trans[i] == obj$ntheta)
+        if (length(w) == 1){
+            theta[i] <- obj$est[w]
+        }
+    }
+    return(theta)
+}
+##' SAEM's init$omega
+##'
+##' @param obj nlmixr UI object
+##' @return Return initial matrix
+##' @author Matthew L. Fidler
+nlmixrUI.saem.init.omega <- function(obj){
+    dm <- sum(!is.na(obj$saem.theta.trans));
+    et <- obj$saem.eta.trans;
+    mat <- matrix(rep(0, dm * dm), dm);
+    etd <- which(!is.na(obj$neta1));
+    for (i in etd){
+        mat[et[obj$neta1[i]], et[obj$neta2[i]]] <- mat[et[obj$neta2[i]], et[obj$neta1[i]]] <- obj$est[i];
+    }
+    return(mat)
+}
+##' Get saem initilization list
+##'
+##' @param obj nlmixr UI object
+##' @return Return SAEM inits list.
+##' @author Matthew L. Fidler
+nlmixrUI.saem.init <- function(obj){
+    ret <- list();
+    ret$theta <- obj$saem.init.theta;
+    if (FALSE){
+        ret$omega <-obj$saem.init.omega;
+    }
+    return(ret);
+}
+
 ##' @export
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
     x <- obj;
@@ -858,6 +1088,28 @@ nlmixrUI.focei.inits <- function(obj){
         return(nlmixrUI.theta.pars(obj))
     } else if (arg == "focei.inits"){
         return(nlmixrUI.focei.inits(obj));
+    } else if (arg == "saem.eta.trans"){
+        return(nlmixrUI.saem.eta.trans(obj))
+    } else if (arg == "saem.model.omega"){
+        return(nlmixrUI.saem.model.omega(obj))
+    } else if (arg == "saem.res.mod"){
+        return(nlmixrUI.saem.res.mod(obj));
+    } else if (arg == "saem.ares"){
+        return(nlmixrUI.saem.ares(obj));
+    } else if (arg == "saem.bres"){
+        return(nlmixrUI.saem.bres(obj));
+    } else if (arg == "saem.log.eta"){
+        return(nlmixrUI.saem.log.eta(obj))
+    } else if (arg == "saem.fit"){
+        return(nlmixrUI.saem.fit(obj))
+    } else if (arg == "saem.model"){
+        return(nlmixrUI.saem.model(obj))
+    } else if (arg == "saem.init.theta"){
+        return(nlmixrUI.saem.init.theta(obj))
+    } else if (arg == "saem.init.omega"){
+        return(nlmixrUI.saem.init.omega(obj))
+    } else if (arg == "saem.init"){
+        return(nlmixrUI.saem.init(obj))
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -884,4 +1136,15 @@ str.nlmixrUI <- function(object, ...){
     message(" $ rxode.pred: The RxODE block with pred attached (final pred is nlmixr_pred)")
     message(" $ theta.pars: Parameters in terms of THETA[#] and ETA[#]")
     message(" $ focei.inits: Initilization for FOCEi style blocks")
+    message(" $ saem.eta.trans: UI ETA -> SAEM ETA")
+    message(" $ saem.model.omega: model$omega for SAEM")
+    message(" $ saem.res.mod: model$res.mod for SAEM")
+    message(" $ saem.ares: model$ares for SAEM")
+    message(" $ saem.bres: model$bres for SAEM")
+    message(" $ saem.log.eta: model$log.eta for SAEM")
+    message(" $ saem.fit  : The SAEM fit user function")
+    message(" $ saem.model: The SAEM model list")
+    message(" $ saem.init.theta: The SAEM init$theta")
+    message(" $ saem.init.omega: The SAEM init$omega")
+    message(" $ saem.init : The SAEM inits list")
 }
