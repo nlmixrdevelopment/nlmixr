@@ -161,6 +161,7 @@ BEGIN_RCPP
     Named("Plambda") = saem.get_Plambda(),
     Named("Ha") = saem.get_Ha(),
     Named("sig2") = saem.get_sig2(),
+    Named("eta") = saem.get_eta(),
     Named("par_hist") = saem.get_par_hist()
   );
   out.attr("saem.cfg") = x;
@@ -298,6 +299,7 @@ BEGIN_RCPP
     Named("Plambda") = saem.get_Plambda(),
     Named("Ha") = saem.get_Ha(),
     Named("sig2") = saem.get_sig2(),
+    Named("eta") = saem.get_eta(),
     Named("par_hist") = saem.get_par_hist()
   );
   out.attr("saem.cfg") = x;
