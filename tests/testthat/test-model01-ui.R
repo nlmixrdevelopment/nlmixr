@@ -49,9 +49,8 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
         expect_equal(signif(fit$omega, 3), structure(c(0.0916908, 0, 0, 0.0713987), .Dim = c(2L, 2L), .Dimnames = list(NULL, NULL)));
 
         ## ID1 and ID2 reversed, but the same value (compared with nlme test)
-        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.267)
-        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.303)
-        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[3], 3)), 0.199)
+        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.297)
+        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.32)
 
         expect_equal(signif(random.effects(fit),3), structure(list(ID = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,   13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,   29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,   45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,   61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76,   77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92,   93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106,   107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119,   120), eta.V = c(-0.152, -0.129, 0.0267, 0.144, -0.191, -0.152,   -0.07, 0.232, -0.202, 0.127, -0.115, -0.268, 0.0888, 0.0699,   0.332, -0.435, 0.191, -0.0438, 0.0584, 0.223, 0.654, 0.0942,   -0.233, -0.494, 0.212, 0.0121, 0.176, -0.17, -0.202, 0.0865,   -0.138, 0.0174, -0.383, 0.325, 0.57, -0.324, -0.197, -0.186,   0.0203, 0.525, 0.0951, 0.163, -0.062, 0.531, -0.551, 0.596, 0.0149,   0.295, -0.141, -0.0708, 0.0247, 0.554, -0.291, -0.429, -0.278,   0.0335, -0.00104, 0.0138, -0.339, -0.489, 0.0948, -0.281, -0.386,   0.185, 0.322, -0.116, -0.327, -0.43, -0.709, 0.291, 0.154, -0.187,   -0.0389, -0.075, -0.156, -0.115, -0.122, -0.0461, -0.178, -0.00479,   -0.286, 0.324, 0.63, 0.668, 0.233, -0.231, 0.0875, -0.102, 0.111,   0.225, -0.766, 0.119, -0.723, 0.0838, 0.36, 0.163, -0.144, -0.333,   0.282, -0.144, 0.163, 0.201, -0.25, 0.312, 0.31, -0.0946, 0.063,   0.343, -0.135, 0.301, -0.186, -0.453, 0.618, 0.514, 0.262, -0.0604,   -0.0923, 0.0565, -0.323, 0.251), eta.Cl = c(-0.0128, -0.289,   -0.0509, -0.195, -0.126, 0.167, -0.042, -0.388, 0.444, 0.566,   0.0337, 0.432, 0.109, 0.427, -0.086, 0.192, -0.0621, 0.133, 0.0101,   -0.236, 0.314, -0.109, -0.457, -0.175, 0.186, -0.112, -0.152,   -0.211, 0.0268, 0.0498, 0.198, -0.107, -0.359, -0.274, -0.374,   -0.121, 0.293, 0.443, 0.201, -0.092, -0.114, 0.241, -0.242, -0.219,   -0.0663, 0.349, -0.303, 0.3, -0.176, 0.398, -0.0752, -0.2, -0.252,   0.169, -0.0473, -0.583, -0.00897, -0.0823, -0.0813, -0.0735,   0.703, 0.114, -0.384, 0.0322, -0.212, 0.0561, -0.499, -0.285,   -0.312, 0.219, -0.378, 0.112, -0.582, -0.108, 0.0226, -0.143,   -0.173, -0.106, 0.539, 0.194, -0.648, -0.0106, 0.174, 0.369,   0.0241, -0.175, -0.0993, 0.0741, 0.25, -0.414, -0.0412, 0.085,   -0.00592, -0.189, -0.509, 0.0103, 0.37, 0.128, 0.29, -0.0205,   0.17, 0.0544, -0.0028, -0.0854, 0.142, 0.188, 0.195, 0.234, 0.486,   0.338, 0.0466, 0.291, -0.24, -0.0559, 0.186, 0.32, -0.0837, 0.373,   0.157, -0.313)), .Names = c("ID", "eta.V", "eta.Cl"), row.names = c(NA,   -120L), class = "data.frame"))
 
@@ -80,26 +79,26 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
             })
             model({
                 v <- exp(lV+ eta.V)
-                cl <- exp(lCl)
+                cl <- exp(lCl + eta.cl)
                 d / dt(centr) = -(cl / v) * centr;
                 cp = centr / v;
                 cp ~ prop(prop.err)
             })
         }
 
-        fitODE <- nlmixr(uif, dat, est="nlme")
+        fitODE <- uif %>% nlme(dat, control = nlmeControl(pnlsTol = .01, msVerbose = TRUE));
 
-        z <- summary(fitODE)
+        z <- summary(as.nlme(fitODE))
 
-        expect_equal(signif(as.numeric(fitODE$logLik), 6),-12119.4)
-        expect_equal(signif(AIC(fitODE), 6), 24248.7)
-        expect_equal(signif(BIC(fitODE), 6), 24277.4)
+        expect_equal(signif(as.numeric(as.nlme(fitODE)$logLik), 6),-12119.4)
+        expect_equal(signif(AIC(as.nlme(fitODE)), 6), 24248.8)
+        expect_equal(signif(BIC(as.nlme(fitODE)), 6), 24277.4)
 
-        expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]), 3), 1.36)
-        expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]), 3), 4.20)
+        expect_equal(signif(as.numeric(as.nlme(fitODE)$coefficients$fixed[1]), 3), 1.36)
+        expect_equal(signif(as.numeric(as.nlme(fitODE)$coefficients$fixed[2]), 3), 4.20)
 
-        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.267)
-        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.303)
+        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.303)
+        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.267)
         expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[3], 3)), 0.199)
     })
 
