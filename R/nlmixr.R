@@ -156,7 +156,7 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
         ## CWRES.
         ## return(fit)
         if (focei.translate){
-            return(as.focei(fit, uif, pt))
+            return(as.focei(fit, uif, pt, data=dat))
         } else  {
             return(fit);
         }
