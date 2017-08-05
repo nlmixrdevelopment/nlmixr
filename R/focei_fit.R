@@ -603,7 +603,12 @@ focei.fit.function <- focei.fit.nlmixrUI
 
 ##' @export
 ##' @rdname focei.fit
-focei.fit.data.frame <- function(data,
+focei.fit.data.frame <- function(...){
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    return(collectWarnings(do.call(focei.fit.data.frame0, call, envir=parent.frame(1))))
+}
+
+focei.fit.data.frame0 <- function(data,
                                  inits,
                                  PKpars,
                                  diag.xform=c("sqrt", "log", "identity"),
@@ -1267,7 +1272,7 @@ focei.fit.data.frame <- function(data,
     np <- length(inits.vec)
     meth <- c();
 
-    opt0 <- function(){
+    opt <- function(){
         fit <- NULL;
         if (optim.method=="lbfgsb3"){
             prm <- rep(1, length(inits.vec));
@@ -1385,9 +1390,6 @@ focei.fit.data.frame <- function(data,
             }
         }
         return(fit);
-    }
-    opt <- function(){
-        return(collectWarnings(opt0()));
     }
     if (is.null(con$inits.mat)){
         inits.mat <- matrix(0, nSUB, nETA)
@@ -1652,6 +1654,8 @@ focei.fit.data.frame <- function(data,
     find.best.eta <- FALSE;
     message("Calculating Table Variables...")
     pt <- proc.time();
+    setup.table <- function(){
+    }
     if (any("ipred" == calculate.vars)){
         data$IPRED <- fitted(data, population=FALSE);
         calculate.vars <- calculate.vars[calculate.vars != "ipred"];
