@@ -7,6 +7,8 @@
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixrValidate <- function(full=FALSE){
+    Sys.setenv("nlmixr_silent"="TRUE")
+    on.exit({Sys.setenv("nlmixr_silent"="")})
     if (full){
         Sys.setenv(NLMIXR_VALIDATION_FULL="true")
     }

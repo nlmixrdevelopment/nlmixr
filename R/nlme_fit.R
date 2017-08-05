@@ -212,7 +212,7 @@ nlme_lin_cmpt <- function(dat, par_model,
     mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
                       data = nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
                       start=par_model$start, ...);
-    if (regexpr(rex::rex("testthat", end), getwd()) != -1){
+    if (Sys.getenv("nlmixr_silent") == "TRUE"){
         ret <- NULL;
         cur.env <- environment()
         R.utils::captureOutput(assign("ret", collectWarnings(do.call(nlme, mod.specs)), , cur.env));
@@ -417,7 +417,7 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
   mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
                     data = nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
                     start=par_model$start, ...)
-  if (regexpr(rex::rex("testthat", end), getwd()) != -1){
+  if (Sys.getenv("nlmixr_silent") == "TRUE"){
       ret <- NULL;
       cur.env <- environment()
       R.utils::captureOutput(assign("ret", collectWarnings(do.call(nlme, mod.specs)), , cur.env));
@@ -660,7 +660,7 @@ focei.theta.nlmixr_nlme <- function(object, uif, ...){
 
 
 ##' @rdname as.focei
-as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
+as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
     }
@@ -676,7 +676,11 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ...){
     init <- list(THTA=th,
                  OMGA=ome)
     nlme.time <- proc.time() - pt;
-    dat <- as.data.frame(getData(object));
+    if (missing(data)){
+        dat <- as.data.frame(getData(object));
+    } else {
+        dat <- data;
+    }
     fit.f <- focei.fit(data=dat,
                        inits=init,
                        PKpars=uif$theta.pars,
