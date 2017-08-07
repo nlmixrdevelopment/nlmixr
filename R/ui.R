@@ -494,85 +494,87 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             } else if (identical(x[[1]], quote(`+`))){
                 ## print(as.character(x))
                 if (do.pred == 4){
-                    if (any(as.character(x[[2]])  == eta.names) &&
-                        any(as.character(x[[3]]) == theta.names)){
-                        ## Found ETA+THETA
-                        mu.ref[[as.character(x[[2]])]] <<- as.character(x[[3]]);
-                        ## Collapse to THETA
-                        return(x[[3]])
-                    } else if (any(as.character(x[[3]])  == eta.names) &&
-                               any(as.character(x[[2]]) == theta.names)){
-                        ## Found THETA+ETA
-                        mu.ref[[as.character(x[[3]])]] <<- as.character(x[[2]]);
-                        ## Collapse to THETA
-                        ## model$omega=diag(c(1,1,0))
-                        ## 0 is not estimated.
-                        ## inits$omega has the initial estimate
-                        ## mod$res.mod = 1 = additive
-                        ## mod$res.mod = 2 = proportional
-                        ## mod$res.mod = 3 = additive + proportional
-                        ## a+b*f
-                        ## mod$ares = initial estimate of res
-                        ## mod$bres = initial estiamte of
-                        return(x[[2]])
-                    } else if (any(as.character(x[[3]])  == eta.names) &&
-                               length(x[[2]]) > 1){
-                        ## This allows 123 + Cl + 123 + eta.Cl + 123
-                        ## And collapses to 123 + Cl + 123 + 123
-                        ## Useful for covariates...
-                        eta <- as.character(x[[3]]);
-                        find.theta <- function(x){
-                            if  (identical(x[[1]], quote(`+`))){
-                                th <- c();
-                                if (any(as.character(x[[3]])  == theta.names)){
-                                    th <- as.character(x[[3]]);
-                                }
-                                if (length(x[[2]]) > 1){
-                                    return(c(th, find.theta(x[[2]])))
-                                } else {
-                                    if (any(as.character(x[[2]])  == theta.names)){
-                                        th <- c(th, as.character(x[[2]]));
-                                    }
-                                    return(th)
-                                }
-                            }
-                        }
-                        th <- find.theta(x[[2]]);
-                        if (length(th) == 1){
-                            mu.ref[[eta]] <<- th;
+                    if (length(x) >= 3){
+                        if (any(as.character(x[[2]])  == eta.names) &&
+                            any(as.character(x[[3]]) == theta.names)){
+                            ## Found ETA+THETA
+                            mu.ref[[as.character(x[[2]])]] <<- as.character(x[[3]]);
+                            ## Collapse to THETA
+                            return(x[[3]])
+                        } else if (any(as.character(x[[3]])  == eta.names) &&
+                                   any(as.character(x[[2]]) == theta.names)){
+                            ## Found THETA+ETA
+                            mu.ref[[as.character(x[[3]])]] <<- as.character(x[[2]]);
+                            ## Collapse to THETA
+                            ## model$omega=diag(c(1,1,0))
+                            ## 0 is not estimated.
+                            ## inits$omega has the initial estimate
+                            ## mod$res.mod = 1 = additive
+                            ## mod$res.mod = 2 = proportional
+                            ## mod$res.mod = 3 = additive + proportional
+                            ## a+b*f
+                            ## mod$ares = initial estimate of res
+                            ## mod$bres = initial estiamte of
                             return(x[[2]])
-                        }
-                    } else if (any(as.character(x[[3]])  == theta.names) &&
-                               length(x[[2]]) > 1){
-                        ## This allows 123 + eta.Cl + 123 + Cl + 123
-                        ## And collapses to 123  + 123 + Cl + 123
-                        ## Useful for covariates...
-                        theta <- as.character(x[[3]]);
-                        etas <- c();
-                        find.etas <- function(x){
-                            if (is.atomic(x) || is.name(x)) {
-                                return(x)
-                            } else if (is.pairlist(x)) {
-                                return(lapply(x, find.etas));
-                            } else if (is.call(x)) {
-                                if (identical(x[[1]], quote(`+`)) &&
-                                    any(as.character(x[[3]])  == eta.names)){
-                                    etas <<- c(etas,as.character(x[[3]]));
-                                    return(x[[2]]);
+                        } else if (any(as.character(x[[3]])  == eta.names) &&
+                                   length(x[[2]]) > 1){
+                            ## This allows 123 + Cl + 123 + eta.Cl + 123
+                            ## And collapses to 123 + Cl + 123 + 123
+                            ## Useful for covariates...
+                            eta <- as.character(x[[3]]);
+                            find.theta <- function(x){
+                                if  (identical(x[[1]], quote(`+`))){
+                                    th <- c();
+                                    if (any(as.character(x[[3]])  == theta.names)){
+                                        th <- as.character(x[[3]]);
+                                    }
+                                    if (length(x[[2]]) > 1){
+                                        return(c(th, find.theta(x[[2]])))
+                                    } else {
+                                        if (any(as.character(x[[2]])  == theta.names)){
+                                            th <- c(th, as.character(x[[2]]));
+                                        }
+                                        return(th)
+                                    }
                                 }
-                                return(as.call(lapply(x, find.etas)));
-                            } else {
-                                stop("Don't know how to handle type ", typeof(x),
-                                     call. = FALSE)
                             }
-                        }
-                        new <- find.etas(x[[2]]);
-                        if (length(etas) == 1){
-                            mu.ref[[etas]] <<- theta;
-                            x[[2]] <- new;
+                            th <- find.theta(x[[2]]);
+                            if (length(th) == 1){
+                                mu.ref[[eta]] <<- th;
+                                return(x[[2]])
+                            }
+                        } else if (any(as.character(x[[3]])  == theta.names) &&
+                                   length(x[[2]]) > 1){
+                            ## This allows 123 + eta.Cl + 123 + Cl + 123
+                            ## And collapses to 123  + 123 + Cl + 123
+                            ## Useful for covariates...
+                            theta <- as.character(x[[3]]);
+                            etas <- c();
+                            find.etas <- function(x){
+                                if (is.atomic(x) || is.name(x)) {
+                                    return(x)
+                                } else if (is.pairlist(x)) {
+                                    return(lapply(x, find.etas));
+                                } else if (is.call(x)) {
+                                    if (identical(x[[1]], quote(`+`)) &&
+                                        any(as.character(x[[3]])  == eta.names)){
+                                        etas <<- c(etas,as.character(x[[3]]));
+                                        return(x[[2]]);
+                                    }
+                                    return(as.call(lapply(x, find.etas)));
+                                } else {
+                                    stop("Don't know how to handle type ", typeof(x),
+                                         call. = FALSE)
+                                }
+                            }
+                            new <- find.etas(x[[2]]);
+                            if (length(etas) == 1){
+                                mu.ref[[etas]] <<- theta;
+                                x[[2]] <- new;
+                            }
                         }
                     }
-                }
+            }
                 return(as.call(lapply(x, f)))
             } else {
                 return(as.call(lapply(x, f)));

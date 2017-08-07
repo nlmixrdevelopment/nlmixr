@@ -1654,19 +1654,23 @@ focei.fit.data.frame0 <- function(data,
     find.best.eta <- FALSE;
     message("Calculating Table Variables...")
     pt <- proc.time();
-    setup.table <- function(){
-    }
     if (any("ipred" == calculate.vars)){
+        ## message("\tIPRED", appendLF=FALSE)
         data$IPRED <- fitted(data, population=FALSE);
         calculate.vars <- calculate.vars[calculate.vars != "ipred"];
+        ## message("done.")
     }
     if (any("pred" == calculate.vars)){
+        ## message("\tPRED", appendLF=FALSE)
         data$PRED <- fitted(data, population=TRUE)
         calculate.vars <- calculate.vars[calculate.vars != "pred"];
+        ## message("done.")
     }
     for (v in calculate.vars){
         if (v != "pred"){
+            ## message(sprintf("\t%s", v), appendLF=FALSE)
             data[, toupper(v)] <- resid(data, type=v);
+            ## message("done.")
         }
     }
     if (con$add.posthoc){
