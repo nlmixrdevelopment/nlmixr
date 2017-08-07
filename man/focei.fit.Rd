@@ -23,17 +23,12 @@ focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
 
 \method{focei.fit}{function}(data, inits, ...)
 
-\method{focei.fit}{data.frame}(data, inits, PKpars, diag.xform = c("sqrt",
-  "log", "identity"), optim = c("bobyqa", "nlminb"), model = NULL,
-  pred = NULL, err = NULL, lower = -Inf, upper = Inf,
-  control = list(), calculate.vars = c("pred", "ipred", "ires", "res",
-  "iwres", "wres", "cwres", "cpred", "cres"), theta.names = NULL,
-  eta.names = NULL)
+\method{focei.fit}{data.frame}(...)
 }
 \arguments{
 \item{data}{Data to fit}
 
-\item{inits}{Initilization list}
+\item{inits}{Initialization list}
 
 \item{PKpars}{Pk Parameters}
 

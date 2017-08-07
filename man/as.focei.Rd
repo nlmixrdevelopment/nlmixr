@@ -7,7 +7,7 @@
 \usage{
 as.focei(object, uif, pt = proc.time(), ...)
 
-\method{as.focei}{nlmixr_nlme}(object, uif, pt = proc.time(), ...)
+\method{as.focei}{nlmixr_nlme}(object, uif, pt = proc.time(), ..., data)
 }
 \arguments{
 \item{object}{Fit object to convert to FOCEi-style fit.}

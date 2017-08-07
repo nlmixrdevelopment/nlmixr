@@ -17,7 +17,7 @@
 
 \item{focei.translate}{Translate the model to FOCEi and then run
 the tables and objective function so that different estimation
-methodologies are comparible through OBJF.}
+methodologies are comparable through OBJF.}
 }
 \value{
 nlmixr fit object

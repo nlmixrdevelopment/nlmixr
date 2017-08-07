@@ -12,7 +12,7 @@
 
 \item{...}{Additional arguments}
 
-\item{type}{Type of resduals fitted.}
+\item{type}{Residuals type fitted.}
 
 \item{etas}{ETAs matrix to use for the calculation.}
 }

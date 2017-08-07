@@ -23,7 +23,7 @@ d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
         start = c(lVM = 7, lKM = 6, lV = 4)
       )
 
-    datr <- Bolus_1CPTM
+    datr <- Bolus_1CPTMM
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
 
     datr <- datr[datr$EVID != 2,]

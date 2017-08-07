@@ -24,7 +24,7 @@
 \item{type}{The type of fitted object to be extracted.  When the
 value is "fitted", this gives the individual or population
 fitted values. The "Vi" option gives the variance estimate for
-the indivdiual.  The "Vfo" gives the Variance under the fo
+the individual.  The "Vfo" gives the Variance under the fo
 assumption when population=FALSE, and the FOCE assumption when
 population=TRUE. "dErr_dEta" gives the df/deta*eta. When
 "posthoc", this extracts the posthoc deviations from the
