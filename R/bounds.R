@@ -569,6 +569,34 @@ nlmixrBounds <- function(fun){
         dups <- unique(n[duplicated(n)])
         stop(sprintf("The following parameter names were duplicated: %s.", paste(dups, collapse=", ")))
     }
+    w <- which(df$lower == df$est && df$est == df$upper);
+    if (length(w) > 0){
+        stop(sprintf("The estimate, and upper and lower bounds are the same for the following parameters: %s\nTo fix parameters use %s=fix(%s) instead.",
+                     paste(df$name[w], collapse=", "), df$name[w[1]], df$est[w[1]]))
+    }
+    w <- which(df$lower == df$est || df$est == df$upper);
+    if (length(w) > 0){
+        tmp <- unique(sort(c(df$est[w[1]], df$lower[w[1]], df$upper[w[1]])));
+        tmp <- tmp[!is.infinite(tmp)];
+        if (length(tmp) == 1){
+            stop(sprintf("The estimate is the same as a boundary for the following parameter: %s\nInstead use %s=%s # est",
+                         paste(df$name[w], collapse=", "), df$name[w[1]], tmp))
+        } else {
+            stop(sprintf("The estimate is the same as a boundary for the following parameters: %s\nInstead use %s=c(%s) # c(lower, est)",
+                         paste(df$name[w], collapse=", "), df$name[w[1]], paste(tmp, collapse=", ")))
+        }
+
+    }
+    w <- which(df$est >= df$upper);
+    if (length(w) > 0){
+        stop(sprintf("The bounds make no sense for these parameters: %s.\nThey should be ordered as follows: %s=c(%s) # c(lower, est, upper)",
+                     paste(df$name[w], collapse=", "), df$name[w[1]], paste(sort(c(df$est[w[1]], df$lower[w[1]], df$upper[w[1]])), collapse=", ")))
+}
+    w <- which(df$lower >= df$est);
+    if (length(w) > 0){
+        stop(sprintf("The lower bound is higher than the estimate for these parameters: %s.\nYou can adjust by %s=c(%s, %s) # c(lower, est)",
+                     paste(df$name[w], collapse=", "), df$name[w[1]], df$est[w[1]], df$lower[w[1]]))
+    }
     class(df) <- c("nlmixrBounds", "data.frame");
     return(df)
 }

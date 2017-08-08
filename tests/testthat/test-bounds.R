@@ -1051,3 +1051,38 @@ test_that("Total ETA FIXED (named)", {
     expect_equal(nlmixrBounds(bnd22d), ref22)
 
 })
+
+f1 <- function(){
+    lCl = c(5, 5, 5) # A
+}
+
+f2 <- function(){
+    lCl = c(0, -1.3) # lCl
+}
+
+f3 <- function(){
+    lCl = c(0, -1.3, -10) # lCl
+}
+
+f4 <- function(){
+    lCl = c(0, 5, 5) # A
+}
+
+f5 <- function(){
+    lCl = c(0, 0, 5) # A
+}
+
+f6 <- function(){
+    lCl = c(5, 5) # A
+}
+
+
+test_that("Invalid bounds raise errors",{
+    expect_error(nlmixrBounds(f1), rex::rex("The estimate, and upper and lower bounds are the same for the following parameters: lCl\nTo fix parameters use lCl=fix(5) instead."))
+    expect_error(nlmixrBounds(f2), rex::rex("The lower bound is higher than the estimate for these parameters: lCl.\nYou can adjust by lCl=c(-1.3, 0) # c(lower, est)"))
+    expect_error(nlmixrBounds(f3), rex::rex("The bounds make no sense for these parameters: lCl.\nThey should be ordered as follows: lCl=c(-10, -1.3, 0) # c(lower, est, upper)"))
+    expect_error(nlmixrBounds(f4), rex::rex("The estimate is the same as a boundary for the following parameters: lCl\nInstead use lCl=c(0, 5) # c(lower, est)"))
+    expect_error(nlmixrBounds(f5), rex::rex("The estimate is the same as a boundary for the following parameters: lCl\nInstead use lCl=c(0, 5) # c(lower, est)"))
+    expect_error(nlmixrBounds(f6), rex::rex("The estimate is the same as a boundary for the following parameter: lCl\nInstead use lCl=5 # est"))
+})
+
