@@ -400,7 +400,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         return(quote(nlmixrIgnore()))
                     }
                 } else {
-                    if (do.pred == 2){
+                    if (do.pred == 2 || do.pred == 4){
                         return(x);
                     } else {
                         if (length(nargs) == 1){
@@ -435,10 +435,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                     any(err2 == add.dists)){
                     tmp <- paste(sort(c(err1, err2)), collapse="+");
                     errs.specified <<- unique(errs.specified, tmp);
-                    if (do.pred == 2){
+                    if (do.pred == 2 || do.pred == 4){
                         return(quote(nlmixrIgnore()));
                     }
-                    else if (do.pred == 1){
+                    else if (do.pred == 1 || do.pred == 4){
                         return(bquote(nlmixr_pred <- .(x[[2]]))) ;
                     } else if (do.pred == 3){
                         w <- which(bounds$name == err1.v);
@@ -459,7 +459,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                  as.character(x[[3]][[2]][[1]]), as.character(x[[3]][[3]][[1]]),
                                  paste(add.dists, collapse=", ")))
                 }
-            } else if (identical(x[[1]], quote(`~`)) && do.pred != 2){
+            } else if (identical(x[[1]], quote(`~`)) && (do.pred != 2)){
                 return(quote(nlmixrIgnore()))
             } else if (identical(x[[1]], quote(`<-`)) && !any(do.pred == c(2, 4) )){
                 return(quote(nlmixrIgnore()))
@@ -637,6 +637,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[-w], "}"), collapse="\n")))
         rxode <- paste(rx.ode, collapse="\n")
         rest <- rx.pred;
+        w <- seq(which(regexpr(rex::rex("d/dt("), saem.pars) != -1)[1], length(saem.pars) - 1);
+        saem.pars <- saem.pars[-w];
         all.vars <- all.vars[!(all.vars %in% RxODE::rxState(rxode))]
         rest.vars <- rest.vars[!(rest.vars %in% RxODE::rxState(rxode))]
     } else {
@@ -978,6 +980,16 @@ nlmixrUI.saem.log.eta <- function(obj){
 nlmixrUI.saem.fit <- function(obj, infusion=FALSE){
     if (any(ls(envir=obj$env) == "saem.fit")){
         return(obj$env$saem.fit)
+    } else if (!is.null(obj$rxode.pred)) {
+        ## RxODE function
+        message("Compiling RxODE differential equations...", appendLF=FALSE)
+        rx <- RxODE(obj$rxode.pred);
+        message("done.")
+        message("Compiling SAEM user function...", appendLF=FALSE)
+        saem.fit <- gen_saem_user_fn(model=rx, obj$saem.pars, pred=function() nlmixr_pred)
+        message("done.")
+        obj$env$saem.fit <- saem.fit;
+        return(saem.fit);
     } else if (!is.null(obj$lin.solved)) {
         message("Compiling SAEM user function...", appendLF=FALSE)
         saem.fit <- gen_saem_user_fn(model=lincmt(ncmt=obj$lin.solved$ncmt,
@@ -985,16 +997,6 @@ nlmixrUI.saem.fit <- function(obj, infusion=FALSE){
                                                   tlag=obj$lin.solved$tlag,
                                                   infusion = infusion,
                                                   parameterization = obj$lin.solved$parameterization))
-        message("done.")
-        obj$env$saem.fit <- saem.fit;
-        return(saem.fit);
-    } else {
-        ## RxODE function
-        message("Compiling RxODE differential equations...", appendLF=FALSE)
-        rx <- RxODE(obj$rxode.pred);
-        message("done.")
-        message("Compiling SAEM user function...", appendLF=FALSE)
-        saem.fit <- gen_saem_user_fn(model=rx, obj$saem.pars, pred=function() nlmixr_pred)
         message("done.")
         obj$env$saem.fit <- saem.fit;
         return(saem.fit);
@@ -1034,6 +1036,8 @@ nlmixrUI.saem.init.theta <- function(obj){
             theta[i] <- obj$est[w]
         }
     }
+    log.eta <- obj$saem.log.eta;
+    theta[log.eta] <- exp(theta[log.eta]);
     return(theta)
 }
 ##' SAEM's init$omega
