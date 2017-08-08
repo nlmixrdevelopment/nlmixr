@@ -1163,6 +1163,150 @@ saem.fit.default <- function(model, data, inits,
     fit
 }
 
+##' @export
+ranef.saemFit <- function(object, ...){
+    return(object$eta)
+}
+
+##' @export
+fixef.saemFit <- function(object, ...){
+    return(object$Plambda)
+}
+
+focei.theta.saemFit <- function(object, uif, ...){
+    ## Get the thetas needed for FOCEi fit.
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    n <- uif$focei.names
+    thetas <- rep(NA, length(n));
+    names(thetas) <- n;
+    sf <- as.vector(fixed.effects(object))
+    theta.trans <- uif$saem.theta.trans
+    theta.trans <- theta.trans[!is.na(theta.trans)];
+    f <- rep(NA, length(sf))
+    for (i in seq_along(theta.trans)){
+        ## i = old theta->  theta.trans[i] = saem.theta
+        f[i] <- sf[theta.trans[i]];
+    }
+    ## Now get the names
+    n <- uif$theta.names;
+    n <- n[is.na(uif$focei.err.type)];
+    names(f) <- n;
+    for (n in names(f)){
+        thetas[n] <- f[n];
+    }
+    err <- abs(as.vector(object$sig2)) ## abs?
+    err.type <- uif$focei.err.type;
+    add <- which(err.type == "add")
+    prop <- which(err.type == "prop")
+    if (length(add) > 0){
+        thetas[add] <- sqrt(err[1]); ## Check is this variance (others are sd)
+    }
+    if (length(prop) > 0){
+        thetas[prop] <- sqrt(err[2]); ## Check is this variance (others are sd)
+    }
+    return(thetas)
+}
+
+focei.eta.saemFit <- function(object, uif, ...){
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    ## Reorder based on translation
+    eta.trans <- uif$saem.eta.trans
+    ## orig eta ->  new eta
+    df <- as.data.frame(uif$ini);
+    eta <- df[!is.na(df$neta1), ];
+    len <- length(eta$name)
+    cur.lhs <- character()
+    cur.rhs <- numeric()
+    ome <- character()
+    cur.ome <- object$Gamma2_phi1;
+    for (i in seq_along(eta$name)){
+        last.block <- FALSE;
+        if (i == len){
+            last.block <- TRUE
+        } else if (eta$neta1[i + 1] == eta$neta2[i + 1]){
+            last.block <- TRUE
+        }
+        if (eta$neta1[i] == eta$neta2[i]){
+            cur.lhs <- c(cur.lhs, sprintf("ETA[%d]", eta$neta1[i]));
+            cur.rhs <- c(cur.rhs, cur.ome[eta.trans[eta$neta1[i]], eta.trans[eta$neta2[i]]]);
+            if (last.block){
+                ome[length(ome) + 1] <- sprintf("%s ~ %s", paste(cur.lhs, collapse=" + "),
+                                                paste(deparse(cur.rhs), collapse=" "));
+                cur.lhs <- character();
+                cur.rhs <- numeric()
+            }
+        } else {
+            cur.rhs <- c(cur.rhs, cur.ome[eta.trans[eta$neta1[i]], eta.trans[eta$neta2[i]]]);
+        }
+    }
+    ome <- eval(parse(text=sprintf("list(%s)", paste(ome, collapse=","))))
+    return(ome)
+}
+
+as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    uif.new <- uif;
+    fit <- object;
+    mat <- random.effects(fit);
+    ## Reorder based on translation
+    eta.trans <- uif$saem.eta.trans
+    ## orig eta ->  new eta
+    mat2 <- mat;
+    for (i in seq_along(eta.trans)){
+        ## i = old eta->  eta.trans[i] = saem.eta
+        mat2[,i] <- mat[, eta.trans[i]];
+    }
+    th <- focei.theta(fit, uif)
+    for (n in names(th)){
+        uif.new$est[uif.new$name == n] <- th[n];
+    }
+    ome <- focei.eta(fit, uif);
+    init <- list(THTA=th,
+                 OMGA=ome)
+    saem.time <- proc.time() - pt;
+    if (missing(data)){
+        stop("Requires Data...")
+    } else {
+        dat <- data;
+    }
+    fit.f <- focei.fit(data=dat,
+                       inits=init,
+                       PKpars=uif$theta.pars,
+                       ## par_trans=fun,
+                       model=uif$rxode.pred,
+                       pred=function(){return(nlmixr_pred)},
+                       err=uif$error,
+                       lower=uif$focei.lower,
+                       upper=uif$focei.upper,
+                       theta.names=uif$focei.names,
+                       eta.names=uif$eta.names,
+                       control=list(NOTRUN=TRUE,
+                                    inits.mat=mat2,
+                                    cores=1,
+                                    find.best.eta=FALSE));
+    ome <- fit.f$omega;
+    w <- which(!is.na(uif.new$ini$neta1))
+    for (i in w){
+        uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
+    }
+    ## enclose the nlme fit in the .focei.env
+    env <- attr(fit.f, ".focei.env");
+    env$fit$saem <- fit
+    tmp <- cbind(data.frame(saem=saem.time["elapsed"]), env$fit$time);
+    names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
+    env$fit$time <- tmp;
+    env$uif <- uif;
+    env$uif.new <- uif.new;
+    class(fit.f) <- c("nlmixr.ui.saem", class(fit.f))
+    return(fit.f)
+}
+
 #FIXME: coef_phi0, rmcmc, coef_sa
 #FIXME: Klog, rho, sa, nmc
 #FIXME: N.design

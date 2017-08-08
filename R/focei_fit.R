@@ -44,6 +44,28 @@ as.nlme <- function(x){
 }
 
 
+##' Return composite saem/focei to saem
+##'
+##' @param x saem/focei object from common UI.
+##' @return saem object or NULL
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+as.saem <- function(x){
+    if (is.focei(x)){
+        env <- attr(x, ".focei.env");
+        fit <- env$fit;
+        saem <- NULL;
+        uif <- NULL
+        if (is(x, "nlmixr.ui.saem")){
+            saem <- fit$saem;
+            return(saem);
+        }
+    }
+    return(NULL);
+}
+
+
 ##' @importFrom nlme VarCorr
 ##' @export
 VarCorr.nlmixr.ui.nlme <- function(x, sigma = 1, ...){
@@ -74,6 +96,7 @@ print.focei.fit <- function(x, ...) {
         } else {
             width <- NULL;
         }
+        saem <- NULL;
         nlme <- NULL;
         uif <- NULL
         if (is(x, "nlmixr.ui.nlme")){
@@ -81,6 +104,10 @@ print.focei.fit <- function(x, ...) {
             uif <- env$uif;
             message(sprintf("nlmixr nlme fit by %s (%s)\n", ifelse(nlme$method == "REML", "REML", "maximum likelihood"),
                             ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")));
+        } else if (is(x, "nlmixr.ui.saem")){
+            saem <- fit$saem;
+            uif <- env$uif;
+            message(sprintf("nlmixr SAEM fit (%s)\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
         } else {
             message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
         }
@@ -111,6 +138,30 @@ print.focei.fit <- function(x, ...) {
             tmp <- fit$par.data.frame
             message("\nResidual Errors")
             print(tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]);
+        } else if (!is.null(saem)){
+
+            df <- fit$par.data.frame;
+            th = saem$Plambda
+            nth = length(th)
+            H = solve(saem$Ha[1:nth,1:nth])
+            se = sqrt(diag(H))
+            m =  cbind(exp(th), th, se)
+            dimnames(m)[[2]] = c("est", "log(est)", "se(log_est)")
+            trans <- uif$saem.theta.trans;
+            nm <- rep("", nth)
+            dfr <- rownames(df)
+            for (i in seq_along(trans)){
+                ## i = focei trans[i] = saem
+                nm[trans[i]] <- dfr[i];
+            }
+            dimnames(m)[[1]] <- nm
+            message("From SAEM:")
+            print(m)
+
+            ## Augment with SEs from SAEM.
+            ## message("SAEM!");
+            message("FOCEi:")
+            print(df);
         } else {
             print(fit$par.data.frame);
         }
@@ -1756,7 +1807,7 @@ anova.nlmixr.ui.focei.fit <- function(object, ..., test = TRUE, type = c("sequen
     ancall$verbose <- ancall$test <- ancall$type <- NULL
     object <- list(object, ...)
     termsClass <- vapply(object, data.class, "")
-    valid.cl <- c("nlmixr.ui.nlme", "nlmixr.ui.focei.fit");
+    valid.cl <- c("nlmixr.ui.saem", "nlmixr.ui.nlme", "nlmixr.ui.focei.fit");
     if (!all(match(termsClass, valid.cl, 0))) {
         valid.cl <- paste0("\"", valid.cl, "\"")
         stop(gettextf("objects must inherit from classes %s, or %s",
@@ -1844,6 +1895,9 @@ anova.nlmixr.ui.focei.fit <- function(object, ..., test = TRUE, type = c("sequen
 
 ##' @export
 anova.nlmixr.ui.nlme <- anova.nlmixr.ui.focei.fit
+
+##' @export
+anova.nlmixr.ui.saem <- anova.nlmixr.ui.focei.fit
 
 print.anova.nlmixr <- function (x, verbose = attr(x, "verbose"), ...)
 {

@@ -117,7 +117,11 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
         saem.fit <- uif$saem.fit
         cfg   = configsaem(model=uif$saem.model, data=dat, inits=uif$saem.init, ...);
         fit <- saem.fit(cfg);
-        return(fit)
+        if (focei.translate){
+            return(as.focei(fit, uif, pt, data=dat))
+        } else  {
+            return(fit);
+        }
     } else if (est == "nlme"){
         pt <- proc.time()
         fun <- uif$nlme.fun;
