@@ -82,5 +82,5 @@ df = plot(fit)
 }
 }
 \author{
-Wenping Wang
+Matthew Fidler & Wenping Wang
 }
