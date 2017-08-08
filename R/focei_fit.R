@@ -952,11 +952,9 @@ focei.fit.data.frame0 <- function(data,
         ## parallelize
         if (con$cores > 1){
             if (.Platform$OS.type != "windows") {
-                gc();
-                llik.subj <- parallel::mclapply(X = ID.all, FUN = llik.one, cores = con$cores, con=con)
+                llik.subj <- parallel::mclapply(X = ID.all, FUN = llik.one, mc.cores = con$cores, con=con)
             } else {
                 llik.subj <- parallel::parLapply(cl, X = ID.all, fun = llik.one, con=con)
-                ## nocov end
             }
         } else {
             llik.subj <- lapply(ID.all, llik.one, con=con);
