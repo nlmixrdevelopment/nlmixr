@@ -4,37 +4,34 @@ library(nlmixr)
 context("NLME23: one-compartment oral, single-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
-  
+
   test_that("Closed-form", {
-    
-    datr <-
-      read.csv("Oral_1CPT.csv",
-               header = TRUE,
-               stringsAsFactors = F)
-    datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
+
+      datr <- Oral_1CPT
+      datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
     datr <- datr[datr$EVID != 2,]
-    
+
     ode1KA <- "
     d/dt(abs)    = -KA*abs;
     d/dt(centr)  =  KA*abs-(CL/V)*centr;
     "
-    
+
     mypar4 <- function(lCL, lV, lKA)
     {
       CL <- exp(lCL)
       V <- exp(lV)
       KA <- exp(lKA)
     }
-    
+
     specs4 <-
       list(
         fixed = lCL + lV + lKA ~ 1,
         random = pdDiag(lCL + lV + lKA ~ 1),
         start = c(lCL = 1, lV = 4, lKA = 0)
       )
-    
+
     runno <- "N023"
-    
+
     dat <- datr[datr$SD == 1,]
 
     fit <-
@@ -46,56 +43,53 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
         oral = TRUE,
         weight = varPower(fixed = c(1))
       )
-    
+
     z <- VarCorr(fit)
-    
+
     expect_equal(signif(as.numeric(fit$logLik),6), -11768.9)
     expect_equal(signif(AIC(fit), 6), 23551.9)
-    expect_equal(signif(BIC(fit), 6), 23592)  
-    
+    expect_equal(signif(BIC(fit), 6), 23592)
+
     expect_equal(signif(as.numeric(fit$coefficients$fixed[1]),3), 1.39)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[2]),3), 4.19)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]),3), -0.0308)
-    
+
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.252)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.27)
     expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.312)
-    
+
     expect_equal(signif(fit$sigma, 3), 0.200)
   })
-  
+
   test_that("ODE", {
-    
-    datr <-
-      read.csv("Oral_1CPT.csv",
-               header = TRUE,
-               stringsAsFactors = F)
+
+    datr <- Oral_1CPT
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
     datr <- datr[datr$EVID != 2,]
-    
+
     ode1KA <- "
     d/dt(abs)    = -KA*abs;
     d/dt(centr)  =  KA*abs-(CL/V)*centr;
     "
-    
+
     mypar4 <- function(lCL, lV, lKA)
     {
       CL <- exp(lCL)
       V <- exp(lV)
       KA <- exp(lKA)
     }
-    
+
     specs4 <-
       list(
         fixed = lCL + lV + lKA ~ 1,
         random = pdDiag(lCL + lV + lKA ~ 1),
         start = c(lCL = 1, lV = 4, lKA = 0)
       )
-    
+
     runno <- "N023"
-    
+
     dat <- datr[datr$SD == 1,]
-    
+
     fitODE <-
       nlme_ode(
         dat,
@@ -112,22 +106,22 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
           msVerbose = TRUE
         )
       )
-    
+
     z <- VarCorr(fitODE)
-    
+
     expect_equal(signif(as.numeric(fitODE$logLik),6), -11780.3)
     expect_equal(signif(AIC(fitODE), 6), 23574.6)
-    expect_equal(signif(BIC(fitODE), 6), 23614.7)  
-    
+    expect_equal(signif(BIC(fitODE), 6), 23614.7)
+
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]),3), 1.39)
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.19)
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), -0.0269)
-    
+
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.252)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.268)
     expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.309)
-    
+
     expect_equal(signif(fitODE$sigma, 3), 0.200)
   })
-  
+
 }
