@@ -1079,7 +1079,7 @@ print.saemFit = function(x, ...)
 #'    Fit a generalized nonlinear mixed-effect model using the Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
 #'
-#' @author Wenping Wang
+#' @author Matthew Fidler & Wenping Wang
 #' @export
 #' @examples
 #' \dontrun{
@@ -1115,12 +1115,51 @@ saem.fit <- function(model, data, inits,
                      ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
                      seed = 99)
 {
-    is.ode = class(model) == "RxODE"
-    saem_fit = if (!is.ode) gen_saem_user_fn(model) else gen_saem_user_fn(model, PKpars, pred)
+    UseMethod("saem.fit");
+}
+
+##' @rdname saem.fit
+##' @export
+saem.fit.nlmixr.ui.nlme <- function(model, ...){
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    names(call)[1] <- "object"
+    call$est <- "saem";
+    return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)));
+}
+
+##' @rdname saem.fit
+##' @export
+saem.fit.function <- saem.fit.nlmixr.ui.nlme
+
+
+##' @rdname saem.fit
+##' @export
+saem.fit.RxODE <- function(model, data, inits,
+                           PKpars=NULL, pred=NULL,
+                           covars=NULL,
+                           mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+                           ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                           seed = 99){
+    saem_fit = gen_saem_user_fn(model, PKpars, pred)
     model = list(saem_mod=saem_fit, covars=covars)
     cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed)
     fit = saem_fit(cfg)
-    #dyn.unload("saem_main.dll")
+                                        #dyn.unload("saem_main.dll")
+    fit
+}
+
+##' @rdname saem.fit
+##' @export
+saem.fit.default <- function(model, data, inits,
+                             PKpars=NULL, pred=NULL,
+                             covars=NULL,
+                             mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+                             ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                             seed = 99){
+    model = gen_saem_user_fn(model)
+    cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed)
+    fit = saem_fit(cfg)
+                                        #dyn.unload("saem_main.dll")
     fit
 }
 
