@@ -461,6 +461,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
   system(shlib)
   file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
+  file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
   setwd(lwd);
   saem.dll <- file.path(lwd, saem.dll);
 
@@ -495,6 +496,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 saem.cleanup <- function(env){
     try({dyn.unload(env$saem.dll)}, silent=TRUE);
     unlink(env$saem.dll);
+    unlink(env$saem.cpp);
 }
 
 parfn.list = c(
