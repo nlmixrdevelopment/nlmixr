@@ -198,5 +198,17 @@ test_that("Parameters cannot be missing or Infinite", {
     expect_error(nlmixr(uif), rex::rex("The following parameters initial estimates are NA: tka"))
 })
 
-
-
+uif <- function(){
+    ini({
+        lCl <- 0.05
+        lV <- 0.2
+        ## Should be lKa
+        KA = 0.02
+    })
+    model({
+        CL = exp(lCL)
+        V = exp(lV)
+        KA = exp(lKA)
+        KE = CL / V
+    })
+}

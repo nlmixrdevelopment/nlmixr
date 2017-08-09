@@ -13,7 +13,7 @@ plot(augPred(fit,level=0:1))
 specs <- list(
 	fixed=list(lKA~1, lCL+lV~WT),
 	random = pdDiag(lKA+lCL~1),
-	start=c(0.5, -3.2, 0, -1, 0))
+    start=c(0.5, -3.2, 0, -1, 0))
 fit <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1)
 #plot(augPred(fit,level=0:1))
 #fit
@@ -112,6 +112,22 @@ print(summary(fit))
 ## ------------------------------------------------------------------------
 ## -- SAEM
 
+uif <- function(){
+    ini({
+        lCl <- 0.05
+        lV <- 0.2
+        lKA = 0.02
+    })
+    model({
+        CL = exp(lCl)
+        V = exp(lV)
+        KA = exp(lKA)
+        KE = CL / V
+    })
+}
+
+fit <- nlmixr(uif, theo_sd, est="saem")
+
 PKpars = function()
 {
   CL = exp(lCL)
@@ -119,7 +135,7 @@ PKpars = function()
   KA = exp(lKA)
   KE = CL / V
   xxx = 0;
-  #initCondition = c(0,xxx)
+                                        #initCondition = c(0,xxx)
 }
 
 #closed form solution:

@@ -591,7 +591,7 @@ focei.fit <- function(data,
                       optim=c(
                           ## "n1qn1",
                           "bobyqa",
-                          ## "lbfgsb3",
+                          "lbfgsb3",
                           ## "newuoa",
                           "nlminb"##,
                           ## "uobyqa"
@@ -666,7 +666,7 @@ focei.fit.data.frame0 <- function(data,
                                  optim=c(
                                      ## "n1qn1",
                                      "bobyqa",
-                                     ## "lbfgsb3",
+                                     "lbfgsb3",
                                      ## "newuoa",
                                      "nlminb"##,
                                      ## "uobyqa"
@@ -749,16 +749,15 @@ focei.fit.data.frame0 <- function(data,
         ## Almquist does DV-PRED
         pred.minus.dv=TRUE,
         switch.solver=FALSE,
-        cov.method="grad",
+        cov.method="s",
         factr=1e10,
         grad=FALSE,
         accept.eta.size=1.5,
-        sigdig=0,
+        sigdig=5,
         precision=0, ## 0 = No ridge penalty.
         ridge.decay=0, ## 0 = no decay; Inf = No ridge
         reset.precision=NULL,
         eigen=TRUE,
-        fix.eta.for.grad=FALSE,
         rhobeg=.2,
         rhoend=1e-2,
         npt=NULL,
@@ -769,7 +768,10 @@ focei.fit.data.frame0 <- function(data,
         inits.mat=NULL,
         find.best.eta=TRUE,
         inner.opt="n1qn1",
-        save.curve=TRUE
+        save.curve=TRUE,
+        numDeriv.method1="simple",
+        numDeriv.method2="Richardson",
+        numDeriv.swap=2.3
     )
 
     curi <- 0;
@@ -780,6 +782,7 @@ focei.fit.data.frame0 <- function(data,
     if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
+    numDeriv.method <- con$numDeriv.method1
 
     cl <- NULL;
     if (.Platform$OS.type == "windows" && con$cores > 1){
@@ -824,6 +827,11 @@ focei.fit.data.frame0 <- function(data,
 
     ## print(th0.om)
     model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad, pred.minus.dv=con$pred.minus.dv);
+    message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
+    message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
+    if (con$grad){
+        message(sprintf("\t Outer Compartments=%s", length(RxODE::rxState(model$outer))))
+    }
     cov.names <- RxODE::rxParams(model$inner);
     cov.names <- cov.names[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), cov.names) == -1];
     lhs <- c(names(RxODE::rxInits(model$inner)), RxODE::rxLhs(model$inner))
@@ -996,6 +1004,14 @@ focei.fit.data.frame0 <- function(data,
                 args$eta.bak=inits.mat.bak[.wh, ];
             }
             ret <- do.call(getFromNamespace("rxFoceiInner","RxODE"), args)
+            func <- function(theta){
+                new.args <- args;
+                args$theta <- theta;
+                ret <- do.call(getFromNamespace("rxFoceiInner","RxODE"), args)
+            }
+            if (print.grad && !con$grad){
+                attr(ret, "grad") <- c(numDeriv::grad(func, args$theta, method=numDeriv.method), attr(ret, "omega.28")) / inits.vec
+            }
             attr(ret, "wh") <- .wh; ## FIXME move to C?
             return(ret)
         }
@@ -1211,6 +1227,9 @@ focei.fit.data.frame0 <- function(data,
                             ##
                             sdig <- -log10(abs(cur.pars - last.pars)) - 1;
                             message(paste0(" D: ", paste(sapply(sdig, function(x){sprintf("%f", x)}), collapse=" ")))
+                            if (all(sdig > con$numDeriv.swap)){
+                                numDeriv.method <- con$numDeriv.method2
+                            }
                             if (con$sigdig > 0 && all(sdig > con$sigdig)){
                                 sigdig.exit <- TRUE
                             }
@@ -1284,7 +1303,7 @@ focei.fit.data.frame0 <- function(data,
     gr.FOCEi <- function(pars){
         llik.subj <- ofv.FOCEi.ind(pars)
         llik <- -2*do.call("sum", llik.subj);
-        if (con$grad){
+        ## if (con$grad){
             if (con$ridge.decay != 0 && is.null(cur.diff)){
                 cur.diff <<- 0
                 extra <- 1
@@ -1298,15 +1317,15 @@ focei.fit.data.frame0 <- function(data,
                                    })) + pars * con$precision  * extra;
             assign(optim.obj(llik, "l"), gr, envir=ofv.cache, inherits=FALSE);
             return(gr);
-        } else {
-            if (con$fix.eta.for.grad){
-                find.best.eta <<- FALSE; ## Keep etas.
-                on.exit({find.best.eta <<- FALSE;}, add=TRUE)
-            }
-            gr <- numDeriv::grad(ofv.FOCEi, pars)
-            assign(optim.obj(llik, "l"), gr, envir=ofv.cache, inherits=FALSE);
-            return(gr);
-        }
+        ## } else {
+        ##     if (con$fix.eta.for.grad){
+        ##         find.best.eta <<- FALSE; ## Keep etas.
+        ##         on.exit({find.best.eta <<- FALSE;}, add=TRUE)
+        ##     }
+        ##     gr <- numDeriv::grad(ofv.FOCEi, pars)
+        ##     assign(optim.obj(llik, "l"), gr, envir=ofv.cache, inherits=FALSE);
+        ##     return(gr);
+        ## }
     }
 
     s.FOCEi <- function(pars){
@@ -1560,9 +1579,9 @@ focei.fit.data.frame0 <- function(data,
             pt <- proc.time();
             fit$setup.time <- setup.time
             fit$optim.time <- optim.time
-            if (con$fix.eta.for.grad){
-                find.best.eta <- FALSE; ## Keep etas.
-            }
+            ## if (con$fix.eta.for.grad){
+            ##     find.best.eta <- FALSE; ## Keep etas.
+            ## }
             ## Cov
             ## - invert second derivative of the llik
             ## - Lewis method
@@ -1575,27 +1594,17 @@ focei.fit.data.frame0 <- function(data,
             ## Psim assumes the fixed effects and random effects
             ## - Assumed the random effects is zero.
             ## - Not sure what is accepted as an input
-            if (con$cov.method=="hessian" && any(names(fit) == "Hessian.inv")) {
-                message("Calculate covariance...")
-                sink.start();
-                R2 <- fit$Hessian.inv;
-                fit$Hessian.inv = NULL
-            } else if (any(con$cov.method==c("hessian", "grad")) && con$grad){
-                message("Calculate covariance...")
-                sink.start();
-                ## Use First Order condition for covariance
-                old.mat <- inits.mat;
-                inits.mat <- matrix(0, nSUB, nETA)
-                R1 <- optimHess(fit$par, ofv.FOCEi, gr.FOCEi);
-                inits.mat <- old.mat;
-                Rinv <- RxODE::rxInv(R1)
-            } else {
-                message("Calculate covariance...")
-                sink.start();
-                R1 <- optimHess(fit$par, ofv.FOCEi);
-                Rinv <- RxODE::rxInv(R1)
+            if (!print.grad && !con$grad){
+                print.grad <- TRUE; ## Calculate covariance a bit qicker
+                memoise::forget(ofv.FOCEi.ind);
             }
-            if (con$cov.method!="hessian"){
+            message("Calculate covariance...")
+            sink.start();
+            ## Use First Order condition for covariance
+            ## inits.mat <- matrix(0, nSUB, nETA)
+            if (con$cov.method != "s"){
+                R1 <- optimHess(fit$par, ofv.FOCEi, gr.FOCEi);
+                Rinv <- RxODE::rxInv(R1)
                 if (det(R1) <= 0){
                     warning("Non positive-definite Hessian matrix when calculating the covariance; Correcting with nearPD")
                     fit$hessian.bad <- R1;
@@ -1603,16 +1612,24 @@ focei.fit.data.frame0 <- function(data,
                     Rinv <- RxODE::rxInv(R1);
                     fit$warning <- "Non positive-definite Hessian matrix when calculating the covariance; Correcting with nearPD"
                 }
+                Rinv = m %*% Rinv %*% m
+            } else {
+                Rinv <- NULL
             }
-            Rinv = m %*% Rinv %*% m
-            if (con$grad){
-                s = s.FOCEi(fit$par)
-                fit$cov.r.s <- Rinv %*% s.FOCEi(fit$par) %*% Rinv
+            ## if (con$grad){
+            s = s.FOCEi(fit$par)
+            if (con$cov.method != "s"){
+                fit$cov.r.s <- Rinv %*% s %*% Rinv
                 fit$cov.r <- 2 * Rinv;
                 fit$cov.s <- 4 * RxODE::rxInv(s);
-                fit$cov <- fit$cov.r;
+                if (con$cov.method == "r"){
+                    fit$cov <- fit$cov.r;
+                } else {
+                    fit$cov <- fit$cov.r.s;
+                }
             } else {
-                fit$cov <- 2 * Rinv
+                fit$cov.s <- 4 * RxODE::rxInv(s);
+                fit$cov <- fit$cov.s;
             }
             if (any(diag(fit$cov) <= 0)){
                 ## Can be semi-definite (i.e. some eigenvalues can be zero, but assume not.)
