@@ -484,6 +484,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   attr(fn, "neq") = neq
   attr(fn, "nlhs") = nlhs
   attr(fn, "nrhs") = nrhs
+  attr(fn, "saem.dll") = saem.dll
   reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
 }
@@ -1133,6 +1134,9 @@ saem.fit.nlmixr.ui.nlme <- function(model, ...){
 ##' @export
 saem.fit.function <- saem.fit.nlmixr.ui.nlme
 
+##' @rdname saem.fit
+##' @export
+saem.fit.nlmixrUI <- saem.fit.nlmixr.ui.nlme
 
 ##' @rdname saem.fit
 ##' @export
@@ -1158,7 +1162,8 @@ saem.fit.default <- function(model, data, inits,
                              mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                              ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
                              seed = 99){
-    model = gen_saem_user_fn(model)
+    saem_fit = gen_saem_user_fn(model)
+    model = list(saem_mod=saem_fit, covars=covars)
     cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed)
     fit = saem_fit(cfg)
                                         #dyn.unload("saem_main.dll")

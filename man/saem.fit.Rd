@@ -4,6 +4,7 @@
 \alias{saem.fit}
 \alias{saem.fit.nlmixr.ui.nlme}
 \alias{saem.fit.function}
+\alias{saem.fit.nlmixrUI}
 \alias{saem.fit.RxODE}
 \alias{saem.fit.default}
 \title{Fit an SAEM model}
@@ -16,6 +17,8 @@ saem.fit(model, data, inits, PKpars = NULL, pred = NULL, covars = NULL,
 \method{saem.fit}{nlmixr.ui.nlme}(model, ...)
 
 \method{saem.fit}{function}(model, ...)
+
+\method{saem.fit}{nlmixrUI}(model, ...)
 
 \method{saem.fit}{RxODE}(model, data, inits, PKpars = NULL, pred = NULL,
   covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),

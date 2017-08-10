@@ -2,8 +2,16 @@
 ## Lincmt infusion checks...
 ## High Covariance in Omgea for nlme
 ## Multiple endpoints check.
-## Initial conditions between methods
+## Initial conditions between methods -- OK
 ## Dots in variable names (especially THETAs for SAEM)
+## Fixing components?
+
+## Unified UI observations
+## - nlme
+## - Initial conditions for residuls.
+## - Error structure
+## -
+
 
 ##' Prepares the UI function and returns a list.
 ##'
@@ -971,6 +979,7 @@ nlmixrUI.saem.log.eta <- function(obj){
     }
     return(ret)
 }
+
 ##' Generate saem.fit user function.
 ##'
 ##' @param obj UI object
@@ -983,13 +992,12 @@ nlmixrUI.saem.fit <- function(obj, infusion=FALSE){
     } else if (!is.null(obj$rxode.pred)) {
         ## RxODE function
         message("Compiling RxODE differential equations...", appendLF=FALSE)
-        rx <- RxODE(obj$rxode.pred);
+        ode <- RxODE::RxODE(obj$rxode.pred);
         message("done.")
-        message("Compiling SAEM user function...", appendLF=FALSE)
-        saem.fit <- gen_saem_user_fn(model=rx, obj$saem.pars, pred=function() nlmixr_pred)
+        saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=function() nlmixr_pred)
         message("done.")
         obj$env$saem.fit <- saem.fit;
-        return(saem.fit);
+        return(obj$env$saem.fit);
     } else if (!is.null(obj$lin.solved)) {
         message("Compiling SAEM user function...", appendLF=FALSE)
         saem.fit <- gen_saem_user_fn(model=lincmt(ncmt=obj$lin.solved$ncmt,
@@ -999,7 +1007,7 @@ nlmixrUI.saem.fit <- function(obj, infusion=FALSE){
                                                   parameterization = obj$lin.solved$parameterization))
         message("done.")
         obj$env$saem.fit <- saem.fit;
-        return(saem.fit);
+        return(obj$env$saem.fit);
     }
 }
 ##' Generate SAEM model list

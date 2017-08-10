@@ -1786,6 +1786,31 @@ str.focei.fit <- function(object, ...){
     str(fit)
 }
 
+##' @export
+head.focei.fit <- function(object, n=6, ...){
+    message('FOCEI combined dataset and list');
+    env <- attr(object, ".focei.env");
+    message('Head List:')
+    fit <- env$fit;
+    print(head(fit, n=floor(n / 2), ...))
+    message('Head Data (Also accessible by $fit):')
+    m <- as.data.frame(object);
+    return(head(m, n=floor(n / 2), ...))
+}
+
+##' @export
+tail.focei.fit <- function(object, n=6, ...){
+    message('FOCEI combined dataset and list');
+    env <- attr(object, ".focei.env");
+    message('Tail List:')
+    fit <- env$fit;
+    print(tail(fit, n=floor(n / 2), ...))
+    message('Tail Data (Also accessible by $fit):')
+    m <- as.data.frame(object);
+    return(tail(m, n=floor(n / 2), ...))
+}
+
+
 ##' Convert fit to FOCEi style fit
 ##'
 ##' @param object Fit object to convert to FOCEi-style fit.
