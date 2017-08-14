@@ -514,7 +514,7 @@ nlmixrBounds <- function(fun){
                         env$df$label <- tmp
                     } else {
                         ## stop("Currently only thetas can be labeled");
-                        warning("Currently only thetas can be labeled")
+                        ## warning("Currently only thetas can be labeled")
                     }
                 }
             } else if (identical(x[[1]], quote(`condition`))){
