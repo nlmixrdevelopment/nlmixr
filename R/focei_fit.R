@@ -1007,6 +1007,10 @@ focei.fit.data.frame0 <- function(data,
             func <- function(theta){
                 new.args <- args;
                 args$theta <- theta;
+                args$eta <- attr(ret, "posthoc");
+                if (con$inner.opt == "n1qn1"){
+                    args$c.hess <- attr(ret, "c.hess");
+                }
                 ret <- do.call(getFromNamespace("rxFoceiInner","RxODE"), args)
             }
             if (print.grad && !con$grad){
