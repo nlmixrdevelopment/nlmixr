@@ -525,6 +525,21 @@ genOM <- function(s)
 #' @author Wenping Wang & Matthew Fidler
 #' @export
 plot.focei.fit <- function(x, ...) {
+    if (class(x) == "nlmixr.ui.saem") {
+      m = x$saem$par_hist
+      df = data.frame(
+        val=as.vector(m),
+        par=rep(1:ncol(m), each=nrow(m)),
+        iter=rep(1:nrow(m), ncol(m))
+      )
+      
+      p0 = ggplot(df, aes(iter, val)) +
+        geom_line() +
+        facet_wrap(~par, scales = "free_y")
+      
+      print(p0)
+    }
+    
     dat <- as.data.frame(x);
     d1 <- data.frame(DV=dat$DV, stack(dat[, c("PRED", "IPRED")]))
 
