@@ -566,8 +566,8 @@ par.hist.default <- function(x, stacked=FALSE, ...){
 #' @export
 plot.focei.fit <- function(x, ...) {
     m = par.hist(x, stacked=TRUE);
-    if (is.null(m)){
-        p0 = ggplot(df, aes(iter, val)) +
+    if (!is.null(m)){
+        p0 = ggplot(m, aes(iter, val)) +
             geom_line() +
             facet_wrap(~par, scales = "free_y")
 
