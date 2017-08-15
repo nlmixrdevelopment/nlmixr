@@ -709,7 +709,7 @@ focei.fit.data.frame <- function(...){
 }
 
 focei.fit.data.frame0 <- function(data,
-                                 inits,
+                                  inits,
                                  PKpars,
                                  diag.xform=c("sqrt", "log", "identity"),
                                  optim=c(
@@ -821,7 +821,8 @@ focei.fit.data.frame0 <- function(data,
         save.curve=TRUE,
         numDeriv.method1="simple",
         numDeriv.method2="Richardson",
-        numDeriv.swap=2.3
+        numDeriv.swap=2.3,
+        logify=TRUE
     )
 
     curi <- 0;
@@ -876,7 +877,7 @@ focei.fit.data.frame0 <- function(data,
     }
 
     ## print(th0.om)
-    model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad, pred.minus.dv=con$pred.minus.dv);
+    model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad, pred.minus.dv=con$pred.minus.dv, logify=con$logify);
     message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
     message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
     if (con$grad){
