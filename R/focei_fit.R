@@ -514,6 +514,45 @@ genOM <- function(s)
     .mat[col(.mat) >= row(.mat)] <- a
     .mat
 }
+##' Parameter history extraction
+##'
+##' @param x object to extract parameter history from
+##' @param stacked Should the data frame be stacked (default FALSE)
+##' @param ... Other parameters (currently ignored)
+##' @return A data frame with the parameter history.  NULL if no
+##'     information is available
+##' @author Matthew L. Fidler & Wenping Wang
+par.hist <- function(x, stacked=FALSE, ...){
+    UseMethod("par.hist")
+}
+##' @rdname par.hist
+##' @export
+par.hist.nlmixr.ui.saem <- function(x, stacked=FALSE, ...){
+    m = x$saem$par_hist
+    df = data.frame(
+        val=as.vector(m),
+        par=rep(1:ncol(m), each=nrow(m)),
+        iter=rep(1:nrow(m), ncol(m))
+    )
+    if (!stacked){
+        df <-  data.frame(iter=df$iter, unstack(df,val~par));
+    }
+    return(df)
+}
+##' @rdname par.hist
+##' @export
+par.hist.nlmixr.ui.focei.fit <- function(x, stacked=FALSE, ...){
+    m <- x$fit.df
+    if (stacked){
+        m <- data.frame(stack(m[,-1]), iter=m$iter);
+        names(m) <- c("val", "par", "iter")
+    }
+    return(m)
+}
+
+par.hist.default <- function(x, stacked=FALSE, ...){
+    return(NULL)
+}
 
 #' Plot a focei.fit plot
 #'
@@ -525,21 +564,15 @@ genOM <- function(s)
 #' @author Wenping Wang & Matthew Fidler
 #' @export
 plot.focei.fit <- function(x, ...) {
-    if (class(x) == "nlmixr.ui.saem") {
-      m = x$saem$par_hist
-      df = data.frame(
-        val=as.vector(m),
-        par=rep(1:ncol(m), each=nrow(m)),
-        iter=rep(1:nrow(m), ncol(m))
-      )
-      
-      p0 = ggplot(df, aes(iter, val)) +
-        geom_line() +
-        facet_wrap(~par, scales = "free_y")
-      
-      print(p0)
+    m = par.hist(x, stacked=TRUE);
+    if (is.null(m)){
+        p0 = ggplot(df, aes(iter, val)) +
+            geom_line() +
+            facet_wrap(~par, scales = "free_y")
+
+        print(p0)
     }
-    
+
     dat <- as.data.frame(x);
     d1 <- data.frame(DV=dat$DV, stack(dat[, c("PRED", "IPRED")]))
 
@@ -700,6 +733,7 @@ focei.fit.data.frame0 <- function(data,
     sink.file <- tempfile();
     orig.sink.number <- sink.number()
     do.sink <- TRUE;
+    fit.df <- NULL;
     sink.close <- function(n=orig.sink.number){
         if (do.sink){
             while(sink.number() > n){
@@ -1216,6 +1250,7 @@ focei.fit.data.frame0 <- function(data,
                     if (exists(last, envir=ofv.cache, inherits=FALSE)){
                         last.info <- get(last, envir=ofv.cache, inherits=FALSE);
                         message(sprintf("Step %s: %s", curi, substr(last, 3, nchar(last))), appendLF=FALSE);
+                        fit.df <<- rbind(fit.df, data.frame(t(c(iter=curi, objf=ofv, last.info$pars*inits.vec))))
                         curi <<- curi + 1;
                         if (is.null(ofv.cache$last)){
                         } else if (ofv.cache$last$ofv > last.info$ofv){
@@ -1714,8 +1749,15 @@ focei.fit.data.frame0 <- function(data,
         fit$omega <- rxSymEnv$omega;
         if (length(eta.names) == dim(fit$omega)[1]){
             dimnames(fit$omega) <- list(eta.names, eta.names);
+        } else {
+            eta.names <- sprintf("Omega*[%d]", seq(1, dim(fit$omega)[1]));
         }
+
         fit$eta.names <- eta.names;
+        if (!is.null(fit.df)){
+            names(fit.df) <- c("iter", "objf", nms, eta.names)
+            fit$fit.df <- fit.df;
+        }
         w <- seq_along(nms)
         if (con$NOTRUN){
             fit$par.data.frame <- data.frame(est=fit$theta, row.names=nms);
