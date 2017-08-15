@@ -522,6 +522,7 @@ genOM <- function(s)
 ##' @return A data frame with the parameter history.  NULL if no
 ##'     information is available
 ##' @author Matthew L. Fidler & Wenping Wang
+##' @export
 par.hist <- function(x, stacked=FALSE, ...){
     UseMethod("par.hist")
 }
