@@ -238,6 +238,73 @@ n1qn1_wrap(
   END_RCPP
 }
 
+extern "C" void qnbd_ (int indqn,S2_fp simul,int n[], double x[],double f[], double g[],int imp[],int io[],double zero[],
+		       int napmax[], int itmax[],double epsf[],double epsg[],double epsx[],double df0[],double binf[],double bsup[],
+		       int nfac[], double trav[],int ntrav[],double itrav[],double nitrav[], int izs[], int rzs[], int dzs[]);
+
+/*
+inqn = indicator of qnbd
+
+Notes from google translate from french.
+
+Input: 1 = standard
+2 =  dh and initialized at the beginning of work and Ifac, f, g initialize
+
+output:
+  If <0 incapable of calculating a point better than the initial point
+  If = 0 stop by the user
+  If> 0 one provides a better point than the starting point
+  <-10 unsuitable input parameters
+  = -6 stop when calculating the direction of descent and iter = 1
+  = -5 stop when calculating the approximation of the hessian iter = 1
+  = -3 Simul anomaly: negative sign at a point or F and g have been previously computed
+  = -2 failure of linear search at the first iteration
+  = -1 f not defined at the initial point
+  = 1 stop on epsg
+  = 2 stop on epsf
+  = 3 stop on epsx
+  = 4 napmax
+  = 5 itmax
+  = 6 slope in the opposite direction to the gradient too small
+  = 7 stop when calculating the direction of descent
+  = 8 stop when calculating the Hessian approximation
+  = 10 stop by linear search failure, cause not specified
+  = 11 idem with indsim <0
+  = 12 a step too small close to a step too big 
+    This may result from an error in the gradient
+  = 13 too many calls in a linear search
+
+n = Dimension of x
+Binf, bsup terminals inf, sup, dim n e?
+X = variables to optimize (control) es
+F value of criterion s
+G gradient of f s
+Zero close zero machine e
+Napmax maximum number of simulate calls
+Itmax maximum number of descent itineraries e
+Itrav vect work dim nitrav = 2n, decomposes into indic and izig
+Nfac number of factorized variables (e if indqn = 2) s
+Imp printing factor
+    - Varies from 0 (no impressions) to 3 (many impressions)
+Io number of the results file e
+Epsx vect dim n precision on x e
+Epsf critere stop on f e
+Epsg stop if sup a norm2 (g +) / n e
+Work vect work dim ntrav
+  It is necessary to ntrav> n (n + 1) / 2 + 6n
+  Df0> 0 decrement f prevue (take 1. by default) e
+    Izs, rzs, dzs: cf modulopt standards
+
+    Indications on internal variables a qnbd and zqnbd
+    Izig is used for storing constraints (active if izag> 1)
+    If i does not change d ens, remove 1 a izig (positive)
+    Otherwise we add izag
+    Factorization only if izig is zero
+    Dh Hessian estimate dim n (n + 1) / 2 ranked in three parts
+    Indic (i) new index of index i
+    Indic vect dim n order of storage of indices
+    No need to initialize it if indqn = 1
+ */
 
 /*
 
