@@ -731,6 +731,7 @@ focei.fit.data.frame0 <- function(data,
                                  eta.names=NULL){
     orig.data <- data;
     colnames(data) <- toupper(names(data));
+    do.table <- FALSE;
     sink.file <- tempfile();
     orig.sink.number <- sink.number()
     do.sink <- TRUE;
@@ -820,9 +821,10 @@ focei.fit.data.frame0 <- function(data,
         inner.opt="n1qn1",
         save.curve=TRUE,
         numDeriv.method1="simple",
-        numDeriv.method2="Richardson",
+        numDeriv.method2="simple",
         numDeriv.swap=2.3,
-        logify=TRUE
+        logify=TRUE,
+        theta.grad=TRUE
     )
 
     curi <- 0;
@@ -855,6 +857,10 @@ focei.fit.data.frame0 <- function(data,
         }
         con$grad <- FALSE;
     }
+    if (con$NOTRUN){
+        con$theta.grad <- FALSE;
+        print.grad <- FALSE;
+    }
     if(is(model, "RxODE") || is(model, "character")) {
         ODEmodel = TRUE
         if (class(pred) != "function"){
@@ -877,7 +883,9 @@ focei.fit.data.frame0 <- function(data,
     }
 
     ## print(th0.om)
-    model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad, pred.minus.dv=con$pred.minus.dv, logify=con$logify);
+    model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad,
+                                     pred.minus.dv=con$pred.minus.dv, logify=con$logify,
+                                     theta.derivs=con$theta.grad);
     message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
     message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
     if (con$grad){
@@ -1050,23 +1058,13 @@ focei.fit.data.frame0 <- function(data,
                          atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
                          atol.outer=con$atol.outer, rtol.outer=con$rtol.outer,
                          pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver,
-                         inner.opt=con$inner.opt);
+                         inner.opt=con$inner.opt, add.grad=print.grad, numDeriv.method=numDeriv.method,
+                         table=do.table);
+            ##method=numDeriv.method
             if (!is.null(inits.mat.bak)){
                 args$eta.bak=inits.mat.bak[.wh, ];
             }
             ret <- do.call(getFromNamespace("rxFoceiInner","RxODE"), args)
-            func <- function(theta){
-                new.args <- args;
-                args$theta <- theta;
-                args$eta <- attr(ret, "posthoc");
-                if (con$inner.opt == "n1qn1"){
-                    args$c.hess <- attr(ret, "c.hess");
-                }
-                ret <- do.call(getFromNamespace("rxFoceiInner","RxODE"), args)
-            }
-            if (print.grad && !con$grad){
-                attr(ret, "grad") <- c(numDeriv::grad(func, args$theta, method=numDeriv.method), attr(ret, "omega.28")) / inits.vec
-            }
             attr(ret, "wh") <- .wh; ## FIXME move to C?
             return(ret)
         }
@@ -1751,11 +1749,8 @@ focei.fit.data.frame0 <- function(data,
         fit$omega <- rxSymEnv$omega;
         if (length(eta.names) == dim(fit$omega)[1]){
             dimnames(fit$omega) <- list(eta.names, eta.names);
-        } else {
-            eta.names <- sprintf("Omega*[%d]", seq(1, dim(fit$omega)[1]));
+            fit$eta.names <- eta.names;
         }
-
-        fit$eta.names <- eta.names;
         if (!is.null(fit.df)){
             names(fit.df) <- c("iter", "objf", nms, eta.names)
             fit$fit.df <- fit.df;
@@ -1781,6 +1776,11 @@ focei.fit.data.frame0 <- function(data,
     sink.close()
     con$cores <- 1; ## don't run parallel for extracting infomration
     find.best.eta <- FALSE;
+    print.grad <- FALSE; ## Turn off slow gradient calculation
+    old.model <- model;
+    model$theta <- NULL;
+    model$outer <- NULL;
+    do.table <- TRUE
     message("Calculating Table Variables...")
     pt <- proc.time();
     if (any("ipred" == calculate.vars)){
@@ -1819,6 +1819,7 @@ focei.fit.data.frame0 <- function(data,
                            covariance=fit$cov.time["elapsed"],
                            table=fit$table.time["elapsed"],
                            row.names="");
+    model <- old.model;
     fit$model <- model;
     message("done")
     data
