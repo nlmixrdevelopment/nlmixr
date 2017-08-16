@@ -1249,10 +1249,10 @@ focei.fit.data.frame0 <- function(data,
                 lines <- subset.lines(lines);
                 last <- optim.obj(lines);
                 if (last != ""){
-                    fit.df <<- rbind(fit.df, data.frame(t(c(iter=curi, objf=ofv, pars*inits.vec))))
                     if (exists(last, envir=ofv.cache, inherits=FALSE)){
                         last.info <- get(last, envir=ofv.cache, inherits=FALSE);
                         message(sprintf("Step %s: %s", curi, substr(last, 3, nchar(last))), appendLF=FALSE);
+                        fit.df <<- rbind(fit.df, data.frame(t(c(iter=curi, objf=as.numeric(substr(last, 3, nchar(last))), last.info$pars*inits.vec))))
                         curi <<- curi + 1;
                         if (is.null(ofv.cache$last)){
                         } else if (ofv.cache$last$ofv > last.info$ofv){
