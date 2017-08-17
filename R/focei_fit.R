@@ -639,6 +639,7 @@ focei.fit <- function(data,
                       diag.xform=c("sqrt", "log", "identity"),
                       optim=c(
                           ## "n1qn1",
+                          "L-BFGS-B",
                           "bobyqa",
                           "lbfgsb3",
                           ## "newuoa",
@@ -714,6 +715,7 @@ focei.fit.data.frame0 <- function(data,
                                  diag.xform=c("sqrt", "log", "identity"),
                                  optim=c(
                                      ## "n1qn1",
+                                     "L-BFGS-B", ## From optim
                                      "bobyqa",
                                      "lbfgsb3",
                                      ## "newuoa",
@@ -791,7 +793,8 @@ focei.fit.data.frame0 <- function(data,
         rtol.outer=1e-8,
         maxsteps.ode = 99999,
         reltol.outer = 1e-4,
-        cores=1,
+        absltol.outer = 1e-4,
+        cores=2,
         transit_abs=FALSE,
         NONMEM=TRUE,
         NOTRUN=FALSE,
@@ -800,7 +803,7 @@ focei.fit.data.frame0 <- function(data,
         ## Almquist does DV-PRED
         pred.minus.dv=TRUE,
         switch.solver=FALSE,
-        cov.method="s",
+        cov.method="r,s",
         factr=1e10,
         grad=FALSE,
         accept.eta.size=1.5,
@@ -848,7 +851,7 @@ focei.fit.data.frame0 <- function(data,
     }
 
     optim.method <- match.arg(optim);
-    grad.methods <- c("lbfgs", "lbfgsb3", "nlminb", "mma", "slsqp", "lbfgs-nlopt", "tnewton_precond_restart",
+    grad.methods <- c("L-BFGS-B", "lbfgs", "lbfgsb3", "nlminb", "mma", "slsqp", "lbfgs-nlopt", "tnewton_precond_restart",
                       "tnewton_precond", "tnewton", "var1", "var2", "n1qn1")
     print.grad <- any(optim.method == grad.methods);
     if (con$grad && !print.grad){
@@ -1127,20 +1130,24 @@ focei.fit.data.frame0 <- function(data,
     optim.obj <- function(lines, prefix="o"){
         if (class(lines) == "numeric"){
             ofv <- lines;
-            if (any(optim.method == c("nlminb", "newuoa", "bobyqa", "uobyqa", "n1qn1"))){
+            if (any(optim.method == c("L-BFGS-B"))){
+                return(sprintf("%s.%.6f", prefix, ofv))
+            } else if (any(optim.method == c("nlminb", "newuoa", "bobyqa", "uobyqa", "n1qn1"))){
                 return(paste0(prefix, ".", gsub("^ *", "", sprintf("%#14.8g",ofv))));
-    } else if (optim.method == "lbfgsb3"){
-        ## This uses dblepr("",)
-        ##  call dblepr(" f=",-1, f, 1)
-        ## According to r documentation this is the same as printing a number.
-        ## I believe this is the same as format(#)
-        return(sprintf("%s.%s", prefix, format(last.ofv)));
-    } else {
-        ## The R interface uses Rprintf("%f")
-        return(sprintf("%s.%s", prefix, sprintf("%f", last.ofv)));
-    }
+            } else if (optim.method == "lbfgsb3"){
+                ## This uses dblepr("",)
+                ##  call dblepr(" f=",-1, f, 1)
+                ## According to r documentation this is the same as printing a number.
+                ## I believe this is the same as format(#)
+                return(sprintf("%s.%s", prefix, format(last.ofv)));
+            } else {
+                ## The R interface uses Rprintf("%f")
+                return(sprintf("%s.%s", prefix, sprintf("%f", last.ofv)));
+            }
         } else {
-            if (any(optim.method == c("newuoa", "nlminb", "bobyqa", "uobyqa", "n1qn1"))){
+            if (any(optim.method == c("L-BFGS-B"))){
+                reg <- rex::rex("iter", any_spaces, any_numbers, any_spaces, "value", any_spaces, capture(regNum));
+            } else if (any(optim.method == c("newuoa", "nlminb", "bobyqa", "uobyqa", "n1qn1"))){
                 reg <- rex::rex(any_spaces, any_numbers, ":", any_spaces, capture(regNum), any_spaces, ":",anything);
             } else if  (optim.method == "lbfgsb3") {
                 reg <- rex::rex(anything, "f", any_spaces, "=", any_spaces,
@@ -1370,7 +1377,7 @@ focei.fit.data.frame0 <- function(data,
                                        return(attr(x,"grad"))
                                    })) + pars * con$precision  * extra;
             assign(optim.obj(llik, "l"), gr, envir=ofv.cache, inherits=FALSE);
-            return(gr);
+        return(gr);
         ## } else {
         ##     if (con$fix.eta.for.grad){
         ##         find.best.eta <<- FALSE; ## Keep etas.
@@ -1396,7 +1403,28 @@ focei.fit.data.frame0 <- function(data,
 
     opt <- function(){
         fit <- NULL;
-        if (optim.method=="lbfgsb3"){
+        if (optim.method == "L-BFGS-B"){
+            par <- rep(1, length(inits.vec));
+            fit <- try({stats::optim(par=par, fn=ofv.FOCEi, gr=gr.FOCEi,
+                                     method=optim.method,
+                                     control=list(trace=1, REPORT=1),
+                                     lower=par.lower,
+                                     upper=par.upper,
+                                     hessian=regexpr("r", con$cov.method) != -1)});
+            if (inherits(fit, "try-error") && !is.null(sigdig.fit)){
+                if (attr(fit, "condition")$message == "sigidig exit"){
+                    fit <- sigdig.fit
+                } else {
+                    lines <- sink.get();
+                    if (!(length(lines) == 1L && lines[1L] == ""))
+                        message(paste0(lines, collapse="\n"), "\n");
+                    fit <- NULL;
+                }
+            } else if (!is.null(fit) && any(names(fit) == "value")) {
+                fit$objective <- fit$value;
+                fit$value <- NULL;
+            }
+        } else if (optim.method=="lbfgsb3"){
             prm <- rep(1, length(inits.vec));
             if (requireNamespace("lbfgsb3", quietly = TRUE)){
                 fit <- try({lbfgsb3::lbfgsb3(prm=prm,
@@ -1657,16 +1685,23 @@ focei.fit.data.frame0 <- function(data,
             ## Use First Order condition for covariance
             ## inits.mat <- matrix(0, nSUB, nETA)
             if (con$cov.method != "s"){
-                R1 <- optimHess(fit$par, ofv.FOCEi, gr.FOCEi);
+                if (any(names(fit) == "hessian")){
+                    R1 <- fit$hessian
+                } else {
+                    R1 <- optimHess(fit$par, ofv.FOCEi, gr.FOCEi);
+                }
                 Rinv <- RxODE::rxInv(R1)
                 if (det(R1) <= 0){
-                    warning("Non positive-definite Hessian matrix when calculating the covariance; Correcting with nearPD")
+                    warning("Non positive-definite Hessian matrix when calculating the covariance; Falling back to S-matrix covariance")
                     fit$hessian.bad <- R1;
-                    R1 <- as.matrix(Matrix::nearPD(R1)$mat);
-                    Rinv <- RxODE::rxInv(R1);
-                    fit$warning <- "Non positive-definite Hessian matrix when calculating the covariance; Correcting with nearPD"
+                    ## R1 <- as.matrix(Matrix::nearPD(R1)$mat);
+                    ## Rinv <- RxODE::rxInv(R1);
+                    con$cov.method <- "s"
+                    fit$warning <- "Non positive-definite Hessian matrix when calculating the covariance; Falling back to S-matrix covariance"
+                    Rinv <- NULL
+                } else {
+                    Rinv = m %*% Rinv %*% m
                 }
-                Rinv = m %*% Rinv %*% m
             } else {
                 Rinv <- NULL
             }
