@@ -1008,6 +1008,7 @@ focei.fit.data.frame0 <- function(data,
             message("\nKey:")
             message(" S: Scaled Parameter values");
             message(" U: Unscaled Parameter values");
+            message(" X: eXp(Unscaled Parameter value)");
             if(print.grad){
                 message(" G: Gradient");
             }
@@ -1260,21 +1261,36 @@ focei.fit.data.frame0 <- function(data,
                         fit.df <<- rbind(fit.df, data.frame(t(c(iter=curi, objf=as.numeric(substr(last, 3, nchar(last))), last.info$pars*inits.vec))))
                         curi <<- curi + 1;
                         if (is.null(ofv.cache$last)){
+                            message("")
                         } else if (ofv.cache$last$ofv > last.info$ofv){
-                            message(sprintf(" (%s reduction)", format(ofv.cache$last$ofv - last.info$ofv)), appendLF=FALSE)
+                            message(sprintf(" (%s reduction)", format(ofv.cache$last$ofv - last.info$ofv)))
                             reset <- TRUE;
                         } else {
-                            message(sprintf(" (%s increase)", format(last.info$ofv - ofv.cache$last$ofv)), appendLF=FALSE)
+                            message(sprintf(" (%s increase)", format(last.info$ofv - ofv.cache$last$ofv)))
                         }
-                        message(paste0("\n S: ", paste(sapply(last.info$pars, function(x){sprintf("%#8g", x)}), collapse=" ")))
-                        message(paste0(" U: ", paste(sapply(last.info$pars*inits.vec, function(x){sprintf("%#8g", x)}), collapse=" ")))
-                            grad.txt <- optim.obj(last.info$llik, "l");
+                        p <- rbind(data.frame(t(c(last.info$pars))),
+                                   data.frame(t(c(last.info$pars * inits.vec))),
+                                   data.frame(exp(t(c(last.info$pars * inits.vec)))))
+                        rn <- c("S:", "U:", "X:")
+                        ## message(paste0("\n S: ", paste(sapply(last.info$pars, function(x){sprintf("%#8g", x)}), collapse=" ")))
+                        ## message(paste0(" U: ", paste(sapply(last.info$pars*inits.vec, function(x){sprintf("%#8g", x)}), collapse=" ")))
+                        ## message(paste0(" X: ", paste(sapply(last.info$pars*inits.vec, function(x){sprintf("%#8g", exp(x))}), collapse=" ")))
+                        grad.txt <- optim.obj(last.info$llik, "l");
                         if (exists(grad.txt, envir=ofv.cache, inherits=FALSE)){
                             last.grad <- get(grad.txt, envir=ofv.cache, inherits=FALSE);
-                            message(paste0(" G: ", paste(sapply(last.grad, function(x){sprintf("%#8g", x)}), collapse=" ")))
-                            }
+                            p <- rbind(p,
+                                       data.frame(t(c(last.grad))))
+                            rn <- c(rn, "G:")
+                        }
                         if (is.null(ofv.cache$last)){
                             reset <- TRUE;
+                            rownames(p) <- rn;
+                            if ((length(theta.names) + length(eta.names)) == length(names(p))){
+                                names(p) <- c(theta.names, paste0("ome(", eta.names, ")"));
+                            } else {
+                                names(p)[seq_along(nms)] <- nms
+                            }
+                            print(p)
                         } else {
                             last.pars <- ofv.cache$last$pars
                             cur.pars <- last.info$pars
@@ -1287,7 +1303,16 @@ focei.fit.data.frame0 <- function(data,
                             ## NONMEM's sigdigs as per http://cognigencorp.com/nonmem/current/2012-October/3654.html
                             ##
                             sdig <- -log10(abs(cur.pars - last.pars)) - 1;
-                            message(paste0(" D: ", paste(sapply(sdig, function(x){sprintf("%f", x)}), collapse=" ")))
+                            rn <- c(rn, "D:");
+                            p <- rbind(p,
+                                       data.frame(t(sdig)));
+                            rownames(p) <- rn;
+                            if ((length(theta.names) + length(eta.names)) == length(names(p))){
+                                names(p) <- c(theta.names, paste0("ome(", eta.names, ")"));
+                            } else {
+                                names(p)[seq_along(nms)] <- nms
+                            }
+                            print(p)
                             if (all(sdig > con$numDeriv.swap)){
                                 numDeriv.method <- con$numDeriv.method2
                             }
@@ -1792,9 +1817,9 @@ focei.fit.data.frame0 <- function(data,
         }
         w <- seq_along(nms)
         if (con$NOTRUN){
-            fit$par.data.frame <- data.frame(est=fit$theta, row.names=nms);
+            fit$par.data.frame <- data.frame(est=fit$theta, "exp(est)"=exp(fit$theta), row.names=nms);
         } else {
-            fit$par.data.frame <- data.frame(est=fit$theta, se=fit$se[w], "%cv"=fit$se[w] / fit$theta * 100,
+            fit$par.data.frame <- data.frame(est=fit$theta, "exp(est)"=exp(fit$theta), "se(est)"=fit$se[w], "%cv(est)"=fit$se[w] / fit$theta * 100,
                                              check.names=FALSE, row.names=nms);
         }
         env <- environment(ofv.FOCEi);

@@ -11,7 +11,10 @@
 ## - Initial conditions for residuls.
 ## - Error structure
 ## -
+## Check on unified SD for SAEM
+## Check on output for OMEGA (is is Var or SD)
 
+## Also need to add check for types of omega blocks
 
 ##' Prepares the UI function and returns a list.
 ##'
