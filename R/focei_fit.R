@@ -536,7 +536,7 @@ par.hist.nlmixr.ui.saem <- function(x, stacked=FALSE, ...){
         iter=rep(1:nrow(m), ncol(m))
     )
     if (!stacked){
-        df <-  data.frame(iter=df$iter, unstack(df,val~par));
+        df <-  data.frame(iter=df$iter, utils::unstack(df,val~par));
     }
     return(df)
 }
@@ -1932,7 +1932,15 @@ str.focei.fit <- function(object, ...){
 }
 
 ##' @export
-head.focei.fit <- function(object, n=6, ...){
+head.focei.fit <- function(x, ...){
+    x <- object;
+    ## hack to be consistent with method... and satisfy CMD CHECK
+    args <- as.list(match.call(expand.dots))
+    if (any(names(args) == "n")){
+        n <- args$n
+    } else {
+        n <- 6
+    }
     message('FOCEI combined dataset and list');
     env <- attr(object, ".focei.env");
     message('Head List:')
@@ -1944,7 +1952,15 @@ head.focei.fit <- function(object, n=6, ...){
 }
 
 ##' @export
-tail.focei.fit <- function(object, n=6, ...){
+tail.focei.fit <- function(x, ...){
+    x <- object;
+    ## hack to be consistent with method... and satisfy CMD CHECK
+    args <- as.list(match.call(expand.dots))
+    if (any(names(args) == "n")){
+        n <- args$n
+    } else {
+        n <- 6
+    }
     message('FOCEI combined dataset and list');
     env <- attr(object, ".focei.env");
     message('Tail List:')
@@ -1961,10 +1977,11 @@ tail.focei.fit <- function(object, n=6, ...){
 ##' @param object Fit object to convert to FOCEi-style fit.
 ##' @param uif Unified Interface Function
 ##' @param pt Proc time object
-##' @param ...  Other Parameters
+##' @param ... Other Parameters
+##' @param data The data to pass to the FOCEi translation.
 ##' @return A FOCEi fit style object.
 ##' @author Matthew L. Fidler
-as.focei <- function(object, uif, pt=proc.time(), ...){
+as.focei <- function(object, uif, pt=proc.time(), ..., data){
     UseMethod("as.focei");
 }
 

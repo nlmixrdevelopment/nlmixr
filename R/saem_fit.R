@@ -1123,7 +1123,12 @@ saem.fit <- function(model, data, inits,
 
 ##' @rdname saem.fit
 ##' @export
-saem.fit.nlmixr.ui.nlme <- function(model, ...){
+saem.fit.nlmixr.ui.nlme <- function(model, data, inits,
+                                    PKpars=NULL, pred=NULL,
+                                    covars=NULL,
+                                    mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+                                    ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                                    seed = 99){
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     names(call)[1] <- "object"
     call$est <- "saem";
@@ -1150,7 +1155,7 @@ saem.fit.RxODE <- function(model, data, inits,
     model = list(saem_mod=saem_fit, covars=covars)
     cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed)
     fit = saem_fit(cfg)
-                                        #dyn.unload("saem_main.dll")
+    ##dyn.unload("saem_main.dll")
     fit
 }
 

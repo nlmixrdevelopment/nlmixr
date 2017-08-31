@@ -38,6 +38,7 @@
 ##'   \item{SS}{Steady State}
 ##'   \item{II}{Interdose Interval}
 ##'   \item{SD}{Single Dose Flag}
+##'   \item{RATE}{NONMEM Rate}
 ##'   \item{CMT}{Compartment}
 ##' }
 ##'

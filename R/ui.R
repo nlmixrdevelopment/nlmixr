@@ -16,6 +16,13 @@
 
 ## Also need to add check for types of omega blocks
 
+## SAEM:
+## - Sometimes with random effects the residuals effects do not work.
+## - ODE for proportional error does not seem to work...  The parameter
+##   estimates are all over the place.
+## - If you define the peripheral compartment it doesn't work well.
+## - Covariate part
+
 ##' Prepares the UI function and returns a list.
 ##'
 ##' @param fun UI function

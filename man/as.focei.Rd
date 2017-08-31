@@ -5,7 +5,7 @@
 \alias{as.focei.nlmixr_nlme}
 \title{Convert fit to FOCEi style fit}
 \usage{
-as.focei(object, uif, pt = proc.time(), ...)
+as.focei(object, uif, pt = proc.time(), ..., data)
 
 \method{as.focei}{nlmixr_nlme}(object, uif, pt = proc.time(), ..., data)
 }
@@ -17,6 +17,8 @@ as.focei(object, uif, pt = proc.time(), ...)
 \item{pt}{Proc time object}
 
 \item{...}{Other Parameters}
+
+\item{data}{The data to pass to the FOCEi translation.}
 }
 \value{
 A FOCEi fit style object.

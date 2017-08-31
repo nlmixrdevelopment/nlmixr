@@ -719,7 +719,7 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
 ##'
 ##' @inheritParams nlme::nlme
 ##'
-##' @export
+##' @export nlme.fit
 nlme.fit <- function(model, data, fixed, random = fixed,
                      groups, start, correlation = NULL, weights = NULL, subset,
                      method = c("ML", "REML"), na.action = na.fail, naPattern,

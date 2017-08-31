@@ -6,7 +6,7 @@
 \alias{nlmixr.nlmixrUI}
 \alias{nlmixr.nlmixr.ui.nlme}
 \alias{nlmixr.nlmixr.ui.focei.fit}
-\title{nlmixr generalized function}
+\title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
 nlmixr(object, data, est = "nlme", ...)
 
@@ -31,7 +31,12 @@ nlmixr(object, data, est = "nlme", ...)
 Either a nlmixr model or a nlmixr fit object
 }
 \description{
-nlmixr generalized function
+nlmixr is an R package for fitting population pharmacokinetic (PK)
+and pharmacokinetic-pharmacodynamic (PKPD) models.
+}
+\details{
+The nlmixr generalized function allows common access to the nlmixr
+estimation routines.
 }
 \author{
 Matthew L. Fidler

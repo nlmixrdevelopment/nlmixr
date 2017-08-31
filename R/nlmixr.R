@@ -1,8 +1,3 @@
-##' nlmixr fits population PK and PKPD non-linear mixed effects models.
-##'
-##' nlmixr is an R package for fitting population pharmacokinetic (PK)
-##' and pharmacokinetic-pharmacodynamic (PKPD) models.
-##'
 ##' @importFrom stats predict logLik na.fail pchisq
 ##' @importFrom brew brew
 ##' @importFrom lattice xyplot
@@ -21,7 +16,7 @@
 ##' @importFrom Rcpp evalCpp
 ##' @importFrom ggplot2 ggplot aes geom_point facet_wrap geom_line geom_abline xlab geom_smooth
 ##' @useDynLib nlmixr, .registration=TRUE
-"_PACKAGE"
+
 
 rex::register_shortcuts("nlmixr");
 ## GGplot use and other issues...
@@ -44,7 +39,14 @@ nlmixrLogo <- function(str="", version=sessionInfo()$otherPkgs$nlmixr$Version){
 nlmixrVersion <- function(){
     nlmixrLogo()
 }
-##' nlmixr generalized function
+
+##' nlmixr fits population PK and PKPD non-linear mixed effects models.
+##'
+##' nlmixr is an R package for fitting population pharmacokinetic (PK)
+##' and pharmacokinetic-pharmacodynamic (PKPD) models.
+##'
+##' The nlmixr generalized function allows common access to the nlmixr
+##' estimation routines.
 ##'
 ##' @param object Fitted object or
 ##' @param data Data for fit.
