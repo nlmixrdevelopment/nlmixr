@@ -370,9 +370,19 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         eta.names <- ini$eta.names;
     }
     errn <- 0
+
+    any.theta.names <- function(what, th.names){
+        for (i in th.names){
+            if (any(what == i)){
+                return(TRUE)
+            }
+        }
+        return(FALSE)
+    }
+
     f <- function(x) {
         if (is.name(x)) {
-            if (any(as.character(x) == theta.names)){
+            if (any.theta.names(as.character(x), theta.names)){
                 theta.ord <<- unique(c(theta.ord, as.character(x)))
             }
             return(x)
@@ -492,9 +502,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 ## parameters.
                 find.log <- function(x){
                     if (is.atomic(x) || is.name(x)) {
-                        if (any(as.character(x) == theta.names)){
+                        if (any.theta.names(as.character(x), theta.names)){
                             log.theta <<- unique(c(log.theta, as.character(x)))
-                        } else if (any(as.character(x) == eta.names)){
+                        } else if (any.theta.names(as.character(x), eta.names)){
                             log.eta <<- unique(c(log.eta, as.character(x)))
                         }
                         return(x)
@@ -513,14 +523,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 ## print(as.character(x))
                 if (do.pred == 4){
                     if (length(x) >= 3){
-                        if (any(as.character(x[[2]])  == eta.names) &&
-                            any(as.character(x[[3]]) == theta.names)){
+                        if (any.theta.names(as.character(x[[2]]), eta.names) &&
+                            any.theta.names(as.character(x[[3]]), theta.names)){
                             ## Found ETA+THETA
                             mu.ref[[as.character(x[[2]])]] <<- as.character(x[[3]]);
                             ## Collapse to THETA
                             return(x[[3]])
-                        } else if (any(as.character(x[[3]])  == eta.names) &&
-                                   any(as.character(x[[2]]) == theta.names)){
+                        } else if (any.theta.names(as.character(x[[3]]), eta.names) &&
+                                   any.theta.names(as.character(x[[2]]), theta.names)){
                             ## Found THETA+ETA
                             mu.ref[[as.character(x[[3]])]] <<- as.character(x[[2]]);
                             ## Collapse to THETA
@@ -543,17 +553,22 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             find.theta <- function(x){
                                 if  (identical(x[[1]], quote(`+`))){
                                     th <- c();
-                                    if (any(as.character(x[[3]])  == theta.names)){
-                                        th <- as.character(x[[3]]);
-                                    }
-                                    if (length(x[[2]]) > 1){
-                                        return(c(th, find.theta(x[[2]])))
-                                    } else {
-                                        if (any(as.character(x[[2]])  == theta.names)){
-                                            th <- c(th, as.character(x[[2]]));
+                                    if (length(x) >= 3){
+                                        if (any.theta.names(as.character(x[[3]]), theta.names)){
+                                            th <- as.character(x[[3]]);
                                         }
-                                        return(th)
                                     }
+                                    if (length(x) >= 2){
+                                        if (length(x[[2]]) > 1){
+                                            return(c(th, find.theta(x[[2]])))
+                                        } else {
+                                            if (any.theta.names(as.character(x[[2]]), theta.names)){
+                                                th <- c(th, as.character(x[[2]]));
+                                            }
+                                            return(th)
+                                        }
+                                    }
+
                                 }
                             }
                             th <- find.theta(x[[2]]);
@@ -561,7 +576,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                 mu.ref[[eta]] <<- th;
                                 return(x[[2]])
                             }
-                        } else if (any(as.character(x[[3]])  == theta.names) &&
+                        } else if (length(x) < 3) {
+                        } else if (any.theta.names(as.character(x[[3]]), theta.names) &&
                                    length(x[[2]]) > 1){
                             ## This allows 123 + eta.Cl + 123 + Cl + 123
                             ## And collapses to 123  + 123 + Cl + 123
@@ -649,14 +665,25 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (rxode){
         rx.txt <- deparse(body(rest))[-1]
         rx.txt <- rx.txt[-length(rx.txt)];
-        ## now parse ode
-        w <- seq(which(regexpr(rex::rex("d/dt("), rx.txt) != -1)[1], length(rx.txt));
-        rx.ode <- rx.txt[w];
-        rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[-w], "}"), collapse="\n")))
+        reg <- rex::rex(boundary, or(ini$name), boundary);
+        w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+        if (length(w) == 0){
+            stop("Error parsing model -- no parameters found.")
+        }
+        ## Separate ode and pred
+        w <- max(w);
+        if (any(regexpr(rex::rex(or("d/dt(", group("(0)", any_spaces, or("=", "~")))), rx.txt[1:w]) != -1)){
+            ## mixed PK parameters and ODEs
+            stop("Mixed PK/ODEs")
+        } else {
+            rx.ode <- rx.txt[-(1:w)];
+            rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n")))
+            ## Now separate out parameters for SAEM.
+            w <- max(which(regexpr(reg, saem.pars, perl=TRUE) != -1));
+            saem.pars <- c(saem.pars[1:w], "");
+        }
         rxode <- paste(rx.ode, collapse="\n")
         rest <- rx.pred;
-        w <- seq(which(regexpr(rex::rex("d/dt("), saem.pars) != -1)[1], length(saem.pars) - 1);
-        saem.pars <- saem.pars[-w];
         all.vars <- all.vars[!(all.vars %in% RxODE::rxState(rxode))]
         rest.vars <- rest.vars[!(rest.vars %in% RxODE::rxState(rxode))]
     } else {
