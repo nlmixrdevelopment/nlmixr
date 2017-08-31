@@ -639,6 +639,7 @@ focei.fit <- function(data,
                       diag.xform=c("sqrt", "log", "identity"),
                       optim=c(
                           ## "n1qn1",
+                          "lbfgs",
                           "L-BFGS-B",
                           "bobyqa",
                           "lbfgsb3",
@@ -787,10 +788,10 @@ focei.fit.data.frame0 <- function(data,
         TRACE.INNER=FALSE,
         TOL.INNER=1e-4,
         trace = 0,
-        atol.ode=1e-13,
-        rtol.ode=1e-13,
-        atol.outer=1e-8,
-        rtol.outer=1e-8,
+        atol.ode=1e-6,
+        rtol.ode=1e-6,
+        atol.outer=1e-6,
+        rtol.outer=1e-6,
         maxsteps.ode = 99999,
         reltol.outer = 1e-4,
         absltol.outer = 1e-4,
@@ -826,7 +827,7 @@ focei.fit.data.frame0 <- function(data,
         numDeriv.method1="simple",
         numDeriv.method2="simple",
         numDeriv.swap=2.3,
-        logify=TRUE,
+        sum.prod=TRUE,
         theta.grad=TRUE
     )
 
@@ -887,7 +888,7 @@ focei.fit.data.frame0 <- function(data,
 
     ## print(th0.om)
     model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad,
-                                     pred.minus.dv=con$pred.minus.dv, logify=con$logify,
+                                     pred.minus.dv=con$pred.minus.dv, sum.prod=con$sum.prod,
                                      theta.derivs=con$theta.grad);
     message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
     message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
@@ -1131,7 +1132,9 @@ focei.fit.data.frame0 <- function(data,
     optim.obj <- function(lines, prefix="o"){
         if (class(lines) == "numeric"){
             ofv <- lines;
-            if (any(optim.method == c("L-BFGS-B"))){
+            if (any(optim.method == c("lbfgs"))){
+                return(paste0(prefix, ".", RxODE::rxCout(ofv)));
+            } else if (any(optim.method == c("L-BFGS-B"))){
                 return(sprintf("%s.%.6f", prefix, ofv))
             } else if (any(optim.method == c("nlminb", "newuoa", "bobyqa", "uobyqa", "n1qn1"))){
                 return(paste0(prefix, ".", gsub("^ *", "", sprintf("%#14.8g",ofv))));
@@ -1146,7 +1149,9 @@ focei.fit.data.frame0 <- function(data,
                 return(sprintf("%s.%s", prefix, sprintf("%f", last.ofv)));
             }
         } else {
-            if (any(optim.method == c("L-BFGS-B"))){
+            if (any(optim.method == "lbfgs")){
+                reg <- rex::rex("fx = ",capture(regNum));
+            } else if (any(optim.method == c("L-BFGS-B"))){
                 reg <- rex::rex("iter", any_spaces, any_numbers, any_spaces, "value", any_spaces, capture(regNum));
             } else if (any(optim.method == c("newuoa", "nlminb", "bobyqa", "uobyqa", "n1qn1"))){
                 reg <- rex::rex(any_spaces, any_numbers, ":", any_spaces, capture(regNum), any_spaces, ":",anything);
@@ -1428,7 +1433,23 @@ focei.fit.data.frame0 <- function(data,
 
     opt <- function(){
         fit <- NULL;
-        if (optim.method == "L-BFGS-B"){
+        if (optim.method == "lbfgs"){
+            par <- rep(1, length(inits.vec));
+            fit <- try({lbfgs::lbfgs(call_eval=ofv.FOCEi, call_grad=gr.FOCEi, vars=par)});
+            if (inherits(fit, "try-error") && !is.null(sigdig.fit)){
+                if (attr(fit, "condition")$message == "sigidig exit"){
+                    fit <- sigdig.fit
+                } else {
+                    lines <- sink.get();
+                    if (!(length(lines) == 1L && lines[1L] == ""))
+                        message(paste0(lines, collapse="\n"), "\n");
+                    fit <- NULL;
+                }
+            } else if (!is.null(fit) && any(names(fit) == "value")) {
+                fit$objective <- fit$value;
+                fit$value <- NULL;
+            }
+        } else if (optim.method == "L-BFGS-B"){
             par <- rep(1, length(inits.vec));
             fit <- try({stats::optim(par=par, fn=ofv.FOCEi, gr=gr.FOCEi,
                                      method=optim.method,
