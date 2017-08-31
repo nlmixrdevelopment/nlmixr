@@ -68,31 +68,31 @@ c!
       real rzs(*)
       character bufstr*(4096)
       external simul
-      if (imp.gt.0) then
-         call basout(io, lp, '')
-         call basout(io, lp, 
-     $    '***** enters -qn code- (without bound cstr)')
-
-         write(bufstr,750)n,eps,imp
-         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-
-750   	 format('dimension=',i10,', epsq=',e24.16,
-     $ ', verbosity level: imp=',i10)
-
-
-         
-         write(bufstr,751)niter
-         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-751   	 format('max number of iterations allowed: iter=',i10)
-
-         
-         write(bufstr,752) nsim
-         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-752   	 format('max number of calls to costf allowed: nap=',i10)
-         
-         call basout(io ,lp ,
-     $    '------------------------------------------------')
-      endif
+c$$$      if (imp.gt.0) then
+c$$$         call basout(io, lp, '')
+c$$$         call basout(io, lp, 
+c$$$     $    '***** enters -qn code- (without bound cstr)')
+c$$$
+c$$$         write(bufstr,750)n,eps,imp
+c$$$         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$
+c$$$750   	 format('dimension=',i10,', epsq=',e24.16,
+c$$$     $ ', verbosity level: imp=',i10)
+c$$$
+c$$$
+c$$$         
+c$$$         write(bufstr,751)niter
+c$$$         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$751   	 format('max number of iterations allowed: iter=',i10)
+c$$$
+c$$$         
+c$$$         write(bufstr,752) nsim
+c$$$         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$752   	 format('max number of calls to costf allowed: nap=',i10)
+c$$$         
+c$$$         call basout(io ,lp ,
+c$$$     $    '------------------------------------------------')
+c$$$      endif
       nd=1+(n*(n+1))/2
       nw=nd+n
       nxa=nw+n
@@ -102,12 +102,12 @@ c!
       call n1qn1a (simul,n,x,f,g,var,eps,mode,
      1 niter,nsim,imp,lp,zm,zm(nd),zm(nw),zm(nxa),zm(nga),
      2 zm(nxb),zm(ngb),izs,rzs,dzs)
-      if (imp.gt.0) then
-       write(bufstr,753) sqrt(eps)
-       call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-753    format('***** leaves -qn code-, gradient norm=',e24.16)
-     
-      endif
+c$$$      if (imp.gt.0) then
+c$$$       write(bufstr,753) sqrt(eps)
+c$$$       call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$753    format('***** leaves -qn code-, gradient norm=',e24.16)
+c$$$     
+c$$$      endif
       end
 c Scilab ( http://www.scilab.org/ ) - This file is part of Scilab
 c Copyright (C) INRIA
@@ -152,14 +152,14 @@ c     next line added by Serge to avoid Inf and Nan's (04/2007)
       if (vfinite(1,f).ne.1.and.vfinite(n,g).ne.1) indic=-1
       if (indic.gt.0) go to 13
       if (iprint.eq.0) go to 12
-      if (indic.lt.0) then
-        write (bufstr,1000)
-        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-      endif
-      if (indic.eq.0) then
-        write (bufstr,1001)
-        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-      endif
+c$$$      if (indic.lt.0) then
+c$$$        write (bufstr,1000)
+c$$$        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$      endif
+c$$$      if (indic.eq.0) then
+c$$$        write (bufstr,1001)
+c$$$        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$      endif
    12 acc=0.0d+0
       niter=1
       nsim=1
@@ -218,11 +218,7 @@ c               factorisation du hessien
  305  continue
 c
       if (k.ge.n) go to 100
-   70 if (iprint.ne.0) then
-          write(bufstr,1010)
-          call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-      endif
-      go to 20
+ 70   go to 20
 c                verification que la diagonale est positive
    80 k=1
       do 90 i=1,n
@@ -295,17 +291,17 @@ c               initialisation du pas
       if (dff.le.0.0d+0) step=min(step,1.0d+0/c)
       if (dff.gt.0.0d+0) step=min(step,(dff+dff)/(-dga))
 
-      if (iprint.ge.2) then
-         write (bufstr,'(A,I4,A,I4,A,G11.4)') ' iter num ',itr,
-     $                ', nb calls=',nfun,', f=',fa
-         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-
-         if (iprint.ge.3) then
-            write (bufstr,'(A,G11.4)')
-     $            ' linear search: initial derivative=',dga/dnrm2(n,d,1)
-            call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-         endif
-      endif
+c$$$      if (iprint.ge.2) then
+c$$$         write (bufstr,'(A,I4,A,I4,A,G11.4)') ' iter num ',itr,
+c$$$     $                ', nb calls=',nfun,', f=',fa
+c$$$         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$
+c$$$         if (iprint.ge.3) then
+c$$$            write (bufstr,'(A,G11.4)')
+c$$$     $            ' linear search: initial derivative=',dga/dnrm2(n,d,1)
+c$$$            call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$         endif
+c$$$      endif
 c              boucle de reherche lineaire
   170 c=stmin+step
       if (nfun.ge.nsim) go to 250
@@ -320,10 +316,10 @@ c     next line added by Serge to avoid Inf and Nan's (04/2007)
 c              test sur indic
       if (indic.gt.0) goto 185
       if (indic.lt.0) goto 183
-      if (iprint.gt.0) then
-        write (bufstr,1001)
-        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-      endif
+c$$$      if (iprint.gt.0) then
+c$$$        write (bufstr,1001)
+c$$$        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$      endif
       do 182 i=1,n
       x(i)=xb(i)
   182 g(i)=gb(i)
@@ -331,16 +327,16 @@ c              test sur indic
   183 stepbd=step
       ial=1
       step=step/10.0d+0
-      if (iprint.ge.3) then
-         write (bufstr,'(A,G11.4,A,I2)')
-     $   '                step length=',c,', indic=',indic
-         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-      endif
+c$$$      if (iprint.ge.3) then
+c$$$         write (bufstr,'(A,G11.4,A,I2)')
+c$$$     $   '                step length=',c,', indic=',indic
+c$$$         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$      endif
       if (stepbd.gt.steplb) goto 170
-      if (iprint.ne.0.and.isfv.lt.2) then
-        write (bufstr,1023)
-        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-      endif
+c$$$      if (iprint.ne.0.and.isfv.lt.2) then
+c$$$        write (bufstr,1023)
+c$$$        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$      endif
       goto 240
 c             stockage si c'est la plus petite valeur
   185 isfv=min(2,isfv)
@@ -365,11 +361,11 @@ c               calcul de la derivee directionnelle
       s=fb-fa
 * a small change (Bruno): to give a better indication about
 *  the directionnal derivative I scale it by || d ||
-      write (bufstr,'(A,G11.4,A,G11.4,A,G11.4)')
-     $  '                step length=',c,
-     $  ', df=',s,', derivative=',dgb/dnrm2(n,d,1)
-
-      call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$      write (bufstr,'(A,G11.4,A,G11.4,A,G11.4)')
+c$$$     $  '                step length=',c,
+c$$$     $  ', df=',s,', derivative=',dgb/dnrm2(n,d,1)
+c$$$
+c$$$      call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
 c               test si la fonction a descendu
   231 if (fb-fa.le.0.10d+0*c*dga) go to 280
       ial=0
@@ -377,12 +373,7 @@ c               iteration terminee si le pas est minimum
       if (step.gt.steplb) go to 270
   240 if (isfv.ge.2) go to 110
 c               ici, tout est termine
-  250 if (iprint.gt.0) then
-         write (bufstr,'(A,I4,A,I4,A,G11.4)') ' iter num ',itr,
-     $                ', nb calls=',nfun,', f=',f
-         call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-      endif
-      acc=0.0d+0
+ 250  acc=0.0d+0
       do 260 i=1,n
   260 acc=acc+g(i)*g(i)
       niter=itr
@@ -400,10 +391,10 @@ c               interpolation cubique
 c               ceci est un pas de descente
   280 if (ial.eq.0) goto 285
       if (stepbd.gt.steplb) go to 285
-      if (iprint.ne.0.and.isfv.lt.2) then
-        write (bufstr,1023)
-        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
-      endif
+c$$$      if (iprint.ne.0.and.isfv.lt.2) then
+c$$$        write (bufstr,1023)
+c$$$        call basout(io ,lp ,bufstr(1:lnblnk(bufstr)))
+c$$$      endif
       go to 240
   285 stepbd=stepbd-step
       stmin=c
