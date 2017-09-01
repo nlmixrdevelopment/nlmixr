@@ -8,6 +8,13 @@ extern void hermite_ek_compute_(void *, void *, void *);
 extern void parse_ode(void *, void *, void *, void *);
 extern void parse_pars(void *, void *, void *, void *);
 
+/* Internal C calls, should not be called outside of C code. */
+typedef void (*S_fp) (double *, double *);
+extern void nelder_fn(S_fp func, int n, double *start, double *step,
+	       int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
+	       int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
+	       int *iprint);
+
 /* .Call calls */
 extern SEXP neldermead_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP n1qn1_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -48,7 +55,8 @@ static const R_CallMethodDef CallEntries[] = {
 
 void R_init_nlmixr(DllInfo *dll)
 {
+    R_RegisterCCallable("nlmixr","nelder_fn", (DL_FUNC) &nelder_fn);
     R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE);
-    R_forceSymbols(dll,TRUE);
+    R_useDynamicSymbols(dll, TRUE);
+    R_forceSymbols(dll,FALSE);
 }

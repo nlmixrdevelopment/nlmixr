@@ -5,10 +5,10 @@ Rcpp::EvalBase *ev = NULL;                  // pointer to abstract base class
 int NPAR=0;
 
 typedef void (*S_fp) (double *, double *);
-void nelder_(S_fp func, int n, double *start, double *step,
-	     int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
-  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
-  int *iprint);
+extern "C" void nelder_fn(S_fp func, int n, double *start, double *step,
+			  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
+			  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
+			  int *iprint);
 
 void nmfn_wrap(double *x, double *fx)
 {
@@ -41,7 +41,7 @@ BEGIN_RCPP
     ccoef = REAL(ccoefSEXP)[0];
     iprint = INTEGER(iprintSEXP)[0];
 
-    nelder_(nmfn_wrap, NPAR, Start, Step,
+    nelder_fn(nmfn_wrap, NPAR, Start, Step,
             Itmax, ftol_rel, rcoef, ecoef, ccoef,
             &Iconv, &Itnum, &Nfcall, &Ynewlo, Xmin,
             &iprint);

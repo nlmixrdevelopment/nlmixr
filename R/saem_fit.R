@@ -173,6 +173,7 @@ END_RCPP
 
 
 saem_cmt_str = '#include <RcppArmadillo.h>
+#include <R_ext/Rdynload.h>
 #include <Eigen/Dense>
 #include "saem_class_rcpp.hpp"
 #include "lin_cmt.hpp"
@@ -386,6 +387,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   is.win <- .Platform$OS.type=="windows"
   env = environment()
   saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
+  saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
   saem.cpp <- paste0(saem.cpp, ".cpp");
   lwd <- getwd();
@@ -457,8 +459,8 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), .lib)
   cat(make_str, file="Makevars")
 
-  shlib = sprintf('R CMD SHLIB %s %%s -o %s', saem.cpp, saem.dll)
-  shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
+  shlib = sprintf('R CMD SHLIB %s -o %s', saem.cpp, saem.dll)
+  ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
   system(shlib)
   file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
   file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
@@ -531,6 +533,7 @@ parfn.list = c(
 #' @param infusion logical, whether infusion is true
 #' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
 #' @return parameters for a linear compartment model
+#' @author Wenping Wang
 #' @export
 lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #ncmt=1; oral=T; tlag=F; parameterization=1
