@@ -1230,6 +1230,11 @@ focei.eta.saemFit <- function(object, uif, ...){
     }
     ## Reorder based on translation
     eta.trans <- uif$saem.eta.trans
+    for (i in seq(1, max(eta.trans))){
+        while (!(any(i == eta.trans)) && max(eta.trans) > i){
+            eta.trans[eta.trans >= i] <- eta.trans[eta.trans >= i] - 1
+        }
+    }
     ## orig eta ->  new eta
     df <- as.data.frame(uif$ini);
     eta <- df[!is.na(df$neta1), ];

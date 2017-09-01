@@ -114,13 +114,20 @@ nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
 ##' @export
 nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
     dat <- data;
+    bad.focei <- "Problem calculating residuals, returning fit without residuals";
     if (est == "saem"){
         pt <- proc.time()
         model <- uif$saem.model
         cfg   = configsaem(model=model, data=dat, inits=uif$saem.init, ...);
         fit <- model$saem_mod(cfg);
         if (focei.translate){
-            return(as.focei(fit, uif, pt, data=dat))
+            ret <- try(as.focei(fit, uif, pt, data=dat));
+            if (inherits(ret, "try-error")){
+                warning(bad.focei)
+                return(fit)
+            } else {
+                return(ret)
+            }
         } else  {
             return(fit);
         }
@@ -162,7 +169,13 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
         ## CWRES.
         ## return(fit)
         if (focei.translate){
-            return(as.focei(fit, uif, pt, data=dat))
+            ret <- try(as.focei(fit, uif, pt, data=dat))
+            if (inherits(ret, "try-error")){
+                warning(bad.focei)
+                return(fit);
+            } else {
+                return(ret)
+            }
         } else  {
             return(fit);
         }

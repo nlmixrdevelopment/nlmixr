@@ -215,12 +215,20 @@ add.dists <- c("add", "prop");
 ##'     to be guessed from the data and is not included in this function's output
 ##' @author Matthew L. Fidler
 nlmixrUILinCmt <- function(lhs){
+    reg <- rex::rex(start, one_of("V", "v"), capture(number), end);
+    w <- which(regexpr(reg, lhs) != -1);
+    if (length(w) > 0){
+        min.v <- min(as.numeric(gsub(reg, "\\1", lhs[w])));
+        vs <- paste0("V", seq(min.v, min.v + 2))
+    } else {
+        vs <- paste0("V", 1:3);
+    }
     par1 <- list(CL  =c("CL"),
-                 V   =c("V", "VC"),
+                 V   =c("V", "VC", vs[1]),
                  CLD =c("Q", "CLD"),
-                 VT  =c("VT", "VP"),
+                 VT  =c("VT", "VP", vs[2]),
                  CLD2=c("CLD2", "Q2"),
-                 VT2 =c("VT2", "VP2"));
+                 VT2 =c("VT2", "VP2", vs[3]));
     ## If Cmt #1 is the central depot compartment then
     ## K12, K21 = 2 cmt model
     ## K13, K31 = 3 compartment model
