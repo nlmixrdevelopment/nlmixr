@@ -1592,7 +1592,8 @@ focei.fit.data.frame0 <- function(data,
     } else if (sum(dim(con$inits.mat) - c(nSUB, nETA)) == 0){
         inits.mat <- con$inits.mat;
     } else {
-        stop("Mismatch of dimensions")
+        stop(sprintf("Mismatch of dimensions; ETA matrix supplied: %sx%s, expected %sx%s", dim(con$inits.mat)[1], dim(con$inits.mat)[2],
+                     nSUB, nETA))
     }
     if (con$inner.opt == "n1qn1"){
         inits.c.hess <- matrix(0, nSUB, nETA * (nETA + 13) / 2)

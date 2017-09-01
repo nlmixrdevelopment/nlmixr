@@ -80,10 +80,12 @@ vec get_sig2(){
 mat get_par_hist(){
   return par_hist;
 }
+
 mat get_eta(){
-  mat eta = mpost_phi;
-  rowvec th = Plambda(span(0, nphi-1)).t();
+  mat eta = mpost_phi.cols(i1);
+  rowvec th = Plambda(span(0, nphi1-1)).t();
   for (int i=0; i<N; i++) eta.row(i) -= th;
+  //Rcout << i1;
   return eta;
 }
 

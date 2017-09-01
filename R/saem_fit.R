@@ -1276,12 +1276,17 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     mat <- random.effects(fit);
     ## Reorder based on translation
     eta.trans <- uif$saem.eta.trans
-    ## orig eta ->  new eta
-    mat2 <- mat;
-    for (i in seq_along(eta.trans)){
-        ## i = old eta->  eta.trans[i] = saem.eta
-        mat2[,i] <- mat[, eta.trans[i]];
+    for (i in seq(1, max(eta.trans))){
+        while (!(any(i == eta.trans)) && max(eta.trans) > i){
+            eta.trans[eta.trans >= i] <- eta.trans[eta.trans >= i] - 1
+        }
     }
+    ## orig eta ->  new eta
+    mat2 <- mat[, eta.trans];
+    ## for (i in seq_along(eta.trans)){
+    ##     ## i = old eta->  eta.trans[i] = saem.eta
+    ##     mat2[,i] <- mat[, eta.trans[i]];
+    ## }
     th <- focei.theta(fit, uif)
     for (n in names(th)){
         uif.new$est[uif.new$name == n] <- th[n];

@@ -1102,12 +1102,12 @@ nlmixrUI.saem.init.theta <- function(obj){
 nlmixrUI.saem.init.omega <- function(obj){
     dm <- sum(!is.na(obj$saem.theta.trans));
     et <- obj$saem.eta.trans;
-    mat <- matrix(rep(0, dm * dm), dm);
-    etd <- which(!is.na(obj$neta1));
+    ret <- rep(1, length(et));
+    etd <- which(obj$neta1 == obj$neta2);
     for (i in etd){
-        mat[et[obj$neta1[i]], et[obj$neta2[i]]] <- mat[et[obj$neta2[i]], et[obj$neta1[i]]] <- obj$est[i];
+        ret[et[obj$neta1[i]]] <- obj$est[i]
     }
-    return(mat)
+    return(ret)
 }
 ##' Get saem initilization list
 ##'
@@ -1117,9 +1117,9 @@ nlmixrUI.saem.init.omega <- function(obj){
 nlmixrUI.saem.init <- function(obj){
     ret <- list();
     ret$theta <- obj$saem.init.theta;
-    if (FALSE){
+    ## if (FALSE){
     ret$omega <-obj$saem.init.omega;
-    }
+    ## }
     return(ret);
 }
 
