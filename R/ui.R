@@ -544,7 +544,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             ## mod$ares = initial estimate of res
                             ## mod$bres = initial estiamte of
                             return(x[[2]])
-                        } else if (any(as.character(x[[3]])  == eta.names) &&
+                        } else if (any.theta.names(as.character(x[[3]]), eta.names) &&
                                    length(x[[2]]) > 1){
                             ## This allows 123 + Cl + 123 + eta.Cl + 123
                             ## And collapses to 123 + Cl + 123 + 123
@@ -591,7 +591,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                     return(lapply(x, find.etas));
                                 } else if (is.call(x)) {
                                     if (identical(x[[1]], quote(`+`)) &&
-                                        any(as.character(x[[3]])  == eta.names)){
+                                        any.theta.names(as.character(x[[3]]), eta.names)){
                                         etas <<- c(etas,as.character(x[[3]]));
                                         return(x[[2]]);
                                     }
@@ -1059,10 +1059,11 @@ nlmixrUI.saem.model <- function(obj){
     }
     mod$res.mod <- obj$saem.res.mod;
     mod$log.eta <- obj$saem.log.eta;
-    if (FALSE){ ## FIXME option/warning
-        mod$ares <- obj$saem.ares;
-        mod$bres <- obj$saem.bres;
-    }
+    ## if (FALSE){
+    ## FIXME option/warning
+    mod$ares <- obj$saem.ares;
+    mod$bres <- obj$saem.bres;
+    ## }
     mod$omega <- obj$saem.model.omega;
     return(mod)
 }
@@ -1109,7 +1110,7 @@ nlmixrUI.saem.init <- function(obj){
     ret <- list();
     ret$theta <- obj$saem.init.theta;
     if (FALSE){
-        ret$omega <-obj$saem.init.omega;
+    ret$omega <-obj$saem.init.omega;
     }
     return(ret);
 }

@@ -117,9 +117,6 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
     if (est == "saem"){
         pt <- proc.time()
         model <- uif$saem.model
-        if (class(model) == "RxODE"){
-            model$assignPtr(); ## Assign ODE pointer
-        }
         cfg   = configsaem(model=model, data=dat, inits=uif$saem.init, ...);
         fit <- model$saem_mod(cfg);
         if (focei.translate){
