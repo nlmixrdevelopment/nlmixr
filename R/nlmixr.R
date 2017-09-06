@@ -1,3 +1,40 @@
+.onAttach <- function(libname, pkgname){ ## nocov start
+    ## Setup RxODE.prefer.tbl
+    nlmixrSetupMemoize()
+}
+
+nlmixrSetupMemoize <- function(){
+    reSlow <- rex::rex(".slow",end)
+    f <- sys.function(-1)
+    ns <- environment(f)
+    .slow <- ls(pattern=reSlow,envir=ns);
+    for (slow in .slow){
+        fast <- sub(reSlow, "", slow);
+        if (!memoise::is.memoised(get(fast, envir=ns)) && is.null(get(slow, envir=ns))){
+            utils::assignInMyNamespace(slow, get(fast, envir=ns))
+            utils::assignInMyNamespace(fast, memoise::memoise(get(slow, envir=ns)))
+        }
+
+    }
+}
+
+##' Clear memoise cache for nlmixr
+##'
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+nlmixrForget <- function(){
+    reSlow <- rex::rex(".slow",end)
+    f <- sys.function(-1)
+    ns <- environment(f)
+    .slow <- ls(pattern=reSlow,envir=ns);
+    for (slow in .slow){
+        fast <- sub(reSlow, "", slow);
+        memoise::forget(get(fast, envir=ns));
+    }
+}
+
+
 ##' @importFrom stats predict logLik na.fail pchisq
 ##' @importFrom brew brew
 ##' @importFrom lattice xyplot

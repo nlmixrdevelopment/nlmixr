@@ -256,6 +256,7 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
     return(fit$cov);
 }
 
+fitted.focei.fit.slow <- NULL
 ##' Extract the fitted values from the model
 ##'
 ##' @param object Fit object
@@ -795,7 +796,7 @@ focei.fit.data.frame0 <- function(data,
         maxsteps.ode = 99999,
         reltol.outer = 1e-4,
         absltol.outer = 1e-4,
-        cores=2,
+        cores=1,
         transit_abs=FALSE,
         NONMEM=TRUE,
         NOTRUN=FALSE,
@@ -808,7 +809,7 @@ focei.fit.data.frame0 <- function(data,
         factr=1e10,
         grad=FALSE,
         accept.eta.size=1.5,
-        sigdig=5,
+        sigdig=4,
         precision=0, ## 0 = No ridge penalty.
         ridge.decay=0, ## 0 = no decay; Inf = No ridge
         reset.precision=NULL,
@@ -827,7 +828,7 @@ focei.fit.data.frame0 <- function(data,
         numDeriv.method1="simple",
         numDeriv.method2="simple",
         numDeriv.swap=2.3,
-        sum.prod=TRUE,
+        sum.prod=FALSE,
         theta.grad=TRUE
     )
 
@@ -1245,7 +1246,7 @@ focei.fit.data.frame0 <- function(data,
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
         first <<- FALSE
-        llik <- -2*do.call("sum", llik.subj);
+        llik <- -2*RxODE::rxSum(unlist(llik.subj)));
         corrected <- do.call("sum", (lapply(llik.subj, function(x){attr(x, "corrected")})))
         ofv <- llik;
         reset <- FALSE;

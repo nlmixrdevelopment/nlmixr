@@ -380,12 +380,13 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     errn <- 0
 
     any.theta.names <- function(what, th.names){
-        for (i in th.names){
-            if (any(what == i)){
-                return(TRUE)
-            }
-        }
-        return(FALSE)
+        ## for (i in th.names){
+        ##     if (any(what == i)){
+        ##         return(TRUE)
+        ##     }
+        ## }
+        ## return(FALSE)
+        return(any(what[1] == th.names))
     }
 
     f <- function(x) {
