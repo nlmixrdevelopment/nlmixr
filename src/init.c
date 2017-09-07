@@ -29,6 +29,7 @@ extern SEXP _nlmixr_llik_student_t(SEXP, SEXP);
 extern SEXP _nlmixr_llik_beta(SEXP, SEXP);
 extern SEXP _nlmixr_lin_cmt_stan(SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP);
 extern SEXP _nlmixr_llik_neg_binomial(SEXP, SEXP);
+extern SEXP _nlmixr_foceiGrad(SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"hermite_ek_compute_",     (DL_FUNC) &hermite_ek_compute_,      3},
@@ -49,14 +50,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_nlmixr_llik_student_t",  (DL_FUNC) &_nlmixr_llik_student_t, 2},
     {"_nlmixr_llik_beta",     (DL_FUNC) &_nlmixr_llik_beta, 2},
     {"_nlmixr_llik_neg_binomial", (DL_FUNC) &_nlmixr_llik_neg_binomial, 2},
+    {"_nlmixr_foceiGrad",(DL_FUNC) &_nlmixr_foceiGrad, 1},
     {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
     {NULL, NULL, 0}
 };
 
 void R_init_nlmixr(DllInfo *dll)
 {
-    R_RegisterCCallable("nlmixr","nelder_fn", (DL_FUNC) &nelder_fn);
-    R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, TRUE);
-    R_forceSymbols(dll,FALSE);
+  R_RegisterCCallable("nlmixr","nelder_fn", (DL_FUNC) &nelder_fn);
+  R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, TRUE);
+  R_forceSymbols(dll,FALSE);
 }

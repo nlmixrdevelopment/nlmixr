@@ -2,7 +2,7 @@ PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 PKG_CPPFLAGS = -Id -I../inst/include
 
 SOURCES_C = jj.c jj.g.d_parser.c quadrule.c init.c rprintf.c vfinite.c
-SOURCES_CPP = neldermead.cpp slice.cpp RcppExportMod.cpp ode_cmt1.cpp RcppExports.cpp
+SOURCES_CPP = neldermead.cpp slice.cpp RcppExportMod.cpp ode_cmt1.cpp RcppExports.cpp focei_fit.cpp
 SOURCES_FORTAN = n1qn1_all.f 
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o) $(SOURCES_FORTAN:.f=.o)
 

@@ -16,7 +16,7 @@ is.focei <- function(x){
     fit <- env$fit;
     if (length(names(x)) == length(fit$data.names)){
         return(all(names(x) == fit$data.names) &&
-               length(x[, 1]) == fit$data.len)
+               length(x[, 1]) == fit$data.len);
     } else {
         return(FALSE)
     }
@@ -42,7 +42,6 @@ as.nlme <- function(x){
     }
     return(NULL);
 }
-
 
 ##' Return composite saem/focei to saem
 ##'
@@ -809,7 +808,7 @@ focei.fit.data.frame0 <- function(data,
         factr=1e10,
         grad=FALSE,
         accept.eta.size=1.5,
-        sigdig=4,
+        sigdig=0,
         precision=0, ## 0 = No ridge penalty.
         ridge.decay=0, ## 0 = no decay; Inf = No ridge
         reset.precision=NULL,
@@ -828,7 +827,7 @@ focei.fit.data.frame0 <- function(data,
         numDeriv.method1="simple",
         numDeriv.method2="simple",
         numDeriv.swap=2.3,
-        sum.prod=FALSE,
+        sum.prod=TRUE,
         theta.grad=TRUE
     )
 
@@ -1246,7 +1245,7 @@ focei.fit.data.frame0 <- function(data,
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
         first <<- FALSE
-        llik <- -2*RxODE::rxSum(unlist(llik.subj)));
+        llik <- -2*RxODE::rxSum(unlist(llik.subj));
         corrected <- do.call("sum", (lapply(llik.subj, function(x){attr(x, "corrected")})))
         ofv <- llik;
         reset <- FALSE;
@@ -1404,10 +1403,8 @@ focei.fit.data.frame0 <- function(data,
             } else {
                 extra <- 1
             }
-            gr <- -2 * Reduce("+", lapply(llik.subj, function(x){
-                                       return(attr(x,"grad"))
-                                   })) + pars * con$precision  * extra;
-            assign(optim.obj(llik, "l"), gr, envir=ofv.cache, inherits=FALSE);
+        gr <- -2 * foceiGrad(llik.subj)+ pars * con$precision  * extra;
+        assign(optim.obj(llik, "l"), gr, envir=ofv.cache, inherits=FALSE);
         return(gr);
         ## } else {
         ##     if (con$fix.eta.for.grad){
@@ -2089,8 +2086,10 @@ anova.nlmixr.ui.focei.fit <- function(object, ..., test = TRUE, type = c("sequen
             lratio[!ldf] <- NA
             pval[ldf] <- pchisq(lratio[ldf], abs(ddf[ldf]),
                                 lower.tail = FALSE)
-            aod <- data.frame(aod, Test = effects, L.Ratio = c(NA,
-                                                               lratio), `p-value` = c(NA, pval), check.names = FALSE)
+            aod <- data.frame(aod, Test = effects,
+                              L.Ratio = c(NA, lratio),
+                              `p-value` = c(NA, pval),
+                              check.names = FALSE)
         }
     }
     attr(aod, "rt") <- rt

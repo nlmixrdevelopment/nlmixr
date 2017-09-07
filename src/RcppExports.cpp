@@ -7,6 +7,17 @@
 
 using namespace Rcpp;
 
+// foceiGrad
+NumericVector foceiGrad(List objf);
+RcppExport SEXP _nlmixr_foceiGrad(SEXP objfSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type objf(objfSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiGrad(objf));
+    return rcpp_result_gen;
+END_RCPP
+}
 // lin_cmt_stan
 SEXP lin_cmt_stan(Eigen::Map<Eigen::VectorXd> obs_time, Eigen::Map<Eigen::VectorXd> dose_time, Eigen::Map<Eigen::VectorXd> dose, Eigen::Map<Eigen::VectorXd> Tinf, Eigen::Map<Eigen::VectorXd> params, SEXP oralSEXP, SEXP infusionSEXP, SEXP ncmtSEXP, SEXP parameterizationSEXP);
 RcppExport SEXP _nlmixr_lin_cmt_stan(SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP, SEXP paramsSEXP, SEXP oralSEXPSEXP, SEXP infusionSEXPSEXP, SEXP ncmtSEXPSEXP, SEXP parameterizationSEXPSEXP) {
