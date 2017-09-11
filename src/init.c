@@ -29,7 +29,8 @@ extern SEXP _nlmixr_llik_student_t(SEXP, SEXP);
 extern SEXP _nlmixr_llik_beta(SEXP, SEXP);
 extern SEXP _nlmixr_lin_cmt_stan(SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP , SEXP);
 extern SEXP _nlmixr_llik_neg_binomial(SEXP, SEXP);
-extern SEXP _nlmixr_foceiGrad(SEXP);
+extern SEXP _nlmixr_grFOCEi(SEXP, SEXP);
+extern SEXP _nlmixr_sFOCEi(SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"hermite_ek_compute_",     (DL_FUNC) &hermite_ek_compute_,      3},
@@ -50,7 +51,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_nlmixr_llik_student_t",  (DL_FUNC) &_nlmixr_llik_student_t, 2},
     {"_nlmixr_llik_beta",     (DL_FUNC) &_nlmixr_llik_beta, 2},
     {"_nlmixr_llik_neg_binomial", (DL_FUNC) &_nlmixr_llik_neg_binomial, 2},
-    {"_nlmixr_foceiGrad",(DL_FUNC) &_nlmixr_foceiGrad, 1},
+    {"_nlmixr_grFOCEi",(DL_FUNC) &_nlmixr_grFOCEi, 2},
+    {"_nlmixr_sFOCEi",(DL_FUNC) &_nlmixr_sFOCEi, 2},
     {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
     {NULL, NULL, 0}
 };

@@ -7,14 +7,27 @@
 
 using namespace Rcpp;
 
-// foceiGrad
-NumericVector foceiGrad(List objf);
-RcppExport SEXP _nlmixr_foceiGrad(SEXP objfSEXP) {
+// sFOCEi
+arma::mat sFOCEi(NumericVector par, Environment e);
+RcppExport SEXP _nlmixr_sFOCEi(SEXP parSEXP, SEXP eSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type objf(objfSEXP);
-    rcpp_result_gen = Rcpp::wrap(foceiGrad(objf));
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(sFOCEi(par, e));
+    return rcpp_result_gen;
+END_RCPP
+}
+// grFOCEi
+NumericVector grFOCEi(NumericVector par, Environment e);
+RcppExport SEXP _nlmixr_grFOCEi(SEXP parSEXP, SEXP eSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(grFOCEi(par, e));
     return rcpp_result_gen;
 END_RCPP
 }

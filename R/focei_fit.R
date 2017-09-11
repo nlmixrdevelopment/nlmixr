@@ -834,6 +834,8 @@ focei.fit.data.frame0 <- function(data,
 
     curi <- 0;
 
+    this.env <- environment()
+
     pt <- proc.time()
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
@@ -1423,44 +1425,14 @@ focei.fit.data.frame0 <- function(data,
         }
     }
 
-    gr.FOCEi <- function(pars){
-        llik.subj <- ofv.FOCEi.ind(pars)
-        llik <- -2*do.call("sum", llik.subj);
-        ## if (con$grad){
-        if (con$ridge.decay != 0 && is.null(cur.diff)){
-            cur.diff <<- 0
-            extra <- 1
-        } else if (con$ridge.decay != 0){
-            extra <- exp(-con$ridge.decay * cur.diff);
-        } else {
-            extra <- 1
-        }
-        ## gr <- -2 * Reduce("+", lapply(llik.subj, function(x){
-        ##                            return(attr(x,"grad"))
-        ##                        })) + pars * con$precision  * extra;
-        gr <- -2 * foceiGrad(llik.subj) + pars * con$precision  * extra;
-        assign(optim.obj(llik, "l"), gr, envir=ofv.cache, inherits=FALSE);
-        return(gr);
-        ## } else {
-        ##     if (con$fix.eta.for.grad){
-        ##         find.best.eta <<- FALSE; ## Keep etas.
-        ##         on.exit({find.best.eta <<- FALSE;}, add=TRUE)
-        ##     }
-        ##     gr <- numDeriv::grad(ofv.FOCEi, pars)
-        ##     assign(optim.obj(llik, "l"), gr, envir=ofv.cache, inherits=FALSE);
-        ##     return(gr);
-        ## }
+    gr.FOCEi <- function(pars, envir=this.env){
+        .Call(`_nlmixr_grFOCEi`, pars, envir);
     }
 
-    s.FOCEi <- function(pars){
-        llik.subj <- ofv.FOCEi.ind(pars);
-        S <- Reduce('+', lapply(llik.subj, function(x){
-                             ## FIXME: when grad=FALSE calculate individual numerical deriavative
-                             ## Gradients on normal scale to form cross-products to be summed.
-                             return(crossprod(matrix(as.vector(attr(x,"grad"))*inits.vec, nrow=1)));
-                         }))
-        return(S);
+    s.FOCEi <- function(pars, envir=this.env){
+        .Call(`_nlmixr_sFOCEi`, pars, envir)
     }
+
     np <- length(inits.vec)
     meth <- c();
 
@@ -1640,7 +1612,6 @@ focei.fit.data.frame0 <- function(data,
         ## all clusters.
         ## Taken from https://github.com/nathanvan/mcmc-in-irt/blob/master/post-10-mclapply-hack.R
 
-        this.env <- environment()
         ## while( identical( this.env, globalenv() ) == FALSE ) {
         parallel::clusterExport(cl,
                                     ls(all.names=TRUE, envir=this.env),
@@ -1733,11 +1704,6 @@ focei.fit.data.frame0 <- function(data,
             fit$precision = con$precision;
             con$precision <- 0;
             fit$grad = con$grad;
-            if (is.null(con$scale.to)){
-                m <- diag(length(inits.vec));
-            } else {
-                m <- diag(inits.vec / con$scale.to);
-            }
             fit$ridge.decay <- con$ridge.decay;
             fit$sigdig <- con$sigdig;
             con$sigdig <- 0 ;
@@ -1770,14 +1736,18 @@ focei.fit.data.frame0 <- function(data,
             }
             message("Calculate covariance...")
             sink.start();
+            scale.to <- con$scale.to;
+            if (is.null(scale.to)){
+                fit$par.unscaled = fit$par;
+            } else {
+                fit$par.unscaled = fit$par*inits.vec / con$scale.to;
+            }
+            ## Perform on unscaled parameters
+            con$scale.to <- NULL;
             ## Use First Order condition for covariance
             ## inits.mat <- matrix(0, nSUB, nETA)
             if (con$cov.method != "s"){
-                if (any(names(fit) == "hessian")){
-                    R1 <- fit$hessian
-                } else {
-                    R1 <- optimHess(fit$par, ofv.FOCEi, gr.FOCEi);
-                }
+                R1 <- optimHess(fit$par.unscaled, ofv.FOCEi, gr.FOCEi);
                 Rinv <- RxODE::rxInv(R1)
                 if (det(R1) <= 0){
                     warning("Non positive-definite Hessian matrix when calculating the covariance; Falling back to S-matrix covariance")
@@ -1787,14 +1757,14 @@ focei.fit.data.frame0 <- function(data,
                     con$cov.method <- "s"
                     fit$warning <- "Non positive-definite Hessian matrix when calculating the covariance; Falling back to S-matrix covariance"
                     Rinv <- NULL
-                } else {
-                    Rinv <- m %*% Rinv %*% m
                 }
             } else {
                 Rinv <- NULL
             }
             ## if (con$grad){
-            s = s.FOCEi(fit$par)
+            s = s.FOCEi(fit$par.unscaled);
+            con$scale.to <- scale.to;
+            rm(scale.to)
             if (con$cov.method != "s"){
                 fit$cov.r.s <- Rinv %*% s %*% Rinv
                 fit$cov.r <- 2 * Rinv;
@@ -1858,11 +1828,6 @@ focei.fit.data.frame0 <- function(data,
     if (!is.null(fit)){
         ## class(con) <- "focei.fit.con"
         fit$control <- con;
-        if (is.null(con$scale.to)){
-            fit$par.unscaled = fit$par;
-        } else {
-            fit$par.unscaled = fit$par*inits.vec / con$scale.to;
-        }
         tmp <- fit$par.unscaled[seq_along(nms)];
         names(tmp) <- nms;
         fit$theta <- tmp;
