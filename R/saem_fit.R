@@ -684,10 +684,13 @@ plot.saemFit = function(x, ...)
 configsaem = function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
 	ODEopt = list(atol=1e-8, rtol=1e-6, stiff=1, transit_abs=0),
+	distribution=c("normal","poisson","binomial"),
 	seed=99)
 #data =  saem.data; mcmc = saem.mcmc; model = saem.model; inits = saem.inits
 {
   set.seed(seed)
+  distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
+  distribution = match.arg(distribution)
   data = list(nmdat=data)
 
   neq  = attr(model$saem_mod, "neq")
@@ -973,6 +976,7 @@ configsaem = function(model, data, inits,
     opt=opt,
     optM=optM,
     print=mcmc$print,
+    distribution=distribution.idx[distribution],
     par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2))
   )
 }

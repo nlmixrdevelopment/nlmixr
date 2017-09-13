@@ -187,6 +187,8 @@ void inits(List x) {
   mx.indioM = indioM;
   mx.evtM = evtM;
   mx.optM = optM;
+
+  distribution=as<int>(x["distribution"]);
 }
 
 void saem_fit() {
@@ -220,7 +222,15 @@ void saem_fit() {
 
     vec f=user_fn(phiM, evtM, optM);
     vec g = ares + bres*f;
-    DYF(indioM)=0.5*(((yM-f)/g)%((yM-f)/g))+log(g);
+    if (distribution == 1) DYF(indioM)=0.5*(((yM-f)/g)%((yM-f)/g))+log(g);
+    else 
+    if (distribution == 2) DYF(indioM)=-yM%log(f)+f;
+    else
+    if (distribution == 3) DYF(indioM)=-yM%log(f)-(1-yM)%log(1-f);
+    else {
+		Rcout << "unknown distribution\n";
+		return;
+    }
     vec U_y=sum(DYF,0).t();
 
     if(nphi1>0) {
@@ -460,6 +470,7 @@ private:
 
   int print;
   mat par_hist;
+  int distribution;
 
 void set_mcmcphi(mcmcphi &mphi1,
                  const uvec i1,
@@ -502,7 +513,11 @@ void do_mcmc(const int method,
 
     fc=user_fn(phiMc, mx.evtM, mx.optM);
     gc = ares + bres*fc;
-    DYF(mx.indioM)=0.5*(((mx.yM-fc)/gc)%((mx.yM-fc)/gc))+log(gc);
+    if (distribution == 1) DYF(mx.indioM)=0.5*(((mx.yM-fc)/gc)%((mx.yM-fc)/gc))+log(gc);
+    else 
+    if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
+    else
+    if (distribution == 3) DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
 
     Uc_y=sum(DYF,0).t();
     if (method==1) deltu=Uc_y-U_y;
