@@ -217,12 +217,22 @@ add.dists <- c("add", "prop");
 nlmixrUILinCmt <- function(lhs){
     reg <- rex::rex(start, one_of("V", "v"), capture(number), end);
     w <- which(regexpr(reg, lhs) != -1);
-    if (length(w) > 0){
-        min.v <- min(as.numeric(gsub(reg, "\\1", lhs[w])));
-        vs <- paste0("V", seq(min.v, min.v + 2))
+    if (any(lhs == "V") || any(lhs == "v")){
+        if (length(w) > 0){
+            min.v <- min(as.numeric(gsub(reg, "\\1", lhs[w])));
+            vs <- c("V", paste0("V", seq(min.v, min.v + 1)))
+        } else {
+            vs <- c("V", paste0("V", 1:2));
+        }
     } else {
-        vs <- paste0("V", 1:3);
+        if (length(w) > 0){
+            min.v <- min(as.numeric(gsub(reg, "\\1", lhs[w])));
+            vs <- paste0("V", seq(min.v, min.v + 2))
+        } else {
+            vs <- paste0("V", 1:3);
+        }
     }
+
     par1 <- list(CL  =c("CL"),
                  V   =c("V", "VC", vs[1]),
                  CLD =c("Q", "CLD"),
