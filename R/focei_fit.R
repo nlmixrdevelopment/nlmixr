@@ -1834,6 +1834,13 @@ focei.fit.data.frame0 <- function(data,
     if (!is.null(fit)){
         ## class(con) <- "focei.fit.con"
         fit$control <- con;
+        if (is.null(fit$par.unscaled)){
+            if (is.null(con$scale.to)){
+                fit$par.unscaled = fit$par;
+            } else {
+                fit$par.unscaled = fit$par*inits.vec / con$scale.to;
+            }
+        }
         tmp <- fit$par.unscaled[seq_along(nms)];
         names(tmp) <- nms;
         fit$theta <- tmp;
