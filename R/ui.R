@@ -804,7 +804,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     saem.pars <- new.fn(saem.pars)
 
     saem.theta.trans <- rep(NA, length(theta.names));
-    cov.theta.pars <- gsub(rex::rex(or(all.covs), "."), "", names(unlist(p$cov.ref)))
+    cov.theta.pars <- gsub(rex::rex(or(all.covs), "."), "", names(unlist(cov.ref)))
     for (i in seq_along(theta.names)){
         if (!any(theta.names[i] == cov.theta.pars)){
             w <- which(theta.names[i] == theta.ord);

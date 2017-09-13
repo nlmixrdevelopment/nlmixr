@@ -7,7 +7,11 @@
 ##' @export
 constructLinCmt <- function(fun){
     pars <- nlmixrfindLhs(body(fun));
-    ret <- RxODE::rxLinCmtTrans(sprintf("Central=linCmt(%s);\n", paste(pars, collapse=", ")));
+    lines <- deparse(body(fun))[-1];
+    lines <- lines[-length(lines)];
+    ret <- RxODE::rxLinCmtTrans(sprintf("%s\nCentral=linCmt(%s);\n", paste(lines, collapse="\n"), paste(pars, collapse=", ")));
+    ret <- strsplit(ret, "\n")[[1]];
+    ret <- paste(ret[-seq_along(lines)], collapse="\n");
     return(ret)
 }
 
@@ -243,7 +247,7 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
     }
     nms <- names(fit$theta);
     w <- seq_along(nms)
-    fit$par.data.frame <- data.frame(est=fit$theta, se=fit$se[w], "%cv"=fit$se[w] / fit$theta * 100,
+    fit$par.data.frame <- data.frame(est=fit$theta, se=fit$se[w], "%cv"=abs(fit$se[w] / fit$theta * 100),
                                      check.names=FALSE, row.names=nms);
     if (env$con$eigen){
         fit$eigen <- eigen(fit$cov,TRUE,TRUE)$values;
@@ -905,6 +909,8 @@ focei.fit.data.frame0 <- function(data,
     }
     if (length(cov.names) > 0){
         if (!all(cov.names %in% names(data))){
+            message("Inner Model:")
+            RxODE::rxCat(model$inner)
             message("Needed Covariates:")
             RxODE::rxPrint(cov.names)
             stop("Not all the covariates are in the dataset.")
@@ -1848,7 +1854,7 @@ focei.fit.data.frame0 <- function(data,
         if (con$NOTRUN){
             fit$par.data.frame <- data.frame(est=fit$theta, "exp(est)"=exp(fit$theta), row.names=nms);
         } else {
-            fit$par.data.frame <- data.frame(est=fit$theta, "exp(est)"=exp(fit$theta), "se(est)"=fit$se[w], "%cv(est)"=fit$se[w] / fit$theta * 100,
+            fit$par.data.frame <- data.frame(est=fit$theta, "exp(est)"=exp(fit$theta), "se(est)"=fit$se[w], "%cv(est)"=abs(fit$se[w] / fit$theta * 100),
                                              check.names=FALSE, row.names=nms);
         }
         env <- environment(ofv.FOCEi);
