@@ -819,7 +819,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         if (!any(theta.names[i] == cov.theta.pars)){
             w <- which(theta.names[i] == theta.ord);
             if (length(w) == 1){
-                saem.theta.trans[i] <- w;
+                if (!any(theta.names[i] == cov.theta.pars)){
+                    saem.theta.trans[i] <- w;
+                }
             }
         }
     }
@@ -1154,21 +1156,23 @@ nlmixrUI.saem.init.theta <- function(obj){
     theta.trans <- obj$saem.theta.trans;
     theta.trans <- theta.trans[!is.na(theta.trans)];
     theta <- rep(NA, length(theta.trans));
-    theta.name <- rep(NA, length(theta.trans))
     for (i in seq_along(theta.trans)){
         w <- which(theta.trans[i] == obj$ntheta)
         if (length(w) == 1){
             theta[i] <- obj$est[w]
-            theta.name[i] <- paste(obj$ini$name[w]);
         }
     }
     log.eta <- obj$saem.log.eta;
     theta[log.eta] <- exp(theta[log.eta]);
     theta <- theta[!is.na(theta)]
-    theta.name <- theta.name[!is.na(theta.name)];
     ## Now get the covariate estimates
+    ntheta <- length(theta)
+    trans <- obj$saem.theta.trans
+    trans.name <- paste(obj$ini$name[which(!is.na(trans))]);
+    trans <- trans[!is.na(trans)]
+    theta.name <- trans.name[order(trans)]
     for (cov in obj$all.covs){
-        theta.cov <- rep(NA, length(theta));
+        theta.cov <- rep(NA, ntheta);
         covr <- obj$cov.ref[[cov]]
         for (v in names(covr)){
             w <- which(theta.name == covr[v]);

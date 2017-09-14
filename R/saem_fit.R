@@ -1201,30 +1201,36 @@ focei.theta.saemFit <- function(object, uif, ...){
     thetas <- rep(NA, length(n));
     names(thetas) <- n;
     sf <- as.vector(fixed.effects(object))
-    theta.trans <- uif$saem.theta.trans
-    theta.trans <- theta.trans[!is.na(theta.trans)];
+    trans <- uif$saem.theta.trans
+    trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
+    trans <- trans[!is.na(trans)]
+    theta.name <- trans.name[order(trans)]
     f <- rep(NA, length(sf))
-    for (i in seq_along(theta.trans)){
-        ## i = old theta->  theta.trans[i] = saem.theta
-        f[i] <- sf[theta.trans[i]];
+    for (i in seq_along(theta.name)){
+        thetas[theta.name[i]] <- sf[i];
     }
-    ## Now get the names
-    n <- uif$theta.names;
-    n <- n[is.na(uif$focei.err.type)];
-    names(f) <- n;
-    for (n in names(f)){
-        thetas[n] <- f[n];
+    ## Get covariate thetas
+    i <- length(theta.name)
+    if (length(sf) > i){
+        i <- i + 1;
+        for (n in names(uif$cov.ref)){
+            for (v in names(uif$cov.ref[[n]])){
+                thetas[v] <- sf[i];
+                i <- i + 1;
+            }
+        }
     }
     err <- abs(as.vector(object$sig2)) ## abs?
     err.type <- uif$focei.err.type;
     add <- which(err.type == "add")
     prop <- which(err.type == "prop")
     if (length(add) > 0){
-        thetas[add] <- sqrt(err[1]); ## Check is this variance (others are sd)
+        thetas[add] <- err[1]; ## This seems to be SD;
     }
     if (length(prop) > 0){
-        thetas[prop] <- sqrt(err[2]); ## Check is this variance (others are sd)
+        thetas[prop] <- err[2]; ## This seems to be SD;
     }
+    w <- which(is.na(thetas))[1];
     return(thetas)
 }
 

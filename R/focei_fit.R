@@ -142,7 +142,6 @@ print.focei.fit <- function(x, ...) {
             message("\nResidual Errors")
             print(tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]);
         } else if (!is.null(saem)){
-
             df <- fit$par.data.frame;
             th = saem$Plambda
             nth = length(th)
@@ -150,14 +149,22 @@ print.focei.fit <- function(x, ...) {
             se = sqrt(diag(H))
             m =  cbind(exp(th), th, se)
             dimnames(m)[[2]] = c("est", "log(est)", "se(log_est)")
-            trans <- uif$saem.theta.trans;
-            nm <- rep("", nth)
-            dfr <- rownames(df)
-            for (i in seq_along(trans)){
-                ## i = focei trans[i] = saem
-                nm[trans[i]] <- dfr[i];
+            trans <- uif$saem.theta.trans
+            trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
+            trans <- trans[!is.na(trans)]
+            theta.name <- trans.name[order(trans)]
+            o.theta.name <- theta.name
+            ## Add covariate names
+            for (nn in names(uif$cov.ref)){
+                cur <- uif$cov.ref[[nn]]
+                for (j in seq_along(o.theta.name)){
+                    w <- which(o.theta.name[j] == cur)
+                    if (length(w) == 1){
+                        theta.name <- c(theta.name, names(cur)[w])
+                    }
+                }
             }
-            dimnames(m)[[1]] <- nm
+            dimnames(m)[[1]] <- theta.name
             message("From SAEM:")
             print(m)
 
@@ -1270,6 +1277,7 @@ focei.fit.data.frame0 <- function(data,
     }
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
+        assign("llik.subj", llik.subj, .GlobalEnv);
         first <<- FALSE
         llik <- -2*RxODE::rxSum(unlist(llik.subj));
         corrected <- do.call("sum", (lapply(llik.subj, function(x){attr(x, "corrected")})))
@@ -1432,7 +1440,8 @@ focei.fit.data.frame0 <- function(data,
     }
 
     gr.FOCEi <- function(pars, envir=this.env){
-        .Call(`_nlmixr_grFOCEi`, pars, envir);
+        ret <- .Call(`_nlmixr_grFOCEi`, pars, envir);
+        return(ret)
     }
 
     s.FOCEi <- function(pars, envir=this.env){
