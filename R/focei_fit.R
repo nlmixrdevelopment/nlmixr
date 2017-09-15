@@ -1168,7 +1168,7 @@ focei.fit.data.frame0 <- function(data,
     sigdig.fit <- NULL;
     last.sigdig <- NULL;
 
-    if (con$sigdig != 0 && !any(optim == c("BFGS", "L-BFGS-B", "lbfgsb3"))){
+    if (con$sigdig != 0 && !any(optim.method == c("BFGS", "L-BFGS-B", "lbfgsb3"))){
         warning("Significant figures doesn't make sense with this optimization routine.  Resetting to no sigdig exit")
         con$sigdig <- 0;
     }
