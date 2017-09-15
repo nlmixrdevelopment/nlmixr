@@ -650,8 +650,8 @@ focei.fit <- function(data,
                       diag.xform=c("sqrt", "log", "identity"),
                       optim=c(
                           ## "n1qn1",
-                          "L-BFGS-B",
                           "bobyqa",
+                          "L-BFGS-B",
                           "BFGS",
                           "lbfgs",
                           "lbfgsb3",
@@ -728,8 +728,8 @@ focei.fit.data.frame0 <- function(data,
                                   diag.xform=c("sqrt", "log", "identity"),
                                   optim=c(
                                       ## "n1qn1",
-                                      "L-BFGS-B",
                                       "bobyqa",
+                                      "L-BFGS-B",
                                       "BFGS",
                                       "lbfgs",
                                       "lbfgsb3",
@@ -842,7 +842,7 @@ focei.fit.data.frame0 <- function(data,
         numDeriv.method2="simple",
         numDeriv.swap=2.3,
         sum.prod=TRUE,
-        theta.grad=TRUE,
+        theta.grad=FALSE,
         scale.to=1
     )
 
@@ -877,6 +877,7 @@ focei.fit.data.frame0 <- function(data,
             message("Warning; You selected a gradient method, but the optimization procedure doesn't require the gradient.\nIgnoring gradient")
         }
         con$grad <- FALSE;
+        con$theta.grad <- FALSE
     }
     if (con$NOTRUN){
         con$theta.grad <- FALSE;
@@ -1370,7 +1371,7 @@ focei.fit.data.frame0 <- function(data,
             }
             print(p)
         }
-        return(list(p, sdig, reset))
+        return(list(p, sdig, reset, last.info))
     }
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
@@ -1395,11 +1396,12 @@ focei.fit.data.frame0 <- function(data,
                         p <- print.step(last.ofv.txt=last)
                         sdig <- p[[2]];
                         reset <- p[[3]];
+                        last.info <- p[[4]];
                         p <- p[[1]]
                         if (all(sdig > con$numDeriv.swap)){
                             numDeriv.method <- con$numDeriv.method2
                         }
-                        if (con$sigdig > 0 && all(sdig > con$sigdig)){
+                        if (con$sigdig > 0 && all(sdig > con$sigdig) && curi > 3){
                             sigdig.exit <- TRUE
                         }
                         if (is.null(ofv.cache$first)){
