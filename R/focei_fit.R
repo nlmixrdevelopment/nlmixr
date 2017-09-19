@@ -155,12 +155,15 @@ print.focei.fit <- function(x, ...) {
             theta.name <- trans.name[order(trans)]
             o.theta.name <- theta.name
             ## Add covariate names
-            for (nn in names(uif$cov.ref)){
+            for (nn in rev(names(uif$cov.ref))){
                 cur <- uif$cov.ref[[nn]]
                 for (j in seq_along(o.theta.name)){
                     w <- which(o.theta.name[j] == cur)
                     if (length(w) == 1){
-                        theta.name <- c(theta.name, names(cur)[w])
+                        w2 <- which(theta.name == cur);
+                        ## print(theta.name);
+                        ## print(cur)
+                        theta.name <- c(theta.name[1:w2], names(cur)[w], theta.name[-(1:w2)])
                     }
                 }
             }

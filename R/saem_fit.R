@@ -1206,17 +1206,17 @@ focei.theta.saemFit <- function(object, uif, ...){
     trans <- trans[!is.na(trans)]
     theta.name <- trans.name[order(trans)]
     f <- rep(NA, length(sf))
+    j <- 1;
+    cov.pars <- as.vector(unlist(uif$cov.ref))
     for (i in seq_along(theta.name)){
-        thetas[theta.name[i]] <- sf[i];
-    }
-    ## Get covariate thetas
-    i <- length(theta.name)
-    if (length(sf) > i){
-        i <- i + 1;
-        for (n in names(uif$cov.ref)){
-            for (v in names(uif$cov.ref[[n]])){
-                thetas[v] <- sf[i];
-                i <- i + 1;
+        thetas[theta.name[i]] <- sf[j];
+        j <- j + 1;
+        if (any(theta.name[i] == cov.pars)){
+            for (n in names(uif$cov.ref)){
+                for (v in names(uif$cov.ref[[n]])){
+                    thetas[v] <- sf[j];
+                    j <- j + 1;
+                }
             }
         }
     }
