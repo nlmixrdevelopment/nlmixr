@@ -82,10 +82,9 @@ mat get_par_hist(){
 }
 
 mat get_eta(){
-  mat eta = mpost_phi.cols(i1);
-  rowvec th = Plambda(span(0, nphi1-1)).t();
-  for (int i=0; i<N; i++) eta.row(i) -= th;
   //Rcout << i1;
+  mat eta = mpost_phi.cols(i1);
+  eta -= mprior_phi1;
   return eta;
 }
 
