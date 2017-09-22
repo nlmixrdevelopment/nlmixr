@@ -1120,7 +1120,7 @@ focei.fit.data.frame0 <- function(data,
             if (!is.null(inits.mat.bak)){
                 args$eta.bak=inits.mat.bak[.wh, ];
             }
-            ret <- do.call(getFromNamespace("rxFoceiInner","RxODE"), args)
+            ret <- do.call(getFromNamespace("rxFoceiInner","nlmixr"), args)
             attr(ret, "wh") <- .wh; ## FIXME move to C?
             return(ret)
         }

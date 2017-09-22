@@ -32,6 +32,22 @@ extern SEXP _nlmixr_llik_neg_binomial(SEXP, SEXP);
 extern SEXP _nlmixr_grFOCEi(SEXP, SEXP);
 extern SEXP _nlmixr_sFOCEi(SEXP, SEXP);
 
+// FOCEi
+extern SEXP _nlmixr_rxGrad(SEXP rhoSEXP);
+extern SEXP _nlmixr_rxInner(SEXP etanewsSEXP, SEXP rhoSEXP);
+extern SEXP _nlmixr_rxInnerNum(SEXP etanewsSEXP, SEXP rhoSEXP);
+extern SEXP _nlmixr_rxHessian(SEXP rhoSEXP);
+extern SEXP _nlmixr_RxODE_focei_eta_lik(SEXP sexp_etaSEXP, SEXP sexp_rhoSEXP);
+extern SEXP _nlmixr_RxODE_focei_eta_lp(SEXP sexp_etaSEXP, SEXP sexp_rhoSEXP);
+extern SEXP _nlmixr_RxODE_focei_eta(SEXP fstrSEXP);
+extern SEXP _nlmixr_RxODE_focei_finalize_llik(SEXP rhoSEXP);
+extern SEXP _nlmixr_RxODE_finalize_log_det_OMGAinv_5(SEXP rhoSEXP);
+extern SEXP _nlmixr_rxDetaDomega(SEXP rhoSEXP);
+extern SEXP _nlmixr_rxOuter_(SEXP rhoSEXP);
+extern SEXP _nlmixr_rxDetaDtheta(SEXP rhoSEXP);
+extern SEXP _nlmixr_rxOuter(SEXP rhoSEXP);
+extern SEXP _nlmixr_rxUpdateEtas(SEXP DnDhSSEXP, SEXP DhSSEXP, SEXP initSSEXP, SEXP acceptNSSEXP);
+
 static const R_CMethodDef CEntries[] = {
     {"hermite_ek_compute_",     (DL_FUNC) &hermite_ek_compute_,      3},
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
@@ -40,21 +56,34 @@ static const R_CMethodDef CEntries[] = {
 };
 
 static const R_CallMethodDef CallEntries[] = {
-    {"neldermead_wrap",      (DL_FUNC) &neldermead_wrap,      11},
-    {"n1qn1_wrap",           (DL_FUNC) &n1qn1_wrap,           13},
-    {"nlmixr_lin_cmt",       (DL_FUNC) &nlmixr_lin_cmt,        9},
-    {"_nlmixr_lin_cmt_stan",  (DL_FUNC) &_nlmixr_lin_cmt_stan,   9},
-    {"_nlmixr_llik_binomial_c", (DL_FUNC) &_nlmixr_llik_binomial_c,  3},
-    {"_nlmixr_llik_poisson",  (DL_FUNC) &_nlmixr_llik_poisson,   2},
-    {"_nlmixr_llik_normal",   (DL_FUNC) &_nlmixr_llik_normal,    2},
-    {"_nlmixr_llik_betabinomial", (DL_FUNC) &_nlmixr_llik_betabinomial, 3},
-    {"_nlmixr_llik_student_t",  (DL_FUNC) &_nlmixr_llik_student_t, 2},
-    {"_nlmixr_llik_beta",     (DL_FUNC) &_nlmixr_llik_beta, 2},
-    {"_nlmixr_llik_neg_binomial", (DL_FUNC) &_nlmixr_llik_neg_binomial, 2},
-    {"_nlmixr_grFOCEi",(DL_FUNC) &_nlmixr_grFOCEi, 2},
-    {"_nlmixr_sFOCEi",(DL_FUNC) &_nlmixr_sFOCEi, 2},
-    {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
-    {NULL, NULL, 0}
+  {"_nlmixr_rxInner", (DL_FUNC) &_nlmixr_rxInner, 2},
+  {"_nlmixr_rxInnerNum", (DL_FUNC) &_nlmixr_rxInnerNum, 2},
+  {"_nlmixr_rxGrad", (DL_FUNC) &_nlmixr_rxGrad, 1},
+  {"_nlmixr_rxHessian", (DL_FUNC) &_nlmixr_rxHessian, 1},
+  {"_nlmixr_RxODE_focei_eta_lik", (DL_FUNC) &_nlmixr_RxODE_focei_eta_lik, 2},
+  {"_nlmixr_RxODE_focei_eta_lp", (DL_FUNC) &_nlmixr_RxODE_focei_eta_lp, 2},
+  {"_nlmixr_RxODE_focei_eta", (DL_FUNC) &_nlmixr_RxODE_focei_eta, 1},
+  {"_nlmixr_RxODE_focei_finalize_llik", (DL_FUNC) &_nlmixr_RxODE_focei_finalize_llik, 1},
+  {"_nlmixr_rxDetaDomega", (DL_FUNC) &_nlmixr_rxDetaDomega, 1},
+  {"_nlmixr_rxOuter_", (DL_FUNC) &_nlmixr_rxOuter_, 1},
+  {"_nlmixr_rxDetaDtheta", (DL_FUNC) &_nlmixr_rxDetaDtheta, 1},
+  {"_nlmixr_rxOuter", (DL_FUNC) &_nlmixr_rxOuter, 1},
+  {"_nlmixr_rxUpdateEtas", (DL_FUNC) &_nlmixr_rxUpdateEtas, 4},
+  {"neldermead_wrap",      (DL_FUNC) &neldermead_wrap,      11},
+  {"n1qn1_wrap",           (DL_FUNC) &n1qn1_wrap,           13},
+  {"nlmixr_lin_cmt",       (DL_FUNC) &nlmixr_lin_cmt,        9},
+  {"_nlmixr_lin_cmt_stan",  (DL_FUNC) &_nlmixr_lin_cmt_stan,   9},
+  {"_nlmixr_llik_binomial_c", (DL_FUNC) &_nlmixr_llik_binomial_c,  3},
+  {"_nlmixr_llik_poisson",  (DL_FUNC) &_nlmixr_llik_poisson,   2},
+  {"_nlmixr_llik_normal",   (DL_FUNC) &_nlmixr_llik_normal,    2},
+  {"_nlmixr_llik_betabinomial", (DL_FUNC) &_nlmixr_llik_betabinomial, 3},
+  {"_nlmixr_llik_student_t",  (DL_FUNC) &_nlmixr_llik_student_t, 2},
+  {"_nlmixr_llik_beta",     (DL_FUNC) &_nlmixr_llik_beta, 2},
+  {"_nlmixr_llik_neg_binomial", (DL_FUNC) &_nlmixr_llik_neg_binomial, 2},
+  {"_nlmixr_grFOCEi",(DL_FUNC) &_nlmixr_grFOCEi, 2},
+  {"_nlmixr_sFOCEi",(DL_FUNC) &_nlmixr_sFOCEi, 2},
+  {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
+  {NULL, NULL, 0}
 };
 
 void R_init_nlmixr(DllInfo *dll)

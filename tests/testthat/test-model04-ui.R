@@ -38,11 +38,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
         expect_equal(signif(AIC(as.nlme(fit)), 6), 77067)
         expect_equal(signif(BIC(as.nlme(fit)), 6), 77101.2)
 
-        expect_equal(signif(as.numeric(fit$coefficients$fixed[1]),3), 1.36)
-        expect_equal(signif(as.numeric(fit$coefficients$fixed[2]),3), 4.20)
+        expect_equal(signif(as.numeric(as.nlme(fit)$coefficients$fixed[1]),3), 1.36)
+        expect_equal(signif(as.numeric(as.nlme(fit)$coefficients$fixed[2]),3), 4.20)
 
-        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.270)
-        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.310)
+        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.270)
+        expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.310)
         expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[3], 3)), 0.203)
 
     })
@@ -74,7 +74,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
 
         dat <- datr
 
-        fitODE <- uif %>% nlme(dat, control = nlmeControl(pnlsTol = .01, msVerbose = TRUE));
+        fitODE <- uif %>% nlme(dat, control = nlmeControl(pnlsTol = .1, msVerbose = TRUE));
 
         z <- summary(as.nlme(fitODE))
 
@@ -88,7 +88,5 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
         expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.270)
         expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.310)
         expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[3], 3)), 0.203)
-
-
     })
 }

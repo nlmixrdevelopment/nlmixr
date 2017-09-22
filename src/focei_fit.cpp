@@ -4,14 +4,7 @@
 using namespace Rcpp;
 using namespace arma;
 
-
-typedef double (*rxode_sum_fn)(double *input, int n);
-
-double RxODE_sum(double *input, int n){
-  static rxode_sum_fn RxODE_sum = NULL;
-  if (RxODE_sum == NULL) RxODE_sum = (rxode_sum_fn) R_GetCCallable("RxODE","RxODE_sum");
-  return RxODE_sum(input, n);
-}
+extern "C" double RxODE_sum (double *input, int n);
 
 //[[Rcpp::export]]
 arma::mat sFOCEi(NumericVector par, Environment e){

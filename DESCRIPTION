@@ -36,7 +36,7 @@ Suggests: knitr,
 Version: 0.9.0-1
 Date: 2016-09-20
 Authors@R: c(person("Matthew","Fidler",
-      role = c("aut", "cre"), email = "matthew.fidler@gmail.com"),      
+      role = "aut", email = "matthew.fidler@gmail.com"),      
    person("Yuan", "Xiong", 
       role = "aut", email = "yuan.xiong@gmail.com"),
    person("Rik", "Schoemaker", 
@@ -48,11 +48,11 @@ Authors@R: c(person("Matthew","Fidler",
    person("Mirjam","Trame",
       role = "aut", email = "mirjam.trame@gmail.com"),   
    person("Wenping", "Wang", 
-      role = "aut", email = "wwang8198@gmail.com")
+      role = c("aut", "cre"), email = "wwang8198@gmail.com")
    )
-Author: Author: Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut], Matt Fidler [aut], Mirjam Trame [aut],
+Author: Matthew Fidler [aut], Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut],  Mirjam Trame [aut],
   Wenping Wang [aut, cre]
-Maintainer: Matthew Fidler <matthew.fidler@gmail.com>
+Maintainer: Wenping Wang <wwang8198@gmail.com>
 Description: nlmixr is an R package for fitting population pharmacokinetic (PK) 
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)

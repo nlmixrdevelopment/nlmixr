@@ -10,7 +10,7 @@
 \title{FOCEI Fit for nlmixr}
 \usage{
 focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
-  optim = c("lbfgs", "L-BFGS-B", "bobyqa", "lbfgsb3", "nlminb"),
+  optim = c("bobyqa", "L-BFGS-B", "BFGS", "lbfgs", "lbfgsb3", "nlminb"),
   model = NULL, pred = NULL, err = NULL, lower = -Inf, upper = Inf,
   control = list(), calculate.vars = c("pred", "ipred", "ires", "res",
   "iwres", "wres", "cwres", "cpred", "cres"), theta.names = NULL,
