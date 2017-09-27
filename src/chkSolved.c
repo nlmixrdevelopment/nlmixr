@@ -11,15 +11,17 @@ SEXP _nlmixr_chkSolvedInf(SEXP evid,SEXP solved){
   int isInf = -1;
   SEXP out = PROTECT(allocVector(LGLSXP,1));
   // For a proper solved object ALL EVIDs must be 0,
+  int cid;
   for (i = 0; i < n; i++){
-    if (ev[i] == 0){
-    } else if (fabs(ev[i]) < 101){
-      error("Non-compatible EVID found(EVID=%d); Please check dataset!",ev[i]);
+    cid = (int)ev[i];
+    if (cid == 0){
+    } else if (abs(cid) < 101){
+      error("Non-compatible EVID found(EVID=%d); Please check dataset!",cid);
     } else if (isSolved){
       // All EVIDs need to be 101 or 10101
       if (isInf == -1){
       } else if (isInf == 0){
-	if (ev[i] != 101){
+	if (ev[i] != cid){
 	  error("With EVID=101, all EVIDs have to be 101 in a solved system.");
 	}
       } else if (isInf == 0){
