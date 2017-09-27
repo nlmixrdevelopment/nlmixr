@@ -1,7 +1,8 @@
 regEta <- rex::rex(start, "ETA[", capture("1":"9", any_of("0":"9")), "]")
 rxFoceiEtaSetup <- function(object, ..., dv, eta, theta, nonmem=FALSE, table=TRUE, inv.env=parent.frame(1), id= -1,
                             inits.vec=NULL, atol.outer=1e-8, rtol.outer=1e-6,
-                            switch.solver=FALSE, pred.minus.dv=TRUE, scale.to=1){
+                            switch.solver=FALSE, pred.minus.dv=TRUE, scale.to=1,
+                            numeric=FALSE){
     args <- list(object=object, ..., eta=eta, theta=theta);
     args$do.solve <- FALSE;
     setup <- c(do.call(object$solve, args), as.list(inv.env));
@@ -33,6 +34,7 @@ rxFoceiEtaSetup <- function(object, ..., dv, eta, theta, nonmem=FALSE, table=TRU
         setup$rc <- 0L;
         setup$switch.solver <- as.integer(switch.solver);
         setup$pred.minus.dv <- as.integer(pred.minus.dv);
+        setup$numeric <- as.integer(numeric)
         if (!is.null(inits.vec)){
             setup$inits.vec <- inits.vec;
         }
@@ -234,15 +236,24 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
                          estimate=TRUE, inner.opt=c("n1qn1", "lbfgs"), return.env=FALSE,
                          add.grad=FALSE){
     inner.opt <- match.arg(inner.opt);
-    inner.rxode <- object$inner;
-    inner.rxode$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
     args <- as.list(match.call(expand.dots=TRUE))[-1];
     args$dv <- dv
     args$eta <- eta
     args$eta.bak <- eta.bak
     args$estimate <- estimate
+    if (!any(names(args) == "numeric")){
+        args$numeric <- FALSE;
+    }
+    if (args$numeric){
+        inner.rxode <- object$pred.only;
+        inner.rxode$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
+    } else {
+        inner.rxode <- object$inner;
+        inner.rxode$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
+    }
     args$object <- inner.rxode;
     env <- do.call(getFromNamespace("rxFoceiEtaSetup", "nlmixr"), args, envir = parent.frame(1));
+
     lik <- RxODE_focei_eta("lik");
     lp <- RxODE_focei_eta("lp")
     c.hess <- NULL
@@ -269,18 +280,23 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
                 }
                 return(output);
             }
-
             output <- est0();
             if (inherits(output, "try-error")){
                 args$vars <- rep(0, length(args$eta));
                 output <- est0();
                 if (inherits(output, "try-error")){
-                    output <- rxInner(rep(0, length(args$eta)), env);
+                    if (env$numeric == 1){
+                        output <- rxInnerNum(rep(0, length(args$eta)), env);
+                    } else {
+                        output <- rxInner(rep(0, length(args$eta)), env);
+                    }
                 }
             }
             return(output);
         } else {
             ret <- try(R.utils::captureOutput(rxInner(args$eta, env)));
+            ## ret <- rxInner(args$eta, env);
+            ## print(as.list(env))
             if (inherits(ret, "try-error")){
                 pred.only <- object$pred.only;
                 pred.only$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
@@ -351,6 +367,12 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
                 attr(ret, "corrected") <- 1L;
             } else {
                 if (inherits(ret, "try-error")){
+                    cat("Hessian:\n");
+                    print(env$H)
+                    cat("log.det.H.neg.5:\n");
+                    print(env$log.det.H.neg.5)
+                    cat("log.det.OMGAinv.5:\n");
+                    print(env$log.det.OMGAinv.5)
                     ## Try with numeric differences instead.
                     pred.only <- object$pred.only;
                     pred.only$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)

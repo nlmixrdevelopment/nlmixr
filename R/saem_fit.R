@@ -1324,7 +1324,9 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                        control=list(NOTRUN=TRUE,
                                     inits.mat=mat2,
                                     cores=1,
-                                    find.best.eta=FALSE));
+                                    find.best.eta=FALSE,
+                                    numeric=(!is.null(uif$nmodel$lin.solved)),
+                                    sum.prod=uif$env$sum.prod));
     ome <- fit.f$omega;
     w <- which(!is.na(uif.new$ini$neta1))
     for (i in w){

@@ -269,7 +269,6 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
     return(fit$cov);
 }
 
-fitted.focei.fit.slow <- NULL
 ##' Extract the fitted values from the model
 ##'
 ##' @param object Fit object
@@ -794,7 +793,6 @@ focei.fit.data.frame0 <- function(data,
             message(paste(paste("##", lines), collapse="\n"));
         }
         running <- FALSE})
-    running <- TRUE
     ##data = dat; PKpars=mypars; diag.xform="sqrt"; model=list(); control=list()
     ##model options
 
@@ -846,8 +844,14 @@ focei.fit.data.frame0 <- function(data,
         numDeriv.swap=2.3,
         sum.prod=TRUE,
         theta.grad=FALSE,
-        scale.to=1
+        scale.to=1,
+        numeric=FALSE
     )
+
+    running <- TRUE
+    if (con$NOTRUN){
+        running <- FALSE
+    }
 
     curi <- 0;
 
@@ -909,23 +913,27 @@ focei.fit.data.frame0 <- function(data,
     ## print(th0.om)
     model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad,
                                      pred.minus.dv=con$pred.minus.dv, sum.prod=con$sum.prod,
-                                     theta.derivs=con$theta.grad);
+                                     theta.derivs=con$theta.grad, run.internal=TRUE,
+                                     only.numeric=con$numeric);
+    ## rxCat(model$inner);
     message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
-    message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
+    if (!con$numeric){
+        message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
+    }
     if (con$grad){
         message(sprintf("\t Outer Compartments=%s", length(RxODE::rxState(model$outer))))
     }
-    cov.names <- par.names <- RxODE::rxParams(model$inner);
+    cov.names <- par.names <- RxODE::rxParams(model$pred.only);
     cov.names <- cov.names[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), cov.names) == -1];
     pcov <- c()
-    lhs <- c(names(RxODE::rxInits(model$inner)), RxODE::rxLhs(model$inner))
+    lhs <- c(names(RxODE::rxInits(model$pred.only)), RxODE::rxLhs(model$pred.only))
     if (length(lhs) > 0){
         cov.names <- cov.names[regexpr(rex::rex(start, or(lhs), end), cov.names) == -1];
     }
     if (length(cov.names) > 0){
         if (!all(cov.names %in% names(data))){
-            message("Inner Model:")
-            RxODE::rxCat(model$inner)
+            message("Model:")
+            RxODE::rxCat(model$pred.only)
             message("Needed Covariates:")
             RxODE::rxPrint(cov.names)
             stop("Not all the covariates are in the dataset.")
@@ -1111,6 +1119,7 @@ focei.fit.data.frame0 <- function(data,
                          atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
                          atol.outer=con$atol.outer, rtol.outer=con$rtol.outer,
                          pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver,
+                         numeric=con$numeric,
                          inner.opt=con$inner.opt, add.grad=print.grad, numDeriv.method=numDeriv.method,
                          table=do.table);
             if (!is.null(con$scale.to)){

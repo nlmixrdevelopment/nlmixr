@@ -149,11 +149,13 @@ nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
+nlmixr.fit <- function(uif, data, est="nlme", ..., sum.prod=FALSE, focei.translate=TRUE){
     dat <- data;
+    uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, dat$EVID, as.integer(!is.null(uif$nmodel$lin.solved)));
     bad.focei <- "Problem calculating residuals, returning fit without residuals";
     if (est == "saem"){
         pt <- proc.time()
+        uif$env$sum.prod <- sum.prod
         model <- uif$saem.model
         cfg   = configsaem(model=model, data=dat, inits=uif$saem.init, ...);
         fit <- model$saem_mod(cfg);
@@ -188,13 +190,19 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., focei.translate=TRUE){
                                  ncmt=uif$nmodel$lin.solved$ncmt,
                                  oral=uif$nmodel$lin.solved$oral,
                                  tlag=uif$nmodel$lin.solved$tlag,
+                                 infusion=uif$env$infusion,
                                  parameterization=uif$nmodel$lin.solved$parameterization,
                                  par_trans=fun,
                                  weight=weight,
                                  verbose=TRUE, ...);
         } else {
+            if (sum.prod){
+                rxode <- RxODE::rxSumProdModel(uif$rxode.pred);
+            } else {
+                rxode <- uif$rxode.pred;
+            }
             fit <- nlme_ode(dat,
-                            model=uif$rxode.pred,
+                            model=rxode,
                             par_model=specs,
                             par_trans=fun,
                             response="nlmixr_pred",

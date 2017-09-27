@@ -831,6 +831,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             cur <- cur + 1;
         }
     }
+    env <- new.env();
+    env$infusion <- FALSE
+    env$sum.prod <- FALSE
     ret <- list(ini=bounds, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
                             all.vars=all.vars, rest.vars=rest.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
@@ -844,7 +847,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             log.eta=log.eta,
                             theta.ord=theta.ord,
                             saem.theta.trans=saem.theta.trans,
-                            env=new.env()))
+                            env=env))
     return(ret)
 }
 ##' Create the nlme specs list for nlmixr nlme solving
@@ -1096,16 +1099,19 @@ nlmixrUI.saem.log.eta <- function(obj){
 ##' Generate saem.fit user function.
 ##'
 ##' @param obj UI object
-##' @param infusion is this an infusion solved system (default FALSE)
 ##' @return saem user function
 ##' @author Matthew L. Fidler
-nlmixrUI.saem.fit <- function(obj, infusion=FALSE){
+nlmixrUI.saem.fit <- function(obj){
     if (any(ls(envir=obj$env) == "saem.fit")){
         return(obj$env$saem.fit)
     } else if (!is.null(obj$rxode.pred)) {
         ## RxODE function
         message("Compiling RxODE differential equations...", appendLF=FALSE)
-        ode <- RxODE::RxODE(obj$rxode.pred);
+        if (obj$env$sum.prod){
+            ode <- RxODE::RxODE(RxODE::rxSumProdModel(obj$rxode.pred));
+        } else {
+            ode <- RxODE::RxODE(obj$rxode.pred);
+        }
         message("done.")
         saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=function() nlmixr_pred)
         message("done.")
@@ -1116,7 +1122,7 @@ nlmixrUI.saem.fit <- function(obj, infusion=FALSE){
         saem.fit <- gen_saem_user_fn(model=lincmt(ncmt=obj$lin.solved$ncmt,
                                                   oral=obj$lin.solved$oral,
                                                   tlag=obj$lin.solved$tlag,
-                                                  infusion = infusion,
+                                                  infusion = obj$env$infusion,
                                                   parameterization = obj$lin.solved$parameterization))
         message("done.")
         obj$env$saem.fit <- saem.fit;

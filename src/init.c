@@ -47,6 +47,7 @@ extern SEXP _nlmixr_rxOuter_(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxDetaDtheta(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxOuter(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxUpdateEtas(SEXP DnDhSSEXP, SEXP DhSSEXP, SEXP initSSEXP, SEXP acceptNSSEXP);
+extern SEXP _nlmixr_chkSolvedInf(SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"hermite_ek_compute_",     (DL_FUNC) &hermite_ek_compute_,      3},
@@ -56,6 +57,7 @@ static const R_CMethodDef CEntries[] = {
 };
 
 static const R_CallMethodDef CallEntries[] = {
+  {"_nlmixr_chkSolvedInf",(DL_FUNC) &_nlmixr_chkSolvedInf, 2},
   {"_nlmixr_rxInner", (DL_FUNC) &_nlmixr_rxInner, 2},
   {"_nlmixr_rxInnerNum", (DL_FUNC) &_nlmixr_rxInnerNum, 2},
   {"_nlmixr_rxGrad", (DL_FUNC) &_nlmixr_rxGrad, 1},
