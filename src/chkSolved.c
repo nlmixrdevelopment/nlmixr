@@ -20,8 +20,15 @@ SEXP _nlmixr_chkSolvedInf(SEXP evid,SEXP solved){
     } else if (isSolved){
       // All EVIDs need to be 101 or 10101
       if (isInf == -1){
+	if (cid == 101){
+	  isInf = 0;
+	} else if (cid == 10101) {
+	  isInf = 1;
+	} else {
+	  error("Solved systems can only have EVID=101 or EVID=10101; (found EVID=%d)",cid);
+	}
       } else if (isInf == 0){
-	if (ev[i] != cid){
+	if (cid != 101){
 	  error("With EVID=101, all EVIDs have to be 101 in a solved system.");
 	}
       } else if (isInf == 0){
@@ -30,7 +37,7 @@ SEXP _nlmixr_chkSolvedInf(SEXP evid,SEXP solved){
     }
   }
   if (isSolved){
-    LOGICAL(out)[0] = isInf;
+    LOGICAL(out)[0] = (isInf==1);
   } else {
     LOGICAL(out)[0] = NA_LOGICAL;
   }
