@@ -1,6 +1,6 @@
 // saem_class_rcpp.hpp: population PK/PD modeling library
 //
-// Copyright (C) 2014 - 2016  Wenping Wang
+// Copyright (C) 2014 - 2017  Wenping Wang
 //
 // This file is part of nlmixr.
 //
@@ -408,6 +408,7 @@ void saem_fit() {
     Rcout << kiter+1
           << ": "
           << par_hist.row(kiter);
+    Rcpp::checkUserInterrupt();
   }//kiter
 }
 
