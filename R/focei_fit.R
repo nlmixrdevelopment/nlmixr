@@ -1091,7 +1091,7 @@ focei.fit.data.frame0 <- function(data,
         }
         if (!is.null(last.pars) && con$accept.eta.size != 0 && find.best.eta && con$grad){
             inits.mat.bak <- inits.mat;
-            inits.mat <- RxODE::rxUpdateEtas(last.dEta.dTheta, matrix(pars - last.pars, ncol=1), inits.mat,con$accept.eta.size);
+            inits.mat <- rxUpdateEtas(last.dEta.dTheta, matrix(pars - last.pars, ncol=1), inits.mat,con$accept.eta.size);
         } else {
             inits.mat.bak <- NULL;
         }
