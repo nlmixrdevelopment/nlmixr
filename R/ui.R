@@ -582,11 +582,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         if (!is.null(wm)){
                             cur <- 2;
                             th <- 3;
-                            w <- which(all.covs == as.character(x[[wm]][[2]]))
+                            w <- which(all.covs == as.character(x[[wm]][[2]])[1])
                             if (length(w) == 0){
                                 cur <- 3;
                                 th <- 2;
-                                w <- which(all.covs == as.character(x[[wm]][[3]]))
+                                w <- which(all.covs == as.character(x[[wm]][[3]])[1])
                             }
                             if (length(w) == 1){
                                 cov <- all.covs[w];
