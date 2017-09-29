@@ -152,7 +152,7 @@ nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
 nlmixr.fit <- function(uif, data, est="nlme", ..., sum.prod=FALSE, focei.translate=TRUE){
     dat <- data;
     uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, dat$EVID, as.integer(!is.null(uif$nmodel$lin.solved)));
-    bad.focei <- "Problem calculating residuals, returning fit without residuals";
+    bad.focei <- "Problem calculating residuals, returning fit without residuals.";
     if (est == "saem"){
         pt <- proc.time()
         uif$env$sum.prod <- sum.prod

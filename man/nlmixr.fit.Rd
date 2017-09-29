@@ -4,7 +4,8 @@
 \alias{nlmixr.fit}
 \title{Fit a nlmixr model}
 \usage{
-\method{nlmixr}{fit}(uif, data, est = "nlme", ..., focei.translate = TRUE)
+\method{nlmixr}{fit}(uif, data, est = "nlme", ..., sum.prod = FALSE,
+  focei.translate = TRUE)
 }
 \arguments{
 \item{uif}{Parsed nlmixr model (by \code{nlmixr(mod.fn)}).}

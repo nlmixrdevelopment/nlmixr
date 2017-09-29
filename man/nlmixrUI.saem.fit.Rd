@@ -4,12 +4,10 @@
 \alias{nlmixrUI.saem.fit}
 \title{Generate saem.fit user function.}
 \usage{
-nlmixrUI.saem.fit(obj, infusion = FALSE)
+nlmixrUI.saem.fit(obj)
 }
 \arguments{
 \item{obj}{UI object}
-
-\item{infusion}{is this an infusion solved system (default FALSE)}
 }
 \value{
 saem user function
