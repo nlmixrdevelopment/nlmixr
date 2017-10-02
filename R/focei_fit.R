@@ -524,22 +524,21 @@ par.hist <- function(x, stacked=FALSE, ...){
 ##' @rdname par.hist
 ##' @export
 par.hist.nlmixr.ui.saem <- function(x, stacked=FALSE, ...){
-    m = x$saem$par_hist
-    df = data.frame(
-        val=as.vector(m),
-        par=rep(1:ncol(m), each=nrow(m)),
-        iter=rep(1:nrow(m), ncol(m))
-    )
-    ## now get the names
     uif <- x$uif;
     theta.names <- c(uif$saem.theta.name, uif$saem.omega.name, uif$saem.res.name);
-    df <-  data.frame(iter=df$iter, utils::unstack(df,val~par));
-    names(df)[seq_along(theta.names) + 1] <- theta.names;
+    m <- x$saem$par_hist
     if (stacked){
-        df <- data.frame(stack(df[,-1]), iter=df$iter);
-        names(df) <- c("val", "par", "iter")
+        df = data.frame(
+            val=as.vector(m),
+            par=rep(theta.names, each=nrow(m)),
+            iter=rep(1:nrow(m), ncol(m))
+        )
+        return(df)
+    } else {
+        dimnames(m) <- list(NULL, theta.names);
+        df <- data.frame(iter=rep(1:nrow(m)), as.data.frame(m));
+        return(df)
     }
-    return(df)
 }
 ##' @rdname par.hist
 ##' @export
