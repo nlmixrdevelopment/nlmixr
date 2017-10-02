@@ -142,20 +142,15 @@ print.focei.fit <- function(x, ...) {
             message("\nResidual Errors")
             print(tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]);
         } else if (!is.null(saem)){
-            df <- fit$par.data.frame;
-            th = saem$Plambda
-            nth = length(th)
-            H = solve(saem$Ha[1:nth,1:nth])
-            se = sqrt(diag(H))
-            m =  cbind(exp(th), th, se)
-            dimnames(m)[[2]] = c("est", "log(est)", "se(log_est)")
-            dimnames(m)[[1]] <- uif$saem.theta.name
-            message("From SAEM:")
-            print(m)
-
-            ## Augment with SEs from SAEM.
-            ## message("SAEM!");
-            message("FOCEi:")
+            nth <- length(uif$saem.theta.name)
+            se <- structure(sqrt(diag(RxODE::rxInv(saem$Ha[1:nth,1:nth]))), .Names=uif$saem.theta.name)
+            df <- fit$par.data.frame
+            se2 <- rep(NA, length(df[, 1]));
+            se2[1:nth] <- se[row.names(df)[1:nth]];
+            lab <- paste(uif$ini$label[!is.na(uif$ini$ntheta)]);
+            lab[lab == "NA"] <- "";
+            lab <- gsub(" *$", "", gsub("^ *", "", lab));
+            df <- data.frame(df, "se(log est)"=se2, label=lab, check.names=FALSE)
             print(df);
         } else {
             print(fit$par.data.frame);
