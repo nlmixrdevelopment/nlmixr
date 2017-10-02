@@ -1,3 +1,4 @@
+
 .onAttach <- function(libname, pkgname){ ## nocov start
     ## Setup RxODE.prefer.tbl
     nlmixrSetupMemoize()
@@ -151,7 +152,7 @@ nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
 ##' @export
 nlmixr.fit <- function(uif, data, est="nlme", ..., sum.prod=FALSE, focei.translate=TRUE){
     dat <- data;
-    uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, dat$EVID, as.integer(!is.null(uif$nmodel$lin.solved)));
+    uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, as.double(dat$EVID), as.integer(!is.null(uif$nmodel$lin.solved)));
     bad.focei <- "Problem calculating residuals, returning fit without residuals.";
     if (est == "saem"){
         pt <- proc.time()
@@ -215,13 +216,15 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., sum.prod=FALSE, focei.transla
         ## CWRES.
         ## return(fit)
         if (focei.translate){
-            ret <- try(as.focei(fit, uif, pt, data=dat))
-            if (inherits(ret, "try-error")){
-                warning(bad.focei)
-                return(fit);
-            } else {
-                return(ret)
-            }
+            ret <- as.focei(fit, uif, pt, data=dat)
+            ## ret <- try(as.focei(fit, uif, pt, data=dat))
+            ## if (inherits(ret, "try-error")){
+            ##     warning(bad.focei)
+            ##     return(fit);
+            ## } else {
+            ##     return(ret)
+            ## }
+            return(ret)
         } else  {
             return(fit);
         }

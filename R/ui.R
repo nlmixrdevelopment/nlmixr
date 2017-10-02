@@ -1049,6 +1049,24 @@ nlmixrUI.saem.res.mod <- function(obj){
         stop("Currently SAEM only supports one type of residual error model.")
     }
 }
+##' Get error names for SAEM
+##'
+##' @param obj SAEM user interface function.
+##' @return Names of error estimates for SAEM
+##' @author Matthew L. Fidler
+nlmixrUI.saem.res.name <- function(obj){
+    w <- which(obj$err == "add");
+    ret <- c();
+    if (length(w) == 1){
+        ret[length(ret) + 1] <- paste(obj$name[w])
+    }
+    w <- which(obj$err == "prop");
+    if (length(w) == 1){
+        ret[length(ret) + 1] <- paste(obj$name[w])
+    }
+    return(ret);
+}
+
 ##' Get initial estimate for ares SAEM.
 ##'
 ##' @param obj UI model
@@ -1076,6 +1094,7 @@ nlmixrUI.saem.bres <- function(obj){
         return(1); ## SAME as SAEM
     }
 }
+
 ##' Get model$log.eta for SAEM
 ##'
 ##' @param obj UI model
@@ -1149,61 +1168,80 @@ nlmixrUI.saem.model <- function(obj){
     mod$omega <- obj$saem.model.omega;
     return(mod)
 }
+##' Get THETA names for nlmixr's SAEM
+##'
+##' @param uif nlmixr UI object
+##' @return SAEM theta names
+##' @author Matthew L. Fidler
+nlmixrUI.saem.theta.name <- function(uif){
+    trans <- uif$saem.theta.trans
+    trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
+    trans <- trans[!is.na(trans)]
+    theta.name <- trans.name[order(trans)]
+    o.theta.name <- theta.name
+    ## Add covariate names
+    for (nn in rev(names(uif$cov.ref))){
+        cur <- uif$cov.ref[[nn]]
+        for (j in seq_along(o.theta.name)){
+            w <- which(o.theta.name[j] == cur)
+            if (length(w) == 1){
+                w2 <- which(theta.name == cur);
+                ## print(theta.name);
+                ## print(cur)
+                theta.name <- c(theta.name[1:w2], names(cur)[w], theta.name[-(1:w2)])
+            }
+        }
+    }
+    return(theta.name);
+}
 ##' Generate SAEM initial estimates for THETA.
 ##'
 ##' @param obj nlmixr UI object
 ##' @return SAEM theta initial estimates
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.init.theta <- function(obj){
-    theta.trans <- obj$saem.theta.trans;
-    theta.trans <- theta.trans[!is.na(theta.trans)];
-    theta <- rep(NA, length(theta.trans));
-    for (i in seq_along(theta.trans)){
-        w <- which(theta.trans[i] == obj$ntheta)
-        if (length(w) == 1){
-            theta[i] <- obj$est[w]
+    theta.name <- obj$saem.theta.name
+    nm <- paste(obj$ini$name)
+    lt <- obj$log.theta;
+    i <- 0;
+    theta.ini <- sapply(theta.name, function(x){
+        w <- which(x == nm)
+        i <<- i + 1;
+        if (any(lt == x)){
+            return(exp(obj$ini$est[w]))
+        } else {
+            return(obj$ini$est[w])
         }
-    }
-    log.eta <- obj$saem.log.eta;
-    theta[log.eta] <- exp(theta[log.eta]);
-    theta <- theta[!is.na(theta)]
-    ## Now get the covariate estimates
-    ntheta <- length(theta)
-    trans <- obj$saem.theta.trans
-    trans.name <- paste(obj$ini$name[which(!is.na(trans))]);
-    trans <- trans[!is.na(trans)]
-    theta.name <- trans.name[order(trans)]
-    for (cov in obj$all.covs){
-        theta.cov <- rep(NA, ntheta);
-        covr <- obj$cov.ref[[cov]]
-        for (v in names(covr)){
-            w <- which(theta.name == covr[v]);
-            w2 <- which(obj$ini$name == v);
-            theta.cov[w] <- obj$est[w2];
-        }
-        theta.cov[log.eta] <- exp(theta.cov[log.eta]);
-        theta <- c(theta, theta.cov);
-    }
-    return(theta)
+    })
+    return(as.vector(theta.ini))
 }
 ##' SAEM's init$omega
 ##'
 ##' @param obj nlmixr UI object
 ##' @return Return initial matrix
 ##' @author Matthew L. Fidler
-nlmixrUI.saem.init.omega <- function(obj){
+nlmixrUI.saem.init.omega <- function(obj, names=FALSE){
     dm <- sum(!is.na(obj$saem.theta.trans));
     et <- obj$saem.eta.trans;
     ret <- rep(NA, dm);
     etd <- which(obj$neta1 == obj$neta2);
     for (i in etd){
-        ret[et[obj$neta1[i]]] <- obj$est[i]
+        if (names){
+            ret[et[obj$neta1[i]]] <- paste(obj$name[i])
+        } else {
+            ret[et[obj$neta1[i]]] <- obj$est[i]
+        }
     }
-    tmp <- unique(ret[!is.na(ret)])
-    if (length(tmp) == 1){
-        ret[is.na(ret)] <- tmp;
+    if (names){
+        ret <- ret[!is.na(ret)];
+        return(ret);
     } else {
-        ret[is.na(ret)] <- 1;
+        tmp <- unique(ret[!is.na(ret)])
+        if (length(tmp) == 1){
+            ret[is.na(ret)] <- tmp;
+        } else {
+            ret[is.na(ret)] <- 1;
+        }
     }
     return(ret)
 }
@@ -1243,6 +1281,8 @@ nlmixrUI.saem.init <- function(obj){
         return(nlmixrUI.theta.pars(obj))
     } else if (arg == "focei.inits"){
         return(nlmixrUI.focei.inits(obj));
+    } else if (arg == "saem.theta.name"){
+        return(nlmixrUI.saem.theta.name(obj))
     } else if (arg == "saem.eta.trans"){
         return(nlmixrUI.saem.eta.trans(obj))
     } else if (arg == "saem.model.omega"){
@@ -1265,6 +1305,10 @@ nlmixrUI.saem.init <- function(obj){
         return(nlmixrUI.saem.init.omega(obj))
     } else if (arg == "saem.init"){
         return(nlmixrUI.saem.init(obj))
+    } else if (arg == "saem.omega.name"){
+        return(nlmixrUI.saem.init.omega(obj, TRUE))
+    } else if (arg == "saem.res.name"){
+        return(nlmixrUI.saem.res.name(obj));
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -1302,4 +1346,7 @@ str.nlmixrUI <- function(object, ...){
     message(" $ saem.init.theta: The SAEM init$theta")
     message(" $ saem.init.omega: The SAEM init$omega")
     message(" $ saem.init : The SAEM inits list")
+    message(" $ saem.theta.name : The SAEM theta names")
+    message(" $ saem.omega.name : The SAEM theta names")
+    message(" $ saem.res.name : The SAEM omega names")
 }

@@ -149,25 +149,7 @@ print.focei.fit <- function(x, ...) {
             se = sqrt(diag(H))
             m =  cbind(exp(th), th, se)
             dimnames(m)[[2]] = c("est", "log(est)", "se(log_est)")
-            trans <- uif$saem.theta.trans
-            trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
-            trans <- trans[!is.na(trans)]
-            theta.name <- trans.name[order(trans)]
-            o.theta.name <- theta.name
-            ## Add covariate names
-            for (nn in rev(names(uif$cov.ref))){
-                cur <- uif$cov.ref[[nn]]
-                for (j in seq_along(o.theta.name)){
-                    w <- which(o.theta.name[j] == cur)
-                    if (length(w) == 1){
-                        w2 <- which(theta.name == cur);
-                        ## print(theta.name);
-                        ## print(cur)
-                        theta.name <- c(theta.name[1:w2], names(cur)[w], theta.name[-(1:w2)])
-                    }
-                }
-            }
-            dimnames(m)[[1]] <- theta.name
+            dimnames(m)[[1]] <- uif$saem.theta.name
             message("From SAEM:")
             print(m)
 
@@ -548,8 +530,14 @@ par.hist.nlmixr.ui.saem <- function(x, stacked=FALSE, ...){
         par=rep(1:ncol(m), each=nrow(m)),
         iter=rep(1:nrow(m), ncol(m))
     )
-    if (!stacked){
-        df <-  data.frame(iter=df$iter, utils::unstack(df,val~par));
+    ## now get the names
+    uif <- x$uif;
+    theta.names <- c(uif$saem.theta.name, uif$saem.omega.name, uif$saem.res.name);
+    df <-  data.frame(iter=df$iter, utils::unstack(df,val~par));
+    names(df)[seq_along(theta.names) + 1] <- theta.names;
+    if (stacked){
+        df <- data.frame(stack(df[,-1]), iter=df$iter);
+        names(df) <- c("val", "par", "iter")
     }
     return(df)
 }
@@ -2016,8 +2004,12 @@ focei.fit.data.frame0 <- function(data,
     ret <- m[[arg, exact = exact]];
     if (is.null(ret)){
         env <- attr(obj, ".focei.env");
-        fit <- env$fit;
-        return(fit[[arg, exact = exact]])
+        if (arg == "uif"){
+            return(env$uif)
+        } else {
+            fit <- env$fit;
+            return(fit[[arg, exact = exact]])
+        }
     } else {
         return(ret)
     }

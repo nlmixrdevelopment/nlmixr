@@ -4,7 +4,7 @@
 \alias{nlmixrUI.saem.init.omega}
 \title{SAEM's init$omega}
 \usage{
-nlmixrUI.saem.init.omega(obj)
+nlmixrUI.saem.init.omega(obj, names = FALSE)
 }
 \arguments{
 \item{obj}{nlmixr UI object}
