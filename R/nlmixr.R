@@ -86,14 +86,13 @@ nlmixrVersion <- function(){
 ##' The nlmixr generalized function allows common access to the nlmixr
 ##' estimation routines.
 ##'
-##' @param object Fitted object or
-##' @param data Data for fit.
-##' @param est Estimation routine.
+##' @param object Fitted object or function specifying the model.
+##' @inheritParams nlmixr.fit
 ##' @param ... Other parameters
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr <- function(object, data, est="nlme", ...){
+nlmixr <- function(object, data, est="nlme", control=control, ...){
     UseMethod("nlmixr")
 }
 
@@ -138,27 +137,73 @@ nlmixr.nlmixr.ui.nlme <- function(object, data, est="nlme", ...){
 ##' @export
 nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
 
+##' @rdname nlmixr
+##' @export
+nlmixr.nlmixr.ui.saem <- nlmixr.nlmixr.ui.nlme
+
 ##' Fit a nlmixr model
 ##'
 ##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).
-##' @param data Dataset to estimate
+##' @param data Dataset to estimate.  Needs to be RxODE compatible in
+##'     EVIDs.
 ##' @param est Estimation method
+##' @param control Estimation control options.  They could be
+##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}
 ##' @param ... Parameters passed to estimation method.
+##' @param sum.prod Take the RxODE model and use more precise
+##'     products/sums.  Increases solving accuracy and solving time.
 ##' @param focei.translate Translate the model to FOCEi and then run
 ##'     the tables and objective function so that different estimation
 ##'     methodologies are comparable through OBJF.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr.fit <- function(uif, data, est="nlme", ..., sum.prod=FALSE, focei.translate=TRUE){
+nlmixr.fit <- function(uif, data, est="nlme", control=list(), ...,
+                       sum.prod=FALSE, focei.translate=TRUE){
     dat <- data;
     uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, as.double(dat$EVID), as.integer(!is.null(uif$nmodel$lin.solved)));
     bad.focei <- "Problem calculating residuals, returning fit without residuals.";
     if (est == "saem"){
         pt <- proc.time()
+        args <- as.list(match.call(expand.dots=TRUE))[-1]
+        default <- saemControl();
+        if (any(names(args) == "mcmc")){
+            mcmc <- args$mcmc;
+        } else if (any(names(control) == "mcmc")){
+            mcmc <- control$mcmc;
+        } else {
+            mcmc <- default$mcmc;
+        }
+        if (any(names(args) == "ODEopt")){
+            ODEopt <- args$ODEopt;
+        } else if (any(names(control) == "ODEopt")){
+            ODEopt <- control$ODEopt;
+        } else {
+            ODEopt <- default$ODEopt;
+        }
+        if (any(names(args) == "seed")){
+            seed <- args$seed;
+        } else if (any(names(control) == "seed")){
+            seed <- control$seed;
+        } else {
+            seed <- default$seed;
+        }
+        if (any(names(args) == "print")){
+            print <- args$print;
+        } else if (any(names(control) == "print")){
+            print <- control$print;
+        } else {
+            print <- default$print;
+        }
+        uif$env$mcmc <- mcmc;
+        uif$env$ODEopt <- ODEopt;
         uif$env$sum.prod <- sum.prod
         model <- uif$saem.model
-        cfg   = configsaem(model=model, data=dat, inits=uif$saem.init, ...);
+        cfg   = configsaem(model=model, data=dat, inits=uif$saem.init,
+                           mcmc=mcmc, ODEopt=ODEopt, seed=seed);
+        if (print > 1){
+            cfg$print <- as.integer(print)
+        }
         fit <- model$saem_mod(cfg);
         if (focei.translate){
             ret <- try(as.focei(fit, uif, pt, data=dat));
@@ -257,4 +302,40 @@ nlmixr.fit <- function(uif, data, est="nlme", ..., sum.prod=FALSE, focei.transla
         class(fit) <- c("nlmixr.ui.focei.fit", class(fit));
         return(fit);
     }
+}
+##' Control Options for SAEM
+##'
+##' @param seed Random Seed for SAEM step.  (Needs to be set for
+##'     reproducibility.)  By default this is 99.
+##' @param sa.iter Number of iterations in the Stochastic
+##'     Approximation (SA) Step
+##' @param em.iter Number of iterations in the
+##'     Expectation-Maximization (EM) Step
+##' @param nmc Number of Markov Chains?
+##' @param nu Nu! A new parameter....?
+##' @inheritParams RxODE::rxSolve
+##' @param print The number it iterations that are completed before
+##'     anything is printed to the console.  By default, this is 1.
+##' @param ... Other arguments to control SAEM.
+##' @return List of options to be used in \code{\link{nlmixr}} fit for
+##'     SAEM.
+##' @author Wenping Wang & Matthew L. Fidler
+##' @export
+saemControl <- function(seed=99,
+                        sa.iter=200, em.iter=300,
+                        nmc=3,
+                        nu=c(2,2,2),
+                        atol = 1e-08,
+                        rtol = 1e-06,
+                        stiff = TRUE,
+                        transit_abs = FALSE,
+                        print=1,
+                        ...){
+    list(mcmc=list(niter=c(sa.iter, em.iter=em.iter), nmc=nmc, nu=nu),
+         ODEopt=list(atol=atol, rtol=rtol,
+                     stiff=as.integer(stiff),
+                     transit_abs = as.integer(transit_abs)),
+         seed=seed,
+         print=print, ...)
+
 }

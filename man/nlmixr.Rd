@@ -6,9 +6,10 @@
 \alias{nlmixr.nlmixrUI}
 \alias{nlmixr.nlmixr.ui.nlme}
 \alias{nlmixr.nlmixr.ui.focei.fit}
+\alias{nlmixr.nlmixr.ui.saem}
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
-nlmixr(object, data, est = "nlme", ...)
+nlmixr(object, data, est = "nlme", control = control, ...)
 
 \method{nlmixr}{function}(object, data, est = "nlme", ...)
 
@@ -17,13 +18,19 @@ nlmixr(object, data, est = "nlme", ...)
 \method{nlmixr}{nlmixr.ui.nlme}(object, data, est = "nlme", ...)
 
 \method{nlmixr}{nlmixr.ui.focei.fit}(object, data, est = "nlme", ...)
+
+\method{nlmixr}{nlmixr.ui.saem}(object, data, est = "nlme", ...)
 }
 \arguments{
-\item{object}{Fitted object or}
+\item{object}{Fitted object or function specifying the model.}
 
-\item{data}{Data for fit.}
+\item{data}{Dataset to estimate.  Needs to be RxODE compatible in
+EVIDs.}
 
-\item{est}{Estimation routine.}
+\item{est}{Estimation method}
+
+\item{control}{Estimation control options.  They could be
+\code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}}
 
 \item{...}{Other parameters}
 }

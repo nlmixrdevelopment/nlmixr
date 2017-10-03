@@ -4,17 +4,24 @@
 \alias{nlmixr.fit}
 \title{Fit a nlmixr model}
 \usage{
-\method{nlmixr}{fit}(uif, data, est = "nlme", ..., sum.prod = FALSE,
-  focei.translate = TRUE)
+\method{nlmixr}{fit}(uif, data, est = "nlme", control = list(), ...,
+  sum.prod = FALSE, focei.translate = TRUE)
 }
 \arguments{
 \item{uif}{Parsed nlmixr model (by \code{nlmixr(mod.fn)}).}
 
-\item{data}{Dataset to estimate}
+\item{data}{Dataset to estimate.  Needs to be RxODE compatible in
+EVIDs.}
 
 \item{est}{Estimation method}
 
+\item{control}{Estimation control options.  They could be
+\code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}}
+
 \item{...}{Parameters passed to estimation method.}
+
+\item{sum.prod}{Take the RxODE model and use more precise
+products/sums.  Increases solving accuracy and solving time.}
 
 \item{focei.translate}{Translate the model to FOCEi and then run
 the tables and objective function so that different estimation
