@@ -92,29 +92,29 @@ nlmixrVersion <- function(){
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr <- function(object, data, est="nlme", control=control, ...){
+nlmixr <- function(object, data, est="nlme", control=list(), ...){
     UseMethod("nlmixr")
 }
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.function <- function(object, data, est="nlme", ...){
+nlmixr.function <- function(object, data, est="nlme", control=list(), ...){
     uif <- nlmixrUI(object);
     if (missing(data) && missing(est)){
         return(uif)
     } else {
-        nlmixr.fit(uif, data, est, ...);
+        nlmixr.fit(uif, data, est, control=control, ...);
     }
 }
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.nlmixrUI <- function(object, data, est="nlme", ...){
+nlmixr.nlmixrUI <- function(object, data, est="nlme", control=list(), ...){
     uif <- object
     if (missing(data) && missing(est)){
         return(uif)
     } else {
-        nlmixr.fit(uif, data, est, ...);
+        nlmixr.fit(uif, data, est, control=control, ...);
     }
 }
 
@@ -240,7 +240,9 @@ nlmixr.fit <- function(uif, data, est="nlme", control=list(), ...,
                                  parameterization=uif$nmodel$lin.solved$parameterization,
                                  par_trans=fun,
                                  weight=weight,
-                                 verbose=TRUE, ...);
+                                 verbose=TRUE,
+                                 control=control,
+                                 ...);
         } else {
             if (sum.prod){
                 rxode <- RxODE::rxSumProdModel(uif$rxode.pred);
@@ -254,6 +256,7 @@ nlmixr.fit <- function(uif, data, est="nlme", control=list(), ...,
                             response="nlmixr_pred",
                             weight=weight,
                             verbose=TRUE,
+                            control=control,
                             ...);
         }
         ## Run FOCEi using same ETAs and THETA estimates to get
