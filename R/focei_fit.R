@@ -143,7 +143,7 @@ print.focei.fit <- function(x, ...) {
             message("\nFit Data (head):")
             print(head(as.matrix(x), n = n));
         } else {
-            message("\nFit Data:")
+            message("\nFit Data (object is a modified data.frame):")
             print(dplyr::as.tbl(x), n = n, width = width);
         }
     } else {
