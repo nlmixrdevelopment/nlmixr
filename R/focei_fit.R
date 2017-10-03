@@ -2011,6 +2011,8 @@ focei.fit.data.frame0 <- function(data,
         env <- attr(obj, ".focei.env");
         if (arg == "uif"){
             return(env$uif)
+        } else if (arg == "par.hist"){
+            return(par.hist(obj))
         } else {
             fit <- env$fit;
             return(fit[[arg, exact = exact]])
@@ -2023,12 +2025,13 @@ focei.fit.data.frame0 <- function(data,
 ##' @importFrom utils str
 ##' @export
 str.focei.fit <- function(object, ...){
-    message('FOCEI combined dataset and list');
+    message('FOCEi/UI combined dataset and properites');
     m <- as.data.frame(object);
     str(m)
     env <- attr(object, ".focei.env");
     fit <- env$fit;
     str(fit)
+    message(" $ par.hist : Parameter history (if available)")
 }
 
 ##' @export
