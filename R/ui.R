@@ -258,6 +258,7 @@ nlmixrUILinCmt <- function(lhs){
     lhs.up <- toupper(lhs);
     npars <- 0;
     extra.lines <- c();
+    par.trans <- list();
     for (i in seq_along(par1)){
         possible <- par1[[i]];
         val <- intersect(possible, lhs.up);
@@ -278,6 +279,7 @@ nlmixrUILinCmt <- function(lhs){
             cur <- names(par1)[i]
             w <- which(lhs.up == val);
             cur.lhs <- lhs[w];
+            par.trans[[length(par.trans) + 1]] <- c(cur, cur.lhs);
             if (cur != cur.lhs){
                 extra.lines[length(extra.lines) + 1] <- sprintf("%s = %s;", cur, cur.lhs);
             }
@@ -304,6 +306,7 @@ nlmixrUILinCmt <- function(lhs){
                 cur <- names(par2)[i]
                 w <- which(lhs.up == val);
                 cur.lhs <- lhs[w];
+                par.trans[[length(par.trans) + 1]] <- c(cur, cur.lhs);
                 if (cur != cur.lhs){
                     extra.lines[length(extra.lines) +1] <- sprintf("%s <- %s;", cur, cur.lhs);
                 }
@@ -327,6 +330,7 @@ nlmixrUILinCmt <- function(lhs){
         w <- which(val == lhs.up);
         if (length(w) > 0){
             cur.lhs <- lhs[w]
+            par.trans[[length(par.trans) + 1]] <- c("KA", cur.lhs);
             if (cur.lhs != "KA"){
                 extra.lines[length(extra.lines) +1] <- sprintf("KA <- %s;", cur.lhs)
             }
@@ -340,6 +344,7 @@ nlmixrUILinCmt <- function(lhs){
     if (length(val) == 1){
         w <- which(val == lhs.up);
         cur.lhs <- lhs[w]
+        par.trans[[length(par.trans) + 1]] <- c("TLAG", cur.lhs);
         if (cur.lhs != "TLAG"){
             extra.lines[length(extra.lines) +1] <- sprintf("TLAG <- %s;", cur.lhs)
         }
@@ -352,7 +357,7 @@ nlmixrUILinCmt <- function(lhs){
     }
     extra.lines <- paste(extra.lines, collapse="\n");
     return(list(extra.lines=extra.lines,
-                ncmt=ncmt, parameterization=param, oral=oral, tlag=tlag))
+                ncmt=ncmt, parameterization=param, oral=oral, tlag=tlag, par.trans=par.trans))
 }
 
 nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
@@ -708,11 +713,13 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
     all.covs <- character();
     do.pred <- 1;
-    pred <- new.fn(deparse(f(body(fun))))
+    pred.txt <- deparse(f(body(fun)))
+    pred <- new.fn(pred.txt);
     do.pred <- 0;
     err <- new.fn(deparse(f(body(fun))));
     do.pred <- 2;
-    rest <- new.fn(deparse(f(body(fun))));
+    rest.txt <- deparse(f(body(fun)))
+    rest <- new.fn(rest.txt);
     rest.funs <- allCalls(body(rest));
     rest.vars <- allVars(body(rest));
     all.covs <- setdiff(rest.vars,paste0(bounds$name))
@@ -794,9 +801,41 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (length(tmp) > 0){
         if (all(regexpr(rex::rex("nlmixr_pred <- linCmt()"), tmp) != -1)){
             lin.solved <- nlmixrUILinCmt(all.lhs)
-            old <- saem.pars[length(saem.pars)];
-            saem.pars[length(saem.pars)] <- lin.solved$extra.lines;
-            saem.pars[length(saem.pars) + 1] <- old
+            par.ord <- as.list(lin.solved$par.trans);
+            ## The theta.ord has to be adjusted...
+            theta.ord2 <- c();
+            log.theta2 <- c();
+            log.eta2 <- c();
+            saem.pars <- c("({", unlist(lapply(par.ord, function(x){
+                x1 <- gsub(" *$", "", x[1]);
+                x2 <- gsub(";", "", gsub("^ *", "", x[2]));
+                reg <- rex::rex(start, any_spaces, x2, any_spaces, or("=", "<-"), any_spaces)
+                w <- which(regexpr(reg, saem.pars) != -1);
+                w2 <- which(regexpr(reg, rest.txt) != -1);
+                if (length(w) == 1){
+                    for (v in theta.ord){
+                        if (regexpr(rex::rex(boundary, v, boundary), rest.txt[w2], perl=TRUE) != -1){
+                            theta.ord2 <<- c(theta.ord2, v);
+                        }
+                    }
+                    for (v in log.theta){
+                        if (regexpr(rex::rex(boundary, v, boundary), rest.txt[w2], perl=TRUE) != -1){
+                            log.theta2 <<- c(log.theta2, v);
+                        }
+                    }
+                    for (v in log.eta){
+                        if (regexpr(rex::rex(boundary, v, boundary), rest.txt[w2], perl=TRUE) != -1){
+                            log.eta2 <<- c(log.eta2, v);
+                        }
+                    }
+                    return(gsub(reg, paste0(x1, " = "), saem.pars[w]));
+                } else {
+                    return("error")
+                }
+                })), "})");
+            theta.ord <- theta.ord2;
+            log.theta <- log.theta2;
+            log.eta <- log.eta2;
         }
     } else {
         add <- linCmt <- function(...) NULL

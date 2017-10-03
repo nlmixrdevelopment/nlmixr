@@ -898,12 +898,14 @@ focei.fit.data.frame0 <- function(data,
                                      theta.derivs=con$theta.grad, run.internal=TRUE,
                                      only.numeric=con$numeric);
     ## rxCat(model$inner);
-    message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
-    if (!con$numeric){
-        message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
-    }
-    if (con$grad){
-        message(sprintf("\t Outer Compartments=%s", length(RxODE::rxState(model$outer))))
+    if (!con$NOTRUN){
+        message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
+        if (!con$numeric){
+            message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
+        }
+        if (con$grad){
+            message(sprintf("\t Outer Compartments=%s", length(RxODE::rxState(model$outer))))
+        }
     }
     cov.names <- par.names <- RxODE::rxParams(model$pred.only);
     cov.names <- cov.names[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), cov.names) == -1];
@@ -1685,6 +1687,7 @@ focei.fit.data.frame0 <- function(data,
     setup.time <- proc.time() - pt;
     pt <- proc.time()
     if (con$NOTRUN) {
+        sink(sink.file);
         pt <- proc.time()
         fit = list()
         fit$par = rep(con$scale.to, length(inits.vec))
@@ -1694,6 +1697,13 @@ focei.fit.data.frame0 <- function(data,
         optim.time <- proc.time() - pt;
         fit$cov.time <- proc.time() - proc.time();
         fit$objective <- fit$value;
+        sink();
+        lines <- readLines(sink.file);
+        unlink(sink.file);
+        w <- which(regexpr(rex::rex("Warning: The Hessian is non-positive definite, correcting with nearPD"), lines) != -1);
+        if (length(w) > 0){
+            warning("Hessian correcting during objective function calculation.")
+        }
     }
     else {
         if (con$grad){
@@ -1940,7 +1950,7 @@ focei.fit.data.frame0 <- function(data,
     ofv.FOCEi.ind <- ofv.FOCEi.ind.slow;
     running <- FALSE;
     sink.close()
-    con$cores <- 1; ## don't run parallel for extracting infomration
+    con$cores <- 1; ## don't run parallel for extracting information
     find.best.eta <- FALSE;
     print.grad <- FALSE; ## Turn off slow gradient calculation
     old.model <- model;
@@ -1948,6 +1958,7 @@ focei.fit.data.frame0 <- function(data,
     model$outer <- NULL;
     do.table <- TRUE
     message("Calculating Table Variables...")
+    tmp <- c()
     pt <- proc.time();
     if (any("ipred" == calculate.vars)){
         ## message("\tIPRED", appendLF=FALSE)
