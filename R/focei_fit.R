@@ -132,30 +132,11 @@ print.focei.fit <- function(x, ...) {
                                   row.names="", check.names=FALSE)
             RxODE::rxPrint(df.objf)
         }
-        message("\nTime (sec):");
+        message("\nTime (sec; $time):");
         print(fit$time);
-        message("\nParameters:")
-        if (!is.null(nlme)){
-            ttab <- summary(nlme)$tTable;
-            print(ttab)
-            tmp <- fit$par.data.frame
-            message("\nResidual Errors")
-            print(tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]);
-        } else if (!is.null(saem)){
-            nth <- length(uif$saem.theta.name)
-            se <- structure(sqrt(diag(RxODE::rxInv(saem$Ha[1:nth,1:nth]))), .Names=uif$saem.theta.name)
-            df <- fit$par.data.frame
-            se2 <- rep(NA, length(df[, 1]));
-            se2[1:nth] <- se[row.names(df)[1:nth]];
-            lab <- paste(uif$ini$label[!is.na(uif$ini$ntheta)]);
-            lab[lab == "NA"] <- "";
-            lab <- gsub(" *$", "", gsub("^ *", "", lab));
-            df <- data.frame(df, "se(log est)"=se2, label=lab, check.names=FALSE)
-            print(df);
-        } else {
-            print(fit$par.data.frame);
-        }
-        message("\nOmega:");
+        message("\nParameters ($par.fixed):")
+        print(x$par.fixed)
+        message("\nOmega ($omgea):");
         print(fit$omega);
         is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
         if (!is.dplyr){
@@ -340,6 +321,45 @@ ranef.focei.fit <- function(object, ...){
 ##' @importFrom nlme fixef
 ##' @export
 fixef.focei.fit <- function(object, ...){
+    args <- as.list(match.call(expand.dots = TRUE))[-1];
+    if (any(names(args) == "full")){
+        if (args$full){
+            uif <- object$uif;
+            if (!is.null(uif)){
+                saem <- object$saem;
+                nlme <- object$nlme;
+                lab <- paste(uif$ini$label[!is.na(uif$ini$ntheta)]);
+                lab[lab == "NA"] <- "";
+                lab <- gsub(" *$", "", gsub("^ *", "", lab));
+                if (!is.null(nlme)){
+                    ttab <- summary(nlme)$tTable;
+                    tmp <- fit$par.data.frame;
+                    tmp <- tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]
+                    tmp2 <- data.frame(Value=tmp$est,
+                               Std.Error=NA, DF=NA,
+                               "t-value"=NA,
+                               "p-value"=NA, check.names=FALSE)
+                    rownames(tmp2) <- rownames(tmp)
+                    tmp <- rbind(ttab,tmp2)
+                    tmp$label <- lab
+                    return(tmp)
+                }
+                if (!is.null(saem)){
+                    nth <- length(uif$saem.theta.name)
+                    se <- structure(sqrt(diag(RxODE::rxInv(saem$Ha[1:nth,1:nth]))), .Names=uif$saem.theta.name)
+                    df <- fit$par.data.frame
+                    se2 <- rep(NA, length(df[, 1]));
+                    se2[1:nth] <- se[row.names(df)[1:nth]];
+                    df <- data.frame(df, "se(log est)"=se2, label=lab, check.names=FALSE)
+                    return(df);
+                }
+                ret <- object$par.data.frame
+                ret$label <- lab;
+                return(ret)
+            }
+            return(object$par.data.frame);
+        }
+    }
     return(object$theta)
 }
 
@@ -2013,6 +2033,8 @@ focei.fit.data.frame0 <- function(data,
             return(env$uif)
         } else if (arg == "par.hist"){
             return(par.hist(obj))
+        } else if (arg == "par.fixed"){
+            return(fixed.effects(obj, full=TRUE));
         } else {
             fit <- env$fit;
             return(fit[[arg, exact = exact]])
@@ -2031,7 +2053,8 @@ str.focei.fit <- function(object, ...){
     env <- attr(object, ".focei.env");
     fit <- env$fit;
     str(fit)
-    message(" $ par.hist : Parameter history (if available)")
+    message(" $ par.hist  : Parameter history (if available)")
+    message(" $ par.fixed : Fixed Effect Parameter Table")
 }
 
 ##' @export
