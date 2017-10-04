@@ -110,7 +110,7 @@ print.focei.fit <- function(x, ...) {
         } else if (is(x, "nlmixr.ui.saem")){
             saem <- fit$saem;
             uif <- env$uif;
-            message(sprintf("nlmixr SAEM fit (%s; Note $par.hist=parameter history)\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
+            message(sprintf("nlmixr SAEM fit (%s)\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
         } else {
             message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
         }
@@ -2087,8 +2087,11 @@ str.focei.fit <- function(object, ...){
     env <- attr(object, ".focei.env");
     fit <- env$fit;
     str(fit)
-    message(" $ par.hist  : Parameter history (if available)")
-    message(" $ par.fixed : Fixed Effect Parameter Table")
+    str(as.list(env$fit))
+    str(as.list(object$uif$env))
+    message(" $ par.hist         : Parameter history (if available)")
+    message(" $ par.hist.stacked : Parameter history in stacked form for easy plotting (if available)")
+    message(" $ par.fixed        : Fixed Effect Parameter Table")
 
 
 }
