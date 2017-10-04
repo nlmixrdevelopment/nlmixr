@@ -573,6 +573,31 @@ par.hist.nlmixr.ui.focei.fit <- function(x, stacked=FALSE, ...){
 par.hist.default <- function(x, stacked=FALSE, ...){
     return(NULL)
 }
+##' Produce trace-plot for fit if applicable
+##'
+##' @param x fit object
+##' @param ... other parameters
+##' @return Fit traceplot or nothing.
+##' @author Matthew L. Fidler
+##' @export
+traceplot <- function(x, ...){
+    UseMethod("traceplot");
+}
+
+##' @rdname traceplot
+##' @export
+traceplot.focei.fit <- function(x, ...){
+    m <- par.hist(x, stacked=TRUE);
+    if (!is.null(m)){
+        p0 <- ggplot(m, aes(iter, val)) +
+            geom_line() +
+            facet_wrap(~par, scales = "free_y")
+        if (!is.null(fit2$mcmc)){
+            p0 <- p0 + ggplot2::geom_vline(xintercept=fit2$mcmc$niter[1], col="blue");
+        }
+        print(p0)
+    }
+}
 
 #' Plot a focei.fit plot
 #'
@@ -584,15 +609,7 @@ par.hist.default <- function(x, stacked=FALSE, ...){
 #' @author Wenping Wang & Matthew Fidler
 #' @export
 plot.focei.fit <- function(x, ...) {
-    m = par.hist(x, stacked=TRUE);
-    if (!is.null(m)){
-        p0 = ggplot(m, aes(iter, val)) +
-            geom_line() +
-            facet_wrap(~par, scales = "free_y")
-
-        print(p0)
-    }
-
+    traceplot(x);
     dat <- as.data.frame(x);
     d1 <- data.frame(DV=dat$DV, stack(dat[, c("PRED", "IPRED")]))
 
@@ -2035,13 +2052,26 @@ focei.fit.data.frame0 <- function(data,
         env <- attr(obj, ".focei.env");
         if (arg == "uif"){
             return(env$uif)
+        } else if (arg == "par.hist.stacked"){
+            return(par.hist(obj, stacked=TRUE))
         } else if (arg == "par.hist"){
             return(par.hist(obj))
         } else if (arg == "par.fixed"){
             return(fixed.effects(obj, full=TRUE));
         } else {
             fit <- env$fit;
-            return(fit[[arg, exact = exact]])
+            ret <- fit[[arg, exact = exact]]
+            if (is.null(ret)){
+                if (exists(arg, env, inherits=FALSE)){
+                    return(get(arg, env, inherits=FALSE));
+                } else if (exists(arg, env$uif$env, inherits=FALSE)){
+                    return(get(arg, env$uif$env, inherits=FALSE));
+                } else {
+                    return(NULL)
+                }
+            } else {
+                return(ret)
+            }
         }
     } else {
         return(ret)
@@ -2059,6 +2089,8 @@ str.focei.fit <- function(object, ...){
     str(fit)
     message(" $ par.hist  : Parameter history (if available)")
     message(" $ par.fixed : Fixed Effect Parameter Table")
+
+
 }
 
 ##' @export
