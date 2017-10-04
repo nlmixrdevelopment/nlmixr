@@ -112,7 +112,7 @@ print.focei.fit <- function(x, ...) {
             uif <- env$uif;
             message(sprintf("nlmixr SAEM fit (%s)\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
         } else {
-            message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$control$grad, "with global gradient", "without global gradient")));
+            message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$focei.control$grad, "with global gradient", "without global gradient")));
         }
         if (any(names(fit) == "condition.number")){
             df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Log-likelihood"=as.numeric(logLik(x)),
@@ -578,7 +578,7 @@ par.hist.default <- function(x, stacked=FALSE, ...){
 ##' @param x fit object
 ##' @param ... other parameters
 ##' @return Fit traceplot or nothing.
-##' @author Matthew L. Fidler
+##' @author Rik Schoemaker, Wenping Wang & Matthew L. Fidler
 ##' @export
 traceplot <- function(x, ...){
     UseMethod("traceplot");
@@ -592,8 +592,8 @@ traceplot.focei.fit <- function(x, ...){
         p0 <- ggplot(m, aes(iter, val)) +
             geom_line() +
             facet_wrap(~par, scales = "free_y")
-        if (!is.null(fit2$mcmc)){
-            p0 <- p0 + ggplot2::geom_vline(xintercept=fit2$mcmc$niter[1], col="blue");
+        if (!is.null(x$mcmc)){
+            p0 <- p0 + ggplot2::geom_vline(xintercept=x$mcmc$niter[1], col="blue", size=1.2);
         }
         print(p0)
     }
@@ -1948,7 +1948,7 @@ focei.fit.data.frame0 <- function(data,
     }
     if (!is.null(fit)){
         ## class(con) <- "focei.fit.con"
-        fit$control <- con;
+        fit$focei.control <- con;
         if (is.null(fit$par.unscaled)){
             if (is.null(con$scale.to)){
                 fit$par.unscaled = fit$par;
