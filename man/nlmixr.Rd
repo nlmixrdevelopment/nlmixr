@@ -9,11 +9,11 @@
 \alias{nlmixr.nlmixr.ui.saem}
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
-nlmixr(object, data, est = "nlme", control = control, ...)
+nlmixr(object, data, est = "nlme", control = list(), ...)
 
-\method{nlmixr}{function}(object, data, est = "nlme", ...)
+\method{nlmixr}{function}(object, data, est = "nlme", control = list(), ...)
 
-\method{nlmixr}{nlmixrUI}(object, data, est = "nlme", ...)
+\method{nlmixr}{nlmixrUI}(object, data, est = "nlme", control = list(), ...)
 
 \method{nlmixr}{nlmixr.ui.nlme}(object, data, est = "nlme", ...)
 
