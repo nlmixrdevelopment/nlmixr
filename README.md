@@ -40,11 +40,8 @@ To replicate the environment that was used in windows for nlmixr development, yo
      https://www.python.org/downloads/release/python-362/ scroll down to select the ‘Windows x86-64 executable installer’ and run the installer. 
    - Ensure ‘Install launcher for all users’ and ‘Add Python 3.6 to PATH’ are checked. 
    - Then choose ‘Customize installation’: make sure all options are checkmarked on the next page, click ‘Next’ and then checkmark ‘Install for all users’. This changes the Python install location to C:\Program Files\Python36. Then click ‘Install’.
-   - Next, add the PYTHONPATH environment variable, as follows:
-•	In the Windows search box, type “environment”, and choose “Edit the system environment variables” when it appears as a suggested option. 
-•	In the System Properties box that appears, click on “Environment Variables…”
-•	In the “System variables” box (lower half of the window), click “New” and create PYTHONPATH, with value C:\Program Files\Python36; C:\Program Files\Python36\Lib (assuming the default installation path has been used), and click “OK”. 
-   - Please check that the environmental variable `PYTHONHOME` is not set and `PYTHONPATH` if setup is set to the correct location.
+   - Next, add the PYTHONPATH environment variable, as follows: In the Windows search box, type “environment”, and choose “Edit the system environment variables” when it appears as a suggested option. In the System Properties box that appears, click on “Environment Variables…” In the “System variables” box (lower half of the window), click “New” and create PYTHONPATH, with value 'C:\Program Files\Python36; C:\Program Files\Python36\Lib' (assuming the default installation path has been used), and click “OK”. 
+   - Please check that the environmental variable `PYTHONHOME` is not set and `PYTHONPATH` is set to the correct location.
    - The default permissions of the Python directory under Program Files must be adjusted to ensure smooth installation of packages. In Windows Explorer, right click the directory C:\Program Files\Python36 and Select “Properties/Security”, then click the “Edit” button with the shield next to it, then click “Users”, click the check box under “Full control”, click “Apply”, and “OK” twice.  
 3. Install devtools
    - This package is required to install packages off of the github website.
