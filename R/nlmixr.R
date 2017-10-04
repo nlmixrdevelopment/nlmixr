@@ -309,12 +309,33 @@ nlmixr.fit <- function(uif, data, est="nlme", control=list(), ...,
 ##'
 ##' @param seed Random Seed for SAEM step.  (Needs to be set for
 ##'     reproducibility.)  By default this is 99.
-##' @param sa.iter Number of iterations in the Stochastic
-##'     Approximation (SA) Step
-##' @param em.iter Number of iterations in the
-##'     Expectation-Maximization (EM) Step
-##' @param nmc Number of Markov Chains?
-##' @param nu Nu! A new parameter....?
+##'
+##' @param n.burn Number of iterations in the Stochastic Approximation
+##'     (SA), or burn-in step. This is equivalent to Monolix's \code{K_0} or \code{K_b}.
+##'
+##' @param n.em Number of iterations in the Expectation-Maximization
+##'     (EM) Step. This is equivalent to Monolix's \code{K_1}.
+##'
+##' @param nmc Number of Markov Chains. By default this is 3.  When
+##'     you increase the number of chains the numerical integration by
+##'     MC method will be more accurate at the cost of more
+##'     computation.  In Monolix this is equivalent to \code{L}
+##'
+##' @param nu This is a vector of 3 integers. They represent the
+##'     numbers of transitions of the three different kernels used in
+##'     the Hasting-Metropolis algorithm.  The default value is \code{c(2,2,2)},
+##'     representing 40 for each transition initially (each value is
+##'     multiplied by 20).
+##'
+##'     The first value represents the initial number of multi-variate
+##'     Gibbs samples are taken from a normal distribution.
+##'
+##'     The second value represents the number of uni-variate, or multi-
+##'     dimensional random walk Gibbs samples are taken.
+##'
+##'     The third value represents the number of bootstrap/reshuffling or
+##'     uni-dimensional random samples are taken.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @param print The number it iterations that are completed before
 ##'     anything is printed to the console.  By default, this is 1.
@@ -324,7 +345,7 @@ nlmixr.fit <- function(uif, data, est="nlme", control=list(), ...,
 ##' @author Wenping Wang & Matthew L. Fidler
 ##' @export
 saemControl <- function(seed=99,
-                        sa.iter=200, em.iter=300,
+                        n.burn=200, n.em=300,
                         nmc=3,
                         nu=c(2,2,2),
                         atol = 1e-08,
@@ -333,7 +354,7 @@ saemControl <- function(seed=99,
                         transit_abs = FALSE,
                         print=1,
                         ...){
-    list(mcmc=list(niter=c(sa.iter, em.iter=em.iter), nmc=nmc, nu=nu),
+    list(mcmc=list(niter=c(n.burn, n.em), nmc=nmc, nu=nu),
          ODEopt=list(atol=atol, rtol=rtol,
                      stiff=as.integer(stiff),
                      transit_abs = as.integer(transit_abs)),

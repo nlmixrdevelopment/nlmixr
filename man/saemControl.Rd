@@ -4,23 +4,39 @@
 \alias{saemControl}
 \title{Control Options for SAEM}
 \usage{
-saemControl(seed = 99, sa.iter = 200, em.iter = 300, nmc = 3,
-  nu = c(2, 2, 2), atol = 1e-08, rtol = 1e-06, stiff = TRUE,
-  transit_abs = FALSE, print = 1, ...)
+saemControl(seed = 99, n.burn = 200, n.em = 300, nmc = 3, nu = c(2, 2,
+  2), atol = 1e-08, rtol = 1e-06, stiff = TRUE, transit_abs = FALSE,
+  print = 1, ...)
 }
 \arguments{
 \item{seed}{Random Seed for SAEM step.  (Needs to be set for
 reproducibility.)  By default this is 99.}
 
-\item{sa.iter}{Number of iterations in the Stochastic
-Approximation (SA) Step}
+\item{n.burn}{Number of iterations in the Stochastic Approximation
+(SA), or burn-in step. This is equivalent to Monolix's \code{K_0} or \code{K_b}.}
 
-\item{em.iter}{Number of iterations in the
-Expectation-Maximization (EM) Step}
+\item{n.em}{Number of iterations in the Expectation-Maximization
+(EM) Step. This is equivalent to Monolix's \code{K_1}.}
 
-\item{nmc}{Number of Markov Chains?}
+\item{nmc}{Number of Markov Chains. By default this is 3.  When
+you increase the number of chains the numerical integration by
+MC method will be more accurate at the cost of more
+computation.  In Monolix this is equivalent to \code{L}}
 
-\item{nu}{Nu! A new parameter....?}
+\item{nu}{This is a vector of 3 integers. They represent the
+    numbers of transitions of the three different kernels used in
+    the Hasting-Metropolis algorithm.  The default value is \code{c(2,2,2)},
+    representing 40 for each transition initially (each value is
+    multiplied by 20).
+
+    The first value represents the initial number of multi-variate
+    Gibbs samples are taken from a normal distribution.
+
+    The second value represents the number of uni-variate, or multi-
+    dimensional random walk Gibbs samples are taken.
+
+    The third value represents the number of bootstrap/reshuffling or
+    uni-dimensional random samples are taken.}
 
 \item{atol}{a numeric absolute tolerance (1e-08 by default);}
 
