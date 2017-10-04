@@ -229,7 +229,6 @@ nlmixr.fit <- function(uif, data, est="nlme", control=list(), ...,
             })
         }));
         dat$nlmixr.num <- seq_along(dat$nlmixr.grp)
-        print(any(dat$EVID[dat$EVID>0]<101))
         weight <- uif$nlme.var
         if (!is.null(uif$nmodel$lin.solved)){
             fit <- nlme_lin_cmpt(dat, par_model=specs,

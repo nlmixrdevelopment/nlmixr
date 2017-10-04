@@ -92,7 +92,7 @@ print.focei.fit <- function(x, ...) {
         if (any(names(args) == "n")){
             n <- args$n;
         } else {
-            n <- 6L;
+            n <- 3L;
         }
         if (any(names(args) == "width")){
             width <- args$width;
@@ -138,13 +138,17 @@ print.focei.fit <- function(x, ...) {
         print(x$par.fixed)
         message("\nOmega ($omgea):");
         print(fit$omega);
-        is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
-        if (!is.dplyr){
-            message("\nFit Data (head):")
-            print(head(as.matrix(x), n = n));
+        is.data.table <- requireNamespace("data.table", quietly = TRUE);
+        message("\nFit Data (object is a modified data.frame):")
+        if (is.data.table){
+            print(data.table::data.table(x), topn=n);
         } else {
-            message("\nFit Data (object is a modified data.frame):")
-            print(dplyr::as.tbl(x), n = n, width = width);
+            is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
+            if (!is.dplyr){
+                print(head(as.matrix(x), n = n));
+            } else {
+                print(dplyr::as.tbl(x), n = n, width = width);
+            }
         }
     } else {
         print(as.data.frame(x));
