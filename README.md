@@ -10,11 +10,6 @@
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-For a brief Windows/OS X installation guide, please see:
-https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.pdf
-or
-https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.rtf
-
 For a brief vignette, please see:
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
 
