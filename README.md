@@ -27,7 +27,7 @@ For PKPD modeling (with ODE and dosing history) with Stan, check out Yuan's pack
 To replicate the environment that was used in windows for nlmixr development, you should perform the following steps:
 
 1. Install R 3.4.1 from the R website
-   - Install R to a user writable location; I use `c:\R\R-3.4.1`.
+   - Install R to a user writable location; I use `c:\R\R-3.4.1`, but you can also use the default location 'C:\Program Files\R\R-3.4.1'. In either case check to make sure you have rights to write in this directory: In Windows Explorer, right click the directory and Select “Properties/Security”, then click the “Edit” button with the shield next to it, then click “Users”, click the check box under “Full control”, click “Apply”, and “OK” twice.
    - For 64 bit windows, make sure to *uncheck* the 32 bit installation files.  They have been known to interfere with R in the past.
 2. Install Rtools for windows version 3.4
    - This allows for fast solving of ODEs and faster estimation
@@ -35,14 +35,17 @@ To replicate the environment that was used in windows for nlmixr development, yo
    - Please *do not install* the R 3.3.x 32 bit toolchain.  These files can interfere with nlmixr
 3. Install python for windows 
    - This is used for its symbolic algebra package [SymPy](http://sympy.org/).
-   - In 64-bit windows, the best Python to install Python 3.6.2 using
+   - In 64-bit windows, the best Python to install is Python 3.6.2 using
      `python-3.6.2-amd64.exe`
-     https://www.python.org/downloads/release/python-362/
-   - When installing, *Make sure to add python to your path*
-   - Also when installing, install only for the current user to avoid
-     any admin rights problems.
-   - Please check that the environmental variable `PYTHOMHOME` is not
-     set and `PYTHONPATH` if setup is set to the correct location.
+     https://www.python.org/downloads/release/python-362/ scroll down to select the ‘Windows x86-64 executable installer’ and run the installer. 
+   - Ensure ‘Install launcher for all users’ and ‘Add Python 3.6 to PATH’ are checked. 
+   - Then choose ‘Customize installation’: make sure all options are checkmarked on the next page, click ‘Next’ and then checkmark ‘Install for all users’. This changes the Python install location to C:\Program Files\Python36. Then click ‘Install’.
+   - Next, add the PYTHONPATH environment variable, as follows:
+•	In the Windows search box, type “environment”, and choose “Edit the system environment variables” when it appears as a suggested option. 
+•	In the System Properties box that appears, click on “Environment Variables…”
+•	In the “System variables” box (lower half of the window), click “New” and create PYTHONPATH, with value C:\Program Files\Python36; C:\Program Files\Python36\Lib (assuming the default installation path has been used), and click “OK”. 
+   - Please check that the environmental variable `PYTHONHOME` is not set and `PYTHONPATH` if setup is set to the correct location.
+   - The default permissions of the Python directory under Program Files must be adjusted to ensure smooth installation of packages. In Windows Explorer, right click the directory C:\Program Files\Python36 and Select “Properties/Security”, then click the “Edit” button with the shield next to it, then click “Users”, click the check box under “Full control”, click “Apply”, and “OK” twice.  
 3. Install devtools
    - This package is required to install packages off of the github website.
    - This can be done from a clean R session by `install.packages("devools")`
