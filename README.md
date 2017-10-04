@@ -1,6 +1,6 @@
 ![alt tag](https://github.com/nlmixrdevelopment/nlmixr/blob/master/logo.png)
 
-nlmixr: an R package for population PKPD modeling
+# nlmixr: an R package for population PKPD modeling
 ***  
 
 #####Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Wenping Wang
@@ -10,7 +10,10 @@ nlmixr: an R package for population PKPD modeling
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-For a brief Windows/OS X installation guide, please see: https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.pdf or  https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.rtf
+For a brief Windows/OS X installation guide, please see:
+https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.pdf
+or
+https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/Installing_nlmixr.rtf
 
 For a brief vignette, please see:
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
@@ -20,7 +23,7 @@ https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes
 
 For PKPD modeling (with ODE and dosing history) with Stan, check out Yuan's package PMXStan: https://github.com/yxiong1/pmxstan
 
-Installation in Windows
+# Installation in Windows
 To replicate the environment that was used in windows for nlmixr development, you should perform the following steps:
 
 1. Install R 3.4.1 from the R website
