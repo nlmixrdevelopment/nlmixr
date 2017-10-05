@@ -38,9 +38,13 @@ computation.  In Monolix this is equivalent to \code{L}}
     The third value represents the number of bootstrap/reshuffling or
     uni-dimensional random samples are taken.}
 
-\item{atol}{a numeric absolute tolerance (1e-08 by default);}
+\item{atol}{a numeric absolute tolerance (1e-08 by default) used
+by the ODE solver to determine if a good solution has been
+achieved;}
 
-\item{rtol}{a numeric relative tolerance (1e-06 by default).}
+\item{rtol}{a numeric relative tolerance (1e-06 by default) used
+by the ODE solver to determine if a good solution has been
+achieved.}
 
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
     the ODE system is stiff or not.

@@ -86,6 +86,8 @@ nlmixrVersion <- function(){
 ##' The nlmixr generalized function allows common access to the nlmixr
 ##' estimation routines.
 ##'
+##' @template uif
+##'
 ##' @param object Fitted object or function specifying the model.
 ##' @inheritParams nlmixr.fit
 ##' @param ... Other parameters

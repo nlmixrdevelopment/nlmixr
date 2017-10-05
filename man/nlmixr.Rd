@@ -45,6 +45,153 @@ and pharmacokinetic-pharmacodynamic (PKPD) models.
 The nlmixr generalized function allows common access to the nlmixr
 estimation routines.
 }
+\section{nlmixr modeling mini-language}{
+
+
+\bold{Rationale}
+
+nlmixr estimation routines each have their own way of specifying
+models.  Often the models are specified in ways that are most
+intuitive for one estimation routine, but does not make sense for
+another estimation routine.  Sometimes, valuable estimation
+routines like \code{\link[nlme]{nlme}} have their own syntax that
+are outside of the control of the nlmixr package.
+
+The unique syntax of each routine makes the routines themselves
+easier to maintain and expand.  This even allows interfacing with
+packages that are outside of nlmixr (like
+\code{\link[nlme]{nlme}}).  However, it is difficult for a
+pharmacometric modeler to remember the syntax for each of the
+estimation routines.  This learning barrier may make some
+pharmacometricians hesitant to even try the routines.
+
+The nlmixr mini-modeling language, attempts to address these
+shortcoming by incorporating with a common language.  This
+language is inspired by both R and NONMEM, since are languages
+familiar to core development team and to many pharmacometricians.
+
+\bold{Initial Estimates and boundaries for population parameters}
+
+nlmixr models are contained in a R function with two blocks:
+\code{ini} and \code{model}.  This R function can be named
+anything, but is not meant to be called directly from R.  In fact
+if you try you will likely get an error such as \code{Error: could not find function "ini"}.
+
+The \code{ini} model block is meant to hold the initial estimates
+for the model, and the boundaries of the parameters for estimation
+routines that support boundaries (note nlmixr's SAEM and nlme do
+not currently support parameter boundaries).
+
+To explain how these initial estimates are specified we will start
+with an annotated example:
+
+\preformatted{
+f <- function()\{ ## Note the arguments to the function are currently
+                 ## ignored by nlmixr
+    ini(\{
+        ## Initial conditions for population parameters (sometimes
+        ## called theta parameters) are defined by either `<-` or '='
+        lCl <- 1.6      #log Cl (L/hr)
+        ## Note that simple expressions that evaluate to a number are
+        ## OK for defining initial conditions (like in R)
+        lVc = log(90)  #log V (L)
+        ## Also note that a comment on a parameter is captured as a parameter label
+        lKa <- 1 #log Ka (1/hr)
+        ## Bounds may be specified by c(lower, est, upper), like NONMEM:
+        ## Residuals errors are assumed to be population parameters
+        prop.err <- c(0, 0.2, 1)
+    \})
+    ## The model block will be discussed later
+    model(\{\})
+\}
+}
+
+As shown in the above examples:
+\itemize{
+\item Simple parameter values are specified as a R-compatible assignment
+\item Boundaries my be specified by \code{c(lower, est, upper)}.
+\item Like NONMEM, \code{c(lower,est)} is equivalent to \code{c(lower,est,Inf)}
+\item Also like NONMEM, \code{c(est)} does not specify a lower bound, and is equivalent
+  to specifying the parameter  without R's `c` function.
+}
+
+These parameters can be named almost any R compatible name.  Please note that:
+\itemize{
+\item Residual error estimates should be coded as population estimates.
+\item Naming variables that start with \code{_} are not supported.  Note that R does not
+    allow variable starting with \code{_} to be assigned without quoting them.
+\item Naming variables that start with \code{rx} or \code{nlmixr} is not supported since
+   \link[RxODE]{RxODE} and nlmixr use these prefixes internally for certain estimation
+   routines and calculating residuals.
+\item Variable names are case sensitive, just like they are in R. \code{CL} is not the
+   same as \code{Cl}.
+}
+
+\bold{Initial Estimates for between subject error distribution (NONMEM's  $OMEGA)}
+
+In mixture models, multivariate normal individual deviations from
+the normal population and are estimated (in NONMEM these are
+called \code{eta} parameters).  Additionally the
+variance/covariance of these deviations are also estimated (in
+NONMEM this is the OMEGA matrix).  These also have initial
+estimates.  In nlmixr these are specified by the `~` operator.
+This is typically used in statistics for "modeled by", and was
+chosen to distinguish these estimates from the population/error
+parameters.
+
+Continuing the prior example, we can annotate the estimates for
+the between subject error distribution
+
+\preformatted{
+f <- function()\{
+    ini(\{
+        lCl <- 1.6      #log Cl (L/hr)
+        lVc = log(90)  #log V (L)
+        lKa <- 1 #log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        ## Initial estimate for ka IIV variance
+        ## Labels work for single parameters
+        eta.ka ~ 0.1 ## BSV Ka
+
+        ## For correlated parameters, you specify the names of each
+        ## correlated parameter separated by a addition operator `+`
+        ## and the left handed side specifies the lower triangular
+        ## matrix initial of the covariance matrix.
+        eta.cl + eta.vc ~ c(0.1,
+                            0.005, 0.1)
+        ## Note that labels do not currently work for correlated
+        ## parameters.  Also do not put comments inside the lower
+        ## triangular matrix as this will currently break the model.
+    \})
+    ## The model block will be discussed later
+    model(\{\})
+\}
+}
+
+ As shown in the above examples:
+
+\itemize{
+\item Simple variances are specified by the variable name  and the
+   estimate separated by `~`.
+\item Correlated parameters are specified by the sum of the variable
+   labels and then the lower triangular matrix of the covariance is
+   specified on the left handed side of the equation. This is also
+   separated by `~`.
+}
+
+Currently the model syntax does not allow comments inside the
+lower triangular matrix.
+
+\bold{Model Syntax (NONMEM\'s $PK, $PRED, $DES and $ERROR)}
+
+Once the initialization block has been defined, you can define a
+model in terms of the defined variables in the \code{ini} block.  You can
+also mix in RxODE blocks into the model.
+
+The current method of defining a nlmixr model is to specify the
+parameters, and then possibly the RxODE lines:
+}
+
 \author{
 Matthew L. Fidler
 }

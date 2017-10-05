@@ -21,5 +21,5 @@ Fit traceplot or nothing.
 Produce trace-plot for fit if applicable
 }
 \author{
-Matthew L. Fidler
+Rik Schoemaker, Wenping Wang & Matthew L. Fidler
 }

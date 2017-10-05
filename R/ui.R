@@ -379,6 +379,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     log.eta <- c();
     this.env <- environment();
     if (!is.null(ini)){
+        if (any(regexpr(rex::rex(start, or("rx", "nlmixr")), paste(ini$name)) != -1)){
+            stop("Parameter names cannot start with `rx` or `nlmixr`");
+        }
         unnamed.thetas <- ini$ntheta[(!is.na(ini$ntheta) & is.na(ini$name))];
         if (length(unnamed.thetas) > 0){
             stop(sprintf("The following THETAs are unnamed: %s", paste(sprintf("THETA[%d]", unnamed.thetas), collapse=", ")))
