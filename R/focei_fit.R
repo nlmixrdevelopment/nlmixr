@@ -351,7 +351,7 @@ fixef.focei.fit <- function(object, ...){
                 if (!is.null(saem)){
                     nth <- length(uif$saem.theta.name)
                     se <- structure(sqrt(diag(RxODE::rxInv(saem$Ha[1:nth,1:nth]))), .Names=uif$saem.theta.name)
-                    df <- fit$par.data.frame
+                    df <- object$par.data.frame
                     se2 <- rep(NA, length(df[, 1]));
                     se2[1:nth] <- se[row.names(df)[1:nth]];
                     df <- data.frame(df, "se(log est)"=se2, label=lab, check.names=FALSE)
