@@ -305,8 +305,8 @@
 ##' \preformatted{
 ##'  d <- Oral_1CPT
 ##'  d <- d[,names(d) != "SS"];
-##' }
 ##'  d <- nmDataConvert(d);
+##' }
 ##'
 ##' Once the data has been converted to the appropriate format, you
 ##' can use the \code{nlmixr} function to run the appropriate code.
@@ -509,3 +509,5 @@
 ##'       \code{eta}s.  This can also be accessed in using the \code{\link{random.effects}}
 ##' function.
 ##' }
+##'
+##'
