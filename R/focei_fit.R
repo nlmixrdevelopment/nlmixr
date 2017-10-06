@@ -277,6 +277,9 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
             stop(sprintf("The matrix of etas specified by population needs to be %s rows by %s columns", env$nSUB, env$nETA));
         }
     }
+    tmp <- tempfile()
+    on.exit({sink();unlink(tmp)})
+    sink(tmp);
     x <- ofv.FOCEi(fit$par)
     if (type == "posthoc"){
         d1 <- data.frame(do.call("rbind", lapply(attr(x,"subj"), function(s) {
@@ -2058,6 +2061,8 @@ focei.fit.data.frame0 <- function(data,
             return(par.hist(obj))
         } else if (arg == "par.fixed"){
             return(fixed.effects(obj, full=TRUE));
+        } else if (arg == "eta"){
+            return(random.effects(obj));
         } else {
             fit <- env$fit;
             ret <- fit[[arg, exact = exact]]
@@ -2092,6 +2097,7 @@ str.focei.fit <- function(object, ...){
     message(" $ par.hist         : Parameter history (if available)")
     message(" $ par.hist.stacked : Parameter history in stacked form for easy plotting (if available)")
     message(" $ par.fixed        : Fixed Effect Parameter Table")
+    message(" $ eta              : Individual Parameter Estimates")
 
 
 }
