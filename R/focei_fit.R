@@ -278,7 +278,7 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
         }
     }
     tmp <- tempfile()
-    on.exit({sink();unlink(tmp)})
+    on.exit({sink();unlink(tmp)}, add=TRUE)
     sink(tmp);
     x <- ofv.FOCEi(fit$par)
     if (type == "posthoc"){
@@ -357,7 +357,7 @@ fixef.focei.fit <- function(object, ...){
                     df <- object$par.data.frame
                     se2 <- rep(NA, length(df[, 1]));
                     se2[1:nth] <- se[row.names(df)[1:nth]];
-                    df <- data.frame(df, "se(log est)"=se2, label=lab, check.names=FALSE)
+                    df <- data.frame(df, "se(est)"=se2, label=lab, check.names=FALSE)
                     return(df);
                 }
                 ret <- object$par.data.frame
