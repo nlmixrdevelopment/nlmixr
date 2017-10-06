@@ -37,6 +37,10 @@ nlmixrUI <- function(fun){
     }
     fun2 <- gsub(rex::rex(boundary, "ini(",any_spaces,"{"), "ini <- function()({", fun2)
     fun2 <- gsub(rex::rex(boundary, "model(",any_spaces,"{"), "model <- function()({", fun2)
+    if (fun2[length(fun2)] != "}"){
+        fun2[length(fun2)] <- sub(rex::rex("}", end), "", fun2[length(fun2)]);
+        fun2[length(fun2) + 1] <- "}"
+    }
     fun2[length(fun2)] <- "ini <- nlmixrBounds(ini);return(nlmixrUIModel(model,ini,fun))\n}"
     fun2 <- try(eval(parse(text=paste0(fun2, collapse = "\n"))), silent=TRUE);
     if (inherits(fun2, "try-error")){
