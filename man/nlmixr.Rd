@@ -491,6 +491,7 @@ Fit Data (object is a modified data.frame):
   ---
 6945: -0.2381078
 6946: -0.2381078
+6947: -0.2381078
 }
 
 
