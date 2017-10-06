@@ -71,8 +71,8 @@ nlmixrUI <- function(fun){
 ##' @author Matthew L. Fidler
 ##' @export
 print.nlmixrUI <- function(x, ...){
-    ## nlmixrLogo("", "Model")
-    message("\n## Initialization:")
+    message(paste0("## ", x$model.desc ))
+    message("## Initialization:")
     message("################################################################################")
     print(x$ini)
     if (length(x$all.covs) > 0){
@@ -364,6 +364,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     ## Parses the UI function to extract predictions and errors, and the other model specification.
     rxode <- FALSE
     all.names <- allNames(body(fun));
+    if (any(regexpr(rex::rex(start, or("rx_", "nlmixr_")), paste(all.names)) != -1)){
+        stop("Parameters/States/Variables cannot start with `rx_` or `nlmixr_`");
+    }
     all.vars <- allVars(body(fun));
     all.funs <- allCalls(body(fun));
     all.lhs <- nlmixrfindLhs(body(fun));
@@ -379,9 +382,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     log.eta <- c();
     this.env <- environment();
     if (!is.null(ini)){
-        if (any(regexpr(rex::rex(start, or("rx", "nlmixr")), paste(ini$name)) != -1)){
-            stop("Parameter names cannot start with `rx` or `nlmixr`");
-        }
         unnamed.thetas <- ini$ntheta[(!is.na(ini$ntheta) & is.na(ini$name))];
         if (length(unnamed.thetas) > 0){
             stop(sprintf("The following THETAs are unnamed: %s", paste(sprintf("THETA[%d]", unnamed.thetas), collapse=", ")))
@@ -1301,6 +1301,23 @@ nlmixrUI.saem.init <- function(obj){
     return(ret);
 }
 
+nlmixrUI.model.desc <- function(obj){
+    if (!is.null(obj$rxode.pred)){
+        return("RxODE-based model")
+        ## n.cmt <- length(RxODE::rxState(RxODE::rxGetModel(obj$rxode.pred)));
+        ## if (n.cmt == 0){
+        ##     return("Compiled Model (with no ODEs)");
+        ## } else {
+        ##     return(sprintf("ODE(%d compartments)", n.cmt));
+        ## }
+    } else {
+        return(sprintf("%s-compartment model%s%s", obj$lin.solved$ncmt,
+                       ifelse(obj$lin.solved$oral, " with first-order absorption"),
+                       ifelse(obj$lin.solved$parameterization == 1, " in terms of Cl", " in terms of micro-constants"),
+                       ifelse(obj$lin.solved$tlag, " (with lag time)", "")));
+    }
+}
+
 ##' @export
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
     x <- obj;
@@ -1351,6 +1368,8 @@ nlmixrUI.saem.init <- function(obj){
         return(nlmixrUI.saem.init.omega(obj, TRUE))
     } else if (arg == "saem.res.name"){
         return(nlmixrUI.saem.res.name(obj));
+    } else if (arg == "model.desc"){
+        return(nlmixrUI.model.desc(obj))
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -1391,4 +1410,5 @@ str.nlmixrUI <- function(object, ...){
     message(" $ saem.theta.name : The SAEM theta names")
     message(" $ saem.omega.name : The SAEM theta names")
     message(" $ saem.res.name : The SAEM omega names")
+    message(" $ model.desc : Model description")
 }
