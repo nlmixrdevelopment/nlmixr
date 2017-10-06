@@ -1127,6 +1127,9 @@ saem.fit <- function(model, data, inits,
 {
     UseMethod("saem.fit");
 }
+##' @rdname saem.fit
+##' @export
+saem <- saem.fit
 
 ##' @rdname saem.fit
 ##' @export

@@ -15,7 +15,6 @@ nlmixrSetupMemoize <- function(){
             utils::assignInMyNamespace(slow, get(fast, envir=ns))
             utils::assignInMyNamespace(fast, memoise::memoise(get(slow, envir=ns)))
         }
-
     }
 }
 

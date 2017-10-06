@@ -79,8 +79,8 @@ if you try you will likely get an error such as \code{Error: could not find func
 
 The \code{ini} model block is meant to hold the initial estimates
 for the model, and the boundaries of the parameters for estimation
-routines that support boundaries (note nlmixr's SAEM and nlme do
-not currently support parameter boundaries).
+routines that support boundaries (note nlmixr's \code{\link{saem}}
+and \code{\link[nlme]{nlme}} do not currently support parameter boundaries).
 
 To explain how these initial estimates are specified we will start
 with an annotated example:
@@ -182,7 +182,7 @@ f <- function()\{
 Currently the model syntax does not allow comments inside the
 lower triangular matrix.
 
-\bold{Model Syntax for ODE based models (NONMEM\'s $PK, $PRED, $DES and $ERROR)}
+\bold{Model Syntax for ODE based models (NONMEM's $PK, $PRED, $DES and $ERROR)}
 
 Once the initialization block has been defined, you can define a
 model in terms of the defined variables in the \code{ini} block.  You can
@@ -237,7 +237,7 @@ A few points to note:
      for additive error,  prop(parameter) for proportional error or add(parameter1) + prop(parameter2)
      for additive plus proportional error.  You can also specify norm(parameter) for the additive error,
      since it follows a normal distribution.
-\item Some routines, like SAEM require  parameters in terms of \code{Pop.Parameter + Individual.Deviation.Parameter + Covariate*Covariate.Parameter}.
+\item Some routines, like \code{\link{saem}} require  parameters in terms of \code{Pop.Parameter + Individual.Deviation.Parameter + Covariate*Covariate.Parameter}.
      The order of these parameters do not matter.  This is similar to NONMEM's mu-referencing, though
      not quite so restrictive.
 \item The type of parameter in the model is determined by the initial block;  Covariates used in the
@@ -365,8 +365,8 @@ The method to estimate the model is:
 fit <- nlmixr(model.function, rxode.dataset, est="est",control=estControl(options))
 }
 
-Currently nlme and saem are implemented.  For example, to run the
-above model with saem, we could have the following:
+Currently \code{\link[nlme]{nlme}} and \code{\link{saem}} are implemented.  For example, to run the
+above model with \code{\link{saem}}, we could have the following:
 
 \preformatted{
 > f <- function()\{
@@ -428,9 +428,9 @@ Calculating Table Variables...
 done
 }
 
-The options for saem are controlled by \code{\link{saemControl}}.
+The options for \code{\link{saem}} are controlled by \code{\link{saemControl}}.
 You may wish to make sure the minimization is complete in the case
-of saem.  You can do that with \code{\link{traceplot}} which shows the
+of \code{\link{saem}}.  You can do that with \code{\link{traceplot}} which shows the
 iteration history with the divided by burn-in and EM phases.  In
 this case, the burn in seems reasonable; you may wish to increase
 the number of iterations in the EM phase of the estimation.
@@ -498,7 +498,7 @@ Fit Data (object is a modified data.frame):
 This example shows what is typical printout of a nlmixr fit object.  The elements of the fit are:
 
 \itemize{
- \item The type of fit (nlme, saem, etc)
+ \item The type of fit (\code{\link[nlme]{nlme}}, \code{\link{saem}}, etc)
  \item Metrics of goodness of fit (\code{\link{AIC}}, \code{\link{BIC}},
    and \code{\link{logLik}}).
    \itemize{
@@ -506,7 +506,8 @@ This example shows what is typical printout of a nlmixr fit object.  The element
           regardless of the method used and used for goodness of fit metrics.
      \item This FOCEi likelihood has been compared to NONMEM's objective function and gives
          the same values (based on the data in Wang 2007)
-      \item Also note that SAEM does not calculate an objective function, and the FOCEi is used as the only objective function for the fit.
+      \item Also note that \code{\link{saem}} does not calculate an objective function,
+            and the FOCEi is used as the only objective function for the fit.
       \item Even though the objective functions are calculated in the same manner, caution should
          be used when comparing fits from various estimation routines.
  }

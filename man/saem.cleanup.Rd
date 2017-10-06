@@ -4,7 +4,7 @@
 \alias{saem.cleanup}
 \title{Cleanup saem_fit environment by removing dll after the object is no logner used by R.}
 \usage{
-saem.cleanup(env)
+\method{saem}{cleanup}(env)
 }
 \arguments{
 \item{env}{Environment where cleanup needs to occur.}
