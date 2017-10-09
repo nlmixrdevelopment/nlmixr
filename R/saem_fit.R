@@ -631,6 +631,7 @@ plot.saemFit = function(x, ...)
 #' @param mcmc a list of various mcmc options
 #' @param ODEopt optional ODE solving options
 #' @param seed seed for random number generator
+#' @param distribution one of c("normal","poisson","binomial")
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by he Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
