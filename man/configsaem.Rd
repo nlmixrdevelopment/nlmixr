@@ -20,6 +20,8 @@ configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
 
 \item{ODEopt}{optional ODE solving options}
 
+\item{distribution}{one of c("normal","poisson","binomial")}
+
 \item{seed}{seed for random number generator}
 }
 \description{

@@ -353,8 +353,8 @@ As an example, you can use a simulated rich 1-compartment dataset.
 \preformatted{
  d <- Oral_1CPT
  d <- d[,names(d) != "SS"];
-}
  d <- nmDataConvert(d);
+}
 
 Once the data has been converted to the appropriate format, you
 can use the \code{nlmixr} function to run the appropriate code.
