@@ -1161,10 +1161,10 @@ saem.fit.RxODE <- function(model, data, inits,
                            covars=NULL,
                            mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                            ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-                           seed = 99){
+                           seed = 99, ...){
     saem_fit = gen_saem_user_fn(model, PKpars, pred)
     model = list(saem_mod=saem_fit, covars=covars)
-    cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed)
+    cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed=seed, ...)
     fit = saem_fit(cfg)
     ##dyn.unload("saem_main.dll")
     fit
@@ -1177,10 +1177,10 @@ saem.fit.default <- function(model, data, inits,
                              covars=NULL,
                              mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                              ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-                             seed = 99){
+                             seed = 99, ...){
     saem_fit = gen_saem_user_fn(model)
     model = list(saem_mod=saem_fit, covars=covars)
-    cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed)
+    cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed=seed, ...)
     fit = saem_fit(cfg)
                                         #dyn.unload("saem_main.dll")
     fit
