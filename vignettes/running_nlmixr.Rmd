@@ -396,7 +396,7 @@ A few points to note:
 * The differential equations, parameters and error terms are in a single block, instead of multiple sections. 
 * Additionally state names, calculated variables, also cannot start with either `rx_` or `nlmixr_` since these are used internally in some estimation routines. 
 * Errors are specified using the tilde, `~`. Currently you can use either `add(parameter)` for additive error, `prop(parameter)` for proportional error or `add(parameter1) + prop(parameter2)` for combined additive and proportional error. You can also specify `norm(parameter)` for additive error, since it follows a normal distribution. 
-* Some routines, like `saem`, require parameters expressed in terms of `Pop.Parameter + Individual.Deviation.Parameter + Covariate*Covariate.Parameter`. The order of these parameters does not matter. This is similar to NONMEM's mu-referencing, though as restrictive. This means that for `saem`, a parameterization of the form `Cl <- Cl*exp(eta.Cl)` is not allowed.
+* Some routines, like `saem`, require parameters expressed in terms of `Pop.Parameter + Individual.Deviation.Parameter + Covariate*Covariate.Parameter`. The order of these parameters does not matter. This is similar to NONMEM's mu-referencing, though not as restrictive. This means that for `saem`, a parameterization of the form `Cl <- Cl*exp(eta.Cl)` is not allowed.
 * The type of parameter in the model is determined by the `ini` block; covariates used in the model are not included in the `ini` block. These variables need to be present in the modeling dataset for the model to run. 
 
 ## Running models
@@ -404,12 +404,12 @@ A few points to note:
 Models can be fitted several ways, including via the [magrittr](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) forward-pipe operator.
 
 ```r
-fit <- nlmixr(one.compartment.model) %>% focei.fit(data)
+fit <- nlmixr(one.compartment.model) %>% saem.fit(data)
 ```
 ```r
-fit <- nlmixr(one.compartment.model, dat, est="focei")
+fit <- nlmixr(one.compartment.model, dat, est="saem")
 ```
 ```r
-fit <- one.compartment.model %>% focei.fit(data)
+fit <- one.compartment.model %>% saem.fit(data)
 ```
 
