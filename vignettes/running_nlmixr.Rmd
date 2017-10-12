@@ -192,8 +192,11 @@ fit$eta
 11 11  0.75757178  0.338588793  0.19567123
 12 12 -0.56750540  0.012073101 -0.09261596
 ```
-
-With a little plotting, we can get set of iteration trace plots ("wriggly worms")...
+Default trace plots can be generated using:
+```r
+traceplot(fit)
+```
+but with a little more work, we can get a nicer set of iteration trace plots ("wriggly worms")...
 
 ```r
 
