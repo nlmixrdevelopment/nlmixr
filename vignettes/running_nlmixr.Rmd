@@ -412,4 +412,14 @@ fit <- nlmixr(one.compartment.model, dat, est="saem")
 ```r
 fit <- one.compartment.model %>% saem.fit(data)
 ```
+Options to the estimation routines can be specified using nlmeControl for nlme estimation:
+```r
+fit <- nlmixr(one.compartment.model,data,est="nlme",control = nlmeControl(pnlsTol = .1))
+```
+where options are specified in the nlme documentation.
+Options for saem can be specified using saemControl:
+```r
+fit <- nlmixr(one.compartment.model,data,est="saem",control=saemControl(n.burn=250,n.em=350,print=50))
+```
+this example specifies 250 burn-in iterations, 350 em iterations and a print progress every 50 runs.
 
