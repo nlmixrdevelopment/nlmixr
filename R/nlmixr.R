@@ -104,7 +104,7 @@ nlmixr.function <- function(object, data, est="nlme", control=list(), ...){
     if (missing(data) && missing(est)){
         return(uif)
     } else {
-        nlmixr.fit(uif, data, est, control=control, ...);
+        nlmixr_fit(uif, data, est, control=control, ...);
     }
 }
 
@@ -115,7 +115,7 @@ nlmixr.nlmixrUI <- function(object, data, est="nlme", control=list(), ...){
     if (missing(data) && missing(est)){
         return(uif)
     } else {
-        nlmixr.fit(uif, data, est, control=control, ...);
+        nlmixr_fit(uif, data, est, control=control, ...);
     }
 }
 
@@ -130,7 +130,7 @@ nlmixr.nlmixr.ui.nlme <- function(object, data, est="nlme", ...){
         if (missing(data)){
             data <- getData(object);
         }
-        nlmixr.fit(uif, data, est, ...);
+        nlmixr_fit(uif, data, est, ...);
     }
 }
 
@@ -159,7 +159,7 @@ nlmixr.nlmixr.ui.saem <- nlmixr.nlmixr.ui.nlme
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr.fit <- function(uif, data, est="nlme", control=list(), ...,
+nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                        sum.prod=FALSE, focei.translate=TRUE){
     dat <- data;
     uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, as.double(dat$EVID), as.integer(!is.null(uif$nmodel$lin.solved)));

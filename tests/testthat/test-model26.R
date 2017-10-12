@@ -58,7 +58,8 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.277)
     expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.325)
 
-    expect_equal(signif(fit$sigma, 3), 0.199)
+      expect_equal(signif(fit$sigma, 3), 0.199)
+
   })
 
   test_that("ODE", {
@@ -100,22 +101,22 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
         response.scaler = "V",
         verbose = TRUE,
         weight = varPower(fixed = c(1)),
-        control = nlmeControl(pnlsTol = .1, msVerbose = TRUE)
+        control = nlmeControl(pnlsTol = .2, msVerbose = TRUE)
       )
 
     z <- VarCorr(fitODE)
 
-    expect_equal(signif(as.numeric(fitODE$logLik),6), -37489.3)
-    expect_equal(signif(AIC(fitODE), 6), 74992.6)
-    expect_equal(signif(BIC(fitODE), 6), 75040.5)
+      expect_equal(signif(as.numeric(fitODE$logLik),6), -37490.9)
+      expect_equal(signif(AIC(fitODE), 6), 74995.8)
+      expect_equal(signif(BIC(fitODE), 6), 75043.7)
 
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]),3), 1.39)
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.2)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), -0.00466)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), -0.0061)
 
-    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.259)
+    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.260)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.277)
-    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.325)
+    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.321)
 
     expect_equal(signif(fitODE$sigma, 3), 0.198)
   })

@@ -24,14 +24,6 @@ nlmixr(object, data, est = "nlme", control = list(), ...)
 \arguments{
 \item{object}{Fitted object or function specifying the model.}
 
-\item{data}{Dataset to estimate.  Needs to be RxODE compatible in
-EVIDs.}
-
-\item{est}{Estimation method}
-
-\item{control}{Estimation control options.  They could be
-\code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}}
-
 \item{...}{Other parameters}
 }
 \value{
