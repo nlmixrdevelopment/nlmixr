@@ -1264,6 +1264,8 @@ nlmixrUI.saem.init.theta <- function(obj){
 ##' SAEM's init$omega
 ##'
 ##' @param obj nlmixr UI object
+##' @param names When \code{TRUE} return the omega names.  By default
+##'     this is \code{FALSE}.
 ##' @return Return initial matrix
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.init.omega <- function(obj, names=FALSE){

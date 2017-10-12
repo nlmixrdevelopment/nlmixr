@@ -687,7 +687,7 @@ configsaem = function(model, data, inits,
 	ODEopt = list(atol=1e-8, rtol=1e-6, stiff=1, transit_abs=0),
 	distribution=c("normal","poisson","binomial"),
 	seed=99)
-#data =  saem.data; mcmc = saem.mcmc; model = saem.model; inits = saem.inits
+                                        #data =  saem.data; mcmc = saem.mcmc; model = saem.model; inits = saem.inits
 {
   set.seed(seed)
   distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
@@ -1085,6 +1085,7 @@ print.saemFit = function(x, ...)
 #' @param covars Covariates in data
 #' @param mcmc a list of various mcmc options
 #' @param ODEopt optional ODE solving options
+#' @inheritParams configsaem
 #' @param seed seed for random number generator
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model using the Stochastic
@@ -1124,6 +1125,7 @@ saem.fit <- function(model, data, inits,
                      covars=NULL,
                      mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                      ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                     distribution=c("normal","poisson","binomial"),
                      seed = 99)
 {
     UseMethod("saem.fit");
@@ -1139,6 +1141,7 @@ saem.fit.nlmixr.ui.nlme <- function(model, data, inits,
                                     covars=NULL,
                                     mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                                     ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                                    distribution=c("normal","poisson","binomial"),
                                     seed = 99){
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     names(call)[1] <- "object"
@@ -1161,10 +1164,11 @@ saem.fit.RxODE <- function(model, data, inits,
                            covars=NULL,
                            mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                            ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-                           seed = 99, ...){
+                           distribution=c("normal","poisson","binomial"),
+                           seed = 99){
     saem_fit = gen_saem_user_fn(model, PKpars, pred)
     model = list(saem_mod=saem_fit, covars=covars)
-    cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed=seed, ...)
+    cfg   = configsaem(model, data, inits, mcmc, ODEopt, distribution, seed)
     fit = saem_fit(cfg)
     ##dyn.unload("saem_main.dll")
     fit
@@ -1177,10 +1181,11 @@ saem.fit.default <- function(model, data, inits,
                              covars=NULL,
                              mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                              ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-                             seed = 99, ...){
+                             distribution=c("normal","poisson","binomial"),
+                             seed = 99){
     saem_fit = gen_saem_user_fn(model)
     model = list(saem_mod=saem_fit, covars=covars)
-    cfg   = configsaem(model, data, inits, mcmc, ODEopt, seed=seed, ...)
+    cfg   = configsaem(model, data, inits, mcmc, ODEopt, distribution, seed)
     fit = saem_fit(cfg)
                                         #dyn.unload("saem_main.dll")
     fit

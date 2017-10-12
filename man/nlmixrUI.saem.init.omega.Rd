@@ -8,6 +8,9 @@ nlmixrUI.saem.init.omega(obj, names = FALSE)
 }
 \arguments{
 \item{obj}{nlmixr UI object}
+
+\item{names}{When \code{TRUE} return the omega names.  By default
+this is \code{FALSE}.}
 }
 \value{
 Return initial matrix

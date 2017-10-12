@@ -13,37 +13,38 @@
 saem.fit(model, data, inits, PKpars = NULL, pred = NULL, covars = NULL,
   mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-  seed = 99)
+  distribution = c("normal", "poisson", "binomial"), seed = 99)
 
 saem(model, data, inits, PKpars = NULL, pred = NULL, covars = NULL,
   mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-  seed = 99)
+  distribution = c("normal", "poisson", "binomial"), seed = 99)
 
 \method{saem}{fit.nlmixr.ui.nlme}(model, data, inits, PKpars = NULL,
   pred = NULL, covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu
   = c(2, 2, 2)), ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1,
-  transit_abs = 0), seed = 99)
+  transit_abs = 0), distribution = c("normal", "poisson", "binomial"),
+  seed = 99)
 
 \method{saem}{fit.function}(model, data, inits, PKpars = NULL, pred = NULL,
   covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-  seed = 99)
+  distribution = c("normal", "poisson", "binomial"), seed = 99)
 
 \method{saem}{fit.nlmixrUI}(model, data, inits, PKpars = NULL, pred = NULL,
   covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-  seed = 99)
+  distribution = c("normal", "poisson", "binomial"), seed = 99)
 
 \method{saem}{fit.RxODE}(model, data, inits, PKpars = NULL, pred = NULL,
   covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-  seed = 99, ...)
+  distribution = c("normal", "poisson", "binomial"), seed = 99)
 
 \method{saem}{fit.default}(model, data, inits, PKpars = NULL, pred = NULL,
   covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-  seed = 99, ...)
+  distribution = c("normal", "poisson", "binomial"), seed = 99)
 }
 \arguments{
 \item{model}{an RxODE model or lincmt()}
@@ -61,6 +62,8 @@ saem(model, data, inits, PKpars = NULL, pred = NULL, covars = NULL,
 \item{mcmc}{a list of various mcmc options}
 
 \item{ODEopt}{optional ODE solving options}
+
+\item{distribution}{one of c("normal","poisson","binomial")}
 
 \item{seed}{seed for random number generator}
 }
