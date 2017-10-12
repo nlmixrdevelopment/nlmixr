@@ -52,23 +52,24 @@ estimation routines.
 
 nlmixr estimation routines each have their own way of specifying
 models.  Often the models are specified in ways that are most
-intuitive for one estimation routine, but does not make sense for
-another estimation routine.  Sometimes, valuable estimation
+intuitive for one estimation routine, but do not make sense for
+another estimation routine.  Sometimes, legacy estimation
 routines like \code{\link[nlme]{nlme}} have their own syntax that
-are outside of the control of the nlmixr package.
+is outside of the control of the nlmixr package.
 
 The unique syntax of each routine makes the routines themselves
-easier to maintain and expand.  This even allows interfacing with
-packages that are outside of nlmixr (like
-\code{\link[nlme]{nlme}}).  However, it is difficult for a
-pharmacometric modeler to remember the syntax for each of the
-estimation routines.  This learning barrier may make some
-pharmacometricians hesitant to even try the routines.
+easier to maintain and expand, and allows interfacing with
+existing packages that are outside of nlmixr (like
+\code{\link[nlme]{nlme}}).  However, a model definition language
+that is common between estimation methods, and an output object
+that is uniform, will make it easier to switch between estimation
+routines and will facilitate interfacing output with external
+packages like Xpose.
 
-The nlmixr mini-modeling language, attempts to address these
-shortcoming by incorporating with a common language.  This
-language is inspired by both R and NONMEM, since are languages
-familiar to core development team and to many pharmacometricians.
+The nlmixr mini-modeling language, attempts to address this issue
+by incorporating a common language.  This language is inspired by
+both R and NONMEM, since these languages are familiar to many
+pharmacometricians.
 
 \bold{Initial Estimates and boundaries for population parameters}
 
@@ -95,7 +96,7 @@ f <- function()\{ ## Note the arguments to the function are currently
         ## Note that simple expressions that evaluate to a number are
         ## OK for defining initial conditions (like in R)
         lVc = log(90)  #log V (L)
-        ## Also note that a comment on a parameter is captured as a parameter label
+        ## Also a comment on a parameter is captured as a parameter label
         lKa <- 1 #log Ka (1/hr)
         ## Bounds may be specified by c(lower, est, upper), like NONMEM:
         ## Residuals errors are assumed to be population parameters
@@ -113,11 +114,15 @@ As shown in the above examples:
 \item Like NONMEM, \code{c(lower,est)} is equivalent to \code{c(lower,est,Inf)}
 \item Also like NONMEM, \code{c(est)} does not specify a lower bound, and is equivalent
   to specifying the parameter  without R's `c` function.
+\item The initial estimates are specified on the variance scale, and in analogy with
+     NONMEM, the square roots of the diagonal elements correspond to coefficients of
+     variation when used in the exponential IIV implementation
 }
 
 These parameters can be named almost any R compatible name.  Please note that:
 \itemize{
-\item Residual error estimates should be coded as population estimates.
+\item Residual error estimates should be coded as population estimates (i.e. using an
+   '=' or '<-' statement, not a '~').
 \item Naming variables that start with "\code{_}" are not supported.  Note that R does not
     allow variable starting with "\code{_}" to be assigned without quoting them.
 \item Naming variables that start with "\code{rx_}" or "\code{nlmixr_}" is not supported since
@@ -130,13 +135,13 @@ These parameters can be named almost any R compatible name.  Please note that:
 \bold{Initial Estimates for between subject error distribution (NONMEM's  $OMEGA)}
 
 In mixture models, multivariate normal individual deviations from
-the normal population and are estimated (in NONMEM these are
+the population parameters are estimated (in NONMEM these are
 called \code{eta} parameters).  Additionally the
-variance/covariance of these deviations are also estimated (in
-NONMEM this is the OMEGA matrix).  These also have initial
-estimates.  In nlmixr these are specified by the `~` operator.
-This is typically used in statistics for "modeled by", and was
-chosen to distinguish these estimates from the population/error
+variance/covariance matrix of these deviations is also estimated
+(in NONMEM this is the OMEGA matrix).  These also have initial
+estimates.  In nlmixr these are specified by the `~` operator that
+is typically used in R for "modeled by", and was chosen to
+distinguish these estimates from the population and residual error
 parameters.
 
 Continuing the prior example, we can annotate the estimates for
@@ -151,7 +156,7 @@ f <- function()\{
         prop.err <- c(0, 0.2, 1)
         ## Initial estimate for ka IIV variance
         ## Labels work for single parameters
-        eta.ka ~ 0.1 ## BSV Ka
+        eta.ka ~ 0.1 # BSV Ka
 
         ## For correlated parameters, you specify the names of each
         ## correlated parameter separated by a addition operator `+`
@@ -231,11 +236,11 @@ A few points to note:
      parameters is not supported.
 \item The differential equations, parameters and error terms are in a single
      block, instead of multiple sections.
-\item Additionally states names, calculated variables also cannot start with either "\code{rx_}"
+\item State names, calculated variables cannot start with either "\code{rx_}"
      or "\code{nlmixr_}" since these are used internally in some estimation routines.
-\item Errors are specified using the `~`.  Currently you can use either add(parameter)
-     for additive error,  prop(parameter) for proportional error or add(parameter1) + prop(parameter2)
-     for additive plus proportional error.  You can also specify norm(parameter) for the additive error,
+\item Errors are specified using the `~`.  Currently you can use either \code{add(parameter)}
+     for additive error,  prop(parameter) for proportional error or \code{add(parameter1) + prop(parameter2)}
+     for additive plus proportional error.  You can also specify \code{norm(parameter)} for the additive error,
      since it follows a normal distribution.
 \item Some routines, like \code{\link{saem}} require  parameters in terms of \code{Pop.Parameter + Individual.Deviation.Parameter + Covariate*Covariate.Parameter}.
      The order of these parameters do not matter.  This is similar to NONMEM's mu-referencing, though
@@ -560,5 +565,5 @@ function.
 }
 
 \author{
-Matthew L. Fidler
+Matthew L. Fidler, Rik Schoemaker
 }

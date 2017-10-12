@@ -717,18 +717,6 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
 
 ## comparePred should work because predict should work...
 
-##' This is an alias for nlme
-##'
-##' @inheritParams nlme::nlme
-##'
-##' @export nlme.fit
-nlme.fit <- function(model, data, fixed, random = fixed,
-                     groups, start, correlation = NULL, weights = NULL, subset,
-                     method = c("ML", "REML"), na.action = na.fail, naPattern,
-                     control = list(), verbose = FALSE){
-    UseMethod("nlme")
-}
-
 ##' @importFrom nlme nlme
 ##' @export
 nlme.function <- function(model, data, fixed, random = fixed,
