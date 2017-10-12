@@ -340,7 +340,7 @@ fixef.focei.fit <- function(object, ...){
                 lab <- gsub(" *$", "", gsub("^ *", "", lab));
                 if (!is.null(nlme)){
                     ttab <- summary(nlme)$tTable;
-                    tmp <- fit$par.data.frame;
+                    tmp <- object$par.data.frame;
                     tmp <- tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]
                     tmp2 <- data.frame(Value=tmp$est,
                                Std.Error=NA, DF=NA,
@@ -1415,7 +1415,6 @@ focei.fit.data.frame0 <- function(data,
     }
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
-        assign("llik.subj", llik.subj, .GlobalEnv);
         first <<- FALSE
         llik <- -2*RxODE::rxSum(unlist(llik.subj));
         corrected <- do.call("sum", (lapply(llik.subj, function(x){attr(x, "corrected")})))
@@ -2104,41 +2103,39 @@ str.focei.fit <- function(object, ...){
 
 ##' @export
 head.focei.fit <- function(x, ...){
-    x <- object;
     ## hack to be consistent with method... and satisfy CMD CHECK
-    args <- as.list(match.call(expand.dots))
+    args <- as.list(match.call(expand.dots=TRUE))
     if (any(names(args) == "n")){
         n <- args$n
     } else {
         n <- 6
     }
     message('FOCEI combined dataset and list');
-    env <- attr(object, ".focei.env");
+    env <- attr(x, ".focei.env");
     message('Head List:')
     fit <- env$fit;
     print(head(fit, n=floor(n / 2), ...))
     message('Head Data (Also accessible by $fit):')
-    m <- as.data.frame(object);
+    m <- as.data.frame(x);
     return(head(m, n=floor(n / 2), ...))
 }
 
 ##' @export
 tail.focei.fit <- function(x, ...){
-    x <- object;
     ## hack to be consistent with method... and satisfy CMD CHECK
-    args <- as.list(match.call(expand.dots))
+    args <- as.list(match.call(expand.dots=TRUE))
     if (any(names(args) == "n")){
         n <- args$n
     } else {
         n <- 6
     }
     message('FOCEI combined dataset and list');
-    env <- attr(object, ".focei.env");
+    env <- attr(x, ".focei.env");
     message('Tail List:')
     fit <- env$fit;
     print(tail(fit, n=floor(n / 2), ...))
     message('Tail Data (Also accessible by $fit):')
-    m <- as.data.frame(object);
+    m <- as.data.frame(x);
     return(tail(m, n=floor(n / 2), ...))
 }
 

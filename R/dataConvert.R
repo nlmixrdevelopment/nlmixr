@@ -125,11 +125,11 @@ nmDataConvert <- function(nonmem.data)
         }
     }
     if (any(col.names == "SS") && any(d$SS == 2)){
-        stop("Steady state = 2 not supported.");.
+        stop("Steady state = 2 not supported.");
     }
 
     if (any(col.names == "RATE") && any(d$RATE < 0)){
-        stop("RxODE does not currently estimating infusion rates or durations. (Found RATE < 0)");.
+        stop("RxODE does not currently estimating infusion rates or durations. (Found RATE < 0)");
     }
 
     if (!any(col.names == "EVID") && !any(col.names == "MDV")){

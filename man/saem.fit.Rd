@@ -38,12 +38,12 @@ saem(model, data, inits, PKpars = NULL, pred = NULL, covars = NULL,
 \method{saem}{fit.RxODE}(model, data, inits, PKpars = NULL, pred = NULL,
   covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-  seed = 99)
+  seed = 99, ...)
 
 \method{saem}{fit.default}(model, data, inits, PKpars = NULL, pred = NULL,
   covars = NULL, mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
-  seed = 99)
+  seed = 99, ...)
 }
 \arguments{
 \item{model}{an RxODE model or lincmt()}

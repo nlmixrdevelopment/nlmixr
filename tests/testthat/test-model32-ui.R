@@ -41,7 +41,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
         }
 
         fit <- nlmixr(uif, dat, est="nlme",
-                      control=nlmeControl(pnlsTol = .3, msVerbose = TRUE))
+                      control=nlmeControl(pnlsTol = .3, msVerbose = TRUE), focei.translate=FALSE)
 
     })
 
@@ -75,7 +75,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
         }
 
         fit <- nlmixr(uif.ode, dat, est="nlme",
-                      control=nlmeControl(pnlsTol = .3, msVerbose = TRUE))
+                      control=nlmeControl(pnlsTol = .3, msVerbose = TRUE), focei.translate=FALSE)
 
 
         uif.ode.add <- function(){
@@ -106,7 +106,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
         }
 
         fit <- nlmixr(uif.ode.add, dat, est="nlme",
-                      control=nlmeControl(pnlsTol = .3, msVerbose = TRUE))
+                      control=nlmeControl(pnlsTol = .3, msVerbose = TRUE), focei.translate=FALSE)
 
 
         uif.ode.add.prop <- function(){
@@ -136,7 +136,8 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
         }
 
         fit <- nlmixr(uif.ode.add.prop, dat, est="nlme",
-                      control=nlmeControl(pnlsTol = .3, msVerbose = TRUE))
+                      control=nlmeControl(pnlsTol = .3, msVerbose = TRUE),
+                      focei.translate=FALSE)
 
     })
 

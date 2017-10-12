@@ -175,7 +175,7 @@ rxFoceiGrad <- function(object, ret, ..., theta, eta=NULL, dv,
             return(as.vector(env2$H));
         }
         H <- fun(theta)
-        Hinv <- rxInv(matrix(H, length(args$eta)));
+        Hinv <- RxODE::rxInv(matrix(H, length(args$eta)));
         jac <- numDeriv::jacobian(fun, theta, method=numDeriv.method);
         gr <- sapply(seq_along(env$lp), function(x){
             return(-env$lp[x] - 0.5 * sum(diag(Hinv %*% matrix(jac[, x], length(args$eta)))))
@@ -343,7 +343,7 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
         ret <- try(RxODE_focei_finalize_llik(env), silent=TRUE);
         if ((attr(ret, "corrected") == 1) || inherits(ret, "try-error")){
             if (estimate){
-                rxCat(sprintf("Warning: Problem with Hessian or ETA estimate, resetting ETAs to 0 (ID=%s).\n", env$id));
+                RxODE::rxCat(sprintf("Warning: Problem with Hessian or ETA estimate, resetting ETAs to 0 (ID=%s).\n", env$id));
                 args$eta <- rep(0, length(env$eta));
                 env$eta <- args$eta;
                 args$orthantwise_end <- length(args$eta);
