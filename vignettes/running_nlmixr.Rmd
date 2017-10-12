@@ -45,8 +45,8 @@ uif <- function() {
         ka <- exp(tka + eta.ka)
         cl <- exp(tcl + eta.cl)
         v <- exp(tv + eta.v)
-        d / dt(depot) = -ka * depot
-        d / dt(center) = ka * depot - cl / v * center
+        d/dt(depot) = -ka * depot
+        d/dt(center) = ka * depot - cl / v * center
         cp = center / v
         cp ~ add(add.err)
     })
@@ -426,3 +426,85 @@ fit <- nlmixr(one.compartment.model,data,est="saem",control=saemControl(n.burn=2
 ```
 this example specifies 250 burn-in iterations, 350 em iterations and a print progress every 50 runs.
 
+## Model Syntax for solved PK systems 
+
+Solved PK systems are also currently supported by nlmixr with the 'linCmt()' pseudo-function. An annotated example of a solved system is below: 
+```r
+f <- function(){
+    ini({
+        lCl <- 1.6      #log Cl (L/hr)
+        lVc <- log(90)  #log Vc (L)
+        lKA <- 0.1      #log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        eta.Cl ~ 0.1   # BSV Cl
+        eta.Vc ~ 0.1   # BSV Vc
+        eta.KA ~ 0.1   # BSV Ka
+    })
+    model({
+        Cl <- exp(lCl + eta.Cl)
+        Vc = exp(lVc + eta.Vc)
+        KA <- exp(lKA + eta.KA)
+        ## Instead of specifying the ODEs, you can use
+        ## the linCmt() function to use the solved system.
+        ##
+        ## This function determines the type of PK solved system
+        ## to use by the parameters that are defined.  In this case
+        ## it knows that this is a one-compartment model with first-order
+        ## absorption.
+        linCmt() ~ prop(prop.err)
+    })
+}
+```
+A few things to keep in mind: 
+*	Currently the solved systems support either oral dosing, IV dosing or IV infusion dosing and does not allow mixing the dosing types. 
+*	While RxODE allows mixing of solved systems and ODEs, this has not been implemented in nlmixr yet. 
+*	The solved systems implemented are the one, two and three compartment models with or without first-order absorption. Each of the models support a lag time with a tlag parameter. 
+*	In general the linear compartment model figures out the model by the parameter names. nlmixr currently knows about numbered volumes, Vc/Vp, Clearances in terms of both Cl and Q/CLD. Additionally nlmixr knows about elimination micro-constants (ie K12). Mixing of these parameters for these models is currently not supported. 
+
+## Checking model syntax 
+
+After specifying the model syntax you can check that nlmixr is interpreting it correctly by using the nlmixr function on it. 
+Using the above function we can get: 
+```r
+> nlmixr(f)
+## 1-compartment model with first-order absorption in terms of Cl
+## Initialization:
+################################################################################
+Fixed Effects ($theta):
+    lCl     lVc     lKA
+1.60000 4.49981 0.10000
+
+Omega ($omega):
+     [,1] [,2] [,3]
+[1,]  0.1  0.0  0.0
+[2,]  0.0  0.1  0.0
+[3,]  0.0  0.0  0.1
+
+## Model:
+################################################################################
+Cl <- exp(lCl + eta.Cl)
+Vc = exp(lVc + eta.Vc)
+KA <- exp(lKA + eta.KA)
+## Instead of specifying the ODEs, you can use
+## the linCmt() function to use the solved system.
+##
+## This function determines the type of PK solved system
+## to use by the parameters that are defined.  In this case
+## it knows that this is a one-compartment model with first-order
+## absorption.
+linCmt() ~ prop(prop.err)
+```
+
+In general this gives you information about the model (what type of solved system/RxODE), initial estimates as well as the code for the model block. 
+
+## Using the model syntax for estimating a model 
+
+Once the model function has been created, you can use it combined with a dataset to estimate the parameters for a model given a dataset. 
+This dataset has to have RxODE compatible events IDs. Both Monolix and NONMEM use a different dataset description. You may convert these datasets to RxODE-compatible datasets with the nmDataConvert function. Note that steady state doses are not supported by RxODE, and therefore not supported by the conversion function. 
+As an example, you can use a simulated rich 1-compartment dataset. 
+```r
+ d <- Oral_1CPT
+ d <- d[,names(d) != "SS"];
+ d <- nmDataConvert(d); 
+```
+Once the data has been converted to the appropriate format, you can use the nlmixr function to run the appropriate code. 
