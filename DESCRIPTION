@@ -1,6 +1,6 @@
 Package: nlmixr
 Type: Package
-Title: nlmixr fits population PK and PKPD non-linear mixed effects models
+Title: Fits Population PK and PKPD Non-Linear Mixed Effects Models
 Depends: R (>= 3.2),
 	 nlme,
 	 RxODE
@@ -49,7 +49,7 @@ Authors@R: c(person("Matthew","Fidler",
 Author: Matthew Fidler [aut], Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut],  Mirjam Trame [aut],
   Wenping Wang [aut, cre]
 Maintainer: Wenping Wang <wwang8198@gmail.com>
-Description: nlmixr is an R package for fitting population pharmacokinetic (PK) 
+Description: This package fits population pharmacokinetic (PK) 
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)
 NeedsCompilation: NeedsCompilation: yes
