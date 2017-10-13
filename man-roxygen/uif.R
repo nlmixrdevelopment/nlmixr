@@ -28,7 +28,8 @@
 ##' nlmixr models are contained in a R function with two blocks:
 ##' \code{ini} and \code{model}.  This R function can be named
 ##' anything, but is not meant to be called directly from R.  In fact
-##' if you try you will likely get an error such as \code{Error: could not find function "ini"}.
+##' if you try you will likely get an error such as \code{Error: could
+##' not find function "ini"}.
 ##'
 ##' The \code{ini} model block is meant to hold the initial estimates
 ##' for the model, and the boundaries of the parameters for estimation

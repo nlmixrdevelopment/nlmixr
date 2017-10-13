@@ -344,7 +344,6 @@ fixef.focei.fit <- function(object, ...){
                 lab <- paste(uif$ini$label[!is.na(uif$ini$ntheta)]);
                 lab[lab == "NA"] <- "";
                 lab <- gsub(" *$", "", gsub("^ *", "", lab));
-                log.theta <- which(row.names(df) %in% uif$log.theta);
                 if (!is.null(nlme)){
                     ttab <- data.frame(summary(nlme)$tTable);
                     names(ttab) <- c("Estimate", "SE", "DF", "t-value", "p-value")
@@ -371,6 +370,7 @@ fixef.focei.fit <- function(object, ...){
                                  Lower.ci=df$Estimate - qn * df$SE,
                                  Upper.ci=df$Estimate + qn * df$SE,
                                  check.names=FALSE);
+                log.theta <- which(row.names(df) %in% uif$log.theta);
                 if (length(log.theta) > 0){
                     df$Untransformed[log.theta] <- exp(df$Untransformed[log.theta])
                     df$Lower.ci[log.theta] <- exp(df$Lower.ci[log.theta])
@@ -408,17 +408,19 @@ print.par.fixed <- function(x, ...){
     df$SE <- F2(df$SE, digs);
     df$CV <- paste0(FFP(df$CV, digs.cv))
 
-    df$Untransformed <- sprintf("%s%s%s%s%s%s%s", F2(df$Untransformed, digs),
-                                ifelse(x$Estimate * 100 == x$Untransformed, "%", ""),
-                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", " ("),
-                                F2(df$Lower.ci, digs),
-                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
-                                F2(df$Upper.ci, digs),
-                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
-    df <- df[, regexpr("[.]ci", names(df)) == -1]
+    df$Untransformed <- sprintf("%s%s", F2(df$Untransformed, digs),
+                                ifelse(x$Estimate * 100 == x$Untransformed, "%", ""));
     ci <- attr(x, "ci")
-    names(df) <- gsub("Untransformed",
-                      sprintf("Untransformed (%s%%CI)", ci * 100), names(df))
+    df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
+                                                 ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
+                                                 F2(df$Lower.ci, digs),
+                                                 ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
+                                                 F2(df$Upper.ci, digs),
+                                                 ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
+    df <- df[, regexpr("[.]ci", names(df)) == -1]
+    if (all(df$Parameter == "")){
+        df <- df[, -1];
+    }
     print(df)
 }
 
