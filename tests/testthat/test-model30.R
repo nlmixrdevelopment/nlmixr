@@ -4,21 +4,21 @@ library(nlmixr)
 context("NLME30: one-compartment oral, Michaelis-Menten, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
-  
+
   test_that("ODE", {
-    
+
     ode1MMKA <- "
     d/dt(abs)    = -KA*abs;
     d/dt(centr)  =  KA*abs-(VM*centr/V)/(KM+centr/V);
     "
-    
+
     mypar5 <- function(lVM, lKM, lV, lKA)
     {
       VM <- exp(lVM)
       KM <- exp(lKM)
       V <- exp(lV)
       KA <- exp(lKA)
-      
+
     }
     specs5i <-
       list(
@@ -32,17 +32,17 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
           lKA = -0.2
         )
       )
-    
+
     datr <-
       read.csv("Oral_1CPTMM.csv",
                header = TRUE,
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
     datr <- datr[datr$EVID != 2,]
-    
+
     runno <- "N030"
     dat <- datr[datr$SD == 0,]
-    
+
     fit <-
       nlme_ode(
         dat,
@@ -55,24 +55,24 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
         weight = varPower(fixed = c(1)),
         control = nlmeControl(pnlsTol = .3, msVerbose = TRUE)
       )
-    
+
     z <- VarCorr(fit)
-    
+
     expect_equal(signif(as.numeric(fit$logLik),6), -30897.9)
-    expect_equal(signif(AIC(fit), 6), 61813.8)
-    expect_equal(signif(BIC(fit), 6), 61871.9)  
-    
+    expect_equal(signif(AIC(fit), 6), 61813.9)
+    expect_equal(signif(BIC(fit), 6), 61871.9)
+
     expect_equal(signif(as.numeric(fit$coefficients$fixed[1]),3), 7.09)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[2]),3), 6.11)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]),3), 4.18)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]),3), -0.0842)
-    
-    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.159)
-    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.726)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]),3), -0.0836)
+
+    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.158)
+    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.728)
     expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.299)
-    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.000359)
-    
+    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.000358)
+
     expect_equal(signif(fit$sigma, 3), 0.203)
   })
-  
+
 }

@@ -194,7 +194,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
 
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.338)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.318)
-    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.000766)
+    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.000764)
     expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.280)
 
     expect_equal(signif(fitODE$sigma, 3), 0.201)

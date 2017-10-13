@@ -57,21 +57,21 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
 
     z <- VarCorr(fit)
 
-    expect_equal(signif(as.numeric(fit$logLik),6), -12190.4)
-    expect_equal(signif(AIC(fit), 6), 24398.8)
-    expect_equal(signif(BIC(fit), 6), 24450.4)
+    expect_equal(signif(as.numeric(fit$logLik),6), -30897.9)
+    expect_equal(signif(AIC(fit), 6), 61813.9)
+    expect_equal(signif(BIC(fit), 6), 61871.9)
 
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]),3), 1.37)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]),3), 4.2)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[3]),3), 1.35)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]),3), 3.84)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]),3), 7.09)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]),3), 6.11)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[3]),3), 4.18)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]),3), -0.0836)
 
-    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.316)
-    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.315)
-    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.000942)
-    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.264)
+    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.158)
+    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.728)
+    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.299)
+    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.000358)
 
-    expect_equal(signif(fit$sigma, 3), 0.201)
+    expect_equal(signif(fit$sigma, 3), 0.203)
   })
 
   test_that("ODE", {
@@ -127,21 +127,20 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
 
     z <- VarCorr(fitODE)
 
-    expect_equal(signif(as.numeric(fitODE$logLik),6), -12190.1)
-    expect_equal(signif(AIC(fitODE), 6), 24398.2)
-    expect_equal(signif(BIC(fitODE), 6), 24449.8)
+    expect_equal(signif(as.numeric(fitODE$logLik),6), -12177.3)
+    expect_equal(signif(AIC(fitODE), 6), 24372.6)
+    expect_equal(signif(BIC(fitODE), 6), 24424.2)
 
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]),3), 1.37)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.19)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), 1.37)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[4]),3), 3.84)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.2)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), 1.33)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[4]),3), 3.83)
 
-    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.318)
+    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.317)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.314)
-    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.00134)
-    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.273)
+    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.284)
+    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.244)
 
-    expect_equal(signif(fitODE$sigma, 3), 0.201)
+    expect_equal(signif(fitODE$sigma, 3), 0.198)
   })
-
 }

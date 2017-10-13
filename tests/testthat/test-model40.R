@@ -58,21 +58,21 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
 
     z <- VarCorr(fit)
 
-    expect_equal(signif(as.numeric(fit$logLik), 6),-11986.1)
-    expect_equal(signif(AIC(fit), 6), 23994.1)
-    expect_equal(signif(BIC(fit), 6), 24057.2)
+    expect_equal(signif(as.numeric(fit$logLik), 6),-11988)
+    expect_equal(signif(AIC(fit), 6), 23998)
+    expect_equal(signif(BIC(fit), 6), 24061)
 
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 6.65)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 5.02)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 6.57)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 4.9)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.25)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.46)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.96)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 4.00)
 
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.33)
-    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 6.25e-18)
+    expect_equal(round(as.numeric(z[2, "StdDev"]), 3), 0)
     expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.287)
-    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.28)
-    expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.287)
+    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.288)
+    expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.291)
 
     expect_equal(signif(fit$sigma, 3), 0.195)
   })

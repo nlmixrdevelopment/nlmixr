@@ -109,16 +109,16 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
 
     z <- VarCorr(fitODE)
 
-    expect_equal(signif(as.numeric(fitODE$logLik),6), -11780.3)
-    expect_equal(signif(AIC(fitODE), 6), 23574.6)
-    expect_equal(signif(BIC(fitODE), 6), 23614.7)
+    expect_equal(signif(as.numeric(fitODE$logLik),6), -11775.3)
+    expect_equal(signif(AIC(fitODE), 6), 23564.6)
+    expect_equal(signif(BIC(fitODE), 6), 23604.7)
 
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[1]),3), 1.39)
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[2]),3), 4.19)
-    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), -0.0269)
+    expect_equal(signif(as.numeric(fitODE$coefficients$fixed[3]),3), -0.0302)
 
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.252)
-    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.268)
+    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.27)
     expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.309)
 
     expect_equal(signif(fitODE$sigma, 3), 0.200)

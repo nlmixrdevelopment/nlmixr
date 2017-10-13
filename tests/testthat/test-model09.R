@@ -47,19 +47,20 @@ d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
 
     z <- summary(fit)
 
-    expect_equal(signif(as.numeric(fit$logLik), 6), -12566.2)
-    expect_equal(signif(AIC(fit), 6), 25146.4)
-    expect_equal(signif(BIC(fit), 6), 25186.5)
+    expect_equal(signif(as.numeric(fit$logLik), 6), -12566.5)
+    expect_equal(signif(AIC(fit), 6), 25147)
+    expect_equal(signif(BIC(fit), 6), 25187.1)
 
     expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 6.80)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 5.33)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.18)
 
-    expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.300)
-    expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.264)
+    expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[1], 3)), 0.301)
+    expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[2], 3)), 0.259)
     expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[3], 3)), 0.297)
 
     expect_equal(as.numeric(signif(exp(attr(z$apVar, "Pars"))[4], 3)), 0.200)
+
   })
 }
 
