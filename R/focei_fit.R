@@ -2139,7 +2139,12 @@ focei.fit.data.frame0 <- function(data,
 ##' @importFrom utils str
 ##' @export
 str.focei.fit <- function(object, ...){
-    message('FOCEi/UI combined dataset and properites');
+    uif <- object$uif;
+    if (is.null(uif)){
+        message('FOCEi combined dataset and properties');
+    } else {
+        message('nlmixr UI combined dataset and properties')
+    }
     m <- as.data.frame(object);
     str(m)
     env <- attr(object, ".focei.env");

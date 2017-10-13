@@ -76,7 +76,8 @@ pharmacometricians.
 nlmixr models are contained in a R function with two blocks:
 \code{ini} and \code{model}.  This R function can be named
 anything, but is not meant to be called directly from R.  In fact
-if you try you will likely get an error such as \code{Error: could not find function "ini"}.
+if you try you will likely get an error such as \code{Error: could
+not find function "ini"}.
 
 The \code{ini} model block is meant to hold the initial estimates
 for the model, and the boundaries of the parameters for estimation
@@ -460,11 +461,11 @@ Time (sec; $time):
 elapsed 379.32   2.9           1.71          0 19.11
 
 Parameters ($par.fixed):
-                 est  exp.est. se(est)             label
-lCl      1.388520956  4.008916  0.02401313 log Cl (L/hr)
-lVc      4.204117500 66.961478  0.02557580    log Vc (L)
-lKA      0.008899362  1.008939  0.03069641 log Ka (1/hr)
-prop.err 0.197975886  1.218933          NA
+             Parameter Estimate     SE     CV Untransformed       (95%CI)
+lCl      log Cl (L/hr)     1.39 0.0240   1.7%          4.01  (3.82, 4.20)
+lVc         log Vc (L)     4.20 0.0256   0.6%          67.0  (63.7, 70.4)
+lKA      log Ka (1/hr)  0.00890 0.0307 344.9%          1.01 (0.950, 1.07)
+prop.err                  0.198                       19.8%
 
 Omega ($omgea):
            eta.Cl     eta.Vc   eta.KA
@@ -524,6 +525,13 @@ This example shows what is typical printout of a nlmixr fit object.  The element
 }
 \item After the timing of the fit, the parameter estimates are displayed (can be accessed by
      \code{fit.s$par.fixed})
+\itemize{
+\item While the items are rounded for R printing, each estimate without rounding is still accessible by the `$` syntax.
+  For example, the `$Untransformed` gives the untransformed parameter values.
+\item The Untransformed parameter takes log-space parameters and back-transforms them to normal parameters.  Not the CIs
+        are listed on the back-transformed parameter space.
+\item Proportional Errors are converted to %CV on the untransformed space
+}
 \item Omega block (accessed by \code{fit.s$omega})
 \item The table of fit data. Please note:
 \itemize{
