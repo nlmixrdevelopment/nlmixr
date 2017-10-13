@@ -1345,7 +1345,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     env <- attr(fit.f, ".focei.env");
     env$fit$saem <- fit
     tmp <- cbind(data.frame(saem=saem.time["elapsed"]), env$fit$time);
-    names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
+    names(tmp) <- gsub("optimize", "Likelihood Calculation", names(tmp))
     env$fit$time <- tmp;
     env$uif <- uif;
     env$uif.new <- uif.new;

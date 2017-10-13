@@ -136,7 +136,7 @@ print.focei.fit <- function(x, ...) {
         print(fit$time);
         message("\nParameters ($par.fixed):")
         print(x$par.fixed)
-        message("\nOmega ($omgea):");
+        message("\nOmega ($omega):");
         print(fit$omega);
         is.data.table <- requireNamespace("data.table", quietly = TRUE);
         message("\nFit Data (object is a modified data.frame):")
@@ -761,7 +761,7 @@ focei.fit.nlmixr.ui.nlme <- function(data, inits, ...){
         inits <- getData(data);
         name.data <- FALSE
     } else if (!is(inits, "data.frame")){
-        stop("The second argument needs to be missing or data to piple a fit to FOCEi");
+        stop("The second argument needs to be missing, data, or a prior fit.");
     }
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     names(call)[1] <- "object"
@@ -2384,3 +2384,6 @@ print.anova.nlmixr <- function (x, verbose = attr(x, "verbose"), ...)
     }
     invisible(ox)
 }
+
+##  LocalWords:  focei nlme linCmt solveC SolvedC UI saem VarCorr AIC
+##  LocalWords:  nlmixr REML FOCEi dplyr logLik
