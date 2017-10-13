@@ -84,4 +84,4 @@ To replicate the environment that was used in windows for nlmixr development, yo
      run all of the unit tests in RxODE to make sure it is running
      correctly on your system.
 7. Install nlmixr
-   - This can be done by `install_github("nlmixrdevelopment/nlmixr", ref="dparser-saem")`
+   - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
