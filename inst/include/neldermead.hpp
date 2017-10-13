@@ -20,14 +20,24 @@
 
 #ifndef __NELDERMEAD_HPP__
 #define __NELDERMEAD_HPP__
-
+#include <R_ext/Rdynload.h>
 
 // for resid error
+
 typedef void (*fn_ptr) (double *, double *);
-void nelder_(fn_ptr func, int n, double *start, double *step,
-  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
-  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
-  int *iprint);
+typedef void (*nelder_fn)(fn_ptr func, int n, double *start, double *step,
+                                   int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
+                                   int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
+                                   int *iprint);
+void nelder_ (fn_ptr func, int n, double *start, double *step,
+		       int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
+		       int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
+		       int *iprint){
+    static nelder_fn fun=NULL;
+    if (fun == NULL) fun = (nelder_fn) R_GetCCallable("nlmixr","nelder_fn");
+    fun(func, n, start, step, itmax, ftol_rel, rcoef, ecoef, ccoef, iconv, it, nfcall, ynewlo, xmin, iprint);
+}
+
 double *yptr, *fptr;	//CHK
 int len;	//CHK
 

@@ -20,4 +20,3 @@ Sets nodes and weigts of Gauss-Hermite quadrature
 gauss.quad(5)
 }
 }
-

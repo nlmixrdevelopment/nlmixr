@@ -4,21 +4,18 @@ library(nlmixr)
 context("NLME42: two-compartment bolus Michaelis-Menten, multiple-dose")
 
 if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
-  
+
   test_that("ODE", {
 
-    datr <-
-      read.csv("Bolus_2CPTMM.csv",
-               header = TRUE,
-               stringsAsFactors = F)
+    datr <-Bolus_2CPTMM
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
     datr <- datr[datr$EVID != 2,]
-    
+
     ode2MM <- "
     d/dt(centr)  = K21*periph-K12*centr-(VM*centr/V)/(KM+centr/V);
     d/dt(periph) =-K21*periph+K12*centr;
     "
-    
+
     mypar7 <- function(lVM, lKM, lV, lCLD, lVT)
     {
       VM <- exp(lVM)
@@ -41,11 +38,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
           lVT = 4
         )
       )
-    
+
     runno <- "N040"
-    
+
     dat <- datr
-    
+
     fit <-
       nlme_ode(
         dat,
@@ -58,26 +55,26 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
         weight = varPower(fixed = c(1)),
         control = nlmeControl(pnlsTol = .1, msVerbose = TRUE)
       )
-    
+
     z <- VarCorr(fit)
-    
-    expect_equal(signif(as.numeric(fit$logLik), 6),-41555.2)
-    expect_equal(signif(AIC(fit), 6), 83132.3)
-    expect_equal(signif(BIC(fit), 6), 83207.6)
-    
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 6.9)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 5.44)
+
+    expect_equal(signif(as.numeric(fit$logLik), 6),-41575.1)
+    expect_equal(signif(AIC(fit), 6), 83172.2)
+    expect_equal(signif(BIC(fit), 6), 83247.5)
+
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 6.91)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 5.45)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.25)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.41)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.9)
-    
-    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.283)
-    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.303)
-    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.291)
-    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.329)
-    expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.306)
-    
-    expect_equal(signif(fit$sigma, 3), 0.203)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.4)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.87)
+
+    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.287)
+    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.301)
+    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.289)
+    expect_equal(round(as.numeric(z[4, "StdDev"]), 3), 0)
+    expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.304)
+
+    expect_equal(signif(fit$sigma, 3), 0.204)
   })
-  
+
 }

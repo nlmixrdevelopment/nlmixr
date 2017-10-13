@@ -25,10 +25,10 @@
 typedef void (*fn_ptr) (double *, double *);
 #define MXPAR  45
 
-void nelder_(fn_ptr func, int n, double *start, double *step,
-  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
-  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
-  int *iprint)
+extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
+			  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
+			  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
+			  int *iprint)
 {
   double fval;
   int i, j, k;
@@ -39,11 +39,11 @@ void nelder_(fn_ptr func, int n, double *start, double *step,
   double ylo, dchk, z, dn, dabit, yoldlo=0;
 
   //FIXME: check malloc status
-  p = (double *) malloc(n*(n+1)*sizeof(double));
-  pstar = (double *) malloc(n*sizeof(double));
-  p2star = (double *) malloc(n*sizeof(double));
-  pbar = (double *) malloc(n*sizeof(double));
-  y = (double *) malloc((n+1)*sizeof(double));
+  p = (double *) Calloc(n*(n+1),double);
+  pstar = (double *) Calloc(n,double);
+  p2star = (double *) Calloc(n,double);
+  pbar = (double *) Calloc(n,double);
+  y = (double *) Calloc((n+1),double);
 
   kcount = 1000000;
   *nfcall = 0;
@@ -52,7 +52,14 @@ void nelder_(fn_ptr func, int n, double *start, double *step,
 
   /* check inputs */
   if (n <= 0 || n > MXPAR) *nfcall += -10;
-  if (*nfcall < 0) return;
+  if (*nfcall < 0){
+    Free(p);
+    Free(pstar);
+    Free(p2star);
+    Free(pbar);
+    Free(y);
+    return;
+  }
 
   /* constants */
   dabit = 2.2204460492503131e-16;
@@ -74,6 +81,12 @@ void nelder_(fn_ptr func, int n, double *start, double *step,
       xmin[i] = start[i];
 
     *ynewlo = fval;
+    
+    Free(p);
+    Free(pstar);
+    Free(p2star);
+    Free(pbar);
+    Free(y);
     return;
   }
   else {
@@ -155,7 +168,7 @@ void nelder_(fn_ptr func, int n, double *start, double *step,
 
       if (*iconv) {
 #ifdef __DEBUG__
-    	printf("fval chk: %21.16f %21.16f %21.16f\n", *ynewlo, ylo, (*ynewlo + dabit) / (ylo + dabit));
+    	Rprintf("fval chk: %21.16f %21.16f %21.16f\n", *ynewlo, ylo, (*ynewlo + dabit) / (ylo + dabit));
 #endif
 	    break;
 	  }
@@ -272,5 +285,12 @@ void nelder_(fn_ptr func, int n, double *start, double *step,
   }
   for (i = 0; i < n; ++i)
     xmin[i] = p[i+ibest*n];
+  
+  Free(p);
+  Free(pstar);
+  Free(p2star);
+  Free(pbar);
+  Free(y);
+  
   return;
 }

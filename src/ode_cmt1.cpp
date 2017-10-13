@@ -1,82 +1,55 @@
-// includes from the plugin
-#ifdef __STANDALONE__
-#include <Eigen/Dense>
-#else
 #include <RcppEigen.h>
-#include <Rcpp.h>
+// [[Rcpp::depends(RcppEigen)]]
 using namespace Rcpp;
 
-#ifndef BEGIN_RCPP
-#define BEGIN_RCPP
-#endif
-
-#ifndef END_RCPP
-#define END_RCPP
-#endif
-#endif
-
 #include <stan/math.hpp>
-#include "PKPDLib_WW.hpp"
+#include "PKPDLib_WW.h"
 
+// Change to the Rcpp interface and let Rcpp handle the BEGIN_RCPP interface.
+// It may have changed in the new RcppEigen...
 
-RcppExport SEXP lin_cmt_stan( SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP,
-	SEXP paramsSEXP, SEXP oralSEXP, SEXP infusionSEXP, SEXP ncmtSEXP, SEXP parameterizationSEXP ) {
-BEGIN_RCPP
+//[[Rcpp::export]]
+SEXP lin_cmt_stan(Eigen::Map<Eigen::VectorXd> obs_time,
+			 Eigen::Map<Eigen::VectorXd> dose_time,
+			 Eigen::Map<Eigen::VectorXd> dose,
+			 Eigen::Map<Eigen::VectorXd> Tinf,
+			 Eigen::Map<Eigen::VectorXd> params,
+			 SEXP oralSEXP,
+			 SEXP infusionSEXP,
+			 SEXP ncmtSEXP,
+			 SEXP parameterizationSEXP ) {
+  const int oral = as<int>(oralSEXP);
+  const int infusion = as<int>(infusionSEXP);
+  const int ncmt = as<int>(ncmtSEXP);
+  const int parameterization = as<int>(parameterizationSEXP);
+  stan::math::lin_cmt_fun f(obs_time, dose_time, dose, Tinf, ncmt, oral, infusion, parameterization);
+  Eigen::VectorXd fx;
+  Eigen::Matrix<double, -1, -1> J;
+  stan::math::jacobian(f, params, fx, J);
 
-    using Eigen::VectorXd;
-    Rcpp::traits::input_parameter< const VectorXd& >::type obs_time_(obs_timeSEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type dose_time_(dose_timeSEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type dose_(doseSEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type Tinf_(TinfSEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
-    Rcpp::traits::input_parameter< const int >::type ncmt(ncmtSEXP);
-    Rcpp::traits::input_parameter< const int >::type infusion(infusionSEXP);
-    Rcpp::traits::input_parameter< const int >::type oral(oralSEXP);
-    Rcpp::traits::input_parameter< const int >::type parameterization(parameterizationSEXP);
-
-    const VectorXd obs_time(obs_time_);
-    const VectorXd dose_time(dose_time_);
-    const VectorXd dose(dose_);
-    const VectorXd Tinf(Tinf_);
-    const VectorXd params(params_);
-
-	stan::math::lin_cmt_fun f(obs_time, dose_time, dose, Tinf, ncmt, oral, infusion, parameterization);
-    VectorXd fx;
-	Eigen::Matrix<double, -1, -1> J;
-	stan::math::jacobian(f, params, fx, J);
-
-    return Rcpp::List::create(Rcpp::Named("fx") = fx,
-	                          Rcpp::Named("J") = J);
-END_RCPP
+  return Rcpp::List::create(Rcpp::Named("fx") = wrap(fx),
+			    Rcpp::Named("J") = wrap(J));
 }
 
 
 //===============================================================
 struct binomial_llik {
-	const Eigen::VectorXd y_, N_;
-	binomial_llik(const Eigen::VectorXd& y, const Eigen::VectorXd& N) : y_(y), N_(N) { }
-
-	template <typename T>
-	Eigen::Matrix<T, -1, 1> operator()(const Eigen::Matrix<T, -1, 1>& theta) const {
-		Eigen::Matrix<T, -1, 1> lp(y_.size());
-		for (int n = 0; n < y_.size(); ++n)
-		lp[n] = binomial_log(y_[n], N_[n], theta[n]);
-		return lp;
-	}
+  const Eigen::VectorXd y_, N_;
+  binomial_llik(const Eigen::VectorXd& y, const Eigen::VectorXd& N) : y_(y), N_(N) { }
+  
+  template <typename T>
+  Eigen::Matrix<T, -1, 1> operator()(const Eigen::Matrix<T, -1, 1>& theta) const {
+    Eigen::Matrix<T, -1, 1> lp(y_.size());
+    for (int n = 0; n < y_.size(); ++n)
+      lp[n] = binomial_log(y_[n], N_[n], theta[n]);
+    return lp;
+  }
 };
 
-RcppExport SEXP llik_binomial(SEXP ySEXP, SEXP NSEXP, SEXP paramsSEXP) {
-BEGIN_RCPP
-
-    using Eigen::VectorXd;
-    Rcpp::traits::input_parameter< const VectorXd& >::type y_(ySEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type N_(NSEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
-
-    const VectorXd y(y_);
-    const VectorXd N(N_);
-    VectorXd params(params_);
-
+//[[Rcpp::export]]
+SEXP llik_binomial_c(Eigen::Map<Eigen::VectorXd> y,
+			  Eigen::Map<Eigen::VectorXd> N,
+			  Eigen::Map<Eigen::VectorXd> params) {
     int i;
     for (i=0; i<params.size(); ++i) {
 		if (params[i] > .99999) params[i] = .99999;
@@ -84,91 +57,72 @@ BEGIN_RCPP
 	}
 
 	binomial_llik f(y, N);
-    VectorXd fx;
+	Eigen::VectorXd fx;
 	Eigen::Matrix<double, -1, -1> J;
 	stan::math::jacobian(f, params, fx, J);
 
     return Rcpp::List::create(Rcpp::Named("fx") = fx,
 	                          Rcpp::Named("J") = J);
-END_RCPP
 }
 
 
 //===============================================================
 struct poisson_llik {
-	const Eigen::VectorXd y_;
-	poisson_llik(const Eigen::VectorXd& y) : y_(y) { }
-
-	template <typename T>
-	Eigen::Matrix<T, -1, 1> operator()(const Eigen::Matrix<T, -1, 1>& theta) const {
-		Eigen::Matrix<T, -1, 1> lp(y_.size());
-		for (int n = 0; n < y_.size(); ++n)
-		lp[n] = poisson_log(y_[n], theta[n]);
-		return lp;
-	}
+  const Eigen::VectorXd y_;
+  poisson_llik(const Eigen::VectorXd& y) : y_(y) { }
+  
+  template <typename T>
+  Eigen::Matrix<T, -1, 1> operator()(const Eigen::Matrix<T, -1, 1>& theta) const {
+    Eigen::Matrix<T, -1, 1> lp(y_.size());
+    for (int n = 0; n < y_.size(); ++n)
+      lp[n] = poisson_log(y_[n], theta[n]);
+    return lp;
+  }
 };
 
-RcppExport SEXP llik_poisson(SEXP ySEXP, SEXP paramsSEXP) {
-BEGIN_RCPP
+//[[Rcpp::export]]
+SEXP llik_poisson(Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> params) {
+  poisson_llik f(y);
+  Eigen::VectorXd fx;
+  Eigen::Matrix<double, -1, -1> J;
+  stan::math::jacobian(f, params, fx, J);
 
-    using Eigen::VectorXd;
-    Rcpp::traits::input_parameter< const VectorXd& >::type y_(ySEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
-
-    const VectorXd y(y_);
-    const VectorXd params(params_);
-
-	poisson_llik f(y);
-    VectorXd fx;
-	Eigen::Matrix<double, -1, -1> J;
-	stan::math::jacobian(f, params, fx, J);
-
-    return Rcpp::List::create(Rcpp::Named("fx") = fx,
-	                          Rcpp::Named("J") = J);
-END_RCPP
+  return Rcpp::List::create(Rcpp::Named("fx") = fx,
+			    Rcpp::Named("J") = J);
 }
 
 
 //===============================================================
 struct normal_llik {
-	const Eigen::VectorXd y_;
-	normal_llik(const Eigen::VectorXd& y) : y_(y) { }
+  const Eigen::VectorXd y_;
+  normal_llik(const Eigen::VectorXd& y) : y_(y) { }
 
-	template <typename T>
-	Eigen::Matrix<T, -1, 1> operator()(const Eigen::Matrix<T, -1, 1>& theta) const {
-		T mu = theta[0];
-		T sigma = theta[1];
+  template <typename T>
+  Eigen::Matrix<T, -1, 1> operator()(const Eigen::Matrix<T, -1, 1>& theta) const {
+    T mu = theta[0];
+    T sigma = theta[1];
 		
-		if (sigma <= 0) {
-			Rcpp::Rcout << "Warning: sigma <= 0" <<std::endl;
-			sigma = 1.0e-12;
-		}
+    if (sigma <= 0) {
+      Rcpp::Rcout << "Warning: sigma <= 0" <<std::endl;
+      sigma = 1.0e-12;
+    }
 		
-		Eigen::Matrix<T, -1, 1> lp(y_.size());
-		for (int n = 0; n < y_.size(); ++n)
-		lp[n] = normal_log(y_[n], mu, sigma);
-		return lp;
-	}
+    Eigen::Matrix<T, -1, 1> lp(y_.size());
+    for (int n = 0; n < y_.size(); ++n)
+      lp[n] = normal_log(y_[n], mu, sigma);
+    return lp;
+  }
 };
 
-RcppExport SEXP llik_normal(SEXP ySEXP, SEXP paramsSEXP) {
-BEGIN_RCPP
-
-    using Eigen::VectorXd;
-    Rcpp::traits::input_parameter< const VectorXd& >::type y_(ySEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
-
-    const VectorXd y(y_);
-    const VectorXd params(params_);
-
-	normal_llik f(y);
-    VectorXd fx;
-	Eigen::Matrix<double, -1, -1> J;
-	stan::math::jacobian(f, params, fx, J);
-
-    return Rcpp::List::create(Rcpp::Named("fx") = fx,
-	                          Rcpp::Named("J") = J);
-END_RCPP
+//[[Rcpp::export]]
+SEXP llik_normal(Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> params) {
+  normal_llik f(y);
+  Eigen::VectorXd fx;
+  Eigen::Matrix<double, -1, -1> J;
+  stan::math::jacobian(f, params, fx, J);
+  
+  return Rcpp::List::create(Rcpp::Named("fx") = fx,
+			    Rcpp::Named("J") = J);
 }
 
 
@@ -197,26 +151,17 @@ struct betabinomial_llik {
 	}
 };
 
-RcppExport SEXP llik_betabinomial(SEXP ySEXP, SEXP NSEXP, SEXP paramsSEXP) {
-BEGIN_RCPP
-
-    using Eigen::VectorXd;
-    Rcpp::traits::input_parameter< const VectorXd& >::type y_(ySEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type N_(NSEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
-
-    const VectorXd y(y_);
-    const VectorXd N(N_);
-    const VectorXd params(params_);
-
-	betabinomial_llik f(y, N);
-    VectorXd fx;
-	Eigen::Matrix<double, -1, -1> J;
-	stan::math::jacobian(f, params, fx, J);
-
-    return Rcpp::List::create(Rcpp::Named("fx") = fx,
-	                          Rcpp::Named("J") = J);
-END_RCPP
+//[[Rcpp::export]]
+SEXP llik_betabinomial(Eigen::Map<Eigen::VectorXd> y,
+			      Eigen::Map<Eigen::VectorXd> N,
+			      Eigen::Map<Eigen::VectorXd> params) {
+  betabinomial_llik f(y, N);
+  Eigen::VectorXd fx;
+  Eigen::Matrix<double, -1, -1> J;
+  stan::math::jacobian(f, params, fx, J);
+	
+  return Rcpp::List::create(Rcpp::Named("fx") = fx,
+			    Rcpp::Named("J") = J);
 }
 
 //===============================================================
@@ -246,24 +191,15 @@ struct student_t_llik {
 	}
 };
 
-RcppExport SEXP llik_student_t(SEXP ySEXP, SEXP paramsSEXP) {
-BEGIN_RCPP
+//[[Rcpp::export]]
+SEXP llik_student_t(Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> params) {
+  student_t_llik f(y);
+  Eigen::VectorXd fx;
+  Eigen::Matrix<double, -1, -1> J;
+  stan::math::jacobian(f, params, fx, J);
 
-    using Eigen::VectorXd;
-    Rcpp::traits::input_parameter< const VectorXd& >::type y_(ySEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
-
-    const VectorXd y(y_);
-    const VectorXd params(params_);
-
-	student_t_llik f(y);
-    VectorXd fx;
-	Eigen::Matrix<double, -1, -1> J;
-	stan::math::jacobian(f, params, fx, J);
-
-    return Rcpp::List::create(Rcpp::Named("fx") = fx,
-	                          Rcpp::Named("J") = J);
-END_RCPP
+  return Rcpp::List::create(Rcpp::Named("fx") = fx,
+			    Rcpp::Named("J") = J);
 }
 
 //===============================================================
@@ -292,24 +228,14 @@ struct beta_llik {
 	}
 };
 
-RcppExport SEXP llik_beta(SEXP ySEXP, SEXP paramsSEXP) {
-BEGIN_RCPP
-
-    using Eigen::VectorXd;
-    Rcpp::traits::input_parameter< const VectorXd& >::type y_(ySEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
-
-    const VectorXd y(y_);
-    const VectorXd params(params_);
-
-	beta_llik f(y);
-    VectorXd fx;
-	Eigen::Matrix<double, -1, -1> J;
-	stan::math::jacobian(f, params, fx, J);
-
-    return Rcpp::List::create(Rcpp::Named("fx") = fx,
-	                          Rcpp::Named("J") = J);
-END_RCPP
+//[[Rcpp::export]]
+SEXP llik_beta(Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> params) {
+  beta_llik f(y);
+  Eigen::VectorXd fx;
+  Eigen::Matrix<double, -1, -1> J;
+  stan::math::jacobian(f, params, fx, J);
+  return Rcpp::List::create(Rcpp::Named("fx") = fx,
+			    Rcpp::Named("J") = J);
 }
 
 
@@ -339,27 +265,19 @@ struct neg_binomial_llik {
 	}
 };
 
-RcppExport SEXP llik_neg_binomial(SEXP ySEXP, SEXP paramsSEXP) {
-BEGIN_RCPP
+//[[Rcpp::export]]
+SEXP llik_neg_binomial(Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> params) {
+  neg_binomial_llik f(y);
+  Eigen::VectorXd fx;
+  Eigen::Matrix<double, -1, -1> J;
+  stan::math::jacobian(f, params, fx, J);
 
-    using Eigen::VectorXd;
-    Rcpp::traits::input_parameter< const VectorXd& >::type y_(ySEXP);
-    Rcpp::traits::input_parameter< const VectorXd& >::type params_(paramsSEXP);
-
-    const VectorXd y(y_);
-    const VectorXd params(params_);
-
-	neg_binomial_llik f(y);
-    VectorXd fx;
-	Eigen::Matrix<double, -1, -1> J;
-	stan::math::jacobian(f, params, fx, J);
-
-    return Rcpp::List::create(Rcpp::Named("fx") = fx,
-	                          Rcpp::Named("J") = J);
-END_RCPP
+  return Rcpp::List::create(Rcpp::Named("fx") = fx,
+			    Rcpp::Named("J") = J);
 }
 
 
+// I'm not sure why the below is here...
 
 #if 0
 

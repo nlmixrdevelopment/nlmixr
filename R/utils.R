@@ -25,13 +25,13 @@ thresh = function(x, cut=.Machine$double.xmin)
 
 gof = function(x, ...)
 {
-	gof_str = "
+    gof_str = "
 {
     theta = th[1:npar]
     names(theta) = names(inits)[1:npar]
     theta = c(theta, fixPars)
     system$solve(theta, ev, atol = 1e-08, rtol = 1e-08)
-}    
+}
 "
 	f = x$obj
 	dat = x$data
@@ -44,12 +44,12 @@ gof = function(x, ...)
 		time = x[,"time"]
 		yo = dat[, s["dv"]]		#FIXME
 		yp = x[, s["pred"]]
-		
+
 		#dv vs pred
 		plot(time, yp, type="n", xlab="time", ylab=s["dv"])
 		points(dat[,"time"], yo, ...)
 		lines(time, yp)
-		
+
 		#pred vs res
 		yp = yp[rows]
 		res = yo - yp
@@ -66,19 +66,21 @@ gof = function(x, ...)
 #' Plot of a non-population dynamic model fit
 #'
 #' Plot of a non-population dynamic model fit
-#' 
+#'
 #' @param x a dynamodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 plot.dyn.ID = gof
 
 #' Print a non-population dynamic model fit object
 #'
 #' Print a non-population dynamic model fit object
-#' 
+#'
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 print.dyn.ID = function(x, ...)
 {
 	print(x$res[, c(1,3)])
@@ -92,10 +94,11 @@ print.dyn.ID = function(x, ...)
 #' Summary of a non-population dynamic model fit
 #'
 #' Summary of a non-population dynamic model fit
-#' 
+#'
 #' @param object a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 summary.dyn.ID = function(object, ...)
 {
 	print(object$res)
@@ -124,11 +127,11 @@ mymin = function(start, fr, rho=NULL, control=list())
     con <- list(maxeval=999, ftol_rel=1e-6, rcoeff=1., ecoeff=2., ccoeff=.5, trace=F)
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
-    if (length(noNms <- namc[!namc %in% nmsC])) 
+    if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
-	
-	.Call("neldermead_wrap", fr, rho, length(start), start, step, 
-		  as.integer(con$maxeval), con$ftol_rel, con$rcoeff, con$ecoeff, con$ccoeff, 
+
+	.Call(neldermead_wrap, fr, rho, length(start), start, step,
+		  as.integer(con$maxeval), con$ftol_rel, con$rcoeff, con$ecoeff, con$ccoeff,
 		  as.integer(con$trace),
 		  PACKAGE = 'nlmixr')
 }
@@ -136,12 +139,13 @@ mymin = function(start, fr, rho=NULL, control=list())
 #' Nelder-Mead of simplex search
 #'
 #' Nelder-Mead of simplex search
-#' 
+#'
 #' @param start initials
 #' @param fr objective function
 #' @param rho evaluation environment
 #' @param control additional optimization options
 #' @return a list of ...
+#' @export
 nmsimplex = function(start, fr, rho=NULL, control=list())
 {
 	if (is.null(rho)) rho = environment(fr)
@@ -150,11 +154,11 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
     con <- list(maxeval=999, reltol=1e-6, rcoeff=1., ecoeff=2., ccoeff=.5, trace=F)
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
-    if (length(noNms <- namc[!namc %in% nmsC])) 
+    if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
-	
-	.Call("neldermead_wrap", fr, rho, length(start), start, step, 
-		  as.integer(con$maxeval), con$reltol, con$rcoeff, con$ecoeff, con$ccoeff, 
+
+	.Call(neldermead_wrap, fr, rho, length(start), start, step,
+		  as.integer(con$maxeval), con$reltol, con$rcoeff, con$ecoeff, con$ccoeff,
 		  as.integer(con$trace),
 		  PACKAGE = 'nlmixr')
 }
@@ -163,7 +167,7 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #' Fit a non-population dynamic model
 #'
 #' Fit a non-population dynamic model
-#' 
+#'
 #' @param system an RxODE object
 #' @param model a list of statistical meaurement models
 #' @param evTable an Event Table object
@@ -177,25 +181,25 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
-#' 
+#'
 #' ode <- "
 #'    dose=200;
 #'    pi = 3.1415926535897931;
-#' 
+#'
 #'    if (t<=0) {
 #'       fI = 0;
 #'    } else {
 #'       fI = F*dose*sqrt(MIT/(2.0*pi*CVI2*t^3))*exp(-(t-MIT)^2/(2.0*CVI2*MIT*t));
 #'    }
-#' 
+#'
 #'    C2 = centr/V2;
 #'    C3 = peri/V3;
 #'    d/dt(centr) = fI - CL*C2 - Q*C2 + Q*C3;
 #'    d/dt(peri)  =              Q*C2 - Q*C3;
 #' "
 #' sys1 <- RxODE(model = ode)
-#' 
-#' 
+#'
+#'
 #' ## ------------------------------------------------------------------------
 #' dat <- read.table("invgaussian.txt", header=TRUE)
 #' mod <- cp ~ C2 + prop(.1)
@@ -204,9 +208,10 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #' ev <- eventTable()
 #' ev$add.sampling(c(0, dat$time))
 #' (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
-#' 
+#'
 #' }
-dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, 
+#' @export
+dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 	method=c("Nelder-Mead", "L-BFGS-B", "PORT"),
 	control=list(ftol_rel=1e-6, maxeval=999), squared=T)
 {
@@ -231,7 +236,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 
 		s = c(s[2:3], err.type)
 		names(s) = c("dv", "pred", "err")
-		s	
+		s
 	})
 	names(inits.err) = rep("err", length(inits.err))
 	inits = c(inits, inits.err)
@@ -264,16 +269,17 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 	rows = if(have_zero) T else -1
 
 	if (squared) inits = sqrt(inits)
-	
-	obj = function(th) 
+
+	obj = function(th)
 	{
 		#squared = get("squared", envir=sys.parent(n = 1))
 		if (squared) th = th^2
 		.ixpar = npar
 		theta = th[1:npar]
 		names(theta) = names(inits)[1:npar]
-		theta = c(theta, fixPars)
-		s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
+            theta = c(theta, fixPars)
+
+            s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
 
 		l = lapply(model, function(x) {
 			err.combo = (x["err"]=="combo")+0
@@ -288,7 +294,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 				sig
 			}
 			#print(sig)
-			
+
 			yp = s[rows,x["pred"]]
 			sgy = thresh(sig[1]+yp*sig[2])
 			yo = data[, x["dv"]]
@@ -308,11 +314,11 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 	} else {
 		if ("ftol_rel" %in% names(control)) {
 			control$rel.tol = control$ftol_rel
-			control$ftol_rel = NULL 
+			control$ftol_rel = NULL
 		}
 		if ("maxeval" %in% names(control)) {
 			control$eval.max = control$maxeval
-			control$maxeval = NULL 
+			control$maxeval = NULL
 		}
 
 		fit = nlminb(as.vector(inits), obj, control=control)
@@ -330,12 +336,12 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 		yo = data[, x["dv"]]
 		nobs <<- nobs + length(yo)
 	})
-	
+
 	if (!is.null(fit$objective)) fit$value = fit$objective
 
 	res = c(list(res=res, obj=obj, npar=length(fit$par), nobs=nobs, data=data), fit)
 	class(res) = "dyn.ID"
-	
+
 	res
 }
 
@@ -344,10 +350,10 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
 {
 	if (is.null(rho)) rho = environment(fr)
-	.Call("slice_wrap", fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
+	.Call(slice_wrap, fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
 }
 
-genobj = function(system, model, evTable, inits, data, fixPars=NULL, 
+genobj = function(system, model, evTable, inits, data, fixPars=NULL,
 	squared=T)
 {
 	if (class(model)=="formula") {
@@ -371,7 +377,7 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL,
 
 		s = c(s[2:3], err.type)
 		names(s) = c("dv", "pred", "err")
-		s	
+		s
 	})
 	names(inits.err) = paste0("err", 1:length(inits.err))
 	inits = c(inits, inits.err)
@@ -405,8 +411,8 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL,
 
 	if (squared) inits = sqrt(inits)
 	s.save = NULL
-	
-	obj = function(th, do.ode.solving=T, negation=F) 
+
+	obj = function(th, do.ode.solving=T, negation=F)
 	{
 		#squared = get("squared", envir=sys.parent(n = 1))
 		if (squared) th = th^2
@@ -434,7 +440,7 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL,
 				sig
 			}
 			#print(sig)
-			
+
 			yp = s[rows,x["pred"]]
 			sgy = thresh(sig[1]+yp*sig[2])
 			yo = data[, x["dv"]]
@@ -462,7 +468,7 @@ do.slice = function(pars, fr0)
 		fr = function(x) {
 			pars.cp[wh] = x
 			fr0(pars.cp, do.ode.solving=do.ode.solving, negation=T)
-		}	
+		}
 		pars.cp[wh] = uni_slice(x0, fr, lower=0)
 		assign("pars", pars.cp, rho)
 		NULL
@@ -475,7 +481,7 @@ do.slice = function(pars, fr0)
 #' Fit a non-population dynamic model using mcmc
 #'
 #' Fit a non-population dynamic model using mcmc
-#' 
+#'
 #' @param system an RxODE object
 #' @param model a list of statistical meaurement models
 #' @param evTable an Event Table object
@@ -489,25 +495,25 @@ do.slice = function(pars, fr0)
 #' @return NULL
 #' @examples
 #' \dontrun{
-#' 
+#'
 #' ode <- "
 #'    dose=200;
 #'    pi = 3.1415926535897931;
-#' 
+#'
 #'    if (t<=0) {
 #'       fI = 0;
 #'    } else {
 #'       fI = F*dose*sqrt(MIT/(2.0*pi*CVI2*t^3))*exp(-(t-MIT)^2/(2.0*CVI2*MIT*t));
 #'    }
-#' 
+#'
 #'    C2 = centr/V2;
 #'    C3 = peri/V3;
 #'    d/dt(centr) = fI - CL*C2 - Q*C2 + Q*C3;
 #'    d/dt(peri)  =              Q*C2 - Q*C3;
 #' "
 #' sys1 <- RxODE(model = ode)
-#' 
-#' 
+#'
+#'
 #' ## ------------------------------------------------------------------------
 #' dat <- read.table("invgaussian.txt", header=TRUE)
 #' mod <- cp ~ C2 + prop(.1)
@@ -516,25 +522,26 @@ do.slice = function(pars, fr0)
 #' ev <- eventTable()
 #' ev$add.sampling(c(0, dat$time))
 #' (fit <- dynmodel.mcmc(sys1, mod, ev, inits, dat, fixPars))
-#' 
+#'
 #' }
-dynmodel.mcmc = function(system, model, evTable, inits, data, 
+#' @export
+dynmodel.mcmc = function(system, model, evTable, inits, data,
 	fixPars=NULL, nsim = 500, squared=T, seed=NULL)
 {
 	calls = match.call()
-	
+
 	l = genobj(system, model, evTable, inits, data, fixPars, squared)
 	rho = environment()
 	pars = l$inits
 	fr0 = l$obj
-	
+
 	if (is.null(seed)) seed=99
 	set.seed(seed)
 	s = t(sapply(1:nsim, function(k,rho) {
 		pars = do.slice(get("pars", rho), fr0)
 		assign("pars", pars, rho)
 	}, rho=rho))
-	
+
 	if (squared) s = s*s
 	attr(s, "calls") <- calls
 	attr(s, "obj") <- fr0
@@ -545,10 +552,11 @@ dynmodel.mcmc = function(system, model, evTable, inits, data,
 #' Summary of a non-population dynamic model fit using mcmc
 #'
 #' Summary of a non-population dynamic model fit using mcmc
-#' 
+#'
 #' @param object a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 summary.dyn.mcmc = function(object, ...)
 {
 	s <- t(apply(object, 2, function(x) c(mean(x), sd(x), sd(x)/mean(x)*100)))
@@ -560,10 +568,11 @@ summary.dyn.mcmc = function(object, ...)
 #' Summary of a non-population dynamic model fit using mcmc
 #'
 #' Summary of a non-population dynamic model fit using mcmc
-#' 
+#'
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 print.dyn.mcmc = function(x, ...)
 {
 	s <- t(apply(x, 2, function(x) c(mean(x), sd(x), sd(x)/mean(x)*100)))
@@ -575,13 +584,109 @@ print.dyn.mcmc = function(x, ...)
 #' Plot of a non-population dynamic model fit using mcmc
 #'
 #' Plot of a non-population dynamic model fit using mcmc
-#' 
+#'
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
+#' @export
 plot.dyn.mcmc = function(x, ...)
 {
 	fit = list(obj=attr(x, "obj"), par=apply(x, 2, mean))
 	gof(fit)
 }
 
+
+
+## Utilities for building nlmixr
+
+refresh <- function(){
+    ## nocov start
+    source(devtools::package_file("build/refresh.R"))
+    ## nocov end
+}
+##' Collect warnings and just warn once.
+##'
+##' @param expr R expression
+##' @return The value of the expression
+##' @author Matthew L. Fidler
+collectWarnings <- function(expr){
+    ws <- c();
+    ret <- suppressWarnings(withCallingHandlers(expr,warning=function(w){ws <<- unique(c(w$message, ws))}))
+    for (w in ws){
+        warning(w)
+    }
+    return(ret);
+}
+
+##' n1qn1 optimization
+##'
+##' This is an R port of the n1qn1 optimization procedure in scilab.
+##'
+##' @param call_eval Objective function
+##' @param call_grad Gradient Function
+##' @param vars Initial starting point for line search
+##' @param environment Environment where call_eval/call_grad are
+##'     evaluated.
+##' @param ... Ignored additional parameters.
+##' @param epsilon Precision of estimate
+##' @param max_iterations Number of iterations
+##' @param nsim Number of function evaluations
+##' @param imp Verbosity of messages.
+##' @param invisible boolean to control if the output of the minimizer
+##'     is suppressed.
+##' @param zm Prior Hessian (in compressed format)
+##' @param restart Is this an estimation restart?
+##' @param assign Assign hessian to c.hess in environment environment?
+##'     (Default FALSE)
+##' @param print.functions Boolean to control if the function value
+##'     and parameter estimates are echoed every time a function is
+##'     called.
+##' @return The return value is a list with the following elements:
+##'     \itemize{ \item \code{value} The value at the minimized
+##'     function \item \code{par} The parameter value that minimized
+##'     the function.  \item \code{H} The estimated Hessian at the
+##'     final parameter estimate \item \code{c.hess} Compressed
+##'     Hessian for saving curvature.  }
+##' @author C. Lemarechal, Stephen L. Campbell, Jean-Philippe
+##'     Chancelier, Ramine Nikoukhah, Wenping Wang & Matthew L. Fidler
+##' @export
+n1qn1 <- function(call_eval, call_grad, vars, environment=parent.frame(1), ...,
+                  epsilon=.Machine$double.eps, max_iterations=100, nsim=100,
+                  imp=0,
+                  invisible=NULL,
+                  zm=NULL, restart=FALSE,
+                  assign=FALSE,
+                  print.functions=FALSE){
+    if (!is.null(invisible)){
+        if (invisible == 1){
+            imp <- 0;
+            print.functions <- FALSE
+        } else {
+            print.functions <- TRUE
+        }
+    }
+    if (!missing(max_iterations) && missing(nsim)){
+        nsim <- max_iterations * 10;
+    }
+    n <- as.integer(length(vars));
+    imp <- as.integer(imp);
+    max_iterations <- as.integer(max_iterations)
+    nsim <- as.integer(nsim)
+    nzm <- as.integer(n * (n + 13) / 2);
+    nsim <- as.integer(nsim);
+    epsilon <- as.double(epsilon)
+    if (is.null(zm)){
+        mode <- 1L
+        zm <- double(nzm);
+    } else {
+        mode <- 2L
+        if (restart) model <- 3L
+        if (length(zm) != nzm){
+            stop(sprintf("Compressed Hessian not the right length for this problem.  It should be %d.", nzm))
+        }
+    }
+    ret <- .Call(n1qn1_wrap, call_eval, call_grad, environment,
+                 vars, epsilon, n, mode, max_iterations, nsim, imp, nzm, zm, as.integer(print.functions));
+    if (assign) environment$c.hess <- ret$hess;
+    return(ret)
+}

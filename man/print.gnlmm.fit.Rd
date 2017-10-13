@@ -7,11 +7,10 @@
 \method{print}{gnlmm.fit}(x, ...)
 }
 \arguments{
-\item{x}{a dynmodel fit object}
+\item{x}{a gnlmm fit object}
 
 \item{...}{additional arguments}
 }
 \description{
 Print a generalized non-linear mixed effect model fit
 }
-

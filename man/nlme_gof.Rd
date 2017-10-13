@@ -14,4 +14,3 @@ nlme_gof(fit, ...)
 \description{
 Generates basic goodness-of-fit plots for nlme-based mixed-effect models
 }
-

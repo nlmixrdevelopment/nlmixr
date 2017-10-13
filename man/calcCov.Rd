@@ -24,4 +24,3 @@ Calculate variance-covariance matrix of fixed effects after a gnlmm() fit
 calcCov(fit)
 }
 }
-

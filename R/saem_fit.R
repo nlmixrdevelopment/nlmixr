@@ -17,8 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
 
-utils::globalVariables(c("dopred"))
-
 saem_ode_str = '#include <RcppArmadillo.h>
 #include "saem_class_rcpp.hpp"
 
@@ -104,10 +102,10 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
     int stiff=as<int>(opt["stiff"]);
     int transit_abs=as<int>(opt["transit_abs"]);
     int nlhs=as<int>(opt["nlhs"]);
-    double atol=as<double>(opt["atol"]); 
+    double atol=as<double>(opt["atol"]);
     double rtol=as<double>(opt["rtol"]);
     int rc=0;
-    
+
     mat ret(neq, ntime);
     mat lhs(nlhs, ntime);
 	<%=ode_solver%>(&neq, params.memptr(), time__.memptr(),
@@ -115,13 +113,13 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
 	    &atol, &rtol, &stiff, &transit_abs, &nlhs, lhs.memptr(), &rc);
 	ret = join_cols(join_cols(time__.t(), ret), lhs).t();
 	ret = ret.rows( find(evid == 0) );
-	
+
 <%=model_vars_decl%>
-	
+
 vec g;
 g = <%=pred_expr%>;
 
-    int no = g.n_elem;	
+    int no = g.n_elem;
     memcpy(p, g.memptr(), no*sizeof(double));
     p += no;
   }
@@ -147,7 +145,7 @@ BEGIN_RCPP
 
   SAEM saem;
   saem.inits(x);
-  
+
   if(x.containsElementNamed("Rfn")) {
     ff = as<Function>(x["Rfn"]);
     saem.set_fn(Ruser_function);
@@ -156,13 +154,15 @@ BEGIN_RCPP
   }
 
   saem.saem_fit();
-  
+
   List out = List::create(
     Named("mpost_phi") = saem.get_mpost_phi(),
     Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),
     Named("Plambda") = saem.get_Plambda(),
     Named("Ha") = saem.get_Ha(),
-    Named("sig2") = saem.get_sig2()
+    Named("sig2") = saem.get_sig2(),
+    Named("eta") = saem.get_eta(),
+    Named("par_hist") = saem.get_par_hist()
   );
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";
@@ -173,6 +173,7 @@ END_RCPP
 
 
 saem_cmt_str = '#include <RcppArmadillo.h>
+#include <R_ext/Rdynload.h>
 #include <Eigen/Dense>
 #include "saem_class_rcpp.hpp"
 #include "lin_cmt.hpp"
@@ -247,7 +248,7 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
     int no=obs_time.size();
     VectorXd g(obs_time.size());
     int ncmt=<%=ncmt%>, oral=<%=oral%>, infusion=<%=infusion%>, parameterization=<%=parameterization%>;
-    
+
 	g = generic_cmt_interface(
       obs_time,
       dose_time,
@@ -257,7 +258,7 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
       ncmt,
       oral,
       infusion,
-      parameterization);    
+      parameterization);
 
     memcpy(p, g.data(), no*sizeof(double));
     p += no;
@@ -283,7 +284,7 @@ BEGIN_RCPP
   List x(xSEXP);
   SAEM saem;
   saem.inits(x);
-  
+
   if(x.containsElementNamed("Rfn")) {
     ff = as<Function>(x["Rfn"]);
     saem.set_fn(Ruser_function);
@@ -298,7 +299,9 @@ BEGIN_RCPP
     Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),
     Named("Plambda") = saem.get_Plambda(),
     Named("Ha") = saem.get_Ha(),
-    Named("sig2") = saem.get_sig2()
+    Named("sig2") = saem.get_sig2(),
+    Named("eta") = saem.get_eta(),
+    Named("par_hist") = saem.get_par_hist()
   );
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";
@@ -307,28 +310,47 @@ END_RCPP
 }
 '
 
+
+##' Get a list of directories for inclusion
+##'
+##' @param pkg a string or list of string for packages to be included.
+##' @return An inclusion string for Makevars
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+nmxInclude <- function(pkg="nlmixr"){
+    if  (length(pkg) == 1){
+        x <- system.file("", package = pkg)
+        if(.Platform$OS.type=="windows") x <- gsub("\\\\", "/", utils::shortPathName(x))
+        x <- paste0("-I", x, "/include");
+        return(x);
+    } else {
+        paste(sapply(pkg, nmxInclude), collapse=" ");
+    }
+}
+
 #' Generate an SAEM model
 #'
 #' Generate an SAEM model using either closed-form solutions or ODE-based model definitions
-#' 
+#'
 #' @param model a compiled SAEM model by gen_saem_user_fn()
 #' @param PKpars PKpars function
 #' @param pred  pred function
 #' @details
-#'    Fit a generalized nonlinear mixed-effect model using the Stochastic 
+#'    Fit a generalized nonlinear mixed-effect model using the Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
-#' 
+#'
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
-#' #ode <- "d/dt(depot) =-KA*depot; 
-#' #        d/dt(centr) = KA*depot - KE*centr;" 
+#' #ode <- "d/dt(depot) =-KA*depot;
+#' #        d/dt(centr) = KA*depot - KE*centr;"
 #' #m1 = RxODE(ode, modName="m1")
-#' #ode <- "C2 = centr/V; 
-#' #      d/dt(depot) =-KA*depot; 
-#' #      d/dt(centr) = KA*depot - KE*centr;" 
+#' #ode <- "C2 = centr/V;
+#' #      d/dt(depot) =-KA*depot;
+#' #      d/dt(centr) = KA*depot - KE*centr;"
 #' #m2 = RxODE(ode, modName="m2")
-#' 
+#'
 #' PKpars = function()
 #' {
 #'   CL = exp(lCL)
@@ -339,19 +361,19 @@ END_RCPP
 #' }
 #' PRED = function() centr / V
 #' PRED2 = function() C2
-#' 
+#'
 #' saem_fit <- gen_saem_user_fn(model=lincmt(ncmt=1, oral=T))
 #' #saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
 #' #saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
-#' 
-#' 
+#'
+#'
 #' #--- saem cfg
 #' nmdat = read.table("theo_sd.dat",  head=T)
 #' model = list(saem_mod=saem_fit, covars="WT")
 #' inits = list(theta=c(.05, .5, 2))
 #' cfg   = configsaem(model, nmdat, inits)
 #' cfg$print = 50
-#' 
+#'
 #' #cfg$Rfn = nlmixr:::Ruser_function_cmt
 #' #dyn.load("m1.d/m1.so");cfg$Rfn = nlmixr:::Ruser_function_ode
 #' fit = saem_fit(cfg)
@@ -359,14 +381,24 @@ END_RCPP
 #' xyplot(DV~TIME|ID, df, type=c("p","l"), lwd=c(NA,1), pch=c(1,NA), groups=grp)
 #' fit
 #' }
+#' @export
 gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL) {
   is.ode = class(model) == "RxODE"
   is.win <- .Platform$OS.type=="windows"
   env = environment()
-  
+  saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
+  saem.base <- saem.cpp
+  saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
+  saem.cpp <- paste0(saem.cpp, ".cpp");
+  lwd <- getwd();
+  .wd <- tempfile()
+  dir.create(.wd, recursive = TRUE)
+  setwd(.wd)
+  on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
+
   if (is.ode) {
     modelVars = model$cmpMgr$get.modelVars()
-    
+
     pars = modelVars$params
     npar = length(pars)
     pars = paste(c(
@@ -379,9 +411,9 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 		sprintf("vec %s;\n%s=ret.col(%d);\n", model_vars[k], model_vars[k], k-1)
 	})
 	model_vars_decl = paste0(s, collapse="")
-	
+
 	ode_solver = model$cmpMgr$ode_solver
-	
+
 	neq = length(modelVars$state)
 	nlhs = length(modelVars$lhs)
 
@@ -394,7 +426,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 	list2env(attr(pars, "calls"), envir=env)
   }
   #str(ls(envir=env))
-	
+
   ### deal with explicit initCondition statement
   x = deparse(body(PKpars))
   ix = grep(reINITS, x, perl=T)
@@ -405,40 +437,69 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 	inits = ""
   }
 ##print(inits);print(x)
-  
-  
+
+
   len = length(x)
   cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
   nrhs = integer(1)
+  RxODE::rxReq("dparser");
   x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE))
   nrhs = x[[3]]
   foo = paste(readLines("foo__.txt"), collapse="\n")
-  brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output="saem_main.cpp")
+  nm = system.file("", package = "nlmixr");
+  brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
   unlink(c("eqn__.txt", "foo__.txt"))
-  
-  #gen Markevars
-  x = system.file("", package = "nlmixr")
-  if(is.win) x = gsub("\\\\", "/", shortPathName(x))  
-  x = sub("/nlmixr", "", x)
+
+  ##gen Markevars
+  ## if(is.win) x = gsub("\\\\", "/", utils::shortPathName(x))
+  ## x = sub("/nlmixr", "", x)
   .lib=  if(is.ode) model$cmpMgr$dllfile else ""
-  
-  make_str = 'PKG_CXXFLAGS=-I%s/nlmixr/include -I%s/StanHeaders/include/ -I%s/Rcpp/include -I%s/RcppArmadillo/include -I%s/RcppEigen/include -I%s/BH/include\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)\n'
-  make_str = sprintf(make_str, x, x, x, x, x, x, .lib)
+
+  make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)\n'
+  make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), .lib)
   cat(make_str, file="Makevars")
-  shlib = 'R CMD SHLIB saem_main.cpp %s/nlmixr/include/neldermead.cpp -o saem_main.dll'
-  shlib = sprintf(shlib, x)
+
+  shlib = sprintf('R CMD SHLIB %s -o %s', saem.cpp, saem.dll)
+  ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
   system(shlib)
-  
+  file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
+  file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
+  setwd(lwd);
+  saem.dll <- file.path(lwd, saem.dll);
+
   if(is.ode) dyn.load(model$cmpMgr$dllfile)
-  `.DLL` <- dyn.load('saem_main.dll')
-  assign("dopred", sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred'), .GlobalEnv)
-  fn = sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
+  `.DLL` <- dyn.load(saem.dll);
+  fn.pred <- sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred')
+  fn1 <- sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
+  fn <- eval(bquote(function(a, b, c){
+      if (missing(b) && missing(c)){
+          cur.fn <- .(fn1)
+          ret <- cur.fn(a)
+          attr(ret, "dopred") <- .(fn.pred);
+          return(ret);
+      } else {
+          cur.fn <- .(fn.pred)
+          return(cur.fn(a, b, c));
+      }
+  }))
   attr(fn, "form") = if (is.ode) "ode" else "cls"
   attr(fn, "neq") = neq
   attr(fn, "nlhs") = nlhs
   attr(fn, "nrhs") = nrhs
+  attr(fn, "saem.dll") = saem.dll
+  reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
+}
 
+##' Cleanup saem_fit environment by removing dll after the object is no logner used by R.
+##'
+##' @param env Environment where cleanup needs to occur.
+##' @author Matthew L. Fidler
+##' @export
+saem.cleanup <- function(env){
+    try({dyn.unload(env$saem.dll)}, silent=TRUE);
+    unlink(env$saem.dll);
+    unlink(env$saem.cpp);
 }
 
 parfn.list = c(
@@ -465,13 +526,15 @@ parfn.list = c(
 #' Parameters for a linear compartment model for SAEM
 #'
 #' Parameters for a linear compartment model using closed-form solutions and the SAEM algorithm.
-#' 
+#'
 #' @param ncmt number of compartments
 #' @param oral logical, whether oral absorption is true
 #' @param tlag logical, whether lag time is present
 #' @param infusion logical, whether infusion is true
 #' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
 #' @return parameters for a linear compartment model
+#' @author Wenping Wang
+#' @export
 lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #ncmt=1; oral=T; tlag=F; parameterization=1
 	#print(as.list(match.call()))
@@ -479,7 +542,7 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 		oral = F
 		tlag = F
 	}
-	
+
 	#master par list
 	pm = list(
 		c("CL", "V", "KA", "TLAG"),
@@ -507,63 +570,87 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' Plot an SAEM model fit
 #'
 #' Plot an SAEM model fit
-#' 
+#'
 #' @param x a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 plot.saemFit = function(x, ...)
 {
-	fit = x ##Rcheck hack
-	saem.cfg = attr(fit, "saem.cfg")
-	dat = as.data.frame(saem.cfg$evt)
-	dat = cbind(dat[dat$EVID==0,], DV=saem.cfg$y)	
-	df = rbind(
-		cbind(dat, grp=1),
-		cbind(dat, grp=2)
-	)
-	yp = dopred(fit$mpost_phi, saem.cfg$evt, saem.cfg$opt)
-	df$DV[df$grp==2] = yp
+    fit = x
+    saem.cfg = attr(fit, "saem.cfg")
+    dat = as.data.frame(saem.cfg$evt)
+    dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
 
-	#require(lattice)
-	p = xyplot(DV~TIME|ID, df, type=c("p", "l"), 
-		lwd=c(NA,1), pch = c(1, NA), groups=grp)
-	print(p)
-	plot(yp, dat$DV); abline(0, 1, col="red")
-	plot(yp, dat$DV-yp); abline(0, 0, col="red")
-	
-	df
+    df = rbind(cbind(dat, grp = 1), cbind(dat, grp = 2))
+    dopred <- attr(x, "dopred");
+    yp = dopred(fit$mpost_phi, saem.cfg$evt, saem.cfg$opt)
+    df$DV[df$grp == 2] = yp
+
+    p4 = ggplot(subset(df, grp==1), aes(TIME, DV)) +
+        geom_point() +
+        facet_wrap(~ID) +
+        geom_line(aes(TIME, DV), subset(df, grp==2), col='red')
+
+    df = cbind(dat, IPRED=yp)
+    df$IRES = df$DV - df$IPRED
+
+    p2 = ggplot(df, aes(IPRED, DV)) +
+        geom_point() +
+        geom_abline(intercept = 0, slope=1, col='red')
+
+    p3 = ggplot(df, aes(IPRED, IRES)) +
+        geom_point() +
+        geom_abline(intercept = 0, slope=0, col='red')
+
+    m = x$par_hist
+    df = data.frame(
+      val=as.vector(m),
+      par=rep(1:ncol(m), each=nrow(m)),
+      iter=rep(1:nrow(m), ncol(m))
+    )
+
+    p1 = ggplot2::ggplot(df, aes(iter, val)) +
+        ggplot2::geom_line() +
+        ggplot2::facet_wrap(~par, scales = "free_y")
+
+    print(p1)
+    print(p2)
+    print(p3)
+    print(p4)
 }
 
 
 #' Configure an SAEM model
 #'
 #' Configure an SAEM model by generating an input list to the SAEM model function
-#' 
+#'
 #' @param model a compiled saem model by gen_saem_user_fn()
-#' @param data input data 
-#' @param inits initial values 
+#' @param data input data
+#' @param inits initial values
 #' @param mcmc a list of various mcmc options
 #' @param ODEopt optional ODE solving options
 #' @param seed seed for random number generator
+#' @param distribution one of c("normal","poisson","binomial")
 #' @details
-#'    Fit a generalized nonlinear mixed-effect model by he Stochastic 
+#'    Fit a generalized nonlinear mixed-effect model by he Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
-#' 
+#'
 #' @author Wenping Wang
 #' @examples
 #' \dontrun{
 #' library(nlmixr)
-#' 
-#' #ode <- "d/dt(depot) =-KA*depot; 
-#' #        d/dt(centr) = KA*depot - KE*centr;" 
+#'
+#' #ode <- "d/dt(depot) =-KA*depot;
+#' #        d/dt(centr) = KA*depot - KE*centr;"
 #' #m1 = RxODE(ode, modName="m1")
-#' #ode <- "C2 = centr/V; 
-#' #      d/dt(depot) =-KA*depot; 
-#' #      d/dt(centr) = KA*depot - KE*centr;" 
+#' #ode <- "C2 = centr/V;
+#' #      d/dt(depot) =-KA*depot;
+#' #      d/dt(centr) = KA*depot - KE*centr;"
 #' #m2 = RxODE(ode, modName="m2")
-#' 
+#'
 #' #Note: only use the '=' assignment, not the '<-' at this point
-#' 
+#'
 #' PKpars = function()
 #' {
 #'   CL = exp(lCL)
@@ -574,19 +661,19 @@ plot.saemFit = function(x, ...)
 #' }
 #' PRED = function() centr / V
 #' PRED2 = function() C2
-#' 
+#'
 #' saem_fit <- gen_saem_user_fn(model=lincmt(ncmt=1, oral=T))
 #' #saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
 #' #saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
-#' 
-#' 
+#'
+#'
 #' #--- saem cfg
 #' nmdat = read.table("theo_sd.dat",  head=T)
 #' model = list(saem_mod=saem_fit, covars="WT")
 #' inits = list(theta=c(.05, .5, 2))
 #' cfg   = configsaem(model, nmdat, inits)
 #' cfg$print = 50
-#' 
+#'
 #' #cfg$Rfn = nlmixr:::Ruser_function_cmt
 #' #dyn.load("m1.d/m1.so");cfg$Rfn = nlmixr:::Ruser_function_ode
 #' fit = saem_fit(cfg)
@@ -594,16 +681,20 @@ plot.saemFit = function(x, ...)
 #' xyplot(DV~TIME|ID, df, type=c("p","l"), lwd=c(NA,1), pch=c(1,NA), groups=grp)
 #' fit
 #' }
-configsaem = function(model, data, inits, 
-	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)), 
+#' @export
+configsaem = function(model, data, inits,
+	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
 	ODEopt = list(atol=1e-8, rtol=1e-6, stiff=1, transit_abs=0),
+	distribution=c("normal","poisson","binomial"),
 	seed=99)
-#data =  saem.data; mcmc = saem.mcmc; model = saem.model; inits = saem.inits
+                                        #data =  saem.data; mcmc = saem.mcmc; model = saem.model; inits = saem.inits
 {
   set.seed(seed)
+  distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
+  distribution = match.arg(distribution)
   data = list(nmdat=data)
 
-  neq  = attr(model$saem_mod, "neq") 
+  neq  = attr(model$saem_mod, "neq")
   nlhs = attr(model$saem_mod, "nlhs")
   opt = optM = c(list(neq=neq, nlhs=nlhs, inits=numeric(neq)), ODEopt)
   model$N.eta = attr(model$saem_mod, "nrhs")
@@ -616,28 +707,33 @@ configsaem = function(model, data, inits,
   if (is.null(inits$bres)) inits$bres = 1
   if (is.null(mcmc$print)) mcmc$print=1
   inits$theta = matrix(inits$theta, byrow=T, ncol=model$N.eta)
-  model$cov.mod=1-is.na(inits$theta) 
+  model$cov.mod=1-is.na(inits$theta)
   data$N.covar=nrow(inits$theta)-1
-  inits$theta[is.na(inits$theta)]=0 
-  
+  inits$theta[is.na(inits$theta)]=0
+
+
   ###  FIXME
-  mcmc$stepsize=0:1; 
+  mcmc$stepsize=0:1;
   mcmc$burn.in=300
-  
-  ###  FIXME: chk vars in input
-  ###  FIXME: chk covars as char vec 
+
+  ###  FIXME: chk covars as char vec
+  wh = setdiff(model$covars, names(data$nmdat))
+  if (length(wh)) {
+  	msg = paste0("covariate(s) not found: ", paste(wh, collapse=", "))
+  	stop(msg)
+  }
   s = subset(data$nmdat, EVID==0)
   data$data = as.matrix(s[,c("ID", "TIME", "DV", model$covars)])
-  
+
   nphi = model$N.eta
   mcov = model$cov.mod
   covstruct = model$omega
-  
+
   check = sum((covstruct-t(covstruct)) != 0)
   if (check) stop("illegal covstruct")
   check = nphi-dim(covstruct)[1]
   if (check) stop("nphi and covstruct dim mismatch")
-  
+
   check = prod(mcov[1,])
   if (check==0) stop("structural par(s) absent")
   check = nphi-dim(mcov)[2]
@@ -646,24 +742,24 @@ configsaem = function(model, data, inits,
   if (check) stop("initial theta's and mcov dim mismatch")
   check = data$N.covar+1 - dim(mcov)[1]
   if (check) stop("dim mcov and N.covar mismatch")
-  
+
   check = length(model$log.eta)-nphi
   if (check) stop("jlog length and nphi mismatch")
-  
+
   check = length(inits$omega)-nphi
   if (check) stop("length of omega inits and nphi mismatch")
-  
+
   #check = mcmc$burn.in>sum(mcmc$niter)
   #if (check) stop("#burn-in exceeds niter")
-  
+
   check = prod(is.element(covstruct, c(0,1)))
   if (check==0) warning("non-zero value(s) in covstruct set to 1")
   covstruct[covstruct!=0] = 1
-  
+
   check = prod(is.element(mcov, c(0,1)))
   if (check==0) warning("non-zero value(s) in mcov set to 1")
   mcov[mcov!=0] = 1
-  
+
   check = sum(inits$theta[1, model$log.eta] <= 0)
   if (check) stop("illegal initial theta's")
   check = sum(inits$omega<=0)
@@ -672,13 +768,13 @@ configsaem = function(model, data, inits,
   #if (check) stop("illegal initial sigma2")
   check = sum(diag(covstruct)==1)
   if (!check) stop("0 ETA's")
-  
-  
+
+
   y = data$data[,"DV"]
   id = data$data[,"ID"]
   ntotal = length(id)
   N = length(unique(id))
-  covariables = tapply(data$data[,model$covars], id, unique)
+  covariables = if(is.null(model$covars)) NULL else tapply(data$data[, model$covars], id, unique)
   nb_measures = table(id)
   ncov = data$N.covar + 1
   nmc = mcmc$nmc
@@ -702,8 +798,8 @@ configsaem = function(model, data, inits,
   evt$ID = evt$ID -1
   evtM = evt[rep(1:dim(evt)[1], nmc),]
   evtM$ID = cumsum(c(FALSE, diff(evtM$ID) != 0))
-  
-  
+
+
   i1 = grep(1, diag(covstruct))
   i0 = grep(0, diag(covstruct))
   nphi1 = sum(diag(covstruct))
@@ -715,30 +811,30 @@ configsaem = function(model, data, inits,
   nd1 =nphi1+nlambda1+1;
   nd2 =nphi1+nlambda1+nlambda0;
   nb_param = nd2+1
-  Mcovariables = cbind(1, covariables)[,1:nrow(mcov)]
+  Mcovariables = cbind(rep(1, N), covariables)[,1:nrow(mcov)]
   dim(Mcovariables) = c(length(Mcovariables)/nrow(mcov), nrow(mcov))	#FIXME
-  
+
   jlog1 = grep(T, model$log.eta)
   jcov = grep(T, apply(mcov, 1, sum)>0)
   covstruct1=covstruct[i1,i1]; dim(covstruct1) = c(nphi1, nphi1)
   ind_cov = grep(1, mcov[mcov>0])
-  
+
   mcov1 = matrix(mcov[, i1], ncol=length(i1))
   mcov0 = matrix(mcov[, i0], nrow=nrow(mcov), ncol=length(i0))
   ind_cov1 = grep(1, mcov1[mcov1>0]) - 1
   ind_cov0 = grep(1, mcov0[mcov0>0]) - 1
-  
+
   pc=apply(mcov,2,sum)
   ipc= cumsum(c(0, pc[1:(nphi-1)]))+1
   ipcl1=ipc[jlog1]
   for (x in jlog1) inits$theta[1,x] = log(inits$theta[1,x])
-  
-  
+
+
   idx = as.vector(mcov1>0)
   COV1 = Mcovariables[, row(mcov1)[idx]]
   dim(COV1) = c(N, sum(idx))
   COV21 = crossprod(COV1)
-  
+
   x = mcov1 * col(mcov1)
   x = sapply(x[idx], function(x)
   {
@@ -750,18 +846,18 @@ configsaem = function(model, data, inits,
   LCOV1 = t(x)
   dim(LCOV1) = c(nlambda1, nphi1)
   pc1 = apply(LCOV1, 2, sum)
-  
+
   x1 = diag(sum(idx))
   diag(x1) = inits$theta[,i1][idx]
   MCOV1 = x1 %*% LCOV1
   jcov1 = grep(1,LCOV1) - 1
-  
-  
+
+
   idx = as.vector(mcov0>0)
   COV0 = Mcovariables[, row(mcov0)[idx]]
   dim(COV0) = c(N, sum(idx))
   COV20 = crossprod(COV0)
-  
+
   x = mcov0 * col(mcov0)
   x = sapply(x[idx], function(x)
   {
@@ -772,35 +868,35 @@ configsaem = function(model, data, inits,
   )
   LCOV0 = t(x)
   dim(LCOV0) = c(nlambda0, nphi0)
-  
+
   x1 = diag(sum(idx))
   diag(x1) = inits$theta[,i0][idx]
   if (dim(x1)[1]>0) {MCOV0 = x1 %*% LCOV0} else {MCOV0 = matrix(x1, nrow=0, ncol=dim(LCOV0)[2])}
   jcov0 = grep(1,LCOV0) - 1
-  
+
   mprior_phi1 = Mcovariables %*% inits$theta[,i1]
   mprior_phi0 = Mcovariables %*% inits$theta[,i0]
-  
+
   Gamma2_phi1=diag(nphi1); diag(Gamma2_phi1) = inits$omega[i1]
   Gamma2_phi0=diag(nphi0); diag(Gamma2_phi0) = inits$omega[i0]
-  
+
   phiM = matrix(0, N, nphi)
   phiM[,i1] = mprior_phi1
   phiM[,i0] = mprior_phi0
   phiM = phiM[rep(1:N, nmc),]
   phiM = phiM + matrix(rnorm(phiM), dim(phiM)) %*% diag(sqrt(inits$omega))
-  
+
   mc.idx = rep(1:N, nmc)
   statphi = sapply(1:nphi, function(x) tapply(phiM[,x], mc.idx, mean))
   statphi11 = statphi[,i1]; dim(statphi11) = c(N, length(i1))
   statphi01 = statphi[,i0]; dim(statphi01) = c(N, length(i0))
   statphi12 = crossprod(phiM[,i1])
   statphi02 = crossprod(phiM[,i0])
-  
+
   #x = mcov *cumsum(mcov)
   #x1 = cbind(x[,i1], x[,i0])
   #indiphi = order(x1[x1>0])	#FINDME
-  
+
   niter = sum(mcmc$niter)
   niter_phi0 = niter*.5
   nb_sa = mcmc$niter[1]*.75
@@ -809,7 +905,7 @@ configsaem = function(model, data, inits,
   vna=mcmc$niter;
   na=length(va);
   pas=1/(1:vna[1])^va[1] ;
-  for (ia in 2:na) 
+  for (ia in 2:na)
   {
   	end=length(pas);
   	k1=pas[end]^(-1/va[ia]);
@@ -817,10 +913,10 @@ configsaem = function(model, data, inits,
   }
   pash=c(rep(1,mcmc$burn.in), 1/(1:niter));
   minv = rep(1e-20, nphi)
-  
+
   i1 = i1 - 1
   i0 = i0 - 1
-  
+
   cfg=list(
     nu=mcmc$nu,
     niter=niter,
@@ -834,7 +930,7 @@ configsaem = function(model, data, inits,
     pas=pas,
     pash=pash,
     minv=minv,
-    
+
     N=N,
     ntotal=ntotal,
     y=y,
@@ -844,11 +940,11 @@ configsaem = function(model, data, inits,
     evtM=as.matrix(evtM),
     mlen=mlen,
     indioM=indioM,
-    
+
     pc1=pc1,
     covstruct1=covstruct1,
     Mcovariables=Mcovariables,
-    
+
     i1=i1,
     i0=i0,
     nphi1=nphi1,
@@ -880,7 +976,9 @@ configsaem = function(model, data, inits,
     bres=inits$bres,
     opt=opt,
     optM=optM,
-    print=mcmc$print
+    print=mcmc$print,
+    distribution=distribution.idx[distribution],
+    par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2))
   )
 }
 
@@ -896,7 +994,7 @@ getInits = function(x, re, collapse=TRUE) {
 	len = attr(m,"capture.length")
 	inits = substring(x, start, start+len-1)
 	s = strsplit(inits, ",")[[1]]
-	
+
 	if (collapse)
 		paste0(sprintf("\tinits[%d] = %s;", 1:length(s)-1, s), collapse="\n")
 	else s
@@ -905,73 +1003,355 @@ getInits = function(x, re, collapse=TRUE) {
 #' Print an SAEM model fit summary
 #'
 #' Print an SAEM model fit summary
-#' 
+#'
 #' @param object a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 summary.saemFit = function(object, ...)
 {
 	fit = object ##Rcheck hack
-	
+
 	th = fit$Plambda
 	nth = length(th)
 	H = solve(fit$Ha[1:nth,1:nth])
 	se = sqrt(diag(H))
-	
+
 	m =  cbind(exp(th), th, se)	#FIXME
-	lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
-	if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
+	## lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
+	## if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
 	dimnames(m)[[2]] = c("th", "log(th)", "se(log_th)")
 	cat("THETA:\n")
 	print(m)
 	cat("\nOMEGA:\n")
 	print(fit$Gamma2_phi1)
 	if (any(fit$sig2==0)) {
-		cat("\nSIGMA:\n") 
+		cat("\nSIGMA:\n")
 		print(max(fit$sig2^2))
 	} else {
 		cat("\nARES & BRES:\n")
 		print(fit$sig2)
 	}
-	
+
 	invisible(list(theta=th, se=se, H=H, omega=fit$Gamma2_phi1, eta=fit$mpost_phi))
 }
 
 #' Print an SAEM model fit summary
 #'
 #' Print an SAEM model fit summary
-#' 
+#'
 #' @param x a saemFit object
 #' @param ... others
 #' @return a list
+#' @export
 print.saemFit = function(x, ...)
 {
 	fit = x ##Rcheck hack
-	
+
 	th = fit$Plambda
 	nth = length(th)
 	H = solve(fit$Ha[1:nth,1:nth])
 	se = sqrt(diag(H))
-	
+
 	m =  cbind(exp(th), th, se)	#FIXME
-	lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
-	if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
+	## lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
+	## if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
 	dimnames(m)[[2]] = c("th", "log(th)", "se(log_th)")
 	cat("THETA:\n")
 	print(m)
 	cat("\nOMEGA:\n")
 	print(fit$Gamma2_phi1)
 	if (any(fit$sig2==0)) {
-		cat("\nSIGMA:\n") 
+		cat("\nSIGMA:\n")
 		print(max(fit$sig2^2))
 	} else {
 		cat("\nARES & BRES:\n")
 		print(fit$sig2)
 	}
-	
+
 	invisible(list(theta=th, se=se, H=H, omega=fit$Gamma2_phi1, eta=fit$mpost_phi))
 }
 
+
+#' Fit an SAEM model
+#'
+#' Fit an SAEM model using either closed-form solutions or ODE-based model definitions
+#'
+#' @param model an RxODE model or lincmt()
+#' @param data input data
+#' @param inits initial values
+#' @param PKpars PKpars function
+#' @param pred  pred function
+#' @param covars Covariates in data
+#' @param mcmc a list of various mcmc options
+#' @param ODEopt optional ODE solving options
+#' @inheritParams configsaem
+#' @param seed seed for random number generator
+#' @details
+#'    Fit a generalized nonlinear mixed-effect model using the Stochastic
+#'    Approximation Expectation-Maximization (SAEM) algorithm
+#'
+#' @author Matthew Fidler & Wenping Wang
+#' @export
+#' @examples
+#' \dontrun{
+#' #ode <- "C2 = centr/V;
+#' #      d/dt(depot) =-KA*depot;
+#' #      d/dt(centr) = KA*depot - KE*centr;"
+#' #m1 = RxODE(ode, modName="m2")
+#'
+#' PKpars = function()
+#' {
+#'   CL = exp(lCL)
+#'   V  = exp(lV)
+#'   KA = exp(lKA)
+#'   KE = CL / V
+#'   #initCondition = c(0, KE - CL/V)
+#' }
+#' PRED = function() centr / V
+#' PRED2 = function() C2
+#'
+#' dat = theo_sd
+#' inits = list(theta=c(.05, .5, 2))
+#' fit = saem.fit(model=lincmt(ncmt=1, oral=T), dat, inits)
+#' #fit = saem.fit(model=m1, dat, inits, PKpars, pred=PRED)
+#' #fit = saem.fit(model=m1, dat, inits, PKpars, pred=PRED2)
+#'
+#' fit
+#' df = plot(fit)
+#' }
+saem.fit <- function(model, data, inits,
+                     PKpars=NULL, pred=NULL,
+                     covars=NULL,
+                     mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+                     ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                     distribution=c("normal","poisson","binomial"),
+                     seed = 99)
+{
+    UseMethod("saem.fit");
+}
+##' @rdname saem.fit
+##' @export
+saem <- saem.fit
+
+##' @rdname saem.fit
+##' @export
+saem.fit.nlmixr.ui.nlme <- function(model, data, inits,
+                                    PKpars=NULL, pred=NULL,
+                                    covars=NULL,
+                                    mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+                                    ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                                    distribution=c("normal","poisson","binomial"),
+                                    seed = 99){
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    names(call)[1] <- "object"
+    call$est <- "saem";
+    return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)));
+}
+
+##' @rdname saem.fit
+##' @export
+saem.fit.function <- saem.fit.nlmixr.ui.nlme
+
+##' @rdname saem.fit
+##' @export
+saem.fit.nlmixrUI <- saem.fit.nlmixr.ui.nlme
+
+##' @rdname saem.fit
+##' @export
+saem.fit.RxODE <- function(model, data, inits,
+                           PKpars=NULL, pred=NULL,
+                           covars=NULL,
+                           mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+                           ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                           distribution=c("normal","poisson","binomial"),
+                           seed = 99){
+    saem_fit = gen_saem_user_fn(model, PKpars, pred)
+    model = list(saem_mod=saem_fit, covars=covars)
+    cfg   = configsaem(model, data, inits, mcmc, ODEopt, distribution, seed)
+    fit = saem_fit(cfg)
+    ##dyn.unload("saem_main.dll")
+    fit
+}
+
+##' @rdname saem.fit
+##' @export
+saem.fit.default <- function(model, data, inits,
+                             PKpars=NULL, pred=NULL,
+                             covars=NULL,
+                             mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
+                             ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                             distribution=c("normal","poisson","binomial"),
+                             seed = 99){
+    saem_fit = gen_saem_user_fn(model)
+    model = list(saem_mod=saem_fit, covars=covars)
+    cfg   = configsaem(model, data, inits, mcmc, ODEopt, distribution, seed)
+    fit = saem_fit(cfg)
+                                        #dyn.unload("saem_main.dll")
+    fit
+}
+
+##' @export
+ranef.saemFit <- function(object, ...){
+    return(object$eta)
+}
+
+##' @export
+fixef.saemFit <- function(object, ...){
+    return(object$Plambda)
+}
+
+focei.theta.saemFit <- function(object, uif, ...){
+    ## Get the thetas needed for FOCEi fit.
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    n <- uif$focei.names
+    thetas <- rep(NA, length(n));
+    names(thetas) <- n;
+    sf <- as.vector(fixed.effects(object))
+    trans <- uif$saem.theta.trans
+    trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
+    trans <- trans[!is.na(trans)]
+    theta.name <- trans.name[order(trans)]
+    f <- rep(NA, length(sf))
+    j <- 1;
+    cov.pars <- as.vector(unlist(uif$cov.ref))
+    for (i in seq_along(theta.name)){
+        thetas[theta.name[i]] <- sf[j];
+        j <- j + 1;
+        if (any(theta.name[i] == cov.pars)){
+            for (n in names(uif$cov.ref)){
+                for (v in names(uif$cov.ref[[n]])){
+                    thetas[v] <- sf[j];
+                    j <- j + 1;
+                }
+            }
+        }
+    }
+    err <- abs(as.vector(object$sig2)) ## abs?
+    err.type <- uif$focei.err.type;
+    add <- which(err.type == "add")
+    prop <- which(err.type == "prop")
+    if (length(add) > 0){
+        thetas[add] <- err[1]; ## This seems to be SD;
+    }
+    if (length(prop) > 0){
+        thetas[prop] <- err[2]; ## This seems to be SD;
+    }
+    w <- which(is.na(thetas))[1];
+    return(thetas)
+}
+
+focei.eta.saemFit <- function(object, uif, ...){
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    ## Reorder based on translation
+    eta.trans <- uif$saem.eta.trans
+    for (i in seq(1, max(eta.trans))){
+        while (!(any(i == eta.trans)) && max(eta.trans) > i){
+            eta.trans[eta.trans >= i] <- eta.trans[eta.trans >= i] - 1
+        }
+    }
+    ## orig eta ->  new eta
+    df <- as.data.frame(uif$ini);
+    eta <- df[!is.na(df$neta1), ];
+    len <- length(eta$name)
+    cur.lhs <- character()
+    cur.rhs <- numeric()
+    ome <- character()
+    cur.ome <- object$Gamma2_phi1;
+    for (i in seq_along(eta$name)){
+        last.block <- FALSE;
+        if (i == len){
+            last.block <- TRUE
+        } else if (eta$neta1[i + 1] == eta$neta2[i + 1]){
+            last.block <- TRUE
+        }
+        if (eta$neta1[i] == eta$neta2[i]){
+            cur.lhs <- c(cur.lhs, sprintf("ETA[%d]", eta$neta1[i]));
+            cur.rhs <- c(cur.rhs, cur.ome[eta.trans[eta$neta1[i]], eta.trans[eta$neta2[i]]]);
+            if (last.block){
+                ome[length(ome) + 1] <- sprintf("%s ~ %s", paste(cur.lhs, collapse=" + "),
+                                                paste(deparse(cur.rhs), collapse=" "));
+                cur.lhs <- character();
+                cur.rhs <- numeric()
+            }
+        } else {
+            cur.rhs <- c(cur.rhs, cur.ome[eta.trans[eta$neta1[i]], eta.trans[eta$neta2[i]]]);
+        }
+    }
+    ome <- eval(parse(text=sprintf("list(%s)", paste(ome, collapse=","))))
+    return(ome)
+}
+
+as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    uif.new <- uif;
+    fit <- object;
+    mat <- random.effects(fit);
+    ## Reorder based on translation
+    eta.trans <- uif$saem.eta.trans
+    for (i in seq(1, max(eta.trans))){
+        while (!(any(i == eta.trans)) && max(eta.trans) > i){
+            eta.trans[eta.trans >= i] <- eta.trans[eta.trans >= i] - 1
+        }
+    }
+    ## orig eta ->  new eta
+    mat2 <- mat[, eta.trans];
+    ## for (i in seq_along(eta.trans)){
+    ##     ## i = old eta->  eta.trans[i] = saem.eta
+    ##     mat2[,i] <- mat[, eta.trans[i]];
+    ## }
+    th <- focei.theta(fit, uif)
+    for (n in names(th)){
+        uif.new$est[uif.new$name == n] <- th[n];
+    }
+    ome <- focei.eta(fit, uif);
+    init <- list(THTA=th,
+                 OMGA=ome)
+    saem.time <- proc.time() - pt;
+    if (missing(data)){
+        stop("Requires Data...")
+    } else {
+        dat <- data;
+    }
+    fit.f <- focei.fit(data=dat,
+                       inits=init,
+                       PKpars=uif$theta.pars,
+                       ## par_trans=fun,
+                       model=uif$rxode.pred,
+                       pred=function(){return(nlmixr_pred)},
+                       err=uif$error,
+                       lower=uif$focei.lower,
+                       upper=uif$focei.upper,
+                       theta.names=uif$focei.names,
+                       eta.names=uif$eta.names,
+                       control=list(NOTRUN=TRUE,
+                                    inits.mat=mat2,
+                                    cores=1,
+                                    find.best.eta=FALSE,
+                                    numeric=(!is.null(uif$nmodel$lin.solved)),
+                                    sum.prod=uif$env$sum.prod));
+    ome <- fit.f$omega;
+    w <- which(!is.na(uif.new$ini$neta1))
+    for (i in w){
+        uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
+    }
+    ## enclose the nlme fit in the .focei.env
+    env <- attr(fit.f, ".focei.env");
+    env$fit$saem <- fit
+    tmp <- cbind(data.frame(saem=saem.time["elapsed"]), env$fit$time);
+    names(tmp) <- gsub("optimize", "Likelihood Calculation", names(tmp))
+    env$fit$time <- tmp;
+    env$uif <- uif;
+    env$uif.new <- uif.new;
+    class(fit.f) <- c("nlmixr.ui.saem", class(fit.f))
+    return(fit.f)
+}
 
 #FIXME: coef_phi0, rmcmc, coef_sa
 #FIXME: Klog, rho, sa, nmc
@@ -979,5 +1359,5 @@ print.saemFit = function(x, ...)
 #FIXME: g = gc = 1
 #FIXME: ODE inits
 #FIXME: Tinf for ODE
-#FIXME: chk infusion poor fit
+                                        #FIXME: chk infusion poor fit
 

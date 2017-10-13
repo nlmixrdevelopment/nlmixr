@@ -1,6 +1,6 @@
 // saem_class_rcpp.hpp: population PK/PD modeling library
 //
-// Copyright (C) 2014 - 2016  Wenping Wang
+// Copyright (C) 2014 - 2017  Wenping Wang
 //
 // This file is part of nlmixr.
 //
@@ -76,6 +76,16 @@ vec get_sig2(){
   vec sig2;
   sig2 << ares << bres;
   return sig2;
+}
+mat get_par_hist(){
+  return par_hist;
+}
+
+mat get_eta(){
+  //Rcout << i1;
+  mat eta = mpost_phi.cols(i1);
+  eta -= mprior_phi1;
+  return eta;
 }
 
 void inits(List x) {
@@ -159,6 +169,7 @@ void inits(List x) {
   sigma2 = max(ares*ares, 10.0); //FIXME
 
   print = as<int>(x["print"]);
+  par_hist = as<mat>(x["par.hist"]);
 
   L  = zeros<vec>(nb_param);
   Ha = zeros<mat>(nb_param,nb_param);
@@ -175,11 +186,13 @@ void inits(List x) {
   mx.indioM = indioM;
   mx.evtM = evtM;
   mx.optM = optM;
+
+  distribution=as<int>(x["distribution"]);
 }
 
 void saem_fit() {
   //arma_rng::set_seed(99);
-  for (int kiter=0; kiter<niter; kiter++) {
+  for (unsigned int kiter=0; kiter<(unsigned int)(niter); kiter++) {
     gamma2_phi1=Gamma2_phi1.diag();
     IGamma2_phi1=inv_sympd(Gamma2_phi1);
     D1Gamma21=LCOV1*IGamma2_phi1;
@@ -208,7 +221,15 @@ void saem_fit() {
 
     vec f=user_fn(phiM, evtM, optM);
     vec g = ares + bres*f;
-    DYF(indioM)=0.5*(((yM-f)/g)%((yM-f)/g))+log(g);
+    if (distribution == 1) DYF(indioM)=0.5*(((yM-f)/g)%((yM-f)/g))+log(g);
+    else 
+    if (distribution == 2) DYF(indioM)=-yM%log(f)+f;
+    else
+    if (distribution == 3) DYF(indioM)=-yM%log(f)-(1-yM)%log(1-f);
+    else {
+		Rcout << "unknown distribution\n";
+		return;
+    }
     vec U_y=sum(DYF,0).t();
 
     if(nphi1>0) {
@@ -318,7 +339,7 @@ void saem_fit() {
     mprior_phi0.set_size(N, nphi0);		// deal w/ nphi0=0
 
     mat G1=statphi12/N+mprior_phi1.t()*mprior_phi1/N - statphi11.t()*mprior_phi1/N - mprior_phi1.t()*statphi11/N;
-    if (kiter<=nb_sa)
+    if (kiter<=(unsigned int)(nb_sa))
       Gamma2_phi1=max(Gamma2_phi1*coef_sa, diagmat(G1));
     else
       Gamma2_phi1=G1;
@@ -327,11 +348,11 @@ void saem_fit() {
     uvec jDmin=find(Gamma2_phi1.diag()<Gmin);
     for(unsigned int jm=0; jm<jDmin.n_elem; jm++)
       Gamma2_phi1(jDmin(jm),jDmin(jm))=Gmin(jDmin(jm));
-    if (kiter<=nb_correl)
+    if (kiter<=(unsigned int)(nb_correl))
     Gamma2_phi1 = diagmat(Gamma2_phi1);
 
     if (nphi0>0) {
-      if (kiter<=niter_phi0) {
+      if (kiter<=(unsigned int)(niter_phi0)) {
       Gamma2_phi0=statphi02/N+mprior_phi0.t()*mprior_phi0/N - statphi01.t()*mprior_phi0/N - mprior_phi0.t()*statphi01/N;
       Gmin=minv(i0);
       jDmin=find(Gamma2_phi0.diag()<Gmin);
@@ -382,13 +403,12 @@ void saem_fit() {
 
     Plambda = join_cols(Plambda1, Plambda0);
 
+    par_hist.row(kiter) = join_cols(join_cols(Plambda, Gamma2_phi1.diag()), vcsig2).t();
     if (print>0 && (kiter==0 || (kiter+1)%print==0))
     Rcout << kiter+1
           << ": "
-          << join_cols(
-             join_cols(Plambda,
-                       Gamma2_phi1.diag()),
-                       vcsig2).t();
+          << par_hist.row(kiter);
+    Rcpp::checkUserInterrupt();
   }//kiter
 }
 
@@ -449,6 +469,8 @@ private:
   mcmcaux mx;
 
   int print;
+  mat par_hist;
+  int distribution;
 
 void set_mcmcphi(mcmcphi &mphi1,
                  const uvec i1,
@@ -491,7 +513,11 @@ void do_mcmc(const int method,
 
     fc=user_fn(phiMc, mx.evtM, mx.optM);
     gc = ares + bres*fc;
-    DYF(mx.indioM)=0.5*(((mx.yM-fc)/gc)%((mx.yM-fc)/gc))+log(gc);
+    if (distribution == 1) DYF(mx.indioM)=0.5*(((mx.yM-fc)/gc)%((mx.yM-fc)/gc))+log(gc);
+    else 
+    if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
+    else
+    if (distribution == 3) DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
 
     Uc_y=sum(DYF,0).t();
     if (method==1) deltu=Uc_y-U_y;

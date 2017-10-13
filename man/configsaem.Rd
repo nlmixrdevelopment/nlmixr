@@ -6,7 +6,8 @@
 \usage{
 configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
   c(2, 2, 2)), ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1,
-  transit_abs = 0), seed = 99)
+  transit_abs = 0), distribution = c("normal", "poisson", "binomial"),
+  seed = 99)
 }
 \arguments{
 \item{model}{a compiled saem model by gen_saem_user_fn()}
@@ -19,25 +20,27 @@ configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
 
 \item{ODEopt}{optional ODE solving options}
 
+\item{distribution}{one of c("normal","poisson","binomial")}
+
 \item{seed}{seed for random number generator}
 }
 \description{
 Configure an SAEM model by generating an input list to the SAEM model function
 }
 \details{
-Fit a generalized nonlinear mixed-effect model by he Stochastic 
+Fit a generalized nonlinear mixed-effect model by he Stochastic
    Approximation Expectation-Maximization (SAEM) algorithm
 }
 \examples{
 \dontrun{
 library(nlmixr)
 
-#ode <- "d/dt(depot) =-KA*depot; 
-#        d/dt(centr) = KA*depot - KE*centr;" 
+#ode <- "d/dt(depot) =-KA*depot;
+#        d/dt(centr) = KA*depot - KE*centr;"
 #m1 = RxODE(ode, modName="m1")
-#ode <- "C2 = centr/V; 
-#      d/dt(depot) =-KA*depot; 
-#      d/dt(centr) = KA*depot - KE*centr;" 
+#ode <- "C2 = centr/V;
+#      d/dt(depot) =-KA*depot;
+#      d/dt(centr) = KA*depot - KE*centr;"
 #m2 = RxODE(ode, modName="m2")
 
 #Note: only use the '=' assignment, not the '<-' at this point
@@ -76,4 +79,3 @@ fit
 \author{
 Wenping Wang
 }
-

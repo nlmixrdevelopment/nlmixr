@@ -1,34 +1,60 @@
 Package: nlmixr
 Type: Package
-Title: nlmixr fits population PK and PKPD non-linear mixed effects models.
-Imports: Rcpp (>= 0.11.5), brew, lattice, parallel, lbfgs
-Depends: RxODE, nlme, Rcpp, RcppEigen, RcppArmadillo, BH, brew, inline, lbfgs, lbfgsb3, madness, Deriv, numDeriv, expm, matrixcalc, reshape2
-Suggests: knitr, rmarkdown, testthat
-VignetteBuilder: knitr
+Title: Fits Population PK and PKPD Non-Linear Mixed Effects Models
+Depends: R (>= 3.2),
+	 nlme,
+	 RxODE
+Imports: Rcpp (>= 0.12.3),
+    brew,
+    lattice,
+    parallel,
+    lbfgs,
+    inline,
+    dparser,
+    methods,
+    ggplot2,
+    memoise,
+    rex,
+    minqa,
+    Matrix,
+    numDeriv,
+    R.utils,
+    mvtnorm
+Suggests: knitr,
+    rmarkdown,
+    dplyr,
+    data.table,
+    lbfgsb3,
+    testthat,
+    madness,
+    devtools,
+    expm,
+    matrixcalc,
+    reshape2
 Version: 0.9.0-1
 Date: 2016-09-20
-Authors@R: c(
+Authors@R: c(person("Matthew","Fidler",
+      role = "aut", email = "matthew.fidler@gmail.com"),      
    person("Yuan", "Xiong", 
       role = "aut", email = "yuan.xiong@gmail.com"),
    person("Rik", "Schoemaker", 
       role = "aut", email = "rik.schoemaker@occams.com"),
    person("Justin", "Wilkins", 
-      role = "aut", email = "justin.wilkins@occams.com"),
-   person("Matthew","Fidler",
-      role = "aut", email = "matthew.fidler@gmail.com"),      
+      role = "aut", email = "justin.wilkins@occams.eu"),
    person("Mirjam","Trame",
       role = "aut", email = "mirjam.trame@gmail.com"),   
    person("Wenping", "Wang", 
       role = c("aut", "cre"), email = "wwang8198@gmail.com")
    )
-Author: Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut], Matt Fidler [aut], Mirjam Trame [aut],
+Author: Matthew Fidler [aut], Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut],  Mirjam Trame [aut],
   Wenping Wang [aut, cre]
 Maintainer: Wenping Wang <wwang8198@gmail.com>
-Description: nlmixr is an R package for fitting population pharmacokinetic (PK) 
+Description: This package fits population pharmacokinetic (PK) 
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)
-LinkingTo: Rcpp, RcppEigen
+NeedsCompilation: NeedsCompilation: yes
+LinkingTo: RcppArmadillo (>= 0.5.600.2.0), dparser, Rcpp (>= 0.12.3), RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
-Packaged: 2016-09-27 17:32:47 UTC; Wenping.Wang
-NeedsCompilation: yes
-RoxygenNote: 5.0.1
+LazyData: true
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1

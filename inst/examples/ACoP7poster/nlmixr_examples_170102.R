@@ -1,5 +1,4 @@
 library(nlmixr)
-source("print.summary.lme.R")
 library(data.table)
 
 ################################################################################################
@@ -12,7 +11,7 @@ library(data.table)
 ################################################################################################
 ################################################################################################
 
-datr <- read.csv("BOLUS_1CPT.csv", header=TRUE,stringsAsFactors=F)
+datr <- Bolus_1CPT;
 datr$EVID<-ifelse(datr$EVID==1,101,datr$EVID)
 datr<-data.table(datr)
 datr<-datr[EVID!=2]
@@ -42,11 +41,11 @@ d/dt(centr)  = -(CL/V)*centr;
 
 mypar1 <- function(lCL, lV )
 {
-    CL = exp(lCL) 
+    CL = exp(lCL)
     V  = exp(lV)
 }
 
-fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 intervals(fitODE)
@@ -71,7 +70,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment IV Bolus: multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 intervals(fitODE)
@@ -96,7 +95,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment IV Bolus: single and multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 intervals(fitODE)
@@ -145,7 +144,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment IV Bolus: steady state data implemented using 7 doses, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 intervals(fitODE)
@@ -158,8 +157,8 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 ##
 ## 1 compartment IV Infusion
 ##
-## Note that infusions need to be coded both with a record to start infusions 
-## and another one to stop infusions! 
+## Note that infusions need to be coded both with a record to start infusions
+## and another one to stop infusions!
 ## For infusions into compartment 1 (for ODEs) EVID needs to be 10101
 ##
 ################################################################################################
@@ -195,7 +194,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 
 #slightly tweaked starting values to ensure convergence
 specs1m<-list(fixed=lCL+lV~1, random = pdDiag(lCL+lV~1), start=c(lCL=1.3,lV=4))
-fitODE <- nlme_ode(dat, model=ode1, par_model=specs1m, par_trans=mypar1, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1, par_model=specs1m, par_trans=mypar1, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 intervals(fitODE)
@@ -219,7 +218,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment IV Infusion: multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -242,7 +241,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment IV Infusion: single and multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -301,7 +300,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment IV Infusion: steady state data implemented using 7 doses, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1, par_model=specs1, par_trans=mypar1, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -324,8 +323,8 @@ d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
 
 mypar3 <- function(lVM, lKM, lV )
 {
-    VM = exp(lVM) 
-    KM = exp(lKM) 
+    VM = exp(lVM)
+    KM = exp(lKM)
     V  = exp(lV)
 }
 specs3 <- list(fixed=lVM+lKM+lV~1, random = pdDiag(lVM+lKM+lV~1), start=c(lVM=7, lKM=6, lV=4))
@@ -342,7 +341,7 @@ datr<-datr[EVID!=2]
 
 runno<-"N009"
 dat<-datr[SD==1]
-fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -355,7 +354,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 runno<-"N010"
 dat<-datr[SD==0]
-fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -368,7 +367,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 runno<-"N011"
 dat<-datr
-fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -380,8 +379,8 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 ##
 ## 1 compartment IV Infusion, Michaelis-Menten elimination
 ##
-## Note that infusions need to be coded both with a record to start infusions 
-## and another one to stop infusions! 
+## Note that infusions need to be coded both with a record to start infusions
+## and another one to stop infusions!
 ## For infusions into compartment 1 (for ODEs) EVID needs to be 10101
 ##
 ################################################################################################
@@ -402,7 +401,7 @@ setkey(datr,ID,TIME)
 
 runno<-"N020"
 dat<-datr[SD==1]
-fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -415,7 +414,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 runno<-"N021"
 dat<-datr[SD==0]
-fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -428,7 +427,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 runno<-"N022"
 dat<-datr
-fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MM, par_model=specs3, par_trans=mypar3, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .01, msVerbose = TRUE))
 summary(fit)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -475,12 +474,12 @@ d/dt(centr)  =  KA*abs-(CL/V)*centr;
 
 mypar4 <- function(lCL, lV, lKA )
 {
-    CL = exp(lCL) 
+    CL = exp(lCL)
     V  = exp(lV)
     KA = exp(lKA)
 }
 
-fitODE <- nlme_ode(dat, model=ode1KA, par_model=specs4, par_trans=mypar4, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1KA, par_model=specs4, par_trans=mypar4, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .3,tolerance=1e-3, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -507,7 +506,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment oral administration: multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1KA, par_model=specs4i, par_trans=mypar4, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1KA, par_model=specs4i, par_trans=mypar4, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -530,7 +529,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment oral administration: single and multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1KA, par_model=specs4, par_trans=mypar4, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1KA, par_model=specs4, par_trans=mypar4, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .3, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -538,7 +537,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## 1 compartment oral administration: 
+## 1 compartment oral administration:
 ## steady state data implemented using 7 doses, closed form solution
 ################################################################################################
 
@@ -579,7 +578,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 1 compartment oral administration: steady state data implemented using 7 doses, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode1KA, par_model=specs4, par_trans=mypar4, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1KA, par_model=specs4, par_trans=mypar4, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -589,7 +588,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 ################################################################################################
 ################################################################################################
 ##
-## first order absorption, 1 compartment distribution, Michaelis-Menten elimination 
+## first order absorption, 1 compartment distribution, Michaelis-Menten elimination
 ##
 ## For a bolus into compartment 1 (for ODEs) EVID needs to be 101
 ##
@@ -604,8 +603,8 @@ d/dt(centr)  =  KA*abs-(VM*centr/V)/(KM+centr/V);
 
 mypar5 <- function(lVM, lKM, lV, lKA )
 {
-    VM = exp(lVM) 
-    KM = exp(lKM) 
+    VM = exp(lVM)
+    KM = exp(lKM)
     V  = exp(lV)
     KA = exp(lKA)
 
@@ -625,7 +624,7 @@ datr<-datr[EVID!=2]
 
 runno<-"N029"
 dat<-datr[SD==1]
-fitODE <- nlme_ode(dat, model=ode1MMKA, par_model=specs5, par_trans=mypar5, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MMKA, par_model=specs5, par_trans=mypar5, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .3, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -633,18 +632,18 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 1 compartment distribution, Michaelis-Menten elimination: 
+## first order absorption, 1 compartment distribution, Michaelis-Menten elimination:
 ## multiple dose
 ################################################################################################
 
-#slightly tweaked initial estimates, including starting estimates for IIV. 
+#slightly tweaked initial estimates, including starting estimates for IIV.
 #The value is a scaled variance and is derived as: 30%IIV, 20% residual error
 #Initial value=(0.3/0.2)^2=2.25:
 specs5i <- list(fixed=lVM+lKM+lV+lKA~1, random = pdDiag(value=diag(c(2,2,2,2)), form = lVM+lKM+lV+lKA~1), start=c(lVM=7, lKM=6.2, lV=4.5,lKA=-0.2))
 
 runno<-"N030"
 dat<-datr[SD==0]
-fitODE <- nlme_ode(dat, model=ode1MMKA, par_model=specs5i, par_trans=mypar5, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MMKA, par_model=specs5i, par_trans=mypar5, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1,msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -652,13 +651,13 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 1 compartment distribution, Michaelis-Menten elimination: 
+## first order absorption, 1 compartment distribution, Michaelis-Menten elimination:
 ## single and multiple dose
 ################################################################################################
 
 runno<-"N031"
 dat<-datr
-fitODE <- nlme_ode(dat, model=ode1MMKA, par_model=specs5, par_trans=mypar5, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode1MMKA, par_model=specs5, par_trans=mypar5, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .3, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -706,7 +705,7 @@ d/dt(periph) =-K21*periph+K12*centr;
 
 mypar6 <- function(lCL, lV, lCLD, lVT)
 {
-    CL = exp(lCL) 
+    CL = exp(lCL)
     V  = exp(lV)
     CLD= exp(lCLD)
     VT = exp(lVT)
@@ -715,7 +714,7 @@ mypar6 <- function(lCL, lV, lCLD, lVT)
     K21= CLD/VT
 }
 
-fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .3, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -739,7 +738,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ################################################################################################
 
 specs6i<-list(fixed=lCL+lV+lCLD+lVT~1, random = pdDiag(value=diag(c(3,3,3,3)), form = lCL+lV+lCLD+lVT~1), start=c(lCL=1.6,lV=4.5,lCLD=1.6,lVT=4))
-fitODE <- nlme_ode(dat, model=ode2, par_model=specs6i, par_trans=mypar6, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2, par_model=specs6i, par_trans=mypar6, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1,msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -762,7 +761,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 2 compartment IV Bolus: single and multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -812,7 +811,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 
 specs6<-list(fixed=lCL+lV+lCLD+lVT~1, random = pdDiag(lCL+lV+lCLD+lVT~1), start=c(lCL=1.3,lV=4.2,lCLD=1.6,lVT=4))
 
-fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -824,8 +823,8 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 ##
 ## 2 compartment IV Infusion
 ##
-## Note that infusions need to be coded both with a record to start infusions 
-## and another one to stop infusions! 
+## Note that infusions need to be coded both with a record to start infusions
+## and another one to stop infusions!
 ## For infusions into compartment 1 (for ODEs) EVID needs to be 10101
 ##
 ################################################################################################
@@ -859,7 +858,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 2 compartment IV Infusion: single dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -882,7 +881,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 2 compartment IV Infusion: multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -905,7 +904,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 2 compartment IV Infusion: single and multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -965,7 +964,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 ## 2 compartment IV Infusion: steady state data implemented using 7 doses, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2, par_model=specs6, par_trans=mypar6, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .3, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -994,15 +993,15 @@ d/dt(periph) =-K21*periph+K12*centr;
 
 mypar7 <- function(lVM, lKM, lV, lCLD, lVT )
 {
-    VM = exp(lVM) 
-    KM = exp(lKM) 
+    VM = exp(lVM)
+    KM = exp(lKM)
     V  = exp(lV)
     CLD= exp(lCLD)
     VT = exp(lVT)
     K12= CLD/V
     K21= CLD/VT
 }
-specs7 <- list(fixed=lVM+lKM+lV+lCLD+lVT~1, random = pdDiag(lVM+lKM+lV+lCLD+lVT~1), 
+specs7 <- list(fixed=lVM+lKM+lV+lCLD+lVT~1, random = pdDiag(lVM+lKM+lV+lCLD+lVT~1),
           start=c(lVM=7, lKM=6, lV=4, lCLD=1.5, lVT=4))
 
 ################################################################################################
@@ -1011,7 +1010,7 @@ specs7 <- list(fixed=lVM+lKM+lV+lCLD+lVT~1, random = pdDiag(lVM+lKM+lV+lCLD+lVT~
 
 runno<-"N040"
 dat<-datr[SD==1]
-fit <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V", 
+fit <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fit)
 assign(paste("fit",runno,sep=""),fit, pos = .GlobalEnv)
@@ -1024,7 +1023,7 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 
 runno<-"N041"
 dat<-datr[SD==0]
-fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .3, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1037,7 +1036,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 runno<-"N042"
 dat<-datr
-fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1049,8 +1048,8 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 ##
 ## 2 compartment IV Infusion, Michaelis-Menten elimination
 ##
-## Note that infusions need to be coded both with a record to start infusions 
-## and another one to stop infusions! 
+## Note that infusions need to be coded both with a record to start infusions
+## and another one to stop infusions!
 ## For infusions into compartment 1 (for ODEs) EVID needs to be 10101
 ##
 ################################################################################################
@@ -1071,7 +1070,7 @@ setkey(datr,ID,TIME)
 
 runno<-"N054"
 dat<-datr[SD==1]
-fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1082,12 +1081,12 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 ## 2 compartment IV Infusion, Michaelis-Menten elimination: multiple dose
 ################################################################################################
 
-specs7i <- list(fixed=lVM+lKM+lV+lCLD+lVT~1, random = pdDiag(value=diag(c(3,3,3,3,3)), form = lVM+lKM+lV+lCLD+lVT~1), 
+specs7i <- list(fixed=lVM+lKM+lV+lCLD+lVT~1, random = pdDiag(value=diag(c(3,3,3,3,3)), form = lVM+lKM+lV+lCLD+lVT~1),
            start=c(lVM=7, lKM=5, lV=4, lCLD=1.2, lVT=4))
 
 runno<-"N055"
 dat<-datr[SD==0]
-fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7i, par_trans=mypar7, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7i, par_trans=mypar7, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1100,7 +1099,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 runno<-"N056"
 dat<-datr
-fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2MM, par_model=specs7, par_trans=mypar7, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1110,7 +1109,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 ################################################################################################
 ################################################################################################
 ##
-## first order absorption, 2 compartment distribution, linear elimination 
+## first order absorption, 2 compartment distribution, linear elimination
 ##
 ## For a bolus into compartment 1 (for ODEs) EVID needs to be 101
 ##
@@ -1125,8 +1124,8 @@ datr<-datr[EVID!=2]
 specs8<-list(fixed=lCL+lV+lCLD+lVT+lKA~1, random = pdDiag(lCL+lV+lCLD+lVT+lKA~1), start=c(lCL=1.6,lV=4.5,lCLD=1.5,lVT=3.9,lKA=0.1))
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, linear elimination: 
-## single dose, closed form solution 
+## first order absorption, 2 compartment distribution, linear elimination:
+## single dose, closed form solution
 ################################################################################################
 
 runno<-"N060"
@@ -1139,8 +1138,8 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, linear elimination: 
-## single dose, ODE solution 
+## first order absorption, 2 compartment distribution, linear elimination:
+## single dose, ODE solution
 ################################################################################################
 
 ode2KA <- "
@@ -1151,7 +1150,7 @@ d/dt(periph) =        -K21*periph+K12*centr;
 
 mypar8 <- function(lCL, lV, lCLD, lVT,lKA)
 {
-    CL = exp(lCL) 
+    CL = exp(lCL)
     V  = exp(lV)
     CLD= exp(lCLD)
     VT = exp(lVT)
@@ -1161,7 +1160,7 @@ mypar8 <- function(lCL, lV, lCLD, lVT,lKA)
     K21= CLD/VT
 }
 
-fitODE <- nlme_ode(dat, model=ode2KA, par_model=specs8, par_trans=mypar8, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2KA, par_model=specs8, par_trans=mypar8, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .3, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1169,8 +1168,8 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, linear elimination: 
-## multiple dose, closed form solution 
+## first order absorption, 2 compartment distribution, linear elimination:
+## multiple dose, closed form solution
 ################################################################################################
 
 runno<-"N061"
@@ -1183,11 +1182,11 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, linear elimination: 
-## multiple dose, ODE solution 
+## first order absorption, 2 compartment distribution, linear elimination:
+## multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode2KA, par_model=specs8, par_trans=mypar8, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2KA, par_model=specs8, par_trans=mypar8, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1195,8 +1194,8 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, linear elimination: 
-## single and multiple dose, closed form solution 
+## first order absorption, 2 compartment distribution, linear elimination:
+## single and multiple dose, closed form solution
 ################################################################################################
 
 runno<-"N063"
@@ -1209,11 +1208,11 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, linear elimination: 
-## single and multiple dose, ODE solution 
+## first order absorption, 2 compartment distribution, linear elimination:
+## single and multiple dose, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode2KA, par_model=specs8, par_trans=mypar8, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2KA, par_model=specs8, par_trans=mypar8, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1221,8 +1220,8 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, linear elimination: 
-## steady state data implemented using 7 doses, closed form solution 
+## first order absorption, 2 compartment distribution, linear elimination:
+## steady state data implemented using 7 doses, closed form solution
 ################################################################################################
 
 runno<-"N062"
@@ -1257,7 +1256,7 @@ datSS<-rbind(datSS,datSD2)
 setkey(datSS,ID,TIME)
 dat<-datSS
 
-specs8i<-list(fixed=lCL+lV+lCLD+lVT+lKA~1, random = pdDiag(value=diag(c(6,6,6,6,6)), 
+specs8i<-list(fixed=lCL+lV+lCLD+lVT+lKA~1, random = pdDiag(value=diag(c(6,6,6,6,6)),
          form = lCL+lV+lCLD+lVT+lKA~1), start=c(lCL=1.4,lV=4.2,lCLD=1.3,lVT=3.9,lKA=0.1))
 
 fit <- nlme_lin_cmpt(dat, par_model=specs8i, ncmt=2, verbose=TRUE,oral=TRUE,weight=varPower(fixed=c(1)),
@@ -1268,11 +1267,11 @@ save(fit,file=paste("fit",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, linear elimination: 
-## steady state data implemented using 7 doses, ODE solution 
+## first order absorption, 2 compartment distribution, linear elimination:
+## steady state data implemented using 7 doses, ODE solution
 ################################################################################################
 
-fitODE <- nlme_ode(dat, model=ode2KA, par_model=specs8i, par_trans=mypar8, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2KA, par_model=specs8i, par_trans=mypar8, response="centr", response.scaler="V",
           verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .15, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1282,7 +1281,7 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 ################################################################################################
 ################################################################################################
 ##
-## first order absorption, 2 compartment distribution, Michaelis-Menten elimination 
+## first order absorption, 2 compartment distribution, Michaelis-Menten elimination
 ##
 ## For a bolus into compartment 1 (for ODEs) EVID needs to be 101
 ##
@@ -1302,8 +1301,8 @@ d/dt(periph) =-K21*periph+K12*centr;
 
 mypar9 <- function(lVM, lKM, lV, lCLD, lVT, lKA )
 {
-    VM = exp(lVM) 
-    KM = exp(lKM) 
+    VM = exp(lVM)
+    KM = exp(lKM)
     V  = exp(lV)
     CLD= exp(lCLD)
     VT = exp(lVT)
@@ -1311,17 +1310,17 @@ mypar9 <- function(lVM, lKM, lV, lCLD, lVT, lKA )
     K12= CLD/V
     K21= CLD/VT
 }
-specs9 <- list(fixed=lVM+lKM+lV+lCLD+lVT+lKA~1, random = pdDiag(lVM+lKM+lV+lCLD+lVT+lKA~1), 
+specs9 <- list(fixed=lVM+lKM+lV+lCLD+lVT+lKA~1, random = pdDiag(lVM+lKM+lV+lCLD+lVT+lKA~1),
           start=c(lVM=7, lKM=6, lV=4, lCLD=1.5, lVT=4,lKA=0.1))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, Michaelis-Menten elimination: single dose 
+## first order absorption, 2 compartment distribution, Michaelis-Menten elimination: single dose
 ################################################################################################
 
 runno<-"N068"
 dat<-datr[SD==1]
-fitODE <- nlme_ode(dat, model=ode2MMKA, par_model=specs9, par_trans=mypar9, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2MMKA, par_model=specs9, par_trans=mypar9, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1329,13 +1328,13 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, Michaelis-Menten elimination: 
-## multiple dose 
+## first order absorption, 2 compartment distribution, Michaelis-Menten elimination:
+## multiple dose
 ################################################################################################
 
 runno<-"N069"
 dat<-datr[SD==0]
-fitODE <- nlme_ode(dat, model=ode2MMKA, par_model=specs9, par_trans=mypar9, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2MMKA, par_model=specs9, par_trans=mypar9, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)
@@ -1343,13 +1342,13 @@ save(fitODE,file=paste("fitODE",runno,".Rdata",sep=""))
 
 
 ################################################################################################
-## first order absorption, 2 compartment distribution, Michaelis-Menten elimination: 
-## single and multiple dose 
+## first order absorption, 2 compartment distribution, Michaelis-Menten elimination:
+## single and multiple dose
 ################################################################################################
 
 runno<-"N070"
 dat<-datr
-fitODE <- nlme_ode(dat, model=ode2MMKA, par_model=specs9, par_trans=mypar9, response="centr", response.scaler="V", 
+fitODE <- nlme_ode(dat, model=ode2MMKA, par_model=specs9, par_trans=mypar9, response="centr", response.scaler="V",
        verbose=TRUE,weight=varPower(fixed=c(1)),control = nlmeControl(pnlsTol = .1, msVerbose = TRUE))
 summary(fitODE)
 assign(paste("fitODE",runno,sep=""),fitODE, pos = .GlobalEnv)

@@ -23,4 +23,6 @@ parameters for a linear compartment model
 \description{
 Parameters for a linear compartment model using closed-form solutions and the SAEM algorithm.
 }
-
+\author{
+Wenping Wang
+}

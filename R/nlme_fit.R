@@ -17,52 +17,82 @@
 ## You should have received a copy of the GNU General Public License
 ## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
 
+
+nlmeModListEnv <- new.env();
+
+##' Access the model list information for nlmixr's nlme user functions
+##'
+##' @param x Parameter to get or set.  If this parameter is an
+##'     environment, change the nlme model environment to this
+##'     environment.
+##' @param value Value of the parameter that is being set.
+##' @return When both x and value are missing, this is the
+##'     nlmeModListEnv.  When x is present and value is missing,
+##'     return the value x in the current nlmeModListEnv.
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+nlmeModList <- function(x, value){
+  if (!missing(x) && !missing(value)){
+    return(assign(x, value,  envir = nlmeModListEnv))
+  } else if (!missing(x) && missing(value)){
+    if (class(x) == "environment"){
+      assignInMyNamespace("nlmeModListEnv", x);
+    } else {
+      return(get(x, envir = nlmeModListEnv))
+    }
+  } else {
+    return(nlmeModListEnv);
+  }
+}
+
 fmt_infusion_data <- function(dat) {
-	x1 <- subset(dat, dat$EVID>10000 & dat$AMT>0)
-	x2 <- subset(dat, dat$EVID>10000 & dat$AMT<0)
-	x1$DUR <- x2$TIME - x1$TIME
-	x1$AMT <- x1$AMT * x1$DUR
-	x <- subset(dat, dat$EVID < 10000)
-	x$DUR <- NA
-	x <- rbind(x, x1)
-	ord <- order(x$ID, x$TIME, -x$EVID)
-	x[ord,]
+    x1 <- dat[dat$EVID>10000 & dat$AMT>0, ]
+    x2 <- dat[dat$EVID>10000 & dat$AMT<0, ]
+    x1$DUR <- x2$TIME - x1$TIME
+    x1$AMT <- x1$AMT * x1$DUR
+    x <- dat[dat$EVID < 10000, ]
+    x$DUR <- NA
+    x <- rbind(x, x1)
+    ord <- order(x$ID, x$TIME, -x$EVID)
+    x[ord,]
 }
 
-cmt_fn_templ <- "
-require(parallel)
+nlme_cmt_gen_usr_fn <- function(arg1, arg2, mc.cores){
+    fun <- eval(parse(text=sprintf("function(%s, TIME, ID){NULL;}", arg1)))
+    pkpars <- eval(parse(text=sprintf("bquote((nlmeModList(\"PKpars\"))(%s))", arg2)));
+    body <- bquote({
+        unlist(parallel::mclapply(as.character(unique(ID)), function(subj)
+            {
+                sel.d <- nlmeModList("ds")$ID==as.integer(subj)
+                dose  <- nlmeModList("ds")[sel.d, "AMT"]
+                dstm  <- nlmeModList("ds")[sel.d, "TIME"]
+                Tinf  <- nlmeModList("ds")[sel.d, "DUR"]
 
-user_fn <- function(<%=arg1%>, TIME, ID)
-{
-    unlist(mclapply(as.character(unique(ID)), function(subj)
-    {
-        sel.d <- ..ModList$ds$ID==as.integer(subj)
-        dose<-..ModList$ds[sel.d, \"AMT\"]
-        dstm<-..ModList$ds[sel.d, \"TIME\"]
-        Tinf<-..ModList$ds[sel.d, \"DUR\"]
+                sel <- ID==subj
+                time.subj <- TIME[sel]
+                s <- .(pkpars)
+                pkpars <- toupper(names(s))
+                names(s) <- pkpars
 
-        sel <- ID==subj
-        time.subj <- TIME[sel]
-        s <- ..ModList$PKpars(<%=arg2%>)
-        pkpars <- toupper(names(s))
-        names(s) <- pkpars
+                if (nlmeModList("oral")) {
+                    if (is.element("TLAG", pkpars)) {
+                        theta <- s[nlmeModList("refpars")]
+                    } else {
+                        theta <- c(s[nlmeModList("refpars")[1:(2*nlmeModList("ncmt")+1)]], 0)    #no TLAG, set to 0
+                    }
+                } else {
+                    theta <- c(s[nlmeModList("refpars")[1:(2*nlmeModList("ncmt"))]], 0, 0)
+                }
 
-        if (..ModList$oral) {
-            if (is.element(\"TLAG\", pkpars)) {
-                theta <- s[..ModList$refpars]
-            } else {
-                theta <- c(s[..ModList$refpars[1:(2*..ModList$ncmt+1)]], 0)    #no TLAG, set to 0
-            }
-        } else {
-            theta <- c(s[..ModList$refpars[1:(2*..ModList$ncmt)]], 0, 0)
-        }
-        
-        cp <- lin_cmt(time.subj, dstm, dose, Tinf, theta, ..ModList$oral, ..ModList$infusion, ..ModList$ncmt, ..ModList$parameterization)
-        cp
-    }, mc.cores=<%=mc.cores%>))
+                cp <- lin_cmt(time.subj, dstm, dose, Tinf, theta, nlmeModList("oral"), nlmeModList("infusion"), nlmeModList("ncmt"), nlmeModList("parameterization"))
+                cp
+            }, mc.cores=.(mc.cores)))
+
+    });
+    body(fun) <- body;
+    return(fun);
 }
-"
-
 
 #' Fit nlme-based linear compartment mixed-effect model using closed form solution
 #'
@@ -74,7 +104,7 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #' parameterization, with the former as the default.  Specification of
 #' fixed effects, random effects and intial values follows the standard
 #' nlme notations.
-#' 
+#'
 #' @param dat data to be fitted
 #' @param par_model list: model for fixed effects, randoms effects and initial values using nlme-type syntax.
 #' @param ncmt numerical: number of compartments: 1-3
@@ -90,17 +120,18 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #' @examples
 #' \dontrun{
 #' library(nlmixr)
-#' 
+#'
 #' dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
 #' specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
 #' fit <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1, verbose=TRUE)
 #' plot(augPred(fit,level=0:1))
 #' summary(fit)
-#' 
+#'
 #' }
-nlme_lin_cmpt <- function(dat, par_model, 
-	ncmt, oral=TRUE, infusion=FALSE, tlag=FALSE, parameterization=1, 
-	par_trans=get.parfn(oral, ncmt, parameterization, tlag), 
+#' @export
+nlme_lin_cmpt <- function(dat, par_model,
+	ncmt, oral=TRUE, infusion=FALSE, tlag=FALSE, parameterization=1,
+	par_trans=get.parfn(oral, ncmt, parameterization, tlag),
 	mc.cores=1, ...)
 {
     if(oral*infusion) {
@@ -114,11 +145,11 @@ nlme_lin_cmpt <- function(dat, par_model,
 	len <- length(x)
 	x[len] <- "unlist(as.list(environment()))"
 	x <- paste(c(x, "}"), collapse = "\n")
-	body(PKpars) <- parse(text=x)    
-    
+	body(PKpars) <- parse(text=x)
+
     #a new env with a ref in .GlobalEnv, holding model components
     #a hack due to non-std call by nlme
-	assign("..ModList", new.env(), envir=.GlobalEnv)
+    ## assign("..ModList", new.env(), envir=.GlobalEnv)
 
     #master par list
     pm <- list(
@@ -132,14 +163,14 @@ nlme_lin_cmpt <- function(dat, par_model,
     dim(pm)<-c(3,2)
 
 
-    #gen user_fn
+    #gen user_fn
     s <- formals(PKpars)
     arg1 <- paste(names(s), collapse=", ")
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
     arg3 <- sprintf("list(%s)", paste(names(s), "=.1", collapse=", "))
-    brew(text=cmt_fn_templ, output="fn.txt")
-    source("fn.txt", local=..ModList)
-
+    ## brew(text=cmt_fn_templ, output="fn.txt")
+    ## source("fn.txt", local=nlmeModList())
+    nlmeModList("user_fn", nlme_cmt_gen_usr_fn(arg1, arg2, mc.cores))
 
     refpars <- pm[[ncmt, parameterization]]
     npars <- length(refpars)
@@ -162,71 +193,81 @@ nlme_lin_cmpt <- function(dat, par_model,
     }
 
     #data prep
-    ..ModList$oral<-oral
-    ..ModList$infusion <- infusion 
-    ..ModList$ncmt<-ncmt
-    ..ModList$parameterization<-parameterization
+    nlmeModList("oral", oral);
+    nlmeModList("infusion", infusion);
+    nlmeModList("ncmt", ncmt)
+    nlmeModList("parameterization", parameterization);
     if (infusion) {
     	dat <- fmt_infusion_data(dat)
     } else {
     	dat$DUR <- -1
     }
-    ..ModList$ds <- dat[dat$EVID>0, c("ID", "TIME", "AMT", "DUR")]
+    nlmeModList("ds", dat[dat$EVID>0, c("ID", "TIME", "AMT", "DUR")]);
     dat$DUR <- NULL
     dat <- dat[dat$EVID==0,]
-    ..ModList$dat.g <- groupedData(DV~TIME|ID, dat)
-    ..ModList$PKpars <- PKpars
-	..ModList$refpars=refpars
-    
-    mod.specs <- list(model=as.formula(sprintf("DV ~ ..ModList$user_fn(%s, TIME, ID)", arg1)),
-	    data = ..ModList$dat.g, fixed=par_model$fixed, random = par_model$random,
-	    start=par_model$start, ...)
-    do.call(nlme, mod.specs)
+    nlmeModList("dat.g", groupedData(DV~TIME|ID, dat));
+    nlmeModList("PKpars", PKpars);
+    nlmeModList("refpars", refpars);
+
+    mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
+                      data = nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
+                      start=par_model$start, ...);
+    if (Sys.getenv("nlmixr_silent") == "TRUE"){
+        ret <- NULL;
+        cur.env <- environment()
+        R.utils::captureOutput(assign("ret", collectWarnings(do.call(nlme, mod.specs)), , cur.env));
+    } else {
+        ret <- collectWarnings(do.call(nlme, mod.specs));
+    }
+    ret$env <- nlmeModListEnv;
+    assignInMyNamespace("nlmeModListEnv", new.env());
+    class(ret) <- c("nlmixr_nlme", class(ret));
+    return(ret);
 }
 
+nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
+    fun <- eval(parse(text=sprintf("function(%s, TIME, ID){NULL;}", arg1)))
+    pkpars <- eval(parse(text=sprintf("bquote((nlmeModList(\"PKpars\"))(%s))", arg2)));
+    body <- bquote({
+        z <- parallel::mclapply(as.character(unique(ID)), function(subj)
+                       {
+                           ev <- eventTable()
+                           ev$import.EventTable(subset(nlmeModList("dat.o"), id==as.integer(subj)))
+                                        #obs.rec <- ev$get.obs.rec()
 
-ode_fn_templ = "
-require(parallel)
+                           sel <- ID==subj
+                           plist <- .(pkpars)
+                           inits <- plist$initCondition
+                           plist$initCondition <- NULL
+                           theta <- unlist(plist)
 
-user_fn <- function(<%=arg1%>, TIME, ID)
-{
-	z <- mclapply(as.character(unique(ID)), function(subj)
-	{
-		ev <- eventTable()
-		ev$import.EventTable(subset(..ModList$dat.o, id==as.integer(subj)))
-		#obs.rec <- ev$get.obs.rec()
+                           if (any(theta>1e38)) {
+                               warning('large parameter values. may rewrite par_trans.')
+                               print(theta)
+                           }
+                           if (nlmeModList("debugODE")) {
+                               print(subj)
+                               print(theta)
+                           }
 
-		sel <- ID==subj
-		plist <- ..ModList$PKpars(<%=arg2%>)
-		inits <- plist$initCondition
-		plist$initCondition <- NULL
-		theta <- unlist(plist)
-		
-		if (any(theta>1e38)) {
-		    warning('large parameter values. may rewrite par_trans.')
-		    print(theta)
-		}
-		if (..ModList$debugODE) {
-		    print(subj)
-		    print(theta)
-		}
-
-		m <- ..ModList$m1$run(theta, ev, inits, transit_abs=<%=transit_abs%>, atol=<%=atol%>, rtol=<%=rtol%>)
-		if (is.null(dim(m))) m = t(as.matrix(m))
-		den <- if(is.null(..ModList$response.scaler)) 1 else theta[..ModList$response.scaler]
-		m[, ..ModList$response]/den
-	}, mc.cores=<%=mc.cores%>)
+                           m <- nlmeModList("m1")$run(theta, ev, inits, transit_abs=.(transit_abs), atol=.(atol), rtol=.(rtol));
+                           if (is.null(dim(m))) m = t(as.matrix(m))
+                           den <- if(is.null(nlmeModList("response.scaler"))) 1 else theta[nlmeModList("response.scaler")]
+                           m[, nlmeModList("response")]/den
+                       }, mc.cores=.(mc.cores))
 	unlist(z)
+    });
+    body(fun) <- body;
+    return(fun);
 }
-"
 
 #' Fit nlme-based mixed-effect model using ODE implementation
 #'
 #' 'nlme_ode' fits a mixed-effect model described using ordinary differential
 #' equation (ODEs). The ODE-definition follows RxODE syntax.
-#' Specification of fixed effects, random effects and intial values follows 
+#' Specification of fixed effects, random effects and intial values follows
 #' the standard nlme notations.
-#' 
+#'
 #' @param dat.o data to be fitted
 #' @param model a string containing the set of ordinary differential equations (ODE) and other expressions defining the changes in the dynamic  system. For details, see the sections \dQuote{Details} and  \dQuote{\code{RxODE Syntax}} below.
 #' @param par_model list: model for fixed effects, randoms effects and initial values.
@@ -235,8 +276,8 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #' @param response.scaler optional response variable scaler. default is NULL
 #' @param transit_abs a logical if transit absorption model is enabled
 #' @param atol atol (absolute tolerance for ODE-solver)
-#' @param rtol rtol (relative tolerance for ODE-solver) 
-#' @param debugODE a logical if debugging is enabled 
+#' @param rtol rtol (relative tolerance for ODE-solver)
+#' @param debugODE a logical if debugging is enabled
 #' @param mc.cores number of cores used in fitting (only for Linux)
 #' @param ... additional nlme options
 #' @return NULL
@@ -249,58 +290,58 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #'    produces an object of class \code{RxODE} which consists of a list-like
 #'    structure (closure) with various member functions (see Section
 #'    \emph{Value} below).
-#' 
+#'
 #' @section RxODE Syntax:
-#'    
-#'    An \code{RxODE} model specification consists of one or more 
+#'
+#'    An \code{RxODE} model specification consists of one or more
 #'    statements terminated by semi-colons, \sQuote{\code{;}}, and
-#'    optional comments (comments are delimited by \code{#} and an 
-#'    end-of-line marker).  \strong{NB:} Comments are not allowed 
+#'    optional comments (comments are delimited by \code{#} and an
+#'    end-of-line marker).  \strong{NB:} Comments are not allowed
 #'    inside statements.
-#' 
+#'
 #'    A block of statements is a set of statements delimited by
 #'    curly braces, \sQuote{\code{\{ ... \}}}.
 #'    Statements can be either assignments or conditional \code{if}
 #'    statements. Assignment statements can be either \dQuote{simple}
-#'    assignments, where the left hand is an identifier (i.e., variable), or 
+#'    assignments, where the left hand is an identifier (i.e., variable), or
 #'    special \dQuote{time-derivative} assignments, where the left hand
-#'    specifies the change of that variable with respect to time  
+#'    specifies the change of that variable with respect to time
 #'    e.g., \code{d/dt(depot)}.
-#' 
-#'    Expressions in assignment and \sQuote{\code{if}} statements can be 
+#'
+#'    Expressions in assignment and \sQuote{\code{if}} statements can be
 #'    numeric or logical (no character expressions are currently supported).
-#'    Numeric expressions can include the following numeric operators 
+#'    Numeric expressions can include the following numeric operators
 #'    (\sQuote{\code{+}}, \sQuote{\code{-}}, \sQuote{\code{*}},
 #'    \sQuote{\code{/}}, \sQuote{\code{^}}),   and
 #'    those mathematical functions defined in the C or the
 #'    R math libraries (e.g., \code{fabs}, \code{exp}, \code{log}, \code{sin}).
 #'    (Note that the modulo operator \sQuote{\code{\%}} is currently
 #'    not supported.)
-#' 
+#'
 #'    Identifiers in an \code{RxODE} model specification can refer to:
 #'    \itemize{
 #'       \item state variables in the dynamic system (e.g., compartments in a
 #'       pharmacokinetic/pharmacodynamic model);
-#'       \item implied input variable, \code{t} (time), 
+#'       \item implied input variable, \code{t} (time),
 #'       \code{podo} (oral dose, for absorption models), and
 #'       \code{tlast} (last time point);
-#'       \item model parameters, (\code{ka} rate of absorption, \code{CL} 
+#'       \item model parameters, (\code{ka} rate of absorption, \code{CL}
 #'       clearance, etc.);
 #'       \item others, as created by assignments as part of the model
 #'       specification.
 #'    }
-#' 
-#'    Identifiers consist of case-sensitive alphanumeric characters, 
+#'
+#'    Identifiers consist of case-sensitive alphanumeric characters,
 #'    plus the underscore \sQuote{_} character.  \strong{NB:} the
 #'    dot \sQuote{.} character is \strong{not} a valid character
 #'    identifier.
-#' 
+#'
 #'    The values of these variables at pre-specified time points are
 #'    saved as part of the fitted/integrated/solved model (see
-#'    \code{\link{eventTable}}, in particular its member function 
+#'    \code{\link{eventTable}}, in particular its member function
 #'    \code{add.sampling} that defines a set of time points at which
 #'    to capture a snapshot of the system via the values of these variables).
-#' 
+#'
 #'    The ODE specification mini-language is parsed with the help of
 #'    the open source tool \emph{DParser}, Plevyak (2015).
 #' @author Wenping Wang
@@ -314,40 +355,39 @@ user_fn <- function(<%=arg1%>, TIME, ID)
 #' dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
 #' mypar <- function(lKA, lKE, lCL)
 #' {
-#'     KA=exp(lKA) 
-#'     KE=exp(lKE) 
+#'     KA=exp(lKA)
+#'     KE=exp(lKE)
 #'     CL=exp(lCL)
 #'     V = CL/KE
 #' }
-#' 
-#' specs <- list(fixed=lKA+lKE+lCL~1, random = pdDiag(lKA+lCL~1), 
+#'
+#' specs <- list(fixed=lKA+lKE+lCL~1, random = pdDiag(lKA+lCL~1),
 #' 	start=c(lKA=0.5, lKE=-2.5, lCL=-3.2))
-#' fit <- nlme_ode(dat, model=ode, par_model=specs, par_trans=mypar, 
+#' fit <- nlme_ode(dat, model=ode, par_model=specs, par_trans=mypar,
 #' 	response="centr", response.scaler="V")
-#' 
+#'
 #' }
-nlme_ode <- function(dat.o, model, par_model, par_trans, 
-	response, response.scaler=NULL, 
+#' @export
+nlme_ode <- function(dat.o, model, par_model, par_trans,
+	response, response.scaler=NULL,
 	transit_abs = FALSE,
-	atol=1.0e-8, rtol=1.0e-8, 
+	atol=1.0e-8, rtol=1.0e-8,
 	debugODE=FALSE, mc.cores=1, ...)
 {
-    if (any(dat.o$EVID[dat.o$EVID>0]<101))
+  if (any(dat.o$EVID[dat.o$EVID>0]<101))
     	stop("incompatible EVID values")
-    
+
     #a new env with a ref in .GlobalEnv, holding model components
     #a hack due to non-std call by nlme
-	assign("..ModList", new.env(), envir=.GlobalEnv)
+    ## assign("..ModList", new.env(), envir=.GlobalEnv)
 
     #prep ode
-    if (class(model)=="RxODE") ..ModList$m1 = model
+    if (class(model)=="RxODE") nlmeModList("m1", model)
     else if (class(model)=="character") {
-		obj <- basename(tempfile())
-		..ModList$m1 <- RxODE(model = model, modName = obj)
-	}
-	else {
-		stop('invalid model input')
-	}
+        nlmeModList("m1", RxODE(model = model));
+    } else {
+      stop('invalid model input')
+    }
 
     #prep PKpars
     PKpars <- par_trans
@@ -355,29 +395,367 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
 	len <- length(x)
 	x[len] <- "as.list(environment())"
 	x <- paste(c(x, "}"), collapse = "\n")
-	body(PKpars) <- parse(text=x)    
-	
+	body(PKpars) <- parse(text=x)
+
     #gen user_fn
     s <- formals(PKpars)
     arg1 <- paste(names(s), collapse=", ")
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
-    brew(text=ode_fn_templ, output="fn.txt")
-    source("fn.txt", local=..ModList)
+
+    nlmeModList("user_fn", nlme_ode_gen_usr_fn(arg1, arg2, transit_abs, atol, rtol, mc.cores));
 
     #data prep
-	dat.g <- groupedData(DV~TIME|ID, subset(dat.o, dat.o$EVID==0))
-	names(dat.o) <- tolower(names(dat.o))
-	..ModList$response = response
-	..ModList$response.scaler = response.scaler
-	..ModList$dat.g = dat.g
-	..ModList$dat.o = dat.o
-	..ModList$PKpars = PKpars
-	..ModList$debugODE = debugODE
-    
-    mod.specs <- list(model=as.formula(sprintf("DV ~ ..ModList$user_fn(%s, TIME, ID)", arg1)),
-	    data = ..ModList$dat.g, fixed=par_model$fixed, random = par_model$random,
-	    start=par_model$start, ...)
+    dat.g <- groupedData(DV~TIME|ID, subset(dat.o, dat.o$EVID==0))
+    names(dat.o) <- tolower(names(dat.o))
+  nlmeModList("response", response);
+  nlmeModList("response.scaler", response.scaler);
+  nlmeModList("dat.g", dat.g);
+  nlmeModList("dat.o", dat.o);
+  nlmeModList("PKpars", PKpars);
+  nlmeModList("debugODE", debugODE);
 
-    do.call(nlme, mod.specs)
+  mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
+                    data = nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
+                    start=par_model$start, ...)
+  if (Sys.getenv("nlmixr_silent") == "TRUE"){
+      ret <- NULL;
+      cur.env <- environment()
+      R.utils::captureOutput(assign("ret", collectWarnings(do.call(nlme, mod.specs)), , cur.env));
+  } else {
+      ret <- collectWarnings(do.call(nlme, mod.specs));
+  }
+  ret$env <- nlmeModListEnv;
+  assignInMyNamespace("nlmeModListEnv", new.env());
+  class(ret) <- c("nlmixr_nlme", class(ret));
+  return(ret);
 }
 
+##' @export
+print.nlmixr_nlme <- function (x, ..., print.data=FALSE)
+{
+  dd <- x$dims
+  if (inherits(x, "nlme")) {
+    cat("Nonlinear mixed-effects model fit by ")
+    cat(ifelse(x$method == "REML", "REML\n", "maximum likelihood\n"))
+    cat("  Model:", deparse(x$call$model), "\n")
+  }
+  else {
+    cat("Linear mixed-effects model fit by ")
+    cat(ifelse(x$method == "REML", "REML\n", "maximum likelihood\n"))
+  }
+  if (print.data)
+    cat("  Data:", deparse(x$call$data), "\n")
+  if (!is.null(x$call$subset)) {
+    cat("  Subset:", deparse(asOneSidedFormula(x$call$subset)[[2L]]),
+        "\n")
+  }
+  cat("  Log-", ifelse(x$method == "REML", "restricted-", ""),
+      "likelihood: ", format(x$logLik), "\n", sep = "")
+  fixF <- x$call$fixed
+  if (inherits(fixF, "formula") || is.call(fixF) || is.name(fixF)) {
+    cat("  Fixed:", deparse(x$call$fixed), "\n")
+  }
+  else {
+    cat("  Fixed:", deparse(lapply(fixF, function(el) as.name(deparse(el)))),
+        "\n")
+  }
+  print(nlme::fixef(x))
+  cat("\n")
+  print(summary(x$modelStruct), sigma = x$sigma)
+  cat("Number of Observations:", dd[["N"]])
+  cat("\nNumber of Groups: ")
+  Ngrps <- dd$ngrps[1:dd$Q]
+  if ((lNgrps <- length(Ngrps)) == 1) {
+    cat(Ngrps, "\n")
+  }
+  else {
+    sNgrps <- 1:lNgrps
+    aux <- rep(names(Ngrps), sNgrps)
+    aux <- split(aux, array(rep(sNgrps, lNgrps), c(lNgrps,
+                                                   lNgrps))[!lower.tri(diag(lNgrps))])
+    names(Ngrps) <- unlist(lapply(aux, paste, collapse = " %in% "))
+    cat("\n")
+    print(rev(Ngrps))
+  }
+  invisible(x)
+}
+
+##' @export
+summary.nlmixr_nlme <- function(object, ...){
+  tmp <- object;
+  class(object) <- class(object)[-1];
+  tmp <- summary(object);
+  class(tmp) <- c("summary_nlmixr_nlme", class(tmp));
+  return(tmp);
+}
+
+##' @export
+print.summary_nlmixr_nlme <- function (x, verbose = FALSE, ..., print.data=FALSE)
+{
+  dd <- x$dims
+  verbose <- verbose || attr(x, "verbose")
+  if (inherits(x, "nlme")) {
+    cat("Nonlinear mixed-effects model fit by ")
+    cat(ifelse(x$method == "REML", "REML\n", "maximum likelihood\n"))
+    cat("  Model:", deparse(x$call$model), "\n")
+  }
+  else {
+    cat("Linear mixed-effects model fit by ")
+    cat(ifelse(x$method == "REML", "REML\n", "maximum likelihood\n"))
+  }
+  if (print.data)
+    cat(" Data:", deparse(x$call$data), "\n")
+  if (!is.null(x$call$subset)) {
+    cat("  Subset:", deparse(asOneSidedFormula(x$call$subset)[[2L]]),
+        "\n")
+  }
+  print(data.frame(AIC = x$AIC, BIC = x$BIC, logLik = c(x$logLik),
+                   row.names = " "))
+  if (verbose) {
+    cat("Convergence at iteration:", x$numIter, "\n")
+  }
+  cat("\n")
+  print(summary(x$modelStruct), sigma = x$sigma, reEstimates = x$coef$random,
+        verbose = verbose)
+  cat("Fixed effects: ")
+  fixF <- x$call$fixed
+  if (inherits(fixF, "formula") || is.call(fixF)) {
+    cat(deparse(x$call$fixed), "\n")
+  }
+  else {
+    cat(deparse(lapply(fixF, function(el) as.name(deparse(el)))),
+        "\n")
+  }
+  xtTab <- as.data.frame(x$tTable)
+  wchPval <- match("p-value", names(xtTab))
+  for (i in names(xtTab)[-wchPval]) {
+    xtTab[, i] <- format(zapsmall(xtTab[, i]))
+  }
+  xtTab[, wchPval] <- format(round(xtTab[, wchPval], 4))
+  if (any(wchLv <- (as.double(levels(xtTab[, wchPval])) ==
+                      0))) {
+    levels(xtTab[, wchPval])[wchLv] <- "<.0001"
+  }
+  row.names(xtTab) <- dimnames(x$tTable)[[1L]]
+  print(xtTab)
+  if (nrow(x$tTable) > 1) {
+    corr <- x$corFixed
+    class(corr) <- "correlation"
+    print(corr, title = " Correlation:", ...)
+  }
+  cat("\nStandardized Within-Group Residuals:\n")
+  print(x$residuals)
+  cat("\nNumber of Observations:", x$dims[["N"]])
+  cat("\nNumber of Groups: ")
+  Ngrps <- dd$ngrps[1:dd$Q]
+  if ((lNgrps <- length(Ngrps)) == 1) {
+    cat(Ngrps, "\n")
+  }
+  else {
+    sNgrps <- 1:lNgrps
+    aux <- rep(names(Ngrps), sNgrps)
+    aux <- split(aux, array(rep(sNgrps, lNgrps), c(lNgrps,
+                                                   lNgrps))[!lower.tri(diag(lNgrps))])
+    names(Ngrps) <- unlist(lapply(aux, paste, collapse = " %in% "))
+    cat("\n")
+    print(rev(Ngrps))
+  }
+  invisible(x)
+}
+##' @importFrom nlme varWeights
+##' @export
+varWeights.nlmixr_nlme <- function(object, ...){
+    nlmeModList(object$env);
+    on.exit({nlmeModList(new.env())})
+    return(nlme::varWeights(object$modelStruct$varStruct))
+}
+
+
+##' @export
+anova.nlmixr_nlme <- function(object, ...){
+    args <- lapply(list(object, ...),
+                   function(x){
+        if (class(x)[1L] == "nlmixr_nlme"){
+            tmp <- x;
+            class(tmp) <- class(tmp)[-1L];
+            return(tmp)
+        } ## else if (is(x, "nlmixr.ui.nlme")){
+        ##     x <- as.nlme(x);
+        ##     if (class(x)[1L] == "nlmixr_nlme"){
+        ##         tmp <- x;
+        ##         class(tmp) <- class(tmp)[-1L];
+        ##         return(tmp)
+        ##     } else {
+        ##         return(x)
+        ##     }
+        ## }
+        else {
+            return(x)
+        }
+    });
+    ret <- do.call(getFromNamespace("anova.lme","nlme"), args);
+    row.names(ret) <- NULL;
+    return(ret);
+}
+
+##' @rdname focei.eta
+focei.eta.nlmixr_nlme <- function(object, ...){
+    mat <- as.matrix(VarCorr(object))
+    dn <- dimnames(mat);
+    d <- dim(mat);
+    is.cov <- (d[2] >= 3);
+    mat <- suppressWarnings(matrix(as.numeric(mat), d[1], d[2]));
+    dimnames(mat) <- dn
+    len <- length(mat[, 1, drop = FALSE]);
+    mat <- mat[-len,, drop = FALSE]
+    est <- as.numeric(mat[, 1]);
+    etas <- sprintf("ETA[%d]", seq_along(row.names(est)))
+    if (!is.cov)
+        return(eval(parse(text=sprintf("list(%s)", paste(sprintf("ETA[%d] ~ %s", seq_along(est), est), collapse=", ")))));
+    sd <- as.numeric(mat[-len, 2]);
+    cor <- apply(mat[-c(1, len), -(1:2), drop = FALSE], 1, function(x){as.numeric(x)})
+    ome <- diag(est)
+    ## Now fill in the diagionals
+    if (class(cor) == "matrix"){
+        stop("Haven't handled covariance translation for this model yet...")
+    } else {
+        ome[1, 2] <- ome[2, 1] <- cor[1] * sd[1] * sd[2]
+        eval(parse(text=sprintf("list(%s ~ c(%s))", paste(etas, collapse="+"),
+                           paste(ome[lower.tri(ome, diag=TRUE)], collapse=", "))))
+    }
+}
+
+##' @rdname focei.theta
+focei.theta.nlmixr_nlme <- function(object, uif, ...){
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    n <- uif$focei.names
+    thetas <- rep(NA, length(n));
+    names(thetas) <- n;
+    f <- fixed.effects(object)
+    for (n in names(f)){
+        thetas[n] <- f[n];
+    }
+    ## Handle variance classes.
+    err <- object$modelStruct$varStruct
+    err.type <- uif$focei.err.type;
+    if (is(err, "varConstPower")){
+        ## Addititive + proportional
+        add <- which(err.type == "add")
+        prop <- which(err.type == "prop")
+        thetas[prop] <- object$modelStruct$varStruct$const;
+        thetas[add] <- object$sigma;
+    } else if (is(err, "varPower")){
+        ## Proportional
+        prop <- which(err.type == "prop")
+        thetas[prop] <- object$sigma
+    } else {
+        ## Additive.
+        add <- which(err.type == "add")
+        thetas[add] <- object$sigma
+    }
+    return(thetas)
+}
+
+
+##' @rdname as.focei
+as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
+    if (class(uif) == "function"){
+        uif <- nlmixr(uif);
+    }
+    uif.new <- uif;
+    fit <- object;
+    mat <- as.matrix(random.effects(fit));
+    mat <- mat[order(as.numeric(row.names(mat))),, drop = FALSE]
+    th <- focei.theta(fit, uif)
+    for (n in names(th)){
+        uif.new$est[uif.new$name == n] <- th[n];
+    }
+    ome <- focei.eta(fit, uif);
+    init <- list(THTA=th,
+                 OMGA=ome)
+    nlme.time <- proc.time() - pt;
+    if (missing(data)){
+        dat <- as.data.frame(getData(object));
+    } else {
+        dat <- data;
+    }
+    fit.f <- focei.fit(data=dat,
+                       inits=init,
+                       PKpars=uif$theta.pars,
+                       ## par_trans=fun,
+                       model=uif$rxode.pred,
+                       pred=function(){return(nlmixr_pred)},
+                       err=uif$error,
+                       lower=uif$focei.lower,
+                       upper=uif$focei.upper,
+                       theta.names=uif$focei.names,
+                       eta.names=uif$eta.names,
+                       control=list(NOTRUN=TRUE,
+                                    inits.mat=mat,
+                                    cores=1,
+                                    find.best.eta=FALSE,
+                                    numeric=(!is.null(uif$nmodel$lin.solved)),
+                                    sum.prod=uif$env$sum.prod));
+    ome <- fit.f$omega;
+    w <- which(!is.na(uif.new$ini$neta1))
+    for (i in w){
+        uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
+    }
+    ## enclose the nlme fit in the .focei.env
+    env <- attr(fit.f, ".focei.env");
+    env$fit$nlme <- fit
+    tmp <- cbind(data.frame(nlme=nlme.time["elapsed"]), env$fit$time);
+    names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
+    env$fit$time <- tmp;
+    env$uif <- uif;
+    env$uif.new <- uif.new;
+    class(fit.f) <- c("nlmixr.ui.nlme", class(fit.f))
+    return(fit.f)
+}
+
+## comparePred should work because predict should work...
+
+##' @importFrom nlme nlme
+##' @export
+nlme.function <- function(model, data, fixed, random = fixed,
+                          groups, start, correlation = NULL, weights = NULL, subset,
+                          method = c("ML", "REML"), na.action = na.fail, naPattern,
+                          control = list(), verbose = FALSE){
+    uif <- nlmixr(model);
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    call$model <- uif;
+    return(do.call(getFromNamespace("nlme.nlmixrUI","nlmixr"), call, envir = parent.frame(1)))
+}
+
+##' @export
+nlme.nlmixrUI <- function(model, data, fixed, random = fixed,
+                          groups, start, correlation = NULL, weights = NULL, subset,
+                          method = c("ML", "REML"), na.action = na.fail, naPattern,
+                          control = list(), verbose = FALSE){
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    names(call)[1] <- "object";
+    call$est <- "nlme";
+    return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)))
+}
+##' @export
+nlme.nlmixr.ui.nlme <- function(model, data, fixed, random = fixed,
+                                groups, start, correlation = NULL, weights = NULL, subset,
+                                method = c("ML", "REML"), na.action = na.fail, naPattern,
+                                control = list(), verbose = FALSE){
+    env <- attr(model, ".focei.env")
+    uif <- env$uif.new;
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    names(call)[1] <- "object";
+    call$object <- uif
+    call$est <- "nlme";
+    if (missing(data)){
+        data <- getData(model);
+        call$data <- data
+    }
+    return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)))
+}
+
+##' @export
+nlme.nlmixr.ui.focei.fit <- nlme.nlmixr.ui.nlme
