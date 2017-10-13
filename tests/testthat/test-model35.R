@@ -7,7 +7,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
 
   test_that("Closed-form", {
 
-      datr <- Bolus_2CPT
+    datr <- Bolus_2CPT
     datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
     datr <- datr[datr$EVID != 2,]
 
@@ -40,7 +40,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
         )
       )
 
-    runno <- "N035"
+      runno <- "N035"
 
     dat <- datr
 
@@ -67,7 +67,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION"), "true")) {
 
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.339)
     expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.313)
-    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.000566)
+    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.000561)
     expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.304)
 
     expect_equal(signif(fit$sigma, 3), 0.203)

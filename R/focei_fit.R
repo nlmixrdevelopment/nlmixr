@@ -337,7 +337,7 @@ fixef.focei.fit <- function(object, ...){
             } else {
                 ci <- 0.95;
             }
-            qn <- qnorm(1-(1-ci)/2);
+            qn <- stats::qnorm(1-(1-ci)/2);
             if (!is.null(uif)){
                 saem <- object$saem;
                 nlme <- object$nlme;

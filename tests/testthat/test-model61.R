@@ -150,11 +150,11 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[4]),3), 3.86)
     expect_equal(signif(as.numeric(fitODE$coefficients$fixed[5]),3), -0.15)
 
-    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.311)
-    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.264)
-    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.436)
-    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.256)
-    expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.319)
+    expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.317)
+    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.258)
+    expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.409)
+    expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.229)
+    expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.321)
 
     expect_equal(signif(fitODE$sigma, 3), 0.20)
   })

@@ -65,7 +65,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 6.57)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 4.9)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.25)
-    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.46)
+    expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.45)
     expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 4.00)
 
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.33)

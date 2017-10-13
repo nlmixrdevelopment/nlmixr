@@ -2,6 +2,8 @@
 ^README(\.md|\.Rmd)$
 ^.git.*$
 ^\.gitignore$
+^vignettes/examples/ACoP7poster/.*$
+^vignettes/examples/LiveDemo/.*$
 ^vignettes/figure/.*$
 ^appveyor\.yml$
 rx_.*\.(so|dll)$
@@ -25,3 +27,5 @@ RxODE.*\.(zip|pdf)$
 ^/?man-roxygen/.*$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+rx_*.*
+

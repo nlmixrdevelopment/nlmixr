@@ -13,7 +13,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
                stringsAsFactors = F)
     datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
 
-    datr <- datr[datr$EVID != 2,]
+      datr <- datr[datr$EVID != 2,]
     datIV <- datr[datr$AMT > 0,]
     datIV$TIME <- datIV$TIME + (datIV$AMT/datIV$RATE)
     datIV$AMT <- -1*datIV$AMT
@@ -80,7 +80,7 @@ if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
     expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.74)
 
     expect_equal(signif(as.numeric(z[1, "StdDev"]), 3), 0.225)
-    expect_equal(round(as.numeric(z[2, "StdDev"]), 3), 0)
+    expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.453)
     expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.293)
     expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.000703)
     expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.000527)
