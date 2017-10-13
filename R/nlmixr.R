@@ -361,5 +361,38 @@ saemControl <- function(seed=99,
                      transit_abs = as.integer(transit_abs)),
          seed=seed,
          print=print, ...)
+}
 
+
+
+ParTable<-function(res,est="SAEM"){
+    theta<-as.data.frame(res$par.fixed)
+    theta$Parameter<-rownames(theta)
+    Time<-data.frame(Parameter="Time",variable="Estimate",value=sum(res$time),stringsAsFactors=FALSE)
+    IIV<-data.frame(Parameter=row.names(res$omega),variable="EtaCV",value=100*sqrt(diag(res$omega)),stringsAsFactors=FALSE)
+
+    if (est=="nlme"){
+        names(theta)[names(theta)=="Value"]<-"est"
+        names(theta)[names(theta)=="Std.Error"]<-"se(est)"
+        theta$exp.est.<-exp(theta$est)
+    }
+
+    F2<-function(x,digits){formatC(signif(x,digits=digits), digits=digits,format="fg", flag="#")}
+    FFP<-function(x,digits){formatC(x,digits=digits,format="f",flag="#")}
+
+    TM1<-data.frame(
+        Parameter=ifelse(theta$Parameter!="prop.err",as.character(theta$label),"Proportional error"),
+        Estimate=F2(theta$est,3),
+        SE=ifelse(theta$Parameter!="prop.err",F2(theta$"se(est)",3)," "),
+        CV=ifelse(theta$Parameter!="prop.err",paste(FFP(100*theta$"se(est)"/theta$est,1),"%",sep="")," "),
+        Backtransformed=ifelse(theta$Parameter!="prop.err",paste(F2(theta$exp.est.,3)," (",F2(exp(theta$est-1.96*theta$"se(est)"),3),"/",F2(exp(theta$est+1.96*theta$"se(est)"),3),")",sep=""),F2(100*(theta$est),3))
+       ,stringsAsFactors=FALSE)
+
+    TM2<-data.frame(Parameter=c(IIV$Parameter,"Time (sec)"),Estimate=F2(c(IIV$value,Time$value),3),SE="",CV="",Backtransformed="",stringsAsFactors=FALSE)
+    TM2<-rbind(TM1,TM2)
+    TM2$Parameter[grep("eta.",TM2$Parameter)]<-paste( TM2$Parameter[grep("eta.",TM2$Parameter)],"(%)")
+    TM2$Parameter<-gsub("eta.", "IIV ", TM2$Parameter)
+    names(TM2)[names(TM2)=="Backtransformed"]<-"Back-transformed (95%CI)"
+
+    TM2
 }

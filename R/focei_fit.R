@@ -332,24 +332,27 @@ fixef.focei.fit <- function(object, ...){
     if (any(names(args) == "full")){
         if (args$full){
             uif <- object$uif;
+            if (any(names(args) == "ci")){
+                ci <- args$ci
+            } else {
+                ci <- 0.95;
+            }
+            qn <- qnorm(1-(1-ci)/2);
             if (!is.null(uif)){
                 saem <- object$saem;
                 nlme <- object$nlme;
                 lab <- paste(uif$ini$label[!is.na(uif$ini$ntheta)]);
                 lab[lab == "NA"] <- "";
                 lab <- gsub(" *$", "", gsub("^ *", "", lab));
+                log.theta <- which(row.names(df) %in% uif$log.theta);
                 if (!is.null(nlme)){
-                    ttab <- summary(nlme)$tTable;
+                    ttab <- data.frame(summary(nlme)$tTable);
+                    names(ttab) <- c("Estimate", "SE", "DF", "t-value", "p-value")
+                    ttab <- ttab[, 1:2]
                     tmp <- object$par.data.frame;
+                    tmp$SE <- NA
                     tmp <- tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]
-                    tmp2 <- data.frame(Value=tmp$est,
-                               Std.Error=NA, DF=NA,
-                               "t-value"=NA,
-                               "p-value"=NA, check.names=FALSE)
-                    rownames(tmp2) <- rownames(tmp)
-                    tmp <- rbind(ttab,tmp2)
-                    tmp$label <- lab
-                    return(tmp)
+                    df <- data.frame(Parameter=lab, rbind(ttab,tmp))
                 }
                 if (!is.null(saem)){
                     nth <- length(uif$saem.theta.name)
@@ -357,17 +360,66 @@ fixef.focei.fit <- function(object, ...){
                     df <- object$par.data.frame
                     se2 <- rep(NA, length(df[, 1]));
                     se2[1:nth] <- se[row.names(df)[1:nth]];
-                    df <- data.frame(df, "se(est)"=se2, label=lab, check.names=FALSE)
-                    return(df);
+                    df <- data.frame(Parameter=lab, df, "SE"=se2);
                 }
-                ret <- object$par.data.frame
-                ret$label <- lab;
-                return(ret)
+                if (!is.null(saem) | !is.null(nlme)){
+                    df <- data.frame(df, "CV"=abs(df$SE / df$Estimate * 100));
+                } else {
+                    df <- object$par.data.frame;
+                }
+                df <- data.frame(df, Untransformed=df$Estimate,
+                                 Lower.ci=df$Estimate - qn * df$SE,
+                                 Upper.ci=df$Estimate + qn * df$SE,
+                                 check.names=FALSE);
+                if (length(log.theta) > 0){
+                    df$Untransformed[log.theta] <- exp(df$Untransformed[log.theta])
+                    df$Lower.ci[log.theta] <- exp(df$Lower.ci[log.theta])
+                    df$Upper.ci[log.theta] <- exp(df$Upper.ci[log.theta])
+                }
+                w <- which(uif$ini$err == "prop")
+                if (length(w) > 0){
+                    df$Untransformed[w] <- df$Untransformed[w] * 100
+                    df$Lower.ci[w] <- df$Lower.ci[w] * 100
+                    df$Upper.ci[w] <- df$Upper.ci[w] * 100
+                }
+                attr(df, "ci") <- ci;
+                class(df) <- c("par.fixed", "data.frame");
+                return(df);
             }
             return(object$par.data.frame);
         }
     }
     return(object$theta)
+}
+
+##'@export
+print.par.fixed <- function(x, ...){
+    df <- x;
+    class(df) <- "data.frame";
+    digs <- 3;
+    digs.cv <- 1;
+    ## Rik's formating functions (modified)
+    F2<-function(x,digits){
+        ifelse(is.na(x), " ",
+               formatC(signif(x,digits=digits), digits=digits,format="fg", flag="#"))}
+    FFP<-function(x,digits){ifelse(is.na(x), " ",
+                                   paste0(formatC(x,digits=digits,format="f",flag="#"), "%"))}
+    df$Estimate <- F2(df$Estimate, digs);
+    df$SE <- F2(df$SE, digs);
+    df$CV <- paste0(FFP(df$CV, digs.cv))
+
+    df$Untransformed <- sprintf("%s%s%s%s%s%s%s", F2(df$Untransformed, digs),
+                                ifelse(x$Estimate * 100 == x$Untransformed, "%", ""),
+                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", " ("),
+                                F2(df$Lower.ci, digs),
+                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
+                                F2(df$Upper.ci, digs),
+                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
+    df <- df[, regexpr("[.]ci", names(df)) == -1]
+    ci <- attr(x, "ci")
+    names(df) <- gsub("Untransformed",
+                      sprintf("Untransformed (%s%%CI)", ci * 100), names(df))
+    print(df)
 }
 
 ##' Extract residuals from the FOCEI fit
@@ -1976,9 +2028,9 @@ focei.fit.data.frame0 <- function(data,
         fit$fit.df <- fit.df;
         w <- seq_along(nms)
         if (con$NOTRUN){
-            fit$par.data.frame <- data.frame(est=fit$theta, "exp(est)"=exp(fit$theta), row.names=nms);
+            fit$par.data.frame <- data.frame(Estimate=fit$theta, row.names=nms);
         } else {
-            fit$par.data.frame <- data.frame(est=fit$theta, "exp(est)"=exp(fit$theta), "se(est)"=fit$se[w], "%cv(est)"=abs(fit$se[w] / fit$theta * 100),
+            fit$par.data.frame <- data.frame(Estimate=fit$theta, SE=fit$se[w], CV=abs(fit$se[w] / fit$theta * 100),
                                              check.names=FALSE, row.names=nms);
         }
         env <- environment(ofv.FOCEi);
