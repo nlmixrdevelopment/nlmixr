@@ -569,6 +569,11 @@ nlmixrBounds <- function(fun){
         dups <- unique(n[duplicated(n)])
         stop(sprintf("The following parameter names were duplicated: %s.", paste(dups, collapse=", ")))
     }
+    w <- which(is.infinite(df$est));
+    if (length(w) > 0){
+        stop(sprintf("The following parameters initial estimates are infinite: %s", paste(df$name[w], collapse=", ")))
+    }
+
     w <- which(df$lower == df$est && df$est == df$upper);
     if (length(w) > 0){
         stop(sprintf("The estimate, and upper and lower bounds are the same for the following parameters: %s\nTo fix parameters use %s=fix(%s) instead.",
