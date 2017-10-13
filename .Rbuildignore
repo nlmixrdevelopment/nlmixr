@@ -10,7 +10,6 @@ rx_.*\.(so|dll)$
 .*\.(o|a|dll)$
 testthat/.*\.(so|dll)$
 BinaryFiles$
-RxODE.*\.(zip|pdf)$
 ^/?inst/Install-windows.md
 ^/?inst/examples/ACoP7poster/.*$
 ^/?inst/examples/LiveDemo/.*$
@@ -27,5 +26,4 @@ RxODE.*\.(zip|pdf)$
 ^/?man-roxygen/.*$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-rx_*.*
 
