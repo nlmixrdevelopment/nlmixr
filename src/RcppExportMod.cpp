@@ -183,21 +183,13 @@ n1qn1_wrap(
   nsim = INTEGER(nsimSEXP)[0];
   imp = INTEGER(impSEXP)[0];
   nzm = INTEGER(nzmSEXP)[0];
-<<<<<<< HEAD
-  double *x, *g, *var, *zm;
-  x = Calloc(n, double);
-  g = Calloc(n, double);
-  var = Calloc(n, double);
-  zm = Calloc(nzm,double);
-  double f, eps;
-=======
 
   double f, eps;
   double *x = new double[n];
   double *g = new double[n];
   double *var = new double[n];
   double *zm = new double[nzm];
->>>>>>> 7fd04719f66bfcd45f7f61e5d8a4ca9a794c270d
+
   int izs[1]; float rzs[1]; double dzs[1];
   for (i=0; i<n; i++) x[i] = REAL(xSEXP)[i];
   for (i=0; i<nzm; i++) zm[i] = REAL(zmSEXP)[i];
@@ -241,20 +233,6 @@ n1qn1_wrap(
       k++;
     }
   }
-<<<<<<< HEAD
-  Rcpp::List ret = Rcpp::List::create(Rcpp::Named("value") = f,
-                                      Rcpp::Named("par") = par,
-                                      // Rcpp::Named("L") = L,
-                                      // Rcpp::Named("D") = D,
-                                      Rcpp::Named("H") = H,
-                                      // Rcpp::Named("zm")=zms,
-                                      Rcpp::Named("c.hess") = hess);
-  Free(x);
-  Free(g);
-  Free(var);
-  Free(zm);
-  return ret;
-=======
 
   delete[] x;
   delete[] g;
@@ -268,8 +246,6 @@ n1qn1_wrap(
 			    Rcpp::Named("H") = H,
 			    // Rcpp::Named("zm")=zms,
 			    Rcpp::Named("c.hess") = hess);
->>>>>>> 7fd04719f66bfcd45f7f61e5d8a4ca9a794c270d
-        
   END_RCPP
 }
 
