@@ -352,8 +352,7 @@ fixef.focei.fit <- function(object, ...){
                     tmp$SE <- NA
                     tmp <- tmp[!(row.names(tmp) %in% row.names(ttab)), ,drop = FALSE]
                     df <- data.frame(Parameter=lab, rbind(ttab,tmp))
-                }
-                if (!is.null(saem)){
+                } else if (!is.null(saem)){
                     nth <- length(uif$saem.theta.name)
                     se <- structure(sqrt(diag(RxODE::rxInv(saem$Ha[1:nth,1:nth]))), .Names=uif$saem.theta.name)
                     df <- object$par.data.frame
@@ -365,6 +364,7 @@ fixef.focei.fit <- function(object, ...){
                     df <- data.frame(df, "CV"=abs(df$SE / df$Estimate * 100));
                 } else {
                     df <- object$par.data.frame;
+                    df <- data.frame(Parameter=lab, df)
                 }
                 df <- data.frame(df, Untransformed=df$Estimate,
                                  Lower.ci=df$Estimate - qn * df$SE,
@@ -383,7 +383,7 @@ fixef.focei.fit <- function(object, ...){
                     df$Upper.ci[w] <- df$Upper.ci[w] * 100
                 }
                 attr(df, "ci") <- ci;
-                class(df) <- c("par.fixed", "data.frame");
+                class(df) <- c("nlmixr.par.fixed", "data.frame");
                 return(df);
             }
             return(object$par.data.frame);
@@ -393,7 +393,7 @@ fixef.focei.fit <- function(object, ...){
 }
 
 ##'@export
-print.par.fixed <- function(x, ...){
+print.nlmixr.par.fixed <- function(x, ...){
     df <- x;
     class(df) <- "data.frame";
     digs <- 3;
