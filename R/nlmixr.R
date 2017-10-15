@@ -288,6 +288,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                          upper=uif$focei.upper,
                          theta.names=uif$focei.names,
                          eta.names=uif$eta.names,
+                         control=control,
                          ...)
         env <- attr(fit, ".focei.env")
         env$uif <- uif;

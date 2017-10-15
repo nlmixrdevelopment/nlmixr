@@ -10,7 +10,6 @@
 \title{FOCEI Fit for nlmixr}
 \usage{
 focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
-  optim = c("bobyqa", "L-BFGS-B", "BFGS", "lbfgs", "lbfgsb3", "nlminb"),
   model = NULL, pred = NULL, err = NULL, lower = -Inf, upper = Inf,
   control = list(), calculate.vars = c("pred", "ipred", "ires", "res",
   "iwres", "wres", "cwres", "cpred", "cres"), theta.names = NULL,
@@ -34,9 +33,7 @@ focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
 \item{PKpars}{Pk Parameters}
 
 \item{diag.xform}{The form of the diagonal of the Omega matrix to
-be estimated.  This can be "sqrt" "log" or "identity".}
-
-\item{optim}{The optimization method to be used}
+be estimated.  This can be "sqrt" "log" or "identity"}
 
 \item{model}{The RxODE model to use}
 

@@ -710,8 +710,7 @@ plot.focei.fit <- function(x, ...) {
 ##' @param inits Initialization list
 ##' @param PKpars Pk Parameters
 ##' @param diag.xform The form of the diagonal of the Omega matrix to
-##'     be estimated.  This can be "sqrt" "log" or "identity".
-##' @param optim The optimization method to be used
+##'     be estimated.  This can be "sqrt" "log" or "identity"
 ##' @param model The RxODE model to use
 ##' @param pred The Prediction function
 ##' @param err The Error function
@@ -730,17 +729,6 @@ focei.fit <- function(data,
                       inits,
                       PKpars,
                       diag.xform=c("sqrt", "log", "identity"),
-                      optim=c(
-                          ## "n1qn1",
-                          "bobyqa",
-                          "L-BFGS-B",
-                          "BFGS",
-                          "lbfgs",
-                          "lbfgsb3",
-                          ## "newuoa",
-                          "nlminb"##,
-                          ## "uobyqa"
-                      ),
                       model=NULL,
                       pred=NULL,
                       err=NULL,
@@ -808,17 +796,6 @@ focei.fit.data.frame0 <- function(data,
                                   inits,
                                   PKpars,
                                   diag.xform=c("sqrt", "log", "identity"),
-                                  optim=c(
-                                      ## "n1qn1",
-                                      "bobyqa",
-                                      "L-BFGS-B",
-                                      "BFGS",
-                                      "lbfgs",
-                                      "lbfgsb3",
-                                      ## "newuoa",
-                                      "nlminb"##,
-                                      ## "uobyqa"
-                                  ),
                                   model=NULL,
                                   pred=NULL,
                                   err=NULL,
@@ -925,7 +902,8 @@ focei.fit.data.frame0 <- function(data,
         sum.prod=TRUE,
         theta.grad=FALSE,
         scale.to=1,
-        numeric=FALSE
+        numeric=FALSE,
+        optim="L-BFGS-B"
     )
 
     running <- TRUE
@@ -954,8 +932,17 @@ focei.fit.data.frame0 <- function(data,
     if (con$sigdig == 0 & con$ridge.decay == 0 && !con$extra.output){
         do.sink <- FALSE
     }
-
-    optim.method <- match.arg(optim);
+    optim <- con$optim;
+    optim.method <- match.arg(optim, c( ## "n1qn1",
+                                             "bobyqa",
+                                             "L-BFGS-B",
+                                             "BFGS",
+                                             "lbfgs",
+                                             "lbfgsb3",
+                                             ## "newuoa",
+                                             "nlminb"##,
+                                             ## "uobyqa"
+                                         ))
     grad.methods <- c("BFGS", "L-BFGS-B", "lbfgs", "lbfgsb3", "nlminb", "mma", "slsqp", "lbfgs-nlopt", "tnewton_precond_restart",
                       "tnewton_precond", "tnewton", "var1", "var2", "n1qn1")
     print.grad <- any(optim.method == grad.methods);
