@@ -183,7 +183,12 @@ n1qn1_wrap(
   nsim = INTEGER(nsimSEXP)[0];
   imp = INTEGER(impSEXP)[0];
   nzm = INTEGER(nzmSEXP)[0];
-  double x[n], f, g[n], var[n], eps, zm[nzm];
+
+  double f, eps;
+  double *x = new double[n];
+  double *g = new double[n];
+  double *var = new double[n];
+  double *zm = new double[nzm];
   int izs[1]; float rzs[1]; double dzs[1];
   for (i=0; i<n; i++) x[i] = REAL(xSEXP)[i];
   for (i=0; i<nzm; i++) zm[i] = REAL(zmSEXP)[i];
@@ -227,6 +232,12 @@ n1qn1_wrap(
       k++;
     }
   }
+
+  delete[] x;
+  delete[] g;
+  delete[] var;
+  delete[] zm;
+
   return Rcpp::List::create(Rcpp::Named("value") = f,
                             Rcpp::Named("par") = par,
 			    // Rcpp::Named("L") = L,
