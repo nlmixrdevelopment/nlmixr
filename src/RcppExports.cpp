@@ -151,6 +151,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// foceiDataSetup
+DataFrame foceiDataSetup(const NumericVector& id);
+RcppExport SEXP _nlmixr_foceiDataSetup(SEXP idSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type id(idSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiDataSetup(id));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sFOCEi
 arma::mat sFOCEi(NumericVector par, Environment e);
 RcppExport SEXP _nlmixr_sFOCEi(SEXP parSEXP, SEXP eSEXP) {

@@ -604,11 +604,10 @@ par.hist.nlmixr.ui.saem <- function(x, stacked=FALSE, ...){
     theta.names <- c(uif$saem.theta.name, uif$saem.omega.name, uif$saem.res.name);
     m <- x$saem$par_hist
     if (stacked){
-        df = data.frame(
+        df <- data.frame(
             val=as.vector(m),
             par=rep(theta.names, each=nrow(m)),
-            iter=rep(1:nrow(m), ncol(m))
-        )
+            iter=rep(1:nrow(m), ncol(m)))
         return(df)
     } else {
         dimnames(m) <- list(NULL, theta.names);
@@ -958,18 +957,18 @@ focei.fit.data.frame0 <- function(data,
         print.grad <- FALSE;
     }
     if(is(model, "RxODE") || is(model, "character")) {
-        ODEmodel = TRUE
+        ODEmodel <- TRUE
         if (class(pred) != "function"){
             stop("pred must be a function specifying the prediction variables in this model.")
         }
     }
     else {
-        ODEmodel = TRUE
+        ODEmodel <- TRUE
         model <- constructLinCmt(PKpars);
         pred <- eval(parse(text="function(){return(Central);}"))
     }
 
-    square = function(x) x*x
+    square <- function(x) x*x
     diag.xform <- match.arg(diag.xform)
     diag.xform.inv = c("sqrt"="square", "log"="exp", "identity"="identity")[diag.xform]
 
@@ -1009,14 +1008,6 @@ focei.fit.data.frame0 <- function(data,
         }
         message("Needed Covariates:")
         RxODE::rxPrint(cov.names)
-        ## pcov <- as.vector(sapply(cov.names, function(x){
-        ##     w <- which(x == par.names);
-        ##     if (length(w) == 1){
-        ##         return(w)
-        ##     } else {
-        ##         return(0);
-        ##     }
-        ## }))
     }
 
     ## RxODE(rxNorm(model$inner), modName="test");

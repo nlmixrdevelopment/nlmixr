@@ -1557,3 +1557,29 @@ NumericVector rxUpdateEtas(SEXP DnDhS, SEXP DhS, SEXP initS, SEXP acceptNS){
   NumericVector ret = as<NumericVector>(wrap(inits));
   return ret;
 }
+
+// [[Rcpp::export]]
+DataFrame foceiDataSetup(const NumericVector &id){
+  // Purpose: get positions of each id and the length of each id's observations
+  int nSub = -1;
+  int ids = id.size();
+  int lastId = id[0]-1;
+  NumericVector pos;
+  NumericVector nobsv;
+  int nobs = 0;
+  int cid = 0;
+  for (int i = 0; i < ids; i++){
+    if (lastId != id[i]){
+      nSub++;
+      nobsv[cid]=nobs;
+      pos[cid]=i;
+      cid++;
+      nobs=0;
+      lastId = id[i];
+    } else {
+      nobs++;
+    }
+  }
+  return DataFrame::create(Named("pos")=pos,
+			   Named("nobs")=nobsv);
+}
