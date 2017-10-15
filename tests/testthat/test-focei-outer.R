@@ -1,5 +1,4 @@
 rxPermissive({
-
     context("Outer Problem Gradient Tests")
 
     mat.indices <- function(nETA){
@@ -451,4 +450,4 @@ rxPermissive({
         expect_equal(attr(tmp5.g,"dEta.dTheta"), attr(tmp5.g2,"dEta.dTheta"));
 
     })
-}, silent=TRUE)
+}, on.validate="NLMIXR_VALIDATION", silent=TRUE)

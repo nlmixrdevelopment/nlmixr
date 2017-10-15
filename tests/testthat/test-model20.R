@@ -1,59 +1,58 @@
 library(testthat)
 library(nlmixr)
 
-context("NLME20: one-compartment infusion, single-dose, Michaelis-Menten")
+rxPermissive({
+    context("NLME20: one-compartment infusion, single-dose, Michaelis-Menten")
 
-if (identical(Sys.getenv("NLMIXR_VALIDATION_FULL"), "true")) {
+    test_that("ODE", {
 
-  test_that("ODE", {
+        datr <-
+            read.csv("Infusion_1CPTMM.csv",
+                     header = TRUE,
+                     stringsAsFactors = F)
+        datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
 
-    datr <-
-      read.csv("Infusion_1CPTMM.csv",
-               header = TRUE,
-               stringsAsFactors = F)
-    datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
+        datr <- subset(datr, EVID != 2)
+        datIV <- subset(datr, AMT>0)
+        datIV$TIME <- datIV$TIME + (datIV$AMT/datIV$RATE)
+        datIV$AMT  <- -1*datIV$AMT
+                                        #datIV <- datr[AMT > 0][, TIME := TIME + AMT / RATE][, AMT := -1 * AMT]
+        datr <- rbind(datr, datIV)
+        datr <- datr[order(datr$ID, datr$TIME),]
 
-    datr <- subset(datr, EVID != 2)
-    datIV <- subset(datr, AMT>0)
-    datIV$TIME <- datIV$TIME + (datIV$AMT/datIV$RATE)
-    datIV$AMT  <- -1*datIV$AMT
-    #datIV <- datr[AMT > 0][, TIME := TIME + AMT / RATE][, AMT := -1 * AMT]
-    datr <- rbind(datr, datIV)
-    datr <- datr[order(datr$ID, datr$TIME),]
-
-    ode1MM <- "
+        ode1MM <- "
 d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
   "
 
     mypar3 <- function(lVM, lKM, lV)
-    {
-      VM <- exp(lVM)
-      KM <- exp(lKM)
-      V <- exp(lV)
-    }
+        {
+            VM <- exp(lVM)
+            KM <- exp(lKM)
+            V <- exp(lV)
+        }
     specs3 <-
-      list(
-        fixed = lVM + lKM + lV ~ 1,
-        random = pdDiag(lVM + lKM + lV ~ 1),
-        start = c(lVM = 7, lKM = 6, lV = 4)
-      )
+        list(
+            fixed = lVM + lKM + lV ~ 1,
+            random = pdDiag(lVM + lKM + lV ~ 1),
+            start = c(lVM = 7, lKM = 6, lV = 4)
+        )
 
     runno <- "N020"
 
     dat <- datr[datr$SD == 1,]
 
     fit <-
-      nlme_ode(
-        dat,
-        model = ode1MM,
-        par_model = specs3,
-        par_trans = mypar3,
-        response = "centr",
-        response.scaler = "V",
-        verbose = TRUE,
-        weight = varPower(fixed = c(1)),
-        control = nlmeControl(pnlsTol = .01, msVerbose = TRUE)
-      )
+        nlme_ode(
+            dat,
+            model = ode1MM,
+            par_model = specs3,
+            par_trans = mypar3,
+            response = "centr",
+            response.scaler = "V",
+            verbose = TRUE,
+            weight = varPower(fixed = c(1)),
+            control = nlmeControl(pnlsTol = .01, msVerbose = TRUE)
+        )
 
     z <- VarCorr(fit)
 
@@ -71,6 +70,6 @@ d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
 
     expect_equal(signif(fit$sigma, 3), 0.204)
 
-  })
+})
+}, on.validate="NLMIXR_VALIDATION_FULL")
 
-}

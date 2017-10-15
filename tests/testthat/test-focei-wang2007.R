@@ -1,5 +1,5 @@
-context("Test FOCEI with NONMEM")
 rxPermissive({
+    context("Test FOCEI with NONMEM")
 
     mypar1 = function ()
     {
@@ -164,4 +164,4 @@ rxPermissive({
         expect_equal(round(fit.add.prop5$objective, 3), 51.882); # New entry that does not match Wang2007
     })
 
-}, silent=TRUE)
+}, on.validate="NLMIXR_VALIDATION", silent=TRUE)

@@ -444,4 +444,4 @@ rxPermissive({
         expect_equal(attr(tmp5.g,"grad") * 2, attr(tmp5.g2,"grad"));
         expect_equal(attr(tmp5.g,"dEta.dTheta"), attr(tmp5.g2,"dEta.dTheta"));
     })
-}, silent=TRUE)
+}, on.validate="NLMIXR_VALIDATION", silent=TRUE)

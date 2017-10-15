@@ -1,5 +1,5 @@
-context("Focei Inner");
 rxPermissive({
+    context("Focei Inner");
 
     mat.indices <- function(nETA){
         idx = do.call("rbind",
@@ -231,4 +231,4 @@ rxPermissive({
     })
 
 
-}, silent=TRUE)
+}, on.validate="NLMIXR_VALIDATION", silent=TRUE)

@@ -231,4 +231,4 @@ rxPermissive({
 
     })
 
-}, silent=TRUE)
+}, on.validate="NLMIXR_VALIDATION", silent=TRUE)
