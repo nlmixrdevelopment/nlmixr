@@ -49,7 +49,7 @@ Authors@R: c(person("Matthew","Fidler",
 Author: Matthew Fidler [aut], Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut],  Mirjam Trame [aut],
   Wenping Wang [aut, cre]
 Maintainer: Wenping Wang <wwang8198@gmail.com>
-Description: This package fits population pharmacokinetic (PK) 
+Description: Fits population pharmacokinetic (PK) 
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)
 NeedsCompilation: NeedsCompilation: yes
