@@ -1,11 +1,13 @@
 ---
-title: ""
+title: "Running PK models with nlmixr"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Running PK models with nlmixr}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
+
 ![nlmixr](logo.png)
 
 # Running PK models with nlmixr
