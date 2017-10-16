@@ -1587,16 +1587,16 @@ List foceiDataSetup(const DataFrame &df){
   NumericVector newDv(nObs);
   NumericVector newTimeO(nObs);
   
-  NumericVector newEvid(nDoses);
+  IntegerVector newEvid(nDoses);
   NumericVector newAmt(nDoses);
   NumericVector newTimeA(nDoses);
 
   lastId = id[0]-1;
-  NumericVector newId(nSub);
-  NumericVector posDose(nSub);
-  NumericVector posObs(nSub);
-  NumericVector nDose(nSub);
-  NumericVector nObsN(nSub);
+  IntegerVector newId(nSub);
+  IntegerVector posDose(nSub);
+  IntegerVector posObs(nSub);
+  IntegerVector nDose(nSub);
+  IntegerVector nObsN(nSub);
     
   int m = 0;
   for (i = 0; i < ids; i++){
@@ -1630,14 +1630,14 @@ List foceiDataSetup(const DataFrame &df){
   }
   nDose[m-1]=nDoses;
   nObsN[m-1]=nObs;
-  return List::create(_["dose"]=DataFrame::create(_["evid"]=newEvid,
-						  _["time"]=newTimeA,
-						  _["amt"]=newAmt),
-		      _["obs"]=DataFrame::create(_["dv"]=newDv,
-						 _["time"]=newTimeO),
+  return List::create(_["dose"]=DataFrame::create(_["evid"]   = newEvid,
+						  _["time"]   = newTimeA,
+						  _["amt"]    = newAmt),
+		      _["obs"]=DataFrame::create(_["dv"]      = newDv,
+						 _["time"]    = newTimeO),
 		      _["ids"]=DataFrame::create(_["id"]      = newId,
 						 _["posDose"] = posDose,
 						 _["posObs"]  = posObs,
 						 _["nDose"]   = nDose,
-						 _["nObs"]   = nObsN));
+						 _["nObs"]    = nObsN));
 }
