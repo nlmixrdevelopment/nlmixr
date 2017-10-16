@@ -1,5 +1,6 @@
 ^\.travis.yml$
 ^README(\.md|\.Rmd)$
+^LICENSE$
 ^.git.*$
 ^\.gitignore$
 ^vignettes/examples/ACoP7poster/.*$
@@ -26,4 +27,3 @@ BinaryFiles$
 ^/?man-roxygen/.*$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-
