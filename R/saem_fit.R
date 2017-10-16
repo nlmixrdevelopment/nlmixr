@@ -1319,23 +1319,23 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     } else {
         dat <- data;
     }
-    fit.f <- focei.fit(data=dat,
-                       inits=init,
-                       PKpars=uif$theta.pars,
-                       ## par_trans=fun,
-                       model=uif$rxode.pred,
-                       pred=function(){return(nlmixr_pred)},
-                       err=uif$error,
-                       lower=uif$focei.lower,
-                       upper=uif$focei.upper,
-                       theta.names=uif$focei.names,
-                       eta.names=uif$eta.names,
-                       control=list(NOTRUN=TRUE,
-                                    inits.mat=mat2,
-                                    cores=1,
-                                    find.best.eta=FALSE,
-                                    numeric=(!is.null(uif$nmodel$lin.solved)),
-                                    sum.prod=uif$env$sum.prod));
+    fit.f <- focei.fit.data.frame(data=dat,
+                                  inits=init,
+                                  PKpars=uif$theta.pars,
+                                  ## par_trans=fun,
+                                  model=uif$rxode.pred,
+                                  pred=function(){return(nlmixr_pred)},
+                                  err=uif$error,
+                                  lower=uif$focei.lower,
+                                  upper=uif$focei.upper,
+                                  theta.names=uif$focei.names,
+                                  eta.names=uif$eta.names,
+                                  control=list(NOTRUN=TRUE,
+                                               inits.mat=mat2,
+                                               cores=1,
+                                               find.best.eta=FALSE,
+                                               numeric=(!is.null(uif$nmodel$lin.solved)),
+                                               sum.prod=uif$env$sum.prod));
     ome <- fit.f$omega;
     w <- which(!is.na(uif.new$ini$neta1))
     for (i in w){
