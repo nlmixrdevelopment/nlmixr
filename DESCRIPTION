@@ -52,8 +52,8 @@ Maintainer: Wenping Wang <wwang8198@gmail.com>
 Description: Fits population pharmacokinetic (PK) 
   and pharmacokinetic-pharmacodynamic (PKPD) models.
 License: GPL (>= 2)
-NeedsCompilation: NeedsCompilation: yes
-LinkingTo: RcppArmadillo (>= 0.5.600.2.0), dparser, Rcpp (>= 0.12.3), RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
+NeedsCompilation: yes
+LinkingTo: RcppArmadillo (>= 0.5.600.2.0), dparser(>= 0.1.7), Rcpp (>= 0.12.3), RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr
