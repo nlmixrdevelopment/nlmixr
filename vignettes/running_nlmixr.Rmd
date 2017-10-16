@@ -479,7 +479,7 @@ A few points to note:
 
 Models can be fitted several ways, including via
 the
-[magrittr](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) forward-pipe
+[magrittr](https://CRAN.R-project.org/package=magrittr) forward-pipe
 operator.
 
 ```r
