@@ -1561,6 +1561,7 @@ NumericVector rxUpdateEtas(SEXP DnDhS, SEXP DhS, SEXP initS, SEXP acceptNS){
 // [[Rcpp::export]]
 List foceiDataSetup(const DataFrame &df){
   // Purpose: get positions of each id and the length of each id's observations
+  // Separate out dose vectors and observation vectors
   IntegerVector id    = df["ID"];
   IntegerVector evid  = df["EVID"];
   NumericVector dv    = df["DV"];
@@ -1630,14 +1631,14 @@ List foceiDataSetup(const DataFrame &df){
   }
   nDose[m-1]=nDoses;
   nObsN[m-1]=nObs;
-  return List::create(_["dose"]=DataFrame::create(_["evid"]   = newEvid,
-						  _["time"]   = newTimeA,
-						  _["amt"]    = newAmt),
-		      _["obs"]=DataFrame::create(_["dv"]      = newDv,
-						 _["time"]    = newTimeO),
-		      _["ids"]=DataFrame::create(_["id"]      = newId,
-						 _["posDose"] = posDose,
-						 _["posObs"]  = posObs,
-						 _["nDose"]   = nDose,
-						 _["nObs"]    = nObsN));
+  return List::create(_["dose"] = DataFrame::create(_["evid"]    = newEvid,
+						    _["time"]    = newTimeA,
+						    _["amt"]     = newAmt),
+		      _["obs"]  = DataFrame::create(_["dv"]      = newDv,
+						    _["time"]    = newTimeO),
+		      _["ids"]  = DataFrame::create(_["id"]      = newId,
+						    _["posDose"] = posDose,
+						    _["posObs"]  = posObs,
+						    _["nDose"]   = nDose,
+						    _["nObs"]    = nObsN));
 }
