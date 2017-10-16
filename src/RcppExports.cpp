@@ -152,13 +152,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // foceiDataSetup
-DataFrame foceiDataSetup(const NumericVector& id);
-RcppExport SEXP _nlmixr_foceiDataSetup(SEXP idSEXP) {
+List foceiDataSetup(const DataFrame& df);
+RcppExport SEXP _nlmixr_foceiDataSetup(SEXP dfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector& >::type id(idSEXP);
-    rcpp_result_gen = Rcpp::wrap(foceiDataSetup(id));
+    Rcpp::traits::input_parameter< const DataFrame& >::type df(dfSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiDataSetup(df));
     return rcpp_result_gen;
 END_RCPP
 }

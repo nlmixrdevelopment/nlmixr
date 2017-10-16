@@ -1559,27 +1559,85 @@ NumericVector rxUpdateEtas(SEXP DnDhS, SEXP DhS, SEXP initS, SEXP acceptNS){
 }
 
 // [[Rcpp::export]]
-DataFrame foceiDataSetup(const NumericVector &id){
+List foceiDataSetup(const DataFrame &df){
   // Purpose: get positions of each id and the length of each id's observations
-  int nSub = -1;
+  IntegerVector id    = df["ID"];
+  IntegerVector evid  = df["EVID"];
+  NumericVector dv    = df["DV"];
+  NumericVector time0 = df["TIME"];
+  NumericVector amt   = df["AMT"];
   int ids = id.size();
   int lastId = id[0]-1;
-  NumericVector pos;
-  NumericVector nobsv;
-  int nobs = 0;
-  int cid = 0;
-  for (int i = 0; i < ids; i++){
+  // Get the number of subjects
+  // Get the number of observations
+  // Get the number of doses
+  int nSub = 0, nObs = 0, nDoses = 0, i = 0, j = 0, k=0;
+  for (i = 0; i < ids; i++){
     if (lastId != id[i]){
       nSub++;
-      nobsv[cid]=nobs;
-      pos[cid]=i;
-      cid++;
-      nobs=0;
-      lastId = id[i];
+      lastId=id[i];
+    }
+    if (evid[i]){
+      nDoses++;
     } else {
-      nobs++;
+      nObs++;
     }
   }
-  return DataFrame::create(Named("pos")=pos,
-			   Named("nobs")=nobsv);
+  // Now create data frames of observations and events
+  NumericVector newDv(nObs);
+  NumericVector newTimeO(nObs);
+  
+  NumericVector newEvid(nDoses);
+  NumericVector newAmt(nDoses);
+  NumericVector newTimeA(nDoses);
+
+  lastId = id[0]-1;
+  NumericVector newId(nSub);
+  NumericVector posDose(nSub);
+  NumericVector posObs(nSub);
+  NumericVector nDose(nSub);
+  NumericVector nObsN(nSub);
+    
+  int m = 0;
+  for (i = 0; i < ids; i++){
+    if (lastId != id[i]){
+      lastId     = id[i];
+      newId[m]   = id[i];
+      posDose[m] = j;
+      posObs[m]  = k;
+      if (m != 0){
+	nDose[m-1] = nDoses;
+	nObsN[m-1]  = nObs;
+      }
+      nDoses = 0;
+      nObs = 0;
+      m++;
+    }
+    if (evid[i]){
+      // Dose
+      newEvid[j]  = evid[i];
+      newTimeA[j] = time0[i];
+      newAmt[j]   = amt[i];
+      nDoses++;
+      j++;
+    } else {
+      // Observation
+      newDv[k]    = dv[i];
+      newTimeO[k] = time0[i];
+      nObs++;
+      k++;
+    }
+  }
+  nDose[m-1]=nDoses;
+  nObsN[m-1]=nObs;
+  return List::create(_["dose"]=DataFrame::create(_["evid"]=newEvid,
+						  _["time"]=newTimeA,
+						  _["amt"]=newAmt),
+		      _["obs"]=DataFrame::create(_["dv"]=newDv,
+						 _["time"]=newTimeO),
+		      _["ids"]=DataFrame::create(_["id"]      = newId,
+						 _["posDose"] = posDose,
+						 _["posObs"]  = posObs,
+						 _["nDose"]   = nDose,
+						 _["nObs"]   = nObsN));
 }
