@@ -906,11 +906,6 @@ focei.fit.data.frame0 <- function(data,
         optim="L-BFGS-B"
     )
 
-    running <- TRUE
-    if (con$NOTRUN){
-        running <- FALSE
-    }
-
     curi <- 0;
 
     this.env <- environment()
@@ -920,6 +915,11 @@ focei.fit.data.frame0 <- function(data,
     con[(namc <- names(control))] <- control
     if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
+
+    running <- TRUE
+    if (con$NOTRUN){
+        running <- FALSE
+    }
 
     numDeriv.method <- con$numDeriv.method1
 
@@ -1530,7 +1530,7 @@ focei.fit.data.frame0 <- function(data,
             last.info <- get(last, envir=ofv.cache, inherits=FALSE);
             ofv.cache$last <- last.info;
         }
-        if (any(optim == c("L-BFGS-B", "BFGS", "lbfgs")) &&
+        if (running && any(optim == c("L-BFGS-B", "BFGS", "lbfgs")) &&
             ((is.null(con$scale.to) && sum(pars - inits.vec) == 0) ||
              (!is.null(con$scale.to) && all(pars == con$scale.to)))){
             last.ofv.txt <- optim.obj(last.ofv)
