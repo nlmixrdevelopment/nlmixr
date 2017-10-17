@@ -2363,5 +2363,15 @@ print.anova.nlmixr <- function (x, verbose = attr(x, "verbose"), ...)
     invisible(ox)
 }
 
+print.nlmixr.focei.data <- function(x, ...){
+    message("FOCEi data:")
+    message(sprintf("  Number of Subjects: %s", x$nSub))
+    message(sprintf("  Number of Observations: %s", x$nObs))
+    message(sprintf("  Number of Dosing Records: %s", x$nDose))
+    if (!is.null(x$cov.names)){
+        message(sprintf("  Covariates: %s", paste(x$cov.names, collapse=", ")))
+    }
+}
+
 ##  LocalWords:  focei nlme linCmt solveC SolvedC UI saem VarCorr AIC
 ##  LocalWords:  nlmixr REML FOCEi dplyr logLik

@@ -48,7 +48,7 @@ extern SEXP _nlmixr_rxDetaDtheta(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxOuter(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxUpdateEtas(SEXP DnDhSSEXP, SEXP DhSSEXP, SEXP initSSEXP, SEXP acceptNSSEXP);
 extern SEXP _nlmixr_chkSolvedInf(SEXP, SEXP);
-extern SEXP _nlmixr_foceiDataSetup(SEXP);
+extern SEXP _nlmixr_foceiDataSetup(SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"hermite_ek_compute_",     (DL_FUNC) &hermite_ek_compute_,      3},
@@ -86,7 +86,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_grFOCEi",(DL_FUNC) &_nlmixr_grFOCEi, 2},
   {"_nlmixr_sFOCEi",(DL_FUNC) &_nlmixr_sFOCEi, 2},
   {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
-  {"_nlmixr_foceiDataSetup", (DL_FUNC) &_nlmixr_foceiDataSetup, 1},
+  {"_nlmixr_foceiDataSetup", (DL_FUNC) &_nlmixr_foceiDataSetup, 2},
   {NULL, NULL, 0}
 };
 

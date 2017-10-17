@@ -152,13 +152,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // foceiDataSetup
-List foceiDataSetup(const DataFrame& df);
-RcppExport SEXP _nlmixr_foceiDataSetup(SEXP dfSEXP) {
+List foceiDataSetup(const DataFrame& df, const Nullable<StringVector>& covNames);
+RcppExport SEXP _nlmixr_foceiDataSetup(SEXP dfSEXP, SEXP covNamesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const DataFrame& >::type df(dfSEXP);
-    rcpp_result_gen = Rcpp::wrap(foceiDataSetup(df));
+    Rcpp::traits::input_parameter< const Nullable<StringVector>& >::type covNames(covNamesSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiDataSetup(df, covNames));
     return rcpp_result_gen;
 END_RCPP
 }

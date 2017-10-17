@@ -95,8 +95,8 @@ rxUpdateEtas <- function(DnDhS, DhS, initS, acceptNS) {
     .Call(`_nlmixr_rxUpdateEtas`, DnDhS, DhS, initS, acceptNS)
 }
 
-foceiDataSetup <- function(df) {
-    .Call(`_nlmixr_foceiDataSetup`, df)
+foceiDataSetup <- function(df, covNames = NULL) {
+    .Call(`_nlmixr_foceiDataSetup`, df, covNames)
 }
 
 sFOCEi <- function(par, e) {
