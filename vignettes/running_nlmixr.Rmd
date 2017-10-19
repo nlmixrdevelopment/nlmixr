@@ -7,46 +7,69 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
 ![nlmixr](logo.png)
 
 # Running PK models with nlmixr
 
 nlmixr uses a unified interface for specifying and running models. Let's start with a very simple PK example, using the single-dose theophylline dataset generously provided by Dr. Robert A. Upton of the University of California, San Francisco:
 
-```r
+```{r}
 library(ggplot2)
 library(nlmixr)
-attach(theo_sd)
 
-str(theo_sd)
+str(theo_md)
 
-ggplot(theo_sd, aes(TIME, DV)) +
+ggplot(theo_md, aes(TIME, DV)) +
  geom_line(aes(group=ID), col="red") + 
   scale_x_continuous("Time (h)") +
   scale_y_continuous("Concentration") +
   labs(title="Theophylline single-dose", subtitle="Concentration vs. time by individual")
 
 ```
-![Raw data](theo_sd.png)
 
 We can try fitting a simple one-compartment PK model to this small dataset. We write the model as follows:
 
-```r
+```{r}
 uif <- function() {
     ini({
-        tka <- log(2)
-        tcl <- log(0.05)
-        tv <- log(0.5)
+        tka <- .5
+        tcl <- -3.2
+        tv <- -1
         eta.ka ~ 1
         eta.cl ~ 2
-        eta.v ~ 2
         add.err <- 0.1
     })
     model({
         ka <- exp(tka + eta.ka)
         cl <- exp(tcl + eta.cl)
-        v <- exp(tv + eta.v)
+        v <- exp(tv)
+        linCmt() ~ add(add.err)
+    })
+}
+```
+
+We can now run the model...
+
+```{r}
+fit <- nlmixr(uif, theo_md, est="nlme", calc.resid=FALSE)
+```
+
+We can express the same model by ordinary differential equations (ODEs):
+
+```r
+uif <- function() {
+    ini({
+        tka <- .5
+        tcl <- -3.2
+        tv <- -1
+        eta.ka ~ 1
+        eta.cl ~ 2
+        add.err <- 0.1
+    })
+    model({
+        ka <- exp(tka + eta.ka)
+        cl <- exp(tcl + eta.cl)
+        v <- exp(tv)
         d/dt(depot) = -ka * depot
         d/dt(center) = ka * depot - cl / v * center
         cp = center / v
@@ -55,10 +78,39 @@ uif <- function() {
 }
 ```
 
-We can now run the model...
+```r
+The model-based sensitivities have been calculated.
+It will be cached for future runs.
+Calculating Table Variables...
+done
+nlmixr UI combined dataset and properties
+...
+ $ theta         : Named num [1:4] 0.448 -3.212 -0.788 0.689
+  ..- attr(*, "names")= chr [1:4] "tka" "tcl" "tv" "add.err"
+ $ omega         : num [1:3, 1:3] 0.4426 0 0 0 0.0713 ...
+  ..- attr(*, "dimnames")=List of 2
+ $ par.hist         : Parameter history (if available)
+ $ par.hist.stacked : Parameter history in stacked form for easy plotting (if available)
+ $ par.fixed        : Fixed Effect Parameter Table
+ $ eta              : Individual Parameter Estimates
+```
+
+This Windows example delivers a complete model fit as the `fit`
+object, including parameter history, a set of fixed effect estimates,
+and random effects for all included subjects.
+
+```{r}
+plot(fit)
+```
+
+```{r}
+fit
+```
+
+We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```r
-fit <- nlmixr(uif, theo_sd, est="saem")
+fit <- nlmixr(uif, theo_md, est="saem")
 ```
 
 ```c
@@ -479,7 +531,7 @@ A few points to note:
 
 Models can be fitted several ways, including via
 the
-[magrittr](https://CRAN.R-project.org/package=magrittr) forward-pipe
+[magrittr] forward-pipe
 operator.
 
 ```r

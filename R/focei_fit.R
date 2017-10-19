@@ -809,13 +809,13 @@ focei.fit.data.frame0 <- function(data,
     colnames(data) <- toupper(names(data));
     do.table <- FALSE;
     sink.file <- tempfile();
-    orig.sink.number <- sink.number()
+    orig.sink.number <- sink.number(type="output");
     do.sink <- TRUE;
     fit.df <- NULL;
     sink.close <- function(n=orig.sink.number){
         if (do.sink){
-            while(sink.number() > n){
-                sink();
+            while(sink.number(type="output") > n){
+                sink(type="output");
             }
         }
         ## message("Closed sink");
@@ -826,7 +826,7 @@ focei.fit.data.frame0 <- function(data,
         if (do.sink){
             if (do.it){
                 ## message("Starting Sink to", sink.file);
-                sink(sink.file);
+                sink(sink.file, type="output");
             }
         }
     }
@@ -1771,7 +1771,7 @@ focei.fit.data.frame0 <- function(data,
     setup.time <- proc.time() - pt;
     pt <- proc.time()
     if (con$NOTRUN) {
-        sink(sink.file);
+        sink(sink.file, type="output");
         pt <- proc.time()
         fit = list()
         fit$par = rep(con$scale.to, length(inits.vec))
@@ -1781,7 +1781,7 @@ focei.fit.data.frame0 <- function(data,
         optim.time <- proc.time() - pt;
         fit$cov.time <- proc.time() - proc.time();
         fit$objective <- fit$value;
-        sink();
+        sink(type="output");
         lines <- readLines(sink.file);
         unlink(sink.file);
         w <- which(regexpr(rex::rex("Warning: The Hessian is non-positive definite, correcting with nearPD"), lines) != -1);

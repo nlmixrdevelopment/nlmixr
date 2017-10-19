@@ -7,10 +7,9 @@
 ##' @keywords internal
 nlmixrBounds <- function(fun){
     temp <- tempfile();
-    on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
-    sink(temp);
-    print(fun);
-    sink();
+    sink(temp, type="output")
+    print(fun)
+    sink(type="output");
     fun2 <- readLines(temp);
     unlink(temp);
     if (regexpr("^<.*>$", fun2[length(fun2)]) != -1){
