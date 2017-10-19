@@ -842,14 +842,14 @@ focei.fit.data.frame0 <- function(data,
         }
         return(lines);
     }
-    on.exit({sink.close(0);
+    on.exit({sink.close();
         lines <- sink.get();
         unlink(sink.file);
         if (!is.null(lines)){
             message("After Error:");
             message(paste(paste("##", lines), collapse="\n"));
         }
-        running <- FALSE})
+        running <- FALSE}, add=TRUE)
     ##data = dat; PKpars=mypars; diag.xform="sqrt"; model=list(); control=list()
     ##model options
 

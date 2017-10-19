@@ -1,4 +1,3 @@
-
 .onAttach <- function(libname, pkgname){ ## nocov start
     ## Setup RxODE.prefer.tbl
     nlmixrSetupMemoize()
@@ -93,18 +92,18 @@ nlmixrVersion <- function(){
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
-nlmixr <- function(object, data, est="nlme", control=list(), ...){
+nlmixr <- function(object, data, est="nlme", control=list(), calc.resid=TRUE, ...){
     UseMethod("nlmixr")
 }
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.function <- function(object, data, est="nlme", control=list(), ...){
+nlmixr.function <- function(object, data, est="nlme", control=list(), calc.resid=TRUE, ...){
     uif <- nlmixrUI(object);
     if (missing(data) && missing(est)){
         return(uif)
     } else {
-        nlmixr_fit(uif, data, est, control=control, ...);
+        nlmixr_fit(uif, data, est, control=control, calc.resid=calc.resid, ...);
     }
 }
 
@@ -153,14 +152,14 @@ nlmixr.nlmixr.ui.saem <- nlmixr.nlmixr.ui.nlme
 ##' @param ... Parameters passed to estimation method.
 ##' @param sum.prod Take the RxODE model and use more precise
 ##'     products/sums.  Increases solving accuracy and solving time.
-##' @param focei.translate Translate the model to FOCEi and then run
+##' @param calc.resid Translate the model to FOCEi and then run
 ##'     the tables and objective function so that different estimation
 ##'     methodologies are comparable through OBJF.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
-                       sum.prod=FALSE, focei.translate=TRUE){
+                       sum.prod=FALSE, calc.resid=TRUE){
     dat <- data;
     uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, as.double(dat$EVID), as.integer(!is.null(uif$nmodel$lin.solved)));
     bad.focei <- "Problem calculating residuals, returning fit without residuals.";
@@ -206,7 +205,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             cfg$print <- as.integer(print)
         }
         fit <- model$saem_mod(cfg);
-        if (focei.translate){
+        if (calc.resid){
             ret <- try(as.focei(fit, uif, pt, data=dat));
             if (inherits(ret, "try-error")){
                 warning(bad.focei)
@@ -263,7 +262,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         ## comparable OBJFs and also extract table entries like
         ## CWRES.
         ## return(fit)
-        if (focei.translate){
+        if (calc.resid){
             ret <- as.focei(fit, uif, pt, data=dat)
             ## ret <- try(as.focei(fit, uif, pt, data=dat))
             ## if (inherits(ret, "try-error")){
