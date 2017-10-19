@@ -49,8 +49,14 @@ Authors@R: c(person("Matthew","Fidler",
 Author: Matthew Fidler [aut], Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut],  Mirjam Trame [aut],
   Wenping Wang [aut, cre]
 Maintainer: Wenping Wang <wwang8198@gmail.com>
-Description: Fits population pharmacokinetic (PK) 
-  and pharmacokinetic-pharmacodynamic (PKPD) models.
+
+Description: Fits population pharmacokinetic (PK) and
+  pharmacokinetic-pharmacodynamic (PKPD) models. The code is mostly
+  released under GPL.  The n1qn1 and all scilab rountines are released
+  under the GPL-compatiable CeCILL license.  The information is
+  available in the inst/COPYRIGHT. This also lists the copyright holders of
+  some of the open source routines in nlmixr.
+    
 License: GPL (>= 2)
 NeedsCompilation: yes
 LinkingTo: RcppArmadillo (>= 0.5.600.2.0), dparser(>= 0.1.7), Rcpp (>= 0.12.3), RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
