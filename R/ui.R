@@ -25,7 +25,7 @@
 ##' @return nlmixr UI function
 ##' @author Matthew L. Fidler
 nlmixrUI <- function(fun){
-    fun2 <- as.character(attr(uif,"srcref"), useSource=TRUE)
+    fun2 <- as.character(attr(fun,"srcref"), useSource=TRUE)
     fun2 <- gsub(rex::rex(boundary, "ini(",any_spaces,"{"), "ini <- function()({", fun2)
     fun2 <- gsub(rex::rex(boundary, "model(",any_spaces,"{"), "model <- function()({", fun2)
     if (fun2[length(fun2)] != "}"){
