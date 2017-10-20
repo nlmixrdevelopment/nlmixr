@@ -7,7 +7,10 @@
 ##' @keywords internal
 nlmixrBounds <- function(fun){
     fun2 <- as.character(attr(fun,"srcref"),useSource=TRUE);
-    fun2 <- fun2[-which(regexpr("^ *#+.*", fun2) == 1)];
+    w <- which(regexpr("^ *#+.*", fun2) == 1);
+    if (length(w) > 0){
+        fun2 <- fun2[-w];
+    }
     w <- which(regexpr("#+.*", fun2) != -1);
     if (length(w) > 0){
         labels <- gsub(".*#+ *(.*) *$", "\\1", fun2[w]);
