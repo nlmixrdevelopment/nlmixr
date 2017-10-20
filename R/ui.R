@@ -25,16 +25,7 @@
 ##' @return nlmixr UI function
 ##' @author Matthew L. Fidler
 nlmixrUI <- function(fun){
-    temp <- tempfile();
-    on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
-    sink(temp);
-    print(fun);
-    sink();
-    fun2 <- readLines(temp);
-    unlink(temp);
-    if (regexpr("^<.*>$", fun2[length(fun2)]) != -1){
-        fun2 <- fun2[-length(fun2)];
-    }
+    fun2 <- as.character(attr(uif,"srcref"), useSource=TRUE)
     fun2 <- gsub(rex::rex(boundary, "ini(",any_spaces,"{"), "ini <- function()({", fun2)
     fun2 <- gsub(rex::rex(boundary, "model(",any_spaces,"{"), "model <- function()({", fun2)
     if (fun2[length(fun2)] != "}"){
@@ -759,29 +750,15 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
     ## FIXME test for compartments that were picked up a covariates...
     all.covs <- setdiff(rest.vars,paste0(bounds$name))
-    temp <- tempfile();
-    on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
-    sink(temp);
-    print(fun);
-    sink();
-    fun2 <- readLines(temp);
-    unlink(temp);
-    if (regexpr("^<.*>$", fun2[length(fun2)]) != -1){
-        fun2 <- fun2[-length(fun2)];
-    }
+    fun2 <- as.character(attr(fun, "srcref"), useSource=TRUE)
     fun2[1] <- "function(){"
     fun2[length(fun2)] <- "}";
-    fun2 <- try(eval(parse(text=paste0(fun2, collapse = "\n"))), silent=TRUE);
+    fun2 <- try(eval(parse(text=paste0(fun2, collapse = "\n"), keep.source=TRUE)), silent=TRUE);
     if (inherits(fun2, "try-error")){
         stop("Error parsing model")
     }
-    temp <- tempfile();
-    on.exit({while(sink.number() != 0){sink()};if (file.exists(temp)){unlink(temp)}});
-    sink(temp);
-    print(fun2);
-    sink();
-    fun3 <- readLines(temp);
-    unlink(temp);
+    fun2 <- as.character(attr(fun2, "srcref"), useSource=TRUE);
+    fun3 <- fun2
     fun3 <- fun3[-1];
     fun3 <- fun3[-length(fun3)]
     fun3 <- fun3[-length(fun3)]

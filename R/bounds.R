@@ -6,22 +6,10 @@
 ##' @export
 ##' @keywords internal
 nlmixrBounds <- function(fun){
-    temp <- tempfile();
-    sink(temp, type="output")
-    print(fun)
-    sink(type="output");
-    fun2 <- readLines(temp);
-    unlink(temp);
-    if (regexpr("^<.*>$", fun2[length(fun2)]) != -1){
-        fun2 <- fun2[-length(fun2)];
-    }
-    w <- which(regexpr("^ *#.*$", fun2) != -1);
+    fun2 <- as.character(attr(fun,"srcref"),useSource=TRUE)
+    w <- which(regexpr("#+.*", fun2) != -1);
     if (length(w) > 0){
-        fun2 <- fun2[-w];
-    }
-    w <- which(regexpr("#.*", fun2) != -1);
-    if (length(w) > 0){
-        labels <- gsub(".*# *(.*) *$", "\\1", fun2[w]);
+        labels <- gsub(".*#+ *(.*) *$", "\\1", fun2[w]);
                            labels <- sapply(labels,
                                             function(x){
                                return(sprintf("label(%s)", paste0(deparse(x))))});
