@@ -1207,27 +1207,10 @@ focei.theta.saemFit <- function(object, uif, ...){
         uif <- nlmixr(uif);
     }
     n <- uif$focei.names
-    thetas <- rep(NA, length(n));
-    names(thetas) <- n;
-    sf <- as.vector(fixed.effects(object))
-    trans <- uif$saem.theta.trans
-    trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
-    trans <- trans[!is.na(trans)]
-    theta.name <- trans.name[order(trans)]
-    f <- rep(NA, length(sf))
-    j <- 1;
-    cov.pars <- as.vector(unlist(uif$cov.ref))
-    for (i in seq_along(theta.name)){
-        thetas[theta.name[i]] <- sf[j];
-        j <- j + 1;
-        if (any(theta.name[i] == cov.pars)){
-            for (n in names(uif$cov.ref)){
-                for (v in names(uif$cov.ref[[n]])){
-                    thetas[v] <- sf[j];
-                    j <- j + 1;
-                }
-            }
-        }
+    thetas <- structure(rep(NA, length(n)), .Names=n);
+    sf <- structure(as.vector(fixed.effects(object)), .Names=uif$saem.theta.name);
+    for (n in names(sf)){
+        thetas[n] <- sf[n];
     }
     err <- abs(as.vector(object$sig2)) ## abs?
     err.type <- uif$focei.err.type;

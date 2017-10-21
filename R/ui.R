@@ -1197,19 +1197,22 @@ nlmixrUI.saem.theta.name <- function(uif){
     trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
     trans <- trans[!is.na(trans)]
     theta.name <- trans.name[order(trans)]
-    o.theta.name <- theta.name
-    ## Add covariate names
-    for (nn in rev(names(uif$cov.ref))){
-        cur <- uif$cov.ref[[nn]]
-        for (j in seq_along(o.theta.name)){
-            w <- which(o.theta.name[j] == cur)
-            if (length(w) == 1){
-                w2 <- which(theta.name == cur);
-                ## print(theta.name);
-                ## print(cur)
-                theta.name <- c(theta.name[1:w2], names(cur)[w], theta.name[-(1:w2)])
+    all.covs <- uif$all.covs
+    lc <- length(all.covs);
+    if (lc > 0){
+        m <- matrix(rep(NA, length(theta.name) * (lc + 1)), nrow=lc + 1);
+        dimnames(m) <- list(c("_name",  all.covs), theta.name);
+        m["_name", ] <- theta.name;
+        for (cn in names(uif$cov.ref)){
+            v <- uif$cov.ref[[cn]];
+            for (var in names(v)){
+                rn <- v[var];
+                m[cn, rn] <- var
             }
         }
+        ret <- unlist(m)
+        ret <- ret[!is.na(ret)]
+        return(ret)
     }
     return(theta.name);
 }
@@ -1220,6 +1223,8 @@ nlmixrUI.saem.theta.name <- function(uif){
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.init.theta <- function(obj){
     theta.name <- obj$saem.theta.name
+    cov.names <- unique(names(unlist(structure(obj$cov.ref, .Names=NULL))));
+    theta.name <- theta.name[!(theta.name %in% cov.names)];
     nm <- paste(obj$ini$name)
     lt <- obj$log.theta;
     i <- 0;
@@ -1232,6 +1237,21 @@ nlmixrUI.saem.init.theta <- function(obj){
             return(obj$ini$est[w])
         }
     })
+    all.covs <- obj$all.covs;
+    lc <- length(all.covs);
+    if (lc > 0){
+        m <- matrix(rep(NA, lc * length(theta.name)), ncol=lc)
+        dimnames(m) <- list(theta.name, all.covs);
+        for (cn in names(obj$cov.ref)){
+            v <- obj$cov.ref[[cn]];
+            for (var in names(v)){
+                rn <- v[var];
+                w <- which(var == nm);
+                m[rn, cn] <- obj$ini$est[w]
+            }
+        }
+        return(as.vector(c(theta.ini, as.vector(m))))
+    }
     return(as.vector(theta.ini))
 }
 ##' SAEM's init$omega

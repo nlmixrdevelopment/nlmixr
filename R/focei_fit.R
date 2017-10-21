@@ -356,9 +356,11 @@ fixef.focei.fit <- function(object, ...){
                     nth <- length(uif$saem.theta.name)
                     se <- structure(sqrt(diag(RxODE::rxInv(saem$Ha[1:nth,1:nth]))), .Names=uif$saem.theta.name)
                     df <- object$par.data.frame
-                    se2 <- rep(NA, length(df[, 1]));
-                    se2[1:nth] <- se[row.names(df)[1:nth]];
-                    df <- data.frame(Parameter=lab, df, "SE"=se2);
+                    df$SE <- NA
+                    for (v in names(se)){
+                        df[v, "SE"] <- se[v]
+                    }
+                    df <- data.frame(Parameter=lab, df);
                 }
                 if (!is.null(saem) | !is.null(nlme)){
                     df <- data.frame(df, "CV"=abs(df$SE / df$Estimate * 100));
@@ -420,6 +422,12 @@ print.nlmixr.par.fixed <- function(x, ...){
     df <- df[, regexpr("[.]ci", names(df)) == -1]
     if (all(df$Parameter == "")){
         df <- df[, -1];
+    } else {
+        df$Parameter <- paste(df$Parameter);
+        w <- which(df$Parameter == "");
+        if (length(w) > 0){
+            df$Parameter[w] <- row.names(df)[w];
+        }
     }
     print(df)
 }
@@ -805,7 +813,6 @@ focei.fit.data.frame0 <- function(data,
                                   theta.names=NULL,
                                   eta.names=NULL){
     orig.data <- data;
-    colnames(data) <- toupper(names(data));
     do.table <- FALSE;
     sink.file <- tempfile();
     orig.sink.number <- sink.number(type="output");
@@ -993,6 +1000,13 @@ focei.fit.data.frame0 <- function(data,
     }
     cov.names <- par.names <- RxODE::rxParams(model$pred.only);
     cov.names <- cov.names[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), cov.names) == -1];
+    colnames(data) <- sapply(names(data), function(x){
+        if (any(x == cov.names)){
+            return(x)
+        } else {
+            return(toupper(x))
+        }
+    })
     pcov <- c()
     lhs <- c(names(RxODE::rxInits(model$pred.only)), RxODE::rxLhs(model$pred.only))
     if (length(lhs) > 0){
@@ -1085,6 +1099,8 @@ focei.fit.data.frame0 <- function(data,
     lower <- c(lower, lower.om);
     upper <- c(upper, upper.om);
     inits.vec = c(inits$THTA, th0.om)
+    print(inits);
+    print(th0.om);
     if (any(inits.vec == 0)){
         warning("Some of the initial conditions were 0, changing to 0.0001");
         inits.vec[inits.vec == 0] <- 0.0001;
