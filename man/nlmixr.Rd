@@ -9,9 +9,11 @@
 \alias{nlmixr.nlmixr.ui.saem}
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
-nlmixr(object, data, est = "nlme", control = list(), ...)
+nlmixr(object, data, est = "nlme", control = list(), calc.resid = TRUE,
+  ...)
 
-\method{nlmixr}{function}(object, data, est = "nlme", control = list(), ...)
+\method{nlmixr}{function}(object, data, est = "nlme", control = list(),
+  calc.resid = TRUE, ...)
 
 \method{nlmixr}{nlmixrUI}(object, data, est = "nlme", control = list(), ...)
 
@@ -31,6 +33,10 @@ EVIDs.}
 
 \item{control}{Estimation control options.  They could be
 \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}}
+
+\item{calc.resid}{Translate the model to FOCEi and then run
+the tables and objective function so that different estimation
+methodologies are comparable through OBJF.}
 
 \item{...}{Other parameters}
 }

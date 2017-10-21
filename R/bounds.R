@@ -552,7 +552,7 @@ nlmixrBounds <- function(fun){
     env <- environment(f)
     f(body(fun2), env)
     if (length(df$ntheta) == 0){
-        stop("Could not find any parameter information.")
+        stop(sprintf("Could not find any parameter information."))
     }
     n <- df$name
     n <- n[!is.na(n)]

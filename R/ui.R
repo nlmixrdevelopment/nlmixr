@@ -25,19 +25,35 @@
 ##' @return nlmixr UI function
 ##' @author Matthew L. Fidler
 nlmixrUI <- function(fun){
-    fun2 <- as.character(attr(fun,"srcref"), useSource=TRUE)
+    env <- new.env(parent=.GlobalEnv)
+    assign("fun", fun, env)
+    fun2 <- attr(fun,"srcref");
+    if (is.null(fun2)){
+        stop("option \"keep.source\" must be TRUE for nlmixr models.")
+    }
+    fun2 <- as.character(fun2, useSource=TRUE)
+    rg <- rex::rex("function", any_spaces, "(", anything, ")")
+    w <- which(regexpr(rg, fun2) != -1);
+    if (length(w) > 0){
+        w <- w[1];
+        fun2[w] <- sub(rg, "", fun2[w]);
+    }
     fun2 <- gsub(rex::rex(boundary, "ini(",any_spaces,"{"), "ini <- function()({", fun2)
     fun2 <- gsub(rex::rex(boundary, "model(",any_spaces,"{"), "model <- function()({", fun2)
     if (fun2[length(fun2)] != "}"){
         fun2[length(fun2)] <- sub(rex::rex("}", end), "", fun2[length(fun2)]);
         fun2[length(fun2) + 1] <- "}"
     }
-    fun2[length(fun2)] <- "ini <- nlmixrBounds(ini);return(nlmixrUIModel(model,ini,fun))\n}"
-    fun2 <- try(eval(parse(text=paste0(fun2, collapse = "\n"))), silent=TRUE);
-    if (inherits(fun2, "try-error")){
-        stop("Error parsing model")
+    model <- ini <- NULL; ## Rcheck hack
+    eval(parse(text=paste(fun2, collapse="\n"), keep.source=TRUE))
+    ini <- nlmixrBounds(ini);
+    if (inherits(ini, "try-error")){
+        stop("Error parsing initial estimates.")
     }
-    fun2 <- fun2();
+    fun2 <- try(nlmixrUIModel(model,ini,fun));
+    if (inherits(fun2, "try-error")){
+        stop("Error parsing model.")
+    }
     class(fun2) <- "nlmixrUI";
     var.ini <- c(fun2$focei.names, fun2$eta.names)
     var.def <- fun2$all.vars;

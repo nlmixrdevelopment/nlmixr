@@ -5,7 +5,7 @@
 \title{Fit a nlmixr model}
 \usage{
 nlmixr_fit(uif, data, est = "nlme", control = list(), ...,
-  sum.prod = FALSE, focei.translate = TRUE)
+  sum.prod = FALSE, calc.resid = TRUE)
 }
 \arguments{
 \item{uif}{Parsed nlmixr model (by \code{nlmixr(mod.fn)}).}
@@ -23,7 +23,7 @@ EVIDs.}
 \item{sum.prod}{Take the RxODE model and use more precise
 products/sums.  Increases solving accuracy and solving time.}
 
-\item{focei.translate}{Translate the model to FOCEi and then run
+\item{calc.resid}{Translate the model to FOCEi and then run
 the tables and objective function so that different estimation
 methodologies are comparable through OBJF.}
 }
