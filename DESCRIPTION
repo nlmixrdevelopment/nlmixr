@@ -46,9 +46,6 @@ Authors@R: c(person("Matthew","Fidler",
    person("Wenping", "Wang", 
       role = c("aut", "cre"), email = "wwang8198@gmail.com")
    )
-Author: Matthew Fidler [aut], Yuan Xiong [aut], Rik Schoemaker [aut], Justin Wilkins [aut],  Mirjam Trame [aut],
-  Wenping Wang [aut, cre]
-Maintainer: Wenping Wang <wwang8198@gmail.com>
 Description: Fit and compare nonlinear mixed-effects models in differential 
   equations with flexible dosing information commonly seen in pharmacokinetics 
   and pharmacodynamics <doi:10.1007/s10928-015-9409-1>. Differential 

@@ -50,9 +50,9 @@ sim.one = function(zz, x) {
 #' @param condition conditional variable
 #' @return NULL
 #' @examples
-#' \dontrun{
+#' specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
+#' fit <- nlme_lin_cmpt(theo_md, par_model=specs, ncmt=1, verbose=TRUE)
 #' vpc(fit, nsim = 100, condition = NULL)
-#' }
 #' @export
 vpc = function(fit, nsim=100, condition=NULL)
 {
@@ -102,25 +102,22 @@ multi2 <- function (mu, vmat, n)
 #' @param dat model data to be bootstrapped
 #' @return Bootstrapped data
 #' @examples
-#' \dontrun{
 #'
-#' dat <- read.table("theo_md.txt", head=TRUE)
 #' specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
-#' set.seed(99); nboot = 20;
+#' set.seed(99); nboot = 5;
 #'
 #' cat("generating", nboot, "bootstrap samples...\n")
 #' cmat <- matrix(NA, nboot, 3)
 #' for (i in 1:nboot)
 #' {
 #' 	#print(i)
-#' 	bd <- bootdata(dat)
+#' 	bd <- bootdata(theo_md)
 #' 	fit <- nlme_lin_cmpt(bd, par_model=specs, ncmt=1)
 #' 	cmat[i,] = fit$coefficients$fixed
 #' }
 #' dimnames(cmat)[[2]] <- names(fit$coefficients$fixed)
 #' print(head(cmat))
 #'
-#' }
 #' @export
 bootdata = function(dat)
 {
@@ -150,9 +147,7 @@ bootdata = function(dat)
 #' @param cutoff significance level
 #' @return an nlme object of the final model
 #' @examples
-#' \dontrun{
-#'
-#' dat <- read.table("theo_md.txt", head=TRUE)
+#' dat <- theo_md
 #' dat$LOGWT <- log(dat$WT)
 #' dat$TG <- (dat$ID < 6) + 0    #dummy covariate
 #'
@@ -161,11 +156,9 @@ bootdata = function(dat)
 #' 	random = pdDiag(lKA+lCL~1),
 #' 	start=c(0.5, -3.2, -1))
 #' fit0 <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1)
-#' cv <- list(lCL=c("WT", "TG", "LOGWT"), lV=c("WT", "TG", "LOGWT"))
+#' cv <- list(lCL=c("WT", "TG"), lV=c("WT"))
 #' fit <- frwd_selection(fit0, cv, dat)
 #' print(summary(fit))
-#'
-#' }
 #' @export
 frwd_selection = function(base, cv, dat, cutoff=.05)
 {

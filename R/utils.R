@@ -180,8 +180,6 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #' @return NULL
 #' @author Wenping Wang
 #' @examples
-#' \dontrun{
-#'
 #' ode <- "
 #'    dose=200;
 #'    pi = 3.1415926535897931;
@@ -201,7 +199,7 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #'
 #'
 #' ## ------------------------------------------------------------------------
-#' dat <- read.table("invgaussian.txt", header=TRUE)
+#' dat <- invgaussian
 #' mod <- cp ~ C2 + prop(.1)
 #' inits <- c(MIT=190, CVI2=.65, F=.92)
 #' fixPars <- c(CL=.0793, V2=.64, Q=.292, V3=9.63)
@@ -209,7 +207,6 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #' ev$add.sampling(c(0, dat$time))
 #' (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
 #'
-#' }
 #' @export
 dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 	method=c("Nelder-Mead", "L-BFGS-B", "PORT"),

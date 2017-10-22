@@ -25,9 +25,7 @@
 #' @param n numbr of nodes
 #' @return a list of nodes and weigts of Gauss-Hermite quadrature
 #' @examples
-#' \dontrun{
 #' gauss.quad(5)
-#' }
 #' @export
 gauss.quad = function(n)
 {#n = 5

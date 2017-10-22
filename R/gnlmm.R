@@ -261,7 +261,6 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #'
 #' @author Wenping Wang
 #' @examples
-#' \dontrun{
 #' llik <- function()
 #' {
 #' 	if (group==1) lp = THETA[1]+THETA[2]*logtstd+ETA[1]
@@ -292,6 +291,7 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #' gnlmm(llik, rats, inits, control=list(nAQD=7))
 #'
 #'
+#' \dontrun{
 #' ode <- "
 #' d/dt(depot) =-KA*depot;
 #' d/dt(centr) = KA*depot - KE*centr;
@@ -629,10 +629,6 @@ linesearch_secant = function(f,d,x,maxIter=5,trace=F) {
 #' @param method method for calculating variance-covariance matrix
 #' @param trace logical whether to trace the iterations
 #' @return variance-covariance matrix of model parameters
-#' @examples
-#' \dontrun{
-#' calcCov(fit)
-#' }
 #' @export
 calcCov = function(fit, method=1, trace=FALSE) {
 	lth = tapply(fit$par, fit$nsplt, identity)
@@ -717,10 +713,6 @@ calcCov = function(fit, method=1, trace=FALSE) {
 #'
 #' @param fit a gnlmm fit object
 #' @return variance-covariance matrix of random effects
-#' @examples
-#' \dontrun{
-#' getOMEGA(fit)
-#' }
 #' @export
 getOMEGA = function(fit)
 {
