@@ -1,5 +1,5 @@
 // Adopted by Wenping Wang from Rcpp.
-// Copyright (C) 2010 - 2015  Dirk Eddelbuettel <edd@debian.org>
+// written originally by Dirk Eddelbuettel <edd@debian.org>
 
 
 #ifndef Rcpp_DE_evaluate_h_
