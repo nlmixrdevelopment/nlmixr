@@ -35,7 +35,6 @@ Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature 
 Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AGQ)
 }
 \examples{
-\dontrun{
 llik <- function()
 {
 	if (group==1) lp = THETA[1]+THETA[2]*logtstd+ETA[1]
@@ -66,6 +65,7 @@ inits = list(THTA=c(1,1,1), OMGA=list(ETA[1]~1))
 gnlmm(llik, rats, inits, control=list(nAQD=7))
 
 
+\dontrun{
 ode <- "
 d/dt(depot) =-KA*depot;
 d/dt(centr) = KA*depot - KE*centr;
@@ -100,3 +100,4 @@ cbind(fit$par[fit$nsplt==1], sqrt(diag(cv)))
 \author{
 Wenping Wang
 }
+

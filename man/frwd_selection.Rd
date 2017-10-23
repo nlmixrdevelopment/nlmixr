@@ -22,9 +22,7 @@ an nlme object of the final model
 Implements forward covariate selection for nlme-based non-linear mixed effect models
 }
 \examples{
-\dontrun{
-
-dat <- read.table("theo_md.txt", head=TRUE)
+dat <- theo_md
 dat$LOGWT <- log(dat$WT)
 dat$TG <- (dat$ID < 6) + 0    #dummy covariate
 
@@ -33,9 +31,8 @@ specs <- list(
 	random = pdDiag(lKA+lCL~1),
 	start=c(0.5, -3.2, -1))
 fit0 <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1)
-cv <- list(lCL=c("WT", "TG", "LOGWT"), lV=c("WT", "TG", "LOGWT"))
+cv <- list(lCL=c("WT", "TG"), lV=c("WT"))
 fit <- frwd_selection(fit0, cv, dat)
 print(summary(fit))
+}
 
-}
-}

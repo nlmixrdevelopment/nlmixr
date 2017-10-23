@@ -17,3 +17,4 @@ Plot some standard goodness of fit plots for the focei fitted object
 \author{
 Wenping Wang & Matthew Fidler
 }
+

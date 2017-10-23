@@ -39,3 +39,4 @@ Extract the fitted values from the model
 \author{
 Matthew L. Fidler
 }
+

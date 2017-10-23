@@ -16,7 +16,6 @@ a list of nodes and weigts of Gauss-Hermite quadrature
 Sets nodes and weigts of Gauss-Hermite quadrature
 }
 \examples{
-\dontrun{
 gauss.quad(5)
 }
-}
+

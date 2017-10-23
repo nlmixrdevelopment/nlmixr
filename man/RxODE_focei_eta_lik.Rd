@@ -15,3 +15,4 @@ RxODE_focei_eta_lik(sexp_eta, sexp_rho)
 Get the likelihood for ETA
 }
 \keyword{internal}
+

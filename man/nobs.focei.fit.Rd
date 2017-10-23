@@ -20,3 +20,4 @@ Extract the number of observations for the focei fit
 \author{
 Matthew L. Fidler
 }
+

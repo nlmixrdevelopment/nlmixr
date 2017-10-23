@@ -19,3 +19,4 @@ Get the variance for the nlme fit process based on UI
 Matthew L. Fidler
 }
 \keyword{internal}
+

@@ -40,17 +40,15 @@ fixed effects, random effects and intial values follows the standard
 nlme notations.
 }
 \examples{
-\dontrun{
 library(nlmixr)
 
-dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
 specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
-fit <- nlme_lin_cmpt(dat, par_model=specs, ncmt=1, verbose=TRUE)
-plot(augPred(fit,level=0:1))
+fit <- nlme_lin_cmpt(theo_md, par_model=specs, ncmt=1, verbose=TRUE)
+#plot(augPred(fit,level=0:1))
 summary(fit)
 
-}
 }
 \author{
 Wenping Wang
 }
+

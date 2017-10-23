@@ -25,3 +25,4 @@ Get the FOCEi theta or eta specification for model.
 \author{
 Matthew L. Fidler
 }
+

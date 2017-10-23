@@ -3,10 +3,10 @@
 \name{nlmixr}
 \alias{nlmixr}
 \alias{nlmixr.function}
-\alias{nlmixr.nlmixrUI}
-\alias{nlmixr.nlmixr.ui.nlme}
 \alias{nlmixr.nlmixr.ui.focei.fit}
+\alias{nlmixr.nlmixr.ui.nlme}
 \alias{nlmixr.nlmixr.ui.saem}
+\alias{nlmixr.nlmixrUI}
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
 nlmixr(object, data, est = "nlme", control = list(), calc.resid = TRUE,
@@ -577,7 +577,7 @@ few additional that may be helpful for the modeler:
 function.
 }
 }
-
 \author{
 Matthew L. Fidler, Rik Schoemaker
 }
+

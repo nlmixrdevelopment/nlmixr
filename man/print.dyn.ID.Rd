@@ -14,3 +14,4 @@
 \description{
 Print a non-population dynamic model fit object
 }
+

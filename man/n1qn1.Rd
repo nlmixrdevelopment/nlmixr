@@ -58,3 +58,4 @@ This is an R port of the n1qn1 optimization procedure in scilab.
 C. Lemarechal, Stephen L. Campbell, Jean-Philippe
     Chancelier, Ramine Nikoukhah, Wenping Wang & Matthew L. Fidler
 }
+

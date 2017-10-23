@@ -22,3 +22,4 @@ Parameter estimates for Theta
 \description{
 Get the FOCEi theta specification for the model
 }
+

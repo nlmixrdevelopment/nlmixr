@@ -2,8 +2,8 @@
 % Please edit documentation in R/focei_fit.R
 \name{par.hist}
 \alias{par.hist}
-\alias{par.hist.nlmixr.ui.saem}
 \alias{par.hist.nlmixr.ui.focei.fit}
+\alias{par.hist.nlmixr.ui.saem}
 \title{Parameter history extraction}
 \usage{
 par.hist(x, stacked = FALSE, ...)
@@ -29,3 +29,4 @@ Parameter history extraction
 \author{
 Matthew L. Fidler & Wenping Wang
 }
+

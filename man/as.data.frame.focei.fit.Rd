@@ -26,3 +26,4 @@ Convert focei fit to a data.frame
 \author{
 Matthew L. Fidler
 }
+

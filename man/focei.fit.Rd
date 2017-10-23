@@ -2,11 +2,11 @@
 % Please edit documentation in R/focei_fit.R
 \name{focei.fit}
 \alias{focei.fit}
-\alias{focei.fit.nlmixr.ui.nlme}
-\alias{focei.fit.nlmixr.ui.focei.fit}
-\alias{focei.fit.nlmixrUI}
-\alias{focei.fit.function}
 \alias{focei.fit.data.frame}
+\alias{focei.fit.function}
+\alias{focei.fit.nlmixr.ui.focei.fit}
+\alias{focei.fit.nlmixr.ui.nlme}
+\alias{focei.fit.nlmixrUI}
 \title{FOCEI Fit for nlmixr}
 \usage{
 focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
@@ -65,3 +65,4 @@ FOCEI Fit for nlmixr
 \author{
 Matthew L. Fidler and Wenping Wang
 }
+

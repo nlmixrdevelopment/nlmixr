@@ -31,8 +31,6 @@ dynmodel(system, model, evTable, inits, data, fixPars = NULL,
 Fit a non-population dynamic model
 }
 \examples{
-\dontrun{
-
 ode <- "
    dose=200;
    pi = 3.1415926535897931;
@@ -52,7 +50,7 @@ sys1 <- RxODE(model = ode)
 
 
 ## ------------------------------------------------------------------------
-dat <- read.table("invgaussian.txt", header=TRUE)
+dat <- invgaussian
 mod <- cp ~ C2 + prop(.1)
 inits <- c(MIT=190, CVI2=.65, F=.92)
 fixPars <- c(CL=.0793, V2=.64, Q=.292, V3=9.63)
@@ -61,7 +59,7 @@ ev$add.sampling(c(0, dat$time))
 (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
 
 }
-}
 \author{
 Wenping Wang
 }
+
