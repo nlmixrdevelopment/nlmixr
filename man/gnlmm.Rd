@@ -37,6 +37,18 @@ Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature 
 \examples{
 llik <- function()
 {
+	lp = THETA[1]*x1+THETA[2]*x2+(x1+x2*THETA[3])*ETA[1]
+	p = pnorm(lp)
+	dbinom(x, m, p, log=TRUE)
+}
+inits = list(THTA=c(1,1,1), OMGA=list(ETA[1]~1))
+
+gnlmm(llik, rats, inits, control=list(nAQD=3))
+
+
+\dontrun{
+llik <- function()
+{
 	if (group==1) lp = THETA[1]+THETA[2]*logtstd+ETA[1]
 	else          lp = THETA[3]+THETA[4]*logtstd+ETA[1]
 	lam = exp(lp)
@@ -54,18 +66,6 @@ fit = gnlmm(llik, pump, inits,
 
 
 
-llik <- function()
-{
-	lp = THETA[1]*x1+THETA[2]*x2+(x1+x2*THETA[3])*ETA[1]
-	p = pnorm(lp)
-	dbinom(x, m, p, log=TRUE)
-}
-inits = list(THTA=c(1,1,1), OMGA=list(ETA[1]~1))
-
-gnlmm(llik, rats, inits, control=list(nAQD=7))
-
-
-\dontrun{
 ode <- "
 d/dt(depot) =-KA*depot;
 d/dt(centr) = KA*depot - KE*centr;
