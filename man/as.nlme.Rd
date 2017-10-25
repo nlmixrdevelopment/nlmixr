@@ -19,4 +19,3 @@ Return composite nlme/focei to nlme
 Matthew L. Fidler
 }
 \keyword{internal}
-

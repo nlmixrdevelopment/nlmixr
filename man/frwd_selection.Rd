@@ -35,4 +35,3 @@ cv <- list(lCL=c("WT", "TG"), lV=c("WT"))
 fit <- frwd_selection(fit0, cv, dat)
 print(summary(fit))
 }
-

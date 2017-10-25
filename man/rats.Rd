@@ -46,4 +46,3 @@ Ochi, Y. and Prentice, R. L. (1984),
     Biometrika, 71, 531-543.
 }
 \keyword{datasets}
-

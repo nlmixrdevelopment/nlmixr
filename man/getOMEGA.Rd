@@ -15,4 +15,3 @@ variance-covariance matrix of random effects
 \description{
 Calculate variance-covariance matrix of random effects after a gnlmm() fit
 }
-

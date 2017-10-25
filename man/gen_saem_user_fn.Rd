@@ -23,4 +23,3 @@ Fit a generalized nonlinear mixed-effect model using the Stochastic
 \author{
 Wenping Wang
 }
-

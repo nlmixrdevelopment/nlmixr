@@ -18,4 +18,3 @@ Collect warnings and just warn once.
 \author{
 Matthew L. Fidler
 }
-

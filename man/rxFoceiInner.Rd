@@ -41,4 +41,3 @@ Solve the FOCEI inner problem
 Matthew L. Fidler
 }
 \keyword{internal}
-

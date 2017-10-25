@@ -20,4 +20,3 @@ invgaussian
 Inverse Guassian absorption model
 }
 \keyword{datasets}
-

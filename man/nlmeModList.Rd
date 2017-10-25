@@ -25,4 +25,3 @@ Access the model list information for nlmixr's nlme user functions
 Matthew L. Fidler
 }
 \keyword{internal}
-

@@ -25,4 +25,3 @@ Extract residuals from the FOCEI fit
 \author{
 Matthew L. Fidler
 }
-

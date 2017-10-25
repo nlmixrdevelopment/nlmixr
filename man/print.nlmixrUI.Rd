@@ -17,4 +17,3 @@ Print UI function
 \author{
 Matthew L. Fidler
 }
-

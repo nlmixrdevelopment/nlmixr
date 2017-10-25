@@ -21,4 +21,3 @@ SAEM's init$omega
 \author{
 Matthew L. Fidler
 }
-

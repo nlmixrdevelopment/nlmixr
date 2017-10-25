@@ -29,4 +29,3 @@ Gaver, D. P. and O'Muircheartaigh, I. G. (1987),
     Technometrics, 29, 1-15.
 }
 \keyword{datasets}
-

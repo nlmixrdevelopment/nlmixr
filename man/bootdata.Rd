@@ -33,4 +33,3 @@ dimnames(cmat)[[2]] <- names(fit$coefficients$fixed)
 print(head(cmat))
 
 }
-

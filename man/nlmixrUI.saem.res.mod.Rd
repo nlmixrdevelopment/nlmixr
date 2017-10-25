@@ -18,4 +18,3 @@ Get the SAEM model$res.mod code
 \author{
 Matthew L. Fidler
 }
-

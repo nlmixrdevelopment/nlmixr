@@ -13,4 +13,3 @@ rxGrad(rho)
 Returns the gradient for FOCEi environment
 }
 \keyword{internal}
-

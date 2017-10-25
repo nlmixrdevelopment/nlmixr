@@ -13,4 +13,3 @@ rxHessian(rho)
 Get the Hessian for the environment
 }
 \keyword{internal}
-

@@ -24,4 +24,3 @@ Simulate response based on FOCEi model's datathe fitted object's dataset
 \author{
 Matthew L. Fidler
 }
-

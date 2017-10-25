@@ -100,4 +100,3 @@ cbind(fit$par[fit$nsplt==1], sqrt(diag(cv)))
 \author{
 Wenping Wang
 }
-

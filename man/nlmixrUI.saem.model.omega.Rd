@@ -18,4 +18,3 @@ Get the SAEM model Omega
 \author{
 Matthew L. Fidler
 }
-

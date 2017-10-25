@@ -18,4 +18,3 @@ Get model$log.eta for SAEM
 \author{
 Matthew L. Fidler
 }
-

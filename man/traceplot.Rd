@@ -23,4 +23,3 @@ Produce trace-plot for fit if applicable
 \author{
 Rik Schoemaker, Wenping Wang & Matthew L. Fidler
 }
-

@@ -17,4 +17,3 @@ a list
 \description{
 Print an SAEM model fit summary
 }
-

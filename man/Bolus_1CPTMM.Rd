@@ -54,4 +54,3 @@ samples in 24 hours per subject, using a first-order absorption,
 1-compartment disposition, linear elimination model.
 }
 \keyword{datasets}
-

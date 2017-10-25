@@ -18,4 +18,3 @@ Return RxODE model with predictions appended
 \author{
 Matthew L. Fidler
 }
-

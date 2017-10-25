@@ -14,9 +14,4 @@ Intenrally the folloiwng copyrights are held:
   and their SAEMIX package, which was released under the GPL.  The
   code in this routine is written by Wenping Wang and relased under the GPL
 
-* The Code for the Scilab optimization routines is licenced under the
-  GPL compatible CeCILL license, Copyright (C) 1987 - INRIA - Claude
-  LEMARECHAL.  The terms are availble at:
-  http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
-
-The rest of the code is distributed under the GPL.
+The code is distributed under the GPL version 2 or greater.

@@ -900,7 +900,8 @@ focei.fit.data.frame0 <- function(data,
         extra.output=TRUE, ## Display extra output on each iteration
         inits.mat=NULL,
         find.best.eta=TRUE,
-        inner.opt="n1qn1",
+        ## inner.opt="n1qn1",
+        inner.opt="lbfgs",
         save.curve=TRUE,
         numDeriv.method1="simple",
         numDeriv.method2="simple",
@@ -1716,20 +1717,6 @@ focei.fit.data.frame0 <- function(data,
                     fit <- NULL;
                 }
             }
-        } else if (optim.method=="n1qn1"){
-            fit <- try({n1qn1(ofv.FOCEi, gr.FOCEi,
-                              par0,
-                              invisible=0)});
-            if (inherits(fit, "try-error") && !is.null(sigdig.fit)){
-                if (attr(fit, "condition")$message == "sigidig exit"){
-                    fit <- sigdig.fit
-                } else {
-                    lines <- sink.get();
-                    if (!is.null(lines))
-                        message(paste0(lines, collapse="\n"), "\n");
-                    fit <- NULL;
-                }
-            }
         } else if (optim.method=="nlminb") {
             fit <- try({nlminb(par0,
                                 ofv.FOCEi, gradient=gr.FOCEi,
@@ -1757,9 +1744,9 @@ focei.fit.data.frame0 <- function(data,
         stop(sprintf("Mismatch of dimensions; ETA matrix supplied: %sx%s, expected %sx%s", dim(con$inits.mat)[1], dim(con$inits.mat)[2],
                      nSUB, nETA))
     }
-    if (con$inner.opt == "n1qn1"){
-        inits.c.hess <- matrix(0, nSUB, nETA * (nETA + 13) / 2)
-    }
+    ## if (con$inner.opt == "n1qn1"){
+    ##     inits.c.hess <- matrix(0, nSUB, nETA * (nETA + 13) / 2)
+    ## }
     if (.Platform$OS.type == "windows" && con$cores > 1){
         ## Copy over all of the objects within scope to
         ## all clusters.

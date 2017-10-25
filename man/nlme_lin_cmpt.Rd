@@ -51,4 +51,3 @@ summary(fit)
 \author{
 Wenping Wang
 }
-

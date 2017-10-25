@@ -29,4 +29,3 @@ Convert fit to FOCEi style fit
 \author{
 Matthew L. Fidler
 }
-

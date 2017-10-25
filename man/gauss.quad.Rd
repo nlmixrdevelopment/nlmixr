@@ -18,4 +18,3 @@ Sets nodes and weigts of Gauss-Hermite quadrature
 \examples{
 gauss.quad(5)
 }
-
