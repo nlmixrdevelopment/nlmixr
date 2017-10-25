@@ -4,8 +4,7 @@ CXX_STD = CXX11
 
 SOURCES_C = jj.c jj.g.d_parser.c quadrule.c init.c rprintf.c RxODE.c chkSolved.c
 SOURCES_CPP = neldermead.cpp slice.cpp RcppExportMod.cpp ode_cmt1.cpp RcppExports.cpp focei_fit.cpp focei.cpp
-SOURCES_FORTAN = n1qn1_all.f 
-OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o) $(SOURCES_FORTAN:.f=.o)
+OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o)
 
 all: $(SHLIB)
 $(SHLIB): $(OBJECTS)

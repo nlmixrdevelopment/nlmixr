@@ -56,7 +56,7 @@ Description: Fit and compare nonlinear mixed-effects models in differential
     <doi:10.1007/s10928-015-9409-1>). Differential equation solving is 
     by compiled C code provided in the 'RxODE' package
     (Wang, Hallow, and James 2015 <doi:10.1002/psp4.12052>).
-License: GPL
+License: GPL (>=2)
 NeedsCompilation: yes
 LinkingTo: RcppArmadillo (>= 0.5.600.2.0), dparser(>= 0.1.7), Rcpp (>= 0.12.3),
     RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
