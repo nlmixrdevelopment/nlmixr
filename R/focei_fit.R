@@ -1188,7 +1188,7 @@ focei.fit.data.frame0 <- function(data,
             if(con$DEBUG>10 && .wh==1) print(inits.mat[.wh,, drop = FALSE])               #FIXME
             if (con$DEBUG.ODE) print("i'm here :)")
             c.hess <- NULL;
-            if (con$save.curve && !first && con$inner.opt == "n1qn1") c.hess <- inits.c.hess[.wh, ];
+            ## if (con$save.curve && !first && con$inner.opt == "n1qn1") c.hess <- inits.c.hess[.wh, ];
             args <- list(model, ev, theta=THETA, eta=inits.mat[.wh,, drop = FALSE], c.hess=c.hess,
                          dv=dati$dv[ev$get.obs.rec()], inv.env=rxSymEnv,
                          nonmem=con$NONMEM, invisible=1-con$TRACE.INNER, epsilon=con$TOL.INNER,
@@ -1227,12 +1227,12 @@ focei.fit.data.frame0 <- function(data,
         }))
         if(con$RESET.INITS.MAT) inits.mat[m[,1],] <<- m[,-1]
         ## Save last curvature
-        if (con$save.curve && con$inner.opt == "n1qn1" && !is.null(attr(llik.subj[[1]], "c.hess"))){
-            m <- t(sapply(llik.subj, function(x){
-                c(attr(x, "wh"), attr(x, "c.hess"))
-            }))
-            inits.c.hess[m[,1],] <<- m[,-1]
-        }
+        ## if (con$save.curve && con$inner.opt == "n1qn1" && !is.null(attr(llik.subj[[1]], "c.hess"))){
+        ##     m <- t(sapply(llik.subj, function(x){
+        ##         c(attr(x, "wh"), attr(x, "c.hess"))
+        ##     }))
+        ##     inits.c.hess[m[,1],] <<- m[,-1]
+        ## }
         if (con$grad && con$accept.eta.size != 0){
             last.pars <<- pars;
             last.dEta.dTheta <<- lapply(llik.subj, function(x){attr(x, "dEta.dTheta")});
