@@ -56,7 +56,7 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
      many packages that may be useful to the data scientist and/or
      pharmacometrician
      is [Anaconda](https://www.anaconda.com/download/). Although very straightforward and easy to install, it is quite a large download and contains much more than you will need to run `nlmixr`.
-   - Another option is to use [official Python](http:://python.org).
+   - Another option is to use [official Python](http://python.org).
    - Regardless of the option you choose, please use like with like (64-bit Python for 64-bit Windows, for example).
    - Note that using the official Python may result in some issues with write permissions on Windows 10 - see [here](https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows) for a few workarounds. 
 3. Install `devtools`.
