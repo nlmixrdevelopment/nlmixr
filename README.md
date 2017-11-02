@@ -55,7 +55,7 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
    - A very robust Python distribution that includes [SymPy](http://sympy.org/) and
      many packages that may be useful to the data scientist and/or
      pharmacometrician
-     is [Anaconda](https://www.anaconda.com/download/). Although very straightforward and easy to install, it is quite a large download and contains much more than you will need to run `nlmixr`. When installing, use the Python 3.6 version.
+     is [Anaconda](https://www.anaconda.com/download/). Although very straightforward and easy to install, it is quite a large download and contains much more than you will need to run `nlmixr`. When installing, use the Python 3.6 version. During the installation, Ananconda advises against adding Anaconda to the PATH environment variable, but you will need to do this anyway, so do not be discouraged, and make sure the top option is marked (after which the warning turns to red).
    - Another option is to use [official Python](http://python.org).
    - Regardless of the option you choose, please use like with like (64-bit Python for 64-bit Windows, for example).
    - Note that using the official Python may result in some issues with write permissions on Windows 10 - see [here](https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows) for a few workarounds. 
