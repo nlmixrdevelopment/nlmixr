@@ -95,8 +95,8 @@ Instructions for Ubuntu-alike distributions are given here (specifically, [Ubunt
 3. Install `devtools` and dependencies.
    - This package is required to install packages from Github, amongst other things.
    - Some Linux distributions don't include build tools out of the box. To be safe, check this: `sudo apt-get install build-essential`
-   - Install `devtools` from a clean `R` session by entering `install.packages("devtools")`.
-4. In `R`, load `devtools` using `library(devtools)`.
+   - Install `devtools` from a clean R session by entering `install.packages("devtools")`.
+4. In R, load `devtools` using `library(devtools)`.
 5. Install `RxODE`.
    - Currently the new version of `RxODE` is in the process of being
      uploaded to CRAN.  `nlmixr` needs this newer version of `RxODE` to
@@ -123,8 +123,8 @@ Instructions for macOS 10.12 Sierra are provided here. They should be broadly ex
    - Install `sympy` using `pip`: `sudo -H pip install sympy`.
 3. Install `devtools` and dependencies.
    - This package is required to install packages from Github, amongst other things.
-   - Install `devtools` from a clean `R` session by entering `install.packages("devtools")`.
-4. In `R`, load `devtools` using `library(devtools)`.
+   - Install `devtools` from a clean R session by entering `install.packages("devtools")`.
+4. In R, load `devtools` using `library(devtools)`.
 5. Install build tools.
    - Install Xcode from the App Store. 
    - Read the license by entering the following at the macOS terminal:
