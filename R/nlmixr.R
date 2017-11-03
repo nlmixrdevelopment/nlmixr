@@ -35,6 +35,7 @@ nlmixrForget <- function(){
 
 
 ##' @importFrom stats predict logLik na.fail pchisq
+##' @importFrom n1qn1 n1qn1
 ##' @importFrom brew brew
 ##' @importFrom lattice xyplot
 ##' @importFrom lattice trellis.par.get

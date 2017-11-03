@@ -269,8 +269,8 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
                     if (is.null(c.hess)){
                         args$c.hess <- c.hess;
                     }
-                    output <- do.call(getFromNamespace("n1qn1","nlmixr"), args, envir = parent.frame(1))
-                    ##output <- try(do.call(getFromNamespace("n1qn1","nlmixr"), args, envir = parent.frame(1)), silent=TRUE)
+                    ## output <- do.call(getFromNamespace("n1qn1","n1qn1"), args, envir = parent.frame(1))
+                    output <- try(do.call(getFromNamespace("n1qn1","n1qn1"), args, envir = parent.frame(1)), silent=TRUE)
                     if (!inherits(output, "try-error")){
                         env$c.hess <- output$c.hess
                         c.hess <<- output$c.hess;

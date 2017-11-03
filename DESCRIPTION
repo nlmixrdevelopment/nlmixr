@@ -22,7 +22,8 @@ Imports:
     Matrix,
     numDeriv,
     R.utils,
-    mvtnorm
+    mvtnorm,
+    n1qn1
 Suggests:
     knitr,
     rmarkdown,
