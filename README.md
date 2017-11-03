@@ -30,9 +30,9 @@ For PKPD modeling (with ODE and dosing history) with [Stan](http://mc-stan.org/)
 # Installation on Windows
 To replicate the environment that was used in Windows for `nlmixr` development, you will need administrator rights, and you should perform the following steps:
 
-1. Install R 3.4.2 (or better) from the R website.
-   - For best results, we suggest you use `C:\R\R-3.4.2`, but
-     you can also use the default location (`C:\Program Files\R\R-3.4.2`) as well, if really needed.
+1. Install R 3.4.1 (or later) from the R website.
+   - For best results, we suggest you use `C:\R\R-3.4.1`, but
+     you can also use the default location (`C:\Program Files\R\R-3.4.1`) as well, if really needed.
    - For 64-bit Windows, it is best practice to include *only* the 64-bit version. 
      If you include 32-bit files, some packages may not
      run correctly.  Additionally, both the 32- and
@@ -82,7 +82,7 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
 # Installation on Linux
 Instructions for Ubuntu-alike distributions are given here (specifically, [Ubuntu 16.04 Xenial Xerus](http://releases.ubuntu.com/16.04/)), but all current Linux distributions are supported, in principle.
 
-1. Install R 3.4.2 (or better) from an appropriate repository (Ubuntu Xenial shown below, based on instructions provided [here](https://www.digitalocean.com/community/tutorials/how-to-install-r-on-ubuntu-16-04-2)).
+1. Install R 3.4.1 (or later) from an appropriate repository (Ubuntu Xenial shown below, based on instructions provided [here](https://www.digitalocean.com/community/tutorials/how-to-install-r-on-ubuntu-16-04-2)).
    - You will need administrator privileges (i.e. access to `sudo`). Provide your admin password when asked. 
    - Add the official CRAN repository for Ubuntu: 
      `sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9`
@@ -116,8 +116,8 @@ Instructions for Ubuntu-alike distributions are given here (specifically, [Ubunt
 # Installation on macOS
 Instructions for macOS 10.12 Sierra are provided here. They should be broadly extensible to all recent releases of macOS, however.
 
-1. Install R 3.4.2 (or better) from the R website.
-   - Download and install `R-3.4.2.pkg` (or better) from [CRAN](http://cran.r-project.org/bin/macosx/).
+1. Install R 3.4.1 (or later) from the R website.
+   - Download and install `R-3.4.1.pkg` (or later) from [CRAN](http://cran.r-project.org/bin/macosx/).
 2. Install Python dependencies.
    - Install `pip` from the macOS terminal prompt: `sudo easy_install pip`.
    - Install `sympy` using `pip`: `sudo -H pip install sympy`.
