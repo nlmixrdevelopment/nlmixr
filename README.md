@@ -63,7 +63,7 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
 3. Install `devtools`.
    - This package is required to install packages from Github, amongst other things.
    - This can be done from a clean R session by `install.packages("devtools")`.
-4. Load `devtools` using `library(devtools)`
+4. Load `devtools` using `library(devtools)`.
 5. Install `RxODE`.
    - Currently the new version of `RxODE` is in the process of being
      uploaded to CRAN.  `nlmixr` needs this newer version of `RxODE` to
@@ -76,13 +76,44 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
    - To validate or test the installation of `RxODE` completely, you
      can type the following `library(RxODE); rxTest();` and it will
      run all of the unit tests in RxODE to make sure it is running
-     correctly on your system.
+     correctly on your system. (Note that the `testthat` package is required for this, and it will take a long time.)
 6. Install `nlmixr`.
    - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
 
 # Installation on Linux
-Installation on Linux is much more straightforward, since many prerequisites (such as compilers and Python) are already available. Details TBA.
+Instructions for Ubuntu-alike distributions are given here (specifically, [Ubuntu 16.04 Xenial Xerus](http://releases.ubuntu.com/16.04/)), but all current Linux distributions are supported, in principle.
 
+1. Install R 3.4.2 (or better) from an appropriate repository (Ubuntu Xenial shown below, based on instructions provided [here](https://www.digitalocean.com/community/tutorials/how-to-install-r-on-ubuntu-16-04-2)).
+   - You will need administrator privileges (i.e. access to `sudo`). Provide your admin password when asked. 
+   - Add the official CRAN repository for Ubuntu: 
+     `sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9`
+   - Add the official CRAN repository for Ubuntu: 
+     `sudo add-apt-repository 'deb [arch=amd64,i386] https://cran.rstudio.com/bin/linux/ubuntu xenial/'`. If you aren't using Ubuntu Xenial, change `xenial` to match your distribution's codename.
+   - Now refresh the package list using `sudo apt-get update`. 
+   - We can now install base R and required development libraries, and their dependencies: `sudo apt-get install r-base r-base-dev libssl-dev` 
+2. Install Python dependencies.
+   - Enter this: `sudo apt-get install python-sympy python-pip python-setuptools python3-pip python-dev python3-dev`.
+3. Install `devtools` and dependencies.
+   - This package is required to install packages from Github, amongst other things.
+   - Some Linux distributions don't include build tools out of the box. To be safe, check this: `sudo apt-get install build-essential`
+   - Install `devtools` from a clean `R` session by entering `install.packages("devtools")`.
+4. In `R`, load `devtools` using `library(devtools)`.
+5. Install `RxODE`.
+   - Currently the new version of `RxODE` is in the process of being
+     uploaded to CRAN.  `nlmixr` needs this newer version of `RxODE` to
+     function correctly. To install this version, use the command:
+     `install_github("nlmixrdevelopment/RxODE")`.
+   - Install `SnakeCharmR` using `install_github("nlmixrdevelopment/SnakeCharmR")`.
+   - Restart your R session.
+   - As a quick test, you can make sure that R and Python can
+     communicate by typing the command `library(SnakeCharmR)`.
+   - To validate or test the installation of `RxODE` completely, you
+     can type the following `library(RxODE); rxTest();` and it will
+     run all of the unit tests in RxODE to make sure it is running
+     correctly on your system. (Note that the `testthat` package is required for this, and it will take a long time.)
+6. Install `nlmixr`.
+   - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
+ 
 # Installation on macOS
 Installation on macOS is much more straightforward, since many prerequisites (such as compilers and Python) are already available. Details TBA.
 
