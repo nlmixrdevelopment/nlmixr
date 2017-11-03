@@ -1,6 +1,6 @@
 Package: nlmixr
 Type: Package
-Title: Non-Linear Mixed Effects Models in Population Pharmacokinetics and
+Title: Nonlinear Mixed Effects Models in Population Pharmacokinetics and
     Pharmacodynamics
 Depends:
     R (>= 3.2),
@@ -45,7 +45,7 @@ Authors@R: c(person("Matthew","Fidler",
    person("Rik", "Schoemaker", 
       role = "aut", email = "rik.schoemaker@occams.com"),
    person("Justin", "Wilkins", 
-      role = "aut", email = "justin.wilkins@occams.eu"),
+      role = "aut", email = "justin.wilkins@occams.com"),
    person("Mirjam","Trame",
       role = "aut", email = "mirjam.trame@gmail.com"),   
    person("Wenping", "Wang", 
