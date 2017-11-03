@@ -1100,8 +1100,7 @@ focei.fit.data.frame0 <- function(data,
     lower <- c(lower, lower.om);
     upper <- c(upper, upper.om);
     inits.vec = c(inits$THTA, th0.om)
-    print(inits);
-    print(th0.om);
+
     if (any(inits.vec == 0)){
         warning("Some of the initial conditions were 0, changing to 0.0001");
         inits.vec[inits.vec == 0] <- 0.0001;
