@@ -50,6 +50,7 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
        3.3.x 32-bit toolchain.  These files can interfere with some
        packages that compile binaries, with unpredictable consequences.  Similarly, only install 32-bit
        Rtools on 32-bit versions of Windows.
+   - Make sure the compilers have been added to the Windows `PATH` environment variable, or `RxODE` and `nlmixr` will not work (this should be done automatically during installation).
 3. Install Python for Windows.
    - This is used for its symbolic algebra package [SymPy](http://sympy.org/).
    - A very robust Python distribution that includes [SymPy](http://sympy.org/) and
@@ -58,7 +59,8 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
      is [Anaconda](https://www.anaconda.com/download/). Although very straightforward and easy to install, it is quite a large download and contains much more than you will need to run `nlmixr`. When installing, use the Python 3.6 version. During the installation, Anaconda provides the option of adding itself to the `PATH` environment variable, but advises against it; please do this anyway (despite the red warning).
    - Another option is to use [official Python](http://python.org).
    - Regardless of the option you choose, please use like with like (64-bit Python for 64-bit Windows, for example).
-   - Note that using the official Python may result in some issues with write permissions on Windows 10 - see [here](https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows) for a few workarounds. 
+   - Note that using the official Python may result in some issues with write permissions on Windows 10 - see [here](https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows) for a few workarounds.
+   - Once again, make sure Python has been added to the Windows `PATH` environment variable, or `RxODE` and `nlmixr` will not work, no matter what Anaconda might say.   
 3. Install `devtools`.
    - This package is required to install packages from Github, amongst other things.
    - This can be done from a clean R session by `install.packages("devtools")`.
