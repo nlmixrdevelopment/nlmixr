@@ -27,7 +27,7 @@ SetDatablockOptimize On
 
 Name \"<%=name%>\"
 !define MUI_ICON \"<%=icon%>\"
-OutFile \"<%=name%>-install.exe\"
+OutFile \"<%=name%>_<%=nlmixr.ver%>_<%=arch%>_install.exe\"
 InstallDir \"$LOCALAPPDATA\\nlmixr\"
 InstallDirRegKey HKCU \"Software\\nlmixr\" \"\"
 !define MUI_HEADERIMAGE
@@ -119,7 +119,8 @@ buildInstaller <- function(name="nlmixr"){
     rtools.cur.ver <- rtools.curr$`Current Version`;
     full.ver <- rtools.curr[[rtools.cur.ver]][["FullVersion"]];
     min.rver <- rtools.curr[[rtools.cur.ver]][["MinRVersion"]];
-
+    arch <- R.version$arch;
+    nlmixr.ver <- sessionInfo()$otherPkgs$nlmixr$Version;
     nsis <- gsub("<%=icon%>",icon,
                  gsub("<%=welcome%>", welcome,
                       gsub("<%=header%>",header,
@@ -132,10 +133,16 @@ buildInstaller <- function(name="nlmixr"){
     nsis <- gsub("<%=rtoolsver%>", rtools.cur.ver, nsis, fixed=TRUE)
     nsis <- gsub("<%=minr%>", min.rver, nsis, fixed=TRUE)
     nsis <- gsub("<%=fullr%>", full.ver, nsis, fixed=TRUE)
-    sink(sprintf("%s.nsi", name));
+    nsis <- gsub("<%=arch%>", arch, nsis, fixed=TRUE)
+    nsis <- gsub("<%=nlmixr.ver%>", nlmixr.ver, nsis, fixed=TRUE);
+    dr <- gsub("/", "\\", devtools::package_file("build"), fixed=TRUE)
+    nsis <- gsub("<%=dir%>", dr, nsis, fixed=TRUE);
+    sink(file.path(devtools::package_file("build"), sprintf("%s.nsi", name)));
     cat(nsis)
     sink()
-    system(sprintf("makensis %s.nsi", name));
+    nsis <- sprintf("%s\\%s.nsi", dr, name);
+    system(sprintf("makensis %s", nsis));
+    unlink(nsis)
 }
 
 buildInstaller()
