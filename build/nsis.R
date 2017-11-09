@@ -10,13 +10,20 @@ SetCompressorDictSize 32
 SetDatablockOptimize On
 ;SetCompress off
 !include \"MUI2.nsh\"
-!include LogicLib.nsh
-!include x64.nsh
-Function .onInit
-    ${IfNot} ${RunningX64}
-       MessageBox MB_OK \"This installer is for 64 bit systems only\" Abort
-    ${EndIf}
-FunctionEnd
+## For some reason, this doesn't work... :(
+## !include LogicLib.nsh
+## !include StrContains.nsh
+## Function .onInit
+##     ${StrContains} $0 \"64\" $SysDir
+##     StrCmp $0 \"\" bit32
+##         Goto bit64
+##     bit32:
+##         MessageBox MB_OK \"This installer is for 64 bit systems only $SysDir\"
+##         Abort
+##     bit64:
+##         Goto done
+##     done:
+##FunctionEnd
 
 Name \"<%=name%>\"
 !define MUI_ICON \"<%=icon%>\"
