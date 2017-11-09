@@ -1,3 +1,0 @@
-
-    d/dt(centr)  = -(CL/V)*centr;
-     

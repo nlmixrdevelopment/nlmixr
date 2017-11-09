@@ -48,8 +48,19 @@ Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "justin.wilkins@occams.com"),
    person("Mirjam","Trame",
       role = "aut", email = "mirjam.trame@gmail.com"),   
+   person("Robert","Leary", role = "ctb"),
    person("Wenping", "Wang", 
-      role = c("aut", "cre"), email = "wwang8198@gmail.com")
+      role = c("aut", "cre"), email = "wwang8198@gmail.com"),
+   person("Hadley","Wickham", role = "ctb"),
+   person("Dirk","Eddelbuettel",
+      role = "cph", email = "edd@debian.org"),   
+   person("David","Ardia",role = "cph"),
+   person("Katharine","Mullen",role = "cph"),
+   person("Sylvan","Elhay",role = "cph"),
+   person("Jaroslav","Kautsky",role = "cph"),
+   person("John","Burkardt",role = "cph"),
+   person("Shanjie","Zhang",role = "cph"),
+   person("Jianming","Jin",role = "cph")
    )
 Description: Fit and compare nonlinear mixed-effects models in differential
     equations with flexible dosing information commonly seen in pharmacokinetics

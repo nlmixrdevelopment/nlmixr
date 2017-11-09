@@ -1,5 +1,9 @@
-// Adopted by Wenping Wang from Rcpp.
-// written originally by Dirk Eddelbuettel <edd@debian.org>
+// -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
+//
+// Port of DEoptim (2.0.7) by Ardia et al to Rcpp/RcppArmadillo/Armadillo
+// Copyright (C) 2010 - 2015  Dirk Eddelbuettel <edd@debian.org>
+//
+// DEoptim is Copyright (C) 2009 David Ardia and Katharine Mullen
 
 
 #ifndef Rcpp_DE_evaluate_h_
