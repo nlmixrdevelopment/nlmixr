@@ -421,7 +421,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
   shlib = sprintf('R CMD SHLIB %s -o %s', saem.cpp, saem.dll)
   ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
-  system(shlib)
+  RxODE::rx.do.call("system", list(shlib))
   file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
   file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
   setwd(lwd);
