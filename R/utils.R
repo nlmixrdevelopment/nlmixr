@@ -601,6 +601,12 @@ refresh <- function(){
     source(devtools::package_file("build/refresh.R"))
     ## nocov end
 }
+
+nsis <- function(){ ## build installer...
+    ## nocov start
+    source(devtools::package_file("build/nsis.R"))
+    ## nocov end
+}
 ##' Collect warnings and just warn once.
 ##'
 ##' @param expr R expression
