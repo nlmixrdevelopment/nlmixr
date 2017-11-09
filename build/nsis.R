@@ -1,6 +1,7 @@
 cat("Generate nlmixr installer")
 
-nsi.stub <- "CRCCheck On
+nsi.stub <- "
+CRCCheck On
 RequestExecutionLevel user
 ; Best Compression
 SetCompress Auto
@@ -9,6 +10,14 @@ SetCompressorDictSize 32
 SetDatablockOptimize On
 ;SetCompress off
 !include \"MUI2.nsh\"
+!include LogicLib.nsh
+!include x64.nsh
+Function .onInit
+    ${IfNot} ${RunningX64}
+       MessageBox MB_OK \"This installer is for 64 bit systems only\" Abort
+    ${EndIf}
+FunctionEnd
+
 Name \"<%=name%>\"
 !define MUI_ICON \"<%=icon%>\"
 OutFile \"<%=name%>-install.exe\"
