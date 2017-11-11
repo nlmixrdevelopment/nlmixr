@@ -138,17 +138,18 @@ print.focei.fit <- function(x, ...) {
         print(x$par.fixed)
         message("\nOmega ($omega):");
         print(fit$omega);
-        is.data.table <- requireNamespace("data.table", quietly = TRUE);
         message("\nFit Data (object is a modified data.frame):")
-        if (is.data.table){
-            print(data.table::data.table(x), topn=n);
-        } else {
-            is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
-            if (!is.dplyr){
-                print(head(as.matrix(x), n = n));
+
+        is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
+        if (!is.dplyr){
+            is.data.table <- requireNamespace("data.table", quietly = TRUE);
+            if (is.data.table){
+                print(data.table::data.table(x), topn=n);
             } else {
-                print(dplyr::as.tbl(x), n = n, width = width);
+                print(head(as.matrix(x), n = n));
             }
+        } else {
+                print(dplyr::as.tbl(x), n = n, width = width);
         }
     } else {
         print(as.data.frame(x));
@@ -2063,6 +2064,7 @@ focei.fit.data.frame0 <- function(data,
         attr(data, ".focei.env") <- env;
         class(data) <- c("focei.fit", "data.frame")
     }
+    ## FIXME -- add lhs/state variables to the data-frame.
     ## data <- merge(data, m);
     table.time <- proc.time() - pt;
     fit$table.time <- table.time;

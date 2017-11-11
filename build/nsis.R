@@ -28,8 +28,8 @@ SetDatablockOptimize On
 Name \"<%=name%>\"
 !define MUI_ICON \"<%=icon%>\"
 OutFile \"<%=name%>_<%=nlmixr.ver%>_<%=arch%>_install.exe\"
-InstallDir \"$LOCALAPPDATA\\nlmixr\"
-InstallDirRegKey HKCU \"Software\\nlmixr\" \"\"
+InstallDir \"$LOCALAPPDATA\\nlmixr<%=archext%>\"
+InstallDirRegKey HKCU \"Software\\nlmixr<%=archext%>\\<%=nlmixr.ver%>\" \"\"
 !define MUI_HEADERIMAGE
 
 !define MUI_HEADERIMAGE_BITMAP \"<%=header%>\"
@@ -61,16 +61,17 @@ BrandingText \"<%=name%> - Nonlinear Mixed Effects Models in R\"
 !insertmacro MUI_UNPAGE_FINISH
 !insertmacro MUI_LANGUAGE \"English\"
 Section Main sec_main
-WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr\" \"InstallPath\" \"$INSTDIR\\R\"
-WriteRegStr HKCU \"Software\\R-core\\R\" \"Current Version\" \"<%=rver%>nlmixr\"
-WriteRegStr HKCU \"Software\\R-core\\R\" \"Current Version\" \"<%=rver%>nlmixr\"
+WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallPath\" \"$INSTDIR\\R\"
+WriteRegStr HKCU \"Software\\R-core\\R\" \"Current Version\" \"<%=rver%>nlmixr<%=archext%>\"
+WriteRegStr HKCU \"Software\\R-core\\R\" \"Current Version\" \"<%=rver%>nlmixr<%=archext%>\"
 WriteRegStr HKCU \"Software\\R-core\\R\" \"InstallPath\" \"$INSTDIR\\R\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\" \"Current Version\" \"<%=rtoolsver%>\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\" \"InstallPath\" \"$INSTDIR\\rtools\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"FullVersion\" \"<%=fullr%>\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"InstallPath\" \"$INSTDIR\\rtools\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"MinRVersion\" \"<%=minr%>\"
-
+SetOutPath \"$INSTDIR\"
+File \"<%=icon%>\"
 SetOutPath \"$INSTDIR\\python\"
 File /r <%=python%>\\*
 SetOutPath \"$INSTDIR\\rtools\"
@@ -79,10 +80,10 @@ SetOutPath \"$INSTDIR\\R\"
 File /r <%=R%>\\*
 
 CreateDirectory \"$SMPROGRAMS\\nlmixr\"
-CreateShortCut \"$SMPROGRAMS\\nlmixr\\nlmixr R.lnk\" \"$INSTDIR\\R\\bin\\x64\\Rgui.exe\"
+<%=shortcuts%>
 
 ;Store installation folder
-WriteRegStr HKCU \"Software\\nlmixr\" \"\" $INSTDIR
+WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\" \"\" $INSTDIR
 ;Create uninstaller
 WriteUninstaller \"$INSTDIR\\Uninstall.exe\"
 SectionEnd
@@ -91,15 +92,15 @@ Section \"Uninstall\"
 RmDir /r \"$INSTDIR\\rtools\"
 RmDir /r \"$INSTDIR\\python\"
 RmDir /r \"$INSTDIR\\R\"
-Delete \"$SMPROGRAMS\\nlmixr\\nlmixr R.lnk\"
+Delete \"$SMPROGRAMS\\nlmixr\\*.lnk\"
 RmDir /r \"$SMPROGRAMS\\nlmixr\"
 
 Delete \"$INSTDIR\\Uninstall.exe\"
 RMDir \"$INSTDIR\"
 
-DeleteRegKey HKCU \"Software\\nlmixr\"
+DeleteRegKey HKCU \"Software\\nlmixr<%=archext%>\"
 DeleteRegKey HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr\\InstallPath\"
-DeleteRegKey HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr\"
+DeleteRegKey HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\"
 DeleteRegKey HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\\FullVersion\"
 DeleteRegKey HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\\InstallPath\"
 DeleteRegKey HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\\MinRVersion\"
@@ -108,7 +109,7 @@ SectionEnd"
 
 buildInstaller <- function(name="nlmixr"){
     rtools <- gsub("/", "\\", RxODE:::rxRtoolsBaseWin(), fixed=TRUE);
-    python <- gsub("/", "\\", RxODE:::rxPythonBaseWin(), fixed=TRUE)
+    python <- gsub("/", "\\", RxODE:::rxPythonBaseWin(), fixed=TRUE);
     R <- gsub("/", "\\", Sys.getenv("R_HOME"), fixed=TRUE);
     lic <- gsub("/", "\\", devtools::package_file("LICENSE"), fixed=TRUE);
     header <- gsub("/", "\\", devtools::package_file("build/nlmixr-header.bmp"), fixed=TRUE)
@@ -121,6 +122,12 @@ buildInstaller <- function(name="nlmixr"){
     min.rver <- rtools.curr[[rtools.cur.ver]][["MinRVersion"]];
     arch <- R.version$arch;
     nlmixr.ver <- sessionInfo()$otherPkgs$nlmixr$Version;
+    archext <- ifelse(.Platform$r_arch == "i386", "32", "")
+    if (archext == "32"){
+        shortcut <- "CreateShortCut \"$DESKTOP\\nlmixr R (32 bit).lnk\" \"$INSTDIR\\R\\bin\\i386\\Rgui.exe\" \"\" \"$INSTDIR\\icon_red.ico\"\nCreateShortCut \"$SMPROGRAMS\\nlmixr\\nlmixr R (32 bit).lnk\" \"$INSTDIR\\R\\bin\\i386\\Rgui.exe\" \"\" \"$INSTDIR\\icon_red.ico\"";
+    } else {
+        shortcut <- "CreateShortCut \"$DESKTOP\\nlmixr R (64 bit).lnk\" \"$INSTDIR\\R\\bin\\x64\\Rgui.exe\" \"\" \"$INSTDIR\\icon_red.ico\"\nCreateShortCut \"$SMPROGRAMS\\nlmixr\\nlmixr R (64 bit).lnk\" \"$INSTDIR\\R\\bin\\x64\\Rgui.exe\" \"\" \"$INSTDIR\\icon_red.ico\""
+    }
     nsis <- gsub("<%=icon%>",icon,
                  gsub("<%=welcome%>", welcome,
                       gsub("<%=header%>",header,
@@ -135,6 +142,8 @@ buildInstaller <- function(name="nlmixr"){
     nsis <- gsub("<%=fullr%>", full.ver, nsis, fixed=TRUE)
     nsis <- gsub("<%=arch%>", arch, nsis, fixed=TRUE)
     nsis <- gsub("<%=nlmixr.ver%>", nlmixr.ver, nsis, fixed=TRUE);
+    nsis <- gsub("<%=shortcuts%>", shortcut, nsis, fixed=TRUE);
+    nsis <- gsub("<%=archext%>", archext, nsis, fixed=TRUE);
     dr <- gsub("/", "\\", devtools::package_file("build"), fixed=TRUE)
     nsis <- gsub("<%=dir%>", dr, nsis, fixed=TRUE);
     sink(file.path(devtools::package_file("build"), sprintf("%s.nsi", name)));
