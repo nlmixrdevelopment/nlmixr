@@ -2098,6 +2098,16 @@ focei.fit.data.frame0 <- function(data,
             return(fixed.effects(obj, full=TRUE));
         } else if (arg == "eta"){
             return(random.effects(obj));
+        } else if (arg == "seed"){
+            if (rxIs(obj, "nlmixr.ui.saem")){
+                return(attr(as.saem(obj),"saem.cfg")$seed)
+            } else {
+                return(NA);
+            }
+        } else if (arg == "model.name"){
+            return(env$uif$model.name);
+        } else if (arg == "data.name"){
+            return(env$uif$data.name);
         } else {
             fit <- env$fit;
             ret <- fit[[arg, exact = exact]]
@@ -2138,8 +2148,9 @@ str.focei.fit <- function(object, ...){
     message(" $ par.hist.stacked : Parameter history in stacked form for easy plotting (if available)")
     message(" $ par.fixed        : Fixed Effect Parameter Table")
     message(" $ eta              : Individual Parameter Estimates")
-
-
+    message(" $ seed             : Seed (if applicable)");
+    message(" $ model.name       : Model name (from R function)");
+    message(" $ data.name        : Name of R data input");
 }
 
 ##' @export

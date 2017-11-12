@@ -357,7 +357,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
 
   if (is.ode) {
-    modelVars = model$cmpMgr$get.modelVars()
+    modelVars = model$cmpMgr$get.modelVars()
 
     pars = modelVars$params
     npar = length(pars)
@@ -938,7 +938,8 @@ configsaem = function(model, data, inits,
     optM=optM,
     print=mcmc$print,
     distribution=distribution.idx[distribution],
-    par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2))
+    par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2)),
+    seed=seed
   )
 }
 

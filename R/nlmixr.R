@@ -101,9 +101,14 @@ nlmixr <- function(object, data, est="nlme", control=list(), calc.resid=TRUE, ..
 ##' @export
 nlmixr.function <- function(object, data, est="nlme", control=list(), calc.resid=TRUE, ...){
     uif <- nlmixrUI(object);
+    class(uif) <- "list";
+    uif$nmodel$model.name <- deparse(substitute(object))
     if (missing(data) && missing(est)){
+        class(uif) <- "nlmixrUI"
         return(uif)
     } else {
+        uif$nmodel$data.name <- deparse(substitute(data))
+        class(uif) <- "nlmixrUI"
         nlmixr_fit(uif, data, est, control=control, calc.resid=calc.resid, ...);
     }
 }
@@ -115,6 +120,9 @@ nlmixr.nlmixrUI <- function(object, data, est="nlme", control=list(), ...){
     if (missing(data) && missing(est)){
         return(uif)
     } else {
+        class(uif) <- "list";
+        uif$nmodel$data.name <- deparse(substitute(data))
+        class(uif) <- "nlmixrUI"
         nlmixr_fit(uif, data, est, control=control, ...);
     }
 }
@@ -161,6 +169,7 @@ nlmixr.nlmixr.ui.saem <- nlmixr.nlmixr.ui.nlme
 ##' @export
 nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                        sum.prod=FALSE, calc.resid=TRUE){
+    start.time <- Sys.time();
     dat <- data;
     uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, as.double(dat$EVID), as.integer(!is.null(uif$nmodel$lin.solved)));
     bad.focei <- "Problem calculating residuals, returning fit without residuals.";
@@ -212,9 +221,13 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 warning(bad.focei)
                 return(fit)
             } else {
+                env <- attr(ret, ".focei.env")
+                assign("start.time", start.time, env);
+                assign("est", est, env);
+                assign("stop.time", Sys.time(), env);
                 return(ret)
             }
-        } else  {
+        } else {
             return(fit);
         }
     } else if (est == "nlme"){
@@ -272,6 +285,10 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             ## } else {
             ##     return(ret)
             ## }
+            env <- attr(fit, ".focei.env")
+            assign("start.time", start.time, env);
+            assign("est", est, env);
+            assign("stop.time", Sys.time(), env);
             return(ret)
         } else  {
             return(fit);
@@ -304,6 +321,9 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         }
         env$uif.new <- uif.new;
         class(fit) <- c("nlmixr.ui.focei.fit", class(fit));
+        assign("start.time", start.time, env);
+        assign("est", est, env);
+        assign("stop.time", Sys.time(), env);
         return(fit);
     }
 }
