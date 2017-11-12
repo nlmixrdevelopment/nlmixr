@@ -96,7 +96,7 @@ Delete \"$SMPROGRAMS\\nlmixr\\*.lnk\"
 RmDir /r \"$SMPROGRAMS\\nlmixr\"
 
 Delete \"$INSTDIR\\Uninstall.exe\"
-RMDir \"$INSTDIR\"
+RmDir /r \"$INSTDIR\"
 
 DeleteRegKey HKCU \"Software\\nlmixr<%=archext%>\"
 DeleteRegKey HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr\\InstallPath\"
