@@ -433,6 +433,17 @@ print.nlmixr.par.fixed <- function(x, ...){
     print(df)
 }
 
+##'@export
+print.nlmixr.shrink <- function(x, ...){
+    tmp <- x;
+    class(tmp) <- NULL;
+    tmp <- (sprintf("%s%%", round(tmp, 3)));
+    names(tmp) <- names(x);
+    tmp <- data.frame(t(tmp))
+    rownames(tmp) <- "";
+    print(tmp)
+}
+
 ##' Extract residuals from the FOCEI fit
 ##'
 ##' @param object focei.fit object
@@ -2059,7 +2070,7 @@ focei.fit.data.frame0 <- function(data,
             ## message("done.")
             if (v == "iwres"){
                 ## Now add shrinkages.
-                fit$eps.shrink <- 1 - stats::sd(data$IWRES);
+                fit$eps.shrink <- structure((1 - stats::sd(data$IWRES)) * 100, .Names="eps", class="nlmixr.shrink");
             }
         }
     }
@@ -2073,9 +2084,10 @@ focei.fit.data.frame0 <- function(data,
         om <- diag(fit$omega)
         d <- etas[,-1]
         eshr <- sapply(seq_along(om), function(i){
-            return((1 - (stats::sd(d[,i]) / sqrt(om[i])))*100)
+            return((1 - (stats::sd(d[,i]) / sqrt(om[i])))*100);
         })
         names(eshr) <- names(d);
+        class(eshr) <- "nlmixr.shrink"
         fit$eta.shrink <- eshr;
     }
 
