@@ -2050,11 +2050,17 @@ focei.fit.data.frame0 <- function(data,
         calculate.vars <- calculate.vars[calculate.vars != "pred"];
         ## message("done.")
     }
+    fit$eps.shrink <- NA
+    fit$eta.shrink <- NA
     for (v in calculate.vars){
         if (v != "pred"){
             ## message(sprintf("\t%s", v), appendLF=FALSE)
             data[, toupper(v)] <- resid(data, type=v);
             ## message("done.")
+            if (v == "iwres"){
+                ## Now add shrinkages.
+                fit$eps.shrink <- 1 - stats::sd(data$IWRES);
+            }
         }
     }
     if (con$add.posthoc){
@@ -2063,7 +2069,17 @@ focei.fit.data.frame0 <- function(data,
         ## Drops the class/environment; Put back in.
         attr(data, ".focei.env") <- env;
         class(data) <- c("focei.fit", "data.frame")
+        ## Adapted
+        om <- diag(fit$omega)
+        d <- etas[,-1]
+        eshr <- sapply(seq_along(om), function(i){
+            return((1 - (stats::sd(d[,i]) / sqrt(om[i])))*100)
+        })
+        names(eshr) <- names(d);
+        fit$eta.shrink <- eshr;
     }
+
+
     ## FIXME -- add lhs/state variables to the data-frame.
     ## data <- merge(data, m);
     table.time <- proc.time() - pt;
