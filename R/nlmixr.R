@@ -171,8 +171,50 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                        sum.prod=FALSE, calc.resid=TRUE){
     start.time <- Sys.time();
     dat <- data;
+    if (RxODE::rxIs(dat$ID, "factor")){
+        dat$ID <- paste(dat$ID);
+    }
+    if (RxODE::rxIs(dat$ID, "character")){
+        lvl <- unique(dat$ID);
+        lab <- paste(lvl)
+        dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
+        backSort <- levels(dat$ID);
+        backSort2 <- seq_along(backSort)
+        dat$ID <- as.integer(dat$ID);
+    } else {
+        idSort <- .Call(`_nlmixr_chkSortIDTime`, as.integer(dat$ID), as.double(dat$TIME));
+        backSort <- c()
+        if (idSort == 2L){
+            lvl <- unique(dat$ID);
+            lab <- paste(lvl)
+            dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
+            backSort <- levels(dat$ID);
+            backSort2 <- seq_along(backSort)
+            dat$ID <- as.integer(dat$ID);
+        } else if (idSort == 0L){
+            warning("Sorting by ID, TIME; Output fit may not be in the same order as input dataset.")
+            dat <- dat[order(dat$ID, dat$TIME), ];
+            lvl <- unique(dat$ID);
+            lab <- paste(lvl)
+            dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
+            backSort <- levels(dat$ID);
+            backSort2 <- seq_along(backSort)
+            dat$ID <- as.integer(dat$ID);
+        }
+    }
     uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, as.double(dat$EVID), as.integer(!is.null(uif$nmodel$lin.solved)));
     bad.focei <- "Problem calculating residuals, returning fit without residuals.";
+    fix.dat <- function(x){
+        if (length(backSort) > 0){
+            cls <- class(x);
+            class(x) <- "data.frame";
+            x$ID <- factor(x$ID, backSort2, labels=backSort);
+            class(x) <- cls;
+            return(x);
+        } else {
+            return(x);
+        }
+    }
     if (est == "saem"){
         pt <- proc.time()
         args <- as.list(match.call(expand.dots=TRUE))[-1]
@@ -221,6 +263,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 warning(bad.focei)
                 return(fit)
             } else {
+                ret <- fix.dat(ret);
                 env <- attr(ret, ".focei.env")
                 assign("start.time", start.time, env);
                 assign("est", est, env);
@@ -285,7 +328,8 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             ## } else {
             ##     return(ret)
             ## }
-            env <- attr(fit, ".focei.env")
+            ret <- fix.dat(ret);
+            env <- attr(ret, ".focei.env")
             assign("start.time", start.time, env);
             assign("est", est, env);
             assign("stop.time", Sys.time(), env);
@@ -319,6 +363,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         for (i in w){
             uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
         }
+        fit <- fix.dat(fit);
         env$uif.new <- uif.new;
         class(fit) <- c("nlmixr.ui.focei.fit", class(fit));
         assign("start.time", start.time, env);
