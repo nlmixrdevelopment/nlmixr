@@ -70,7 +70,7 @@ Description: Fit and compare nonlinear mixed-effects models in differential
     (Wang, Hallow, and James 2015 <doi:10.1002/psp4.12052>).
 License: GPL (>=2)
 NeedsCompilation: yes
-LinkingTo: RcppArmadillo (>= 0.5.600.2.0), dparser(>= 0.1.7), Rcpp (>= 0.12.3),
+LinkingTo: RcppArmadillo (>= 0.5.600.2.0), dparser(>= 0.1.8), Rcpp (>= 0.12.3),
     RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
