@@ -18,7 +18,7 @@
 ## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
 
 
-nlmeModListEnv <- new.env();
+nlmeModListEnv <- new.env(parent = emptyenv());
 
 ##' Access the model list information for nlmixr's nlme user functions
 ##'
@@ -134,9 +134,7 @@ nlme_lin_cmpt <- function(dat, par_model,
     if(oral*infusion) {
         msg <- "oral and infusion cannot be all TRUE"
         stop(msg)
-    }
-
-    #prep PKpars
+    }    #prep PKpars
     PKpars <- par_trans
 	x <- deparse(body(PKpars))
 	len <- length(x)
@@ -217,7 +215,7 @@ nlme_lin_cmpt <- function(dat, par_model,
         ret <- collectWarnings(do.call(nlme, mod.specs));
     }
     ret$env <- nlmeModListEnv;
-    assignInMyNamespace("nlmeModListEnv", new.env());
+    assignInMyNamespace("nlmeModListEnv", new.env(parent = emptyenv()));
     class(ret) <- c("nlmixr_nlme", class(ret));
     return(ret);
 }
@@ -422,7 +420,7 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
       ret <- collectWarnings(do.call(nlme, mod.specs));
   }
   ret$env <- nlmeModListEnv;
-  assignInMyNamespace("nlmeModListEnv", new.env());
+  assignInMyNamespace("nlmeModListEnv", new.env(parent = emptyenv()));
   class(ret) <- c("nlmixr_nlme", class(ret));
   return(ret);
 }
@@ -563,7 +561,7 @@ print.summary_nlmixr_nlme <- function (x, verbose = FALSE, ..., print.data=FALSE
 ##' @export
 varWeights.nlmixr_nlme <- function(object, ...){
     nlmeModList(object$env);
-    on.exit({nlmeModList(new.env())})
+    on.exit({nlmeModList(new.env(parent = emptyenv()))})
     return(nlme::varWeights(object$modelStruct$varStruct))
 }
 
