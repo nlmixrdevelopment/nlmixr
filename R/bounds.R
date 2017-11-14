@@ -54,7 +54,7 @@ nlmixrBounds <- function(fun){
         if (is.name(x)) {
             character()
         } else if (is.call(x)) {
-            nenv <- new.env();
+            nenv <- new.env(parent=emptyenv());
             nenv$do.fixed <- FALSE;
             fix <- FIX <- fixed <- FIXED <- function(x){
                 assign("do.fixed", TRUE, nenv)

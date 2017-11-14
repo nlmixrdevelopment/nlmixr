@@ -144,7 +144,7 @@ nlme_lin_cmpt <- function(dat, par_model,
 
     #a new env with a ref in .GlobalEnv, holding model components
     #a hack due to non-std call by nlme
-    ## assign("..ModList", new.env(), envir=.GlobalEnv)
+    ## assign("..ModList", new.env(parent=emptyenv()), envir=.GlobalEnv)
 
     #master par list
     pm <- list(

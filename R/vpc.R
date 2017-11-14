@@ -57,7 +57,7 @@ sim.one = function(zz, x) {
 vpc = function(fit, nsim=100, condition=NULL)
 {
     nlmeModList(fit$env);
-    on.exit({nlmeModList(new.env())})
+    on.exit({nlmeModList(new.env(parent=emptyenv()))})
     ..ModList <- nlmeModList();
 
 	options(warn=-1)

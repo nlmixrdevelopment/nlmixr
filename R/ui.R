@@ -866,7 +866,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             cur <- cur + 1;
         }
     }
-    env <- new.env();
+    env <- new.env(parent=emptyenv());
     env$infusion <- FALSE
     env$sum.prod <- FALSE
     ret <- list(ini=bounds, model=bigmodel,
