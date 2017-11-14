@@ -146,10 +146,10 @@ buildInstaller <- function(name="nlmixr"){
     nsis <- gsub("<%=archext%>", archext, nsis, fixed=TRUE);
     dr <- gsub("/", "\\", devtools::package_file("build"), fixed=TRUE)
     nsis <- gsub("<%=dir%>", dr, nsis, fixed=TRUE);
-    sink(file.path(devtools::package_file("build"), sprintf("%s.nsi", name)));
+    sink(file.path(devtools::package_file("build"), sprintf("%s%s.nsi", name, archex)));
     cat(nsis)
     sink()
-    nsis <- sprintf("%s\\%s.nsi", dr, name);
+    nsis <- sprintf("%s\\%s%s.nsi", dr, name, archex);
     system(sprintf("makensis %s", nsis));
     unlink(nsis)
 }
