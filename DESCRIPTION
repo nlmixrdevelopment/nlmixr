@@ -23,7 +23,8 @@ Imports:
     numDeriv,
     R.utils,
     mvtnorm,
-    n1qn1
+    n1qn1,
+    PreciseSums
 Suggests:
     knitr,
     rmarkdown,

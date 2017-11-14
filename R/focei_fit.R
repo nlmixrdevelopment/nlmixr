@@ -1476,7 +1476,7 @@ focei.fit.data.frame0 <- function(data,
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
         first <<- FALSE
-        llik <- -2*RxODE::rxSum(unlist(llik.subj));
+        llik <- -2*PreciseSums::psSum(unlist(llik.subj));
         corrected <- do.call("sum", (lapply(llik.subj, function(x){attr(x, "corrected")})))
         ofv <- llik;
         reset <- FALSE;
