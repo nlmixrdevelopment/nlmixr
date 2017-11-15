@@ -1,4 +1,5 @@
 #define BOOST_DISABLE_ASSERTS true
+#define NDEBUG
 #include "evaluate.h"
 #include "lin_cmt.h"
 Rcpp::EvalBase *ev = NULL;                  // pointer to abstract base class

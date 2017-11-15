@@ -1,4 +1,5 @@
 #define BOOST_DISABLE_ASSERTS true
+#define NDEBUG
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
 using namespace Rcpp;
