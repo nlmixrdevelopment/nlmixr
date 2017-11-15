@@ -1,8 +1,6 @@
-#ifndef __RxODE_types__
-#define __RxODE_types__
-#define BOOST_DISABLE_ASSERTS true
-#define NDEBUG
+#ifndef __nlmixr_types__
+#define __nlmixr_types__
 #include <RcppArmadillo.h>
 typedef Rcpp::NumericVector (*rxFn2)(SEXP,SEXP);
-#endif // __RxODE_types__
+#endif // __nlmixr_types__
 

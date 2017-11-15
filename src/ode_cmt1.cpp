@@ -1,5 +1,4 @@
-#define BOOST_DISABLE_ASSERTS true
-#define NDEBUG
+#include "../inst/include/nlmixr_types.h"
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
 using namespace Rcpp;

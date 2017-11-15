@@ -18,7 +18,6 @@
 // along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
 // includes from the plugin
-#define BOOST_DISABLE_ASSERTS true
 #include <RcppEigen.h>
 #include <Rcpp.h>
 
