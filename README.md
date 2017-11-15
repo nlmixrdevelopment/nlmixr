@@ -27,10 +27,6 @@ https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes
 
 For PKPD modeling (with ODE and dosing history) with [Stan](http://mc-stan.org/), check out Yuan's package PMXStan: https://github.com/yxiong1/pmxstan. 
 
-# Windows installer
-For those not interested in custuomized installation on Windows, we **recommend** you download a Windows installer for your platform from the following link:
-https://github.com/nlmixrdevelopment/nlmixr/releases/tag/v0.9.0-2
-
 # Installation on Windows
 To replicate the environment that was used in Windows for `nlmixr` development, you will need administrator rights, and you should perform the following steps:
 
