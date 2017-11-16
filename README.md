@@ -84,7 +84,8 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
      run all of the unit tests in RxODE to make sure it is running
      correctly on your system. (Note that the `testthat` package is required for this, and it will take a long time.)
 6. Install `nlmixr`.
-   - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
+   - Load `devtools` again using `library(devtools)`
+   - Install `nlmixr` by running `install_github("nlmixrdevelopment/nlmixr")`
 
 # Installation on Linux
 Instructions for Ubuntu-alike distributions are given here (specifically, [Ubuntu 16.04 Xenial Xerus](http://releases.ubuntu.com/16.04/)), but all current Linux distributions are supported, in principle.
