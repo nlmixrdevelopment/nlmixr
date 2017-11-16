@@ -9,7 +9,7 @@ output: html_document
 ##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Wenping Wang
 
 ***
-`nlmixr` is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter defintion syntax and results in a fit object that can be used as input into the 'Xpose' package. Running nlmixr using the UUI is described in the vignette:
+`nlmixr` is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter defintion syntax and results in a fit object that can be used as input into the `Xpose` package. Running nlmixr using the UUI is described in the vignette:
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
 
 Under the hood `nlmixr` has five main modules:  
