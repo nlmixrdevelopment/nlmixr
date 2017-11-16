@@ -9,7 +9,10 @@ output: html_document
 ##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Wenping Wang
 
 ***
-`nlmixr` is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. `nlmixr` has five main modules:  
+`nlmixr` is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter defintion syntax and results in a fit object that can be used as input into the 'Xpose' package. Running nlmixr using the UUI is described in the vignette:
+https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
+
+Under the hood `nlmixr` has five main modules:  
 
 1. `dynmodel()` and its mcmc cousin `dynmodel.mcmc()` for nonlinear dynamic models of individual data; 
 2. `nlme_lin_cmpt()`for one to three linear compartment models of population data with first order absorption, or i.v. bolus, or i.v. infusion using the nlme algorithm; 
@@ -19,7 +22,7 @@ output: html_document
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-For a brief vignette, please see:
+For a brief vignette describing the modules, please see:
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
 
 The examples in the vignette can be run using VignetteDemo.R and the associated data files available at:
