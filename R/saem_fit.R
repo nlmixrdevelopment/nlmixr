@@ -76,8 +76,12 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
   vec yp(ix.n_elem);
   double *p=yp.memptr();
   int N=id.max()+1;
+  
+<%=declPars%>
 
   for (int i=0; i<N; i++) {
+<%=assgnPars%>
+
     wm = evt.rows( find(id == i) );
 
     vec time__;
@@ -342,7 +346,7 @@ nmxInclude <- function(pkg="nlmixr"){
 #'
 #' @author Wenping Wang
 #' @export
-gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL) {
+gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL, inPars=NULL) {
   is.ode = class(model) == "RxODE"
   is.win <- .Platform$OS.type=="windows"
   env = environment()
@@ -357,8 +361,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
 
   if (is.ode) {
-    modelVars = model$cmpMgr$get.modelVars()
-
+    modelVars = model$cmpMgr$get.modelVars()
     pars = modelVars$params
     npar = length(pars)
     pars = paste(c(
@@ -401,14 +404,25 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
   len = length(x)
   cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
+  
   nrhs = integer(1)
   RxODE::rxReq("dparser");
   x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE))
   nrhs = x[[3]]
   foo = paste(readLines("foo__.txt"), collapse="\n")
+
   nm = system.file("", package = "nlmixr");
+  if (is.null(inPars)) {
+    assgnPars = declPars = ""
+  } else {
+    s = sprintf("      %s = mPars(i,%d);", inPars, 1:length(inPars)-1)
+    assgnPars = paste0(s, collapse="\n")
+    s = "mat mPars=as<mat>(opt[\"mPars\"]);"
+    declPars = sprintf("\tdouble %s;\n\t%s", paste0(inPars, collapse=", "), s)
+  }
   brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
   unlink(c("eqn__.txt", "foo__.txt"))
+  #if (inPars == "") inPars = NULL
 
   ##gen Markevars
   ## if(is.win) x = gsub("\\\\", "/", utils::shortPathName(x))
@@ -447,6 +461,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   attr(fn, "nlhs") = nlhs
   attr(fn, "nrhs") = nrhs
   attr(fn, "saem.dll") = saem.dll
+  attr(fn, "inPars") = inPars
   reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
 }
@@ -646,9 +661,9 @@ configsaem = function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
 	ODEopt = list(atol=1e-8, rtol=1e-6, stiff=1, transit_abs=0),
 	distribution=c("normal","poisson","binomial"),
-	seed=99)
-                                        #data =  saem.data; mcmc = saem.mcmc; model = saem.model; inits = saem.inits
+	seed=99, fixed=NULL)
 {
+#mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-8, rtol=1e-6, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
   set.seed(seed)
   distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
   distribution = match.arg(distribution)
@@ -656,7 +671,11 @@ configsaem = function(model, data, inits,
 
   neq  = attr(model$saem_mod, "neq")
   nlhs = attr(model$saem_mod, "nlhs")
-  opt = optM = c(list(neq=neq, nlhs=nlhs, inits=numeric(neq)), ODEopt)
+  inPars = attr(model$saem_mod, "inPars")
+  ninputpars = length(inPars)
+  opt = optM = c(list(neq=neq, nlhs=nlhs, inits=numeric(neq)), ODEopt, 
+                 ninputpars=ninputpars, inPars=inPars)
+
   model$N.eta = attr(model$saem_mod, "nrhs")
 
   if (is.null(model$log.eta)) model$log.eta = rep(TRUE, model$N.eta)
@@ -677,13 +696,13 @@ configsaem = function(model, data, inits,
   mcmc$burn.in=300
 
   ###  FIXME: chk covars as char vec
-  wh = setdiff(model$covars, names(data$nmdat))
+  wh = setdiff(c(model$covars, inPars), names(data$nmdat))
   if (length(wh)) {
   	msg = paste0("covariate(s) not found: ", paste(wh, collapse=", "))
   	stop(msg)
   }
   s = subset(data$nmdat, EVID==0)
-  data$data = as.matrix(s[,c("ID", "TIME", "DV", model$covars)])
+  data$data = as.matrix(s[,c("ID", "TIME", "DV", c(model$covars, inPars))])
 
   nphi = model$N.eta
   mcov = model$cov.mod
@@ -734,7 +753,8 @@ configsaem = function(model, data, inits,
   id = data$data[,"ID"]
   ntotal = length(id)
   N = length(unique(id))
-  covariables = if(is.null(model$covars)) NULL else tapply(data$data[, model$covars], id, unique)
+  covariables = if(is.null(model$covars)) NULL else unlist(aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
+  if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
   ncov = data$N.covar + 1
   nmc = mcmc$nmc
@@ -745,6 +765,14 @@ configsaem = function(model, data, inits,
   ix = rep(1:dim(io)[1], nmc)
   ioM = io[ix,]
   indioM = grep(1, t(ioM)) - 1
+  mPars = if(ninputpars==0) NULL else unlist(aggregate(as.data.frame(data$data[, inPars]), list(id), unique)[,-1])
+  if (!is.null(mPars)) {
+    dim(mPars) = c(N, ninputpars)
+    opt$mPars = mPars
+    ix = rep(1:dim(mPars)[1], nmc)
+    optM$mPars = mPars[ix,]
+    dim(optM$mPars) = c(nmc*N, ninputpars)
+  }
 
   dat = data$nmdat[,c("ID", "TIME", "EVID", "AMT")]		## CHECKME
   form = attr(model$saem_mod, "form")
@@ -773,6 +801,12 @@ configsaem = function(model, data, inits,
   nb_param = nd2+1
   Mcovariables = cbind(rep(1, N), covariables)[,1:nrow(mcov)]
   dim(Mcovariables) = c(length(Mcovariables)/nrow(mcov), nrow(mcov))	#FIXME
+
+  wh = intersect(fixed, i1)
+  if (length(wh)) stop("FIXED pars cannot have ETA")
+  wh = setdiff(fixed, i0)
+  if (length(wh)) stop("invalid FIXED index")
+  fixed.ix = match(fixed, i0)-1
 
   jlog1 = grep(T, model$log.eta)
   jcov = grep(T, apply(mcov, 1, sum)>0)
@@ -939,7 +973,8 @@ configsaem = function(model, data, inits,
     print=mcmc$print,
     distribution=distribution.idx[distribution],
     par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2)),
-    seed=seed
+    seed=seed,
+    fixed.ix = fixed.ix
   )
 }
 
@@ -1276,5 +1311,5 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
 #FIXME: g = gc = 1
 #FIXME: ODE inits
 #FIXME: Tinf for ODE
-                                        #FIXME: chk infusion poor fit
+#FIXME: chk infusion poor fit
 
