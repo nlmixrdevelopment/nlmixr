@@ -157,6 +157,8 @@ This Windows example delivers a complete model fit as the `fit`
 object, including parameter history, a set of fixed effect estimates,
 and random effects for all included subjects.
 
+Now let's look at the fit using nlmixr's built-in diagnostics...
+
 ```r
 plot(fit)
 ```
@@ -280,6 +282,76 @@ ggplot(etas, aes(eta)) +
 ```
 ![IIV distributions](etas.png)
 
+
+## xpose
+
+This is all very nice. But what we really want is a complete suite of model diagnostic
+tools, like those available in [xpose](https://github.com/UUPharmacometrics/xpose), right?
+
+First, save the nlmixr `fit` object you created (this example assumes in the same folder you're working in...)
+
+```r
+save(fit, file="nlmixrFit.RData")
+```
+
+Restart R, and install xpose from CRAN, if you haven't already...
+
+```r
+install.packages("xpose")
+```
+
+Now install the extension for nlmixr:
+
+```r
+devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
+```
+Now restore your session...
+
+```r
+library(nlmixr)
+library(xpose)
+library(xpose.nlmixr)
+
+load("nlmixrFit.RData")
+```
+
+... and convert your nlmixr fit object into an xpose fit object.
+
+```r
+xp <- xpose_data_nlmixr(fit)
+```
+
+Now let's look at some diagnostic plots!
+
+```r
+dv_vs_pred(xp)
+```
+![DV vs PRED](dv_vs_pred.png)
+
+```r
+dv_vs_ipred(xp)
+```
+![DV vs IPRED](dv_vs_ipred.png)
+
+```r
+pred_vs_pred(xp)
+```
+![CWRES vs PRED](cwres_vs_pred.png)
+
+```r
+absval_res_vs_pred(xp, res="IWRES")
+```
+![abs(IWRES) vs PRED](iwres_vs_pred.png)
+
+We can also replicate some of nlmixr's internal plots...
+
+```r
+ind_plots(xp, res="IWRES")
+```
+![Individual plots](ind_plots.png)
+
+
+
 # The UI
 
 The nlmixr modeling dialect, inspired by R and NONMEM, can be used to
@@ -288,6 +360,7 @@ nlmixr. Using these widely-used tools as inspiration has the advantage
 of delivering a model specification syntax taht is instantly familira
 to the majority of analysts working in pharmacometrics and related
 fields.
+
 
 ## Overall model structure
 
