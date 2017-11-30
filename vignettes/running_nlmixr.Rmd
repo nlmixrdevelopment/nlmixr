@@ -350,7 +350,8 @@ ind_plots(xp, res="IWRES")
 ```
 ![Individual plots](ind_plots.png)
 
-
+For more information about using xpose, see the Uppsala pharmacometrics group's 
+comprehensive site [here](https://uupharmacometrics.github.io/xpose/).
 
 # The UI
 
