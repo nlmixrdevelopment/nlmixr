@@ -158,7 +158,8 @@ nlme_lin_cmpt <- function(dat, par_model,
     dim(pm)<-c(3,2)
 
 
-    #gen user_fn
+    #gen user_fn
+
     s <- formals(PKpars)
     arg1 <- paste(names(s), collapse=", ")
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
@@ -226,15 +227,16 @@ nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
     body <- bquote({
         z <- parallel::mclapply(as.character(unique(ID)), function(subj)
                        {
-                           ev <- eventTable()
-                           ev$import.EventTable(subset(nlmeModList("dat.o"), id==as.integer(subj)))
-                                        #obs.rec <- ev$get.obs.rec()
-
                            sel <- ID==subj
                            plist <- .(pkpars)
                            inits <- plist$initCondition
                            plist$initCondition <- NULL
                            theta <- unlist(plist)
+
+                           dati = subset(..ModList$dat.o, id==as.integer(subj))
+                           if (match("F1", names(theta), nomatch=0)) dati$amt = theta["F1"]*dati$amt
+                           ev <- eventTable()
+                           ev$import.EventTable(dati)
 
                            if (any(theta>1e38)) {
                                warning('large parameter values. may rewrite par_trans.')
