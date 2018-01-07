@@ -235,6 +235,7 @@ nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
 
                            dati = subset(..ModList$dat.o, id==as.integer(subj))
                            if (match("F1", names(theta), nomatch=0)) dati$amt = theta["F1"]*dati$amt
+		           if (match("RATE", names(theta), nomatch=0)) dati = prepEv(dati, theta)
                            ev <- eventTable()
                            ev$import.EventTable(dati)
 
@@ -256,6 +257,23 @@ nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
     });
     body(fun) <- body;
     return(fun);
+}
+
+prepEv = function(dati, theta)
+{
+  ds = dati$evid>0
+  arr1 = with(dati[ds,], time + amt/theta["RATE"])
+  arr2 = as.double(dati$time)
+  nar1 = length(arr1)
+  nar2 = length(arr2)
+  arr3 = (1L:nar2)[ds]-1L  #with bolus, narr1 != narr3
+  nar3 = length(arr3)
+  nevt = nar1+nar2
+  s = .C("mergeArrays", arr1, arr2, arr3, integer(nar1), double(nevt), nar1, nar2, nar3)
+  datii = data.frame(time=s[[5]], evid=0, amt=0)
+  wh = s[[3]]; datii$evid[wh] = 10101; datii$amt[wh] = theta["RATE"]
+  wh = s[[4]]; datii$evid[wh] = 10101; datii$amt[wh] =-theta["RATE"]
+  datii
 }
 
 #' Fit nlme-based mixed-effect model using ODE implementation
