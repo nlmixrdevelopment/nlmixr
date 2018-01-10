@@ -233,7 +233,7 @@ nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
                            plist$initCondition <- NULL
                            theta <- unlist(plist)
 
-                           dati = subset(..ModList$dat.o, id==as.integer(subj))
+                           dati = subset(nlmeModList("dat.o"), id==as.integer(subj))
                            if (match("F1", names(theta), nomatch=0)) dati$amt = theta["F1"]*dati$amt
 		           if (match("RATE", names(theta), nomatch=0)) dati = prepEv(dati, theta)
                            ev <- eventTable()
