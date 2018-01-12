@@ -147,6 +147,7 @@ void inits(List x) {
   statphi01 = as<mat>(x["statphi01"]);
   statphi02 = as<mat>(x["statphi02"]);
   }
+  fixedIx = as<uvec>(x["fixed.ix"]);
 
   statrese=0;
 
@@ -332,6 +333,9 @@ void saem_fit() {
     MCOV1(jcov1)=Plambda1;
     if (nphi0>0) {
     Plambda0=inv_sympd(CGamma20)*sum((D1Gamma20%(COV0.t()*statphi01)),1);
+    if (fixedIx.n_elem>0) {
+      Plambda0(fixedIx) = MCOV0(jcov0(fixedIx));
+	}
     MCOV0(jcov0)=Plambda0;
     }
     mprior_phi1=COV1*MCOV1;
@@ -440,7 +444,7 @@ private:
 
   int nphi0, nphi1, nphi;
   mat covstruct1;
-  uvec i1, i0;
+  uvec i1, i0, fixedIx;
   uvec pc1;
   mat COV1, COV0, LCOV1, LCOV0, COV21, COV20, MCOV1, MCOV0;
   mat Gamma2_phi1, Gamma2_phi0, mprior_phi1, mprior_phi0;

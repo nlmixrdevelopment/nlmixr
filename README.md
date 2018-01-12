@@ -6,10 +6,13 @@ output: html_document
 # nlmixr: an R package for population PKPD modeling
 ***  
 
-##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Wenping Wang
+##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Wenping Wang
 
 ***
-`nlmixr` is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. `nlmixr` has five main modules:  
+`nlmixr` is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter defintion syntax and results in a fit object that can be used as input into the `Xpose` package. Running nlmixr using the UUI is described in the vignette:
+https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
+
+Under the hood `nlmixr` has five main modules:  
 
 1. `dynmodel()` and its mcmc cousin `dynmodel.mcmc()` for nonlinear dynamic models of individual data; 
 2. `nlme_lin_cmpt()`for one to three linear compartment models of population data with first order absorption, or i.v. bolus, or i.v. infusion using the nlme algorithm; 
@@ -19,7 +22,7 @@ output: html_document
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-For a brief vignette, please see:
+For a brief vignette describing the modules, please see:
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
 
 The examples in the vignette can be run using VignetteDemo.R and the associated data files available at:
@@ -81,7 +84,8 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
      run all of the unit tests in RxODE to make sure it is running
      correctly on your system. (Note that the `testthat` package is required for this, and it will take a long time.)
 6. Install `nlmixr`.
-   - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
+   - Load `devtools` again using `library(devtools)`
+   - Install `nlmixr` by running `install_github("nlmixrdevelopment/nlmixr")`
 
 # Installation on Linux
 Instructions for Ubuntu-alike distributions are given here (specifically, [Ubuntu 16.04 Xenial Xerus](http://releases.ubuntu.com/16.04/)), but all current Linux distributions are supported, in principle.
