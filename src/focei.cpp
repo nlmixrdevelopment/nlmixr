@@ -789,7 +789,10 @@ NumericVector RxODE_focei_finalize_llik(SEXP rho){
   }
   ret.attr("posthoc") = as<NumericVector>(e["eta"]);
   if (e.exists("c.hess")){
-    ret.attr("c.hess") = as<NumericVector>(e["c.hess"]);
+    Nullable<NumericVector> cHess  = e["c.hess"];
+    if (!cHess.isNull()){
+      ret.attr("c.hess") = cHess;
+    }
   }
   ret.attr("corrected") = as<NumericVector>(e["corrected"]);
   rxDetaDomega(e);
