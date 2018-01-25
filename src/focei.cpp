@@ -1454,7 +1454,10 @@ void rxDetaDtheta(SEXP rho){
     mat etam = as<mat>(e["eta.mat"]);
     ret.attr("posthoc") = as<NumericVector>(wrap(e["eta.mat"]));
     if (e.exists("c.hess")){
-      ret.attr("c.hess") = as<NumericVector>(e["c.hess"]);
+      Nullable<NumericVector> cHess  = e["c.hess"];
+      if (!cHess.isNull()){
+        ret.attr("c.hess") = as<NumericVector>(e["c.hess"]);
+      }
     }
     if (e.exists("inits.vec")){
       // This calculation is done on the non-scaled parameters, but
