@@ -84,7 +84,7 @@ uif <- function() {
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```r
-fit <- nlmixr(uif, theo_md, est="saem")
+fit <- nlmixr(uif, theo_sd, est="saem")
 ```
 
 ```c
