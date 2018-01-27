@@ -25,6 +25,9 @@
 ##' @return nlmixr UI function
 ##' @author Matthew L. Fidler
 nlmixrUI <- function(fun){
+    lhs0 <- nlmixrfindLhs(body(fun))
+    dum.fun <- function(){return(TRUE)}
+    env.here <- environment(dum.fun)
     env <- new.env(parent=.GlobalEnv)
     assign("fun", fun, env)
     fun2 <- attr(fun,"srcref");
@@ -44,9 +47,29 @@ nlmixrUI <- function(fun){
         fun2[length(fun2)] <- sub(rex::rex("}", end), "", fun2[length(fun2)]);
         fun2[length(fun2) + 1] <- "}"
     }
+    w <- which(regexpr(rex::rex(start, any_spaces, "#", anything), fun2) != -1);
+    if (length(w) > 0 && all(lhs0 != "desc")){
+        w2 <- w[1];
+        for (i in 2:length(w)){
+            if (w[i] - 1 == w[i - 1]){
+                w2[i] <- w[i];
+            } else {
+                break;
+            }
+        }
+        desc <- paste(gsub(rex::rex(any_spaces, end), "", gsub(rex::rex(start, any_spaces, any_of("#"), any_spaces), "", fun2[w2])), collapse=" ");
+        lhs0 <- c(lhs0, "desc");
+    }
     model <- ini <- NULL; ## Rcheck hack
     eval(parse(text=paste(fun2, collapse="\n"), keep.source=TRUE))
     ini <- nlmixrBounds(ini);
+    meta <- list();
+    for (var in lhs0){
+        if (!any(var == c("ini", "model")) &&
+            exists(var, envir=env.here)){
+            meta[[var]] <- get(var, envir=env.here);
+        }
+    }
     if (inherits(ini, "try-error")){
         stop("Error parsing initial estimates.")
     }
@@ -69,6 +92,7 @@ nlmixrUI <- function(fun){
     if (length(ns) > 0){
         stop(sprintf("The following parameters initial estimates are NA: %s", paste(ns, collapse=", ")))
     }
+    fun2$meta <- list2env(meta, parent=emptyenv());
     return(fun2)
 }
 ##' Print UI function
@@ -1385,6 +1409,8 @@ nlmixrUI.model.desc <- function(obj){
         return(nlmixrUI.saem.res.name(obj));
     } else if (arg == "model.desc"){
         return(nlmixrUI.model.desc(obj))
+    } else if (arg == "meta"){
+        return(x$meta);
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
