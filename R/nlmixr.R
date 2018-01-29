@@ -273,11 +273,17 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         } else {
             return(fit);
         }
-    } else if (est == "nlme"){
+    } else if (est == "nlme" || est == "nlme.mu"){
         pt <- proc.time()
-        fun <- uif$nlme.fun;
-        specs <- uif$nlme.specs;
-        grp.fn <- uif$grp.fn
+        if (est == "nlme"){
+            fun <- uif$nlme.fun;
+            specs <- uif$nlme.specs;
+        } else {
+            fun <- uif$nlme.fun.mu;
+            specs <- uif$nlme.specs.mu;
+            stop("Need to incorporate covariates to use this type of model...");
+        }
+        grp.fn <- uif$grp.fn;
         dat$nlmixr.grp <- factor(apply(data, 1, function(x){
             cur <- x;
             names(cur) <- names(dat);

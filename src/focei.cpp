@@ -1549,7 +1549,7 @@ NumericVector rxUpdateEtas(SEXP DnDhS, SEXP DhS, SEXP initS, SEXP acceptNS){
     prod = cur * Dh;
     accept = 1;
     for (j = 0; j < prod.n_rows; j++){
-      if (abs(prod(j,0)+inits(i, j)) > acceptN){
+      if (fabs(prod(j,0)+inits(i, j)) > acceptN){
         accept = 0;
         break;
       }

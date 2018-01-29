@@ -8,30 +8,6 @@
 
 using namespace Rcpp;
 
-// sFOCEi
-arma::mat sFOCEi(NumericVector par, Environment e);
-RcppExport SEXP _nlmixr_sFOCEi(SEXP parSEXP, SEXP eSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
-    rcpp_result_gen = Rcpp::wrap(sFOCEi(par, e));
-    return rcpp_result_gen;
-END_RCPP
-}
-// grFOCEi
-NumericVector grFOCEi(NumericVector par, Environment e);
-RcppExport SEXP _nlmixr_grFOCEi(SEXP parSEXP, SEXP eSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
-    rcpp_result_gen = Rcpp::wrap(grFOCEi(par, e));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rxGrad
 void rxGrad(SEXP rho);
 RcppExport SEXP _nlmixr_rxGrad(SEXP rhoSEXP) {
@@ -172,6 +148,30 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type initS(initSSEXP);
     Rcpp::traits::input_parameter< SEXP >::type acceptNS(acceptNSSEXP);
     rcpp_result_gen = Rcpp::wrap(rxUpdateEtas(DnDhS, DhS, initS, acceptNS));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sFOCEi
+arma::mat sFOCEi(NumericVector par, Environment e);
+RcppExport SEXP _nlmixr_sFOCEi(SEXP parSEXP, SEXP eSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(sFOCEi(par, e));
+    return rcpp_result_gen;
+END_RCPP
+}
+// grFOCEi
+NumericVector grFOCEi(NumericVector par, Environment e);
+RcppExport SEXP _nlmixr_grFOCEi(SEXP parSEXP, SEXP eSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(grFOCEi(par, e));
     return rcpp_result_gen;
 END_RCPP
 }

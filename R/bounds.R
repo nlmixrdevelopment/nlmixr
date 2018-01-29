@@ -759,11 +759,25 @@ nlmixrBoundsOmega <- function(x, nlme=FALSE){
                     mat[neta1, neta2] <- mat[neta2, neta1]<- df$est[i];
                 }
             }
-            if (nlme){
+            if (rxIs(nlme, "logical") && nlme){
                 df.diag <- df[df$neta1 == df$neta2, ];
                 n2 <- sprintf(".eta.%d", seq_along(df.diag$name));
                 w <- which(!is.na(df.diag$name))
                 n2[w] <- as.character(df.diag$name[w])
+                frm <- as.formula(paste(paste(n2, collapse=" + "), "~ 1"))
+                if (diag){
+                    return(nlme::pdDiag(mat, form=frm))
+                } else {
+                    return(nlme::pdSymm(as.matrix(Matrix::nearPD(mat)$mat), form=frm))
+                }
+            } else if (rxIs(nlme, "list")){
+                df.diag <- df[df$neta1 == df$neta2, ];
+                class(df.diag) <- "data.frame"
+                n2 <- sprintf(".eta.%d", seq_along(df.diag$name));
+                w <- which(!is.na(df.diag$name))
+                n2[w] <- sapply(as.character(df.diag$name[w]), function(x){
+                    nlme[[x]]
+                })
                 frm <- as.formula(paste(paste(n2, collapse=" + "), "~ 1"))
                 if (diag){
                     return(nlme::pdDiag(mat, form=frm))

@@ -912,32 +912,54 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
 ##' Create the nlme specs list for nlmixr nlme solving
 ##'
 ##' @param object UI object
+##' @param mu.ref Use mu-referencing for nlme.
 ##' @return specs list for nlme
 ##' @author Matthew L. Fidler
-nlmixrUI.nlme.specs <- function(object){
-    return(list(fixed=object$fixed.form,
-                random=object$random,
-                start=object$theta))
+nlmixrUI.nlme.specs <- function(object, mu.ref=FALSE){
+    if (mu.ref){
+        return(list(fixed=object$fixed.form,
+                    random=object$random.mu,
+                    start=object$theta))
+    } else {
+        return(list(fixed=object$fixed.form,
+                    random=object$random,
+                    start=object$theta))
+    }
 }
 ##' Create the nlme parameter transform function from the UI object.
 ##'
 ##' @param object UI object
+##' @param mu Is the model mu referenced?
 ##' @return parameter function for nlme
 ##' @author Matthew L. Fidler
 ##' @keywords internal
-nlmixrUI.nlmefun <- function(object){
+nlmixrUI.nlmefun <- function(object, mu=FALSE){
     ## create nlme function
     if (!is.null(object$lin.solved)){
         ## This is only a solved system.
-        bod <- deparse(body(object$rest));
-        bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
-        bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
-        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))));
-        body(fn) <- bod
-        return(fn);
+        if (mu){
+            bod <- deparse(body(object$saem.pars));
+            bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
+            bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
+            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unlist(object$mu.ref), collapse=", "))));
+            body(fn) <- bod
+            return(fn);
+        } else {
+            bod <- deparse(body(object$rest));
+            bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
+            bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
+            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))));
+            body(fn) <- bod
+            return(fn);
+        }
     } else {
-        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))))
-        body(fn) <- body(object$rest);
+        if (mu){
+            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unlist(object$mu.ref), collapse=", "))))
+            body(fn) <- body(object$saem.pars);
+        } else {
+            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))))
+            body(fn) <- body(object$rest);
+        }
     }
     return(fn)
 }
@@ -1367,10 +1389,14 @@ nlmixrUI.model.desc <- function(obj){
         return(x$nmodel);
     } else if (arg == "model"){
         return(x$model);
+    } else if (arg == "nlme.fun.mu"){
+        return(nlmixrUI.nlmefun(obj, T))
     } else if (arg == "nlme.fun"){
         return(nlmixrUI.nlmefun(obj))
     } else if (arg == "nlme.specs"){
         return(nlmixrUI.nlme.specs(obj))
+    } else if (arg == "nlme.specs.mu"){
+        return(nlmixrUI.nlme.specs(obj, T));
     } else if (arg == "nlme.var"){
         return(nlmixrUI.nlme.var(obj))
     } else if (arg == "rxode.pred"){
@@ -1411,6 +1437,8 @@ nlmixrUI.model.desc <- function(obj){
         return(nlmixrUI.model.desc(obj))
     } else if (arg == "meta"){
         return(x$meta);
+    } else if (arg == "random.mu"){
+        return(nlmixrBoundsOmega(x$ini,x$nmodel$mu.ref))
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
