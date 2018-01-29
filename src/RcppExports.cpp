@@ -2,7 +2,6 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include "../inst/include/nlmixr_types.h"
-#include <RcppArmadillo.h>
 #include <RcppEigen.h>
 #include <Rcpp.h>
 
@@ -152,7 +151,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // sFOCEi
-arma::mat sFOCEi(NumericVector par, Environment e);
+SEXP sFOCEi(NumericVector par, Environment e);
 RcppExport SEXP _nlmixr_sFOCEi(SEXP parSEXP, SEXP eSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

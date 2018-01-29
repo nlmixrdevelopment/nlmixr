@@ -1,4 +1,3 @@
-// [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 
 using namespace Rcpp;
@@ -7,7 +6,7 @@ using namespace arma;
 extern "C" double RxODE_sum (double *input, int n);
 
 //[[Rcpp::export]]
-arma::mat sFOCEi(NumericVector par, Environment e){
+SEXP sFOCEi(NumericVector par, Environment e){
   Function objf = as<Function>(e["ofv.FOCEi.ind"]);
   List llikSubj = objf(par);
   int nsub = llikSubj.size();
@@ -44,7 +43,7 @@ arma::mat sFOCEi(NumericVector par, Environment e){
   }
   Free(d);
   // m3 is S matrix
-  return m3;
+  return wrap(m3);
 }
 
 //[[Rcpp::export]]
