@@ -4,10 +4,12 @@
 \alias{nlmixrUI.nlmefun}
 \title{Create the nlme parameter transform function from the UI object.}
 \usage{
-nlmixrUI.nlmefun(object)
+nlmixrUI.nlmefun(object, mu = FALSE)
 }
 \arguments{
 \item{object}{UI object}
+
+\item{mu}{Is the model mu referenced?}
 }
 \value{
 parameter function for nlme

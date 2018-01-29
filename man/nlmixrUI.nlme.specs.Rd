@@ -4,10 +4,12 @@
 \alias{nlmixrUI.nlme.specs}
 \title{Create the nlme specs list for nlmixr nlme solving}
 \usage{
-nlmixrUI.nlme.specs(object)
+nlmixrUI.nlme.specs(object, mu.ref = FALSE)
 }
 \arguments{
 \item{object}{UI object}
+
+\item{mu.ref}{Use mu-referencing for nlme.}
 }
 \value{
 specs list for nlme
