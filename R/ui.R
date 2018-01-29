@@ -1444,10 +1444,14 @@ nlmixrUI.model.desc <- function(obj){
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
     if (is.null(ret)){
         m <- x$nmodel;
-        return(m[[arg, exact = exact]]);
-    } else {
-        return(ret)
+        ret <- m[[arg, exact = exact]];
+        if (is.null(ret)){
+            if (exists(arg, envir=x$meta)){
+                ret <- get(arg, envir=x$meta);
+            }
+        }
     }
+    ret
 }
 
 ##' @export
