@@ -340,6 +340,7 @@ nmxInclude <- function(pkg="nlmixr"){
 #' @param model a compiled SAEM model by gen_saem_user_fn()
 #' @param PKpars PKpars function
 #' @param pred  pred function
+#' @param inPars a character vector of parameters to be read from the input dataset
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model using the Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
@@ -607,6 +608,7 @@ plot.saemFit = function(x, ...)
 #' @param ODEopt optional ODE solving options
 #' @param seed seed for random number generator
 #' @param distribution one of c("normal","poisson","binomial")
+#' @param fixed a character vector of fixed effect only parameters (no random effects attached) to be fixed
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by he Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
