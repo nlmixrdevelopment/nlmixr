@@ -157,7 +157,13 @@ This Windows example delivers a complete model fit as the `fit`
 object, including parameter history, a set of fixed effect estimates,
 and random effects for all included subjects.
 
-Now let's look at the fit using nlmixr's built-in diagnostics...
+Also note that the `nlme` fit returned the traditional `nlme`
+object. You can instruct `nlmixr` to convert the `nlme` object to a
+`nlmixr` object and calculate quantities like `CWRES` by specifying
+`calc.resid=TRUE` or dropping this option entirely since it is turned
+on by default.
+
+Now back to the `saem` fit; Let's look at the fit using nlmixr's built-in diagnostics...
 
 ```r
 plot(fit)
