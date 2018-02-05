@@ -1,4 +1,6 @@
 ^\.travis.yml$
+\.nsi$
+^rx_.*\.(dll|so|c|prd|inv)$
 ^README(\.md|\.Rmd)$
 ^LICENSE$
 ^.git.*$
@@ -25,4 +27,4 @@ BinaryFiles$
 ^/?man-roxygen/.*$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^/?build/refresh.R
+^/?build/.*$

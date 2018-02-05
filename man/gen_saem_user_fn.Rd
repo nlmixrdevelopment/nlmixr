@@ -13,6 +13,8 @@ gen_saem_user_fn(model, PKpars = attr(model, "default.pars"), pred = NULL,
 \item{PKpars}{PKpars function}
 
 \item{pred}{pred function}
+
+\item{inPars}{a character vector of parameters to be read from the input dataset}
 }
 \description{
 Generate an SAEM model using either closed-form solutions or ODE-based model definitions

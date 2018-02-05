@@ -76,7 +76,7 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
   vec yp(ix.n_elem);
   double *p=yp.memptr();
   int N=id.max()+1;
-  
+
 <%=declPars%>
 
   for (int i=0; i<N; i++) {
@@ -405,7 +405,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
   len = length(x)
   cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
-  
+
   nrhs = integer(1)
   RxODE::rxReq("dparser");
   x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE))
@@ -675,7 +675,7 @@ configsaem = function(model, data, inits,
   nlhs = attr(model$saem_mod, "nlhs")
   inPars = attr(model$saem_mod, "inPars")
   ninputpars = length(inPars)
-  opt = optM = c(list(neq=neq, nlhs=nlhs, inits=numeric(neq)), ODEopt, 
+  opt = optM = c(list(neq=neq, nlhs=nlhs, inits=numeric(neq)), ODEopt,
                  ninputpars=ninputpars, inPars=inPars)
 
   model$N.eta = attr(model$saem_mod, "nrhs")
@@ -755,7 +755,7 @@ configsaem = function(model, data, inits,
   id = data$data[,"ID"]
   ntotal = length(id)
   N = length(unique(id))
-  covariables = if(is.null(model$covars)) NULL else unlist(aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
+  covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
   ncov = data$N.covar + 1
@@ -767,7 +767,7 @@ configsaem = function(model, data, inits,
   ix = rep(1:dim(io)[1], nmc)
   ioM = io[ix,]
   indioM = grep(1, t(ioM)) - 1
-  mPars = if(ninputpars==0) NULL else unlist(aggregate(as.data.frame(data$data[, inPars]), list(id), unique)[,-1])
+  mPars = if(ninputpars==0) NULL else unlist(stats::aggregate(as.data.frame(data$data[, inPars]), list(id), unique)[,-1])
   if (!is.null(mPars)) {
     dim(mPars) = c(N, ninputpars)
     opt$mPars = mPars

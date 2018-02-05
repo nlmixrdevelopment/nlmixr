@@ -23,6 +23,8 @@ configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
 \item{distribution}{one of c("normal","poisson","binomial")}
 
 \item{seed}{seed for random number generator}
+
+\item{fixed}{a character vector of fixed effect only parameters (no random effects attached) to be fixed}
 }
 \description{
 Configure an SAEM model by generating an input list to the SAEM model function
