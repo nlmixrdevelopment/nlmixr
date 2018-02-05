@@ -24,6 +24,8 @@
 ##' @param fun UI function
 ##' @return nlmixr UI function
 ##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
 nlmixrUI <- function(fun){
     lhs0 <- nlmixrfindLhs(body(fun))
     dum.fun <- function(){return(TRUE)}
