@@ -37,7 +37,7 @@ Suggests:
     expm,
     matrixcalc,
     reshape2
-Version: 0.9.0-2
+Version: 0.9.0-3
 Date: 2017-10-15
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com"),      

@@ -60,14 +60,14 @@ fmt_infusion_data <- function(dat) {
 
 nlme_cmt_gen_usr_fn <- function(arg1, arg2, mc.cores){
     fun <- eval(parse(text=sprintf("function(%s, TIME, ID){NULL;}", arg1)))
-    pkpars <- eval(parse(text=sprintf("bquote((nlmeModList(\"PKpars\"))(%s))", arg2)));
+    pkpars <- eval(parse(text=sprintf("bquote((nlmixr::nlmeModList(\"PKpars\"))(%s))", arg2)));
     body <- bquote({
         unlist(parallel::mclapply(as.character(unique(ID)), function(subj)
             {
-                sel.d <- nlmeModList("ds")$ID==as.integer(subj)
-                dose  <- nlmeModList("ds")[sel.d, "AMT"]
-                dstm  <- nlmeModList("ds")[sel.d, "TIME"]
-                Tinf  <- nlmeModList("ds")[sel.d, "DUR"]
+                sel.d <- nlmixr::nlmeModList("ds")$ID==as.integer(subj)
+                dose  <- nlmixr::nlmeModList("ds")[sel.d, "AMT"]
+                dstm  <- nlmixr::nlmeModList("ds")[sel.d, "TIME"]
+                Tinf  <- nlmixr::nlmeModList("ds")[sel.d, "DUR"]
 
                 sel <- ID==subj
                 time.subj <- TIME[sel]
@@ -75,17 +75,17 @@ nlme_cmt_gen_usr_fn <- function(arg1, arg2, mc.cores){
                 pkpars <- toupper(names(s))
                 names(s) <- pkpars
 
-                if (nlmeModList("oral")) {
+                if (nlmixr::nlmeModList("oral")) {
                     if (is.element("TLAG", pkpars)) {
-                        theta <- s[nlmeModList("refpars")]
+                        theta <- s[nlmixr::nlmeModList("refpars")]
                     } else {
-                        theta <- c(s[nlmeModList("refpars")[1:(2*nlmeModList("ncmt")+1)]], 0)    #no TLAG, set to 0
+                        theta <- c(s[nlmixr::nlmeModList("refpars")[1:(2*nlmixr::nlmeModList("ncmt")+1)]], 0)    #no TLAG, set to 0
                     }
                 } else {
-                    theta <- c(s[nlmeModList("refpars")[1:(2*nlmeModList("ncmt"))]], 0, 0)
+                    theta <- c(s[nlmixr::nlmeModList("refpars")[1:(2*nlmixr::nlmeModList("ncmt"))]], 0, 0)
                 }
 
-                cp <- lin_cmt(time.subj, dstm, dose, Tinf, theta, nlmeModList("oral"), nlmeModList("infusion"), nlmeModList("ncmt"), nlmeModList("parameterization"))
+                cp <- lin_cmt(time.subj, dstm, dose, Tinf, theta, nlmixr::nlmeModList("oral"), nlmixr::nlmeModList("infusion"), nlmixr::nlmeModList("ncmt"), nlmixr::nlmeModList("parameterization"))
                 cp
             }, mc.cores=.(mc.cores)))
 
@@ -165,8 +165,8 @@ nlme_lin_cmpt <- function(dat, par_model,
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
     arg3 <- sprintf("list(%s)", paste(names(s), "=.1", collapse=", "))
     ## brew(text=cmt_fn_templ, output="fn.txt")
-    ## source("fn.txt", local=nlmeModList())
-    nlmeModList("user_fn", nlme_cmt_gen_usr_fn(arg1, arg2, mc.cores))
+    ## source("fn.txt", local=nlmixr::nlmeModList())
+    nlmixr::nlmeModList("user_fn", nlme_cmt_gen_usr_fn(arg1, arg2, mc.cores))
 
     refpars <- pm[[ncmt, parameterization]]
     npars <- length(refpars)
@@ -189,24 +189,24 @@ nlme_lin_cmpt <- function(dat, par_model,
     }
 
     #data prep
-    nlmeModList("oral", oral);
-    nlmeModList("infusion", infusion);
-    nlmeModList("ncmt", ncmt)
-    nlmeModList("parameterization", parameterization);
+    nlmixr::nlmeModList("oral", oral);
+    nlmixr::nlmeModList("infusion", infusion);
+    nlmixr::nlmeModList("ncmt", ncmt)
+    nlmixr::nlmeModList("parameterization", parameterization);
     if (infusion) {
     	dat <- fmt_infusion_data(dat)
     } else {
     	dat$DUR <- -1
     }
-    nlmeModList("ds", dat[dat$EVID>0, c("ID", "TIME", "AMT", "DUR")]);
+    nlmixr::nlmeModList("ds", dat[dat$EVID>0, c("ID", "TIME", "AMT", "DUR")]);
     dat$DUR <- NULL
     dat <- dat[dat$EVID==0,]
-    nlmeModList("dat.g", groupedData(DV~TIME|ID, dat));
-    nlmeModList("PKpars", PKpars);
-    nlmeModList("refpars", refpars);
+    nlmixr::nlmeModList("dat.g", groupedData(DV~TIME|ID, dat));
+    nlmixr::nlmeModList("PKpars", PKpars);
+    nlmixr::nlmeModList("refpars", refpars);
 
-    mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
-                      data = nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
+    mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmixr::nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
+                      data = nlmixr::nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
                       start=par_model$start, ...);
     if (Sys.getenv("nlmixr_silent") == "TRUE"){
         ret <- NULL;
@@ -223,7 +223,7 @@ nlme_lin_cmpt <- function(dat, par_model,
 
 nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
     fun <- eval(parse(text=sprintf("function(%s, TIME, ID){NULL;}", arg1)))
-    pkpars <- eval(parse(text=sprintf("bquote((nlmeModList(\"PKpars\"))(%s))", arg2)));
+    pkpars <- eval(parse(text=sprintf("bquote((nlmixr::nlmeModList(\"PKpars\"))(%s))", arg2)));
     body <- bquote({
         z <- parallel::mclapply(as.character(unique(ID)), function(subj)
                        {
@@ -233,7 +233,7 @@ nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
                            plist$initCondition <- NULL
                            theta <- unlist(plist)
 
-                           dati = subset(nlmeModList("dat.o"), id==as.integer(subj))
+                           dati = subset(nlmixr::nlmeModList("dat.o"), id==as.integer(subj))
                            if (match("F1", names(theta), nomatch=0)) dati$amt = theta["F1"]*dati$amt
 		           if (match("RATE", names(theta), nomatch=0)) dati = prepEv(dati, theta)
                            ev <- eventTable()
@@ -243,15 +243,15 @@ nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
                                warning('large parameter values. may rewrite par_trans.')
                                print(theta)
                            }
-                           if (nlmeModList("debugODE")) {
+                           if (nlmixr::nlmeModList("debugODE")) {
                                print(subj)
                                print(theta)
                            }
 
-                           m <- nlmeModList("m1")$run(theta, ev, inits, transit_abs=.(transit_abs), atol=.(atol), rtol=.(rtol));
+                           m <- nlmixr::nlmeModList("m1")$run(theta, ev, inits, transit_abs=.(transit_abs), atol=.(atol), rtol=.(rtol));
                            if (is.null(dim(m))) m = t(as.matrix(m))
-                           den <- if(is.null(nlmeModList("response.scaler"))) 1 else theta[nlmeModList("response.scaler")]
-                           m[, nlmeModList("response")]/den
+                           den <- if(is.null(nlmixr::nlmeModList("response.scaler"))) 1 else theta[nlmixr::nlmeModList("response.scaler")]
+                           m[, nlmixr::nlmeModList("response")]/den
                        }, mc.cores=.(mc.cores))
 	unlist(z)
     });
@@ -397,9 +397,9 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
     ## assign("..ModList", new.env(), envir=.GlobalEnv)
 
     #prep ode
-    if (class(model)=="RxODE") nlmeModList("m1", model)
+    if (class(model)=="RxODE") nlmixr::nlmeModList("m1", model)
     else if (class(model)=="character") {
-        nlmeModList("m1", RxODE(model = model));
+        nlmixr::nlmeModList("m1", RxODE(model = model));
     } else {
       stop('invalid model input')
     }
@@ -417,20 +417,20 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
     arg1 <- paste(names(s), collapse=", ")
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
 
-    nlmeModList("user_fn", nlme_ode_gen_usr_fn(arg1, arg2, transit_abs, atol, rtol, mc.cores));
+    nlmixr::nlmeModList("user_fn", nlme_ode_gen_usr_fn(arg1, arg2, transit_abs, atol, rtol, mc.cores));
 
     #data prep
     dat.g <- groupedData(DV~TIME|ID, subset(dat.o, dat.o$EVID==0))
     names(dat.o) <- tolower(names(dat.o))
-  nlmeModList("response", response);
-  nlmeModList("response.scaler", response.scaler);
-  nlmeModList("dat.g", dat.g);
-  nlmeModList("dat.o", dat.o);
-  nlmeModList("PKpars", PKpars);
-  nlmeModList("debugODE", debugODE);
+  nlmixr::nlmeModList("response", response);
+  nlmixr::nlmeModList("response.scaler", response.scaler);
+  nlmixr::nlmeModList("dat.g", dat.g);
+  nlmixr::nlmeModList("dat.o", dat.o);
+  nlmixr::nlmeModList("PKpars", PKpars);
+  nlmixr::nlmeModList("debugODE", debugODE);
 
-  mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
-                    data = nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
+  mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmixr::nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
+                    data = nlmixr::nlmeModList("dat.g"), fixed=par_model$fixed, random = par_model$random,
                     start=par_model$start, ...)
   if (Sys.getenv("nlmixr_silent") == "TRUE"){
       ret <- NULL;
@@ -580,8 +580,8 @@ print.summary_nlmixr_nlme <- function (x, verbose = FALSE, ..., print.data=FALSE
 ##' @importFrom nlme varWeights
 ##' @export
 varWeights.nlmixr_nlme <- function(object, ...){
-    nlmeModList(object$env);
-    on.exit({nlmeModList(new.env(parent = emptyenv()))})
+    nlmixr::nlmeModList(object$env);
+    on.exit({nlmixr::nlmeModList(new.env(parent = emptyenv()))})
     return(nlme::varWeights(object$modelStruct$varStruct))
 }
 
