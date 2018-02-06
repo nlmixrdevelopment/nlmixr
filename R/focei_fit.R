@@ -110,7 +110,7 @@ print.focei.fit <- function(x, ...) {
         } else if (is(x, "nlmixr.ui.saem")){
             saem <- fit$saem;
             uif <- env$uif;
-            message(sprintf("nlmixr SAEM fit (%s); OBJF based on FOCEi approximation.\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
+            message(sprintf("nlmixr SAEM fit (%s)\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
         } else {
             message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$focei.control$grad, "with global gradient", "without global gradient")));
         }
@@ -149,7 +149,7 @@ print.focei.fit <- function(x, ...) {
                 print(head(as.matrix(x), n = n));
             }
         } else {
-                print(dplyr::as.tbl(x), n = n, width = width);
+            print(dplyr::as.tbl(x), n = n, width = width);
         }
     } else {
         print(as.data.frame(x));
@@ -415,11 +415,11 @@ print.nlmixr.par.fixed <- function(x, ...){
                                 ifelse(x$Estimate * 100 == x$Untransformed, "%", ""));
     ci <- attr(x, "ci")
     df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
-                                                 ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
-                                                 F2(df$Lower.ci, digs),
-                                                 ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
-                                                 F2(df$Upper.ci, digs),
-                                                 ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
+                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
+                                                   F2(df$Lower.ci, digs),
+                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
+                                                   F2(df$Upper.ci, digs),
+                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
     df <- df[, regexpr("[.]ci", names(df)) == -1]
     if (all(df$Parameter == "")){
         df <- df[, -1];
@@ -571,7 +571,6 @@ simulate.focei.fit <- function(object, nsim=1, seed=NULL, ...){
 parseOM <- function(OMGA){
     re = "\\bETA\\[(\\d+)\\]\\b"
     .offset = as.integer(0)
-    this.env <- environment()
     lapply(1:length(OMGA), function(k) {
         s = OMGA[[k]]
         f = eval(parse(text=(sprintf("y~%s", deparse(s[[2]])))))
@@ -583,7 +582,7 @@ parseOM <- function(OMGA){
 
         ix = as.integer(sub(re, "\\1", r))
         if (any(ix - (.offset+1:nr))) stop("invalid OMGA specs")
-        assign(".offset", .offset + nr, this.env)
+        .offset <<- .offset + nr
         eval(s[[3]])
     })
 }
@@ -594,15 +593,12 @@ genOM <- function(s)
     nr = sum(sapply(s, getNR))
     .mat <- matrix(0, nr, nr)
     .offset = as.integer(0)
-    this.env <- environment()
     j = lapply(1:length(s), function(k) {
         a = s[[k]]
         p <- getNR(a)
         starts = row(.mat) > .offset  & col(.mat) > .offset
-        .mat <- tmp;
-        tmp[col(.mat) >= row(.mat) & col(.mat) <= .offset+p & starts] <- a
-        assign(".mat", tmp, this.env);
-        assign(".offset", .offset+p, this.env)
+        .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset+p & starts] <<- a
+        .offset <<- .offset+p
     })
     a = .mat[col(.mat) >= row(.mat)]
     .mat <- t(.mat)
@@ -833,7 +829,6 @@ focei.fit.data.frame0 <- function(data,
     sink.file <- tempfile();
     orig.sink.number <- sink.number(type="output");
     do.sink <- TRUE;
-    this.env <- environment()
     fit.df <- NULL;
     sink.close <- function(n=orig.sink.number){
         if (do.sink){
@@ -932,6 +927,8 @@ focei.fit.data.frame0 <- function(data,
 
     curi <- 0;
 
+    this.env <- environment()
+
     pt <- proc.time()
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
@@ -956,15 +953,15 @@ focei.fit.data.frame0 <- function(data,
     }
     optim <- con$optim;
     optim.method <- match.arg(optim, c( ## "n1qn1",
-                                             "bobyqa",
-                                             "L-BFGS-B",
-                                             "BFGS",
-                                             "lbfgs",
-                                             "lbfgsb3",
-                                             ## "newuoa",
-                                             "nlminb"##,
-                                             ## "uobyqa"
-                                         ))
+                                         "bobyqa",
+                                         "L-BFGS-B",
+                                         "BFGS",
+                                         "lbfgs",
+                                         "lbfgsb3",
+                                         ## "newuoa",
+                                         "nlminb"##,
+                                         ## "uobyqa"
+                                     ))
     grad.methods <- c("BFGS", "L-BFGS-B", "lbfgs", "lbfgsb3", "nlminb", "mma", "slsqp", "lbfgs-nlopt", "tnewton_precond_restart",
                       "tnewton_precond", "tnewton", "var1", "var2", "n1qn1")
     print.grad <- any(optim.method == grad.methods);
@@ -1174,7 +1171,7 @@ focei.fit.data.frame0 <- function(data,
     first <- TRUE
 
     ofv.FOCEi.ind.slow <- function(pars) {
-        assign("cur.diff", NULL, this.env);
+        cur.diff <<- NULL;
         if(con$PRINT.PARS) print(pars)
         ## initial parameters are scale.to which translates to scale.to * inits.vec / scale.to = inits.vecs
         if (!is.null(con$scale.to)){
@@ -1239,23 +1236,17 @@ focei.fit.data.frame0 <- function(data,
         m = t(sapply(llik.subj, function(x) {
             c(attr(x, "wh"), attr(x, "posthoc"))
         }))
-        if(con$RESET.INITS.MAT){
-            tmp <- inits.mat
-            tmp[m[,1],] <- m[,-1]
-            assign("inits.mat", tmp, this.env);
-        }
+        if(con$RESET.INITS.MAT) inits.mat[m[,1],] <<- m[,-1]
         ## Save last curvature
         if (con$save.curve && con$inner.opt == "n1qn1" && !is.null(attr(llik.subj[[1]], "c.hess"))){
             m <- t(sapply(llik.subj, function(x){
                 c(attr(x, "wh"), attr(x, "c.hess"))
             }))
-            tmp <- inits.c.hess
-            tmp[m[,1],] <- m[,-1]
-            assign("inits.c.hess", tmp, this.env);
+            inits.c.hess[m[,1],] <<- m[,-1]
         }
         if (con$grad && con$accept.eta.size != 0){
-            assign("last.pars", pars, this.env);
-            assign("last.dEta.dTheta", lapply(llik.subj, function(x){attr(x, "dEta.dTheta")}), this.env);
+            last.pars <<- pars;
+            last.dEta.dTheta <<- lapply(llik.subj, function(x){attr(x, "dEta.dTheta")});
         }
         llik.subj
     }
@@ -1332,7 +1323,7 @@ focei.fit.data.frame0 <- function(data,
             }
         }
     }
-    assign("curi", 0, this.env);
+    curi <- 0;
     ofv.cache <- new.env(parent=emptyenv())
     ofv.cache$last1 <- NULL;
     ofv.cache$last <- NULL;
@@ -1484,7 +1475,7 @@ focei.fit.data.frame0 <- function(data,
     }
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
-        assign("first", first, this.env)
+        first <<- FALSE
         llik <- -2*PreciseSums::psSum(unlist(llik.subj));
         corrected <- do.call("sum", (lapply(llik.subj, function(x){attr(x, "corrected")})))
         ofv <- llik;
@@ -1515,12 +1506,12 @@ focei.fit.data.frame0 <- function(data,
                         if (is.null(ofv.cache$first)){
                             ofv.cache$first <- llik;
                         }
-                        assign("cur.diff", (ofv.cache$first - llik), this.env)
+                        cur.diff <<- (ofv.cache$first - llik);
                         w <- which(row.names(p) == "U:");
-                        assign("curi", curi + 1, this.env);
+                        curi <<- curi + 1;
                         tmp <- cbind(data.frame(iter=curi, objf=as.numeric(substr(last, 3, nchar(last))), p[w,, drop = TRUE]));
                         row.names(tmp) <- NULL;
-                        assign("fit.df", rbind(fit.df, tmp, check.names=FALSE), envir=this.env)
+                        fit.df <<- rbind(fit.df, tmp, check.names=FALSE);
                     } else {
                         message("Warning: Prior objective function not found...");
                         reset <- TRUE;
@@ -1537,7 +1528,7 @@ focei.fit.data.frame0 <- function(data,
             extra <- 1;
         }
         ## ridge penalty llik - 0.5*(sum(pars)^2*con$precision):
-        assign("last.penalty", 0.5 * sum( pars * pars * con$precision) * extra, this.env);
+        last.penalty <<- 0.5 * sum( pars * pars * con$precision) * extra;
         if (reset && con$ridge.decay != 0 && ofv.cache$echo.ridge){
             message(sprintf("Current ridge penalty: %s", last.penalty));
             if (sprintf("%s", last.penalty) == "0"){
@@ -1547,9 +1538,9 @@ focei.fit.data.frame0 <- function(data,
         lst <- list(pars=pars, llik=llik);
         llik <- llik + last.penalty;
         attr(llik, "subj") = llik.subj
-        assign("last.ofv", as.numeric(llik), this.env)
+        last.ofv <<- as.numeric(llik);
         lst$ofv <- last.ofv;
-        assign("last.pars", pars, this.env);
+        last.pars <<- pars;
         assign(optim.obj(last.ofv), lst, envir=ofv.cache, inherits=FALSE);
         if (reset){
             if (!is.null(ofv.cache$last)){
@@ -1567,12 +1558,12 @@ focei.fit.data.frame0 <- function(data,
                 ofv.cache$first <- llik;
                 ofv.cache$last <- lst;
             }
-            assign("cur.diff", (ofv.cache$first - llik), this.env);
+            cur.diff <<- (ofv.cache$first - llik);
             w <- which(row.names(p) == "U:");
-            assign("curi", curi + 1, this.env);
+            curi <<- curi + 1;
             tmp <- cbind(data.frame(iter=curi, objf=as.numeric(substr(last.ofv.txt, 3, nchar(last.ofv.txt))), p[w,, drop = TRUE]));
             row.names(tmp) <- NULL;
-            assign("fit.df", rbind(fit.df, tmp, check.names=FALSE), envir=this.env);
+            fit.df <<- rbind(fit.df, tmp, check.names=FALSE);
         }
         sink.start(running);
         if (sigdig.exit){
@@ -1588,7 +1579,7 @@ focei.fit.data.frame0 <- function(data,
             fit$objective = ofv;
             fit$convergence = 2
             fit$message = "sigdig convergence"
-            assign("sigdig.fit", fit, this.env);
+            sigdig.fit <<- fit;
             stop("sigidig exit");
         }
         if (running){
@@ -1739,9 +1730,9 @@ focei.fit.data.frame0 <- function(data,
             }
         } else if (optim.method=="nlminb") {
             fit <- try({nlminb(par0,
-                                ofv.FOCEi, gradient=gr.FOCEi,
-                                control=list(trace=1, rel.tol=con$reltol.outer),
-                                lower=par.lower,
+                               ofv.FOCEi, gradient=gr.FOCEi,
+                               control=list(trace=1, rel.tol=con$reltol.outer),
+                               lower=par.lower,
                                upper=par.upper)});
             if (inherits(fit, "try-error") && !is.null(sigdig.fit)){
                 if (attr(fit, "condition")$message == "sigidig exit"){
@@ -1774,8 +1765,8 @@ focei.fit.data.frame0 <- function(data,
 
         ## while( identical( this.env, globalenv() ) == FALSE ) {
         parallel::clusterExport(cl,
-                                    ls(all.names=TRUE, envir=this.env),
-                                    envir=this.env)
+                                ls(all.names=TRUE, envir=this.env),
+                                envir=this.env)
         ##     this.env <- parent.env(environment())
         ## }
         parallel::clusterExport(cl,

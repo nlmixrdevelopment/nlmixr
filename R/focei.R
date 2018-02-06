@@ -273,7 +273,7 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
                     output <- try(do.call(getFromNamespace("n1qn1","n1qn1"), args, envir = parent.frame(1)), silent=TRUE)
                     if (!inherits(output, "try-error")){
                         env$c.hess <- output$c.hess
-                        assign("c.hess", output$c.hess, this.env)
+                        c.hess <<- output$c.hess;
                     }
                 } else {
                     output <- try(do.call(getFromNamespace("lbfgs","lbfgs"), args, envir = parent.frame(1)), silent=TRUE)
