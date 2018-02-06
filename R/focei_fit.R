@@ -571,6 +571,7 @@ simulate.focei.fit <- function(object, nsim=1, seed=NULL, ...){
 parseOM <- function(OMGA){
     re = "\\bETA\\[(\\d+)\\]\\b"
     .offset = as.integer(0)
+    this.env <- environment()
     lapply(1:length(OMGA), function(k) {
         s = OMGA[[k]]
         f = eval(parse(text=(sprintf("y~%s", deparse(s[[2]])))))
@@ -582,7 +583,7 @@ parseOM <- function(OMGA){
 
         ix = as.integer(sub(re, "\\1", r))
         if (any(ix - (.offset+1:nr))) stop("invalid OMGA specs")
-        .offset <<- .offset + nr
+        assign(".offset", .offset + nr, this.env)
         eval(s[[3]])
     })
 }
@@ -593,12 +594,15 @@ genOM <- function(s)
     nr = sum(sapply(s, getNR))
     .mat <- matrix(0, nr, nr)
     .offset = as.integer(0)
+    this.env <- environment()
     j = lapply(1:length(s), function(k) {
         a = s[[k]]
         p <- getNR(a)
         starts = row(.mat) > .offset  & col(.mat) > .offset
-        .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset+p & starts] <<- a
-        .offset <<- .offset+p
+        .mat <- tmp;
+        tmp[col(.mat) >= row(.mat) & col(.mat) <= .offset+p & starts] <- a
+        assign(".mat", tmp, this.env);
+        assign(".offset", .offset+p, this.env)
     })
     a = .mat[col(.mat) >= row(.mat)]
     .mat <- t(.mat)
@@ -1170,7 +1174,7 @@ focei.fit.data.frame0 <- function(data,
     first <- TRUE
 
     ofv.FOCEi.ind.slow <- function(pars) {
-        cur.diff <<- NULL;
+        assign("cur.diff", NULL, this.env);
         if(con$PRINT.PARS) print(pars)
         ## initial parameters are scale.to which translates to scale.to * inits.vec / scale.to = inits.vecs
         if (!is.null(con$scale.to)){
@@ -1235,17 +1239,23 @@ focei.fit.data.frame0 <- function(data,
         m = t(sapply(llik.subj, function(x) {
             c(attr(x, "wh"), attr(x, "posthoc"))
         }))
-        if(con$RESET.INITS.MAT) inits.mat[m[,1],] <<- m[,-1]
+        if(con$RESET.INITS.MAT){
+            tmp <- inits.mat
+            tmp[m[,1],] <- m[,-1]
+            assign("inits.mat", tmp, this.env);
+        }
         ## Save last curvature
         if (con$save.curve && con$inner.opt == "n1qn1" && !is.null(attr(llik.subj[[1]], "c.hess"))){
             m <- t(sapply(llik.subj, function(x){
                 c(attr(x, "wh"), attr(x, "c.hess"))
             }))
-            inits.c.hess[m[,1],] <<- m[,-1]
+            tmp <- inits.c.hess
+            tmp[m[,1],] <- m[,-1]
+            assign("inits.c.hess", tmp, this.env);
         }
         if (con$grad && con$accept.eta.size != 0){
-            last.pars <<- pars;
-            last.dEta.dTheta <<- lapply(llik.subj, function(x){attr(x, "dEta.dTheta")});
+            assign("last.pars", pars, this.env);
+            assign("last.dEta.dTheta", lapply(llik.subj, function(x){attr(x, "dEta.dTheta")}), this.env);
         }
         llik.subj
     }
@@ -1474,7 +1484,7 @@ focei.fit.data.frame0 <- function(data,
     }
     ofv.FOCEi <- function(pars) {
         llik.subj <- ofv.FOCEi.ind(pars)
-        first <<- FALSE
+        assign("first", first, this.env)
         llik <- -2*PreciseSums::psSum(unlist(llik.subj));
         corrected <- do.call("sum", (lapply(llik.subj, function(x){attr(x, "corrected")})))
         ofv <- llik;
@@ -1505,7 +1515,7 @@ focei.fit.data.frame0 <- function(data,
                         if (is.null(ofv.cache$first)){
                             ofv.cache$first <- llik;
                         }
-                        cur.diff <<- (ofv.cache$first - llik);
+                        assign("cur.diff", (ofv.cache$first - llik), this.env)
                         w <- which(row.names(p) == "U:");
                         assign("curi", curi + 1, this.env);
                         tmp <- cbind(data.frame(iter=curi, objf=as.numeric(substr(last, 3, nchar(last))), p[w,, drop = TRUE]));
@@ -1527,7 +1537,7 @@ focei.fit.data.frame0 <- function(data,
             extra <- 1;
         }
         ## ridge penalty llik - 0.5*(sum(pars)^2*con$precision):
-        last.penalty <<- 0.5 * sum( pars * pars * con$precision) * extra;
+        assign("last.penalty", 0.5 * sum( pars * pars * con$precision) * extra, this.env);
         if (reset && con$ridge.decay != 0 && ofv.cache$echo.ridge){
             message(sprintf("Current ridge penalty: %s", last.penalty));
             if (sprintf("%s", last.penalty) == "0"){
@@ -1537,9 +1547,9 @@ focei.fit.data.frame0 <- function(data,
         lst <- list(pars=pars, llik=llik);
         llik <- llik + last.penalty;
         attr(llik, "subj") = llik.subj
-        last.ofv <<- as.numeric(llik);
+        assign("last.ofv", as.numeric(llik), this.env)
         lst$ofv <- last.ofv;
-        last.pars <<- pars;
+        assign("last.pars", pars, this.env);
         assign(optim.obj(last.ofv), lst, envir=ofv.cache, inherits=FALSE);
         if (reset){
             if (!is.null(ofv.cache$last)){
@@ -1557,7 +1567,7 @@ focei.fit.data.frame0 <- function(data,
                 ofv.cache$first <- llik;
                 ofv.cache$last <- lst;
             }
-            cur.diff <<- (ofv.cache$first - llik);
+            assign("cur.diff", (ofv.cache$first - llik), this.env);
             w <- which(row.names(p) == "U:");
             assign("curi", curi + 1, this.env);
             tmp <- cbind(data.frame(iter=curi, objf=as.numeric(substr(last.ofv.txt, 3, nchar(last.ofv.txt))), p[w,, drop = TRUE]));
@@ -1578,7 +1588,7 @@ focei.fit.data.frame0 <- function(data,
             fit$objective = ofv;
             fit$convergence = 2
             fit$message = "sigdig convergence"
-            sigdig.fit <<- fit;
+            assign("sigdig.fit", fit, this.env);
             stop("sigidig exit");
         }
         if (running){

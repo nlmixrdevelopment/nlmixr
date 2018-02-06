@@ -614,7 +614,8 @@ nsis <- function(){ ## build installer...
 ##' @author Matthew L. Fidler
 collectWarnings <- function(expr){
     ws <- c();
-    ret <- suppressWarnings(withCallingHandlers(expr,warning=function(w){ws <<- unique(c(w$message, ws))}))
+    this.env <- environment()
+    ret <- suppressWarnings(withCallingHandlers(expr,warning=function(w){assign("ws", unique(c(w$message, ws)), this.env)}))
     for (w in ws){
         warning(w)
     }
