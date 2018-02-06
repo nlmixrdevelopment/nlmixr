@@ -622,3 +622,21 @@ collectWarnings <- function(expr){
     return(ret);
 }
 
+##' Print x using the message facility
+##'
+##' This allows the suppressMessages to work on print functions.  This
+##' captures the output via R.Util's captureOutput function and then
+##' sends it through the message routine.
+##'
+##' catpureOutput was used since it is much faster than the internal
+##' capture.output see https://www.r-bloggers.com/performance-captureoutput-is-much-faster-than-capture-output/
+##' @param x object to print
+##' @param ... Other things output
+##' @author Matthew L. Fidler
+##' @export
+##' @keywords internal
+nlmixrPrint <- function(x, ...){
+    this.env <- environment();
+    message(invisible(paste(R.utils::captureOutput(assign("x", print(x, ...), this.env)), collapse="\n")), appendLF=TRUE);
+    invisible(x)
+}

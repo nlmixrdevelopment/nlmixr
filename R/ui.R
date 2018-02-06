@@ -52,11 +52,13 @@ nlmixrUI <- function(fun){
     w <- which(regexpr(rex::rex(start, any_spaces, "#", anything), fun2) != -1);
     if (length(w) > 0 && all(lhs0 != "desc")){
         w2 <- w[1];
-        for (i in 2:length(w)){
-            if (w[i] - 1 == w[i - 1]){
-                w2[i] <- w[i];
-            } else {
-                break;
+        if (length(w) > 1){
+            for (i in 2:length(w)){
+                if (w[i] - 1 == w[i - 1]){
+                    w2[i] <- w[i];
+                } else {
+                    break;
+                }
             }
         }
         desc <- paste(gsub(rex::rex(any_spaces, end), "", gsub(rex::rex(start, any_spaces, any_of("#"), any_spaces), "", fun2[w2])), collapse=" ");

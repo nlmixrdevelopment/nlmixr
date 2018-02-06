@@ -110,7 +110,7 @@ print.focei.fit <- function(x, ...) {
         } else if (is(x, "nlmixr.ui.saem")){
             saem <- fit$saem;
             uif <- env$uif;
-            message(sprintf("nlmixr SAEM fit (%s)\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
+            message(sprintf("nlmixr SAEM fit (%s); OBJF based on FOCEi approximation.\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
         } else {
             message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$focei.control$grad, "with global gradient", "without global gradient")));
         }
@@ -125,12 +125,12 @@ print.focei.fit <- function(x, ...) {
         if (!is.null(nlme)){
             message("FOCEi-based goodness of fit metrics:")
         }
-        RxODE::rxPrint(df.objf)
+        nlmixrPrint(df.objf)
         if (!is.null(nlme)){
             message("\nnlme-based goodness of fit metrics:")
             df.objf <- data.frame(AIC=AIC(as.nlme(x)), BIC=BIC(as.nlme(x)),"Log-likelihood"=as.numeric(logLik(as.nlme(x))),
                                   row.names="", check.names=FALSE)
-            RxODE::rxPrint(df.objf)
+            nlmixrPrint(df.objf)
         }
         message("\nTime (sec; $time):");
         print(fit$time);
@@ -1033,11 +1033,11 @@ focei.fit.data.frame0 <- function(data,
             message("Model:")
             RxODE::rxCat(model$pred.only)
             message("Needed Covariates:")
-            RxODE::rxPrint(cov.names)
+            nlmixrPrint(cov.names)
             stop("Not all the covariates are in the dataset.")
         }
         message("Needed Covariates:")
-        RxODE::rxPrint(cov.names)
+        nlmixrPrint(cov.names)
     }
 
     ## RxODE(rxNorm(model$inner), modName="test");
@@ -1122,7 +1122,7 @@ focei.fit.data.frame0 <- function(data,
     }
     if (!con$NOTRUN){
         message("Boundaries:");
-        RxODE::rxPrint(data.frame(lower,inits.vec,upper));
+        nlmixrPrint(data.frame(lower,inits.vec,upper));
     }
     names(inits.vec) = NULL
     if (con$scale.to == 0){
@@ -1145,7 +1145,7 @@ focei.fit.data.frame0 <- function(data,
     par.upper[w.neg] <- tmp;
     if (!con$NOTRUN){
         if (!is.null(con$scale.to)){
-            RxODE::rxPrint(data.frame(par.lower,scaled=rep(con$scale.to, length(inits.vec)),par.upper))
+            nlmixrPrint(data.frame(par.lower,scaled=rep(con$scale.to, length(inits.vec)),par.upper))
         }
         if (do.sink){
             message("\nKey:")
