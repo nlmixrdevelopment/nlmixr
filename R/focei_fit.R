@@ -110,7 +110,7 @@ print.focei.fit <- function(x, ...) {
         } else if (is(x, "nlmixr.ui.saem")){
             saem <- fit$saem;
             uif <- env$uif;
-            message(sprintf("nlmixr SAEM fit (%s)\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
+            message(sprintf("nlmixr SAEM fit (%s); OBJF calculated from FOCEi approximation\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
         } else {
             message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$focei.control$grad, "with global gradient", "without global gradient")));
         }
