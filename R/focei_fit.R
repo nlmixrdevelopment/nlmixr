@@ -1323,7 +1323,7 @@ focei.fit.data.frame0 <- function(data,
             }
         }
     }
-    curi <<- 0;
+    assign("curi", 0, this.env);
     ofv.cache <- new.env(parent=emptyenv())
     ofv.cache$last1 <- NULL;
     ofv.cache$last <- NULL;
@@ -1508,7 +1508,7 @@ focei.fit.data.frame0 <- function(data,
                         }
                         cur.diff <<- (ofv.cache$first - llik);
                         w <- which(row.names(p) == "U:");
-                        curi <<- curi + 1;
+                        assign("curi", curi + 1, this.env);
                         tmp <- cbind(data.frame(iter=curi, objf=as.numeric(substr(last, 3, nchar(last))), p[w,, drop = TRUE]));
                         row.names(tmp) <- NULL;
                         fit.df <<- rbind(fit.df, tmp, check.names=FALSE);
@@ -1560,7 +1560,7 @@ focei.fit.data.frame0 <- function(data,
             }
             cur.diff <<- (ofv.cache$first - llik);
             w <- which(row.names(p) == "U:");
-            curi <<- curi + 1;
+            assign("curi", curi + 1, this.env);
             tmp <- cbind(data.frame(iter=curi, objf=as.numeric(substr(last.ofv.txt, 3, nchar(last.ofv.txt))), p[w,, drop = TRUE]));
             row.names(tmp) <- NULL;
             fit.df <<- rbind(fit.df, tmp, check.names=FALSE);
