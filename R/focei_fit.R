@@ -829,6 +829,7 @@ focei.fit.data.frame0 <- function(data,
     sink.file <- tempfile();
     orig.sink.number <- sink.number(type="output");
     do.sink <- TRUE;
+    this.env <- environment()
     fit.df <- NULL;
     sink.close <- function(n=orig.sink.number){
         if (do.sink){
@@ -926,8 +927,6 @@ focei.fit.data.frame0 <- function(data,
     )
 
     curi <- 0;
-
-    this.env <- environment()
 
     pt <- proc.time()
     nmsC <- names(con)
@@ -1511,7 +1510,7 @@ focei.fit.data.frame0 <- function(data,
                         assign("curi", curi + 1, this.env);
                         tmp <- cbind(data.frame(iter=curi, objf=as.numeric(substr(last, 3, nchar(last))), p[w,, drop = TRUE]));
                         row.names(tmp) <- NULL;
-                        fit.df <<- rbind(fit.df, tmp, check.names=FALSE);
+                        assign("fit.df", rbind(fit.df, tmp, check.names=FALSE), envir=this.env)
                     } else {
                         message("Warning: Prior objective function not found...");
                         reset <- TRUE;
@@ -1563,7 +1562,7 @@ focei.fit.data.frame0 <- function(data,
             assign("curi", curi + 1, this.env);
             tmp <- cbind(data.frame(iter=curi, objf=as.numeric(substr(last.ofv.txt, 3, nchar(last.ofv.txt))), p[w,, drop = TRUE]));
             row.names(tmp) <- NULL;
-            fit.df <<- rbind(fit.df, tmp, check.names=FALSE);
+            assign("fit.df", rbind(fit.df, tmp, check.names=FALSE), envir=this.env);
         }
         sink.start(running);
         if (sigdig.exit){
