@@ -759,7 +759,7 @@ nlmixrBoundsOmega <- function(x, nlme=FALSE){
                     mat[neta1, neta2] <- mat[neta2, neta1]<- df$est[i];
                 }
             }
-            if (RxODE::rxIs(nlme, "logical") && nlme){
+            if (is(nlme, "logical") && nlme){
                 df.diag <- df[df$neta1 == df$neta2, ];
                 n2 <- sprintf(".eta.%d", seq_along(df.diag$name));
                 w <- which(!is.na(df.diag$name))
@@ -770,7 +770,7 @@ nlmixrBoundsOmega <- function(x, nlme=FALSE){
                 } else {
                     return(nlme::pdSymm(as.matrix(Matrix::nearPD(mat)$mat), form=frm))
                 }
-            } else if (RxODE::rxIs(nlme, "list")){
+            } else if (is(nlme, "list")){
                 df.diag <- df[df$neta1 == df$neta2, ];
                 class(df.diag) <- "data.frame"
                 n2 <- sprintf(".eta.%d", seq_along(df.diag$name));

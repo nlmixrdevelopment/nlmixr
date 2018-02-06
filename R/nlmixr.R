@@ -171,10 +171,10 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                        sum.prod=FALSE, calc.resid=TRUE){
     start.time <- Sys.time();
     dat <- data;
-    if (RxODE::rxIs(dat$ID, "factor")){
+    if (is(dat$ID, "factor")){
         dat$ID <- paste(dat$ID);
     }
-    if (RxODE::rxIs(dat$ID, "character")){
+    if (is(dat$ID, "character")){
         lvl <- unique(dat$ID);
         lab <- paste(lvl)
         dat$ID <- factor(dat$ID, levels=lvl, labels=lab);

@@ -2127,7 +2127,7 @@ focei.fit.data.frame0 <- function(data,
         } else if (arg == "eta"){
             return(random.effects(obj));
         } else if (arg == "seed"){
-            if (RxODE::rxIs(obj, "nlmixr.ui.saem")){
+            if (is(obj, "nlmixr.ui.saem")){
                 return(attr(as.saem(obj),"saem.cfg")$seed)
             } else {
                 return(NA);
