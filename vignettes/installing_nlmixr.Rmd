@@ -23,7 +23,7 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
      If you include 32-bit files, some packages may not
      run correctly.  Additionally, both the 32- and
      64-bit binaries have to be compiled for every package. Similarly, if on 32-bit Windows, install only the 32-bit version of R (and Python, and Rtools).
-2. Install the appropriate version of Rtools for Windows, currently version 3.4, from [here](https://cran.r-project.org/bin/windows/Rtools/).
+2. Install the appropriate version of Rtools for Windows, currently version 3.4, from [here](https://CRAN.R-project.org/bin/windows/Rtools/).
    - This is an absolute requirement, since it includes C++ and related compilers not usually available under Windows.
    - For best results, use the default location of `c:\Rtools`
      - `RxODE`, a required component of `nlmixr`, checks and sets up the path based on the following:
@@ -104,7 +104,7 @@ Instructions for Ubuntu-alike distributions are given here (specifically, [Ubunt
 Instructions for macOS 10.12 Sierra are provided here. They should be broadly extensible to all recent releases of macOS, however.
 
 1. Install R 3.4.1 (or later) from the R website.
-   - Download and install `R-3.4.1.pkg` (or later) from [CRAN](http://cran.r-project.org/bin/macosx/).
+   - Download and install `R-3.4.1.pkg` (or later) from [CRAN](https://CRAN.R-project.org/bin/macosx/).
 2. Install Python dependencies.
    - Install `pip` from the macOS terminal prompt: `sudo easy_install pip`.
    - Install `sympy` using `pip`: `sudo -H pip install sympy`.
