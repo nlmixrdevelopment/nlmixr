@@ -24,7 +24,8 @@ Imports:
     R.utils,
     mvtnorm,
     n1qn1,
-    PreciseSums
+    PreciseSums,
+    fastGHQuad
 Suggests:
     knitr,
     rmarkdown,
@@ -58,12 +59,7 @@ Authors@R: c(person("Matthew","Fidler",
    person("Dirk","Eddelbuettel",
       role = "cph", email = "edd@debian.org"),   
    person("David","Ardia",role = "cph"),
-   person("Katharine","Mullen",role = "cph"),
-   person("Sylvan","Elhay",role = "cph"),
-   person("Jaroslav","Kautsky",role = "cph"),
-   person("John","Burkardt",role = "cph"),
-   person("Shanjie","Zhang",role = "cph"),
-   person("Jianming","Jin",role = "cph")
+   person("Katharine","Mullen",role = "cph")
    )
 Description: Fit and compare nonlinear mixed-effects models in differential
     equations with flexible dosing information commonly seen in pharmacokinetics
