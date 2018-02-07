@@ -27,10 +27,10 @@
 #' @examples
 #' gauss.quad(5)
 #' @export
-gauss.quad = function(n)
-{#n = 5
-	s = .C("hermite_ek_compute_", as.integer(n), double(n), double(n))
-	s[[1]] = NULL
-	names(s) = c("nodes", "weights")
-	s
+gauss.quad <- function(n) 
+{
+    s <- gaussHermiteData(n)
+    names(s) = c("nodes", "weights")
+    s
 }
+
