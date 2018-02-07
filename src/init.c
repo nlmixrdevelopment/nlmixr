@@ -4,7 +4,6 @@
 #include <R_ext/Rdynload.h>
 
 /* .C calls */
-extern void hermite_ek_compute_(void *, void *, void *);
 extern void parse_ode(void *, void *, void *, void *);
 extern void parse_pars(void *, void *, void *, void *);
 
@@ -51,7 +50,6 @@ extern SEXP _nlmixr_chkSolvedInf(SEXP, SEXP);
 extern SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time);
 
 static const R_CMethodDef CEntries[] = {
-    {"hermite_ek_compute_",     (DL_FUNC) &hermite_ek_compute_,      3},
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
     {"parse_pars",              (DL_FUNC) &parse_pars,               4},
     {NULL, NULL, 0}

@@ -3,7 +3,7 @@ PKG_CPPFLAGS =-Id -I../inst/include -DBOOST_DISABLE_ASSERTS
 #PKG_CFLAGS = -g
 CXX_STD = CXX11
 
-SOURCES_C = jj.c jj.g.d_parser.c quadrule.c init.c rprintf.c RxODE.c chkSolved.c merge3.c
+SOURCES_C = jj.c jj.g.d_parser.c init.c rprintf.c RxODE.c chkSolved.c merge3.c
 SOURCES_CPP = neldermead.cpp slice.cpp RcppExportMod.cpp ode_cmt1.cpp RcppExports.cpp focei_fit.cpp focei.cpp
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o)
 
