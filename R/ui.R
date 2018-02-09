@@ -777,7 +777,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     do.pred <- 3;
     grp.fn <- new.fn(deparse(f(body(fun))));
     do.pred <- 4;
-    saem.pars <- deparse(f(body(fun)));
+    saem.pars <- try(deparse(f(body(fun))), silent=TRUE);
+    if (inherits(saem.pars, "try-error")){
+        saem.pars <- NULL
+    }
     if (rxode){
         rx.txt <- deparse(body(rest))[-1]
         rx.txt <- rx.txt[-length(rx.txt)];
@@ -883,9 +886,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         add.prop.errs <- data.frame(y="Y1", add=TRUE, prop=FALSE);
         lin.solved <- nlmixrUILinCmt(all.lhs)
     }
-    saem.pars <- new.fn(saem.pars)
+    if (!is.null(saem.pars)){
+        saem.pars <- new.fn(saem.pars)
+        saem.theta.trans <- rep(NA, length(theta.names));
+    } else {
+        saem.pars <- NULL
+        saem.theta.trans <- NULL
+    }
 
-    saem.theta.trans <- rep(NA, length(theta.names));
     cov.theta.pars <- gsub(rex::rex(or(all.covs), "."), "", names(unlist(cov.ref)))
     for (i in seq_along(theta.names)){
         if (!any(theta.names[i] == cov.theta.pars)){
