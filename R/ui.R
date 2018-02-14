@@ -560,7 +560,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         w <- which(bounds$name == err2.v);
                         tmp$err[w] <- err2;
                         assign("bounds", tmp, this.env);
-                        if (any(tmp == c("norm+prop", "add+prop"))){
+                        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
                             assign("errn", errn + 1, this.env);
                             assign("add.prop.errs", rbind(add.prop.errs,
                                                           data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
