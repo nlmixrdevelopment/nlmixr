@@ -381,9 +381,13 @@ fixef.focei.fit <- function(object, ...){
                 }
                 w <- which(uif$ini$err == "prop")
                 if (length(w) > 0){
-                    df$Untransformed[w] <- df$Untransformed[w] * 100
-                    df$Lower.ci[w] <- df$Lower.ci[w] * 100
-                    df$Upper.ci[w] <- df$Upper.ci[w] * 100
+                    name <- uif$ini$name[w];
+                    w <- which(row.names(df) %in% name);
+                    if (length(w) > 0){
+                        df$Untransformed[w] <- df$Untransformed[w] * 100
+                        df$Lower.ci[w] <- df$Lower.ci[w] * 100
+                        df$Upper.ci[w] <- df$Upper.ci[w] * 100
+                    }
                 }
                 attr(df, "ci") <- ci;
                 class(df) <- c("nlmixr.par.fixed", "data.frame");
