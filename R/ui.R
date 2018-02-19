@@ -1399,7 +1399,7 @@ nlmixrUI.model.desc <- function(obj){
         ## }
     } else {
         return(sprintf("%s-compartment model%s%s", obj$lin.solved$ncmt,
-                       ifelse(obj$lin.solved$oral, " with first-order absorption"),
+                       ifelse(obj$lin.solved$oral, " with first-order absorption", ""),
                        ifelse(obj$lin.solved$parameterization == 1, " in terms of Cl", " in terms of micro-constants"),
                        ifelse(obj$lin.solved$tlag, " (with lag time)", "")));
     }
