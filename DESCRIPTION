@@ -5,7 +5,7 @@ Title: Nonlinear Mixed Effects Models in Population Pharmacokinetics and
 Depends:
     R (>= 3.2),
     nlme,
-    RxODE(>=0.7-0)
+    RxODE(>=0.7)
 Imports:
     Rcpp (>= 0.12.3),
     brew,
