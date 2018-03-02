@@ -66,36 +66,6 @@ void RxODE_ode_solve_env(SEXP sexp_rho){
   RxODE_ode_solve_env(sexp_rho);
 }
 
-void RxODE_ode_free(){
-  static rxode_void0 RxODE_ode_free = NULL;
-  if (RxODE_ode_free == NULL) RxODE_ode_free = (rxode_void0) R_GetCCallable("RxODE","RxODE_ode_free");
-  RxODE_ode_free();
-}
-
-double RxODE_safe_zero(double x){
-  static rxode_double1d RxODE_safe_zero = NULL;
-  if (RxODE_safe_zero == NULL) RxODE_safe_zero = (rxode_double1d) R_GetCCallable("RxODE","RxODE_safe_zero");
-  return RxODE_safe_zero(x);
-}
-
-double RxODE_safe_log(double x){
-  static rxode_double1d RxODE_safe_log = NULL;
-  if (RxODE_safe_log == NULL) RxODE_safe_log = (rxode_double1d) R_GetCCallable("RxODE","RxODE_safe_log");
-  return RxODE_safe_log(x);
-}
-
-double RxODE_abs_log(double x){
-  static rxode_double1d RxODE_abs_log = NULL;
-  if (RxODE_abs_log == NULL) RxODE_abs_log = (rxode_double1d) R_GetCCallable("RxODE","RxODE_abs_log");
-  return RxODE_abs_log(x);
-}
-
-double RxODE_sign_exp(double sgn, double x){
-  static rxode_double2d RxODE_sign_exp = NULL;
-  if (RxODE_sign_exp == NULL) RxODE_sign_exp = (rxode_double2d) R_GetCCallable("RxODE","RxODE_sign_exp");
-  return RxODE_sign_exp(sgn, x);
-}
-
 typedef double (*rxode_sum_fn)(double *input, int n);
 
 extern double RxODE_sum(double *input, int n){

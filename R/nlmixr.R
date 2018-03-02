@@ -52,6 +52,7 @@ nlmixrForget <- function(){
 ##' @importFrom methods is
 ##' @importFrom Rcpp evalCpp
 ##' @importFrom ggplot2 ggplot aes geom_point facet_wrap geom_line geom_abline xlab geom_smooth
+##' @importFrom RcppArmadillo armadillo_version
 ##' @useDynLib nlmixr, .registration=TRUE
 
 
@@ -75,6 +76,10 @@ nlmixrLogo <- function(str="", version=sessionInfo()$otherPkgs$nlmixr$Version){
 ##' @export
 nlmixrVersion <- function(){
     nlmixrLogo()
+}
+
+armaVersion <- function(){
+    nlmixrLogo(str="RcppArmadiilo", RcppArmadillo::armadillo_version())
 }
 
 ##' nlmixr fits population PK and PKPD non-linear mixed effects models.

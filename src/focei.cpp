@@ -23,11 +23,11 @@ extern "C" double rxLhs(int i);
 extern "C" void rxCalcLhs(int i);
 extern "C" unsigned int nObs();
 extern "C" void RxODE_ode_solve_env(SEXP sexp_rho);
-extern "C" void RxODE_ode_free();
-extern "C" double RxODE_safe_zero(double x);
-extern "C" double RxODE_safe_log(double x);
-extern "C" double RxODE_sign_exp(double sgn, double x);
-extern "C" double RxODE_abs_log(double x);
+#define RxODE_safe_zero(a) ((a) == 0 ? DOUBLE_EPS : (a))
+#define RxODE_safe_log(a) (((a) <= 0) ? log(DOUBLE_EPS) : log(a))
+#define RxODE_sign_exp(sgn, x)(((sgn) > 0.0) ? exp(x) : (((sgn) < 0.0) ? -exp(x) : 0.0))
+#define RxODE_abs_log(x) ((fabs(x) <= sqrt(DOUBLE_EPS)) ? log(sqrt(DOUBLE_EPS)) : (((x) > 0.0) ? log(x) ? (((x) == 0) ? 0.0 : log(-x))))
+
 void rxDetaDomega(SEXP rho);
 double stablizeNums(double x){
   if (ISNAN(x)){
@@ -113,7 +113,6 @@ void rxGrad(SEXP rho){
         // for (j = 0; j < length(sexp_theta); j++){
         //   Rprintf("params[%d] = %f\n", j, par_ptr[j]);
         // }
-        RxODE_ode_free();
         stop("A covariance term is zero or negative and should remain positive");
       }
       r(k, 0)=Lhs(j); // R always has to be positive.
@@ -143,7 +142,6 @@ void rxGrad(SEXP rho){
     lp[j] = RxODE_sum(lpi+3*nObs()*j,3*nObs());
   }
   // Free
-  RxODE_ode_free();
   Free(lpi);
   e["err"] = err;
   e["f"] = f;
@@ -235,7 +233,6 @@ void rxInnerNum(SEXP etanews, SEXP rho){
 	  // for (j = 0; j < length(sexp_theta); j++){
 	  //   Rprintf("params[%d] = %f\n", j, par_ptr[j]);
 	  // }
-	  RxODE_ode_free();
 	  stop("A covariance term is zero or negative and should remain positive");
 	}
 	r(k, 0)=Lhs(1); // R always has to be positive.
@@ -353,8 +350,7 @@ void rxInnerNum(SEXP etanews, SEXP rho){
     Free(llik0);
 
     // Free
-    RxODE_ode_free();
-  
+    
     mat llikm = mat(1,1);
     
     mat omegaInv = as<mat>(e["omegaInv"]);
@@ -529,7 +525,6 @@ void rxInner(SEXP etanews, SEXP rho){
           // for (j = 0; j < length(sexp_theta); j++){
           //   Rprintf("params[%d] = %f\n", j, par_ptr[j]);
           // }
-          RxODE_ode_free();
           stop("A covariance term is zero or negative and should remain positive");
         }
         r(k, 0)=Lhs(j); // R always has to be positive.
@@ -563,8 +558,6 @@ void rxInner(SEXP etanews, SEXP rho){
     llik[0] = RxODE_sum(llik0,2*nObs());
     Free(lpi);
     Free(llik0);
-    // Free
-    RxODE_ode_free();
     mat llikm = mat(1,1);
     
     mat omegaInv = as<mat>(e["omegaInv"]);
@@ -963,7 +956,6 @@ void rxOuter_ (SEXP rho){
           Rprintf("Lhs(%d) = %f\n", j, Lhs(j));
         }
         Rprintf("\n");
-        RxODE_ode_free();
         stop("A covariance term is zero or negative and should remain positive.");
       }
       r(k, 0)=Lhs(j); // R always has to be positive.
@@ -1229,7 +1221,6 @@ void rxOuter_ (SEXP rho){
 
   e["l.dEta.dTheta"] = lDnDt;
   e["H2"] = lDn;
-  RxODE_ode_free();
 }
 
 // [[Rcpp::export]]
