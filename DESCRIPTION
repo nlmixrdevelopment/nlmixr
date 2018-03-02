@@ -26,6 +26,8 @@ Imports:
     n1qn1,
     PreciseSums,
     fastGHQuad,
+    crayon,
+    cli,
     RcppArmadillo (>= 0.5.600.2.0)
 Suggests:
     knitr,

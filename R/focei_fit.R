@@ -105,14 +105,21 @@ print.focei.fit <- function(x, ...) {
         if (is(x, "nlmixr.ui.nlme")){
             nlme <- fit$nlme;
             uif <- env$uif;
-            message(sprintf("nlmixr nlme fit by %s (%s)\n", ifelse(nlme$method == "REML", "REML", "maximum likelihood"),
-                            ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")));
+            message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("nlme"), " fit by ",
+                                     crayon::bold$yellow(ifelse(nlme$method == "REML", "REML", "maximum likelihood"))," (",
+                                     crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), ")")))
         } else if (is(x, "nlmixr.ui.saem")){
             saem <- fit$saem;
             uif <- env$uif;
-            message(sprintf("nlmixr SAEM fit (%s); OBJF calculated from FOCEi approximation\n", ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")))
+            message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("SAEM"), " fit (",
+                             crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
+                             crayon::blurred$italic("OBJF calculated from FOCEi approximation"))))
         } else {
-            message(sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$focei.control$grad, "with global gradient", "without global gradient")));
+            ## sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$focei.control$grad, "with global gradient", "without global gradient")
+            message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("FOCEi"), " fit",
+                                     ifelse(fit$focei.control$grad, "with global gradient", "without global gradient"),
+                                     " (",
+                                     crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), ")")));
         }
         if (any(names(fit) == "condition.number")){
             df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Log-likelihood"=as.numeric(logLik(x)),
@@ -123,22 +130,22 @@ print.focei.fit <- function(x, ...) {
                                   row.names="", check.names=FALSE)
         }
         if (!is.null(nlme)){
-            message("FOCEi-based goodness of fit metrics:")
+            message(paste0(crayon::bold$yellow("FOCEi"), "-based goodness of fit metrics:"))
         }
         nlmixrPrint(df.objf)
         if (!is.null(nlme)){
-            message("\nnlme-based goodness of fit metrics:")
+            message(paste0("\n",crayon::bold$yellow("nlme"), "-based goodness of fit metrics:"))
             df.objf <- data.frame(AIC=AIC(as.nlme(x)), BIC=BIC(as.nlme(x)),"Log-likelihood"=as.numeric(logLik(as.nlme(x))),
                                   row.names="", check.names=FALSE)
             nlmixrPrint(df.objf)
         }
-        message("\nTime (sec; $time):");
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::bold$blue("$time"), "):"))));
         print(fit$time);
-        message("\nParameters ($par.fixed):")
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Parameters"), " (sec; ", crayon::bold$blue("$par.fixed"), "):"))));
         print(x$par.fixed)
-        message("\nOmega ($omega):");
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Omega"), " (sec; ", crayon::bold$blue("$omega"), "):"))));
         print(fit$omega);
-        message("\nFit Data (object is a modified data.frame):")
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object is a modified ", crayon::blue("data.frame"), "):"))))
 
         is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
         if (!is.dplyr){
