@@ -400,6 +400,45 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         assign("est", est, env);
         assign("stop.time", Sys.time(), env);
         return(fit);
+    } else if (est == "posthoc"){
+        control.posthoc <- list(NOTRUN=TRUE,
+                                ## inits.mat=mat,
+                                cores=1,
+                                find.best.eta=TRUE,
+                                numeric=(!is.null(uif$nmodel$lin.solved)),
+                                sum.prod=uif$env$sum.prod);
+        fit <- focei.fit(dat,
+                         inits=uif$focei.inits,
+                         PKpars=uif$theta.pars,
+                         ## par_trans=fun,
+                         model=uif$rxode.pred,
+                         pred=function(){return(nlmixr_pred)},
+                         err=uif$error,
+                         lower=uif$focei.lower,
+                         upper=uif$focei.upper,
+                         theta.names=uif$focei.names,
+                         eta.names=uif$eta.names,
+                         control=control.posthoc,
+                         ...)
+        env <- attr(fit, ".focei.env")
+        env$uif <- uif;
+        uif.new <- uif;
+        ns <- names(fit$theta);
+        for (n in ns){
+            uif.new$ini$est[uif.new$ini$name == n] <- fit$theta[n];
+        }
+        ome <- fit$omega;
+        w <- which(!is.na(uif.new$ini$neta1))
+        for (i in w){
+            uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
+        }
+        fit <- fix.dat(fit);
+        env$uif.new <- uif.new;
+        class(fit) <- c("nlmixr.ui.focei.posthoc", class(fit));
+        assign("start.time", start.time, env);
+        assign("est", est, env);
+        assign("stop.time", Sys.time(), env);
+        return(fit);
     }
 }
 ##' Control Options for SAEM

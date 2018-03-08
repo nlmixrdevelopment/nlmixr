@@ -145,10 +145,20 @@ print.focei.fit <- function(x, ...) {
                              crayon::blurred$italic("OBJF calculated from FOCEi approximation"))))
         } else {
             ## sprintf("nlmixr FOCEI fit (%s)\n", ifelse(fit$focei.control$grad, "with global gradient", "without global gradient")
-            message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("FOCEi"), " fit",
-                                     ifelse(fit$focei.control$grad, "with global gradient", "without global gradient"),
-                                     " (",
-                                     crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), ")")));
+            if (use.utf()){
+                eta.name <- "\u03B7";
+            } else {
+                eta.name <- "eta"
+            }
+            type <- crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"));
+            if (is(x, "nlmixr.ui.focei.posthoc")){
+                message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("FOCEi"), " posthoc ",
+                                         eta, " estimation (",type, ")")))
+            } else {
+                message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("FOCEi"), " fit ",
+                                         ifelse(fit$focei.control$grad, "with global gradient", "without global gradient"),
+                                         " (",type , ")")));
+            }
         }
         if (any(names(fit) == "condition.number")){
             df.objf <- data.frame(OBJF=fit$objective, AIC=AIC(x), BIC=BIC(x), "Log-likelihood"=as.numeric(logLik(x)),
@@ -400,21 +410,28 @@ fixef.focei.fit <- function(object, ...){
                     }
                     df <- data.frame(Parameter=lab, df);
                 }
-                if (!is.null(saem) | !is.null(nlme)){
+                if (!is.null(saem) || !is.null(nlme)){
                     df <- data.frame(df, "CV"=abs(df$SE / df$Estimate * 100));
                 } else {
                     df <- object$par.data.frame;
                     df <- data.frame(Parameter=lab, df)
                 }
-                df <- data.frame(df, Untransformed=df$Estimate,
-                                 Lower.ci=df$Estimate - qn * df$SE,
-                                 Upper.ci=df$Estimate + qn * df$SE,
-                                 check.names=FALSE);
+                if (!is(object, "nlmixr.ui.focei.posthoc")){
+                    df <- data.frame(df, Untransformed=df$Estimate,
+                                     Lower.ci=df$Estimate - qn * df$SE,
+                                     Upper.ci=df$Estimate + qn * df$SE,
+                                     check.names=FALSE);
+                } else {
+                    df <- data.frame(df, Untransformed=df$Estimate,
+                                     check.names=FALSE);
+                }
                 log.theta <- which(row.names(df) %in% uif$log.theta);
                 if (length(log.theta) > 0){
                     df$Untransformed[log.theta] <- exp(df$Untransformed[log.theta])
-                    df$Lower.ci[log.theta] <- exp(df$Lower.ci[log.theta])
-                    df$Upper.ci[log.theta] <- exp(df$Upper.ci[log.theta])
+                    if (!is(object, "nlmixr.ui.focei.posthoc")){
+                        df$Lower.ci[log.theta] <- exp(df$Lower.ci[log.theta])
+                        df$Upper.ci[log.theta] <- exp(df$Upper.ci[log.theta])
+                    }
                 }
                 w <- which(uif$ini$err == "prop")
                 if (length(w) > 0){
@@ -422,8 +439,10 @@ fixef.focei.fit <- function(object, ...){
                     w <- which(row.names(df) %in% name);
                     if (length(w) > 0){
                         df$Untransformed[w] <- df$Untransformed[w] * 100
-                        df$Lower.ci[w] <- df$Lower.ci[w] * 100
-                        df$Upper.ci[w] <- df$Upper.ci[w] * 100
+                        if (!is(object, "nlmixr.ui.focei.posthoc")){
+                            df$Lower.ci[w] <- df$Lower.ci[w] * 100
+                            df$Upper.ci[w] <- df$Upper.ci[w] * 100
+                        }
                     }
                 }
                 attr(df, "ci") <- ci;
@@ -449,19 +468,22 @@ print.nlmixr.par.fixed <- function(x, ...){
     FFP<-function(x,digits){ifelse(is.na(x), " ",
                                    paste0(formatC(x,digits=digits,format="f",flag="#"), "%"))}
     df$Estimate <- F2(df$Estimate, digs);
-    df$SE <- F2(df$SE, digs);
-    df$CV <- paste0(FFP(df$CV, digs.cv))
-
+    if (is(x, "nlmixr.ui.focei.posthoc")){
+        df$SE <- F2(df$SE, digs);
+        df$CV <- paste0(FFP(df$CV, digs.cv))
+    }
     df$Untransformed <- sprintf("%s%s", F2(df$Untransformed, digs),
                                 ifelse(x$Estimate * 100 == x$Untransformed, "%", ""));
-    ci <- attr(x, "ci")
-    df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
-                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
-                                                   F2(df$Lower.ci, digs),
-                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
-                                                   F2(df$Upper.ci, digs),
-                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
-    df <- df[, regexpr("[.]ci", names(df)) == -1]
+    if (is(x, "nlmixr.ui.focei.posthoc")){
+        ci <- attr(x, "ci")
+        df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
+                                                       ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
+                                                       F2(df$Lower.ci, digs),
+                                                       ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
+                                                       F2(df$Upper.ci, digs),
+                                                       ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
+        df <- df[, regexpr("[.]ci", names(df)) == -1]
+    }
     if (all(df$Parameter == "")){
         df <- df[, -1];
     } else {
