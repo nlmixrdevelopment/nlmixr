@@ -278,15 +278,32 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         } else {
             return(fit);
         }
-    } else if (est == "nlme" || est == "nlme.mu"){
+    } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
         pt <- proc.time()
-        if (est == "nlme"){
+        est.type <- est;
+        if (est == "nlme.free"){
             fun <- uif$nlme.fun;
             specs <- uif$nlme.specs;
-        } else {
+        } else if (est == "nlme.mu"){
             fun <- uif$nlme.fun.mu;
             specs <- uif$nlme.specs.mu;
-            stop("Need to incorporate covariates to use this type of model...");
+        } else if (est == "nlme.mu.cov"){
+            fun <- uif$nlme.fun.mu.cov
+            specs <- uif$nlme.specs.mu.cov;
+        } else {
+            if (!is.null(uif$saem.pars)){
+                est.type <- "nlme.mu.cov"
+                fun <- uif$nlme.fun.mu.cov
+                specs <- uif$nlme.specs.mu.cov;
+            } else if (!is.null(uif$nlme.mu.fun)){
+                est.type <- "nlme.mu"
+                fun <- uif$nlme.fun.mu
+                specs <- uif$nlme.fun.specs.mu;
+            } else {
+                est.type <- "nlme.mu"
+                fun <- uif$nlme.fun
+                specs <- uif$nlme.fun.specs;
+            }
         }
         grp.fn <- uif$grp.fn;
         dat$nlmixr.grp <- factor(apply(data, 1, function(x){
@@ -326,6 +343,8 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                             control=control,
                             ...);
         }
+        class(fit) <- c(est.type, class(fit));
+
         ## Run FOCEi using same ETAs and THETA estimates to get
         ## comparable OBJFs and also extract table entries like
         ## CWRES.

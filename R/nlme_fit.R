@@ -640,6 +640,16 @@ focei.eta.nlmixr_nlme <- function(object, ...){
     }
 }
 
+fix.nlme.names <- function(n, uif){
+    n <- gsub(rex::rex(".(Intercept)"), "", n);
+    for (n2 in names(uif$cov.ref)){
+        cur <- uif$cov.ref[[n2]];
+        var <- paste(cur, n2, sep=".");
+        n <- gsub(var, names(cur), n)
+    }
+    n
+}
+
 ##' @rdname focei.theta
 focei.theta.nlmixr_nlme <- function(object, uif, ...){
     if (class(uif) == "function"){
@@ -649,6 +659,7 @@ focei.theta.nlmixr_nlme <- function(object, uif, ...){
     thetas <- rep(NA, length(n));
     names(thetas) <- n;
     f <- fixed.effects(object)
+    names(f) <- fix.nlme.names(names(f), uif);
     for (n in names(f)){
         thetas[n] <- f[n];
     }
@@ -711,7 +722,7 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
                                     inits.mat=mat,
                                     cores=1,
                                     find.best.eta=FALSE,
-                                    ## numeric=(!is.null(uif$nmodel$lin.solved)),
+                                    numeric=(!is.null(uif$nmodel$lin.solved)),
                                     sum.prod=uif$env$sum.prod));
     ome <- fit.f$omega;
     w <- which(!is.na(uif.new$ini$neta1))

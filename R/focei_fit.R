@@ -75,6 +75,20 @@ VarCorr.nlmixr.ui.nlme <- function(x, sigma = 1, ...){
     VarCorr(as.nlme(x), sigma=sigma, ...)
 }
 
+use.utf <- function() {
+    opt <- getOption("cli.unicode", NULL)
+    if (! is.null(opt)) {
+        isTRUE(opt)
+    } else {
+        l10n_info()$`UTF-8` && !is.latex()
+    }
+}
+
+is.latex <- function() {
+    if (!("knitr" %in% loadedNamespaces())) return(FALSE)
+    get("is_latex_output", asNamespace("knitr"))()
+}
+
 #' Print a focei fit
 #'
 #' Print a first-order conditional non-linear mixed effect model with
@@ -105,9 +119,24 @@ print.focei.fit <- function(x, ...) {
         if (is(x, "nlmixr.ui.nlme")){
             nlme <- fit$nlme;
             uif <- env$uif;
+            if (is(nlme, "nlme.free")){
+                text <- "Free-form"
+            } else {
+                if (use.utf()){
+                    mu <- "\u03BC";
+                } else {
+                    mu <- "mu"
+                }
+                if (is(nlme, "nlme.mu")){
+                    text <- sprintf("%s-ref", mu)
+                } else if (is(nlme, "nlme.mu.cov")){
+                    text <- sprintf("%s-ref & covs", mu)
+                }
+            }
             message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("nlme"), " fit by ",
                                      crayon::bold$yellow(ifelse(nlme$method == "REML", "REML", "maximum likelihood"))," (",
-                                     crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), ")")))
+                                     crayon::italic(paste0(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"),
+                                                           "; ", text)), ")")))
         } else if (is(x, "nlmixr.ui.saem")){
             saem <- fit$saem;
             uif <- env$uif;
@@ -354,6 +383,7 @@ fixef.focei.fit <- function(object, ...){
                 lab <- gsub(" *$", "", gsub("^ *", "", lab));
                 if (!is.null(nlme)){
                     ttab <- data.frame(summary(nlme)$tTable);
+                    row.names(ttab) <- fix.nlme.names(row.names(ttab), uif);
                     names(ttab) <- c("Estimate", "SE", "DF", "t-value", "p-value")
                     ttab <- ttab[, 1:2]
                     tmp <- object$par.data.frame;
