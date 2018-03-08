@@ -300,7 +300,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 fun <- uif$nlme.fun.mu
                 specs <- uif$nlme.fun.specs.mu;
             } else {
-                est.type <- "nlme.mu"
+                est.type <- "nlme.free"
                 fun <- uif$nlme.fun
                 specs <- uif$nlme.fun.specs;
             }
