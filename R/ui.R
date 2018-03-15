@@ -412,7 +412,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     theta.names <-  c()
     theta.ord <- c();
     eta.names <- c();
-    mu.ref <- list();
+    .mu.ref <- list();
     cov.ref <- list();
     log.theta <- c();
     log.eta <- c();
@@ -651,17 +651,19 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         if (any.theta.names(as.character(x[[2]]), eta.names) &&
                             any.theta.names(as.character(x[[3]]), theta.names)){
                             ## Found ETA+THETA
-                            tmp <- mu.ref;
+                            tmp <- .mu.ref;
                             tmp[[as.character(x[[2]])]] <- as.character(x[[3]]);
-                            assign("mu.ref", tmp, this.env);
+                            ## assign("mu.ref", tmp, this.env);
+                            .mu.ref <<- tmp
                             ## Collapse to THETA
                             return(x[[3]])
                         } else if (any.theta.names(as.character(x[[3]]), eta.names) &&
                                    any.theta.names(as.character(x[[2]]), theta.names)){
                             ## Found THETA+ETA
-                            tmp <- mu.ref
+                            tmp <- .mu.ref
                             tmp[[as.character(x[[3]])]] <- as.character(x[[2]]);
-                            assign("mu.ref", tmp, this.env)
+                            ## assign(".mu.ref", tmp, this.env)
+                            .mu.ref <<- tmp
                             ## Collapse to THETA
                             ## model$omega=diag(c(1,1,0))
                             ## 0 is not estimated.
@@ -681,9 +683,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             eta <- as.character(x[[3]]);
                             th <- find.theta(x[[2]]);
                             if (length(th) == 1){
-                                tmp <- mu.ref
+                                tmp <- .mu.ref
                                 tmp[[eta]] <- th;
-                                assign("tmp", mu.ref, this.env)
+                                ## assign("tmp", .mu.ref, this.env)
+                                .mu.ref <<- tmp
                                 return(f(as.call(x[[2]])));
                             }
                         } else if (length(x) < 3) {
@@ -693,7 +696,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             ## And collapses to 123  + 123 + Cl + 123
                             ## Useful for covariates...
                             theta <- as.character(x[[3]]);
-                            etas <- c();
+                            .etas <- c();
                             find.etas <- function(x){
                                 if (is.atomic(x) || is.name(x)) {
                                     return(x)
@@ -702,7 +705,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                 } else if (is.call(x)) {
                                     if (identical(x[[1]], quote(`+`)) &&
                                         any.theta.names(as.character(x[[3]]), eta.names)){
-                                        assign("etas", c(etas,as.character(x[[3]])), this.env)
+                                        .etas <<- c(.etas,as.character(x[[3]]));
                                         return(x[[2]]);
                                     }
                                     return(as.call(lapply(x, find.etas)));
@@ -713,9 +716,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             }
                             new <- find.etas(x[[2]]);
                             if (length(etas) == 1){
-                                tmp <- mu.ref;
-                                tmp[[etas]] <- theta;
-                                assign("tmp", mu.ref, this.env);
+                                tmp <- .mu.ref;
+                                tmp[[.etas]] <- theta;
+                                ## assign("tmp", .mu.ref, this.env);
+                                .mu.ref <<- tmp
                                 x[[2]] <- new;
                             }
                         }
@@ -941,7 +945,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             errs.specified=errs.specified,
                             add.prop.errs=add.prop.errs,
                             grp.fn=grp.fn,
-                            mu.ref=mu.ref, cov.ref=cov.ref,
+                            mu.ref=.mu.ref, cov.ref=cov.ref,
                             saem.pars=saem.pars,
                             nlme.mu.fun=nlme.mu.fun,
                             nlme.mu.fun2=nlme.mu.fun2,
@@ -1184,6 +1188,9 @@ nlmixrUI.saem.eta.trans <- function(obj){
                 trans[i] <- theta.trans[w];
             }
         }
+    }
+    if (any(is.na(trans))){
+        stop("Could not figure out the mu-referencing for this model.")
     }
     return(trans)
 }
