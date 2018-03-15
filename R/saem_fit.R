@@ -1204,9 +1204,9 @@ focei.eta.saemFit <- function(object, uif, ...){
     }
     ## Reorder based on translation
     eta.trans <- uif$saem.eta.trans
-    for (i in seq(1, max(eta.trans))){
-        while (!(any(i == eta.trans)) && max(eta.trans) > i){
-            eta.trans[eta.trans >= i] <- eta.trans[eta.trans >= i] - 1
+    for (i in seq(1, max(eta.trans, na.rm=TRUE))){
+        while (!(any(i == eta.trans, na.rm=TRUE)) && max(eta.trans, na.rm=TRUE) > i){
+            eta.trans[which(eta.trans >= i)] <- eta.trans[which(eta.trans >= i)] - 1
         }
     }
     ## orig eta ->  new eta
@@ -1250,9 +1250,9 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     mat <- random.effects(fit);
     ## Reorder based on translation
     eta.trans <- uif$saem.eta.trans
-    for (i in seq(1, max(eta.trans))){
-        while (!(any(i == eta.trans)) && max(eta.trans) > i){
-            eta.trans[eta.trans >= i] <- eta.trans[eta.trans >= i] - 1
+    for (i in seq(1, max(eta.trans, na.rm=TRUE))){
+        while (!(any(i == eta.trans, na.rm=TRUE)) && max(eta.trans, na.rm=TRUE) > i){
+            eta.trans[which(eta.trans >= i)] <- eta.trans[which(eta.trans >= i)] - 1
         }
     }
     ## orig eta ->  new eta
