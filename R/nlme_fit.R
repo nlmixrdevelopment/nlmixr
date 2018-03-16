@@ -143,7 +143,7 @@ nlme_lin_cmpt <- function(dat, par_model,
 	body(PKpars) <- parse(text=x)
 
     #a new env with a ref in .GlobalEnv, holding model components
-    #a hack due to non-std call by nlme
+                                        #a hack due to non-std call by nlme
     ## assign("..ModList", new.env(parent=emptyenv()), envir=.GlobalEnv)
 
     #master par list
@@ -221,7 +221,7 @@ nlme_lin_cmpt <- function(dat, par_model,
     return(ret);
 }
 
-nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
+nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, hmin, hmax, hini, maxordn, maxords, maxsteps, mc.cores){
     fun <- eval(parse(text=sprintf("function(%s, TIME, ID){NULL;}", arg1)))
     pkpars <- eval(parse(text=sprintf("bquote((nlmixr::nlmeModList(\"PKpars\"))(%s))", arg2)));
     body <- bquote({
@@ -248,7 +248,9 @@ nlme_ode_gen_usr_fn <- function(arg1, arg2, transit_abs, atol, rtol, mc.cores){
                                print(theta)
                            }
 
-                           m <- nlmixr::nlmeModList("m1")$run(theta, ev, inits, transit_abs=.(transit_abs), atol=.(atol), rtol=.(rtol));
+                           m <- nlmixr::nlmeModList("m1")$run(theta, ev, inits, transit_abs=.(transit_abs), atol=.(atol), rtol=.(rtol),
+                                                              hmin=.(hmin), hmax=.(hmax), hini=.(hini), maxsteps = .(maxsteps),
+                                                              maxordn=.(maxordn), maxords=.(maxords));
                            if (is.null(dim(m))) m = t(as.matrix(m))
                            den <- if(is.null(nlmixr::nlmeModList("response.scaler"))) 1 else theta[nlmixr::nlmeModList("response.scaler")]
                            m[, nlmixr::nlmeModList("response")]/den
@@ -386,7 +388,9 @@ prepEv = function(dati, theta)
 nlme_ode <- function(dat.o, model, par_model, par_trans,
 	response, response.scaler=NULL,
 	transit_abs = FALSE,
-	atol=1.0e-8, rtol=1.0e-8,
+	atol=1.0e-8, rtol=1.0e-8, maxsteps = 5000,
+        hmin = 0, hmax = NULL,
+        hini = 0, maxordn = 12, maxords = 5,
 	debugODE=FALSE, mc.cores=1, ...)
 {
   if (any(dat.o$EVID[dat.o$EVID>0]<101))
@@ -417,7 +421,9 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
     arg1 <- paste(names(s), collapse=", ")
     arg2 <- paste(unlist(lapply(names(s), function(x) paste(x,"=",x,"[sel][1]", sep=""))), collapse=", ")
 
-    nlmixr::nlmeModList("user_fn", nlme_ode_gen_usr_fn(arg1, arg2, transit_abs, atol, rtol, mc.cores));
+    nlmixr::nlmeModList("user_fn", nlme_ode_gen_usr_fn(arg1, arg2, transit_abs, atol, rtol,
+                                                       hmin, hmax, hini, maxordn, maxords, maxsteps,
+                                                       mc.cores));
 
     #data prep
     dat.g <- groupedData(DV~TIME|ID, subset(dat.o, dat.o$EVID==0))
