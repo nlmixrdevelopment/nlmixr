@@ -407,8 +407,19 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
 
   nrhs = integer(1)
+
+  if (is.null(inPars)) {
+    offset = 0L
+    nignore  = 0L
+    ignore_vars = ""
+  } else {
+    offset = cumsum(c(0L, nchar(inPars)+1L))
+    nignore  = length(inPars)
+    ignore_vars = paste(c(inPars, ""), collapse=",")
+  }
+
   RxODE::rxReq("dparser");
-  x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE))
+  x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE), ignore_vars, offset, nignore)
   nrhs = x[[3]]
   foo = paste(readLines("foo__.txt"), collapse="\n")
 
@@ -422,7 +433,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
     declPars = sprintf("\tdouble %s;\n\t%s", paste0(inPars, collapse=", "), s)
   }
   brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
-  unlink(c("eqn__.txt", "foo__.txt"))
+  #unlink(c("eqn__.txt", "foo__.txt"))
   #if (inPars == "") inPars = NULL
 
   ##gen Markevars
@@ -431,9 +442,10 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   .lib=  if(is.ode) model$cmpMgr$dllfile else ""
   if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
-  make_str = 'PKG_CXXFLAGS=-g %s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)\n'
+  make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)\n'
   make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), .lib)
   cat(make_str, file="Makevars")
+cat(make_str)
 
   shlib = sprintf('R CMD SHLIB %s -o %s', saem.cpp, saem.dll)
   ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))

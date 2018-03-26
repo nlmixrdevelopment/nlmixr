@@ -5,7 +5,7 @@
 
 /* .C calls */
 extern void parse_ode(void *, void *, void *, void *);
-extern void parse_pars(void *, void *, void *, void *);
+extern void parse_pars(void *, void *, void *, void *, void *, void *, void *);
 
 /* Internal C calls, should not be called outside of C code. */
 typedef void (*S_fp) (double *, double *);
@@ -51,7 +51,7 @@ extern SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time);
 
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
-    {"parse_pars",              (DL_FUNC) &parse_pars,               4},
+    {"parse_pars",              (DL_FUNC) &parse_pars,               7},
     {NULL, NULL, 0}
 };
 

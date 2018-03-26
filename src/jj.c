@@ -84,6 +84,10 @@ typedef void (print_node_fn_t)(int depth, char *token_name, char *token_value, v
 extern D_ParserTables parser_tables_gram;
 
 
+char *ignore_symb_str;
+int *ignore_offset;
+int nignore;
+
 typedef struct Symtable {
   char *symb_str;       /* symbol string: all vars*/
   int offset[MXSYM];    /* offset of symbols */
@@ -119,6 +123,15 @@ int new_or_ith(const char *s) {
   if (!strcmp("t", s)) return 0;
   if (!strcmp("podo", s)) return 0;
   if (!strcmp("tlast", s)) return 0;
+
+  // ignore?
+  for (i=0; i<nignore; i++) {
+    len = ignore_offset[i+1] - ignore_offset[i] - 1;    /* -1 for added ',' */
+    //printf("%s\n", ignore_symb_str+ignore_offset[i]);
+    if (!strncmp(ignore_symb_str+ignore_offset[i], s, max(len, len_s))) {/* note we need take the max in order not to match a sub-string */
+      return 0;
+    }
+  }
 
   // starting point
   if (!symtab.nvar) return 1;
@@ -451,13 +464,18 @@ void inits() {
 #ifdef __STANDALONE_PARS__
 int main(int argc, char *argv[]) {
 #else
-void parse_pars(char **model_file, char **result_file, int *nrhs, int *dosep) {
+void parse_pars(char **model_file, char **result_file, int *nrhs, int *dosep, char **ign_str, int *offset, int *nign) {
   int argc = 3;
-  char *argv[] = {"", *model_file, *result_file};
+  char *argv[] = {"", *model_file, *result_file, *ign_str};
 #endif
 
   int i;
   char *buf;
+
+  ignore_symb_str = argv[3];
+  ignore_offset = offset;
+  nignore = *nign;
+  //printf("%d %s\n", strlen(argv[3]), argv[3]);
 
   D_ParseNode *pn;
   /* any number greater than sizeof(D_ParseNode_User) will do;
