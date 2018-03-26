@@ -293,7 +293,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             fun <- uif$nlme.fun.mu.cov
             specs <- uif$nlme.specs.mu.cov;
         } else {
-            if (!is.null(uif$saem.pars)){
+            if (!is.null(uif$nlme.fun.mu.cov)){
                 est.type <- "nlme.mu.cov"
                 fun <- uif$nlme.fun.mu.cov
                 specs <- uif$nlme.specs.mu.cov;

@@ -646,7 +646,7 @@ plot.saemFit = function(x, ...)
 #'
 #'
 #' #--- saem cfg
-#' nmdat = read.table("theo_sd.dat",  head=T)
+#' nmdat = theo_sd
 #' model = list(saem_mod=saem_fit, covars="WT")
 #' inits = list(theta=c(.05, .5, 2))
 #' cfg   = configsaem(model, nmdat, inits)

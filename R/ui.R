@@ -983,10 +983,12 @@ nlmixrUI.nlme.specs <- function(object, mu.type=c("thetas", "covariates", "none"
                 new.theta <- c(new.theta, as.vector(m), names(m))
             }
         }
-        new.theta <- unique(new.theta)
         e1 <- paste(paste(cov.base, collapse="+"), "~ 1");
         fixed.form <- paste(c(e1, sapply(names(cov.lst), function(x){paste(x, "~", paste(cov.lst[[x]], collapse="+"))})), collapse=", ")
         fixed.form <- eval(parse(text=sprintf("list(%s)", fixed.form)))
+        if (length(cov.base) == 0){
+            fixed.form <- fixed.form[-1];
+        }
         theta <- theta[new.theta]
         return(list(fixed=fixed.form,
                     random=object$random.mu,
@@ -1029,15 +1031,18 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
             bod <- deparse(body(object$nlme.mu.fun));
             bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
             bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(c(names(object$ini$theta), object$all.covs), collapse=", "))));
+            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unique(c(names(object$ini$theta), object$all.covs)), collapse=", "))));
             body(fn) <- bod
             return(fn);
         } else if (mu.type == "covariates"){
             bod <- deparse(body(object$nlme.mu.fun2));
             bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
             bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(c(unlist(object$mu.ref), unlist(object$cov.ref)), collapse=", "))));
+            vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
+            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(vars, collapse=", "))));
+            vars2 <- allVars(bod);
             body(fn) <- bod;
+            if (length(vars) != length(vars2)) return(NULL);
             return(fn);
         } else {
             bod <- deparse(body(object$rest));
@@ -1049,11 +1054,16 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
         }
     } else {
         if (mu.type == "thetas"){
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(c(names(object$ini$theta), object$all.covs), collapse=", "))))
+            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unique(c(names(object$ini$theta), object$all.covs)), collapse=", "))))
             body(fn) <- body(object$nlme.mu.fun);
         } else if (mu.type == "covariates"){
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(c(unlist(object$mu.ref), unlist(object$cov.ref)), collapse=", "))))
+            vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
+            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(vars, collapse=", "))))
             body(fn) <- body(object$nlme.mu.fun2);
+            vars2 <- allVars(body(fn));
+            if (length(vars) != length(vars2)){
+                return(NULL);
+            }
         } else {
             fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))))
             body(fn) <- body(object$rest);
