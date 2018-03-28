@@ -474,16 +474,17 @@ print.nlmixr.par.fixed <- function(x, ...){
     }
     df$Untransformed <- sprintf("%s%s", F2(df$Untransformed, digs),
                                 ifelse(x$Estimate * 100 == x$Untransformed, "%", ""));
-    if (is(x, "nlmixr.ui.focei.posthoc")){
-        ci <- attr(x, "ci")
-        df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
-                                                       ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
-                                                       F2(df$Lower.ci, digs),
-                                                       ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
-                                                       F2(df$Upper.ci, digs),
-                                                       ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
-        df <- df[, regexpr("[.]ci", names(df)) == -1]
-    }
+    df$CV <- gsub("NA", "", sprintf("%s", F2(df$CV, digs)));
+    names(df) <- gsub("CV", "CV%", names(df))
+    df$SE <- gsub("NA", "", sprintf("%s", F2(df$SE, digs)));
+    ci <- attr(x, "ci")
+    df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
+                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
+                                                   F2(df$Lower.ci, digs),
+                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
+                                                   F2(df$Upper.ci, digs),
+                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
+    df <- df[, regexpr("[.]ci", names(df)) == -1]
     if (all(df$Parameter == "")){
         df <- df[, -1];
     } else {
