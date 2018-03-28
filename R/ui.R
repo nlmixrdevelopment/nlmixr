@@ -817,12 +817,15 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         rest <- rx.pred;
         all.vars <- all.vars[!(all.vars %in% RxODE::rxState(rxode))]
         rest.vars <- rest.vars[!(rest.vars %in% RxODE::rxState(rxode))]
+        all.covs <- setdiff(rest.vars,paste0(bounds$name))
+        all.covs <- all.covs[!(all.covs %in% RxODE::rxLhs(rxode))]
+        all.covs <- all.covs[!(all.covs %in% RxODE::rxState(rxode))]
     } else {
+        all.covs <- setdiff(rest.vars,paste0(bounds$name))
         nlme.mu.fun2 <- saem.pars
         rxode <- NULL
     }
-    ## FIXME test for compartments that were picked up a covariates...
-    all.covs <- setdiff(rest.vars,paste0(bounds$name))
+
     fun2 <- as.character(attr(fun, "srcref"), useSource=TRUE)
     fun2[1] <- "function(){"
     fun2[length(fun2)] <- "}";
@@ -1323,7 +1326,7 @@ nlmixrUI.saem.fit <- function(obj){
             ode <- RxODE::RxODE(obj$rxode.pred);
         }
         message("done.")
-        saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=function() nlmixr_pred)
+        saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=function() nlmixr_pred, inPars=obj$all.covs)
         message("done.")
         obj$env$saem.fit <- saem.fit;
         return(obj$env$saem.fit);
