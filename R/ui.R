@@ -1326,6 +1326,8 @@ nlmixrUI.saem.fit <- function(obj){
             ode <- RxODE::RxODE(obj$rxode.pred);
         }
         message("done.")
+        inPars <- obj$all.covs;
+        if (length(inPars) == 0) inPars <- NULL
         saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=function() nlmixr_pred, inPars=inPars)
         message("done.")
         obj$env$saem.fit <- saem.fit;
@@ -1350,7 +1352,6 @@ nlmixrUI.saem.fit <- function(obj){
 nlmixrUI.saem.model <- function(obj){
     mod <- list(saem_mod=obj$saem.fit);
     if (length(obj$all.covs > 0)){
-        mod$inPars <- obj$all.covs;
         ## mod$covars <- obj$all.covs;
     }
     mod$res.mod <- obj$saem.res.mod;
