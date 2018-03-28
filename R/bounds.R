@@ -618,11 +618,11 @@ as.data.frame.nlmixrBounds <- function(x, row.names = NULL, optional = FALSE, ..
 
 ##' @export
 print.nlmixrBounds <- function(x, ...){
-    cat("Fixed Effects ($theta):\n");
+    message(paste0(crayon::bold("Fixed Effects")," (", crayon::bold$blue("$theta"), "):"));
     print(x$theta);
     omega <- x$omega;
     if (dim(omega)[1] > 0){
-        cat("\nOmega ($omega):\n");
+        message(paste0("\n", crayon::bold("Omega")," (", crayon::bold$blue("$omega"), "):"))
         print(omega)
     }
 }
@@ -785,6 +785,8 @@ nlmixrBoundsOmega <- function(x, nlme=FALSE){
                     return(nlme::pdSymm(as.matrix(Matrix::nearPD(mat)$mat), form=frm))
                 }
             }
+            w <- which(df$neta1 == df$neta2);
+            dimnames(mat) <- list(paste(df$name[w]), paste(df$name[w]));
             return(mat);
         } else {
             return(matrix(double(), 0, 0))

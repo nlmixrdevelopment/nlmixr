@@ -1,8 +1,7 @@
 .onAttach <- function(libname, pkgname){ ## nocov start
     ## Setup RxODE.prefer.tbl
     nlmixrSetupMemoize()
-    options(RxODE.syntax.allow.ini=FALSE,
-            keep.source=TRUE)
+    options(keep.source=TRUE)
 }
 
 nlmixrSetupMemoize <- function(){

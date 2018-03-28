@@ -106,17 +106,16 @@ nlmixrUI <- function(fun){
 ##' @author Matthew L. Fidler
 ##' @export
 print.nlmixrUI <- function(x, ...){
-    message(paste0("## ", x$model.desc ))
-    message("## Initialization:")
-    message("################################################################################")
+    message(cli::rule(x$model.desc, line="bar2"))
+    message(cli::rule(crayon::bold("Initialization:")))
     print(x$ini)
     if (length(x$all.covs) > 0){
         message("\n Covariates or Uninitialized Parameters ($all.covs)")
         print(x$all.covs);
     }
-    message(sprintf("\n## Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))
-    message("################################################################################")
+    message(cli::rule(crayon::bold(sprintf("Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))))
     message(x$fun.txt)
+    message(cli::rule(line="bar2"))
 }
 
 ## This is a list of supported distributions with the number of arguments they currently support.
