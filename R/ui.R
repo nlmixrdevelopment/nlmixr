@@ -739,7 +739,16 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
     rm.empty <- function(x){
         ## empty if/else
-        x <- x[regexpr(rex::rex(any_spaces, "nlmixrIgnore()", any_spaces), x, perl=TRUE) == -1];
+        ## First remove if () followed by nlmixrIgnore()
+        ignoreit <- rex::rex(any_spaces, "nlmixrIgnore()", any_spaces)
+        w1 <- which(regexpr(rex::rex(start, any_spaces, or(group("if", any_spaces, "(", anything, ")"), "else"),any_spaces, end), x) != -1);
+        if (length(w1) > 0){
+            w2 <- which(regexpr(ignoreit, x[w1 + 1]) != -1)
+            if (length(w2) > 0){
+                x <- x[-w1[w2]];
+            }
+        }
+        x <- x[regexpr(ignoreit, x, perl=TRUE) == -1];
         w1 <- which(regexpr(rex::rex(start, any_spaces, or("if", "else"), anything, "{", end), x) != -1)
         if (length(w1) > 0){
             w2 <- w1 + 1;
