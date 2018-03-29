@@ -1268,7 +1268,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
         }
     }
     ## orig eta ->  new eta
-    mat2 <- mat[, eta.trans];
+    mat2 <- mat[, eta.trans, drop = FALSE];
     ## for (i in seq_along(eta.trans)){
     ##     ## i = old eta->  eta.trans[i] = saem.eta
     ##     mat2[,i] <- mat[, eta.trans[i]];

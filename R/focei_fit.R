@@ -2146,7 +2146,7 @@ focei.fit.data.frame0 <- function(data,
         class(data) <- c("focei.fit", "data.frame")
         ## Adapted
         om <- diag(fit$omega)
-        d <- etas[,-1]
+        d <- etas[,-1, drop = FALSE]
         eshr <- sapply(seq_along(om), function(i){
             return((1 - (stats::sd(d[,i]) / sqrt(om[i])))*100);
         })
