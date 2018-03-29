@@ -100,6 +100,17 @@ is.latex <- function() {
 #' @export
 print.focei.fit <- function(x, ...) {
     if (is.focei(x)){
+        parent <- parent.frame(2);
+        bound <- do.call("c", lapply(ls(parent), function(cur){
+            if (identical(parent[[cur]], x)){
+                return(cur)
+            }
+            return(NULL);
+        }));
+        if (length(bound) > 1) bound <- bound[1];
+        if (length(bound) == 0){
+            bound  <- ""
+        }
         env <- attr(x, ".focei.env");
         fit <- env$fit;
         args <- as.list(match.call(expand.dots = TRUE));
@@ -178,13 +189,15 @@ print.focei.fit <- function(x, ...) {
                                   row.names="", check.names=FALSE)
             nlmixrPrint(df.objf)
         }
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::bold$blue("$time"), "):"))));
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(bound), crayon::bold$blue("$time"), "):"))));
         print(fit$time);
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Parameters"), " (sec; ", crayon::bold$blue("$par.fixed"), "):"))));
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Parameters"), " (sec; ", crayon::yellow(bound), crayon::bold$blue("$par.fixed"), "):"))));
         print(x$par.fixed)
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Omega"), " (sec; ", crayon::bold$blue("$omega"), "):"))));
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Omega"), " (sec; ", crayon::yellow(bound), crayon::bold$blue("$omega"), "):"))));
         print(fit$omega);
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object is a modified ", crayon::blue("data.frame"), "):"))))
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object", ifelse(bound == "", "", " "),
+                                              crayon::yellow(bound),
+                                              " is a modified ", crayon::blue("data.frame"), "):"))))
 
         is.dplyr <- requireNamespace("dplyr", quietly = TRUE);
         if (!is.dplyr){
