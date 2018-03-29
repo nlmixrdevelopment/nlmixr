@@ -825,7 +825,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         nlme.mu.fun2 <- saem.pars
         rxode <- NULL
     }
-
     fun2 <- as.character(attr(fun, "srcref"), useSource=TRUE)
     fun2[1] <- "function(){"
     fun2[length(fun2)] <- "}";
@@ -940,21 +939,16 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     env <- new.env(parent=emptyenv());
     env$infusion <- FALSE
     env$sum.prod <- FALSE
+    ## Split out inPars
+    saem.all.covs <- all.covs[all.covs %in% names(cov.ref)]
+    saem.inPars <- all.covs[!(all.covs %in% names(cov.ref))]
     ret <- list(ini=bounds, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
                             all.vars=all.vars, rest.vars=rest.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
-                            all.covs=all.covs, lin.solved=lin.solved,
-                            errs.specified=errs.specified,
-                            add.prop.errs=add.prop.errs,
-                            grp.fn=grp.fn,
-                            mu.ref=.mu.ref, cov.ref=cov.ref,
-                            saem.pars=saem.pars,
-                            nlme.mu.fun=nlme.mu.fun,
-                            nlme.mu.fun2=nlme.mu.fun2,
-                            log.theta=log.theta,
-                            log.eta=log.eta,
-                            theta.ord=theta.ord,
-                            saem.theta.trans=saem.theta.trans,
+                            all.covs=all.covs, saem.all.covs=saem.all.covs, saem.inPars=saem.inPars, lin.solved=lin.solved,
+                            errs.specified=errs.specified, add.prop.errs=add.prop.errs, grp.fn=grp.fn, mu.ref=.mu.ref, cov.ref=cov.ref,
+                            saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2, log.theta=log.theta,
+                            log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
                             env=env))
     return(ret)
 }
@@ -1326,9 +1320,9 @@ nlmixrUI.saem.fit <- function(obj){
             ode <- RxODE::RxODE(obj$rxode.pred);
         }
         message("done.")
-        inPars <- obj$all.covs;
+        inPars <- obj$saem.inPars;
         if (length(inPars) == 0) inPars <- NULL
-        saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=function() nlmixr_pred, inPars=inPars)
+        saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=function() nlmixr_pred, inPars=inPars);
         message("done.")
         obj$env$saem.fit <- saem.fit;
         return(obj$env$saem.fit);
@@ -1351,8 +1345,8 @@ nlmixrUI.saem.fit <- function(obj){
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.model <- function(obj){
     mod <- list(saem_mod=obj$saem.fit);
-    if (length(obj$all.covs > 0)){
-        ## mod$covars <- obj$all.covs;
+    if (length(obj$saem.all.covs > 0)){
+        mod$covars <- obj$saem.all.covs;
     }
     mod$res.mod <- obj$saem.res.mod;
     mod$log.eta <- obj$saem.log.eta;
@@ -1374,7 +1368,7 @@ nlmixrUI.saem.theta.name <- function(uif){
     trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
     trans <- trans[!is.na(trans)]
     theta.name <- trans.name[order(trans)]
-    all.covs <- uif$all.covs
+    all.covs <- uif$saem.all.covs
     lc <- length(all.covs);
     if (lc > 0){
         m <- matrix(rep(NA, length(theta.name) * (lc + 1)), nrow=lc + 1);
@@ -1415,7 +1409,7 @@ nlmixrUI.saem.init.theta <- function(obj){
             return(obj$ini$est[w])
         }
     })
-    all.covs <- obj$all.covs;
+    all.covs <- obj$saem.all.covs;
     lc <- length(all.covs);
     if (lc > 0){
         m <- matrix(rep(NA, lc * length(theta.name)), ncol=lc)
