@@ -156,6 +156,7 @@ void inits(List x) {
   nlambda = nlambda1 + nlambda0;
   nb_param = nphi1 + nlambda + 1;
   nphi = nphi1+nphi0;
+  Plambda.zeros(nlambda);
 
   DYF = zeros<mat>(mlen, nM);
   phi.set_size(N, nphi, nmc);
@@ -405,7 +406,8 @@ void saem_fit() {
     if (res_mod==2) vcsig2 << bres;
     if (res_mod==3) vcsig2 << ares << bres;
 
-    Plambda = join_cols(Plambda1, Plambda0);
+    Plambda(i0) = Plambda0;
+    Plambda(i1) = Plambda1;
 
     par_hist.row(kiter) = join_cols(join_cols(Plambda, Gamma2_phi1.diag()), vcsig2).t();
     if (print>0 && (kiter==0 || (kiter+1)%print==0))
