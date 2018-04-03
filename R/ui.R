@@ -1328,6 +1328,7 @@ nlmixrUI.saem.fit <- function(obj){
         } else {
             ode <- RxODE::RxODE(obj$rxode.pred);
         }
+        rxLoad(ode);
         message("done.")
         inPars <- obj$saem.inPars;
         if (length(inPars) == 0) inPars <- NULL

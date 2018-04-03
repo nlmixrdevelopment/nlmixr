@@ -193,10 +193,14 @@ print.focei.fit <- function(x, ...) {
         print(fit$time);
         message(paste0("\n", cli::rule(paste0(crayon::bold("Parameters"), " (", crayon::yellow(bound), crayon::bold$blue("$par.fixed"), "):"))));
         print(x$par.fixed)
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Omega"), " covariance matrix (", crayon::yellow(bound), crayon::bold$blue("$omega"), "):"))));
-        print(fit$omega);
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Omega"), " correlation matrix (", crayon::yellow(bound), crayon::bold$blue("$omega.R"), "), diagonals=SDs:"))));
-        print(fit$omega.R);
+        tmp <- fit$omega
+        diag(tmp) <- 0;
+        if (all(tmp == 0)){
+            message("\n  No correlations in between subject variability (BSV) matrix")
+        } else {
+            message("\n  Correlations in between subject variability (BSV) matrix")
+        }
+        message(paste0("  Full BSV covariance (", crayon::yellow(bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(bound), crayon::bold$blue("$omega.R"), "; diagonals=SDs) available"));
 
         message(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object", ifelse(bound == "", "", " "),
                                               crayon::yellow(bound),
@@ -427,14 +431,37 @@ fixef.focei.fit <- function(object, ...){
                     df <- object$par.data.frame;
                     df <- data.frame(Parameter=lab, df)
                 }
+
+                df <- data.frame(df, Untransformed=df$Estimate,
+                                 Lower.ci=df$Estimate - qn * df$SE,
+                                 Upper.ci=df$Estimate + qn * df$SE,
+                                 check.names=FALSE);
+                ## Now get the ETA information
+                mu.ref <- unlist(uif$mu.ref);
+                if (length(mu.ref) > 0){
+                    n.mu.ref <- names(mu.ref)
+                    ome <- object$omega
+                    mu.ref <- structure(as.vector(n.mu.ref), .Names=as.vector(mu.ref));
+                    log.eta <- uif$log.eta;
+                    digs <- 3;
+                    cvp <- sapply(row.names(df), function(x){
+                        y <- mu.ref[x];
+                        if (is.na(y)) return(" ");
+                        v <- ome[y, y];
+                        if (any(y == log.eta)){
+                            sprintf("%s%%", formatC(signif(sqrt(exp(v) - 1) * 100, digits=digs),digits=digs,format="fg", flag="#"));
+                        } else {
+                            sprintf("%s", formatC(signif(sqrt(v),digits=digs), digits=digs,format="fg", flag="#"))
+                        }
+                    })
+                    df <- data.frame(df, BSV.cv.sd=cvp, check.names=FALSE);
+                }
                 if (!is(object, "nlmixr.ui.focei.posthoc")){
-                    df <- data.frame(df, Untransformed=df$Estimate,
+                    df <- data.frame(df,
                                      Lower.ci=df$Estimate - qn * df$SE,
                                      Upper.ci=df$Estimate + qn * df$SE,
                                      check.names=FALSE);
-                } else {
-                    df <- data.frame(df, Untransformed=df$Estimate,
-                                     check.names=FALSE);
+
                 }
                 log.theta <- which(row.names(df) %in% uif$log.theta);
                 if (length(log.theta) > 0){
@@ -488,6 +515,17 @@ print.nlmixr.par.fixed <- function(x, ...){
     df$CV <- gsub("NA", "", sprintf("%s", F2(df$CV, digs)));
     names(df) <- gsub("CV", "%RSE", names(df))
     names(df) <- gsub("Untransformed", "Back-transformed", names(df))
+    if (any(names(df) == "BSV.cv.sd")){
+        tmp <- df$BSV.cv.sd
+        tmp <- tmp[tmp != " "];
+        if (all(regexpr(rex::rex("%", end), tmp) != -1)){
+            names(df) <- gsub("BSV.cv.sd", "BSV CV%", names(df));
+        } else if (all(regexpr(rex::rex("%", end), tmp) == -1)){
+            names(df) <- gsub("BSV.cv.sd", "BSV SD", names(df));
+        } else {
+            names(df) <- gsub("BSV.cv.sd", "BSV CV% or SD", names(df));
+        }
+    }
     df$SE <- gsub("NA", "", sprintf("%s", F2(df$SE, digs)));
     ci <- attr(x, "ci")
     df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
@@ -506,7 +544,6 @@ print.nlmixr.par.fixed <- function(x, ...){
             df$Parameter[w] <- row.names(df)[w];
         }
     }
-
     print(df)
 }
 
