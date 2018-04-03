@@ -2076,14 +2076,9 @@ focei.fit.data.frame0 <- function(data,
     ##     class(eshr) <- "nlmixr.shrink"
     ##     fit$eta.shrink <- eshr;
     ## }
-
-
-    ## FIXME -- add lhs/state variables to the data-frame.
-    ## data <- merge(data, m);
     res <- calc.resid.fit(data, orig.data)
     fit$eta.shrink <- res[[2]];
-    data <- cbind(as.data.frame(data), res[[1]]);
-
+    data <- cbind(as.data.frame(data), res[[1]], res[[3]]);
     table.time <- proc.time() - pt;
     fit$table.time <- table.time;
     fit$data.names <- names(data);
