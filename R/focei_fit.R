@@ -191,10 +191,13 @@ print.focei.fit <- function(x, ...) {
         }
         message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(bound), crayon::bold$blue("$time"), "):"))));
         print(fit$time);
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Parameters"), " (sec; ", crayon::yellow(bound), crayon::bold$blue("$par.fixed"), "):"))));
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Parameters"), " (", crayon::yellow(bound), crayon::bold$blue("$par.fixed"), "):"))));
         print(x$par.fixed)
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Omega"), " (sec; ", crayon::yellow(bound), crayon::bold$blue("$omega"), "):"))));
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Omega"), " covariance matrix (", crayon::yellow(bound), crayon::bold$blue("$omega"), "):"))));
         print(fit$omega);
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Omega"), " correlation matrix (", crayon::yellow(bound), crayon::bold$blue("$omega.R"), "), diagonals=SDs:"))));
+        print(fit$omega.R);
+
         message(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object", ifelse(bound == "", "", " "),
                                               crayon::yellow(bound),
                                               " is a modified ", crayon::blue("data.frame"), "):"))))
@@ -295,8 +298,8 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
 ##'
 ##' @param object Fit object
 ##' @param ... other parameters
-##' @param population when true (default false), calculate the
-##'     population predictions; When false, calculate the individual
+##' @param population when true (default false), calculate/extract the
+##'     population predictions; When false, calculate/extract the individual
 ##'     predictions.
 ##'
 ##'     If this is a matrix with the number columns equal to the
@@ -305,30 +308,27 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
 ##'     used to fit the data.
 ##' @param type The type of fitted object to be extracted.  When the
 ##'     value is "fitted", this gives the individual or population
-##'     fitted values. The "Vi" option gives the variance estimate for
-##'     the individual.  The "Vfo" gives the Variance under the fo
-##'     assumption when population=FALSE, and the FOCE assumption when
-##'     population=TRUE. "dErr_dEta" gives the df/deta*eta. When
-##'     "posthoc", this extracts the posthoc deviations from the
-##'     typical values or ETAs.
+##'     fitted values. When "posthoc", this extracts the posthoc
+##'     deviations from the typical values or ETAs.
 ##' @return Individual/population predictions
 ##' @author Matthew L. Fidler
 ##' @export
 fitted.focei.fit <- function(object, ..., population=FALSE,
-                             type=c("fitted", "Vi", "Vfo", "dErr_dEta", "dR_dEta", "posthoc")){
+                             type=c("fitted", "posthoc")){
+    type <- match.arg(type);
+    if (type == "fitted"){
+        if (population){
+            return(object$CPRED);
+        } else {
+            return(object$PRED);
+        }
+    }
     env <- attr(object, ".focei.env");
     fit <- env$fit;
-    type <- match.arg(type);
     ofv.FOCEi <- env$ofv.FOCEi;
     dat <- object
     env <- environment(ofv.FOCEi);
-    if (class(population) == "logical"){
-        if (population && type != "posthoc"){
-            old.mat <- env$inits.mat
-            assign("inits.mat", matrix(0, env$nSUB, env$nETA), env)
-            on.exit({assign("inits.mat", old.mat, env)});
-        }
-    } else if (class(population) == "matrix"){
+    if (class(population) == "matrix"){
         if (nrow(population) == env$nSUB && ncol(population) == env$nETA){
             old.mat <- env$inits.mat
             assign("inits.mat", population, env)
@@ -354,8 +354,6 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
         }
         d1 <- data.frame(ID=unique(object$ID), d1)
         return(d1)
-    } else {
-        return(unlist(lapply(attr(x,"subj"), function(s) attr(s, type))))
     }
 }
 
@@ -488,7 +486,8 @@ print.nlmixr.par.fixed <- function(x, ...){
     df$Untransformed <- sprintf("%s%s", F2(df$Untransformed, digs),
                                 ifelse(x$Estimate * 100 == x$Untransformed, "%", ""));
     df$CV <- gsub("NA", "", sprintf("%s", F2(df$CV, digs)));
-    names(df) <- gsub("CV", "CV%", names(df))
+    names(df) <- gsub("CV", "%RSE", names(df))
+    names(df) <- gsub("Untransformed", "Back-transformed", names(df))
     df$SE <- gsub("NA", "", sprintf("%s", F2(df$SE, digs)));
     ci <- attr(x, "ci")
     df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
@@ -507,6 +506,7 @@ print.nlmixr.par.fixed <- function(x, ...){
             df$Parameter[w] <- row.names(df)[w];
         }
     }
+
     print(df)
 }
 
@@ -526,73 +526,12 @@ print.nlmixr.shrink <- function(x, ...){
 ##' @param object focei.fit object
 ##' @param ... Additional arguments
 ##' @param type Residuals type fitted.
-##' @param etas ETAs matrix to use for the calculation.
 ##' @return residuals
 ##' @author Matthew L. Fidler
 ##' @export
 residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
                                 etas=NULL){
-    env <- attr(object, ".focei.env");
-    if (!is.null(etas)){
-        if (class(etas) == "matrix" && nrow(etas) == env$nSUB && ncol(etas) == env$nETA){
-            old.mat <- env$inits.mat
-            assign("inits.mat", etas, env)
-            on.exit({assign("inits.mat", old.mat, env)});
-        } else {
-            stop(sprintf("The matrix of etas specified by etas needs to be %s rows by %s columns", env$nSUB, env$nETA))
-        }
-    }
-    dat <- object;
-    DV <- dat$DV;
-    type <- match.arg(type);
-    ## up.type <- toupper(type)
-    ## if (any(up.type == names(object))){
-    ##     return(dat[, ]);
-    ## }
-    if (any(type == c("res", "wres", "cwres", "cres", "cpred", "cpredi"))){
-        ## population=TRUE => eta=0
-        if (type == "wres"){
-            ## Efo= f(|eta=0)
-            ## cov = Vfo|eta=0+Vi|eta=0
-            ## These WRES are calculated the same as Hooker 2007, but don't seem to match NONMEM.
-            pred <- fitted(object, population=TRUE)
-            ## In theory the decorrelation is done by eigenvector decomposition. However, it doens't seem to affect the WRES values.
-            ## W <- fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi")
-            ## tmp <- aggregate(W,by=list(object$ID),FUN=function(x){e <- eigen(diag(x)); return(diag(e$vectors %*% diag(sqrt(e$values)) %*% rxInv(e$vectors)))});
-            ## tmp <- data.frame(ID=tmp[,1],stack(data.frame(tmp[,-1])));
-            ## tmp <- tmp[order(tmp$ID,tmp$ind),];
-            ## tmp <- sqrt(tmp$values)
-            ## Even though it does not match NONMEM, it should be adequate metric for WRES...
-            W <- fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi")
-            return((DV - pred) / sqrt(W));
-        } else if (type == "cwres"){
-            ## According to Hooker 2007, the Vi (or the
-            ## dh/deta*Sigma*dh/deta) should be calculated under eta=0
-            ## conditions.  However, I don't think this is correct;
-            ## Neither does NONMEM; They use Vi under the post-hoc
-            ## predicted conditions
-            pred <- fitted(object, population=FALSE) - fitted(object, population=FALSE, type="dErr_dEta");
-            W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
-            return((DV - pred) / W);
-        } else if (type == "cpred"){
-            pred <- fitted(object, population=FALSE) - fitted(object, population=FALSE, type="dErr_dEta");
-            return(pred);
-        } else if (type == "cres"){
-            pred <- fitted(object, population=FALSE) - fitted(object, population=FALSE, type="dErr_dEta");
-            return(DV - pred);
-        } else {
-            pred <- fitted(object, population=TRUE);
-            return(DV - pred);
-        }
-    } else if (any(type == c("ires", "iwres"))){
-        ipred <- fitted(object, population=FALSE);
-        if (type == "iwres"){
-            W <- sqrt(fitted(object, population=FALSE, type="Vi"));
-            return((DV - ipred) / W);
-        } else {
-            return(DV - ipred);
-        }
-    }
+    return(object[, toupper(match.arg(type))]);
 }
 ##' Convert focei fit to a data.frame
 ##'
@@ -625,20 +564,7 @@ as.data.frame.focei.fit <- function(x, row.names = NULL, optional = FALSE, ...){
 ##' @export
 ##' @author Matthew L. Fidler
 simulate.focei.fit <- function(object, nsim=1, seed=NULL, ...){
-    if(!is.null(seed)){
-        set.seed(seed);
-    }
-    nsub <- length(unique(object$ID));
-    nobs <- length(object$ID);
-    do.call("rbind",
-            lapply(seq(1, nsim),
-                   function(x){
-                eta.mat <- mvtnorm::rmvnorm(nsub, sigma = object$omega, ...)
-                ipred <- fitted(object, population=eta.mat);
-                dv <- ipred + sapply(fitted(object, population=eta.mat, type="Vi"),
-                                     function(r){ return(rnorm(1, sd=sqrt(r)))});
-                return(data.frame(SIMID=x, ID=object$ID, TIME=object$TIME, DV=dv, IPRED=ipred))
-            }))
+    stop("FIXME")
 }
 ## FIXME: show?
 ## FIXME: qqnorm?
@@ -897,6 +823,7 @@ focei.fit.data.frame0 <- function(data,
                                   control=list(),
                                   theta.names=NULL,
                                   eta.names=NULL){
+
     orig.data <- data;
     do.table <- FALSE;
     sink.file <- tempfile();
@@ -2088,10 +2015,18 @@ focei.fit.data.frame0 <- function(data,
         lD <- fit$par.unscaled[-seq_along(nms)];
         rxSymEnv <-  RxODE::rxSymInv(rxSym, lD);
         fit$omega <- rxSymEnv$omega;
+        d <- sqrt(diag(fit$omega))
+        d1 <- d;
+        d <- RxODE::rxInv(diag(length(d)) * d);
+        omega.r <- d %*% fit$omega %*% d;
+        diag(omega.r) <- d1;
+
         if (length(eta.names) == dim(fit$omega)[1]){
             dimnames(fit$omega) <- list(eta.names, eta.names);
             fit$eta.names <- eta.names;
+            dimnames(omega.r) <- dimnames(fit$omega)
         }
+        fit$omega.R <- omega.r
         fit$fit.df <- fit.df;
         w <- seq_along(nms)
         if (con$NOTRUN){
