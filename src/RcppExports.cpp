@@ -7,30 +7,6 @@
 
 using namespace Rcpp;
 
-// sFOCEi
-SEXP sFOCEi(NumericVector par, Environment e);
-RcppExport SEXP _nlmixr_sFOCEi(SEXP parSEXP, SEXP eSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
-    rcpp_result_gen = Rcpp::wrap(sFOCEi(par, e));
-    return rcpp_result_gen;
-END_RCPP
-}
-// grFOCEi
-NumericVector grFOCEi(NumericVector par, Environment e);
-RcppExport SEXP _nlmixr_grFOCEi(SEXP parSEXP, SEXP eSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
-    rcpp_result_gen = Rcpp::wrap(grFOCEi(par, e));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rxGrad
 void rxGrad(SEXP rho);
 RcppExport SEXP _nlmixr_rxGrad(SEXP rhoSEXP) {
@@ -174,6 +150,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sFOCEi
+SEXP sFOCEi(NumericVector par, Environment e);
+RcppExport SEXP _nlmixr_sFOCEi(SEXP parSEXP, SEXP eSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(sFOCEi(par, e));
+    return rcpp_result_gen;
+END_RCPP
+}
+// grFOCEi
+NumericVector grFOCEi(NumericVector par, Environment e);
+RcppExport SEXP _nlmixr_grFOCEi(SEXP parSEXP, SEXP eSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(grFOCEi(par, e));
+    return rcpp_result_gen;
+END_RCPP
+}
 // lin_cmt_stan
 SEXP lin_cmt_stan(Eigen::Map<Eigen::VectorXd> obs_time, Eigen::Map<Eigen::VectorXd> dose_time, Eigen::Map<Eigen::VectorXd> dose, Eigen::Map<Eigen::VectorXd> Tinf, Eigen::Map<Eigen::VectorXd> params, SEXP oralSEXP, SEXP infusionSEXP, SEXP ncmtSEXP, SEXP parameterizationSEXP);
 RcppExport SEXP _nlmixr_lin_cmt_stan(SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP, SEXP paramsSEXP, SEXP oralSEXPSEXP, SEXP infusionSEXPSEXP, SEXP ncmtSEXPSEXP, SEXP parameterizationSEXPSEXP) {
@@ -276,6 +276,33 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type y(ySEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type params(paramsSEXP);
     rcpp_result_gen = Rcpp::wrap(llik_neg_binomial(y, params));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nlmixrParameters
+List nlmixrParameters(NumericVector theta, DataFrame eta);
+RcppExport SEXP _nlmixr_nlmixrParameters(SEXP thetaSEXP, SEXP etaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type eta(etaSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrParameters(theta, eta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nlmixrResid
+List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& dv, DataFrame etasDf, List etaLst);
+RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP dvSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List& >::type innerList(innerListSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix& >::type omegaMat(omegaMatSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type dv(dvSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type etasDf(etasDfSEXP);
+    Rcpp::traits::input_parameter< List >::type etaLst(etaLstSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrResid(innerList, omegaMat, dv, etasDf, etaLst));
     return rcpp_result_gen;
 END_RCPP
 }

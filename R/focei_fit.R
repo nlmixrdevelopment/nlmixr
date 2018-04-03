@@ -813,8 +813,6 @@ plot.focei.fit <- function(x, ...) {
 ##' @param lower Lower bounds
 ##' @param upper Upper Bounds
 ##' @param control Control list
-##' @param calculate.vars is a list of variables that will be
-##'     calculated after the FOCEI estimation is complete.
 ##' @param theta.names Names of the thetas to be used in the final object
 ##' @param eta.names Eta names to be used in the final object
 ##' @param ... Ignored parameters
@@ -831,7 +829,6 @@ focei.fit <- function(data,
                       lower= -Inf,
                       upper= Inf,
                       control=list(),
-                      calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
                       theta.names=NULL,
                       eta.names=NULL,
                       ...){
@@ -898,7 +895,6 @@ focei.fit.data.frame0 <- function(data,
                                   lower= -Inf,
                                   upper= Inf,
                                   control=list(),
-                                  calculate.vars=c("pred", "ipred", "ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
                                   theta.names=NULL,
                                   eta.names=NULL){
     orig.data <- data;
@@ -2126,51 +2122,33 @@ focei.fit.data.frame0 <- function(data,
     message("Calculating Table Variables...")
     tmp <- c()
     pt <- proc.time();
-    if (any("ipred" == calculate.vars)){
-        ## message("\tIPRED", appendLF=FALSE)
-        data$IPRED <- fitted(data, population=FALSE);
-        calculate.vars <- calculate.vars[calculate.vars != "ipred"];
-        ## message("done.")
-    }
-    if (any("pred" == calculate.vars)){
-        ## message("\tPRED", appendLF=FALSE)
-        data$PRED <- fitted(data, population=TRUE)
-        calculate.vars <- calculate.vars[calculate.vars != "pred"];
-        ## message("done.")
-    }
-    fit$eps.shrink <- NA
-    fit$eta.shrink <- NA
-    for (v in calculate.vars){
-        if (v != "pred"){
-            ## message(sprintf("\t%s", v), appendLF=FALSE)
-            data[, toupper(v)] <- resid(data, type=v);
-            ## message("done.")
-            if (v == "iwres"){
-                ## Now add shrinkages.
-                fit$eps.shrink <- structure((1 - stats::sd(data$IWRES)) * 100, .Names="eps", class="nlmixr.shrink");
-            }
-        }
-    }
-    if (con$add.posthoc){
-        etas <- fitted(data, type="posthoc")
-        data <- merge(data, etas);
-        ## Drops the class/environment; Put back in.
-        attr(data, ".focei.env") <- env;
-        class(data) <- c("focei.fit", "data.frame")
-        ## Adapted
-        om <- diag(fit$omega)
-        d <- etas[,-1, drop = FALSE]
-        eshr <- sapply(seq_along(om), function(i){
-            return((1 - (stats::sd(d[,i]) / sqrt(om[i])))*100);
-        })
-        names(eshr) <- names(d);
-        class(eshr) <- "nlmixr.shrink"
-        fit$eta.shrink <- eshr;
-    }
+    ## fit$eps.shrink <- NA
+    ## fit$eta.shrink <- NA
+    ## if (con$add.posthoc){
+    ##     etas <- fitted(data, type="posthoc")
+    ##     data <- merge(data, etas);
+    ##     ## Drops the class/environment; Put back in.
+    ##     attr(data, ".focei.env") <- env;
+    ##     class(data) <- c("focei.fit", "data.frame")
+
+    ##     ## Adapted
+    ##     om <- diag(fit$omega)
+    ##     d <- etas[,-1, drop = FALSE]
+    ##     eshr <- sapply(seq_along(om), function(i){
+    ##         return((1 - (stats::sd(d[,i]) / sqrt(om[i])))*100);
+    ##     })
+    ##     names(eshr) <- names(d);
+    ##     class(eshr) <- "nlmixr.shrink"
+    ##     fit$eta.shrink <- eshr;
+    ## }
 
 
     ## FIXME -- add lhs/state variables to the data-frame.
     ## data <- merge(data, m);
+    res <- calc.resid.fit(data, orig.data)
+    fit$eta.shrink <- res[[2]];
+    data <- cbind(as.data.frame(data), res[[1]]);
+
     table.time <- proc.time() - pt;
     fit$table.time <- table.time;
     fit$data.names <- names(data);
@@ -2183,6 +2161,8 @@ focei.fit.data.frame0 <- function(data,
     model <- old.model;
     fit$model <- model;
     message("done")
+    attr(data, ".focei.env") <- env
+    class(data) <- c("focei.fit", "data.frame")
     data
 }
 

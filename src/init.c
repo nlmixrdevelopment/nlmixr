@@ -48,6 +48,8 @@ extern SEXP _nlmixr_rxOuter(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxUpdateEtas(SEXP DnDhSSEXP, SEXP DhSSEXP, SEXP initSSEXP, SEXP acceptNSSEXP);
 extern SEXP _nlmixr_chkSolvedInf(SEXP, SEXP);
 extern SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time);
+extern SEXP _nlmixr_nlmixrParameters(SEXP, SEXP);
+extern SEXP _nlmixr_nlmixrResid(SEXP, SEXP, SEXP,SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
@@ -85,6 +87,8 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_sFOCEi",(DL_FUNC) &_nlmixr_sFOCEi, 2},
   {"_nlmixr_chkSortIDTime",(DL_FUNC) &_nlmixr_chkSortIDTime, 2},
   {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
+  {"_nlmixr_nlmixrParameters", (DL_FUNC) &_nlmixr_nlmixrParameters, 2},
+  {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 5},
   {NULL, NULL, 0}
 };
 
