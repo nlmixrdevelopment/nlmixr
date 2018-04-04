@@ -24,8 +24,10 @@ List nlmixrParameters(NumericVector theta, DataFrame eta){
   unsigned int k = theta.size();
   unsigned int n, n1;
   double M1, M2, M3, M4, delta, delta_n, delta_n2, term1;
-  // Create data frame for ETA mean, sd, variance, kurtosis and skewness
-  List etadf(eta2.ncol());
+  // Create data frame for ETA/EPS mean, sd, variance, kurtosis and skewness
+  List etadf(eta2.ncol()+1);
+  NumericVector cur1(5);
+  etadf[eta2.ncol()]=cur1;
   for (j=eta2.ncol();j--;){
     pred[k+j]=0;
     predn[k+j] = "ETA[" + std::to_string(j+1) + "]";
@@ -87,7 +89,11 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
     om =omegaMat(j,j);
     cur[4]= (1.0-cur[1]/sqrt(om))*100.0;
   }
-  etaLst.attr("names") = (as<List>(omegaMat.attr("dimnames")))[1];
+  CharacterVector dimN= (as<List>(omegaMat.attr("dimnames")))[1];
+  CharacterVector dimN2(dimN.size()+1);
+  dimN2[dimN.size()] = "IWRES";
+  std::copy(dimN.begin(),dimN.end(),dimN2.begin());
+  etaLst.attr("names") = dimN2;
   etaLst.attr("row.names") = CharacterVector::create("mean","sd","skewness", "kurtosis","shrinkage (%)");
   etaLst.attr("class") = "data.frame";
   pred.erase(0,neta);
@@ -204,13 +210,34 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   // ipred.erase(0,neta);
   // rp(_,0) = NumericVector(pred[0]);
   // ri(_,0) = NumericVector(ipred[0]);
+
+  NumericVector iwres=(dv-iprednv)/sqrt(ri);
+  NumericVector stat=etaLst[neta];
+  unsigned int n =0, n1 = 0;
+  double M1 =  0, M2 = 0, M3 = 0, M4 =0, term1, delta, delta_n, delta_n2;
+  for (unsigned int i = iprednv.size(); i--;){
+    n1=n; n++;
+    delta = iwres[i] - M1;
+    delta_n = delta / n;
+    delta_n2 = delta_n * delta_n;
+    term1 = delta * delta_n * n1;
+    M1 += delta_n;
+    M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
+    M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
+    M2 += term1;
+  }
+  stat[0] = M1;
+  stat[1] = sqrt(M2/((double)n1));
+  stat[2] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
+  stat[3] = (double)(n)*M4 / (M2*M2) - 3.0;
+  stat[4] = (1-stat[1])*100;
   List ret(3);
   ret[0] = DataFrame::create(_["PRED"]=prednv,
                              _["RES"]=res,
                              _["WRES"]=wrap(wres),
                              _["IPRED"]=iprednv,
                              _["IRES"]=dv-iprednv,
-                             _["IWRES"]=(dv-iprednv)/sqrt(ri),
+                             _["IWRES"]=iwres,
                              _["CPRED"]=cpred,
                              _["CRES"]=cres,
                              _["CWRES"]=cwres);

@@ -454,7 +454,23 @@ fixef.focei.fit <- function(object, ...){
                             sprintf("%s", formatC(signif(sqrt(v),digits=digs), digits=digs,format="fg", flag="#"))
                         }
                     })
-                    df <- data.frame(df, BSV.cv.sd=cvp, check.names=FALSE);
+                    shrink <- object$shrink;
+                    errs <- as.data.frame(uif$ini);
+                    errs <- paste(errs[which(!is.na(errs$err)), "name"]);
+                    sh <- sapply(row.names(df), function(x){
+                        y <- mu.ref[x];
+                        if (is.na(y)) {
+                            if (any(x == errs)){
+                                v <- shrink[5, "IWRES"];
+                            } else {
+                                return(" ")
+                            }
+                        } else {
+                            v <- shrink[5, y];
+                        }
+                        sprintf("%s%%", formatC(signif(v, digits=digs),digits=digs,format="fg", flag="#"));
+                    })
+                    df <- data.frame(df, BSV.cv.sd=cvp, "Shrink%"=sh, check.names=FALSE);
                 }
                 if (!is(object, "nlmixr.ui.focei.posthoc")){
                     df <- data.frame(df,
@@ -2089,27 +2105,8 @@ focei.fit.data.frame0 <- function(data,
     message("Calculating Table Variables...")
     tmp <- c()
     pt <- proc.time();
-    ## fit$eps.shrink <- NA
-    ## fit$eta.shrink <- NA
-    ## if (con$add.posthoc){
-    ##     etas <- fitted(data, type="posthoc")
-    ##     data <- merge(data, etas);
-    ##     ## Drops the class/environment; Put back in.
-    ##     attr(data, ".focei.env") <- env;
-    ##     class(data) <- c("focei.fit", "data.frame")
-
-    ##     ## Adapted
-    ##     om <- diag(fit$omega)
-    ##     d <- etas[,-1, drop = FALSE]
-    ##     eshr <- sapply(seq_along(om), function(i){
-    ##         return((1 - (stats::sd(d[,i]) / sqrt(om[i])))*100);
-    ##     })
-    ##     names(eshr) <- names(d);
-    ##     class(eshr) <- "nlmixr.shrink"
-    ##     fit$eta.shrink <- eshr;
-    ## }
     res <- calc.resid.fit(data, orig.data)
-    fit$eta.shrink <- res[[2]];
+    fit$shrink <- res[[2]];
     data <- cbind(as.data.frame(data), res[[1]], res[[3]], res[[4]]);
     table.time <- proc.time() - pt;
     fit$table.time <- table.time;
