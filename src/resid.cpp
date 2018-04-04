@@ -77,7 +77,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   NumericMatrix fpi(iprednv.size(),neta);
   NumericMatrix rpp(iprednv.size(),neta);
   NumericMatrix rpi(iprednv.size(),neta);
-  unsigned int j;
+  unsigned int i, j;
   double om;
   for (j = neta;j--;){
     NumericVector cur = etaLst[j];
@@ -100,7 +100,13 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   etasDf1.erase(0);
   unsigned int nid=etasDf.nrows();
   NumericMatrix etas1(nid,neta);
+  List etasDfFull(etasDf1.size());
+  etasDfFull.names()=etasDf1.names();
+  etasDfFull.attr("row.names")=IntegerVector::create(NA_INTEGER,-iprednv.size());
+  etasDfFull.attr("class") = "data.frame";
   for (j = neta; j--;){
+    NumericVector cur(iprednv.size(),NA_REAL);
+    etasDfFull[j]= cur;
     etas1(_,j)=NumericVector(etasDf1[j]);
   }
   arma::mat etas = as<arma::mat>(etas1);
@@ -134,8 +140,18 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   NumericVector dErr_dEta_p(fppm.n_rows, NA_REAL);
   NumericVector dErr_dEta_i(fppm.n_rows, NA_REAL);
   int lastId = ID[ID.size()-1], lastCol = nid-1, lastIndex=ID.size()-1;
+  // List etaFull(neta);
+  int etaFulli = nid-1;
+  double curEta=0.0;
   for (j = fppm.n_rows; j--; ){
     if (lastId != ID[j]){
+      // Fill in full eta data frame
+      for (i = neta; i--;){
+	curEta = (as<NumericVector>(etasDf1[i]))[etaFulli];
+	NumericVector cur = etasDfFull[i];
+	std::fill_n(cur.begin()+j+1,lastIndex-j,curEta);
+      }
+      etaFulli--;
       // FIXME do it without copy?
       arma::vec tmp = fppm.rows(j+1, lastIndex) * trans(etas.row(lastCol));
       std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin()+j+1);
@@ -145,6 +161,13 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
       lastIndex=j;
       lastCol--;
       if (lastCol == 0){
+	// Finalize ETA
+        for (i = neta; i--;){
+	  curEta = (as<NumericVector>(etasDf1[i]))[0];
+	  NumericVector cur = etasDfFull[i];
+	  std::fill_n(cur.begin(),lastIndex+1,curEta);
+	}
+	// Finalize dErr_dEta
 	arma::vec tmp = fppm.rows(0, lastIndex) * trans(etas.row(lastCol));
         std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin());
         tmp = fpim.rows(0, lastIndex) * trans(etas.row(lastCol));
@@ -181,7 +204,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   // ipred.erase(0,neta);
   // rp(_,0) = NumericVector(pred[0]);
   // ri(_,0) = NumericVector(ipred[0]);
-  List ret(2);
+  List ret(3);
   ret[0] = DataFrame::create(_["PRED"]=prednv,
                              _["RES"]=res,
                              _["WRES"]=wrap(wres),
@@ -192,5 +215,6 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
                              _["CRES"]=cres,
                              _["CWRES"]=cwres);
   ret[1] = etaLst;
+  ret[2] = etasDfFull;
   return ret;
 }

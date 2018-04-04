@@ -728,7 +728,7 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
                                     inits.mat=mat,
                                     cores=1,
                                     find.best.eta=FALSE,
-                                    numeric=(!is.null(uif$nmodel$lin.solved)),
+                                    ## numeric=(!is.null(uif$nmodel$lin.solved)),
                                     sum.prod=uif$env$sum.prod));
     ome <- fit.f$omega;
     w <- which(!is.na(uif.new$ini$neta1))

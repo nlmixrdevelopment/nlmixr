@@ -59,7 +59,7 @@ print(fit)
 We can alternatively express the same model by ordinary differential equations (ODEs):
 
 ```{r}
-uif <- function() {
+one.compartment.saem <- function() {
     ini({
         tka <- .5
         tcl <- -3.2
@@ -84,7 +84,7 @@ uif <- function() {
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```r
-fit <- nlmixr(uif, theo_sd, est="saem")
+fit <- nlmixr(one.compartment.saem, theo_sd, est="saem")
 ```
 
 ```c

@@ -9,10 +9,6 @@ rxGrad <- function(rho) {
     invisible(.Call(`_nlmixr_rxGrad`, rho))
 }
 
-rxInnerNum <- function(etanews, rho) {
-    invisible(.Call(`_nlmixr_rxInnerNum`, etanews, rho))
-}
-
 rxInner <- function(etanews, rho) {
     invisible(.Call(`_nlmixr_rxInner`, etanews, rho))
 }

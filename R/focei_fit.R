@@ -958,7 +958,6 @@ focei.fit.data.frame0 <- function(data,
         sum.prod=TRUE,
         theta.grad=FALSE,
         scale.to=1,
-        numeric=FALSE,
         optim="L-BFGS-B"
     )
 
@@ -1036,8 +1035,7 @@ focei.fit.data.frame0 <- function(data,
     ## print(th0.om)
     model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=con$grad,
                                      pred.minus.dv=con$pred.minus.dv, sum.prod=con$sum.prod,
-                                     theta.derivs=con$theta.grad, run.internal=TRUE,
-                                     only.numeric=con$numeric);
+                                     theta.derivs=con$theta.grad, run.internal=TRUE);
     ## rxCat(model$inner);
     if (!con$NOTRUN){
         message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
@@ -2087,9 +2085,6 @@ focei.fit.data.frame0 <- function(data,
     con$cores <- 1; ## don't run parallel for extracting information
     find.best.eta <- FALSE;
     print.grad <- FALSE; ## Turn off slow gradient calculation
-    old.model <- model;
-    model$theta <- NULL;
-    model$outer <- NULL;
     do.table <- TRUE
     message("Calculating Table Variables...")
     tmp <- c()
@@ -2115,7 +2110,7 @@ focei.fit.data.frame0 <- function(data,
     ## }
     res <- calc.resid.fit(data, orig.data)
     fit$eta.shrink <- res[[2]];
-    data <- cbind(as.data.frame(data), res[[1]], res[[3]]);
+    data <- cbind(as.data.frame(data), res[[1]], res[[3]], res[[4]]);
     table.time <- proc.time() - pt;
     fit$table.time <- table.time;
     fit$data.names <- names(data);
@@ -2125,7 +2120,6 @@ focei.fit.data.frame0 <- function(data,
                            covariance=fit$cov.time["elapsed"],
                            table=fit$table.time["elapsed"],
                            row.names="");
-    model <- old.model;
     fit$model <- model;
     message("done")
     attr(data, ".focei.env") <- env

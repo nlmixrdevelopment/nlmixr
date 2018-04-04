@@ -34,7 +34,6 @@ rxFoceiEtaSetup <- function(object, ..., dv, eta, theta, nonmem=FALSE, table=TRU
         setup$rc <- 0L;
         setup$switch.solver <- as.integer(switch.solver);
         setup$pred.minus.dv <- as.integer(pred.minus.dv);
-        setup$numeric <- as.integer(numeric)
         if (!is.null(inits.vec)){
             setup$inits.vec <- inits.vec;
         }
@@ -241,16 +240,8 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
     args$eta <- eta
     args$eta.bak <- eta.bak
     args$estimate <- estimate
-    if (!any(names(args) == "numeric")){
-        args$numeric <- FALSE;
-    }
-    if (args$numeric){
-        inner.rxode <- object$pred.only;
-        inner.rxode$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
-    } else {
-        inner.rxode <- object$inner;
-        inner.rxode$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
-    }
+    inner.rxode <- object$inner;
+    inner.rxode$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
     args$object <- inner.rxode;
     env <- do.call(getFromNamespace("rxFoceiEtaSetup", "nlmixr"), args, envir = parent.frame(1));
 
@@ -285,11 +276,7 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
                 args$vars <- rep(0, length(args$eta));
                 output <- est0();
                 if (inherits(output, "try-error")){
-                    if (env$numeric == 1){
-                        output <- rxInnerNum(rep(0, length(args$eta)), env);
-                    } else {
-                        output <- rxInner(rep(0, length(args$eta)), env);
-                    }
+                    output <- rxInner(rep(0, length(args$eta)), env);
                 }
             }
             return(output);

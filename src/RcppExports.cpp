@@ -17,17 +17,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// rxInnerNum
-void rxInnerNum(SEXP etanews, SEXP rho);
-RcppExport SEXP _nlmixr_rxInnerNum(SEXP etanewsSEXP, SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type etanews(etanewsSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rxInnerNum(etanews, rho);
-    return R_NilValue;
-END_RCPP
-}
 // rxInner
 void rxInner(SEXP etanews, SEXP rho);
 RcppExport SEXP _nlmixr_rxInner(SEXP etanewsSEXP, SEXP rhoSEXP) {

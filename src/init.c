@@ -34,7 +34,6 @@ extern SEXP _nlmixr_sFOCEi(SEXP, SEXP);
 // FOCEi
 extern SEXP _nlmixr_rxGrad(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxInner(SEXP etanewsSEXP, SEXP rhoSEXP);
-extern SEXP _nlmixr_rxInnerNum(SEXP etanewsSEXP, SEXP rhoSEXP);
 extern SEXP _nlmixr_rxHessian(SEXP rhoSEXP);
 extern SEXP _nlmixr_RxODE_focei_eta_lik(SEXP sexp_etaSEXP, SEXP sexp_rhoSEXP);
 extern SEXP _nlmixr_RxODE_focei_eta_lp(SEXP sexp_etaSEXP, SEXP sexp_rhoSEXP);
@@ -60,7 +59,6 @@ static const R_CMethodDef CEntries[] = {
 static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_chkSolvedInf",(DL_FUNC) &_nlmixr_chkSolvedInf, 2},
   {"_nlmixr_rxInner", (DL_FUNC) &_nlmixr_rxInner, 2},
-  {"_nlmixr_rxInnerNum", (DL_FUNC) &_nlmixr_rxInnerNum, 2},
   {"_nlmixr_rxGrad", (DL_FUNC) &_nlmixr_rxGrad, 1},
   {"_nlmixr_rxHessian", (DL_FUNC) &_nlmixr_rxHessian, 1},
   {"_nlmixr_RxODE_focei_eta_lik", (DL_FUNC) &_nlmixr_RxODE_focei_eta_lik, 2},
