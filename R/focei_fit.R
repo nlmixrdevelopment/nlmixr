@@ -291,7 +291,6 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
     if (env$con$eigen){
         fit$eigen <- eigen(fit$cov,TRUE,TRUE)$values;
         tmp <- sapply(fit$eigen, abs)
-        print(tmp);
         fit$condition.number <- max(tmp) / min(tmp);
     }
     assign("fit", fit, env);
