@@ -8,6 +8,13 @@ calc.resid.fit <- function(fit, data){
     ## Add Empirical Bayes Estimates
     df <- rxSolve(fit$env$model$ebe, pars$ipred,data,return.type="data.frame")[, -(1:2)];
     df <- df[, !(names(df) %in% (c("nlmixr_pred", names(etas), names(thetas))))]
+    if (any(names(df) %in% names(lst[[1]]))){
+        warning("Calculated residuals like IPRED are masked by nlmixr calculated values");
+        df <- df[, !(names(df) %in% names(lst[[1]]))];
+    }
+    if (any(names(df) %in% names(lst[[3]]))){
+        df <- df[, !(names(df) %in% names(lst[[3]]))];
+    }
     lst[[4]] <- df;
     return(lst);
 }
