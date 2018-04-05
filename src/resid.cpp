@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <RcppArmadillo.h>
 #include <R.h>
+#include <Rmath.h>
 #include "nlmixr_types.h"
 
 using namespace Rcpp;
@@ -26,7 +27,7 @@ List nlmixrParameters(NumericVector theta, DataFrame eta){
   double M1, M2, M3, M4, delta, delta_n, delta_n2, term1;
   // Create data frame for ETA/EPS mean, sd, variance, kurtosis and skewness
   List etadf(eta2.ncol()+1);
-  NumericVector cur1(5);
+  NumericVector cur1(9);
   etadf[eta2.ncol()]=cur1;
   for (j=eta2.ncol();j--;){
     pred[k+j]=0;
@@ -38,7 +39,7 @@ List nlmixrParameters(NumericVector theta, DataFrame eta){
     // this problem.
     n =0; n1 = 0;
     M1 =  M2 = M3 = M4 =0;
-    NumericVector stat(5);
+    NumericVector stat(9);
     for (unsigned int i = eta.nrow(); i--;){
       n1=n; n++;
       delta = cur[i] - M1;
@@ -51,9 +52,10 @@ List nlmixrParameters(NumericVector theta, DataFrame eta){
       M2 += term1;
     }
     stat[0] = M1;
-    stat[1] = sqrt(M2/((double)n1));
-    stat[2] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
-    stat[3] = (double)(n)*M4 / (M2*M2) - 3.0;
+    stat[1] = M2/((double)n1);
+    stat[2] = sqrt(stat[1]);
+    stat[3] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
+    stat[4] = (double)(n)*M4 / (M2*M2) - 3.0;
     etadf[j] = stat;
   }
   pred.names() = predn;
@@ -81,20 +83,25 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   NumericMatrix rpi(iprednv.size(),neta);
   unsigned int i, j;
   double om;
+  unsigned int nid=etasDf.nrows();
+  double tc = sqrt(nid);
   for (j = neta;j--;){
     NumericVector cur = etaLst[j];
     fpp(_,j) = NumericVector(pred[j]);
     fpi(_,j) = NumericVector(ipred[j]);
     // Finalize by adding shrinkage.
     om =omegaMat(j,j);
-    cur[4]= (1.0-cur[1]/sqrt(om))*100.0;
+    cur[5]= (1.0-cur[1]/om)*100.0;
+    cur[6]= (1.0-cur[2]/sqrt(om))*100.0;
+    cur[7] = cur[0]*tc/(cur[2]);
+    cur[8] = 2*Rf_pt(-fabs(cur[7]),(double)(nid-1),1,0);
   }
   CharacterVector dimN= (as<List>(omegaMat.attr("dimnames")))[1];
   CharacterVector dimN2(dimN.size()+1);
   dimN2[dimN.size()] = "IWRES";
   std::copy(dimN.begin(),dimN.end(),dimN2.begin());
   etaLst.attr("names") = dimN2;
-  etaLst.attr("row.names") = CharacterVector::create("mean","sd","skewness", "kurtosis","shrinkage (%)");
+  etaLst.attr("row.names") = CharacterVector::create("mean","var","sd","skewness", "kurtosis","var shrinkage (%)", "sd shrinkage (%)","t statistic","p-value");
   etaLst.attr("class") = "data.frame";
   pred.erase(0,neta);
   ipred.erase(0,neta);
@@ -104,7 +111,6 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   arma::vec riv = as<arma::vec>(ri);
   DataFrame etasDf1 = etasDf;
   etasDf1.erase(0);
-  unsigned int nid=etasDf.nrows();
   NumericMatrix etas1(nid,neta);
   List etasDfFull(etasDf1.size());
   etasDfFull.names()=etasDf1.names();
@@ -227,10 +233,14 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
     M2 += term1;
   }
   stat[0] = M1;
-  stat[1] = sqrt(M2/((double)n1));
-  stat[2] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
-  stat[3] = (double)(n)*M4 / (M2*M2) - 3.0;
-  stat[4] = (1-stat[1])*100;
+  stat[1] = M2/((double)n1);
+  stat[2] = sqrt(stat[1]);
+  stat[3] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
+  stat[4] = (double)(n)*M4 / (M2*M2) - 3.0;
+  stat[5] = (1-stat[1])*100;
+  stat[6] = (1-stat[2])*100;
+  stat[7] = M1*sqrt((double)n)/stat[2];
+  stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
   List ret(3);
   ret[0] = DataFrame::create(_["PRED"]=prednv,
                              _["RES"]=res,

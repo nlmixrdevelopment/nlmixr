@@ -1,3 +1,10 @@
+regFloat1 <- rex::rex(or(group(some_of("0":"9"), ".", any_of("0":"9")),
+                         group(any_of("0":"9"), ".", some_of("0":"9"))),
+                      maybe(group(one_of("E", "e"), maybe(one_of("+", "-")), some_of("0":"9"))));
+regFloat2 <- rex::rex(some_of("0":"9"), one_of("E", "e"), maybe(one_of("-", "+")), some_of("0":"9"));
+regDecimalint <- rex::rex(or("0", group("1":"9", any_of("0":"9"))))
+regNum <- rex::rex(maybe("-"), or(regDecimalint, regFloat1, regFloat2))
+
 ##' Construct RxODE linCmt function
 ##'
 ##' @param fun function to convert to solveC syntax
@@ -201,6 +208,8 @@ print.focei.fit <- function(x, ...) {
             message("\n  Correlations in between subject variability (BSV) matrix")
         }
         message(paste0("  Full BSV covariance (", crayon::yellow(bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(bound), crayon::bold$blue("$omega.R"), "; diagonals=SDs) available"));
+        message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+                       crayon::yellow(bound), crayon::bold$blue("$shrink")));
 
         message(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object", ifelse(bound == "", "", " "),
                                               crayon::yellow(bound),
@@ -289,9 +298,12 @@ vcov.focei.fit <- function(object, ..., type=c("", "r.s", "s", "r")){
     fit$par.data.frame <- data.frame(est=fit$theta, se=fit$se[w], "%cv"=abs(fit$se[w] / fit$theta * 100),
                                      check.names=FALSE, row.names=nms);
     if (env$con$eigen){
-        fit$eigen <- eigen(fit$cov,TRUE,TRUE)$values;
-        tmp <- sapply(fit$eigen, abs)
-        fit$condition.number <- max(tmp) / min(tmp);
+        eig <- try(eigen(fit$cov,TRUE,TRUE)$values, silent=TRUE);
+        if (!inherits(eig, "try-error")){
+            fit$eigen <- eig
+            tmp <- sapply(fit$eigen, abs)
+            fit$condition.number <- max(tmp) / min(tmp);
+        }
     }
     assign("fit", fit, env);
     return(fit$cov);
@@ -460,16 +472,23 @@ fixef.focei.fit <- function(object, ...){
                         y <- mu.ref[x];
                         if (is.na(y)) {
                             if (any(x == errs)){
-                                v <- shrink[5, "IWRES"];
+                                v <- shrink[7, "IWRES"];
                             } else {
                                 return(" ")
                             }
                         } else {
-                            v <- shrink[5, y];
+                            v <- shrink[7, y];
                         }
-                        sprintf("%s%%", formatC(signif(v, digits=digs),digits=digs,format="fg", flag="#"));
+                        t <- ">"
+                        if (v < 0){
+                        } else  if (v < 20){
+                            t <- "<"
+                        } else if (v < 30){
+                            t <- "="
+                        }
+                        sprintf("%s%%%s", formatC(signif(v, digits=digs),digits=digs,format="fg", flag="#"), t);
                     })
-                    df <- data.frame(df, BSV.cv.sd=cvp, "Shrink%"=sh, check.names=FALSE);
+                    df <- data.frame(df, BSV.cv.sd=cvp, "Shrink(SD)%"=sh, check.names=FALSE);
                 }
                 if (!is(object, "nlmixr.ui.focei.posthoc")){
                     df <- data.frame(df,
@@ -525,30 +544,29 @@ print.nlmixr.par.fixed <- function(x, ...){
         df$SE <- F2(df$SE, digs);
         df$CV <- paste0(FFP(df$CV, digs.cv))
     }
-    df$Untransformed <- sprintf("%s%s", F2(df$Untransformed, digs),
-                                ifelse(x$Estimate * 100 == x$Untransformed, "%", ""));
+    ci <- attr(x, "ci")
+    df$Untransformed <- sprintf("%s%s %s%s%s%s%s", F2(df$Untransformed, digs),
+                                ifelse(x$Estimate * 100 == x$Untransformed, "%", ""),
+                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
+                                F2(df$Lower.ci, digs),
+                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
+                                F2(df$Upper.ci, digs),
+                                ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
     df$CV <- gsub("NA", "", sprintf("%s", F2(df$CV, digs)));
     names(df) <- gsub("CV", "%RSE", names(df))
-    names(df) <- gsub("Untransformed", "Back-transformed", names(df))
+    names(df) <- gsub("Untransformed", sprintf("Back-transformed(%s%%CI)", ci * 100), names(df))
     if (any(names(df) == "BSV.cv.sd")){
         tmp <- df$BSV.cv.sd
         tmp <- tmp[tmp != " "];
         if (all(regexpr(rex::rex("%", end), tmp) != -1)){
-            names(df) <- gsub("BSV.cv.sd", "BSV CV%", names(df));
+            names(df) <- gsub("BSV.cv.sd", "BSV(CV%)", names(df));
         } else if (all(regexpr(rex::rex("%", end), tmp) == -1)){
-            names(df) <- gsub("BSV.cv.sd", "BSV SD", names(df));
+            names(df) <- gsub("BSV.cv.sd", "BSV(SD)", names(df));
         } else {
-            names(df) <- gsub("BSV.cv.sd", "BSV CV% or SD", names(df));
+            names(df) <- gsub("BSV.cv.sd", "BSV(CV% or SD)", names(df));
         }
     }
     df$SE <- gsub("NA", "", sprintf("%s", F2(df$SE, digs)));
-    ci <- attr(x, "ci")
-    df[, sprintf("(%s%%CI)", ci * 100)] <- sprintf("%s%s%s%s%s",
-                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", "("),
-                                                   F2(df$Lower.ci, digs),
-                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ", "),
-                                                   F2(df$Upper.ci, digs),
-                                                   ifelse(is.na(df$Lower.ci) | is.na(df$Lower.ci), "", ")"));
     df <- df[, regexpr("[.]ci", names(df)) == -1]
     if (all(df$Parameter == "")){
         df <- df[, -1];
@@ -559,7 +577,18 @@ print.nlmixr.par.fixed <- function(x, ...){
             df$Parameter[w] <- row.names(df)[w];
         }
     }
-    print(df)
+    pdf <- R.utils::captureOutput(print(df));
+    if (crayon::has_color()){
+        pdf <- gsub(rex::rex(capture(regNum), "%>"), "\033[1m\033[31m\\1%\033[39m\033[22m ", pdf, perl=TRUE)
+        pdf <- gsub(rex::rex(capture(regNum), "%="), "\033[1m\033[32m\\1%\033[39m\033[22m ", pdf, perl=TRUE)
+        pdf <- gsub(rex::rex(capture(regNum), "%<"), "\\1% ", pdf, perl=TRUE)
+        pdf <- gsub(rex::rex(capture(or(c(row.names(df), names(df))))), "\033[1m\\1\033[22m", pdf, perl=TRUE);
+    } else {
+        pdf <- gsub(rex::rex(capture(regNum), "%", or(">", "=", "<")), "\\1% ", pdf, perl=TRUE)
+    }
+    pdf <- paste(pdf, collapse="\n");
+    message(pdf)
+    return(invisible(df))
 }
 
 ##'@export

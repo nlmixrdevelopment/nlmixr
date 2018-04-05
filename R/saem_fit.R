@@ -1316,9 +1316,12 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     env$fit$time <- tmp;
     env$uif <- uif;
     env$uif.new <- uif.new;
-    env$fit$eigen <- eigen(object$Ha,TRUE,TRUE)$values;
-    tmp <- sapply(fit.f$eigen, abs)
-    env$fit$condition.number <- max(tmp) / min(tmp);
+    eig <- try(eigen(object$Ha,TRUE,TRUE)$values, silent=TRUE);
+    if (!inherits(eig, "try-error")){
+        env$fit$eigen <- eigen(object$Ha,TRUE,TRUE)$values;
+        tmp <- sapply(fit.f$eigen, abs)
+        env$fit$condition.number <- max(tmp) / min(tmp);
+    }
     class(fit.f) <- c("nlmixr.ui.saem", class(fit.f))
     return(fit.f)
 }

@@ -2,6 +2,7 @@ calc.resid.fit <- function(fit, data){
     etas <- random.effects(fit);
     thetas <- fixed.effects(fit);
     pars <- .Call(`_nlmixr_nlmixrParameters`, thetas, etas);
+    print(pars$ipred)
     preds <- list(ipred=rxSolve(fit$env$model$inner, pars$ipred,data,return.type="data.frame"),
                   pred=rxSolve(fit$env$model$inner, pars$pred,data,return.type="data.frame"));
     lst <- .Call(`_nlmixr_nlmixrResid`, preds,fit$omega, fit$DV, etas, pars$eta.lst);
