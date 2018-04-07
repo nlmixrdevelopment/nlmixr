@@ -39,4 +39,3 @@ vpc.nlme = function (fit, nsim = 100, by = NULL, ...)
     invisible(df)
 }
 
-vpc.nlme(fit)
