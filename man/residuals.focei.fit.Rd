@@ -13,8 +13,6 @@
 \item{...}{Additional arguments}
 
 \item{type}{Residuals type fitted.}
-
-\item{etas}{ETAs matrix to use for the calculation.}
 }
 \value{
 residuals

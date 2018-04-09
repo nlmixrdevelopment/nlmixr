@@ -5,8 +5,9 @@
 \title{Fit nlme-based mixed-effect model using ODE implementation}
 \usage{
 nlme_ode(dat.o, model, par_model, par_trans, response, response.scaler = NULL,
-  transit_abs = FALSE, atol = 1e-08, rtol = 1e-08, debugODE = FALSE,
-  mc.cores = 1, ...)
+  transit_abs = FALSE, atol = 1e-08, rtol = 1e-08, maxsteps = 5000,
+  hmin = 0, hmax = NULL, hini = 0, maxordn = 12, maxords = 5,
+  debugODE = FALSE, mc.cores = 1, ...)
 }
 \arguments{
 \item{dat.o}{data to be fitted}

@@ -11,9 +11,7 @@
 \usage{
 focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
   model = NULL, pred = NULL, err = NULL, lower = -Inf, upper = Inf,
-  control = list(), calculate.vars = c("pred", "ipred", "ires", "res",
-  "iwres", "wres", "cwres", "cpred", "cres"), theta.names = NULL,
-  eta.names = NULL, ...)
+  control = list(), theta.names = NULL, eta.names = NULL, ...)
 
 \method{focei.fit}{nlmixr.ui.nlme}(data, inits, ...)
 
@@ -46,9 +44,6 @@ be estimated.  This can be "sqrt" "log" or "identity"}
 \item{upper}{Upper Bounds}
 
 \item{control}{Control list}
-
-\item{calculate.vars}{is a list of variables that will be
-calculated after the FOCEI estimation is complete.}
 
 \item{theta.names}{Names of the thetas to be used in the final object}
 

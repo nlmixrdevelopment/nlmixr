@@ -40,11 +40,13 @@ computation.  In Monolix this is equivalent to \code{L}}
 
 \item{atol}{a numeric absolute tolerance (1e-08 by default) used
 by the ODE solver to determine if a good solution has been
-achieved;}
+achieved;  This is also used in the solved linear model to check
+if prior doses do not add anything to the solution.}
 
 \item{rtol}{a numeric relative tolerance (1e-06 by default) used
 by the ODE solver to determine if a good solution has been
-achieved.}
+achieved. This is also used in the solved linear model to check
+ if prior doses do not add anything to the solution.}
 
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
     the ODE system is stiff or not.

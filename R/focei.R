@@ -285,9 +285,7 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
             ## ret <- rxInner(args$eta, env);
             ## print(as.list(env))
             if (inherits(ret, "try-error")){
-                pred.only <- object$pred.only;
-                pred.only$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
-                ret <- R.utils::captureOutput(rxInnerNum(args$eta, env)); ## Use finite difference instead.
+                stop("Cannot Solve")
             }
             return(ret);
         }
@@ -354,17 +352,7 @@ rxFoceiInner <- function(object, ..., dv, eta, c.hess=NULL, eta.bak=NULL,
                 attr(ret, "corrected") <- 1L;
             } else {
                 if (inherits(ret, "try-error")){
-                    cat("Hessian:\n");
-                    print(env$H)
-                    cat("log.det.H.neg.5:\n");
-                    print(env$log.det.H.neg.5)
-                    cat("log.det.OMGAinv.5:\n");
-                    print(env$log.det.OMGAinv.5)
-                    ## Try with numeric differences instead.
-                    pred.only <- object$pred.only;
-                    pred.only$assignPtr(); ## Assign the ODE pointers (and Jacobian Type)
-                    rxInnerNum(args$eta, env); ## Use finite difference instead.
-                    ret <- RxODE_focei_finalize_llik(env)
+                    stop("Cannot solve");
                 }
             }
         }

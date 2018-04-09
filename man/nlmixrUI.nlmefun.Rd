@@ -4,15 +4,31 @@
 \alias{nlmixrUI.nlmefun}
 \title{Create the nlme parameter transform function from the UI object.}
 \usage{
-nlmixrUI.nlmefun(object, mu = FALSE)
+nlmixrUI.nlmefun(object, mu.type = c("thetas", "covariates", "none"))
 }
 \arguments{
 \item{object}{UI object}
 
-\item{mu}{Is the model mu referenced?}
+\item{mu}{Is the model mu referenced?
+\itemize{
+
+\item With the "thetas" only the population parameters are
+mu-referenced; All covariates are included in the model parameter
+function.  The between subject variability pieces are specified in
+the \code{random} specs parameter.
+
+\item With the "covariates" option, the population parameters are
+mu referenced and covariates are removed from the model function.
+The covariates will be specified used in the fixed effects
+parameterization of nlme, like \code{list(lKA+lCL~1, lV~WT)}
+
+\item With the "none" option, the model function is given to nlme
+without any modification.
+
+}}
 }
 \value{
-parameter function for nlme
+Parameter function for nlme
 }
 \description{
 Create the nlme parameter transform function from the UI object.

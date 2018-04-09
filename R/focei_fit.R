@@ -151,14 +151,14 @@ print.focei.fit <- function(x, ...) {
                     text <- sprintf("%s-ref & covs", mu)
                 }
             }
-            message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("nlme"), " fit by ",
+            message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow("nlme"), " fit by ",
                                      crayon::bold$yellow(ifelse(nlme$method == "REML", "REML", "maximum likelihood"))," (",
                                      crayon::italic(paste0(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"),
                                                            "; ", text)), ")")))
         } else if (is(x, "nlmixr.ui.saem")){
             saem <- fit$saem;
             uif <- env$uif;
-            message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("SAEM"), " fit (",
+            message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow("SAEM"), " fit (",
                              crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
                              crayon::blurred$italic("OBJF calculated from FOCEi approximation"))))
         } else {
@@ -170,10 +170,10 @@ print.focei.fit <- function(x, ...) {
             }
             type <- crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"));
             if (is(x, "nlmixr.ui.focei.posthoc")){
-                message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("FOCEi"), " posthoc ",
+                message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow("FOCEi"), " posthoc ",
                                          eta, " estimation (",type, ")")))
             } else {
-                message(cli::rule(paste0(crayon::bold("nlmixr"), " ", crayon::bold$yellow("FOCEi"), " fit ",
+                message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow("FOCEi"), " fit ",
                                          ifelse(fit$focei.control$grad, "with global gradient", "without global gradient"),
                                          " (",type , ")")));
             }
@@ -205,7 +205,36 @@ print.focei.fit <- function(x, ...) {
         if (all(tmp == 0)){
             message("\n  No correlations in between subject variability (BSV) matrix")
         } else {
-            message("\n  Correlations in between subject variability (BSV) matrix")
+            message("\n  Correlations in between subject variability (BSV) matrix:")
+            rs <- fit$omega.R
+            lt <- lower.tri(rs);
+            dn1 <- dimnames(fit.saem$omega.R)[[2]]
+            nms <- apply(which(lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(dn1[x],collapse=", "))});
+            lt <- structure(rs[lt], .Names=nms)
+            lt <- lt[lt != 0]
+            digs <- 3;
+            lts <- sapply(lt, function(x){
+                x <- abs(lt);
+                ret <- "<"
+                if (x > 0.7){
+                    ret <- ">" ## Strong
+                } else if (x > 0.3){
+                    ret <- "=" ## Moderate
+                }
+                return(ret)
+            })
+            nms <- names(lt);
+            lt <- sprintf("%s%s", formatC(signif(lt, digits=digs),digits=digs,format="fg", flag="#"), lts)
+            names(lt) <- nms;
+            lt <- gsub(rex::rex("\""), "", paste0("    ", R.utils::captureOutput(print(lt))));
+            if (crayon::has_color()){
+                lt <- gsub(rex::rex(capture(regNum), ">"), "\033[1m\033[31m\\1 \033[39m\033[22m", lt, perl=TRUE)
+                lt <- gsub(rex::rex(capture(regNum), "="), "\033[1m\033[32m\\1 \033[39m\033[22m", lt, perl=TRUE)
+                lt <- gsub(rex::rex(capture(regNum), "<"), "\\1 ", lt, perl=TRUE)
+            } else {
+                lt <- gsub(rex::rex(capture(regNum), or(">", "=", "<")), "\\1 ", lt, perl=TRUE)
+            }
+            message(paste(lt, collapse="\n"), "\n")
         }
         message(paste0("  Full BSV covariance (", crayon::yellow(bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(bound), crayon::bold$blue("$omega.R"), "; diagonals=SDs) available"));
         message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
@@ -340,6 +369,12 @@ fitted.focei.fit <- function(object, ..., population=FALSE,
     }
     env <- attr(object, ".focei.env");
     fit <- env$fit;
+    if (is(population, "logical")){
+        tmp <- fit$etas.df
+        if (!is.null(tmp)){
+            return(tmp)
+        }
+    }
     ofv.FOCEi <- env$ofv.FOCEi;
     dat <- object
     env <- environment(ofv.FOCEi);
@@ -473,6 +508,9 @@ fixef.focei.fit <- function(object, ...){
                         if (is.na(y)) {
                             if (any(x == errs)){
                                 v <- shrink[7, "IWRES"];
+                                if (is.na(v)){
+                                    return(" ")
+                                }
                             } else {
                                 return(" ")
                             }
@@ -1249,87 +1287,86 @@ focei.fit.data.frame0 <- function(data,
     find.best.eta <- con$find.best.eta;
     first <- TRUE
 
-    ofv.FOCEi.ind.slow <- function(pars) {
-        cur.diff <<- NULL;
-        if(con$PRINT.PARS) print(pars)
-        ## initial parameters are scale.to which translates to scale.to * inits.vec / scale.to = inits.vecs
-        if (!is.null(con$scale.to)){
-            pars <- pars * inits.vec / con$scale.to
-        }
-        if (!is.null(last.pars) && con$accept.eta.size != 0 && find.best.eta && con$grad){
-            inits.mat.bak <- inits.mat;
-            inits.mat <- rxUpdateEtas(last.dEta.dTheta, matrix(pars - last.pars, ncol=1), inits.mat,con$accept.eta.size);
-        } else {
-            inits.mat.bak <- NULL;
-        }
-        ## last.pars
-        THETA <- pars[w.th];
-        rxSymEnv <-  RxODE::rxSymInv(rxSym, pars[w.om]);
-        llik.one <- function(subj, con){
-            ev <- RxODE::eventTable()
-            dati <- data.sav[data.sav$id==subj, ]
-            if (length(cov.names) > 0){
-                cur.cov <- dati[, cov.names, drop = FALSE];
-            } else {
-                cur.cov <- NULL;
-            }
-            ev$import.EventTable(dati)
-            .wh = ID.ord[as.character(subj)]
-            if(con$DEBUG>10 && .wh==1) print(inits.mat[.wh,, drop = FALSE])               #FIXME
-            if (con$DEBUG.ODE) print("i'm here :)")
-            c.hess <- NULL;
-            if (con$save.curve && !first && con$inner.opt == "n1qn1") c.hess <- inits.c.hess[.wh, ];
-            args <- list(model, ev, theta=THETA, eta=inits.mat[.wh,, drop = FALSE], c.hess=c.hess,
-                         dv=dati$dv[ev$get.obs.rec()], inv.env=rxSymEnv,
-                         nonmem=con$NONMEM, invisible=1-con$TRACE.INNER, epsilon=con$TOL.INNER,
-                         id=subj, inits.vec=inits.vec, cov=cur.cov, estimate=find.best.eta,
-                         atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
-                         atol.outer=con$atol.outer, rtol.outer=con$rtol.outer,
-                         pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver,
-                         numeric=con$numeric,
-                         inner.opt=con$inner.opt, add.grad=print.grad, numDeriv.method=numDeriv.method,
-                         table=do.table);
-            if (!is.null(con$scale.to)){
-                args$scale.to <- con$scale.to
-            }
-            ##method=numDeriv.method
-            if (!is.null(inits.mat.bak)){
-                args$eta.bak=inits.mat.bak[.wh, ];
-            }
-            ret <- do.call(getFromNamespace("rxFoceiInner","nlmixr"), args)
-            attr(ret, "wh") <- .wh; ## FIXME move to C?
-            return(ret)
-        }
-        ##------------------------------
-        ## parallelize
-        if (con$cores > 1){
-            if (.Platform$OS.type != "windows") {
-                llik.subj <- parallel::mclapply(X = ID.all, FUN = llik.one, mc.cores = con$cores, con=con)
-            } else {
-                llik.subj <- parallel::parLapply(cl, X = ID.all, fun = llik.one, con=con)
-            }
-        } else {
-            llik.subj <- lapply(ID.all, llik.one, con=con);
-        }
-        ## Use wenping's solution for inits.mat
-        m = t(sapply(llik.subj, function(x) {
-            c(attr(x, "wh"), attr(x, "posthoc"))
-        }))
-        if(con$RESET.INITS.MAT) inits.mat[m[,1],] <<- m[,-1]
-        ## Save last curvature
-        if (con$save.curve && con$inner.opt == "n1qn1" && !is.null(attr(llik.subj[[1]], "c.hess"))){
-            m <- t(sapply(llik.subj, function(x){
-                c(attr(x, "wh"), attr(x, "c.hess"))
-            }))
-            inits.c.hess[m[,1],] <<- m[,-1]
-        }
-        if (con$grad && con$accept.eta.size != 0){
-            last.pars <<- pars;
-            last.dEta.dTheta <<- lapply(llik.subj, function(x){attr(x, "dEta.dTheta")});
-        }
-        llik.subj
-    }
-    ofv.FOCEi.ind <- memoise::memoise(ofv.FOCEi.ind.slow)
+    ofv.FOCEi.ind <- memoise::memoise(function(pars) {
+                                      cur.diff <<- NULL;
+                                      if(con$PRINT.PARS) print(pars)
+                                      ## initial parameters are scale.to which translates to scale.to * inits.vec / scale.to = inits.vecs
+                                      if (!is.null(con$scale.to)){
+                                          pars <- pars * inits.vec / con$scale.to
+                                      }
+                                      if (!is.null(last.pars) && con$accept.eta.size != 0 && find.best.eta && con$grad){
+                                          inits.mat.bak <- inits.mat;
+                                          inits.mat <- rxUpdateEtas(last.dEta.dTheta, matrix(pars - last.pars, ncol=1), inits.mat,con$accept.eta.size);
+                                      } else {
+                                          inits.mat.bak <- NULL;
+                                      }
+                                      ## last.pars
+                                      THETA <- pars[w.th];
+                                      rxSymEnv <-  RxODE::rxSymInv(rxSym, pars[w.om]);
+                                      llik.one <- function(subj, con){
+                                          ev <- RxODE::eventTable()
+                                          dati <- data.sav[data.sav$id==subj, ]
+                                          if (length(cov.names) > 0){
+                                              cur.cov <- dati[, cov.names, drop = FALSE];
+                                          } else {
+                                              cur.cov <- NULL;
+                                          }
+                                          ev$import.EventTable(dati)
+                                          .wh = ID.ord[as.character(subj)]
+                                          if(con$DEBUG>10 && .wh==1) print(inits.mat[.wh,, drop = FALSE])               #FIXME
+                                          if (con$DEBUG.ODE) print("i'm here :)")
+                                          c.hess <- NULL;
+                                          if (con$save.curve && !first && con$inner.opt == "n1qn1") c.hess <- inits.c.hess[.wh, ];
+                                          args <- list(model, ev, theta=THETA, eta=inits.mat[.wh,, drop = FALSE], c.hess=c.hess,
+                                                       dv=dati$dv[ev$get.obs.rec()], inv.env=rxSymEnv,
+                                                       nonmem=con$NONMEM, invisible=1-con$TRACE.INNER, epsilon=con$TOL.INNER,
+                                                       id=subj, inits.vec=inits.vec, cov=cur.cov, estimate=find.best.eta,
+                                                       atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
+                                                       atol.outer=con$atol.outer, rtol.outer=con$rtol.outer,
+                                                       pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver,
+                                                       numeric=con$numeric,
+                                                       inner.opt=con$inner.opt, add.grad=print.grad, numDeriv.method=numDeriv.method,
+                                                       table=do.table);
+                                          if (!is.null(con$scale.to)){
+                                              args$scale.to <- con$scale.to
+                                          }
+                                          ##method=numDeriv.method
+                                          if (!is.null(inits.mat.bak)){
+                                              args$eta.bak=inits.mat.bak[.wh, ];
+                                          }
+                                          ret <- do.call(getFromNamespace("rxFoceiInner","nlmixr"), args)
+                                          attr(ret, "wh") <- .wh; ## FIXME move to C?
+                                          return(ret)
+                                      }
+                                      ##------------------------------
+                                      ## parallelize
+                                      if (con$cores > 1){
+                                          if (.Platform$OS.type != "windows") {
+                                              llik.subj <- parallel::mclapply(X = ID.all, FUN = llik.one, mc.cores = con$cores, con=con)
+                                          } else {
+                                              llik.subj <- parallel::parLapply(cl, X = ID.all, fun = llik.one, con=con)
+                                          }
+                                      } else {
+                                          llik.subj <- lapply(ID.all, llik.one, con=con);
+                                      }
+                                      ## Use wenping's solution for inits.mat
+                                      m = t(sapply(llik.subj, function(x) {
+                                          c(attr(x, "wh"), attr(x, "posthoc"))
+                                      }))
+                                      if(con$RESET.INITS.MAT) inits.mat[m[,1],] <<- m[,-1]
+                                      ## Save last curvature
+                                      if (con$save.curve && con$inner.opt == "n1qn1" && !is.null(attr(llik.subj[[1]], "c.hess"))){
+                                          m <- t(sapply(llik.subj, function(x){
+                                              c(attr(x, "wh"), attr(x, "c.hess"))
+                                          }))
+                                          inits.c.hess[m[,1],] <<- m[,-1]
+                                      }
+                                      if (con$grad && con$accept.eta.size != 0){
+                                          last.pars <<- pars;
+                                          last.dEta.dTheta <<- lapply(llik.subj, function(x){attr(x, "dEta.dTheta")});
+                                      }
+                                      llik.subj
+                                  })
 
     ofv.FOCEi.vec = function(pars) {
         llik.subj = ofv.FOCEi.ind(pars)
@@ -2123,7 +2160,7 @@ focei.fit.data.frame0 <- function(data,
     memoise::forget(ofv.FOCEi.ind);
     ## Allow IPRED/PRED to be calculated by taking out the caching
     ## (which is per-parameter, not per parameter and eta)
-    ofv.FOCEi.ind <- ofv.FOCEi.ind.slow;
+    ## ofv.FOCEi.ind <- ofv.FOCEi.ind.slow;
     running <- FALSE;
     sink.close()
     con$cores <- 1; ## don't run parallel for extracting information
@@ -2185,9 +2222,10 @@ focei.fit.data.frame0 <- function(data,
             if (is.null(ret)){
                 if (exists(arg, env, inherits=FALSE)){
                     return(get(arg, env, inherits=FALSE));
-                } else if (exists(arg, env$uif$env, inherits=FALSE)){
-                    return(get(arg, env$uif$env, inherits=FALSE));
-                } else {
+                } ## else if (exists(arg, env$uif$env, inherits=FALSE)){
+                ##     return(get(arg, env$uif$env, inherits=FALSE));
+                ## }
+                else {
                     return(NULL)
                 }
             } else {

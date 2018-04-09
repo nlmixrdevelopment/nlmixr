@@ -767,7 +767,7 @@ configsaem = function(model, data, inits,
   y = data$data[,"DV"]
   id = data$data[,"ID"]
   ntotal = length(id)
-  N = length(unique(id))
+    N = length(unique(id))
   covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
@@ -1308,8 +1308,15 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     for (i in w){
         uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
     }
+
     ## enclose the nlme fit in the .focei.env
     env <- attr(fit.f, ".focei.env");
+    dimnames(mat2) <- list(NULL, uif$eta.names);
+    env$eta.df <- data.frame(ID=seq_along(mat[, 1]), as.data.frame(mat2));
+    ## etas <- mat2;
+    ## dimnames(etas) <- list(NULL, row.names(ome))
+    ## env$etas.df <- data.frame(ID=seq_along(etas[1, ]), as.data.frame(etas))
+
     env$fit$saem <- fit
     tmp <- cbind(data.frame(saem=saem.time["elapsed"]), env$fit$time);
     names(tmp) <- gsub("optimize", "Likelihood Calculation", names(tmp))

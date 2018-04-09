@@ -361,7 +361,7 @@ prepEv = function(dati, theta)
 #'
 #'    The ODE specification mini-language is parsed with the help of
 #'    the open source tool \emph{DParser}, Plevyak (2015).
-#' @author Wenping Wang
+#' @author Wenping Wang, Mathew Fidler
 #' @examples
 #' \dontrun{
 #' library(nlmixr)
@@ -393,7 +393,7 @@ nlme_ode <- function(dat.o, model, par_model, par_trans,
         hini = 0, maxordn = 12, maxords = 5,
 	debugODE=FALSE, mc.cores=1, ...)
 {
-  if (any(dat.o$EVID[dat.o$EVID>0]<101))
+  if (any(dat.o$EVID[dat.o$EVID>0]<101))
     	stop("incompatible EVID values")
 
     #a new env with a ref in .GlobalEnv, holding model components
@@ -737,6 +737,11 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
     }
     ## enclose the nlme fit in the .focei.env
     env <- attr(fit.f, ".focei.env");
+    dimnames(mat) <- list(NULL, uif$eta.names);
+    env$eta.df <- data.frame(ID=seq_along(mat[, 1]), as.data.frame(mat));
+    ## etas <- mat;
+    ## dimnames(etas) <- list(NULL, row.names(ome))
+    ## env$fit$etas.df <- data.frame(ID=seq_along(etas[1, ]), as.data.frame(etas))
     env$fit$nlme <- fit
     tmp <- cbind(data.frame(nlme=nlme.time["elapsed"]), env$fit$time);
     names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
