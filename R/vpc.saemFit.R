@@ -11,6 +11,8 @@ multi2 = function (mu, vmat, n)
 rmvnorm = function(n, mu, vmat) multi2(mu, vmat, n) 
 
 vpc.saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
+  if (class(fit) == "nlmixr.ui.saem") fit = as.saem(fit)
+  
   saem.cfg = attr(fit, "saem.cfg")
   dopred <- attr(fit, "dopred")
   red.mod = sum((fit$sig2 != 0) * 1:2)
