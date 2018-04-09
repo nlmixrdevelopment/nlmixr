@@ -10,7 +10,7 @@
   \item{ID}{Subject ID}
   \item{TIME}{Time (hrs)}
   \item{DV}{Dependant Variable, Theophiline Concentration}
-  \item{AMT}{Dose Amount}
+  \item{AMT}{Dose Amount/kg}
   \item{EVID}{RxODE/nlmixr event ID (not NONMEM's)}
   \item{CMT}{Compartment number}
   \item{WT}{Weight (kg)}

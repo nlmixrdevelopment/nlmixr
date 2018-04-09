@@ -130,5 +130,5 @@ fit <- nlme_ode(dat, model=ode, par_model=specs, par_trans=mypar,
 }
 }
 \author{
-Wenping Wang
+Wenping Wang, Mathew Fidler
 }
