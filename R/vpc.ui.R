@@ -31,9 +31,27 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     dimnames(omega) <- list(n, n)
     sigma <- matrix(1, dimnames=list("rx_err_", "rx_err_"))
     dat <- getData(fit);
+    message("Simulating VPC model...", appendLF=FALSE)
     sim <- rxSolve(mod, params=theta, events=dat, omega=omega, nStud=nStud, sigma=sigma, add.cov=TRUE, return.type="data.frame",
                    method=method);
+    message("done!");
+
     names(dat) <- tolower(names(dat))
+    if (!is.null(stratify)){
+        stratify <- tolower(stratify)
+        ## Assume this is in the observed dataset. Add it to the current dataset
+        if(!all(names(sim) %in% stratify)){
+            w <- stratify[!(stratify %in% names(sim))]
+            dat <- dat[dat$evid == 0, ];
+            message(sprintf("Merging stratification variable(s) %s to simulated dataset...", paste(w, collapse=", ")), appendLF=FALSE)
+            n <- names(sim)
+            sim <- cbind(sim, dat[, w]);
+            names(sim) <- c(n, w);
+            print(head(sim))
+            message("done!")
+        }
+    }
+
     ## rxDelete(mod);
     vpc::vpc(sim = sim, obs = dat,
              bins = bins, n_bins = n_bins, bin_mid = bin_mid, obs_cols = list(id="id", dv="dv", idv="time"),

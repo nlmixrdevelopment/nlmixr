@@ -46,7 +46,7 @@ extern SEXP _nlmixr_rxDetaDtheta(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxOuter(SEXP rhoSEXP);
 extern SEXP _nlmixr_rxUpdateEtas(SEXP DnDhSSEXP, SEXP DhSSEXP, SEXP initSSEXP, SEXP acceptNSSEXP);
 extern SEXP _nlmixr_chkSolvedInf(SEXP, SEXP);
-extern SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time);
+extern SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time, SEXP _evid);
 extern SEXP _nlmixr_nlmixrParameters(SEXP, SEXP);
 extern SEXP _nlmixr_nlmixrResid(SEXP, SEXP, SEXP,SEXP, SEXP);
 
@@ -83,7 +83,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_llik_neg_binomial", (DL_FUNC) &_nlmixr_llik_neg_binomial, 2},
   {"_nlmixr_grFOCEi",(DL_FUNC) &_nlmixr_grFOCEi, 2},
   {"_nlmixr_sFOCEi",(DL_FUNC) &_nlmixr_sFOCEi, 2},
-  {"_nlmixr_chkSortIDTime",(DL_FUNC) &_nlmixr_chkSortIDTime, 2},
+  {"_nlmixr_chkSortIDTime",(DL_FUNC) &_nlmixr_chkSortIDTime, 3},
   {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
   {"_nlmixr_nlmixrParameters", (DL_FUNC) &_nlmixr_nlmixrParameters, 2},
   {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 5},

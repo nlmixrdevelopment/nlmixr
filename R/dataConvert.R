@@ -150,8 +150,9 @@ nmDataConvert <- function(nonmem.data)
         d$ID <- 1;
     }
 
+    drop.cmt <- FALSE
     if (any(d$EVID > 0) && !any(col.names == "CMT")){
-        warning("Adding CMT=1, for non-zero EVIDs.")
+        drop.cmt <- TRUE
         d$CMT <- 1;
         d$CMT[d$EVID == 0] <- NA;
     }

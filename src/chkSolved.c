@@ -46,17 +46,23 @@ SEXP _nlmixr_chkSolvedInf(SEXP evid,SEXP solved){
 }
 
 
-SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time){
+SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time, SEXP _evid){
   double *time = REAL(_time);
   int *id = INTEGER(_id);
-  int len = length(_time), i = 0, lastID;
-  double lastTime;
+  int *evid = INTEGER(_evid);
+  int len = length(_time), i = 0, lastID=-1;
+  double lastTime=-1;
   SEXP out = PROTECT(allocVector(INTSXP,1));
   INTEGER(out)[0] = 1;
   if (len != length(_id)){
     error("TIME and ID need the same length.");
   } else{
     for (i=0; i < len; i++){
+      if (evid[i] != 0 && abs(evid[i]) < 101){
+	INTEGER(out)[0] = 3;
+        UNPROTECT(1);
+	return out;
+      }
       if (i == 0){
 	lastID = id[i];
 	lastTime = time[i];

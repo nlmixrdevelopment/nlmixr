@@ -155,6 +155,84 @@ nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
 ##' @rdname nlmixr
 ##' @export
 nlmixr.nlmixr.ui.saem <- nlmixr.nlmixr.ui.nlme
+##' Convert/Format the data appropriately for nlmixr
+##'
+##' @param data is the name of the data to convert.  Can be a csv file
+##'     as well.
+##' @return Appropriately formatted data
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+nlmixrData <- function(data){
+    UseMethod("nlmixrData");
+}
+##' @export
+##' @rdname nlmixrData
+nlmixrData.character <- function(data){
+    if (!file.exists(data)){
+        stop(sprintf("%s does not exist.", data))
+    }
+    if (regexpr(rex::rex(".csv", end), data) != -1){
+        return(nlmixrData.default(read.csv(data, na.strings=c(".", "NA", "na", ""))))
+    } else {
+        stop(sprintf("Do not know how to read in %s", data));
+    }
+}
+##' @export
+##' @rdname nlmixrData
+nlmixrData.default <- function(data){
+    dat <- data;
+    nm1 <- toupper(names(dat));
+    for (n in c("ID", "EVID", "TIME", "DV", "AMT")){
+        w <- which(nm1 == n)
+        if (length(w) == 1L){
+            names(dat)[w] <- n;
+        } else if (length(w) == 0L){
+            stop(sprintf("Need '%s' data item in dataset.", n))
+        } else {
+            stop(sprintf("Multiple '%s' columns in dataset.", n))
+        }
+    }
+    if (is(dat$ID, "factor")){
+        dat$ID <- paste(dat$ID);
+    }
+    idSort <- .Call(`_nlmixr_chkSortIDTime`, as.integer(dat$ID), as.double(dat$TIME), as.integer(dat$EVID));
+    if (idSort == 3L){
+        warning("NONMEM-style data converted to nlmixr/RxODE-style data.");
+        return(nlmixrData.default(nmDataConvert(dat)));
+    }
+    backSort <- c()
+    backSort2 <- c();
+    if (is(dat$ID, "character")){
+        lvl <- unique(dat$ID);
+        lab <- paste(lvl)
+        dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
+        backSort <- levels(dat$ID);
+        backSort2 <- seq_along(backSort)
+        dat$ID <- as.integer(dat$ID);
+    } else {
+        if (idSort == 2L){
+            lvl <- unique(dat$ID);
+            lab <- paste(lvl)
+            dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
+            backSort <- levels(dat$ID);
+            backSort2 <- seq_along(backSort)
+            dat$ID <- as.integer(dat$ID);
+        } else if (idSort == 0L){
+            warning("Sorting by ID, TIME; Output fit may not be in the same order as input dataset.")
+            dat <- dat[order(dat$ID, dat$TIME), ];
+            lvl <- unique(dat$ID);
+            lab <- paste(lvl)
+            dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
+            backSort <- levels(dat$ID);
+            backSort2 <- seq_along(backSort)
+            dat$ID <- as.integer(dat$ID);
+        }
+    }
+    attr(dat, "backSort") <- backSort;
+    attr(dat, "backSort2") <- backSort2;
+    return(dat);
+}
 
 ##' Fit a nlmixr model
 ##'
@@ -176,38 +254,11 @@ nlmixr.nlmixr.ui.saem <- nlmixr.nlmixr.ui.nlme
 nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                        sum.prod=FALSE, calc.resid=TRUE){
     start.time <- Sys.time();
-    dat <- data;
-    if (is(dat$ID, "factor")){
-        dat$ID <- paste(dat$ID);
-    }
-    if (is(dat$ID, "character")){
-        lvl <- unique(dat$ID);
-        lab <- paste(lvl)
-        dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
-        backSort <- levels(dat$ID);
-        backSort2 <- seq_along(backSort)
-        dat$ID <- as.integer(dat$ID);
-    } else {
-        idSort <- .Call(`_nlmixr_chkSortIDTime`, as.integer(dat$ID), as.double(dat$TIME));
-        backSort <- c()
-        if (idSort == 2L){
-            lvl <- unique(dat$ID);
-            lab <- paste(lvl)
-            dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
-            backSort <- levels(dat$ID);
-            backSort2 <- seq_along(backSort)
-            dat$ID <- as.integer(dat$ID);
-        } else if (idSort == 0L){
-            warning("Sorting by ID, TIME; Output fit may not be in the same order as input dataset.")
-            dat <- dat[order(dat$ID, dat$TIME), ];
-            lvl <- unique(dat$ID);
-            lab <- paste(lvl)
-            dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
-            backSort <- levels(dat$ID);
-            backSort2 <- seq_along(backSort)
-            dat$ID <- as.integer(dat$ID);
-        }
-    }
+    dat <- nlmixrData(data);
+    backSort <- attr(dat, "backSort");
+    backSort2 <- attr(dat, "backSort2");
+    attr(dat, "backSort") <- NULL;
+    attr(dat, "backSort2") <- NULL;
     uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, as.double(dat$EVID), as.integer(!is.null(uif$nmodel$lin.solved)));
     bad.focei <- "Problem calculating residuals, returning fit without residuals.";
     fix.dat <- function(x){
