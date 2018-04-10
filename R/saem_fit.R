@@ -1290,6 +1290,14 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     } else {
         dat <- data;
     }
+    atol <- fit$env$uif$env$ODEopt$atol;
+    if(is.null(atol))atol <- 1e-8
+    rtol <- fit$env$uif$env$ODEopt$rtol;
+    if(is.null(rtol))rtol <- 1e-6
+    stiff <- fit$env$uif$env$ODEopt$stiff;
+    if(is.null(stiff))stiff <- 1L
+    transit_abs <- fit$env$uif$env$ODEopt$transit_abs;
+    if(is.null(transit_abs)) transit_abs<- 0L
     fit.f <- focei.fit.data.frame(data=dat,
                                   inits=init,
                                   PKpars=uif$theta.pars,
@@ -1306,6 +1314,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                                                cores=1,
                                                find.best.eta=FALSE,
                                                ## numeric=(!is.null(uif$nmodel$lin.solved)),
+                                               atol.ode=atol,
+                                               rtol.ode=rtol,
+                                               stiff=stiff,
+                                               transit_abs=transit_abs,
                                                sum.prod=uif$env$sum.prod));
     ome <- fit.f$omega;
     w <- which(!is.na(uif.new$ini$neta1))

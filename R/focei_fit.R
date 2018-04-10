@@ -999,6 +999,13 @@ focei.fit.data.frame0 <- function(data,
         trace = 0,
         atol.ode=1e-6,
         rtol.ode=1e-6,
+        hmin = 0L,
+        hmax = NULL,
+        hini = 0L,
+        transit_abs = NULL,
+        maxordn = 12L,
+        maxords = 5L,
+        stiff=1L,
         atol.outer=1e-6,
         rtol.outer=1e-6,
         maxsteps.ode = 99999,
@@ -1049,6 +1056,9 @@ focei.fit.data.frame0 <- function(data,
 
     pt <- proc.time()
     nmsC <- names(con)
+    if (length(control) > 0){
+        control <- control[sapply(names(control), function(x){!is.null(control[[x]])})]
+    }
     con[(namc <- names(control))] <- control
     if (length(noNms <- namc[!namc %in% nmsC]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
@@ -1323,6 +1333,8 @@ focei.fit.data.frame0 <- function(data,
                                                        id=subj, inits.vec=inits.vec, cov=cur.cov, estimate=find.best.eta,
                                                        atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
                                                        atol.outer=con$atol.outer, rtol.outer=con$rtol.outer,
+                                                       hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
+                                                       maxordn = con$maxordn, maxords = con$maxords, stiff=con$stiff,
                                                        pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver,
                                                        numeric=con$numeric,
                                                        inner.opt=con$inner.opt, add.grad=print.grad, numDeriv.method=numDeriv.method,
