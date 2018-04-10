@@ -2182,7 +2182,7 @@ focei.fit.data.frame0 <- function(data,
     message("Calculating Table Variables...")
     tmp <- c()
     pt <- proc.time();
-    res <- calc.resid.fit(data, orig.data)
+    res <- calc.resid.fit(data, orig.data, con);
     fit$shrink <- res[[2]];
     data <- cbind(as.data.frame(data), res[[1]], res[[3]], res[[4]]);
     table.time <- proc.time() - pt;
