@@ -325,6 +325,23 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 assign("start.time", start.time, env);
                 assign("est", est, env);
                 assign("stop.time", Sys.time(), env);
+                ## Now remove dlls
+                ## sf <- ret$uif$env$saem.fit
+                ## rx <- attr(sf, "rx")
+                ## if (is(rx, "RxODE")){
+                ##     rxDelete(rx);
+                ## }
+                ## cpp <- attr(sf, "saem.cpp")
+                ## if (file.exists(cpp)){
+                ##     try(unlink(cpp))
+                ## }
+                ## dll <- attr(sf, "saem.dll")
+                ## try({dyn.unload(dll)}, silent=TRUE);
+                ## if (file.exists(dll))
+                ##     unlink(dll);
+                ## rxDelete(ret$model$pred.only)
+                ## rxDelete(ret$model$ebe)
+                ## rxDelete(ret$model$inner)
                 return(ret)
             }
         } else {

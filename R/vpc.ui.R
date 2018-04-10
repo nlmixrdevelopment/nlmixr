@@ -33,7 +33,7 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     dat <- getData(fit);
     message("Simulating VPC model...", appendLF=FALSE)
     sim <- rxSolve(mod, params=theta, events=dat, omega=omega, nStud=nStud, sigma=sigma, add.cov=TRUE, return.type="data.frame",
-                   method=method);
+                   method=method, ...);
     message("done!");
 
     names(dat) <- tolower(names(dat))

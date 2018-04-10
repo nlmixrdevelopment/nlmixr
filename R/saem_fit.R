@@ -475,6 +475,8 @@ cat(make_str)
   attr(fn, "nlhs") = nlhs
   attr(fn, "nrhs") = nrhs
   attr(fn, "saem.dll") = saem.dll
+  attr(fn, "saem.cpp") = saem.cpp
+  attr(fn, "rx") = if(is.ode) model else ""
   attr(fn, "inPars") = inPars
   reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
@@ -487,8 +489,10 @@ cat(make_str)
 ##' @export
 saem.cleanup <- function(env){
     try({dyn.unload(env$saem.dll)}, silent=TRUE);
-    unlink(env$saem.dll);
-    unlink(env$saem.cpp);
+    if (file.exists(env$saem.dll))
+        unlink(env$saem.dll);
+    if (file.exists(env$saem.cpp))
+        unlink(env$saem.cpp);
 }
 
 parfn.list = c(
