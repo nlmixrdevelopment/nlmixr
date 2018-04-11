@@ -49,7 +49,6 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
                    maxordn = con$maxordn, maxords = con$maxords, method=meth);
     diff <- proc.time() - pt;
     message(sprintf("done (%.2f sec)", diff["elapsed"]));
-    pt <- proc.time();
     names(dat) <- tolower(names(dat))
     w <- which(duplicated(names(dat)));
     if (length(w) > 0){
@@ -57,25 +56,25 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
         dat <- dat[, -w];
     }
     if (!is.null(stratify)){
-        stratify <- tolower(stratify)
-        ## Assume this is in the observed dataset. Add it to the current dataset
-        if(!all(names(sim) %in% stratify)){
-            w <- stratify[!(stratify %in% names(sim))]
-            dat <- dat[dat$evid == 0, ];
-            message(sprintf("Merging stratification variable(s) %s to simulated dataset...", paste(w, collapse=", ")), appendLF=FALSE)
-            n <- names(sim)
-            sim <- cbind(sim, dat[, w]);
-            names(sim) <- c(n, w);
-            diff <- proc.time() - pt;
-            message(sprintf("done (%.2f sec)", diff["elapsed"]))
-            pt <- proc.time();
-        }
+        cols <- c(tolower(stratify), "dv")
+    }  else {
+        cols <- c("dv");
     }
-
-    ## rxDelete(mod);
+    dat <- dat[dat$evid == 0, ];
+    ## Assume this is in the observed dataset. Add it to the current dataset
+    if(!all(names(sim) %in% cols)){
+        w <- cols[!(cols %in% names(sim))]
+        n <- names(sim)
+        sim <- cbind(sim, dat[, w]);
+        names(sim) <- c(n, w);
+        diff <- proc.time() - pt;
+        pt <- proc.time();
+    }
+    rxDelete(mod);
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     call <- call[names(call) %in% formalArgs(getFromNamespace("vpc","vpc"))]
     call$obs_cols = list(id="id", dv="dv", idv="time")
     call$sim_cols = list(id="id", dv="dv", idv="time")
+    call$stratify = stratify
     do.call(getFromNamespace("vpc","vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
 }
