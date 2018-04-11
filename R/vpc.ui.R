@@ -75,5 +75,7 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     ## rxDelete(mod);
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     call <- call[names(call) %in% formalArgs(getFromNamespace("vpc","vpc"))]
+    call$obs_cols = list(id="id", dv="dv", idv="time")
+    call$sim_cols = list(id="id", dv="dv", idv="time")
     do.call(getFromNamespace("vpc","vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
 }
