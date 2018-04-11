@@ -14,15 +14,20 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
                    uloq = NULL, lloq = NULL, log_y = FALSE, log_y_min = 0.001,
                    xlab = NULL, ylab = NULL, title = NULL, smooth = TRUE, vpc_theme = NULL,
                    facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...,
-                   nStud=NULL, method="lsoda"){
+                   nStud=NULL,
+                   method=NULL){
     if (is.null(nStud)){
         nStud <- n;
     }
+    con <- fit$fit$con;
+    pt <- proc.time();
     message("Compiling VPC model...", appendLF=FALSE)
     mod <- gsub(rex::rex("(0)~"), "(0)=", paste0(gsub("=", "~", rxNorm(fit$model$pred.only), perl=TRUE),
-           "\ndv=rx_pred_+sqrt(rx_r_)*rx_err_"))
+                                                 "\ndv=rx_pred_+sqrt(rx_r_)*rx_err_"))
     mod <- RxODE(mod);
-    message("done!");
+    diff <- proc.time() - pt;
+    message(sprintf("done (%.2f sec)", diff["elapsed"]));
+    pt <- proc.time();
     theta <- fixed.effects(fit);
     names(theta) <- sprintf("THETA[%d]", seq_along(theta))
     omega <- fit$omega
@@ -31,11 +36,20 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     dimnames(omega) <- list(n, n)
     sigma <- matrix(1, dimnames=list("rx_err_", "rx_err_"))
     dat <- getData(fit);
-    message("Simulating VPC model...", appendLF=FALSE)
+    if (is.null(method)){
+        meth <- c("dop853", "lsoda", "liblsoda");
+        meth <- meth[con$stiff + 1];
+    } else {
+        meth <- method;
+    }
+    message(sprintf("Simulating VPC model (%s)...", meth), appendLF=FALSE)
     sim <- rxSolve(mod, params=theta, events=dat, omega=omega, nStud=nStud, sigma=sigma, add.cov=TRUE, return.type="data.frame",
-                   method=method, ...);
-    message("done!");
-
+                   atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
+                   hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
+                   maxordn = con$maxordn, maxords = con$maxords, method=meth);
+    diff <- proc.time() - pt;
+    message(sprintf("done (%.2f sec)", diff["elapsed"]));
+    pt <- proc.time();
     names(dat) <- tolower(names(dat))
     if (!is.null(stratify)){
         stratify <- tolower(stratify)
@@ -48,7 +62,9 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
             sim <- cbind(sim, dat[, w]);
             names(sim) <- c(n, w);
             print(head(sim))
-            message("done!")
+            diff <- proc.time() - pt;
+            message(sprintf("done (%.2f sec)", diff["elapsed"]))
+            pt <- proc.tim();
         }
     }
 

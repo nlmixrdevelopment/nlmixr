@@ -2184,6 +2184,7 @@ focei.fit.data.frame0 <- function(data,
     pt <- proc.time();
     res <- calc.resid.fit(data, orig.data, con);
     fit$shrink <- res[[2]];
+    fit$con <- con;
     data <- cbind(as.data.frame(data), res[[1]], res[[3]], res[[4]]);
     table.time <- proc.time() - pt;
     fit$table.time <- table.time;

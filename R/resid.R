@@ -2,14 +2,16 @@ calc.resid.fit <- function(fit, data, con){
     etas <- random.effects(fit);
     thetas <- fixed.effects(fit);
     pars <- .Call(`_nlmixr_nlmixrParameters`, thetas, etas);
+    meth <- c("dop853", "lsoda", "liblsoda");
+    meth <- meth[con$stiff + 1];
     preds <- list(ipred=rxSolve(fit$env$model$inner, pars$ipred,data,return.type="data.frame",
                                 atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
                                 hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
-                                maxordn = con$maxordn, maxords = con$maxords, method=(c("lsoda", "dop853", "liblsoda"))[con$stiff]),
+                                maxordn = con$maxordn, maxords = con$maxords, method=meth),
                   pred=rxSolve(fit$env$model$inner, pars$pred,data,return.type="data.frame",
                                atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
                                hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
-                               maxordn = con$maxordn, maxords = con$maxords, method=(c("lsoda", "dop853", "liblsoda"))[con$stiff]));
+                               maxordn = con$maxordn, maxords = con$maxords, method=meth));
     lst <- .Call(`_nlmixr_nlmixrResid`, preds,fit$omega, fit$DV, etas, pars$eta.lst);
     ## Add Empirical Bayes Estimates
     df <- rxSolve(fit$env$model$ebe, pars$ipred,data,return.type="data.frame",
