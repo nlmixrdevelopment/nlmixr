@@ -64,7 +64,7 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
             print(head(sim))
             diff <- proc.time() - pt;
             message(sprintf("done (%.2f sec)", diff["elapsed"]))
-            pt <- proc.tim();
+            pt <- proc.time();
         }
     }
 
