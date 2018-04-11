@@ -42,7 +42,6 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     } else {
         meth <- method;
     }
-    message(sprintf("Simulating VPC model (%s)...", meth), appendLF=FALSE)
     sim <- rxSolve(mod, params=theta, events=dat, omega=omega, nStud=nStud, sigma=sigma, add.cov=TRUE, return.type="data.frame",
                    atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
                    hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
