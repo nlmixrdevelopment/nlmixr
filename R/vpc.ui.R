@@ -35,7 +35,7 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     n <- sprintf("ETA[%d]", seq(1, dm))
     dimnames(omega) <- list(n, n)
     sigma <- matrix(1, dimnames=list("rx_err_", "rx_err_"))
-    dat <- getData(fit);
+    dat <- nlmixrData(getData(fit));
     if (is.null(method)){
         meth <- c("dop853", "lsoda", "liblsoda");
         meth <- meth[con$stiff + 1];
@@ -51,6 +51,11 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     message(sprintf("done (%.2f sec)", diff["elapsed"]));
     pt <- proc.time();
     names(dat) <- tolower(names(dat))
+    w <- which(duplicated(names(dat)));
+    if (length(w) > 0){
+        warning("Dropping duplicate columns (case insensitive)")
+        dat <- dat[, -w];
+    }
     if (!is.null(stratify)){
         stratify <- tolower(stratify)
         ## Assume this is in the observed dataset. Add it to the current dataset
@@ -61,7 +66,6 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
             n <- names(sim)
             sim <- cbind(sim, dat[, w]);
             names(sim) <- c(n, w);
-            print(head(sim))
             diff <- proc.time() - pt;
             message(sprintf("done (%.2f sec)", diff["elapsed"]))
             pt <- proc.time();
