@@ -73,12 +73,7 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     }
 
     ## rxDelete(mod);
-    vpc::vpc(sim = sim, obs = dat,
-             bins = bins, n_bins = n_bins, bin_mid = bin_mid, obs_cols = list(id="id", dv="dv", idv="time"),
-             sim_cols = list(id="id", dv="dv", idv="time"),
-             software = "auto", show = show, stratify = stratify, pred_corr = pred_corr,
-             pred_corr_lower_bnd = pred_corr_lower_bnd, pi = pi, ci = ci,
-             uloq = uloq, lloq = lloq, log_y = log_y, log_y_min = log_y_min,
-             xlab = xlab, ylab = ylab, title = title, smooth = smooth, vpc_theme = vpc_theme,
-             facet = facet, labeller = labeller, vpcdb = vpcdb, verbose = verbose)
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    call <- call[names(call) %in% formalArgs(getFromNamespace("vpc","vpc"))]
+    do.call(getFromNamespace("vpc","vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
 }
