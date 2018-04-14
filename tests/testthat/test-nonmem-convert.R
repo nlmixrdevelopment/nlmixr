@@ -169,7 +169,6 @@ rxPermissive({
     d3$AMT[c(1, 4)] <- 1
 
     test_that("Add CMT=1", {
-        expect_warning(nmDataConvert(d3), "Adding CMT=1, for non-zero EVIDs.");
         expect_equal(suppressWarnings(nmDataConvert(d3))$EVID, c(101, 0, 0, 101, 0, 0));
     })
 
@@ -208,4 +207,14 @@ rxPermissive({
         expect_warning(nmDataConvert(Bolus_1CPT[,names(Bolus_1CPT) != "SS"]), "EVID=2 is dropped from RxODE/nlmixr datasets.")
         expect_warning(nmDataConvert(Infusion_1CPT[,names(Infusion_1CPT) != "SS"]), "EVID=2 is dropped from RxODE/nlmixr datasets.")
     })
+
+    test_that("100+ cmt", {
+        tmp <- Infusion_1CPT[,names(Infusion_1CPT) != "SS"]
+        tmp$CMT[tmp$CMT == 1] <- 123;
+        expect_equal(suppressWarnings(unique(nmDataConvert(tmp)$EVID)), c(112301L, 0L))
+        tmp <- Bolus_1CPT[,names(Bolus_1CPT) != "SS"]
+        tmp$CMT[tmp$CMT == 1] <- 123;
+        expect_equal(suppressWarnings(unique(nmDataConvert(tmp)$EVID)), c(102301L, 0L))
+    })
+
 }, cran=TRUE)

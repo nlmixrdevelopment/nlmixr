@@ -236,7 +236,7 @@ print.focei.fit <- function(x, ...) {
             }
             message(paste(lt, collapse="\n"), "\n")
         }
-        message(paste0("  Full BSV covariance (", crayon::yellow(bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(bound), crayon::bold$blue("$omega.R"), "; diagonals=SDs) available"));
+        message(paste0("  Full BSV covariance (", crayon::yellow(bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(bound), crayon::bold$blue("$omega.R"), "; diagonals=SDs)"));
         message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                        crayon::yellow(bound), crayon::bold$blue("$shrink")));
 

@@ -195,7 +195,7 @@ nmDataConvert <- function(nonmem.data)
 
         ## infusion
         d.inf <- d[d$RATE>0, ]
-        d.inf$EVID <- ifelse(d.inf$EVID>0, 10000+d.inf$CMT*100+d.inf$EVID, d.inf$EVID)
+        d.inf$EVID <- .Call(`_nlmixr_convertEvidRate`, as.integer(d.inf$EVID), as.integer(d.inf$CMT));
         ## add end of infusion records
         d.inf.end <- d.inf[d.inf$AMT>0, ]
         d.inf.end$TIME <- d.inf.end$TIME + d.inf.end$AMT/d.inf.end$RATE
@@ -209,10 +209,10 @@ nmDataConvert <- function(nonmem.data)
         dat <- dat[order(dat$ID, dat$TIME, -dat$EVID), ]
 
     } else { ## no infusion: EVID is the only thing to change
-        ## last two digits: EVID in original NONMEM dataset
+        ## last two digits: EVID=01
         ## mid two digits: label for CMT in original NONMEM dataset
         ## upper two digits: infusion indicator, set to 0
-        d$EVID <- ifelse(d$EVID>0,d$CMT*100+d$EVID,d$EVID)
+        d$EVID <- .Call(`_nlmixr_convertEvid`, as.integer(d$EVID), as.integer(d$CMT));
         dat <- d
     }
     dat

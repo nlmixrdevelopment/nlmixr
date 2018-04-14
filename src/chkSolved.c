@@ -3,6 +3,50 @@
 #include <Rmath.h> //Rmath includes math.
 #include <R_ext/Rdynload.h>
 
+SEXP _nlmixr_convertEvid(SEXP evid, SEXP cmt){
+  int *ev = INTEGER(evid);
+  int *amt = INTEGER(cmt);
+  SEXP outs = PROTECT(allocVector(INTSXP,length(evid)));
+  int *out = INTEGER(outs);
+  for (unsigned int i = length(evid); i--;){
+    if (ev[i]){
+      if (amt[i] > 99){
+	int amt100 = amt[i]/100;
+	int amt99  = amt[i]-amt100*100;
+        out[i] = amt100*1e5+amt99*100+1;
+      } else {
+	out[i] = 100*amt[i]+1;
+      }
+    } else {
+      out[i]=0;
+    }
+  }
+  UNPROTECT(1);
+  return(outs);
+}
+
+SEXP _nlmixr_convertEvidRate(SEXP evid, SEXP cmt){
+  int *ev = INTEGER(evid);
+  int *amt = INTEGER(cmt);
+  SEXP outs = PROTECT(allocVector(INTSXP,length(evid)));
+  int *out = INTEGER(outs);
+  for (unsigned int i = length(evid); i--;){
+    if (ev[i]){
+      if (amt[i] > 99){
+        int amt100 = amt[i]/100;
+        int amt99  = amt[i]-amt100*100;
+        out[i] = amt100*1e5+amt99*100+10001;
+      } else {
+        out[i] = 100*amt[i]+10001;
+      }
+    } else {
+      out[i]=0;
+    }
+  }
+  UNPROTECT(1);
+  return(outs);
+}
+
 SEXP _nlmixr_chkSolvedInf(SEXP evid,SEXP solved){
   double *ev = REAL(evid);
   int n = length(evid);
