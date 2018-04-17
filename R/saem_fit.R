@@ -927,6 +927,14 @@ configsaem = function(model, data, inits,
   pash=c(rep(1,mcmc$burn.in), 1/(1:niter));
   minv = rep(1e-20, nphi)
 
+  #preserve par order when printing iter history
+  mcov[mcov==1] = 1:nlambda
+  ilambda1 = mcov[,i1]; ilambda1 = ilambda1[ilambda1>0] - 1
+  ilambda0 = mcov[,i0]; ilambda0 = ilambda0[ilambda0>0] - 1
+  #print(mcov)
+  #print(mcov[,i1]); print(ilambda1)
+  #print(mcov[,i0]); print(ilambda0)
+
   i1 = i1 - 1
   i0 = i0 - 1
 
@@ -993,7 +1001,9 @@ configsaem = function(model, data, inits,
     distribution=distribution.idx[distribution],
     par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2)),
     seed=seed,
-    fixed.ix = fixed.ix
+    fixed.ix = fixed.ix,
+    ilambda1 = as.integer(ilambda1),
+    ilambda0 = as.integer(ilambda0)
   )
 }
 
