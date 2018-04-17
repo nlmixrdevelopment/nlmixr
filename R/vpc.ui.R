@@ -1,13 +1,17 @@
 ##' VPC based on ui model
 ##'
 ##' @param fit nlmixr fit object
+##' @param data this is the data to use to augment the VPC fit.  By
+##'     default is the fitted data, (can be retrieved by
+##'     \code{\link[nlme]{getData}}), but it can be changed by specifying
+##'     this argument.
 ##' @param n Number of VPC simulations.  By default 100
 ##' @inheritParams vpc::vpc
 ##' @inheritParams RxODE::rxSolve
-##' @param ... Args sent to rxSolve
+##' @param ... Args sent to \code{\link[RxODE]{rxSolve}}
 ##' @author Matthew L. Fidler
 ##' @export
-vpc.ui <- function(fit, n=100, bins = "jenks",
+vpc.ui <- function(fit, data=NULL, n=100, bins = "jenks",
                    n_bins = "auto", bin_mid = "mean",
                    show = NULL, stratify = NULL, pred_corr = FALSE,
                    pred_corr_lower_bnd = 0, pi = c(0.05, 0.95), ci = c(0.05, 0.95),
@@ -35,7 +39,11 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     n <- sprintf("ETA[%d]", seq(1, dm))
     dimnames(omega) <- list(n, n)
     sigma <- matrix(1, dimnames=list("rx_err_", "rx_err_"))
-    dat <- nlmixrData(getData(fit));
+    if (is.null(data)){
+        dat <- nlmixrData(getData(fit));
+    } else {
+        dat <- data
+    }
     if (is.null(method)){
         meth <- c("dop853", "lsoda", "liblsoda");
         meth <- meth[con$stiff + 1];
