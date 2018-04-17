@@ -48,14 +48,16 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
                    maxordn = con$maxordn, maxords = con$maxords, method=meth);
     diff <- proc.time() - pt;
     message(sprintf("done (%.2f sec)", diff["elapsed"]));
-    names(dat) <- tolower(names(dat))
+    onames <- names(dat)
+    names(dat) <- tolower(onames)
     w <- which(duplicated(names(dat)));
     if (length(w) > 0){
-        warning("Dropping duplicate columns (case insensitive)")
+        warning(sprintf("Dropping duplicate columns (case insensitive): %s", paste(onames, collapse=", ")))
         dat <- dat[, -w];
     }
     if (!is.null(stratify)){
         cols <- c(tolower(stratify), "dv")
+        stratify <- tolower(stratify);
     }  else {
         cols <- c("dv");
     }
@@ -71,7 +73,7 @@ vpc.ui <- function(fit, n=100, bins = "jenks",
     }
     rxDelete(mod);
     call <- as.list(match.call(expand.dots=TRUE))[-1];
-    call <- call[names(call) %in% formalArgs(getFromNamespace("vpc","vpc"))]
+    call <- call[names(call) %in% formalArgs(getFromNamespace("vpc_vpc","vpc"))]
     call$obs_cols = list(id="id", dv="dv", idv="time")
     call$sim_cols = list(id="id", dv="dv", idv="time")
     call$stratify = stratify
