@@ -74,11 +74,11 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     ## Assume this is in the observed dataset. Add it to the current dataset
     if(!all(names(sim) %in% cols)){
         w <- cols[!(cols %in% names(sim))]
-        n <- names(sim)
-        sim <- cbind(sim, dat[, w]);
-        names(sim) <- c(n, w);
-        diff <- proc.time() - pt;
-        pt <- proc.time();
+        if (length(w) > 1){
+            n <- names(sim)
+            sim <- cbind(sim, dat[, w]);
+            names(sim) <- c(n, w);
+        }
     }
     RxODE::rxDelete(mod);
     call <- as.list(match.call(expand.dots=TRUE))[-1];
