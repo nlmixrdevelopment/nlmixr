@@ -755,6 +755,10 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
     env$uif <- uif;
     env$uif.new <- uif.new;
     class(fit.f) <- c("nlmixr.ui.nlme", class(fit.f))
+    if (fit.f$uif$.clean.dll){
+        nlme.cleanup(fit.f);
+        focei.cleanup(fit.f);
+    }
     return(fit.f)
 }
 
@@ -802,3 +806,11 @@ nlme.nlmixr.ui.nlme <- function(model, data, fixed, random = fixed,
 
 ##' @export
 nlme.nlmixr.ui.focei.fit <- nlme.nlmixr.ui.nlme
+
+
+nlme.cleanup <- function(x){
+    if (is(x, "nlmixr.ui.nlme")) x <- as.nlme(x);
+    if (exists("m1", x$env)){
+        RxODE::rxDelete(x$env$m1);
+    }
+}

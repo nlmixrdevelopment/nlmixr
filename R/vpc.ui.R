@@ -11,7 +11,7 @@
 ##' @param ... Args sent to \code{\link[RxODE]{rxSolve}}
 ##' @author Matthew L. Fidler
 ##' @export
-vpc.ui <- function(fit, data=NULL, n=100, bins = "jenks",
+vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                    n_bins = "auto", bin_mid = "mean",
                    show = NULL, stratify = NULL, pred_corr = FALSE,
                    pred_corr_lower_bnd = 0, pi = c(0.05, 0.95), ci = c(0.05, 0.95),
@@ -86,4 +86,29 @@ vpc.ui <- function(fit, data=NULL, n=100, bins = "jenks",
     call$sim_cols = list(id="id", dv="dv", idv="time")
     call$stratify = stratify
     do.call(getFromNamespace("vpc","vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
+}
+
+
+##' @rdname vpc_ui
+##' @export
+vpc.nlmixr.ui.focei <- function(sim, ...){
+    vpc_ui(fit=sim, ...);
+}
+
+##' @rdname vpc_ui
+##' @export
+vpc.nlmixr.ui.saem <- function(sim, ...){
+    vpc_ui(fit=sim, ...);
+}
+
+##' @rdname vpc_ui
+##' @export
+vpc.nlmixr.ui.nlme <- function(sim, ...){
+    vpc_ui(fit=sim, ...);
+}
+
+##' @rdname vpc_ui
+##' @export
+vpc.ui <- function(sim, ...){
+    vpc_ui(fit=sim, ...);
 }

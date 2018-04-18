@@ -465,6 +465,9 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         fit <- fix.dat(fit);
         env$uif.new <- uif.new;
         class(fit) <- c("nlmixr.ui.focei.fit", class(fit));
+        if (uif$.clean.dll){
+            focei.cleanup(fit)
+        }
         assign("start.time", start.time, env);
         assign("est", est, env);
         assign("stop.time", Sys.time(), env);

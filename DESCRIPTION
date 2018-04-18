@@ -28,7 +28,8 @@ Imports:
     fastGHQuad,
     crayon,
     cli,
-    RcppArmadillo (>= 0.5.600.2.0)
+    RcppArmadillo (>= 0.5.600.2.0),
+    vpc (>= 1.0.2)
 Suggests:
     knitr,
     rmarkdown,

@@ -1131,9 +1131,7 @@ focei.fit.data.frame0 <- function(data,
     ## rxCat(model$inner);
     if (!con$NOTRUN){
         message(sprintf("Original Compartments=%s", length(RxODE::rxState(model$obj))))
-        if (!con$numeric){
-            message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
-        }
+        message(sprintf("\t Inner Compartments=%s", length(RxODE::rxState(model$inner))))
         if (con$grad){
             message(sprintf("\t Outer Compartments=%s", length(RxODE::rxState(model$outer))))
         }
@@ -1336,7 +1334,6 @@ focei.fit.data.frame0 <- function(data,
                                                        hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
                                                        maxordn = con$maxordn, maxords = con$maxords, stiff=con$stiff,
                                                        pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver,
-                                                       numeric=con$numeric,
                                                        inner.opt=con$inner.opt, add.grad=print.grad, numDeriv.method=numDeriv.method,
                                                        table=do.table);
                                           if (!is.null(con$scale.to)){
@@ -2498,6 +2495,15 @@ print.anova.nlmixr <- function (x, verbose = attr(x, "verbose"), ...)
         print(as.data.frame(x), ...)
     }
     invisible(ox)
+}
+
+focei.cleanup <- function(obj){
+    if (is(obj, "focei.fit")){
+        model <- obj$model
+        for (m in c("ebe", "pred.only", "inner", "outer")){
+            if (is(model[[m]], "RxODE")) {RxODE::rxDelete(model[[m]])}
+        }
+    }
 }
 
 ##  LocalWords:  focei nlme linCmt solveC SolvedC UI saem VarCorr AIC

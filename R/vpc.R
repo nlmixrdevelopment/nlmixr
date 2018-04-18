@@ -41,9 +41,13 @@ sim.one = function(zz, x) {
 }
 
 
-#' Visual predictive check (VPC)
+##' @importFrom vpc vpc
+##' @export
+vpc::vpc
+
+#' Visual predictive check (VPC) for nlmixr nlme objects
 #'
-#' Do visual predictive check (VPC) plots for nlme-base non-linear mixed effect models
+#' Do visual predictive check (VPC) plots for nlme-based non-linear mixed effect models
 #'
 #' @param fit nlme fit object
 #' @param nsim number of simulations
@@ -54,7 +58,7 @@ sim.one = function(zz, x) {
 #' fit <- nlme_lin_cmpt(theo_md, par_model=specs, ncmt=1, verbose=TRUE)
 #' vpc(fit, nsim = 100, condition = NULL)
 #' @export
-vpc = function(fit, nsim=100, condition=NULL)
+vpc_nlmixr_nlme = function(fit, nsim=100, condition=NULL)
 {
     nlmeModList(fit$env);
     on.exit({nlmeModList(new.env(parent=emptyenv()))})
@@ -80,6 +84,12 @@ vpc = function(fit, nsim=100, condition=NULL)
 
 	options(warn=0)
 	invisible(NULL)
+}
+
+#' @rdname vpc_nlmixr_nlme
+#' @export
+vpc.nlmixr_nlme <- function(sim, ...){
+    vpc_nlmixr_nlme(fit, ...);
 }
 
 #vpc(fit, 100)

@@ -1561,6 +1561,14 @@ nlmixrUI.model.desc <- function(obj){
         return(nlmixrUI.model.desc(obj))
     } else if (arg == "meta"){
         return(x$meta);
+    } else if (arg == ".clean.dll"){
+        if (exists(".clean.dll", envir=x$meta)){
+            clean <- x$meta$.clean.dll;
+            if (is(clean, "logical")){
+                return(clean)
+            }
+        }
+        return(TRUE);
     } else if (arg == "random.mu"){
         return(nlmixrBoundsOmega(x$ini,x$nmodel$mu.ref))
     }
@@ -1608,4 +1616,5 @@ str.nlmixrUI <- function(object, ...){
     message(" $ saem.omega.name : The SAEM theta names")
     message(" $ saem.res.name : The SAEM omega names")
     message(" $ model.desc : Model description")
+    message(" $ .clean.dll : boolean representing if dlls are cleaned after running.")
 }

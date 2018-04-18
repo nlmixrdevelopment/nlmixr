@@ -445,7 +445,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)\n'
   make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), .lib)
   cat(make_str, file="Makevars")
-cat(make_str)
+  cat(make_str)
 
   shlib = sprintf('R CMD SHLIB %s -o %s', saem.cpp, saem.dll)
   ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
@@ -464,6 +464,7 @@ cat(make_str)
           cur.fn <- .(fn1)
           ret <- cur.fn(a)
           attr(ret, "dopred") <- .(fn.pred);
+          attr(ret, "env") <- .(env);
           return(ret);
       } else {
           cur.fn <- .(fn.pred)
@@ -488,6 +489,9 @@ cat(make_str)
 ##' @author Matthew L. Fidler
 ##' @export
 saem.cleanup <- function(env){
+    if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
+    if (is(env, "saemFit")) env <- attr(env, "env");
+    if (env$is.ode) RxODE::rxDelete(env$model)
     try({dyn.unload(env$saem.dll)}, silent=TRUE);
     if (file.exists(env$saem.dll))
         unlink(env$saem.dll);
@@ -1356,6 +1360,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
         env$fit$condition.number <- max(tmp) / min(tmp);
     }
     class(fit.f) <- c("nlmixr.ui.saem", class(fit.f))
+    if (uif$.clean.dll){
+        saem.cleanup(fit.f);
+        focei.cleanup(fit.f);
+    }
     return(fit.f)
 }
 

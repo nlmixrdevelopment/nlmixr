@@ -1,4 +1,4 @@
-multi2 = function (mu, vmat, n) 
+multi2 = function (mu, vmat, n)
 {
     eta <- matrix(rnorm(length(mu) * n), ncol = n, nrow = length(mu))
     Q <- chol(vmat, pivot = TRUE)
@@ -8,11 +8,21 @@ multi2 = function (mu, vmat, n)
     sweep(para, 1, mu, "+")
 }
 
-rmvnorm = function(n, mu, vmat) multi2(mu, vmat, n) 
+rmvnorm = function(n, mu, vmat) multi2(mu, vmat, n)
 
-vpc.saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
+##' VPC for nlmixr saemFit objects
+##'
+##' @param fit  saemFit object
+##' @param dat  Data to augment the saemFit vpc simulation
+##' @param nsim Number of simulations for the VPC
+##' @param by Variables to condition the VPC
+##' @param ... Other arguments sent to \code{\link[vpc:vpc]{vpc_vpc}}
+##' @return vpc object from the \code{\link[vpc:vpc]{vpc_vpc}} package
+##' @author Wenping Wang
+##' @export
+vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
   if (class(fit) == "nlmixr.ui.saem") fit = as.saem(fit)
-  
+
   saem.cfg = attr(fit, "saem.cfg")
   dopred <- attr(fit, "dopred")
   red.mod = sum((fit$sig2 != 0) * 1:2)
@@ -40,7 +50,7 @@ vpc.saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
     p = dopred(mpost_rand, saem.cfg$evt, saem.cfg$opt)
     if      (red.mod==1) res = rnorm(ntim,0,sqrt(fit$sig2[1]))
     else if (red.mod==2) res = p*fit$sig2[2]*rnorm(ntim,0,1)
-    else if (red.mod==3) res = (fit$sig2[1]+p*fit$sig2[2])*rnorm(ntim,0,1)
+    else if (red.mod==3) res = sqrt(fit$sig2[1]+p*fit$sig2[2])*rnorm(ntim,0,1)
     p+res
   })
   xs = do.call("cbind",s)
@@ -54,4 +64,10 @@ vpc.saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
   print(p)
 
   invisible(df)
+}
+
+#' @rdname vpc_saemFit
+#' @export
+vpc.saemFit <- function(sim, ...){
+    vpc_saemFit(fit, ...);
 }
