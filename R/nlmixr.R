@@ -173,7 +173,7 @@ nlmixrData.character <- function(data){
         stop(sprintf("%s does not exist.", data))
     }
     if (regexpr(rex::rex(".csv", end), data) != -1){
-        return(nlmixrData.default(read.csv(data, na.strings=c(".", "NA", "na", ""))))
+        return(nlmixrData.default(utils::read.csv(data, na.strings=c(".", "NA", "na", ""))))
     } else {
         stop(sprintf("Do not know how to read in %s", data));
     }

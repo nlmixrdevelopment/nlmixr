@@ -714,7 +714,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                 }
                             }
                             new <- find.etas(x[[2]]);
-                            if (length(etas) == 1){
+                            if (length(.etas) == 1){
                                 tmp <- .mu.ref;
                                 tmp[[.etas]] <- theta;
                                 ## assign("tmp", .mu.ref, this.env);
@@ -963,6 +963,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
 }
 ##' Create the nlme specs list for nlmixr nlme solving
 ##' @inheritParams nlmixrUI.nlmefun
+##' @param mu.type is the mu-referencing type of model hat nlme will be using.
 ##' @return specs list for nlme
 ##' @author Matthew L. Fidler
 nlmixrUI.nlme.specs <- function(object, mu.type=c("thetas", "covariates", "none")){
@@ -1328,7 +1329,7 @@ nlmixrUI.saem.fit <- function(obj){
         } else {
             ode <- RxODE::RxODE(obj$rxode.pred);
         }
-        rxLoad(ode);
+        RxODE::rxLoad(ode);
         message("done.")
         inPars <- obj$saem.inPars;
         if (length(inPars) == 0) inPars <- NULL

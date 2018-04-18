@@ -8,6 +8,8 @@ nlmixrUI.nlme.specs(object, mu.type = c("thetas", "covariates", "none"))
 }
 \arguments{
 \item{object}{UI object}
+
+\item{mu.type}{is the mu-referencing type of model hat nlme will be using.}
 }
 \value{
 specs list for nlme

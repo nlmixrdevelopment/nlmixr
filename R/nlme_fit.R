@@ -291,9 +291,7 @@ prepEv = function(dati, theta)
 #' @param par_trans function: calculation of PK parameters
 #' @param response names of the response variable
 #' @param response.scaler optional response variable scaler. default is NULL
-#' @param transit_abs a logical if transit absorption model is enabled
-#' @param atol atol (absolute tolerance for ODE-solver)
-#' @param rtol rtol (relative tolerance for ODE-solver)
+#' @inheritParams RxODE::rxSolve
 #' @param debugODE a logical if debugging is enabled
 #' @param mc.cores number of cores used in fitting (only for Linux)
 #' @param ... additional nlme options

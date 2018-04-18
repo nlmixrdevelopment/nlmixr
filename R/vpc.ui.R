@@ -9,6 +9,7 @@
 ##' @inheritParams vpc::vpc
 ##' @inheritParams RxODE::rxSolve
 ##' @param ... Args sent to \code{\link[RxODE]{rxSolve}}
+##' @inheritParams vpc::vpc
 ##' @author Matthew L. Fidler
 ##' @export
 vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
@@ -26,7 +27,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     con <- fit$fit$con;
     pt <- proc.time();
     message("Compiling VPC model...", appendLF=FALSE)
-    mod <- gsub(rex::rex("(0)~"), "(0)=", paste0(gsub("=", "~", rxNorm(fit$model$pred.only), perl=TRUE),
+    mod <- gsub(rex::rex("(0)~"), "(0)=", paste0(gsub("=", "~", RxODE::rxNorm(fit$model$pred.only), perl=TRUE),
                                                  "\ndv=rx_pred_+sqrt(rx_r_)*rx_err_"))
     mod <- RxODE(mod);
     diff <- proc.time() - pt;
@@ -50,10 +51,10 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     } else {
         meth <- method;
     }
-    sim <- rxSolve(mod, params=theta, events=dat, omega=omega, nStud=nStud, sigma=sigma, add.cov=TRUE, return.type="data.frame",
-                   atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
-                   hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
-                   maxordn = con$maxordn, maxords = con$maxords, method=meth);
+    sim <- RxODE::rxSolve(mod, params=theta, events=dat, omega=omega, nStud=nStud, sigma=sigma, add.cov=TRUE, return.type="data.frame",
+                          atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
+                          hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
+                          maxordn = con$maxordn, maxords = con$maxords, method=meth);
     diff <- proc.time() - pt;
     message(sprintf("done (%.2f sec)", diff["elapsed"]));
     onames <- names(dat)
@@ -79,9 +80,9 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         diff <- proc.time() - pt;
         pt <- proc.time();
     }
-    rxDelete(mod);
+    RxODE::rxDelete(mod);
     call <- as.list(match.call(expand.dots=TRUE))[-1];
-    call <- call[names(call) %in% formalArgs(getFromNamespace("vpc_vpc","vpc"))]
+    call <- call[names(call) %in% methods::formalArgs(getFromNamespace("vpc_vpc","vpc"))]
     call$obs_cols = list(id="id", dv="dv", idv="time")
     call$sim_cols = list(id="id", dv="dv", idv="time")
     call$stratify = stratify

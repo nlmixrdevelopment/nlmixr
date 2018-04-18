@@ -52,6 +52,7 @@ vpc::vpc
 #' @param fit nlme fit object
 #' @param nsim number of simulations
 #' @param condition conditional variable
+#' @inheritParams vpc::vpc
 #' @return NULL
 #' @examples
 #' specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
@@ -68,7 +69,7 @@ vpc_nlmixr_nlme = function(fit, nsim=100, condition=NULL)
 
     s = sapply(1:nsim, sim.one, x=fit)
 
-	cond.var = if(is.null(condition)) rep(1, dim(..ModList$dat.g)[1]) else ..ModList$dat.g[, condition]
+    cond.var = if(is.null(condition)) rep(1, dim(..ModList$dat.g)[1]) else ..ModList$dat.g[, condition]
 	levels = sort(unique(cond.var))
 	for (k in 1:length(levels)) {
 		sel = cond.var == levels[k]
@@ -89,7 +90,7 @@ vpc_nlmixr_nlme = function(fit, nsim=100, condition=NULL)
 #' @rdname vpc_nlmixr_nlme
 #' @export
 vpc.nlmixr_nlme <- function(sim, ...){
-    vpc_nlmixr_nlme(fit, ...);
+    vpc_nlmixr_nlme(sim, ...);
 }
 
 #vpc(fit, 100)

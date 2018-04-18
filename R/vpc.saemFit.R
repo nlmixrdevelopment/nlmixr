@@ -16,6 +16,7 @@ rmvnorm = function(n, mu, vmat) multi2(mu, vmat, n)
 ##' @param dat  Data to augment the saemFit vpc simulation
 ##' @param nsim Number of simulations for the VPC
 ##' @param by Variables to condition the VPC
+##' @inheritParams vpc::vpc
 ##' @param ... Other arguments sent to \code{\link[vpc:vpc]{vpc_vpc}}
 ##' @return vpc object from the \code{\link[vpc:vpc]{vpc_vpc}} package
 ##' @author Wenping Wang
@@ -69,5 +70,5 @@ vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
 #' @rdname vpc_saemFit
 #' @export
 vpc.saemFit <- function(sim, ...){
-    vpc_saemFit(fit, ...);
+    vpc_saemFit(sim, ...);
 }

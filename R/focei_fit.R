@@ -171,7 +171,7 @@ print.focei.fit <- function(x, ...) {
             type <- crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"));
             if (is(x, "nlmixr.ui.focei.posthoc")){
                 message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow("FOCEi"), " posthoc ",
-                                         eta, " estimation (",type, ")")))
+                                         eta.name, " estimation (",type, ")")))
             } else {
                 message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow("FOCEi"), " fit ",
                                          ifelse(fit$focei.control$grad, "with global gradient", "without global gradient"),
@@ -208,7 +208,7 @@ print.focei.fit <- function(x, ...) {
             message("\n  Correlations in between subject variability (BSV) matrix:")
             rs <- fit$omega.R
             lt <- lower.tri(rs);
-            dn1 <- dimnames(fit.saem$omega.R)[[2]]
+            dn1 <- dimnames(fit$omega.R)[[2]]
             nms <- apply(which(lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(dn1[x],collapse=", "))});
             lt <- structure(rs[lt], .Names=nms)
             lt <- lt[lt != 0]
@@ -648,8 +648,7 @@ print.nlmixr.shrink <- function(x, ...){
 ##' @return residuals
 ##' @author Matthew L. Fidler
 ##' @export
-residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wres", "cwres", "cpred", "cres"),
-                                etas=NULL){
+residuals.focei.fit <- function(object, ..., type=c("ires", "res", "iwres", "wres", "cwres", "cpred", "cres")){
     return(object[, toupper(match.arg(type))]);
 }
 ##' Convert focei fit to a data.frame
