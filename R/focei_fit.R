@@ -2502,6 +2502,9 @@ focei.cleanup <- function(obj){
         for (m in c("ebe", "pred.only", "inner", "outer")){
             if (is(model[[m]], "RxODE")) {RxODE::rxDelete(model[[m]])}
         }
+        if (file.exists(model$cache.file)){
+            unlink(model$cache.file)
+        }
     }
 }
 
