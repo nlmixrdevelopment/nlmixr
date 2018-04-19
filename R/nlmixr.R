@@ -367,7 +367,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             } else if (!is.null(uif$nlme.mu.fun)){
                 est.type <- "nlme.mu"
                 fun <- uif$nlme.fun.mu
-                specs <- uif$nlme.fun.specs.mu;
+                specs <- uif$nlme.specs.mu;
             } else {
                 est.type <- "nlme.free"
                 fun <- uif$nlme.fun
