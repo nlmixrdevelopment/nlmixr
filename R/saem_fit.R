@@ -122,6 +122,13 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
 
 vec g;
 g = <%=pred_expr%>;
+if (g.has_nan()) {
+	Rcout <<"WARNING: NAN in pred" << endl;
+	Rcout  << i << params << endl;
+	Rcout << join_rows(time,g) << endl;
+	Rcout << "Consider to relax atol & rtol" << endl;
+	g.replace(datum::nan, 1.0e9); 
+}
 
     int no = g.n_elem;
     memcpy(p, g.memptr(), no*sizeof(double));
