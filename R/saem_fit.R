@@ -1149,7 +1149,7 @@ saem.fit.nlmixr.ui.nlme <- function(model, data, inits,
                                     PKpars=NULL, pred=NULL,
                                     covars=NULL,
                                     mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                                    ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                                    ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transit_abs = 0),
                                     distribution=c("normal","poisson","binomial"),
                                     seed = 99){
     call <- as.list(match.call(expand.dots=TRUE))[-1];
@@ -1172,7 +1172,7 @@ saem.fit.RxODE <- function(model, data, inits,
                            PKpars=NULL, pred=NULL,
                            covars=NULL,
                            mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                           ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                           ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transit_abs = 0),
                            distribution=c("normal","poisson","binomial"),
                            seed = 99){
     saem_fit = gen_saem_user_fn(model, PKpars, pred)
@@ -1189,7 +1189,7 @@ saem.fit.default <- function(model, data, inits,
                              PKpars=NULL, pred=NULL,
                              covars=NULL,
                              mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                             ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1, transit_abs = 0),
+                             ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transit_abs = 0),
                              distribution=c("normal","poisson","binomial"),
                              seed = 99){
     saem_fit = gen_saem_user_fn(model)
@@ -1312,9 +1312,9 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
         dat <- data;
     }
     atol <- fit$env$uif$env$ODEopt$atol;
-    if(is.null(atol))atol <- 1e-8
+    if(is.null(atol))atol <- 1e-6
     rtol <- fit$env$uif$env$ODEopt$rtol;
-    if(is.null(rtol))rtol <- 1e-6
+    if(is.null(rtol))rtol <- 1e-4
     stiff <- fit$env$uif$env$ODEopt$stiff;
     if(is.null(stiff))stiff <- 1L
     transit_abs <- fit$env$uif$env$ODEopt$transit_abs;
