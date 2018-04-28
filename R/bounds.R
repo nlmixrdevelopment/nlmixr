@@ -676,16 +676,16 @@ nlmixrBounds.eta.names <- function(obj){
 ##'@export
 str.nlmixrBounds <- function(object, ...){
     str(as.data.frame(object), ...);
-    message(" $ theta     : num ... (theta estimates)")
-    message(" $ theta.full: num ... (theta estimates, including error terms)")
-    message(" $ omega     : matrix ... (omega matrix)")
-    message(" $ random    : matrix class ... (Based on Between Subject Random effects)")
-    message(" $ fixed.form: formula  ... (Fixed effect parameters based on theta.)")
-    message(" $ focei.upper: Upper bounds for FOCEi")
-    message(" $ focei.lower: Lower bounds for FOCEi")
-    message(" $ focei.err.type: Residual Error type for FOCEi thetas")
-    message(" $ eta.names: Eta names")
-    message(" $ focei.names: Theta names for FOCEi")
+    cat(" $ theta     : num ... (theta estimates)\n")
+    cat(" $ theta.full: num ... (theta estimates, including error terms)\n")
+    cat(" $ omega     : matrix ... (omega matrix)\n")
+    cat(" $ random    : matrix class ... (Based on Between Subject Random effects)\n")
+    cat(" $ fixed.form: formula  ... (Fixed effect parameters based on theta.)\n")
+    cat(" $ focei.upper: Upper bounds for FOCEi\n")
+    cat(" $ focei.lower: Lower bounds for FOCEi\n")
+    cat(" $ focei.err.type: Residual Error type for FOCEi thetas\n")
+    cat(" $ eta.names: Eta names\n")
+    cat(" $ focei.names: Theta names for FOCEi\n")
 }
 
 ##' Get upper/lower/names for THETAs

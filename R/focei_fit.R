@@ -2251,9 +2251,9 @@ focei.fit.data.frame0 <- function(data,
 str.focei.fit <- function(object, ...){
     uif <- object$uif;
     if (is.null(uif)){
-        message('FOCEi combined dataset and properties');
+        cat('FOCEi combined dataset and properties\n');
     } else {
-        message('nlmixr UI combined dataset and properties')
+        cat('nlmixr UI combined dataset and properties\n')
     }
     m <- as.data.frame(object);
     str(m)
@@ -2262,13 +2262,13 @@ str.focei.fit <- function(object, ...){
     str(fit)
     str(as.list(env$fit))
     str(as.list(object$uif$env))
-    message(" $ par.hist         : Parameter history (if available)")
-    message(" $ par.hist.stacked : Parameter history in stacked form for easy plotting (if available)")
-    message(" $ par.fixed        : Fixed Effect Parameter Table")
-    message(" $ eta              : Individual Parameter Estimates")
-    message(" $ seed             : Seed (if applicable)");
-    message(" $ model.name       : Model name (from R function)");
-    message(" $ data.name        : Name of R data input");
+    cat(" $ par.hist         : Parameter history (if available)\n")
+    cat(" $ par.hist.stacked : Parameter history in stacked form for easy plotting (if available)\n")
+    cat(" $ par.fixed        : Fixed Effect Parameter Table\n")
+    cat(" $ eta              : Individual Parameter Estimates\n")
+    cat(" $ seed             : Seed (if applicable)\n");
+    cat(" $ model.name       : Model name (from R function)\n");
+    cat(" $ data.name        : Name of R data input\n");
 }
 
 ##' @export

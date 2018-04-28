@@ -1329,6 +1329,7 @@ nlmixrUI.saem.fit <- function(obj){
         } else {
             ode <- RxODE::RxODE(obj$rxode.pred);
         }
+        obj$env$saem.ode <- ode;
         RxODE::rxLoad(ode);
         message("done.")
         inPars <- obj$saem.inPars;
@@ -1593,29 +1594,29 @@ str.nlmixrUI <- function(object, ...){
     class(obj) <- "list";
     str(obj$ini);
     str(obj$nmodel)
-    message(" $ ini       : Model initilizations/bounds object");
-    message(" $ model     : Original Model");
-    message(" $ nmodel    : Parsed Model List");
-    message(" $ nlme.fun  : The nlme model function.");
-    message(" $ nlme.specs: The nlme model specs.");
-    message(" $ nlme.var  : The nlme model varaince.")
-    message(" $ rxode.pred: The RxODE block with pred attached (final pred is nlmixr_pred)")
-    message(" $ theta.pars: Parameters in terms of THETA[#] and ETA[#]")
-    message(" $ focei.inits: Initilization for FOCEi style blocks")
-    message(" $ saem.eta.trans: UI ETA -> SAEM ETA")
-    message(" $ saem.model.omega: model$omega for SAEM")
-    message(" $ saem.res.mod: model$res.mod for SAEM")
-    message(" $ saem.ares: model$ares for SAEM")
-    message(" $ saem.bres: model$bres for SAEM")
-    message(" $ saem.log.eta: model$log.eta for SAEM")
-    message(" $ saem.fit  : The SAEM fit user function")
-    message(" $ saem.model: The SAEM model list")
-    message(" $ saem.init.theta: The SAEM init$theta")
-    message(" $ saem.init.omega: The SAEM init$omega")
-    message(" $ saem.init : The SAEM inits list")
-    message(" $ saem.theta.name : The SAEM theta names")
-    message(" $ saem.omega.name : The SAEM theta names")
-    message(" $ saem.res.name : The SAEM omega names")
-    message(" $ model.desc : Model description")
-    message(" $ .clean.dll : boolean representing if dlls are cleaned after running.")
+    cat(" $ ini       : Model initilizations/bounds object\n");
+    cat(" $ model     : Original Model\n");
+    cat(" $ nmodel    : Parsed Model List\n");
+    cat(" $ nlme.fun  : The nlme model function.\n");
+    cat(" $ nlme.specs: The nlme model specs.\n");
+    cat(" $ nlme.var  : The nlme model varaince.\n")
+    cat(" $ rxode.pred: The RxODE block with pred attached (final pred is nlmixr_pred)\n")
+    cat(" $ theta.pars: Parameters in terms of THETA[#] and ETA[#]\n")
+    cat(" $ focei.inits: Initilization for FOCEi style blocks\n")
+    cat(" $ saem.eta.trans: UI ETA -> SAEM ETA\n")
+    cat(" $ saem.model.omega: model$omega for SAEM\n")
+    cat(" $ saem.res.mod: model$res.mod for SAEM\n")
+    cat(" $ saem.ares: model$ares for SAEM\n")
+    cat(" $ saem.bres: model$bres for SAEM\n")
+    cat(" $ saem.log.eta: model$log.eta for SAEM\n")
+    cat(" $ saem.fit  : The SAEM fit user function\n")
+    cat(" $ saem.model: The SAEM model list\n")
+    cat(" $ saem.init.theta: The SAEM init$theta\n")
+    cat(" $ saem.init.omega: The SAEM init$omega\n")
+    cat(" $ saem.init : The SAEM inits list\n")
+    cat(" $ saem.theta.name : The SAEM theta names\n")
+    cat(" $ saem.omega.name : The SAEM theta names\n")
+    cat(" $ saem.res.name : The SAEM omega names\n")
+    cat(" $ model.desc : Model description\n")
+    cat(" $ .clean.dll : boolean representing if dlls are cleaned after running.\n")
 }

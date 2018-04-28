@@ -1,5 +1,5 @@
 cat("Generate nlmixr installer")
-
+library(nlmixr)
 nsi.lauch.stub <- "
 CRCCheck On
 RequestExecutionLevel user

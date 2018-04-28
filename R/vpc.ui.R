@@ -113,3 +113,7 @@ vpc.nlmixr.ui.nlme <- function(sim, ...){
 vpc.ui <- function(sim, ...){
     vpc_ui(fit=sim, ...);
 }
+
+##' @importFrom vpc vpc
+##' @export
+vpc::vpc
