@@ -1,49 +1,16 @@
 Package: nlmixr
 Type: Package
-Title: Nonlinear Mixed Effects Models in Population Pharmacokinetics and
-    Pharmacodynamics
-Depends:
-    R (>= 3.2),
-    nlme,
-    RxODE
-Imports:
-    Rcpp (>= 0.12.3),
-    brew,
-    lattice,
-    parallel,
-    lbfgs,
-    inline,
-    dparser,
-    methods,
-    ggplot2,
-    memoise,
-    rex,
-    minqa,
-    Matrix,
-    numDeriv,
-    R.utils,
-    mvtnorm,
-    n1qn1,
-    PreciseSums,
-    fastGHQuad,
-    crayon,
-    cli,
-    RcppArmadillo (>= 0.5.600.2.0),
-    vpc (>= 1.0.2)
-Suggests:
-    knitr,
-    rmarkdown,
-    dplyr,
-    data.table,
-    lbfgsb3,
-    testthat,
-    madness,
-    devtools,
-    expm,
-    matrixcalc,
-    reshape2
+Title: Nonlinear Mixed Effects Models in Population Pharmacokinetics
+        and Pharmacodynamics
+Depends: R (>= 3.2), nlme, RxODE
+Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs, inline,
+        dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
+        numDeriv, R.utils, mvtnorm, n1qn1, PreciseSums, fastGHQuad,
+        crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.2)
+Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3, testthat,
+        madness, devtools, expm, matrixcalc, reshape2
 Version: 0.9.1-0
-Date: 2018-02-06
+Date: 2018-04-29
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com"),      
    person("Yuan", "Xiong", 
@@ -73,9 +40,23 @@ Description: Fit and compare nonlinear mixed-effects models in differential
     (Wang, Hallow, and James 2015 <doi:10.1002/psp4.12052>).
 License: GPL (>=2)
 NeedsCompilation: yes
-LinkingTo: dparser(>= 0.1.8), Rcpp (>= 0.12.3),
-    RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
+LinkingTo: dparser(>= 0.1.8), RcppArmadillo, Rcpp (>= 0.12.3),
+        RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
+Packaged: 2018-04-30 00:44:50 UTC; annie
+Author: Matthew Fidler [aut],
+  Yuan Xiong [aut],
+  Rik Schoemaker [aut],
+  Justin Wilkins [aut],
+  Mirjam Trame [aut],
+  Teun Post [aut],
+  Robert Leary [ctb],
+  Wenping Wang [aut, cre],
+  Hadley Wickham [ctb],
+  Dirk Eddelbuettel [cph],
+  David Ardia [cph],
+  Katharine Mullen [cph]
+Maintainer: Wenping Wang <wwang8198@gmail.com>
