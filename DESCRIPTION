@@ -6,7 +6,7 @@ Depends: R (>= 3.2), nlme, RxODE
 Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs, inline,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
         numDeriv, R.utils, mvtnorm, n1qn1, PreciseSums, fastGHQuad,
-        crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.2)
+        crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0)
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3, testthat,
         madness, devtools, expm, matrixcalc, reshape2
 Version: 0.9.1-0
@@ -46,7 +46,7 @@ URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
-Packaged: 2018-04-30 00:44:50 UTC; annie
+Packaged: 2018-04-30 01:43:13 UTC; annie
 Author: Matthew Fidler [aut],
   Yuan Xiong [aut],
   Rik Schoemaker [aut],
