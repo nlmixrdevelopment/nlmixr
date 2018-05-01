@@ -40,23 +40,11 @@ Description: Fit and compare nonlinear mixed-effects models in differential
     (Wang, Hallow, and James 2015 <doi:10.1002/psp4.12052>).
 License: GPL (>=2)
 NeedsCompilation: yes
-LinkingTo: dparser(>= 0.1.8), RcppArmadillo, Rcpp (>= 0.12.3),
+LinkingTo: dparser(>= 0.1.8), Rcpp (>= 0.12.3),
         RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Packaged: 2018-04-30 01:43:13 UTC; annie
-Author: Matthew Fidler [aut],
-  Yuan Xiong [aut],
-  Rik Schoemaker [aut],
-  Justin Wilkins [aut],
-  Mirjam Trame [aut],
-  Teun Post [aut],
-  Robert Leary [ctb],
-  Wenping Wang [aut, cre],
-  Hadley Wickham [ctb],
-  Dirk Eddelbuettel [cph],
-  David Ardia [cph],
-  Katharine Mullen [cph]
 Maintainer: Wenping Wang <wwang8198@gmail.com>
