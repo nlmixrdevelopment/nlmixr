@@ -27,4 +27,3 @@ BinaryFiles$
 ^/?man-roxygen/.*$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^/?build/.*$
