@@ -2417,7 +2417,7 @@ anova.nlmixr.ui.focei.fit <- function(object, ..., test = TRUE, type = c("sequen
                               L.Ratio = c(NA, lratio),
                               `p-value` = c(NA, pval),
                               check.names = FALSE)
-s        }
+        }
     }
     attr(aod, "rt") <- rt
     attr(aod, "verbose") <- verbose

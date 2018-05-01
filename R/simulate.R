@@ -103,3 +103,7 @@ solve.focei.fit <- function(a, b, ...){
     names(lst) <- n
     do.call("nlmixrSim", lst, envir=parent.frame(1))
 }
+
+##' @importFrom RxODE rxSolve
+##' @export
+RxODE::rxSolve

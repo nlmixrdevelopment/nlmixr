@@ -43,6 +43,7 @@ NeedsCompilation: yes
 LinkingTo: dparser(>= 0.1.8), Rcpp (>= 0.12.3),
         RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
+SystemRequirements: GNU make
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1

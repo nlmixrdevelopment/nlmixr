@@ -19,7 +19,8 @@ install.packages(c("tidyverse", "data.table",
                    "microbenchmark",
                    "scales",
                    "stringi",
-                   "roxygen"))
+                   "roxygen",
+                   "lbfgsb3", "madness", "expm", "matrixcalc"))
 
 devtools::install_github("ronkeizer/vpc");
 devtools::install_github("mattfidler/xpose")
