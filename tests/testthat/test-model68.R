@@ -11,9 +11,9 @@ rxPermissive({
         datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
         datr <- datr[datr$EVID != 2,]
 
-        ode2MMKA <- "
+       ode2MMKA <- "
     d/dt(abs)    =-KA*abs;
-    d/dt(centr)  = KA*abs+K21*periph-K12*centr-(VM*centr/V)/(KM+centr/V);
+    d/dt(centr)  = KA*abs+K21*periph-K12*centr-exp(log(VM)+log(centr)-log(V)-log(KM+centr/V));
     d/dt(periph) =-K21*periph+K12*centr;
     "
 
@@ -61,23 +61,23 @@ rxPermissive({
 
         z <- VarCorr(fit)
 
-        expect_equal(signif(as.numeric(fit$logLik), 6),-11762.4)
-        expect_equal(signif(AIC(fit), 6), 23550.8)
-        expect_equal(signif(BIC(fit), 6), 23625.3)
+        expect_equal(signif(as.numeric(fit$logLik), 6),-11754.6)
+        expect_equal(signif(AIC(fit), 6), 23535.1)
+        expect_equal(signif(BIC(fit), 6), 23609.7)
 
         expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 7.3)
-        expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 6.06)
-        expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.24)
-        expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.39)
-        expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.76)
-        expect_equal(signif(as.numeric(fit$coefficients$fixed[6]), 3), -0.0296)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 6.07)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.26)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.33)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.73)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[6]), 3), -0.00552)
 
-        expect_equal(signif(as.numeric(z[1, "StdDev"]), 3),  0.194)
-        expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.329)
-        expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.34)
-        expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.00266)
-        expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.249)
-        expect_equal(signif(as.numeric(z[6, "StdDev"]), 3), 0.28)
+        expect_equal(signif(as.numeric(z[1, "StdDev"]), 3),  0.188)
+        expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.335)
+        expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.339)
+        expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.000319)
+        expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.254)
+        expect_equal(signif(as.numeric(z[6, "StdDev"]), 3), 0.286)
 
         expect_equal(signif(fit$sigma, 3), 0.205)
     })
