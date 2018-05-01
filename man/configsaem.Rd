@@ -5,7 +5,7 @@
 \title{Configure an SAEM model}
 \usage{
 configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
-  c(2, 2, 2)), ODEopt = list(atol = 1e-08, rtol = 1e-06, stiff = 1,
+  c(2, 2, 2)), ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1,
   transit_abs = 0), distribution = c("normal", "poisson", "binomial"),
   seed = 99, fixed = NULL)
 }

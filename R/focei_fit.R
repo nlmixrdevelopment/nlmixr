@@ -672,18 +672,6 @@ as.data.frame.focei.fit <- function(x, row.names = NULL, optional = FALSE, ...){
 
 ## FIXME: simulate function
 
-##' Simulate response based on FOCEi model's datathe fitted object's dataset
-##'
-##' @param object Focei object
-##' @param nsim Number of simulated parameters
-##' @param seed Seed to start with (if specified)
-##' @param ... Other parameters
-##' @return New dataset based on original dataset
-##' @export
-##' @author Matthew L. Fidler
-simulate.focei.fit <- function(object, nsim=1, seed=NULL, ...){
-    stop("FIXME")
-}
 ## FIXME: show?
 ## FIXME: qqnorm?
 ## FIXME: family?
@@ -2429,7 +2417,7 @@ anova.nlmixr.ui.focei.fit <- function(object, ..., test = TRUE, type = c("sequen
                               L.Ratio = c(NA, lratio),
                               `p-value` = c(NA, pval),
                               check.names = FALSE)
-        }
+s        }
     }
     attr(aod, "rt") <- rt
     attr(aod, "verbose") <- verbose

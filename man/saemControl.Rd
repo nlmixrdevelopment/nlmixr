@@ -5,7 +5,7 @@
 \title{Control Options for SAEM}
 \usage{
 saemControl(seed = 99, n.burn = 200, n.em = 300, nmc = 3, nu = c(2, 2,
-  2), atol = 1e-08, rtol = 1e-06, stiff = TRUE, transit_abs = FALSE,
+  2), atol = 1e-06, rtol = 1e-04, stiff = TRUE, transit_abs = FALSE,
   print = 1, ...)
 }
 \arguments{
