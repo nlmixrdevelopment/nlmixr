@@ -7,8 +7,7 @@ nlmixrSim <- function(object, params=NULL, events=NULL, inits = NULL, scale = NU
                       covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
                       transit_abs = NULL, atol = 1.0e-8, rtol = 1.0e-6,
                       maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-                      cores,
-                      covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
+                      cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
                       add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
                       nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
                       amountUnits = NA_character_, timeUnits = "hours", stiff,
@@ -51,7 +50,17 @@ nlmixrSim <- function(object, params=NULL, events=NULL, inits = NULL, scale = NU
     dm <- dim(object$omega)[1];
     n <- sprintf("ETA[%d]", seq(1, dm))
     dimnames(omega) <- list(n, n)
+    lst$omega <- omega;
     sigma <- matrix(1, dimnames=list("rx_err_", "rx_err_"))
+    lst$sigma <- sigma;
+    thetaMat <- object$varFix;
+    d <- dimnames(thetaMat)[[1]];
+    n <- names(fixed.effects(object))
+    for (i in seq_along(n)){
+        d <- gsub(n[i], sprintf("THETA[%d]", i), d, fixed=TRUE)
+    }
+    dimnames(thetaMat) <- list(d, d);
+    lst$thetaMat <- thetaMat;
     on.exit({RxODE::rxDelete(lst$object)});
     do.call(getFromNamespace("rxSolve","RxODE"), lst)
 }
@@ -62,8 +71,7 @@ rxSolve.focei.fit <- function(object, params=NULL, events=NULL, inits = NULL, sc
                               covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
                               transit_abs = NULL, atol = 1.0e-8, rtol = 1.0e-6,
                               maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-                              cores,
-                              covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
+                              cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
                               add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
                               nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
                               amountUnits = NA_character_, timeUnits = "hours", stiff,

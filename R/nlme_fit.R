@@ -745,11 +745,23 @@ as.focei.nlmixr_nlme <- function(object, uif, pt=proc.time(), ..., data){
     names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
     env$fit$time <- tmp;
     eig <- try(eigen(object$apVar,TRUE,TRUE)$values, silent=TRUE);
+    eig2 <- try(eigen(object$varFix,TRUE,TRUE)$values, silent=TRUE);
     if (!inherits(eig, "try-error")){
         env$fit$eigen <- unlist(eig)
         tmp <- sapply(env$fit$eigen, abs)
-        env$fit$condition.number <- max(tmp) / min(tmp);
+        if (!inherits(eig2, "try-error")){
+            env$fit$eigen2 <- unlist(eig2)
+            tmp2 <- sapply(env$fit$eigen2, abs)
+            env$fit$condition.number <- max(c(max(tmp) / min(tmp), max(tmp2) / min(tmp2)));
+        } else {
+            env$fit$condition.number <- max(tmp) / min(tmp);
+        }
+    } else if (!inherits(eig2, "try-error")) {
+        env$fit$eigen2 <- unlist(eig2)
+        tmp2 <- sapply(env$fit$eigen2, abs)
+        env$fit$condition.number <- max(tmp2) / min(tmp2);
     }
+    env$fit$varFix <- object$varFix
     env$uif <- uif;
     env$uif.new <- uif.new;
     class(fit.f) <- c("nlmixr.ui.nlme", class(fit.f))

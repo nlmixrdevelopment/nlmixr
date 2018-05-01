@@ -127,7 +127,7 @@ if (g.has_nan()) {
 	Rcout  << i << params << endl;
 	Rcout << join_rows(time,g) << endl;
 	Rcout << "Consider to relax atol & rtol" << endl;
-	g.replace(datum::nan, 1.0e9); 
+	g.replace(datum::nan, 1.0e9);
 }
 
     int no = g.n_elem;
@@ -1366,6 +1366,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
         tmp <- sapply(fit.f$eigen, abs)
         env$fit$condition.number <- max(tmp) / min(tmp);
     }
+    nth <- length(uif$saem.theta.name)
+    tmp <- object$Ha[1:nth, 1:nth]
+    dimnames(tmp) <- list(uif$saem.theta.name, uif$saem.theta.name)
+    env$fit$varFix <- tmp
     class(fit.f) <- c("nlmixr.ui.saem", class(fit.f))
     if (uif$.clean.dll){
         saem.cleanup(fit.f);
