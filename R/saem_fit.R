@@ -25,24 +25,21 @@ using namespace std;
 using namespace arma;
 
 extern "C" {
+  typedef void (*ode_solver_c)(int *neq, double *theta, double *time, int *evid,
+                               int *ntime, double *inits, double *dose,
+                               double *ret, double *atol, double *rtol,
+                               int *stiff, int *transit_abs, int *nlhs,
+                               double *lhs, int *rc);
 
-void <%=ode_solver%>(
-	int *neq,
-	double *theta,	//order:
-	double *time,
-	int *evid,
-	int *ntime,
-	double *inits,
-	double *dose,
-	double *ret,
-	double *atol,
-	double *rtol,
-	int *stiff,
-	int *transit_abs,
-	int *nlhs,
-	double *lhs,
-    int *rc
-);
+  void <%=ode_solver%>(int *neq, double *theta, double *time, int *evid, int *ntime,
+                       double *inits, double *dose, double *ret, double *atol,
+                       double *rtol, int *stiff, int *transit_abs, int *nlhs,
+                       double *lhs, int *rc){
+    static ode_solver_c fun=NULL;
+    if (fun == NULL) fun = (ode_solver_c) R_GetCCallable("<%=dll%>","<%=ode_solver%>");
+    fun(neq, theta, time, evid, ntime, inits, dose, ret, atol,
+        rtol, stiff, transit_abs, nlhs, lhs, rc);
+  }
 
 }
 
@@ -358,7 +355,11 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   is.ode = class(model) == "RxODE"
   is.win <- .Platform$OS.type=="windows"
   env = environment()
-  saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
+  if (getOption("RxODE.tempfiles",TRUE)){
+      saem.cpp <- paste0(tempfile(pattern="saem", getwd()), .Platform$r_arch);
+  } else {
+      saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
+  }
   saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
   saem.cpp <- paste0(saem.cpp, ".cpp");
@@ -384,6 +385,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 	model_vars_decl = paste0(s, collapse="")
 
 	ode_solver = model$cmpMgr$ode_solver
+    dll = sub("[.].*","",basename(rxDll(model)))
 
 	neq = length(modelVars$state)
 	nlhs = length(modelVars$lhs)
