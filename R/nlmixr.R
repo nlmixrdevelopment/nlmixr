@@ -255,6 +255,14 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                        sum.prod=FALSE, calc.resid=TRUE){
     start.time <- Sys.time();
     dat <- nlmixrData(data);
+    up.covs <- toupper(uif$all.covs);
+    up.names <- toupper(names(dat))
+    for (i in seq_along(up.covs)){
+        w <- which(up.covs[i] == up.names)
+        if (length(w) == 1){
+            names(dat)[w] = uif$all.covs[i];
+        }
+    }
     backSort <- attr(dat, "backSort");
     backSort2 <- attr(dat, "backSort2");
     attr(dat, "backSort") <- NULL;
@@ -375,7 +383,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             }
         }
         grp.fn <- uif$grp.fn;
-        dat$nlmixr.grp <- factor(apply(data, 1, function(x){
+        dat$nlmixr.grp <- factor(apply(dat, 1, function(x){
             cur <- x;
             names(cur) <- names(dat);
             with(as.list(cur), {

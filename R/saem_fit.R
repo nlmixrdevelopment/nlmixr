@@ -355,11 +355,11 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   is.ode = class(model) == "RxODE"
   is.win <- .Platform$OS.type=="windows"
   env = environment()
-  if (getOption("RxODE.tempfiles",TRUE)){
-      saem.cpp <- paste0(tempfile(pattern="saem", getwd()), .Platform$r_arch);
-  } else {
-      saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
-  }
+  ## if (getOption("RxODE.tempfiles",TRUE)){
+  ##     saem.cpp <- paste0(tempfile(pattern="saem", getwd()), .Platform$r_arch);
+  ## } else {
+  saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
+  ## }
   saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
   saem.cpp <- paste0(saem.cpp, ".cpp");
