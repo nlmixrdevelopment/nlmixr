@@ -386,12 +386,12 @@ prepEv = function(dati, theta)
 nlme_ode <- function(dat.o, model, par_model, par_trans,
 	response, response.scaler=NULL,
 	transit_abs = FALSE,
-	atol=1.0e-8, rtol=1.0e-8, maxsteps = 5000,
+	atol = 1e-06, rtol=1.0e-4, maxsteps = 5000,
         hmin = 0, hmax = NULL,
         hini = 0, maxordn = 12, maxords = 5,
 	debugODE=FALSE, mc.cores=1, ...)
 {
-  if (any(dat.o$EVID[dat.o$EVID>0]<101))
+  if (any(dat.o$EVID[dat.o$EVID>0]<101))
     	stop("incompatible EVID values")
 
     #a new env with a ref in .GlobalEnv, holding model components

@@ -1369,7 +1369,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
         env$fit$condition.number <- max(tmp) / min(tmp);
     }
     nth <- length(uif$saem.theta.name)
-    tmp <- object$Ha[1:nth, 1:nth]
+    tmp <- RxODE::rxInv(object$Ha[1:nth, 1:nth])
     dimnames(tmp) <- list(uif$saem.theta.name, uif$saem.theta.name)
     env$fit$varFix <- tmp
     class(fit.f) <- c("nlmixr.ui.saem", class(fit.f))

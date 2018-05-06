@@ -3,6 +3,7 @@
 \name{nlmixrAugPred}
 \alias{nlmixrAugPred}
 \alias{augPred.focei.fit}
+\alias{plot.nlmixrAugPred}
 \title{Augmented Prediction for nlmixr fit}
 \usage{
 nlmixrAugPred(object, ..., covs_interpolation = c("linear", "locf", "nocb",
@@ -11,6 +12,8 @@ nlmixrAugPred(object, ..., covs_interpolation = c("linear", "locf", "nocb",
 
 \method{augPred}{focei.fit}(object, primary = NULL, minimum = min(primary),
   maximum = max(primary), length.out = 51, ...)
+
+\method{plot}{nlmixrAugPred}(x, y, ...)
 }
 \arguments{
 \item{object}{Nlmixr fit object}
