@@ -20,18 +20,6 @@ repThetaEta <- function(x, theta=c(), eta=c()){
             } else {
                 return(as.call(lapply(x, f)))
             }
-            ## if (FALSE){
-            ##     if (is.call(x[[3]])){
-            ##         ret <- unique(unlist(lapply(x[[3]][-1], f)));
-            ##     } else {
-            ##         ret <- unique(unlist(lapply(x[[3]], f)));
-            ##     }
-            ##     ret <- ret[!(ret %in% defined)]
-            ##     assign("defined", unique(c(defined, x[[2]])), this.env)
-            ##     return(ret)
-            ## } else {
-            ##     children <- as.expression(lapply(x[-1], f))
-            ## }
         } else {
             stop("Don't know how to handle type ", typeof(x),
                  call. = FALSE)
@@ -39,7 +27,7 @@ repThetaEta <- function(x, theta=c(), eta=c()){
     }
     ret <- deparse(f(ret))[-1];
     ret <- paste(ret[-length(ret)], collapse="\n");
-    return(RxODE::rxGetModel(ret))
+    return(RxODE::rxNorm(RxODE::rxGetModel(ret))
 }
 
 
@@ -113,7 +101,7 @@ nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
         eta.n <- dimnames(omega)[[1]]
         omega <- omega;
     }
-    new.mod <- RxODE::rxNorm(repThetaEta(mod, theta=theta.n, eta=eta.n));
+    new.mod <- repThetaEta(mod, theta=theta.n, eta=eta.n);
     message("Compiling model...", appendLF=FALSE)
     newobj <- RxODE::RxODE(new.mod);
     on.exit({RxODE::rxUnload(newobj)});
