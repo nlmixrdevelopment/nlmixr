@@ -80,7 +80,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
             names(sim) <- c(n, w);
         }
     }
-    RxODE::rxDelete(mod);
+    RxODE::rxUnload(mod);
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     call <- call[names(call) %in% methods::formalArgs(getFromNamespace("vpc_vpc","vpc"))]
     call$obs_cols = list(id="id", dv="dv", idv="time")

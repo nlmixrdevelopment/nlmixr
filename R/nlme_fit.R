@@ -821,6 +821,6 @@ nlme.nlmixr.ui.focei.fit <- nlme.nlmixr.ui.nlme
 nlme.cleanup <- function(x){
     if (is(x, "nlmixr.ui.nlme")) x <- as.nlme(x);
     if (exists("m1", x$env)){
-        RxODE::rxDelete(x$env$m1);
+        RxODE::rxUnload(x$env$m1);
     }
 }
