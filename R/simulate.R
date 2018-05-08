@@ -1,3 +1,49 @@
+## Add RxODE THETA/ETA replacement mini DSL
+repThetaEta <- function(x, theta=c(), eta=c()){
+    ret <- eval(parse(text=sprintf("quote({%s})", x)));
+    f <- function(x){
+        if (is.atomic(x)) {
+            return(x)
+        } else if (is.name(x)) {
+            return(x)
+        } else if (is.pairlist(x)){
+            return(x)
+        } else if (is.call(x)) {
+            if (identical(x[[1]], quote(`[`))){
+                type <- tolower(as.character(x[[2]]))
+                if (type == "theta"){
+                    return(eval(parse(text=sprintf("quote(%s)", theta[as.numeric(x[[3]])]))))
+                } else if (type == "eta"){
+                    return(eval(parse(text=sprintf("quote(%s)", eta[as.numeric(x[[3]])]))))
+                }
+                stop("Only theta/eta translation supported.");
+            } else {
+                return(as.call(lapply(x, f)))
+            }
+            ## if (FALSE){
+            ##     if (is.call(x[[3]])){
+            ##         ret <- unique(unlist(lapply(x[[3]][-1], f)));
+            ##     } else {
+            ##         ret <- unique(unlist(lapply(x[[3]], f)));
+            ##     }
+            ##     ret <- ret[!(ret %in% defined)]
+            ##     assign("defined", unique(c(defined, x[[2]])), this.env)
+            ##     return(ret)
+            ## } else {
+            ##     children <- as.expression(lapply(x[-1], f))
+            ## }
+        } else {
+            stop("Don't know how to handle type ", typeof(x),
+                 call. = FALSE)
+        }
+    }
+    ret <- deparse(f(ret))[-1];
+    ret <- paste(ret[-length(ret)], collapse="\n");
+    return(RxODE::rxGetModel(ret))
+}
+
+
+
 ##' Simulate a nlmixr solved system
 ##'
 ##' This takes the uncertainty in the model parameter estimates and to
@@ -28,23 +74,24 @@ nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
     method <- match.arg(method)
     covs_interpolation <- match.arg(covs_interpolation)
     return.type <- match.arg(return.type)
-    mod <- gsub("rx_r_~.*;", "",
-                gsub(rex::rex("(0)~"), "(0)=",
-                     gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE)));
+    mod <- gsub("rx_pred_~", "ipred=",
+                gsub("rx_r_~.*;", "",
+                     gsub(rex::rex("(0)~"), "(0)=",
+                          gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE))));
     nlmixr.data <- nlmixrData(getData(object))
     if (!RxODE::rxIs(events, "rx.event")){
         events <- nlmixr.data;
     }
     params <- fixed.effects(object);
-    names(params) <- sprintf("THETA[%d]", seq_along(params))
-    sim <- "ipred=rx_pred_;\nsim=ipred"
+    theta.n <- names(params);
+    sim <- "\nsim=ipred"
     err <- object$uif$err;
     w <- which(!is.na(object$uif$err))
     mat <- diag(length(w))
     dimn <- character(length(w))
     for (i in seq_along(w)){
         ntheta <- object$uif$ini$ntheta[w[i]]
-        cur <- sprintf("THETA[%d]", ntheta);
+        cur <- theta.n[ntheta];
         dimn[i] <- cur;
         if (err[w[i]] == "add"){
             sim <- paste0(sim, "+", cur);
@@ -59,8 +106,16 @@ nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
     params <- params[!is.na(params)]
     dimnames(mat) <- list(dimn, dimn);
     sigma <- mat;
+    mod <- paste0(mod, "\n", sim);
+    if (is.null(omega)){
+        omega <- object$omega
+        dm <- dim(object$omega)[1];
+        eta.n <- dimnames(omega)[[1]]
+        omega <- omega;
+    }
+    new.mod <- RxODE::rxNorm(repThetaEta(mod, theta=theta.n, eta=eta.n));
     message("Compiling model...", appendLF=FALSE)
-    newobj <- RxODE::RxODE(paste0(mod, "\n", sim));
+    newobj <- RxODE::RxODE(new.mod);
     on.exit({RxODE::rxUnload(newobj)});
     message("done");
     params <- params[-w];
@@ -70,22 +125,8 @@ nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
     if (dfSub == 0.0){
         dfSub <- length(unique(nlmixr.data$ID))
     }
-    if (is.null(omega)){
-        omega <- object$omega
-        dm <- dim(object$omega)[1];
-        n <- sprintf("ETA[%d]", seq(1, dm))
-        dimnames(omega) <- list(n, n)
-        omega <- omega;
-    }
     if (is.null(thetaMat) && nStud > 1L){
         thetaMat <- object$varFix;
-        d <- dimnames(thetaMat)[[1]];
-        n <- names(fixed.effects(object))
-        for (i in seq_along(n)){
-            d <- gsub(n[i], sprintf("THETA[%d]", i), d, fixed=TRUE)
-        }
-        dimnames(thetaMat) <- list(d, d);
-        thetaMat <- thetaMat;
     }
     ## if (!any(names(lst) == "return.type")){
     ##     lst$return.type <- "data.frame"

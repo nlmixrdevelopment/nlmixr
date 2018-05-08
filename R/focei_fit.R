@@ -812,6 +812,12 @@ plot.focei.fit <- function(x, ...) {
         geom_abline(slope=0, intercept=0, col="red")
     print(p2)
 
+    p2 <- ggplot(dat, aes(x=TIME, y=IRES)) +
+        geom_point() +
+        geom_abline(slope=0, intercept=0, col="red")
+    print(p2)
+
+
     ids <- unique(dat$ID)
     for (i  in seq(1, length(ids), by=16)){
         tmp <- ids[seq(i, i + 15)]
