@@ -27,7 +27,7 @@ repThetaEta <- function(x, theta=c(), eta=c()){
     }
     ret <- deparse(f(ret))[-1];
     ret <- paste(ret[-length(ret)], collapse="\n");
-    return(RxODE::rxNorm(RxODE::rxGetModel(ret))
+    return(RxODE::rxNorm(RxODE::rxGetModel(ret)))
 }
 
 
