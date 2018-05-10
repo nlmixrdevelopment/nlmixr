@@ -465,7 +465,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   saem.dll <- file.path(lwd, saem.dll);
 
   ## if(is.ode) RxODE::rxDynLoad(model)
-  if(is.ode) dyn.load(model, FALSE)
+  if(is.ode) dyn.load(model$cmpMgr$dllfile, FALSE)
   `.DLL` <- dyn.load(saem.dll);
   fn.pred <- sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred')
   fn1 <- sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
