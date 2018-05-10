@@ -448,11 +448,11 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   ##gen Markevars
   ## if(is.win) x = gsub("\\\\", "/", utils::shortPathName(x))
   ## x = sub("/nlmixr", "", x)
-  .lib=  if(is.ode) model$cmpMgr$dllfile else ""
-  if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
+  ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
+  ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
   make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)\n'
-  make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), .lib)
+  make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), "")
   cat(make_str, file="Makevars")
   cat(make_str)
 
@@ -464,8 +464,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   setwd(lwd);
   saem.dll <- file.path(lwd, saem.dll);
 
-  ## if(is.ode) RxODE::rxDynLoad(model)
-  if(is.ode) dyn.load(model$cmpMgr$dllfile, FALSE)
+  if(is.ode) RxODE::rxLoad(model)
   `.DLL` <- dyn.load(saem.dll);
   fn.pred <- sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred')
   fn1 <- sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
