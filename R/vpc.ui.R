@@ -109,7 +109,7 @@ vpc.nlmixr.ui.nlme <- function(sim, ...){
 }
 
 ##' @rdname vpc_ui
-##' @export
+##' @export vpc.ui
 vpc.ui <- function(sim, ...){
     vpc_ui(fit=sim, ...);
 }

@@ -5,7 +5,7 @@
 \title{Fit nlme-based mixed-effect model using ODE implementation}
 \usage{
 nlme_ode(dat.o, model, par_model, par_trans, response, response.scaler = NULL,
-  transit_abs = FALSE, atol = 1e-08, rtol = 1e-08, maxsteps = 5000,
+  transit_abs = FALSE, atol = 1e-06, rtol = 1e-04, maxsteps = 5000,
   hmin = 0, hmax = NULL, hini = 0, maxordn = 12, maxords = 5,
   debugODE = FALSE, mc.cores = 1, ...)
 }
@@ -25,12 +25,12 @@ nlme_ode(dat.o, model, par_model, par_trans, response, response.scaler = NULL,
 \item{transit_abs}{boolean indicating if this is a transit
 compartment absorption}
 
-\item{atol}{a numeric absolute tolerance (1e-08 by default) used
+\item{atol}{a numeric absolute tolerance (1e-8 by default) used
 by the ODE solver to determine if a good solution has been
 achieved;  This is also used in the solved linear model to check
 if prior doses do not add anything to the solution.}
 
-\item{rtol}{a numeric relative tolerance (1e-06 by default) used
+\item{rtol}{a numeric relative tolerance (1e-6 by default) used
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
  if prior doses do not add anything to the solution.}

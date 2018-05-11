@@ -7,9 +7,9 @@
 \alias{solve.focei.fit}
 \title{Simulate a nlmixr solved system}
 \usage{
-nlmixrSim(object, params = NULL, events = NULL, inits = NULL,
-  scale = NULL, covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-  transit_abs = NULL, atol = 1e-08, rtol = 1e-06, maxsteps = 5000L,
+nlmixrSim(object, events = NULL, inits = NULL, scale = NULL,
+  covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
+  transit_abs = NULL, atol = 1e-06, rtol = 1e-04, maxsteps = 5000L,
   hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
   cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
   add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
@@ -21,16 +21,15 @@ nlmixrSim(object, params = NULL, events = NULL, inits = NULL,
   dfSub = 0, dfObs = 0, return.type = c("rxSolve", "matrix",
   "data.frame"), seed = NULL, nsim = NULL)
 
-\method{rxSolve}{focei.fit}(object, params = NULL, events = NULL,
-  inits = NULL, scale = NULL, covs = NULL, method = c("liblsoda",
-  "lsoda", "dop853"), transit_abs = NULL, atol = 1e-08, rtol = 1e-06,
-  maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L,
-  maxords = 5L, ..., cores, covs_interpolation = c("linear", "locf", "nocb",
-  "midpoint"), add.cov = FALSE, matrix = FALSE, sigma = NULL,
-  sigmaDf = NULL, nCoresRV = 1L, sigmaIsChol = FALSE,
-  nDisplayProgress = 10000L, amountUnits = NA_character_,
-  timeUnits = "hours", stiff, theta = NULL, eta = NULL,
-  addDosing = FALSE, update.object = FALSE, do.solve = TRUE,
+\method{rxSolve}{focei.fit}(object, events = NULL, inits = NULL,
+  scale = NULL, covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
+  transit_abs = NULL, atol = 1e-06, rtol = 1e-04, maxsteps = 5000L,
+  hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
+  cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
+  add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
+  nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress = 10000L,
+  amountUnits = NA_character_, timeUnits = "hours", stiff, theta = NULL,
+  eta = NULL, addDosing = FALSE, update.object = FALSE, do.solve = TRUE,
   omega = NULL, omegaDf = NULL, omegaIsChol = FALSE, nSub = 1L,
   thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE, nStud = 1L,
   dfSub = 0, dfObs = 0, return.type = c("rxSolve", "matrix",
@@ -44,10 +43,6 @@ nlmixrSim(object, params = NULL, events = NULL, inits = NULL,
 \item{object}{is a either a RxODE family of objects, or a file-name
 with a RxODE model specification, or a string with a RxODE
 model specification.}
-
-\item{params}{a numeric named vector with values for every
-parameter in the ODE system; the names must correspond to the
-parameter identifiers used in the ODE specification;}
 
 \item{events}{an \code{eventTable} object describing the input
 (e.g., doses) to the dynamic system and observation sampling
@@ -83,12 +78,12 @@ is for time-varying covariates.}
 \item{transit_abs}{boolean indicating if this is a transit
 compartment absorption}
 
-\item{atol}{a numeric absolute tolerance (1e-08 by default) used
+\item{atol}{a numeric absolute tolerance (1e-8 by default) used
 by the ODE solver to determine if a good solution has been
 achieved;  This is also used in the solved linear model to check
 if prior doses do not add anything to the solution.}
 
-\item{rtol}{a numeric relative tolerance (1e-06 by default) used
+\item{rtol}{a numeric relative tolerance (1e-6 by default) used
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
  if prior doses do not add anything to the solution.}

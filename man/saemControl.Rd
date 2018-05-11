@@ -38,12 +38,12 @@ computation.  In Monolix this is equivalent to \code{L}}
     The third value represents the number of bootstrap/reshuffling or
     uni-dimensional random samples are taken.}
 
-\item{atol}{a numeric absolute tolerance (1e-08 by default) used
+\item{atol}{a numeric absolute tolerance (1e-8 by default) used
 by the ODE solver to determine if a good solution has been
 achieved;  This is also used in the solved linear model to check
 if prior doses do not add anything to the solution.}
 
-\item{rtol}{a numeric relative tolerance (1e-06 by default) used
+\item{rtol}{a numeric relative tolerance (1e-6 by default) used
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
  if prior doses do not add anything to the solution.}
