@@ -11,30 +11,30 @@ vignette: >
 
 # Running PK models with nlmixr
 
-nlmixr uses a unified interface for specifying and running models. Let's start with a very simple PK example, using the single-dose theophylline dataset generously provided by Dr. Robert A. Upton of the University of California, San Francisco:
+nlmixr uses a unified interface for specifying and running
+models. Let's start with a very simple PK example, using the
+single-dose theophylline dataset generously provided by Dr. Robert
+A. Upton of the University of California, San Francisco:
 
 ```{r}
+## Load libraries
 library(ggplot2)
 library(nlmixr)
 
 str(theo_sd)
 
-ggplot(theo_sd, aes(TIME, DV)) +
- geom_line(aes(group=ID), col="red") + 
-  scale_x_continuous("Time (h)") +
-  scale_y_continuous("Concentration") +
-  labs(title="Theophylline single-dose", subtitle="Concentration vs. time by individual")
+ggplot(theo_sd, aes(TIME, DV)) + geom_line(aes(group=ID), col="red") + scale_x_continuous("Time (h)") + scale_y_continuous("Concentration") + labs(title="Theophylline single-dose", subtitle="Concentration vs. time by individual")
 
 ```
 
 We can try fitting a simple one-compartment PK model to this small dataset. We write the model as follows:
 
 ```{r}
-uif <- function() {
+one.cmt <- function() {
     ini({
-        tka <- .5
-        tcl <- -3.2
-        tv <- -1
+        tka <- .5   # log Ka
+        tcl <- -3.2 # log Cl
+        tv <- -1    # log V
         eta.ka ~ 1
         eta.cl ~ 2
         eta.v ~ 1
@@ -52,7 +52,7 @@ uif <- function() {
 We can now run the model...
 
 ```{r}
-fit <- nlmixr(uif, theo_sd, est="nlme", calc.resid=FALSE)
+fit <- nlmixr(one.cmt, theo_sd, est="nlme", calc.resid=FALSE)
 print(fit)
 ```
 
@@ -61,9 +61,9 @@ We can alternatively express the same model by ordinary differential equations (
 ```{r}
 one.compartment.saem <- function() {
     ini({
-        tka <- .5
-        tcl <- -3.2
-        tv <- -1
+        tka <- .5   # Log Ka
+        tcl <- -3.2 # Log Cl
+        tv <- -1    # Log V
         eta.ka ~ 1
         eta.cl ~ 2
         eta.v ~ 1
@@ -75,7 +75,7 @@ one.compartment.saem <- function() {
         v <- exp(tv + eta.v)
         d/dt(depot) = -ka * depot
         d/dt(center) = ka * depot - cl / v * center
-        cp = center / v
+        cp = center / v 
         cp ~ add(add.err)
     })
 }
@@ -141,16 +141,6 @@ The model-based sensitivities have been calculated.
 It will be cached for future runs.
 Calculating Table Variables...
 done
-nlmixr UI combined dataset and properties
-...
- $ theta         : Named num [1:4] 0.448 -3.212 -0.788 0.689
-  ..- attr(*, "names")= chr [1:4] "tka" "tcl" "tv" "add.err"
- $ omega         : num [1:3, 1:3] 0.4426 0 0 0 0.0713 ...
-  ..- attr(*, "dimnames")=List of 2
- $ par.hist         : Parameter history (if available)
- $ par.hist.stacked : Parameter history in stacked form for easy plotting (if available)
- $ par.fixed        : Fixed Effect Parameter Table
- $ eta              : Individual Parameter Estimates
 ```
 
 This Windows example delivers a complete model fit as the `fit`
@@ -176,45 +166,41 @@ fit
 ```
 
 ```r
-nlmixr SAEM fit (ODE)
+> fit
+-- nlmixr SAEM fit (ODE); OBJF calculated from FOCEi approximation -------------
+                                                         OBJF      AIC      BIC Log-likelihood Condition Number
+116.1543 130.1543 150.3339      -58.07713         140.8018
 
-    OBJF     AIC      BIC Log-likelihood
- 116.211 130.211 150.3906       -58.1055
+-- Time (sec; fit$time): -------------------------------------------------------
+    saem setup Likelihood Calculation covariance table
+elapsed 58.64 31.91                   0.31          0  0.44
 
-Time (sec; $time):
-         saem setup FOCEi Evaulate covariance table
-elapsed 32.53 24.95           0.04          0  0.64
+-- Parameters (fit$par.fixed): -------------------------------------------------
+    Parameter Estimate     SE %RSE Back-transformed(95%CI) BSV(CV%)
+tka        Log Ka    0.455  0.198 43.4       1.58 (1.07, 2.32)    74.5%
+tcl        Log Cl    -3.22 0.0814 2.53 0.0401 (0.0342, 0.0471)    27.2%
+tv          Log V   -0.785 0.0426 5.43    0.456 (0.420, 0.496)    13.5%
+add.err   add.err    0.691                            0.691            
+Shrink(SD)%
+tka        -0.520% 
+tcl          3.76% 
+tv           11.0% 
+add.err      12.0% 
 
-Parameters ($par.fixed):
-        Estimate     SE    CV Untransformed          (95%CI)
-tka        0.448  0.198 44.3%          1.56     (1.06, 2.31)
-tcl        -3.21 0.0808  2.5%        0.0403 (0.0344, 0.0472)
-tv        -0.788 0.0420  5.3%         0.455   (0.419, 0.494)
-add.err    0.689                      0.689                 
+  No correlations in between subject variability (BSV) matrix
+  Full BSV covariance (fit$omega) or correlation (fit$omega.R; diagonals=SDs)
+  Distribution stats (mean/skewness/kurtosis/p-value) available in fit$shrink
 
-Omega ($omgea):
-          eta.ka     eta.cl      eta.v
-eta.ka 0.4425785 0.00000000 0.00000000
-eta.cl 0.0000000 0.07125033 0.00000000
-eta.v  0.0000000 0.00000000 0.01764135
-
-Fit Data (object is a modified data.frame):
-     ID  TIME   DV    IPRED     PRED       IRES         RES      IWRES         WRES       CWRES
-  1:  1  0.00 0.74 0.000000 0.000000  0.7400000  0.74000000  1.0733773  1.073377301  1.07337730
-  2:  1  0.25 2.84 3.877715 2.827771 -1.0377150  0.01222892 -1.5052158  0.007093383  0.08011876
-  3:  1  0.57 6.57 6.803636 5.067377 -0.2336357  1.50262337 -0.3388909  0.657973448  0.61426093
- ---                                                                                           
-130: 12  9.03 6.11 5.910060 5.550456  0.1999398  0.55954371  0.2900147  0.421389714  0.45457245
-131: 12 12.05 4.57 4.394221 4.247425  0.1757787  0.32257468  0.2549688  0.239830381  0.27506033
-132: 12 24.15 1.17 1.336427 1.453920 -0.1664266 -0.28392025 -0.2414034 -0.262089996 -0.24191376
-        CPRED       CRES     eta.ka     eta.cl       eta.v
-  1: 0.000000  0.7400000  0.1289524 -0.6293931 -0.20786978
-  2: 2.662178  0.1778215  0.1289524 -0.6293931 -0.20786978
-  3: 4.830243  1.7397568  0.1289524 -0.6293931 -0.20786978
- ---                                                      
-130: 5.438893  0.6711065 -0.5675054  0.0120731 -0.09261596
-131: 4.166123  0.4038770 -0.5675054  0.0120731 -0.09261596
-132: 1.432980 -0.2629799 -0.5675054  0.0120731 -0.09261596
+-- Fit Data (object fit is a modified data.frame): -----------------------------
+# A tibble: 132 x 21
+  ID     TIME    DV  PRED     RES    WRES IPRED   IRES  IWRES CPRED  CRES
+* <fct> <dbl> <dbl> <dbl>   <dbl>   <dbl> <dbl>  <dbl>  <dbl> <dbl> <dbl>
+1 1     0      0.74  0    0.74    1.07     0     0.74   1.07   0    0.74 
+2 1     0.25   2.84  2.84 0.00438 0.00254  3.86 -1.02  -1.48   2.68 0.164
+3 1     0.570  6.57  5.07 1.50    0.656    6.79 -0.219 -0.316  4.84 1.73 
+# ... with 129 more rows, and 10 more variables: CWRES <dbl>, eta.ka <dbl>,
+#   eta.cl <dbl>, eta.v <dbl>, depot <dbl>, center <dbl>, ka <dbl>, cl <dbl>,
+#   v <dbl>, cp <dbl>
 ```
 
 ```r
