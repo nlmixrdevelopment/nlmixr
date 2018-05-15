@@ -47,6 +47,13 @@ For PKPD modeling (with ODE and dosing history) with
 [Stan](http://mc-stan.org/), check out Yuan's package PMXStan:
 https://github.com/yxiong1/pmxstan.
 
+# Using a Docker Image for running nlmixr
+
+One of the easiest way to setup nlmixr is to docker image.  For more details see:
+
+https://github.com/nlmixrdevelopment/nlmixr/releases/download/v9.0.1-0/dockerInstall.pdf
+
+
 # Windows installer
 For those not interested in customized installation on Windows, we
  **recommend** you download a Windows installer for your platform from
@@ -129,7 +136,10 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
    - Install `nlmixr` by running `install_github("nlmixrdevelopment/nlmixr")`
 
 # Installation on Linux
-Instructions for Ubuntu-alike distributions are given here (specifically, [Ubuntu 16.04 Xenial Xerus](http://releases.ubuntu.com/16.04/)), but all current Linux distributions are supported, in principle.
+Instructions for Ubuntu-alike distributions are given here
+(specifically, [Ubuntu 16.04 Xenial
+Xerus](http://releases.ubuntu.com/16.04/)), but all current Linux
+distributions are supported, in principle.
 
 1. Install R 3.4.1 (or later) from an appropriate repository (Ubuntu Xenial shown below, based on instructions provided [here](https://www.digitalocean.com/community/tutorials/how-to-install-r-on-ubuntu-16-04-2)).
    - You will need administrator privileges (i.e. access to `sudo`). Provide your admin password when asked. 
