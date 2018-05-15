@@ -9,16 +9,31 @@ output: html_document
 ##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Wenping Wang
 
 ***
-`nlmixr` is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter defintion syntax and results in a fit object that can be used as input into the `Xpose` package. Running nlmixr using the UUI is described in the vignette:
+
+`nlmixr` is an R package for fitting general dynamic models,
+pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD)
+models in particular, with either individual data or population
+data. The nlme and SAEM estimation routines can be accessed using a
+universal user interface (UUI), that provides universal model and
+parameter defintion syntax and results in a fit object that can be
+used as input into the `Xpose` package. Running nlmixr using the UUI
+is described in the vignette:
 https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
 
 Under the hood `nlmixr` has five main modules:  
 
-1. `dynmodel()` and its mcmc cousin `dynmodel.mcmc()` for nonlinear dynamic models of individual data; 
-2. `nlme_lin_cmpt()`for one to three linear compartment models of population data with first order absorption, or i.v. bolus, or i.v. infusion using the nlme algorithm; 
-3. `nlme_ode()` for general dynamic models defined by ordinary differential equations (ODEs) of population data using the nlme algorithm; 
+1. `dynmodel()` and its mcmc cousin `dynmodel.mcmc()` for nonlinear
+   dynamic models of individual data;
+2. `nlme_lin_cmpt()`for one to three linear compartment models of
+   population data with first order absorption, or i.v. bolus, or
+   i.v. infusion using the nlme algorithm;
+3. `nlme_ode()` for general dynamic models defined by ordinary
+   differential equations (ODEs) of population data using the nlme
+   algorithm;
 4. `saem_fit` for general dynamic models defined by ordinary differential equations (ODEs) of population data by the Stochastic Approximation Expectation-Maximization (SAEM) algorithm;  
-5. `gnlmm` for generalized non-linear mixed-models (possibly defined by ordinary differential equations) of population data by the adaptive Gaussian quadrature algorithm.
+5. `gnlmm` for generalized non-linear mixed-models (possibly defined
+   by ordinary differential equations) of population data by the
+   adaptive Gaussian quadrature algorithm.
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
@@ -28,11 +43,15 @@ https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
 The examples in the vignette can be run using VignetteDemo.R and the associated data files available at:
 https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes
 
-For PKPD modeling (with ODE and dosing history) with [Stan](http://mc-stan.org/), check out Yuan's package PMXStan: https://github.com/yxiong1/pmxstan. 
+For PKPD modeling (with ODE and dosing history) with
+[Stan](http://mc-stan.org/), check out Yuan's package PMXStan:
+https://github.com/yxiong1/pmxstan.
 
 # Windows installer
-For those not interested in customized installation on Windows, we **recommend** you download a Windows installer for your platform from the following link:
- https://github.com/nlmixrdevelopment/nlmixr/releases/tag/v0.9.0-2
+For those not interested in customized installation on Windows, we
+ **recommend** you download a Windows installer for your platform from
+ the following link:
+ https://github.com/nlmixrdevelopment/nlmixr/releases/
 
 # Installation on Windows
 To replicate the environment that was used in Windows for `nlmixr` development, you will need administrator rights, and you should perform the following steps:
@@ -59,13 +78,35 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
    - Make sure the compilers have been added to the Windows `PATH` environment variable, or `RxODE` and `nlmixr` will not work (this should be done automatically during installation).
 3. Install a version of Python for Windows.
    - This is used for its symbolic algebra package [SymPy](http://sympy.org/).
-   - A very robust Python distribution that includes [SymPy](http://sympy.org/) and
-     many packages that may be useful to the data scientist and/or
-     pharmacometrician
-     is [Anaconda](https://www.anaconda.com/download/). Although very straightforward and easy to install, it is quite a large download and contains much more than you will need to run `nlmixr`. When installing, use the Python 3.6 version. During the installation, Anaconda provides the option of adding itself to the `PATH` environment variable, but advises against it; please do this anyway (despite the red warning).
-   - Another option is to use [official Python](http://python.org), although you will need to install [SymPy](http://sympy.org/) separately if you go this route, which is sometimes not straightforward under Windows 10 owing to folder permissions (see [here](https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows) for a few workarounds). Nonetheless, see [here](http://simpy.readthedocs.io/en/latest/simpy_intro/installation.html) for instructions for installation from source or using `pip`. Note that if you approach us for support, we are going to recommend that you use [Anaconda](https://www.anaconda.com/download/).
-   - Regardless of the option you choose, please use like with like (64-bit Python for 64-bit Windows, for example).
-   - Once again, make sure Python has been added to the Windows `PATH` environment variable, or `RxODE` and `nlmixr` will not work, no matter what Anaconda might say.   
+   - If you already have a python installed, it is much easier to
+     piggy-back on that system than install two different python
+     versions.
+   - If you are new to python, a very robust Python distribution that
+     includes [SymPy](http://sympy.org/) and many packages that may be
+     useful to the data scientist and/or pharmacometrician is
+     [Anaconda](https://www.anaconda.com/download/). Although very
+     straightforward and easy to install, it is quite a large download
+     and contains much more than you will need to run `nlmixr`. When
+     installing, use the Python 3.6 version. During the installation,
+     Anaconda provides the option of adding itself to the `PATH`
+     environment variable, but advises against it; please do this
+     anyway (despite the red warning).
+   - Another option is to use [official Python](http://python.org),
+     although you will need to install [SymPy](http://sympy.org/)
+     separately if you go this route, which is sometimes not
+     straightforward under Windows 10 owing to folder permissions (see
+     [here](https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows)
+     for a few workarounds). Nonetheless, see
+     [here](http://simpy.readthedocs.io/en/latest/simpy_intro/installation.html)
+     for instructions for installation from source or using
+     `pip`. Note that if you approach us for support, we are going to
+     recommend that you use
+     [Anaconda](https://www.anaconda.com/download/).
+   - Regardless of the option you choose, please use like with like
+     (64-bit Python for 64-bit Windows, for example).
+   - Once again, make sure Python has been added to the Windows `PATH`
+     environment variable, or `RxODE` and `nlmixr` will not work, no
+     matter what Anaconda might say.
 3. Install `devtools`.
    - This package is required to install packages from Github, amongst other things.
    - This can be done from a clean R session by `install.packages("devtools")`.
@@ -154,6 +195,45 @@ Instructions for macOS 10.12 Sierra are provided here. They should be broadly ex
      correctly on your system. (Note that the `testthat` package is required for this, and it will take a long time.)
 7. Install `nlmixr`.
    - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
-
    
-	 
+# Notes on Python configuration
+
+If you have multiple versions of python installed on your system, you
+may run into some more issues.  To be more careful in your install,
+you can install SnakeCharmR as follows:
+
+```R
+Sys.setenv(SNAKECHARMR_PYTHON_VERSION="/path/to/python/with/sympy/installed")
+devtools::install_github("nlmixrdevelopment/SnakeCharmR")
+```
+
+You may also have to adjust the following python variables to match
+the version with sympy installed:
+
+Environmental Variable |  Correct value
+--------------------------|---------------------------
+`PYTHON_EXE`  | Path where the python with sympy is installed
+`PYTHONHOME` | Path where the python with sympy is installed
+`PYTHON_INCLUDE` | Path where the python libaries are installed; In windows this is `PYTHONHOME\include`
+`PYTHON_LIB` | Path where python libraries are installed; In windows this is `PYTHONHOME\libs`
+`PYTHONPATH` | Path where python searches.  In windows this is a path-style varible including `PYTHONHOME\DLLs`, `PYTHONHOME\Lib` and `PYTHONHOME\Lib\site-packages`.  
+`PYTHONSTARTUP` | In windows, this value is unset if present
+
+I believe you could also unset some of these variables and python can
+figure them out.  Please be warned if these variables are not setup
+correctly a call to python will abort python.  The python abort does
+not respect R's way of doing things and will also abort/crash R.
+
+To test without running a model you may wish to try
+
+```R
+library(SnakeCharmR)
+```
+If it doesn't crash R, then python is likely setup correctly.
+
+After that point you can then type:
+```R
+library(RxODE)
+rxSymPyVersion()
+```
+It will show the version of sympy that you are using if SnakeCharmR is setup correctly.
