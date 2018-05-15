@@ -6,7 +6,7 @@ output: html_document
 # nlmixr: an R package for population PKPD modeling
 ***  
 
-##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Wenping Wang
+##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Richard Hooijmaijers, Wenping Wang
 
 ***
 
@@ -237,3 +237,30 @@ library(RxODE)
 rxSymPyVersion()
 ```
 It will show the version of sympy that you are using if SnakeCharmR is setup correctly.
+
+# Testing the install
+
+Once nlmixr is installed, you can test if everything is working well (as well as running shinyMixR)
+by [running this install checker](https://raw.githubusercontent.com/nlmixrdevelopment/nlmixr/master/build/test_install.R) by Richard Hooijmaijers & Matt Fidler.
+
+Once downloaded you would source the code;  If successful you should see something similar to the following:
+```
+> source("test_install.R")
+Correct R version: Yes, R version 3.5.0 (2018-04-23)
+RxODE installed: Yes
+Python installed: Yes, Python 3.6.2
+sympy installed: Yes
+devtools package installed: Yes
+Rtools installed: Yes
+RxODE package installed: Yes
+SnakeCharmR package installed: Yes
+nlmixr package installed: Yes
+xpose.nlmixr package installed: Yes
+shinyMixR package installed: Yes
+Loading required package: nlme
+nlmixr run under nlme: Yes
+nlmixr run under saem: Yes
+---- Installation test finished! ----
+```
+
+
