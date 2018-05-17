@@ -19,6 +19,7 @@ ChangeUI all \"${NSISDIR}\\Contrib\\UIs\\LoadingBar_Icon.exe\"
 XPStyle on
 InstallDirRegKey HKCU \"Software\\nlmixr<%=archext%>\\<%=nlmixr.ver%>\" \"\"
 Section Main sec_main
+WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\\<%=nlmixr.ver%>\" \"$EXEDIR\"
 WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallPath\" \"$EXEDIR\\R\"
 Exec \"$EXEDIR\\R\\bin\\<%=Rdir%>\\Rgui.exe\"
 SectionEnd"
