@@ -434,8 +434,7 @@ done.
 ## done
 ## ...
 ## done
-The model-based sensitivities have been calculated.
-It will be cached for future runs.
+The model-based sensitivities have been calculated
 Calculating Table Variables...
 done
 }
@@ -457,53 +456,39 @@ You can see the fit object by typing the object name:
 
 \preformatted{
 > fit.s
-nlmixr SAEM fit (ODE)
+ -- nlmixr SAEM fit (ODE); OBJF calculated from FOCEi approximation -------------
+      OBJF      AIC      BIC Log-likelihood Condition Number
+  62337.09 62351.09 62399.01      -31168.55          82.6086
 
-     OBJF      AIC      BIC Log-likelihood
- 62335.96 62349.96 62397.88      -31167.98
+ -- Time (sec; fit.s$time): -----------------------------------------------------
+           saem setup Likelihood Calculation covariance table
+ elapsed 430.25 31.64                   1.19          0  3.44
 
-Time (sec; $time):
-          saem setup FOCEi Evaulate covariance table
-elapsed 379.32   2.9           1.71          0 19.11
+ -- Parameters (fit.s$par.fixed): -----------------------------------------------
+              Parameter Estimate     SE  %RSE Back-transformed(95%CI) BSV(CV%)
+ lCl      log Cl (L/hr)     1.39 0.0240  1.73       4.01 (3.83, 4.20)    26.6%
+ lVc         log Vc (L)     4.20 0.0256 0.608       67.0 (63.7, 70.4)    28.5%
+ lKA      log Ka (1/hr)  0.00924 0.0323  349.      1.01 (0.947, 1.08)    34.3%
+ prop.err      prop.err    0.198                             19.8%
+          Shrink(SD)%
+ lCl          0.248%
+ lVc           1.09%
+ lKA           4.19%
+ prop.err      1.81%
 
-Parameters ($par.fixed):
-             Parameter Estimate     SE     CV Untransformed       (95%CI)
-lCl      log Cl (L/hr)     1.39 0.0240   1.7%          4.01  (3.82, 4.20)
-lVc         log Vc (L)     4.20 0.0256   0.6%          67.0  (63.7, 70.4)
-lKA      log Ka (1/hr)  0.00890 0.0307 344.9%          1.01 (0.950, 1.07)
-prop.err                  0.198                       19.8%
+   No correlations in between subject variability (BSV) matrix
+   Full BSV covariance (fit.s$omega) or correlation (fit.s$omega.R; diagonals=SDs)
+   Distribution stats (mean/skewness/kurtosis/p-value) available in fit.s$shrink
 
-Omega ($omgea):
-           eta.Cl     eta.Vc   eta.KA
-eta.Cl 0.06833621 0.00000000 0.000000
-eta.Vc 0.00000000 0.07783316 0.000000
-eta.KA 0.00000000 0.00000000 0.111673
-
-Fit Data (object is a modified data.frame):
-       ID   TIME    DV      IPRED      PRED         IRES        RES       IWRES
-   1:   1   0.25 204.8 194.859810 198.21076   9.94018953   6.589244  0.25766777
-   2:   1   0.50 310.6 338.006073 349.28827 -27.40607290 -38.688274 -0.40955290
-   3:   1   0.75 389.2 442.467750 463.78410 -53.26775045 -74.584098 -0.60809361
-  ---
-6945: 120 264.00  11.3  13.840800  70.58248  -2.54080024 -59.282475 -0.92725039
-6946: 120 276.00   3.9   4.444197  34.41018  -0.54419655 -30.510177 -0.61851500
-6947: 120 288.00   1.4   1.427006  16.77557  -0.02700637 -15.375569 -0.09559342
-             WRES       CWRES     CPRED      CRES     eta.Cl     eta.Vc
-   1:  0.07395107  0.07349997 198.41341   6.38659 0.09153143  0.1366395
-   2: -0.26081216 -0.27717947 349.82730 -39.22730 0.09153143  0.1366395
-   3: -0.39860485 -0.42988445 464.55651 -75.35651 0.09153143  0.1366395
-  ---
-6945: -0.77916115 -1.34050999  41.10189 -29.80189 0.32007359 -0.1381479
-6946: -0.65906613 -1.28359979  15.51100 -11.61100 0.32007359 -0.1381479
-6947: -0.56746681 -1.22839732   5.72332  -4.32332 0.32007359 -0.1381479
-          eta.KA
-   1:  0.1369685
-   2:  0.1369685
-   3:  0.1369685
-  ---
-6945: -0.2381078
-6946: -0.2381078
-6947: -0.2381078
+ -- Fit Data (object fit.s is a modified data.frame): ---------------------------
+ # A tibble: 6,947 x 22
+   ID     TIME    DV  PRED    RES    WRES IPRED  IRES  IWRES CPRED   CRES
+ * <fct> <dbl> <dbl> <dbl>  <dbl>   <dbl> <dbl> <dbl>  <dbl> <dbl>  <dbl>
+ 1 1      0.25  205.  198.   6.60  0.0741  189.  16.2  0.434  198.   6.78
+ 2 1      0.5   311.  349. -38.7  -0.261   330. -19.0 -0.291  349. -38.3
+ 3 1      0.75  389.  464. -74.5  -0.398   434. -45.2 -0.526  463. -73.9
+ # ... with 6,944 more rows, and 11 more variables: CWRES <dbl>, eta.Cl <dbl>,
+ #   eta.Vc <dbl>, eta.KA <dbl>, depot <dbl>, centr <dbl>, Cl <dbl>, Vc <dbl>,
 }
 
 

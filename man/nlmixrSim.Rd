@@ -21,15 +21,16 @@ nlmixrSim(object, events = NULL, inits = NULL, scale = NULL,
   dfSub = 0, dfObs = 0, return.type = c("rxSolve", "matrix",
   "data.frame"), seed = NULL, nsim = NULL)
 
-\method{rxSolve}{focei.fit}(object, events = NULL, inits = NULL,
-  scale = NULL, covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-  transit_abs = NULL, atol = 1e-06, rtol = 1e-04, maxsteps = 5000L,
-  hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-  cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
-  add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
-  nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress = 10000L,
-  amountUnits = NA_character_, timeUnits = "hours", stiff, theta = NULL,
-  eta = NULL, addDosing = FALSE, update.object = FALSE, do.solve = TRUE,
+\method{rxSolve}{focei.fit}(object, params = NULL, events = NULL,
+  inits = NULL, scale = NULL, covs = NULL, method = c("liblsoda",
+  "lsoda", "dop853"), transit_abs = NULL, atol = 1e-06, rtol = 1e-04,
+  maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L,
+  maxords = 5L, ..., cores, covs_interpolation = c("linear", "locf", "nocb",
+  "midpoint"), add.cov = FALSE, matrix = FALSE, sigma = NULL,
+  sigmaDf = NULL, nCoresRV = 1L, sigmaIsChol = FALSE,
+  nDisplayProgress = 10000L, amountUnits = NA_character_,
+  timeUnits = "hours", stiff, theta = NULL, eta = NULL,
+  addDosing = FALSE, update.object = FALSE, do.solve = TRUE,
   omega = NULL, omegaDf = NULL, omegaIsChol = FALSE, nSub = 1L,
   thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE, nStud = 1L,
   dfSub = 0, dfObs = 0, return.type = c("rxSolve", "matrix",
@@ -268,6 +269,10 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
   }
 
 \item{nsim}{represents the number of simulations.  For RxODE, if you supply single subject event tables (created with eventTable)}
+
+\item{params}{a numeric named vector with values for every
+parameter in the ODE system; the names must correspond to the
+parameter identifiers used in the ODE specification;}
 
 \item{a}{when using \code{solve}, this is equivalent to the
 \code{object} argument.  If you specify \code{object} later in

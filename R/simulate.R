@@ -134,11 +134,11 @@ nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
 }
 ##' Predict a nlmixr solved system
 ##'
-##' This takes uncertainty in the model and sets it to 0 and solve the
-##' event information supplied.  When \code{ipred} is \code{TRUE}, set
-##' residual predictions to 0.  When \code{ipred} is \code{FALSE}, set
-##' residual predations.  When \code{ipred} is \code{NA}, do both
-##' individual and population predictions.
+##' @param ipred Flag to calculate individual predictions. When
+##'     \code{ipred} is \code{TRUE}, calculate individual predictions.
+##'     When \code{ipred} is \code{FALSE}, set calculate typical population predations.
+##'     When \code{ipred} is \code{NA}, calculateboth individual and
+##'     population predictions.
 ##'
 ##' @inheritParams RxODE::rxSolve
 ##'
@@ -266,9 +266,9 @@ nlmixrAugPred <- function(object, ..., covs_interpolation = c("linear", "locf", 
         new.cov<- lapply(all.covs, function(cov){
             unlist(lapply(ids, function(id){
                 dat.id <- dat[dat$ID == id, ];
-                fun <- approxfun(dat.id$TIME, dat.id[[cov]], method=ifelse(covsi == "linear", "linear", "constant"),
-                                 rule=2,
-                                 f=fs[covsi]);
+                fun <- stats::approxfun(dat.id$TIME, dat.id[[cov]], method=ifelse(covsi == "linear", "linear", "constant"),
+                                        rule=2,
+                                        f=fs[covsi]);
                 return(fun(new.time))
             }))})
         names(new.cov) <- all.covs;
@@ -304,10 +304,10 @@ augPred.focei.fit <- function(object, primary = NULL, minimum = min(primary), ma
     return(ret)
 }
 
-##' @rdname nlmixrAugPred
 ##' @export
 plot.nlmixrAugPred <- function(x, y, ...){
     ids <- unique(x$id)
+    time <- values <- ind <- id <- NULL;  # Rcheck fix
     for (i  in seq(1, length(ids), by=16)){
         tmp <- ids[seq(i, i + 15)]
         tmp <- tmp[!is.na(tmp)];
@@ -322,7 +322,7 @@ plot.nlmixrAugPred <- function(x, y, ...){
 
 ##' @rdname nlmixrSim
 ##' @export
-rxSolve.focei.fit <- function(object, events=NULL, inits = NULL, scale = NULL,
+rxSolve.focei.fit <- function(object, params=NULL, events=NULL, inits = NULL, scale = NULL,
                               covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
                               transit_abs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
                               maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,

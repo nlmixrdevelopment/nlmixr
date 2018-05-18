@@ -1077,7 +1077,7 @@ focei.fit.data.frame0 <- function(data,
                                          "bobyqa",
                                          "L-BFGS-B",
                                          "BFGS",
-                                         "lbfgs",
+                                         ## "lbfgs",
                                          "lbfgsb3",
                                          ## "newuoa",
                                          "nlminb"##,
@@ -1403,9 +1403,10 @@ focei.fit.data.frame0 <- function(data,
     optim.obj <- function(lines, prefix="o"){
         if (class(lines) == "numeric"){
             ofv <- lines;
-            if (any(optim.method == c("lbfgs"))){
-                return(paste0(prefix, ".", RxODE::rxCout(ofv)));
-            } else if (any(optim.method == c("L-BFGS-B", "BFGS"))){
+            ## if (any(optim.method == c("lbfgs"))){
+            ##     return(paste0(prefix, ".", RxODE::rxCout(ofv)));
+            ## } else
+            if (any(optim.method == c("L-BFGS-B", "BFGS"))){
                 return(sprintf("%s.%.6f", prefix, ofv))
             } else if (any(optim.method == c("nlminb", "newuoa", "bobyqa", "uobyqa", "n1qn1"))){
                 return(paste0(prefix, ".", gsub("^ *", "", sprintf("%#14.8g",ofv))));

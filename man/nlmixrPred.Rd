@@ -254,11 +254,13 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
   }
 
 \item{nsim}{represents the number of simulations.  For RxODE, if you supply single subject event tables (created with eventTable)}
+
+\item{ipred}{Flag to calculate individual predictions. When
+\code{ipred} is \code{TRUE}, calculate individual predictions.
+When \code{ipred} is \code{FALSE}, set calculate typical population predations.
+When \code{ipred} is \code{NA}, calculateboth individual and
+population predictions.}
 }
 \description{
-This takes uncertainty in the model and sets it to 0 and solve the
-event information supplied.  When \code{ipred} is \code{TRUE}, set
-residual predictions to 0.  When \code{ipred} is \code{FALSE}, set
-residual predations.  When \code{ipred} is \code{NA}, do both
-individual and population predictions.
+Predict a nlmixr solved system
 }

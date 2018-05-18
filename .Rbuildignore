@@ -28,3 +28,4 @@ BinaryFiles$
 ^/?man-roxygen/.*$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^/?docs/*$
