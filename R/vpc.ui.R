@@ -26,6 +26,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     }
     if (is.numeric(data) || is.integer(data)){
         nStud <- n
+        data <- NULL
     }
     tmp <- list(...)
     if (!is.null(tmp$nsim)){
