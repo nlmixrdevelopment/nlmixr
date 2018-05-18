@@ -24,6 +24,13 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     if (is.null(nStud)){
         nStud <- n;
     }
+    if (is.numeric(data) || is.integer(data)){
+        nStud <- n
+    }
+    tmp <- list(...)
+    if (!is.null(tmp$nsim)){
+        nStud <- tmp$nsim
+    }
     con <- fit$fit$con;
     pt <- proc.time();
     message("Compiling VPC model...", appendLF=FALSE)
@@ -74,9 +81,9 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     ## Assume this is in the observed dataset. Add it to the current dataset
     if(!all(names(sim) %in% cols)){
         w <- cols[!(cols %in% names(sim))]
-        if (length(w) > 1){
+        if (length(w) >= 1){
             n <- names(sim)
-            sim <- cbind(sim, dat[, w]);
+            sim <- cbind(sim, dat[, w, drop = FALSE]);
             names(sim) <- c(n, w);
         }
     }
