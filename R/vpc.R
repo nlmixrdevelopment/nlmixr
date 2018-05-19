@@ -41,9 +41,21 @@ sim.one = function(zz, x) {
 }
 
 
-##' @importFrom vpc vpc
+##' Vpc function for nlmixr
+##'
+##' @param sim Observed data frame or fit object
+##' @param ... Other parameters
+##'
 ##' @export
-vpc::vpc
+vpc <- function (sim, ...)
+{
+    UseMethod("vpc")
+}
+##' @rdname vpc
+##' @export
+vpc.default <- function(sim, ...){
+    vpc::vpc(sim, ...)
+}
 
 #' Visual predictive check (VPC) for nlmixr nlme objects
 #'
