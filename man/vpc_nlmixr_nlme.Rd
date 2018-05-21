@@ -5,7 +5,7 @@
 \alias{vpc.nlmixr_nlme}
 \title{Visual predictive check (VPC) for nlmixr nlme objects}
 \usage{
-vpc_nlmixr_nlme(fit, nsim = 100, condition = NULL)
+vpc_nlmixr_nlme(fit, nsim = 100, condition = NULL, ...)
 
 \method{vpc}{nlmixr_nlme}(sim, ...)
 }
@@ -15,6 +15,8 @@ vpc_nlmixr_nlme(fit, nsim = 100, condition = NULL)
 \item{nsim}{number of simulations}
 
 \item{condition}{conditional variable}
+
+\item{...}{Additional arguments}
 
 \item{sim}{a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link{read_table_nm}}
 }

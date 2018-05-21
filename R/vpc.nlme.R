@@ -1,4 +1,4 @@
-vpc.nlme = function (fit, nsim = 100, by = NULL, ...) 
+vpc.nlme = function (fit, nsim = 100, by = NULL, ...)
 {
     if (class(fit) == "nlmixr.ui.nlme") fit = as.nlme(fit)
     dat = getData(fit)
@@ -30,11 +30,19 @@ vpc.nlme = function (fit, nsim = 100, by = NULL, ...)
     xs = do.call("cbind", s)
 
     df = cbind(xd[ord, c("ID", "TIME", "grp")], DV = as.vector(xs), SIM = sim)
-    if (!is.null(by)) {
-        p = vpc::vpc(sim = df, obs = dat, strat = c("grp"), facet = "wrap", ...)
+    ns <- loadNamespace("vpc");
+    if (exists("vpc_vpc",ns)){
+        vpcn <- "vpc_vpc"
     } else {
-        p = vpc::vpc(sim = df, obs = dat, ...)
+        vpcn <- "vpc"
     }
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    if (!is.null(by)) {
+        call$strat <- c("grp")
+        call$facet <- "wrap";
+    }
+    call <- call[names(call) %in% methods::formalArgs(getFromNamespace(vpcn,"vpc"))]
+    p = do.call(getFromNamespace(vpcn,"vpc"), c(list(sim=df, obs=dat), call), envir = parent.frame(1))
     print(p)
     invisible(df)
 }

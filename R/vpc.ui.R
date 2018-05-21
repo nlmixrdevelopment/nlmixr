@@ -9,7 +9,7 @@
 ##' @inheritParams vpc::vpc
 ##' @inheritParams RxODE::rxSolve
 ##' @param ... Args sent to \code{\link[RxODE]{rxSolve}}
-##' @inheritParams vpc::vpc
+##' @return Simulated dataset (invisibly)
 ##' @author Matthew L. Fidler
 ##' @export
 vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
@@ -100,7 +100,9 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     call$obs_cols = list(id="id", dv="dv", idv="time")
     call$sim_cols = list(id="id", dv="dv", idv="time")
     call$stratify = stratify
-    do.call(getFromNamespace(vpcn,"vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
+    p = do.call(getFromNamespace(vpcn,"vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
+    print(p);
+    return(invisible(sim));
 }
 
 
@@ -128,7 +130,3 @@ vpc.nlmixr.ui.nlme <- function(sim, ...){
 vpc.ui <- function(sim, ...){
     vpc_ui(fit=sim, ...);
 }
-
-##' @importFrom vpc vpc
-##' @export
-vpc::vpc

@@ -96,6 +96,9 @@ parameters.}
 
 \item{sim}{a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link{read_table_nm}}
 }
+\value{
+Simulated dataset (invisibly)
+}
 \description{
 VPC based on ui model
 }
