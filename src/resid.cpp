@@ -53,7 +53,7 @@ List nlmixrParameters(NumericVector theta, DataFrame eta){
     }
     stat[0] = M1;
     stat[1] = M2/((double)n1);
-    stat[2] = sqrt(stat[1]);
+    stat[2] = sqrt((double)stat[1]);
     stat[3] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
     stat[4] = (double)(n)*M4 / (M2*M2) - 3.0;
     etadf[j] = stat;
@@ -84,7 +84,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   unsigned int i, j;
   double om;
   unsigned int nid=etasDf.nrows();
-  double tc = sqrt(nid);
+  double tc = sqrt((double)nid);
   for (j = neta;j--;){
     NumericVector cur = etaLst[j];
     fpp(_,j) = NumericVector(pred[j]);
