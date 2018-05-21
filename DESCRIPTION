@@ -9,8 +9,8 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs, inline,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0)
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3, testthat,
         madness, devtools, expm, matrixcalc, reshape2
-Version: 0.9.1-0
-Date: 2018-04-29
+Version: 0.9.1-2
+Date: 2018-05-21
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com"),      
    person("Yuan", "Xiong", 
