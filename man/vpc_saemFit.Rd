@@ -20,7 +20,7 @@ vpc_saemFit(fit, dat, nsim = 100, by = NULL, ...)
 
 \item{...}{Other arguments sent to \code{\link[vpc:vpc]{vpc_vpc}}}
 
-\item{sim}{this is usually a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link{read_table_nm}.  However it can also be an object like a nlmixr or xpose object}
+\item{sim}{a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link{read_table_nm}}
 }
 \value{
 vpc object from the \code{\link[vpc:vpc]{vpc_vpc}} package
