@@ -55,7 +55,7 @@ vpc <- function (sim, ...)
 ##' @export
 vpc.default <- function(sim, ...){
     ns <- loadNamespace("vpc");
-    if (exists("vpc_vpc",ns){
+    if (exists("vpc_vpc",ns)){
         vpc::vpc_vpc(sim, ...)
     } else {
         vpc::vpc(sim, ...)

@@ -1,6 +1,5 @@
 # Installation test function
 test_install <- function(){
-
   # Test 1: Correct R version
   if(sessionInfo()$R.version$major=="3" & as.numeric(sessionInfo()$R.version$minor)>=4.1){
     cat(paste0("Correct R version: Yes, ",sessionInfo()$R.version$version.string,"\n"))
@@ -22,7 +21,7 @@ test_install <- function(){
     try(shell("python -V > pv.txt 2>&1",intern=TRUE),silent=TRUE)
   }
   res1 <- readLines("pv.txt")
-  if(any(grepl("not found|recognized",res1))){
+    if(any(grepl("not found|recognized",res1))){
     cat("Python installed: No, check https://github.com/nlmixrdevelopment/nlmixr for instructions to do so\n")
     return("Installation not complete!")
   }else{
@@ -139,4 +138,9 @@ test_install <- function(){
   }
   cat("---- Installation test finished! ----\n")
 }
-test_install()
+
+try({test_install()})
+
+cat("Begin Session Info:\n")
+print(sessionInfo())
+cat("\n")

@@ -89,12 +89,18 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         }
     }
     RxODE::rxUnload(mod);
+    ns <- loadNamespace("vpc");
+    if (exists("vpc_vpc",ns)){
+        vpcn <- "vpc_vpc"
+    } else {
+        vpcn <- "vpc"
+    }
     call <- as.list(match.call(expand.dots=TRUE))[-1];
-    call <- call[names(call) %in% methods::formalArgs(getFromNamespace("vpc_vpc","vpc"))]
+    call <- call[names(call) %in% methods::formalArgs(getFromNamespace(vpcn,"vpc"))]
     call$obs_cols = list(id="id", dv="dv", idv="time")
     call$sim_cols = list(id="id", dv="dv", idv="time")
     call$stratify = stratify
-    do.call(getFromNamespace("vpc","vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
+    do.call(getFromNamespace(vpcn,"vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
 }
 
 
