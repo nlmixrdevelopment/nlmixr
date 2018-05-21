@@ -54,7 +54,12 @@ vpc <- function (sim, ...)
 ##' @rdname vpc
 ##' @export
 vpc.default <- function(sim, ...){
-    vpc::vpc(sim, ...)
+    ns <- loadNamespace("vpc");
+    if (exists("vpc_vpc",ns){
+        vpc::vpc_vpc(sim, ...)
+    } else {
+        vpc::vpc(sim, ...)
+    }
 }
 
 #' Visual predictive check (VPC) for nlmixr nlme objects
