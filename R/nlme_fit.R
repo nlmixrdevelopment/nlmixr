@@ -378,8 +378,9 @@ prepEv = function(dati, theta)
 #'
 #' specs <- list(fixed=lKA+lKE+lCL~1, random = pdDiag(lKA+lCL~1),
 #' 	start=c(lKA=0.5, lKE=-2.5, lCL=-3.2))
-#' fit <- nlme_ode(dat, model=ode, par_model=specs, par_trans=mypar,
-#' 	response="centr", response.scaler="V")
+#'
+#' fit <- nlme_ode(theo_md, model=ode, par_model=specs, par_trans=mypar,
+#'      response="centr", response.scaler="V",control=nlmeControl(pnlsTol=0.1))
 #'
 #' }
 #' @export
