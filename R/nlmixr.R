@@ -181,7 +181,7 @@ nlmixrData.character <- function(data){
 ##' @export
 ##' @rdname nlmixrData
 nlmixrData.default <- function(data){
-    dat <- data;
+    dat <- as.data.frame(data);
     nm1 <- toupper(names(dat));
     for (n in c("ID", "EVID", "TIME", "DV", "AMT")){
         w <- which(nm1 == n)

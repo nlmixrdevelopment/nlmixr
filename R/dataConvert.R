@@ -9,7 +9,7 @@ nmDataConvert <- function(nonmem.data)
     if (!is(nonmem.data, "data.frame")){
         stop("Input must be a data frame.")
     }
-    d <- nonmem.data
+    d <- as.data.frame(nonmem.data)
     col.names <- colnames(d)
     col.names <- toupper(col.names)
     row.names(d) <- NULL;  ## Make sure row.names are named by R's internals
