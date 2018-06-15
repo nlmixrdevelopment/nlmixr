@@ -62,9 +62,6 @@ achieved. This is also used in the solved linear model to check
     Dormand and Prince as implemented in C by Hairer and Wanner
     (1993).}
 
-\item{transit_abs}{boolean indicating if this is a transit
-compartment absorption}
-
 \item{print}{The number it iterations that are completed before
 anything is printed to the console.  By default, this is 1.}
 

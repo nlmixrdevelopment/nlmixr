@@ -5,7 +5,7 @@
 }
 
 nlmixrSetupMemoize <- function(){
-    reSlow <- rex::rex(".slow",end)
+    reSlow <- rex::rex(".slow", end)
     f <- sys.function(-1)
     ns <- environment(f)
     .slow <- ls(pattern=reSlow,envir=ns);

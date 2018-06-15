@@ -61,9 +61,6 @@ is for time-varying covariates.}
         solving nor user Jacobain specification
 }}
 
-\item{transit_abs}{boolean indicating if this is a transit
-compartment absorption}
-
 \item{atol}{a numeric absolute tolerance (1e-8 by default) used
 by the ODE solver to determine if a good solution has been
 achieved;  This is also used in the solved linear model to check
@@ -104,27 +101,6 @@ like NONMEM.}
 defaults to the number or system cores determined by
 \code{\link{rxCores}} for methods that support parallel
 solving (ie thread-safe methods like "liblsoda").}
-
-\item{covs_interpolation}{specifies the interpolation method for
-    time-varying covariates. When solving ODEs it often samples
-    times outside the sampling time specified in \code{events}.
-    When this happens, the time varying covariates are
-    interpolated.  Currently this can be:
-
-\itemize{
-\item \code{"linear"} interpolation (the default), which interpolates the covariate
-    by solving the line between the observed covariates and extrapolating the new
-    covariate value.
-\item \code{"constant"} -- Last observation carried forward.
-\item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
-      that NONMEM uses.
-\item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
-  carried backward to midpoint.
-}}
-
-\item{add.cov}{A boolean indicating if covariates should be added
-to the output matrix or data frame. By default this is
-disabled.}
 
 \item{matrix}{A boolean inticating if a matrix should be returned
 instead of the RxODE's solved object.}
@@ -186,15 +162,6 @@ information and estimates at the doses.  Be default, RxODE
 only includes estimates at the observations. (default
 \code{FALSE}).}
 
-\item{update.object}{This is an internally used flag to update the
-RxODE solved object (when supplying an RxODE solved object) as
-well as returning a new object.  You probably should not
-modify it's \code{FALSE} default unless you are willing to
-have unexpected results.}
-
-\item{do.solve}{Internal flag.  By default this is \code{TRUE},
-when \code{FALSE} a list of solving options is returned.}
-
 \item{omega}{Named omega matrix.}
 
 \item{omegaDf}{The degrees of freedom of a t-distribution for
@@ -229,20 +196,6 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
 \item{dfObs}{Degrees of freedom to sample the unexplained variaiblity matrix from the 
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
 
-\item{return.type}{This tells what type of object is returned.  The currently supported types are:
-\itemize{
-\item \code{"rxSolve"} (default) will return a reactive data frame
-     that can change easily change different pieces of the solve and
-     update the data frame.  This is the currently standard solving
-     method in RxODE,  is used for \code{rxSolve(object, ...)}, \code{solev(object,...)},
-\item \code{"data.frame"} -- returns a plain, non-reactive data
-     frame; Currently very slightly Faster than \code{return.type=\"matrix\"}
-\item \code{"matrix"} -- returns a plain matrix with column names attached
-    to the solved object.  This is what is used \code{eobject$run} as well as ob
-}
-
-    \code{return.type} equals {matrix}, rxSolve returns a matrix.}
-
 \item{seed}{an object specifying if and how the random number
     generator should be initialized (\sQuote{seeded}).\cr
     For the "lm" method, either \code{NULL} or an integer that will be
@@ -253,7 +206,9 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
     \code{"seed"} attribute, see \sQuote{Value}.
   }
 
-\item{nsim}{represents the number of simulations.  For RxODE, if you supply single subject event tables (created with eventTable)}
+\item{nsim}{represents the number of simulations.  For RxODE, if
+you supply single subject event tables (created with
+eventTable)}
 
 \item{ipred}{Flag to calculate individual predictions. When
 \code{ipred} is \code{TRUE}, calculate individual predictions.

@@ -18,23 +18,6 @@ nlmixrAugPred(object, ..., covs_interpolation = c("linear", "locf", "nocb",
 \item{...}{some methods for the generic may require additional
    arguments.}
 
-\item{covs_interpolation}{specifies the interpolation method for
-    time-varying covariates. When solving ODEs it often samples
-    times outside the sampling time specified in \code{events}.
-    When this happens, the time varying covariates are
-    interpolated.  Currently this can be:
-
-\itemize{
-\item \code{"linear"} interpolation (the default), which interpolates the covariate
-    by solving the line between the observed covariates and extrapolating the new
-    covariate value.
-\item \code{"constant"} -- Last observation carried forward.
-\item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
-      that NONMEM uses.
-\item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
-  carried backward to midpoint.
-}}
-
 \item{primary}{an optional one-sided formula specifying the primary
    covariate to be used to generate the augmented predictions. By
    default, if a  covariate can be extracted from the data used to generate

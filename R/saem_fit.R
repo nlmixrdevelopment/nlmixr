@@ -384,7 +384,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 	})
 	model_vars_decl = paste0(s, collapse="")
 
-	ode_solver = model$cmpMgr$ode_solver
+    ode_solver = model$cmpMgr$ode_solver
     dll = sub("[.].*","",basename(RxODE::rxDll(model)))
 
 	neq = length(modelVars$state)
