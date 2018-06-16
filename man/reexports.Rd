@@ -29,6 +29,12 @@
 \alias{reexports}
 \alias{nlmeControl}
 \alias{reexports}
+\alias{eventTable}
+\alias{reexports}
+\alias{add.dosing}
+\alias{reexports}
+\alias{add.sampling}
+\alias{reexports}
 \alias{rxSolve}
 \title{Objects exported from other packages}
 \keyword{internal}
@@ -41,6 +47,6 @@ below to see their documentation.
 
   \item{nlme}{\code{\link[nlme]{nlme}}, \code{\link[nlme]{ACF}}, \code{\link[nlme]{VarCorr}}, \code{\link[nlme]{augPred}}, \code{\link[nlme]{fixef}}, \code{\link[nlme]{fixed.effects}}, \code{\link[nlme]{ranef}}, \code{\link[nlme]{random.effects}}, \code{\link[nlme]{varWeights}}, \code{\link[nlme]{nlmeControl}}}
 
-  \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{rxSolve}}}
+  \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{eventTable}}, \code{\link[RxODE]{add.dosing}}, \code{\link[RxODE]{add.sampling}}, \code{\link[RxODE]{rxSolve}}}
 }}
 

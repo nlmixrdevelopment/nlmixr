@@ -53,3 +53,16 @@ nlme::varWeights
 ##' @importFrom nlme nlmeControl
 ##' @export
 nlme::nlmeControl
+
+
+##' @importFrom RxODE eventTable
+##' @export
+RxODE::eventTable
+
+##' @importFrom RxODE add.dosing
+##' @export
+RxODE::add.dosing
+
+##' @importFrom RxODE add.sampling
+##' @export
+RxODE::add.sampling
