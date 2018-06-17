@@ -2,12 +2,15 @@
 % Please edit documentation in R/vpc.R
 \name{vpc_nlmixr_nlme}
 \alias{vpc_nlmixr_nlme}
-\alias{vpc.nlmixr_nlme}
+\alias{vpcNlmixrNlme}
+\alias{vpc.nlmixrNlme}
 \title{Visual predictive check (VPC) for nlmixr nlme objects}
 \usage{
 vpc_nlmixr_nlme(fit, nsim = 100, condition = NULL, ...)
 
-\method{vpc}{nlmixr_nlme}(sim, ...)
+vpcNlmixrNlme(fit, nsim = 100, condition = NULL, ...)
+
+\method{vpc}{nlmixrNlme}(sim, ...)
 }
 \arguments{
 \item{fit}{nlme fit object}

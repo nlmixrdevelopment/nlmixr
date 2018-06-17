@@ -108,9 +108,13 @@ vpc_nlmixr_nlme = function(fit, nsim=100, condition=NULL, ...)
 	invisible(NULL)
 }
 
+##' @rdname vpc_nlmixr_nlme
+##' @export
+vpcNlmixrNlme <- vpc_nlmixr_nlme
+
 #' @rdname vpc_nlmixr_nlme
 #' @export
-vpc.nlmixr_nlme <- function(sim, ...){
+vpc.nlmixrNlme <- function(sim, ...){
     vpc_nlmixr_nlme(sim, ...);
 }
 

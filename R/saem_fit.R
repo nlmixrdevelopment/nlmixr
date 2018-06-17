@@ -811,7 +811,7 @@ configsaem <- function(model, data, inits,
   form = attr(model$saem_mod, "form")
   infusion = max(dat$EVID)>10000
   if (form=="cls" && infusion) {
-	  dat = fmt_infusion_data(dat)
+      dat <- .fmtInfusionData(dat)
   } else {
 	  dat$DUR = -1
   }
