@@ -2,16 +2,26 @@
 % Please edit documentation in R/nlme_fit.R
 \name{nlme_lin_cmpt}
 \alias{nlme_lin_cmpt}
+\alias{nlmeLinCmpt}
+\alias{nlmeLinCmt}
 \title{Fit nlme-based linear compartment mixed-effect model using closed form solution}
 \usage{
-nlme_lin_cmpt(dat, par_model, ncmt, oral = TRUE, infusion = FALSE,
-  tlag = FALSE, parameterization = 1, par_trans = get.parfn(oral, ncmt,
-  parameterization, tlag), mc.cores = 1, ...)
+nlme_lin_cmpt(dat, parModel, ncmt, oral = TRUE, infusion = FALSE,
+  tlag = FALSE, parameterization = 1, parTrans = .getParfn(oral, ncmt,
+  parameterization, tlag), mcCores = 1, ...)
+
+nlmeLinCmpt(dat, parModel, ncmt, oral = TRUE, infusion = FALSE,
+  tlag = FALSE, parameterization = 1, parTrans = .getParfn(oral, ncmt,
+  parameterization, tlag), mcCores = 1, ...)
+
+nlmeLinCmt(dat, parModel, ncmt, oral = TRUE, infusion = FALSE,
+  tlag = FALSE, parameterization = 1, parTrans = .getParfn(oral, ncmt,
+  parameterization, tlag), mcCores = 1, ...)
 }
 \arguments{
 \item{dat}{data to be fitted}
 
-\item{par_model}{list: model for fixed effects, randoms effects and initial values using nlme-type syntax.}
+\item{parModel}{list: model for fixed effects, randoms effects and initial values using nlme-type syntax.}
 
 \item{ncmt}{numerical: number of compartments: 1-3}
 
@@ -23,9 +33,9 @@ nlme_lin_cmpt(dat, par_model, ncmt, oral = TRUE, infusion = FALSE,
 
 \item{parameterization}{numerical: type of parameterization, 1=clearance/volume, 2=micro-constants}
 
-\item{par_trans}{function: calculation of PK parameters}
+\item{parTrans}{function: calculation of PK parameters}
 
-\item{mc.cores}{number of cores used in fitting (only for Linux)}
+\item{mcCores}{number of cores used in fitting (only for Linux)}
 
 \item{...}{additional nlme options}
 }

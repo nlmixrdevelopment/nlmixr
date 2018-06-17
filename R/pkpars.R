@@ -178,12 +178,11 @@ TLAG = exp(lTLAG)
 
 }
 
-get.parfn <- function(oral, ncmt, parameterization, tlag)
+.getParfn <- function(oral, ncmt, parameterization, tlag)
 {
-	x<-sprintf("par.%dcmt.%s%s%s", 
-		ncmt, 
+	x<-sprintf("par.%dcmt.%s%s%s", ncmt,
 		c("CL", "micro")[parameterization],
-		c("",".oral")[oral+1], 
+		c("",".oral")[oral+1],
 		c("",".tlag")[tlag+1]
 	)
 

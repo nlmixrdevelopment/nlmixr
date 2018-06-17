@@ -612,7 +612,7 @@ nsis <- function(){ ## build installer...
 ##' @param expr R expression
 ##' @return The value of the expression
 ##' @author Matthew L. Fidler
-collectWarnings <- function(expr){
+.collectWarnings <- function(expr){
     ws <- c();
     this.env <- environment()
     ret <- suppressWarnings(withCallingHandlers(expr,warning=function(w){assign("ws", unique(c(w$message, ws)), this.env)}))

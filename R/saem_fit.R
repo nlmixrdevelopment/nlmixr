@@ -101,7 +101,7 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
 <%=inits%>
 
     int stiff=as<int>(opt["stiff"]);
-    int transit_abs=as<int>(opt["transit_abs"]);
+    int transit_abs=as<int>(opt["transitAbs"]);
     int nlhs=as<int>(opt["nlhs"]);
     double atol=as<double>(opt["atol"]);
     double rtol=as<double>(opt["rtol"]);
@@ -689,12 +689,13 @@ plot.saemFit = function(x, ...)
 #' fit
 #' }
 #' @export
-configsaem = function(model, data, inits,
+configsaem <- function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
-	ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0),
+	ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transitAbs=0),
 	distribution=c("normal","poisson","binomial"),
 	seed=99, fixed=NULL)
 {
+    names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt));
 #mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
   set.seed(seed)
   distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
@@ -748,7 +749,7 @@ configsaem = function(model, data, inits,
   check = prod(mcov[1,])
   if (check==0) stop("structural par(s) absent")
   check = nphi-dim(mcov)[2]
-  if (check) stop("nphi and ncol(mcov) mismatch")
+    if (check) stop("nphi and ncol(mcov) mismatch")
   check = sum(dim(inits$theta)-dim(mcov) != 0)
   if (check) stop("initial theta's and mcov dim mismatch")
   check = data$N.covar+1 - dim(mcov)[1]
@@ -1135,7 +1136,7 @@ saem.fit <- function(model, data, inits,
                      PKpars=NULL, pred=NULL,
                      covars=NULL,
                      mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                     ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transit_abs = 0),
+                     ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs = 0),
                      distribution=c("normal","poisson","binomial"),
                      seed = 99)
 {
@@ -1151,7 +1152,7 @@ saem.fit.nlmixr.ui.nlme <- function(model, data, inits,
                                     PKpars=NULL, pred=NULL,
                                     covars=NULL,
                                     mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                                    ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transit_abs = 0),
+                                    ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs = 0),
                                     distribution=c("normal","poisson","binomial"),
                                     seed = 99){
     call <- as.list(match.call(expand.dots=TRUE))[-1];
@@ -1174,7 +1175,7 @@ saem.fit.RxODE <- function(model, data, inits,
                            PKpars=NULL, pred=NULL,
                            covars=NULL,
                            mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                           ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transit_abs = 0),
+                           ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs = 0),
                            distribution=c("normal","poisson","binomial"),
                            seed = 99){
     saem_fit = gen_saem_user_fn(model, PKpars, pred)
@@ -1191,7 +1192,7 @@ saem.fit.default <- function(model, data, inits,
                              PKpars=NULL, pred=NULL,
                              covars=NULL,
                              mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                             ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transit_abs = 0),
+                             ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs = 0),
                              distribution=c("normal","poisson","binomial"),
                              seed = 99){
     saem_fit = gen_saem_user_fn(model)
@@ -1319,8 +1320,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     if(is.null(rtol))rtol <- 1e-4
     stiff <- fit$env$uif$env$ODEopt$stiff;
     if(is.null(stiff))stiff <- 1L
-    transit_abs <- fit$env$uif$env$ODEopt$transit_abs;
-    if(is.null(transit_abs)) transit_abs<- 0L
+    transitAbs <- fit$env$uif$env$ODEopt$transitAbs;
+    if(is.null(transitAbs)) transitAbs<- 0L
     fit.f <- focei.fit.data.frame(data=dat,
                                   inits=init,
                                   PKpars=uif$theta.pars,
@@ -1340,7 +1341,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                                                atol.ode=atol,
                                                rtol.ode=rtol,
                                                stiff=stiff,
-                                               transit_abs=transit_abs,
+                                               transitAbs=transitAbs,
                                                sum.prod=uif$env$sum.prod));
     ome <- fit.f$omega;
     w <- which(!is.na(uif.new$ini$neta1))

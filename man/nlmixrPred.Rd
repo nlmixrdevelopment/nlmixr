@@ -7,17 +7,17 @@
 \usage{
 nlmixrPred(object, params = NULL, events = NULL, inits = NULL,
   scale = NULL, covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-  transit_abs = NULL, atol = 1e-06, rtol = 1e-04, maxsteps = 5000L,
+  transitAbs = NULL, atol = 1e-06, rtol = 1e-04, maxsteps = 5000L,
   hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-  cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
-  add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
+  cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+  addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
   nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress = 10000L,
   amountUnits = NA_character_, timeUnits = "hours", stiff, theta = NULL,
-  eta = NULL, addDosing = FALSE, update.object = FALSE, do.solve = TRUE,
+  eta = NULL, addDosing = FALSE, updateObject = FALSE, doSolve = TRUE,
   omega = NULL, omegaDf = NULL, omegaIsChol = FALSE, nSub = 1L,
   thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE, nStud = 1L,
-  dfSub = 0, dfObs = 0, return.type = c("data.frame", "rxSolve",
-  "matrix"), seed = NULL, nsim = NULL, ipred = FALSE)
+  dfSub = 0, dfObs = 0, returnType = c("data.frame", "rxSolve", "matrix"),
+  seed = NULL, nsim = NULL, ipred = FALSE)
 
 \method{predict}{focei.fit}(object, ...)
 }
@@ -61,6 +61,9 @@ is for time-varying covariates.}
         solving nor user Jacobain specification
 }}
 
+\item{transitAbs}{boolean indicating if this is a transit
+compartment absorption}
+
 \item{atol}{a numeric absolute tolerance (1e-8 by default) used
 by the ODE solver to determine if a good solution has been
 achieved;  This is also used in the solved linear model to check
@@ -101,6 +104,27 @@ like NONMEM.}
 defaults to the number or system cores determined by
 \code{\link{rxCores}} for methods that support parallel
 solving (ie thread-safe methods like "liblsoda").}
+
+\item{covsInterpolation}{specifies the interpolation method for
+    time-varying covariates. When solving ODEs it often samples
+    times outside the sampling time specified in \code{events}.
+    When this happens, the time varying covariates are
+    interpolated.  Currently this can be:
+
+\itemize{
+\item \code{"linear"} interpolation (the default), which interpolates the covariate
+    by solving the line between the observed covariates and extrapolating the new
+    covariate value.
+\item \code{"constant"} -- Last observation carried forward.
+\item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
+      that NONMEM uses.
+\item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
+  carried backward to midpoint.
+}}
+
+\item{addCov}{A boolean indicating if covariates should be added
+to the output matrix or data frame. By default this is
+disabled.}
 
 \item{matrix}{A boolean inticating if a matrix should be returned
 instead of the RxODE's solved object.}
@@ -162,6 +186,15 @@ information and estimates at the doses.  Be default, RxODE
 only includes estimates at the observations. (default
 \code{FALSE}).}
 
+\item{updateObject}{This is an internally used flag to update the
+RxODE solved object (when supplying an RxODE solved object) as
+well as returning a new object.  You probably should not
+modify it's \code{FALSE} default unless you are willing to
+have unexpected results.}
+
+\item{doSolve}{Internal flag.  By default this is \code{TRUE},
+when \code{FALSE} a list of solving options is returned.}
+
 \item{omega}{Named omega matrix.}
 
 \item{omegaDf}{The degrees of freedom of a t-distribution for
@@ -195,6 +228,18 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
 
 \item{dfObs}{Degrees of freedom to sample the unexplained variaiblity matrix from the 
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
+
+\item{returnType}{This tells what type of object is returned.  The currently supported types are:
+\itemize{
+\item \code{"rxSolve"} (default) will return a reactive data frame
+     that can change easily change different pieces of the solve and
+     update the data frame.  This is the currently standard solving
+     method in RxODE,  is used for \code{rxSolve(object, ...)}, \code{solev(object,...)},
+\item \code{"data.frame"} -- returns a plain, non-reactive data
+     frame; Currently very slightly Faster than \code{returnType=\"matrix\"}
+\item \code{"matrix"} -- returns a plain matrix with column names attached
+    to the solved object.  This is what is used \code{object$run} as well as \code{object$solve}
+}}
 
 \item{seed}{an object specifying if and how the random number
     generator should be initialized (\sQuote{seeded}).\cr

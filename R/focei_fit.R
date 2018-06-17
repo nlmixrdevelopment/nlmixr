@@ -454,7 +454,7 @@ fixef.focei.fit <- function(object, ...){
                 lab <- gsub(" *$", "", gsub("^ *", "", lab));
                 if (!is.null(nlme)){
                     ttab <- data.frame(summary(nlme)$tTable);
-                    row.names(ttab) <- fix.nlme.names(row.names(ttab), uif);
+                    row.names(ttab) <- .fixNlmeNames(row.names(ttab), uif);
                     names(ttab) <- c("Estimate", "SE", "DF", "t-value", "p-value")
                     ttab <- ttab[, 1:2]
                     tmp <- object$par.data.frame;
@@ -920,7 +920,7 @@ focei.fit.function <- focei.fit.nlmixrUI
 ##' @rdname focei.fit
 focei.fit.data.frame <- function(...){
     call <- as.list(match.call(expand.dots=TRUE))[-1];
-    return(collectWarnings(do.call(focei.fit.data.frame0, call, envir=parent.frame(1))))
+    return(.collectWarnings(do.call(focei.fit.data.frame0, call, envir=parent.frame(1))))
 }
 
 focei.fit.data.frame0 <- function(data,
@@ -995,7 +995,6 @@ focei.fit.data.frame0 <- function(data,
         hmin = 0L,
         hmax = NULL,
         hini = 0L,
-        transit_abs = NULL,
         maxordn = 12L,
         maxords = 5L,
         stiff=1L,
@@ -1005,7 +1004,7 @@ focei.fit.data.frame0 <- function(data,
         reltol.outer = 1e-4,
         absltol.outer = 1e-4,
         cores=1,
-        transit_abs=FALSE,
+        transitAbs=FALSE,
         NONMEM=TRUE,
         NOTRUN=FALSE,
         PRINT.PARS=FALSE,
@@ -1053,7 +1052,10 @@ focei.fit.data.frame0 <- function(data,
         control <- control[sapply(names(control), function(x){!is.null(control[[x]])})]
     }
     con[(namc <- names(control))] <- control
-    if (length(noNms <- namc[!namc %in% nmsC]))
+    if (!is.null(control$transit_abs)){
+        con$transitAbs <- control$transit_abs;
+    }
+    if (length(noNms <- namc[!namc %in% c(nmsC, "transit_abs")]))
         warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
     running <- TRUE
@@ -1324,7 +1326,7 @@ focei.fit.data.frame0 <- function(data,
                                                        id=subj, inits.vec=inits.vec, cov=cur.cov, estimate=find.best.eta,
                                                        atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
                                                        atol.outer=con$atol.outer, rtol.outer=con$rtol.outer,
-                                                       hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
+                                                       hmin = con$hmin, hmax = con$hmax, hini = con$hini, transitAbs = con$transitAbs,
                                                        maxordn = con$maxordn, maxords = con$maxords, stiff=con$stiff,
                                                        pred.minus.dv=con$pred.minus.dv, switch.solver=con$switch.solver,
                                                        inner.opt=con$inner.opt, add.grad=print.grad, numDeriv.method=numDeriv.method,

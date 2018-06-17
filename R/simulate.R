@@ -46,22 +46,22 @@ repThetaEta <- function(x, theta=c(), eta=c()){
 ##' @export
 nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
                       covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-                      transit_abs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
+                      transitAbs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
                       maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-                      cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
-                      add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
+                      cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+                      addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
                       nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
                       amountUnits = NA_character_, timeUnits = "hours", stiff,
-                      theta = NULL, eta = NULL, addDosing=FALSE, update.object=FALSE,do.solve=TRUE,
+                      theta = NULL, eta = NULL, addDosing=FALSE, updateObject=FALSE,doSolve=TRUE,
                       omega = NULL, omegaDf = NULL, omegaIsChol = FALSE,
                       nSub = 1L, thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE,
-                      nStud = 1L, dfSub=0.0, dfObs=0.0, return.type=c("rxSolve", "matrix", "data.frame"),
+                      nStud = 1L, dfSub=0.0, dfObs=0.0, returnType=c("rxSolve", "matrix", "data.frame"),
                       seed=NULL, nsim=NULL){
     ## Get around lazy evaluation issues.
     force(events)
     method <- match.arg(method)
-    covs_interpolation <- match.arg(covs_interpolation)
-    return.type <- match.arg(return.type)
+    covsInterpolation <- match.arg(covsInterpolation)
+    returnType <- match.arg(returnType)
     mod <- gsub("rx_pred_~", "ipred=",
                 gsub("rx_r_~.*;", "",
                      gsub(rex::rex("(0)~"), "(0)=",
@@ -116,21 +116,21 @@ nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
     if (is.null(thetaMat) && nStud > 1L){
         thetaMat <- object$varFix;
     }
-    ## if (!any(names(lst) == "return.type")){
-    ##     lst$return.type <- "data.frame"
+    ## if (!any(names(lst) == "returnType")){
+    ##     lst$returnType <- "data.frame"
     ## }
     RxODE::rxSolve(object=newobj, params=params, events=events, inits=inits,
-                   scale=scale, covs=covs, method=method, transit_abs=transit_abs,
+                   scale=scale, covs=covs, method=method, transitAbs=transitAbs,
                    atol=atol, rtol=rtol, maxsteps=maxsteps, hmin=hmin, hmax=hmax,
                    hini = hini, maxordn = maxordn, maxords = maxords, ...,
-                   cores=cores, covs_interpolation = covs_interpolation, add.cov = add.cov,
+                   cores=cores, covsInterpolation = covsInterpolation, addCov = addCov,
                    matrix = matrix,
                    sigma = sigma, sigmaDf = sigmaDf, nCoresRV = nCoresRV, sigmaIsChol = sigmaIsChol,
                    nDisplayProgress = nDisplayProgress, amountUnits = amountUnits, timeUnits = timeUnits,
-                   stiff=stiff, theta = theta, eta = eta, addDosing = addDosing, update.object = update.object,
-                   do.solve = do.solve, omega = omega, omegaDf = omegaDf, omegaIsChol = omegaIsChol,
+                   stiff=stiff, theta = theta, eta = eta, addDosing = addDosing, updateObject = updateObject,
+                   doSolve = doSolve, omega = omega, omegaDf = omegaDf, omegaIsChol = omegaIsChol,
                    nSub = nSub, thetaMat = thetaMat, thetaDf = thetaDf, thetaIsChol = thetaIsChol,
-                   nStud = nStud, dfSub = dfSub, dfObs = dfObs, return.type = return.type, seed = seed, nsim = nsim)
+                   nStud = nStud, dfSub = dfSub, dfObs = dfObs, returnType = returnType, seed = seed, nsim = nsim)
 }
 ##' Predict a nlmixr solved system
 ##'
@@ -145,16 +145,16 @@ nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
 ##' @export
 nlmixrPred <- function(object, params=NULL, events=NULL, inits = NULL, scale = NULL,
                        covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-                       transit_abs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
+                       transitAbs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
                        maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-                       cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
-                       add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
+                       cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+                       addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
                        nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
                        amountUnits = NA_character_, timeUnits = "hours", stiff,
-                       theta = NULL, eta = NULL, addDosing=FALSE, update.object=FALSE,do.solve=TRUE,
+                       theta = NULL, eta = NULL, addDosing=FALSE, updateObject=FALSE,doSolve=TRUE,
                        omega = NULL, omegaDf = NULL, omegaIsChol = FALSE,
                        nSub = 1L, thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE,
-                       nStud = 1L, dfSub=0.0, dfObs=0.0, return.type=c("data.frame", "rxSolve", "matrix"),
+                       nStud = 1L, dfSub=0.0, dfObs=0.0, returnType=c("data.frame", "rxSolve", "matrix"),
                        seed=NULL, nsim=NULL,
                        ipred=FALSE){
     lst <- as.list(match.call()[-1]);
@@ -199,7 +199,7 @@ nlmixrPred <- function(object, params=NULL, events=NULL, inits = NULL, scale = N
         pred.par <- c(params, setNames(rep(0, neta + 1), c(sprintf("ETA[%d]", seq(1, neta)), "rx_err_")));
     }
     on.exit({RxODE::rxUnload(lst$object)});
-    lst$return.type <- match.arg(return.type);
+    lst$returnType <- match.arg(returnType);
     if (!is.na(ipred)){
         if (do.pred){
             lst$params <- pred.par
@@ -233,7 +233,7 @@ predict.focei.fit <- function(object, ...){
 ##' @inheritParams RxODE::rxSolve
 ##' @return Stacked data.frame with observations, individual/population predictions.
 ##' @author Matthew L. Fidler
-nlmixrAugPred <- function(object, ..., covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
+nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
                           primary=NULL, minimum = NULL, maximum = NULL, length.out = 51L){
     if (!inherits(object, "focei.fit")){
         stop("Need a nlmixr fit object")
@@ -259,7 +259,7 @@ nlmixrAugPred <- function(object, ..., covs_interpolation = c("linear", "locf", 
     ids <- unique(dat$ID)
     new.pts <- expand.grid(TIME=new.time, ID=ids);
     ## Add covariates in the augmented prediction
-    covsi <- match.arg(covs_interpolation)
+    covsi <- match.arg(covsInterpolation)
     all.covs <- uif$all.covs
     if (length(all.covs) > 0){
         fs <- c(locf=0, nocb=1, midpoint=0.5, linear=0)
@@ -324,16 +324,16 @@ plot.nlmixrAugPred <- function(x, y, ...){
 ##' @export
 rxSolve.focei.fit <- function(object, params=NULL, events=NULL, inits = NULL, scale = NULL,
                               covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-                              transit_abs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
+                              transitAbs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
                               maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-                              cores, covs_interpolation = c("linear", "locf", "nocb", "midpoint"),
-                              add.cov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
+                              cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+                              addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
                               nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
                               amountUnits = NA_character_, timeUnits = "hours", stiff,
-                              theta = NULL, eta = NULL, addDosing=FALSE, update.object=FALSE,do.solve=TRUE,
+                              theta = NULL, eta = NULL, addDosing=FALSE, updateObject=FALSE, doSolve=TRUE,
                               omega = NULL, omegaDf = NULL, omegaIsChol = FALSE,
                               nSub = 1L, thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE,
-                              nStud = 1L, dfSub=0.0, dfObs=0.0, return.type=c("rxSolve", "matrix", "data.frame"),
+                              nStud = 1L, dfSub=0.0, dfObs=0.0, returnType=c("rxSolve", "matrix", "data.frame"),
                               seed=NULL, nsim=NULL){
     do.call("nlmixrSim", as.list(match.call()[-1]), envir=parent.frame(2));
 }

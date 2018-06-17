@@ -2,12 +2,12 @@
 % Please edit documentation in R/focei_fit.R, R/nlme_fit.R
 \name{focei.eta}
 \alias{focei.eta}
-\alias{focei.eta.nlmixr_nlme}
+\alias{focei.eta.nlmixrNlme}
 \title{Get the FOCEi theta or eta specification for model.}
 \usage{
 focei.eta(object, uif, ...)
 
-\method{focei.eta}{nlmixr_nlme}(object, ...)
+\method{focei.eta}{nlmixrNlme}(object, ...)
 }
 \arguments{
 \item{object}{Fit object}

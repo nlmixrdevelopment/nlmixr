@@ -2,12 +2,12 @@
 % Please edit documentation in R/focei_fit.R, R/nlme_fit.R
 \name{as.focei}
 \alias{as.focei}
-\alias{as.focei.nlmixr_nlme}
+\alias{as.focei.nlmixrNlme}
 \title{Convert fit to FOCEi style fit}
 \usage{
 as.focei(object, uif, pt = proc.time(), ..., data)
 
-\method{as.focei}{nlmixr_nlme}(object, uif, pt = proc.time(), ..., data)
+\method{as.focei}{nlmixrNlme}(object, uif, pt = proc.time(), ..., data)
 }
 \arguments{
 \item{object}{Fit object to convert to FOCEi-style fit.}

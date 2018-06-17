@@ -2,25 +2,34 @@
 % Please edit documentation in R/nlme_fit.R
 \name{nlme_ode}
 \alias{nlme_ode}
+\alias{nlmeOde}
 \title{Fit nlme-based mixed-effect model using ODE implementation}
 \usage{
-nlme_ode(dat.o, model, par_model, par_trans, response, response.scaler = NULL,
-  transit_abs = FALSE, atol = 1e-06, rtol = 1e-04, maxsteps = 5000,
+nlme_ode(dat.o, model, parModel, parTrans, response, responseScaler = NULL,
+  transitAbs = FALSE, atol = 1e-06, rtol = 1e-04, maxsteps = 5000,
   hmin = 0, hmax = NULL, hini = 0, maxordn = 12, maxords = 5,
-  debugODE = FALSE, mc.cores = 1, ...)
+  debugODE = FALSE, mcCores = 1, ...)
+
+nlmeOde(dat.o, model, parModel, parTrans, response, responseScaler = NULL,
+  transitAbs = FALSE, atol = 1e-06, rtol = 1e-04, maxsteps = 5000,
+  hmin = 0, hmax = NULL, hini = 0, maxordn = 12, maxords = 5,
+  debugODE = FALSE, mcCores = 1, ...)
 }
 \arguments{
 \item{dat.o}{data to be fitted}
 
 \item{model}{a string containing the set of ordinary differential equations (ODE) and other expressions defining the changes in the dynamic  system. For details, see the sections \dQuote{Details} and  \dQuote{\code{RxODE Syntax}} below.}
 
-\item{par_model}{list: model for fixed effects, randoms effects and initial values.}
+\item{parModel}{list: model for fixed effects, randoms effects and initial values.}
 
-\item{par_trans}{function: calculation of PK parameters}
+\item{parTrans}{function: calculation of PK parameters}
 
 \item{response}{names of the response variable}
 
-\item{response.scaler}{optional response variable scaler. default is NULL}
+\item{responseScaler}{optional response variable scaler. default is NULL}
+
+\item{transitAbs}{boolean indicating if this is a transit
+compartment absorption}
 
 \item{atol}{a numeric absolute tolerance (1e-8 by default) used
 by the ODE solver to determine if a good solution has been
@@ -55,7 +64,7 @@ method.  The default value is 5.  This can be between 1 and 5.}
 
 \item{debugODE}{a logical if debugging is enabled}
 
-\item{mc.cores}{number of cores used in fitting (only for Linux)}
+\item{mcCores}{number of cores used in fitting (only for Linux)}
 
 \item{...}{additional nlme options}
 }
@@ -148,7 +157,7 @@ mypar <- function(lKA, lKE, lCL)
 }
 
 specs <- list(fixed=lKA+lKE+lCL~1, random = pdDiag(lKA+lCL~1),
-	start=c(lKA=0.5, lKE=-2.5, lCL=-3.2))
+     start=c(lKA=0.5, lKE=-2.5, lCL=-3.2))
 
 fit <- nlme_ode(theo_md, model=ode, par_model=specs, par_trans=mypar,
      response="centr", response.scaler="V",control=nlmeControl(pnlsTol=0.1))
