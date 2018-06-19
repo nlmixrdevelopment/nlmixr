@@ -151,3 +151,7 @@ nlme::varComb
 ##' @importFrom nlme groupedData
 ##' @export
 nlme::groupedData
+
+##' @importFrom nlme getData
+##' @export
+nlme::getData

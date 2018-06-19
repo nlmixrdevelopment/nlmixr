@@ -1,5 +1,5 @@
 ## Add RxODE THETA/ETA replacement mini DSL
-repThetaEta <- function(x, theta=c(), eta=c()){
+.repThetaEta <- function(x, theta=c(), eta=c()){
     ret <- eval(parse(text=sprintf("quote({%s})", x)));
     f <- function(x){
         if (is.atomic(x)) {
@@ -30,6 +30,47 @@ repThetaEta <- function(x, theta=c(), eta=c()){
     return(RxODE::rxNorm(RxODE::rxGetModel(ret)))
 }
 
+.simInfo <- function(object){
+    .mod <- gsub("rx_pred_~", "ipred=",
+                 gsub("rx_r_~.*;", "",
+                      gsub(rex::rex("(0)~"), "(0)=",
+                          gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE))));
+    .params <- nlme::fixed.effects(object);
+    .thetaN <- names(.params);
+    .sim <- "\nsim=ipred"
+    .err <- object$uif$err;
+    .w <- which(!is.na(object$uif$err))
+    .mat <- diag(length(.w))
+    .dimn <- character(length(.w))
+    for (.i in seq_along(.w)){
+        .ntheta <- object$uif$ini$ntheta[.w[.i]]
+        .cur <- .thetaN[.ntheta];
+        .dimn[.i] <- .cur;
+        if (.err[.w[.i]] == "add"){
+            .sim <- paste0(.sim, "+", .cur);
+            .mat[.i, .i] <- .params[.ntheta] ^ 2;
+            .params[.ntheta] <- NA_real_;
+        } else if (.err[.w[.i]] == "prop"){
+            .sim <- paste0(.sim, "+ipred*", .cur);
+            .mat[.i, .i] <- .params[.ntheta] ^ 2;
+            .params[.ntheta] <- NA_real_;
+        }
+    }
+    .params <- .params[!is.na(.params)]
+    dimnames(.mat) <- list(.dimn, .dimn);
+    .sigma <- .mat;
+    .mod <- paste0(.mod, "\n", .sim);
+    .omega <- object$omega
+    .etaN <- dimnames(.omega)[[1]]
+    .newMod <- .repThetaEta(.mod, theta=.thetaN, eta=.etaN);
+    .params <- .params[-.w];
+    .dfObs <- nobs(object);
+    .nlmixrData <- nlmixr::nlmixrData(nlme::getData(object))
+    .dfSub <- length(unique(.nlmixrData$ID));
+    .thetaMat <- object$varFix;
+    return(list(rx=.newMod, params=.params, events=.nlmixrData,
+                thetaMat=.thetaMat, omega=.omega, sigma=.sigma, dfObs=.dfObs, dfSub=.dfSub))
+}
 
 
 ##' Simulate a nlmixr solved system
@@ -44,93 +85,46 @@ repThetaEta <- function(x, theta=c(), eta=c()){
 ##' @inheritParams RxODE::rxSolve
 ##'
 ##' @export
-nlmixrSim <- function(object, events=NULL, inits = NULL, scale = NULL,
-                      covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-                      transitAbs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
-                      maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-                      cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
-                      addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
-                      nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
-                      amountUnits = NA_character_, timeUnits = "hours", stiff,
-                      theta = NULL, eta = NULL, addDosing=FALSE, updateObject=FALSE,doSolve=TRUE,
-                      omega = NULL, omegaDf = NULL, omegaIsChol = FALSE,
-                      nSub = 1L, thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE,
-                      nStud = 1L, dfSub=0.0, dfObs=0.0, returnType=c("rxSolve", "matrix", "data.frame"),
-                      seed=NULL, nsim=NULL){
+nlmixrSim <- function(object, ...){
     ## Get around lazy evaluation issues.
-    force(events)
-    method <- match.arg(method)
-    covsInterpolation <- match.arg(covsInterpolation)
-    returnType <- match.arg(returnType)
-    mod <- gsub("rx_pred_~", "ipred=",
-                gsub("rx_r_~.*;", "",
-                     gsub(rex::rex("(0)~"), "(0)=",
-                          gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE))));
-    nlmixr.data <- nlmixrData(getData(object))
-    if (!RxODE::rxIs(events, "rx.event")){
-        events <- nlmixr.data;
-    }
-    params <- fixed.effects(object);
-    theta.n <- names(params);
-    sim <- "\nsim=ipred"
-    err <- object$uif$err;
-    w <- which(!is.na(object$uif$err))
-    mat <- diag(length(w))
-    dimn <- character(length(w))
-    for (i in seq_along(w)){
-        ntheta <- object$uif$ini$ntheta[w[i]]
-        cur <- theta.n[ntheta];
-        dimn[i] <- cur;
-        if (err[w[i]] == "add"){
-            sim <- paste0(sim, "+", cur);
-            mat[i, i] <- params[ntheta] ^ 2;
-            params[ntheta] <- NA_real_;
-        } else if (err[w[i]] == "prop"){
-            sim <- paste0(sim, "+ipred*", cur);
-            mat[i, i] <- params[ntheta] ^ 2;
-            params[ntheta] <- NA_real_;
-        }
-    }
-    params <- params[!is.na(params)]
-    dimnames(mat) <- list(dimn, dimn);
-    sigma <- mat;
-    mod <- paste0(mod, "\n", sim);
-    if (is.null(omega)){
-        omega <- object$omega
-        dm <- dim(object$omega)[1];
-        eta.n <- dimnames(omega)[[1]]
-        omega <- omega;
-    }
-    new.mod <- repThetaEta(mod, theta=theta.n, eta=eta.n);
+    .si <- .simInfo(object);
+
     message("Compiling model...", appendLF=FALSE)
-    newobj <- RxODE::RxODE(new.mod);
-    on.exit({RxODE::rxUnload(newobj)});
+    .newobj <- RxODE::RxODE(.si$rx);
+    on.exit({RxODE::rxUnload(.newobj)});
     message("done");
-    params <- params[-w];
-    if (dfObs == 0.0){
-        dfObs <- nobs(object);
+    .xtra <- list(...)
+    if (any(names(.xtra) == "dfObs")){
+        .si$dfObs <- .xtra$dfObs;
     }
-    if (dfSub == 0.0){
-        dfSub <- length(unique(nlmixr.data$ID))
+    if (any(names(.xtra) == "dfSub")){
+        .si$dfSub <- .xtra$dfSub
     }
-    if (is.null(thetaMat) && nStud > 1L){
-        thetaMat <- object$varFix;
+    if (any(names(.xtra) == "nStud") && .xtra$nStud <= 1){
+        .si$thetaMat <- NULL;
+    } else if (any(names(.xtra) == "thetaMat")){
+        .si$thetaMat <- .xtra$thetaMat;
     }
-    ## if (!any(names(lst) == "returnType")){
-    ##     lst$returnType <- "data.frame"
-    ## }
-    RxODE::rxSolve(object=newobj, params=params, events=events, inits=inits,
-                   scale=scale, covs=covs, method=method, transitAbs=transitAbs,
-                   atol=atol, rtol=rtol, maxsteps=maxsteps, hmin=hmin, hmax=hmax,
-                   hini = hini, maxordn = maxordn, maxords = maxords, ...,
-                   cores=cores, covsInterpolation = covsInterpolation, addCov = addCov,
-                   matrix = matrix,
-                   sigma = sigma, sigmaDf = sigmaDf, nCoresRV = nCoresRV, sigmaIsChol = sigmaIsChol,
-                   nDisplayProgress = nDisplayProgress, amountUnits = amountUnits, timeUnits = timeUnits,
-                   stiff=stiff, theta = theta, eta = eta, addDosing = addDosing, updateObject = updateObject,
-                   doSolve = doSolve, omega = omega, omegaDf = omegaDf, omegaIsChol = omegaIsChol,
-                   nSub = nSub, thetaMat = thetaMat, thetaDf = thetaDf, thetaIsChol = thetaIsChol,
-                   nStud = nStud, dfSub = dfSub, dfObs = dfObs, returnType = returnType, seed = seed, nsim = nsim)
+
+    if (any(names(.xtra) == "omega")){
+        .si$omega <- .xtra$omega;
+    }
+    if (any(names(.xtra) == "sigma")){
+        .si$sigma <- .xtra$sigma;
+    }
+    if (any(names(.xtra) == "events") &&
+        RxODE::rxIs(.xtra$events, "rx.event")){
+        .si$events <- .xtra$events;
+    }
+    .xtra$object <- .newobj;
+    .xtra$params <- .si$params;
+    .xtra$events <- .si$events;
+    .xtra$thetaMat <- .si$thetaMat;
+    .xtra$dfObs <- .si$dfObs
+    .xtra$omega <- .si$omega;
+    .xtra$dfSub <- .si$dfSub
+    .xtra$sigma <- .si$sigma;
+    do.call(getFromNamespace("rxSolve", "RxODE"), .xtra, envir=parent.frame(2))
 }
 ##' Predict a nlmixr solved system
 ##'
@@ -341,7 +335,7 @@ rxSolve.focei.fit <- function(object, params=NULL, events=NULL, inits = NULL, sc
 ##' @rdname nlmixrSim
 ##' @export
 simulate.focei.fit <- function(object, nsim=1, seed=NULL, ...){
-    nlmixrSim(object, ..., nsim=nsim, seed=seed)
+    nlmixr::nlmixrSim(object, ..., nsim=nsim, seed=seed)
 }
 
 ##' @rdname nlmixrSim

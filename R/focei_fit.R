@@ -2222,6 +2222,8 @@ focei.fit.data.frame0 <- function(data,
             return(env$uif$model.name);
         } else if (arg == "data.name"){
             return(env$uif$data.name);
+        } else if (arg == "simInfo"){
+            return(.simInfo(obj));
         } else {
             fit <- env$fit;
             ret <- fit[[arg, exact = exact]]
@@ -2266,6 +2268,7 @@ str.focei.fit <- function(object, ...){
     cat(" $ seed             : Seed (if applicable)\n");
     cat(" $ model.name       : Model name (from R function)\n");
     cat(" $ data.name        : Name of R data input\n");
+    cat(" $ simInfo          : RxODE list for simulation\n");
 }
 
 ##' @export

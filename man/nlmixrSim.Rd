@@ -7,19 +7,7 @@
 \alias{solve.focei.fit}
 \title{Simulate a nlmixr solved system}
 \usage{
-nlmixrSim(object, events = NULL, inits = NULL, scale = NULL,
-  covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-  transitAbs = NULL, atol = 1e-06, rtol = 1e-04, maxsteps = 5000L,
-  hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-  cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
-  addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
-  nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress = 10000L,
-  amountUnits = NA_character_, timeUnits = "hours", stiff, theta = NULL,
-  eta = NULL, addDosing = FALSE, updateObject = FALSE, doSolve = TRUE,
-  omega = NULL, omegaDf = NULL, omegaIsChol = FALSE, nSub = 1L,
-  thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE, nStud = 1L,
-  dfSub = 0, dfObs = 0, returnType = c("rxSolve", "matrix", "data.frame"),
-  seed = NULL, nsim = NULL)
+nlmixrSim(object, ...)
 
 \method{rxSolve}{focei.fit}(object, params = NULL, events = NULL,
   inits = NULL, scale = NULL, covs = NULL, method = c("liblsoda",
@@ -44,6 +32,15 @@ nlmixrSim(object, events = NULL, inits = NULL, scale = NULL,
 \item{object}{is a either a RxODE family of objects, or a file-name
 with a RxODE model specification, or a string with a RxODE
 model specification.}
+
+\item{...}{Other arguments including scaling factors for each
+compartment.  This includes S# = numeric will scale a compartment
+# by a dividing the compartment amount by the scale factor,
+like NONMEM.}
+
+\item{params}{a numeric named vector with values for every
+parameter in the ODE system; the names must correspond to the
+parameter identifiers used in the ODE specification;}
 
 \item{events}{an \code{eventTable} object describing the input
 (e.g., doses) to the dynamic system and observation sampling
@@ -109,11 +106,6 @@ default value is determined by the solver (when hini = 0)}
 
 \item{maxords}{The maximum order to be allowed for the stiff (BDF)
 method.  The default value is 5.  This can be between 1 and 5.}
-
-\item{...}{Other arguments including scaling factors for each
-compartment.  This includes S# = numeric will scale a compartment
-# by a dividing the compartment amount by the scale factor,
-like NONMEM.}
 
 \item{cores}{Number of cores used in parallel ODE solving.  This
 defaults to the number or system cores determined by
@@ -269,10 +261,6 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
 \item{nsim}{represents the number of simulations.  For RxODE, if
 you supply single subject event tables (created with
 eventTable)}
-
-\item{params}{a numeric named vector with values for every
-parameter in the ODE system; the names must correspond to the
-parameter identifiers used in the ODE specification;}
 
 \item{a}{when using \code{solve}, this is equivalent to the
 \code{object} argument.  If you specify \code{object} later in
