@@ -640,3 +640,9 @@ nlmixrPrint <- function(x, ...){
     message(invisible(paste(R.utils::captureOutput(assign("x", print(x, ...), this.env)), collapse="\n")), appendLF=TRUE);
     invisible(x)
 }
+
+.dontRun <- function(...){
+    ## This is for r checks, though they need to be loaded...
+    vpc::vpc(...)
+    dparser::dparse(...)
+}

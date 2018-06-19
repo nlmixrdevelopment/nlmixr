@@ -52,6 +52,8 @@ nlmixrForget <- function(){
 ##' @importFrom lbfgs lbfgs
 ##' @importFrom methods is
 ##' @importFrom Rcpp evalCpp
+##' @importFrom dparser dparse
+##' @importFrom vpc vpc
 ##' @importFrom ggplot2 ggplot aes geom_point facet_wrap geom_line geom_abline xlab geom_smooth
 ##' @importFrom RcppArmadillo armadillo_version
 ##' @useDynLib nlmixr, .registration=TRUE
