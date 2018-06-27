@@ -500,7 +500,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 saem.cleanup <- function(env){
     if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
     if (is(env, "saemFit")) env <- attr(env, "env");
-    if (env$is.ode) RxODE::rxUnload(env$model)
+    if (env$is.ode) try({RxODE::rxUnload(env$model)}, silent=TRUE)
     try({dyn.unload(env$saem.dll)}, silent=TRUE);
     if (file.exists(env$saem.dll))
         unlink(env$saem.dll);
