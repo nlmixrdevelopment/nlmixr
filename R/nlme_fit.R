@@ -752,6 +752,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...){
 
 ##' @rdname as.focei
 as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
+    RxODE::rxSolveFree();
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
     }

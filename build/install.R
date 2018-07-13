@@ -19,14 +19,17 @@ install.packages(c("tidyverse", "data.table",
                    "microbenchmark",
                    "scales",
                    "stringi",
-                   "roxygen",
                    "lbfgsb3", "madness", "expm", "matrixcalc", "bookdown", "roxygen2"))
 
 devtools::install_github("ronkeizer/vpc");
 devtools::install_github("mattfidler/xpose")
+devtools::install_github("nlmixrdevelopment/RxODE")
+library(RxODE)
 devtools::install_github("nlmixrdevelopment/SnakeCharmR")
 devtools::install_github("richardhooijmaijers/R3port")
 devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
-devtools::install_github("richardhooijmaijers/shinyMixR")
-devtools::install_github("nlmixrdevelopment/RxODE")
 devtools::install_github("nlmixrdevelopment/nlmixr")
+devtools::install_github("richardhooijmaijers/shinyMixR")
+
+
+

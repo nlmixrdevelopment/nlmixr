@@ -131,8 +131,8 @@ DeleteRegKey HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\"
 SectionEnd"
 
 buildInstaller <- function(name="nlmixr"){
-    rtools <- gsub("/", "\\", RxODE:::rxRtoolsBaseWin(), fixed=TRUE);
-    python <- gsub("/", "\\", RxODE:::rxPythonBaseWin(), fixed=TRUE);
+    rtools <- gsub("/", "\\", RxODE:::.rxRtoolsBaseWin(), fixed=TRUE);
+    python <- gsub("/", "\\", RxODE:::.rxPythonBaseWin(), fixed=TRUE);
     R <- gsub("/", "\\", Sys.getenv("R_HOME"), fixed=TRUE);
     lic <- gsub("/", "\\", devtools::package_file("LICENSE"), fixed=TRUE);
     header <- gsub("/", "\\", devtools::package_file("build/nlmixr-header.bmp"), fixed=TRUE)
