@@ -100,7 +100,7 @@ nlmixrSim <- function(object, ...){
     if (any(names(.xtra) == "dfSub")){
         .si$dfSub <- .xtra$dfSub
     }
-    if (any(names(.xtra) == "nStud") && .xtra$nStud <= 1){
+    if ((any(names(.xtra) == "nStud") && .xtra$nStud <= 1) || !any(names(.xtra) == "nStud")){
         .si$thetaMat <- NULL;
     } else if (any(names(.xtra) == "thetaMat")){
         .si$thetaMat <- .xtra$thetaMat;
@@ -115,6 +115,9 @@ nlmixrSim <- function(object, ...){
     if (any(names(.xtra) == "events") &&
         RxODE::rxIs(.xtra$events, "rx.event")){
         .si$events <- .xtra$events;
+    }
+    if (any(names(.xtra) == "params")){
+        .si$params <- .xtra$params;
     }
     .xtra$object <- .newobj;
     .xtra$params <- .si$params;
