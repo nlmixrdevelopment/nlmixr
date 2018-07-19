@@ -34,7 +34,7 @@
     .mod <- gsub("rx_pred_~", "ipred=",
                  gsub("rx_r_~.*;", "",
                       gsub(rex::rex("(0)~"), "(0)=",
-                          gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE))));
+                           gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE))));
     .params <- nlme::fixed.effects(object);
     .thetaN <- names(.params);
     .sim <- "\nsim=ipred"
@@ -86,9 +86,7 @@
 ##'
 ##' @export
 nlmixrSim <- function(object, ...){
-    ## Get around lazy evaluation issues.
     .si <- .simInfo(object);
-
     message("Compiling model...", appendLF=FALSE)
     .newobj <- RxODE::RxODE(.si$rx);
     on.exit({RxODE::rxUnload(.newobj)});
@@ -127,8 +125,67 @@ nlmixrSim <- function(object, ...){
     .xtra$omega <- .si$omega;
     .xtra$dfSub <- .si$dfSub
     .xtra$sigma <- .si$sigma;
-    do.call(getFromNamespace("rxSolve", "RxODE"), .xtra, envir=parent.frame(2))
+    .ret <- do.call(getFromNamespace("rxSolve", "RxODE"), .xtra, envir=parent.frame(2))
+    .rxEnv <- attr(class(.ret),".RxODE.env")
+    if (!is.null(.xtra$nsim)){
+        .rxEnv$nSub <- .xtra$nsim
+    }
+    if (!is.null(.xtra$nSub)){
+        .rxEnv$nSub <- .xtra$nSub
+    }
+    if (is.null(.xtra$nStud)){
+        .rxEnv$nStud <- 1;
+    } else {
+        .rxEnv$nStud <- .xtra$nStud
+    }
+    .cls <- c("nlmixrSim", class(.ret));
+    attr(.cls, ".RxODE.env") <- .rxEnv
+    class(.ret) <- .cls
+    return(.ret)
 }
+
+##' @export
+plot.nlmixrSim <- function(x, y, ...){
+    .args <- list(...)
+    RxODE::rxReq("dplyr")
+    RxODE::rxReq("tidyr")
+    if (is.null(.args$p)){
+        .p <- c(0.05, 0.5, 0.95)
+    } else {
+        .p <- .args$p;
+    }
+    if (x$env$nStud <= 1){
+        if (x$env$nSub < 2500){
+            warning("In order to put confidence bands around the intervals, you need at least 2500 simulations.")
+            message("Summarizing data for plot")
+            .ret <- x %>% dplyr::group_by(time) %>%
+                dplyr::do(data.frame(p1=.p, eff=quantile(.$sim, probs=.p))) %>%
+                dplyr::mutate(Percentile=factor(sprintf("%02d%%",round(p1*100))))
+            message("done.")
+            .ret <- ggplot2::ggplot(.ret,aes(time,eff,col=Percentile,fill=Percentile)) +
+                ggplot2::geom_line(size=1.2)
+            return(.ret)
+        } else {
+            .n <- round(sqrt(x$env$nSub));
+        }
+    } else {
+        .n <- x$env$nStud;
+    }
+    message("Summarizing data for plot")
+    .ret <- x %>% dplyr::mutate(id=sim.id%%n) %>% dplyr::group_by(id,time) %>%
+        dplyr::do(data.frame(p1=.p, eff=quantile(.$sim, probs=.p)))%>%
+        dplyr::group_by(p1,time) %>%
+        dplyr::do(data.frame(p2=.p, eff=quantile(.$eff, probs=.p))) %>%
+        dplyr::ungroup()  %>% dplyr::mutate(p2=sprintf("p%02d",(p2*100)))%>%
+        tidyr::spread(p2,eff) %>% dplyr::mutate(Percentile=factor(sprintf("%02d%%",round(p1*100))));
+    message("done.")
+    .ret <- ggplot2::ggplot(.ret,aes(time,p50,col=Percentile,fill=Percentile)) +
+        ggplot2::geom_ribbon(aes(ymin=p05,ymax=p95),alpha=0.5)+
+        ggplot2::geom_line(size=1.2)
+    return(.ret);
+}
+
+
 ##' Predict a nlmixr solved system
 ##'
 ##' @param ipred Flag to calculate individual predictions. When
