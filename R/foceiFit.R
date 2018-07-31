@@ -57,11 +57,12 @@
 ##'     gradient cross-product (evaluated at the individual empirical
 ##'     Bayes estimates).
 ##' \itemize{
-##' \item \code{r,s} Uses the sandwich matrix to calculate the covariance, that is: \code{R^-1 * S * R^-1}
+##' \item "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \code{R^-1 * S * R^-1}
 ##'
-##' \item \code{r} Uses the Hessian matrix to calculate the
+##' \item "\code{r}" Uses the Hessian matrix to calculate the
 ##'      covariance as \code{2*R^-1}
-##' \item \code{s} Uses the crossproduct matrix to calculate the covariance as \code{4*S^-1}
+##' \item "\code{s}" Uses the crossproduct matrix to calculate the covariance as \code{4*S^-1}
+##' \item "" Does not calculate the covariance step.
 ##' }
 ##'
 ##' @param lbfgsLmm An integer giving the number of BFGS updates
@@ -121,14 +122,26 @@
 ##' Note this uses the R's L-BFGS-B in \code{\link{optim}} for the
 ##' outer problem and the BFGS \code{\link[n1qn1]{n1qn1}} with that
 ##' allows restoring the prior individual Hessian (for faster
-##' optimization speed)
+##' optimization speed).
+##'
+##' By default FOCEi scales the outer problem parameters to 1.0 for the initial parameter estimates and scales the objective function to 1.0,
+##' as suggested by the NAG library
+##' (https://www.nag.com/numeric/fl/nagdoc_fl25/html/e04/e04intro.html) and scipy (https://www.scipy-lectures.org/advanced/mathematical_optimization/).
+##'
+##' However the inner problem is not scaled.  Since most eta estimates
+##' start near zero, scaling for these parameters do not make sense.
+##'
+##' This process of scaling can fix some ill conditioning for the
+##' unscaled problem.  The covariance step is performed on the
+##' unscaled problem, so the condition number of that matrix may not
+##' be reflective of the scaled problem's condition-number.
 ##'
 ##' @author Matthew L. Fidler
 ##'
 ##' @seealso \code{\link{optim}}
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @export
-foceiControl <- function(sigdig=3,
+foceiControl <- function(sigdig=4,
                          epsilon=NULL, #1e-4,
                          maxInnerIterations=10000,
                          maxOuterIterations=50000,
@@ -140,10 +153,11 @@ foceiControl <- function(sigdig=3,
                          printInner=0L,
                          printOuter=1L,
                          scaleTo=1.0,
+                         scaleObjective=1.0,
                          derivEps=c(1.0e-5, 1.0e-5),
                          derivMethod=c("forward", "central"),
                          covDerivMethod=c("central", "forward"),
-                         covMethod=c("r,s", "r", "s"),
+                         covMethod=c("r,s", "r", "s", ""),
                          lbfgsLmm=40L,
                          lbfgsPgtol=0,
                          lbfgsFactr=NULL, #1e-4 / .Machine$double.eps, ## .Machine$double.eps*x=1e-5
@@ -206,8 +220,16 @@ foceiControl <- function(sigdig=3,
     if (missing(n1qn1nsim)){
         n1qn1nsim <- 10 * maxInnerIterations + 1;
     }
-    .covMethodIdx <- c("r,s" = 0L, "r"=1L, "s"=2L);
-    covMethod <- .covMethodIdx[match.arg(covMethod)];
+    if (length(covMethod) == 1){
+        if (covMethod == ""){
+            covMethod <- 0L
+        }
+    }
+    if (RxODE::rxIs(covMethod, "character")){
+        covMethod <- match.arg(covMethod);
+        .covMethodIdx <- c("r,s" = 1L, "r"=2L, "s"=3L);
+        covMethod <- .covMethodIdx[match.arg(covMethod)];
+    }
     ## outerOpt <- match.arg(outerOpt)
     ## .outerIdx <- c("lbfgsb"=0L, "qnbd"=1L)
     ## outerOpt <- as.integer(.outerIdx[outerOpt]);
@@ -242,7 +264,8 @@ foceiControl <- function(sigdig=3,
                  diagXform=match.arg(diagXform),
                  sumProd=sumProd,
                  optExpression=optExpression,
-                 outerOpt=0L)
+                 outerOpt=0L,
+                 scaleObjective=as.double(scaleObjective))
     class(.ret) <- "foceiControl"
     return(.ret);
 }
@@ -475,7 +498,7 @@ foceiFit <- function(data,
 
     .om0 = .genOM(.lh)
     if (length(etaNames) == dim(.om0)[1]){
-        .ret$etaNames <- ret$etaNames
+        .ret$etaNames <- .ret$etaNames
     } else {
         .ret$etaNames <- sprintf("ETA[%d]", seq(1, dim(.om0)[1]))
     }
