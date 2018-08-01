@@ -7,23 +7,21 @@
 
 ##' Control Options for FOCEi
 ##'
-##' @param sigdig Optimization significant digits.  This controls
-##'     defaults for optimization and ODE solving, if unspecified.
-##'     The sigdigs move the tolerances of the optimization procedure
-##'     to 10^-sigdig and the tolerances of the ODE solvers to
-##'     10^(-sigdig-1)
+##' @param sigdig Optimization significant digits. This controls:
+##'
+##'  \itemize{
+##' \item Defaults for optimization and ODE solving
+##' \itemize{
+##' \item The tolerance of the inner and outer optimization is 10^-sigdig
+##' \item The tolerance of the ODE solvers is 10^(-sigdig-1)
+##' }
+##' \item The significant figures that some tables are rounded to.
+##' }
 ##'
 ##' @param epsilon Precision of estimate for n1qn1 optimization.
-##'
-##' @param maxInnerIterations Number of iterations for n1qn1
-##'     optimization.
-##'
-##' @param maxOuterIterations Maximum number of L-BFGS-B optimization
-##'     for outer problem.
-##' @param n1qn1nsim Number of function evaluations for n1qn1
-##'     optimization.
-##'
+
 ##' @param maxstepsOde Maximum number of steps for ODE solver.
+##'
 ##'
 ##' @param printInner Integer representing when the inner step is
 ##'     printed. By default this is 0 or do not print.  1 is print
@@ -35,11 +33,22 @@
 ##'     evaluations.
 ##'
 ##' @param scaleTo Scale the initial parameter estimate to this value.
-##'     By default this is 1.
+##'     By default this is 1.  When zero or below, no scaling is performed.
 ##'
-##' @param derivEps Central/Forward difference tolerances, which is a vector
-##'     of relative difference and absolute difference.  The central/forward
-##'     difference step size h is calculated as:
+##' @param scaleObjective Scale the initial objective function to this
+##'     value.  By default this is 1.  When \code{scaleObjective} is
+##'     greater than zero, this scaling is performed by:
+##'
+##'      scaledObj = (currentObj / |initialObj|) * scaleObjective
+##'
+##'     Therefore, if the initial objective function is negative, the
+##'     initial scaled objective function would be negative as well.
+##'     When \code{scaleObjective} is less than zero, no scaling is
+##'     performed.
+##'
+##' @param derivEps Central/Forward difference tolerances, which is a
+##'     vector of relative difference and absolute difference.  The
+##'     central/forward difference step size h is calculated as:
 ##'
 ##'         h = abs(x)*derivEps[1]+derivEps[2]
 ##'
@@ -88,12 +97,6 @@
 ##'     exact tolerance by multiplying this value by
 ##'     \code{.Machine$double.eps}
 ##'
-##' @param eigen A boolean indicating if eigenvectors are calculated
-##'     to include a condition number calculation.
-##'
-##' @param addPosthoc Boolean indicating if posthoc parameters are
-##'     added to the table output.
-##'
 ##' @param diagXform This is the transformation used on the diagonal
 ##'     of the \code{chol(inv(omega))}. This matrix and values are the
 ##'     parameters estimated in FOCEi. The possibilities are:
@@ -112,7 +115,26 @@
 ##'     this is \code{FALSE}.
 ##'
 ##'
+##' @param optExpression Optimize the RxODE expression to speed up
+##'     calculation. By default this is turned on.
+##'
+##' @param ci Confidence level for some tables.  By default this is
+##'     0.95 or 95% confidence.
+##'
 ##' @param ...
+##' @param maxInnerIterations Number of iterations for n1qn1
+##'     optimization.
+##'
+##' @param maxOuterIterations Maximum number of L-BFGS-B optimization
+##'     for outer problem.
+##' @param n1qn1nsim Number of function evaluations for n1qn1
+##'     optimization.
+##'
+##' @param eigen A boolean indicating if eigenvectors are calculated
+##'     to include a condition number calculation.
+##'
+##' @param addPosthoc Boolean indicating if posthoc parameters are
+##'     added to the table output.
 ##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams RxODE::rxSymPySetupPred
@@ -124,9 +146,12 @@
 ##' allows restoring the prior individual Hessian (for faster
 ##' optimization speed).
 ##'
-##' By default FOCEi scales the outer problem parameters to 1.0 for the initial parameter estimates and scales the objective function to 1.0,
-##' as suggested by the NAG library
-##' (https://www.nag.com/numeric/fl/nagdoc_fl25/html/e04/e04intro.html) and scipy (https://www.scipy-lectures.org/advanced/mathematical_optimization/).
+##' By default FOCEi scales the outer problem parameters to 1.0 for
+##' the initial parameter estimates and scales the objective function
+##' to 1.0, as suggested by the NAG library
+##' (https://www.nag.com/numeric/fl/nagdoc_fl25/html/e04/e04intro.html)
+##' and scipy
+##' (https://www.scipy-lectures.org/advanced/mathematical_optimization/).
 ##'
 ##' However the inner problem is not scaled.  Since most eta estimates
 ##' start near zero, scaling for these parameters do not make sense.
@@ -166,6 +191,7 @@ foceiControl <- function(sigdig=4,
                          diagXform=c("sqrt", "log", "identity"),
                          sumProd=FALSE,
                          optExpression=TRUE,
+                         ci=0.95,
                          ## outerOpt=c("lbfgsb", "qnbd"),
                          ..., stiff){
     if (is.null(epsilon)){
@@ -265,6 +291,8 @@ foceiControl <- function(sigdig=4,
                  sumProd=sumProd,
                  optExpression=optExpression,
                  outerOpt=0L,
+                 ci=as.double(ci),
+                 sigdig=as.double(sigdig),
                  scaleObjective=as.double(scaleObjective))
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -373,13 +401,15 @@ foceiFit <- function(data,
                      thetaNames=NULL,
                      etaNames=NULL,
                      etaMat=NULL,
-                     ...){
+                     ...,
+                     env=NULL){
     .pt <- proc.time();
     loadNamespace("n1qn1");
     if (!RxODE::rxIs(control, "foceiControl")){
         control <- do.call(foceiControl, control);
     }
-    .ret <- new.env(parent=emptyenv())
+    if (is.null(env)) .ret <- new.env(parent=emptyenv())
+    else .ret <- env;
     .ret$origData <- data;
     .ret$etaNames <- etaNames;
     .ret$lower <- lower;
@@ -621,8 +651,8 @@ print.foceiFitCore <- function(x, ...){
     print(x$objDf)
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)
-    message(paste0("\n", cli::rule(paste0(crayon::bold("Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parDf"), "):"))));
-    print(x$parDf)
+    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$fixedDf"), " & ", crayon::yellow(.bound), crayon::bold$blue("$fixedDfSig"), "):"))));
+    print(x$fixedDfSig)
     ################################################################################
     ## Correlations
     .tmp <- x$omega
