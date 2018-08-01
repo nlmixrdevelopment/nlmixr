@@ -172,7 +172,7 @@ plot.nlmixrSim <- function(x, y, ...){
         .n <- x$env$nStud;
     }
     message("Summarizing data for plot")
-    .ret <- x %>% dplyr::mutate(id=sim.id%%n) %>% dplyr::group_by(id,time) %>%
+    .ret <- x %>% dplyr::mutate(id=sim.id%%.n) %>% dplyr::group_by(id,time) %>%
         dplyr::do(data.frame(p1=.p, eff=quantile(.$sim, probs=.p)))%>%
         dplyr::group_by(p1,time) %>%
         dplyr::do(data.frame(p2=.p, eff=quantile(.$eff, probs=.p))) %>%
