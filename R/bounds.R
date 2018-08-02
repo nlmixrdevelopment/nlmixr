@@ -698,8 +698,7 @@ nlmixrBounds.focei.upper.lower <- function(obj, type=c("upper", "lower", "name",
     type <- match.arg(type);
     df <- as.data.frame(obj);
     dft <- df[!is.na(df$ntheta), ];
-    dft.unfixed <- dft[!dft$fix, ];
-    ret <- dft.unfixed[[type]]
+    ret <- dft[[type]]
     if (is(ret, "factor")){
         ret <- paste(ret);
     }

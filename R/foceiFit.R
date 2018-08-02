@@ -9,17 +9,16 @@
 ##'
 ##' @param sigdig Optimization significant digits. This controls:
 ##'
-##'  \itemize{
-##' \item Defaults for optimization and ODE solving
-##' \itemize{
-##' \item The tolerance of the inner and outer optimization is 10^-sigdig
-##' \item The tolerance of the ODE solvers is 10^(-sigdig-1)
-##' }
-##' \item The significant figures that some tables are rounded to.
-##' }
+##'  Defaults for optimization and ODE solving
+##'
+##'  The tolerance of the inner and outer optimization is \code{10^-sigdig}
+##'
+##'  The tolerance of the ODE solvers is \code{10^(-sigdig-1)}
+##'
+##'  The significant figures that some tables are rounded to.
 ##'
 ##' @param epsilon Precision of estimate for n1qn1 optimization.
-
+##'
 ##' @param maxstepsOde Maximum number of steps for ODE solver.
 ##'
 ##'
@@ -39,7 +38,7 @@
 ##'     value.  By default this is 1.  When \code{scaleObjective} is
 ##'     greater than zero, this scaling is performed by:
 ##'
-##'      scaledObj = (currentObj / |initialObj|) * scaleObjective
+##'      \code{scaledObj = currentObj / |initialObj| * scaleObjective}
 ##'
 ##'     Therefore, if the initial objective function is negative, the
 ##'     initial scaled objective function would be negative as well.
@@ -50,7 +49,7 @@
 ##'     vector of relative difference and absolute difference.  The
 ##'     central/forward difference step size h is calculated as:
 ##'
-##'         h = abs(x)*derivEps[1]+derivEps[2]
+##'         \code{h = abs(x)*derivEps[1] + derivEps[2]}
 ##'
 ##' @param derivMethod indicates the method for calculating
 ##'     derivatives of the outer problem.  Currently supports
@@ -65,14 +64,14 @@
 ##'     function. The S matrix is the sum of each individual's
 ##'     gradient cross-product (evaluated at the individual empirical
 ##'     Bayes estimates).
-##' \itemize{
-##' \item "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \code{R^-1 * S * R^-1}
 ##'
-##' \item "\code{r}" Uses the Hessian matrix to calculate the
-##'      covariance as \code{2*R^-1}
-##' \item "\code{s}" Uses the crossproduct matrix to calculate the covariance as \code{4*S^-1}
-##' \item "" Does not calculate the covariance step.
-##' }
+##'  "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \eqn{R^-1 \times S \times R^-1}
+##'
+##'  "\code{r}" Uses the Hessian matrix to calculate the covariance as \eqn{2\times R^-1}
+##'
+##'  "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
+##'
+##'  "" Does not calculate the covariance step.
 ##'
 ##' @param lbfgsLmm An integer giving the number of BFGS updates
 ##'     retained in the "L-BFGS-B" method, It defaults to 40.
@@ -101,13 +100,11 @@
 ##'     of the \code{chol(inv(omega))}. This matrix and values are the
 ##'     parameters estimated in FOCEi. The possibilities are:
 ##'
-##' \itemize{
-##' \item sqrt Estimates the sqrt of the diagonal elements of \code{chol(inv(omega))}.  This is the default method.
-##' \item log Estimates the log of the diagonal elements of \code{chol(inv(omega))}
-##' \item identity Estimates the diagonal elements without any transformations
-##' }
+##'  \code{sqrt} Estimates the sqrt of the diagonal elements of \code{chol(inv(omega))}.  This is the default method.
 ##'
-##' c("sqrt", "log", "identity"),
+##'  \code{log} Estimates the log of the diagonal elements of \code{chol(inv(omega))}
+##'
+##'  \code{identity} Estimates the diagonal elements without any transformations
 ##'
 ##' @param sumProd Is a boolean indicating if the model should change
 ##'     multiplication to high precision multiplication and sums to
@@ -121,7 +118,8 @@
 ##' @param ci Confidence level for some tables.  By default this is
 ##'     0.95 or 95% confidence.
 ##'
-##' @param ...
+##' @param ... Ignored parameters
+##'
 ##' @param maxInnerIterations Number of iterations for n1qn1
 ##'     optimization.
 ##'
@@ -148,10 +146,9 @@
 ##'
 ##' By default FOCEi scales the outer problem parameters to 1.0 for
 ##' the initial parameter estimates and scales the objective function
-##' to 1.0, as suggested by the NAG library
-##' (https://www.nag.com/numeric/fl/nagdoc_fl25/html/e04/e04intro.html)
-##' and scipy
-##' (https://www.scipy-lectures.org/advanced/mathematical_optimization/).
+##' to 1.0, as suggested by the
+##' \href{https://www.nag.com/numeric/fl/nagdoc_fl25/html/e04/e04intro.html}{NAG library}
+##' and \href{scipy}{https://www.scipy-lectures.org/advanced/mathematical_optimization/}.
 ##'
 ##' However the inner problem is not scaled.  Since most eta estimates
 ##' start near zero, scaling for these parameters do not make sense.
@@ -166,7 +163,7 @@
 ##' @seealso \code{\link{optim}}
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @export
-foceiControl <- function(sigdig=4,
+foceiControl <- function(sigdig=5,
                          epsilon=NULL, #1e-4,
                          maxInnerIterations=10000,
                          maxOuterIterations=50000,
@@ -336,9 +333,10 @@ foceiControl <- function(sigdig=4,
 }
 ##' FOCEi fit
 ##'
-##' @param data Data to fit
+##' @param data Data to fit; Needs to be RxODE compatible and have \code{DV},
+##'     \code{AMT}, \code{EVID} in the dataset.
 ##' @param inits Initialization list
-##' @param PKpars Pk Parameters
+##' @param PKpars Pk Parameters function
 ##' @param model The RxODE model to use
 ##' @param pred The Prediction function
 ##' @param err The Error function
@@ -348,20 +346,65 @@ foceiControl <- function(sigdig=4,
 ##'     fixed.
 ##' @param skipCov Boolean vector indicating what parameters should be
 ##'     fixed when calculating covariances
-##' @param control FOCEi options Control list
+##' @param control FOCEi options Control list.  See
+##'     \code{\link{foceiControl}}
 ##' @param thetaNames Names of the thetas to be used in the final
-##'     object
-##' @param etaNames Eta names to be used in the final object
+##'     object.
+##' @param etaNames Eta names to be used in the final object.
 ##' @param etaMat Eta matrix for initial estimates or final estimates
 ##'     of the ETAs.
 ##' @param ... Ignored parameters
 ##' @return A focei fit object
 ##' @author Matthew L. Fidler and Wenping Wang
 ##' @return FOCEi fit object
-##' @author Matthew L. Fidler & Wenping Wang
 ##' @export
 ##' @examples
+##' \dontrun{
+##' ## Comparison to Wang2007 objective functions
 ##'
+##' mypar2 = function ()
+##' {
+##'     k = theta[1] * exp(eta[1]);
+##' }
+##'
+##' mod <- RxODE({
+##'     ipre = 10 * exp(-k * t)
+##' })
+##' pred <- function() ipre
+##'
+##' errProp <- function(){
+##'   err <- prop(0.1)
+##' }
+##'
+##' inits <- list(THTA=c(0.5),
+##'               OMGA=list(ETA[1] ~ 0.04));
+##'
+##' w7 <- Wang2007
+##'
+##' w7$DV <- w7$Y
+##' w7$EVID <- 0
+##' w7$AMT <- 0
+##'
+##' ## Wang2007 prop error 39.458 for NONMEM, nlmixr matches.
+##' fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
+##'      control=foceiControl(maxOuterIterations=0,covMethod=""))
+##'
+##' errAdd <- function(){
+##'   err <- add(0.1)
+##' }
+##'
+##' ## Wang2007 add error of -2.059 for NONMEM FOCE=NONMEM FOCEi;
+##' ## nlmixr matches.
+##' fitA <- foceiFit(w7, inits, mypar2,mod,pred,errAdd,
+##'      control=foceiControl(maxOuterIterations=0,covMethod=""))
+##'
+##' ## Extending Wang2007 to add+prop with same dataset
+##' errAddProp <- function(){
+##'   err <- add(0.1) + prop(0.1)
+##' }
+##'
+##' fitAP <- foceiFit(w7, inits, mypar2,mod,pred,errAddProp,
+##'      control=foceiControl(maxOuterIterations=0,covMethod=""))g
 ##'
 ##' mypar2 <- function ()
 ##' {
@@ -385,8 +428,59 @@ foceiControl <- function(sigdig=4,
 ##' inits <- list(THTA=c(0.5, -3.2, -1),
 ##'               OMGA=list(ETA[1] ~ 1, ETA[2] ~ 2, ETA[3] ~ 1));
 ##'
-##' fit <- foceiFit(theo_sd, inits, mypar2,mod,pred,err)
+##' ## Remove 0 concentrations (should be lloq)
 ##'
+##' d <- theo_sd[theo_sd$EVID==0 & theo_sd$DV>0 | theo_sd$EVID>0,];
+##'
+##' fit1 <- foceiFit(d, inits, mypar2,mod,pred,err)
+##'
+##' ## you can also fit lognormal data with the objective function on the same scale
+##'
+##' errl <- function(){
+##'     err <- lnorm(0.1)
+##' }
+##'
+##' fit2 <- foceiFit(d, inits, mypar2,mod,pred,errl)
+##'
+##' ## You can also use the standard nlmixr functions to run FOCEi
+##'
+##' library(data.table);
+##' datr <- Infusion_1CPT;
+##' datr$EVID<-ifelse(datr$EVID==1,10101,datr$EVID)
+##' datr<-data.table(datr)
+##' datr<-datr[EVID!=2]
+##' datro<-copy(datr)
+##' datIV<-datr[AMT>0][,TIME:=TIME+AMT/RATE][,AMT:=-1*AMT]
+##' datr<-rbind(datr,datIV)
+##'
+##' one.compartment.IV.model <- function(){
+##'   ini({ # Where initial conditions/variables are specified
+##'     # '<-' or '=' defines population parameters
+##'     # Simple numeric expressions are supported
+##'     lCl <- 1.6      #log Cl (L/hr)
+##'     lVc <- log(90)  #log V (L)
+##'     # Bounds may be specified by c(lower, est, upper), like NONMEM:
+##'     # Residuals errors are assumed to be population parameters
+##'     prop.err <- c(0, 0.2, 1)
+##'     # Between subject variability estimates are specified by '~'
+##'     # Semicolons are optional
+##'     eta.Vc ~ 0.1   #IIV V
+##'     eta.Cl ~ 0.1; #IIV Cl
+##'   })
+##'   model({ # Where the model is specified
+##'     # The model uses the ini-defined variable names
+##'     Vc <- exp(lVc + eta.Vc)
+##'     Cl <- exp(lCl + eta.Cl)
+##'     # RxODE-style differential equations are supported
+##'     d / dt(centr) = -(Cl / Vc) * centr;
+##'     ## Concentration is calculated
+##'     cp = centr / Vc;
+##'     # And is assumed to follow proportional error estimated by prop.err
+##'     cp ~ prop(prop.err)
+##'    })}
+##'
+##'  fitIV <- nlmixr(one.compartment.IV.model, datr, "focei");
+##' }
 foceiFit <- function(data,
                      inits,
                      PKpars,
@@ -415,7 +509,6 @@ foceiFit <- function(data,
     .ret$lower <- lower;
     .ret$upper <- upper;
     .ret$thetaFixed <- fixed;
-    .ret$skipCov <- skipCov;
     .ret$control <- control;
     if(is(model, "RxODE") || is(model, "character")) {
         .ret$ODEmodel <- TRUE
@@ -435,7 +528,7 @@ foceiFit <- function(data,
     }
     .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
                                           pred.minus.dv=TRUE, sum.prod=control$sumProd,
-                                          theta.derivs=FALSE, optExpression=control$optExpression);
+                                          theta.derivs=FALSE, optExpression=control$optExpression, run.internal=TRUE);
 
     .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
     .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
@@ -461,18 +554,20 @@ foceiFit <- function(data,
         message("Needed Covariates:")
         print(.covNames);
     }
+    .ret$skipCov <- skipCov;
+    if (is.null(skipCov)){
+        if (is.null(fixed)){
+            .tmp <- rep(FALSE, length(inits$THTA))
+        } else {
+            .tmp <- c(fixed, rep(FALSE, length(inits$THTA) - length(fixed)))
+        }
+        .ret$skipCov <- c(.tmp,
+                          rep(TRUE, length(.ret$model$extra.pars)))
+    }
     if (is.null(.ret$model$extra.pars)){
         .nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)))
     } else {
-        if (is.null(skipCov)){
-            if (is.null(fixed)){
-                .tmp <- rep(FALSE, length(inits$THTA))
-            } else {
-                .tmp <- c(fixed, rep(FALSE, length(inits$THTA) - length(fixed)))
-            }
-            .ret$skipCov <- c(.tmp,
-                              rep(TRUE, length(.ret$model$extra.pars)))
-        }
+
         .nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)),
                   sprintf("ERR[%s]", seq_along(.ret$model$extra.pars)))
     }
@@ -651,8 +746,8 @@ print.foceiFitCore <- function(x, ...){
     print(x$objDf)
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)
-    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$fixedDf"), " & ", crayon::yellow(.bound), crayon::bold$blue("$fixedDfSig"), "):"))));
-    print(x$fixedDfSig)
+    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$popDf"), " & ", crayon::yellow(.bound), crayon::bold$blue("$popDfSig"), "):"))));
+    print(x$popDfSig)
     ################################################################################
     ## Correlations
     .tmp <- x$omega

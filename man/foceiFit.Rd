@@ -7,14 +7,15 @@
 foceiFit(data, inits, PKpars, model = NULL, pred = NULL, err = NULL,
   lower = -Inf, upper = Inf, fixed = NULL, skipCov = NULL,
   control = foceiControl(), thetaNames = NULL, etaNames = NULL,
-  etaMat = NULL, ...)
+  etaMat = NULL, ..., env = NULL)
 }
 \arguments{
-\item{data}{Data to fit}
+\item{data}{Data to fit; Needs to be RxODE compatible and have \code{DV},
+\code{AMT}, \code{EVID} in the dataset.}
 
 \item{inits}{Initialization list}
 
-\item{PKpars}{Pk Parameters}
+\item{PKpars}{Pk Parameters function}
 
 \item{model}{The RxODE model to use}
 
@@ -32,12 +33,13 @@ fixed.}
 \item{skipCov}{Boolean vector indicating what parameters should be
 fixed when calculating covariances}
 
-\item{control}{FOCEi options Control list}
+\item{control}{FOCEi options Control list.  See
+\code{\link{foceiControl}}}
 
 \item{thetaNames}{Names of the thetas to be used in the final
-object}
+object.}
 
-\item{etaNames}{Eta names to be used in the final object}
+\item{etaNames}{Eta names to be used in the final object.}
 
 \item{etaMat}{Eta matrix for initial estimates or final estimates
 of the ETAs.}
@@ -53,7 +55,52 @@ FOCEi fit object
 FOCEi fit
 }
 \examples{
+\dontrun{
+## Comparison to Wang2007 objective functions
 
+mypar2 = function ()
+{
+    k = theta[1] * exp(eta[1]);
+}
+
+mod <- RxODE({
+    ipre = 10 * exp(-k * t)
+})
+pred <- function() ipre
+
+errProp <- function(){
+  err <- prop(0.1)
+}
+
+inits <- list(THTA=c(0.5),
+              OMGA=list(ETA[1] ~ 0.04));
+
+w7 <- Wang2007
+
+w7$DV <- w7$Y
+w7$EVID <- 0
+w7$AMT <- 0
+
+## Wang2007 prop error 39.458 for NONMEM, nlmixr matches.
+fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
+     control=foceiControl(maxOuterIterations=0,covMethod=""))
+
+errAdd <- function(){
+  err <- add(0.1)
+}
+
+## Wang2007 add error of -2.059 for NONMEM FOCE=NONMEM FOCEi;
+## nlmixr matches.
+fitA <- foceiFit(w7, inits, mypar2,mod,pred,errAdd,
+     control=foceiControl(maxOuterIterations=0,covMethod=""))
+
+## Extending Wang2007 to add+prop with same dataset
+errAddProp <- function(){
+  err <- add(0.1) + prop(0.1)
+}
+
+fitAP <- foceiFit(w7, inits, mypar2,mod,pred,errAddProp,
+     control=foceiControl(maxOuterIterations=0,covMethod=""))g
 
 mypar2 <- function ()
 {
@@ -77,11 +124,60 @@ err <- function(){
 inits <- list(THTA=c(0.5, -3.2, -1),
               OMGA=list(ETA[1] ~ 1, ETA[2] ~ 2, ETA[3] ~ 1));
 
-fit <- foceiFit(theo_sd, inits, mypar2,mod,pred,err)
+## Remove 0 concentrations (should be lloq)
 
+d <- theo_sd[theo_sd$EVID==0 & theo_sd$DV>0 | theo_sd$EVID>0,];
+
+fit1 <- foceiFit(d, inits, mypar2,mod,pred,err)
+
+## you can also fit lognormal data with the objective function on the same scale
+
+errl <- function(){
+    err <- lnorm(0.1)
+}
+
+fit2 <- foceiFit(d, inits, mypar2,mod,pred,errl)
+
+## You can also use the standard nlmixr functions to run FOCEi
+
+library(data.table);
+datr <- Infusion_1CPT;
+datr$EVID<-ifelse(datr$EVID==1,10101,datr$EVID)
+datr<-data.table(datr)
+datr<-datr[EVID!=2]
+datro<-copy(datr)
+datIV<-datr[AMT>0][,TIME:=TIME+AMT/RATE][,AMT:=-1*AMT]
+datr<-rbind(datr,datIV)
+
+one.compartment.IV.model <- function(){
+  ini({ # Where initial conditions/variables are specified
+    # '<-' or '=' defines population parameters
+    # Simple numeric expressions are supported
+    lCl <- 1.6      #log Cl (L/hr)
+    lVc <- log(90)  #log V (L)
+    # Bounds may be specified by c(lower, est, upper), like NONMEM:
+    # Residuals errors are assumed to be population parameters
+    prop.err <- c(0, 0.2, 1)
+    # Between subject variability estimates are specified by '~'
+    # Semicolons are optional
+    eta.Vc ~ 0.1   #IIV V
+    eta.Cl ~ 0.1; #IIV Cl
+  })
+  model({ # Where the model is specified
+    # The model uses the ini-defined variable names
+    Vc <- exp(lVc + eta.Vc)
+    Cl <- exp(lCl + eta.Cl)
+    # RxODE-style differential equations are supported
+    d / dt(centr) = -(Cl / Vc) * centr;
+    ## Concentration is calculated
+    cp = centr / Vc;
+    # And is assumed to follow proportional error estimated by prop.err
+    cp ~ prop(prop.err)
+   })}
+
+ fitIV <- nlmixr(one.compartment.IV.model, datr, "focei");
+}
 }
 \author{
 Matthew L. Fidler and Wenping Wang
-
-Matthew L. Fidler & Wenping Wang
 }

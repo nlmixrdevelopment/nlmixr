@@ -4,24 +4,29 @@
 \alias{foceiControl}
 \title{Control Options for FOCEi}
 \usage{
-foceiControl(sigdig = 3, epsilon = NULL, maxInnerIterations = 10000,
+foceiControl(sigdig = 5, epsilon = NULL, maxInnerIterations = 10000,
   maxOuterIterations = 50000, n1qn1nsim = NULL, method = c("liblsoda",
   "lsoda", "dop853"), transitAbs = NULL, atol = NULL, rtol = NULL,
   maxstepsOde = 5000L, hmin = 0L, hmax = NULL, hini = 0,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("linear",
   "locf", "nocb", "midpoint"), printInner = 0L, printOuter = 1L,
-  scaleTo = 1, derivEps = c(1e-05, 1e-05), derivMethod = c("forward",
-  "central"), covDerivMethod = c("central", "forward"), covMethod = c("r,s",
-  "r", "s"), lbfgsLmm = 40L, lbfgsPgtol = 0, lbfgsFactr = NULL,
-  eigen = TRUE, addPosthoc = TRUE, diagXform = c("sqrt", "log",
-  "identity"), sumProd = FALSE, optExpression = TRUE, ..., stiff)
+  scaleTo = 1, scaleObjective = 1, derivEps = c(1e-05, 1e-05),
+  derivMethod = c("forward", "central"), covDerivMethod = c("central",
+  "forward"), covMethod = c("r,s", "r", "s", ""), lbfgsLmm = 40L,
+  lbfgsPgtol = 0, lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
+  diagXform = c("sqrt", "log", "identity"), sumProd = FALSE,
+  optExpression = TRUE, ci = 0.95, ..., stiff)
 }
 \arguments{
-\item{sigdig}{Optimization significant digits.  This controls
-defaults for optimization and ODE solving, if unspecified.
-The sigdigs move the tolerances of the optimization procedure
-to 10^-sigdig and the tolerances of the ODE solvers to
-10^(-sigdig-1)}
+\item{sigdig}{Optimization significant digits. This controls:
+
+ Defaults for optimization and ODE solving
+
+ The tolerance of the inner and outer optimization is \code{10^-sigdig}
+
+ The tolerance of the ODE solvers is \code{10^(-sigdig-1)}
+
+ The significant figures that some tables are rounded to.}
 
 \item{epsilon}{Precision of estimate for n1qn1 optimization.}
 
@@ -110,13 +115,24 @@ print every function evaluation (default), 5 is print every 5
 evaluations.}
 
 \item{scaleTo}{Scale the initial parameter estimate to this value.
-By default this is 1.}
+By default this is 1.  When zero or below, no scaling is performed.}
 
-\item{derivEps}{Central/Forward difference tolerances, which is a vector
-    of relative difference and absolute difference.  The central/forward
-    difference step size h is calculated as:
+\item{scaleObjective}{Scale the initial objective function to this
+    value.  By default this is 1.  When \code{scaleObjective} is
+    greater than zero, this scaling is performed by:
 
-        h = abs(x)*derivEps[1]+derivEps[2]}
+     \code{scaledObj = currentObj / |initialObj| * scaleObjective}
+
+    Therefore, if the initial objective function is negative, the
+    initial scaled objective function would be negative as well.
+    When \code{scaleObjective} is less than zero, no scaling is
+    performed.}
+
+\item{derivEps}{Central/Forward difference tolerances, which is a
+    vector of relative difference and absolute difference.  The
+    central/forward difference step size h is calculated as:
+
+        \code{h = abs(x)*derivEps[1] + derivEps[2]}}
 
 \item{derivMethod}{indicates the method for calculating
 derivatives of the outer problem.  Currently supports
@@ -131,13 +147,14 @@ derivatives while calculating the covariance components
     function. The S matrix is the sum of each individual's
     gradient cross-product (evaluated at the individual empirical
     Bayes estimates).
-\itemize{
-\item \code{r,s} Uses the sandwich matrix to calculate the covariance, that is: \code{R^-1 * S * R^-1}
 
-\item \code{r} Uses the Hessian matrix to calculate the
-     covariance as \code{2*R^-1}
-\item \code{s} Uses the crossproduct matrix to calculate the covariance as \code{4*S^-1}
-}}
+ "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \eqn{R^-1 \times S \times R^-1}
+
+ "\code{r}" Uses the Hessian matrix to calculate the covariance as \eqn{2\times R^-1}
+
+ "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
+
+ "" Does not calculate the covariance step.}
 
 \item{lbfgsLmm}{An integer giving the number of BFGS updates
 retained in the "L-BFGS-B" method, It defaults to 40.}
@@ -172,22 +189,24 @@ added to the table output.}
     of the \code{chol(inv(omega))}. This matrix and values are the
     parameters estimated in FOCEi. The possibilities are:
 
-\itemize{
-\item sqrt Estimates the sqrt of the diagonal elements of \code{chol(inv(omega))}.  This is the default method.
-\item log Estimates the log of the diagonal elements of \code{chol(inv(omega))}
-\item identity Estimates the diagonal elements without any transformations
-}
+ \code{sqrt} Estimates the sqrt of the diagonal elements of \code{chol(inv(omega))}.  This is the default method.
 
-c("sqrt", "log", "identity"),}
+ \code{log} Estimates the log of the diagonal elements of \code{chol(inv(omega))}
+
+ \code{identity} Estimates the diagonal elements without any transformations}
 
 \item{sumProd}{Is a boolean indicating if the model should change
 multiplication to high precision multiplication and sums to
 high precision sums using the PreciseSums package.  By default
 this is \code{FALSE}.}
 
-\item{optExpression}{Optimize the model text for computer evaluation.}
+\item{optExpression}{Optimize the RxODE expression to speed up
+calculation. By default this is turned on.}
 
-\item{...}{}
+\item{ci}{Confidence level for some tables.  By default this is
+0.95 or 95% confidence.}
+
+\item{...}{Ignored parameters}
 
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
     the ODE system is stiff or not.
@@ -210,7 +229,21 @@ Control Options for FOCEi
 Note this uses the R's L-BFGS-B in \code{\link{optim}} for the
 outer problem and the BFGS \code{\link[n1qn1]{n1qn1}} with that
 allows restoring the prior individual Hessian (for faster
-optimization speed)
+optimization speed).
+
+By default FOCEi scales the outer problem parameters to 1.0 for
+the initial parameter estimates and scales the objective function
+to 1.0, as suggested by the
+\href{https://www.nag.com/numeric/fl/nagdoc_fl25/html/e04/e04intro.html}{NAG library}
+and \href{scipy}{https://www.scipy-lectures.org/advanced/mathematical_optimization/}.
+
+However the inner problem is not scaled.  Since most eta estimates
+start near zero, scaling for these parameters do not make sense.
+
+This process of scaling can fix some ill conditioning for the
+unscaled problem.  The covariance step is performed on the
+unscaled problem, so the condition number of that matrix may not
+be reflective of the scaled problem's condition-number.
 }
 \seealso{
 \code{\link{optim}}

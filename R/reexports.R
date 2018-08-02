@@ -10,6 +10,11 @@ RxODE::RxODE
 ##' @export
 RxODE::rxSolve
 
+
+##' @importFrom RxODE rxClean
+##' @export
+RxODE::rxClean
+
 ##' @importFrom nlme nlme
 ##' @export
 nlme::nlme
@@ -155,3 +160,5 @@ nlme::groupedData
 ##' @importFrom nlme getData
 ##' @export
 nlme::getData
+
+

@@ -1149,16 +1149,25 @@ nlmixrUI.theta.pars <- function(obj){
     f <- eval(parse(text=paste(c("function(){", unfixed, eta, fixed, f[-length(f)], "}"), collapse="\n")))
     return(f)
 }
-
-##' Get the FOCEi initilizations
+##' Get parameters that are fixed
 ##'
 ##' @param obj UI object
-##' @return list with FOCEi style initilizations
+##' @return logical vector of fixed THETA parameters
+##' @author Matthew L. Fidler
+nlmixrUI.focei.fixed <- function(obj){
+    df <- as.data.frame(obj$ini);
+    dft <- df[!is.na(df$ntheta), ];
+    return(dft$fix)
+}
+
+##' Get the FOCEi initializations
+##'
+##' @param obj UI object
+##' @return list with FOCEi style initializations
 ##' @author Matthew L. Fidler
 nlmixrUI.focei.inits <- function(obj){
     df <- as.data.frame(obj$ini);
     dft <- df[!is.na(df$ntheta), ];
-    dft.unfixed <- dft[!dft$fix, ];
     eta <- df[!is.na(df$neta1), ];
     len <- length(eta$name)
     cur.lhs <- character()
@@ -1185,7 +1194,7 @@ nlmixrUI.focei.inits <- function(obj){
         }
     }
     ome <- eval(parse(text=sprintf("list(%s)", paste(ome, collapse=","))))
-    return(list(THTA=dft.unfixed$est,
+    return(list(THTA=dft$est,
                 OMGA=ome));
 }
 ##' Get the eta->eta.trans for SAEM
@@ -1506,6 +1515,9 @@ nlmixrUI.model.desc <- function(obj){
 }
 
 ##' @export
+##' @param obj
+##' @param arg
+##' @param exact
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
     x <- obj;
     class(x) <- "list"
@@ -1535,6 +1547,8 @@ nlmixrUI.model.desc <- function(obj){
         return(nlmixrUI.theta.pars(obj))
     } else if (arg == "focei.inits"){
         return(nlmixrUI.focei.inits(obj));
+    } else if (arg == "focei.fixed"){
+        return(nlmixrUI.focei.fixed(obj));
     } else if (arg == "saem.theta.name"){
         return(nlmixrUI.saem.theta.name(obj))
     } else if (arg == "saem.eta.trans"){
@@ -1606,7 +1620,8 @@ str.nlmixrUI <- function(object, ...){
     cat(" $ nlme.var  : The nlme model varaince.\n")
     cat(" $ rxode.pred: The RxODE block with pred attached (final pred is nlmixr_pred)\n")
     cat(" $ theta.pars: Parameters in terms of THETA[#] and ETA[#]\n")
-    cat(" $ focei.inits: Initilization for FOCEi style blocks\n")
+    cat(" $ focei.inits: Initialization for FOCEi style blocks\n")
+    cat(" $ focei.fixed: Logical vector of FOCEi fixed parameters\n")
     cat(" $ saem.eta.trans: UI ETA -> SAEM ETA\n")
     cat(" $ saem.model.omega: model$omega for SAEM\n")
     cat(" $ saem.res.mod: model$res.mod for SAEM\n")
