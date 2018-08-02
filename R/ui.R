@@ -1515,9 +1515,6 @@ nlmixrUI.model.desc <- function(obj){
 }
 
 ##' @export
-##' @param obj
-##' @param arg
-##' @param exact
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
     x <- obj;
     class(x) <- "list"

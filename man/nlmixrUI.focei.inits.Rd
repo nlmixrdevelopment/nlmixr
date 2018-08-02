@@ -2,7 +2,7 @@
 % Please edit documentation in R/ui.R
 \name{nlmixrUI.focei.inits}
 \alias{nlmixrUI.focei.inits}
-\title{Get the FOCEi initilizations}
+\title{Get the FOCEi initializations}
 \usage{
 nlmixrUI.focei.inits(obj)
 }
@@ -10,10 +10,10 @@ nlmixrUI.focei.inits(obj)
 \item{obj}{UI object}
 }
 \value{
-list with FOCEi style initilizations
+list with FOCEi style initializations
 }
 \description{
-Get the FOCEi initilizations
+Get the FOCEi initializations
 }
 \author{
 Matthew L. Fidler
