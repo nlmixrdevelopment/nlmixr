@@ -134,9 +134,6 @@
 ##' @param addPosthoc Boolean indicating if posthoc parameters are
 ##'     added to the table output.
 ##'
-##' @inheritParams RxODE::rxSolve
-##' @inheritParams RxODE::rxSymPySetupPred
-##'
 ##' @details
 ##'
 ##' Note this uses the R's L-BFGS-B in \code{\link{optim}} for the
@@ -682,14 +679,14 @@ foceiFit <- function(data,
         .df <- dplyr::as.tbl(.df);
     }
     .cls <- class(.df);
-    .cls <- c("foceiFitData", "foceiFitCore", .cls)
+    .cls <- c("nlmixrFitData", "nlmixrFitCore", .cls)
     attr(.cls, ".foceiEnv") <- .ret;
     class(.df) <- .cls;
     return(.df)
 }
 
 ##' @export
-`$.foceiFitData` <-  function(obj, arg, exact = FALSE){
+`$.nlmixrFitData` <-  function(obj, arg, exact = FALSE){
     .ret <- obj[[arg]]
     if (is.null(.ret)){
         .cls <- class(obj);
@@ -703,37 +700,37 @@ foceiFit <- function(data,
 }
 
 ##'@export
-logLik.foceiFitCore <- function(object, ...){
+logLik.nlmixrFitCore <- function(object, ...){
     object$logLik
 }
 
 ##'@export
-nobs.foceiFitCore <- function(object, ...){
+nobs.nlmixrFitCore <- function(object, ...){
     object$nobs
 }
 
 ##'@export
-vcov.foceiFitCore <- function(object, ...){
+vcov.nlmixrFitCore <- function(object, ...){
     object$cov
 }
 
 ##'@export
-getData.foceiFitCore <- function(object){
+getData.nlmixrFitCore <- function(object){
     object$origData
 }
 
 ##'@export
-ranef.foceiFitCore <- function(object, ...){
+ranef.nlmixrFitCore <- function(object, ...){
     object$ranef;
 }
 
 ##'@export
-fixef.foceiFitCore <- function(object, ...){
+fixef.nlmixrFitCore <- function(object, ...){
     object$fixef;
 }
 
 ##'@export
-print.foceiFitCore <- function(x, ...){
+print.nlmixrFitCore <- function(x, ...){
     .parent <- parent.frame(2);
     .bound <- do.call("c", lapply(ls(.parent), function(.cur){
                                if (identical(.parent[[.cur]], x)){
@@ -789,11 +786,17 @@ print.foceiFitCore <- function(x, ...){
     message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"));
     message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                    crayon::yellow(.bound), crayon::bold$blue("$shrink")));
-    if (RxODE::rxIs(x, "foceiFitData")){
+    if (RxODE::rxIs(x, "nlmixrFitData")){
+        .dfName <- "data.frame";
+        if (RxODE::rxIs(x, "tbl"))  .dfName <- "tibble"
+        if (RxODE::rxIs(x, "data.table"))  .dfName <- "data.table"
         message(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object", ifelse(.bound == "", "", " "),
                                               crayon::yellow(.bound),
-                                              " is a modified ", crayon::blue("data.frame"), "):"))))
+                                              " is a modified ", crayon::blue(.dfName), "):"))))
         if (RxODE::rxIs(x, "tbl") || RxODE::rxIs(x, "data.table")){
+            .oldOps <- options();
+            on.exit(options(.oldOps))
+            options(tibble.print_max = 3, tibble.print_min = 3)
             NextMethod(x)
         } else{
             print(head(x));
