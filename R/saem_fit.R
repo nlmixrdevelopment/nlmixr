@@ -1317,7 +1317,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     }
     env <- new.env(parent=emptyenv());
     env$method <- "SAEM";
-    atol <- fit$env$uif$env$ODEopt$atol;
+    env$uif <- uif;
+    atol <- uif$env$ODEopt$atol;
     if(is.null(atol))atol <- 1e-6
     rtol <- uif$env$ODEopt$rtol;
     if(is.null(rtol))rtol <- 1e-4
@@ -1340,7 +1341,11 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     .cov <- .cov[.ini, .ini, drop = FALSE];
     .ini <- as.data.frame(uif$ini)
     .ini <- .ini[!is.na(.ini$ntheta),];
-    .skipCov <- is.na(.ini$ntheta);
+    .skipCov <- !is.na(.ini$err);
+    .covMethod <- uif$env$covMethod
+    if (!any(.covMethod == c("r", "s", "r,s"))){
+        .covMethod <- "";
+    }
     env$cov <- .cov;
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
@@ -1358,7 +1363,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                                  skipCov=.skipCov,
                                  control=foceiControl(maxOuterIterations=0,
                                                       maxInnerIterations=0,
-                                                      covMethod="",
+                                                      covMethod=.covMethod,
                                                       cores=1,
                                                       atol=atol,
                                                       rtol=rtol,

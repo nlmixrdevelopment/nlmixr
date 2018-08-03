@@ -314,10 +314,18 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         } else {
             print <- default$print;
         }
+        if (any(names(args) == "covMethod")){
+            covMethod <- args$covMethod;
+        } else if (any(names(control) == "covMethod")){
+            covMethod <- control$covMethod;
+        } else {
+            covMethod <- default$covMethod;
+        }
         uif$env$mcmc <- mcmc;
         uif$env$ODEopt <- ODEopt;
         uif$env$sum.prod <- sum.prod
-        model <- uif$saem.model
+        uif$env$covMethod <- covMethod
+            model <- uif$saem.model
         cfg <- configsaem(model=model, data=dat, inits=uif$saem.init,
                            mcmc=mcmc, ODEopt=ODEopt, seed=seed);
         if (print > 1){
@@ -331,27 +339,10 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 return(fit)
             } else {
                 ret <- fix.dat(ret);
-                env <- attr(ret, ".focei.env")
-                assign("start.time", start.time, env);
-                assign("est", est, env);
-                assign("stop.time", Sys.time(), env);
-                ## Now remove dlls
-                ## sf <- ret$uif$env$saem.fit
-                ## rx <- attr(sf, "rx")
-                ## if (is(rx, "RxODE")){
-                ##     rxDelete(rx);
-                ## }
-                ## cpp <- attr(sf, "saem.cpp")
-                ## if (file.exists(cpp)){
-                ##     try(unlink(cpp))
-                ## }
-                ## dll <- attr(sf, "saem.dll")
-                ## try({dyn.unload(dll)}, silent=TRUE);
-                ## if (file.exists(dll))
-                ##     unlink(dll);
-                ## rxDelete(ret$model$pred.only)
-                ## rxDelete(ret$model$ebe)
-                ## rxDelete(ret$model$inner)
+                .env <- ret$env
+                assign("startTime", start.time, .env);
+                assign("est", est, .env);
+                assign("stopTime", Sys.time(), .env);
                 return(ret)
             }
         } else {
@@ -540,10 +531,26 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
 ##'     The third value represents the number of bootstrap/reshuffling or
 ##'     uni-dimensional random samples are taken.
 ##'
-##' @inheritParams RxODE::rxSolve
 ##' @param print The number it iterations that are completed before
 ##'     anything is printed to the console.  By default, this is 1.
+##'
+##' @param covMethod  Method for calculating covariance.  In this
+##'     discussion, R is the Hessian matrix of the objective
+##'     function. The S matrix is the sum of each individual's
+##'     gradient cross-product (evaluated at the individual empirical
+##'     Bayes estimates).
+##'
+##'  "\code{fim}" Use the SAEM-calculated Fisher Information Matrix to calculate the covariance.
+##'
+##'  "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \eqn{R^-1 \times S \times R^-1}
+##'
+##'  "\code{r}" Uses the Hessian matrix to calculate the covariance as \eqn{2\times R^-1}
+##'
+##'  "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
+##'
+##'  "" Does not calculate the covariance step.
 ##' @param ... Other arguments to control SAEM.
+##' @inheritParams RxODE::rxSolve
 ##' @return List of options to be used in \code{\link{nlmixr}} fit for
 ##'     SAEM.
 ##' @author Wenping Wang & Matthew L. Fidler
@@ -557,6 +564,7 @@ saemControl <- function(seed=99,
                         stiff = TRUE,
                         transitAbs = FALSE,
                         print=1,
+                        covMethod=c("fim", "r,s", "r", "s"),
                         ...){
     .xtra <- list(...);
     .rm <- c();
@@ -581,5 +589,6 @@ saemControl <- function(seed=99,
     if (length(.rm) > 0){
         .ret <- .ret[!(names(.ret) %in% .rm)]
     }
+    .ret[["covMethod"]] <- match.arg(covMethod);
     .ret
 }
