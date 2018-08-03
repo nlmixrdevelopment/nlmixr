@@ -530,33 +530,39 @@ foceiFit.data.frame <- function(data,
     if (is.null(err)){
         err <-eval(parse(text=paste0("function(){err",paste(inits$ERROR[[1]],collapse=""),"}")));
     }
-    .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
-                                          pred.minus.dv=TRUE, sum.prod=control$sumProd,
-                                          theta.derivs=FALSE, optExpression=control$optExpression, run.internal=TRUE);
+    if (!exists("noLik", envir=.ret)){
+        .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
+                                              pred.minus.dv=TRUE, sum.prod=control$sumProd,
+                                              theta.derivs=FALSE, optExpression=control$optExpression, run.internal=TRUE);
 
-    .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
-    .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
-    colnames(data) <- sapply(names(data), function(x){
-        if (any(x == .covNames)){
-            return(x)
-        } else {
-            return(toupper(x))
+
+        .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
+        .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
+        colnames(data) <- sapply(names(data), function(x){
+            if (any(x == .covNames)){
+                return(x)
+            } else {
+                return(toupper(x))
+            }
+        })
+        .lhs <- c(names(RxODE::rxInits(.ret$model$pred.only)), RxODE::rxLhs(.ret$model$pred.only))
+        if (length(.lhs) > 0){
+            .covNames <- .covNames[regexpr(rex::rex(start, or(.lhs), end), .covNames) == -1];
         }
-    })
-    .lhs <- c(names(RxODE::rxInits(.ret$model$pred.only)), RxODE::rxLhs(.ret$model$pred.only))
-    if (length(.lhs) > 0){
-        .covNames <- .covNames[regexpr(rex::rex(start, or(.lhs), end), .covNames) == -1];
-    }
-    if (length(.covNames) > 0){
-        if (!all(.covNames %in% names(data))){
-            message("Model:")
-            RxODE::rxCat(model$pred.only)
+        if (length(.covNames) > 0){
+            if (!all(.covNames %in% names(data))){
+                message("Model:")
+                RxODE::rxCat(model$pred.only)
+                message("Needed Covariates:")
+                nlmixrPrint(.covNames)
+                stop("Not all the covariates are in the dataset.")
+            }
             message("Needed Covariates:")
-            nlmixrPrint(.covNames)
-            stop("Not all the covariates are in the dataset.")
+            print(.covNames);
         }
-        message("Needed Covariates:")
-        print(.covNames);
+        .extraPars <- .ret$model$extra.pars
+    } else {
+        .extraPars <- NULL;
     }
     .ret$skipCov <- skipCov;
     if (is.null(skipCov)){
@@ -566,16 +572,15 @@ foceiFit.data.frame <- function(data,
             .tmp <- c(fixed, rep(FALSE, length(inits$THTA) - length(fixed)))
         }
         .ret$skipCov <- c(.tmp,
-                          rep(TRUE, length(.ret$model$extra.pars)))
+                          rep(TRUE, length(.extraPars)))
     }
-    if (is.null(.ret$model$extra.pars)){
+    if (is.null(.extraPars)){
         .nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)))
     } else {
-
         .nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)),
-                  sprintf("ERR[%s]", seq_along(.ret$model$extra.pars)))
+                  sprintf("ERR[%s]", seq_along(.extraPars)))
     }
-    if (!is.null(thetaNames) && (length(inits$THTA) + length(.ret$model$extra.pars)) == length(thetaNames)){
+    if (!is.null(thetaNames) && (length(inits$THTA) + length(.extraPars)) == length(thetaNames)){
         .nms <- thetaNames;
     }
     .ret$thetaNames <- .nms;
@@ -592,8 +597,7 @@ foceiFit.data.frame <- function(data,
         stop("Upper must be a single constant for all the THETA lower bounds, or match the dimension of THETA.")
     }
 
-    .extraPars <- c();
-    if (!is.null(.ret$model$extra.pars)){
+    if (!is.null(.extraPars)){
         .ret$model$extra.pars <- eval(call(control$diagXform, .ret$model$extra.pars))
         if (length(.ret$model$extra.pars) > 0){
             inits$THTA <- c(inits$THTA, .ret$model$extra.pars);
@@ -643,6 +647,9 @@ foceiFit.data.frame <- function(data,
     .ret$etaMat <- etaMat
     .ret$setupTime <- (proc.time() - .pt)["elapsed"];
     .ret <- RxODE::foceiFitCpp_(.ret);
+    if (exists("noLik", envir=.ret)){
+        return(.ret);
+    }
     message("Calculating residuals/tables")
     .pt <- proc.time();
     .etas <- .ret$ranef

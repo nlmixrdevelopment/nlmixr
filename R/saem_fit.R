@@ -1315,9 +1315,9 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     } else {
         dat <- data;
     }
-    env <- new.env(parent=emptyenv());
-    env$method <- "SAEM";
-    env$uif <- uif;
+    .env <- new.env(parent=emptyenv());
+    .env$method <- "SAEM";
+    .env$uif <- uif;
     atol <- uif$env$ODEopt$atol;
     if(is.null(atol))atol <- 1e-6
     rtol <- uif$env$ODEopt$rtol;
@@ -1327,9 +1327,9 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     if (.stiff == 1L) .method <- "lsoda"
     if (.stiff == 0L) .method <- "dop853"
 
-    transitAbs <- fit$env$uif$env$ODEopt$transitAbs;
+    transitAbs <- uif$env$ODEopt$transitAbs;
     if(is.null(transitAbs)) transitAbs<- 0L
-    env$saem <- object;
+    .env$saem <- object;
     .tn <-uif$saem.theta.name;
     .nth <- length(.tn)
     .cov <- RxODE::rxInv(object$Ha[1:.nth,1:.nth])
@@ -1346,7 +1346,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     if (!any(.covMethod == c("r", "s", "r,s"))){
         .covMethod <- "";
     }
-    env$cov <- .cov;
+    .env$cov <- .cov;
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
                                  PKpars=uif$theta.pars,
@@ -1359,7 +1359,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                                  thetaNames=uif$focei.names,
                                  etaNames=uif$eta.names,
                                  etaMat=mat2,
-                                 env=env,
+                                 env=.env,
                                  skipCov=.skipCov,
                                  control=foceiControl(maxOuterIterations=0,
                                                       maxInnerIterations=0,

@@ -773,64 +773,37 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
     } else {
         dat <- data;
     }
-    fit.f <- focei.fit(data=dat,
-                       inits=init,
-                       PKpars=uif$theta.pars,
-                       ## par_trans=fun,
-                       model=uif$rxode.pred,
-                       pred=function(){return(nlmixr_pred)},
-                       err=uif$error,
-                       lower=uif$focei.lower,
-                       upper=uif$focei.upper,
-                       theta.names=uif$focei.names,
-                       eta.names=uif$eta.names,
-                       control=list(NOTRUN=TRUE,
-                                    inits.mat=mat,
-                                    cores=1,
-                                    find.best.eta=FALSE,
-                                    ## numeric=(!is.null(uif$nmodel$lin.solved)),
-                                    sum.prod=uif$env$sum.prod));
-    ome <- fit.f$omega;
-    w <- which(!is.na(uif.new$ini$neta1))
-    for (i in w){
-        uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
-    }
-    ## enclose the nlme fit in the .focei.env
-    env <- attr(fit.f, ".focei.env");
-    dimnames(mat) <- list(NULL, uif$eta.names);
-    env$eta.df <- data.frame(ID=seq_along(mat[, 1]), as.data.frame(mat));
-    ## etas <- mat;
-    ## dimnames(etas) <- list(NULL, row.names(ome))
-    ## env$fit$etas.df <- data.frame(ID=seq_along(etas[1, ]), as.data.frame(etas))
-    env$fit$nlme <- fit
-    tmp <- cbind(data.frame(nlme=nlme.time["elapsed"]), env$fit$time);
-    names(tmp) <- gsub("optimize", "FOCEi Evaulate", names(tmp))
-    env$fit$time <- tmp;
-    eig <- try(eigen(object$apVar, TRUE, TRUE)$values, silent=TRUE);
-    eig2 <- try(eigen(object$varFix, TRUE, TRUE)$values, silent=TRUE);
-    if (!inherits(eig, "try-error")){
-        env$fit$eigen <- unlist(eig)
-        tmp <- sapply(env$fit$eigen, abs)
-        if (!inherits(eig2, "try-error")){
-            env$fit$eigen2 <- unlist(eig2)
-            tmp2 <- sapply(env$fit$eigen2, abs)
-            env$fit$condition.number <- max(c(max(tmp) / min(tmp), max(tmp2) / min(tmp2)));
-        } else {
-            env$fit$condition.number <- max(tmp) / min(tmp);
-        }
-    } else if (!inherits(eig2, "try-error")) {
-        env$fit$eigen2 <- unlist(eig2)
-        tmp2 <- sapply(env$fit$eigen2, abs)
-        env$fit$condition.number <- max(tmp2) / min(tmp2);
-    }
-    env$fit$varFix <- object$varFix
-    env$uif <- uif;
-    env$uif.new <- uif.new;
-    class(fit.f) <- c("nlmixr.ui.nlme", class(fit.f))
-    if (fit.f$uif$.clean.dll){
-        nlme.cleanup(fit.f);
-        focei.cleanup(fit.f);
-    }
+    env <- new.env(parent=emptyenv());
+    env$method <- "nlme"
+    env$uif <- uif
+    env$nlme <- object;
+    .ini <- as.data.frame(uif$ini)
+    .ini <- .ini[!is.na(.ini$ntheta),];
+    .skipCov <- !is.na(.ini$err);
+    fit.f <- foceiFit.data.frame(data=dat,
+                                 inits=init,
+                                 PKpars=uif$theta.pars,
+                                 ## par_trans=fun,
+                                 model=uif$rxode.pred,
+                                 pred=function(){return(nlmixr_pred)},
+                                 err=uif$error,
+                                 lower=uif$focei.lower,
+                                 upper=uif$focei.upper,
+                                 thetaNames=uif$focei.names,
+                                 etaNames=uif$eta.names,
+                                 etaMat=mat,
+                                 env=env,
+                                 skipCov=.skipCov,
+                                 control=foceiControl(maxOuterIterations=0,
+                                                      maxInnerIterations=0,
+                                                      covMethod="r,s",
+                                                      cores=1,
+                                                      ## transitAbs=transitAbs,
+                                                      sumProd=uif$env$sum.prod));
+    ## if (fit.f$uif$.clean.dll){
+    ##     nlme.cleanup(fit.f);
+    ##     focei.cleanup(fit.f);
+    ## }
     return(fit.f)
 }
 

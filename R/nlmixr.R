@@ -333,17 +333,17 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         }
         fit <- model$saem_mod(cfg);
         if (calc.resid){
-            ret <- try(as.focei(fit, uif, pt, data=dat));
+            .ret <- try(as.focei(fit, uif, pt, data=dat), silent=TRUE);
             if (inherits(ret, "try-error")){
                 warning(bad.focei)
                 return(fit)
             } else {
-                ret <- fix.dat(ret);
-                .env <- ret$env
+                .ret <- fix.dat(.ret);
+                .env <- .ret$env
                 assign("startTime", start.time, .env);
                 assign("est", est, .env);
                 assign("stopTime", Sys.time(), .env);
-                return(ret)
+                return(.ret)
             }
         } else {
             return(fit);
@@ -420,7 +420,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         ## CWRES.
         ## return(fit)
         if (calc.resid){
-            ret <- as.focei(fit, uif, pt, data=dat)
+            .ret <- as.focei(fit, uif, pt, data=dat)
             ## ret <- try(as.focei(fit, uif, pt, data=dat))
             ## if (inherits(ret, "try-error")){
             ##     warning(bad.focei)
@@ -428,12 +428,12 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             ## } else {
             ##     return(ret)
             ## }
-            ret <- fix.dat(ret);
-            env <- attr(ret, ".focei.env")
-            assign("start.time", start.time, env);
-            assign("est", est, env);
-            assign("stop.time", Sys.time(), env);
-            return(ret)
+            .ret <- fix.dat(.ret);
+            .env <- .ret$env
+            assign("startTime", start.time, .env);
+            assign("est", est, .env);
+            assign("stopTime", Sys.time(), .env);
+            return(.ret)
         } else  {
             return(fit);
         }
