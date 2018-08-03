@@ -1307,7 +1307,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
         uif.new$est[uif.new$name == n] <- th[n];
     }
     ome <- focei.eta(fit, uif);
-    init <- list(THTA=th,
+    init <- list(THTA=as.vector(th),
                  OMGA=ome)
     saem.time <- proc.time() - pt;
     if (missing(data)){
@@ -1315,70 +1315,57 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     } else {
         dat <- data;
     }
+    env <- new.env(parent=emptyenv());
+    env$method <- "SAEM";
     atol <- fit$env$uif$env$ODEopt$atol;
     if(is.null(atol))atol <- 1e-6
-    rtol <- fit$env$uif$env$ODEopt$rtol;
+    rtol <- uif$env$ODEopt$rtol;
     if(is.null(rtol))rtol <- 1e-4
-    stiff <- fit$env$uif$env$ODEopt$stiff;
-    if(is.null(stiff))stiff <- 1L
+    .stiff <- uif$env$ODEopt$stiff;
+    if(is.null(.stiff)) .stiff <- 1L
+    if (.stiff == 1L) .method <- "lsoda"
+    if (.stiff == 0L) .method <- "dop853"
+
     transitAbs <- fit$env$uif$env$ODEopt$transitAbs;
     if(is.null(transitAbs)) transitAbs<- 0L
-    fit.f <- focei.fit.data.frame(data=dat,
-                                  inits=init,
-                                  PKpars=uif$theta.pars,
-                                  ## par_trans=fun,
-                                  model=uif$rxode.pred,
-                                  pred=function(){return(nlmixr_pred)},
-                                  err=uif$error,
-                                  lower=uif$focei.lower,
-                                  upper=uif$focei.upper,
-                                  theta.names=uif$focei.names,
-                                  eta.names=uif$eta.names,
-                                  control=list(NOTRUN=TRUE,
-                                               inits.mat=mat2,
-                                               cores=1,
-                                               find.best.eta=FALSE,
-                                               ## numeric=(!is.null(uif$nmodel$lin.solved)),
-                                               atol.ode=atol,
-                                               rtol.ode=rtol,
-                                               stiff=stiff,
-                                               transitAbs=transitAbs,
-                                               sum.prod=uif$env$sum.prod));
-    ome <- fit.f$omega;
-    w <- which(!is.na(uif.new$ini$neta1))
-    for (i in w){
-        uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
-    }
-
-    ## enclose the nlme fit in the .focei.env
-    env <- attr(fit.f, ".focei.env");
-    dimnames(mat2) <- list(NULL, uif$eta.names);
-    env$eta.df <- data.frame(ID=seq_along(mat[, 1]), as.data.frame(mat2));
-    ## etas <- mat2;
-    ## dimnames(etas) <- list(NULL, row.names(ome))
-    ## env$etas.df <- data.frame(ID=seq_along(etas[1, ]), as.data.frame(etas))
-
-    env$fit$saem <- fit
-    tmp <- cbind(data.frame(saem=saem.time["elapsed"]), env$fit$time);
-    names(tmp) <- gsub("optimize", "Likelihood Calculation", names(tmp))
-    env$fit$time <- tmp;
-    env$uif <- uif;
-    env$uif.new <- uif.new;
-    eig <- try(eigen(object$Ha,TRUE,TRUE)$values, silent=TRUE);
-    if (!inherits(eig, "try-error")){
-        env$fit$eigen <- eigen(object$Ha,TRUE,TRUE)$values;
-        tmp <- sapply(fit.f$eigen, abs)
-        env$fit$condition.number <- max(tmp) / min(tmp);
-    }
-    nth <- length(uif$saem.theta.name)
-    tmp <- RxODE::rxInv(object$Ha[1:nth, 1:nth])
-    dimnames(tmp) <- list(uif$saem.theta.name, uif$saem.theta.name)
-    env$fit$varFix <- tmp
-    class(fit.f) <- c("nlmixr.ui.saem", class(fit.f))
-    if (uif$.clean.dll){
-        saem.cleanup(fit.f);
-        focei.cleanup(fit.f);
-    }
+    env$saem <- object;
+    .tn <-uif$saem.theta.name;
+    .nth <- length(.tn)
+    .cov <- RxODE::rxInv(object$Ha[1:.nth,1:.nth])
+    attr(.cov, "dimnames") <- list(.tn, .tn)
+    .ini <- as.data.frame(uif$ini)
+    .ini <- .ini[is.na(.ini$err),]
+    .ini <- .ini[!is.na(.ini$ntheta),]
+    .ini <- paste(.ini$name);
+    .cov <- .cov[.ini, .ini, drop = FALSE];
+    .ini <- as.data.frame(uif$ini)
+    .ini <- .ini[!is.na(.ini$ntheta),];
+    .skipCov <- is.na(.ini$ntheta);
+    env$cov <- .cov;
+    fit.f <- foceiFit.data.frame(data=dat,
+                                 inits=init,
+                                 PKpars=uif$theta.pars,
+                                 ## par_trans=fun,
+                                 model=uif$rxode.pred,
+                                 pred=function(){return(nlmixr_pred)},
+                                 err=uif$error,
+                                 lower=uif$focei.lower,
+                                 upper=uif$focei.upper,
+                                 thetaNames=uif$focei.names,
+                                 etaNames=uif$eta.names,
+                                 etaMat=mat2,
+                                 env=env,
+                                 skipCov=.skipCov,
+                                 control=foceiControl(maxOuterIterations=0,
+                                                      maxInnerIterations=0,
+                                                      covMethod="",
+                                                      cores=1,
+                                                      atol=atol,
+                                                      rtol=rtol,
+                                                      method=.method,
+                                                      transitAbs=transitAbs,
+                                                      sumProd=uif$env$sum.prod)
+                                 );
     return(fit.f)
 }
 

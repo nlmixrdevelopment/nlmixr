@@ -358,6 +358,9 @@ augPred.focei.fit <- function(object, primary = NULL, minimum = min(primary), ma
     return(ret)
 }
 
+##' @rdname nlmixrAugPred
+augPred.nlmixrFitData <- augPred.focei.fit
+
 ##' @export
 plot.nlmixrAugPred <- function(x, y, ...){
     ids <- unique(x$id)

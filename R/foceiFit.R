@@ -187,6 +187,7 @@ foceiControl <- function(sigdig=5,
                          optExpression=TRUE,
                          ci=0.95,
                          ## outerOpt=c("lbfgsb", "qnbd"),
+                         useColor=crayon::has_color(),
                          ..., stiff){
     if (is.null(epsilon)){
         epsilon <- 10 ^ (-sigdig)
@@ -287,7 +288,8 @@ foceiControl <- function(sigdig=5,
                  outerOpt=0L,
                  ci=as.double(ci),
                  sigdig=as.double(sigdig),
-                 scaleObjective=as.double(scaleObjective))
+                 scaleObjective=as.double(scaleObjective),
+                 useColor=as.integer(useColor));
     class(.ret) <- "foceiControl"
     return(.ret);
 }
@@ -478,22 +480,27 @@ foceiControl <- function(sigdig=5,
 ##'
 ##'  fitIV <- nlmixr(one.compartment.IV.model, datr, "focei");
 ##' }
-foceiFit <- function(data,
-                     inits,
-                     PKpars,
-                     model=NULL,
-                     pred=NULL,
-                     err=NULL,
-                     lower= -Inf,
-                     upper= Inf,
-                     fixed = NULL,
-                     skipCov=NULL,
-                     control=foceiControl(),
-                     thetaNames=NULL,
-                     etaNames=NULL,
-                     etaMat=NULL,
-                     ...,
-                     env=NULL){
+foceiFit <- function(data, ...){
+    UseMethod("foceiFit")
+}
+##'@rdname foceiFit
+##'@export
+foceiFit.data.frame <- function(data,
+                                inits,
+                                PKpars,
+                                model=NULL,
+                                pred=NULL,
+                                err=NULL,
+                                lower= -Inf,
+                                upper= Inf,
+                                fixed = NULL,
+                                skipCov=NULL,
+                                control=foceiControl(),
+                                thetaNames=NULL,
+                                etaNames=NULL,
+                                etaMat=NULL,
+                                ...,
+                                env=NULL){
     .pt <- proc.time();
     loadNamespace("n1qn1");
     if (!RxODE::rxIs(control, "foceiControl")){
@@ -628,7 +635,7 @@ foceiFit <- function(data,
 
     .ret$thetaIni <- inits$THTA
 
-    if (any(.ret$thetaIni == 0)){
+    if (any(.ret$thetaIni == 0 && control$scaleTo > 0)){
         warning("Some of the initial conditions were 0, changing to 0.0001");
         .ret$thetaIni[.ret$thetaIni == 0] <- 0.0001;
     }
@@ -636,6 +643,7 @@ foceiFit <- function(data,
     .ret$etaMat <- etaMat
     .ret$setupTime <- (proc.time() - .pt)["elapsed"];
     .ret <- RxODE::foceiFitCpp_(.ret);
+    message("Calculating residuals/tables")
     .pt <- proc.time();
     .etas <- .ret$ranef
     .thetas <- .ret$fixef
@@ -666,6 +674,70 @@ foceiFit <- function(data,
     }
     .lst[[4]] <- .df;
     .ret$shrink <- .lst[[2]];
+    if (exists("uif", envir=.ret)){
+        .uif <- .ret$uif;
+        .muRef <- unlist(.uif$mu.ref);
+        if (length(.muRef) > 0){
+            .nMuRef <- names(.muRef)
+            .ome <- .ret$omega
+            .muRef <- structure(as.vector(.nMuRef), .Names=as.vector(.muRef));
+            .logEta <- .uif$log.eta;
+            .digs <- .ret$control$sigdig;
+            .cvOnly <- TRUE;
+            .sdOnly <- TRUE;
+            .cvp <- sapply(row.names(.ret$popDfSig), function(x){
+                .y <- .muRef[x];
+                if (is.na(.y)) return(" ");
+                .v <- .ome[.y, .y];
+                if (any(.y == .logEta)){
+                    .sdOnly <<- FALSE;
+                    sprintf("%s%%", formatC(signif(sqrt(exp(.v) - 1) * 100, digits=.digs),
+                                            digits=.digs, format="fg", flag="#"));
+                } else {
+                    .cvOnly <<- FALSE;
+                    sprintf("%s", formatC(signif(sqrt(.v),digits=.digs),
+                                          digits=.digs, format="fg", flag="#"));
+                }
+            })
+
+            .shrink <- .ret$shrink;
+            .errs <- as.data.frame(.uif$ini);
+            .errs <- paste(.errs[which(!is.na(.errs$err)), "name"]);
+            .sh <- sapply(row.names(.ret$popDfSig), function(x){
+                .y <- .muRef[x];
+                if (is.na(.y)) {
+                    if (any(x == .errs)){
+                        .v <- .shrink[7, "IWRES"];
+                        if (length(.v) != 0) return(" ")
+                        if (is.na(.v)){
+                            return(" ")
+                        }
+                    } else {
+                        return(" ")
+                    }
+                } else {
+                    .v <- .shrink[7, .y];
+                }
+                if (length(.v) != 1) return(" ");
+                .t <- ">"
+                if (.v < 0){
+                } else  if (.v < 20){
+                    .t <- "<"
+                } else if (.v < 30){
+                    .t <- "="
+                }
+                sprintf("%s%%%s", formatC(signif(.v, digits=.digs),
+                                          digits=.digs, format="fg", flag="#"), .t);
+            })
+            .ret$parFixed <- data.frame(.ret$popDfSig, "BSD"=.cvp, "Shrink(SD)%"=.sh, check.names=FALSE);
+            names(.ret$parFixed)[5] <- ifelse(.sdOnly, "BSV(SD)", ifelse(.cvOnly, "BSV(CV%)", "BSV(CV% or SD)"))
+        } else {
+            .ret$parFixed <- .ret$popDfSig
+        }
+    } else {
+        .ret$parFixed <- .ret$popDfSig
+    }
+    class(.ret$parFixed) <- c("nlmixrParFixed", "data.frame");
     .df <- cbind(as.data.frame(data), .lst[[1]], .lst[[3]], .lst[[4]]);
     .ret$tableTime <- (proc.time() - .pt)["elapsed"];
     .ret$time <- data.frame(.ret$time, table=.ret$tableTime);
@@ -682,6 +754,7 @@ foceiFit <- function(data,
     .cls <- c("nlmixrFitData", "nlmixrFitCore", .cls)
     attr(.cls, ".foceiEnv") <- .ret;
     class(.df) <- .cls;
+    message("done.")
     return(.df)
 }
 
@@ -692,11 +765,124 @@ foceiFit <- function(data,
         .cls <- class(obj);
         .env <- attr(.cls, ".foceiEnv");
         if (arg == "omega.R") arg <- "omegaR"
+        if (arg == "par.fixed") arg <- "parFixed"
+        if (arg == "eta") arg <- "ranef"
+        if (arg == "theta") arg <- "fixef"
         if (exists(arg, envir=.env)){
-            .ret <- get(arg, envir=.env);
+            return(get(arg, envir=.env));
+        }
+        if (is.null(.ret) && arg == "env"){
+            class(.env) <- NULL
+            return(.env)
+        }
+        if (arg == "simInfo"){
+            return(.simInfo(obj))
+        }
+        if (exists("uif", .env)){
+            .uif <- .env$uif;
+            if (arg == "modelName") arg <- "model.name"
+            if (arg == "dataName") arg <- "data.name"
+            .ret <- `$.nlmixrUI`(.uif, arg);
+            if (!is.null(.ret)) return(.ret)
         }
     }
     return(.ret)
+}
+
+##' @export
+str.nlmixrFitData <- function(object, ...){
+    NextMethod(object);
+    .env <- object$env
+    ## cat(" $ par.hist         : Parameter history (if available)\n")
+    ## cat(" $ par.hist.stacked : Parameter history in stacked form for easy plotting (if available)\n")
+    cat(" $ omega            : Omega matrix\n")
+    cat(" $ omegaR           : Omega Correlation matrix\n")
+    cat(" $ shrink           : Shrinkage table, includes skewness, kurtosis, and eta p-values\n")
+    cat(" $ parFixed         : Fixed Effect Parameter Table\n")
+    cat(" $ theta            : Fixed Parameter Estimates\n")
+    cat(" $ eta              : Individual Parameter Estimates\n")
+    cat(" $ seed             : Seed (if applicable)\n");
+    if (exists("uif", envir=object$env)){
+        cat(" $ meta             : Model meta information environment\n");
+        cat(" $ modelName        : Model name (from R function)\n");
+        cat(" $ dataName         : Name of R data input\n");
+        cat(" $ simInfo          : RxODE list for simulation\n");
+    }
+
+}
+
+
+##' Extract residuals from the FOCEI fit
+##'
+##' @param object focei.fit object
+##' @param ... Additional arguments
+##' @param type Residuals type fitted.
+##' @return residuals
+##' @author Matthew L. Fidler
+##' @export
+residuals.nlmixrFitData <- function(object, ..., type=c("ires", "res", "iwres", "wres", "cwres", "cpred", "cres")){
+    return(object[, toupper(match.arg(type))]);
+}
+
+
+#' Plot a focei.fit plot
+#'
+#' Plot some standard goodness of fit plots for the focei fitted object
+#'
+#' @param x a focei fit object
+#' @param ... additional arguments
+#' @return NULL
+#' @author Wenping Wang & Matthew Fidler
+#' @export
+plot.nlmixrFitData <- function(x, ...) {
+    ## traceplot(x);
+    dat <- as.data.frame(x);
+    d1 <- data.frame(DV=dat$DV, stack(dat[, c("PRED", "IPRED")]))
+
+    p1 <- ggplot(d1,aes(values,DV)) +
+        facet_wrap(~ind) +
+        geom_abline(slope=1, intercept=0, col="red", size=1.2) +
+        geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
+        geom_point() +
+        xlab("Predictions");
+
+    print(p1)
+
+    p2 <- ggplot(dat, aes(x=IPRED, y=IRES)) +
+        geom_point() +
+        geom_abline(slope=0, intercept=0, col="red")
+    print(p2)
+
+    p2 <- ggplot(dat, aes(x=TIME, y=IRES)) +
+        geom_point() +
+        geom_abline(slope=0, intercept=0, col="red")
+    print(p2)
+
+
+    p2 <- ggplot(dat, aes(x=IPRED, y=IWRES)) +
+        geom_point() +
+        geom_abline(slope=0, intercept=0, col="red")
+    print(p2)
+
+    p2 <- ggplot(dat, aes(x=TIME, y=IWRES)) +
+        geom_point() +
+        geom_abline(slope=0, intercept=0, col="red")
+    print(p2)
+
+
+    ids <- unique(dat$ID)
+    for (i  in seq(1, length(ids), by=16)){
+        tmp <- ids[seq(i, i + 15)]
+        tmp <- tmp[!is.na(tmp)];
+        d1 <- dat[dat$ID %in% tmp, ];
+
+        p3 <- ggplot(d1, aes(x=TIME, y=DV)) +
+            geom_point() +
+            geom_line(aes(x=TIME, y=IPRED), col="red", size=1.2) +
+            geom_line(aes(x=TIME, y=PRED), col="blue", size=1.2) +
+            facet_wrap(~ID)
+        print(p3)
+    }
 }
 
 ##'@export
@@ -743,9 +929,17 @@ print.nlmixrFitCore <- function(x, ...){
     print(x$objDf)
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)
-    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$popDf"), " & ", crayon::yellow(.bound), crayon::bold$blue("$popDfSig"), "):"))));
-    print(x$popDfSig)
-    ################################################################################
+    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), "):"))));
+    .pf <- R.utils::captureOutput(print(x$parFixed))
+    if (crayon::has_color()){
+        .pf <- gsub(rex::rex(capture(.regNum), "%>"), "\033[1;31m\\1%\033[0m ", .pf, perl=TRUE)
+        .pf <- gsub(rex::rex(capture(.regNum), "%="), "\033[1;32m\\1%\033[0m ", .pf, perl=TRUE)
+        .pf <- gsub(rex::rex(capture(.regNum), "%<"), "\\1% ", .pf, perl=TRUE)
+        .pf <- gsub(rex::rex(capture(or(c(row.names(x$parFixed), names(x$parFixed))))), "\033[1m\\1\033[0m", .pf, perl=TRUE);
+    } else {
+        .pf <- gsub(rex::rex(capture(.regNum), "%", or(">", "=", "<")), "\\1% ", .pf, perl=TRUE)
+    }
+    message(paste(.pf, collapse="\n"), "\n")
     ## Correlations
     .tmp <- x$omega
     diag(.tmp) <- 0;
