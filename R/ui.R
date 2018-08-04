@@ -1159,6 +1159,23 @@ nlmixrUI.focei.fixed <- function(obj){
     dft <- df[!is.na(df$ntheta), ];
     return(dft$fix)
 }
+##' Get parameters that are fixed for SAEM
+##'
+##' @param obj UI object
+##' @return List of parameters that are fixed.
+##' @author Matthew L. Fidler
+nlmixrUI.saem.fixed <- function(obj){
+    .df <- as.data.frame(obj$ini);
+    .dft <- .df[!is.na(.df$ntheta), ];
+    .fixError <- .dft[!is.na(.dft$err), ];
+    if (any(.fixError$fix)){
+        stop("Residuals cannot be fixed in SAEM.")
+    }
+    .dft <- .dft[is.na(.dft$err), ];
+    .dft <- setNames(.dft$fix, paste(.dft$name))
+    .dft <- .dft[obj$saem.theta.name]
+    return(setNames(which(.dft), NULL));
+}
 
 ##' Get the FOCEi initializations
 ##'
@@ -1546,6 +1563,8 @@ nlmixrUI.model.desc <- function(obj){
         return(nlmixrUI.focei.inits(obj));
     } else if (arg == "focei.fixed"){
         return(nlmixrUI.focei.fixed(obj));
+    } else if (arg == "saem.fixed"){
+        return(nlmixrUI.saem.fixed(obj));
     } else if (arg == "saem.theta.name"){
         return(nlmixrUI.saem.theta.name(obj))
     } else if (arg == "saem.eta.trans"){

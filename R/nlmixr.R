@@ -327,14 +327,14 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         uif$env$covMethod <- covMethod
             model <- uif$saem.model
         cfg <- configsaem(model=model, data=dat, inits=uif$saem.init,
-                           mcmc=mcmc, ODEopt=ODEopt, seed=seed);
+                          mcmc=mcmc, ODEopt=ODEopt, seed=seed, fixed=uif$saem.fixed);
         if (print > 1){
             cfg$print <- as.integer(print)
         }
         fit <- model$saem_mod(cfg);
         if (calc.resid){
             .ret <- try(as.focei(fit, uif, pt, data=dat), silent=TRUE);
-            if (inherits(ret, "try-error")){
+            if (inherits(.ret, "try-error")){
                 warning(bad.focei)
                 return(fit)
             } else {

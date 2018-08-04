@@ -1342,6 +1342,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     .ini <- as.data.frame(uif$ini)
     .ini <- .ini[!is.na(.ini$ntheta),];
     .skipCov <- !is.na(.ini$err);
+    .fixed <- uif$focei.fixed
+    .skipCov <- .skipCov | .fixed
     .covMethod <- uif$env$covMethod
     if (!any(.covMethod == c("r", "s", "r,s"))){
         .covMethod <- "";
@@ -1360,6 +1362,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                                  etaNames=uif$eta.names,
                                  etaMat=mat2,
                                  env=.env,
+                                 fixed=.fixed,
                                  skipCov=.skipCov,
                                  control=foceiControl(maxOuterIterations=0,
                                                       maxInnerIterations=0,
