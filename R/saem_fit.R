@@ -1349,6 +1349,15 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
         .covMethod <- "";
     }
     .env$cov <- .cov;
+    .allThetaNames <- c(uif$saem.theta.name, uif$saem.omega.name, uif$saem.res.name);
+    .m <- object$par_hist
+    .env$parHistStacked <- data.frame(val=as.vector(.m),
+                                      par=rep(.allThetaNames, each=nrow(.m)),
+                                      iter=rep(1:nrow(.m), ncol(.m)));
+    dimnames(.m) <- list(NULL, .allThetaNames);
+    .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
+    .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
+                         crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
                                  PKpars=uif$theta.pars,

@@ -777,9 +777,36 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
     env$method <- "nlme"
     env$uif <- uif
     env$nlme <- object;
+    var <- as.matrix(nlme::VarCorr(object))[,"Variance"]
+    var <- var[uif$focei.names]
+    var <- setNames(as.numeric(var), uif$focei.names);
+    var <- var[!is.na(var)];
+    cov <- diag(length(var))
+    diag(cov) <- var;
+    attr(cov, "dimnames") <- list(names(var), names(var));
+    env$cov <- cov
     .ini <- as.data.frame(uif$ini)
     .ini <- .ini[!is.na(.ini$ntheta),];
     .skipCov <- !is.na(.ini$err);
+    if (is(object, "nlme.free")){
+        .text <- "Free-form"
+    } else {
+        if (use.utf()){
+            .mu <- "\u03BC";
+        } else {
+            .mu <- "mu"
+        }
+        if (is(object, "nlme.mu")){
+            .text <- sprintf("%s-ref", .mu)
+        } else if (is(object, "nlme.mu.cov")){
+            .text <- sprintf("%s-ref & covs", .mu)
+        } else {
+            .text <- "";
+        }
+    }
+    env$extra <- paste0(" by ", crayon::bold$yellow(ifelse(object$method == "REML", "REML", "maximum likelihood"))," (",
+                         crayon::italic(paste0(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"),
+                                               "; ", .text)), ")")
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
                                  PKpars=uif$theta.pars,
@@ -796,7 +823,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
                                  skipCov=.skipCov,
                                  control=foceiControl(maxOuterIterations=0,
                                                       maxInnerIterations=0,
-                                                      covMethod="r,s",
+                                                      covMethod="",
                                                       cores=1,
                                                       ## transitAbs=transitAbs,
                                                       sumProd=uif$env$sum.prod));

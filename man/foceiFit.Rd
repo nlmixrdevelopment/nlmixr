@@ -2,16 +2,21 @@
 % Please edit documentation in R/foceiFit.R
 \name{foceiFit}
 \alias{foceiFit}
+\alias{foceiFit.data.frame}
 \title{FOCEi fit}
 \usage{
-foceiFit(data, inits, PKpars, model = NULL, pred = NULL, err = NULL,
-  lower = -Inf, upper = Inf, fixed = NULL, skipCov = NULL,
-  control = foceiControl(), thetaNames = NULL, etaNames = NULL,
-  etaMat = NULL, ..., env = NULL)
+foceiFit(data, ...)
+
+\method{foceiFit}{data.frame}(data, inits, PKpars, model = NULL,
+  pred = NULL, err = NULL, lower = -Inf, upper = Inf, fixed = NULL,
+  skipCov = NULL, control = foceiControl(), thetaNames = NULL,
+  etaNames = NULL, etaMat = NULL, ..., env = NULL)
 }
 \arguments{
 \item{data}{Data to fit; Needs to be RxODE compatible and have \code{DV},
 \code{AMT}, \code{EVID} in the dataset.}
+
+\item{...}{Ignored parameters}
 
 \item{inits}{Initialization list}
 
@@ -43,8 +48,6 @@ object.}
 
 \item{etaMat}{Eta matrix for initial estimates or final estimates
 of the ETAs.}
-
-\item{...}{Ignored parameters}
 }
 \value{
 A focei fit object

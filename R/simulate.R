@@ -275,7 +275,7 @@ nlmixrPred <- function(object, params=NULL, events=NULL, inits = NULL, scale = N
 }
 ##' @rdname nlmixrPred
 ##' @export
-predict.focei.fit <- function(object, ...){
+predict.nlmixrFitData <- function(object, ...){
     nlmixrPred(object, ...)
 }
 
@@ -287,9 +287,10 @@ predict.focei.fit <- function(object, ...){
 ##' @inheritParams RxODE::rxSolve
 ##' @return Stacked data.frame with observations, individual/population predictions.
 ##' @author Matthew L. Fidler
+##' @export
 nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
                           primary=NULL, minimum = NULL, maximum = NULL, length.out = 51L){
-    if (!inherits(object, "focei.fit")){
+    if (!inherits(object, "nlmixrFitData")){
         stop("Need a nlmixr fit object")
     }
     uif <- object$uif
@@ -350,16 +351,13 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
 
 ##' @rdname nlmixrAugPred
 ##' @export
-augPred.focei.fit <- function(object, primary = NULL, minimum = min(primary), maximum = max(primary),
+augPred.nlmixrFitData <- function(object, primary = NULL, minimum = min(primary), maximum = max(primary),
                               length.out = 51, ...){
     lst <- as.list(match.call()[-1])
     ret <- do.call("nlmixrAugPred", lst, envir=parent.frame(2))
     class(ret) <- c("nlmixrAugPred", "data.frame")
     return(ret)
 }
-
-##' @rdname nlmixrAugPred
-augPred.nlmixrFitData <- augPred.focei.fit
 
 ##' @export
 plot.nlmixrAugPred <- function(x, y, ...){
@@ -379,7 +377,7 @@ plot.nlmixrAugPred <- function(x, y, ...){
 
 ##' @rdname nlmixrSim
 ##' @export
-rxSolve.focei.fit <- function(object, params=NULL, events=NULL, inits = NULL, scale = NULL,
+rxSolve.nlmixrFitData <- function(object, params=NULL, events=NULL, inits = NULL, scale = NULL,
                               covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
                               transitAbs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
                               maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
@@ -397,13 +395,13 @@ rxSolve.focei.fit <- function(object, params=NULL, events=NULL, inits = NULL, sc
 
 ##' @rdname nlmixrSim
 ##' @export
-simulate.focei.fit <- function(object, nsim=1, seed=NULL, ...){
+simulate.nlmixrFitData <- function(object, nsim=1, seed=NULL, ...){
     nlmixr::nlmixrSim(object, ..., nsim=nsim, seed=seed)
 }
 
 ##' @rdname nlmixrSim
 ##' @export
-solve.focei.fit <- function(a, b, ...){
+solve.nlmixrFitData <- function(a, b, ...){
     lst <- as.list(match.call()[-1])
     n <- names(lst)
     if (!missing(a)){

@@ -5,6 +5,20 @@
 .regDecimalint <- rex::rex(or("0", group("1":"9", any_of("0":"9"))))
 .regNum <- rex::rex(maybe("-"), or(.regDecimalint, .regFloat1, .regFloat2))
 
+use.utf <- function() {
+    opt <- getOption("cli.unicode", NULL)
+    if (! is.null(opt)) {
+        isTRUE(opt)
+    } else {
+        l10n_info()$`UTF-8` && !is.latex()
+    }
+}
+
+is.latex <- function() {
+    if (!("knitr" %in% loadedNamespaces())) return(FALSE)
+    get("is_latex_output", asNamespace("knitr"))()
+}
+
 ##' Control Options for FOCEi
 ##'
 ##' @param sigdig Optimization significant digits. This controls:
@@ -330,6 +344,22 @@ foceiControl <- function(sigdig=5,
     .mat[col(.mat) >= row(.mat)] <- .a
     .mat
 }
+##' Construct RxODE linCmt function
+##'
+##' @param fun function to convert to solveC syntax
+##' @return SolvedC RxODE object
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+constructLinCmt <- function(fun){
+    pars <- nlmixrfindLhs(body(fun));
+    lines <- deparse(body(fun))[-1];
+    lines <- lines[-length(lines)];
+    ret <- RxODE::rxLinCmtTrans(sprintf("%s\nCentral=linCmt(%s);\n", paste(lines, collapse="\n"), paste(pars, collapse=", ")));
+    ret <- strsplit(ret, "\n")[[1]];
+    ret <- paste(ret[-seq_along(lines)], collapse="\n");
+    return(ret)
+}
 ##' FOCEi fit
 ##'
 ##' @param data Data to fit; Needs to be RxODE compatible and have \code{DV},
@@ -485,6 +515,11 @@ foceiFit <- function(data, ...){
 }
 ##'@rdname foceiFit
 ##'@export
+foceiFit.data.frame <- function(...){
+    call <- as.list(match.call(expand.dots=TRUE))[-1];
+    return(.collectWarnings(do.call(foceiFit.data.frame0, call, envir=parent.frame(1))))
+}
+
 foceiFit.data.frame <- function(data,
                                 inits,
                                 PKpars,
@@ -771,6 +806,8 @@ foceiFit.data.frame <- function(data,
     if (is.null(.ret)){
         .cls <- class(obj);
         .env <- attr(.cls, ".foceiEnv");
+        if (arg == "par.hist") arg <- "parHist"
+        if (arg == "par.hist.stacked") arg <- "parHistStacked"
         if (arg == "omega.R") arg <- "omegaR"
         if (arg == "par.fixed") arg <- "parFixed"
         if (arg == "eta") arg <- "ranef"
@@ -791,9 +828,44 @@ foceiFit.data.frame <- function(data,
             if (arg == "dataName") arg <- "data.name"
             .ret <- `$.nlmixrUI`(.uif, arg);
             if (!is.null(.ret)) return(.ret)
+            .env2  <- `$.nlmixrUI`(.uif, "env");
+            if (exists(arg, envir=.env2)){
+                return(get(arg, envir=.env2))
+            }
         }
     }
     return(.ret)
+}
+
+##' Return composite nlme/focei to nlme
+##'
+##' @param x nlme/focei object from common UI.
+##' @return nlme object or NULL
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+as.nlme <- function(object, ...){
+    .ret <- object$nlme
+    if (is.null(.ret)) stop("Cannot convert to nlme.");
+    return(.ret)
+}
+##' Return composite saem/focei to saem
+##'
+##' @param x saem/focei object from common UI.
+##' @return saem object or NULL
+##' @author Matthew L. Fidler
+##' @keywords internal
+##' @export
+as.saem <- function(x){
+    .ret <- x$saem
+    if (is.null(.ret)) stop("Cannot convert to saem.");
+    return(.ret)
+}
+
+##' @importFrom nlme VarCorr
+##' @export
+VarCorr.nlmixrFitCore <- function(x, sigma = 1, ...){
+    VarCorr(as.nlme(x), sigma=sigma, ...)
 }
 
 ##' @export
@@ -842,7 +914,7 @@ residuals.nlmixrFitData <- function(object, ..., type=c("ires", "res", "iwres", 
 #' @author Wenping Wang & Matthew Fidler
 #' @export
 plot.nlmixrFitData <- function(x, ...) {
-    ## traceplot(x);
+    traceplot(x);
     dat <- as.data.frame(x);
     d1 <- data.frame(DV=dat$DV, stack(dat[, c("PRED", "IPRED")]))
 
@@ -931,7 +1003,7 @@ print.nlmixrFitCore <- function(x, ...){
                                }
                                return(NULL);
                            }))
-    message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method), " fit ",
+    message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method), " fit",
                              x$extra)))
     print(x$objDf)
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
@@ -1003,4 +1075,67 @@ print.nlmixrFitCore <- function(x, ...){
             print(head(x));
         }
     }
+}
+
+
+## FIXME fitted?
+
+
+##' Produce trace-plot for fit if applicable
+##'
+##' @param x fit object
+##' @param ... other parameters
+##' @return Fit traceplot or nothing.
+##' @author Rik Schoemaker, Wenping Wang & Matthew L. Fidler
+##' @export
+traceplot <- function(x, ...){
+    UseMethod("traceplot");
+}
+
+##' @rdname traceplot
+##' @export
+traceplot.nlmixrFitCore <- function(x, ...){
+    .m <- x$parHistStacked;
+    if (!is.null(.m)){
+        .p0 <- ggplot(.m, aes(iter, val)) +
+            geom_line() +
+            facet_wrap(~par, scales = "free_y")
+        if (!is.null(x$mcmc)){
+            .p0 <- .p0 + ggplot2::geom_vline(xintercept=x$mcmc$niter[1], col="blue", size=1.2);
+        }
+        print(.p0)
+    }
+}
+
+##' Convert fit to FOCEi style fit
+##'
+##' @param object Fit object to convert to FOCEi-style fit.
+##' @param uif Unified Interface Function
+##' @param pt Proc time object
+##' @param ... Other Parameters
+##' @param data The data to pass to the FOCEi translation.
+##' @return A FOCEi fit style object.
+##' @author Matthew L. Fidler
+as.focei <- function(object, uif, pt=proc.time(), ..., data){
+    UseMethod("as.focei");
+}
+
+
+##' Get the FOCEi theta or eta specification for model.
+##'
+##' @param object Fit object
+##' @param uif User interface function or object
+##' @param ... Other parameters
+##' @return List for the OMGA list in FOCEi
+##' @author Matthew L. Fidler
+focei.eta <- function(object, uif, ...){
+    UseMethod("focei.eta");
+}
+
+##' Get the FOCEi theta specification for the model
+##'
+##' @inheritParams focei.eta
+##' @return Parameter estimates for Theta
+focei.theta <- function(object, uif, ...){
+    UseMethod("focei.theta");
 }

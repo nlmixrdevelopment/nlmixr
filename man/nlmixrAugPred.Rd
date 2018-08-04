@@ -2,15 +2,15 @@
 % Please edit documentation in R/simulate.R
 \name{nlmixrAugPred}
 \alias{nlmixrAugPred}
-\alias{augPred.focei.fit}
+\alias{augPred.nlmixrFitData}
 \title{Augmented Prediction for nlmixr fit}
 \usage{
 nlmixrAugPred(object, ..., covsInterpolation = c("linear", "locf", "nocb",
   "midpoint"), primary = NULL, minimum = NULL, maximum = NULL,
   length.out = 51L)
 
-\method{augPred}{focei.fit}(object, primary = NULL, minimum = min(primary),
-  maximum = max(primary), length.out = 51, ...)
+\method{augPred}{nlmixrFitData}(object, primary = NULL,
+  minimum = min(primary), maximum = max(primary), length.out = 51, ...)
 }
 \arguments{
 \item{object}{Nlmixr fit object}

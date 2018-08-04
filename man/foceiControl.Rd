@@ -15,7 +15,8 @@ foceiControl(sigdig = 5, epsilon = NULL, maxInnerIterations = 10000,
   "forward"), covMethod = c("r,s", "r", "s", ""), lbfgsLmm = 40L,
   lbfgsPgtol = 0, lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
   diagXform = c("sqrt", "log", "identity"), sumProd = FALSE,
-  optExpression = TRUE, ci = 0.95, ..., stiff)
+  optExpression = TRUE, ci = 0.95, useColor = crayon::has_color(), ...,
+  stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
