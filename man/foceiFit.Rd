@@ -103,7 +103,33 @@ errAddProp <- function(){
 }
 
 fitAP <- foceiFit(w7, inits, mypar2,mod,pred,errAddProp,
-     control=foceiControl(maxOuterIterations=0,covMethod=""))g
+     control=foceiControl(maxOuterIterations=0,covMethod=""))
+
+## Checking lognormal
+
+errLogn <- function(){
+   err <- lnorm(0.1)
+}
+
+## First run the fit with the nlmixr lnorm error
+
+fitLN <- foceiFit(w7, inits, mypar2,mod,pred,errLogn,
+     control=foceiControl(maxOuterIterations=0,covMethod=""))
+
+
+## Next run on the log-transformed space
+w72 <- w7; w72$DV <- log(w72$DV)
+
+predL <- function() log(ipre)
+
+fitLN2 <- foceiFit(w72, inits, mypar2,mod,predL,errAdd,
+     control=foceiControl(maxOuterIterations=0,covMethod=""))
+
+## Correct the fitLN2's objective function to be on the normal scale
+print(fitLN2$objective + 2*sum(w72$DV))
+
+## Note the objective function of the lognormal error is on the normal scale.
+print(fitLN$objective)
 
 mypar2 <- function ()
 {

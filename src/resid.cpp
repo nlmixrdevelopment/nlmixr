@@ -4,6 +4,20 @@
 #include <Rmath.h>
 #include "nlmixr_types.h"
 
+typedef double (*rxPow)(double x, double lambda, int yj);
+
+double powerDi(double x, double lambda, int yj){
+  static rxPow fun=NULL;
+  if (fun == NULL) fun = (rxPow) R_GetCCallable("RxODE","powerDi");
+  return fun(x, lambda, yj);
+}
+
+double powerD(double x, double lambda, int yj){
+  static rxPow fun=NULL;
+  if (fun == NULL) fun = (rxPow) R_GetCCallable("RxODE","powerD");
+  return fun(x, lambda, yj);
+}
+
 using namespace Rcpp;
 using namespace R;
 using namespace arma;
@@ -64,16 +78,18 @@ List nlmixrParameters(NumericVector theta, DataFrame eta){
 }
 
 // [[Rcpp::export]]
-List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, DataFrame etasDf, List etaLst){
+List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, NumericVector &lambda, NumericVector &yj, DataFrame etasDf, List etaLst){
   DataFrame pred = as<DataFrame>(innerList["pred"]);
   IntegerVector ID= as<IntegerVector>(pred[0]);
   IntegerVector TIME= as<IntegerVector>(pred[1]);
   pred.erase(0,2);
   NumericVector prednv = as<NumericVector>(pred[0]);
+  NumericVector prednvI(prednv.size());
   pred.erase(0);
   DataFrame ipred = as<DataFrame>(innerList["ipred"]);
   ipred.erase(0,2);
   NumericVector iprednv = as<NumericVector>(ipred[0]);
+  NumericVector iprednvI(iprednv.size());
   ipred.erase(0);
   // Now get fp r, rp
   unsigned int neta = omegaMat.nrow();
@@ -82,6 +98,12 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   NumericMatrix rpp(iprednv.size(),neta);
   NumericMatrix rpi(iprednv.size(),neta);
   unsigned int i, j;
+  NumericVector dvTBS(dv.size());
+  for (i = dv.size(); i--;){
+    dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
+    prednvI[i] = powerDi(prednv[i], lambda[i], (int)yj[i]);
+    iprednvI[i]= powerDi(iprednv[i], lambda[i], (int)yj[i]);
+  }
   double om;
   unsigned int nid=etasDf.nrows();
   double tc = sqrt((double)nid);
@@ -190,12 +212,19 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   }
   // For WRES
   // W <- fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi")
-  NumericVector res = dv-prednv;
+  NumericVector resI = dv-prednvI;
+  NumericVector res = dvTBS-prednv;
   arma::vec resv = as<arma::vec>(res);
   arma::vec wres = resv/sqrt(Vfop+rpv);
   // For CPRED, CRES and CWRES
   NumericVector cpred = iprednv - dErr_dEta_i;
-  NumericVector cres = dv-cpred;
+  NumericVector cpredI(cpred.size());
+  NumericVector cres = dvTBS-cpred;
+  NumericVector cresI(cres.size());
+  for (i = cres.size(); i--;){
+    cpredI[i] = powerDi(cpred[i], lambda[i], (int)yj[i]);
+    cresI[i]  = dv[i] - cpredI[i];
+  }
   //W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
   arma::vec cresv=as<arma::vec>(cres);
   arma::vec cwres = cresv/sqrt(Vfoi+riv);
@@ -217,7 +246,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   // rp(_,0) = NumericVector(pred[0]);
   // ri(_,0) = NumericVector(ipred[0]);
 
-  NumericVector iwres=(dv-iprednv)/sqrt(ri);
+  NumericVector iwres=(dvTBS-iprednv)/sqrt(ri);
   NumericVector stat=etaLst[neta];
   unsigned int n =0, n1 = 0;
   double M1 =  0, M2 = 0, M3 = 0, M4 =0, term1, delta, delta_n, delta_n2;
@@ -242,14 +271,15 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   stat[7] = M1*sqrt((double)n)/stat[2];
   stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
   List ret(3);
-  ret[0] = DataFrame::create(_["PRED"]=prednv,
-                             _["RES"]=res,
+  // Now do inverse TBS to backtransform
+  ret[0] = DataFrame::create(_["PRED"]=prednvI,
+                             _["RES"]=resI,
                              _["WRES"]=wrap(wres),
-                             _["IPRED"]=iprednv,
-                             _["IRES"]=dv-iprednv,
+                             _["IPRED"]=iprednvI,
+                             _["IRES"]=dv-iprednvI,
                              _["IWRES"]=iwres,
-                             _["CPRED"]=cpred,
-                             _["CRES"]=cres,
+                             _["CPRED"]=cpredI,
+                             _["CRES"]=cresI,
                              _["CWRES"]=cwres);
   ret[1] = etaLst;
   ret[2] = etasDfFull;

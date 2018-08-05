@@ -33,7 +33,8 @@ extern SEXP _nlmixr_llik_neg_binomial(SEXP, SEXP);
 extern SEXP _nlmixr_chkSolvedInf(SEXP, SEXP);
 extern SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time, SEXP _evid);
 extern SEXP _nlmixr_nlmixrParameters(SEXP, SEXP);
-extern SEXP _nlmixr_nlmixrResid(SEXP, SEXP, SEXP,SEXP, SEXP);
+extern SEXP _nlmixr_nlmixrResid(SEXP, SEXP, SEXP, SEXP, SEXP, 
+				SEXP, SEXP);
 extern SEXP _nlmixr_convertEvidRate(SEXP, SEXP);
 extern SEXP _nlmixr_convertEvid(SEXP, SEXP);
 
@@ -59,7 +60,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_chkSortIDTime",(DL_FUNC) &_nlmixr_chkSortIDTime, 3},
   {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
   {"_nlmixr_nlmixrParameters", (DL_FUNC) &_nlmixr_nlmixrParameters, 2},
-  {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 5},
+  {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 7},
   {"_nlmixr_convertEvid", (DL_FUNC) &_nlmixr_convertEvid, 2},
   {"_nlmixr_convertEvidRate", (DL_FUNC) &_nlmixr_convertEvidRate, 2},
   {NULL, NULL, 0}

@@ -1,4 +1,4 @@
-calc.resid.fit <- function(fit, data, con){
+nner.cppcalc.resid.fit <- function(fit, data, con){
     etas <- random.effects(fit);
     thetas <- fixed.effects(fit);
     pars <- .Call(`_nlmixr_nlmixrParameters`, thetas, etas);

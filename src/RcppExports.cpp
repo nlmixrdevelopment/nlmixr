@@ -125,17 +125,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // nlmixrResid
-List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& dv, DataFrame etasDf, List etaLst);
-RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP dvSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
+List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& dv, NumericVector& lambda, NumericVector& yj, DataFrame etasDf, List etaLst);
+RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP dvSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List& >::type innerList(innerListSEXP);
     Rcpp::traits::input_parameter< NumericMatrix& >::type omegaMat(omegaMatSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type dv(dvSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type yj(yjSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type etasDf(etasDfSEXP);
     Rcpp::traits::input_parameter< List >::type etaLst(etaLstSEXP);
-    rcpp_result_gen = Rcpp::wrap(nlmixrResid(innerList, omegaMat, dv, etasDf, etaLst));
+    rcpp_result_gen = Rcpp::wrap(nlmixrResid(innerList, omegaMat, dv, lambda, yj, etasDf, etaLst));
     return rcpp_result_gen;
 END_RCPP
 }

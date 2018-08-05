@@ -4,13 +4,13 @@
 \alias{foceiControl}
 \title{Control Options for FOCEi}
 \usage{
-foceiControl(sigdig = 5, epsilon = NULL, maxInnerIterations = 10000,
+foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 10000,
   maxOuterIterations = 50000, n1qn1nsim = NULL, method = c("liblsoda",
   "lsoda", "dop853"), transitAbs = NULL, atol = NULL, rtol = NULL,
   maxstepsOde = 5000L, hmin = 0L, hmax = NULL, hini = 0,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("linear",
-  "locf", "nocb", "midpoint"), printInner = 0L, printOuter = 1L,
-  scaleTo = 1, scaleObjective = 1, derivEps = c(1e-05, 1e-05),
+  "locf", "nocb", "midpoint"), printInner = 0L, print = 1L, scaleTo = 1,
+  scaleObjective = 1, derivEps = c(1e-05, 1e-05),
   derivMethod = c("forward", "central"), covDerivMethod = c("central",
   "forward"), covMethod = c("r,s", "r", "s", ""), lbfgsLmm = 40L,
   lbfgsPgtol = 0, lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
@@ -46,7 +46,7 @@ optimization.}
 printed. By default this is 0 or do not print.  1 is print
 every function evaluation, 5 is print every 5 evaluations.}
 
-\item{printOuter}{Integer representing when the outer step is
+\item{print}{Integer representing when the outer step is
 printed. When this is 0 or do not print the iterations.  1 is
 print every function evaluation (default), 5 is print every 5
 evaluations.}

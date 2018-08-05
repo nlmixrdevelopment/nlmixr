@@ -433,7 +433,33 @@ constructLinCmt <- function(fun){
 ##' }
 ##'
 ##' fitAP <- foceiFit(w7, inits, mypar2,mod,pred,errAddProp,
-##'      control=foceiControl(maxOuterIterations=0,covMethod=""))g
+##'      control=foceiControl(maxOuterIterations=0,covMethod=""))
+##'
+##' ## Checking lognormal
+##'
+##' errLogn <- function(){
+##'    err <- lnorm(0.1)
+##' }
+##'
+##' ## First run the fit with the nlmixr lnorm error
+##'
+##' fitLN <- foceiFit(w7, inits, mypar2,mod,pred,errLogn,
+##'      control=foceiControl(maxOuterIterations=0,covMethod=""))
+##'
+##'
+##' ## Next run on the log-transformed space
+##' w72 <- w7; w72$DV <- log(w72$DV)
+##'
+##' predL <- function() log(ipre)
+##'
+##' fitLN2 <- foceiFit(w72, inits, mypar2,mod,predL,errAdd,
+##'      control=foceiControl(maxOuterIterations=0,covMethod=""))
+##'
+##' ## Correct the fitLN2's objective function to be on the normal scale
+##' print(fitLN2$objective + 2*sum(w72$DV))
+##'
+##' ## Note the objective function of the lognormal error is on the normal scale.
+##' print(fitLN$objective)
 ##'
 ##' mypar2 <- function ()
 ##' {
@@ -694,7 +720,7 @@ foceiFit.data.frame <- function(data,
     .etas <- .ret$ranef
     .thetas <- .ret$fixef
     .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
-    .preds <- list(ipred=RxODE::rxSolve(.ret$model$inner, .pars$ipred, .ret$dataSav,returnType="data.frame",
+    .preds <- list(ipred=RxODE::rxSolve(.ret$model$inner, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
                                         atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
                                         hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
                                         transitAbs = .ret$control$TransitAbs,
@@ -705,7 +731,7 @@ foceiFit.data.frame <- function(data,
                                        hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
                                        transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
                                        maxords = .ret$control$maxords, method=.ret$control$method));
-    .lst <- .Call(`_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, .etas, .pars$eta.lst);
+    .lst <- .Call(`_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, .preds$ipred$rxLambda, .preds$ipred$rxYj, .etas, .pars$eta.lst);
     .df <- RxODE::rxSolve(.ret$model$ebe, .pars$ipred,.ret$dataSav,returnType="data.frame",
                           hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
                           maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
