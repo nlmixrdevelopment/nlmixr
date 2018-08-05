@@ -1136,18 +1136,15 @@ nlmixrUI.rxode.pred <- function(object){
 ##' @return parameters function defined in THETA[#] and ETA[#]s.
 ##' @author Matthew L. Fidler
 nlmixrUI.theta.pars <- function(obj){
-    df <- as.data.frame(obj$ini)
-    dft <- df[!is.na(df$ntheta), ];
-    dft.fixed <- dft[dft$fix, ];
-    dft.unfixed <- dft[!dft$fix, ];
-    fixed <- with(dft.fixed, sprintf("%s=%s", name, est))
-    unfixed <- with(dft.unfixed, sprintf("%s=THETA[%d]", name, seq_along(dft.unfixed$name)))
-    eta <- df[!is.na(df$neta1), ];
-    eta <- eta[eta$neta1 == eta$neta2, ];
-    eta <- with(eta, sprintf("%s=ETA[%d]", name, eta$neta1))
-    f <- deparse(body(obj$rest))[-1]
-    f <- eval(parse(text=paste(c("function(){", unfixed, eta, fixed, f[-length(f)], "}"), collapse="\n")))
-    return(f)
+    .df <- as.data.frame(obj$ini)
+    .dft <- .df[!is.na(.df$ntheta), ];
+    .unfixed <- with(.dft, sprintf("%s=THETA[%d]", name, seq_along(.dft$name)))
+    .eta <- .df[!is.na(.df$neta1), ];
+    .eta <- .eta[.eta$neta1 == .eta$neta2, ];
+    .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
+    .f <- deparse(body(obj$rest))[-1]
+    .f <- eval(parse(text=paste(c("function(){", .unfixed, .eta, .f[-length(.f)], "}"), collapse="\n")))
+    return(.f)
 }
 ##' Get parameters that are fixed
 ##'

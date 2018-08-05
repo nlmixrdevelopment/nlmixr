@@ -40,7 +40,7 @@ is.latex <- function() {
 ##'     printed. By default this is 0 or do not print.  1 is print
 ##'     every function evaluation, 5 is print every 5 evaluations.
 ##'
-##' @param printOuter Integer representing when the outer step is
+##' @param print Integer representing when the outer step is
 ##'     printed. When this is 0 or do not print the iterations.  1 is
 ##'     print every function evaluation (default), 5 is print every 5
 ##'     evaluations.
@@ -174,7 +174,7 @@ is.latex <- function() {
 ##' @seealso \code{\link{optim}}
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @export
-foceiControl <- function(sigdig=5,
+foceiControl <- function(sigdig=4,
                          epsilon=NULL, #1e-4,
                          maxInnerIterations=10000,
                          maxOuterIterations=50000,
@@ -184,7 +184,7 @@ foceiControl <- function(sigdig=5,
                          maxstepsOde = 5000L, hmin = 0L, hmax = NULL, hini = 0, maxordn = 12L, maxords = 5L, cores,
                          covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
                          printInner=0L,
-                         printOuter=1L,
+                         print=1L,
                          scaleTo=1.0,
                          scaleObjective=1.0,
                          derivEps=c(1.0e-5, 1.0e-5),
@@ -284,7 +284,7 @@ foceiControl <- function(sigdig=5,
                  covsInterpolation=covsInterpolation,
                  n1qn1nsim=as.integer(n1qn1nsim),
                  printInner=as.integer(printInner),
-                 printOuter=as.integer(printOuter),
+                 print=as.integer(print),
                  lbfgsLmm=as.integer(lbfgsLmm),
                  lbfgsPgtol=as.double(lbfgsPgtol),
                  lbfgsFactr=as.double(lbfgsFactr),
@@ -587,7 +587,7 @@ foceiFit.data.frame <- function(data,
         if (length(.covNames) > 0){
             if (!all(.covNames %in% names(data))){
                 message("Model:")
-                RxODE::rxCat(model$pred.only)
+                RxODE::rxCat(.ret$model$pred.only)
                 message("Needed Covariates:")
                 nlmixrPrint(.covNames)
                 stop("Not all the covariates are in the dataset.")
@@ -681,6 +681,10 @@ foceiFit.data.frame <- function(data,
     names(.ret$thetaIni) <- sprintf("THETA[%d]", seq_along(.ret$thetaIni))
     .ret$etaMat <- etaMat
     .ret$setupTime <- (proc.time() - .pt)["elapsed"];
+    if (exists("uif", envir=.ret)){
+        .uif <- .ret$uif
+        .ret$logThetas <- which(setNames(sapply(.uif$focei.names,function(x)any(x==.uif$log.theta)),NULL))
+    }
     .ret <- RxODE::foceiFitCpp_(.ret);
     if (exists("noLik", envir=.ret)){
         return(.ret);
@@ -1015,6 +1019,7 @@ print.nlmixrFitCore <- function(x, ...){
         .pf <- gsub(rex::rex(capture(.regNum), "%="), "\033[1;32m\\1%\033[0m ", .pf, perl=TRUE)
         .pf <- gsub(rex::rex(capture(.regNum), "%<"), "\\1% ", .pf, perl=TRUE)
         .pf <- gsub(rex::rex(capture(or(c(row.names(x$parFixed), names(x$parFixed))))), "\033[1m\\1\033[0m", .pf, perl=TRUE);
+        .pf <- gsub(rex::rex("FIXED"), "\033[1;32mFIXED\033[0m", .pf, perl=TRUE)
     } else {
         .pf <- gsub(rex::rex(capture(.regNum), "%", or(">", "=", "<")), "\\1% ", .pf, perl=TRUE)
     }
