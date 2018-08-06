@@ -135,9 +135,11 @@ dists <- list("dpois"=1,
               "t"=1:2,
               "add"=1,
               "prop"=1,
-              "norm"=1,
-              "dnorm"=1
-              )
+              "dnorm"=1,
+              "logn"=1,
+              "dlogn"=1,
+              "lnorm"=1,
+              "dlnorm"=1)
 
 allVars <- function(x){
     defined <- character()
@@ -231,11 +233,12 @@ nlmixrfindLhs <- function(x) {
 ## dgeom is a special negative binomial; Support?
 ## fixme
 unsupported.dists <- c("dchisq", "chisq", "dexp", "df", "f", "dgeom", "geom",
-                       "dhyper", "hyper", "dlnorm", "lnorm", "dunif", "unif",
+                       "dhyper", "hyper", "dunif", "unif",
                        "dweibull", "weibull",
                        ## for testing...
                        "nlmixrDist")
 add.dists <- c("add", "prop");
+
 
 ##' Build linear solved information based on defined parameters.
 ##'
@@ -462,7 +465,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             }
         }
     }
-
     f <- function(x) {
         if (is.name(x)) {
             if (any.theta.names(as.character(x), theta.names)){
