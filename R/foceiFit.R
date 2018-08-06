@@ -748,6 +748,9 @@ foceiFit.data.frame <- function(data,
     .ret$shrink <- .lst[[2]];
     if (exists("uif", envir=.ret)){
         .uif <- .ret$uif;
+        .lab <- paste(.uif$ini$label[!is.na(.uif$ini$ntheta)]);
+        .lab[.lab == "NA"] <- "";
+        .lab <- gsub(" *$", "", gsub("^ *", "", .lab));
         .muRef <- unlist(.uif$mu.ref);
         if (length(.muRef) > 0){
             .nMuRef <- names(.muRef)
@@ -803,6 +806,9 @@ foceiFit.data.frame <- function(data,
             })
             .ret$parFixed <- data.frame(.ret$popDfSig, "BSD"=.cvp, "Shrink(SD)%"=.sh, check.names=FALSE);
             names(.ret$parFixed)[5] <- ifelse(.sdOnly, "BSV(SD)", ifelse(.cvOnly, "BSV(CV%)", "BSV(CV% or SD)"))
+            if (!all(.lab == "")){
+                .ret$parFixed <- data.frame(Parameter=.lab, .ret$parFixed, check.names=FALSE)
+            }
         } else {
             .ret$parFixed <- .ret$popDfSig
         }
@@ -1064,7 +1070,7 @@ print.nlmixrFitCore <- function(x, ...){
         .lt <- structure(.rs[.lt], .Names=.nms)
         .lt <- .lt[.lt != 0]
         .digs <- 3;
-        lts <- sapply(.lt, function(x){
+        .lts <- sapply(.lt, function(x){
             x <- abs(.lt);
             .ret <- "<"
             if (x > 0.7){
@@ -1075,7 +1081,7 @@ print.nlmixrFitCore <- function(x, ...){
             return(.ret)
         })
         .nms <- names(.lt);
-        .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), lts)
+        .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), .lts)
         names(.lt) <- .nms;
         .lt <- gsub(rex::rex("\""), "", paste0("    ", R.utils::captureOutput(print(.lt))));
         if (crayon::has_color()){
