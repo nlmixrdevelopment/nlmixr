@@ -137,8 +137,8 @@ dists <- list("dpois"=1,
               "prop"=1,
               "dnorm"=1,
               "pow"=2,
-              "tbs"=2,
-              "tbsYj"=2,
+              "tbs"=1,
+              "tbsYj"=1,
               "logn"=1,
               "dlogn"=1,
               "lnorm"=1,
@@ -240,7 +240,7 @@ unsupported.dists <- c("dchisq", "chisq", "dexp", "df", "f", "dgeom", "geom",
                        "dweibull", "weibull",
                        ## for testing...
                        "nlmixrDist")
-add.dists <- c("add", "prop");
+add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj");
 
 
 ##' Build linear solved information based on defined parameters.
@@ -527,12 +527,64 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         }
                     }
                 }
+            } else if (identical(x[[1]], quote(`~`)) && ## Arg parsing 4 should be the last....
+                       identical(x[[3]][[1]], quote(`+`)) &&
+                       identical(x[[3]][[2]][[1]], quote(`+`)) &&
+                       identical(x[[3]][[2]][[2]][[1]], quote(`+`)) &&
+                       any(as.character(x[[3]][[2]][[2]][[2]][[1]]) == c(names(dists), unsupported.dists))){
+                stop(sprintf("Only 3 distributions can be combined.\nCurrently can combine: %s",
+                             paste(add.dists, collapse=", ")));
             } else if (identical(x[[1]], quote(`~`)) &&
                        identical(x[[3]][[1]], quote(`+`)) &&
                        identical(x[[3]][[2]][[1]], quote(`+`)) &&
                        any(as.character(x[[3]][[2]][[2]][[1]]) == c(names(dists), unsupported.dists))){
-                stop(sprintf("Only 2 distributions can be combined.\nCurrently can combine: %s",
-                             paste(add.dists, collapse=", ")))
+                err1 <- as.character(x[[3]][[2]][[2]][[1]]);
+                err1.v <- as.character(x[[3]][[2]][[2]][[2]]);
+                err2 <- as.character(x[[3]][[3]][[1]]);
+                err2.v <- as.character(x[[3]][[3]][[2]]);
+                err3 <- as.character(x[[3]][[2]][[3]][[1]]);
+                err3.v <- as.character(x[[3]][[2]][[3]][[2]]);
+                if (!is.na(suppressWarnings(as.numeric(err1.v)))){
+                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
+                }
+                if (!is.na(suppressWarnings(as.numeric(err2.v)))){
+                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
+                }
+                if (!is.na(suppressWarnings(as.numeric(err3.v)))){
+                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
+                }
+                if (any(err1 == add.dists) &&
+                    any(err2 == add.dists) &&
+                    any(err3 == add.dists)){
+                    tmp <- paste(sort(c(err1, err2, err3)), collapse="+");
+                    assign("errs.specified", unique(errs.specified, tmp), this.env)
+                    if (any(do.pred == c(2, 4, 5))){
+                        return(quote(nlmixrIgnore()));
+                    }
+                    else if (any(do.pred == c(1, 4, 5))){
+                        return(bquote(nlmixr_pred <- .(x[[2]])));
+                    } else if (do.pred == 3){
+                        w <- which(bounds$name == err1.v);
+                        tmp <- bounds;
+                        tmp$err[w] <- err1;
+                        w <- which(bounds$name == err2.v);
+                        tmp$err[w] <- err2;
+                        w <- which(bounds$name == err3.v);
+                        tmp$err[w] <- err3;
+                        assign("bounds", tmp, this.env);
+                        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
+                            assign("errn", errn + 1, this.env);
+                            assign("add.prop.errs", rbind(add.prop.errs,
+                                                          data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
+                        }
+                        return(bquote(return(.(sprintf("Y%02d", errn)))));
+                    } else {
+                        return(bquote(return(.(x[[3]]))));
+                    }
+                } else {
+                    stop(sprintf("The %s, %s and %s distributions cannot be combined\nCurrently can combine: %s",
+                                 err1, err2, err3, paste(add.dists, collapse=", ")))
+                }
             } else if (identical(x[[1]], quote(`~`)) &&
                        identical(x[[3]][[1]], quote(`+`)) &&
                        length(as.character(x[[3]])) == 3  &&

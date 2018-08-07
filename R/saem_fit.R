@@ -1282,6 +1282,7 @@ focei.eta.saemFit <- function(object, uif, ...){
 }
 
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
+    .saemTime <- proc.time() - pt;
     RxODE::rxSolveFree();
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
@@ -1383,6 +1384,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                                                       transitAbs=transitAbs,
                                                       sumProd=uif$env$sum.prod)
                                  );
+    .env <- fit.f$env;
+    .env$time <- data.frame(saem=.saemTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
     return(fit.f)
 }
 

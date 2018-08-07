@@ -752,6 +752,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...){
 
 ##' @rdname as.focei
 as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
+    .nlmeTime <- proc.time() - pt;
     RxODE::rxSolveFree();
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
@@ -827,6 +828,8 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
                                                       cores=1,
                                                       ## transitAbs=transitAbs,
                                                       sumProd=uif$env$sum.prod));
+    .env <- fit.f$env;
+    .env$time <- data.frame(nlme=.nlmeTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
     ## if (fit.f$uif$.clean.dll){
     ##     nlme.cleanup(fit.f);
     ##     focei.cleanup(fit.f);
