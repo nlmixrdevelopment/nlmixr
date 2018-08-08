@@ -72,7 +72,7 @@
     .dfObs <- nobs(object);
     .nlmixrData <- nlmixr::nlmixrData(nlme::getData(object))
     .dfSub <- length(unique(.nlmixrData$ID));
-    .thetaMat <- object$cov;
+    .thetaMat <- nlme::getVarCov(object);
     return(list(rx=.newMod, params=.params, events=.nlmixrData,
                 thetaMat=.thetaMat, omega=.omega, sigma=.sigma, dfObs=.dfObs, dfSub=.dfSub))
 }

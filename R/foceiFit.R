@@ -1280,6 +1280,14 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     .env$popDf <- .fit2$popDf;
     .env$popDfSig <- .fit2$popDfSig;
     .updateParFixed(.env);
+    .parent <- parent.frame(2);
+    .bound <- do.call("c", lapply(ls(.parent), function(.cur){
+                               if (identical(.parent[[.cur]], obj)){
+                                   return(.cur)
+                               }
+                               return(NULL);
+                           }))
+    message(paste0("Updated original fit object ", ifelse(is.null(.bound), "", crayon::yellow(.bound))))
     .env$time$covariance <- (proc.time() - .pt)["elapsed"];
     return(.env$cov);
 }
