@@ -204,7 +204,76 @@ one.compartment.IV.model <- function(){
     cp ~ prop(prop.err)
    })}
 
- fitIV <- nlmixr(one.compartment.IV.model, datr, "focei");
+fitIVp <- nlmixr(one.compartment.IV.model, datr, "focei");
+
+## You can also use the Cox-Box Transform of both sides with
+## proportional error (Donse 2016)
+
+one.compartment.IV.model <- function(){
+ini({ # Where initial conditions/variables are specified
+    ## '<-' or '=' defines population parameters
+    ## Simple numeric expressions are supported
+    lCl <- 1.6      #log Cl (L/hr)
+    lVc <- log(90)  #log V (L)
+    ## Bounds may be specified by c(lower, est, upper), like NONMEM:
+    ## Residuals errors are assumed to be population parameters
+    prop.err <- c(0, 0.2, 1)
+    zeta <- c(0.1, 1, 10)
+    add.err <- c(0, 0.001)
+    lambda <- c(-2, 1, 2)
+    ## Between subject variability estimates are specified by '~'
+    ## Semicolons are optional
+    eta.Vc ~ 0.1   #IIV V
+    eta.Cl ~ 0.1; #IIV Cl
+})
+model({ ## Where the model is specified
+    ## The model uses the ini-defined variable names
+    Vc <- exp(lVc + eta.Vc)
+    Cl <- exp(lCl + eta.Cl)
+    ## RxODE-style differential equations are supported
+    d / dt(centr) = -(Cl / Vc) * centr;
+    ## Concentration is calculated
+    cp = centr / Vc;
+    ## And is assumed to follow proportional error estimated by prop.err
+    cp ~ pow(prop.err, zeta) + add(add.err) + tbs(lambda)
+})}
+
+fitIVtbs <- nlmixr(one.compartment.IV.model, datr, "focei")
+
+## If you want to use a variance normalizing distribution with
+## negative/positive data you can use the Yeo-Johnson transformation
+## as well.  This is implemented by the tbsYj(lambda) function.
+one.compartment.IV.model <- function(){
+ini({ # Where initial conditions/variables are specified
+    ## '<-' or '=' defines population parameters
+    ## Simple numeric expressions are supported
+    lCl <- 1.6      #log Cl (L/hr)
+    lVc <- log(90)  #log V (L)
+    ## Bounds may be specified by c(lower, est, upper), like NONMEM:
+    ## Residuals errors are assumed to be population parameters
+    prop.err <- c(0, 0.2, 1)
+    delta <- c(0.1, 1, 10)
+    add.err <- c(0, 0.001)
+    lambda <- c(-2, 1, 2)
+    ## Between subject variability estimates are specified by '~'
+    ## Semicolons are optional
+    eta.Vc ~ 0.1   #IIV V
+    eta.Cl ~ 0.1; #IIV Cl
+})
+model({ ## Where the model is specified
+    ## The model uses the ini-defined variable names
+    Vc <- exp(lVc + eta.Vc)
+    Cl <- exp(lCl + eta.Cl)
+    ## RxODE-style differential equations are supported
+    d / dt(centr) = -(Cl / Vc) * centr;
+    ## Concentration is calculated
+    cp = centr / Vc;
+    ## And is assumed to follow proportional error estimated by prop.err
+    cp ~ pow(prop.err, delta) + add(add.err) + tbsYj(lambda)
+})}
+
+fitIVyj <- nlmixr(one.compartment.IV.model, datr, "focei")
+
 }
 }
 \author{

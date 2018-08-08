@@ -15,6 +15,10 @@ RxODE::rxSolve
 ##' @export
 RxODE::rxClean
 
+##' @importFrom RxODE rxCat
+##' @export
+RxODE::rxCat
+
 ##' @importFrom nlme nlme
 ##' @export
 nlme::nlme
@@ -27,6 +31,10 @@ nlme::ACF
 ##' @importFrom nlme VarCorr
 ##' @export
 nlme::VarCorr
+
+##' @importFrom nlme getVarCov
+##' @export
+nlme::getVarCov
 
 
 ##' @importFrom nlme augPred

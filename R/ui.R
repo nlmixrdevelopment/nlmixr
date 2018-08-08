@@ -468,6 +468,21 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             }
         }
     }
+    .doDist <- function(distName, distArgs){
+        for (.i in seq_along(distArgs)){
+            .tmp <- suppressWarnings(as.numeric(distArgs[.i]))
+            errn <- errn + 1;
+            if (!is.na(.tmp)){
+                ## FIXME: allow numeric estimates...?
+                stop("Distribution parameters cannot be numeric, but need to be estimated.")
+            }
+            .w <- which(bounds$name == distArgs[.i]);
+            .tmp <- bounds;
+            .tmp$err[.w] <- ifelse(.i == 1, distName, paste0(distName, .i));
+            assign("bounds", .tmp, this.env)
+        }
+        return(errn)
+    }
     f <- function(x) {
         if (is.name(x)) {
             if (any.theta.names(as.character(x), theta.names)){
@@ -489,18 +504,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                     } else if (do.pred == 0){
                         dist.name <- ch.dist[1];
                         dist.args <- ch.dist[-1];
-                        for (i in seq_along(dist.args)){
-                            tmp <- suppressWarnings(as.numeric(dist.args[i]))
-                            errn <- errn + 1;
-                            if (!is.na(tmp)){
-                                ## FIXME: allow numeric estimates...?
-                                stop("Distribution parameters cannot be numeric, but need to be estimated.")
-                            }
-                            w <- which(bounds$name == dist.args[i]);
-                            tmp <- bounds;
-                            tmp$err[w] <- dist.name;
-                            assign("bounds", tmp, this.env)
-                        }
+                        errn <- .doDist(dist.name, dist.args);
                         if (any(ch.dist[1] == c("add", "norm"))){
                             assign("errn", errn + 1, this.env);
                             assign("add.prop.errs", rbind(add.prop.errs,
@@ -540,10 +544,13 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                        any(as.character(x[[3]][[2]][[2]][[1]]) == c(names(dists), unsupported.dists))){
                 err1 <- as.character(x[[3]][[2]][[2]][[1]]);
                 err1.v <- as.character(x[[3]][[2]][[2]][[2]]);
+                err1.args <- as.character(x[[3]][[2]][[2]][-1])
                 err2 <- as.character(x[[3]][[3]][[1]]);
                 err2.v <- as.character(x[[3]][[3]][[2]]);
+                err2.args <- as.character(x[[3]][[3]][-1]);
                 err3 <- as.character(x[[3]][[2]][[3]][[1]]);
                 err3.v <- as.character(x[[3]][[2]][[3]][[2]]);
+                err3.args <- as.character(x[[3]][[2]][[3]][-1]);
                 if (!is.na(suppressWarnings(as.numeric(err1.v)))){
                     stop("Distribution parameters cannot be numeric, but need to be estimated.")
                 }
@@ -564,14 +571,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                     else if (any(do.pred == c(1, 4, 5))){
                         return(bquote(nlmixr_pred <- .(x[[2]])));
                     } else if (do.pred == 3){
-                        w <- which(bounds$name == err1.v);
-                        tmp <- bounds;
-                        tmp$err[w] <- err1;
-                        w <- which(bounds$name == err2.v);
-                        tmp$err[w] <- err2;
-                        w <- which(bounds$name == err3.v);
-                        tmp$err[w] <- err3;
-                        assign("bounds", tmp, this.env);
+                        .doDist(err1, err1.args)
+                        .doDist(err2, err2.args)
+                        .doDist(err3, err3.args)
+                        tmp <- bounds
                         if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
                             assign("errn", errn + 1, this.env);
                             assign("add.prop.errs", rbind(add.prop.errs,
@@ -592,8 +595,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                        any(as.character(x[[3]][[3]][[1]]) == c(names(dists), unsupported.dists))){
                 err1 <- as.character(x[[3]][[2]][[1]]);
                 err1.v <- as.character(x[[3]][[2]][[2]])
+                err1.args <- as.character(x[[3]][[2]][-1])
                 err2 <- as.character(x[[3]][[3]][[1]]);
-                err2.v <- as.character(x[[3]][[3]][[2]])
+                err2.v <- as.character(x[[3]][[3]][[2]]);
+                err2.args <- as.character(x[[3]][[3]][-1])
                 if (!is.na(suppressWarnings(as.numeric(err1.v)))){
                     stop("Distribution parameters cannot be numeric, but need to be estimated.")
                 }
@@ -610,12 +615,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                     else if (any(do.pred == c(1, 4, 5))){
                         return(bquote(nlmixr_pred <- .(x[[2]]))) ;
                     } else if (do.pred == 3){
-                        w <- which(bounds$name == err1.v);
+                        .doDist(err1, err1.args)
+                        .doDist(err2, err2.args)
                         tmp <- bounds;
-                        tmp$err[w] <- err1;
-                        w <- which(bounds$name == err2.v);
-                        tmp$err[w] <- err2;
-                        assign("bounds", tmp, this.env);
                         if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
                             assign("errn", errn + 1, this.env);
                             assign("add.prop.errs", rbind(add.prop.errs,

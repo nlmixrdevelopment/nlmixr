@@ -31,13 +31,16 @@
 }
 
 .simInfo <- function(object){
-    .mod <- gsub("rx_pred_~", "ipred=",
-                 gsub("rx_r_~.*;", "",
-                      gsub(rex::rex("(0)~"), "(0)=",
-                           gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE))));
+    .mod <- RxODE::rxNorm(object$model$pred.only)
+    .omega <- object$omega
+    .etaN <- dimnames(.omega)[[1]]
     .params <- nlme::fixed.effects(object);
     .thetaN <- names(.params);
-    .sim <- "\nsim=ipred"
+    .newMod <- paste0(gsub(rex::rex(capture("rx_r_"), or("=", "~"), except_any_of("\n;"),any_of("\n;")), "",
+                           gsub(rex::rex(capture("rx_pred_"), or("=", "~")), "\\1~",
+                                .repThetaEta(.mod, theta=.thetaN, eta=.etaN))),
+                      "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);");
+    .sim <- "\nsim=rxTBSi(rx_pred_"
     .err <- object$uif$err;
     .w <- which(!is.na(object$uif$err))
     .mat <- diag(length(.w))
@@ -54,20 +57,22 @@
             .sim <- paste0(.sim, "+ipred*", .cur);
             .mat[.i, .i] <- .params[.ntheta] ^ 2;
             .params[.ntheta] <- NA_real_;
+        } else if (.err[.w[.i]] == "pow"){
+            .sim <- paste0(.sim, "+", .cur, "*ipred^(", object$uif$ini$name[which(object$uif$ini$err == "pow2")], ")");
+            .mat[.i, .i] <- .params[.ntheta] ^ 2;
+            .params[.ntheta] <- NA_real_;
         }
     }
     .params <- .params[!is.na(.params)]
     dimnames(.mat) <- list(.dimn, .dimn);
+    .w <- which(!(.dimn %in% names(.params)))
+    .mat <- .mat[.w, .w]
     .sigma <- .mat;
-    .mod <- paste0(.mod, "\n", .sim);
-    .omega <- object$omega
-    .etaN <- dimnames(.omega)[[1]]
-    .newMod <- .repThetaEta(.mod, theta=.thetaN, eta=.etaN);
-    .params <- .params[-.w];
+    .newMod <- paste0(.newMod, .sim, ", rx_lambda_, rx_yj_);\n");
     .dfObs <- nobs(object);
     .nlmixrData <- nlmixr::nlmixrData(nlme::getData(object))
     .dfSub <- length(unique(.nlmixrData$ID));
-    .thetaMat <- object$varFix;
+    .thetaMat <- object$cov;
     return(list(rx=.newMod, params=.params, events=.nlmixrData,
                 thetaMat=.thetaMat, omega=.omega, sigma=.sigma, dfObs=.dfObs, dfSub=.dfSub))
 }
