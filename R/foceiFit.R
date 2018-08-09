@@ -1131,6 +1131,12 @@ print.nlmixrFitCore <- function(x, ...){
                                }
                                return(NULL);
                            }))
+    if (length(.bound) == 0){
+        .bound <- ""
+    } else if (length(.bound) > 2){
+        .bound <- .bound[order(sapply(.bound, nchar))];
+        .bound <- .bound[1];
+    }
     .posthoc <- (x$control$maxOuterIterations == 0L & x$control$maxInnerIterations > 0L)
     .posthoc <- ifelse(.posthoc, paste0(crayon::bold(" posthoc"), " estimation"), " fit");
     message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),.posthoc,

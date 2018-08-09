@@ -1327,7 +1327,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
     if(is.null(.stiff)) .stiff <- 1L
     if (.stiff == 1L) .method <- "lsoda"
     if (.stiff == 0L) .method <- "dop853"
-
     transitAbs <- uif$env$ODEopt$transitAbs;
     if(is.null(transitAbs)) transitAbs<- 0L
     .env$saem <- object;

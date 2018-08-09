@@ -49,7 +49,7 @@
         .ntheta <- object$uif$ini$ntheta[.w[.i]]
         .cur <- .thetaN[.ntheta];
         .dimn[.i] <- .cur;
-        if (.err[.w[.i]] == "add"){
+        if (any(.err[.w[.i]] == c("add", "norm", "dnorm", "lnorm", "dlnorm", "logn"))){
             .sim <- paste0(.sim, "+", .cur);
             .mat[.i, .i] <- .params[.ntheta] ^ 2;
             .params[.ntheta] <- NA_real_;
@@ -66,7 +66,7 @@
     .params <- .params[!is.na(.params)]
     dimnames(.mat) <- list(.dimn, .dimn);
     .w <- which(!(.dimn %in% names(.params)))
-    .mat <- .mat[.w, .w]
+    .mat <- .mat[.w, .w, drop = FALSE]
     .sigma <- .mat;
     .newMod <- paste0(.newMod, .sim, ", rx_lambda_, rx_yj_);\n");
     .dfObs <- nobs(object);
