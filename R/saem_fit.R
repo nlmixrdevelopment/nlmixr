@@ -456,7 +456,8 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   cat(make_str, file="Makevars")
   cat(make_str)
 
-  shlib = sprintf('R CMD SHLIB %s -o %s', saem.cpp, saem.dll)
+  rexec = paste(R.home(component="bin"), .Platform$file.sep, "R", sep="")
+  shlib = sprintf('%s CMD SHLIB %s -o %s', rexec, saem.cpp, saem.dll)
   ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
   do.call("system", list(shlib))
   file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
