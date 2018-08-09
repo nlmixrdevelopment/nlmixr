@@ -1283,6 +1283,7 @@ focei.eta.saemFit <- function(object, uif, ...){
 }
 
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
+    RxODE::rxSolveFree();
     .saemTime <- proc.time() - pt;
     RxODE::rxSolveFree();
     if (class(uif) == "function"){

@@ -713,6 +713,7 @@ foceiFit.data.frame <- function(data,
                                 etaMat=NULL,
                                 ...,
                                 env=NULL){
+    on.exit({RxODE::rxSolveFree()});
     .pt <- proc.time();
     loadNamespace("n1qn1");
     if (!RxODE::rxIs(control, "foceiControl")){
