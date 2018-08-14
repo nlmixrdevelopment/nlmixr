@@ -134,8 +134,9 @@ dists <- list("dpois"=1,
               "beta"=2:3,
               "t"=1:2,
               "add"=1,
-              "prop"=1,
+              "norm"=1,
               "dnorm"=1,
+              "prop"=1,
               "pow"=2,
               "tbs"=1,
               "tbsYj"=1,
@@ -505,7 +506,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         dist.name <- ch.dist[1];
                         dist.args <- ch.dist[-1];
                         errn <- .doDist(dist.name, dist.args);
-                        if (any(ch.dist[1] == c("add", "norm"))){
+                        if (any(ch.dist[1] == c("add", "norm", "dnorm"))){
                             assign("errn", errn + 1, this.env);
                             assign("add.prop.errs", rbind(add.prop.errs,
                                                           data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=FALSE)), this.env)
@@ -575,7 +576,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         .doDist(err2, err2.args)
                         .doDist(err3, err3.args)
                         tmp <- bounds
-                        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
+                        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "dnorm") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
                             assign("errn", errn + 1, this.env);
                             assign("add.prop.errs", rbind(add.prop.errs,
                                                           data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
@@ -618,7 +619,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         .doDist(err1, err1.args)
                         .doDist(err2, err2.args)
                         tmp <- bounds;
-                        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
+                        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm") || any(paste(tmp$err) == "dnorm")) && any(paste(tmp$err) == "prop")){
                             assign("errn", errn + 1, this.env);
                             assign("add.prop.errs", rbind(add.prop.errs,
                                                           data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
@@ -1338,7 +1339,7 @@ nlmixrUI.saem.res.mod <- function(obj){
 ##' @return Names of error estimates for SAEM
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.res.name <- function(obj){
-    w <- which(obj$err == "add");
+    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm"))));
     ret <- c();
     if (length(w) == 1){
         ret[length(ret) + 1] <- paste(obj$name[w])
@@ -1356,7 +1357,7 @@ nlmixrUI.saem.res.name <- function(obj){
 ##' @return SAEM model$ares spec
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.ares <- function(obj){
-    w <- which(obj$err == "add");
+    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm"))));
     if (length(w) == 1){
         return(obj$est[w]);
     } else {

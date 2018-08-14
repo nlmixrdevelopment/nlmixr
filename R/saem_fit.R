@@ -1227,7 +1227,7 @@ focei.theta.saemFit <- function(object, uif, ...){
     }
     err <- abs(as.vector(object$sig2)) ## abs?
     err.type <- uif$focei.err.type;
-    add <- which(err.type == "add")
+    add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))))
     prop <- which(err.type == "prop")
     if (length(add) > 0){
         thetas[add] <- err[1]; ## This seems to be SD;

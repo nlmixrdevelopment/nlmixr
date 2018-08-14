@@ -733,7 +733,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...){
     err.type <- uif$focei.err.type;
     if (is(err, "varConstPower")){
         ## Addititive + proportional
-        add <- which(err.type == "add")
+        add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))))
         prop <- which(err.type == "prop")
         thetas[prop] <- object$modelStruct$varStruct$const;
         thetas[add] <- object$sigma;
@@ -743,7 +743,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...){
         thetas[prop] <- object$sigma
     } else {
         ## Additive.
-        add <- which(err.type == "add")
+        add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))))
         thetas[add] <- object$sigma
     }
     return(thetas)

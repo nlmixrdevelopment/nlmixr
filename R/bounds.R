@@ -387,7 +387,7 @@ nlmixrBounds <- function(fun){
                                 n <- n[n != "+"];
                                 stop(sprintf("%s ~ c(%s) does not have the right dimensions for a lower triangular matrix.", paste(n, collapse=" + "), paste(sapply(x[[3]][-1], as.character), collapse=", ")))
                             }
-                        } else if (any(as.character(x[[3]][[1]]) == c("add", "prop"))){
+                        } else if (any(as.character(x[[3]][[1]]) == c("add", "norm", "dnorm", "prop"))){
                             env$theta <- env$theta + 1;
                             env$nerr <- 1;
                             env$df <- rbind(env$df,

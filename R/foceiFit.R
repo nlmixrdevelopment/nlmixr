@@ -176,8 +176,8 @@ is.latex <- function() {
 ##' @export
 foceiControl <- function(sigdig=4,
                          epsilon=NULL, #1e-4,
-                         maxInnerIterations=10000,
-                         maxOuterIterations=50000,
+                         maxInnerIterations=1000,
+                         maxOuterIterations=5000,
                          n1qn1nsim=NULL,
                          method = c("liblsoda", "lsoda", "dop853"),
                          transitAbs = NULL, atol = NULL, rtol = NULL,
@@ -185,6 +185,7 @@ foceiControl <- function(sigdig=4,
                          covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
                          printInner=0L,
                          print=1L,
+                         printNcol=8L,
                          scaleTo=1.0,
                          scaleObjective=1.0,
                          derivEps=c(1.0e-5, 1.0e-5),
@@ -310,7 +311,8 @@ foceiControl <- function(sigdig=4,
                  scaleObjective=as.double(scaleObjective),
                  useColor=as.integer(useColor),
                  boundTol=as.double(boundTol),
-                 calcTables=calcTables);
+                 calcTables=calcTables,
+                 printNcol=as.integer(printNcol));
     class(.ret) <- "foceiControl"
     return(.ret);
 }
