@@ -346,7 +346,19 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 return(.ret)
             }
         } else {
-            return(fit);
+            .ret <- try(as.focei(fit, uif, pt, data=dat, calcResid=FALSE), silent=TRUE);
+            if (inherits(.ret, "try-error")){
+                warning(bad.focei)
+                return(fit)
+            } else {
+                .ret <- fix.dat(.ret);
+                .env <- .ret$env
+                assign("startTime", start.time, .env);
+                assign("est", est, .env);
+                assign("stopTime", Sys.time(), .env);
+                return(.ret)
+            }
+            return(.ret);
         }
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
         pt <- proc.time()

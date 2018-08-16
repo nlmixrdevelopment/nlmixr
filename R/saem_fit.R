@@ -1282,7 +1282,7 @@ focei.eta.saemFit <- function(object, uif, ...){
     return(ome)
 }
 
-as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
+as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE){
     RxODE::rxSolveFree();
     .saemTime <- proc.time() - pt;
     RxODE::rxSolveFree();
@@ -1358,8 +1358,21 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                                       iter=rep(1:nrow(.m), ncol(.m)));
     dimnames(.m) <- list(NULL, .allThetaNames);
     .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
-    .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
-                         crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
+    if (calcResid){
+        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
+                             crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
+    } else {
+        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
+                             crayon::blurred$italic("OBJF missing"))
+        .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
+        .env$fullTheta <- setNames(init$THTA, uif$focei.names)
+        .om0 <- .genOM(.parseOM(init$OMGA));
+        attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
+        .env$omega <- .om0;
+        .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
+        .env$noLik <- TRUE;
+        .env$objective <- NA_real_;
+    }
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
                                  PKpars=uif$theta.pars,
@@ -1383,11 +1396,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data){
                                                       rtol=rtol,
                                                       method=.method,
                                                       transitAbs=transitAbs,
-                                                      sumProd=uif$env$sum.prod)
-                                 );
+                                                      sumProd=uif$env$sum.prod));
     .env <- fit.f$env;
     .env$time <- data.frame(saem=.saemTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
-    return(fit.f)
+    return(fit.f);
 }
 
 #FIXME: coef_phi0, rmcmc, coef_sa

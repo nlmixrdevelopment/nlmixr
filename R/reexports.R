@@ -23,7 +23,6 @@ RxODE::rxCat
 ##' @export
 nlme::nlme
 
-
 ##' @importFrom nlme ACF
 ##' @export
 nlme::ACF
@@ -49,6 +48,10 @@ nlme::fixef
 ##' @export
 nlme::fixed.effects
 
+##' @rdname fixed.effects
+##' @export
+fixedEffects <- nlme::fixed.effects
+
 
 ##' @importFrom nlme ranef
 ##' @export
@@ -59,6 +62,9 @@ nlme::ranef
 nlme::random.effects
 
 
+##' @rdname random.effects
+##' @export
+randomEffects <- nlme::random.effects
 
 ##' @importFrom nlme nlmeControl
 ##' @export

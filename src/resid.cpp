@@ -79,6 +79,7 @@ List nlmixrParameters(NumericVector theta, DataFrame eta){
 
 // [[Rcpp::export]]
 List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, NumericVector &lambda, NumericVector &yj, DataFrame etasDf, List etaLst){
+  bool doCwres = (innerList.size() == 2);
   DataFrame pred = as<DataFrame>(innerList["pred"]);
   IntegerVector ID= as<IntegerVector>(pred[0]);
   IntegerVector TIME= as<IntegerVector>(pred[1]);
@@ -109,8 +110,10 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   double tc = sqrt((double)nid);
   for (j = neta;j--;){
     NumericVector cur = etaLst[j];
-    fpp(_,j) = NumericVector(pred[j]);
-    fpi(_,j) = NumericVector(ipred[j]);
+    if (doCwres){
+      fpp(_,j) = NumericVector(pred[j]);
+      fpi(_,j) = NumericVector(ipred[j]);
+    }
     // Finalize by adding shrinkage.
     om =omegaMat(j,j);
     cur[5]= (1.0-cur[1]/om)*100.0;
@@ -125,8 +128,10 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   etaLst.attr("names") = dimN2;
   etaLst.attr("row.names") = CharacterVector::create("mean","var","sd","skewness", "kurtosis","var shrinkage (%)", "sd shrinkage (%)","t statistic","p-value");
   etaLst.attr("class") = "data.frame";
-  pred.erase(0,neta);
-  ipred.erase(0,neta);
+  if (doCwres){
+    pred.erase(0,neta);
+    ipred.erase(0,neta);
+  }
   NumericVector rp = pred[0];
   arma::vec rpv = as<arma::vec>(rp);
   NumericVector ri = ipred[0];
@@ -143,70 +148,101 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
     etasDfFull[j]= cur;
     etas1(_,j)=NumericVector(etasDf1[j]);
   }
+  
   arma::mat etas = as<arma::mat>(etas1);
   arma::mat fppm = as<arma::mat>(fpp);
   arma::mat fpim = as<arma::mat>(fpi);
   arma::mat omegaMatA = as<arma::mat>(omegaMat);
-  arma::mat V_fo_p = (fppm * omegaMatA * fppm.t()); // From Mentre 2006 p. 352
-  arma::mat V_fo_i = (fpim * omegaMatA * fpim.t()); // From Mentre 2006 p. 352
-  // There seems to be a difference between how NONMEM and R/S types
-  // of software calculate WRES.  Mentre 2006 states that the
-  // Variance under the FO condition should only be diag(Vfo_full) + Sigma,
-  // but Hooker 2007 claims there is a
-  // diag(Vfo_full)+diag(dh/deta*Sigma*dh/deta).
-  // h = the additional error from the predicted function.
-  //
-  // In the nlmixr/FOCEi implemented here, the variance of the err
-  // term is 1, or Sigma is a 1 by 1 matrix with one element (1)
-  //
-  // The dh/deta term would be the sd term, or sqrt(r), which means
-  // sqrt(r)*sqrt(r)=|r|.  Since r is positive, this would be r.
-  //
-  // Also according to Hooker, WRES is calculated under the FO
-  // assumption, where eta=0, eps=0 for this r term and Vfo term.
-  // However, conditional weighted residuals are calculated under
-  // the FOCE condition for the Vfo and the FO conditions for
-  // dh/deta
-  //
-  arma::vec Vfop = V_fo_p.diag();
-  arma::vec Vfoi = V_fo_i.diag();
-  // Calculate dErr/dEta
-  NumericVector dErr_dEta_p(fppm.n_rows, NA_REAL);
+  arma::vec Vfop, Vfoi;
   NumericVector dErr_dEta_i(fppm.n_rows, NA_REAL);
-  int lastId = ID[ID.size()-1], lastCol = nid-1, lastIndex=ID.size()-1;
-  // List etaFull(neta);
-  int etaFulli = nid-1;
-  double curEta=0.0;
-  for (j = fppm.n_rows; j--; ){
-    if (lastId != ID[j]){
-      // Fill in full eta data frame
-      for (i = neta; i--;){
-	curEta = (as<NumericVector>(etasDf1[i]))[etaFulli];
-	NumericVector cur = etasDfFull[i];
-	std::fill_n(cur.begin()+j+1,lastIndex-j,curEta);
-      }
-      etaFulli--;
-      // FIXME do it without copy?
-      arma::vec tmp = fppm.rows(j+1, lastIndex) * trans(etas.row(lastCol));
-      std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin()+j+1);
-      tmp = fpim.rows(j+1, lastIndex) * trans(etas.row(lastCol));
-      std::copy(tmp.begin(),tmp.end(),dErr_dEta_i.begin()+j+1);
-      lastId=ID[j];
-      lastIndex=j;
-      lastCol--;
-      if (lastCol == 0){
-	// Finalize ETA
+  if (!doCwres){
+    int lastId = ID[ID.size()-1], lastCol = nid-1, lastIndex=ID.size()-1;
+    int etaFulli = nid-1;
+    double curEta=0.0;
+    for (j = fppm.n_rows; j--; ){
+      if (lastId != ID[j]){
+        // Fill in full eta data frame
         for (i = neta; i--;){
-	  curEta = (as<NumericVector>(etasDf1[i]))[0];
-	  NumericVector cur = etasDfFull[i];
-	  std::fill_n(cur.begin(),lastIndex+1,curEta);
-	}
-	// Finalize dErr_dEta
-	arma::vec tmp = fppm.rows(0, lastIndex) * trans(etas.row(lastCol));
-        std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin());
-        tmp = fpim.rows(0, lastIndex) * trans(etas.row(lastCol));
-        std::copy(tmp.begin(),tmp.end(),dErr_dEta_i.begin());
-	break;
+          curEta = (as<NumericVector>(etasDf1[i]))[etaFulli];
+          NumericVector cur = etasDfFull[i];
+          std::fill_n(cur.begin()+j+1,lastIndex-j,curEta);
+        }
+        etaFulli--;
+        lastId=ID[j];
+        lastIndex=j;
+        lastCol--;
+        if (lastCol == 0){
+          // Finalize ETA
+          for (i = neta; i--;){
+            curEta = (as<NumericVector>(etasDf1[i]))[0];
+            NumericVector cur = etasDfFull[i];
+            std::fill_n(cur.begin(),lastIndex+1,curEta);
+          }
+          break;
+        }
+      }
+    }
+  } else {
+    arma::mat V_fo_p = (fppm * omegaMatA * fppm.t()); // From Mentre 2006 p. 352
+    arma::mat V_fo_i = (fpim * omegaMatA * fpim.t()); // From Mentre 2006 p. 352
+    // There seems to be a difference between how NONMEM and R/S types
+    // of software calculate WRES.  Mentre 2006 states that the
+    // Variance under the FO condition should only be diag(Vfo_full) + Sigma,
+    // but Hooker 2007 claims there is a
+    // diag(Vfo_full)+diag(dh/deta*Sigma*dh/deta).
+    // h = the additional error from the predicted function.
+    //
+    // In the nlmixr/FOCEi implemented here, the variance of the err
+    // term is 1, or Sigma is a 1 by 1 matrix with one element (1)
+    //
+    // The dh/deta term would be the sd term, or sqrt(r), which means
+    // sqrt(r)*sqrt(r)=|r|.  Since r is positive, this would be r.
+    //
+    // Also according to Hooker, WRES is calculated under the FO
+    // assumption, where eta=0, eps=0 for this r term and Vfo term.
+    // However, conditional weighted residuals are calculated under
+    // the FOCE condition for the Vfo and the FO conditions for
+    // dh/deta
+    //
+    Vfop = V_fo_p.diag();
+    Vfoi = V_fo_i.diag();
+    // Calculate dErr/dEta
+    NumericVector dErr_dEta_p(fppm.n_rows, NA_REAL);
+    int lastId = ID[ID.size()-1], lastCol = nid-1, lastIndex=ID.size()-1;
+    // List etaFull(neta);
+    int etaFulli = nid-1;
+    double curEta=0.0;
+    for (j = fppm.n_rows; j--; ){
+      if (lastId != ID[j]){
+        // Fill in full eta data frame
+        for (i = neta; i--;){
+          curEta = (as<NumericVector>(etasDf1[i]))[etaFulli];
+          NumericVector cur = etasDfFull[i];
+          std::fill_n(cur.begin()+j+1,lastIndex-j,curEta);
+        }
+        etaFulli--;
+        // FIXME do it without copy?
+        arma::vec tmp = fppm.rows(j+1, lastIndex) * trans(etas.row(lastCol));
+        std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin()+j+1);
+        tmp = fpim.rows(j+1, lastIndex) * trans(etas.row(lastCol));
+        std::copy(tmp.begin(),tmp.end(),dErr_dEta_i.begin()+j+1);
+        lastId=ID[j];
+        lastIndex=j;
+        lastCol--;
+        if (lastCol == 0){
+          // Finalize ETA
+          for (i = neta; i--;){
+            curEta = (as<NumericVector>(etasDf1[i]))[0];
+            NumericVector cur = etasDfFull[i];
+            std::fill_n(cur.begin(),lastIndex+1,curEta);
+          }
+          // Finalize dErr_dEta
+          arma::vec tmp = fppm.rows(0, lastIndex) * trans(etas.row(lastCol));
+          std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin());
+          tmp = fpim.rows(0, lastIndex) * trans(etas.row(lastCol));
+          std::copy(tmp.begin(),tmp.end(),dErr_dEta_i.begin());
+          break;
+        }
       }
     }
   }
@@ -215,19 +251,23 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   NumericVector resI = dv-prednvI;
   NumericVector res = dvTBS-prednv;
   arma::vec resv = as<arma::vec>(res);
-  arma::vec wres = resv/sqrt(Vfop+rpv);
-  // For CPRED, CRES and CWRES
-  NumericVector cpred = iprednv - dErr_dEta_i;
-  NumericVector cpredI(cpred.size());
-  NumericVector cres = dvTBS-cpred;
-  NumericVector cresI(cres.size());
-  for (i = cres.size(); i--;){
-    cpredI[i] = powerDi(cpred[i], lambda[i], (int)yj[i]);
-    cresI[i]  = dv[i] - cpredI[i];
+  arma::vec wres, cwres;
+  NumericVector cpredI, cresI, cres, cpred;
+  if (doCwres){
+    wres = resv/sqrt(Vfop+rpv);
+    // For CPRED, CRES and CWRES
+    cpred = iprednv - dErr_dEta_i;
+    cpredI = NumericVector(cpred.size());
+    cres = dvTBS-cpred;
+    cresI = NumericVector(cres.size());
+    for (i = cres.size(); i--;){
+      cpredI[i] = powerDi(cpred[i], lambda[i], (int)yj[i]);
+      cresI[i]  = dv[i] - cpredI[i];
+    }
+    //W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
+    arma::vec cresv=as<arma::vec>(cres);
+    cwres = cresv/sqrt(Vfoi+riv);
   }
-  //W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
-  arma::vec cresv=as<arma::vec>(cres);
-  arma::vec cwres = cresv/sqrt(Vfoi+riv);
   // e["Vfo"] = wrap(Vfo);
   // e["dErr_dEta"] = wrap(dErr_dEta);
   // W <- fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi")
@@ -272,15 +312,23 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
   List ret(3);
   // Now do inverse TBS to backtransform
-  ret[0] = DataFrame::create(_["PRED"]=prednvI,
-                             _["RES"]=resI,
-                             _["WRES"]=wrap(wres),
-                             _["IPRED"]=iprednvI,
-                             _["IRES"]=dv-iprednvI,
-                             _["IWRES"]=iwres,
-                             _["CPRED"]=cpredI,
-                             _["CRES"]=cresI,
-                             _["CWRES"]=cwres);
+  if (doCwres){
+    ret[0] = DataFrame::create(_["PRED"]=prednvI,
+			       _["RES"]=resI,
+			       _["WRES"]=wrap(wres),
+			       _["IPRED"]=iprednvI,
+			       _["IRES"]=dv-iprednvI,
+			       _["IWRES"]=iwres,
+			       _["CPRED"]=cpredI,
+			       _["CRES"]=cresI,
+			       _["CWRES"]=cwres);
+  } else {
+    ret[0] = DataFrame::create(_["PRED"]=prednvI,
+                               _["RES"]=resI,
+                               _["IPRED"]=iprednvI,
+                               _["IRES"]=dv-iprednvI,
+                               _["IWRES"]=iwres);
+  }
   ret[1] = etaLst;
   ret[2] = etasDfFull;
   return ret;

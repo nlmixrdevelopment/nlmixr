@@ -174,7 +174,7 @@ is.latex <- function() {
 ##' @seealso \code{\link{optim}}
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @export
-foceiControl <- function(sigdig=4,
+foceiControl <- function(sigdig=5,
                          epsilon=NULL, #1e-4,
                          maxInnerIterations=1000,
                          maxOuterIterations=5000,
@@ -189,10 +189,10 @@ foceiControl <- function(sigdig=4,
                          scaleTo=1.0,
                          scaleObjective=1.0,
                          derivEps=c(1.0e-5, 1.0e-5),
-                         derivMethod=c("forward", "central"),
-                         covDerivMethod=c("forward", "central"),
+                         derivMethod=c("central", "forward"),
+                         covDerivMethod=c("central", "forward"),
                          covMethod=c("r,s", "r", "s", ""),
-                         lbfgsLmm=40L,
+                         lbfgsLmm=50L,
                          lbfgsPgtol=0,
                          lbfgsFactr=NULL, #1e-4 / .Machine$double.eps, ## .Machine$double.eps*x=1e-5
                          eigen=TRUE,
@@ -777,7 +777,39 @@ foceiFit.data.frame <- function(data,
         }
         .extraPars <- .ret$model$extra.pars
     } else {
-        .extraPars <- NULL;
+        if (.ret$noLik){
+            .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
+                                                  pred.minus.dv=TRUE, sum.prod=control$sumProd,
+                                                  theta.derivs=FALSE, optExpression=control$optExpression, run.internal=TRUE,
+                                                  only.numeric=TRUE);
+            .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
+            .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
+            colnames(data) <- sapply(names(data), function(x){
+                if (any(x == .covNames)){
+                    return(x)
+                } else {
+                    return(toupper(x))
+                }
+            })
+            .lhs <- c(names(RxODE::rxInits(.ret$model$pred.only)), RxODE::rxLhs(.ret$model$pred.only))
+            if (length(.lhs) > 0){
+                .covNames <- .covNames[regexpr(rex::rex(start, or(.lhs), end), .covNames) == -1];
+            }
+            if (length(.covNames) > 0){
+                if (!all(.covNames %in% names(data))){
+                    message("Model:")
+                    RxODE::rxCat(.ret$model$pred.only)
+                    message("Needed Covariates:")
+                    nlmixrPrint(.covNames)
+                    stop("Not all the covariates are in the dataset.")
+                }
+                message("Needed Covariates:")
+                print(.covNames);
+            }
+            .extraPars <- .ret$model$extra.pars
+        } else {
+            .extraPars <- NULL;
+        }
     }
     .ret$skipCov <- skipCov;
     if (is.null(skipCov)){
@@ -874,30 +906,60 @@ foceiFit.data.frame <- function(data,
         .ret$logThetas <- which(setNames(sapply(.uif$focei.names,function(x)any(x==.uif$log.theta)),NULL))
     }
     .ret <- RxODE::foceiFitCpp_(.ret);
-    if (exists("noLik", envir=.ret) | !control$calcTables){
+    if (!control$calcTables){
         return(.ret);
     }
-    message("Calculating residuals/tables")
-    .pt <- proc.time();
-    .etas <- .ret$ranef
-    .thetas <- .ret$fixef
-    .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
-    .preds <- list(ipred=RxODE::rxSolve(.ret$model$inner, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
-                                        atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
-                                        hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                                        transitAbs = .ret$control$TransitAbs,
-                                        maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                                        method=.ret$control$method),
-                   pred=RxODE::rxSolve(.ret$model$inner, .pars$pred, .ret$dataSav, returnType="data.frame",
-                                       atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
-                                       hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                                       transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
-                                       maxords = .ret$control$maxords, method=.ret$control$method));
+    if (exists("noLik", envir=.ret)){
+        if (.ret$noLik){
+            message("Calculating residuals/tables")
+            .pt <- proc.time();
+            .etas <- .ret$ranef
+            .thetas <- .ret$fixef
+            .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
+            .preds <- list(ipred=RxODE::rxSolve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
+                                                atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                                hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                                                transitAbs = .ret$control$TransitAbs,
+                                                maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                                                method=.ret$control$method),
+                           pred=RxODE::rxSolve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
+                                               atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                               hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                                               transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
+                                               maxords = .ret$control$maxords, method=.ret$control$method),
+                           cwres=FALSE);
+            assign(".preds", .preds, globalenv());
+            assign("data", data, globalenv())
+        } else {
+            return(.ret);
+        }
+    } else{
+        message("Calculating residuals/tables")
+        .pt <- proc.time();
+        .etas <- .ret$ranef
+        .thetas <- .ret$fixef
+        .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
+        .preds <- list(ipred=RxODE::rxSolve(.ret$model$inner, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
+                                            atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                            hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                                            transitAbs = .ret$control$TransitAbs,
+                                            maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                                            method=.ret$control$method),
+                       pred=RxODE::rxSolve(.ret$model$inner, .pars$pred, .ret$dataSav, returnType="data.frame",
+                                           atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                           hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                                           transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
+                                           maxords = .ret$control$maxords, method=.ret$control$method));
+    }
     .lst <- .Call(`_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, .preds$ipred$rxLambda, .preds$ipred$rxYj, .etas, .pars$eta.lst);
-    .df <- RxODE::rxSolve(.ret$model$ebe, .pars$ipred,.ret$dataSav,returnType="data.frame",
-                          hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
-                          maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                          Method=.ret$control$method)[, -(1:2)];
+    if (is.null(.preds$cwres)){
+        .df <- RxODE::rxSolve(.ret$model$pred.only, .pars$ipred,.ret$dataSav,returnType="data.frame",
+                              hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
+                              maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                              Method=.ret$control$method)[, -(1:4)];
+    } else {
+        .df <- .preds$ipred[, -c(1:4, length(names(.preds$ipred)) - 0:1), drop = FALSE];
+    }
     .df <- .df[, !(names(.df) %in% c("nlmixr_pred", names(.etas), names(.thetas)))]
     if (any(names(.df) %in% names(.lst[[1]]))){
         warning("Calculated residuals like IPRED are masked by nlmixr calculated values");
@@ -928,6 +990,10 @@ foceiFit.data.frame <- function(data,
     message("done.")
     return(.df)
 }
+
+##' @rdname foceiFit
+##' @export
+focei.fit <- foceiFit
 
 ##' @export
 `$.nlmixrFitData` <-  function(obj, arg, exact = FALSE){
