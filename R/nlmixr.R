@@ -589,3 +589,22 @@ saemControl <- function(seed=99,
     .ret[["covMethod"]] <- match.arg(covMethod);
     .ret
 }
+
+##' Add CWRES
+##'
+##' This returns a new fit object with CWRES attached
+##'
+##' @param fit nlmixr fit without WRES/CWRES
+##' @return fit with CWRES
+##' @author Matthew L. Fidler
+addCwres <- function(fit){
+    if(any(names(fit) == "CWRES")){
+        warning("Already contains CWRES");
+        return(fit)
+    }
+    .uif <- fit$uif;
+    .saem <- fit$saem
+    if (!is.null(.saem)){
+        return(as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE))
+    }
+}

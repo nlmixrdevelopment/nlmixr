@@ -3,6 +3,8 @@
 \name{foceiFit}
 \alias{foceiFit}
 \alias{foceiFit.data.frame}
+\alias{foceiFit.data.frame}
+\alias{focei.fit}
 \title{FOCEi fit}
 \usage{
 foceiFit(data, ...)
@@ -11,6 +13,13 @@ foceiFit(data, ...)
   pred = NULL, err = NULL, lower = -Inf, upper = Inf, fixed = NULL,
   skipCov = NULL, control = foceiControl(), thetaNames = NULL,
   etaNames = NULL, etaMat = NULL, ..., env = NULL)
+
+\method{foceiFit}{data.frame}(data, inits, PKpars, model = NULL,
+  pred = NULL, err = NULL, lower = -Inf, upper = Inf, fixed = NULL,
+  skipCov = NULL, control = foceiControl(), thetaNames = NULL,
+  etaNames = NULL, etaMat = NULL, ..., env = NULL)
+
+focei.fit(data, ...)
 }
 \arguments{
 \item{data}{Data to fit; Needs to be RxODE compatible and have \code{DV},
