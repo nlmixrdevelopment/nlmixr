@@ -35,6 +35,7 @@ extern SEXP _nlmixr_chkSortIDTime(SEXP _id,SEXP _time, SEXP _evid);
 extern SEXP _nlmixr_nlmixrParameters(SEXP, SEXP);
 extern SEXP _nlmixr_nlmixrResid(SEXP, SEXP, SEXP, SEXP, SEXP, 
 				SEXP, SEXP);
+extern SEXP _nlmixr_nlmixrShrink(SEXP, SEXP, SEXP);
 extern SEXP _nlmixr_convertEvidRate(SEXP, SEXP);
 extern SEXP _nlmixr_convertEvid(SEXP, SEXP);
 
@@ -61,6 +62,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
   {"_nlmixr_nlmixrParameters", (DL_FUNC) &_nlmixr_nlmixrParameters, 2},
   {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 7},
+  {"_nlmixr_nlmixrShrink", (DL_FUNC) &_nlmixr_nlmixrShrink, 3},
   {"_nlmixr_convertEvid", (DL_FUNC) &_nlmixr_convertEvid, 2},
   {"_nlmixr_convertEvidRate", (DL_FUNC) &_nlmixr_convertEvidRate, 2},
   {NULL, NULL, 0}

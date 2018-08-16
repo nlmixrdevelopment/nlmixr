@@ -597,6 +597,7 @@ saemControl <- function(seed=99,
 ##' @param fit nlmixr fit without WRES/CWRES
 ##' @return fit with CWRES
 ##' @author Matthew L. Fidler
+##' @export
 addCwres <- function(fit){
     if(any(names(fit) == "CWRES")){
         warning("Already contains CWRES");

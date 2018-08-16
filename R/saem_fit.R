@@ -1358,7 +1358,18 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
                                       iter=rep(1:nrow(.m), ncol(.m)));
     dimnames(.m) <- list(NULL, .allThetaNames);
     .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
-    if (calcResid){
+    if (is.na(calcResid)){
+        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
+                             crayon::blurred$italic("OBJF missing"))
+        .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
+        .env$fullTheta <- setNames(init$THTA, uif$focei.names)
+        .om0 <- .genOM(.parseOM(init$OMGA));
+        attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
+        .env$omega <- .om0;
+        .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
+        .env$noLik <- FALSE;
+        .env$objective <- NA_real_;
+    } else if (calcResid){
         .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
                              crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
     } else {
@@ -1398,7 +1409,11 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
                                                       transitAbs=transitAbs,
                                                       sumProd=uif$env$sum.prod));
     .env <- fit.f$env;
-    .env$time <- data.frame(saem=.saemTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
+    if (is.null(.env$time)){
+        .env$time <- data.frame(saem=.saemTime["elapsed"], check.names=FALSE, row.names=c(""));
+    } else {
+        .env$time <- data.frame(saem=.saemTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
+    }
     return(fit.f);
 }
 

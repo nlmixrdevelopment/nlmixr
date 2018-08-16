@@ -124,6 +124,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrShrink
+List nlmixrShrink(NumericMatrix& omegaMat, DataFrame etasDf, List etaLst);
+RcppExport SEXP _nlmixr_nlmixrShrink(SEXP omegaMatSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix& >::type omegaMat(omegaMatSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type etasDf(etasDfSEXP);
+    Rcpp::traits::input_parameter< List >::type etaLst(etaLstSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrShrink(omegaMat, etasDf, etaLst));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nlmixrResid
 List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& dv, NumericVector& lambda, NumericVector& yj, DataFrame etasDf, List etaLst);
 RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP dvSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {

@@ -174,7 +174,7 @@ is.latex <- function() {
 ##' @seealso \code{\link{optim}}
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @export
-foceiControl <- function(sigdig=5,
+foceiControl <- function(sigdig=4,
                          epsilon=NULL, #1e-4,
                          maxInnerIterations=1000,
                          maxOuterIterations=5000,
@@ -663,6 +663,7 @@ foceiFit.data.frame <- function(...){
                     if (any(x == .errs)){
                         .v <- .shrink[7, "IWRES"];
                         if (length(.v) != 0) return(" ")
+                        if (is.null(.v)) return(" ")
                         if (is.na(.v)){
                             return(" ")
                         }
@@ -745,11 +746,11 @@ foceiFit.data.frame <- function(data,
     if (is.null(err)){
         err <-eval(parse(text=paste0("function(){err",paste(inits$ERROR[[1]],collapse=""),"}")));
     }
+    .covNames <- .parNames <- c();
     if (!exists("noLik", envir=.ret)){
         .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
                                               pred.minus.dv=TRUE, sum.prod=control$sumProd,
                                               theta.derivs=FALSE, optExpression=control$optExpression, run.internal=TRUE);
-
 
         .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
         .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
@@ -905,6 +906,14 @@ foceiFit.data.frame <- function(data,
         .uif <- .ret$uif
         .ret$logThetas <- which(setNames(sapply(.uif$focei.names,function(x)any(x==.uif$log.theta)),NULL))
     }
+    if (exists("noLik", envir=.ret)){
+        if (!.ret$noLik){
+            .ret$.params <- c(sprintf("THETA[%d]", seq_along(.ret$thetaIni)),
+                              sprintf("ETA[%d]", seq(1, dim(.om0)[1])));
+            .ret$.thetan <- length(.ret$thetaIni);
+            .ret$nobs <- sum(data$EVID == 0)
+        }
+    }
     .ret <- RxODE::foceiFitCpp_(.ret);
     if (!control$calcTables){
         return(.ret);
@@ -928,9 +937,13 @@ foceiFit.data.frame <- function(data,
                                                transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
                                                maxords = .ret$control$maxords, method=.ret$control$method),
                            cwres=FALSE);
-            assign(".preds", .preds, globalenv());
-            assign("data", data, globalenv())
         } else {
+            .pt <- proc.time();
+            .etas <- .ret$ranef
+            .thetas <- .ret$fixef
+            .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
+            .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)]);
+            .updateParFixed(.ret);
             return(.ret);
         }
     } else{

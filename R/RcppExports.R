@@ -37,6 +37,10 @@ nlmixrParameters <- function(theta, eta) {
     .Call(`_nlmixr_nlmixrParameters`, theta, eta)
 }
 
+nlmixrShrink <- function(omegaMat, etasDf, etaLst) {
+    .Call(`_nlmixr_nlmixrShrink`, omegaMat, etasDf, etaLst)
+}
+
 nlmixrResid <- function(innerList, omegaMat, dv, lambda, yj, etasDf, etaLst) {
     .Call(`_nlmixr_nlmixrResid`, innerList, omegaMat, dv, lambda, yj, etasDf, etaLst)
 }

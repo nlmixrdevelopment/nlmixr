@@ -4,7 +4,7 @@
 \alias{foceiControl}
 \title{Control Options for FOCEi}
 \usage{
-foceiControl(sigdig = 5, epsilon = NULL, maxInnerIterations = 1000,
+foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 1000,
   maxOuterIterations = 5000, n1qn1nsim = NULL, method = c("liblsoda",
   "lsoda", "dop853"), transitAbs = NULL, atol = NULL, rtol = NULL,
   maxstepsOde = 5000L, hmin = 0L, hmax = NULL, hini = 0,
