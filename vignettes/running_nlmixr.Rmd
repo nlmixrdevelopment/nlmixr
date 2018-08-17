@@ -52,7 +52,7 @@ one.cmt <- function() {
 We can now run the model...
 
 ```{r}
-fit <- nlmixr(one.cmt, theo_sd, est="nlme", calc.resid=FALSE)
+fit <- nlmixr(one.cmt, theo_sd, est="nlme", calc.resid=NA)
 print(fit)
 ```
 

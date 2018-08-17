@@ -669,4 +669,9 @@ addCwres <- function(fit){
     if (!is.null(.saem)){
         return(as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE))
     }
+
+    .nlme <- fit$nlme
+    if (!is.null(.nlme)){
+        return(as.focei(.nlme, .uif, data=getData(fit), calcResid = TRUE))
+    }
 }
