@@ -1227,7 +1227,7 @@ focei.theta.saemFit <- function(object, uif, ...){
     }
     err <- abs(as.vector(object$sig2)) ## abs?
     err.type <- uif$focei.err.type;
-    add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois"))))
+    add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois", "binom", "dbinom"))))
     prop <- which(err.type == "prop")
     if (length(add) > 0){
         thetas[add] <- err[1]; ## This seems to be SD;
@@ -1288,8 +1288,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
     }
+    .dist <- ""
     if (any(uif$saem.distribution == c("poisson", "binomial"))){
         calcResid <- NA;
+        .dist <- uif$saem.distribution;
     }
     uif.new <- uif;
     fit <- object;
@@ -1362,7 +1364,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     dimnames(.m) <- list(NULL, .allThetaNames);
     .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
     if (is.na(calcResid)){
-        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
+        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
+                             " ",crayon::bold$blue(uif$saem.distribution), "); ",
                              crayon::blurred$italic("OBJF missing"))
         .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
         .env$fullTheta <- setNames(init$THTA, uif$focei.names)
@@ -1376,8 +1379,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
                              crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
     } else {
-        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
-                             crayon::blurred$italic("OBJF missing"))
+        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF missing"))
         .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
         .env$fullTheta <- setNames(init$THTA, uif$focei.names)
         .om0 <- .genOM(.parseOM(init$OMGA));

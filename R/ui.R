@@ -120,7 +120,7 @@ print.nlmixrUI <- function(x, ...){
 
 ## This is a list of supported distributions with the number of arguments they currently support.
 dists <- list("dpois"=1,
-              "dbinom"=2,
+              "dbinom"=1:2,
               "dbeta"=2:3,
               ##
               ## "dnbinom"=2:3,  ## dnbinom is in R; FIXME: how does ot compare to dneg_binomial
@@ -130,7 +130,7 @@ dists <- list("dpois"=1,
               ## "dbetabinomial", ## not in base R (but in glnmm2)
               "dt"=1:2,
               "pois"=1,
-              "binom"=2,
+              "binom"=1:2,
               "beta"=2:3,
               "t"=1:2,
               "add"=1,
@@ -1360,7 +1360,7 @@ nlmixrUI.saem.res.mod <- function(obj){
 ##' @return Names of error estimates for SAEM
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.res.name <- function(obj){
-    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "pois", "dpois"))));
+    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "pois", "dpois", "binom", "dbinom"))));
     ret <- c();
     if (length(w) == 1){
         ret[length(ret) + 1] <- paste(obj$name[w])

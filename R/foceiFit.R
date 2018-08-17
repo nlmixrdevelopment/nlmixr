@@ -1240,7 +1240,10 @@ print.nlmixrFitCore <- function(x, ...){
         .pf <- gsub(rex::rex(capture(.regNum), "%="), "\033[1;32m\\1%\033[0m ", .pf, perl=TRUE)
         .pf <- gsub(rex::rex(capture(.regNum), "="), "\033[1;32m\\1\033[0m ", .pf, perl=TRUE)
         .pf <- gsub(rex::rex(capture(.regNum), "%<"), "\\1% ", .pf, perl=TRUE)
-        .pf <- gsub(rex::rex(capture(or(c(row.names(x$parFixed), names(x$parFixed))))), "\033[1m\\1\033[0m", .pf, perl=TRUE);
+        .tmp <- c(row.names(x$parFixed), names(x$parFixed))
+        .tmp <- .tmp[order(-sapply(.tmp, nchar))]
+        .pf <- gsub(rex::rex(boundary,capture(or(.tmp)), boundary), "\033[1m\\1\033[0m", .pf, perl=TRUE);
+        .pf <- gsub(rex::rex(capture(or(.tmp))), "\033[1m\\1\033[0m", .pf, perl=TRUE);
         .pf <- gsub(rex::rex("FIXED"), "\033[1;32mFIXED\033[0m", .pf, perl=TRUE)
     } else {
         .pf <- gsub(rex::rex(capture(.regNum), "%", or(">", "=", "<")), "\\1% ", .pf, perl=TRUE)
