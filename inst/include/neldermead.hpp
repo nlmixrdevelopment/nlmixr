@@ -45,9 +45,12 @@ void obj(double *ab, double *fx)
 {
 	int i;
 	double g, sum;
+    double xmin = 1.0e-200;
 
 	for (i=0, sum=0; i<len; ++i) {
-		g = fabs(ab[0] + ab[1]*fptr[i]);
+        // nelder_() does not allow lower bounds; we force ab[] be positive here
+		g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
+		if (g < xmin) g = xmin;
 		sum += pow((yptr[i]-fptr[i])/g, 2.0) + 2*log(g);
 	}
 
