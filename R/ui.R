@@ -1221,7 +1221,7 @@ nlmixrUI.saem.distribution <- function(obj){
     if (any(.df %in% c("dbinom", "binom"))){
         return("binomial");
     }
-    if (any(.df %in% c("dnorm", "norm"))) return("normal");
+    if (any(.df %in% c("dnorm", "norm", "prop", "add"))) return("normal");
     stop("Distribution unsupported by SAEM");
 }
 ##' Get parameters that are fixed

@@ -751,7 +751,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...){
 
 
 ##' @rdname as.focei
-as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
+as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE){
     RxODE::rxSolveFree();
     .nlmeTime <- proc.time() - pt;
     RxODE::rxSolveFree();
@@ -809,6 +809,30 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
     env$extra <- paste0(" by ", crayon::bold$yellow(ifelse(object$method == "REML", "REML", "maximum likelihood"))," (",
                          crayon::italic(paste0(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"),
                                                "; ", .text)), ")")
+    if (is.na(calcResid)){
+        env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
+        env$fullTheta <- setNames(init$THTA, uif$focei.names)
+        .om0 <- .genOM(.parseOM(init$OMGA));
+        attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
+        env$omega <- .om0;
+        env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
+        env$noLik <- FALSE;
+        env$objective <- -2 * as.numeric(logLik(object));
+        env$objectiveType <- "nlme";
+        if (object$method == "REML") env$objectiveType <- "nlmeREML";
+    } else if (!calcResid){
+        env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
+        env$fullTheta <- setNames(init$THTA, uif$focei.names)
+        .om0 <- .genOM(.parseOM(init$OMGA));
+        attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
+        env$omega <- .om0;
+        env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
+        env$noLik <- TRUE;
+        env$objective <- -2 * as.numeric(logLik(object));
+        env$objectiveType <- "nlme";
+        if (object$method == "REML") env$objectiveType <- "nlmeREML";
+        env$extra <- paste(env$extra, "nlme OBF")
+    }
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
                                  PKpars=uif$theta.pars,
@@ -829,6 +853,18 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data){
                                                       cores=1,
                                                       ## transitAbs=transitAbs,
                                                       sumProd=uif$env$sum.prod));
+    if (is.na(calcResid)){
+        row.names(env$objDf) <- "nlme";
+    } else if (!calcResid){
+        row.names(env$objDf) <- "nlme";
+    } else {
+        .tmp <- data.frame(OBJF=-2 * as.numeric(logLik(object)), AIC=AIC(object), BIC=BIC(object),
+                           "Log-likelihood"=as.numeric(logLik(object)), check.names=FALSE);
+        if (any(names(env$objDf) == "Condition Number")) .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
+        env$objDf  <- rbind(env$objDf,
+                            .tmp)
+        row.names(env$objDf) <- c("FOCEi", "nlme");
+    }
     .env <- fit.f$env;
     .env$time <- data.frame(nlme=.nlmeTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
     ## if (fit.f$uif$.clean.dll){
