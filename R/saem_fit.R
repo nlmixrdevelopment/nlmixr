@@ -68,6 +68,7 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
   vec id = evt.col(0);
   mat wm;
   vec wv;
+  int DEBUG = opt["DEBUG"];
 
   ix = find(evt.col(2) == 0);
   vec yp(ix.n_elem);
@@ -87,6 +88,9 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
     wv = wm.col(2);
     ivec evid(ntime);
     for (int k=0; k<ntime; ++k) evid(k) = wv(k);
+    wv = wm.col(4);
+    ivec cmt(ntime);
+    for (int k=0; k<ntime; ++k) cmt(k) = wv(k);
     vec amt;
     amt = wm.col(3);
     amt = amt( find(evid > 0) );
@@ -109,25 +113,58 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
 
     mat ret(neq, ntime);
     mat lhs(nlhs, ntime);
+
 	<%=ode_solver%>(&neq, params.memptr(), time__.memptr(),
 	    evid.memptr(), &ntime, inits.memptr(), amt.memptr(), ret.memptr(),
 	    &atol, &rtol, &stiff, &transit_abs, &nlhs, lhs.memptr(), &rc);
+
+    if ( DEBUG > 3 || (DEBUG > 2 && rc != 0) ) {
+        Rcout << "pars: " << params.t();
+        Rcout << "inits: " << inits.t();
+        Rcout << "LSODA return code: " << rc << endl;
+    }
 	ret = join_cols(join_cols(time__.t(), ret), lhs).t();
-	ret = ret.rows( find(evid == 0) );
+    if (DEBUG>3) {
+        Rcout << wm << endl;
+        Rcout << ret << endl;
+    }
+	uvec r  = find(evid == 0);
+	ret = ret.rows(r);
+	cmt = cmt(r);
 
 <%=model_vars_decl%>
 
-vec g;
-g = <%=pred_expr%>;
-if (g.has_nan()) {
-	Rcout <<"WARNING: NAN in pred" << endl;
-	Rcout  << i << params << endl;
-	Rcout << join_rows(time,g) << endl;
-	Rcout << "Consider to relax atol & rtol" << endl;
-	g.replace(datum::nan, 1.0e9);
+mat g(time.n_elem, <%=nendpnt%>);
+<%=pred_expr%>
+
+if (0 && g.has_nan()) {
+	Rcout << "====================================================================================" << endl;
+	Rcout << "WARNING: NaN in prediction." << endl;
+	Rcout << "Consider to: relax atol & rtol; change initials; change seed; change strcuture model" << endl;
+	Rcout << "Make sure the below pars & initial conditions reasonable" << endl;
+	Rcout << "====================================================================================" << endl;
+	Rcout << "pars: " << params.t();
+	Rcout << "inits: " << inits.t();
+	Rcout << "LSODA code: " << rc << endl;
+	Rcout << "input data:" << endl;
+	Rcout << wm;
+	Rcout << "LSODA solutions:" << endl;
+	Rcout << ret << endl;
+	g.replace(datum::nan, -1.0e9);
 }
 
-    int no = g.n_elem;
+int nendpnt = <%=nendpnt%>;
+uvec cmt_endpnt = opt["cmt_endpnt"];
+uvec b0(1), b1(1); b0(0) = 0;
+
+for (int b=1; b<nendpnt; ++b) {
+  b1(0) = b;
+  uvec r;
+  r = find(cmt==cmt_endpnt(b));
+  g.submat(r, b0) = g.submat(r, b1);
+}
+
+    int no = cmt.n_elem;
     memcpy(p, g.memptr(), no*sizeof(double));
     p += no;
   }
@@ -164,6 +201,8 @@ BEGIN_RCPP
   saem.saem_fit();
 
   List out = List::create(
+    Named("resMat") = saem.get_resMat(),
+    Named("mprior_phi") = saem.get_mprior_phi(),
     Named("mpost_phi") = saem.get_mpost_phi(),
     Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),
     Named("Plambda") = saem.get_Plambda(),
@@ -303,6 +342,8 @@ BEGIN_RCPP
   saem.saem_fit();
 
   List out = List::create(
+    Named("resMat") = saem.get_resMat(),
+    Named("mprior_phi") = saem.get_mprior_phi(),
     Named("mpost_phi") = saem.get_mpost_phi(),
     Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),
     Named("Plambda") = saem.get_Plambda(),
@@ -392,7 +433,11 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
     x = deparse(body(pred))
     len = length(x)
-    pred_expr = if(len>2) x[2:(len-1)] else x
+    x = if(x[1]=="{") x[2:(len-1)] else x
+    len = length(x)
+    nendpnt = len
+    pred_expr = paste(paste("g.col(", 1:len-1, ") = ", x, ";", sep=""), collapse="\n")
+
   } else {
 	neq = nlhs = 0
 	pars = model
@@ -489,6 +534,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   attr(fn, "saem.cpp") = saem.cpp
   attr(fn, "rx") = if(is.ode) model else ""
   attr(fn, "inPars") = inPars
+  if(is.ode) attr(fn, "nendpnt") = nendpnt
   reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
 }
@@ -582,7 +628,7 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @param ... others
 #' @return a list
 #' @export
-plot.saemFit = function(x, ...)
+plot.saemFit.old = function(x, ...)
 {
     fit = x
     saem.cfg = attr(fit, "saem.cfg")
@@ -694,7 +740,7 @@ configsaem <- function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
 	ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transitAbs=0),
 	distribution=c("normal","poisson","binomial"),
-	seed=99, fixed=NULL)
+	seed=99, fixed=NULL, DEBUG=0)
 {
     names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt));
 #mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
@@ -711,10 +757,12 @@ configsaem <- function(model, data, inits,
                  ninputpars=ninputpars, inPars=inPars)
 
   model$N.eta = attr(model$saem_mod, "nrhs")
+  model$nendpnt = attr(model$saem_mod, "nendpnt")
+  if (is.null(model$nendpnt)) model$nendpnt = 1
 
   if (is.null(model$log.eta)) model$log.eta = rep(TRUE, model$N.eta)
   if (is.null(model$omega)) model$omega = diag(model$N.eta)
-  if (is.null(model$res.mod)) model$res.mod = 1
+  if (is.null(model$res.mod)) model$res.mod = rep(1, model$nendpnt)
   if (is.null(inits$omega)) inits$omega = rep(1, model$N.eta)*4
   if (is.null(inits$ares)) inits$ares = 10
   if (is.null(inits$bres)) inits$bres = 1
@@ -808,7 +856,11 @@ configsaem <- function(model, data, inits,
     dim(optM$mPars) = c(nmc*N, ninputpars)
   }
 
-  dat = data$nmdat[,c("ID", "TIME", "EVID", "AMT")]		## CHECKME
+  if (is.null(data$nmdat$CMT)) data$nmdat$CMT = 1				## CHECKME
+  if (any(is.na(data$nmdat$CMT))) {
+    stop("'CMT' has NA(s)")
+  }
+  dat = data$nmdat[,c("ID", "TIME", "EVID", "AMT", "CMT")]		## CHECKME
   form = attr(model$saem_mod, "form")
   infusion = max(dat$EVID)>10000
   if (form=="cls" && infusion) {
@@ -1020,7 +1072,41 @@ configsaem <- function(model, data, inits,
     ilambda1 = as.integer(ilambda1),
     ilambda0 = as.integer(ilambda0)
   )
+  
+
+  ## CHECKME
+  s = cfg$evt[cfg$evt[,"EVID"] == 0, "CMT"]
+  cfg$opt$cmt_endpnt = cfg$optM$cmt_endpnt = sort(unique(s))
+  cfg$nendpnt = length(unique(s))
+  if (model$nendpnt != cfg$nendpnt) {
+	  msg = sprintf("mis-match in nbr endpoints in model & in data")
+	  stop(msg)
+  }
+  t = unlist(split(1L:length(s), s))
+  cfg$ysM = rep(cfg$y[t], cfg$nmc) 
+  cfg$ix_sorting = t - 1                            #c-index for sorting by endpnt
+  cfg$y_offset = c(0, cumsum(table(s)))
+  s = cfg$evtM[cfg$evtM[,"EVID"] == 0, "CMT"]
+  cfg$ix_endpnt = as.integer(as.factor(s)) - 1      #to derive vecares & vecbres
+  s = cfg$evtM[cfg$evtM[,"EVID"] == 0, "ID"]
+  t = cumsum(c(0,table(s)))
+  cfg$ix_idM = cbind(t[-length(t)], t[-1]-1)        #c-index of obs records of each subject
+  
+  cfg$ares = rep(10, cfg$nendpnt)
+  cfg$bres = rep(1,  cfg$nendpnt)
+  cfg$ares[cfg$res.mod == 2] = 0
+  cfg$bres[cfg$res.mod == 1] = 0
+  
+  nres = (1:2)[(cfg$res.mod==3)+1]
+  cfg$res_offset = cumsum(c(0, nres))
+  cfg$par.hist = matrix(0, cfg$niter, cfg$nphi0+2*cfg$nphi1+sum(nres))
+
+  cfg$DEBUG = cfg$opt$DEBUG = cfg$optM$DEBUG = DEBUG
+  cfg$phiMFile = tempfile()
+
+  cfg  
 }
+
 
 reINITS = "^\\s*initCondition\\s*=\\s*c\\((?<inits>.+)\\)\\s*$"
 reDATAPAR = "^\\s*ParamFromData\\s*=\\s*c\\((?<inits>.+)\\)\\s*$"
