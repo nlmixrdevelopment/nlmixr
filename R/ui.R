@@ -19,6 +19,59 @@
 ## SAEM:
 ## - Covariate part
 
+
+##' nlmixr ini block handling
+##'
+##' @param ini Ini block or nlmixr model object
+##' @param ... Other arguments parsed by nlmixr
+##' @return bounds expression or parsed ui object
+##' @author Matthew L. Fidler
+##' @export
+ini <- function(ini, ...){
+    if (is(substitute(ini), "{")){
+        .f <- eval(parse(text=sprintf("function() %s", paste(deparse(substitute(ini)), collapse="\n"))))
+        .fb <- nlmixrBounds(.f)
+        if (!exists(".ini", parent.frame(1))){
+            assign(".ini", .f, parent.frame(1));
+        } else {
+            .ini <- get(".ini", parent.frame(1));
+            if (is(.ini, "function")){
+                assign(".ini", .f, parent.frame(1));
+            }
+        }
+        return(.fb);
+    }
+}
+
+##' nlmixr model block
+##'
+##' @param model Model specification
+##' @param ...
+##' @return Parsed UI object
+##' @author Matthew L. Fidler
+##' @export
+model <- function(model, ...){
+    if (is(substitute(model), "{")){
+        .f <- eval(parse(text=sprintf("function() %s", paste(deparse(substitute(model)), collapse="\n"))))
+        if (!exists(".model", parent.frame(1))){
+            assign(".model", .f, parent.frame(1));
+        } else {
+            .model <- get(".model", parent.frame(1));
+            if (is(.model, "function")){
+                assign(".model", .f, parent.frame(1));
+            }
+        }
+        if (exists(".ini", parent.frame(1))){
+            .ini <- get(".model", parent.frame(1));
+            .model <- get(".model", parent.frame(1));
+            if (is(.ini, "function") & is(.model, "function")){
+                return(nlmixrUI(parent.frame(1)))
+            }
+        }
+        return(.f);
+    }
+}
+
 ##' Prepares the UI function and returns a list.
 ##'
 ##' @param fun UI function
@@ -27,57 +80,71 @@
 ##' @keywords internal
 ##' @export
 nlmixrUI <- function(fun){
-    lhs0 <- nlmixrfindLhs(body(fun))
-    dum.fun <- function(){return(TRUE)}
-    env.here <- environment(dum.fun)
-    env <- new.env(parent=.GlobalEnv)
-    assign("fun", fun, env)
-    fun2 <- attr(fun,"srcref");
-    if (is.null(fun2)){
-        stop("option \"keep.source\" must be TRUE for nlmixr models.")
-    }
-    fun2 <- as.character(fun2, useSource=TRUE)
-    rg <- rex::rex("function", any_spaces, "(", anything, ")")
-    w <- which(regexpr(rg, fun2) != -1);
-    if (length(w) > 0){
-        w <- w[1];
-        fun2[w] <- sub(rg, "", fun2[w]);
-    }
-    fun2 <- gsub(rex::rex(boundary, "ini(",any_spaces,"{"), "ini <- function()({", fun2)
-    fun2 <- gsub(rex::rex(boundary, "model(",any_spaces,"{"), "model <- function()({", fun2)
-    if (fun2[length(fun2)] != "}"){
-        fun2[length(fun2)] <- sub(rex::rex("}", end), "", fun2[length(fun2)]);
-        fun2[length(fun2) + 1] <- "}"
-    }
-    w <- which(regexpr(rex::rex(start, any_spaces, "#", anything), fun2) != -1);
-    if (length(w) > 0 && all(lhs0 != "desc")){
-        w2 <- w[1];
-        if (length(w) > 1){
-            for (i in 2:length(w)){
-                if (w[i] - 1 == w[i - 1]){
-                    w2[i] <- w[i];
-                } else {
-                    break;
+    if (is(fun, "function")){
+        lhs0 <- nlmixrfindLhs(body(fun))
+        dum.fun <- function(){return(TRUE)}
+        env.here <- environment(dum.fun)
+        env <- new.env(parent=.GlobalEnv)
+        assign("fun", fun, env)
+        fun2 <- attr(fun,"srcref");
+        if (is.null(fun2)){
+            stop("option \"keep.source\" must be TRUE for nlmixr models.")
+        }
+        fun2 <- as.character(fun2, useSource=TRUE)
+        rg <- rex::rex("function", any_spaces, "(", anything, ")")
+        w <- which(regexpr(rg, fun2) != -1);
+        if (length(w) > 0){
+            w <- w[1];
+            fun2[w] <- sub(rg, "", fun2[w]);
+        }
+        fun2 <- gsub(rex::rex(boundary, "ini(",any_spaces,"{"), ".ini <- function()({", fun2)
+        fun2 <- gsub(rex::rex(boundary, "model(",any_spaces,"{"), ".model <- function()({", fun2)
+        if (fun2[length(fun2)] != "}"){
+            fun2[length(fun2)] <- sub(rex::rex("}", end), "", fun2[length(fun2)]);
+            fun2[length(fun2) + 1] <- "}"
+        }
+        w <- which(regexpr(rex::rex(start, any_spaces, "#", anything), fun2) != -1);
+        if (length(w) > 0 && all(lhs0 != "desc")){
+            w2 <- w[1];
+            if (length(w) > 1){
+                for (i in 2:length(w)){
+                    if (w[i] - 1 == w[i - 1]){
+                        w2[i] <- w[i];
+                    } else {
+                        break;
+                    }
                 }
             }
+            desc <- paste(gsub(rex::rex(any_spaces, end), "", gsub(rex::rex(start, any_spaces, any_of("#"), any_spaces), "", fun2[w2])), collapse=" ");
+            lhs0 <- c(lhs0, "desc");
         }
-        desc <- paste(gsub(rex::rex(any_spaces, end), "", gsub(rex::rex(start, any_spaces, any_of("#"), any_spaces), "", fun2[w2])), collapse=" ");
-        lhs0 <- c(lhs0, "desc");
+        .model <- .ini <- NULL; ## Rcheck hack
+        eval(parse(text=paste(fun2, collapse="\n"), keep.source=TRUE))
+    } else if (is(fun, "environment")) {
+        env.here  <- fun;
+        .model <- fun$.model
+        .ini <- fun$.ini
+        env <- new.env(parent=.GlobalEnv)
+        lhs0 <- c();
+        warning("Some information (like parameter labels) is lost by evaluating a nlmixr function")
+        fun <- eval(parse(text=paste0("function(){\n",
+                                      sprintf("\nini(%s)", paste(deparse(body(.ini)), collapse="\n")),
+                                      sprintf("\nmodel(%s)", paste(deparse(body(.model)), collapse="\n")),
+                                      "\n}")));
+        assign("fun", fun, env)
     }
-    model <- ini <- NULL; ## Rcheck hack
-    eval(parse(text=paste(fun2, collapse="\n"), keep.source=TRUE))
-    ini <- nlmixrBounds(ini);
+    ini <- nlmixrBounds(.ini);
     meta <- list();
     for (var in lhs0){
-        if (!any(var == c("ini", "model")) &&
+        if (!any(var == c(".ini", ".model")) &&
             exists(var, envir=env.here)){
             meta[[var]] <- get(var, envir=env.here);
         }
     }
-    if (inherits(ini, "try-error")){
+    if (inherits(.ini, "try-error")){
         stop("Error parsing initial estimates.")
     }
-    fun2 <- try(nlmixrUIModel(model,ini,fun));
+    fun2 <- try(nlmixrUIModel(.model,ini,fun));
     if (inherits(fun2, "try-error")){
         stop("Error parsing model.")
     }
