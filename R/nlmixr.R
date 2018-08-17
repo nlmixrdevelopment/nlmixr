@@ -325,9 +325,10 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         uif$env$ODEopt <- ODEopt;
         uif$env$sum.prod <- sum.prod
         uif$env$covMethod <- covMethod
-            model <- uif$saem.model
+        model <- uif$saem.model
         cfg <- configsaem(model=model, data=dat, inits=uif$saem.init,
-                          mcmc=mcmc, ODEopt=ODEopt, seed=seed, fixed=uif$saem.fixed);
+                          mcmc=mcmc, ODEopt=ODEopt, seed=seed, fixed=uif$saem.fixed,
+                          uif$saem.distribution);
         if (print > 1){
             cfg$print <- as.integer(print)
         }

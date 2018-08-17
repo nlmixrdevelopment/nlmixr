@@ -1227,7 +1227,7 @@ focei.theta.saemFit <- function(object, uif, ...){
     }
     err <- abs(as.vector(object$sig2)) ## abs?
     err.type <- uif$focei.err.type;
-    add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))))
+    add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois"))))
     prop <- which(err.type == "prop")
     if (length(add) > 0){
         thetas[add] <- err[1]; ## This seems to be SD;
@@ -1285,9 +1285,11 @@ focei.eta.saemFit <- function(object, uif, ...){
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE){
     RxODE::rxSolveFree();
     .saemTime <- proc.time() - pt;
-    RxODE::rxSolveFree();
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
+    }
+    if (any(uif$saem.distribution == c("poisson", "binomial"))){
+        calcResid <- NA;
     }
     uif.new <- uif;
     fit <- object;
@@ -1350,9 +1352,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (!any(.covMethod == c("r", "s", "r,s"))){
         .covMethod <- "";
     }
+    if (is.na(calcResid)) .covMethod <- "";
     .env$cov <- .cov;
     .allThetaNames <- c(uif$saem.theta.name, uif$saem.omega.name, uif$saem.res.name);
-    .m <- object$par_hist
+    .m <- object$par_hist;
     .env$parHistStacked <- data.frame(val=as.vector(.m),
                                       par=rep(.allThetaNames, each=nrow(.m)),
                                       iter=rep(1:nrow(.m), ncol(.m)));

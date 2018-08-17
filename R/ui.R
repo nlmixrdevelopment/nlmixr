@@ -727,7 +727,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             ## model$omega=diag(c(1,1,0))
                             ## 0 is not estimated.
                             ## inits$omega has the initial estimate
-                            ## mod$res.mod = 1 = additive
+                            ## mod$res.mod = 1 = additive or poisson
                             ## mod$res.mod = 2 = proportional
                             ## mod$res.mod = 3 = additive + proportional
                             ## a+b*f
@@ -1019,7 +1019,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             all.vars=all.vars, rest.vars=rest.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
                             all.covs=all.covs, saem.all.covs=saem.all.covs, saem.inPars=saem.inPars, lin.solved=lin.solved,
                             errs.specified=errs.specified, add.prop.errs=add.prop.errs, grp.fn=grp.fn, mu.ref=.mu.ref, cov.ref=cov.ref,
-                            saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2, log.theta=log.theta,
+                            saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
+                            log.theta=log.theta,
                             log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
                             env=env))
     return(ret)
@@ -1206,6 +1207,23 @@ nlmixrUI.theta.pars <- function(obj){
     .f <- eval(parse(text=paste(c("function(){", .unfixed, .eta, .f[-length(.f)], "}"), collapse="\n")))
     return(.f)
 }
+##' Get SAEM distribution
+##'
+##' @param obj UI object
+##' @return Character of distribution
+##' @author Matthew L. Fidler
+nlmixrUI.saem.distribution <- function(obj){
+    .df <- obj$ini$err;
+    .df <- paste(.df[which(!is.na(.df))]);
+    if (any(.df %in% c("dpois", "pois"))){
+        return("poisson");
+    }
+    if (any(.df %in% c("dbinom", "binom"))){
+        return("binomial");
+    }
+    if (any(.df %in% c("dnorm", "norm"))) return("normal");
+    stop("Distribution unsupported by SAEM");
+}
 ##' Get parameters that are fixed
 ##'
 ##' @param obj UI object
@@ -1317,6 +1335,9 @@ nlmixrUI.saem.model.omega <- function(obj){
 ##' @return SAEM model$res.mod spec
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.res.mod <- function(obj){
+    if (any(obj$saem.distribution == c("poisson","binomial"))){
+        return(1);
+    }
     obj <- obj$add.prop.errs
     if (length(obj$add) == 1){
         if (obj$add && !obj$prop){
@@ -1339,7 +1360,7 @@ nlmixrUI.saem.res.mod <- function(obj){
 ##' @return Names of error estimates for SAEM
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.res.name <- function(obj){
-    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm"))));
+    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "pois", "dpois"))));
     ret <- c();
     if (length(w) == 1){
         ret[length(ret) + 1] <- paste(obj$name[w])
@@ -1357,7 +1378,7 @@ nlmixrUI.saem.res.name <- function(obj){
 ##' @return SAEM model$ares spec
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.ares <- function(obj){
-    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm"))));
+    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois"))));
     if (length(w) == 1){
         return(obj$est[w]);
     } else {
@@ -1654,6 +1675,8 @@ nlmixrUI.model.desc <- function(obj){
         return(nlmixrUI.model.desc(obj))
     } else if (arg == "meta"){
         return(x$meta);
+    } else if (arg == "saem.distribution"){
+        return(nlmixrUI.saem.distribution(obj))
     } else if (arg == ".clean.dll"){
         if (exists(".clean.dll", envir=x$meta)){
             clean <- x$meta$.clean.dll;
@@ -1710,5 +1733,6 @@ str.nlmixrUI <- function(object, ...){
     cat(" $ saem.omega.name : The SAEM theta names\n")
     cat(" $ saem.res.name : The SAEM omega names\n")
     cat(" $ model.desc : Model description\n")
+    cat(" $ saem.distribution: SAEM distribution");
     cat(" $ .clean.dll : boolean representing if dlls are cleaned after running.\n")
 }

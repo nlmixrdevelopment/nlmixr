@@ -904,7 +904,7 @@ foceiFit.data.frame <- function(data,
     .ret$setupTime <- (proc.time() - .pt)["elapsed"];
     if (exists("uif", envir=.ret)){
         .uif <- .ret$uif
-        .ret$logThetas <- which(setNames(sapply(.uif$focei.names,function(x)any(x==.uif$log.theta)),NULL))
+        .ret$logThetas <- as.integer(which(setNames(sapply(.uif$focei.names,function(x)any(x==.uif$log.theta)),NULL)))
     }
     if (exists("noLik", envir=.ret)){
         if (!.ret$noLik){
@@ -1009,38 +1009,45 @@ foceiFit.data.frame <- function(data,
 focei.fit <- foceiFit
 
 ##' @export
+`$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
+    .env <- obj;
+    if (arg == "par.hist") arg <- "parHist"
+    if (arg == "par.hist.stacked") arg <- "parHistStacked"
+    if (arg == "omega.R") arg <- "omegaR"
+    if (arg == "par.fixed") arg <- "parFixed"
+    if (arg == "eta") arg <- "ranef"
+    if (arg == "theta") arg <- "fixef"
+    if (arg == "varFix") arg <- "cov"
+    if (arg == "thetaMat") arg <- "cov"
+    if (exists(arg, envir=.env)){
+        return(get(arg, envir=.env));
+    }
+    if (arg == "env"){
+        return(.env)
+    }
+    if (exists("uif", .env)){
+        .uif <- .env$uif;
+        if (arg == "modelName") arg <- "model.name"
+        if (arg == "dataName") arg <- "data.name"
+        .ret <- `$.nlmixrUI`(.uif, arg);
+        if (!is.null(.ret)) return(.ret)
+        .env2  <- `$.nlmixrUI`(.uif, "env");
+        if (exists(arg, envir=.env2)){
+            return(get(arg, envir=.env2))
+        }
+    }
+}
+
+##' @export
 `$.nlmixrFitData` <-  function(obj, arg, exact = FALSE){
     .ret <- obj[[arg]]
     if (is.null(.ret)){
         .cls <- class(obj);
         .env <- attr(.cls, ".foceiEnv");
-        if (arg == "par.hist") arg <- "parHist"
-        if (arg == "par.hist.stacked") arg <- "parHistStacked"
-        if (arg == "omega.R") arg <- "omegaR"
-        if (arg == "par.fixed") arg <- "parFixed"
-        if (arg == "eta") arg <- "ranef"
-        if (arg == "theta") arg <- "fixef"
-        if (arg == "varFix") arg <- "cov"
-        if (arg == "thetaMat") arg <- "cov"
-        if (exists(arg, envir=.env)){
-            return(get(arg, envir=.env));
-        }
-        if (is.null(.ret) && arg == "env"){
-            class(.env) <- NULL
-            return(.env)
-        }
-        if (arg == "simInfo"){
-            return(.simInfo(obj))
-        }
-        if (exists("uif", .env)){
-            .uif <- .env$uif;
-            if (arg == "modelName") arg <- "model.name"
-            if (arg == "dataName") arg <- "data.name"
-            .ret <- `$.nlmixrUI`(.uif, arg);
-            if (!is.null(.ret)) return(.ret)
-            .env2  <- `$.nlmixrUI`(.uif, "env");
-            if (exists(arg, envir=.env2)){
-                return(get(arg, envir=.env2))
+        .ret <- `$.nlmixrFitCore`(.env, arg, exact);
+        if (is.null(.ret)){
+            if (arg == "simInfo"){
+                return(.simInfo(obj))
             }
         }
     }
