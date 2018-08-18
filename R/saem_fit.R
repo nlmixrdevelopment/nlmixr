@@ -140,7 +140,7 @@ mat g(time.n_elem, <%=nendpnt%>);
 if (0 && g.has_nan()) {
 	Rcout << "====================================================================================" << endl;
 	Rcout << "WARNING: NaN in prediction." << endl;
-	Rcout << "Consider to: relax atol & rtol; change initials; change seed; change strcuture model" << endl;
+	Rcout << "Consider to: relax atol & rtol; change initials; change seed; change structure model" << endl;
 	Rcout << "Make sure the below pars & initial conditions reasonable" << endl;
 	Rcout << "====================================================================================" << endl;
 	Rcout << "pars: " << params.t();
@@ -1072,7 +1072,7 @@ configsaem <- function(model, data, inits,
     ilambda1 = as.integer(ilambda1),
     ilambda0 = as.integer(ilambda0)
   )
-  
+
 
   ## CHECKME
   s = cfg$evt[cfg$evt[,"EVID"] == 0, "CMT"]
@@ -1083,7 +1083,7 @@ configsaem <- function(model, data, inits,
 	  stop(msg)
   }
   t = unlist(split(1L:length(s), s))
-  cfg$ysM = rep(cfg$y[t], cfg$nmc) 
+  cfg$ysM = rep(cfg$y[t], cfg$nmc)
   cfg$ix_sorting = t - 1                            #c-index for sorting by endpnt
   cfg$y_offset = c(0, cumsum(table(s)))
   s = cfg$evtM[cfg$evtM[,"EVID"] == 0, "CMT"]
@@ -1091,12 +1091,12 @@ configsaem <- function(model, data, inits,
   s = cfg$evtM[cfg$evtM[,"EVID"] == 0, "ID"]
   t = cumsum(c(0,table(s)))
   cfg$ix_idM = cbind(t[-length(t)], t[-1]-1)        #c-index of obs records of each subject
-  
+
   cfg$ares = rep(10, cfg$nendpnt)
   cfg$bres = rep(1,  cfg$nendpnt)
   cfg$ares[cfg$res.mod == 2] = 0
   cfg$bres[cfg$res.mod == 1] = 0
-  
+
   nres = (1:2)[(cfg$res.mod==3)+1]
   cfg$res_offset = cumsum(c(0, nres))
   cfg$par.hist = matrix(0, cfg$niter, cfg$nphi0+2*cfg$nphi1+sum(nres))
@@ -1104,7 +1104,7 @@ configsaem <- function(model, data, inits,
   cfg$DEBUG = cfg$opt$DEBUG = cfg$optM$DEBUG = DEBUG
   cfg$phiMFile = tempfile()
 
-  cfg  
+  cfg
 }
 
 
