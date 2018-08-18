@@ -321,14 +321,29 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         } else {
             covMethod <- default$covMethod;
         }
+        if (is.null(uif$nlme.fun.mu)){
+            stop("SAEM requires all ETAS to be mu-referenced")
+        }
+        .low <- uif$ini$lower;
+        .low <- .low[!is.na(.low)]
+        .up <- uif$ini$upper;
+        .up <- .up[!is.na(.up)]
+        if (any(.low != -Inf) | any(.up != Inf)){
+            warning("Bounds are ignored in SAEM")
+        }
+        if (any(paste(uif$ini$name[uif$ini$fix]) %in% unlist(uif$mu.ref))){
+            stop("Fixed thetas cannot be associated with an ETA in SAEM")
+        }
+
         uif$env$mcmc <- mcmc;
         uif$env$ODEopt <- ODEopt;
         uif$env$sum.prod <- sum.prod
         uif$env$covMethod <- covMethod
+        .dist <- uif$saem.distribution
         model <- uif$saem.model
         cfg <- configsaem(model=model, data=dat, inits=uif$saem.init,
                           mcmc=mcmc, ODEopt=ODEopt, seed=seed, fixed=uif$saem.fixed,
-                          distribution=uif$saem.distribution);
+                          distribution=.dist);
         if (print > 1){
             cfg$print <- as.integer(print)
         }
@@ -403,7 +418,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 est.type <- "nlme.mu.cov"
                 fun <- uif$nlme.fun.mu.cov
                 specs <- uif$nlme.specs.mu.cov;
-            } else if (!is.null(uif$nlme.mu.fun)){
+            } else if (!is.null(uif$nlme.fun.mu)){
                 est.type <- "nlme.mu"
                 fun <- uif$nlme.fun.mu
                 specs <- uif$nlme.specs.mu;

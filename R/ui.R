@@ -186,8 +186,10 @@ print.nlmixrUI <- function(x, ...){
 }
 
 ## This is a list of supported distributions with the number of arguments they currently support.
-dists <- list("dpois"=1,
-              "dbinom"=1:2,
+dists <- list("dpois"=0,
+              "dbinom"=0:1,
+              "dbern"=0,
+              "bern"=0,
               "dbeta"=2:3,
               ##
               ## "dnbinom"=2:3,  ## dnbinom is in R; FIXME: how does ot compare to dneg_binomial
@@ -196,8 +198,8 @@ dists <- list("dpois"=1,
               ## Available as external package http://ugrad.stat.ubc.ca/R/library/rmutil/html/BetaBinom.html
               ## "dbetabinomial", ## not in base R (but in glnmm2)
               "dt"=1:2,
-              "pois"=1,
-              "binom"=1:2,
+              "pois"=0,
+              "binom"=0:1,
               "beta"=2:3,
               "t"=1:2,
               "add"=1,
@@ -537,6 +539,17 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
     }
     .doDist <- function(distName, distArgs){
+        if (length(distArgs) == 0L){
+            .tmp <- as.data.frame(bounds);
+            .tmp1 <- .tmp[1, ]
+            .tmp1[1, ] <- NA;
+            .tmp1[, "err"] <- distName
+            .tmp1[, "est"] <- -Inf
+            .tmp <- rbind(.tmp, .tmp1);
+            class(.tmp) <- c("nlmixrBounds", "data.frame");
+            assign("bounds", .tmp, this.env)
+            return(errn)
+        }
         for (.i in seq_along(distArgs)){
             .tmp <- suppressWarnings(as.numeric(distArgs[.i]))
             errn <- errn + 1;
@@ -1165,6 +1178,9 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
     if (!is.null(object$lin.solved)){
         ## This is only a solved system.
         if (mu.type == "thetas"){
+            if (length(object$mu.ref) == 0L) return(NULL)
+            .all <- object$ini$name[which(object$ini$neta1 == object$ini$neta2)] %in% names(object$mu.ref)
+            if (!all(.all)) return(NULL)
             bod <- deparse(body(object$nlme.mu.fun));
             bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
             bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
@@ -1172,8 +1188,9 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
             body(fn) <- bod
             return(fn);
         } else if (mu.type == "covariates"){
+            if (length(object$mu.ref) == 0L) return(NULL)
             bod <- deparse(body(object$nlme.mu.fun2));
-            bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
+            bod[length(bod)] <- uuuuupaste0(object$lin.solved$extra.lines, "\n}");
             bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
             vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
             fn <- eval(parse(text=sprintf("function(%s) NULL", paste(vars, collapse=", "))));
@@ -1191,9 +1208,13 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
         }
     } else {
         if (mu.type == "thetas"){
+            if (length(object$mu.ref) == 0L) return(NULL)
+            .all <- object$ini$name[which(object$ini$neta1 == object$ini$neta2)] %in% names(object$mu.ref)
+            if (!all(.all)) return(NULL)
             fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unique(c(names(object$ini$theta), object$all.covs)), collapse=", "))))
             body(fn) <- body(object$nlme.mu.fun);
         } else if (mu.type == "covariates"){
+            if (length(object$mu.ref) == 0L) return(NULL)
             vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
             fn <- eval(parse(text=sprintf("function(%s) NULL", paste(vars, collapse=", "))))
             body(fn) <- body(object$nlme.mu.fun2);
@@ -1285,7 +1306,13 @@ nlmixrUI.saem.distribution <- function(obj){
     if (any(.df %in% c("dpois", "pois"))){
         return("poisson");
     }
-    if (any(.df %in% c("dbinom", "binom"))){
+    if (any(.df %in% c("dbern", "bern", "dbinom", "binom"))){
+        if (.df %in% c("dbinom", "binom")){
+            .df <- obj$ini
+            .w <- which(.df$err %in% c("dbinom", "binom"))
+            if (length(.w) != 1L) stop("Distribution unsupported by SAEM");
+            if (!is.na(.df$name[.w])) stop("Distribution unsupported by SAEM");
+        }
         return("binomial");
     }
     if (any(.df %in% c("dnorm", "norm", "prop", "add"))) return("normal");
@@ -1427,7 +1454,7 @@ nlmixrUI.saem.res.mod <- function(obj){
 ##' @return Names of error estimates for SAEM
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.res.name <- function(obj){
-    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "pois", "dpois", "binom", "dbinom"))));
+    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm"))));
     ret <- c();
     if (length(w) == 1){
         ret[length(ret) + 1] <- paste(obj$name[w])
@@ -1445,7 +1472,7 @@ nlmixrUI.saem.res.name <- function(obj){
 ##' @return SAEM model$ares spec
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.ares <- function(obj){
-    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois"))));
+    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois", "dbinom", "binom", "dbern", "bern"))));
     if (length(w) == 1){
         return(obj$est[w]);
     } else {

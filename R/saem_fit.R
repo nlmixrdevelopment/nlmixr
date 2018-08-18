@@ -1227,7 +1227,7 @@ focei.theta.saemFit <- function(object, uif, ...){
     }
     err <- abs(as.vector(object$sig2)) ## abs?
     err.type <- uif$focei.err.type;
-    add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois", "binom", "dbinom"))))
+    add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))));
     prop <- which(err.type == "prop")
     if (length(add) > 0){
         thetas[add] <- err[1]; ## This seems to be SD;
@@ -1358,11 +1358,22 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .env$cov <- .cov;
     .allThetaNames <- c(uif$saem.theta.name, uif$saem.omega.name, uif$saem.res.name);
     .m <- object$par_hist;
+    if (ncol(.m) > length(.allThetaNames)){
+        .m <- .m[, seq_along(.allThetaNames)];
+    }
+    if (.dist == "binomial"){
+        .dist <- "bernoulli"
+    }
     .env$parHistStacked <- data.frame(val=as.vector(.m),
                                       par=rep(.allThetaNames, each=nrow(.m)),
                                       iter=rep(1:nrow(.m), ncol(.m)));
     dimnames(.m) <- list(NULL, .allThetaNames);
     .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
+    .fixedNames <- paste(uif$ini$name[which(uif$ini$fix)]);
+    if (length(.fixedNames) > 0){
+        .env$parHistStacked <- .env$parHistStacked[!(.env$parHistStacked$par %in% .fixedNames),, drop = FALSE];
+        .env$parHist <- .env$parHist[, !(names(.env$parHist) %in% .fixedNames), drop = FALSE];
+    }
     if (is.na(calcResid)){
         .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
                              " ",crayon::bold$blue(uif$saem.distribution), "); ",
