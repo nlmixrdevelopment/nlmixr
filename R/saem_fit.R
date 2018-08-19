@@ -1456,6 +1456,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     dimnames(.m) <- list(NULL, .allThetaNames);
     .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
     .fixedNames <- paste(uif$ini$name[which(uif$ini$fix)]);
+    .saemObf <- calc.2LL(object);
     if (length(.fixedNames) > 0){
         .env$parHistStacked <- .env$parHistStacked[!(.env$parHistStacked$par %in% .fixedNames),, drop = FALSE];
         .env$parHist <- .env$parHist[, !(names(.env$parHist) %in% .fixedNames), drop = FALSE];
@@ -1463,7 +1464,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (is.na(calcResid)){
         .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
                              " ",crayon::bold$blue(uif$saem.distribution), "); ",
-                             crayon::blurred$italic("OBJF missing"))
+                             crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
         .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
         .env$fullTheta <- setNames(init$THTA, uif$focei.names)
         .om0 <- .genOM(.parseOM(init$OMGA));
@@ -1471,12 +1472,12 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         .env$omega <- .om0;
         .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
         .env$noLik <- FALSE;
-        .env$objective <- NA_real_;
+        .env$objective <- .saemObf;
     } else if (calcResid){
         .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
                              crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
     } else {
-        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF missing"))
+        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
         .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
         .env$fullTheta <- setNames(init$THTA, uif$focei.names)
         .om0 <- .genOM(.parseOM(init$OMGA));
@@ -1484,7 +1485,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         .env$omega <- .om0;
         .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
         .env$noLik <- TRUE;
-        .env$objective <- NA_real_;
+        .env$objective <- .saemObf;
     }
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
@@ -1516,6 +1517,21 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     } else {
         .env$time <- data.frame(saem=.saemTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
     }
+    if (is.na(calcResid)){
+        row.names(.env$objDf) <- "SAEMg";
+    } else if (calcResid){
+        .llik <- -.saemObf / 2;
+        attr(.llik, "df") <- attr(.env$loglik, "df");
+        .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(.env$logLik, "df"),
+                           BIC=.saemObf + log(.env$nobs) * attr(.env$logLik, "df"),
+                           "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
+        if (any(names(.env$objDf) == "Condition Number")) .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
+        .env$objDf  <- rbind(.env$objDf,
+                             .tmp)
+        row.names(.env$objDf) <- c("FOCEi", "SAEMg");
+    } else {
+        row.names(.env$objDf) <- "SAEMg";
+    }
     return(fit.f);
 }
 
@@ -1525,5 +1541,5 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
 #FIXME: g = gc = 1
 #FIXME: ODE inits
 #FIXME: Tinf for ODE
-#FIXME: chk infusion poor fit
+                                        #FIXME: chk infusion poor fit
 

@@ -1190,7 +1190,7 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
         } else if (mu.type == "covariates"){
             if (length(object$mu.ref) == 0L) return(NULL)
             bod <- deparse(body(object$nlme.mu.fun2));
-            bod[length(bod)] <- uuuuupaste0(object$lin.solved$extra.lines, "\n}");
+            bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
             bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
             vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
             fn <- eval(parse(text=sprintf("function(%s) NULL", paste(vars, collapse=", "))));
