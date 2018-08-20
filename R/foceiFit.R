@@ -411,7 +411,7 @@ constructLinCmt <- function(fun){
 ##' pred <- function() ipre
 ##'
 ##' errProp <- function(){
-##'   err <- prop(0.1)
+##'   return(prop(0.1))
 ##' }
 ##'
 ##' inits <- list(THTA=c(0.5),
@@ -427,8 +427,19 @@ constructLinCmt <- function(fun){
 ##' fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
 ##'      control=foceiControl(maxOuterIterations=0,covMethod=""))
 ##'
+##' ## Note if you have the etas you can evaluate the likelihood
+##' ## of an arbitrary model.  It doesn't have to be solved by
+##' ## FOCEi
+##'
+##' etaMat <- matrix(fitP$eta[,-1])
+##'
+##' fitP2 <- foceiFit(w7, inits, mypar2,mod,pred,errProp, etaMat=etaMat,
+##'       control=foceiControl(maxOuterIterations=0,maxInnerIterations=0,
+##'       covMethod=""))
+##'
+##'
 ##' errAdd <- function(){
-##'   err <- add(0.1)
+##'   return(add(0.1))
 ##' }
 ##'
 ##' ## Wang2007 add error of -2.059 for NONMEM FOCE=NONMEM FOCEi;
@@ -438,7 +449,7 @@ constructLinCmt <- function(fun){
 ##'
 ##' ## Extending Wang2007 to add+prop with same dataset
 ##' errAddProp <- function(){
-##'   err <- add(0.1) + prop(0.1)
+##'   return(add(0.1) + prop(0.1));
 ##' }
 ##'
 ##' fitAP <- foceiFit(w7, inits, mypar2,mod,pred,errAddProp,
@@ -447,7 +458,7 @@ constructLinCmt <- function(fun){
 ##' ## Checking lognormal
 ##'
 ##' errLogn <- function(){
-##'    err <- lnorm(0.1)
+##'    return(lnorm(0.1));
 ##' }
 ##'
 ##' ## First run the fit with the nlmixr lnorm error
@@ -486,7 +497,7 @@ constructLinCmt <- function(fun){
 ##' pred <- function() cp
 ##'
 ##' err <- function(){
-##'     err <- add(0.1)
+##'     return(add(0.1))
 ##' }
 ##'
 ##' inits <- list(THTA=c(0.5, -3.2, -1),
@@ -501,7 +512,7 @@ constructLinCmt <- function(fun){
 ##' ## you can also fit lognormal data with the objective function on the same scale
 ##'
 ##' errl <- function(){
-##'     err <- lnorm(0.1)
+##'     return(lnorm(0.1))
 ##' }
 ##'
 ##' fit2 <- foceiFit(d, inits, mypar2,mod,pred,errl)
@@ -698,9 +709,7 @@ foceiFit.data.frame <- function(...){
     class(.ret$parFixed) <- c("nlmixrParFixed", "data.frame");
 }
 
-##' @rdname foceiFit
-##' @export
-foceiFit.data.frame <- function(data,
+foceiFit.data.frame0 <- function(data,
                                 inits,
                                 PKpars,
                                 model=NULL,

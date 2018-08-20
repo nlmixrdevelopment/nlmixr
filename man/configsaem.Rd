@@ -7,7 +7,7 @@
 configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3, nu =
   c(2, 2, 2)), ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs
   = 0), distribution = c("normal", "poisson", "binomial"), seed = 99,
-  fixed = NULL)
+  fixed = NULL, DEBUG = 0)
 }
 \arguments{
 \item{model}{a compiled saem model by gen_saem_user_fn()}

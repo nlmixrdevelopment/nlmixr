@@ -619,61 +619,6 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 	pars
 }
 
-
-#' Plot an SAEM model fit
-#'
-#' Plot an SAEM model fit
-#'
-#' @param x a saemFit object
-#' @param ... others
-#' @return a list
-#' @export
-plot.saemFit.old = function(x, ...)
-{
-    fit = x
-    saem.cfg = attr(fit, "saem.cfg")
-    dat = as.data.frame(saem.cfg$evt)
-    dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
-
-    df = rbind(cbind(dat, grp = 1), cbind(dat, grp = 2))
-    dopred <- attr(x, "dopred");
-    yp = dopred(fit$mpost_phi, saem.cfg$evt, saem.cfg$opt)
-    df$DV[df$grp == 2] = yp
-
-    p4 = ggplot(subset(df, grp==1), aes(TIME, DV)) +
-        geom_point() +
-        facet_wrap(~ID) +
-        geom_line(aes(TIME, DV), subset(df, grp==2), col='red')
-
-    df = cbind(dat, IPRED=yp)
-    df$IRES = df$DV - df$IPRED
-
-    p2 = ggplot(df, aes(IPRED, DV)) +
-        geom_point() +
-        geom_abline(intercept = 0, slope=1, col='red')
-
-    p3 = ggplot(df, aes(IPRED, IRES)) +
-        geom_point() +
-        geom_abline(intercept = 0, slope=0, col='red')
-
-    m = x$par_hist
-    df = data.frame(
-      val=as.vector(m),
-      par=rep(1:ncol(m), each=nrow(m)),
-      iter=rep(1:nrow(m), ncol(m))
-    )
-
-    p1 = ggplot2::ggplot(df, aes(iter, val)) +
-        ggplot2::geom_line() +
-        ggplot2::facet_wrap(~par, scales = "free_y")
-
-    print(p1)
-    print(p2)
-    print(p3)
-    print(p4)
-}
-
-
 #' Configure an SAEM model
 #'
 #' Configure an SAEM model by generating an input list to the SAEM model function
@@ -1487,6 +1432,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         .env$noLik <- TRUE;
         .env$objective <- .saemObf;
     }
+    print(init);
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
                                  PKpars=uif$theta.pars,
