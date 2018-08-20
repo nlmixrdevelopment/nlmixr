@@ -91,9 +91,9 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
     wv = wm.col(4);
     ivec cmt(ntime);
     for (int k=0; k<ntime; ++k) cmt(k) = wv(k);
+    wv = wm.col(3);
     vec amt;
-    amt = wm.col(3);
-    amt = amt( find(evid > 0) );
+    amt = wv( find(evid > 0) );
 
     int neq=as<int>(opt["neq"]);
     vec inits(neq);
@@ -130,7 +130,7 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
     }
 	uvec r  = find(evid == 0);
 	ret = ret.rows(r);
-	cmt = cmt(r);
+	ivec cmtObs = cmt(r);
 
 <%=model_vars_decl%>
 
@@ -160,11 +160,11 @@ uvec b0(1), b1(1); b0(0) = 0;
 for (int b=1; b<nendpnt; ++b) {
   b1(0) = b;
   uvec r;
-  r = find(cmt==cmt_endpnt(b));
+  r = find( cmtObs==cmt_endpnt(b) );
   g.submat(r, b0) = g.submat(r, b1);
 }
 
-    int no = cmt.n_elem;
+    int no = cmtObs.n_elem;
     memcpy(p, g.memptr(), no*sizeof(double));
     p += no;
   }
