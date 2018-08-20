@@ -1432,7 +1432,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         .env$noLik <- TRUE;
         .env$objective <- .saemObf;
     }
-    print(init);
     fit.f <- foceiFit.data.frame(data=dat,
                                  inits=init,
                                  PKpars=uif$theta.pars,
