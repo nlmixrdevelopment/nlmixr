@@ -1456,7 +1456,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     dimnames(.m) <- list(NULL, .allThetaNames);
     .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
     .fixedNames <- paste(uif$ini$name[which(uif$ini$fix)]);
-    .saemObf <- calc.2LL(object);
+    .saemObf <- -calc.2LL(object);
     if (length(.fixedNames) > 0){
         .env$parHistStacked <- .env$parHistStacked[!(.env$parHistStacked$par %in% .fixedNames),, drop = FALSE];
         .env$parHist <- .env$parHist[, !(names(.env$parHist) %in% .fixedNames), drop = FALSE];
