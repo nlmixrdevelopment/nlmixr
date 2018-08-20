@@ -1,13 +1,15 @@
 #FIXME: g by endpint
-calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4)
-{
+calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
+#nnodes.gq=8, nsd.gq=4
     dopred = attr(fit, "dopred")
     saem.cfg = attr(fit, "saem.cfg")
     resMat = fit$resMat
     ares = resMat[,1]
     bres = resMat[,2]
     i1 = saem.cfg$i1+1
-    nphi1 = length(i1)
+    nphi1 = saem.cfg$nphi1
+    nphi0 = saem.cfg$nphi0
+    nphi = nphi0 + nphi1
     N = saem.cfg$N
     ntotal = saem.cfg$ntotal
     ix_endpnt = saem.cfg$ix_endpnt[1:ntotal]+1
@@ -26,12 +28,14 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4)
     ind.io = grep(1, t(io))
     DYF = matrix(0, mlen, N)
 
-    phiM = as.matrix(read.table(saem.cfg$phiMFile))
-    dim(phiM) = c(N, saem.cfg$nmc, saem.cfg$niter, nphi1)
+    phiM = matrix(scan(saem.cfg$phiMFile), byrow=T, ncol=nphi)
+    dim(phiM) = c(N, saem.cfg$nmc, saem.cfg$niter, nphi)
+    print(head(phiM))
+    print(dim(phiM))
     cond.mean.phi = apply(phiM, c(1,4), mean)
     var.all = lapply(1:N, function(k) {
       x = phiM[k, , ,];
-      dim(x) = c(saem.cfg$nmc*saem.cfg$niter, nphi1); 
+      dim(x) = c(saem.cfg$nmc*saem.cfg$niter, nphi); 
       var(x)
     })
     condsd.eta = t(sapply(var.all, function(x) sqrt(diag(x))))
@@ -41,11 +45,11 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4)
     x = (y$nodes-0.5)*2
     w = (y$weights)*(2^nphi1)
     nx = dim(x)[1]
-    nx.1 = as.integer(nx/10)
-    xmin = cond.mean.phi[,i1]-nsd.gq*condsd.eta
-    xmax = cond.mean.phi[,i1]+nsd.gq*condsd.eta
-    a = (xmin+xmax)/2
-    b = (xmax-xmin)/2
+    nx.1 = max(as.integer(nx/10), 1)
+    xmin = cond.mean.phi[,i1]-nsd.gq*condsd.eta[,i1]
+    xmax = cond.mean.phi[,i1]+nsd.gq*condsd.eta[,i1]
+    a = (xmin+xmax)/2; dim(a) = c(N, nphi1)
+    b = (xmax-xmin)/2; dim(b) = c(N, nphi1)
 
     cat("Calculating -2LL by Gaussian quadrature ")
     Q = 0
@@ -56,7 +60,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4)
         g[g<1.0e-200] = 1.0e-200
         DYF[ind.io] = -0.5*((yobs-f)/g)^2 - log(g)
         ly = colSums(DYF)
-        dphi1 = phi[, i1]-fit$mprior_phi
+        dphi1 = phi[, i1]-fit$mprior_phi[, i1]
         lphi1 = -0.5*rowSums((dphi1 %*% IOmega.phi1)*dphi1)
         ltot = ly+lphi1
         ltot[is.na(ltot)] = -Inf
@@ -67,7 +71,8 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4)
         }
     }
     cat("\n")
-    2*sum(log(Q)+rowSums(log(b))) - N*log(det(Omega)) - (N*nphi1+ ntotal)*log(2*pi)
+    ll2 = 2*sum(log(Q)+rowSums(log(b))) - N*log(det(Omega)) - (N*nphi1+ ntotal)*log(2*pi)
+    -ll2
 }
 
 #' Plot an SAEM model fit
