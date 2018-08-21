@@ -834,7 +834,13 @@ configsaem <- function(model, data, inits,
   y = data$data[,"DV"]
   id = data$data[,"ID"]
   ntotal = length(id)
-    N = length(unique(id))
+  N = length(unique(id))
+  wh = setdiff(data$nmdat$ID, unique(id))
+  if(length(wh)) {
+    msg = paste0("observations not found for ID: ", paste(wh, collapse=", "))
+    stop(msg)
+  }
+
   covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
