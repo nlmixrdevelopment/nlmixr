@@ -46,7 +46,7 @@ ini <- function(ini, ...){
 ##' nlmixr model block
 ##'
 ##' @param model Model specification
-##' @param ...
+##' @param ... Other arguments to model object parsed by nlmixr
 ##' @return Parsed UI object
 ##' @author Matthew L. Fidler
 ##' @export

@@ -22,13 +22,16 @@ foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 1000,
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
 
- Defaults for optimization and ODE solving
+\itemize{
 
- The tolerance of the inner and outer optimization is \code{10^-sigdig}
+ \item The tolerance of the inner and outer optimization is \code{10^-sigdig}
 
- The tolerance of the ODE solvers is \code{10^(-sigdig-1)}
+ \item The tolerance of the ODE solvers is \code{10^(-sigdig-1)}
 
- The significant figures that some tables are rounded to.}
+ \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
+
+ \item The significant figures that some tables are rounded to.
+}}
 
 \item{epsilon}{Precision of estimate for n1qn1 optimization.}
 
@@ -41,7 +44,71 @@ for outer problem.}
 \item{n1qn1nsim}{Number of function evaluations for n1qn1
 optimization.}
 
+\item{method}{The method for solving ODEs.  Currently this supports:
+
+\itemize{
+\item \code{"liblsoda"} thread safe lsoda.  This supports parallel
+           thread-based solving, and ignores user Jacobian specification.
+\item \code{"lsoda"} -- LSODA solver.  Does not support parallel thread-based
+      solving, but allows user Jacobian specification.
+\item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
+        solving nor user Jacobain specification
+}}
+
+\item{transitAbs}{boolean indicating if this is a transit
+compartment absorption}
+
+\item{atol}{a numeric absolute tolerance (1e-8 by default) used
+by the ODE solver to determine if a good solution has been
+achieved;  This is also used in the solved linear model to check
+if prior doses do not add anything to the solution.}
+
+\item{rtol}{a numeric relative tolerance (1e-6 by default) used
+by the ODE solver to determine if a good solution has been
+achieved. This is also used in the solved linear model to check
+ if prior doses do not add anything to the solution.}
+
 \item{maxstepsOde}{Maximum number of steps for ODE solver.}
+
+\item{hmin}{The minimum absolute step size allowed. The default
+value is 0.}
+
+\item{hmax}{The maximum absolute step size allowed.  The default
+checks for the maximum difference in times in your sampling and
+events, and uses this value.  The value 0 is equivalent to
+infinite maximum absolute step size.}
+
+\item{hini}{The step size to be attempted on the first step. The
+default value is determined by the solver (when hini = 0)}
+
+\item{maxordn}{The maximum order to be allowed for the nonstiff
+(Adams) method.  The default is 12.  It can be between 1 and
+12.}
+
+\item{maxords}{The maximum order to be allowed for the stiff (BDF)
+method.  The default value is 5.  This can be between 1 and 5.}
+
+\item{cores}{Number of cores used in parallel ODE solving.  This
+defaults to the number or system cores determined by
+\code{\link{rxCores}} for methods that support parallel
+solving (ie thread-safe methods like "liblsoda").}
+
+\item{covsInterpolation}{specifies the interpolation method for
+    time-varying covariates. When solving ODEs it often samples
+    times outside the sampling time specified in \code{events}.
+    When this happens, the time varying covariates are
+    interpolated.  Currently this can be:
+
+\itemize{
+\item \code{"linear"} interpolation (the default), which interpolates the covariate
+    by solving the line between the observed covariates and extrapolating the new
+    covariate value.
+\item \code{"constant"} -- Last observation carried forward.
+\item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
+      that NONMEM uses.
+\item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
+  carried backward to midpoint.
+}}
 
 \item{printInner}{Integer representing when the inner step is
 printed. By default this is 0 or do not print.  1 is print
@@ -52,6 +119,9 @@ printed. When this is 0 or do not print the iterations.  1 is
 print every function evaluation (default), 5 is print every 5
 evaluations.}
 
+\item{printNcol}{Number of columns to printout before wrapping
+parameter estimates/gradient}
+
 \item{scaleTo}{Scale the initial parameter estimate to this value.
 By default this is 1.  When zero or below, no scaling is performed.}
 
@@ -59,7 +129,7 @@ By default this is 1.  When zero or below, no scaling is performed.}
     value.  By default this is 1.  When \code{scaleObjective} is
     greater than zero, this scaling is performed by:
 
-     \code{scaledObj = currentObj / |initialObj| * scaleObjective}
+     \code{scaledObj = currentObj / \|initialObj\| * scaleObjective}
 
     Therefore, if the initial objective function is negative, the
     initial scaled objective function would be negative as well.
@@ -80,20 +150,6 @@ derivatives of the outer problem.  Currently supports
 derivatives while calculating the covariance components
 (Hessian and S).}
 
-\item{covMethod}{Method for calculating covariance.  In this
-    discussion, R is the Hessian matrix of the objective
-    function. The S matrix is the sum of each individual's
-    gradient cross-product (evaluated at the individual empirical
-    Bayes estimates).
-
- "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \eqn{R^-1 \times S \times R^-1}
-
- "\code{r}" Uses the Hessian matrix to calculate the covariance as \eqn{2\times R^-1}
-
- "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
-
- "" Does not calculate the covariance step.}
-
 \item{lbfgsLmm}{An integer giving the number of BFGS updates
 retained in the "L-BFGS-B" method, It defaults to 40.}
 
@@ -102,7 +158,7 @@ retained in the "L-BFGS-B" method, It defaults to 40.}
     On entry pgtol >= 0 is specified by the user.  The iteration
     will stop when:
 
-       \code{max{|proj g_i | i = 1, ..., n} <= lbfgsPgtol}
+       \code{max(\| proj g_i \| i = 1, ..., n) <= lbfgsPgtol}
 
     where pg_i is the ith component of the projected gradient.
 
@@ -124,14 +180,16 @@ to include a condition number calculation.}
 added to the table output.}
 
 \item{diagXform}{This is the transformation used on the diagonal
-    of the \code{chol(inv(omega))}. This matrix and values are the
+    of the \code{chol(solve(omega))}. This matrix and values are the
     parameters estimated in FOCEi. The possibilities are:
 
- \code{sqrt} Estimates the sqrt of the diagonal elements of \code{chol(inv(omega))}.  This is the default method.
+\itemize{
+ \item \code{sqrt} Estimates the sqrt of the diagonal elements of \code{chol(solve(omega))}.  This is the default method.
 
- \code{log} Estimates the log of the diagonal elements of \code{chol(inv(omega))}
+ \item \code{log} Estimates the log of the diagonal elements of \code{chol(solve(omega))}
 
- \code{identity} Estimates the diagonal elements without any transformations}
+ \item \code{identity} Estimates the diagonal elements without any transformations
+}}
 
 \item{sumProd}{Is a boolean indicating if the model should change
 multiplication to high precision multiplication and sums to
@@ -142,9 +200,30 @@ this is \code{FALSE}.}
 calculation. By default this is turned on.}
 
 \item{ci}{Confidence level for some tables.  By default this is
-0.95 or 95% confidence.}
+0.95 or 95\% confidence.}
+
+\item{useColor}{Boolean indicating if focei can use ASCII color codes}
+
+\item{boundTol}{Tolerance for boundary issues.}
+
+\item{calcTables}{This boolean is to determine if the foceiFit
+will calculate tables. By default this is \code{TRUE}}
 
 \item{...}{Ignored parameters}
+
+\item{stiff}{a logical (\code{TRUE} by default) indicating whether
+    the ODE system is stiff or not.
+
+    For stiff ODE sytems (\code{stiff = TRUE}), \code{RxODE} uses the
+    LSODA (Livermore Solver for Ordinary Differential Equations)
+    Fortran package, which implements an automatic method switching
+    for stiff and non-stiff problems along the integration
+    interval, authored by Hindmarsh and Petzold (2003).
+
+    For non-stiff systems (\code{stiff = FALSE}), \code{RxODE} uses
+    DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
+    Dormand and Prince as implemented in C by Hairer and Wanner
+    (1993).}
 }
 \description{
 Control Options for FOCEi
@@ -173,6 +252,8 @@ be reflective of the scaled problem's condition-number.
 \code{\link{optim}}
 
 \code{\link[n1qn1]{n1qn1}}
+
+\code{\link[RxODE]{rxSolve}}
 }
 \author{
 Matthew L. Fidler

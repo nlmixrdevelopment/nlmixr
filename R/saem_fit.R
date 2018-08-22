@@ -631,6 +631,7 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @param seed seed for random number generator
 #' @param distribution one of c("normal","poisson","binomial")
 #' @param fixed a character vector of fixed effect only parameters (no random effects attached) to be fixed
+#' @param DEBUG Integer determining if debugging is enabled.
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by he Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm

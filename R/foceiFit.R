@@ -23,13 +23,16 @@ is.latex <- function() {
 ##'
 ##' @param sigdig Optimization significant digits. This controls:
 ##'
-##'  Defaults for optimization and ODE solving
+##' \itemize{
 ##'
-##'  The tolerance of the inner and outer optimization is \code{10^-sigdig}
+##'  \item The tolerance of the inner and outer optimization is \code{10^-sigdig}
 ##'
-##'  The tolerance of the ODE solvers is \code{10^(-sigdig-1)}
+##'  \item The tolerance of the ODE solvers is \code{10^(-sigdig-1)}
 ##'
-##'  The significant figures that some tables are rounded to.
+##'  \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
+##'
+##'  \item The significant figures that some tables are rounded to.
+##' }
 ##'
 ##' @param epsilon Precision of estimate for n1qn1 optimization.
 ##'
@@ -51,7 +54,7 @@ is.latex <- function() {
 ##'     value.  By default this is 1.  When \code{scaleObjective} is
 ##'     greater than zero, this scaling is performed by:
 ##'
-##'      \code{scaledObj = currentObj / |initialObj| * scaleObjective}
+##'      \code{scaledObj = currentObj / \|initialObj\| * scaleObjective}
 ##'
 ##'     Therefore, if the initial objective function is negative, the
 ##'     initial scaled objective function would be negative as well.
@@ -74,17 +77,20 @@ is.latex <- function() {
 ##'
 ##' @param covMethod Method for calculating covariance.  In this
 ##'     discussion, R is the Hessian matrix of the objective
-##'     function. The S matrix is the sum of each individual's
+##'     function. The S matrix is the sum of individual
 ##'     gradient cross-product (evaluated at the individual empirical
 ##'     Bayes estimates).
 ##'
-##'  "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \eqn{R^-1 \times S \times R^-1}
+##' \itemize{
 ##'
-##'  "\code{r}" Uses the Hessian matrix to calculate the covariance as \eqn{2\times R^-1}
+##'  \item "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \code{solve(R) %*% S %*% solve(R)}
 ##'
-##'  "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
+##'  \item "\code{r}" Uses the Hessian matrix to calculate the covariance as \code{2 %*% solve(R)}
 ##'
-##'  "" Does not calculate the covariance step.
+##'  \item "\code{s}" Uses the crossproduct matrix to calculate the covariance as \code{4 %*% solve(S)}
+##'
+##'  \item "" Does not calculate the covariance step.
+##' }
 ##'
 ##' @param lbfgsLmm An integer giving the number of BFGS updates
 ##'     retained in the "L-BFGS-B" method, It defaults to 40.
@@ -94,7 +100,7 @@ is.latex <- function() {
 ##'     On entry pgtol >= 0 is specified by the user.  The iteration
 ##'     will stop when:
 ##'
-##'        \code{max{|proj g_i | i = 1, ..., n} <= lbfgsPgtol}
+##'        \code{max(\| proj g_i \| i = 1, ..., n) <= lbfgsPgtol}
 ##'
 ##'     where pg_i is the ith component of the projected gradient.
 ##'
@@ -110,15 +116,16 @@ is.latex <- function() {
 ##'     \code{.Machine$double.eps}
 ##'
 ##' @param diagXform This is the transformation used on the diagonal
-##'     of the \code{chol(inv(omega))}. This matrix and values are the
+##'     of the \code{chol(solve(omega))}. This matrix and values are the
 ##'     parameters estimated in FOCEi. The possibilities are:
 ##'
-##'  \code{sqrt} Estimates the sqrt of the diagonal elements of \code{chol(inv(omega))}.  This is the default method.
+##' \itemize{
+##'  \item \code{sqrt} Estimates the sqrt of the diagonal elements of \code{chol(solve(omega))}.  This is the default method.
 ##'
-##'  \code{log} Estimates the log of the diagonal elements of \code{chol(inv(omega))}
+##'  \item \code{log} Estimates the log of the diagonal elements of \code{chol(solve(omega))}
 ##'
-##'  \code{identity} Estimates the diagonal elements without any transformations
-##'
+##'  \item \code{identity} Estimates the diagonal elements without any transformations
+##' }
 ##' @param sumProd Is a boolean indicating if the model should change
 ##'     multiplication to high precision multiplication and sums to
 ##'     high precision sums using the PreciseSums package.  By default
@@ -129,7 +136,14 @@ is.latex <- function() {
 ##'     calculation. By default this is turned on.
 ##'
 ##' @param ci Confidence level for some tables.  By default this is
-##'     0.95 or 95% confidence.
+##'     0.95 or 95\% confidence.
+##'
+##' @param useColor Boolean indicating if focei can use ASCII color codes
+##'
+##' @param boundTol Tolerance for boundary issues.
+##'
+##' @param calcTables This boolean is to determine if the foceiFit
+##'     will calculate tables. By default this is \code{TRUE}
 ##'
 ##' @param ... Ignored parameters
 ##'
@@ -138,6 +152,7 @@ is.latex <- function() {
 ##'
 ##' @param maxOuterIterations Maximum number of L-BFGS-B optimization
 ##'     for outer problem.
+##'
 ##' @param n1qn1nsim Number of function evaluations for n1qn1
 ##'     optimization.
 ##'
@@ -146,6 +161,11 @@ is.latex <- function() {
 ##'
 ##' @param addPosthoc Boolean indicating if posthoc parameters are
 ##'     added to the table output.
+##'
+##' @param printNcol Number of columns to printout before wrapping
+##'     parameter estimates/gradient
+##'
+##' @inheritParams RxODE::rxSolve
 ##'
 ##' @details
 ##'
@@ -172,6 +192,7 @@ is.latex <- function() {
 ##'
 ##' @seealso \code{\link{optim}}
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
+##' @seealso \code{\link[RxODE]{rxSolve}}
 ##' @export
 foceiControl <- function(sigdig=4,
                          epsilon=NULL, #1e-4,
@@ -200,7 +221,6 @@ foceiControl <- function(sigdig=4,
                          sumProd=FALSE,
                          optExpression=TRUE,
                          ci=0.95,
-                         ## outerOpt=c("lbfgsb", "qnbd"),
                          useColor=crayon::has_color(),
                          boundTol=NULL,
                          calcTables=TRUE,
@@ -1439,9 +1459,11 @@ focei.eta.nlmixrFitCore <- function(object, ...){
 ##' @param pt Proc time object
 ##' @param ... Other Parameters
 ##' @param data The data to pass to the FOCEi translation.
+##' @param calcResid A boolean to indicate if the CWRES residuals
+##'     should be calculated
 ##' @return A FOCEi fit style object.
 ##' @author Matthew L. Fidler
-as.focei <- function(object, uif, pt=proc.time(), ..., data){
+as.focei <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE){
     UseMethod("as.focei");
 }
 

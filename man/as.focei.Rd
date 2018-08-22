@@ -5,7 +5,7 @@
 \alias{as.focei.nlmixrNlme}
 \title{Convert fit to FOCEi style fit}
 \usage{
-as.focei(object, uif, pt = proc.time(), ..., data)
+as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
 
 \method{as.focei}{nlmixrNlme}(object, uif, pt = proc.time(), ..., data,
   calcResid = TRUE)
@@ -20,6 +20,9 @@ as.focei(object, uif, pt = proc.time(), ..., data)
 \item{...}{Other Parameters}
 
 \item{data}{The data to pass to the FOCEi translation.}
+
+\item{calcResid}{A boolean to indicate if the CWRES residuals
+should be calculated}
 }
 \value{
 A FOCEi fit style object.

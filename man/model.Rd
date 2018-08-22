@@ -8,6 +8,8 @@ model(model, ...)
 }
 \arguments{
 \item{model}{Model specification}
+
+\item{...}{Other arguments to model object parsed by nlmixr}
 }
 \value{
 Parsed UI object
