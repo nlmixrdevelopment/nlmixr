@@ -32,6 +32,7 @@
 
 .simInfo <- function(object){
     .mod <- RxODE::rxNorm(object$model$pred.only)
+    .mod <- gsub(rex::rex("d/dt(", capture(except_any_of("\n;)")), ")", or("=", "~")), "d/dt(\\1)~", .mod);
     .lhs <- object$model$pred.only$lhs
     .lhs <- .lhs[.lhs != "rx_pred_"];
     .omega <- object$omega

@@ -21,6 +21,7 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, .
     .si <- object$simInfo
     .rx <- .si$rx;
     .rx <- gsub(rex::rex(capture("ipred"), or("=", "~"),  except_any_of("\n;"), any_of("\n;")), "", .rx)
+    .rx <- gsub(rex::rex("d/dt(", capture(except_any_of("\n;)")), ")", or("=", "~")), "d/dt(\\1)~", .rx);
     .rx <- gsub(rex::rex("sim", or("=", "~"), "rxTBSi(", capture(except_any_of(",)")), ",", anything, any_of("\n;")),
                 "sim=\\1", .rx)
     .si$rx <- .rx
