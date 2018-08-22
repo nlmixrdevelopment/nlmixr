@@ -81,6 +81,10 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
 <%=assgnPars%>
 
     wm = evt.rows( find(id == i) );
+    if(wm.n_rows==0) {
+      Rcout << "ID = " << i+1 << " has no data. Please check." << endl;
+      arma_stop_runtime_error("");
+    }
 
     vec time__;
     time__ = wm.col(1);
@@ -835,8 +839,10 @@ configsaem <- function(model, data, inits,
 
   y = data$data[,"DV"]
   id = data$data[,"ID"]
+  check = any(diff(unique(id))!=1)
+  if (check) stop("saem classic UI needs sequential ID. check your data")
   ntotal = length(id)
-    N = length(unique(id))
+  N = length(unique(id))
   covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
