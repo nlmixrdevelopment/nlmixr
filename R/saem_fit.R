@@ -118,16 +118,13 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
 	    evid.memptr(), &ntime, inits.memptr(), amt.memptr(), ret.memptr(),
 	    &atol, &rtol, &stiff, &transit_abs, &nlhs, lhs.memptr(), &rc);
 
-    if ( DEBUG > 3 || (DEBUG > 2 && rc != 0) ) {
+    if ( DEBUG > 4 && rc != 0 ) {
         Rcout << "pars: " << params.t();
         Rcout << "inits: " << inits.t();
         Rcout << "LSODA return code: " << rc << endl;
+        Rcout << wm << endl;
     }
 	ret = join_cols(join_cols(time__.t(), ret), lhs).t();
-    if (DEBUG>3) {
-        Rcout << wm << endl;
-        Rcout << ret << endl;
-    }
 	uvec r  = find(evid == 0);
 	ret = ret.rows(r);
 	ivec cmtObs = cmt(r);
@@ -137,12 +134,9 @@ vec user_function(const mat &phi, const mat &evt, const List &opt) {
 mat g(time.n_elem, <%=nendpnt%>);
 <%=pred_expr%>
 
-if (0 && g.has_nan()) {
-	Rcout << "====================================================================================" << endl;
-	Rcout << "WARNING: NaN in prediction." << endl;
-	Rcout << "Consider to: relax atol & rtol; change initials; change seed; change strcuture model" << endl;
-	Rcout << "Make sure the below pars & initial conditions reasonable" << endl;
-	Rcout << "====================================================================================" << endl;
+if (g.has_nan()) {
+	Rcout << "NaN in prediction. Consider to: relax atol & rtol; change initials; change seed; change strcuture model." << endl;
+    if ( DEBUG > 4) {
 	Rcout << "pars: " << params.t();
 	Rcout << "inits: " << inits.t();
 	Rcout << "LSODA code: " << rc << endl;
@@ -150,7 +144,8 @@ if (0 && g.has_nan()) {
 	Rcout << wm;
 	Rcout << "LSODA solutions:" << endl;
 	Rcout << ret << endl;
-	g.replace(datum::nan, -1.0e9);
+	}
+	g.replace(datum::nan, 1.0e99);
 }
 
 int nendpnt = <%=nendpnt%>;
@@ -786,6 +781,13 @@ configsaem <- function(model, data, inits,
   s = subset(data$nmdat, EVID==0)
   data$data = as.matrix(s[,c("ID", "TIME", "DV", c(model$covars, inPars))])
 
+  ###  chk for no obs records
+  wh = setdiff(unique(data$nmdat$ID), unique(data$data[,"ID"]))
+  if (length(wh)) {
+      msg = paste0("No data with ID: ", paste(wh, collapse = ", "))
+      stop(msg)
+  }
+
   nphi = model$N.eta
   mcov = model$cov.mod
   covstruct = model$omega
@@ -834,13 +836,7 @@ configsaem <- function(model, data, inits,
   y = data$data[,"DV"]
   id = data$data[,"ID"]
   ntotal = length(id)
-  N = length(unique(id))
-  wh = setdiff(data$nmdat$ID, unique(id))
-  if(length(wh)) {
-    msg = paste0("observations not found for ID: ", paste(wh, collapse=", "))
-    stop(msg)
-  }
-
+    N = length(unique(id))
   covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
