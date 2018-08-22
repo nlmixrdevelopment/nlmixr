@@ -21,6 +21,9 @@ extern SEXP nlmixr_lin_cmt(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP)
 extern SEXP _nlmixr_llik_binomial_c(SEXP, SEXP, SEXP);
 extern SEXP slice_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
+extern SEXP _nlmixr_npde(SEXP, SEXP, SEXP, SEXP, SEXP, 
+			 SEXP);
+
 extern SEXP _nlmixr_llik_poisson(SEXP, SEXP);
 extern SEXP _nlmixr_llik_normal(SEXP, SEXP);
 extern SEXP _nlmixr_llik_betabinomial(SEXP, SEXP, SEXP);
@@ -65,6 +68,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_nlmixrShrink", (DL_FUNC) &_nlmixr_nlmixrShrink, 3},
   {"_nlmixr_convertEvid", (DL_FUNC) &_nlmixr_convertEvid, 2},
   {"_nlmixr_convertEvidRate", (DL_FUNC) &_nlmixr_convertEvidRate, 2},
+  {"_nlmixr_npde", (DL_FUNC) &_nlmixr_npde, 6},
   {NULL, NULL, 0}
 };
 

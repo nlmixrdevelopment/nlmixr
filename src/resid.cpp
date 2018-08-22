@@ -356,3 +356,167 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   ret[2] = etasDfFull;
   return ret;
 }
+
+// [[Rcpp::export]]
+List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector lambda, NumericVector yj, bool ties = false){
+  bool warn1 = false;
+  bool warn2 = false;
+  int nobs = dv.size();
+  int K = sim.size()/nobs;
+  NumericVector epredt(nobs);
+  NumericVector epred(nobs);
+  NumericVector eres(nobs);
+  NumericVector erest(nobs);
+  NumericVector simrest(sim.size());
+  // NumericVector simY(sim.size());
+  // NumericVector Y(nobs);
+  NumericVector pd(nobs);
+  NumericVector npde(nobs);
+  NumericVector dvt(nobs);
+  IntegerVector idLoc(nobs);
+  // This uses welford's method for means
+  int lastId=id[0], nid=1;
+  idLoc[0]=0;
+  for (int i = 0; i < nobs; i++){
+    if (lastId != id[i]){
+      idLoc[nid] = i;
+      nid++;
+      lastId = id[i];
+    }
+    // Calculte EPREDt
+    epredt[i] = sim[i];
+    for (int j = 1; j < K; j++){
+      epredt[i] = epredt[i]+(sim[i+nobs*j]-epredt[i])/((double)(j+1));
+    }
+    // Calculate dvt, EPRED, ERES ERESt
+    dvt[i] = powerD(dv[i], lambda[i], (int)yj[i]);
+    epred[i] = powerDi(epredt[i], lambda[i], (int)yj[i]);
+    eres[i] = dv[i] - epred[i];
+    erest[i] = dvt[i] - epredt[i];
+    // Calculate simRESt
+    for (int j = K; j--; ){
+      simrest[i+nobs*j] = sim[i+nobs*j]-epredt[i];
+    }
+  }
+  idLoc[nid] = nobs;
+  // Calculate Var(Yj)
+  // Even though we are using matrix algebra, we are still using Welford's method
+  double d;
+  for (int i = 0; i < nid; i++){
+    arma::mat d1(idLoc[i+1]-idLoc[i], 1);
+    std::copy(simrest.begin()+idLoc[i], simrest.begin()+idLoc[i+1], d1.begin());
+    mat vYi = d1 * trans(d1);
+    mat vYi2;
+    for (int j = 1; j < K; j++){
+      std::copy(simrest.begin()+idLoc[i]+nobs*j, simrest.begin()+idLoc[i+1]+nobs*j, d1.begin());
+      d=j+1;
+      vYi2=d1 * trans(d1);
+      vYi = vYi + (vYi2 - vYi)/d;
+    }
+    // Now decorrelate covariance
+    vec eigval;
+    mat eigvec;
+    vec d;
+    mat u;
+    mat v;
+    arma::mat ch;
+    mat eigvalS(vYi.n_rows, vYi.n_rows, fill::zeros);
+    try {
+      ch = chol(vYi);
+    } catch (...){
+      Function loadNamespace("loadNamespace", R_BaseNamespace);
+      Environment rx = loadNamespace("RxODE");
+      Function nearpd = rx[".nearPd"];    
+
+      // Try nearPD from R/RxODE
+      warn1 = true;
+      ch = as<mat>(nearpd(wrap(vYi)));
+      try {
+	ch = chol(ch);
+      } catch (...){
+	stop("The simulated data covariance matrix Cholesky decomposition could not be obtained for %d.", i+1);
+      }
+    }
+    try{
+      vYi = trans(inv(trimatu(ch)));
+    } catch (...) {
+      warn2=true;
+      try {
+	vYi = trans(pinv(trimatu(ch)));
+      } catch (...){
+	stop("The simulated data covariance matrix Cholesky decomposition inverse or pseudo-inverse could not be obtained for %d.", i+1);
+      }
+    }
+    // Now calculate  Y_{i,sim} and Y_i
+    std::copy(erest.begin()+idLoc[i], erest.begin()+idLoc[i+1], d1.begin());
+    mat Yi = vYi*d1;
+    mat Yis;
+    std::copy(simrest.begin()+idLoc[i], simrest.begin()+idLoc[i+1], d1.begin());
+    Yis = vYi*d1;
+    for (int k = idLoc[i]; k < idLoc[i+1]; k++){
+      if (Yi[k-idLoc[i]] < Yis[k-idLoc[i]]){
+        pd[k] = 1.0;
+      } else {
+	pd[k] = 0.0;
+      }
+    }
+    double de;
+    for (int j = 1; j < K; j++){
+      de = j+1;
+      for (int k = idLoc[i]; k < idLoc[i+1]; k++){
+        std::copy(simrest.begin()+idLoc[i]+j*nobs, simrest.begin()+idLoc[i+1]+j*nobs, d1.begin());
+        Yis = vYi*d1;
+        if (Yi[k-idLoc[i]] < Yis[k-idLoc[i]]){
+          pd[k] = pd[k]+(1-pd[k])/de;
+        } else {
+          pd[k] = pd[k]-pd[k]/de;
+        }
+      }
+    }
+  }
+  // Now deal with exceptions pd=1 or 0 or when ties=FALSE, put some
+  // random noise in.
+  if (ties){
+    for (int i = pd.size(); i--;){
+      if (fabs(pd[i]) < DOUBLE_EPS){
+	pd[i] = 1 / (2.0 * K);
+      } else if (fabs(1-pd[i]) < DOUBLE_EPS){
+	pd[i] = 1 - 1 / (2.0 * K);
+      }
+      npde[i] = -qnorm(pd[i], 0.0, 1.0, true, false);
+    }
+  } else {
+    // This is a little different than the NPDE manual
+    // the bounds are 1/(2K) to 1 - 1/(2K) instead of 0 to 1
+    for (int i = pd.size(); i--;){
+      if (fabs(pd[i]) < DOUBLE_EPS){
+        pd[i] = Rf_runif(0, 1/K);
+      } else if (fabs(1-pd[i]) < DOUBLE_EPS){
+        pd[i] = Rf_runif(1.0 - 1/K, 1.0);
+      } else {
+	pd[i] = Rf_runif(0, 1/K) + pd[i];
+      }
+
+      if (fabs(pd[i]) < 1 / (2.0 * K)){
+        pd[i] = 1 / (2.0 * K);
+      } else if (fabs(1-pd[i]) < 1 / (2.0 * K)){
+        pd[i] = 1 - 1 / (2.0 * K);
+      }
+      npde[i] = -qnorm(pd[i], 0.0, 1.0, true, false);
+    }
+  }
+  List ret(3);
+  ret[0] = epred;
+  ret[1] = eres;
+  ret[2] = npde;
+  ret.attr("names") = CharacterVector::create("EPRED", "ERES", "NPDE");
+  ret.attr("row.names") = IntegerVector::create(NA_INTEGER, -nobs);
+  ret.attr("class") = "data.frame";
+  if (warn1){
+    warning("Some subjects simulated data covariance matrix were corrected with Matrix::nearPD");
+  }
+  if (warn2){
+    warning("Some subjects simulated data covariance matrix were inverted by a psuedo-inverse");
+  }
+  return ret;
+}

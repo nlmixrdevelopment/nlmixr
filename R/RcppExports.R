@@ -45,3 +45,7 @@ nlmixrResid <- function(innerList, omegaMat, dv, lambda, yj, etasDf, etaLst) {
     .Call(`_nlmixr_nlmixrResid`, innerList, omegaMat, dv, lambda, yj, etasDf, etaLst)
 }
 
+npde <- function(id, dv, sim, lambda, yj, ties = FALSE) {
+    .Call(`_nlmixr_npde`, id, dv, sim, lambda, yj, ties)
+}
+

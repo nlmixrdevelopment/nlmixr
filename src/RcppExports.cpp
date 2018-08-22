@@ -154,3 +154,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// npde
+List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector lambda, NumericVector yj, bool ties);
+RcppExport SEXP _nlmixr_npde(SEXP idSEXP, SEXP dvSEXP, SEXP simSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP tiesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type id(idSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dv(dvSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sim(simSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type yj(yjSEXP);
+    Rcpp::traits::input_parameter< bool >::type ties(tiesSEXP);
+    rcpp_result_gen = Rcpp::wrap(npde(id, dv, sim, lambda, yj, ties));
+    return rcpp_result_gen;
+END_RCPP
+}

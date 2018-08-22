@@ -94,11 +94,18 @@
 ##' @export
 nlmixrSim <- function(object, ...){
     .si <- .simInfo(object);
-    message("Compiling model...", appendLF=FALSE)
+    .xtra <- list(...)
+    if (any(names(.xtra) == "rx")){
+        .si$rx <- .xtra$rx
+    }
+    if (!is.null(.xtra$modelName)){
+        message(sprintf("Compiling %s model...", .xtra$modelName), appendLF=FALSE)
+    } else {
+        message("Compiling model...", appendLF=FALSE)
+    }
     .newobj <- RxODE::RxODE(.si$rx);
     on.exit({RxODE::rxUnload(.newobj)});
     message("done");
-    .xtra <- list(...)
     if (any(names(.xtra) == "dfObs")){
         .si$dfObs <- .xtra$dfObs;
     }
@@ -133,21 +140,23 @@ nlmixrSim <- function(object, ...){
     .xtra$dfSub <- .si$dfSub
     .xtra$sigma <- .si$sigma;
     .ret <- do.call(getFromNamespace("rxSolve", "RxODE"), .xtra, envir=parent.frame(2))
-    .rxEnv <- attr(class(.ret),".RxODE.env")
-    if (!is.null(.xtra$nsim)){
-        .rxEnv$nSub <- .xtra$nsim
+    if (inherits(.ret, "rxSolve")){
+        .rxEnv <- attr(class(.ret),".RxODE.env")
+        if (!is.null(.xtra$nsim)){
+            .rxEnv$nSub <- .xtra$nsim
+        }
+        if (!is.null(.xtra$nSub)){
+            .rxEnv$nSub <- .xtra$nSub
+        }
+        if (is.null(.xtra$nStud)){
+            .rxEnv$nStud <- 1;
+        } else {
+            .rxEnv$nStud <- .xtra$nStud
+        }
+        .cls <- c("nlmixrSim", class(.ret));
+        attr(.cls, ".RxODE.env") <- .rxEnv
+        class(.ret) <- .cls
     }
-    if (!is.null(.xtra$nSub)){
-        .rxEnv$nSub <- .xtra$nSub
-    }
-    if (is.null(.xtra$nStud)){
-        .rxEnv$nStud <- 1;
-    } else {
-        .rxEnv$nStud <- .xtra$nStud
-    }
-    .cls <- c("nlmixrSim", class(.ret));
-    attr(.cls, ".RxODE.env") <- .rxEnv
-    class(.ret) <- .cls
     return(.ret)
 }
 

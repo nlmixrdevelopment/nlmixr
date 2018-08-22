@@ -1,4 +1,4 @@
-#FIXME: g by endpint
+                                        #FIXME: g by endpint
 calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
 #nnodes.gq=8, nsd.gq=4
     dopred = attr(fit, "dopred")
@@ -30,8 +30,8 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
 
     phiM = matrix(scan(saem.cfg$phiMFile), byrow=T, ncol=nphi)
     dim(phiM) = c(N, saem.cfg$nmc, saem.cfg$niter, nphi)
-    print(head(phiM))
-    print(dim(phiM))
+    ## print(head(phiM))
+    ## print(dim(phiM))
     cond.mean.phi = apply(phiM, c(1,4), mean)
     var.all = lapply(1:N, function(k) {
       x = phiM[k, , ,];
