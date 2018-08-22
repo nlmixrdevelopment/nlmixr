@@ -685,7 +685,8 @@ addCwres <- function(fit, updateObject=TRUE){
     .saem <- fit$saem
     .cls <- class(fit);
     if (!is.null(.saem)){
-        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE);
+        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE,
+                                    obf=fit$objDf["SAEMg","OBJF"]);
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
     }
@@ -711,5 +712,4 @@ addCwres <- function(fit, updateObject=TRUE){
         assign(.bound, .new, envir=.parent)
     }
     return(.new);
-
 }

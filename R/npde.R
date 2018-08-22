@@ -24,7 +24,7 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, .
     .rx <- gsub(rex::rex("sim", or("=", "~"), "rxTBSi(", capture(except_any_of(",)")), ",", anything, any_of("\n;")),
                 "sim=\\1", .rx)
     .si$rx <- .rx
-    .dat <- nlmixrData(getData(fit))
+    .dat <- nlmixrData(getData(object))
     .dat <- .dat[.dat$EVID == 0, ]
     .si$object <- object;
     .si$returnType <- "data.frame.TBS";

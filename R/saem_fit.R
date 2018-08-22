@@ -1313,7 +1313,7 @@ focei.eta.saemFit <- function(object, uif, ...){
     return(ome)
 }
 
-as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE){
+as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL){
     RxODE::rxSolveFree();
     .saemTime <- proc.time() - pt;
     if (class(uif) == "function"){
@@ -1334,12 +1334,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
             eta.trans[eta.trans >= i] <- eta.trans[eta.trans >= i] - 1
         }
     }
-    ## orig eta ->  new eta
     mat2 <- mat[, eta.trans, drop = FALSE];
-    ## for (i in seq_along(eta.trans)){
-    ##     ## i = old eta->  eta.trans[i] = saem.eta
-    ##     mat2[,i] <- mat[, eta.trans[i]];
-    ## }
     th <- focei.theta(fit, uif)
     for (n in names(th)){
         uif.new$est[uif.new$name == n] <- th[n];
@@ -1401,7 +1396,11 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     dimnames(.m) <- list(NULL, .allThetaNames);
     .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
     .fixedNames <- paste(uif$ini$name[which(uif$ini$fix)]);
-    .saemObf <- -calc.2LL(object);
+    if (is.null(obf)){
+        .saemObf <- calc.2LL(object);
+    } else {
+        .saemObf <- obf;
+    }
     if (length(.fixedNames) > 0){
         .env$parHistStacked <- .env$parHistStacked[!(.env$parHistStacked$par %in% .fixedNames),, drop = FALSE];
         .env$parHist <- .env$parHist[, !(names(.env$parHist) %in% .fixedNames), drop = FALSE];
