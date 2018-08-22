@@ -28,7 +28,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
     ind.io = grep(1, t(io))
     DYF = matrix(0, mlen, N)
 
-    phiM = matrix(scan(saem.cfg$phiMFile), byrow=T, ncol=nphi)
+    phiM = matrix(scan(saem.cfg$phiMFile, quiet=TRUE), byrow=TRUE, ncol=nphi)
     dim(phiM) = c(N, saem.cfg$nmc, saem.cfg$niter, nphi)
     ## print(head(phiM))
     ## print(dim(phiM))
