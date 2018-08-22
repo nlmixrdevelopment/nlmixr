@@ -101,13 +101,14 @@ armaVersion <- function(){
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
-nlmixr <- function(object, data, est="nlme", control=list(), calc.resid=TRUE, ...){
+nlmixr <- function(object, data, est="nlme", control=list(),
+                   table=tableControl(), ...){
     UseMethod("nlmixr")
 }
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.function <- function(object, data, est="nlme", control=list(), calc.resid=TRUE, ...){
+nlmixr.function <- function(object, data, est="nlme", control=list(), table=tableControl(), ...){
     uif <- nlmixrUI(object);
     class(uif) <- "list";
     uif$nmodel$model.name <- deparse(substitute(object))
@@ -117,7 +118,7 @@ nlmixr.function <- function(object, data, est="nlme", control=list(), calc.resid
     } else {
         uif$nmodel$data.name <- deparse(substitute(data))
         class(uif) <- "nlmixrUI"
-        nlmixr_fit(uif, data, est, control=control, calc.resid=calc.resid, ...);
+        nlmixr_fit(uif, data, est, control=control, table=table, ...);
     }
 }
 
@@ -135,28 +136,6 @@ nlmixr.nlmixrUI <- function(object, data, est="nlme", control=list(), ...){
     }
 }
 
-##' @rdname nlmixr
-##' @export
-nlmixr.nlmixr.ui.nlme <- function(object, data, est="nlme", ...){
-    env <- attr(object, ".focei.env")
-    uif <- env$uif.new;
-    if (missing(data) && missing(est)){
-        return(uif)
-    } else {
-        if (missing(data)){
-            data <- getData(object);
-        }
-        nlmixr_fit(uif, data, est, ...);
-    }
-}
-
-##' @rdname nlmixr
-##' @export
-nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
-
-##' @rdname nlmixr
-##' @export
-nlmixr.nlmixr.ui.saem <- nlmixr.nlmixr.ui.nlme
 ##' Convert/Format the data appropriately for nlmixr
 ##'
 ##' @param data is the name of the data to convert.  Can be a csv file
@@ -243,19 +222,22 @@ nlmixrData.default <- function(data){
 ##'     EVIDs.
 ##' @param est Estimation method
 ##' @param control Estimation control options.  They could be
-##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}
+##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
+##'     \code{\link{foceiControl}}
 ##' @param ... Parameters passed to estimation method.
 ##' @param sum.prod Take the RxODE model and use more precise
 ##'     products/sums.  Increases solving accuracy and solving time.
-##' @param calc.resid Translate the model to FOCEi and then run
-##'     the tables and objective function so that different estimation
-##'     methodologies are comparable through OBJF.
+##' @param table A list controlling the table options (i.e. CWRES,
+##'     NPDE etc).  See \code{\link{tableControl}}.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
-                       sum.prod=FALSE, calc.resid=TRUE){
+                       sum.prod=FALSE, table=tableControl()){
     start.time <- Sys.time();
+    if (!is(table, "tableControl")){
+        table <- do.call(tableControl, table);
+    }
     dat <- nlmixrData(data);
     up.covs <- toupper(uif$all.covs);
     up.names <- toupper(names(dat))
@@ -280,6 +262,30 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             return(x);
         } else {
             return(x);
+        }
+    }
+    .addNpde <- function(x){
+        .doIt <- table$npde;
+        if (is.null(.doIt)){
+            if (est == "saem"){
+                .doIt <- table$saemNPDE
+            } else if (est == "focei"){
+                .doIt <- table$foceiNPDE
+            } else if (est == "nlme"){
+                .doIt <- table$nlmeNPDE
+            }
+        }
+        if (!.doIt) return (x);
+        .ret <- try(addNpde(x,nsim=table$nsim, ties=table$ties, seed=table$seed, updateObject=FALSE), silent=TRUE);
+        if (inherits(.ret, "try-error")) return(x);
+        return(.ret);
+    }
+    calc.resid <- table$cwres;
+    if (is.null(calc.resid)){
+        if (est == "saem"){
+            calc.resid <- table$saemCWRES
+        } else if (est == "nlme"){
+            calc.resid <- table$nlmeCWRES
         }
     }
     if (est == "saem"){
@@ -353,7 +359,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             if (inherits(.ret, "try-error")){
                 return(fit)
             }
-            .env <- .ret$env
+            .ret <- .addNpde(.ret);
             assign("startTime", start.time, .env);
             assign("est", est, .env);
             assign("stopTime", Sys.time(), .env);
@@ -368,6 +374,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                     if (inherits(.ret, "try-error")){
                         return(fit)
                     }
+                    .ret <- .addNpde(.ret);
                     .env <- .ret$env
                     assign("startTime", start.time, .env);
                     assign("est", est, .env);
@@ -376,6 +383,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 }
             }
             .ret <- fix.dat(.ret);
+            .ret <- .addNpde(.ret);
             .env <- .ret$env
             assign("startTime", start.time, .env);
             assign("est", est, .env);
@@ -388,6 +396,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 if (inherits(.ret, "try-error")){
                     return(fit)
                 }
+                .ret <- .addNpde(.ret);
                 .env <- .ret$env
                 assign("startTime", start.time, .env);
                 assign("est", est, .env);
@@ -395,6 +404,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 return(.ret);
             }
             .ret <- fix.dat(.ret);
+            .ret <- .addNpde(.ret);
             .env <- .ret$env
             assign("startTime", start.time, .env);
             assign("est", est, .env);
@@ -477,6 +487,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             if (inherits(.ret, "try-error")){
                 return(fit);
             }
+            .ret <- .addNpde(.ret);
             .env <- .ret$env
             assign("startTime", start.time, .env);
             assign("est", est, .env);
@@ -492,6 +503,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                     if (inherits(.ret, "try-error")){
                         return(fit);
                     }
+                    .ret <- .addNpde(.ret);
                     .env <- .ret$env
                     assign("startTime", start.time, .env);
                     assign("est", est, .env);
@@ -500,6 +512,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 }
             }
             .ret <- fix.dat(.ret);
+            .ret <- .addNpde(.ret);
             .env <- .ret$env
             assign("startTime", start.time, .env);
             assign("est", est, .env);
@@ -513,12 +526,14 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                     return(fit);
                 }
                 .env <- .ret$env
+                .ret <- .addNpde(.ret);
                 assign("startTime", start.time, .env);
                 assign("est", est, .env);
                 assign("stopTime", Sys.time(), .env);
                 return(.ret)
             }
             .ret <- fix.dat(.ret);
+            .ret <- .addNpde(.ret);
             .env <- .ret$env
             assign("startTime", start.time, .env);
             assign("est", est, .env);
@@ -543,6 +558,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                         control=control,
                         env=env,
                         ...)
+        fit <- .addNpde(fit);
         assign("start.time", start.time, env);
         assign("est", est, env);
         assign("stop.time", Sys.time(), env);
@@ -685,8 +701,7 @@ addCwres <- function(fit, updateObject=TRUE){
     .saem <- fit$saem
     .cls <- class(fit);
     if (!is.null(.saem)){
-        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE,
-                                    obf=fit$objDf["SAEMg","OBJF"]);
+        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=fit$objDf["SAEMg","OBJF"]);
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
     }

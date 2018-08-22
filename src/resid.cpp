@@ -361,6 +361,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
 List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector lambda, NumericVector yj, bool ties = false){
   bool warn1 = false;
   bool warn2 = false;
+  bool warn3=false;
   int nobs = dv.size();
   int K = sim.size()/nobs;
   NumericVector epredt(nobs);
@@ -372,11 +373,13 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
   // NumericVector Y(nobs);
   NumericVector pd(nobs);
   NumericVector npde(nobs);
+  NumericVector nsim(nobs);
   NumericVector dvt(nobs);
   IntegerVector idLoc(nobs);
   // This uses welford's method for means
   int lastId=id[0], nid=1;
   idLoc[0]=0;
+  int k2=0;
   for (int i = 0; i < nobs; i++){
     if (lastId != id[i]){
       idLoc[nid] = i;
@@ -384,9 +387,20 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
       lastId = id[i];
     }
     // Calculte EPREDt
-    epredt[i] = sim[i];
+    if (ISNA(sim[i])){
+      epredt[i] = 0;
+      warn3=true;
+    } else {
+      k2++;
+      epredt[i] = sim[i];
+    }
     for (int j = 1; j < K; j++){
-      epredt[i] = epredt[i]+(sim[i+nobs*j]-epredt[i])/((double)(j+1));
+      if (!ISNA(sim[i+nobs*j])){
+	k2++;
+	epredt[i] = epredt[i]+(sim[i+nobs*j]-epredt[i])/((double)(k2));
+      } else {
+	warn3=true;
+      }
     }
     // Calculate dvt, EPRED, ERES ERESt
     dvt[i] = powerD(dv[i], lambda[i], (int)yj[i]);
@@ -405,13 +419,39 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
   for (int i = 0; i < nid; i++){
     arma::mat d1(idLoc[i+1]-idLoc[i], 1);
     std::copy(simrest.begin()+idLoc[i], simrest.begin()+idLoc[i+1], d1.begin());
-    mat vYi = d1 * trans(d1);
+    bool anyNa = false;
+    for (int j = d1.size(); j--;){
+      if (ISNAN(d1[j])){
+        anyNa=true;
+	break;
+      }
+    }
+    mat vYi(idLoc[i+1]-idLoc[i], idLoc[i+1]-idLoc[i], fill::zeros);
+    k2=0;
+    if (anyNa) {
+      warn3=true;
+    } else {
+      k2++;
+      vYi = d1 * trans(d1);
+    }
     mat vYi2;
     for (int j = 1; j < K; j++){
       std::copy(simrest.begin()+idLoc[i]+nobs*j, simrest.begin()+idLoc[i+1]+nobs*j, d1.begin());
-      d=j+1;
-      vYi2=d1 * trans(d1);
-      vYi = vYi + (vYi2 - vYi)/d;
+      anyNa=false;
+      for (int k = d1.size(); k--;){
+        if (ISNAN(d1[k])){
+          anyNa=true;
+          break;
+        }
+      }
+      if (anyNa){
+	warn3=true;
+      } else {
+        k2++;
+        d=k2;
+        vYi2=d1 * trans(d1);
+        vYi = vYi + (vYi2 - vYi)/d;
+      }
     }
     // Now decorrelate covariance
     vec eigval;
@@ -461,14 +501,20 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
       }
     }
     double de;
+    k2 = 0;
     for (int j = 1; j < K; j++){
-      de = j+1;
+      std::copy(simrest.begin()+idLoc[i]+j*nobs, simrest.begin()+idLoc[i+1]+j*nobs, d1.begin());
+      Yis = vYi*d1;        
       for (int k = idLoc[i]; k < idLoc[i+1]; k++){
-        std::copy(simrest.begin()+idLoc[i]+j*nobs, simrest.begin()+idLoc[i+1]+j*nobs, d1.begin());
-        Yis = vYi*d1;
-        if (Yi[k-idLoc[i]] < Yis[k-idLoc[i]]){
+	if (ISNAN(Yis[k-idLoc[i]])){
+	  warn3=true;
+	} else if (Yi[k-idLoc[i]] < Yis[k-idLoc[i]]){
+	  k2++;
+	  de = k2;
           pd[k] = pd[k]+(1-pd[k])/de;
         } else {
+          k2++;
+          de = k2;
           pd[k] = pd[k]-pd[k]/de;
         }
       }
@@ -496,7 +542,6 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
       } else {
 	pd[i] = Rf_runif(0, 1/K) + pd[i];
       }
-
       if (fabs(pd[i]) < 1 / (2.0 * K)){
         pd[i] = 1 / (2.0 * K);
       } else if (fabs(1-pd[i]) < 1 / (2.0 * K)){
@@ -517,6 +562,9 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
   }
   if (warn2){
     warning("Some subjects simulated data covariance matrix were inverted by a psuedo-inverse");
+  }
+  if (warn3){
+    warning("Some of the simulated subjects had NA/NaN values, implying failed solves and likely an unstable model");
   }
   return ret;
 }

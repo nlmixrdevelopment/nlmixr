@@ -4,7 +4,26 @@
 \alias{addNpde}
 \title{NPDE calculation for nlmixr}
 \usage{
-addNpde(object, nsim = 300, ties = TRUE, seed = 1009, ...)
+addNpde(object, nsim = 300, ties = TRUE, seed = 1009,
+  updateObject = TRUE, ...)
+}
+\arguments{
+\item{object}{nlmixr fit object}
+
+\item{nsim}{Number of simulations.  By default this is 300}
+
+\item{ties}{When TRUE, the npde distribution can have ties.  When
+FALSE, the npde distribution uses uniform random numbers to
+prevent ties.}
+
+\item{seed}{Seed for running nlmixr simulation.  By default 1009}
+
+\item{updateObject}{Boolean indicating if original object should be updated.  By default this is TRUE.}
+
+\item{...}{Other ignored parameters.}
+}
+\value{
+New nlmixr fit object
 }
 \description{
 NPDE calculation for nlmixr

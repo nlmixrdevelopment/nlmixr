@@ -35,7 +35,6 @@ is.latex <- function() {
 ##'
 ##' @param maxstepsOde Maximum number of steps for ODE solver.
 ##'
-##'
 ##' @param printInner Integer representing when the inner step is
 ##'     printed. By default this is 0 or do not print.  1 is print
 ##'     every function evaluation, 5 is print every 5 evaluations.

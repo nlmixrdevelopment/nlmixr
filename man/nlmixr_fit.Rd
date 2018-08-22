@@ -5,7 +5,7 @@
 \title{Fit a nlmixr model}
 \usage{
 nlmixr_fit(uif, data, est = "nlme", control = list(), ...,
-  sum.prod = FALSE, calc.resid = TRUE)
+  sum.prod = FALSE, table = tableControl())
 }
 \arguments{
 \item{uif}{Parsed nlmixr model (by \code{nlmixr(mod.fn)}).}
@@ -16,16 +16,16 @@ EVIDs.}
 \item{est}{Estimation method}
 
 \item{control}{Estimation control options.  They could be
-\code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}}
+\code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
+\code{\link{foceiControl}}}
 
 \item{...}{Parameters passed to estimation method.}
 
 \item{sum.prod}{Take the RxODE model and use more precise
 products/sums.  Increases solving accuracy and solving time.}
 
-\item{calc.resid}{Translate the model to FOCEi and then run
-the tables and objective function so that different estimation
-methodologies are comparable through OBJF.}
+\item{table}{A list controlling the table options (i.e. CWRES,
+NPDE etc).  See \code{\link{tableControl}}.}
 }
 \value{
 nlmixr fit object

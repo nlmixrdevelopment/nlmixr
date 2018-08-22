@@ -4,10 +4,12 @@
 \alias{addCwres}
 \title{Add CWRES}
 \usage{
-addCwres(fit)
+addCwres(fit, updateObject = TRUE)
 }
 \arguments{
 \item{fit}{nlmixr fit without WRES/CWRES}
+
+\item{updateObject}{Boolean indicating if the original fit object should be updated. By default this is true.}
 }
 \value{
 fit with CWRES
