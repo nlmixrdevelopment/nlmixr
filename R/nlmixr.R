@@ -101,14 +101,14 @@ armaVersion <- function(){
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
-nlmixr <- function(object, data, est="nlme", control=list(),
+nlmixr <- function(object, data, est=NULL, control=list(),
                    table=tableControl(), ...){
     UseMethod("nlmixr")
 }
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.function <- function(object, data, est="nlme", control=list(), table=tableControl(), ...){
+nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .uif <- nlmixrUI(object);
     class(.uif) <- "list";
@@ -126,15 +126,14 @@ nlmixr.function <- function(object, data, est="nlme", control=list(), table=tabl
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.nlmixrUI <- function(object, data, est="nlme", control=list(), ...){
-    uif <- object
+nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...){
+    .uif <- object
     if (missing(data) && missing(est)){
         return(uif)
     } else {
-        class(uif) <- "list";
-        uif$nmodel$data.name <- deparse(substitute(data))
-        class(uif) <- "nlmixrUI"
-        nlmixr_fit(uif, data, est, control=control, ...);
+        .args <- c(list(uif=.uif), .args[-1]);
+        .uif$nmodel$data.name <- deparse(substitute(data))
+        return(do.call(nlmixr_fit, .args));
     }
 }
 
@@ -236,14 +235,14 @@ nlmixrData.default <- function(data){
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
+nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                        sum.prod=FALSE, table=tableControl()){
     .meta <- uif$meta
-    .missingEst <- missing(est);
-    if (.missingEst && exists("est", envir=.meta)){
+    .missingEst <- is.null(est);
+    if (.missingEst & exists("est", envir=.meta)){
         est <- .meta$est
     }
-    if (missing(control) && exists("control", envir=.meta)){
+    if (.missingEst & missing(control) & exists("control", envir=.meta)){
         control <- .meta$control
         if (is(control, "foceiControl")){
             est <- "focei"
