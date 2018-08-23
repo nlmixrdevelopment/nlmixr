@@ -176,6 +176,8 @@ nlmixrData.default <- function(data){
             stop(sprintf("Multiple '%s' columns in dataset.", n))
         }
     }
+    ## Drop dosing-only IDs
+    dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
     if (is(dat$ID, "factor")){
         dat$ID <- paste(dat$ID);
     }

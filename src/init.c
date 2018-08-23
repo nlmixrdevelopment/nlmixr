@@ -41,6 +41,7 @@ extern SEXP _nlmixr_nlmixrResid(SEXP, SEXP, SEXP, SEXP, SEXP,
 extern SEXP _nlmixr_nlmixrShrink(SEXP, SEXP, SEXP);
 extern SEXP _nlmixr_convertEvidRate(SEXP, SEXP);
 extern SEXP _nlmixr_convertEvid(SEXP, SEXP);
+extern SEXP _nlmixr_allDose(SEXP evid, SEXP ids);
 
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
@@ -69,6 +70,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_convertEvid", (DL_FUNC) &_nlmixr_convertEvid, 2},
   {"_nlmixr_convertEvidRate", (DL_FUNC) &_nlmixr_convertEvidRate, 2},
   {"_nlmixr_npde", (DL_FUNC) &_nlmixr_npde, 6},
+  {"_nlmixr_allDose", (DL_FUNC) &_nlmixr_allDose, 2},
   {NULL, NULL, 0}
 };
 
