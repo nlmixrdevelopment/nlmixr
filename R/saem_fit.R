@@ -1273,7 +1273,11 @@ focei.theta.saemFit <- function(object, uif, ...){
         thetas[add] <- err[1]; ## This seems to be SD;
     }
     if (length(prop) > 0){
-        thetas[prop] <- err[2]; ## This seems to be SD;
+        if (length(err) == 1){
+            thetas[prop] <- err[1]; ## This seems to be SD;
+        } else {
+            thetas[prop] <- err[2]; ## This seems to be SD;
+        }
     }
     w <- which(is.na(thetas))[1];
     return(thetas)

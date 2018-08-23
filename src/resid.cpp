@@ -158,6 +158,18 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   NumericVector rp = pred[0];
   arma::vec rpv = as<arma::vec>(rp);
   NumericVector ri = ipred[0];
+  int warn1 = 0;
+  int warn2 = 0;
+  for (unsigned int j = ri.size(); j--;){
+    if (ri[j] < DOUBLE_EPS){
+      warn1 = 1;
+      ri[j] = 1;
+    }
+    if (ISNAN(ri[j])){
+      warn2 = 1;
+      ri[j] = 1;
+    }
+  }
   arma::vec riv = as<arma::vec>(ri);
   DataFrame etasDf1 = etasDf;
   etasDf1.erase(0);
@@ -308,7 +320,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   // ipred.erase(0,neta);
   // rp(_,0) = NumericVector(pred[0]);
   // ri(_,0) = NumericVector(ipred[0]);
-
+  
   NumericVector iwres=(dvTBS-iprednv)/sqrt(ri);
   NumericVector stat=etaLst[neta];
   unsigned int n =0, n1 = 0;
@@ -354,6 +366,12 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   }
   ret[1] = etaLst;
   ret[2] = etasDfFull;
+  if (warn1){
+    warning("Some variances were zero, replaced with 1.");
+  }
+  if (warn2){
+    warning("Some variances were NA/NaN, replaced with 1.");
+  }
   return ret;
 }
 
