@@ -284,10 +284,21 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             class(x) <- "data.frame";
             x$ID <- factor(x$ID, backSort2, labels=backSort);
             class(x) <- cls;
-            return(x);
-        } else {
-            return(x);
         }
+        .uif <- x$uif;
+        .thetas <- x$theta;
+        for (.n in names(.thetas)){
+            .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n];
+        }
+        .omega <- x$omega;
+        for (.i in seq_along(.uif$ini$neta1)){
+            if (!is.na(.uif$ini$neta1[.i])){
+                .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]];
+            }
+        }
+        .env <- x$env
+        .env$uif <- .uif;
+        return(x);
     }
     .addNpde <- function(x){
         .doIt <- table$npde;
@@ -487,6 +498,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                         control=control,
                         env=env,
                         ...)
+        fit <- fix.dat(fit);
         fit <- .addNpde(fit);
         assign("start.time", start.time, env);
         assign("est", est, env);
