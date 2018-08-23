@@ -109,16 +109,18 @@ nlmixr <- function(object, data, est="nlme", control=list(),
 ##' @rdname nlmixr
 ##' @export
 nlmixr.function <- function(object, data, est="nlme", control=list(), table=tableControl(), ...){
-    uif <- nlmixrUI(object);
-    class(uif) <- "list";
-    uif$nmodel$model.name <- deparse(substitute(object))
+    .args <- as.list(match.call(expand.dots=TRUE))[-1]
+    .uif <- nlmixrUI(object);
+    class(.uif) <- "list";
+    .uif$nmodel$model.name <- deparse(substitute(object))
     if (missing(data) && missing(est)){
-        class(uif) <- "nlmixrUI"
-        return(uif)
+        class(.uif) <- "nlmixrUI"
+        return(.uif)
     } else {
-        uif$nmodel$data.name <- deparse(substitute(data))
-        class(uif) <- "nlmixrUI"
-        nlmixr_fit(uif, data, est, control=control, table=table, ...);
+        .uif$nmodel$data.name <- deparse(substitute(data))
+        class(.uif) <- "nlmixrUI"
+        .args <- c(list(uif=.uif), .args[-1]);
+        return(do.call(nlmixr_fit, .args))
     }
 }
 
@@ -234,6 +236,28 @@ nlmixrData.default <- function(data){
 ##' @export
 nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                        sum.prod=FALSE, table=tableControl()){
+    .meta <- uif$meta
+    .missingEst <- missing(est);
+    if (.missingEst && exists("est", envir=.meta)){
+        est <- .meta$est
+    }
+    if (missing(control) && exists("control", envir=.meta)){
+        control <- .meta$control
+        if (is(control, "foceiControl")){
+            est <- "focei"
+            if (.missingEst && est != "focei"){
+                warning(sprintf("Using focei instead of %s since focei controls were specified.", est))
+            }
+        } else if (is(control, "saemControl")){
+            est <- "saem"
+            if (.missingEst && est != "saem"){
+                warning(sprintf("Using saem instead of %s since saem controls were specified.", est))
+            }
+        }
+    }
+    if (missing(table) && exists("table", envir=.meta)){
+        table <- .meta$table
+    }
     start.time <- Sys.time();
     if (!is(table, "tableControl")){
         table <- do.call(tableControl, table);
@@ -679,6 +703,7 @@ saemControl <- function(seed=99,
         .ret <- .ret[!(names(.ret) %in% .rm)]
     }
     .ret[["covMethod"]] <- match.arg(covMethod);
+    class(.ret) <- "saemControl"
     .ret
 }
 

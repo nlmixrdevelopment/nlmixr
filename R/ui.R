@@ -125,9 +125,17 @@ nlmixrUI <- function(fun){
         .model <- fun$.model
         .ini <- fun$.ini
         env <- new.env(parent=.GlobalEnv)
-        lhs0 <- c();
+        lhs0 <- c("data", "desc", "ref", "imp", "est", "control", "table");
         warning("Some information (like parameter labels) is lost by evaluating a nlmixr function")
         fun <- eval(parse(text=paste0("function(){\n",
+                                      paste(sapply(lhs0, function(var){
+                                          if (exists(var, envir=env.here)){
+                                              return(sprintf("\n%s <- %s;", var, deparse(get(var, envir=env.here))))
+                                          } else {
+                                              return("");
+                                          }
+
+                                      }), collapse=""),
                                       sprintf("\nini(%s)", paste(deparse(body(.ini)), collapse="\n")),
                                       sprintf("\nmodel(%s)", paste(deparse(body(.model)), collapse="\n")),
                                       "\n}")));
