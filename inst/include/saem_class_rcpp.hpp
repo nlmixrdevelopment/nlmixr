@@ -482,6 +482,8 @@ void saem_fit() {
         bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
       }
       sigma2[b] = sig2;                                          //CHK: sigma2[] use
+      if (sigma2[b]>1.0e99) sigma2[b] = 1.0e99;
+      if (isnan(sigma2[b])) sigma2[b] = 1.0e99;
     }
     vecares = ares(ix_endpnt);
     vecbres = bres(ix_endpnt);
