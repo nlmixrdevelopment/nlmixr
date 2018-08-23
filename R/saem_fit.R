@@ -1361,9 +1361,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     } else {
         dat <- data;
     }
-    .env <- new.env(parent=emptyenv());
-    .env$method <- "SAEM";
-    .env$uif <- uif;
     atol <- uif$env$ODEopt$atol;
     if(is.null(atol))atol <- 1e-6
     rtol <- uif$env$ODEopt$rtol;
@@ -1374,7 +1371,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (.stiff == 0L) .method <- "dop853"
     transitAbs <- uif$env$ODEopt$transitAbs;
     if(is.null(transitAbs)) transitAbs<- 0L
-    .env$saem <- object;
     .tn <-uif$saem.theta.name;
     .nth <- length(.tn)
     .cov <- RxODE::rxInv(object$Ha[1:.nth,1:.nth])
@@ -1394,7 +1390,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         .covMethod <- "";
     }
     if (is.na(calcResid)) .covMethod <- "";
-    .env$cov <- .cov;
     .allThetaNames <- c(uif$saem.theta.name, uif$saem.omega.name, uif$saem.res.name);
     .m <- object$par_hist;
     if (ncol(.m) > length(.allThetaNames)){
@@ -1403,71 +1398,93 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (.dist == "binomial"){
         .dist <- "bernoulli"
     }
-    .env$parHistStacked <- data.frame(val=as.vector(.m),
-                                      par=rep(.allThetaNames, each=nrow(.m)),
-                                      iter=rep(1:nrow(.m), ncol(.m)));
     dimnames(.m) <- list(NULL, .allThetaNames);
-    .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
     .fixedNames <- paste(uif$ini$name[which(uif$ini$fix)]);
     if (is.null(obf)){
         .saemObf <- calc.2LL(object);
     } else {
         .saemObf <- obf;
     }
-    if (length(.fixedNames) > 0){
-        .env$parHistStacked <- .env$parHistStacked[!(.env$parHistStacked$par %in% .fixedNames),, drop = FALSE];
-        .env$parHist <- .env$parHist[, !(names(.env$parHist) %in% .fixedNames), drop = FALSE];
+    .notCalced <- TRUE;
+    while (.notCalced){
+        .env <- new.env(parent=emptyenv());
+        .env$method <- "SAEM";
+        .env$uif <- uif;
+        .env$saem <- object;
+        .env$cov <- .cov;
+        .env$parHistStacked <- data.frame(val=as.vector(.m),
+                                          par=rep(.allThetaNames, each=nrow(.m)),
+                                          iter=rep(1:nrow(.m), ncol(.m)));
+        .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
+        if (length(.fixedNames) > 0){
+            .env$parHistStacked <- .env$parHistStacked[!(.env$parHistStacked$par %in% .fixedNames),, drop = FALSE];
+            .env$parHist <- .env$parHist[, !(names(.env$parHist) %in% .fixedNames), drop = FALSE];
+        }
+        if (is.na(calcResid)){
+            .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
+                                 " ",crayon::bold$blue(uif$saem.distribution), "); ",
+                                 crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
+            .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
+            .env$fullTheta <- setNames(init$THTA, uif$focei.names)
+            .om0 <- .genOM(.parseOM(init$OMGA));
+            attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
+            .env$omega <- .om0;
+            .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
+            .env$noLik <- FALSE;
+            .env$objective <- .saemObf;
+        } else if (calcResid){
+            .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
+                                 crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
+        } else {
+            .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
+            .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
+            .env$fullTheta <- setNames(init$THTA, uif$focei.names)
+            .om0 <- .genOM(.parseOM(init$OMGA));
+            attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
+            .env$omega <- .om0;
+            .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
+            .env$noLik <- TRUE;
+            .env$objective <- .saemObf;
+        }
+        fit.f <- try(foceiFit.data.frame(data=dat,
+                                         inits=init,
+                                         PKpars=uif$theta.pars,
+                                         ## par_trans=fun,
+                                         model=uif$rxode.pred,
+                                         pred=function(){return(nlmixr_pred)},
+                                         err=uif$error,
+                                         lower=uif$focei.lower,
+                                         upper=uif$focei.upper,
+                                         thetaNames=uif$focei.names,
+                                         etaNames=uif$eta.names,
+                                         etaMat=mat2,
+                                         env=.env,
+                                         fixed=.fixed,
+                                         skipCov=.skipCov,
+                                         control=foceiControl(maxOuterIterations=0,
+                                                              maxInnerIterations=0,
+                                                              covMethod=.covMethod,
+                                                              cores=1,
+                                                              atol=atol,
+                                                              rtol=rtol,
+                                                              method=.method,
+                                                              transitAbs=transitAbs,
+                                                              sumProd=uif$env$sum.prod)), silent=FALSE);
+        if (inherits(fit.f, "try-error")){
+            if (is.na(calcResid)){
+                warning("Error calculating nlmixr object, return classic object");
+                .notCalced <- FALSE;
+                return(object);
+            } else if (calcResid){
+                calcResid <- FALSE
+            } else {
+                calcResid <- NA;
+            }
+        } else {
+            .notCalced <- FALSE;
+        }
     }
-    if (is.na(calcResid)){
-        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
-                             " ",crayon::bold$blue(uif$saem.distribution), "); ",
-                             crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
-        .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
-        .env$fullTheta <- setNames(init$THTA, uif$focei.names)
-        .om0 <- .genOM(.parseOM(init$OMGA));
-        attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
-        .env$omega <- .om0;
-        .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
-        .env$noLik <- FALSE;
-        .env$objective <- .saemObf;
-    } else if (calcResid){
-        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
-                             crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
-    } else {
-        .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
-        .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
-        .env$fullTheta <- setNames(init$THTA, uif$focei.names)
-        .om0 <- .genOM(.parseOM(init$OMGA));
-        attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
-        .env$omega <- .om0;
-        .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
-        .env$noLik <- TRUE;
-        .env$objective <- .saemObf;
-    }
-    fit.f <- foceiFit.data.frame(data=dat,
-                                 inits=init,
-                                 PKpars=uif$theta.pars,
-                                 ## par_trans=fun,
-                                 model=uif$rxode.pred,
-                                 pred=function(){return(nlmixr_pred)},
-                                 err=uif$error,
-                                 lower=uif$focei.lower,
-                                 upper=uif$focei.upper,
-                                 thetaNames=uif$focei.names,
-                                 etaNames=uif$eta.names,
-                                 etaMat=mat2,
-                                 env=.env,
-                                 fixed=.fixed,
-                                 skipCov=.skipCov,
-                                 control=foceiControl(maxOuterIterations=0,
-                                                      maxInnerIterations=0,
-                                                      covMethod=.covMethod,
-                                                      cores=1,
-                                                      atol=atol,
-                                                      rtol=rtol,
-                                                      method=.method,
-                                                      transitAbs=transitAbs,
-                                                      sumProd=uif$env$sum.prod));
+
     .env <- fit.f$env;
     if (is.null(.env$time)){
         .env$time <- data.frame(saem=.saemTime["elapsed"], check.names=FALSE, row.names=c(""));

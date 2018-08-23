@@ -378,64 +378,19 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         if (print > 1){
             cfg$print <- as.integer(print)
         }
-        fit <- model$saem_mod(cfg);
-        if (is.na(calc.resid)){
-            .ret <- try(as.focei.saemFit(fit, uif, pt, data=dat, calcResid=NA), silent=TRUE);
-            if (inherits(.ret, "try-error")){
-                return(fit)
-            }
-            .ret <- .addNpde(.ret);
-            assign("startTime", start.time, .env);
-            assign("est", est, .env);
-            assign("stopTime", Sys.time(), .env);
-            return(.ret);
-        } else if (calc.resid){
-            .ret <- try(as.focei.saemFit(fit, uif, pt, data=dat), silent=TRUE);
-            if (inherits(.ret, "try-error")){
-                warning(bad.focei)
-                .ret <- try(as.focei.saemFit(fit, uif, pt, data=dat, calcResid=FALSE), silent=TRUE);
-                if (inherits(.ret, "try-error")){
-                    .ret <- try(as.focei.saemFit(fit, uif, pt, data=dat, calcResid=NA), silent=TRUE);
-                    if (inherits(.ret, "try-error")){
-                        return(fit)
-                    }
-                    .ret <- .addNpde(.ret);
-                    .env <- .ret$env
-                    assign("startTime", start.time, .env);
-                    assign("est", est, .env);
-                    assign("stopTime", Sys.time(), .env);
-                    return(.ret);
-                }
-            }
+        .fit <- model$saem_mod(cfg);
+        .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid);
+        if (inherits(.ret, "nlmixrFitData")){
             .ret <- fix.dat(.ret);
             .ret <- .addNpde(.ret);
-            .env <- .ret$env
-            assign("startTime", start.time, .env);
-            assign("est", est, .env);
-            assign("stopTime", Sys.time(), .env);
-            return(.ret)
-        } else {
-            .ret <- try(as.focei.saemFit(fit, uif, pt, data=dat, calcResid=FALSE), silent=TRUE);
-            if (inherits(.ret, "try-error")){
-                .ret <- try(as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=NA), silent=TRUE);
-                if (inherits(.ret, "try-error")){
-                    return(fit)
-                }
-                .ret <- .addNpde(.ret);
-                .env <- .ret$env
-                assign("startTime", start.time, .env);
-                assign("est", est, .env);
-                assign("stopTime", Sys.time(), .env);
-                return(.ret);
-            }
-            .ret <- fix.dat(.ret);
-            .ret <- .addNpde(.ret);
-            .env <- .ret$env
-            assign("startTime", start.time, .env);
-            assign("est", est, .env);
-            assign("stopTime", Sys.time(), .env);
-            return(.ret)
         }
+        if (inherits(.ret, "nlmixrFitCore")){
+            .env <- .ret$env
+            assign("startTime", start.time, .env);
+            assign("est", est, .env);
+            assign("stopTime", Sys.time(), .env);
+        }
+        return(.ret);
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
         pt <- proc.time()
         est.type <- est;
@@ -502,69 +457,18 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                             ...);
         }
         class(fit) <- c(est.type, class(fit));
-
-        ## Run FOCEi using same ETAs and THETA estimates to get
-        ## comparable OBJFs and also extract table entries like
-        ## CWRES.
-        ## return(fit)
-        if (is.na(calc.resid)){
-            .ret <- try(as.focei(fit, uif, pt, data=dat, calcResid=NA), silent=TRUE);
-            if (inherits(.ret, "try-error")){
-                return(fit);
-            }
-            .ret <- .addNpde(.ret);
-            .env <- .ret$env
-            assign("startTime", start.time, .env);
-            assign("est", est, .env);
-            assign("stopTime", Sys.time(), .env);
-            return(.ret)
-        } else if (calc.resid){
-            .ret <- try(as.focei(fit, uif, pt, data=dat), silent=TRUE);
-            if (inherits(.ret, "try-error")){
-                warning(bad.focei)
-                .ret <- try(as.focei(fit, uif, pt, data=dat, calcResid=FALSE), silent=TRUE);
-                if (inherits(.ret, "try-error")){
-                    .ret <- try(as.focei(fit, uif, pt, data=dat, calcResid=NA), silent=TRUE);
-                    if (inherits(.ret, "try-error")){
-                        return(fit);
-                    }
-                    .ret <- .addNpde(.ret);
-                    .env <- .ret$env
-                    assign("startTime", start.time, .env);
-                    assign("est", est, .env);
-                    assign("stopTime", Sys.time(), .env);
-                    return(.ret)
-                }
-            }
+        .ret <- as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=calc.resid);
+        if (inherits(.ret, "nlmixrFitData")){
             .ret <- fix.dat(.ret);
             .ret <- .addNpde(.ret);
-            .env <- .ret$env
-            assign("startTime", start.time, .env);
-            assign("est", est, .env);
-            assign("stopTime", Sys.time(), .env);
-            return(.ret)
-        } else  {
-            .ret <- try(as.focei(fit, uif, pt, data=dat, calcResid=FALSE), silent=TRUE);
-            if (inherits(.ret, "try-error")){
-                .ret <- try(as.focei(fit, uif, pt, data=dat, calcResid=NA), silent=TRUE);
-                if (inherits(.ret, "try-error")){
-                    return(fit);
-                }
-                .env <- .ret$env
-                .ret <- .addNpde(.ret);
-                assign("startTime", start.time, .env);
-                assign("est", est, .env);
-                assign("stopTime", Sys.time(), .env);
-                return(.ret)
-            }
-            .ret <- fix.dat(.ret);
-            .ret <- .addNpde(.ret);
-            .env <- .ret$env
-            assign("startTime", start.time, .env);
-            assign("est", est, .env);
-            assign("stopTime", Sys.time(), .env);
-            return(.ret)
         }
+        if (inherits(.ret, "nlmixrFitCore")){
+            .env <- .ret$env
+            assign("startTime", start.time, .env);
+            assign("est", est, .env);
+            assign("stopTime", Sys.time(), .env);
+        }
+        return(.ret)
     } else if (est == "focei"){
         env <- new.env(parent=emptyenv());
         env$uif <- uif;

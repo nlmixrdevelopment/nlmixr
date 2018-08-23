@@ -165,6 +165,9 @@ is.latex <- function() {
 ##' @param printNcol Number of columns to printout before wrapping
 ##'     parameter estimates/gradient
 ##'
+##' @param noAbort Boolean to indicate if you should abort the FOCEi
+##'     evaluation if it runs into troubles.  (default TRUE)
+##'
 ##' @inheritParams RxODE::rxSolve
 ##'
 ##' @details
@@ -224,6 +227,7 @@ foceiControl <- function(sigdig=4,
                          useColor=crayon::has_color(),
                          boundTol=NULL,
                          calcTables=TRUE,
+                         noAbort=TRUE,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -331,7 +335,8 @@ foceiControl <- function(sigdig=4,
                  useColor=as.integer(useColor),
                  boundTol=as.double(boundTol),
                  calcTables=calcTables,
-                 printNcol=as.integer(printNcol));
+                 printNcol=as.integer(printNcol),
+                 noAbort=as.integer(noAbort));
     class(.ret) <- "foceiControl"
     return(.ret);
 }

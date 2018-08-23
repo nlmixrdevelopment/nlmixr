@@ -775,10 +775,6 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     } else {
         dat <- data;
     }
-    env <- new.env(parent=emptyenv());
-    env$method <- "nlme"
-    env$uif <- uif
-    env$nlme <- object;
     var <- as.matrix(nlme::VarCorr(object))[,"Variance"]
     var <- var[uif$focei.names]
     var <- setNames(as.numeric(var), uif$focei.names);
@@ -786,7 +782,6 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     cov <- diag(length(var))
     diag(cov) <- var;
     attr(cov, "dimnames") <- list(names(var), names(var));
-    env$cov <- cov
     .ini <- as.data.frame(uif$ini)
     .ini <- .ini[!is.na(.ini$ntheta),];
     .skipCov <- !is.na(.ini$err);
@@ -806,53 +801,73 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
             .text <- "";
         }
     }
-    env$extra <- paste0(" by ", crayon::bold$yellow(ifelse(object$method == "REML", "REML", "maximum likelihood"))," (",
-                         crayon::italic(paste0(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"),
-                                               "; ", .text)), ")")
-    if (is.na(calcResid)){
-        env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
-        env$fullTheta <- setNames(init$THTA, uif$focei.names)
-        .om0 <- .genOM(.parseOM(init$OMGA));
-        attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
-        env$omega <- .om0;
-        env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
-        env$noLik <- FALSE;
-        env$objective <- -2 * as.numeric(logLik(object));
-        env$objectiveType <- "nlme";
-        if (object$method == "REML") env$objectiveType <- "nlmeREML";
-    } else if (!calcResid){
-        env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
-        env$fullTheta <- setNames(init$THTA, uif$focei.names)
-        .om0 <- .genOM(.parseOM(init$OMGA));
-        attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
-        env$omega <- .om0;
-        env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
-        env$noLik <- TRUE;
-        env$objective <- -2 * as.numeric(logLik(object));
-        env$objectiveType <- "nlme";
-        if (object$method == "REML") env$objectiveType <- "nlmeREML";
-        env$extra <- paste(env$extra, "nlme OBF")
+    .notCalced <- TRUE;
+    while (.notCalced){
+        env <- new.env(parent=emptyenv());
+        env$method <- "nlme"
+        env$uif <- uif
+        env$nlme <- object;
+        env$cov <- cov
+        env$extra <- paste0(" by ", crayon::bold$yellow(ifelse(object$method == "REML", "REML", "maximum likelihood"))," (",
+                            crayon::italic(paste0(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved"),
+                                                  "; ", .text)), ")")
+        if (is.na(calcResid)){
+            env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
+            env$fullTheta <- setNames(init$THTA, uif$focei.names)
+            .om0 <- .genOM(.parseOM(init$OMGA));
+            attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
+            env$omega <- .om0;
+            env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
+            env$noLik <- FALSE;
+            env$objective <- -2 * as.numeric(logLik(object));
+            env$objectiveType <- "nlme";
+            if (object$method == "REML") env$objectiveType <- "nlmeREML";
+        } else if (!calcResid){
+            env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
+            env$fullTheta <- setNames(init$THTA, uif$focei.names)
+            .om0 <- .genOM(.parseOM(init$OMGA));
+            attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
+            env$omega <- .om0;
+            env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
+            env$noLik <- TRUE;
+            env$objective <- -2 * as.numeric(logLik(object));
+            env$objectiveType <- "nlme";
+            if (object$method == "REML") env$objectiveType <- "nlmeREML";
+            env$extra <- paste(env$extra, "nlme OBF")
+        }
+        fit.f <- try(foceiFit.data.frame(data=dat,
+                                         inits=init,
+                                         PKpars=uif$theta.pars,
+                                         ## par_trans=fun,
+                                         model=uif$rxode.pred,
+                                         pred=function(){return(nlmixr_pred)},
+                                         err=uif$error,
+                                         lower=uif$focei.lower,
+                                         upper=uif$focei.upper,
+                                         thetaNames=uif$focei.names,
+                                         etaNames=uif$eta.names,
+                                         etaMat=mat,
+                                         env=env,
+                                         skipCov=.skipCov,
+                                         control=foceiControl(maxOuterIterations=0,
+                                                              maxInnerIterations=0,
+                                                              covMethod="",
+                                                              cores=1,
+                                                              ## transitAbs=transitAbs,
+                                                              sumProd=uif$env$sum.prod)));
+        if (inherits(fit.f, "try-error")){
+            if (is.na(calcResid)){
+                warning("Error calculating nlmixr object, return classic nlme object");
+                return(object);
+            } else if (calcResid){
+                calcResid <- FALSE
+            } else {
+                calcResid <- NA;
+            }
+        } else {
+            .notCalced <- FALSE;
+        }
     }
-    fit.f <- foceiFit.data.frame(data=dat,
-                                 inits=init,
-                                 PKpars=uif$theta.pars,
-                                 ## par_trans=fun,
-                                 model=uif$rxode.pred,
-                                 pred=function(){return(nlmixr_pred)},
-                                 err=uif$error,
-                                 lower=uif$focei.lower,
-                                 upper=uif$focei.upper,
-                                 thetaNames=uif$focei.names,
-                                 etaNames=uif$eta.names,
-                                 etaMat=mat,
-                                 env=env,
-                                 skipCov=.skipCov,
-                                 control=foceiControl(maxOuterIterations=0,
-                                                      maxInnerIterations=0,
-                                                      covMethod="",
-                                                      cores=1,
-                                                      ## transitAbs=transitAbs,
-                                                      sumProd=uif$env$sum.prod));
     if (is.na(calcResid)){
         row.names(env$objDf) <- "nlme";
     } else if (!calcResid){
