@@ -16,8 +16,8 @@ foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 1000,
   ""), lbfgsLmm = 50L, lbfgsPgtol = 0, lbfgsFactr = NULL, eigen = TRUE,
   addPosthoc = TRUE, diagXform = c("sqrt", "log", "identity"),
   sumProd = FALSE, optExpression = TRUE, ci = 0.95,
-  useColor = crayon::has_color(), boundTol = NULL, calcTables = TRUE, ...,
-  stiff)
+  useColor = crayon::has_color(), boundTol = NULL, calcTables = TRUE,
+  noAbort = TRUE, ..., stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -150,6 +150,23 @@ derivatives of the outer problem.  Currently supports
 derivatives while calculating the covariance components
 (Hessian and S).}
 
+\item{covMethod}{Method for calculating covariance.  In this
+    discussion, R is the Hessian matrix of the objective
+    function. The S matrix is the sum of individual
+    gradient cross-product (evaluated at the individual empirical
+    Bayes estimates).
+
+\itemize{
+
+ \item "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \code{solve(R) \%*\% S \%*\% solve(R)}
+
+ \item "\code{r}" Uses the Hessian matrix to calculate the covariance as \code{2 \%*\% solve(R)}
+
+ \item "\code{s}" Uses the crossproduct matrix to calculate the covariance as \code{4 \%*\% solve(S)}
+
+ \item "" Does not calculate the covariance step.
+}}
+
 \item{lbfgsLmm}{An integer giving the number of BFGS updates
 retained in the "L-BFGS-B" method, It defaults to 40.}
 
@@ -208,6 +225,9 @@ calculation. By default this is turned on.}
 
 \item{calcTables}{This boolean is to determine if the foceiFit
 will calculate tables. By default this is \code{TRUE}}
+
+\item{noAbort}{Boolean to indicate if you should abort the FOCEi
+evaluation if it runs into troubles.  (default TRUE)}
 
 \item{...}{Ignored parameters}
 

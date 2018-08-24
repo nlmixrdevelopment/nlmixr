@@ -4,9 +4,9 @@
 \alias{tableControl}
 \title{Output table/data.frame options}
 \usage{
-tableControl(npde = NULL, cwres = NULL, saemNPDE = TRUE,
-  saemCWRES = FALSE, nlmeNPDE = TRUE, nlmeCWRES = FALSE,
-  foceiNPDE = TRUE, nsim = 300, ties = TRUE, seed = 1009)
+tableControl(npde = NULL, cwres = NULL, saemNPDE = FALSE,
+  saemCWRES = FALSE, nlmeNPDE = FALSE, nlmeCWRES = FALSE,
+  foceiNPDE = FALSE, nsim = 300, ties = TRUE, seed = 1009)
 }
 \arguments{
 \item{npde}{When TRUE, request npde regardless of the algorithm used.}

@@ -3,12 +3,18 @@
 \name{foceiFit}
 \alias{foceiFit}
 \alias{foceiFit.data.frame}
+\alias{foceiFit.data.frame0}
 \alias{focei.fit}
 \title{FOCEi fit}
 \usage{
 foceiFit(data, ...)
 
-\method{foceiFit}{data.frame}(...)
+\method{foceiFit}{data.frame}(data, ...)
+
+\method{foceiFit}{data.frame0}(data, inits, PKpars, model = NULL,
+  pred = NULL, err = NULL, lower = -Inf, upper = Inf, fixed = NULL,
+  skipCov = NULL, control = foceiControl(), thetaNames = NULL,
+  etaNames = NULL, etaMat = NULL, ..., env = NULL)
 
 focei.fit(data, ...)
 }
@@ -48,9 +54,11 @@ object.}
 
 \item{etaMat}{Eta matrix for initial estimates or final estimates
 of the ETAs.}
+
+\item{env}{An environment used to build the FOCEi or nlmixr object.}
 }
 \value{
-A focei fit object
+A focei fit or nlmixr fit object
 
 FOCEi fit object
 }
@@ -229,7 +237,6 @@ ini({ # Where initial conditions/variables are specified
     ## Bounds may be specified by c(lower, est, upper), like NONMEM:
     ## Residuals errors are assumed to be population parameters
     prop.err <- c(0, 0.2, 1)
-    zeta <- c(0.1, 1, 10)
     add.err <- c(0, 0.001)
     lambda <- c(-2, 1, 2)
     ## Between subject variability estimates are specified by '~'
@@ -246,7 +253,7 @@ model({ ## Where the model is specified
     ## Concentration is calculated
     cp = centr / Vc;
     ## And is assumed to follow proportional error estimated by prop.err
-    cp ~ pow(prop.err, zeta) + add(add.err) + tbs(lambda)
+    cp ~ prop(prop.err) + add(add.err) + tbs(lambda)
 })}
 
 fitIVtbs <- nlmixr(one.compartment.IV.model, datr, "focei")

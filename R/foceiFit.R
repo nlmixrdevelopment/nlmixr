@@ -83,11 +83,11 @@ is.latex <- function() {
 ##'
 ##' \itemize{
 ##'
-##'  \item "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \code{solve(R) %*% S %*% solve(R)}
+##'  \item "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \code{solve(R) \%*\% S \%*\% solve(R)}
 ##'
-##'  \item "\code{r}" Uses the Hessian matrix to calculate the covariance as \code{2 %*% solve(R)}
+##'  \item "\code{r}" Uses the Hessian matrix to calculate the covariance as \code{2 \%*\% solve(R)}
 ##'
-##'  \item "\code{s}" Uses the crossproduct matrix to calculate the covariance as \code{4 %*% solve(S)}
+##'  \item "\code{s}" Uses the crossproduct matrix to calculate the covariance as \code{4 \%*\% solve(S)}
 ##'
 ##'  \item "" Does not calculate the covariance step.
 ##' }
@@ -416,7 +416,8 @@ constructLinCmt <- function(fun){
 ##' @param etaMat Eta matrix for initial estimates or final estimates
 ##'     of the ETAs.
 ##' @param ... Ignored parameters
-##' @return A focei fit object
+##' @param env An environment used to build the FOCEi or nlmixr object.
+##' @return A focei fit or nlmixr fit object
 ##' @author Matthew L. Fidler and Wenping Wang
 ##' @return FOCEi fit object
 ##' @export
@@ -592,7 +593,6 @@ constructLinCmt <- function(fun){
 ##'     ## Bounds may be specified by c(lower, est, upper), like NONMEM:
 ##'     ## Residuals errors are assumed to be population parameters
 ##'     prop.err <- c(0, 0.2, 1)
-##'     zeta <- c(0.1, 1, 10)
 ##'     add.err <- c(0, 0.001)
 ##'     lambda <- c(-2, 1, 2)
 ##'     ## Between subject variability estimates are specified by '~'
@@ -609,7 +609,7 @@ constructLinCmt <- function(fun){
 ##'     ## Concentration is calculated
 ##'     cp = centr / Vc;
 ##'     ## And is assumed to follow proportional error estimated by prop.err
-##'     cp ~ pow(prop.err, zeta) + add(add.err) + tbs(lambda)
+##'     cp ~ prop(prop.err) + add(add.err) + tbs(lambda)
 ##' })}
 ##'
 ##' fitIVtbs <- nlmixr(one.compartment.IV.model, datr, "focei")
@@ -654,7 +654,7 @@ foceiFit <- function(data, ...){
 }
 ##'@rdname foceiFit
 ##'@export
-foceiFit.data.frame <- function(...){
+foceiFit.data.frame <- function(data, ...){
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     return(.collectWarnings(do.call(foceiFit.data.frame0, call, envir=parent.frame(1))))
 }
@@ -733,6 +733,8 @@ foceiFit.data.frame <- function(...){
     class(.ret$parFixed) <- c("nlmixrParFixed", "data.frame");
 }
 
+##'@rdname foceiFit
+##'@export
 foceiFit.data.frame0 <- function(data,
                                 inits,
                                 PKpars,
