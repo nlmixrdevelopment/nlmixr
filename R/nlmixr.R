@@ -658,23 +658,18 @@ addCwres <- function(fit, updateObject=TRUE){
     }
     .uif <- fit$uif;
     .saem <- fit$saem
-    .cls <- class(fit);
     if (!is.null(.saem)){
         .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=fit$objDf["SAEMg","OBJF"]);
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
     }
-
     .nlme <- fit$nlme
     if (!is.null(.nlme)){
         .newFit <- as.focei(.nlme, .uif, data=getData(fit), calcResid = TRUE);
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
     }
-    class(.new) <- .cls
-    .objDf <- .newFit$objDf
-    env <- .new$env;
-    env$objDf <- .objDf;
+    class(.new) <- class(.newFit)
     if (updateObject){
         .parent <- parent.frame(2);
         .bound <- do.call("c", lapply(ls(.parent, all=TRUE), function(.cur){

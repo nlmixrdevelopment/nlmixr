@@ -1452,7 +1452,11 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
             .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
                                  crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
         } else {
-            .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
+            if (!is.na(.saemObf)){
+                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
+            } else {
+                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF not calculated"))
+            }
             .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
             .env$fullTheta <- setNames(init$THTA, uif$focei.names)
             .om0 <- .genOM(.parseOM(init$OMGA));
@@ -1500,7 +1504,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
             .notCalced <- FALSE;
         }
     }
-
     .env <- fit.f$env;
     if (is.null(.env$time)){
         .env$time <- data.frame(saem=.saemTime["elapsed"], check.names=FALSE, row.names=c(""));
@@ -1511,7 +1514,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         row.names(.env$objDf) <- "SAEMg";
     } else if (calcResid){
         if (!is.na(.saemObf)){
-
             .llik <- -.saemObf / 2;
             attr(.llik, "df") <- attr(.env$loglik, "df");
             .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(.env$logLik, "df"),
