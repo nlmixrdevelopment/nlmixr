@@ -356,6 +356,13 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         } else {
             print <- default$print;
         }
+        if (any(names(args) == "DEBUG")){
+            DEBUG <- args$DEBUG;
+        } else if (any(names(control) == "DEBUG")){
+            DEBUG <- control$DEBUG;
+        } else {
+            DEBUG <- default$DEBUG;
+        }
         if (any(names(args) == "covMethod")){
             covMethod <- args$covMethod;
         } else if (any(names(control) == "covMethod")){
@@ -385,7 +392,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         model <- uif$saem.model
         cfg <- configsaem(model=model, data=dat, inits=uif$saem.init,
                           mcmc=mcmc, ODEopt=ODEopt, seed=seed, fixed=uif$saem.fixed,
-                          distribution=.dist);
+                          distribution=.dist, DEBUG=DEBUG);
         if (print > 1){
             cfg$print <- as.integer(print)
         }
