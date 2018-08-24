@@ -1400,9 +1400,19 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     }
     dimnames(.m) <- list(NULL, .allThetaNames);
     .fixedNames <- paste(uif$ini$name[which(uif$ini$fix)]);
-    if (is.null(obf)){
+    if (is.na(obf)){
+        .saemObf <- NA
+    } else if (is.null(obf)){
         .saemObf <- calc.2LL(object);
-    } else {
+    } else if (is(obf, "logical")) {
+        if (is.na(obf)){
+            .saemObf <- NA;
+        } else if (obf){
+            .saemObf <- calc.2LL(object);
+        } else {
+            .saemObf <- NA
+        }
+    } else if (is(obj, "numeric")){
         .saemObf <- obf;
     }
     .notCalced <- TRUE;
@@ -1421,9 +1431,15 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
             .env$parHist <- .env$parHist[, !(names(.env$parHist) %in% .fixedNames), drop = FALSE];
         }
         if (is.na(calcResid)){
-            .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
-                                 " ",crayon::bold$blue(uif$saem.distribution), "); ",
-                                 crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
+            if (is.na(.saemObf)){
+                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
+                                     " ",crayon::bold$blue(uif$saem.distribution), ") ",
+                                     crayon::blurred$italic("OBJF not calculated"))
+            } else {
+                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
+                                     " ",crayon::bold$blue(uif$saem.distribution), "); ",
+                                     crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
+            }
             .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
             .env$fullTheta <- setNames(init$THTA, uif$focei.names)
             .om0 <- .genOM(.parseOM(init$OMGA));
@@ -1494,15 +1510,18 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (is.na(calcResid)){
         row.names(.env$objDf) <- "SAEMg";
     } else if (calcResid){
-        .llik <- -.saemObf / 2;
-        attr(.llik, "df") <- attr(.env$loglik, "df");
-        .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(.env$logLik, "df"),
-                           BIC=.saemObf + log(.env$nobs) * attr(.env$logLik, "df"),
-                           "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
-        if (any(names(.env$objDf) == "Condition Number")) .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
-        .env$objDf  <- rbind(.env$objDf,
-                             .tmp)
-        row.names(.env$objDf) <- c("FOCEi", "SAEMg");
+        if (!is.na(.saemObf)){
+
+            .llik <- -.saemObf / 2;
+            attr(.llik, "df") <- attr(.env$loglik, "df");
+            .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(.env$logLik, "df"),
+                               BIC=.saemObf + log(.env$nobs) * attr(.env$logLik, "df"),
+                               "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
+            if (any(names(.env$objDf) == "Condition Number")) .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
+            .env$objDf  <- rbind(.env$objDf,
+                                 .tmp)
+            row.names(.env$objDf) <- c("FOCEi", "SAEMg");
+        }
     } else {
         row.names(.env$objDf) <- "SAEMg";
     }

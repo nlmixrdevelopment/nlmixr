@@ -370,6 +370,11 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         } else {
             covMethod <- default$covMethod;
         }
+        if (any(names(control) == "logLik")){
+            .logLik <- control$logLik
+        } else {
+            .logLik <- default$logLik
+        }
         if (is.null(uif$nlme.fun.mu)){
             stop("SAEM requires all ETAS to be mu-referenced")
         }
@@ -383,7 +388,6 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         if (any(paste(uif$ini$name[uif$ini$fix]) %in% unlist(uif$mu.ref))){
             stop("Fixed thetas cannot be associated with an ETA in SAEM")
         }
-
         uif$env$mcmc <- mcmc;
         uif$env$ODEopt <- ODEopt;
         uif$env$sum.prod <- sum.prod
@@ -397,7 +401,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             cfg$print <- as.integer(print)
         }
         .fit <- model$saem_mod(cfg);
-        .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid);
+        .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik);
         if (inherits(.ret, "nlmixrFitData")){
             .ret <- fix.dat(.ret);
             .ret <- .addNpde(.ret);
@@ -586,6 +590,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
 ##'  "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
 ##'
 ##'  "" Does not calculate the covariance step.
+##' @param logLik boolean indicating that log-likelihood should be
+##'     calculate by Gaussian quadrature.
 ##' @param ... Other arguments to control SAEM.
 ##' @inheritParams RxODE::rxSolve
 ##' @return List of options to be used in \code{\link{nlmixr}} fit for
@@ -603,6 +609,7 @@ saemControl <- function(seed=99,
                         print=1,
                         trace=0,
                         covMethod=c("fim", "r,s", "r", "s"),
+                        logLik=FALSE,
                         ...){
     .xtra <- list(...);
     .rm <- c();
@@ -629,6 +636,7 @@ saemControl <- function(seed=99,
         .ret <- .ret[!(names(.ret) %in% .rm)]
     }
     .ret[["covMethod"]] <- match.arg(covMethod);
+    .ret[["logLik"]] <- logLik;
     class(.ret) <- "saemControl"
     .ret
 }
@@ -670,7 +678,7 @@ addCwres <- function(fit, updateObject=TRUE){
     if (updateObject){
         .parent <- parent.frame(2);
         .bound <- do.call("c", lapply(ls(.parent, all=TRUE), function(.cur){
-                                   if (.cur == .objName && identical(.parent[[.cur]], object)){
+                                   if (.cur == .objName && identical(.parent[[.cur]], fit)){
                                        return(.cur)
                                    }
                                    return(NULL);
