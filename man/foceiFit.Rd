@@ -12,9 +12,10 @@ foceiFit(data, ...)
 \method{foceiFit}{data.frame}(data, ...)
 
 \method{foceiFit}{data.frame0}(data, inits, PKpars, model = NULL,
-  pred = NULL, err = NULL, lower = -Inf, upper = Inf, fixed = NULL,
-  skipCov = NULL, control = foceiControl(), thetaNames = NULL,
-  etaNames = NULL, etaMat = NULL, ..., env = NULL)
+  pred = NULL, err = NULL, lower = -Inf, upper = Inf,
+  fixed = NULL, skipCov = NULL, control = foceiControl(),
+  thetaNames = NULL, etaNames = NULL, etaMat = NULL, ...,
+  env = NULL)
 
 focei.fit(data, ...)
 }
@@ -239,6 +240,7 @@ ini({ # Where initial conditions/variables are specified
     prop.err <- c(0, 0.2, 1)
     add.err <- c(0, 0.001)
     lambda <- c(-2, 1, 2)
+    zeta <- c(0.1, 1, 10)
     ## Between subject variability estimates are specified by '~'
     ## Semicolons are optional
     eta.Vc ~ 0.1   #IIV V
@@ -253,7 +255,7 @@ model({ ## Where the model is specified
     ## Concentration is calculated
     cp = centr / Vc;
     ## And is assumed to follow proportional error estimated by prop.err
-    cp ~ prop(prop.err) + add(add.err) + tbs(lambda)
+    cp ~ pow(prop.err, zeta) + add(add.err) + boxCox(lambda)
 })}
 
 fitIVtbs <- nlmixr(one.compartment.IV.model, datr, "focei")

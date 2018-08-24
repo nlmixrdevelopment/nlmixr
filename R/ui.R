@@ -216,7 +216,9 @@ dists <- list("dpois"=0,
               "prop"=1,
               "pow"=2,
               "tbs"=1,
+              "boxCox"=1,
               "tbsYj"=1,
+              "yeoJohnson"=1,
               "logn"=1,
               "dlogn"=1,
               "lnorm"=1,
@@ -318,7 +320,7 @@ unsupported.dists <- c("dchisq", "chisq", "dexp", "df", "f", "dgeom", "geom",
                        "dweibull", "weibull",
                        ## for testing...
                        "nlmixrDist")
-add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj");
+add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj", "boxCox", "yeoJohnson");
 
 
 ##' Build linear solved information based on defined parameters.
