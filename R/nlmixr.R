@@ -660,13 +660,17 @@ addCwres <- function(fit, updateObject=TRUE){
     env$objDf <- .objDf;
     if (updateObject){
         .parent <- parent.frame(2);
-        .bound <- do.call("c", lapply(ls(.parent), function(.cur){
-                                   if (.cur == .objName && identical(.parent[[.cur]], fit)){
+        .bound <- do.call("c", lapply(ls(.parent, all=TRUE), function(.cur){
+                                   if (.cur == .objName && identical(.parent[[.cur]], object)){
                                        return(.cur)
                                    }
                                    return(NULL);
                                }))
-        assign(.bound, .new, envir=.parent)
+        if (length(.bound) == 1){
+            if (exists(.bound, envir=.parent)){
+                assign(.bound, .new, envir=.parent)
+            }
+        }
     }
     return(.new);
 }

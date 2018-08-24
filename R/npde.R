@@ -47,7 +47,11 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, .
                                    }
                                    return(NULL);
                                }))
-        assign(.bound, .new, envir=.parent)
+        if (length(.bound) == 1){
+            if (exists(.bound, envir=.parent)){
+                assign(.bound, .new, envir=.parent)
+            }
+        }
     }
     return(.new)
 }
