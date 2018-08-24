@@ -1,4 +1,4 @@
-#FIXME: g by endpint
+                                        #FIXME: g by endpint
 calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
 #nnodes.gq=8, nsd.gq=4
     dopred = attr(fit, "dopred")
@@ -15,7 +15,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
     ix_endpnt = saem.cfg$ix_endpnt[1:ntotal]+1
     ares = ares[ix_endpnt]
     bres = bres[ix_endpnt]
-    
+
     phi = fit$mpost_phi
     IOmega.phi1 = solve(fit$Gamma2_phi1)
     Omega = fit$Gamma2_phi1
@@ -28,31 +28,33 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
     ind.io = grep(1, t(io))
     DYF = matrix(0, mlen, N)
 
-    phiM = matrix(scan(saem.cfg$phiMFile), byrow=T, ncol=nphi)
+    phiM = matrix(scan(saem.cfg$phiMFile, quiet=TRUE), byrow=TRUE, ncol=nphi)
     dim(phiM) = c(N, saem.cfg$nmc, saem.cfg$niter, nphi)
-    print(head(phiM))
-    print(dim(phiM))
+    ## print(head(phiM))
+    ## print(dim(phiM))
     cond.mean.phi = apply(phiM, c(1,4), mean)
     var.all = lapply(1:N, function(k) {
       x = phiM[k, , ,];
-      dim(x) = c(saem.cfg$nmc*saem.cfg$niter, nphi); 
+      dim(x) = c(saem.cfg$nmc*saem.cfg$niter, nphi);
       var(x)
     })
     condsd.eta = t(sapply(var.all, function(x) sqrt(diag(x))))
-    
+
     y = gqg.mlx(nphi1,nnodes.gq)
-    # xform [0,1] => [-1, 1]
+                                        # xform [0,1] => [-1, 1]
     x = (y$nodes-0.5)*2
     w = (y$weights)*(2^nphi1)
     nx = dim(x)[1]
-    nx.1 = max(as.integer(nx/10), 1)
+    ## nx.1 = max(as.integer(nx/10), 1)
     xmin = cond.mean.phi[,i1]-nsd.gq*condsd.eta[,i1]
     xmax = cond.mean.phi[,i1]+nsd.gq*condsd.eta[,i1]
     a = (xmin+xmax)/2; dim(a) = c(N, nphi1)
     b = (xmax-xmin)/2; dim(b) = c(N, nphi1)
 
-    cat("Calculating -2LL by Gaussian quadrature ")
     Q = 0
+    message("Calculating -2LL by Gaussian quadrature")
+    RxODE::rxProgress(nx)
+    on.exit(RxODE::rxProgressAbort());
     for (j in 1:nx) {
         phi[, i1] = a+b*matrix(rep(x[j, ], N), ncol=nphi1, byrow=TRUE)
         f = as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt))
@@ -65,12 +67,9 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         ltot = ly+lphi1
         ltot[is.na(ltot)] = -Inf
         Q = Q+w[j]*exp(ltot)
-        if (j %% nx.1 == 1) {
-          cat(".")
-          flush.console()
-        }
+        RxODE::rxTick();
     }
-    cat("\n")
+    RxODE::rxProgressStop();
     ll2 = 2*sum(log(Q)+rowSums(log(b))) - N*log(det(Omega)) - (N*nphi1+ ntotal)*log(2*pi)
     -ll2
 }
@@ -97,21 +96,21 @@ plot.saemFit = function(x,...) {
     df0 = df
 
     m = fit$par_hist
-    df = data.frame(val = as.vector(m), par = rep(1:ncol(m), 
+    df = data.frame(val = as.vector(m), par = rep(1:ncol(m),
         each = nrow(m)), iter = rep(1:nrow(m), ncol(m)))
-    p1 = ggplot2::ggplot(df, aes(iter, val)) + ggplot2::geom_line() + 
+    p1 = ggplot2::ggplot(df, aes(iter, val)) + ggplot2::geom_line() +
         ggplot2::facet_wrap(~par, scales = "free_y")
     print(p1)
 
     for (cmt in sort(unique(df0$CMT))) {
       df = subset(df0, CMT==cmt)
-      p6 = ggplot(subset(df, grp == 1), aes(TIME, DV)) + geom_point() + facet_wrap(~ID) + 
-          geom_line(aes(TIME, DV), subset(df, grp == 2), col = "blue") + 
+      p6 = ggplot(subset(df, grp == 1), aes(TIME, DV)) + geom_point() + facet_wrap(~ID) +
+          geom_line(aes(TIME, DV), subset(df, grp == 2), col = "blue") +
           geom_line(aes(TIME, DV), subset(df, grp == 3), col = "red")
 
       df = cbind(subset(df, grp == 1), PRED = subset(df, grp == 2)[,"DV"])
       df$RES = df$DV - df$PRED
-      p2 = ggplot(df, aes(PRED, DV)) + geom_point() + geom_abline(intercept = 0, 
+      p2 = ggplot(df, aes(PRED, DV)) + geom_point() + geom_abline(intercept = 0,
           slope = 1, col = "red")
       p3 = ggplot(df, aes(PRED, RES)) + geom_point() + geom_abline(intercept = 0,
           slope = 0, col = "red")
@@ -119,7 +118,7 @@ plot.saemFit = function(x,...) {
       df = subset(df0, CMT==cmt)
       df = cbind(subset(df, grp == 1), IPRED = subset(df, grp == 3)[,"DV"])
       df$IRES = df$DV - df$IPRED
-      p4 = ggplot(df, aes(IPRED, DV)) + geom_point() + geom_abline(intercept = 0, 
+      p4 = ggplot(df, aes(IPRED, DV)) + geom_point() + geom_abline(intercept = 0,
           slope = 1, col = "red")
       p5 = ggplot(df, aes(IPRED, IRES)) + geom_point() + geom_abline(intercept = 0,
           slope = 0, col = "red")
@@ -230,13 +229,13 @@ gqg.mlx<-function(dim,nnodes.gq) {
 		w<-c(rev(w),w)
 	} else {
 		x<-c(rev(n1[-1]),n)
-		w<-c(rev(w[-1]),w)  
+		w<-c(rev(w[-1]),w)
 	}
 	mw<-nodes<-matrix(0,nrow=nnodes.gq**dim,ncol=dim)
 	for(j in 1:dim) {
 		nodes[,j]<-rep(rep(x,each=nnodes.gq**(dim-j)),nnodes.gq**(j-1))
 		mw[,j]<-rep(rep(w,each=nnodes.gq**(dim-j)),nnodes.gq**(j-1))
-	}  
+	}
 	weights<-apply(mw,1,prod)
 	return(list(nodes=nodes,weights=weights))
 }

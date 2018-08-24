@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate.R
 \name{nlmixrPred}
 \alias{nlmixrPred}
-\alias{predict.focei.fit}
+\alias{predict.nlmixrFitData}
 \title{Predict a nlmixr solved system}
 \usage{
 nlmixrPred(object, params = NULL, events = NULL, inits = NULL,
@@ -19,7 +19,7 @@ nlmixrPred(object, params = NULL, events = NULL, inits = NULL,
   dfSub = 0, dfObs = 0, returnType = c("data.frame", "rxSolve", "matrix"),
   seed = NULL, nsim = NULL, ipred = FALSE)
 
-\method{predict}{focei.fit}(object, ...)
+\method{predict}{nlmixrFitData}(object, ...)
 }
 \arguments{
 \item{object}{is a either a RxODE family of objects, or a file-name

@@ -10,10 +10,18 @@ RxODE::RxODE
 ##' @export
 RxODE::rxSolve
 
+
+##' @importFrom RxODE rxClean
+##' @export
+RxODE::rxClean
+
+##' @importFrom RxODE rxCat
+##' @export
+RxODE::rxCat
+
 ##' @importFrom nlme nlme
 ##' @export
 nlme::nlme
-
 
 ##' @importFrom nlme ACF
 ##' @export
@@ -22,6 +30,10 @@ nlme::ACF
 ##' @importFrom nlme VarCorr
 ##' @export
 nlme::VarCorr
+
+##' @importFrom nlme getVarCov
+##' @export
+nlme::getVarCov
 
 
 ##' @importFrom nlme augPred
@@ -36,6 +48,10 @@ nlme::fixef
 ##' @export
 nlme::fixed.effects
 
+##' @rdname fixed.effects
+##' @export
+fixedEffects <- nlme::fixed.effects
+
 
 ##' @importFrom nlme ranef
 ##' @export
@@ -46,6 +62,9 @@ nlme::ranef
 nlme::random.effects
 
 
+##' @rdname random.effects
+##' @export
+randomEffects <- nlme::random.effects
 
 ##' @importFrom nlme nlmeControl
 ##' @export
@@ -155,3 +174,5 @@ nlme::groupedData
 ##' @importFrom nlme getData
 ##' @export
 nlme::getData
+
+

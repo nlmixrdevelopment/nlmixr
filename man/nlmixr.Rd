@@ -4,24 +4,15 @@
 \alias{nlmixr}
 \alias{nlmixr.function}
 \alias{nlmixr.nlmixrUI}
-\alias{nlmixr.nlmixr.ui.nlme}
-\alias{nlmixr.nlmixr.ui.focei.fit}
-\alias{nlmixr.nlmixr.ui.saem}
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
-nlmixr(object, data, est = "nlme", control = list(), calc.resid = TRUE,
+nlmixr(object, data, est = NULL, control = list(), table = tableControl(),
   ...)
 
-\method{nlmixr}{function}(object, data, est = "nlme", control = list(),
-  calc.resid = TRUE, ...)
+\method{nlmixr}{function}(object, data, est = NULL, control = list(),
+  table = tableControl(), ...)
 
-\method{nlmixr}{nlmixrUI}(object, data, est = "nlme", control = list(), ...)
-
-\method{nlmixr}{nlmixr.ui.nlme}(object, data, est = "nlme", ...)
-
-\method{nlmixr}{nlmixr.ui.focei.fit}(object, data, est = "nlme", ...)
-
-\method{nlmixr}{nlmixr.ui.saem}(object, data, est = "nlme", ...)
+\method{nlmixr}{nlmixrUI}(object, data, est = NULL, control = list(), ...)
 }
 \arguments{
 \item{object}{Fitted object or function specifying the model.}
@@ -32,11 +23,11 @@ EVIDs.}
 \item{est}{Estimation method}
 
 \item{control}{Estimation control options.  They could be
-\code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}}
+\code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
+\code{\link{foceiControl}}}
 
-\item{calc.resid}{Translate the model to FOCEi and then run
-the tables and objective function so that different estimation
-methodologies are comparable through OBJF.}
+\item{table}{A list controlling the table options (i.e. CWRES,
+NPDE etc).  See \code{\link{tableControl}}.}
 
 \item{...}{Other parameters}
 }

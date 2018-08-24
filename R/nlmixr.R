@@ -101,62 +101,42 @@ armaVersion <- function(){
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
-nlmixr <- function(object, data, est="nlme", control=list(), calc.resid=TRUE, ...){
+nlmixr <- function(object, data, est=NULL, control=list(),
+                   table=tableControl(), ...){
     UseMethod("nlmixr")
 }
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.function <- function(object, data, est="nlme", control=list(), calc.resid=TRUE, ...){
-    uif <- nlmixrUI(object);
-    class(uif) <- "list";
-    uif$nmodel$model.name <- deparse(substitute(object))
+nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...){
+    .args <- as.list(match.call(expand.dots=TRUE))[-1]
+    .uif <- nlmixrUI(object);
+    class(.uif) <- "list";
+    .uif$nmodel$model.name <- deparse(substitute(object))
     if (missing(data) && missing(est)){
-        class(uif) <- "nlmixrUI"
-        return(uif)
+        class(.uif) <- "nlmixrUI"
+        return(.uif)
     } else {
-        uif$nmodel$data.name <- deparse(substitute(data))
-        class(uif) <- "nlmixrUI"
-        nlmixr_fit(uif, data, est, control=control, calc.resid=calc.resid, ...);
+        .uif$nmodel$data.name <- deparse(substitute(data))
+        class(.uif) <- "nlmixrUI"
+        .args <- c(list(uif=.uif), .args[-1]);
+        return(do.call(nlmixr_fit, .args))
     }
 }
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.nlmixrUI <- function(object, data, est="nlme", control=list(), ...){
-    uif <- object
+nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...){
+    .uif <- object
     if (missing(data) && missing(est)){
         return(uif)
     } else {
-        class(uif) <- "list";
-        uif$nmodel$data.name <- deparse(substitute(data))
-        class(uif) <- "nlmixrUI"
-        nlmixr_fit(uif, data, est, control=control, ...);
+        .args <- c(list(uif=.uif), .args[-1]);
+        .uif$nmodel$data.name <- deparse(substitute(data))
+        return(do.call(nlmixr_fit, .args));
     }
 }
 
-##' @rdname nlmixr
-##' @export
-nlmixr.nlmixr.ui.nlme <- function(object, data, est="nlme", ...){
-    env <- attr(object, ".focei.env")
-    uif <- env$uif.new;
-    if (missing(data) && missing(est)){
-        return(uif)
-    } else {
-        if (missing(data)){
-            data <- getData(object);
-        }
-        nlmixr_fit(uif, data, est, ...);
-    }
-}
-
-##' @rdname nlmixr
-##' @export
-nlmixr.nlmixr.ui.focei.fit <- nlmixr.nlmixr.ui.nlme
-
-##' @rdname nlmixr
-##' @export
-nlmixr.nlmixr.ui.saem <- nlmixr.nlmixr.ui.nlme
 ##' Convert/Format the data appropriately for nlmixr
 ##'
 ##' @param data is the name of the data to convert.  Can be a csv file
@@ -195,6 +175,8 @@ nlmixrData.default <- function(data){
             stop(sprintf("Multiple '%s' columns in dataset.", n))
         }
     }
+    ## Drop dosing-only IDs
+    dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
     if (is(dat$ID, "factor")){
         dat$ID <- paste(dat$ID);
     }
@@ -243,19 +225,44 @@ nlmixrData.default <- function(data){
 ##'     EVIDs.
 ##' @param est Estimation method
 ##' @param control Estimation control options.  They could be
-##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}}
+##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
+##'     \code{\link{foceiControl}}
 ##' @param ... Parameters passed to estimation method.
 ##' @param sum.prod Take the RxODE model and use more precise
 ##'     products/sums.  Increases solving accuracy and solving time.
-##' @param calc.resid Translate the model to FOCEi and then run
-##'     the tables and objective function so that different estimation
-##'     methodologies are comparable through OBJF.
+##' @param table A list controlling the table options (i.e. CWRES,
+##'     NPDE etc).  See \code{\link{tableControl}}.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
-                       sum.prod=FALSE, calc.resid=TRUE){
+nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
+                       sum.prod=FALSE, table=tableControl()){
+    .meta <- uif$meta
+    .missingEst <- is.null(est);
+    if (.missingEst & exists("est", envir=.meta)){
+        est <- .meta$est
+    }
+    if (.missingEst & missing(control) & exists("control", envir=.meta)){
+        control <- .meta$control
+        if (is(control, "foceiControl")){
+            est <- "focei"
+            if (.missingEst && est != "focei"){
+                warning(sprintf("Using focei instead of %s since focei controls were specified.", est))
+            }
+        } else if (is(control, "saemControl")){
+            est <- "saem"
+            if (.missingEst && est != "saem"){
+                warning(sprintf("Using saem instead of %s since saem controls were specified.", est))
+            }
+        }
+    }
+    if (missing(table) && exists("table", envir=.meta)){
+        table <- .meta$table
+    }
     start.time <- Sys.time();
+    if (!is(table, "tableControl")){
+        table <- do.call(tableControl, table);
+    }
     dat <- nlmixrData(data);
     up.covs <- toupper(uif$all.covs);
     up.names <- toupper(names(dat))
@@ -277,9 +284,44 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
             class(x) <- "data.frame";
             x$ID <- factor(x$ID, backSort2, labels=backSort);
             class(x) <- cls;
-            return(x);
-        } else {
-            return(x);
+        }
+        .uif <- x$uif;
+        .thetas <- x$theta;
+        for (.n in names(.thetas)){
+            .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n];
+        }
+        .omega <- x$omega;
+        for (.i in seq_along(.uif$ini$neta1)){
+            if (!is.na(.uif$ini$neta1[.i])){
+                .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]];
+            }
+        }
+        .env <- x$env
+        .env$uif <- .uif;
+        return(x);
+    }
+    .addNpde <- function(x){
+        .doIt <- table$npde;
+        if (is.null(.doIt)){
+            if (est == "saem"){
+                .doIt <- table$saemNPDE
+            } else if (est == "focei"){
+                .doIt <- table$foceiNPDE
+            } else if (est == "nlme"){
+                .doIt <- table$nlmeNPDE
+            }
+        }
+        if (!.doIt) return (x);
+        .ret <- try(addNpde(x,nsim=table$nsim, ties=table$ties, seed=table$seed, updateObject=FALSE), silent=TRUE);
+        if (inherits(.ret, "try-error")) return(x);
+        return(.ret);
+    }
+    calc.resid <- table$cwres;
+    if (is.null(calc.resid)){
+        if (est == "saem"){
+            calc.resid <- table$saemCWRES
+        } else if (est == "nlme"){
+            calc.resid <- table$nlmeCWRES
         }
     }
     if (est == "saem"){
@@ -314,49 +356,59 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
         } else {
             print <- default$print;
         }
+        if (any(names(args) == "DEBUG")){
+            DEBUG <- args$DEBUG;
+        } else if (any(names(control) == "DEBUG")){
+            DEBUG <- control$DEBUG;
+        } else {
+            DEBUG <- default$DEBUG;
+        }
+        if (any(names(args) == "covMethod")){
+            covMethod <- args$covMethod;
+        } else if (any(names(control) == "covMethod")){
+            covMethod <- control$covMethod;
+        } else {
+            covMethod <- default$covMethod;
+        }
+        if (is.null(uif$nlme.fun.mu)){
+            stop("SAEM requires all ETAS to be mu-referenced")
+        }
+        .low <- uif$ini$lower;
+        .low <- .low[!is.na(.low)]
+        .up <- uif$ini$upper;
+        .up <- .up[!is.na(.up)]
+        if (any(.low != -Inf) | any(.up != Inf)){
+            warning("Bounds are ignored in SAEM")
+        }
+        if (any(paste(uif$ini$name[uif$ini$fix]) %in% unlist(uif$mu.ref))){
+            stop("Fixed thetas cannot be associated with an ETA in SAEM")
+        }
+
         uif$env$mcmc <- mcmc;
         uif$env$ODEopt <- ODEopt;
         uif$env$sum.prod <- sum.prod
+        uif$env$covMethod <- covMethod
+        .dist <- uif$saem.distribution
         model <- uif$saem.model
         cfg <- configsaem(model=model, data=dat, inits=uif$saem.init,
-                           mcmc=mcmc, ODEopt=ODEopt, seed=seed);
+                          mcmc=mcmc, ODEopt=ODEopt, seed=seed, fixed=uif$saem.fixed,
+                          distribution=.dist, DEBUG=DEBUG);
         if (print > 1){
             cfg$print <- as.integer(print)
         }
-        fit <- model$saem_mod(cfg);
-        if (calc.resid){
-            ret <- try(as.focei(fit, uif, pt, data=dat));
-            if (inherits(ret, "try-error")){
-                warning(bad.focei)
-                return(fit)
-            } else {
-                ret <- fix.dat(ret);
-                env <- attr(ret, ".focei.env")
-                assign("start.time", start.time, env);
-                assign("est", est, env);
-                assign("stop.time", Sys.time(), env);
-                ## Now remove dlls
-                ## sf <- ret$uif$env$saem.fit
-                ## rx <- attr(sf, "rx")
-                ## if (is(rx, "RxODE")){
-                ##     rxDelete(rx);
-                ## }
-                ## cpp <- attr(sf, "saem.cpp")
-                ## if (file.exists(cpp)){
-                ##     try(unlink(cpp))
-                ## }
-                ## dll <- attr(sf, "saem.dll")
-                ## try({dyn.unload(dll)}, silent=TRUE);
-                ## if (file.exists(dll))
-                ##     unlink(dll);
-                ## rxDelete(ret$model$pred.only)
-                ## rxDelete(ret$model$ebe)
-                ## rxDelete(ret$model$inner)
-                return(ret)
-            }
-        } else {
-            return(fit);
+        .fit <- model$saem_mod(cfg);
+        .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid);
+        if (inherits(.ret, "nlmixrFitData")){
+            .ret <- fix.dat(.ret);
+            .ret <- .addNpde(.ret);
         }
+        if (inherits(.ret, "nlmixrFitCore")){
+            .env <- .ret$env
+            assign("startTime", start.time, .env);
+            assign("est", est, .env);
+            assign("stopTime", Sys.time(), .env);
+        }
+        return(.ret);
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
         pt <- proc.time()
         est.type <- est;
@@ -374,7 +426,7 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                 est.type <- "nlme.mu.cov"
                 fun <- uif$nlme.fun.mu.cov
                 specs <- uif$nlme.specs.mu.cov;
-            } else if (!is.null(uif$nlme.mu.fun)){
+            } else if (!is.null(uif$nlme.fun.mu)){
                 est.type <- "nlme.mu"
                 fun <- uif$nlme.fun.mu
                 specs <- uif$nlme.specs.mu;
@@ -423,103 +475,65 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
                             ...);
         }
         class(fit) <- c(est.type, class(fit));
-
-        ## Run FOCEi using same ETAs and THETA estimates to get
-        ## comparable OBJFs and also extract table entries like
-        ## CWRES.
-        ## return(fit)
-        if (calc.resid){
-            ret <- as.focei(fit, uif, pt, data=dat)
-            ## ret <- try(as.focei(fit, uif, pt, data=dat))
-            ## if (inherits(ret, "try-error")){
-            ##     warning(bad.focei)
-            ##     return(fit);
-            ## } else {
-            ##     return(ret)
-            ## }
-            ret <- fix.dat(ret);
-            env <- attr(ret, ".focei.env")
-            assign("start.time", start.time, env);
-            assign("est", est, env);
-            assign("stop.time", Sys.time(), env);
-            return(ret)
-        } else  {
-            return(fit);
+        .ret <- as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=calc.resid);
+        if (inherits(.ret, "nlmixrFitData")){
+            .ret <- fix.dat(.ret);
+            .ret <- .addNpde(.ret);
         }
+        if (inherits(.ret, "nlmixrFitCore")){
+            .env <- .ret$env
+            assign("startTime", start.time, .env);
+            assign("est", est, .env);
+            assign("stopTime", Sys.time(), .env);
+        }
+        return(.ret)
     } else if (est == "focei"){
-        fit <- focei.fit(dat,
-                         inits=uif$focei.inits,
-                         PKpars=uif$theta.pars,
-                         ## par_trans=fun,
-                         model=uif$rxode.pred,
-                         pred=function(){return(nlmixr_pred)},
-                         err=uif$error,
-                         lower=uif$focei.lower,
-                         upper=uif$focei.upper,
-                         theta.names=uif$focei.names,
-                         eta.names=uif$eta.names,
-                         control=control,
-                         ...)
-        env <- attr(fit, ".focei.env")
+        env <- new.env(parent=emptyenv());
         env$uif <- uif;
-        uif.new <- uif;
-        ns <- names(fit$theta);
-        for (n in ns){
-            uif.new$ini$est[uif.new$ini$name == n] <- fit$theta[n];
-        }
-        ome <- fit$omega;
-        w <- which(!is.na(uif.new$ini$neta1))
-        for (i in w){
-            uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
-        }
+        fit <- foceiFit(dat,
+                        inits=uif$focei.inits,
+                        PKpars=uif$theta.pars,
+                        ## par_trans=fun,
+                        model=uif$rxode.pred,
+                        pred=function(){return(nlmixr_pred)},
+                        err=uif$error,
+                        lower=uif$focei.lower,
+                        upper=uif$focei.upper,
+                        fixed=uif$focei.fixed,
+                        thetaNames=uif$focei.names,
+                        etaNames=uif$eta.names,
+                        control=control,
+                        env=env,
+                        ...)
         fit <- fix.dat(fit);
-        env$uif.new <- uif.new;
-        class(fit) <- c("nlmixr.ui.focei.fit", class(fit));
-        if (uif$.clean.dll){
-            focei.cleanup(fit)
-        }
+        fit <- .addNpde(fit);
         assign("start.time", start.time, env);
         assign("est", est, env);
         assign("stop.time", Sys.time(), env);
         return(fit);
     } else if (est == "posthoc"){
-        control.posthoc <- list(NOTRUN=TRUE,
-                                ## inits.mat=mat,
-                                cores=1,
-                                find.best.eta=TRUE,
-                                numeric=(!is.null(uif$nmodel$lin.solved)),
-                                sum.prod=uif$env$sum.prod);
-        fit <- focei.fit(dat,
-                         inits=uif$focei.inits,
-                         PKpars=uif$theta.pars,
-                         ## par_trans=fun,
-                         model=uif$rxode.pred,
-                         pred=function(){return(nlmixr_pred)},
-                         err=uif$error,
-                         lower=uif$focei.lower,
-                         upper=uif$focei.upper,
-                         theta.names=uif$focei.names,
-                         eta.names=uif$eta.names,
-                         control=control.posthoc,
-                         ...)
-        env <- attr(fit, ".focei.env")
-        env$uif <- uif;
-        uif.new <- uif;
-        ns <- names(fit$theta);
-        for (n in ns){
-            uif.new$ini$est[uif.new$ini$name == n] <- fit$theta[n];
-        }
-        ome <- fit$omega;
-        w <- which(!is.na(uif.new$ini$neta1))
-        for (i in w){
-            uif.new$ini$est[i] <- ome[uif.new$ini$neta1[i], uif.new$ini$neta2[i]];
-        }
-        fit <- fix.dat(fit);
-        env$uif.new <- uif.new;
-        class(fit) <- c("nlmixr.ui.focei.posthoc", class(fit));
-        assign("start.time", start.time, env);
-        assign("est", est, env);
-        assign("stop.time", Sys.time(), env);
+        control <- do.call(nlmixr::foceiControl, control);
+        control$covMethod <- 0L
+        control$maxOuterIterations <- 0L;
+        fit <- foceiFit(dat,
+                        inits=uif$focei.inits,
+                        PKpars=uif$theta.pars,
+                        ## par_trans=fun,
+                        model=uif$rxode.pred,
+                        pred=function(){return(nlmixr_pred)},
+                        err=uif$error,
+                        lower=uif$focei.lower,
+                        upper=uif$focei.upper,
+                        thetaNames=uif$focei.names,
+                        etaNames=uif$eta.names,
+                        control=control,
+                        ...)
+        ## assign("start.time", start.time, env);
+        ## assign("est", est, env);
+        ## assign("stop.time", Sys.time(), env);
+        ## assign("start.time", start.time, env);
+        ## assign("est", est, env);
+        ## assign("stop.time", Sys.time(), env);
         return(fit);
     }
 }
@@ -554,10 +568,26 @@ nlmixr_fit <- function(uif, data, est="nlme", control=list(), ...,
 ##'     The third value represents the number of bootstrap/reshuffling or
 ##'     uni-dimensional random samples are taken.
 ##'
-##' @inheritParams RxODE::rxSolve
 ##' @param print The number it iterations that are completed before
 ##'     anything is printed to the console.  By default, this is 1.
+##'
+##' @param covMethod  Method for calculating covariance.  In this
+##'     discussion, R is the Hessian matrix of the objective
+##'     function. The S matrix is the sum of each individual's
+##'     gradient cross-product (evaluated at the individual empirical
+##'     Bayes estimates).
+##'
+##'  "\code{fim}" Use the SAEM-calculated Fisher Information Matrix to calculate the covariance.
+##'
+##'  "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \eqn{R^-1 \times S \times R^-1}
+##'
+##'  "\code{r}" Uses the Hessian matrix to calculate the covariance as \eqn{2\times R^-1}
+##'
+##'  "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
+##'
+##'  "" Does not calculate the covariance step.
 ##' @param ... Other arguments to control SAEM.
+##' @inheritParams RxODE::rxSolve
 ##' @return List of options to be used in \code{\link{nlmixr}} fit for
 ##'     SAEM.
 ##' @author Wenping Wang & Matthew L. Fidler
@@ -571,6 +601,8 @@ saemControl <- function(seed=99,
                         stiff = TRUE,
                         transitAbs = FALSE,
                         print=1,
+                        trace=0,
+                        covMethod=c("fim", "r,s", "r", "s"),
                         ...){
     .xtra <- list(...);
     .rm <- c();
@@ -591,9 +623,63 @@ saemControl <- function(seed=99,
                      stiff=as.integer(stiff),
                      transitAbs = as.integer(transitAbs)),
          seed=seed,
-         print=print, ...)
+         print=print,
+         DEBUG=trace, ...)
     if (length(.rm) > 0){
         .ret <- .ret[!(names(.ret) %in% .rm)]
     }
+    .ret[["covMethod"]] <- match.arg(covMethod);
+    class(.ret) <- "saemControl"
     .ret
+}
+
+##' Add CWRES
+##'
+##' This returns a new fit object with CWRES attached
+##'
+##' @param fit nlmixr fit without WRES/CWRES
+##' @param updateObject Boolean indicating if the original fit object should be updated. By default this is true.
+##' @return fit with CWRES
+##' @author Matthew L. Fidler
+##' @export
+addCwres <- function(fit, updateObject=TRUE){
+    .objName <- substitute(fit);
+    if(any(names(fit) == "CWRES")){
+        warning("Already contains CWRES");
+        return(fit)
+    }
+    .uif <- fit$uif;
+    .saem <- fit$saem
+    .cls <- class(fit);
+    if (!is.null(.saem)){
+        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=fit$objDf["SAEMg","OBJF"]);
+        .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
+        .new <- cbind(fit, .df);
+    }
+
+    .nlme <- fit$nlme
+    if (!is.null(.nlme)){
+        .newFit <- as.focei(.nlme, .uif, data=getData(fit), calcResid = TRUE);
+        .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
+        .new <- cbind(fit, .df);
+    }
+    class(.new) <- .cls
+    .objDf <- .newFit$objDf
+    env <- .new$env;
+    env$objDf <- .objDf;
+    if (updateObject){
+        .parent <- parent.frame(2);
+        .bound <- do.call("c", lapply(ls(.parent, all=TRUE), function(.cur){
+                                   if (.cur == .objName && identical(.parent[[.cur]], object)){
+                                       return(.cur)
+                                   }
+                                   return(NULL);
+                               }))
+        if (length(.bound) == 1){
+            if (exists(.bound, envir=.parent)){
+                assign(.bound, .new, envir=.parent)
+            }
+        }
+    }
+    return(.new);
 }

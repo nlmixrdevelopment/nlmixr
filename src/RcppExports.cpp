@@ -7,162 +7,6 @@
 
 using namespace Rcpp;
 
-// rxGrad
-void rxGrad(SEXP rho);
-RcppExport SEXP _nlmixr_rxGrad(SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rxGrad(rho);
-    return R_NilValue;
-END_RCPP
-}
-// rxInner
-void rxInner(SEXP etanews, SEXP rho);
-RcppExport SEXP _nlmixr_rxInner(SEXP etanewsSEXP, SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type etanews(etanewsSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rxInner(etanews, rho);
-    return R_NilValue;
-END_RCPP
-}
-// rxHessian
-void rxHessian(SEXP rho);
-RcppExport SEXP _nlmixr_rxHessian(SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rxHessian(rho);
-    return R_NilValue;
-END_RCPP
-}
-// RxODE_focei_eta_lik
-NumericVector RxODE_focei_eta_lik(SEXP sexp_eta, SEXP sexp_rho);
-RcppExport SEXP _nlmixr_RxODE_focei_eta_lik(SEXP sexp_etaSEXP, SEXP sexp_rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type sexp_eta(sexp_etaSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type sexp_rho(sexp_rhoSEXP);
-    rcpp_result_gen = Rcpp::wrap(RxODE_focei_eta_lik(sexp_eta, sexp_rho));
-    return rcpp_result_gen;
-END_RCPP
-}
-// RxODE_focei_eta_lp
-NumericVector RxODE_focei_eta_lp(SEXP sexp_eta, SEXP sexp_rho);
-RcppExport SEXP _nlmixr_RxODE_focei_eta_lp(SEXP sexp_etaSEXP, SEXP sexp_rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type sexp_eta(sexp_etaSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type sexp_rho(sexp_rhoSEXP);
-    rcpp_result_gen = Rcpp::wrap(RxODE_focei_eta_lp(sexp_eta, sexp_rho));
-    return rcpp_result_gen;
-END_RCPP
-}
-// RxODE_focei_eta
-XPtr<rxFn2> RxODE_focei_eta(std::string fstr);
-RcppExport SEXP _nlmixr_RxODE_focei_eta(SEXP fstrSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type fstr(fstrSEXP);
-    rcpp_result_gen = Rcpp::wrap(RxODE_focei_eta(fstr));
-    return rcpp_result_gen;
-END_RCPP
-}
-// RxODE_focei_finalize_llik
-NumericVector RxODE_focei_finalize_llik(SEXP rho);
-RcppExport SEXP _nlmixr_RxODE_focei_finalize_llik(SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rcpp_result_gen = Rcpp::wrap(RxODE_focei_finalize_llik(rho));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rxDetaDomega
-void rxDetaDomega(SEXP rho);
-RcppExport SEXP _nlmixr_rxDetaDomega(SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rxDetaDomega(rho);
-    return R_NilValue;
-END_RCPP
-}
-// rxOuter_
-void rxOuter_(SEXP rho);
-RcppExport SEXP _nlmixr_rxOuter_(SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rxOuter_(rho);
-    return R_NilValue;
-END_RCPP
-}
-// rxDetaDtheta
-void rxDetaDtheta(SEXP rho);
-RcppExport SEXP _nlmixr_rxDetaDtheta(SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rxDetaDtheta(rho);
-    return R_NilValue;
-END_RCPP
-}
-// rxOuter
-NumericVector rxOuter(SEXP rho);
-RcppExport SEXP _nlmixr_rxOuter(SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type rho(rhoSEXP);
-    rcpp_result_gen = Rcpp::wrap(rxOuter(rho));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rxUpdateEtas
-NumericVector rxUpdateEtas(SEXP DnDhS, SEXP DhS, SEXP initS, SEXP acceptNS);
-RcppExport SEXP _nlmixr_rxUpdateEtas(SEXP DnDhSSEXP, SEXP DhSSEXP, SEXP initSSEXP, SEXP acceptNSSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type DnDhS(DnDhSSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type DhS(DhSSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type initS(initSSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type acceptNS(acceptNSSEXP);
-    rcpp_result_gen = Rcpp::wrap(rxUpdateEtas(DnDhS, DhS, initS, acceptNS));
-    return rcpp_result_gen;
-END_RCPP
-}
-// sFOCEi
-SEXP sFOCEi(NumericVector par, Environment e);
-RcppExport SEXP _nlmixr_sFOCEi(SEXP parSEXP, SEXP eSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
-    rcpp_result_gen = Rcpp::wrap(sFOCEi(par, e));
-    return rcpp_result_gen;
-END_RCPP
-}
-// grFOCEi
-NumericVector grFOCEi(NumericVector par, Environment e);
-RcppExport SEXP _nlmixr_grFOCEi(SEXP parSEXP, SEXP eSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
-    rcpp_result_gen = Rcpp::wrap(grFOCEi(par, e));
-    return rcpp_result_gen;
-END_RCPP
-}
 // lin_cmt_stan
 SEXP lin_cmt_stan(Eigen::Map<Eigen::VectorXd> obs_time, Eigen::Map<Eigen::VectorXd> dose_time, Eigen::Map<Eigen::VectorXd> dose, Eigen::Map<Eigen::VectorXd> Tinf, Eigen::Map<Eigen::VectorXd> params, SEXP oralSEXP, SEXP infusionSEXP, SEXP ncmtSEXP, SEXP parameterizationSEXP);
 RcppExport SEXP _nlmixr_lin_cmt_stan(SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP, SEXP paramsSEXP, SEXP oralSEXPSEXP, SEXP infusionSEXPSEXP, SEXP ncmtSEXPSEXP, SEXP parameterizationSEXPSEXP) {
@@ -280,18 +124,49 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrShrink
+List nlmixrShrink(NumericMatrix& omegaMat, DataFrame etasDf, List etaLst);
+RcppExport SEXP _nlmixr_nlmixrShrink(SEXP omegaMatSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix& >::type omegaMat(omegaMatSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type etasDf(etasDfSEXP);
+    Rcpp::traits::input_parameter< List >::type etaLst(etaLstSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrShrink(omegaMat, etasDf, etaLst));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nlmixrResid
-List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& dv, DataFrame etasDf, List etaLst);
-RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP dvSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
+List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& dv, NumericVector& lambda, NumericVector& yj, DataFrame etasDf, List etaLst);
+RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP dvSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List& >::type innerList(innerListSEXP);
     Rcpp::traits::input_parameter< NumericMatrix& >::type omegaMat(omegaMatSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type dv(dvSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type yj(yjSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type etasDf(etasDfSEXP);
     Rcpp::traits::input_parameter< List >::type etaLst(etaLstSEXP);
-    rcpp_result_gen = Rcpp::wrap(nlmixrResid(innerList, omegaMat, dv, etasDf, etaLst));
+    rcpp_result_gen = Rcpp::wrap(nlmixrResid(innerList, omegaMat, dv, lambda, yj, etasDf, etaLst));
+    return rcpp_result_gen;
+END_RCPP
+}
+// npde
+List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector lambda, NumericVector yj, bool ties);
+RcppExport SEXP _nlmixr_npde(SEXP idSEXP, SEXP dvSEXP, SEXP simSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP tiesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type id(idSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type dv(dvSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type sim(simSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type yj(yjSEXP);
+    Rcpp::traits::input_parameter< bool >::type ties(tiesSEXP);
+    rcpp_result_gen = Rcpp::wrap(npde(id, dv, sim, lambda, yj, ties));
     return rcpp_result_gen;
 END_RCPP
 }

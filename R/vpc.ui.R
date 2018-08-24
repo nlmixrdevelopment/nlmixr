@@ -18,77 +18,62 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                    pred_corr_lower_bnd = 0, pi = c(0.05, 0.95), ci = c(0.05, 0.95),
                    uloq = NULL, lloq = NULL, log_y = FALSE, log_y_min = 0.001,
                    xlab = NULL, ylab = NULL, title = NULL, smooth = TRUE, vpc_theme = NULL,
-                   facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...,
-                   nStud=NULL,
-                   method=NULL){
-    if (is.null(nStud)){
-        nStud <- n;
-    }
-    if (is.numeric(data) || is.integer(data)){
-        nStud <- n
-        data <- NULL
-    }
-    tmp <- list(...)
-    if (!is.null(tmp$nsim)){
-        nStud <- tmp$nsim
-    }
-    con <- fit$fit$con;
-    pt <- proc.time();
-    message("Compiling VPC model...", appendLF=FALSE)
-    mod <- gsub(rex::rex("(0)~"), "(0)=", paste0(gsub("=", "~", RxODE::rxNorm(fit$model$pred.only), perl=TRUE),
-                                                 "\ndv=rx_pred_+sqrt(rx_r_)*rx_err_"))
-    mod <- RxODE(mod);
-    diff <- proc.time() - pt;
-    message(sprintf("done (%.2f sec)", diff["elapsed"]));
-    pt <- proc.time();
-    theta <- fixed.effects(fit);
-    names(theta) <- sprintf("THETA[%d]", seq_along(theta))
-    omega <- fit$omega
-    dm <- dim(fit$omega)[1];
-    n <- sprintf("ETA[%d]", seq(1, dm))
-    dimnames(omega) <- list(n, n)
-    sigma <- matrix(1, dimnames=list("rx_err_", "rx_err_"))
-    if (is.null(data)){
-        dat <- nlmixrData(getData(fit));
-    } else {
-        dat <- data
-    }
-    if (is.null(method)){
-        meth <- c("dop853", "lsoda", "liblsoda");
-        meth <- meth[con$stiff + 1];
-    } else {
-        meth <- method;
-    }
-    sim <- RxODE::rxSolve(mod, params=theta, events=dat, omega=omega, nStud=nStud, sigma=sigma, add.cov=TRUE, return.type="data.frame",
-                          atol=con$atol.ode, rtol=con$rtol.ode, maxsteps=con$maxsteps.ode,
-                          hmin = con$hmin, hmax = con$hmax, hini = con$hini, transit_abs = con$transit_abs,
-                          maxordn = con$maxordn, maxords = con$maxords, method=meth);
-    diff <- proc.time() - pt;
-    message(sprintf("done (%.2f sec)", diff["elapsed"]));
-    onames <- names(dat)
-    names(dat) <- tolower(onames)
-    w <- which(duplicated(names(dat)));
-    if (length(w) > 0){
-        warning(sprintf("Dropping duplicate columns (case insensitive): %s", paste(onames, collapse=", ")))
-        dat <- dat[, -w];
-    }
-    if (!is.null(stratify)){
-        cols <- c(tolower(stratify), "dv")
-        stratify <- tolower(stratify);
-    }  else {
-        cols <- c("dv");
-    }
-    dat <- dat[dat$evid == 0, ];
-    ## Assume this is in the observed dataset. Add it to the current dataset
-    if(!all(names(sim) %in% cols)){
-        w <- cols[!(cols %in% names(sim))]
-        if (length(w) >= 1){
-            n <- names(sim)
-            sim <- cbind(sim, dat[, w, drop = FALSE]);
-            names(sim) <- c(n, w);
+                   facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...){
+    if (is(data, "numeric") | is(data, "integer")){
+        if (missing(n)){
+            n <- data;
+            data <- NULL;
+        } else {
+            stop("Data needs to be a data frame instead of a numeric value.")
         }
     }
-    RxODE::rxUnload(mod);
+    .xtra <- list(...);
+    if (is.null(.xtra$nsim)){
+        .xtra$nsim <- n;
+    }
+    if (inherits(fit, "nlmixrVpc")){
+        sim <- fit;
+    } else {
+        .xtra$object <- fit;
+        .xtra$returnType <- "data.frame";
+        pt <- proc.time();
+        sim <- do.call("nlmixrSim", .xtra);
+        sim <- sim[, c("sim.id", "id", "time", "sim")]
+        names(sim)[4] <- "dv";
+        if (is.null(data)){
+            dat <- nlmixrData(getData(fit));
+        } else {
+            dat <- data
+        }
+        diff <- proc.time() - pt;
+        message(sprintf("done (%.2f sec)", diff["elapsed"]));
+        onames <- names(dat)
+        names(dat) <- tolower(onames)
+        w <- which(duplicated(names(dat)));
+        if (length(w) > 0){
+            warning(sprintf("Dropping duplicate columns (case insensitive): %s", paste(onames, collapse=", ")))
+            dat <- dat[, -w];
+        }
+        if (!is.null(stratify)){
+            cols <- c(tolower(stratify), "dv")
+            stratify <- tolower(stratify);
+        }  else {
+            cols <- c("dv");
+        }
+        dat <- dat[dat$evid == 0, ];
+        ## Assume this is in the observed dataset. Add it to the current dataset
+        if(!all(names(sim) %in% cols)){
+            w <- cols[!(cols %in% names(sim))]
+            if (length(w) >= 1){
+                n <- names(sim)
+                sim <- cbind(sim, dat[, w, drop = FALSE]);
+                names(sim) <- c(n, w);
+            }
+        }
+        sim <- list(sim=sim, obs=dat)
+        attr(sim, "nsim") <- .xtra$nsim;
+        class(sim) <- "nlmixrVpc";
+    }
     ns <- loadNamespace("vpc");
     if (exists("vpc_vpc",ns)){
         vpcn <- "vpc_vpc"
@@ -100,27 +85,29 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     call$obs_cols = list(id="id", dv="dv", idv="time")
     call$sim_cols = list(id="id", dv="dv", idv="time")
     call$stratify = stratify
-    p = do.call(getFromNamespace(vpcn,"vpc"), c(list(sim=sim, obs=dat), call), envir = parent.frame(1))
+    p = do.call(getFromNamespace(vpcn,"vpc"), c(sim, call), envir = parent.frame(1))
     print(p);
+
     return(invisible(sim));
 }
 
+##'@export
+print.nlmixrVpc <- function(x, ...){
+    cat(sprintf("nlmixr vpc object of %d simulations.\n", attr(sim, "nsim")))
+    cat("  $sim = simulated data\n")
+    cat("  $obs = observed data\n")
+    cat("use vpc(...) to change plot options\n")
+}
 
 ##' @rdname vpc_ui
 ##' @export
-vpc.nlmixr.ui.focei <- function(sim, ...){
+vpc.nlmixrFitData <- function(sim, ...){
     vpc_ui(fit=sim, ...);
 }
 
 ##' @rdname vpc_ui
 ##' @export
-vpc.nlmixr.ui.saem <- function(sim, ...){
-    vpc_ui(fit=sim, ...);
-}
-
-##' @rdname vpc_ui
-##' @export
-vpc.nlmixr.ui.nlme <- function(sim, ...){
+vpc.nlmixrVpc <- function(sim, ...){
     vpc_ui(fit=sim, ...);
 }
 

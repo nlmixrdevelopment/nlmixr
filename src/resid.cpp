@@ -4,6 +4,20 @@
 #include <Rmath.h>
 #include "nlmixr_types.h"
 
+typedef double (*rxPow)(double x, double lambda, int yj);
+
+double powerDi(double x, double lambda, int yj){
+  static rxPow fun=NULL;
+  if (fun == NULL) fun = (rxPow) R_GetCCallable("RxODE","powerDi");
+  return fun(x, lambda, yj);
+}
+
+double powerD(double x, double lambda, int yj){
+  static rxPow fun=NULL;
+  if (fun == NULL) fun = (rxPow) R_GetCCallable("RxODE","powerD");
+  return fun(x, lambda, yj);
+}
+
 using namespace Rcpp;
 using namespace R;
 using namespace arma;
@@ -64,16 +78,42 @@ List nlmixrParameters(NumericVector theta, DataFrame eta){
 }
 
 // [[Rcpp::export]]
-List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, DataFrame etasDf, List etaLst){
+List nlmixrShrink(NumericMatrix &omegaMat,DataFrame etasDf, List etaLst){
+  unsigned int nid=etasDf.nrows();
+  double tc = sqrt((double)nid);
+  double om;
+  int j;
+  unsigned int neta = omegaMat.nrow();
+  for (j = neta;j--;){
+    NumericVector cur = etaLst[j];
+    // Finalize by adding shrinkage.
+    om =omegaMat(j,j);
+    cur[5]= (1.0-cur[1]/om)*100.0;
+    cur[6]= (1.0-cur[2]/sqrt(om))*100.0;
+    cur[7] = cur[0]*tc/(cur[2]);
+    cur[8] = 2*Rf_pt(-fabs(cur[7]),(double)(nid-1),1,0);
+  }
+  CharacterVector dimN= (as<List>(omegaMat.attr("dimnames")))[1];
+  etaLst.attr("names") = dimN;
+  etaLst.attr("row.names") = CharacterVector::create("mean","var","sd","skewness", "kurtosis","var shrinkage (%)", "sd shrinkage (%)","t statistic","p-value");
+  etaLst.attr("class") = "data.frame";
+  return etaLst;
+}
+
+// [[Rcpp::export]]
+List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, NumericVector &lambda, NumericVector &yj, DataFrame etasDf, List etaLst){
+  bool doCwres = (innerList.size() == 2);
   DataFrame pred = as<DataFrame>(innerList["pred"]);
   IntegerVector ID= as<IntegerVector>(pred[0]);
   IntegerVector TIME= as<IntegerVector>(pred[1]);
   pred.erase(0,2);
   NumericVector prednv = as<NumericVector>(pred[0]);
+  NumericVector prednvI(prednv.size());
   pred.erase(0);
   DataFrame ipred = as<DataFrame>(innerList["ipred"]);
   ipred.erase(0,2);
   NumericVector iprednv = as<NumericVector>(ipred[0]);
+  NumericVector iprednvI(iprednv.size());
   ipred.erase(0);
   // Now get fp r, rp
   unsigned int neta = omegaMat.nrow();
@@ -82,13 +122,21 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   NumericMatrix rpp(iprednv.size(),neta);
   NumericMatrix rpi(iprednv.size(),neta);
   unsigned int i, j;
+  NumericVector dvTBS(dv.size());
+  for (i = dv.size(); i--;){
+    dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
+    prednvI[i] = powerDi(prednv[i], lambda[i], (int)yj[i]);
+    iprednvI[i]= powerDi(iprednv[i], lambda[i], (int)yj[i]);
+  }
   double om;
   unsigned int nid=etasDf.nrows();
   double tc = sqrt((double)nid);
   for (j = neta;j--;){
     NumericVector cur = etaLst[j];
-    fpp(_,j) = NumericVector(pred[j]);
-    fpi(_,j) = NumericVector(ipred[j]);
+    if (doCwres){
+      fpp(_,j) = NumericVector(pred[j]);
+      fpi(_,j) = NumericVector(ipred[j]);
+    }
     // Finalize by adding shrinkage.
     om =omegaMat(j,j);
     cur[5]= (1.0-cur[1]/om)*100.0;
@@ -103,11 +151,25 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   etaLst.attr("names") = dimN2;
   etaLst.attr("row.names") = CharacterVector::create("mean","var","sd","skewness", "kurtosis","var shrinkage (%)", "sd shrinkage (%)","t statistic","p-value");
   etaLst.attr("class") = "data.frame";
-  pred.erase(0,neta);
-  ipred.erase(0,neta);
+  if (doCwres){
+    pred.erase(0,neta);
+    ipred.erase(0,neta);
+  }
   NumericVector rp = pred[0];
   arma::vec rpv = as<arma::vec>(rp);
   NumericVector ri = ipred[0];
+  int warn1 = 0;
+  int warn2 = 0;
+  for (unsigned int j = ri.size(); j--;){
+    if (ri[j] < DOUBLE_EPS){
+      warn1 = 1;
+      ri[j] = 1;
+    }
+    if (ISNAN(ri[j])){
+      warn2 = 1;
+      ri[j] = 1;
+    }
+  }
   arma::vec riv = as<arma::vec>(ri);
   DataFrame etasDf1 = etasDf;
   etasDf1.erase(0);
@@ -121,84 +183,126 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
     etasDfFull[j]= cur;
     etas1(_,j)=NumericVector(etasDf1[j]);
   }
+  
   arma::mat etas = as<arma::mat>(etas1);
   arma::mat fppm = as<arma::mat>(fpp);
   arma::mat fpim = as<arma::mat>(fpi);
   arma::mat omegaMatA = as<arma::mat>(omegaMat);
-  arma::mat V_fo_p = (fppm * omegaMatA * fppm.t()); // From Mentre 2006 p. 352
-  arma::mat V_fo_i = (fpim * omegaMatA * fpim.t()); // From Mentre 2006 p. 352
-  // There seems to be a difference between how NONMEM and R/S types
-  // of software calculate WRES.  Mentre 2006 states that the
-  // Variance under the FO condition should only be diag(Vfo_full) + Sigma,
-  // but Hooker 2007 claims there is a
-  // diag(Vfo_full)+diag(dh/deta*Sigma*dh/deta).
-  // h = the additional error from the predicted function.
-  //
-  // In the nlmixr/FOCEi implemented here, the variance of the err
-  // term is 1, or Sigma is a 1 by 1 matrix with one element (1)
-  //
-  // The dh/deta term would be the sd term, or sqrt(r), which means
-  // sqrt(r)*sqrt(r)=|r|.  Since r is positive, this would be r.
-  //
-  // Also according to Hooker, WRES is calculated under the FO
-  // assumption, where eta=0, eps=0 for this r term and Vfo term.
-  // However, conditional weighted residuals are calculated under
-  // the FOCE condition for the Vfo and the FO conditions for
-  // dh/deta
-  //
-  arma::vec Vfop = V_fo_p.diag();
-  arma::vec Vfoi = V_fo_i.diag();
-  // Calculate dErr/dEta
-  NumericVector dErr_dEta_p(fppm.n_rows, NA_REAL);
+  arma::vec Vfop, Vfoi;
   NumericVector dErr_dEta_i(fppm.n_rows, NA_REAL);
-  int lastId = ID[ID.size()-1], lastCol = nid-1, lastIndex=ID.size()-1;
-  // List etaFull(neta);
-  int etaFulli = nid-1;
-  double curEta=0.0;
-  for (j = fppm.n_rows; j--; ){
-    if (lastId != ID[j]){
-      // Fill in full eta data frame
-      for (i = neta; i--;){
-	curEta = (as<NumericVector>(etasDf1[i]))[etaFulli];
-	NumericVector cur = etasDfFull[i];
-	std::fill_n(cur.begin()+j+1,lastIndex-j,curEta);
-      }
-      etaFulli--;
-      // FIXME do it without copy?
-      arma::vec tmp = fppm.rows(j+1, lastIndex) * trans(etas.row(lastCol));
-      std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin()+j+1);
-      tmp = fpim.rows(j+1, lastIndex) * trans(etas.row(lastCol));
-      std::copy(tmp.begin(),tmp.end(),dErr_dEta_i.begin()+j+1);
-      lastId=ID[j];
-      lastIndex=j;
-      lastCol--;
-      if (lastCol == 0){
-	// Finalize ETA
+  if (!doCwres){
+    int lastId = ID[ID.size()-1], lastCol = nid-1, lastIndex=ID.size()-1;
+    int etaFulli = nid-1;
+    double curEta=0.0;
+    for (j = fppm.n_rows; j--; ){
+      if (lastId != ID[j]){
+        // Fill in full eta data frame
         for (i = neta; i--;){
-	  curEta = (as<NumericVector>(etasDf1[i]))[0];
-	  NumericVector cur = etasDfFull[i];
-	  std::fill_n(cur.begin(),lastIndex+1,curEta);
-	}
-	// Finalize dErr_dEta
-	arma::vec tmp = fppm.rows(0, lastIndex) * trans(etas.row(lastCol));
-        std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin());
-        tmp = fpim.rows(0, lastIndex) * trans(etas.row(lastCol));
-        std::copy(tmp.begin(),tmp.end(),dErr_dEta_i.begin());
-	break;
+          curEta = (as<NumericVector>(etasDf1[i]))[etaFulli];
+          NumericVector cur = etasDfFull[i];
+          std::fill_n(cur.begin()+j+1,lastIndex-j,curEta);
+        }
+        etaFulli--;
+        lastId=ID[j];
+        lastIndex=j;
+        lastCol--;
+        if (lastCol == 0){
+          // Finalize ETA
+          for (i = neta; i--;){
+            curEta = (as<NumericVector>(etasDf1[i]))[0];
+            NumericVector cur = etasDfFull[i];
+            std::fill_n(cur.begin(),lastIndex+1,curEta);
+          }
+          break;
+        }
+      }
+    }
+  } else {
+    arma::mat V_fo_p = (fppm * omegaMatA * fppm.t()); // From Mentre 2006 p. 352
+    arma::mat V_fo_i = (fpim * omegaMatA * fpim.t()); // From Mentre 2006 p. 352
+    // There seems to be a difference between how NONMEM and R/S types
+    // of software calculate WRES.  Mentre 2006 states that the
+    // Variance under the FO condition should only be diag(Vfo_full) + Sigma,
+    // but Hooker 2007 claims there is a
+    // diag(Vfo_full)+diag(dh/deta*Sigma*dh/deta).
+    // h = the additional error from the predicted function.
+    //
+    // In the nlmixr/FOCEi implemented here, the variance of the err
+    // term is 1, or Sigma is a 1 by 1 matrix with one element (1)
+    //
+    // The dh/deta term would be the sd term, or sqrt(r), which means
+    // sqrt(r)*sqrt(r)=|r|.  Since r is positive, this would be r.
+    //
+    // Also according to Hooker, WRES is calculated under the FO
+    // assumption, where eta=0, eps=0 for this r term and Vfo term.
+    // However, conditional weighted residuals are calculated under
+    // the FOCE condition for the Vfo and the FO conditions for
+    // dh/deta
+    //
+    Vfop = V_fo_p.diag();
+    Vfoi = V_fo_i.diag();
+    // Calculate dErr/dEta
+    NumericVector dErr_dEta_p(fppm.n_rows, NA_REAL);
+    int lastId = ID[ID.size()-1], lastCol = nid-1, lastIndex=ID.size()-1;
+    // List etaFull(neta);
+    int etaFulli = nid-1;
+    double curEta=0.0;
+    for (j = fppm.n_rows; j--; ){
+      if (lastId != ID[j]){
+        // Fill in full eta data frame
+        for (i = neta; i--;){
+          curEta = (as<NumericVector>(etasDf1[i]))[etaFulli];
+          NumericVector cur = etasDfFull[i];
+          std::fill_n(cur.begin()+j+1,lastIndex-j,curEta);
+        }
+        etaFulli--;
+        // FIXME do it without copy?
+        arma::vec tmp = fppm.rows(j+1, lastIndex) * trans(etas.row(lastCol));
+        std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin()+j+1);
+        tmp = fpim.rows(j+1, lastIndex) * trans(etas.row(lastCol));
+        std::copy(tmp.begin(),tmp.end(),dErr_dEta_i.begin()+j+1);
+        lastId=ID[j];
+        lastIndex=j;
+        lastCol--;
+        if (lastCol == 0){
+          // Finalize ETA
+          for (i = neta; i--;){
+            curEta = (as<NumericVector>(etasDf1[i]))[0];
+            NumericVector cur = etasDfFull[i];
+            std::fill_n(cur.begin(),lastIndex+1,curEta);
+          }
+          // Finalize dErr_dEta
+          arma::vec tmp = fppm.rows(0, lastIndex) * trans(etas.row(lastCol));
+          std::copy(tmp.begin(),tmp.end(),dErr_dEta_p.begin());
+          tmp = fpim.rows(0, lastIndex) * trans(etas.row(lastCol));
+          std::copy(tmp.begin(),tmp.end(),dErr_dEta_i.begin());
+          break;
+        }
       }
     }
   }
   // For WRES
   // W <- fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi")
-  NumericVector res = dv-prednv;
+  NumericVector resI = dv-prednvI;
+  NumericVector res = dvTBS-prednv;
   arma::vec resv = as<arma::vec>(res);
-  arma::vec wres = resv/sqrt(Vfop+rpv);
-  // For CPRED, CRES and CWRES
-  NumericVector cpred = iprednv - dErr_dEta_i;
-  NumericVector cres = dv-cpred;
-  //W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
-  arma::vec cresv=as<arma::vec>(cres);
-  arma::vec cwres = cresv/sqrt(Vfoi+riv);
+  arma::vec wres, cwres;
+  NumericVector cpredI, cresI, cres, cpred;
+  if (doCwres){
+    wres = resv/sqrt(Vfop+rpv);
+    // For CPRED, CRES and CWRES
+    cpred = iprednv - dErr_dEta_i;
+    cpredI = NumericVector(cpred.size());
+    cres = dvTBS-cpred;
+    cresI = NumericVector(cres.size());
+    for (i = cres.size(); i--;){
+      cpredI[i] = powerDi(cpred[i], lambda[i], (int)yj[i]);
+      cresI[i]  = dv[i] - cpredI[i];
+    }
+    //W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
+    arma::vec cresv=as<arma::vec>(cres);
+    cwres = cresv/sqrt(Vfoi+riv);
+  }
   // e["Vfo"] = wrap(Vfo);
   // e["dErr_dEta"] = wrap(dErr_dEta);
   // W <- fitted(object, population=TRUE, type="Vfo") + fitted(object, population=TRUE, type="Vi")
@@ -216,8 +320,8 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   // ipred.erase(0,neta);
   // rp(_,0) = NumericVector(pred[0]);
   // ri(_,0) = NumericVector(ipred[0]);
-
-  NumericVector iwres=(dv-iprednv)/sqrt(ri);
+  
+  NumericVector iwres=(dvTBS-iprednv)/sqrt(ri);
   NumericVector stat=etaLst[neta];
   unsigned int n =0, n1 = 0;
   double M1 =  0, M2 = 0, M3 = 0, M4 =0, term1, delta, delta_n, delta_n2;
@@ -242,16 +346,243 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Da
   stat[7] = M1*sqrt((double)n)/stat[2];
   stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
   List ret(3);
-  ret[0] = DataFrame::create(_["PRED"]=prednv,
-                             _["RES"]=res,
-                             _["WRES"]=wrap(wres),
-                             _["IPRED"]=iprednv,
-                             _["IRES"]=dv-iprednv,
-                             _["IWRES"]=iwres,
-                             _["CPRED"]=cpred,
-                             _["CRES"]=cres,
-                             _["CWRES"]=cwres);
+  // Now do inverse TBS to backtransform
+  if (doCwres){
+    ret[0] = DataFrame::create(_["PRED"]=prednvI,
+			       _["RES"]=resI,
+			       _["WRES"]=wrap(wres),
+			       _["IPRED"]=iprednvI,
+			       _["IRES"]=dv-iprednvI,
+			       _["IWRES"]=iwres,
+			       _["CPRED"]=cpredI,
+			       _["CRES"]=cresI,
+			       _["CWRES"]=cwres);
+  } else {
+    ret[0] = DataFrame::create(_["PRED"]=prednvI,
+                               _["RES"]=resI,
+                               _["IPRED"]=iprednvI,
+                               _["IRES"]=dv-iprednvI,
+                               _["IWRES"]=iwres);
+  }
   ret[1] = etaLst;
   ret[2] = etasDfFull;
+  if (warn1){
+    warning("Some variances were zero, replaced with 1.");
+  }
+  if (warn2){
+    warning("Some variances were NA/NaN, replaced with 1.");
+  }
+  return ret;
+}
+
+// [[Rcpp::export]]
+List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector lambda, NumericVector yj, bool ties = false){
+  bool warn1 = false;
+  bool warn2 = false;
+  bool warn3=false;
+  int nobs = dv.size();
+  int K = sim.size()/nobs;
+  NumericVector epredt(nobs);
+  NumericVector epred(nobs);
+  NumericVector eres(nobs);
+  NumericVector erest(nobs);
+  NumericVector simrest(sim.size());
+  // NumericVector simY(sim.size());
+  // NumericVector Y(nobs);
+  NumericVector pd(nobs);
+  NumericVector npde(nobs);
+  NumericVector nsim(nobs);
+  NumericVector dvt(nobs);
+  IntegerVector idLoc(nobs);
+  // This uses welford's method for means
+  int lastId=id[0], nid=1;
+  idLoc[0]=0;
+  int k2=0;
+  for (int i = 0; i < nobs; i++){
+    if (lastId != id[i]){
+      idLoc[nid] = i;
+      nid++;
+      lastId = id[i];
+    }
+    // Calculte EPREDt
+    if (ISNA(sim[i])){
+      epredt[i] = 0;
+      warn3=true;
+    } else {
+      k2++;
+      epredt[i] = sim[i];
+    }
+    for (int j = 1; j < K; j++){
+      if (!ISNA(sim[i+nobs*j])){
+	k2++;
+	epredt[i] = epredt[i]+(sim[i+nobs*j]-epredt[i])/((double)(k2));
+      } else {
+	warn3=true;
+      }
+    }
+    // Calculate dvt, EPRED, ERES ERESt
+    dvt[i] = powerD(dv[i], lambda[i], (int)yj[i]);
+    epred[i] = powerDi(epredt[i], lambda[i], (int)yj[i]);
+    eres[i] = dv[i] - epred[i];
+    erest[i] = dvt[i] - epredt[i];
+    // Calculate simRESt
+    for (int j = K; j--; ){
+      simrest[i+nobs*j] = sim[i+nobs*j]-epredt[i];
+    }
+  }
+  idLoc[nid] = nobs;
+  // Calculate Var(Yj)
+  // Even though we are using matrix algebra, we are still using Welford's method
+  double d;
+  for (int i = 0; i < nid; i++){
+    arma::mat d1(idLoc[i+1]-idLoc[i], 1);
+    std::copy(simrest.begin()+idLoc[i], simrest.begin()+idLoc[i+1], d1.begin());
+    bool anyNa = false;
+    for (int j = d1.size(); j--;){
+      if (ISNAN(d1[j])){
+        anyNa=true;
+	break;
+      }
+    }
+    mat vYi(idLoc[i+1]-idLoc[i], idLoc[i+1]-idLoc[i], fill::zeros);
+    k2=0;
+    if (anyNa) {
+      warn3=true;
+    } else {
+      k2++;
+      vYi = d1 * trans(d1);
+    }
+    mat vYi2;
+    for (int j = 1; j < K; j++){
+      std::copy(simrest.begin()+idLoc[i]+nobs*j, simrest.begin()+idLoc[i+1]+nobs*j, d1.begin());
+      anyNa=false;
+      for (int k = d1.size(); k--;){
+        if (ISNAN(d1[k])){
+          anyNa=true;
+          break;
+        }
+      }
+      if (anyNa){
+	warn3=true;
+      } else {
+        k2++;
+        d=k2;
+        vYi2=d1 * trans(d1);
+        vYi = vYi + (vYi2 - vYi)/d;
+      }
+    }
+    // Now decorrelate covariance
+    vec eigval;
+    mat eigvec;
+    vec d;
+    mat u;
+    mat v;
+    arma::mat ch;
+    mat eigvalS(vYi.n_rows, vYi.n_rows, fill::zeros);
+    try {
+      ch = chol(vYi);
+    } catch (...){
+      Function loadNamespace("loadNamespace", R_BaseNamespace);
+      Environment rx = loadNamespace("RxODE");
+      Function nearpd = rx[".nearPd"];    
+
+      // Try nearPD from R/RxODE
+      warn1 = true;
+      ch = as<mat>(nearpd(wrap(vYi)));
+      try {
+	ch = chol(ch);
+      } catch (...){
+	stop("The simulated data covariance matrix Cholesky decomposition could not be obtained for %d.", i+1);
+      }
+    }
+    try{
+      vYi = trans(inv(trimatu(ch)));
+    } catch (...) {
+      warn2=true;
+      try {
+	vYi = trans(pinv(trimatu(ch)));
+      } catch (...){
+	stop("The simulated data covariance matrix Cholesky decomposition inverse or pseudo-inverse could not be obtained for %d.", i+1);
+      }
+    }
+    // Now calculate  Y_{i,sim} and Y_i
+    std::copy(erest.begin()+idLoc[i], erest.begin()+idLoc[i+1], d1.begin());
+    mat Yi = vYi*d1;
+    mat Yis;
+    std::copy(simrest.begin()+idLoc[i], simrest.begin()+idLoc[i+1], d1.begin());
+    Yis = vYi*d1;
+    for (int k = idLoc[i]; k < idLoc[i+1]; k++){
+      if (Yi[k-idLoc[i]] < Yis[k-idLoc[i]]){
+        pd[k] = 1.0;
+      } else {
+	pd[k] = 0.0;
+      }
+    }
+    double de;
+    k2 = 0;
+    for (int j = 1; j < K; j++){
+      std::copy(simrest.begin()+idLoc[i]+j*nobs, simrest.begin()+idLoc[i+1]+j*nobs, d1.begin());
+      Yis = vYi*d1;        
+      for (int k = idLoc[i]; k < idLoc[i+1]; k++){
+	if (ISNAN(Yis[k-idLoc[i]])){
+	  warn3=true;
+	} else if (Yi[k-idLoc[i]] < Yis[k-idLoc[i]]){
+	  k2++;
+	  de = k2;
+          pd[k] = pd[k]+(1-pd[k])/de;
+        } else {
+          k2++;
+          de = k2;
+          pd[k] = pd[k]-pd[k]/de;
+        }
+      }
+    }
+  }
+  // Now deal with exceptions pd=1 or 0 or when ties=FALSE, put some
+  // random noise in.
+  if (ties){
+    for (int i = pd.size(); i--;){
+      if (fabs(pd[i]) < DOUBLE_EPS){
+	pd[i] = 1 / (2.0 * K);
+      } else if (fabs(1-pd[i]) < DOUBLE_EPS){
+	pd[i] = 1 - 1 / (2.0 * K);
+      }
+      npde[i] = -qnorm(pd[i], 0.0, 1.0, true, false);
+    }
+  } else {
+    // This is a little different than the NPDE manual
+    // the bounds are 1/(2K) to 1 - 1/(2K) instead of 0 to 1
+    for (int i = pd.size(); i--;){
+      if (fabs(pd[i]) < DOUBLE_EPS){
+        pd[i] = Rf_runif(0, 1/K);
+      } else if (fabs(1-pd[i]) < DOUBLE_EPS){
+        pd[i] = Rf_runif(1.0 - 1/K, 1.0);
+      } else {
+	pd[i] = Rf_runif(0, 1/K) + pd[i];
+      }
+      if (fabs(pd[i]) < 1 / (2.0 * K)){
+        pd[i] = 1 / (2.0 * K);
+      } else if (fabs(1-pd[i]) < 1 / (2.0 * K)){
+        pd[i] = 1 - 1 / (2.0 * K);
+      }
+      npde[i] = -qnorm(pd[i], 0.0, 1.0, true, false);
+    }
+  }
+  List ret(3);
+  ret[0] = epred;
+  ret[1] = eres;
+  ret[2] = npde;
+  ret.attr("names") = CharacterVector::create("EPRED", "ERES", "NPDE");
+  ret.attr("row.names") = IntegerVector::create(NA_INTEGER, -nobs);
+  ret.attr("class") = "data.frame";
+  if (warn1){
+    warning("Some subjects simulated data covariance matrix were corrected with Matrix::nearPD");
+  }
+  if (warn2){
+    warning("Some subjects simulated data covariance matrix were inverted by a psuedo-inverse");
+  }
+  if (warn3){
+    warning("Some of the simulated subjects had NA/NaN values, implying failed solves and likely an unstable model");
+  }
   return ret;
 }

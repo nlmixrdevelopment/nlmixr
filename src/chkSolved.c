@@ -3,6 +3,45 @@
 #include <Rmath.h> //Rmath includes math.
 #include <R_ext/Rdynload.h>
 
+SEXP _nlmixr_allDose(SEXP evid, SEXP ids){
+  SEXP outs = PROTECT(allocVector(LGLSXP,length(evid)));
+  int *ev = INTEGER(evid);
+  int *id = INTEGER(ids);
+  int lastId = id[length(ids)-1]+1;
+  int found = 0;
+  int lastI = 0;
+  for (unsigned int i = length(evid); i--;){
+    if (lastId != id[i]){
+      lastId = id[i];
+      if (found == 0){
+	for (unsigned int j = i+1; j < lastI+1; j++){
+	  LOGICAL(outs)[j] = 0;
+	}
+      } else {
+        for (unsigned int j = i+1; j < lastI+1; j++){
+          LOGICAL(outs)[j] = 1;
+	}
+      }
+      lastI = i;
+      found = 0;
+      if (ev[i] == 0) found=1;
+    } else if (ev[i] == 0) {
+      found=1;
+    }
+  }
+  if (found == 0){
+    for (unsigned int j = 0; j < lastI+1; j++){
+      LOGICAL(outs)[j] = 0;
+    }
+  } else {
+    for (unsigned int j = 0; j < lastI+1; j++){
+      LOGICAL(outs)[j] = 1;
+    }
+  }
+  UNPROTECT(1);
+  return outs;
+}
+
 SEXP _nlmixr_convertEvid(SEXP evid, SEXP cmt){
   int *ev = INTEGER(evid);
   int *amt = INTEGER(cmt);

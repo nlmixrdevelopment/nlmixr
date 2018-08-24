@@ -2,9 +2,8 @@
 % Please edit documentation in R/vpc.ui.R
 \name{vpc_ui}
 \alias{vpc_ui}
-\alias{vpc.nlmixr.ui.focei}
-\alias{vpc.nlmixr.ui.saem}
-\alias{vpc.nlmixr.ui.nlme}
+\alias{vpc.nlmixrFitData}
+\alias{vpc.nlmixrVpc}
 \alias{vpc.ui}
 \title{VPC based on ui model}
 \usage{
@@ -14,13 +13,11 @@ vpc_ui(fit, data = NULL, n = 100, bins = "jenks", n_bins = "auto",
   uloq = NULL, lloq = NULL, log_y = FALSE, log_y_min = 0.001,
   xlab = NULL, ylab = NULL, title = NULL, smooth = TRUE,
   vpc_theme = NULL, facet = "wrap", labeller = NULL, vpcdb = FALSE,
-  verbose = FALSE, ..., nStud = NULL, method = NULL)
+  verbose = FALSE, ...)
 
-\method{vpc}{nlmixr.ui.focei}(sim, ...)
+\method{vpc}{nlmixrFitData}(sim, ...)
 
-\method{vpc}{nlmixr.ui.saem}(sim, ...)
-
-\method{vpc}{nlmixr.ui.nlme}(sim, ...)
+\method{vpc}{nlmixrVpc}(sim, ...)
 
 \method{vpc}{ui}(sim, ...)
 }
@@ -79,20 +76,6 @@ this argument.}
 \item{verbose}{show debugging information (TRUE or FALSE)}
 
 \item{...}{Args sent to \code{\link[RxODE]{rxSolve}}}
-
-\item{nStud}{Number virtual studies to characterize uncertainty in estimated 
-parameters.}
-
-\item{method}{The method for solving ODEs.  Currently this supports:
-
-\itemize{
-\item \code{"liblsoda"} thread safe lsoda.  This supports parallel
-           thread-based solving, and ignores user Jacobian specification.
-\item \code{"lsoda"} -- LSODA solver.  Does not support parallel thread-based
-      solving, but allows user Jacobian specification.
-\item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
-        solving nor user Jacobain specification
-}}
 
 \item{sim}{this is usually a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link{read_table_nm}.  However it can also be an object like a nlmixr or xpose object}
 }

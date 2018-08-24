@@ -6,7 +6,7 @@
 \usage{
 saemControl(seed = 99, nBurn = 200, nEm = 300, nmc = 3, nu = c(2, 2,
   2), atol = 1e-06, rtol = 1e-04, stiff = TRUE, transitAbs = FALSE,
-  print = 1, ...)
+  print = 1, covMethod = c("fim", "r,s", "r", "s"), ...)
 }
 \arguments{
 \item{seed}{Random Seed for SAEM step.  (Needs to be set for
@@ -67,6 +67,22 @@ compartment absorption}
 
 \item{print}{The number it iterations that are completed before
 anything is printed to the console.  By default, this is 1.}
+
+\item{covMethod}{Method for calculating covariance.  In this
+    discussion, R is the Hessian matrix of the objective
+    function. The S matrix is the sum of each individual's
+    gradient cross-product (evaluated at the individual empirical
+    Bayes estimates).
+
+ "\code{fim}" Use the SAEM-calculated Fisher Information Matrix to calculate the covariance.
+
+ "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \eqn{R^-1 \times S \times R^-1}
+
+ "\code{r}" Uses the Hessian matrix to calculate the covariance as \eqn{2\times R^-1}
+
+ "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
+
+ "" Does not calculate the covariance step.}
 
 \item{...}{Other arguments to control SAEM.}
 }

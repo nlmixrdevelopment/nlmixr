@@ -2,14 +2,14 @@
 % Please edit documentation in R/simulate.R
 \name{nlmixrSim}
 \alias{nlmixrSim}
-\alias{rxSolve.focei.fit}
-\alias{simulate.focei.fit}
-\alias{solve.focei.fit}
+\alias{rxSolve.nlmixrFitData}
+\alias{simulate.nlmixrFitData}
+\alias{solve.nlmixrFitData}
 \title{Simulate a nlmixr solved system}
 \usage{
 nlmixrSim(object, ...)
 
-\method{rxSolve}{focei.fit}(object, params = NULL, events = NULL,
+\method{rxSolve}{nlmixrFitData}(object, params = NULL, events = NULL,
   inits = NULL, scale = NULL, covs = NULL, method = c("liblsoda",
   "lsoda", "dop853"), transitAbs = NULL, atol = 1e-06, rtol = 1e-04,
   maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L,
@@ -24,9 +24,9 @@ nlmixrSim(object, ...)
   dfObs = 0, returnType = c("rxSolve", "matrix", "data.frame"),
   seed = NULL, nsim = NULL)
 
-\method{simulate}{focei.fit}(object, nsim = 1, seed = NULL, ...)
+\method{simulate}{nlmixrFitData}(object, nsim = 1, seed = NULL, ...)
 
-\method{solve}{focei.fit}(a, b, ...)
+\method{solve}{nlmixrFitData}(a, b, ...)
 }
 \arguments{
 \item{object}{is a either a RxODE family of objects, or a file-name

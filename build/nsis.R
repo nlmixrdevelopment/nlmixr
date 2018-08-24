@@ -51,7 +51,7 @@ SetDatablockOptimize On
 Name \"<%=name%>\"
 !define MUI_ICON \"<%=icon%>\"
 OutFile \"<%=name%>_<%=nlmixr.ver%>_<%=arch%>_install.exe\"
-InstallDir \"$LOCALAPPDATA\\nlmixr<%=archext%>\"
+InstallDir \"c:\\R\\nlmixr_<%=nlmixr.ver%><%=archext%>\"
 InstallDirRegKey HKCU \"Software\\nlmixr<%=archext%>\\<%=nlmixr.ver%>\" \"\"
 !define MUI_HEADERIMAGE
 
@@ -102,13 +102,13 @@ File /r <%=rtools%>\\*
 SetOutPath \"$INSTDIR\\R\"
 File /r <%=R%>\\*
 
-CreateDirectory \"$SMPROGRAMS\\nlmixr\"
+##CreateDirectory \"c:\\R\\nlmixr<%=arch%>-<%=nlmixr.ver%>\"
 <%=shortcuts%>
 
 ;Store installation folder
 WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\" \"\" $INSTDIR
 ;Create uninstaller
-WriteUninstaller \"$INSTDIR\\etc\\Uninstall.exe\"
+WriteUninstaller \"$INSTDIR\\Uninstall.exe\"
 SectionEnd
 
 Section \"Uninstall\"
@@ -147,10 +147,10 @@ buildInstaller <- function(name="nlmixr"){
     nlmixr.ver <- sessionInfo()$otherPkgs$nlmixr$Version;
     archext <- ifelse(.Platform$r_arch == "i386", "32", "")
     if (archext == "32"){
-        shortcut <- "CreateShortCut \"$DESKTOP\\nlmixr R (32 bit).lnk\" \"$INSTDIR\\nlmixr.exe\"\nCreateShortCut \"$SMPROGRAMS\\nlmixr\\nlmixr R (32 bit).lnk\" \"$INSTDIR\\nlmixr.exe\"";
+        shortcut <- sprintf("CreateShortCut \"$DESKTOP\\nlmixr R (32 bit).lnk\" \"$INSTDIR\\nlmixr.exe\"\nCreateShortCut \"$SMPROGRAMS\\nlmixr\\nlmixr R %s (32 bit).lnk\" \"$INSTDIR\\nlmixr.exe\"", nlmixr.ver);
         Rdir <- "i386"
     } else {
-        shortcut <- "CreateShortCut \"$DESKTOP\\nlmixr R (64 bit).lnk\" \"$INSTDIR\\nlmixr.exe\"\nCreateShortCut \"$SMPROGRAMS\\nlmixr\\nlmixr R (64 bit).lnk\" \"$INSTDIR\\nlmixr.exe\"";
+        shortcut <- sprintf("CreateShortCut \"$DESKTOP\\nlmixr R (64 bit).lnk\" \"$INSTDIR\\nlmixr.exe\"\nCreateShortCut \"$SMPROGRAMS\\nlmixr\\nlmixr R (64 bit).lnk\" \"$INSTDIR\\nlmixr.exe\"", nlmixr.ver);
         Rdir <- "x64"
     }
     rtoolsver <- rtools.cur.ver;
