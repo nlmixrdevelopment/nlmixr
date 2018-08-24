@@ -594,6 +594,7 @@ saemControl <- function(seed=99,
                         stiff = TRUE,
                         transitAbs = FALSE,
                         print=1,
+                        trace=0,
                         covMethod=c("fim", "r,s", "r", "s"),
                         ...){
     .xtra <- list(...);
@@ -615,7 +616,8 @@ saemControl <- function(seed=99,
                      stiff=as.integer(stiff),
                      transitAbs = as.integer(transitAbs)),
          seed=seed,
-         print=print, ...)
+         print=print,
+         DEBUG=trace, ...)
     if (length(.rm) > 0){
         .ret <- .ret[!(names(.ret) %in% .rm)]
     }
