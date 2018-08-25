@@ -4,9 +4,10 @@
 \alias{saemControl}
 \title{Control Options for SAEM}
 \usage{
-saemControl(seed = 99, nBurn = 200, nEm = 300, nmc = 3, nu = c(2, 2,
-  2), atol = 1e-06, rtol = 1e-04, stiff = TRUE, transitAbs = FALSE,
-  print = 1, covMethod = c("fim", "r,s", "r", "s"), ...)
+saemControl(seed = 99, nBurn = 200, nEm = 300, nmc = 3, nu = c(2,
+  2, 2), atol = 1e-06, rtol = 1e-04, stiff = TRUE,
+  transitAbs = FALSE, print = 1, trace = 0, covMethod = c("fim",
+  "r,s", "r", "s"), logLik = FALSE, ...)
 }
 \arguments{
 \item{seed}{Random Seed for SAEM step.  (Needs to be set for
@@ -83,6 +84,9 @@ anything is printed to the console.  By default, this is 1.}
  "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
 
  "" Does not calculate the covariance step.}
+
+\item{logLik}{boolean indicating that log-likelihood should be
+calculate by Gaussian quadrature.}
 
 \item{...}{Other arguments to control SAEM.}
 }

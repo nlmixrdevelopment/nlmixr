@@ -90,7 +90,8 @@
 ##' simulated from the uncertainty in the Omega/Sigma matrices based
 ##' on the number of subjects and observations the model was based on.
 ##'
-##' @inheritParams RxODE::rxSolve
+##' @param object nlmixr object
+##' @param ... Other arguments sent to \code{rxSolve}
 ##'
 ##' @export
 nlmixrSim <- function(object, ...){
@@ -208,26 +209,13 @@ plot.nlmixrSim <- function(x, y, ...){
 ##' @param ipred Flag to calculate individual predictions. When
 ##'     \code{ipred} is \code{TRUE}, calculate individual predictions.
 ##'     When \code{ipred} is \code{FALSE}, set calculate typical population predations.
-##'     When \code{ipred} is \code{NA}, calculateboth individual and
+##'     When \code{ipred} is \code{NA}, calculate both individual and
 ##'     population predictions.
 ##'
 ##' @inheritParams RxODE::rxSolve
 ##'
 ##' @export
-nlmixrPred <- function(object, params=NULL, events=NULL, inits = NULL, scale = NULL,
-                       covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-                       transitAbs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
-                       maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-                       cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
-                       addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
-                       nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
-                       amountUnits = NA_character_, timeUnits = "hours", stiff,
-                       theta = NULL, eta = NULL, addDosing=FALSE, updateObject=FALSE,doSolve=TRUE,
-                       omega = NULL, omegaDf = NULL, omegaIsChol = FALSE,
-                       nSub = 1L, thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE,
-                       nStud = 1L, dfSub=0.0, dfObs=0.0, returnType=c("data.frame", "rxSolve", "matrix"),
-                       seed=NULL, nsim=NULL,
-                       ipred=FALSE){
+nlmixrPred <- function(object, ..., ipred=FALSE){
     lst <- as.list(match.call()[-1]);
     if (RxODE::rxIs(lst$params, "rx.event")){
         if (!is.null(lst$events)){

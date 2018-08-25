@@ -168,6 +168,9 @@ is.latex <- function() {
 ##' @param noAbort Boolean to indicate if you should abort the FOCEi
 ##'     evaluation if it runs into troubles.  (default TRUE)
 ##'
+##' @param interaction Boolean indicate FOCEi should be used (TRUE)
+##'     instead of FOCE (FALSE)
+##'
 ##' @inheritParams RxODE::rxSolve
 ##'
 ##' @details
@@ -228,6 +231,7 @@ foceiControl <- function(sigdig=4,
                          boundTol=NULL,
                          calcTables=TRUE,
                          noAbort=TRUE,
+                         interaction=TRUE,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -336,7 +340,8 @@ foceiControl <- function(sigdig=4,
                  boundTol=as.double(boundTol),
                  calcTables=calcTables,
                  printNcol=as.integer(printNcol),
-                 noAbort=as.integer(noAbort));
+                 noAbort=as.integer(noAbort),
+                 interaction=as.integer(interaction));
     class(.ret) <- "foceiControl"
     return(.ret);
 }
@@ -448,15 +453,20 @@ constructLinCmt <- function(fun){
 ##' w7$EVID <- 0
 ##' w7$AMT <- 0
 ##'
-##' ## Wang2007 prop error 39.458 for NONMEM, nlmixr matches.
-##' fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
+##' ## Wang2007 prop error 39.458 for NONMEM FOCEi, nlmixr matches.
+##' fitPi <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
 ##'      control=foceiControl(maxOuterIterations=0,covMethod=""))
+##'
+##' ## Wang2007 prop error 39.207 for NONMEM FOCE; nlmixr matches.
+##' fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
+##'      control=foceiControl(maxOuterIterations=0,covMethod="",
+##'      interaction=FALSE))
 ##'
 ##' ## Note if you have the etas you can evaluate the likelihood
 ##' ## of an arbitrary model.  It doesn't have to be solved by
 ##' ## FOCEi
 ##'
-##' etaMat <- matrix(fitP$eta[,-1])
+##' etaMat <- matrix(fitPi$eta[,-1])
 ##'
 ##' fitP2 <- foceiFit(w7, inits, mypar2,mod,pred,errProp, etaMat=etaMat,
 ##'       control=foceiControl(maxOuterIterations=0,maxInnerIterations=0,
@@ -786,7 +796,9 @@ foceiFit.data.frame0 <- function(data,
     if (!exists("noLik", envir=.ret)){
         .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
                                               pred.minus.dv=TRUE, sum.prod=control$sumProd,
-                                              theta.derivs=FALSE, optExpression=control$optExpression, run.internal=TRUE);
+                                              theta.derivs=FALSE, optExpression=control$optExpression,
+                                              interaction=(control$interaction == 1L),
+                                              run.internal=TRUE);
 
         .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
         .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
@@ -1264,8 +1276,8 @@ print.nlmixrFitCore <- function(x, ...){
     }
     .posthoc <- (x$control$maxOuterIterations == 0L & x$control$maxInnerIterations > 0L)
     .posthoc <- ifelse(.posthoc, paste0(crayon::bold(" posthoc"), " estimation"), " fit");
-    message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),.posthoc,
-                             x$extra)))
+    message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
+                             x$extra, .posthoc)))
     print(x$objDf)
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)

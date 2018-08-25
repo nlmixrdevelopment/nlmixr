@@ -10,14 +10,14 @@ foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 1000,
   maxstepsOde = 5000L, hmin = 0L, hmax = NULL, hini = 0,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("linear",
   "locf", "nocb", "midpoint"), printInner = 0L, print = 1L,
-  printNcol = 8L, scaleTo = 1, scaleObjective = 1, derivEps = c(1e-05,
-  1e-05), derivMethod = c("forward", "central"),
-  covDerivMethod = c("forward", "central"), covMethod = c("r,s", "r", "s",
-  ""), lbfgsLmm = 50L, lbfgsPgtol = 0, lbfgsFactr = NULL, eigen = TRUE,
-  addPosthoc = TRUE, diagXform = c("sqrt", "log", "identity"),
-  sumProd = FALSE, optExpression = TRUE, ci = 0.95,
+  printNcol = 8L, scaleTo = 1, scaleObjective = 1,
+  derivEps = c(1e-05, 1e-05), derivMethod = c("forward", "central"),
+  covDerivMethod = c("forward", "central"), covMethod = c("r,s", "r",
+  "s", ""), lbfgsLmm = 50L, lbfgsPgtol = 0, lbfgsFactr = NULL,
+  eigen = TRUE, addPosthoc = TRUE, diagXform = c("sqrt", "log",
+  "identity"), sumProd = FALSE, optExpression = TRUE, ci = 0.95,
   useColor = crayon::has_color(), boundTol = NULL, calcTables = TRUE,
-  noAbort = TRUE, ..., stiff)
+  noAbort = TRUE, interaction = TRUE, ..., stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -228,6 +228,9 @@ will calculate tables. By default this is \code{TRUE}}
 
 \item{noAbort}{Boolean to indicate if you should abort the FOCEi
 evaluation if it runs into troubles.  (default TRUE)}
+
+\item{interaction}{Boolean indicate FOCEi should be used (TRUE)
+instead of FOCE (FALSE)}
 
 \item{...}{Ignored parameters}
 

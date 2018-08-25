@@ -5,12 +5,13 @@
 \alias{augPred.nlmixrFitData}
 \title{Augmented Prediction for nlmixr fit}
 \usage{
-nlmixrAugPred(object, ..., covsInterpolation = c("linear", "locf", "nocb",
-  "midpoint"), primary = NULL, minimum = NULL, maximum = NULL,
-  length.out = 51L)
+nlmixrAugPred(object, ..., covsInterpolation = c("linear", "locf",
+  "nocb", "midpoint"), primary = NULL, minimum = NULL,
+  maximum = NULL, length.out = 51L)
 
 \method{augPred}{nlmixrFitData}(object, primary = NULL,
-  minimum = min(primary), maximum = max(primary), length.out = 51, ...)
+  minimum = min(primary), maximum = max(primary), length.out = 51,
+  ...)
 }
 \arguments{
 \item{object}{Nlmixr fit object}

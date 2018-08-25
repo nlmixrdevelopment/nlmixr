@@ -45,6 +45,6 @@ LinkingTo: dparser(>= 0.1.8), Rcpp (>= 0.12.3),
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Packaged: 2018-04-30 01:43:13 UTC; annie
 Maintainer: Wenping Wang <wwang8198@gmail.com>

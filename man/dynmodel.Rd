@@ -5,8 +5,8 @@
 \title{Fit a non-population dynamic model}
 \usage{
 dynmodel(system, model, evTable, inits, data, fixPars = NULL,
-  method = c("Nelder-Mead", "L-BFGS-B", "PORT"), control = list(ftol_rel =
-  1e-06, maxeval = 999), squared = T)
+  method = c("Nelder-Mead", "L-BFGS-B", "PORT"),
+  control = list(ftol_rel = 1e-06, maxeval = 999), squared = T)
 }
 \arguments{
 \item{system}{an RxODE object}

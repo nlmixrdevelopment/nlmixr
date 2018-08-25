@@ -8,12 +8,12 @@
 \title{VPC based on ui model}
 \usage{
 vpc_ui(fit, data = NULL, n = 100, bins = "jenks", n_bins = "auto",
-  bin_mid = "mean", show = NULL, stratify = NULL, pred_corr = FALSE,
-  pred_corr_lower_bnd = 0, pi = c(0.05, 0.95), ci = c(0.05, 0.95),
-  uloq = NULL, lloq = NULL, log_y = FALSE, log_y_min = 0.001,
-  xlab = NULL, ylab = NULL, title = NULL, smooth = TRUE,
-  vpc_theme = NULL, facet = "wrap", labeller = NULL, vpcdb = FALSE,
-  verbose = FALSE, ...)
+  bin_mid = "mean", show = NULL, stratify = NULL,
+  pred_corr = FALSE, pred_corr_lower_bnd = 0, pi = c(0.05, 0.95),
+  ci = c(0.05, 0.95), uloq = NULL, lloq = NULL, log_y = FALSE,
+  log_y_min = 0.001, xlab = NULL, ylab = NULL, title = NULL,
+  smooth = TRUE, vpc_theme = NULL, facet = "wrap", labeller = NULL,
+  vpcdb = FALSE, verbose = FALSE, ...)
 
 \method{vpc}{nlmixrFitData}(sim, ...)
 

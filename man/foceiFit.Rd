@@ -93,15 +93,20 @@ w7$DV <- w7$Y
 w7$EVID <- 0
 w7$AMT <- 0
 
-## Wang2007 prop error 39.458 for NONMEM, nlmixr matches.
-fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
+## Wang2007 prop error 39.458 for NONMEM FOCEi, nlmixr matches.
+fitPi <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
      control=foceiControl(maxOuterIterations=0,covMethod=""))
+
+## Wang2007 prop error 39.207 for NONMEM FOCE; nlmixr matches.
+fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
+     control=foceiControl(maxOuterIterations=0,covMethod="",
+     interaction=FALSE))
 
 ## Note if you have the etas you can evaluate the likelihood
 ## of an arbitrary model.  It doesn't have to be solved by
 ## FOCEi
 
-etaMat <- matrix(fitP$eta[,-1])
+etaMat <- matrix(fitPi$eta[,-1])
 
 fitP2 <- foceiFit(w7, inits, mypar2,mod,pred,errProp, etaMat=etaMat,
       control=foceiControl(maxOuterIterations=0,maxInnerIterations=0,

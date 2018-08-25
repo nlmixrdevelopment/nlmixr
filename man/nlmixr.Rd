@@ -6,13 +6,14 @@
 \alias{nlmixr.nlmixrUI}
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
-nlmixr(object, data, est = NULL, control = list(), table = tableControl(),
-  ...)
+nlmixr(object, data, est = NULL, control = list(),
+  table = tableControl(), ...)
 
 \method{nlmixr}{function}(object, data, est = NULL, control = list(),
   table = tableControl(), ...)
 
-\method{nlmixr}{nlmixrUI}(object, data, est = NULL, control = list(), ...)
+\method{nlmixr}{nlmixrUI}(object, data, est = NULL, control = list(),
+  ...)
 }
 \arguments{
 \item{object}{Fitted object or function specifying the model.}
