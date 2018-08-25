@@ -307,10 +307,14 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                 .doIt <- table$saemNPDE
             } else if (est == "focei"){
                 .doIt <- table$foceiNPDE
+            } else if (est == "foce"){
+                .doIt <- table$foceNPDE
             } else if (est == "nlme"){
                 .doIt <- table$nlmeNPDE
             }
         }
+        if (!is.logical(.doIt)) return(x);
+        if (is.na(.doIt)) return(x);
         if (!.doIt) return (x);
         .ret <- try(addNpde(x,nsim=table$nsim, ties=table$ties, seed=table$seed, updateObject=FALSE), silent=TRUE);
         if (inherits(.ret, "try-error")) return(x);
@@ -491,7 +495,10 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             assign("stopTime", Sys.time(), .env);
         }
         return(.ret)
-    } else if (est == "focei"){
+    } else if (any(est == c("foce", "focei"))){
+        if (est == "foce"){
+            control$interaction <- FALSE;
+        }
         env <- new.env(parent=emptyenv());
         env$uif <- uif;
         fit <- foceiFit(dat,

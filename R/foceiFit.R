@@ -1408,20 +1408,20 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     .skipCov <- obj$skipCov;
     .inits <- list(THTA=as.vector(nlme::fixed.effects(obj)),
                    OMGA=focei.eta.nlmixrFitCore(obj))
-    .fit2 <- foceiFit.data.frame(data=.dat,
-                                 inits=.inits,
-                                 PKpars=.uif$theta.pars,
-                                 ## par_trans=fun,
-                                 model=.uif$rxode.pred,
-                                 pred=function(){return(nlmixr_pred)},
-                                 err=.uif$error,
-                                 lower=.uif$focei.lower,
-                                 upper=.uif$focei.upper,
-                                 thetaNames=.uif$focei.names,
-                                 etaNames=.uif$eta.names,
-                                 etaMat=.mat,
-                                 skipCov=.skipCov,
-                                 control=.control)
+    .fit2 <- foceiFit.data.frame0(data=.dat,
+                                  inits=.inits,
+                                  PKpars=.uif$theta.pars,
+                                  ## par_trans=fun,
+                                  model=.uif$rxode.pred,
+                                  pred=function(){return(nlmixr_pred)},
+                                  err=.uif$error,
+                                  lower=.uif$focei.lower,
+                                  upper=.uif$focei.upper,
+                                  thetaNames=.uif$focei.names,
+                                  etaNames=.uif$eta.names,
+                                  etaMat=.mat,
+                                  skipCov=.skipCov,
+                                  control=.control)
     .env$cov <- .fit2$cov;
     .env$popDf <- .fit2$popDf;
     .env$popDfSig <- .fit2$popDfSig;

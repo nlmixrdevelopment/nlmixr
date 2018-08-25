@@ -84,6 +84,10 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, .
 ##'     metrics to fit including EPRED, ERES, and NPDE. (default
 ##'     TRUE);
 ##'
+##' @param foceNPDE When TRUE and estimating with FOCEi, adds NPDE
+##'     metrics to fit including EPRED, ERES, and NPDE. (default
+##'     TRUE);
+##'
 ##' @inheritParams addNpde
 ##'
 ##' @details
@@ -102,6 +106,7 @@ tableControl <- function(npde=NULL,
                          nlmeNPDE=FALSE,
                          nlmeCWRES=FALSE,
                          foceiNPDE=FALSE,
+                         foceNPDE=FALSE,
                          nsim=300, ties=TRUE, seed=1009){
     .ret <- list(npde=npde, cwres=cwres,
                  saemNPDE=saemNPDE,
@@ -109,6 +114,7 @@ tableControl <- function(npde=NULL,
                  nlmeNPDE=nlmeNPDE,
                  nlmeCWRES=nlmeCWRES,
                  foceiNPDE=foceiNPDE,
+                 foceNPDE=foceNPDE,
                  nsim=nsim, ties=ties, seed=seed)
     class(.ret) <- "tableControl";
     return(.ret)

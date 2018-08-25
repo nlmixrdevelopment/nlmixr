@@ -7,7 +7,7 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
         numDeriv, R.utils, n1qn1, PreciseSums, fastGHQuad,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
-	RxODE(>= 0.8.0-1), nlme, magrittr
+	RxODE(>= 0.8.0-2), nlme, magrittr
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3, testthat,
         madness, devtools, expm, matrixcalc, reshape2
 Version: 1.0.0-1
