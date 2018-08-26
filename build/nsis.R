@@ -51,7 +51,7 @@ SetDatablockOptimize On
 Name \"<%=name%>\"
 !define MUI_ICON \"<%=icon%>\"
 OutFile \"<%=name%>_<%=nlmixr.ver%>_<%=arch%>_install.exe\"
-InstallDir \"c:\\R\\nlmixr_<%=nlmixr.ver%><%=archext%>\"
+InstallDir \"c:\\R\\nlmixr<%=archext%>_<%=nlmixr.ver%>\"
 InstallDirRegKey HKCU \"Software\\nlmixr<%=archext%>\\<%=nlmixr.ver%>\" \"\"
 !define MUI_HEADERIMAGE
 
