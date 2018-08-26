@@ -187,6 +187,15 @@ nlmixrData.default <- function(data){
     backSort <- c()
     backSort2 <- c();
     if (is(dat$ID, "character")){
+        ## Character need to sort first
+        lvl <- unique(dat$ID);
+        lab <- paste(lvl)
+        dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
+        dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ];
+        ## Dropped some IDs?  Need to make sure they are still sequential
+        dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
+        ## Get new factor level
+        dat$ID <- paste(dat$ID);
         lvl <- unique(dat$ID);
         lab <- paste(lvl)
         dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
@@ -195,6 +204,7 @@ nlmixrData.default <- function(data){
         dat$ID <- as.integer(dat$ID);
     } else {
         if (idSort == 2L){
+            dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ];
             lvl <- unique(dat$ID);
             lab <- paste(lvl)
             dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
@@ -204,6 +214,7 @@ nlmixrData.default <- function(data){
         } else if (idSort == 0L){
             warning("Sorting by ID, TIME; Output fit may not be in the same order as input dataset.")
             dat <- dat[order(dat$ID, dat$TIME), ];
+            dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
             lvl <- unique(dat$ID);
             lab <- paste(lvl)
             dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
@@ -212,7 +223,6 @@ nlmixrData.default <- function(data){
             dat$ID <- as.integer(dat$ID);
         }
     }
-    dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
     attr(dat, "backSort") <- backSort;
     attr(dat, "backSort2") <- backSort2;
     return(dat);
