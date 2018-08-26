@@ -10,7 +10,7 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
 	RxODE(>= 0.8.0-2), nlme, magrittr
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3, testthat,
         madness, devtools, expm, matrixcalc, reshape2
-Version: 1.0.0-1
+Version: 1.0.0-2
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com"),      
    person("Yuan", "Xiong", 
