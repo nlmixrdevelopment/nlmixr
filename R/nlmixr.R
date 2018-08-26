@@ -175,14 +175,13 @@ nlmixrData.default <- function(data){
             stop(sprintf("Multiple '%s' columns in dataset.", n))
         }
     }
-    ## Drop dosing-only IDs
-    dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
     if (is(dat$ID, "factor")){
         dat$ID <- paste(dat$ID);
     }
     idSort <- .Call(`_nlmixr_chkSortIDTime`, as.integer(dat$ID), as.double(dat$TIME), as.integer(dat$EVID));
     if (idSort == 3L){
-        warning("NONMEM-style data converted to nlmixr/RxODE-style data.");
+        dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
+        ## warning("NONMEM-style data converted to nlmixr/RxODE-style data.");
         return(nlmixrData.default(nmDataConvert(dat)));
     }
     backSort <- c()
@@ -213,6 +212,7 @@ nlmixrData.default <- function(data){
             dat$ID <- as.integer(dat$ID);
         }
     }
+    dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
     attr(dat, "backSort") <- backSort;
     attr(dat, "backSort2") <- backSort2;
     return(dat);
