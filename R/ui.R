@@ -127,18 +127,23 @@ nlmixrUI <- function(fun){
         env <- new.env(parent=.GlobalEnv)
         lhs0 <- c("data", "desc", "ref", "imp", "est", "control", "table");
         warning("Some information (like parameter labels) is lost by evaluating a nlmixr function")
-        fun <- eval(parse(text=paste0("function(){\n",
-                                      paste(sapply(lhs0, function(var){
-                                          if (exists(var, envir=env.here)){
-                                              return(sprintf("\n%s <- %s;", var, deparse(get(var, envir=env.here))))
-                                          } else {
-                                              return("");
-                                          }
+        fun <- paste0("function(){\n",
+                      paste(sapply(lhs0, function(var){
+                          if (exists(var, envir=env.here)){
+                              if (!inherits(get(var, envir=env.here), "function")){
+                                  return(sprintf("\n%s <- %s;", var, deparse(get(var, envir=env.here))))
+                              } else {
+                                  return("");
+                              }
+                          } else {
+                              return("");
+                          }
 
-                                      }), collapse=""),
-                                      sprintf("\nini(%s)", paste(deparse(body(.ini)), collapse="\n")),
-                                      sprintf("\nmodel(%s)", paste(deparse(body(.model)), collapse="\n")),
-                                      "\n}")));
+                      }), collapse=""),
+                      sprintf("\nini(%s)", paste(deparse(body(.ini)), collapse="\n")),
+                      sprintf("\nmodel(%s)", paste(deparse(body(.model)), collapse="\n")),
+                      "\n}");
+        fun <- eval(parse(text=fun));
         assign("fun", fun, env)
     }
     ini <- nlmixrBounds(.ini);
