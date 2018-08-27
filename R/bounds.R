@@ -593,6 +593,10 @@ nlmixrBounds <- function(fun){
         stop(sprintf("The lower bound is higher than the estimate for these parameters: %s.\nYou can adjust by %s=c(%s, %s) # c(lower, est)",
                      paste(df$name[w], collapse=", "), df$name[w[1]], df$est[w[1]], df$lower[w[1]]))
     }
+    .w <- which(df$lower == 0)
+    if(length(.w) > 0) df$lower[.w] <- sqrt(.Machine$double.eps)
+    .w <- which(df$upper == 0)
+    if(length(.w) > 0) df$upper[.w] <- -sqrt(.Machine$double.eps)
     class(df) <- c("nlmixrBounds", "data.frame");
     return(df)
 }
