@@ -217,7 +217,7 @@ foceiControl <- function(sigdig=4,
                          derivEps=c(1.0e-5, 1.0e-5),
                          derivMethod=c("forward", "central"),
                          covDerivMethod=c("forward", "central"),
-                         covMethod=c("r,s", "r", "s", ""),
+                         covMethod=c("s", "r,s", "r", ""),
                          lbfgsLmm=50L,
                          lbfgsPgtol=0,
                          lbfgsFactr=NULL, #1e-4 / .Machine$double.eps, ## .Machine$double.eps*x=1e-5
