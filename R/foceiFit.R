@@ -171,6 +171,9 @@ is.latex <- function() {
 ##' @param interaction Boolean indicate FOCEi should be used (TRUE)
 ##'     instead of FOCE (FALSE)
 ##'
+##' @param cholSEtol double tolerance for Generalized Cholesky
+##'     Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)
+##'
 ##' @inheritParams RxODE::rxSolve
 ##'
 ##' @details
@@ -217,7 +220,9 @@ foceiControl <- function(sigdig=4,
                          derivEps=c(1.0e-5, 1.0e-5),
                          derivMethod=c("forward", "central"),
                          covDerivMethod=c("forward", "central"),
-                         covMethod=c("s", "r,s", "r", ""),
+                         covMethod=c("r,s", "r", "s", ""),
+                         hessEps=1e-3,
+                         covDerivEps=c(0, 1e-3),
                          lbfgsLmm=50L,
                          lbfgsPgtol=0,
                          lbfgsFactr=NULL, #1e-4 / .Machine$double.eps, ## .Machine$double.eps*x=1e-5
@@ -232,6 +237,7 @@ foceiControl <- function(sigdig=4,
                          calcTables=TRUE,
                          noAbort=TRUE,
                          interaction=TRUE,
+                         cholSEtol=(.Machine$double.eps)^(1/3),
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -327,6 +333,7 @@ foceiControl <- function(sigdig=4,
                  derivMethod=derivMethod,
                  covDerivMethod=covDerivMethod,
                  covMethod=covMethod,
+                 covDerivEps=covDerivEps,
                  eigen=as.integer(eigen),
                  addPosthoc=as.integer(addPosthoc),
                  diagXform=match.arg(diagXform),
@@ -341,7 +348,9 @@ foceiControl <- function(sigdig=4,
                  calcTables=calcTables,
                  printNcol=as.integer(printNcol),
                  noAbort=as.integer(noAbort),
-                 interaction=as.integer(interaction));
+                 interaction=as.integer(interaction),
+                 cholSEtol=as.double(cholSEtol),
+                 hessEps=as.double(hessEps));
     class(.ret) <- "foceiControl"
     return(.ret);
 }
