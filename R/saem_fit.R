@@ -1270,13 +1270,16 @@ focei.theta.saemFit <- function(object, uif, ...){
     add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))));
     prop <- which(err.type == "prop")
     if (length(add) > 0){
-        thetas[add] <- err[1]; ## This seems to be SD;
+        ## 0.9 was SD; 1.0 is variance
+        thetas[add] <- sqrt(err[1]);
     }
     if (length(prop) > 0){
         if (length(err) == 1){
-            thetas[prop] <- err[1]; ## This seems to be SD;
+            ## SD
+            thetas[prop] <- err[1];
         } else {
-            thetas[prop] <- err[2]; ## This seems to be SD;
+            ## SD
+            thetas[prop] <- err[2];
         }
     }
     w <- which(is.na(thetas))[1];
