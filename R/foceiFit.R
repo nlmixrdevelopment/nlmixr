@@ -238,6 +238,7 @@ foceiControl <- function(sigdig=4,
                          noAbort=TRUE,
                          interaction=TRUE,
                          cholSEtol=(.Machine$double.eps)^(1/3),
+                         cholAccept=1e-3,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -350,7 +351,8 @@ foceiControl <- function(sigdig=4,
                  noAbort=as.integer(noAbort),
                  interaction=as.integer(interaction),
                  cholSEtol=as.double(cholSEtol),
-                 hessEps=as.double(hessEps));
+                 hessEps=as.double(hessEps),
+                 cholAccept=as.double(cholAccept));
     class(.ret) <- "foceiControl"
     return(.ret);
 }
