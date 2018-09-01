@@ -119,6 +119,7 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
     } else {
         .uif$nmodel$data.name <- deparse(substitute(data))
         class(.uif) <- "nlmixrUI"
+        .args$data <- data;
         .args <- c(list(uif=.uif), .args[-1]);
         return(do.call(nlmixr_fit, .args))
     }
@@ -133,6 +134,7 @@ nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...){
     } else {
         .args <- c(list(uif=.uif), .args[-1]);
         .uif$nmodel$data.name <- deparse(substitute(data))
+        .args$data <- data;
         return(do.call(nlmixr_fit, .args));
     }
 }
