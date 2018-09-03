@@ -239,12 +239,12 @@ foceiControl <- function(sigdig=4,
                          interaction=TRUE,
                          cholSEtol=(.Machine$double.eps)^(1/3),
                          cholAccept=1e-3,
-                         resetEtaSize=1.5,
-                         diagOmegaBoundUpper=1, #diag(omega) = diag(omega)*diagOmegaBoundUpper; =1 no upper
-                         diagOmegaBoundLower=1, #diag(omega) = diag(omega)/diagOmegaBoundLower; = 1 no lower
+                         resetEtaP=0.05,
+                         diagOmegaBoundUpper=5, #diag(omega) = diag(omega)*diagOmegaBoundUpper; =1 no upper
+                         diagOmegaBoundLower=100, #diag(omega) = diag(omega)/diagOmegaBoundLower; = 1 no lower
                          cholSEOpt=FALSE,
                          cholSECov=TRUE,
-                         ..., stiff){
+                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
@@ -310,6 +310,13 @@ foceiControl <- function(sigdig=4,
         .covMethodIdx <- c("r,s" = 1L, "r"=2L, "s"=3L);
         covMethod <- .covMethodIdx[match.arg(covMethod)];
     }
+    if (resetEtaP > 0 & resetEtaP < 1){
+        .resetEtaSize <- qnorm(1 - (resetEtaP / 2));
+    } else if (resetEtaP <= 0){
+        .resetEtaSize <- Inf;
+    } else {
+        .resetEtaSize <- 0;
+    }
     ## outerOpt <- match.arg(outerOpt)
     ## .outerIdx <- c("lbfgsb"=0L, "qnbd"=1L)
     ## outerOpt <- as.integer(.outerIdx[outerOpt]);
@@ -358,7 +365,7 @@ foceiControl <- function(sigdig=4,
                  cholSEtol=as.double(cholSEtol),
                  hessEps=as.double(hessEps),
                  cholAccept=as.double(cholAccept),
-                 resetEtaSize=as.double(resetEtaSize),
+                 resetEtaSize=as.double(.resetEtaSize),
                  diagOmegaBoundUpper=diagOmegaBoundUpper,
                  diagOmegaBoundLower=diagOmegaBoundLower,
                  cholSEOpt=as.integer(cholSEOpt),
