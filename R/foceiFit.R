@@ -240,6 +240,10 @@ foceiControl <- function(sigdig=4,
                          cholSEtol=(.Machine$double.eps)^(1/3),
                          cholAccept=1e-3,
                          resetEtaSize=1.5,
+                         diagOmegaBoundUpper=1, #diag(omega) = diag(omega)*diagOmegaBoundUpper; =1 no upper
+                         diagOmegaBoundLower=1, #diag(omega) = diag(omega)/diagOmegaBoundLower; = 1 no lower
+                         cholSEOpt=FALSE,
+                         cholSECov=TRUE,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -354,7 +358,11 @@ foceiControl <- function(sigdig=4,
                  cholSEtol=as.double(cholSEtol),
                  hessEps=as.double(hessEps),
                  cholAccept=as.double(cholAccept),
-                 resetEtaSize=as.double(resetEtaSize));
+                 resetEtaSize=as.double(resetEtaSize),
+                 diagOmegaBoundUpper=diagOmegaBoundUpper,
+                 diagOmegaBoundLower=diagOmegaBoundLower,
+                 cholSEOpt=as.integer(cholSEOpt),
+                 cholSECov=as.integer(cholSECov));
     class(.ret) <- "foceiControl"
     return(.ret);
 }
@@ -785,8 +793,6 @@ foceiFit.data.frame0 <- function(data,
     else .ret <- env;
     .ret$origData <- data;
     .ret$etaNames <- etaNames;
-    .ret$lower <- lower;
-    .ret$upper <- upper;
     .ret$thetaFixed <- fixed;
     .ret$control <- control;
     if(is(model, "RxODE") || is(model, "character")) {
@@ -953,6 +959,22 @@ foceiFit.data.frame0 <- function(data,
         .ret$etaNames <- sprintf("ETA[%d]", seq(1, dim(.om0)[1]))
     }
     .ret$rxInv <- RxODE::rxSymInvCholCreate(mat=.om0, diag.xform=control$diagXform);
+    .om0a <- .om0
+    diag(.om0a) <- diag(.om0a) / control$diagOmegaBoundLower;
+    .om0b <- .om0
+    diag(.om0b) <- diag(.om0b) * control$diagOmegaBoundUpper;
+    .om0a <- RxODE::rxSymInvCholCreate(mat=.om0a, diag.xform=control$diagXform)
+    .om0b <- RxODE::rxSymInvCholCreate(mat=.om0b, diag.xform=control$diagXform)
+    .omdf <- data.frame(a=.om0a$theta, m=.ret$rxInv$theta, b=.om0b$theta);
+    .omdf$lower <- with(.omdf, ifelse(a > b, b, a))
+    .omdf$lower <- with(.omdf, ifelse(lower == m, -Inf, lower));
+    .omdf$upper <- with(.omdf, ifelse(a < b, b, a))
+    .omdf$upper <- with(.omdf, ifelse(upper == m, Inf, upper));
+    lower <- c(lower, .omdf$lower)
+    upper <- c(upper, .omdf$upper)
+
+    .ret$lower <- lower;
+    .ret$upper <- upper;
 
     .ret$thetaIni <- inits$THTA
 
