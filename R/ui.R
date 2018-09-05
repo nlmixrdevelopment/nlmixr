@@ -553,13 +553,16 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             }
         }
     }
-    .doDist <- function(distName, distArgs){
+    .doDist <- function(distName, distArgs, curCond=NULL){
         if (length(distArgs) == 0L){
             .tmp <- as.data.frame(bounds);
             .tmp1 <- .tmp[1, ]
             .tmp1[1, ] <- NA;
             .tmp1[, "err"] <- distName
             .tmp1[, "est"] <- -Inf
+            if (!is.null(curCond)){
+                .tmp1[, "condition"] <- curCond;
+            }
             .tmp <- rbind(.tmp, .tmp1);
             class(.tmp) <- c("nlmixrBounds", "data.frame");
             assign("bounds", .tmp, this.env)
@@ -575,9 +578,160 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             .w <- which(bounds$name == distArgs[.i]);
             .tmp <- bounds;
             .tmp$err[.w] <- ifelse(.i == 1, distName, paste0(distName, .i));
+            if (!is.null(curCond)){
+                .tmp$condition[.w] <- sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", deparse(curCond));
+            } else {
+                .tmp$condition[.w] <- "";
+            }
             assign("bounds", .tmp, this.env)
         }
         return(errn)
+    }
+    .predDf <- NULL
+    .doDist1 <- function(err1, err1.v, err1.args, x2, x3, curCond=NULL){
+        if (!is.na(suppressWarnings(as.numeric(err1.v)))){
+            stop("Distribution parameters cannot be numeric, but need to be estimated.")
+        }
+        if (any(err1 == add.dists)){
+            assign("errs.specified", unique(errs.specified, err1), this.env)
+            if (any(do.pred == c(2, 4, 5))){
+                return(quote(nlmixrIgnore()));
+            }
+            else if (any(do.pred == c(1, 4, 5))){
+                if (is.null(curCond)){
+                    assign(".predDf", rbind(.predDf,
+                                            data.frame(cond="",
+                                                       var=deparse(x2))), this.env)
+                    return(bquote(nlmixr_pred <- .(x2)));
+                } else {
+                    assign(".predDf", rbind(.predDf,
+                                            data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", deparse(curCond)),
+                                                       var=deparse(x2))), this.env)
+                    return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
+                }
+            } else if (do.pred == 3){
+                .doDist(err1, err1.args, curCond)
+                tmp <- bounds;
+                if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm") || any(paste(tmp$err) == "dnorm")) && any(paste(tmp$err) == "prop")){
+                    assign("errn", errn + 1, this.env);
+                    assign("add.prop.errs", rbind(add.prop.errs,
+                                                  data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
+                }
+                return(bquote(return(.(sprintf("Y%02d", errn)))));
+            } else {
+                if (is.null(curCond)){
+                    return(bquote(return(.(x3))));
+                } else {
+                    return(bquote(if (.(curCond)){return(.(x3))}));
+                }
+            }
+        } else {
+            stop(sprintf("The %s and %s distributions cannot be combined\nCurrently can combine: %s",
+                         as.character(x3[[2]][[1]]), as.character(x3[[3]][[1]]),
+                         paste(add.dists, collapse=", ")))
+        }
+    }
+    .doDist2 <- function(err1, err1.v, err1.args, err2, err2.v, err2.args, x2, x3, curCond=NULL){
+        if (!is.na(suppressWarnings(as.numeric(err1.v)))){
+            stop("Distribution parameters cannot be numeric, but need to be estimated.")
+        }
+        if (!is.na(suppressWarnings(as.numeric(err2.v)))){
+            stop("Distribution parameters cannot be numeric, but need to be estimated.")
+        }
+        if (any(err1 == add.dists) &&
+            any(err2 == add.dists)){
+            tmp <- paste(sort(c(err1, err2)), collapse="+");
+            assign("errs.specified", unique(errs.specified, tmp), this.env)
+            if (any(do.pred == c(2, 4, 5))){
+                return(quote(nlmixrIgnore()));
+            }
+            else if (any(do.pred == c(1, 4, 5))){
+                if (is.null(curCond)){
+                    assign(".predDf", rbind(.predDf,
+                                            data.frame(cond="",
+                                                       var=deparse(x2))), this.env)
+                    return(bquote(nlmixr_pred <- .(x2)));
+                } else {
+                    assign(".predDf", rbind(.predDf,
+                                            data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", deparse(curCond)),
+                                                       var=deparse(x2))), this.env)
+                    return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
+                }
+            } else if (do.pred == 3){
+                .doDist(err1, err1.args, curCond)
+                .doDist(err2, err2.args, curCond)
+                tmp <- bounds;
+                if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm") || any(paste(tmp$err) == "dnorm")) && any(paste(tmp$err) == "prop")){
+                    assign("errn", errn + 1, this.env);
+                    assign("add.prop.errs", rbind(add.prop.errs,
+                                                  data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
+                }
+                return(bquote(return(.(sprintf("Y%02d", errn)))));
+            } else {
+                if (is.null(curCond)){
+                    return(bquote(return(.(x3))));
+                } else {
+                    return(bquote(if (.(curCond)){return(.(x3))}));
+                }
+            }
+        } else {
+            stop(sprintf("The %s and %s distributions cannot be combined\nCurrently can combine: %s",
+                         as.character(x3[[2]][[1]]), as.character(x3[[3]][[1]]),
+                         paste(add.dists, collapse=", ")))
+        }
+    }
+    .doDist3 <- function(err1, err1.v, err1.args, err2, err2.v, err2.args, err3, err3.v, err3.args, x2, x3, curCond=NULL){
+        if (!is.na(suppressWarnings(as.numeric(err1.v)))){
+            stop("Distribution parameters cannot be numeric, but need to be estimated.")
+        }
+        if (!is.na(suppressWarnings(as.numeric(err2.v)))){
+            stop("Distribution parameters cannot be numeric, but need to be estimated.")
+        }
+        if (!is.na(suppressWarnings(as.numeric(err3.v)))){
+            stop("Distribution parameters cannot be numeric, but need to be estimated.")
+        }
+        if (any(err1 == add.dists) &&
+            any(err2 == add.dists) &&
+            any(err3 == add.dists)){
+            tmp <- paste(sort(c(err1, err2, err3)), collapse="+");
+            assign("errs.specified", unique(errs.specified, tmp), this.env)
+            if (any(do.pred == c(2, 4, 5))){
+                return(quote(nlmixrIgnore()));
+            }
+            else if (any(do.pred == c(1, 4, 5))){
+                if (is.null(curCond)){
+                    assign(".predDf", rbind(.predDf,
+                                            data.frame(cond="",
+                                                       var=deparse(x2))), this.env)
+                    return(bquote(nlmixr_pred <- .(x2)));
+                } else {
+                    assign(".predDf", rbind(.predDf,
+                                            data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", deparse(curCond)),
+                                                       var=deparse(x2))), this.env)
+                    return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
+                }
+            } else if (do.pred == 3){
+                .doDist(err1, err1.args, curCond)
+                .doDist(err2, err2.args, curCond)
+                .doDist(err3, err3.args, curCond)
+                tmp <- bounds
+                if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "dnorm") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
+                    assign("errn", errn + 1, this.env);
+                    assign("add.prop.errs", rbind(add.prop.errs,
+                                                  data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
+                }
+                return(bquote(return(.(sprintf("Y%02d", errn)))));
+            } else {
+                if (is.null(curCond)){
+                    return(bquote(return(.(x3))));
+                } else {
+                    return(bquote(if (.(curCond)){return(.(x3))}));
+                }
+            }
+        } else {
+            stop(sprintf("The %s, %s and %s distributions cannot be combined\nCurrently can combine: %s",
+                         err1, err2, err3, paste(add.dists, collapse=", ")))
+        }
     }
     f <- function(x) {
         if (is.name(x)) {
@@ -587,46 +741,66 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             return(x)
         } else if (is.call(x)) {
             if (identical(x[[1]], quote(`~`)) &&
+                as.character(x[[3]][[1]]) == "|" &&
+                any(as.character(x[[3]][[2]][[1]]) == c(names(dists), unsupported.dists))){
+                ch.dist <- as.character(x[[3]][[2]]);
+                if (length(x[[3]][[3]]) == 1){
+                    curCond <- sprintf("cmt == %s", as.character(x[[3]][[3]]));
+                } else {
+                    curCond <- deparse(x[[3]][[3]]);
+                }
+                curCond <- eval(parse(text=sprintf("quote(%s)", curCond)));
+                err1 <- as.character(x[[3]][[2]][[1]]);
+                err1.v <- as.character(x[[3]][[2]][[2]]);
+                err1.args <- as.character(x[[3]][[2]][-1])
+                .doDist1(err1, err1.v, err1.args, x[[2]], x[[3]][[2]], curCond=curCond)
+            } else if (identical(x[[1]], quote(`~`)) &&
+                       as.character(x[[3]][[1]]) == "|" &&
+                       identical(x[[3]][[2]][[1]], quote(`+`)) &&
+                       length(as.character(x[[3]][[2]])) == 3 &&
+                       any(as.character(x[[3]][[2]][[2]][[1]]) == c(names(dists), unsupported.dists)) &&
+                       any(as.character(x[[3]][[2]][[3]][[1]]) == c(names(dists), unsupported.dists))){
+                err1 <- as.character(x[[3]][[2]][[2]][[1]]);
+                err1.v <- as.character(x[[3]][[2]][[2]][[2]])
+                err1.args <- as.character(x[[3]][[2]][[2]][-1])
+                err2 <- as.character(x[[3]][[2]][[3]][[1]]);
+                err2.v <- as.character(x[[3]][[2]][[3]][[2]]);
+                err2.args <- as.character(x[[3]][[2]][[3]][-1]);
+                if (length(x[[3]][[3]]) == 1){
+                    curCond <- sprintf("cmt == %s", as.character(x[[3]][[3]]));
+                } else {
+                    curCond <- deparse(x[[3]][[3]]);
+                }
+                curCond <- eval(parse(text=sprintf("quote(%s)", curCond)));
+                .doDist2(err1, err1.v, err1.args, err2, err2.v, err2.args, x[[2]], x[[3]][[2]], curCond=curCond)
+            } else if (identical(x[[1]], quote(`~`)) &&
+                       as.character(x[[3]][[1]]) == "|" &&
+                       identical(x[[3]][[2]][[1]], quote(`+`)) &&
+                       length(as.character(x[[3]][[2]])) == 3 &&
+                       any(as.character(x[[3]][[2]][[2]][[2]][[1]]) == c(names(dists), unsupported.dists))){
+                err1 <- as.character(x[[3]][[2]][[2]][[2]][[1]]);
+                err1.v <- as.character(x[[3]][[2]][[2]][[2]][[2]]);
+                err1.args <- as.character(x[[3]][[2]][[2]][[2]][-1])
+                err2 <- as.character(x[[3]][[2]][[3]][[1]]);
+                err2.v <- as.character(x[[3]][[2]][[3]][[2]]);
+                err2.args <- as.character(x[[3]][[2]][[3]][-1]);
+                err3 <- as.character(x[[3]][[2]][[2]][[3]][[1]]);
+                err3.v <- as.character(x[[3]][[2]][[2]][[3]][[2]]);
+                err3.args <- as.character(x[[3]][[2]][[2]][[3]][-1]);
+                if (length(x[[3]][[3]]) == 1){
+                    curCond <- sprintf("cmt == %s", as.character(x[[3]][[3]]));
+                } else {
+                    curCond <- deparse(x[[3]][[3]]);
+                }
+                curCond <- eval(parse(text=sprintf("quote(%s)", curCond)));
+                .doDist3(err1, err1.v, err1.args, err2, err2.v, err2.args, err3, err3.v, err3.args, x[[2]], x[[3]][[2]], curCond=curCond)
+            } else if (identical(x[[1]], quote(`~`)) &&
                 any(as.character(x[[3]][[1]]) == c(names(dists), unsupported.dists))){
                 ch.dist <- as.character(x[[3]]);
-                if (any(ch.dist[1] == unsupported.dists)){
-                    stop(sprintf("The %s distribution is currently unsupported.", ch.dist[1]))
-                }
-                nargs <- dists[[ch.dist[1]]]
-                if (any((length(ch.dist) - 1) == nargs)){
-                    assign("errs.specified", unique(errs.specified, as.character(x[[3]][[1]])))
-                    if (do.pred == 1){
-                        return(bquote(nlmixr_pred <- .(x[[2]])));
-                    } else if (do.pred == 0){
-                        dist.name <- ch.dist[1];
-                        dist.args <- ch.dist[-1];
-                        errn <- .doDist(dist.name, dist.args);
-                        if (any(ch.dist[1] == c("add", "norm", "dnorm"))){
-                            assign("errn", errn + 1, this.env);
-                            assign("add.prop.errs", rbind(add.prop.errs,
-                                                          data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=FALSE)), this.env)
-                        } else if (ch.dist[1] == "prop"){
-                            assign("errn", errn + 1, this.env);
-                            assign("add.prop.errs", rbind(add.prop.errs,
-                                                          data.frame(y=sprintf("Y%02d", errn), add=FALSE, prop=TRUE)), this.env);
-                        }
-                        return(bquote(return(.(eval(parse(text=sprintf("quote(%s(%s))", dist.name, paste(dist.args, collapse=", "))))))));
-                    } else if (do.pred == 3){ ## Dataset preparation function for nlme
-                        return(bquote(return(.(sprintf("Y%02d", errn)))))
-                    } else {
-                        return(quote(nlmixrIgnore()))
-                    }
-                } else {
-                    if (any(do.pred == c(2, 4, 5))){
-                        return(x);
-                    } else {
-                        if (length(nargs) == 1){
-                            stop(sprintf("The %s distribution requires %s arguments.", ch.dist[1], nargs))
-                        } else {
-                            stop(sprintf("The %s distribution requires %s-%s arguments.", ch.dist[1], min(nargs), max(nargs)))
-                        }
-                    }
-                }
+                err1 <- as.character(x[[3]][[1]]);
+                err1.v <- as.character(x[[3]][[2]]);
+                err1.args <- as.character(x[[3]][-1])
+                .doDist1(err1, err1.v, err1.args, x[[2]], x[[3]], curCond=NULL)
             } else if (identical(x[[1]], quote(`~`)) && ## Arg parsing 4 should be the last....
                        identical(x[[3]][[1]], quote(`+`)) &&
                        identical(x[[3]][[2]][[1]], quote(`+`)) &&
@@ -647,43 +821,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 err3 <- as.character(x[[3]][[2]][[3]][[1]]);
                 err3.v <- as.character(x[[3]][[2]][[3]][[2]]);
                 err3.args <- as.character(x[[3]][[2]][[3]][-1]);
-                if (!is.na(suppressWarnings(as.numeric(err1.v)))){
-                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
-                }
-                if (!is.na(suppressWarnings(as.numeric(err2.v)))){
-                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
-                }
-                if (!is.na(suppressWarnings(as.numeric(err3.v)))){
-                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
-                }
-                if (any(err1 == add.dists) &&
-                    any(err2 == add.dists) &&
-                    any(err3 == add.dists)){
-                    tmp <- paste(sort(c(err1, err2, err3)), collapse="+");
-                    assign("errs.specified", unique(errs.specified, tmp), this.env)
-                    if (any(do.pred == c(2, 4, 5))){
-                        return(quote(nlmixrIgnore()));
-                    }
-                    else if (any(do.pred == c(1, 4, 5))){
-                        return(bquote(nlmixr_pred <- .(x[[2]])));
-                    } else if (do.pred == 3){
-                        .doDist(err1, err1.args)
-                        .doDist(err2, err2.args)
-                        .doDist(err3, err3.args)
-                        tmp <- bounds
-                        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "dnorm") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
-                            assign("errn", errn + 1, this.env);
-                            assign("add.prop.errs", rbind(add.prop.errs,
-                                                          data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
-                        }
-                        return(bquote(return(.(sprintf("Y%02d", errn)))));
-                    } else {
-                        return(bquote(return(.(x[[3]]))));
-                    }
-                } else {
-                    stop(sprintf("The %s, %s and %s distributions cannot be combined\nCurrently can combine: %s",
-                                 err1, err2, err3, paste(add.dists, collapse=", ")))
-                }
+                .doDist3(err1, err1.v, err1.args, err2, err2.v, err2.args, err3, err3.v, err3.args, x[[2]], x[[3]], curCond=NULL)
             } else if (identical(x[[1]], quote(`~`)) &&
                        identical(x[[3]][[1]], quote(`+`)) &&
                        length(as.character(x[[3]])) == 3  &&
@@ -695,39 +833,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 err2 <- as.character(x[[3]][[3]][[1]]);
                 err2.v <- as.character(x[[3]][[3]][[2]]);
                 err2.args <- as.character(x[[3]][[3]][-1])
-                if (!is.na(suppressWarnings(as.numeric(err1.v)))){
-                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
-                }
-                if (!is.na(suppressWarnings(as.numeric(err2.v)))){
-                    stop("Distribution parameters cannot be numeric, but need to be estimated.")
-                }
-                if (any(err1 == add.dists) &&
-                    any(err2 == add.dists)){
-                    tmp <- paste(sort(c(err1, err2)), collapse="+");
-                    assign("errs.specified", unique(errs.specified, tmp), this.env)
-                    if (any(do.pred == c(2, 4, 5))){
-                        return(quote(nlmixrIgnore()));
-                    }
-                    else if (any(do.pred == c(1, 4, 5))){
-                        return(bquote(nlmixr_pred <- .(x[[2]]))) ;
-                    } else if (do.pred == 3){
-                        .doDist(err1, err1.args)
-                        .doDist(err2, err2.args)
-                        tmp <- bounds;
-                        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm") || any(paste(tmp$err) == "dnorm")) && any(paste(tmp$err) == "prop")){
-                            assign("errn", errn + 1, this.env);
-                            assign("add.prop.errs", rbind(add.prop.errs,
-                                                          data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
-                        }
-                        return(bquote(return(.(sprintf("Y%02d", errn)))));
-                    } else {
-                        return(bquote(return(.(x[[3]]))));
-                    }
-                } else {
-                    stop(sprintf("The %s and %s distributions cannot be combined\nCurrently can combine: %s",
-                                 as.character(x[[3]][[2]][[1]]), as.character(x[[3]][[3]][[1]]),
-                                 paste(add.dists, collapse=", ")))
-                }
+                .doDist2(err1, err1.v, err1.args, err2, err2.v, err2.args, x[[2]], x[[3]])
             } else if (identical(x[[1]], quote(`~`)) && (do.pred != 2)){
                 return(quote(nlmixrIgnore()))
             } else if (identical(x[[1]], quote(`<-`)) && !any(do.pred == c(2, 4, 5) )){
@@ -987,7 +1093,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         all.covs <- setdiff(all.covs,c("t", "time", "podo", "M_E","M_LOG2E","M_LOG10E","M_LN2","M_LN10","M_PI","M_PI_2","M_PI_4","M_1_PI",
                                        "M_2_PI","M_2_SQRTPI","M_SQRT2","M_SQRT1_2","M_SQRT_3","M_SQRT_32","M_LOG10_2","M_2PI","M_SQRT_PI",
                                        "M_1_SQRT_2PI","M_SQRT_2dPI","M_LN_SQRT_PI","M_LN_SQRT_2PI","M_LN_SQRT_PId2","pi"))
+        .tmp <- RxODE::rxState(rxode);
+        .tmp <- data.frame(cmt=seq_along(.tmp), cond=.tmp)
+        .predDf <- merge(.predDf, .tmp, all.x=TRUE)
     } else {
+        .predDf$cmt <- -1
         all.covs <- setdiff(rest.vars,paste0(bounds$name))
         nlme.mu.fun2 <- saem.pars
         rxode <- NULL
@@ -1005,6 +1115,15 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     fun3 <- fun3[-length(fun3)]
     fun3 <- fun3[-length(fun3)]
     fun3 <- paste0(fun3, collapse="\n");
+    if(length(.predDf$cond) != 1L){
+        if (any(.predDf$cond == "")){
+            stop("With multiple endpoints, all residual error predictions must be specified with the | syntax.")
+        }
+    } else {
+        if (any(.predDf$cond != "")){
+            warning("Multiple endpoint specified with | syntax, but only one endpoint specified.");
+        }
+    }
 
     misplaced.dists <- intersect(rest.funs, c(names(dists), unsupported.dists));
     if (length(misplaced.dists) == 1){
@@ -1109,6 +1228,33 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     ## Split out inPars
     saem.all.covs <- all.covs[all.covs %in% names(cov.ref)]
     saem.inPars <- all.covs[!(all.covs %in% names(cov.ref))]
+    .subs <- function(x){
+        if (is.call(x)) {
+            if (identical(x[[1]], quote(`==`)) &&
+                all(as.character(x[[3]]) == .what)){
+                if (x[[2]] != "cmt"){
+                    stop("Multiple endpoints can only be defined in terms of CMT");
+                }
+                x[[3]] <- eval(parse(text=sprintf("quote(%s)", .with)))
+            }
+            as.call(lapply(x, .subs))
+        } else if (is.pairlist(x)) {
+            as.pairlist(lapply(x, .subs))
+        } else {
+            return(x);
+        }
+    }
+    for (i in seq_along(.predDf$cond)){
+        if (.predDf$cond[i] != ""){
+            .what <- (.predDf$cond[i]);
+            .with <- paste(.predDf$cmt[i]);
+            body(pred) <- .subs(body(pred))
+            body(err) <- .subs(body(err))
+        }
+    }
+    .predDf <- .predDf[order(.predDf$cmt), ];
+    .predDf$cond[is.na(.predDf$cond)] <- ""
+    .predSaem <- eval(parse(text=sprintf("function(){\n%s;\n}", paste(paste(.predDf$var), collapse=";\n"))))
     ret <- list(ini=bounds, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
                             all.vars=all.vars, rest.vars=rest.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
@@ -1117,6 +1263,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
                             log.theta=log.theta,
                             log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
+                            predDf=.predDf,
+                            predSaem =.predSaem,
                             env=env))
     return(ret)
 }
@@ -1447,21 +1595,17 @@ nlmixrUI.saem.res.mod <- function(obj){
     if (any(obj$saem.distribution == c("poisson","binomial"))){
         return(1);
     }
-    obj <- obj$add.prop.errs
-    if (length(obj$add) == 1){
-        if (obj$add && !obj$prop){
-            return(1)
-        } else if (obj$add && obj$prop){
-            return(3)
-        } else {
-            return(2)
-        }
-    } else if (length(obj$add) == 0) {
-        ## Use default...
-        return(1)
-    } else {
-        stop("Currently SAEM only supports one type of residual error model.")
-    }
+    .predDf <- obj$predDf;
+    .ini <- as.data.frame(obj$ini);
+    .ini <- .ini[!is.na(.ini$err), ];
+    return(sapply(.predDf$cond, function(x){
+        .tmp <- .ini[.ini$condition == x, ];
+        .hasAdd <- any(.tmp$err == "add");
+        .hasProp <- any(.tmp$err == "prop");
+        if (.hasAdd & .hasProp) return(3)
+        if (.hasAdd) return(1)
+        return(2);
+    }));
 }
 ##' Get error names for SAEM
 ##'
@@ -1487,12 +1631,18 @@ nlmixrUI.saem.res.name <- function(obj){
 ##' @return SAEM model$ares spec
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.ares <- function(obj){
-    w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois", "dbinom", "binom", "dbern", "bern"))));
-    if (length(w) == 1){
-        return(obj$est[w]);
-    } else {
-        return(10); ## SAME as SAEM
-    }
+    .predDf <- obj$predDf;
+    .ini <- as.data.frame(obj$ini);
+    .ini <- .ini[!is.na(.ini$err), ];
+    return(sapply(.predDf$cond, function(x){
+        .tmp <- .ini[.ini$condition == x, ];
+        .w <- which(sapply(.tmp$err, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois", "dbinom", "binom", "dbern", "bern"))));
+        if (length(.w) == 1){
+            return(.tmp$est[.w]);
+        } else {
+            return(10);
+        }
+    }));
 }
 
 ##' Get initial estimate for bres SAEM.
@@ -1501,12 +1651,18 @@ nlmixrUI.saem.ares <- function(obj){
 ##' @return SAEM model$ares spec
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.bres <- function(obj){
-    w <- which(obj$err == "prop");
-    if (length(w) == 1){
-        return(obj$est[w]);
-    } else {
-        return(1); ## SAME as SAEM
-    }
+    .predDf <- obj$predDf;
+    .ini <- as.data.frame(obj$ini);
+    .ini <- .ini[!is.na(.ini$err), ];
+    return(sapply(.predDf$cond, function(x){
+        .tmp <- .ini[.ini$condition == x, ];
+        .w <- which(sapply(.tmp$err, function(x)any(x == "prop")));
+        if (length(.w) == 1){
+            return(.tmp$est[.w]);
+        } else {
+            return(1);
+        }
+    }))
 }
 
 ##' Get model$log.eta for SAEM

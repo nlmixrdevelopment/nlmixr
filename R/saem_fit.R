@@ -1265,6 +1265,7 @@ focei.theta.saemFit <- function(object, uif, ...){
     for (n in names(sf)){
         thetas[n] <- sf[n];
     }
+    ##(object$resMat)
     err <- abs(as.vector(object$sig2)) ## abs?
     err.type <- uif$focei.err.type;
     add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))));
