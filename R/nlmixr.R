@@ -330,6 +330,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                 .doIt <- table$foceNPDE
             } else if (est == "nlme"){
                 .doIt <- table$nlmeNPDE
+            } else {
+                .doIt <- FALSE;
             }
         }
         if (!is.logical(.doIt)) return(x);
@@ -520,12 +522,17 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             assign("stopTime", Sys.time(), .env);
         }
         return(.ret)
-    } else if (any(est == c("foce", "focei"))){
-        if (est == "foce"){
+    } else if (any(est == c("foce", "focei", "fo", "foi"))){
+        if (any(est == c("foce", "fo"))){
             control$interaction <- FALSE;
         }
         env <- new.env(parent=emptyenv());
         env$uif <- uif;
+        if (any(est == c("fo", "foi"))){
+            control$maxInnerIterations <- 0
+            control$boundTol <- 0;
+            env$skipTable <- TRUE;
+        }
         fit <- foceiFit(dat,
                         inits=uif$focei.inits,
                         PKpars=uif$theta.pars,
@@ -540,7 +547,53 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                         etaNames=uif$eta.names,
                         control=control,
                         env=env,
-                        ...)
+                        ...);
+        if (any(est == c("fo", "foi"))){
+            ## Add posthoc.
+            .default <- foceiControl();
+            control$maxInnerIterations <- .default$maxInnerIterations
+            control$maxInnerIterationsOuter <- 0L
+            control$maxOuterIterations <- 0L;
+            control$covMethod <- "";
+            .uif <- fit$uif;
+            .thetas <- fit$theta;
+            for (.n in names(.thetas)){
+                .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n];
+            }
+            .omega <- fit$omega;
+            for (.i in seq_along(.uif$ini$neta1)){
+                if (!is.na(.uif$ini$neta1[.i])){
+                    .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]];
+                }
+            }
+            .time <- fit$time;
+            .objDf <- fit$objDf;
+            env <- new.env(parent=emptyenv());
+            env$cov <- getVarCov(fit);
+            env$time2 <- time;
+            env$uif <- .uif;
+            env$method <- "FO";
+            fit <- foceiFit(dat,
+                            inits=.uif$focei.inits,
+                            PKpars=.uif$theta.pars,
+                            ## par_trans=fun,
+                            model=.uif$rxode.pred,
+                            pred=function(){return(nlmixr_pred)},
+                            err=.uif$error,
+                            lower=.uif$focei.lower,
+                            upper=.uif$focei.upper,
+                            fixed=.uif$focei.fixed,
+                            thetaNames=.uif$focei.names,
+                            etaNames=.uif$eta.names,
+                            control=control,
+                            env=env,
+                            ...);
+            .tmp1 <- env$objDf;
+            if (any(names(.objDf) == "Condition Number")) .tmp1 <- data.frame(.tmp1, "Condition Number"=NA, check.names=FALSE);
+            if (any(names(.tmp1) == "Condition Number")) .objDf <- data.frame(.objDf, "Condition Number"=NA, check.names=FALSE);
+            env$objDf <- rbind(.tmp1, .objDf);
+            row.names(env$objDf) <- c(ifelse(est == "fo", "FOCE", "FOCEi"), "FO");
+        }
         fit <- fix.dat(fit);
         fit <- .addNpde(fit);
         assign("start.time", start.time, env);

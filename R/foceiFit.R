@@ -1037,6 +1037,9 @@ foceiFit.data.frame0 <- function(data,
             return(.ret);
         }
     } else{
+        if (exists("skipTable", envir=.ret)){
+            if (.ret$skipTable) return(.ret);
+        }
         message("Calculating residuals/tables")
         .pt <- proc.time();
         .etas <- .ret$ranef
@@ -1335,7 +1338,8 @@ print.nlmixrFitCore <- function(x, ...){
         .bound <- .bound[1];
     }
     .posthoc <- (x$control$maxOuterIterations == 0L & x$control$maxInnerIterations > 0L)
-    .posthoc <- ifelse(.posthoc, paste0(crayon::bold(" posthoc"), " estimation"), " fit");
+    .posthoc <- ifelse(.posthoc, paste0(ifelse(x$method == "FO", paste0(" estimation with ", crayon::bold$yellow("FOCE"), x$extra, crayon::bold(" posthoc")),
+                                               crayon::bold(" posthoc")), " estimation"), " fit");
     message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
                              x$extra, .posthoc)))
     print(x$objDf)
