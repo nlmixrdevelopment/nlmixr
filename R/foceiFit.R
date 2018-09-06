@@ -1222,52 +1222,70 @@ residuals.nlmixrFitData <- function(object, ..., type=c("ires", "res", "iwres", 
 #' @export
 plot.nlmixrFitData <- function(x, ...) {
     traceplot(x);
-    dat <- as.data.frame(x);
-    d1 <- data.frame(DV=dat$DV, stack(dat[, c("PRED", "IPRED")]))
+    .dat <- as.data.frame(x);
+    .doCmt <- FALSE;
+    if (any(names(.dat) == "CMT")){
+        if (length(levels(.dat$CMT)) > 1){
+            .doCmt <- TRUE;
+        }
+    }
+    if (!.doCmt){
+        .dat$CMT <- factor(rep(1, length(.dat$CMT)), 1, "All Data");
+    } else {
+        levels(.dat$CMT) <- paste("Compartment: ", levels(.dat$CMT))
+    }
+    for (.cmt in levels(.dat$CMT)){
+        .dat0 <- .dat[.dat$CMT == .cmt, ];
 
-    p1 <- ggplot(d1,aes(values,DV)) +
-        facet_wrap(~ind) +
-        geom_abline(slope=1, intercept=0, col="red", size=1.2) +
-        geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
-        geom_point() +
-        xlab("Predictions");
+        .d1 <- data.frame(DV=.dat0$DV, stack(.dat0[, c("PRED", "IPRED")]))
+        .p1 <- ggplot2::ggplot(.d1, aes(values, DV)) + ggplot2::facet_wrap( ~ ind) +
+            ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
+            ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
+            ggplot2::geom_point() + xlab("Predictions") + ggtitle(.cmt, "DV vs PRED/IPRED")
+        print(.p1);
 
-    print(p1)
+        .p2 <- ggplot2::ggplot(.dat0, aes(x=IPRED, y=IRES)) +
+            ggplot2::geom_point() +
+            ggplot2::geom_abline(slope=0, intercept=0, col="red") +
+            ggplot2::ggtitle(.cmt, "IRES vs IPRED")
+        print(.p2)
 
-    p2 <- ggplot(dat, aes(x=IPRED, y=IRES)) +
-        geom_point() +
-        geom_abline(slope=0, intercept=0, col="red")
-    print(p2)
+        .p2 <- ggplot2::ggplot(.dat0, aes(x=TIME, y=IRES)) +
+            ggplot2::geom_point() +
+            ggplot2::geom_abline(slope=0, intercept=0, col="red") +
+            ggplot2::ggtitle(.cmt, "IRES vs TIME")
+        print(.p2)
 
-    p2 <- ggplot(dat, aes(x=TIME, y=IRES)) +
-        geom_point() +
-        geom_abline(slope=0, intercept=0, col="red")
-    print(p2)
+        .p2 <- ggplot2::ggplot(.dat0, aes(x=IPRED, y=IWRES)) +
+            ggplot2::geom_point() +
+            ggplot2::geom_abline(slope=0, intercept=0, col="red") +
+            ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
+        print(.p2)
 
+        .p2 <- ggplot2::ggplot(.dat0, aes(x=TIME, y=IWRES)) +
+            ggplot2::geom_point() +
+            ggplot2::geom_abline(slope=0, intercept=0, col="red") +
+            ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
+        print(.p2)
 
-    p2 <- ggplot(dat, aes(x=IPRED, y=IWRES)) +
-        geom_point() +
-        geom_abline(slope=0, intercept=0, col="red")
-    print(p2)
+        .ids <- unique(.dat0$ID)
+        .s <- seq(1, length(.ids), by=16)
+        .j <- 0;
+        for (i  in .s){
+            .j <- .j + 1
+            .tmp <- .ids[seq(i, i + 15)]
+            .tmp <- .tmp[!is.na(.tmp)];
+            .d1 <- .dat0[.dat0$ID %in% .tmp, ];
 
-    p2 <- ggplot(dat, aes(x=TIME, y=IWRES)) +
-        geom_point() +
-        geom_abline(slope=0, intercept=0, col="red")
-    print(p2)
+            .p3 <- ggplot2::ggplot(.d1, aes(x=TIME, y=DV)) +
+                ggplot2::geom_point() +
+                ggplot2::geom_line(aes(x=TIME, y=IPRED), col="red", size=1.2) +
+                ggplot2::geom_line(aes(x=TIME, y=PRED), col="blue", size=1.2) +
+                ggplot2::facet_wrap(~ID) +
+                ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s)))
+            print(.p3)
+        }
 
-
-    ids <- unique(dat$ID)
-    for (i  in seq(1, length(ids), by=16)){
-        tmp <- ids[seq(i, i + 15)]
-        tmp <- tmp[!is.na(tmp)];
-        d1 <- dat[dat$ID %in% tmp, ];
-
-        p3 <- ggplot(d1, aes(x=TIME, y=DV)) +
-            geom_point() +
-            geom_line(aes(x=TIME, y=IPRED), col="red", size=1.2) +
-            geom_line(aes(x=TIME, y=PRED), col="blue", size=1.2) +
-            facet_wrap(~ID)
-        print(p3)
     }
 }
 

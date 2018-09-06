@@ -1256,6 +1256,7 @@ fixef.saemFit <- function(object, ...){
 
 focei.theta.saemFit <- function(object, uif, ...){
     ## Get the thetas needed for FOCEi fit.
+    this.env <- environment()
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
     }
@@ -1265,24 +1266,25 @@ focei.theta.saemFit <- function(object, uif, ...){
     for (n in names(sf)){
         thetas[n] <- sf[n];
     }
-    err <- abs(as.vector(object$sig2)) ## abs?
-    err.type <- uif$focei.err.type;
-    add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))));
-    prop <- which(err.type == "prop")
-    if (length(add) > 0){
-        ## 0.9 was SD; 1.0 is variance
-        thetas[add] <- sqrt(err[1]);
-    }
-    if (length(prop) > 0){
-        if (length(err) == 1){
-            ## SD
-            thetas[prop] <- err[1];
-        } else {
-            ## SD
-            thetas[prop] <- err[2];
+    ##(object$resMat)
+    ## print(object$resMat)
+    ## print(object$sig2)
+    .predDf <- uif$predDf;
+    .ini <- as.data.frame(uif$ini);
+    .resMat <- object$resMat;
+    sapply(seq_along(.predDf$cond), function(i){
+        x <- paste(.predDf$cond[i]);
+        .tmp <- .ini[which(.ini$condition == x), ];
+        .w <- which(sapply(.tmp$err, function(x)any(x == "prop")));
+        if (length(.w) == 1){
+            thetas[paste(.tmp$name[.w])]  <- .resMat[i, 2];
         }
-    }
-    w <- which(is.na(thetas))[1];
+        .w <- which(sapply(.tmp$err, function(x)any(x == c("add", "norm", "dnorm"))));
+        if (length(.w) == 1){
+            thetas[paste(.tmp$name[.w])] <- .resMat[i, 1];
+        }
+        assign("thetas", thetas, this.env)
+    })
     return(thetas)
 }
 
@@ -1492,7 +1494,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
                                                               rtol=rtol,
                                                               method=.method,
                                                               transitAbs=transitAbs,
-                                                              sumProd=uif$env$sum.prod)), silent=FALSE);
+                                                              sumProd=uif$env$sum.prod,
+                                                              optExpression=uif$env$optExpression)), silent=FALSE);
         if (inherits(fit.f, "try-error")){
             if (is.na(calcResid)){
                 warning("Error calculating nlmixr object, return classic object");

@@ -310,6 +310,13 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         }
         .env <- x$env
         .env$uif <- .uif;
+        .predDf <- .uif$predDf;
+        if (any(.predDf$cond != "") & any(names(x) == "CMT")){
+            .cls <- class(x);
+            class(x) <- "data.frame";
+            x$CMT <- factor(x$CMT, levels=.predDf$cmt, labels=.predDf$cond)
+            class(x) <- .cls;
+        }
         return(x);
     }
     .addNpde <- function(x){
@@ -391,6 +398,12 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         } else {
             .logLik <- default$logLik
         }
+        if (any(names(control) == "optExpression")){
+            uif$env$optExpression <- control$optExpression
+        } else {
+            uif$env$optExpression <- default$optExpression
+        }
+
         if (is.null(uif$nlme.fun.mu)){
             stop("SAEM requires all ETAS to be mu-referenced")
         }
@@ -613,6 +626,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
 ##'     calculate by Gaussian quadrature.
 ##' @param ... Other arguments to control SAEM.
 ##' @inheritParams RxODE::rxSolve
+##' @inheritParams foceiControl
 ##' @return List of options to be used in \code{\link{nlmixr}} fit for
 ##'     SAEM.
 ##' @author Wenping Wang & Matthew L. Fidler
@@ -629,6 +643,7 @@ saemControl <- function(seed=99,
                         trace=0,
                         covMethod=c("fim", "r,s", "r", "s"),
                         logLik=FALSE,
+                        optExpression=TRUE,
                         ...){
     .xtra <- list(...);
     .rm <- c();
@@ -650,7 +665,8 @@ saemControl <- function(seed=99,
                      transitAbs = as.integer(transitAbs)),
          seed=seed,
          print=print,
-         DEBUG=trace, ...)
+         DEBUG=trace,
+         optExpression=optExpression, ...)
     if (length(.rm) > 0){
         .ret <- .ret[!(names(.ret) %in% .rm)]
     }
