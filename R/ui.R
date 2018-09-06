@@ -562,6 +562,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             .tmp1[, "est"] <- -Inf
             if (!is.null(curCond)){
                 .tmp1[, "condition"] <- curCond;
+            } else {
+                .tmp1[, "condition"] <- "";
             }
             .tmp <- rbind(.tmp, .tmp1);
             class(.tmp) <- c("nlmixrBounds", "data.frame");
@@ -745,7 +747,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 any(as.character(x[[3]][[2]][[1]]) == c(names(dists), unsupported.dists))){
                 ch.dist <- as.character(x[[3]][[2]]);
                 if (length(x[[3]][[3]]) == 1){
-                    curCond <- sprintf("cmt == %s", as.character(x[[3]][[3]]));
+                    curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
                 } else {
                     curCond <- deparse(x[[3]][[3]]);
                 }
@@ -767,7 +769,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 err2.v <- as.character(x[[3]][[2]][[3]][[2]]);
                 err2.args <- as.character(x[[3]][[2]][[3]][-1]);
                 if (length(x[[3]][[3]]) == 1){
-                    curCond <- sprintf("cmt == %s", as.character(x[[3]][[3]]));
+                    curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
                 } else {
                     curCond <- deparse(x[[3]][[3]]);
                 }
@@ -788,7 +790,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 err3.v <- as.character(x[[3]][[2]][[2]][[3]][[2]]);
                 err3.args <- as.character(x[[3]][[2]][[2]][[3]][-1]);
                 if (length(x[[3]][[3]]) == 1){
-                    curCond <- sprintf("cmt == %s", as.character(x[[3]][[3]]));
+                    curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
                 } else {
                     curCond <- deparse(x[[3]][[3]]);
                 }
@@ -1232,7 +1234,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         if (is.call(x)) {
             if (identical(x[[1]], quote(`==`)) &&
                 all(as.character(x[[3]]) == .what)){
-                if (x[[2]] != "cmt"){
+                if (x[[2]] != "CMT"){
                     stop("Multiple endpoints can only be defined in terms of CMT");
                 }
                 x[[3]] <- eval(parse(text=sprintf("quote(%s)", .with)))
@@ -1253,7 +1255,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
     }
     .predDf <- .predDf[order(.predDf$cmt), ];
-    .predDf$cond[is.na(.predDf$cond)] <- ""
+    .w <- which(is.na(.predDf$cond))
+    if (length(.w) > 0) .predDf$cond[.w] <- ""
     .predSaem <- eval(parse(text=sprintf("function(){\n%s;\n}", paste(paste(.predDf$var), collapse=";\n"))))
     ret <- list(ini=bounds, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
@@ -1263,9 +1266,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
                             log.theta=log.theta,
                             log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
-                            predDf=.predDf,
-                            predSaem =.predSaem,
-                            env=env))
+                            predDf=.predDf, predSaem =.predSaem, env=env))
     return(ret)
 }
 ##' Create the nlme specs list for nlmixr nlme solving
@@ -1599,7 +1600,7 @@ nlmixrUI.saem.res.mod <- function(obj){
     .ini <- as.data.frame(obj$ini);
     .ini <- .ini[!is.na(.ini$err), ];
     return(sapply(.predDf$cond, function(x){
-        .tmp <- .ini[.ini$condition == x, ];
+        .tmp <- .ini[which(.ini$condition == x), ];
         .hasAdd <- any(.tmp$err == "add");
         .hasProp <- any(.tmp$err == "prop");
         if (.hasAdd & .hasProp) return(3)
@@ -1635,7 +1636,7 @@ nlmixrUI.saem.ares <- function(obj){
     .ini <- as.data.frame(obj$ini);
     .ini <- .ini[!is.na(.ini$err), ];
     return(sapply(.predDf$cond, function(x){
-        .tmp <- .ini[.ini$condition == x, ];
+        .tmp <- .ini[which(.ini$condition == x), ];
         .w <- which(sapply(.tmp$err, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois", "dbinom", "binom", "dbern", "bern"))));
         if (length(.w) == 1){
             return(.tmp$est[.w]);
@@ -1655,7 +1656,7 @@ nlmixrUI.saem.bres <- function(obj){
     .ini <- as.data.frame(obj$ini);
     .ini <- .ini[!is.na(.ini$err), ];
     return(sapply(.predDf$cond, function(x){
-        .tmp <- .ini[.ini$condition == x, ];
+        .tmp <- .ini[which(.ini$condition == x), ];
         .w <- which(sapply(.tmp$err, function(x)any(x == "prop")));
         if (length(.w) == 1){
             return(.tmp$est[.w]);
@@ -1693,13 +1694,13 @@ nlmixrUI.saem.log.eta <- function(obj){
 nlmixrUI.saem.fit <- function(obj){
     if (any(ls(envir=obj$env) == "saem.fit")){
         return(obj$env$saem.fit)
-    } else if (!is.null(obj$rxode.pred)) {
+    } else if (!is.null(obj$rxode)) {
         ## RxODE function
         message("Compiling RxODE differential equations...", appendLF=FALSE)
         if (obj$env$sum.prod){
-            ode <- RxODE::RxODE(RxODE::rxSumProdModel(obj$rxode.pred));
+            ode <- RxODE::RxODE(RxODE::rxSumProdModel(obj$rxode));
         } else {
-            ode <- RxODE::RxODE(obj$rxode.pred);
+            ode <- RxODE::RxODE(obj$rxode);
         }
         RxODE::rxLoad(ode);
         obj$env$saem.ode <- ode;
@@ -1707,7 +1708,7 @@ nlmixrUI.saem.fit <- function(obj){
         message("done.")
         inPars <- obj$saem.inPars;
         if (length(inPars) == 0) inPars <- NULL
-        saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=function() nlmixr_pred, inPars=inPars);
+        saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=obj$predSaem, inPars=inPars);
         message("done.")
         obj$env$saem.fit <- saem.fit;
         return(obj$env$saem.fit);
