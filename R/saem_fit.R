@@ -1374,7 +1374,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if(is.null(.stiff)) .stiff <- 1L
     if (.stiff == 1L) .method <- "lsoda"
     if (.stiff == 0L) .method <- "dop853"
-    print(.method)
     transitAbs <- uif$env$ODEopt$transitAbs;
     if(is.null(transitAbs)) transitAbs<- 0L
     .tn <-uif$saem.theta.name;
