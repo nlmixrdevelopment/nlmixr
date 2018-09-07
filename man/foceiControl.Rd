@@ -12,12 +12,17 @@ foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 1000,
   "locf", "nocb", "midpoint"), printInner = 0L, print = 1L,
   printNcol = 8L, scaleTo = 1, scaleObjective = 1,
   derivEps = c(1e-05, 1e-05), derivMethod = c("forward", "central"),
-  covDerivMethod = c("forward", "central"), covMethod = c("r,s", "r",
-  "s", ""), lbfgsLmm = 50L, lbfgsPgtol = 0, lbfgsFactr = NULL,
-  eigen = TRUE, addPosthoc = TRUE, diagXform = c("sqrt", "log",
-  "identity"), sumProd = FALSE, optExpression = TRUE, ci = 0.95,
+  covDerivMethod = c("central", "forward"), covMethod = c("r,s", "r",
+  "s", ""), hessEps = 0.001, covDerivEps = c(0, 0.001),
+  lbfgsLmm = 50L, lbfgsPgtol = 0, lbfgsFactr = NULL, eigen = TRUE,
+  addPosthoc = TRUE, diagXform = c("sqrt", "log", "identity"),
+  sumProd = FALSE, optExpression = TRUE, ci = 0.95,
   useColor = crayon::has_color(), boundTol = NULL, calcTables = TRUE,
-  noAbort = TRUE, interaction = TRUE, ..., stiff)
+  noAbort = TRUE, interaction = TRUE,
+  cholSEtol = (.Machine$double.eps)^(1/3), cholAccept = 0.001,
+  resetEtaP = 0.05, diagOmegaBoundUpper = 5,
+  diagOmegaBoundLower = 100, cholSEOpt = FALSE, cholSECov = FALSE,
+  fo = FALSE, covTryHarder = FALSE, ..., stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -231,6 +236,9 @@ evaluation if it runs into troubles.  (default TRUE)}
 
 \item{interaction}{Boolean indicate FOCEi should be used (TRUE)
 instead of FOCE (FALSE)}
+
+\item{cholSEtol}{double tolerance for Generalized Cholesky
+Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)}
 
 \item{...}{Ignored parameters}
 

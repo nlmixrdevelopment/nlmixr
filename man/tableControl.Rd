@@ -6,7 +6,8 @@
 \usage{
 tableControl(npde = NULL, cwres = NULL, saemNPDE = FALSE,
   saemCWRES = FALSE, nlmeNPDE = FALSE, nlmeCWRES = FALSE,
-  foceiNPDE = FALSE, nsim = 300, ties = TRUE, seed = 1009)
+  foceiNPDE = FALSE, foceNPDE = FALSE, nsim = 300, ties = TRUE,
+  seed = 1009)
 }
 \arguments{
 \item{npde}{When TRUE, request npde regardless of the algorithm used.}
@@ -33,6 +34,10 @@ evaluates the function with the FOCEi objective function to
 allow comparison between estimation methods. (default FALSE)}
 
 \item{foceiNPDE}{When TRUE and estimating with FOCEi, adds NPDE
+metrics to fit including EPRED, ERES, and NPDE. (default
+TRUE);}
+
+\item{foceNPDE}{When TRUE and estimating with FOCEi, adds NPDE
 metrics to fit including EPRED, ERES, and NPDE. (default
 TRUE);}
 

@@ -93,14 +93,25 @@ w7$DV <- w7$Y
 w7$EVID <- 0
 w7$AMT <- 0
 
-## Wang2007 prop error 39.458 for NONMEM FOCEi, nlmixr matches.
+## Wang2007 prop error OBF 39.458 for NONMEM FOCEi, nlmixr matches.
 fitPi <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
      control=foceiControl(maxOuterIterations=0,covMethod=""))
 
-## Wang2007 prop error 39.207 for NONMEM FOCE; nlmixr matches.
+print(fitPi$objective)
+
+## Wang2007 prop error OBF 39.207 for NONMEM FOCE; nlmixr matches.
 fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
      control=foceiControl(maxOuterIterations=0,covMethod="",
      interaction=FALSE))
+
+print(fitP$objective)
+
+## Wang 2007 prop error OBF 39.213 for NONMEM FO; nlmixr matches
+fitPfo <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
+     control=foceiControl(maxOuterIterations=0,covMethod="",
+     fo=TRUE))
+
+print(fitPfo$objective)
 
 ## Note if you have the etas you can evaluate the likelihood
 ## of an arbitrary model.  It doesn't have to be solved by
@@ -121,6 +132,11 @@ errAdd <- function(){
 ## nlmixr matches.
 fitA <- foceiFit(w7, inits, mypar2,mod,pred,errAdd,
      control=foceiControl(maxOuterIterations=0,covMethod=""))
+
+## Wang2007 add error of 0.026 for NONMEM FO; nlmixr matches
+
+fitAfo <- foceiFit(w7, inits, mypar2,mod,pred,errAdd,
+     control=foceiControl(maxOuterIterations=0,fo=TRUE,covMethod=""))
 
 ## Extending Wang2007 to add+prop with same dataset
 errAddProp <- function(){

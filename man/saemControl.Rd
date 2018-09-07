@@ -7,7 +7,7 @@
 saemControl(seed = 99, nBurn = 200, nEm = 300, nmc = 3, nu = c(2,
   2, 2), atol = 1e-06, rtol = 1e-04, stiff = TRUE,
   transitAbs = FALSE, print = 1, trace = 0, covMethod = c("fim",
-  "r,s", "r", "s"), logLik = FALSE, ...)
+  "r,s", "r", "s"), logLik = FALSE, optExpression = TRUE, ...)
 }
 \arguments{
 \item{seed}{Random Seed for SAEM step.  (Needs to be set for
@@ -87,6 +87,9 @@ anything is printed to the console.  By default, this is 1.}
 
 \item{logLik}{boolean indicating that log-likelihood should be
 calculate by Gaussian quadrature.}
+
+\item{optExpression}{Optimize the RxODE expression to speed up
+calculation. By default this is turned on.}
 
 \item{...}{Other arguments to control SAEM.}
 }
