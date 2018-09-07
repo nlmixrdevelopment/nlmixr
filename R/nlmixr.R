@@ -530,6 +530,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         env$uif <- uif;
         if (any(est == c("fo", "foi"))){
             control$maxInnerIterations <- 0
+            control$fo <-TRUE;
             control$boundTol <- 0;
             env$skipTable <- TRUE;
         }
@@ -552,9 +553,9 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             ## Add posthoc.
             .default <- foceiControl();
             control$maxInnerIterations <- .default$maxInnerIterations
-            control$maxInnerIterationsOuter <- 0L
             control$maxOuterIterations <- 0L;
             control$covMethod <- "";
+            control$fo <- 0L
             .uif <- fit$uif;
             .thetas <- fit$theta;
             for (.n in names(.thetas)){
@@ -569,7 +570,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             .time <- fit$time;
             .objDf <- fit$objDf;
             env <- new.env(parent=emptyenv());
-            env$cov <- getVarCov(fit);
+            env$cov <- fit$cov;
             env$time2 <- time;
             env$uif <- .uif;
             env$method <- "FO";

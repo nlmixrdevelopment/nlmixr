@@ -244,7 +244,7 @@ foceiControl <- function(sigdig=4,
                          diagOmegaBoundLower=100, #diag(omega) = diag(omega)/diagOmegaBoundLower; = 1 no lower
                          cholSEOpt=FALSE,
                          cholSECov=FALSE,
-                         foCov=FALSE,
+                         fo=FALSE,
                          covTryHarder=FALSE,
                           ..., stiff){
     if (is.null(boundTol)){
@@ -372,7 +372,7 @@ foceiControl <- function(sigdig=4,
                  diagOmegaBoundLower=diagOmegaBoundLower,
                  cholSEOpt=as.integer(cholSEOpt),
                  cholSECov=as.integer(cholSECov),
-                 foCov=as.integer(foCov),
+                 fo=as.integer(fo),
                  covTryHarder=as.integer(covTryHarder));
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -485,14 +485,19 @@ constructLinCmt <- function(fun){
 ##' w7$EVID <- 0
 ##' w7$AMT <- 0
 ##'
-##' ## Wang2007 prop error 39.458 for NONMEM FOCEi, nlmixr matches.
+##' ## Wang2007 prop error OBF 39.458 for NONMEM FOCEi, nlmixr matches.
 ##' fitPi <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
 ##'      control=foceiControl(maxOuterIterations=0,covMethod=""))
 ##'
-##' ## Wang2007 prop error 39.207 for NONMEM FOCE; nlmixr matches.
+##' ## Wang2007 prop error OBF 39.207 for NONMEM FOCE; nlmixr matches.
 ##' fitP <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
 ##'      control=foceiControl(maxOuterIterations=0,covMethod="",
 ##'      interaction=FALSE))
+##'
+##' ## Wang 2007 prop error OBF 39.213 for NONMEM FO; nlmixr matches
+##' fitPfo <- foceiFit(w7, inits, mypar2,mod,pred,errProp,
+##'      control=foceiControl(maxOuterIterations=0,covMethod="",
+##'      fo=TRUE))
 ##'
 ##' ## Note if you have the etas you can evaluate the likelihood
 ##' ## of an arbitrary model.  It doesn't have to be solved by
@@ -1042,6 +1047,11 @@ foceiFit.data.frame0 <- function(data,
         }
     } else{
         if (exists("skipTable", envir=.ret)){
+            .etas <- .ret$ranef
+            .thetas <- .ret$fixef
+            .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
+            .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)]);
+            .updateParFixed(.ret);
             if (.ret$skipTable) return(.ret);
         }
         message("Calculating residuals/tables")
@@ -1344,7 +1354,9 @@ print.nlmixrFitCore <- function(x, ...){
         .bound <- .bound[1];
     }
     .posthoc <- (x$control$maxOuterIterations == 0L & x$control$maxInnerIterations > 0L)
-    .posthoc <- ifelse(.posthoc, paste0(ifelse(x$method == "FO", paste0(" estimation with ", crayon::bold$yellow("FOCE"), x$extra, crayon::bold(" posthoc")),
+    .posthoc <- ifelse(.posthoc, paste0(ifelse(x$method == "FO",
+                                        ifelse(RxODE::rxIs(x, "nlmixrFitData"), paste0(" estimation with ", crayon::bold$yellow("FOCE"), x$extra, crayon::bold(" posthoc")),
+                                               ""),
                                                crayon::bold(" posthoc")), " estimation"), " fit");
     message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
                              x$extra, .posthoc)))
