@@ -1237,10 +1237,11 @@ plot.nlmixrFitData <- function(x, ...) {
         }
     }
     if (!.doCmt){
-        .dat$CMT <- factor(rep(1, length(.dat$CMT)), 1, "All Data");
+        .dat$CMT <- factor(rep(1, length(.dat[, 1])), 1, "All Data");
     } else {
         levels(.dat$CMT) <- paste("Compartment: ", levels(.dat$CMT))
     }
+
     for (.cmt in levels(.dat$CMT)){
         .dat0 <- .dat[.dat$CMT == .cmt, ];
 
@@ -1248,7 +1249,8 @@ plot.nlmixrFitData <- function(x, ...) {
         .p1 <- ggplot2::ggplot(.d1, aes(values, DV)) + ggplot2::facet_wrap( ~ ind) +
             ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
             ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
-            ggplot2::geom_point() + xlab("Predictions") + ggtitle(.cmt, "DV vs PRED/IPRED")
+            ggplot2::geom_point() + xlab("Predictions") +
+            ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
         print(.p1);
 
         .p2 <- ggplot2::ggplot(.dat0, aes(x=IPRED, y=IRES)) +
