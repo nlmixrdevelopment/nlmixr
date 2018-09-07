@@ -1053,7 +1053,7 @@ configsaem <- function(model, data, inits,
 
   nres = (1:2)[(cfg$res.mod==3)+1]
   cfg$res_offset = cumsum(c(0, nres))
-  cfg$par.hist = matrix(0, cfg$niter, cfg$nphi0+2*cfg$nphi1+sum(nres))
+  cfg$par.hist = matrix(0, cfg$niter, nlambda1 + nlambda0 + nphi1 + sum(nres))
 
   cfg$DEBUG = cfg$opt$DEBUG = cfg$optM$DEBUG = DEBUG
   cfg$phiMFile = tempfile()
