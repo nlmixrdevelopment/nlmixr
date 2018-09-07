@@ -244,6 +244,8 @@ foceiControl <- function(sigdig=4,
                          diagOmegaBoundLower=100, #diag(omega) = diag(omega)/diagOmegaBoundLower; = 1 no lower
                          cholSEOpt=FALSE,
                          cholSECov=FALSE,
+                         foCov=FALSE,
+                         covTryHarder=FALSE,
                           ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -369,7 +371,9 @@ foceiControl <- function(sigdig=4,
                  diagOmegaBoundUpper=diagOmegaBoundUpper,
                  diagOmegaBoundLower=diagOmegaBoundLower,
                  cholSEOpt=as.integer(cholSEOpt),
-                 cholSECov=as.integer(cholSECov));
+                 cholSECov=as.integer(cholSECov),
+                 foCov=as.integer(foCov),
+                 covTryHarder=as.integer(covTryHarder));
     class(.ret) <- "foceiControl"
     return(.ret);
 }
