@@ -211,7 +211,7 @@ foceiControl <- function(sigdig=4,
                          method = c("liblsoda", "lsoda", "dop853"),
                          transitAbs = NULL, atol = NULL, rtol = NULL,
                          maxstepsOde = 5000L, hmin = 0L, hmax = NULL, hini = 0, maxordn = 12L, maxords = 5L, cores,
-                         covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+                         covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
                          printInner=0L,
                          print=1L,
                          printNcol=floor((getOption("width") - 23)/12) ,
@@ -246,12 +246,25 @@ foceiControl <- function(sigdig=4,
                          cholSECov=FALSE,
                          fo=FALSE,
                          covTryHarder=FALSE,
-                          ..., stiff){
+                         outerOpt=c("L-BFGS-B", "bobyqa", "nlminb", "lbfgsb3"),
+                         ##
+                         rhobeg=.2,
+                         rhoend=NULL,
+                         npt=NULL,
+                         ## nlminb
+                         rel.tol=NULL,
+                         x.tol=NULL,
+                         eval.max=4000,
+                         iter.max=2000,
+                         ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
     if (is.null(epsilon)){
         epsilon <- 10 ^ (-sigdig)
+    }
+    if (is.null(rhoend)){
+        rhoend <- 10 ^ (-sigdig);
     }
     if (is.null(lbfgsFactr)){
         lbfgsFactr <- 10 ^ (-sigdig - 1) / .Machine$double.eps;
@@ -261,6 +274,12 @@ foceiControl <- function(sigdig=4,
     }
     if (is.null(rtol)){
         rtol <- 0.5 * 10 ^ (-sigdig - 1);
+    }
+    if (is.null(rel.tol)){
+        rel.tol <- 10 ^ (-sigdig);
+    }
+    if (is.null(x.tol)){
+        x.tol <- 10 ^ (-sigdig);
     }
     .xtra <- list(...);
     if (is.null(transitAbs) && !is.null(.xtra$transit_abs)){  # nolint
@@ -312,6 +331,27 @@ foceiControl <- function(sigdig=4,
         .covMethodIdx <- c("r,s" = 1L, "r"=2L, "s"=3L);
         covMethod <- .covMethodIdx[match.arg(covMethod)];
     }
+    if (RxODE::rxIs(outerOpt, "character")){
+        outerOpt <- match.arg(outerOpt);
+        if (outerOpt == "bobyqa"){
+            outerOptFun <- nlmixr:::.bobyqa;
+            outerOpt <- -1L;
+        } else if (outerOpt == "nlminb"){
+            outerOptFun <- nlmixr:::.nlminb;
+            outerOpt <- -1L;
+        } else if (outerOpt == "lbfgsb3"){
+            outerOptFun <- nlmixr:::.lbfgsb3;
+            outerOpt <- -1L;
+        } else {
+            .outerOptIdx <- c("L-BFGS-B"=0L);
+            outerOpt <- .outerOptIdx[outerOpt]
+            outerOptFun <- NULL
+        }
+    } else if (is(outerOpt, "function")) {
+        outerOptFun <- outerOpt;
+        outerOpt <- -1L;
+    }
+
     if (resetEtaP > 0 & resetEtaP < 1){
         .resetEtaSize <- qnorm(1 - (resetEtaP / 2));
     } else if (resetEtaP <= 0){
@@ -319,9 +359,6 @@ foceiControl <- function(sigdig=4,
     } else {
         .resetEtaSize <- 0;
     }
-    ## outerOpt <- match.arg(outerOpt)
-    ## .outerIdx <- c("lbfgsb"=0L, "qnbd"=1L)
-    ## outerOpt <- as.integer(.outerIdx[outerOpt]);
     .ret <- list(maxOuterIterations=as.integer(maxOuterIterations),
                  maxInnerIterations=as.integer(maxInnerIterations),
                  method=method,
@@ -354,7 +391,7 @@ foceiControl <- function(sigdig=4,
                  diagXform=match.arg(diagXform),
                  sumProd=sumProd,
                  optExpression=optExpression,
-                 outerOpt=0L,
+                 outerOpt=as.integer(outerOpt),
                  ci=as.double(ci),
                  sigdig=as.double(sigdig),
                  scaleObjective=as.double(scaleObjective),
@@ -373,8 +410,55 @@ foceiControl <- function(sigdig=4,
                  cholSEOpt=as.integer(cholSEOpt),
                  cholSECov=as.integer(cholSECov),
                  fo=as.integer(fo),
-                 covTryHarder=as.integer(covTryHarder));
+                 covTryHarder=as.integer(covTryHarder),
+                 outerOptFun=outerOptFun,
+                 ## bobyqa
+                 rhobeg=as.double(rhobeg),
+                 rhoend=as.double(rhoend),
+                 npt=npt,
+                 ## nlminb
+                 rel.tol=as.double(rel.tol),
+                 x.tol=as.double(x.tol),
+                 eval.max=eval.max,
+                 iter.max=iter.max,
+                 ...);
     class(.ret) <- "foceiControl"
+    return(.ret);
+}
+
+.bobyqa <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .ctl <- control;
+    if (is.null(.ctl$npt)) .ctl$npt <- length(par) * 2 + 1
+    .ctl$iprint <- 0L;
+    .ctl <- .ctl[names(.ctl) %in% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")];
+    .ret <- minqa::bobyqa(par, fn, control=.ctl,
+                          lower=lower,
+                          upper=upper);
+    .ret$x <- .ret$par;
+    .ret$message <- .ret$msg;
+    .ret$convergence <- .ret$ierr
+    return(.ret);
+}
+
+.nlminb <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .ctl <- control;
+    .ctl <- .ctl[names(.ctl) %in% c("eval.max", "iter.max", "trace", "abs.tol", "rel.tol", "x.tol", "xf.tol", "step.min", "step.max", "sing.tol",
+                                    "scale.inti", "diff.g")];
+    .ctl$trace <- 0;
+    .ret <- stats::nlminb(start=par, objective=fn, gradient = gr, hessian = NULL, control = .ctl,
+                          lower = lower, upper = upper);
+    .ret$x <- .ret$par;
+    ##.ret$message   already there.
+    ##.ret$convergence already there.
+    return(.ret);
+}
+
+.lbfgsb3 <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .ctl <- list(iprint= -1L, trace=0L)
+    .ret <- lbfgsb3::lbfgsb3(prm=par, fn=fn, gr=gr, lower=lower, control=.ctl);
+    .ret$x <- .ret$prm
+    .ret$message <- "lbfgsb3"
+    .ret$convergence <- 0L;
     return(.ret);
 }
 .parseOM <- function(OMGA){
@@ -1599,3 +1683,4 @@ focei.eta <- function(object, uif, ...){
 focei.theta <- function(object, uif, ...){
     UseMethod("focei.theta");
 }
+
