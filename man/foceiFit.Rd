@@ -283,7 +283,7 @@ fitIVtbs <- nlmixr(one.compartment.IV.model, datr, "focei")
 
 ## If you want to use a variance normalizing distribution with
 ## negative/positive data you can use the Yeo-Johnson transformation
-## as well.  This is implemented by the tbsYj(lambda) function.
+## as well.  This is implemented by the yeoJohnson(lambda) function.
 one.compartment.IV.model <- function(){
 ini({ # Where initial conditions/variables are specified
     ## '<-' or '=' defines population parameters
@@ -310,10 +310,61 @@ model({ ## Where the model is specified
     ## Concentration is calculated
     cp = centr / Vc;
     ## And is assumed to follow proportional error estimated by prop.err
-    cp ~ pow(prop.err, delta) + add(add.err) + tbsYj(lambda)
+    cp ~ pow(prop.err, delta) + add(add.err) + yeoJohnson(lambda)
 })}
 
 fitIVyj <- nlmixr(one.compartment.IV.model, datr, "focei")
+
+## In addition to using L-BFGS-B for FOCEi (outer problem) you may
+## use other optimizers.  An example is below
+
+one.cmt <- function() {
+  ini({
+      tka <- .5   # log Ka
+      tcl <- -3.2 # log Cl
+      tv <- -1    # log V
+      eta.ka ~ 1
+      eta.cl ~ 2
+      eta.v ~ 1
+      add.err <- 0.1
+  })
+  model({
+      ka <- exp(tka + eta.ka)
+      cl <- exp(tcl + eta.cl)
+      v <- exp(tv + eta.v)
+      linCmt() ~ add(add.err)
+  })
+}
+
+fit <- nlmixr(one.cmt, theo_sd, "focei", foceiControl(outerOpt="bobyqa"))
+
+## You may also make an arbitrary optimizer work by adding a wrapper function:
+
+newuoa0 <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+  ## The function requires par, fn, gr, lower, upper and control
+  ##
+  ## The par, fn, gr, lower and upper and sent to the function from nlmixr's focei.
+  ## The  control is the foceiControl list
+  ##
+  ##  The following code modifies the list control list for no warnings.
+  .ctl <- control;
+  if (is.null(.ctl$npt)) .ctl$npt <- length(par) * 2 + 1
+  .ctl$iprint <- 0L; ## nlmixr will print information this is to suppress the printing from the opimtizer
+  .ctl <- .ctl[names(.ctl) \%in\% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")];
+  ## This does not require gradient and is an unbounded optimization:
+  .ret <- minqa::newuoa(par, fn, control=.ctl);
+  ## The return statement must be a list with:
+  ##    - x for the final parameter message
+  ##    - message for a minimization message
+  ##    - convergence for a convergence code
+  .ret$x <- .ret$par;
+  .ret$message <- .ret$msg;
+  .ret$convergence <- .ret$ierr
+  ## you can access the final list from the optimization by fit$optReturn
+  return(.ret);
+}
+
+fit <- nlmixr(one.cmt, theo_sd, "focei", foceiControl(outerOpt=newuoa0))
 
 }
 }
