@@ -35,9 +35,11 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         sim <- fit;
     } else {
         .xtra$object <- fit;
-        .xtra$returnType <- "data.frame";
+        ## .xtra$returnType <- "data.frame";
+        .xtra$returnType <- "rxSolve";
         pt <- proc.time();
         sim <- do.call("nlmixrSim", .xtra);
+        sim0 <- sim;
         sim <- sim[, c("sim.id", "id", "time", "sim")]
         names(sim)[4] <- "dv";
         if (is.null(data)){
@@ -60,6 +62,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         }  else {
             cols <- c("dv");
         }
+
         dat <- dat[dat$evid == 0, ];
         ## Assume this is in the observed dataset. Add it to the current dataset
         if(!all(names(sim) %in% cols)){
@@ -70,7 +73,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                 names(sim) <- c(n, w);
             }
         }
-        sim <- list(sim=sim, obs=dat)
+        sim <- list(rxsim=sim0, sim=sim, obs=dat)
         attr(sim, "nsim") <- .xtra$nsim;
         class(sim) <- "nlmixrVpc";
     }
@@ -87,15 +90,17 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     call$stratify = stratify
     p = do.call(getFromNamespace(vpcn,"vpc"), c(sim, call), envir = parent.frame(1))
     print(p);
+    sim$gg <- p;
 
     return(invisible(sim));
 }
 
 ##'@export
 print.nlmixrVpc <- function(x, ...){
-    cat(sprintf("nlmixr vpc object of %d simulations.\n", attr(sim, "nsim")))
+    cat(sprintf("nlmixr vpc object of %d simulations.\n", attr(x, "nsim")))
     cat("  $sim = simulated data\n")
     cat("  $obs = observed data\n")
+    cat("  $gg = vpc ggplot\n")
     cat("use vpc(...) to change plot options\n")
 }
 
