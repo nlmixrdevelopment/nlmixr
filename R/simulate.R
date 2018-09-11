@@ -108,17 +108,26 @@ nlmixrSim <- function(object, ...){
     .newobj <- RxODE::RxODE(.si$rx);
     on.exit({RxODE::rxUnload(.newobj)});
     message("done");
-    if (any(names(.xtra) == "dfObs")){
-        .si$dfObs <- .xtra$dfObs;
-    }
-    if (any(names(.xtra) == "dfSub")){
-        .si$dfSub <- .xtra$dfSub
-    }
     if ((any(names(.xtra) == "nStud") && .xtra$nStud <= 1) || !any(names(.xtra) == "nStud")){
         .si$thetaMat <- NULL;
-    } else if (any(names(.xtra) == "thetaMat")){
-        .si$thetaMat <- .xtra$thetaMat;
+        .si$dfSub <- NULL;
+        .si$dfObs <- NULL;
+    } else {
+        if (RxODE::rxIs(.xtra$thetaMat, "matrix")){
+            .si$thetaMat <- .xtra$thetaMat;
+        } else if (!is.null(.xtra$thetaMat)){
+            if (is.na(.xtra$thetaMat)){
+                .si$thetaMat <- NULL
+            }
+        }
+        if (any(names(.xtra) == "dfSub")){
+            .si$dfSub <- .xtra$dfSub
+        }
+        if (any(names(.xtra) == "dfObs")){
+            .si$dfObs <- .xtra$dfObs;
+        }
     }
+
 
     if (any(names(.xtra) == "omega")){
         .si$omega <- .xtra$omega;
@@ -136,7 +145,11 @@ nlmixrSim <- function(object, ...){
     .xtra$object <- .newobj;
     .xtra$params <- .si$params;
     .xtra$events <- .si$events;
-    .xtra$thetaMat <- .si$thetaMat;
+    if (RxODE::rxIs(.xtra$thetaMat, "matrix")){
+        .xtra$thetaMat <- NULL;
+    } else {
+        .xtra$thetaMat <- .si$thetaMat;
+    }
     .xtra$dfObs <- .si$dfObs
     .xtra$omega <- .si$omega;
     .xtra$dfSub <- .si$dfSub

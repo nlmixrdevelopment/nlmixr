@@ -17,7 +17,8 @@ foceiFit(data, ...)
   thetaNames = NULL, etaNames = NULL, etaMat = NULL, ...,
   env = NULL)
 
-focei.fit(data, ...)
+focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
+  model = list(), control = list())
 }
 \arguments{
 \item{data}{Data to fit; Needs to be RxODE compatible and have \code{DV},

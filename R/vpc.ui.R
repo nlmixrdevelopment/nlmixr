@@ -47,6 +47,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         }
         .xtra$dfObs <- 0
         .xtra$dfSub <- 0
+        .xtra$thetaMat <- NA
         sim <- do.call("nlmixrSim", .xtra);
         sim0 <- sim;
         sim <- sim[, c("id", "time", "sim")]
@@ -103,10 +104,16 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
 ##'@export
 print.nlmixrVpc <- function(x, ...){
     cat(sprintf("nlmixr vpc object of %d simulations.\n", attr(x, "nsim")))
-    cat("  $sim = simulated data\n")
+    cat("  $rxsim = original simulated data\n")
+    cat("  $sim = merge simulated data\n")
     cat("  $obs = observed data\n")
     cat("  $gg = vpc ggplot\n")
     cat("use vpc(...) to change plot options\n")
+}
+
+##'@export
+plot.nlmixrVpc <- function(x, ...){
+    return(x$gg)
 }
 
 ##' @rdname vpc_ui
