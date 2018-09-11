@@ -28,9 +28,6 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         }
     }
     .xtra <- list(...);
-    if (is.null(.xtra$nsim)){
-        .xtra$nsim <- n;
-    }
     if (inherits(fit, "nlmixrVpc")){
         sim <- fit;
     } else {
@@ -38,15 +35,23 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         ## .xtra$returnType <- "data.frame";
         .xtra$returnType <- "rxSolve";
         pt <- proc.time();
-        sim <- do.call("nlmixrSim", .xtra);
-        sim0 <- sim;
-        sim <- sim[, c("sim.id", "id", "time", "sim")]
-        names(sim)[4] <- "dv";
         if (is.null(data)){
             dat <- nlmixrData(getData(fit));
         } else {
             dat <- data
         }
+        .xtra$nStud <- n;
+        if (!is.null(.xtra$nsim)){
+            .xtra$nsim <- NULL;
+            .xtra$nStud <- .xtra$nsim
+        }
+        .xtra$dfObs <- 0
+        .xtra$dfSub <- 0
+        sim <- do.call("nlmixrSim", .xtra);
+        sim0 <- sim;
+        sim <- sim[, c("id", "time", "sim")]
+        names(sim)[3] <- "dv";
+
         diff <- proc.time() - pt;
         message(sprintf("done (%.2f sec)", diff["elapsed"]));
         onames <- names(dat)
