@@ -120,20 +120,29 @@ test_install <- function(){
   if(Sys.info()['sysname']%in%c('Darwin','Linux')){
     {sink("/dev/null"); fit1 <- suppressWarnings(suppressMessages(nlmixr(testmod,theo_sd,est="nlme"))); sink(); }
     {sink("/dev/null"); fit2 <- suppressWarnings(suppressMessages(nlmixr(testmod,theo_sd,est="saem"))); sink(); }
+    {sink("/dev/null"); fit2 <- suppressWarnings(suppressMessages(nlmixr(testmod,theo_sd,est="focei"))); sink(); }
   }else{
     {sink("NUL"); fit1 <- suppressWarnings(suppressMessages(nlmixr(testmod,theo_sd,est="nlme"))); sink(); }
     {sink("NUL"); fit2 <- suppressWarnings(suppressMessages(nlmixr(testmod,theo_sd,est="saem"))); sink(); }
+    {sink("NUL"); fit3 <- suppressWarnings(suppressMessages(nlmixr(testmod,theo_sd,est="focei"))); sink(); }
+
   }
-  if(all(class(fit1)%in%c("nlmixr.ui.nlme","focei.fit","data.frame"))){
+  if(is(fit1, "nlmixrFitData") && !is.null(fit1$nlme)){
     cat("nlmixr run under nlme: Yes\n")
   }else{
     cat("nlmixr run under nlme: No, contact nlmixr team\n")
     return("Installation not complete!")
   }
-  if(all(class(fit2)%in%c("nlmixr.ui.saem","focei.fit","data.frame"))){
+  if(is(fit2, "nlmixrFitData") && !is.null(fit2$saem)){
     cat("nlmixr run under saem: Yes\n")
   }else{
     cat("nlmixr run under saem: No, contact nlmixr team\n")
+    return("Installation not complete!")
+  }
+  if(is(fit3, "nlmixrFitData") && fit3$method == "FOCE"){
+    cat("nlmixr run under focei: Yes\n")
+  }else{
+    cat("nlmixr run under focei: No, contact nlmixr team\n")
     return("Installation not complete!")
   }
   cat("---- Installation test finished! ----\n")
