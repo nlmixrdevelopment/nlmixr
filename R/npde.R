@@ -33,6 +33,9 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, .
     .si <- c(.si, list(...))
     .si$modelName <- "NPDE"
     .pt <- proc.time();
+    .si$dfObs <- 0
+    .si$dfSub <- 0
+    .si$thetaMat <- NA
     .sim <- do.call("nlmixrSim", .si);
     .dv <- object$DV;
     .dvl <- length(.dv)
