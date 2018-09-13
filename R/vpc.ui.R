@@ -42,8 +42,8 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         }
         .xtra$nStud <- n;
         if (!is.null(.xtra$nsim)){
-            .xtra$nsim <- NULL;
             .xtra$nStud <- .xtra$nsim
+            .xtra$nsim <- NULL;
         }
         .xtra$dfObs <- 0
         .xtra$dfSub <- 0
