@@ -1262,7 +1262,8 @@ focei.theta.saemFit <- function(object, uif, ...){
     }
     n <- uif$focei.names
     thetas <- structure(rep(NA, length(n)), .Names=n);
-    sf <- structure(as.vector(fixed.effects(object)), .Names=uif$saem.theta.name);
+    sf <- as.vector(fixed.effects(object));
+    sf <- structure(sf, .Names=uif$saem.theta.name[seq(1, length(sf))]);
     for (n in names(sf)){
         thetas[n] <- sf[n];
     }
