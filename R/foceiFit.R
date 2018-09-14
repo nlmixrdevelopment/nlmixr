@@ -69,7 +69,14 @@ is.latex <- function() {
 ##'
 ##' @param derivMethod indicates the method for calculating
 ##'     derivatives of the outer problem.  Currently supports
-##'     "central" and "forward" difference methods.
+##'     "switch", "central" and "forward" difference methods.  Switch
+##'     starts with forward differences.  This will switch to central
+##'     differences when abs(delta(OFV)) <= derivSwitchTol and switch
+##'     back to forward differences when abs(delta(OFV)) >
+##'     derivSwitchTol.
+##'
+##' @param derivSwitchTol The tolerance to switch forward to central
+##'     differences.
 ##'
 ##' @param covDerivMethod indicates the method for calculating the
 ##'     derivatives while calculating the covariance components
@@ -218,14 +225,15 @@ foceiControl <- function(sigdig=4,
                          scaleTo=1.0,
                          scaleObjective=1.0,
                          derivEps=c(1.0e-5, 1.0e-5),
-                         derivMethod=c("forward", "central"),
+                         derivMethod=c("switch", "forward", "central"),
+                         derivSwitchTol=NULL,
                          covDerivMethod=c("central", "forward"),
                          covMethod=c("r,s", "r", "s", ""),
                          hessEps=1e-3,
                          covDerivEps=c(0, 1e-3),
                          lbfgsLmm=50L,
                          lbfgsPgtol=0,
-                         lbfgsFactr=NULL, #1e-4 / .Machine$double.eps, ## .Machine$double.eps*x=1e-5
+                         lbfgsFactr=NULL,
                          eigen=TRUE,
                          addPosthoc=TRUE,
                          diagXform=c("sqrt", "log", "identity"),
@@ -246,7 +254,16 @@ foceiControl <- function(sigdig=4,
                          cholSECov=FALSE,
                          fo=FALSE,
                          covTryHarder=FALSE,
-                         outerOpt=c("L-BFGS-B", "bobyqa", "nlminb", "lbfgsb3"),
+                         ## Ranking based on run 025
+                         ## L-BFGS-B: 20970.53 (2094.004    429.535)
+                         ## bobyqa: 21082.34 (338.677    420.754)
+                         ## lbfgsb3* (modified for tolerances):
+                         ## nlminb: 20973.468 (755.821    458.343)
+                         ## mma: 20974.20 (Time: Opt: 3000.501 Cov: 467.287)
+                         ## slsqp: 21023.89 (Time: Opt: 460.099; Cov: 488.921)
+                         ## lbfgsbLG: 20974.74 (Time: Opt: 946.463; Cov:397.537)
+                         outerOpt=c("L-BFGS-B", "bobyqa", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
+                         innerOpt=c("n1qn1", "BFGS"),
                          ##
                          rhobeg=.2,
                          rhoend=NULL,
@@ -256,30 +273,42 @@ foceiControl <- function(sigdig=4,
                          x.tol=NULL,
                          eval.max=4000,
                          iter.max=2000,
+                         abstol=NULL,
+                         reltol=NULL,
+                         resetHessianAndEta=FALSE,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
     if (is.null(epsilon)){
-        epsilon <- 10 ^ (-sigdig)
+        epsilon <- 10 ^ (-sigdig - 1)
+    }
+    if (is.null(abstol)){
+        abstol <- 10 ^ (-sigdig - 1)
+    }
+    if (is.null(reltol)){
+        reltol <- 10 ^ (-sigdig - 1)
     }
     if (is.null(rhoend)){
-        rhoend <- 10 ^ (-sigdig);
+        rhoend <- 10 ^ (-sigdig - 1);
     }
     if (is.null(lbfgsFactr)){
         lbfgsFactr <- 10 ^ (-sigdig - 1) / .Machine$double.eps;
     }
     if (is.null(atol)){
-        atol <- 0.5 * 10 ^ (-sigdig - 1);
+        atol <- 0.5 * 10 ^ (-sigdig - 2);
     }
     if (is.null(rtol)){
-        rtol <- 0.5 * 10 ^ (-sigdig - 1);
+        rtol <- 0.5 * 10 ^ (-sigdig - 2);
     }
     if (is.null(rel.tol)){
-        rel.tol <- 10 ^ (-sigdig);
+        rel.tol <- 10 ^ (-sigdig - 1);
     }
     if (is.null(x.tol)){
-        x.tol <- 10 ^ (-sigdig);
+        x.tol <- 10 ^ (-sigdig - 1);
+    }
+    if (is.null(derivSwitchTol)){
+        derivSwitchTol <- 1.15 * 10 ^ (-sigdig);
     }
     .xtra <- list(...);
     if (is.null(transitAbs) && !is.null(.xtra$transit_abs)){  # nolint
@@ -307,7 +336,7 @@ foceiControl <- function(sigdig=4,
     .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
     method <- as.integer(.methodIdx[method]);
     derivMethod <- match.arg(derivMethod);
-    .methodIdx <- c("forward"=0L, "central"=1L);
+    .methodIdx <- c("forward"=0L, "central"=1L, "switch"=3L);
     derivMethod <- as.integer(.methodIdx[derivMethod])
     covDerivMethod <- .methodIdx[match.arg(covDerivMethod)];
     if (length(covsInterpolation) > 1) covsInterpolation <- covsInterpolation[1];
@@ -342,6 +371,15 @@ foceiControl <- function(sigdig=4,
         } else if (outerOpt == "lbfgsb3"){
             outerOptFun <- nlmixr:::.lbfgsb3;
             outerOpt <- -1L;
+        } else if (outerOpt == "mma"){
+            outerOptFun <- nlmixr:::.nloptr;
+            outerOpt <- -1L;
+        } else if (outerOpt == "slsqp"){
+            outerOptFun <- nlmixr:::.slsqp;
+            outerOpt <- -1L;
+        } else if (outerOpt == "lbfgsbLG"){
+            outerOptFun <- nlmixr:::.lbfgsbLG;
+            outerOpt <- -1L;
         } else {
             .outerOptIdx <- c("L-BFGS-B"=0L);
             outerOpt <- .outerOptIdx[outerOpt]
@@ -350,6 +388,10 @@ foceiControl <- function(sigdig=4,
     } else if (is(outerOpt, "function")) {
         outerOptFun <- outerOpt;
         outerOpt <- -1L;
+    }
+    if (RxODE::rxIs(innerOpt, "character")){
+        .innerOptFun <- c("n1qn1"=1L, "BFGS"=2L);
+        innerOpt <- setNames(.innerOptFun[match.arg(innerOpt)], NULL);
     }
 
     if (resetEtaP > 0 & resetEtaP < 1){
@@ -421,6 +463,12 @@ foceiControl <- function(sigdig=4,
                  x.tol=as.double(x.tol),
                  eval.max=eval.max,
                  iter.max=iter.max,
+                 innerOpt=innerOpt,
+                 ## BFGS
+                 abstol=abstol,
+                 reltol=reltol,
+                 derivSwitchTol=derivSwitchTol,
+                 resetHessianAndEta=as.integer(resetHessianAndEta),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -455,12 +503,95 @@ foceiControl <- function(sigdig=4,
 
 .lbfgsb3 <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
     .ctl <- list(iprint= -1L, trace=0L)
+    .ctl$factr <- control$lbfgsFactr
+    .ctl$pgtol <- control$pgtol
     .ret <- lbfgsb3::lbfgsb3(prm=par, fn=fn, gr=gr, lower=lower, control=.ctl);
     .ret$x <- .ret$prm
     .ret$message <- "lbfgsb3"
     .ret$convergence <- 0L;
     return(.ret);
 }
+
+## .Rvmmin <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+##     ## Very very slow.
+##     ## Also gives unreasonable estimates
+##     .masked <- rep_len(1, length(par))
+##     .ctl <- list(maxit=control$maxOuterIterations,
+##                  ## maxfevals
+##                  trace=0, dowarn=FALSE, checkgrad=FALSE, checkbounds=FALSE,
+##                  keepinputpar=FALSE, eps=control$abstol);
+##     .ret <- Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, bdmsk=.masked, control = list(), ...);
+##     .ret$x <- .ret$par
+##     .ret$message <- .ret$message
+##     ret(.ret)
+## }
+
+.nloptr <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ..., nloptrAlgoritm="NLOPT_LD_MMA"){
+    .ctl <- list(algorithm=nloptrAlgoritm,
+                 xtol_rel=control$reltol,
+                 xtol_abs=rep_len(control$abstol, length(par)),
+                 ftol_abs=control$abstol,
+                 ftol_rel=control$reltol,
+                 print_level=0,
+                 check_derivatives=FALSE,
+                 check_derivatives_print=FALSE,
+                 maxeval=control$maxOuterIterations);
+    .ret <- nloptr::nloptr(x0=par, eval_f=fn, eval_grad_f=gr,
+                           lb=lower, ub=upper,
+                           opts=.ctl)
+    .ret$x <- .ret$solution;
+    .ret$convergence <- .ret$status;
+    return(.ret);
+}
+
+.bobyqaNLopt <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ...){
+    .ctl <- list(algorithm="NLOPT_LN_BOBYQA",
+                 xtol_rel=control$reltol,
+                 xtol_abs=rep_len(control$abstol, length(par)),
+                 ftol_abs=control$abstol,
+                 ftol_rel=control$reltol,
+                 print_level=0,
+                 check_derivatives=FALSE,
+                 check_derivatives_print=FALSE,
+                 maxeval=control$maxOuterIterations);
+    .ret <- nloptr::nloptr(x0=par, eval_f=fn,
+                           lb=lower, ub=upper,
+                           opts=.ctl)
+    .ret$x <- .ret$solution;
+    .ret$convergence <- .ret$status;
+    return(.ret);
+}
+
+.slsqp <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ...){
+    return(nlmixr:::.nloptr(par, fn, gr, lower, upper, control, ..., nloptrAlgoritm="NLOPT_LD_SLSQP"));
+}
+
+.lbfgsbLG <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ...){
+    .ctlLocal <- list(algorithm="NLOPT_LD_LBFGS",
+                 xtol_rel=control$reltol,
+                 xtol_abs=rep_len(control$abstol, length(par)),
+                 ftol_abs=control$abstol,
+                 ftol_rel=control$reltol,
+                 print_level=0,
+                 check_derivatives=FALSE,
+                 check_derivatives_print=FALSE,
+                 maxeval=control$maxOuterIterations);
+    .ctl <- opts <- list("algorithm" = "NLOPT_LD_AUGLAG",
+                         xtol_rel=control$reltol,
+                         xtol_abs=rep_len(control$abstol, length(par)),
+                         ftol_abs=control$abstol,
+                         ftol_rel=control$reltol,
+                         maxeval=control$maxOuterIterations,
+                         "local_opts" = .ctlLocal,
+                         "print_level" = 0 )
+    .ret <- nloptr::nloptr(x0=par, eval_f=fn, eval_grad_f=gr,
+                           lb=lower, ub=upper,
+                           opts=.ctl)
+    .ret$x <- .ret$solution;
+    .ret$convergence <- .ret$status;
+    return(.ret);
+}
+
 .parseOM <- function(OMGA){
     .re = "\\bETA\\[(\\d+)\\]\\b"
     .offset = as.integer(0)
