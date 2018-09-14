@@ -26,7 +26,13 @@ vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
 
   saem.cfg = attr(fit, "saem.cfg")
   dopred <- attr(fit, "dopred")
-  red.mod = sum((fit$sig2 != 0) * 1:2)
+  resMat = fit$resMat
+  ares = resMat[, 1]
+  bres = resMat[, 2]
+  ntotal = saem.cfg$ntotal
+  ix_endpnt = saem.cfg$ix_endpnt[1:ntotal] + 1
+  ares = ares[ix_endpnt]
+  bres = bres[ix_endpnt]
 
   if (!is.null(by)) {
     if (by %in% names(dat)) {
@@ -49,9 +55,8 @@ vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
     mpost_rand1 = t(rmvnorm(nsub, fit$Plambda[saem.cfg$i1+1], fit$Gamma2_phi1))
     mpost_rand[, saem.cfg$i1+1] = mpost_rand1
     p = dopred(mpost_rand, saem.cfg$evt, saem.cfg$opt)
-    if      (red.mod==1) res = rnorm(ntim,0,sqrt(fit$sig2[1]))
-    else if (red.mod==2) res = p*fit$sig2[2]*rnorm(ntim,0,1)
-    else if (red.mod==3) res = sqrt(fit$sig2[1]+p*fit$sig2[2])*rnorm(ntim,0,1)
+    dim(p) = NULL
+    res = (ares + p * bres) * rnorm(ntim, 0, 1)
     p+res
   })
   xs = do.call("cbind",s)
@@ -65,7 +70,7 @@ vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
   }
   call <- as.list(match.call(expand.dots=TRUE))[-1];
   if (!is.null(by)) {
-      call$strat <- c("grp")
+      call$stratify <- c("grp")
       call$facet <- "wrap";
   }
   call <- call[names(call) %in% methods::formalArgs(getFromNamespace(vpcn,"vpc"))]
