@@ -1660,10 +1660,12 @@ print.nlmixrFitCore <- function(x, ...){
     ## Correlations
     .tmp <- x$omega
     diag(.tmp) <- 0;
+    message(paste0("\n  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
+                   crayon::bold(x$covMethod)))
     if (all(.tmp == 0)){
-        message("\n  No correlations in between subject variability (BSV) matrix")
+        message("  No correlations in between subject variability (BSV) matrix")
     } else {
-        message("\n  Correlations in between subject variability (BSV) matrix:")
+        message("  Correlations in between subject variability (BSV) matrix:")
         .rs <- fit$omegaR
         .lt <- lower.tri(.rs);
         .dn1 <- dimnames(fit$omegaR)[[2]]
