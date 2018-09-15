@@ -35,15 +35,16 @@
     .mod <- gsub(rex::rex("d/dt(", capture(except_any_of("\n;)")), ")", or("=", "~")), "d/dt(\\1)~", .mod);
     .lhs <- object$model$pred.only$lhs
     .lhs <- .lhs[.lhs != "rx_pred_"];
+    .lhs <- .lhs[.lhs != "rx_r_"];
     .omega <- object$omega
     .etaN <- dimnames(.omega)[[1]]
     .params <- nlme::fixed.effects(object);
     .thetaN <- names(.params);
     .newMod <- paste0(gsub(rex::rex(capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),any_of("\n;")), "",
-                           gsub(rex::rex(capture("rx_pred_"), or("=", "~")), "\\1~",
+                           gsub(rex::rex(capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
                                 .repThetaEta(.mod, theta=.thetaN, eta=.etaN))),
                       "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);");
-    .sim <- "\nsim=rxTBSi(rx_pred_"
+    .sim <- "\nsim=rxTBSi(rx_pred_+rx_r_"
     .err <- object$uif$err;
     .w <- which(!is.na(object$uif$err))
     .mat <- diag(length(.w))
@@ -53,15 +54,15 @@
         .cur <- .thetaN[.ntheta];
         .dimn[.i] <- .cur;
         if (any(.err[.w[.i]] == c("add", "norm", "dnorm", "lnorm", "dlnorm", "logn"))){
-            .sim <- paste0(.sim, "+", .cur);
+            ## .sim <- paste0(.sim, "+", .cur);
             .mat[.i, .i] <- .params[.ntheta] ^ 2;
             .params[.ntheta] <- NA_real_;
         } else if (.err[.w[.i]] == "prop"){
-            .sim <- paste0(.sim, "+ipred*", .cur);
+            ## .sim <- paste0(.sim, "+ipred*", .cur);
             .mat[.i, .i] <- .params[.ntheta] ^ 2;
             .params[.ntheta] <- NA_real_;
         } else if (.err[.w[.i]] == "pow"){
-            .sim <- paste0(.sim, "+", .cur, "*ipred^(", object$uif$ini$name[which(object$uif$ini$err == "pow2")], ")");
+            ## .sim <- paste0(.sim, "+", .cur, "*ipred^(", object$uif$ini$name[which(object$uif$ini$err == "pow2")], ")");
             .mat[.i, .i] <- .params[.ntheta] ^ 2;
             .params[.ntheta] <- NA_real_;
         }
@@ -71,7 +72,43 @@
     .w <- which(!(.dimn %in% names(.params)))
     .mat <- .mat[.w, .w, drop = FALSE]
     .sigma <- .mat;
+    .sigmaNames <- dimnames(.mat)[[1]]
     .newMod <- paste0(.newMod, .sim, ", rx_lambda_, rx_yj_);\n");
+    .newMod <- strsplit(.newMod, "\n")[[1]];
+    .w <- which(regexpr("rx_r_~", .newMod) != -1);
+    .subs <- function(x, .what, .with){
+        if (all(as.character(x) == .what)){
+            return(eval(parse(text=sprintf("quote(%s)", .with))));
+        } else if (is.call(x)) {
+            as.call(lapply(x, .subs, .what=.what, .with=.with))
+        } else if (is.pairlist(x)) {
+            as.pairlist(lapply(x, .subs, .what=.what, .with=.with))
+        } else {
+            return(x);
+        }
+    }
+    for (.i in .w){
+        .cur <- sub(";", "", sub("rx_r_~", "", .newMod[.i]))
+        .cur <- eval(parse(text=sprintf("RxODE::rxSplitPlusQ(quote(%s))", .cur)))
+        .cur <- paste(sapply(.cur, function(x){
+            .ret <- sprintf("sqrt(%s)", x)
+            for (.what in .sigmaNames){
+                .with <- "1"
+                .old <- paste(deparse(eval(parse(text=sprintf("quote(%s)", .ret)))), collapse="")
+                .new <- paste(deparse(eval(parse(text=sprintf(".subs(quote(%s),.what=%s,.with=%s)", .ret,
+                                                              deparse(.what), deparse(.with))))), collapse="")
+                if (.old != .new){
+                    .ret <- sprintf("%s*%s", .what, .new);
+                }
+            }
+            return(.ret)
+        }), collapse="+");
+        .cur <- gsub("  +", " ", .cur);
+        .cur <- gsub(rex::rex("*sqrt(Rx_pow_di(1, 2))"), "", .cur)
+        .cur <- gsub(rex::rex("Rx_pow_di(1, 2)", any_spaces, "*", any_spaces), "", .cur)
+        .newMod[.i] <- paste0("rx_r_~", .cur, ";");
+    }
+    .newMod <- paste(paste(.newMod, collapse="\n"), "\n");
     .dfObs <- nobs(object);
     .nlmixrData <- nlmixr::nlmixrData(nlme::getData(object))
     .dfSub <- length(unique(.nlmixrData$ID));
