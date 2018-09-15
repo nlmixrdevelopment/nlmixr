@@ -1333,7 +1333,7 @@ focei.eta.saemFit <- function(object, uif, ...){
 }
 
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL){
-    RxODE::rxSolveFree();
+    on.exit({RxODE::rxSolveFree()});
     .saemTime <- proc.time() - pt;
     if (class(uif) == "function"){
         uif <- nlmixr(uif);
