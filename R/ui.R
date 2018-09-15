@@ -1750,10 +1750,12 @@ nlmixrUI.saem.model <- function(obj){
 ##' @return SAEM theta names
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.theta.name <- function(uif){
-    trans <- uif$saem.theta.trans
-    trans.name <- paste(uif$ini$name[which(!is.na(trans))]);
-    trans <- trans[!is.na(trans)]
-    theta.name <- trans.name[order(trans)]
+    .trans <- uif$saem.theta.trans
+    .df <- as.data.frame(uif$ini);
+    .df <- .df[!is.na(.df$ntheta), ]
+    .transName <- paste(.df$name[which(!is.na(.trans))]);
+    .trans <- .trans[!is.na(.trans)]
+    theta.name <- .transName[order(.trans)]
     all.covs <- uif$saem.all.covs
     lc <- length(all.covs);
     if (lc > 0){
