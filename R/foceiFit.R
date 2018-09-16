@@ -1223,7 +1223,11 @@ foceiFit.data.frame0 <- function(data,
             upper <- c(upper, .upperErr);
         }
     }
-
+    .w <- which(inits$THTA == 0);
+    if (length(.w) > 0){
+        inits$THTA[.w] <- 0.0001
+        warning("Some of the initial conditions were 0, changing to 0.0001");
+    }
     if (is.null(data$ID)) stop('"ID" not found in data')
     if (is.null(data$DV)) stop('"DV" not found in data')
     if (is.null(data$EVID)) data$EVID = 0
