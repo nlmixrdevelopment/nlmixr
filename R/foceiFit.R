@@ -100,7 +100,7 @@ is.latex <- function() {
 ##' }
 ##'
 ##' @param lbfgsLmm An integer giving the number of BFGS updates
-##'     retained in the "L-BFGS-B" method, It defaults to 40.
+##'     retained in the "L-BFGS-B" method, It defaults to 7.
 ##'
 ##' @param lbfgsPgtol is a double precision variable.
 ##'
@@ -224,14 +224,14 @@ foceiControl <- function(sigdig=4,
                          printNcol=floor((getOption("width") - 23)/12) ,
                          scaleTo=1.0,
                          scaleObjective=1.0,
-                         derivEps=c(1.0e-5, 1.0e-5),
+                         derivEps=rep(20*sqrt(.Machine$double.eps), 2),
                          derivMethod=c("switch", "forward", "central"),
                          derivSwitchTol=NULL,
                          covDerivMethod=c("central", "forward"),
                          covMethod=c("r,s", "r", "s", ""),
                          hessEps=1e-3,
                          covDerivEps=c(0, 1e-3),
-                         lbfgsLmm=50L,
+                         lbfgsLmm=7L,
                          lbfgsPgtol=0,
                          lbfgsFactr=NULL,
                          eigen=TRUE,
@@ -308,7 +308,7 @@ foceiControl <- function(sigdig=4,
         x.tol <- 10 ^ (-sigdig - 1);
     }
     if (is.null(derivSwitchTol)){
-        derivSwitchTol <- 1.15 * 10 ^ (-sigdig);
+        derivSwitchTol <- 70 ^ (-sigdig);
     }
     .xtra <- list(...);
     if (is.null(transitAbs) && !is.null(.xtra$transit_abs)){  # nolint
@@ -472,6 +472,16 @@ foceiControl <- function(sigdig=4,
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
+}
+
+.ucminf <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .ctl <- control;
+    .ctl$stepmax <- control$rhobeg;
+    .ctl$maxeval <- control$maxOuterIterations
+    .ctl <- .ctl[names(.ctl) %in% c("stepmax", "maxeval")]
+    .ret <- ucminf::ucminf(par, fn, gr = NULL, ..., control = list(), hessian=2)
+    .ret$x <- .ret$par;
+    return(.ret)
 }
 
 .bobyqa <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
