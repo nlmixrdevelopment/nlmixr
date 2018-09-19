@@ -181,6 +181,8 @@ is.latex <- function() {
 ##' @param cholSEtol double tolerance for Generalized Cholesky
 ##'     Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)
 ##'
+##' @param stateTrim Trim state amounts/concentrations to this value.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##'
 ##' @details
@@ -276,6 +278,7 @@ foceiControl <- function(sigdig=4,
                          abstol=NULL,
                          reltol=NULL,
                          resetHessianAndEta=FALSE,
+                         stateTrim=Inf,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -469,6 +472,7 @@ foceiControl <- function(sigdig=4,
                  reltol=reltol,
                  derivSwitchTol=derivSwitchTol,
                  resetHessianAndEta=as.integer(resetHessianAndEta),
+                 stateTrim=as.double(stateTrim),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
