@@ -1573,7 +1573,7 @@ residuals.nlmixrFitData <- function(object, ..., type=c("ires", "res", "iwres", 
 }
 
 
-#' Plot a focei.fit plot
+#' Plot a nlmixr data object
 #'
 #' Plot some standard goodness of fit plots for the focei fitted object
 #'

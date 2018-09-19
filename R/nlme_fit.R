@@ -931,9 +931,6 @@ nlme.nlmixr.ui.nlme <- function(model, data, fixed, random = fixed,
     return(do.call(getFromNamespace("nlmixr","nlmixr"), call, envir = parent.frame(1)))
 }
 
-##' @export
-nlme.nlmixr.ui.focei.fit <- nlme.nlmixr.ui.nlme
-
 nlme.cleanup <- function(x){
     if (is(x, "nlmixr.ui.nlme")) x <- as.nlme(x);
     if (exists("m1", x$env)){

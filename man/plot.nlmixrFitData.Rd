@@ -2,7 +2,7 @@
 % Please edit documentation in R/foceiFit.R
 \name{plot.nlmixrFitData}
 \alias{plot.nlmixrFitData}
-\title{Plot a focei.fit plot}
+\title{Plot a nlmixr data object}
 \usage{
 \method{plot}{nlmixrFitData}(x, ...)
 }
