@@ -1877,6 +1877,44 @@ nlmixrUI.model.desc <- function(obj){
     }
 }
 
+
+nlmixrUI.poped.notfixed_bpop <- function(obj){
+    .df <- as.data.frame(obj$ini);
+    .tmp <- .df[!is.na(.df$ntheta) & is.na(.df$err), ]
+    return( setNames(1 - .tmp$fix* 1, paste(.tmp$name)))
+}
+
+nlmixrUI.poped.d <- function(obj){
+    .df <- as.data.frame(obj$ini);
+    .tmp <- .df[which(is.na(.df$ntheta) & .df$neta1 == .df$neta2), ]
+    return(setNames(.tmp$est, paste(.tmp$name)))
+}
+
+nlmixrUI.poped.sigma <- function(obj){
+    .df <- as.data.frame(obj$ini);
+    .tmp <- .df[!which(is.na(.df$err) & .df$neta1 == .df$neta2), ]
+    return(setNames(.tmp$est * .tmp$est, paste(.tmp$name)))
+}
+
+
+nlmixrUI.poped.ff_fun <- function(obj){
+    if (!is.null(obj$lin.solved)){
+        stop("Solved system not supported yet.")
+    } else {
+        .df <- as.data.frame(obj$ini)
+        .dft <- .df[!is.na(.df$ntheta) & is.na(.df$err), ];
+        .unfixed <- with(.dft, sprintf("%s=bpop[%d]", name, seq_along(.dft$name)))
+        .eta <- .df[!is.na(.df$neta1), ];
+        .eta <- .eta[.eta$neta1 == .eta$neta2, ];
+        .eta <- with(.eta, sprintf("%s=b[%d]", name, .eta$neta1))
+        .lhs <- nlmixrfindLhs(body(obj$rest));
+        .f <- deparse(body(obj$rest))[-1]
+        .lhs <- sprintf("return(c(%s))", paste(sprintf("\"%s\"=%s", .lhs, .lhs), collapse=", "));
+        .f <- eval(parse(text=paste(c("function(x,a,bpop,b,bocc){", .unfixed, .eta, .f[-length(.f)], .lhs, "}"), collapse="\n")))
+        return(.f)
+    }
+}
+
 ##' @export
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
     x <- obj;
@@ -1945,6 +1983,14 @@ nlmixrUI.model.desc <- function(obj){
         return(x$meta);
     } else if (arg == "saem.distribution"){
         return(nlmixrUI.saem.distribution(obj))
+    } else if (arg == "notfixed_bpop" || arg == "poped.notfixed_bpop"){
+        return(nlmixrUI.poped.notfixed_bpop(obj));
+    } else if (arg == "poped.ff_fun"){
+        return(nlmixrUI.poped.ff_fun(obj))
+    } else if (arg == "poped.d"){
+        return(nlmixrUI.poped.d(obj));
+    } else if (arg == "poped.sigma"){
+        return(nlmixrUI.poped.sigma(obj));
     } else if (arg == ".clean.dll"){
         if (exists(".clean.dll", envir=x$meta)){
             clean <- x$meta$.clean.dll;
@@ -1955,6 +2001,8 @@ nlmixrUI.model.desc <- function(obj){
         return(TRUE);
     } else if (arg == "random.mu"){
         return(nlmixrBoundsOmega(x$ini,x$nmodel$mu.ref))
+    } else if (arg == "bpop"){
+        arg <- "theta";
     }
     m <- x$ini;
     ret <- `$.nlmixrBounds`(m, arg, exact=exact)
