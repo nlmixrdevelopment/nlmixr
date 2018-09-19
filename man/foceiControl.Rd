@@ -11,21 +11,24 @@ foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 1000,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
   "linear", "nocb", "midpoint"), printInner = 0L, print = 1L,
   printNcol = floor((getOption("width") - 23)/12), scaleTo = 1,
-  scaleObjective = 1, derivEps = c(1e-05, 1e-05),
-  derivMethod = c("forward", "central"), covDerivMethod = c("central",
-  "forward"), covMethod = c("r,s", "r", "s", ""), hessEps = 0.001,
-  covDerivEps = c(0, 0.001), lbfgsLmm = 50L, lbfgsPgtol = 0,
+  scaleObjective = 1, derivEps = rep(20 * sqrt(.Machine$double.eps),
+  2), derivMethod = c("switch", "forward", "central"),
+  derivSwitchTol = NULL, covDerivMethod = c("central", "forward"),
+  covMethod = c("r,s", "r", "s", ""), hessEps = 0.001,
+  covDerivEps = c(0, 0.001), lbfgsLmm = 7L, lbfgsPgtol = 0,
   lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
   diagXform = c("sqrt", "log", "identity"), sumProd = FALSE,
   optExpression = TRUE, ci = 0.95, useColor = crayon::has_color(),
   boundTol = NULL, calcTables = TRUE, noAbort = TRUE,
   interaction = TRUE, cholSEtol = (.Machine$double.eps)^(1/3),
-  cholAccept = 0.001, resetEtaP = 0.05, diagOmegaBoundUpper = 5,
+  cholAccept = 0.001, resetEtaP = 0.1, diagOmegaBoundUpper = 5,
   diagOmegaBoundLower = 100, cholSEOpt = FALSE, cholSECov = FALSE,
   fo = FALSE, covTryHarder = FALSE, outerOpt = c("L-BFGS-B",
-  "bobyqa", "nlminb", "lbfgsb3"), rhobeg = 0.2, rhoend = NULL,
+  "bobyqa", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
+  innerOpt = c("n1qn1", "BFGS"), rhobeg = 0.2, rhoend = NULL,
   npt = NULL, rel.tol = NULL, x.tol = NULL, eval.max = 4000,
-  iter.max = 2000, ..., stiff)
+  iter.max = 2000, abstol = NULL, reltol = NULL,
+  resetHessianAndEta = FALSE, stateTrim = Inf, ..., stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -152,7 +155,14 @@ By default this is 1.  When zero or below, no scaling is performed.}
 
 \item{derivMethod}{indicates the method for calculating
 derivatives of the outer problem.  Currently supports
-"central" and "forward" difference methods.}
+"switch", "central" and "forward" difference methods.  Switch
+starts with forward differences.  This will switch to central
+differences when abs(delta(OFV)) <= derivSwitchTol and switch
+back to forward differences when abs(delta(OFV)) >
+derivSwitchTol.}
+
+\item{derivSwitchTol}{The tolerance to switch forward to central
+differences.}
 
 \item{covDerivMethod}{indicates the method for calculating the
 derivatives while calculating the covariance components
@@ -175,8 +185,17 @@ derivatives while calculating the covariance components
  \item "" Does not calculate the covariance step.
 }}
 
+\item{hessEps}{is a double value representing the epsilon for the Hessian calculation.}
+
+\item{covDerivEps}{Central/Forward difference tolerances while
+    calculating the covariance matrices.  This is a numeric vector
+    of relative difference and absolute difference.  The
+    central/forward difference step size h is calculated as:
+
+        \code{h = abs(x)*derivEps[1] + derivEps[2]}}
+
 \item{lbfgsLmm}{An integer giving the number of BFGS updates
-retained in the "L-BFGS-B" method, It defaults to 40.}
+retained in the "L-BFGS-B" method, It defaults to 7.}
 
 \item{lbfgsPgtol}{is a double precision variable.
 
@@ -240,8 +259,53 @@ evaluation if it runs into troubles.  (default TRUE)}
 \item{interaction}{Boolean indicate FOCEi should be used (TRUE)
 instead of FOCE (FALSE)}
 
-\item{cholSEtol}{double tolerance for Generalized Cholesky
+\item{cholSEtol}{tolerance for Generalized Cholesky
 Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)}
+
+\item{cholAccept}{Tolerance to accept a Generalized Cholesky
+Decomposition for a R or S matrix.}
+
+\item{resetEtaP}{represents the p-value for reseting the
+individual ETA to 0 during optimization (instead of the saved
+value).  The two test statistics used in the z-test are either
+chol(omega^-1) %%*%% eta or eta/sd(allEtas).  A p-value of 0
+indicates the ETAs never reset.  A p-value of 1 indicates the
+ETAs always reset.}
+
+\item{diagOmegaBoundUpper}{This represents the upper bound of the
+diagonal omega matrix.  The upper bound is given by
+diag(omega)*diagOmegaBoundUpper.  If
+\code{diagOmegaBoundUpper} is 1, there is no upper bound on
+Omega}
+
+\item{diagOmegaBoundLower}{This represents the lower bound of the
+diagonal omega matrix.  The lower bound is given by
+diag(omega)/diagOmegaBoundUpper.  If
+\code{diagOmegaBoundLower} is 1, there is no lower bound on
+Omega}
+
+\item{cholSEOpt}{Boolean indicating if the generalized Cholesky
+should be used while optimizing.}
+
+\item{cholSECov}{Boolean indicating if the generalized Cholesky
+should be used while calculating the Covariance Matrix.}
+
+\item{fo}{is a boolean indicating if this is a fo approximation routine.}
+
+\item{covTryHarder}{If the R matrix is non-positive definite and
+cannot be corrected to be non-positive definite try estimating
+the Hessian on the unscaled parameter space.}
+
+\item{outerOpt}{optimization method for the outer problem}
+
+\item{innerOpt}{optimization method for the inner problem (not
+implemented yet.)}
+
+\item{resetHessianAndEta}{is a boolean representing if the
+individual Hessian is reset when ETAs are reset using the
+option \code{resetEtaP}.}
+
+\item{stateTrim}{Trim state amounts/concentrations to this value.}
 
 \item{...}{Ignored parameters}
 

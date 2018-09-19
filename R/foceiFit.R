@@ -99,6 +99,19 @@ is.latex <- function() {
 ##'  \item "" Does not calculate the covariance step.
 ##' }
 ##'
+##' @param covTryHarder If the R matrix is non-positive definite and
+##'     cannot be corrected to be non-positive definite try estimating
+##'     the Hessian on the unscaled parameter space.
+##'
+##' @param hessEps is a double value representing the epsilon for the Hessian calculation.
+##'
+##' @param covDerivEps Central/Forward difference tolerances while
+##'     calculating the covariance matrices.  This is a numeric vector
+##'     of relative difference and absolute difference.  The
+##'     central/forward difference step size h is calculated as:
+##'
+##'         \code{h = abs(x)*derivEps[1] + derivEps[2]}
+##'
 ##' @param lbfgsLmm An integer giving the number of BFGS updates
 ##'     retained in the "L-BFGS-B" method, It defaults to 7.
 ##'
@@ -178,12 +191,52 @@ is.latex <- function() {
 ##' @param interaction Boolean indicate FOCEi should be used (TRUE)
 ##'     instead of FOCE (FALSE)
 ##'
-##' @param cholSEtol double tolerance for Generalized Cholesky
+##' @param cholSEOpt Boolean indicating if the generalized Cholesky
+##'     should be used while optimizing.
+##'
+##' @param cholSECov Boolean indicating if the generalized Cholesky
+##'     should be used while calculating the Covariance Matrix.
+##'
+##' @param fo is a boolean indicating if this is a fo approximation routine.
+##'
+##' @param cholSEtol tolerance for Generalized Cholesky
 ##'     Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)
+##'
+##' @param cholAccept Tolerance to accept a Generalized Cholesky
+##'     Decomposition for a R or S matrix.
+##'
+##' @param outerOpt optimization method for the outer problem
+##'
+##' @param innerOpt optimization method for the inner problem (not
+##'     implemented yet.)
 ##'
 ##' @param stateTrim Trim state amounts/concentrations to this value.
 ##'
+##' @param resetEtaP represents the p-value for reseting the
+##'     individual ETA to 0 during optimization (instead of the saved
+##'     value).  The two test statistics used in the z-test are either
+##'     chol(omega^-1) %%*%% eta or eta/sd(allEtas).  A p-value of 0
+##'     indicates the ETAs never reset.  A p-value of 1 indicates the
+##'     ETAs always reset.
+##'
+##' @param resetHessianAndEta is a boolean representing if the
+##'     individual Hessian is reset when ETAs are reset using the
+##'     option \code{resetEtaP}.
+##'
+##' @param diagOmegaBoundUpper This represents the upper bound of the
+##'     diagonal omega matrix.  The upper bound is given by
+##'     diag(omega)*diagOmegaBoundUpper.  If
+##'     \code{diagOmegaBoundUpper} is 1, there is no upper bound on
+##'     Omega
+##'
+##' @param diagOmegaBoundLower This represents the lower bound of the
+##'     diagonal omega matrix.  The lower bound is given by
+##'     diag(omega)/diagOmegaBoundUpper.  If
+##'     \code{diagOmegaBoundLower} is 1, there is no lower bound on
+##'     Omega
+##'
 ##' @inheritParams RxODE::rxSolve
+##' @inheritParams minqa::bobyqa
 ##'
 ##' @details
 ##'
@@ -249,7 +302,7 @@ foceiControl <- function(sigdig=4,
                          interaction=TRUE,
                          cholSEtol=(.Machine$double.eps)^(1/3),
                          cholAccept=1e-3,
-                         resetEtaP=0.05,
+                         resetEtaP=0.1,
                          diagOmegaBoundUpper=5, #diag(omega) = diag(omega)*diagOmegaBoundUpper; =1 no upper
                          diagOmegaBoundLower=100, #diag(omega) = diag(omega)/diagOmegaBoundLower; = 1 no lower
                          cholSEOpt=FALSE,
@@ -1406,9 +1459,6 @@ foceiFit.data.frame0 <- function(data,
     return(.df)
 }
 
-##' @rdname foceiFit
-##' @export
-focei.fit <- foceiFit
 
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){

@@ -4,7 +4,6 @@
 \alias{foceiFit}
 \alias{foceiFit.data.frame}
 \alias{foceiFit.data.frame0}
-\alias{focei.fit}
 \title{FOCEi fit}
 \usage{
 foceiFit(data, ...)
@@ -16,9 +15,6 @@ foceiFit(data, ...)
   fixed = NULL, skipCov = NULL, control = foceiControl(),
   thetaNames = NULL, etaNames = NULL, etaMat = NULL, ...,
   env = NULL)
-
-focei.fit(data, inits, PKpars, diag.xform = c("sqrt", "log", "identity"),
-  model = list(), control = list())
 }
 \arguments{
 \item{data}{Data to fit; Needs to be RxODE compatible and have \code{DV},

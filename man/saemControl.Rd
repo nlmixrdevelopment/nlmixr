@@ -7,7 +7,7 @@
 saemControl(seed = 99, nBurn = 200, nEm = 300, nmc = 3, nu = c(2,
   2, 2), atol = 1e-06, rtol = 1e-04, stiff = TRUE,
   transitAbs = FALSE, print = 1, trace = 0, covMethod = c("fim",
-  "r,s", "r", "s"), logLik = FALSE, optExpression = TRUE, ...)
+  "r,s", "r", "s"), logLik = TRUE, optExpression = TRUE, ...)
 }
 \arguments{
 \item{seed}{Random Seed for SAEM step.  (Needs to be set for
