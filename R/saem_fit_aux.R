@@ -1,6 +1,8 @@
-                                        #FIXME: g by endpint
+##FIXME: g by endpint
 calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
-#nnodes.gq=8, nsd.gq=4
+    ##nnodes.gq=8, nsd.gq=4
+    .env <- attr(fit,"env");
+    if (.env$is.ode) .env$model$assignPtr()
     dopred = attr(fit, "dopred")
     saem.cfg = attr(fit, "saem.cfg")
     resMat = fit$resMat
@@ -84,6 +86,8 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
 #' @export
 plot.saemFit = function(x,...) {
     fit = x
+    .env <- attr(fit,"env");
+    if (.env$is.ode) .env$model$assignPtr()
     saem.cfg = attr(fit, "saem.cfg")
     dat = as.data.frame(saem.cfg$evt)
     dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)

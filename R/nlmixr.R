@@ -696,7 +696,7 @@ saemControl <- function(seed=99,
                         print=1,
                         trace=0,
                         covMethod=c("fim", "r,s", "r", "s"),
-                        logLik=FALSE,
+                        logLik=TRUE,
                         optExpression=TRUE,
                         ...){
     .xtra <- list(...);

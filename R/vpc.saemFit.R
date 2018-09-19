@@ -23,7 +23,8 @@ rmvnorm = function(n, mu, vmat) multi2(mu, vmat, n)
 ##' @export
 vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
   if (class(fit) == "nlmixr.ui.saem") fit = as.saem(fit)
-
+  .env <- attr(fit,"env");
+  if (.env$is.ode) .env$model$assignPtr()
   saem.cfg = attr(fit, "saem.cfg")
   dopred <- attr(fit, "dopred")
   resMat = fit$resMat
