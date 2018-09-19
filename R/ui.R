@@ -2026,6 +2026,7 @@ str.nlmixrUI <- function(object, ...){
     str(obj$nmodel)
     cat(" $ ini       : Model initilizations/bounds object\n");
     cat(" $ model     : Original Model\n");
+    cat(" $ model.desc: Model description\n")
     cat(" $ nmodel    : Parsed Model List\n");
     cat(" $ nlme.fun  : The nlme model function.\n");
     cat(" $ nlme.specs: The nlme model specs.\n");
@@ -2048,7 +2049,6 @@ str.nlmixrUI <- function(object, ...){
     cat(" $ saem.theta.name : The SAEM theta names\n")
     cat(" $ saem.omega.name : The SAEM theta names\n")
     cat(" $ saem.res.name : The SAEM omega names\n")
-    cat(" $ model.desc : Model description\n")
-    cat(" $ saem.distribution: SAEM distribution");
+    cat(" $ saem.distribution: SAEM distribution\n");
     cat(" $ .clean.dll : boolean representing if dlls are cleaned after running.\n")
 }

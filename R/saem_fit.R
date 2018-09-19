@@ -548,8 +548,8 @@ saem.cleanup <- function(env){
     if (is(env, "saemFit")) env <- attr(env, "env");
     if (env$is.ode) try({RxODE::rxUnload(env$model)}, silent=TRUE)
     try({dyn.unload(env$saem.dll)}, silent=TRUE);
-    if (file.exists(env$saem.dll))
-        unlink(env$saem.dll);
+    ## if (file.exists(env$saem.dll))
+    ##     unlink(env$saem.dll);
     if (file.exists(env$saem.cpp))
         unlink(env$saem.cpp);
 }
