@@ -227,13 +227,33 @@ is.latex <- function() {
 ##'     diagonal omega matrix.  The upper bound is given by
 ##'     diag(omega)*diagOmegaBoundUpper.  If
 ##'     \code{diagOmegaBoundUpper} is 1, there is no upper bound on
-##'     Omega
+##'     Omega.
 ##'
 ##' @param diagOmegaBoundLower This represents the lower bound of the
 ##'     diagonal omega matrix.  The lower bound is given by
 ##'     diag(omega)/diagOmegaBoundUpper.  If
 ##'     \code{diagOmegaBoundLower} is 1, there is no lower bound on
-##'     Omega
+##'     Omega.
+##'
+##' @param rhobeg Beginning change in parameters for bobyqa algorithm
+##'     (trust region).  By default this is 0.2 or 20% of the initial
+##'     parameters when the parameters are scaled to 1. rhobeg and
+##'     rhoend must be set to the initial and final values of a trust
+##'     region radius, so both must be positive with 0 < rhoend <
+##'     rhobeg. Typically rhobeg should be about one tenth of the
+##'     greatest expected change to a variable.  Note also that
+##'     smallest difference abs(upper-lower) should be greater than or
+##'     equal to rhobeg*2. If this is not the case then rhobeg will be
+##'     adjusted.
+##'
+##' @param rhoend The smallest value of the trust region radius that
+##'     is allowed. If not defined, then 10^(-sigdig-1) will be used.
+##'
+##' @param npt The number of points used to approximate the objective
+##'     function via a quadratic approximation for bobyqa. The value
+##'     of npt must be in the interval [n+2,(n+1)(n+2)/2] where n is
+##'     the number of parameters in par. Choices that exceed 2*n+1 are
+##'     not recommended. If not defined, it will be set to 2*n + 1
 ##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
