@@ -1132,7 +1132,9 @@ foceiFit.data.frame <- function(data, ...){
                                           digits=.digs, format="fg", flag="#"), .t);
             })
             .ret$parFixed <- data.frame(.ret$popDfSig, "BSD"=.cvp, "Shrink(SD)%"=.sh, check.names=FALSE);
-            names(.ret$parFixed)[ifelse(exists("cov", envir=.ret), 5, 3)] <- ifelse(.sdOnly, "BSV(SD)", ifelse(.cvOnly, "BSV(CV%)", "BSV(CV% or SD)"))
+            .w <- which(names(.ret$parFixed) == "BSD")
+            if (length(.w) >= 1)
+                names(.ret$parFixed)[.w] <- ifelse(.sdOnly, "BSV(SD)", ifelse(.cvOnly, "BSV(CV%)", "BSV(CV% or SD)"))
             if (!all(.lab == "")){
                 .ret$parFixed <- data.frame(Parameter=.lab, .ret$parFixed, check.names=FALSE)
             }
@@ -1843,7 +1845,9 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     } else {
         class(.env) <- NULL
     }
-    if (exists("cov", envir=.env)) return(.env$cov);
+    if (exists("cov", envir=.env)){
+        if (RxODE::rxIs(.env$cov, "matrix")) return(.env$cov);
+    }
     .pt <- proc.time();
     .args <- list(...);
     .control <- .env$control;
@@ -1851,6 +1855,9 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     .control$maxOuterIterations <- 0L;
     .control$boundTol <- 0
     .control$calcTables <- FALSE;
+    if (.control$covMethod == 0L){
+        .control$covMethod <- 1L;
+    }
     .dat <- getData(obj);
     .uif <- obj$uif;
     .mat <- as.matrix(nlme::random.effects(obj)[,-1]);
