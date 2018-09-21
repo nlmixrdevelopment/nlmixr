@@ -33,10 +33,235 @@ nlmixrSim(object, ...)
 \item{object}{nlmixr object}
 
 \item{...}{Other arguments sent to \code{rxSolve}}
+
+\item{params}{a numeric named vector with values for every
+parameter in the ODE system; the names must correspond to the
+parameter identifiers used in the ODE specification;}
+
+\item{events}{an \code{eventTable} object describing the input
+(e.g., doses) to the dynamic system and observation sampling
+time points (see \code{\link{eventTable}});}
+
+\item{inits}{a vector of initial values of the state variables
+(e.g., amounts in each compartment), and the order in this
+vector must be the same as the state variables (e.g., PK/PD
+compartments);}
+
+\item{scale}{a numeric named vector with scaling for ode
+parameters of the system.  The names must correstond to the
+parameter identifiers in the ODE specification. Each of the
+ODE variables will be divided by the scaling factor.  For
+example \code{scale=(center=2)} will divide the center ODE
+variable by 2.}
+
+\item{covs}{a matrix or dataframe the same number of rows as the
+sampling points defined in the events \code{eventTable}.  This
+is for time-varying covariates.}
+
+\item{method}{The method for solving ODEs.  Currently this supports:
+
+\itemize{
+\item \code{"liblsoda"} thread safe lsoda.  This supports parallel
+           thread-based solving, and ignores user Jacobian specification.
+\item \code{"lsoda"} -- LSODA solver.  Does not support parallel thread-based
+      solving, but allows user Jacobian specification.
+\item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
+        solving nor user Jacobain specification
+}}
+
+\item{transitAbs}{boolean indicating if this is a transit
+compartment absorption}
+
+\item{atol}{a numeric absolute tolerance (1e-8 by default) used
+by the ODE solver to determine if a good solution has been
+achieved;  This is also used in the solved linear model to check
+if prior doses do not add anything to the solution.}
+
+\item{rtol}{a numeric relative tolerance (1e-6 by default) used
+by the ODE solver to determine if a good solution has been
+achieved. This is also used in the solved linear model to check
+ if prior doses do not add anything to the solution.}
+
+\item{maxsteps}{maximum number of (internally defined) steps allowed
+during one call to the solver. (5000 by default)}
+
+\item{hmin}{The minimum absolute step size allowed. The default
+value is 0.}
+
+\item{hmax}{The maximum absolute step size allowed.  The default
+checks for the maximum difference in times in your sampling and
+events, and uses this value.  The value 0 is equivalent to
+infinite maximum absolute step size.}
+
+\item{hini}{The step size to be attempted on the first step. The
+default value is determined by the solver (when hini = 0)}
+
+\item{maxordn}{The maximum order to be allowed for the nonstiff
+(Adams) method.  The default is 12.  It can be between 1 and
+12.}
+
+\item{maxords}{The maximum order to be allowed for the stiff (BDF)
+method.  The default value is 5.  This can be between 1 and 5.}
+
+\item{cores}{Number of cores used in parallel ODE solving.  This
+defaults to the number or system cores determined by
+\code{\link{rxCores}} for methods that support parallel
+solving (ie thread-safe methods like "liblsoda").}
+
+\item{covsInterpolation}{specifies the interpolation method for
+    time-varying covariates. When solving ODEs it often samples
+    times outside the sampling time specified in \code{events}.
+    When this happens, the time varying covariates are
+    interpolated.  Currently this can be:
+
+\itemize{
+\item \code{"linear"} interpolation (the default), which interpolates the covariate
+    by solving the line between the observed covariates and extrapolating the new
+    covariate value.
+\item \code{"constant"} -- Last observation carried forward.
+\item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
+      that NONMEM uses.
+\item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
+  carried backward to midpoint.
+}}
+
+\item{addCov}{A boolean indicating if covariates should be added
+to the output matrix or data frame. By default this is
+disabled.}
+
+\item{matrix}{A boolean inticating if a matrix should be returned
+instead of the RxODE's solved object.}
+
+\item{sigma}{Named sigma covariance or Cholesky decomposition of a
+covariance matrix.  The names of the columns indicate
+parameters that are simulated.  These are simulated for every
+observation in the solved system.}
+
+\item{sigmaDf}{Degrees of freedom of the sigma t-distribution.  By
+default it is equivalent to \code{Inf}, or a normal distribution.}
+
+\item{nCoresRV}{Number of cores used for the simulation of the
+sigma variables.  By default this is 1. This uses the package
+\code{\link[mvnfast]{rmvn}} and \code{\link[mvnfast]{rmvt}}.
+To reproduce the results you need to run on the same platform
+with the same number of cores. This is the reason this is set
+to be one, regardless of what the number of cores are used in
+threaded ODE solving.}
+
+\item{sigmaIsChol}{Boolean indicating if the sigma is in the
+Cholesky decomposition instead of a symmetric covariance}
+
+\item{nDisplayProgress}{An integer indicating the minimum number
+of c-based solves before a progress bar is shown.  By default
+this is 10,000.}
+
+\item{amountUnits}{This supplies the dose units of a data frame
+supplied instead of an event table.  This is for importing the
+data as an RxODE event table.}
+
+\item{timeUnits}{This supplies the time units of a data frame
+supplied instead of an event table.  This is for importing the
+data as an RxODE event table.}
+
+\item{stiff}{a logical (\code{TRUE} by default) indicating whether
+    the ODE system is stiff or not.
+
+    For stiff ODE sytems (\code{stiff = TRUE}), \code{RxODE} uses the
+    LSODA (Livermore Solver for Ordinary Differential Equations)
+    Fortran package, which implements an automatic method switching
+    for stiff and non-stiff problems along the integration
+    interval, authored by Hindmarsh and Petzold (2003).
+
+    For non-stiff systems (\code{stiff = FALSE}), \code{RxODE} uses
+    DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
+    Dormand and Prince as implemented in C by Hairer and Wanner
+    (1993).}
+
+\item{theta}{A vector of parameters that will be named THETA[#] and
+added to parameters}
+
+\item{eta}{A vector of parameters that will be named ETA[#] and
+added to parameters}
+
+\item{addDosing}{Boolean indicating if the solve should add RxODE
+evid and amt columns.  This will also include dosing
+information and estimates at the doses.  Be default, RxODE
+only includes estimates at the observations. (default
+\code{FALSE}).}
+
+\item{updateObject}{This is an internally used flag to update the
+RxODE solved object (when supplying an RxODE solved object) as
+well as returning a new object.  You probably should not
+modify it's \code{FALSE} default unless you are willing to
+have unexpected results.}
+
+\item{doSolve}{Internal flag.  By default this is \code{TRUE},
+when \code{FALSE} a list of solving options is returned.}
+
+\item{omega}{Named omega matrix.}
+
+\item{omegaDf}{The degrees of freedom of a t-distribution for
+simulation.  By default this is \code{NULL} which is
+equivalent to \code{Inf} degrees, or to simulate from a normal
+distribution instead of a t-distribution.}
+
+\item{omegaIsChol}{Indicates if the \code{omega} supplied is a
+Cholesky decomposed matrix instead of the traditional
+symmetric matrix.}
+
+\item{nSub}{Number between subject variabilities (ETAs) simulated for every 
+realization of the parameters.}
+
+\item{thetaMat}{Named theta matrix.}
+
+\item{thetaDf}{The degrees of freedom of a t-distribution for
+simulation.  By default this is \code{NULL} which is
+equivalent to \code{Inf} degrees, or to simulate from a normal
+distribution instead of a t-distribution.}
+
+\item{thetaIsChol}{Indicates if the \code{theta} supplied is a
+Cholesky decomposed matrix instead of the traditional
+symmetric matrix.}
+
+\item{nStud}{Number virtual studies to characterize uncertainty in estimated 
+parameters.}
+
+\item{dfSub}{Degrees of freedom to sample the between subject variaiblity matrix from the 
+inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
+
+\item{dfObs}{Degrees of freedom to sample the unexplained variaiblity matrix from the 
+inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
+
+\item{returnType}{This tells what type of object is returned.  The currently supported types are:
+\itemize{
+\item \code{"rxSolve"} (default) will return a reactive data frame
+     that can change easily change different pieces of the solve and
+     update the data frame.  This is the currently standard solving
+     method in RxODE,  is used for \code{rxSolve(object, ...)}, \code{solve(object,...)},
+\item \code{"data.frame"} -- returns a plain, non-reactive data
+     frame; Currently very slightly Faster than \code{returnType="matrix"}
+\item \code{"matrix"} -- returns a plain matrix with column names attached
+    to the solved object.  This is what is used \code{object$run} as well as \code{object$solve}
+}}
+
+\item{seed}{an object specifying if and how the random number
+generator should be initialized}
+
+\item{nsim}{represents the number of simulations.  For RxODE, if
+you supply single subject event tables (created with
+eventTable)}
+
+\item{a}{when using \code{solve}, this is equivalent to the
+\code{object} argument.  If you specify \code{object} later in
+the argument list it overwrites this parameter.}
+
+\item{b}{when using \code{solve}, this is equivalent to the
+\code{params} argument.  If you specify \code{params} as a
+named argument, this overwrites the output}
 }
 \description{
 This takes the uncertainty in the model parameter estimates and to
-simulate a number of "studies".  Each study simulates a
+simulate a number of theoretical studies.  Each study simulates a
 realization of the parameters from the uncertainty in the fixed
 parameter estimates.  In addition the omega and sigma matrices are
 simulated from the uncertainty in the Omega/Sigma matrices based

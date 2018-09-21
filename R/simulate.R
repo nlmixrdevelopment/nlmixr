@@ -121,7 +121,7 @@
 ##' Simulate a nlmixr solved system
 ##'
 ##' This takes the uncertainty in the model parameter estimates and to
-##' simulate a number of "studies".  Each study simulates a
+##' simulate a number of theoretical studies.  Each study simulates a
 ##' realization of the parameters from the uncertainty in the fixed
 ##' parameter estimates.  In addition the omega and sigma matrices are
 ##' simulated from the uncertainty in the Omega/Sigma matrices based
@@ -129,7 +129,7 @@
 ##'
 ##' @param object nlmixr object
 ##' @param ... Other arguments sent to \code{rxSolve}
-##'
+##' @inheritParams RxODE::rxSolve
 ##' @export
 nlmixrSim <- function(object, ...){
     .si <- .simInfo(object);

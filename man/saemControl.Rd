@@ -69,6 +69,10 @@ compartment absorption}
 \item{print}{The number it iterations that are completed before
 anything is printed to the console.  By default, this is 1.}
 
+\item{trace}{An integer indicating if you want to trace(1) the
+SAEM algorithm process.  Useful for debugging, but not for
+typical fitting.}
+
 \item{covMethod}{Method for calculating covariance.  In this
     discussion, R is the Hessian matrix of the objective
     function. The S matrix is the sum of each individual's

@@ -678,6 +678,9 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
 ##'  "" Does not calculate the covariance step.
 ##' @param logLik boolean indicating that log-likelihood should be
 ##'     calculate by Gaussian quadrature.
+##' @param trace An integer indicating if you want to trace(1) the
+##'     SAEM algorithm process.  Useful for debugging, but not for
+##'     typical fitting.
 ##' @param ... Other arguments to control SAEM.
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams foceiControl
