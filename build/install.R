@@ -25,14 +25,14 @@ install.packages(c("tidyverse", "data.table",
 devtools::install_github("ronkeizer/vpc");
 devtools::install_github("nlmixrdevelopment/RxODE")
 library(RxODE)
-## devtools::install_github("nlmixrdevelopment/SnakeCharmR")
+devtools::install_github("nlmixrdevelopment/SnakeCharmR")
 devtools::install_github("richardhooijmaijers/R3port")
 devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
 devtools::install_github("nlmixrdevelopment/nlmixr")
 
 devtools::install_github("AdeelK93/collapsibleTree")
 
-devtools::install_github("richardhooijmaijers/shinyMixR", ref="inner2")
+devtools::install_github("richardhooijmaijers/shinyMixR")
 
 
 
