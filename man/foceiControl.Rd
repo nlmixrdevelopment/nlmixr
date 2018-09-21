@@ -321,6 +321,18 @@ of npt must be in the interval [n+2,(n+1)(n+2)/2] where n is
 the number of parameters in par. Choices that exceed 2*n+1 are
 not recommended. If not defined, it will be set to 2*n + 1}
 
+\item{rel.tol}{Relative tolerance before nlminb stops.}
+
+\item{x.tol}{X tolerance}
+
+\item{eval.max}{Number of maximum evaluations of the objective function}
+
+\item{iter.max}{Maximum number of iterations allowed.}
+
+\item{abstol}{Absolute tolerance for nlmixr}
+
+\item{reltol}{tolerance for nlmixr}
+
 \item{resetHessianAndEta}{is a boolean representing if the
 individual Hessian is reset when ETAs are reset using the
 option \code{resetEtaP}.}

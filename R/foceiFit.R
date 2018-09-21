@@ -254,6 +254,14 @@ is.latex <- function() {
 ##'     of npt must be in the interval [n+2,(n+1)(n+2)/2] where n is
 ##'     the number of parameters in par. Choices that exceed 2*n+1 are
 ##'     not recommended. If not defined, it will be set to 2*n + 1
+##' @param eval.max Number of maximum evaluations of the objective function
+##'
+##' @param iter.max Maximum number of iterations allowed.
+##'
+##' @param rel.tol Relative tolerance before nlminb stops.
+##' @param x.tol X tolerance
+##' @param abstol Absolute tolerance for nlmixr
+##' @param reltol  tolerance for nlmixr
 ##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
