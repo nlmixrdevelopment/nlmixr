@@ -12,7 +12,7 @@ nmDataConvert <- function(nonmem.data)
     d <- as.data.frame(nonmem.data)
     col.names <- colnames(d)
     col.names <- toupper(col.names)
-    .anyCmt <- (any(col.names) == "CMT")
+    .anyCmt <- (any(col.names == "CMT"))
     row.names(d) <- NULL;  ## Make sure row.names are named by R's internals
     ## Fix a few possible problems
     colnames(d) <- col.names
@@ -216,7 +216,10 @@ nmDataConvert <- function(nonmem.data)
         d$EVID <- .Call(`_nlmixr_convertEvid`, as.integer(d$EVID), as.integer(d$CMT));
         dat <- d
     }
-    if(!.anyCmt) dat <- dat[, names(dat) != "CMT"];
+    assign("dat0", dat, globalenv())
+    if(!.anyCmt){
+        dat <- dat[, names(dat) != "CMT"];
+    }
     dat
 }
 
