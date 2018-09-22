@@ -176,3 +176,4 @@ nlme::groupedData
 nlme::getData
 
 
+##'@importFrom stats nobs

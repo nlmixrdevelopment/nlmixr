@@ -216,7 +216,6 @@ nmDataConvert <- function(nonmem.data)
         d$EVID <- .Call(`_nlmixr_convertEvid`, as.integer(d$EVID), as.integer(d$CMT));
         dat <- d
     }
-    assign("dat0", dat, globalenv())
     if(!.anyCmt){
         dat <- dat[, names(dat) != "CMT"];
     }
