@@ -48,11 +48,6 @@ nlme::fixef
 ##' @export
 nlme::fixed.effects
 
-##' @rdname fixed.effects
-##' @export
-fixedEffects <- nlme::fixed.effects
-
-
 ##' @importFrom nlme ranef
 ##' @export
 nlme::ranef
@@ -60,11 +55,6 @@ nlme::ranef
 ##' @importFrom nlme random.effects
 ##' @export
 nlme::random.effects
-
-
-##' @rdname random.effects
-##' @export
-randomEffects <- nlme::random.effects
 
 ##' @importFrom nlme nlmeControl
 ##' @export
@@ -174,6 +164,3 @@ nlme::groupedData
 ##' @importFrom nlme getData
 ##' @export
 nlme::getData
-
-
-##'@importFrom stats nobs

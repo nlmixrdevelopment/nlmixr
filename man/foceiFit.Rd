@@ -346,7 +346,9 @@ newuoa0 <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ..
   ##  The following code modifies the list control list for no warnings.
   .ctl <- control;
   if (is.null(.ctl$npt)) .ctl$npt <- length(par) * 2 + 1
-  .ctl$iprint <- 0L; ## nlmixr will print information this is to suppress the printing from the opimtizer
+  ## nlmixr will print information this is to suppress the printing from the
+  ## optimizer
+  .ctl$iprint <- 0L;
   .ctl <- .ctl[names(.ctl) \%in\% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")];
   ## This does not require gradient and is an unbounded optimization:
   .ret <- minqa::newuoa(par, fn, control=.ctl);

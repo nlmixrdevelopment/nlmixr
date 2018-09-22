@@ -447,22 +447,22 @@ foceiControl <- function(sigdig=4,
     if (RxODE::rxIs(outerOpt, "character")){
         outerOpt <- match.arg(outerOpt);
         if (outerOpt == "bobyqa"){
-            outerOptFun <- nlmixr:::.bobyqa;
+            outerOptFun <- .bobyqa;
             outerOpt <- -1L;
         } else if (outerOpt == "nlminb"){
-            outerOptFun <- nlmixr:::.nlminb;
+            outerOptFun <- .nlminb;
             outerOpt <- -1L;
         } else if (outerOpt == "lbfgsb3"){
-            outerOptFun <- nlmixr:::.lbfgsb3;
+            outerOptFun <- .lbfgsb3;
             outerOpt <- -1L;
         } else if (outerOpt == "mma"){
-            outerOptFun <- nlmixr:::.nloptr;
+            outerOptFun <- .nloptr;
             outerOpt <- -1L;
         } else if (outerOpt == "slsqp"){
-            outerOptFun <- nlmixr:::.slsqp;
+            outerOptFun <- .slsqp;
             outerOpt <- -1L;
         } else if (outerOpt == "lbfgsbLG"){
-            outerOptFun <- nlmixr:::.lbfgsbLG;
+            outerOptFun <- .lbfgsbLG;
             outerOpt <- -1L;
         } else {
             .outerOptIdx <- c("L-BFGS-B"=0L);
@@ -560,6 +560,7 @@ foceiControl <- function(sigdig=4,
 }
 
 .ucminf <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    RxODE::rxReq("ucminf")
     .ctl <- control;
     .ctl$stepmax <- control$rhobeg;
     .ctl$maxeval <- control$maxOuterIterations
@@ -622,6 +623,7 @@ foceiControl <- function(sigdig=4,
 ## }
 
 .nloptr <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ..., nloptrAlgoritm="NLOPT_LD_MMA"){
+    RxODE::rxReq("nloptr")
     .ctl <- list(algorithm=nloptrAlgoritm,
                  xtol_rel=control$reltol,
                  xtol_abs=rep_len(control$abstol, length(par)),
@@ -658,7 +660,7 @@ foceiControl <- function(sigdig=4,
 }
 
 .slsqp <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ...){
-    return(nlmixr:::.nloptr(par, fn, gr, lower, upper, control, ..., nloptrAlgoritm="NLOPT_LD_SLSQP"));
+    return(.nloptr(par, fn, gr, lower, upper, control, ..., nloptrAlgoritm="NLOPT_LD_SLSQP"));
 }
 
 .lbfgsbLG <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ...){
@@ -1051,7 +1053,9 @@ constructLinCmt <- function(fun){
 ##'   ##  The following code modifies the list control list for no warnings.
 ##'   .ctl <- control;
 ##'   if (is.null(.ctl$npt)) .ctl$npt <- length(par) * 2 + 1
-##'   .ctl$iprint <- 0L; ## nlmixr will print information this is to suppress the printing from the opimtizer
+##'   ## nlmixr will print information this is to suppress the printing from the
+##'   ## optimizer
+##'   .ctl$iprint <- 0L;
 ##'   .ctl <- .ctl[names(.ctl) %in% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")];
 ##'   ## This does not require gradient and is an unbounded optimization:
 ##'   .ret <- minqa::newuoa(par, fn, control=.ctl);

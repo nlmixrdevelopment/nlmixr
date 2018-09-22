@@ -46,8 +46,8 @@ nlmixrForget <- function(){
 ##' @importFrom nlme pdDiag
 ##' @importFrom RxODE RxODE
 ##' @importFrom graphics abline lines matplot plot points title
-##' @importFrom stats as.formula nlminb optimHess rnorm terms predict anova optim sd var AIC BIC asOneSidedFormula coef end fitted resid setNames start simulate
-##' @importFrom utils assignInMyNamespace getFromNamespace head stack sessionInfo tail
+##' @importFrom stats as.formula nlminb optimHess rnorm terms predict anova optim sd var AIC BIC asOneSidedFormula coef end fitted resid setNames start simulate nobs qnorm quantile time
+##' @importFrom utils assignInMyNamespace getFromNamespace head stack sessionInfo tail str
 ##' @importFrom parallel mclapply
 ##' @importFrom lbfgs lbfgs
 ##' @importFrom methods is
@@ -764,7 +764,7 @@ addCwres <- function(fit, updateObject=TRUE){
     class(.new) <- class(.newFit)
     if (updateObject){
         .parent <- parent.frame(2);
-        .bound <- do.call("c", lapply(ls(.parent, all=TRUE), function(.cur){
+        .bound <- do.call("c", lapply(ls(.parent, all.names=TRUE), function(.cur){
                                    if (.cur == .objName && identical(.parent[[.cur]], fit)){
                                        return(.cur)
                                    }

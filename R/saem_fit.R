@@ -1,4 +1,4 @@
-## saem_fit.R: population PK/PD modeling library
+qq## saem_fit.R: population PK/PD modeling library
 ##
 ## Copyright (C) 2014 - 2016  Wenping Wang
 ##
@@ -1433,7 +1433,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         } else {
             .saemObf <- NA
         }
-    } else if (is(obj, "numeric")){
+    } else if (is(object, "numeric")){
         .saemObf <- obf;
     }
     .notCalced <- TRUE;

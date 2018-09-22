@@ -109,7 +109,7 @@
         .newMod[.i] <- paste0("rx_r_~", .cur, ";");
     }
     .newMod <- paste(paste(.newMod, collapse="\n"), "\n");
-    .dfObs <- stats::nobs(object);
+    .dfObs <- object$nobs;
     .nlmixrData <- nlmixr::nlmixrData(nlme::getData(object))
     .dfSub <- length(unique(.nlmixrData$ID));
     .thetaMat <- nlme::getVarCov(object);

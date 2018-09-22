@@ -44,7 +44,7 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, .
     class(.new) <- .cls;
     if (updateObject){
         .parent <- parent.frame(2);
-        .bound <- do.call("c", lapply(ls(.parent, all=TRUE), function(.cur){
+        .bound <- do.call("c", lapply(ls(.parent, all.names=TRUE), function(.cur){
                                    if (.cur == .objName && identical(.parent[[.cur]], object)){
                                        return(.cur)
                                    }
