@@ -1617,6 +1617,7 @@ residuals.nlmixrFitData <- function(object, ..., type=c("ires", "res", "iwres", 
 #' @author Wenping Wang & Matthew Fidler
 #' @export
 plot.nlmixrFitData <- function(x, ...) {
+    IWRES <- NULL
     traceplot(x);
     .dat <- as.data.frame(x);
     .doCmt <- FALSE;
@@ -1768,9 +1769,9 @@ print.nlmixrFitCore <- function(x, ...){
         message("  No correlations in between subject variability (BSV) matrix")
     } else {
         message("  Correlations in between subject variability (BSV) matrix:")
-        .rs <- fit$omegaR
+        .rs <- x$omegaR
         .lt <- lower.tri(.rs);
-        .dn1 <- dimnames(fit$omegaR)[[2]]
+        .dn1 <- dimnames(x$omegaR)[[2]]
         .nms <- apply(which(.lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(.dn1[x],collapse=", "))});
         .lt <- structure(.rs[.lt], .Names=.nms)
         .lt <- .lt[.lt != 0]

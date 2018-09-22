@@ -1,4 +1,4 @@
-qq## saem_fit.R: population PK/PD modeling library
+## saem_fit.R: population PK/PD modeling library
 ##
 ## Copyright (C) 2014 - 2016  Wenping Wang
 ##

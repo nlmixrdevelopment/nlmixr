@@ -20,7 +20,7 @@ install.packages(c("tidyverse", "data.table",
                    "scales",
                    "stringi",
                    "lbfgsb3", "madness", "expm", "matrixcalc", "bookdown", "roxygen2", "xpose",
-                   "reticulate"))
+                   "reticulate", "nloptr", "ucminf"))
 
 devtools::install_github("ronkeizer/vpc");
 devtools::install_github("nlmixrdevelopment/RxODE")

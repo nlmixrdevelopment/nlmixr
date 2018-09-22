@@ -85,6 +85,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
 #' @return a list
 #' @export
 plot.saemFit = function(x,...) {
+    CMT <- RES <- NULL
     fit = x
     .env <- attr(fit,"env");
     if (.env$is.ode) .env$model$assignPtr()

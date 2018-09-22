@@ -130,7 +130,7 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
 nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...){
     .uif <- object
     if (missing(data) && missing(est)){
-        return(uif)
+        return(.uif)
     } else {
         .args <- c(list(uif=.uif), .args[-1]);
         .uif$nmodel$data.name <- deparse(substitute(data))

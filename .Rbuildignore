@@ -1,3 +1,4 @@
+^[^\/]*.R$
 ^\.travis.yml$
 \.nsi$
 ^rx_.*\.(dll|so|c|prd|inv)$

@@ -214,6 +214,7 @@ nlmixrSim <- function(object, ...){
 
 ##' @export
 plot.nlmixrSim <- function(x, y, ...){
+    p1 <-eff <-Percentile <-sim.id <-id <-p2 <-p50 <-p05 <- p95 <- . <- NULL
     .args <- list(...)
     RxODE::rxReq("dplyr")
     RxODE::rxReq("tidyr")
@@ -308,7 +309,6 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
         pred.par <- c(params, setNames(rep(0, neta + 1), c(sprintf("ETA[%d]", seq(1, neta)), "rx_err_")));
     }
     on.exit({RxODE::rxUnload(lst$object)});
-    lst$returnType <- match.arg(returnType);
     if (!is.na(ipred)){
         if (do.pred){
             lst$params <- pred.par
