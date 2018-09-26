@@ -15,20 +15,22 @@ foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 1000,
   2), derivMethod = c("switch", "forward", "central"),
   derivSwitchTol = NULL, covDerivMethod = c("central", "forward"),
   covMethod = c("r,s", "r", "s", ""), hessEps = 0.001,
-  covDerivEps = c(0, 0.001), lbfgsLmm = 7L, lbfgsPgtol = 0,
-  lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
-  diagXform = c("sqrt", "log", "identity"), sumProd = FALSE,
-  optExpression = TRUE, ci = 0.95, useColor = crayon::has_color(),
-  boundTol = NULL, calcTables = TRUE, noAbort = TRUE,
-  interaction = TRUE, cholSEtol = (.Machine$double.eps)^(1/3),
-  cholAccept = 0.001, resetEtaP = 0.1, diagOmegaBoundUpper = 5,
+  centralDerivEps = rep(20 * sqrt(.Machine$double.eps), 2),
+  lbfgsLmm = 7L, lbfgsPgtol = 0, lbfgsFactr = NULL, eigen = TRUE,
+  addPosthoc = TRUE, diagXform = c("sqrt", "log", "identity"),
+  sumProd = FALSE, optExpression = TRUE, ci = 0.95,
+  useColor = crayon::has_color(), boundTol = NULL, calcTables = TRUE,
+  noAbort = TRUE, interaction = TRUE,
+  cholSEtol = (.Machine$double.eps)^(1/3), cholAccept = 0.001,
+  resetEtaP = 0.1, diagOmegaBoundUpper = 5,
   diagOmegaBoundLower = 100, cholSEOpt = FALSE, cholSECov = FALSE,
   fo = FALSE, covTryHarder = FALSE, outerOpt = c("bobyqa",
   "L-BFGS-B", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
   innerOpt = c("n1qn1", "BFGS"), rhobeg = 0.2, rhoend = NULL,
   npt = NULL, rel.tol = NULL, x.tol = NULL, eval.max = 4000,
   iter.max = 2000, abstol = NULL, reltol = NULL,
-  resetHessianAndEta = FALSE, stateTrim = Inf, ..., stiff)
+  resetHessianAndEta = FALSE, stateTrim = Inf, gillK = 7L,
+  gillRtol = sqrt(.Machine$double.eps), ..., stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -147,7 +149,7 @@ By default this is 1.  When zero or below, no scaling is performed.}
     When \code{scaleObjective} is less than zero, no scaling is
     performed.}
 
-\item{derivEps}{Central/Forward difference tolerances, which is a
+\item{derivEps}{Forward difference tolerances, which is a
     vector of relative difference and absolute difference.  The
     central/forward difference step size h is calculated as:
 
@@ -187,10 +189,9 @@ derivatives while calculating the covariance components
 
 \item{hessEps}{is a double value representing the epsilon for the Hessian calculation.}
 
-\item{covDerivEps}{Central/Forward difference tolerances while
-    calculating the covariance matrices.  This is a numeric vector
-    of relative difference and absolute difference.  The
-    central/forward difference step size h is calculated as:
+\item{centralDerivEps}{Central difference tolerances.  This is a
+    numeric vector of relative difference and absolute difference.
+    The central/forward difference step size h is calculated as:
 
         \code{h = abs(x)*derivEps[1] + derivEps[2]}}
 
@@ -338,6 +339,15 @@ individual Hessian is reset when ETAs are reset using the
 option \code{resetEtaP}.}
 
 \item{stateTrim}{Trim state amounts/concentrations to this value.}
+
+\item{gillK}{The total number of possible steps to determine the
+optimal forward/central difference step size per parameter (by
+the Gill 1983 method).  If 0, no optimal step size is
+determined.  Otherwise this is the optimal step size
+determined.}
+
+\item{gillRtol}{The relative tolerance used for Gill 1983
+determination of optimal step size.}
 
 \item{...}{Ignored parameters}
 

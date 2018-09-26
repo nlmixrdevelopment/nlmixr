@@ -61,7 +61,7 @@ is.latex <- function() {
 ##'     When \code{scaleObjective} is less than zero, no scaling is
 ##'     performed.
 ##'
-##' @param derivEps Central/Forward difference tolerances, which is a
+##' @param derivEps Forward difference tolerances, which is a
 ##'     vector of relative difference and absolute difference.  The
 ##'     central/forward difference step size h is calculated as:
 ##'
@@ -105,10 +105,9 @@ is.latex <- function() {
 ##'
 ##' @param hessEps is a double value representing the epsilon for the Hessian calculation.
 ##'
-##' @param covDerivEps Central/Forward difference tolerances while
-##'     calculating the covariance matrices.  This is a numeric vector
-##'     of relative difference and absolute difference.  The
-##'     central/forward difference step size h is calculated as:
+##' @param centralDerivEps Central difference tolerances.  This is a
+##'     numeric vector of relative difference and absolute difference.
+##'     The central/forward difference step size h is calculated as:
 ##'
 ##'         \code{h = abs(x)*derivEps[1] + derivEps[2]}
 ##'
@@ -263,6 +262,15 @@ is.latex <- function() {
 ##' @param abstol Absolute tolerance for nlmixr
 ##' @param reltol  tolerance for nlmixr
 ##'
+##' @param gillK The total number of possible steps to determine the
+##'     optimal forward/central difference step size per parameter (by
+##'     the Gill 1983 method).  If 0, no optimal step size is
+##'     determined.  Otherwise this is the optimal step size
+##'     determined.
+##'
+##' @param gillRtol The relative tolerance used for Gill 1983
+##'     determination of optimal step size.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##'
@@ -312,8 +320,8 @@ foceiControl <- function(sigdig=4,
                          derivSwitchTol=NULL,
                          covDerivMethod=c("central", "forward"),
                          covMethod=c("r,s", "r", "s", ""),
-                         hessEps=1e-3,
-                         covDerivEps=c(0, 1e-3),
+                         hessEps=(.Machine$double.eps) ^ (1 / 3),
+                         centralDerivEps=rep(20*sqrt(.Machine$double.eps), 2),
                          lbfgsLmm=7L,
                          lbfgsPgtol=0,
                          lbfgsFactr=NULL,
@@ -360,6 +368,8 @@ foceiControl <- function(sigdig=4,
                          reltol=NULL,
                          resetHessianAndEta=FALSE,
                          stateTrim=Inf,
+                         gillK=7L,
+                         gillRtol=sqrt(.Machine$double.eps),
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -392,8 +402,13 @@ foceiControl <- function(sigdig=4,
         x.tol <- 10 ^ (-sigdig - 1);
     }
     if (is.null(derivSwitchTol)){
-        derivSwitchTol <- 70 ^ (-sigdig);
+        derivSwitchTol <- 2 * 10 ^ (-sigdig-1);
     }
+    ## if (is.null(gillRtol)){
+    ##     ## FIXME: there is a way to calculate this according to the
+    ##     ## Gill paper but it is buried in their optimization book.
+    ##     gillRtol <- 10 ^ (-sigdig - 1);
+    ## }
     .xtra <- list(...);
     if (is.null(transitAbs) && !is.null(.xtra$transit_abs)){  # nolint
         transitAbs <- .xtra$transit_abs;  # nolint
@@ -511,7 +526,7 @@ foceiControl <- function(sigdig=4,
                  derivMethod=derivMethod,
                  covDerivMethod=covDerivMethod,
                  covMethod=covMethod,
-                 covDerivEps=covDerivEps,
+                 centralDerivEps=centralDerivEps,
                  eigen=as.integer(eigen),
                  addPosthoc=as.integer(addPosthoc),
                  diagXform=match.arg(diagXform),
@@ -554,6 +569,8 @@ foceiControl <- function(sigdig=4,
                  derivSwitchTol=derivSwitchTol,
                  resetHessianAndEta=as.integer(resetHessianAndEta),
                  stateTrim=as.double(stateTrim),
+                 gillK=as.integer(gillK),
+                 gillRtol=as.double(gillRtol),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -1864,7 +1881,7 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     .pt <- proc.time();
     .args <- list(...);
     .control <- .env$control;
-    .control$maxInnerIterations <- 0L;
+    ## .control$maxInnerIterations <- 0L;
     .control$maxOuterIterations <- 0L;
     .control$boundTol <- 0
     .control$calcTables <- FALSE;
@@ -1894,6 +1911,7 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     .env$cov <- .fit2$cov;
     .env$popDf <- .fit2$popDf;
     .env$popDfSig <- .fit2$popDfSig;
+    .env$covMethod <- .fit2$covMethod
     .updateParFixed(.env);
     .parent <- parent.frame(2);
     .bound <- do.call("c", lapply(ls(.parent), function(.cur){
