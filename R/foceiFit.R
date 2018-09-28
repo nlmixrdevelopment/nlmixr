@@ -301,7 +301,7 @@ is.latex <- function() {
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @seealso \code{\link[RxODE]{rxSolve}}
 ##' @export
-foceiControl <- function(sigdig=4,
+foceiControl <- function(sigdig=3,
                          epsilon=NULL, #1e-4,
                          maxInnerIterations=1000,
                          maxOuterIterations=5000,
@@ -368,7 +368,7 @@ foceiControl <- function(sigdig=4,
                          reltol=NULL,
                          resetHessianAndEta=FALSE,
                          stateTrim=Inf,
-                         gillK=7L,
+                         gillK=3L,
                          gillRtol=sqrt(.Machine$double.eps),
                          ..., stiff){
     if (is.null(boundTol)){
