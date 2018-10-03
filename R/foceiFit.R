@@ -51,15 +51,22 @@ is.latex <- function() {
 ##'     By default this is 1.  When zero or below, no scaling is performed.
 ##'
 ##' @param scaleObjective Scale the initial objective function to this
-##'     value.  By default this is 1.  When \code{scaleObjective} is
+##'     value.  By default this is 1.  The type of scaling is determined by scaleObjectiveType
+##'
+##' @param scaleObjectiveType This can be "times" or "add1".
+##'
+##'     When \code{scaleObjectiveType} is "times" and \code{scaleObjective}
 ##'     greater than zero, this scaling is performed by:
 ##'
 ##'      \code{scaledObj = currentObj / \|initialObj\| * scaleObjective}
 ##'
 ##'     Therefore, if the initial objective function is negative, the
 ##'     initial scaled objective function would be negative as well.
-##'     When \code{scaleObjective} is less than zero, no scaling is
-##'     performed.
+##'
+##'     When \code{scaleObjectiveType} is "add" and \code{scaleObjective}
+##'     greater than zero, this scaling is performed by:
+##'
+##'     \code{scaledObj = (currentObj -  initialObj) + scaleObjective}
 ##'
 ##' @param derivEps Forward difference tolerances, which is a
 ##'     vector of relative difference and absolute difference.  The
@@ -315,6 +322,10 @@ foceiControl <- function(sigdig=3,
                          printNcol=floor((getOption("width") - 23)/12) ,
                          scaleTo=1.0,
                          scaleObjective=1.0,
+                         normType=c("rescale2", "rescale", "mean", "std", "len", "constant"),
+                         scaleType=c("nlmixr", "norm", "mult", "multAdd"),
+                         scaleCmin=1.0,
+                         scaleC=NULL,
                          derivEps=rep(20*sqrt(.Machine$double.eps), 2),
                          derivMethod=c("switch", "forward", "central"),
                          derivSwitchTol=NULL,
@@ -353,7 +364,7 @@ foceiControl <- function(sigdig=3,
                          ## mma: 20974.20 (Time: Opt: 3000.501 Cov: 467.287)
                          ## slsqp: 21023.89 (Time: Opt: 460.099; Cov: 488.921)
                          ## lbfgsbLG: 20974.74 (Time: Opt: 946.463; Cov:397.537)
-                         outerOpt=c("bobyqa", "L-BFGS-B", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
+                         outerOpt=c("L-BFGS-B", "bobyqa", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
                          innerOpt=c("n1qn1", "BFGS"),
                          ##
                          rhobeg=.2,
@@ -434,6 +445,14 @@ foceiControl <- function(sigdig=3,
     }
     .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
     method <- as.integer(.methodIdx[method]);
+    if (RxODE::rxIs(scaleType, "character")){
+        .scaleTypeIdx <- c("norm"=1L, "nlmixr"=2L, "mult"=3L, "multAdd"=4L);
+        scaleType <- as.integer(.scaleTypeIdx[match.arg(scaleType)]);
+    }
+    if (RxODE::rxIs(normType, "character")){
+        .normTypeIdx <- c("rescale2"=1L, "rescale"=2L, "mean"=3L, "std"=4L, "len"=5L, "constant"=6);
+        normType <- as.integer(.normTypeIdx[match.arg(normType)]);
+    }
     derivMethod <- match.arg(derivMethod);
     .methodIdx <- c("forward"=0L, "central"=1L, "switch"=3L);
     derivMethod <- as.integer(.methodIdx[derivMethod])
@@ -571,6 +590,10 @@ foceiControl <- function(sigdig=3,
                  stateTrim=as.double(stateTrim),
                  gillK=as.integer(gillK),
                  gillRtol=as.double(gillRtol),
+                 scaleType=scaleType,
+                 normType=normType,
+                 scaleC=scaleC,
+                 scaleCmin=as.double(scaleCmin),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -968,7 +991,7 @@ constructLinCmt <- function(fun){
 ##'
 ##' fitIVp <- nlmixr(one.compartment.IV.model, datr, "focei");
 ##'
-##' ## You can also use the Cox-Box Transform of both sides with
+##' ## You can also use the Box-Cox Transform of both sides with
 ##' ## proportional error (Donse 2016)
 ##'
 ##' one.compartment.IV.model <- function(){
@@ -1374,6 +1397,7 @@ foceiFit.data.frame0 <- function(data,
         .ret$etaNames <- sprintf("ETA[%d]", seq(1, dim(.om0)[1]))
     }
     .ret$rxInv <- RxODE::rxSymInvCholCreate(mat=.om0, diag.xform=control$diagXform);
+    .ret$xType <- .ret$rxInv$xType
     .om0a <- .om0
     diag(.om0a) <- diag(.om0a) / control$diagOmegaBoundLower;
     .om0b <- .om0
@@ -1393,9 +1417,31 @@ foceiFit.data.frame0 <- function(data,
 
     .ret$thetaIni <- inits$THTA
 
-    if (any(.ret$thetaIni == 0 && control$scaleTo > 0)){
-        warning("Some of the initial conditions were 0, changing to 0.0001");
-        .ret$thetaIni[.ret$thetaIni == 0] <- 0.0001;
+    .scaleC <- double(length(lower));
+    if (is.null(control$scaleC)){
+        .scaleC <- rep(NA_real_, length(lower))
+    } else {
+        .scaleC <- as.double(control$scaleC);
+        if (length(lower) > length(.scaleC)){
+            .scaleC <- c(.scaleC, rep(NA_real_, length(lower) - length(.scaleC)));
+        } else if (length(lower) < length(.scaleC)){
+            .scaleC <- .scaleC[seq(1, length(lower))];
+            warning("scaleC control option has more options than estimated population parameters, please check.")
+        }
+    }
+
+    .ret$scaleC <- .scaleC;
+    if (exists("uif", envir=.ret)){
+        .ini <- as.data.frame(.ret$uif$ini)[!is.na(.ret$uif$ini$err), c("est", "err", "ntheta")]
+        for (.i in seq_along(.ini$err)){
+            if (is.na(.ret$scaleC[.ini$ntheta[.i]])){
+                if (any(.ini$err[.i] == c("boxCox", "yeoJohnson", "pow2", "tbs", "tbsYj"))){
+                    .ret$scaleC[.ini$ntheta[.i]] <- 1
+                } else if (any(.ini$err[.i] == c("prop", "add", "norm", "dnorm", "logn", "dlogn", "lnorm", "dlnorm"))){
+                    .ret$scaleC[.ini$ntheta[.i]] <- 0.5 * abs(.ini$est[.i]);
+                }
+            }
+        }
     }
     names(.ret$thetaIni) <- sprintf("THETA[%d]", seq_along(.ret$thetaIni))
     .ret$etaMat <- etaMat
