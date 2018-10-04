@@ -324,6 +324,7 @@ foceiControl <- function(sigdig=3,
                          scaleObjective=1.0,
                          normType=c("rescale2", "rescale", "mean", "std", "len", "constant"),
                          scaleType=c("nlmixr", "norm", "mult", "multAdd"),
+                         scaleCmax=1e5,
                          scaleCmin=1e-5,
                          scaleC=NULL,
                          derivEps=rep(20*sqrt(.Machine$double.eps), 2),
@@ -594,6 +595,7 @@ foceiControl <- function(sigdig=3,
                  normType=normType,
                  scaleC=scaleC,
                  scaleCmin=as.double(scaleCmin),
+                 scaleCmax=as.double(scaleCmax),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -1442,6 +1444,28 @@ foceiFit.data.frame0 <- function(data,
                 }
             }
         }
+    }
+    for (.i in .ini$model$extraProps$powTheta){
+        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1; ## Powers are log-scaled
+    }
+    .ini <- as.data.frame(.ret$uif$ini)
+    for (.i in .ini$model$extraProps$factorial){
+        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1 / digamma(.ini$est[.i] + 1);
+    }
+    for (.i in .ini$model$extraProps$gamma){
+        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1 / digamma(.ini$est[.i]);
+    }
+    for (.i in .ini$model$extraProps$log){
+        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- log(fabs(.ini$est[.i])) * fabs(.ini$est[.i]);
+    }
+    for (.i in .ini$model$extraProps$sin){
+        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(tan(.ini$est[.i]));
+    }
+    for (.i in .ini$model$extraProps$cos){
+        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(1 / tan(.ini$est[.i]));
+    }
+    for (.i in .ini$model$extraProps$tan){
+        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(2 * sin(2 * .ini$est[.i]));
     }
     names(.ret$thetaIni) <- sprintf("THETA[%d]", seq_along(.ret$thetaIni))
     .ret$etaMat <- etaMat
