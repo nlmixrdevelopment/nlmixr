@@ -339,7 +339,7 @@ foceiControl <- function(sigdig=3,
                          lbfgsFactr=NULL,
                          eigen=TRUE,
                          addPosthoc=TRUE,
-                         diagXform=c("sqrt", "log", "identity"),
+                         diagXform=c("log", "sqrt", "identity"),
                          sumProd=FALSE,
                          optExpression=TRUE,
                          ci=0.95,
@@ -1444,28 +1444,31 @@ foceiFit.data.frame0 <- function(data,
                 }
             }
         }
-    }
-    for (.i in .ini$model$extraProps$powTheta){
-        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1; ## Powers are log-scaled
-    }
-    .ini <- as.data.frame(.ret$uif$ini)
-    for (.i in .ini$model$extraProps$factorial){
-        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1 / digamma(.ini$est[.i] + 1);
-    }
-    for (.i in .ini$model$extraProps$gamma){
-        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1 / digamma(.ini$est[.i]);
-    }
-    for (.i in .ini$model$extraProps$log){
-        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- log(fabs(.ini$est[.i])) * fabs(.ini$est[.i]);
-    }
-    for (.i in .ini$model$extraProps$sin){
-        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(tan(.ini$est[.i]));
-    }
-    for (.i in .ini$model$extraProps$cos){
-        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(1 / tan(.ini$est[.i]));
-    }
-    for (.i in .ini$model$extraProps$tan){
-        if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(2 * sin(2 * .ini$est[.i]));
+
+        for (.i in .ini$model$extraProps$powTheta){
+            if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1; ## Powers are log-scaled
+        }
+        .ini <- as.data.frame(.ret$uif$ini)
+        for (.i in .ini$model$extraProps$factorial){
+            if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- abs(1 / digamma(.ini$est[.i] + 1));
+        }
+        for (.i in .ini$model$extraProps$gamma){
+            if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- abs(1 / digamma(.ini$est[.i]));
+        }
+        for (.i in .ini$model$extraProps$log){
+            if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- log(abs(.ini$est[.i])) * abs(.ini$est[.i]);
+        }
+        ## FIXME: needs to be based on actual initial values in sin because typically change to correct scale
+        ## Ctime is also usually used for circadian rhythm models
+        ## for (.i in .ini$model$extraProps$sin){
+        ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(tan(.ini$est[.i]));
+        ## }
+        ## for (.i in .ini$model$extraProps$cos){
+        ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(1 / tan(.ini$est[.i]));
+        ## }
+        ## for (.i in .ini$model$extraProps$tan){
+        ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(2 * sin(2 * .ini$est[.i]));
+        ## }
     }
     names(.ret$thetaIni) <- sprintf("THETA[%d]", seq_along(.ret$thetaIni))
     .ret$etaMat <- etaMat
