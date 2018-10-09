@@ -134,8 +134,14 @@ nmDataConvert <- function(nonmem.data)
     }
 
     if (!any(col.names == "EVID") && !any(col.names == "MDV")){
-        d$EVID <- 0;
-        warning("Assumed all DV values are observations. (EVID=0)")
+        if (any(col.names == "AMT")){
+            d$EVID <- 1;
+            d$EVID[d$AMT == 0] <- 0
+            warning("Assumed all AMT=0 values are observations. (EVID=0)")
+        } else {
+            d$EVID <- 0;
+            warning("Assumed all DV values are observations. (EVID=0)")
+        }
     }
     if (any(d$EVID == 2)){
         warning("EVID=2 is dropped from RxODE/nlmixr datasets.")
