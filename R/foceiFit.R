@@ -365,7 +365,7 @@ foceiControl <- function(sigdig=3,
                          ## mma: 20974.20 (Time: Opt: 3000.501 Cov: 467.287)
                          ## slsqp: 21023.89 (Time: Opt: 460.099; Cov: 488.921)
                          ## lbfgsbLG: 20974.74 (Time: Opt: 946.463; Cov:397.537)
-                         outerOpt=c("bobyqa", "L-BFGS-B", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
+                         outerOpt=c("lbfgsb3c", "bobyqa", "L-BFGS-B", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
                          innerOpt=c("n1qn1", "BFGS"),
                          ##
                          rhobeg=.2,
@@ -500,8 +500,11 @@ foceiControl <- function(sigdig=3,
             outerOptFun <- .lbfgsbLG;
             outerOpt <- -1L;
         } else {
-            .outerOptIdx <- c("L-BFGS-B"=0L);
+            .outerOptIdx <- c("L-BFGS-B"=0L, "lbfgsb3c"=1L);
             outerOpt <- .outerOptIdx[outerOpt]
+            if (outerOpt == 1L){
+                RxODE::rxReq("lbfgsb3c")
+            }
             outerOptFun <- NULL
         }
     } else if (is(outerOpt, "function")) {
