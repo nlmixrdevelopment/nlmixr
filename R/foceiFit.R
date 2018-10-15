@@ -339,7 +339,7 @@ foceiControl <- function(sigdig=3,
                          lbfgsFactr=NULL,
                          eigen=TRUE,
                          addPosthoc=TRUE,
-                         diagXform=c("log", "sqrt", "identity"),
+                         diagXform=c("identity", "log", "sqrt"),
                          sumProd=FALSE,
                          optExpression=TRUE,
                          ci=0.95,
@@ -1586,6 +1586,14 @@ foceiFit.data.frame0 <- function(data,
     return(.df)
 }
 
+##'@export
+print.nlmixrClass <- function(x, ...){
+    tmp <- x;
+    attr(tmp, ".foceiEnv") <- NULL
+    class(tmp) <- NULL
+    print(tmp);
+}
+
 
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
@@ -1852,47 +1860,57 @@ print.nlmixrFitCore <- function(x, ...){
         .pf <- gsub(rex::rex(capture(.regNum), "%", or(">", "=", "<")), "\\1% ", .pf, perl=TRUE)
         .pf <- gsub(rex::rex(capture(.regNum), "="), "\\1 ", .pf, perl=TRUE)
     }
-    message(paste(.pf, collapse="\n"), "\n")
+    cat(paste(.pf, collapse="\n"), "\n")
+    .mu <- dim(x$omega)[1] == length(x$mu.ref)
+    if (!.mu){
+        message(paste0("\n", cli::rule(paste0(crayon::bold("BSV Covariance"), " (", crayon::yellow(.bound), crayon::bold$blue("$omega"), "):"))));
+        print(x$omega);
+        cat(paste0("\n  Not all variables are ", ifelse(use.utf(), "\u03bc", "mu"), "-referenced.\n  Can also see BSV Correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n"))
+    } else {
+        cat("\n");
+    }
     ## Correlations
     .tmp <- x$omega
     diag(.tmp) <- 0;
-    message(paste0("\n  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
-                   crayon::bold(x$covMethod)))
-    if (all(.tmp == 0)){
-        message("  No correlations in between subject variability (BSV) matrix")
-    } else {
-        message("  Correlations in between subject variability (BSV) matrix:")
-        .rs <- x$omegaR
-        .lt <- lower.tri(.rs);
-        .dn1 <- dimnames(x$omegaR)[[2]]
-        .nms <- apply(which(.lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(.dn1[x],collapse=", "))});
-        .lt <- structure(.rs[.lt], .Names=.nms)
-        .lt <- .lt[.lt != 0]
-        .digs <- 3;
-        .lts <- sapply(.lt, function(x){
-            x <- abs(.lt);
-            .ret <- "<"
-            if (x > 0.7){
-                .ret <- ">" ## Strong
-            } else if (x > 0.3){
-                .ret <- "=" ## Moderate
-            }
-            return(.ret)
-        })
-        .nms <- names(.lt);
-        .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), .lts)
-        names(.lt) <- .nms;
-        .lt <- gsub(rex::rex("\""), "", paste0("    ", R.utils::captureOutput(print(.lt))));
-        if (crayon::has_color()){
-            .lt <- gsub(rex::rex(capture(.regNum), ">"), "\033[1m\033[31m\\1 \033[39m\033[22m", .lt, perl=TRUE)
-            .lt <- gsub(rex::rex(capture(.regNum), "="), "\033[1m\033[32m\\1 \033[39m\033[22m", .lt, perl=TRUE)
-            .lt <- gsub(rex::rex(capture(.regNum), "<"), "\\1 ", .lt, perl=TRUE)
+    cat(paste0("  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
+               crayon::bold(x$covMethod), "\n"))
+    if (.mu){
+        if (all(.tmp == 0)){
+            cat("  No correlations in between subject variability (BSV) matrix\n")
         } else {
-            .lt <- gsub(rex::rex(capture(.regNum), or(">", "=", "<")), "\\1 ", .lt, perl=TRUE)
+            cat("  Correlations in between subject variability (BSV) matrix:\n")
+            .rs <- x$omegaR
+            .lt <- lower.tri(.rs);
+            .dn1 <- dimnames(x$omegaR)[[2]]
+            .nms <- apply(which(.lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(.dn1[x],collapse=", "))});
+            .lt <- structure(.rs[.lt], .Names=.nms)
+            .lt <- .lt[.lt != 0]
+            .digs <- 3;
+            .lts <- sapply(.lt, function(x){
+                x <- abs(.lt);
+                .ret <- "<"
+                if (x > 0.7){
+                    .ret <- ">" ## Strong
+                } else if (x > 0.3){
+                    .ret <- "=" ## Moderate
+                }
+                return(.ret)
+            })
+            .nms <- names(.lt);
+            .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), .lts)
+            names(.lt) <- .nms;
+            .lt <- gsub(rex::rex("\""), "", paste0("    ", R.utils::captureOutput(print(.lt))));
+            if (crayon::has_color()){
+                .lt <- gsub(rex::rex(capture(.regNum), ">"), "\033[1m\033[31m\\1 \033[39m\033[22m", .lt, perl=TRUE)
+                .lt <- gsub(rex::rex(capture(.regNum), "="), "\033[1m\033[32m\\1 \033[39m\033[22m", .lt, perl=TRUE)
+                .lt <- gsub(rex::rex(capture(.regNum), "<"), "\\1 ", .lt, perl=TRUE)
+            } else {
+                .lt <- gsub(rex::rex(capture(.regNum), or(">", "=", "<")), "\\1 ", .lt, perl=TRUE)
+            }
+            cat(paste(.lt, collapse="\n"), "\n\n")
         }
-        message(paste(.lt, collapse="\n"), "\n")
+        message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"));
     }
-    message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"));
     message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                    crayon::yellow(.bound), crayon::bold$blue("$shrink")));
     if (RxODE::rxIs(x, "nlmixrFitData")){
