@@ -445,6 +445,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         }
         return(.ret);
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
+        if (length(uif$predDf$cond) > 1) stop("nlmixr nlme does not support multiple endpoints.")
         pt <- proc.time()
         est.type <- est;
         if (est == "nlme.free"){
