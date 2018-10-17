@@ -41,7 +41,7 @@ Description: Fit and compare nonlinear mixed-effects models in differential
 License: GPL (>=2)
 NeedsCompilation: yes
 LinkingTo: dparser(>= 0.1.8), Rcpp (>= 0.12.3),
-        RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
+        RcppEigen (>= 0.3.3.3.0), StanHeaders(>= 2.18.0), BH
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr
