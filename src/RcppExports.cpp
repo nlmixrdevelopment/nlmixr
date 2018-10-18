@@ -7,6 +7,184 @@
 
 using namespace Rcpp;
 
+// foceiInnerLp
+NumericVector foceiInnerLp(NumericVector eta, int id);
+RcppExport SEXP _nlmixr_foceiInnerLp(SEXP etaSEXP, SEXP idSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< int >::type id(idSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiInnerLp(eta, id));
+    return rcpp_result_gen;
+END_RCPP
+}
+// likInner
+double likInner(NumericVector eta, int id);
+RcppExport SEXP _nlmixr_likInner(SEXP etaSEXP, SEXP idSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< int >::type id(idSEXP);
+    rcpp_result_gen = Rcpp::wrap(likInner(eta, id));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cholSE_
+NumericMatrix cholSE_(NumericMatrix A, double tol);
+RcppExport SEXP _nlmixr_cholSE_(SEXP ASEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type A(ASEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(cholSE_(A, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiLik
+double foceiLik(NumericVector theta);
+RcppExport SEXP _nlmixr_foceiLik(SEXP thetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiLik(theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiOfv
+double foceiOfv(NumericVector theta);
+RcppExport SEXP _nlmixr_foceiOfv(SEXP thetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiOfv(theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiEtas
+List foceiEtas();
+RcppExport SEXP _nlmixr_foceiEtas() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(foceiEtas());
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiNumericGrad
+NumericVector foceiNumericGrad(NumericVector theta);
+RcppExport SEXP _nlmixr_foceiNumericGrad(SEXP thetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiNumericGrad(theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiSetup_
+NumericVector foceiSetup_(const RObject& obj, const RObject& data, NumericVector theta, Nullable<LogicalVector> thetaFixed, Nullable<LogicalVector> skipCov, RObject rxInv, Nullable<NumericVector> lower, Nullable<NumericVector> upper, Nullable<NumericMatrix> etaMat, Nullable<List> control);
+RcppExport SEXP _nlmixr_foceiSetup_(SEXP objSEXP, SEXP dataSEXP, SEXP thetaSEXP, SEXP thetaFixedSEXP, SEXP skipCovSEXP, SEXP rxInvSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP etaMatSEXP, SEXP controlSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const RObject& >::type obj(objSEXP);
+    Rcpp::traits::input_parameter< const RObject& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< Nullable<LogicalVector> >::type thetaFixed(thetaFixedSEXP);
+    Rcpp::traits::input_parameter< Nullable<LogicalVector> >::type skipCov(skipCovSEXP);
+    Rcpp::traits::input_parameter< RObject >::type rxInv(rxInvSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type lower(lowerSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type upper(upperSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericMatrix> >::type etaMat(etaMatSEXP);
+    Rcpp::traits::input_parameter< Nullable<List> >::type control(controlSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiSetup_(obj, data, theta, thetaFixed, skipCov, rxInv, lower, upper, etaMat, control));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiOuterF
+double foceiOuterF(NumericVector& theta);
+RcppExport SEXP _nlmixr_foceiOuterF(SEXP thetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector& >::type theta(thetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiOuterF(theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiOuterG
+NumericVector foceiOuterG(NumericVector& theta);
+RcppExport SEXP _nlmixr_foceiOuterG(SEXP thetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector& >::type theta(thetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiOuterG(theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiOuter
+Environment foceiOuter(Environment e);
+RcppExport SEXP _nlmixr_foceiOuter(SEXP eSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiOuter(e));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sqrtm
+NumericMatrix sqrtm(NumericMatrix m);
+RcppExport SEXP _nlmixr_sqrtm(SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(sqrtm(m));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiCalcCov
+NumericMatrix foceiCalcCov(Environment e);
+RcppExport SEXP _nlmixr_foceiCalcCov(SEXP eSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiCalcCov(e));
+    return rcpp_result_gen;
+END_RCPP
+}
+// foceiFitCpp_
+Environment foceiFitCpp_(Environment e);
+RcppExport SEXP _nlmixr_foceiFitCpp_(SEXP eSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Environment >::type e(eSEXP);
+    rcpp_result_gen = Rcpp::wrap(foceiFitCpp_(e));
+    return rcpp_result_gen;
+END_RCPP
+}
+// coxBox_
+NumericVector coxBox_(NumericVector x, double lambda, int yj);
+RcppExport SEXP _nlmixr_coxBox_(SEXP xSEXP, SEXP lambdaSEXP, SEXP yjSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< int >::type yj(yjSEXP);
+    rcpp_result_gen = Rcpp::wrap(coxBox_(x, lambda, yj));
+    return rcpp_result_gen;
+END_RCPP
+}
 // lin_cmt_stan
 SEXP lin_cmt_stan(Eigen::Map<Eigen::VectorXd> obs_time, Eigen::Map<Eigen::VectorXd> dose_time, Eigen::Map<Eigen::VectorXd> dose, Eigen::Map<Eigen::VectorXd> Tinf, Eigen::Map<Eigen::VectorXd> params, SEXP oralSEXP, SEXP infusionSEXP, SEXP ncmtSEXP, SEXP parameterizationSEXP);
 RcppExport SEXP _nlmixr_lin_cmt_stan(SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP, SEXP paramsSEXP, SEXP oralSEXPSEXP, SEXP infusionSEXPSEXP, SEXP ncmtSEXPSEXP, SEXP parameterizationSEXPSEXP) {

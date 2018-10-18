@@ -1392,7 +1392,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .sqrtm <- FALSE
     if (inherits(.tmp, "try-error")){
         .tmp <- object$Ha[1:.nth,1:.nth]
-        .tmp <- try(RxODE::sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+        .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
         if (inherits(.tmp, "try-error")){
             .addCov <- FALSE;
         } else {

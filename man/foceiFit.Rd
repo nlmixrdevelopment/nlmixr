@@ -244,7 +244,7 @@ one.compartment.IV.model <- function(){
 
 fitIVp <- nlmixr(one.compartment.IV.model, datr, "focei");
 
-## You can also use the Cox-Box Transform of both sides with
+## You can also use the Box-Cox Transform of both sides with
 ## proportional error (Donse 2016)
 
 one.compartment.IV.model <- function(){
