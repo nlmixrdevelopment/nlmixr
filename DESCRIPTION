@@ -28,7 +28,10 @@ Authors@R: c(person("Matthew","Fidler",
       role = c("aut", "cre"), email = "wwang8198@gmail.com"),
    person("Hadley","Wickham", role = "ctb"),
    person("Dirk","Eddelbuettel",
-      role = "cph", email = "edd@debian.org"),   
+      role = "cph", email = "edd@debian.org"),
+   person("Johannes", "Pfeifer",role="ctb"),
+   person("Robert B.", "Schnabel",role="ctb"),
+   person("Elizabeth", "Eskow", role="ctb"), 
    person("David","Ardia",role = "cph"),
    person("Katharine","Mullen",role = "cph")
    )
@@ -40,8 +43,8 @@ Description: Fit and compare nonlinear mixed-effects models in differential
     (Wang, Hallow, and James 2015 <doi:10.1002/psp4.12052>).
 License: GPL (>=2)
 NeedsCompilation: yes
-LinkingTo: dparser(>= 0.1.8), Rcpp (>= 0.12.3),
-        RcppEigen (>= 0.3.3.3.0), StanHeaders, BH
+LinkingTo: dparser(>= 0.1.8), Rcpp (>= 0.12.3), RxODE,
+        RcppEigen (>= 0.3.3.3.0), StanHeaders(>= 2.17.0), BH, lbfgsb3c
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr

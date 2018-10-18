@@ -4,31 +4,36 @@
 \alias{foceiControl}
 \title{Control Options for FOCEi}
 \usage{
-foceiControl(sigdig = 4, epsilon = NULL, maxInnerIterations = 1000,
+foceiControl(sigdig = 3, epsilon = NULL, maxInnerIterations = 1000,
   maxOuterIterations = 5000, n1qn1nsim = NULL, method = c("liblsoda",
   "lsoda", "dop853"), transitAbs = NULL, atol = NULL, rtol = NULL,
   maxstepsOde = 5000L, hmin = 0L, hmax = NULL, hini = 0,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
   "linear", "nocb", "midpoint"), printInner = 0L, print = 1L,
   printNcol = floor((getOption("width") - 23)/12), scaleTo = 1,
-  scaleObjective = 1, derivEps = rep(20 * sqrt(.Machine$double.eps),
-  2), derivMethod = c("switch", "forward", "central"),
+  scaleObjective = 1, normType = c("rescale2", "rescale", "mean",
+  "std", "len", "constant"), scaleType = c("nlmixr", "norm", "mult",
+  "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
+  derivEps = rep(20 * sqrt(.Machine$double.eps), 2),
+  derivMethod = c("switch", "forward", "central"),
   derivSwitchTol = NULL, covDerivMethod = c("central", "forward"),
-  covMethod = c("r,s", "r", "s", ""), hessEps = 0.001,
-  covDerivEps = c(0, 0.001), lbfgsLmm = 7L, lbfgsPgtol = 0,
+  covMethod = c("r,s", "r", "s", ""),
+  hessEps = (.Machine$double.eps)^(1/3), centralDerivEps = rep(20 *
+  sqrt(.Machine$double.eps), 2), lbfgsLmm = 7L, lbfgsPgtol = 0,
   lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
-  diagXform = c("sqrt", "log", "identity"), sumProd = FALSE,
+  diagXform = c("identity", "log", "sqrt"), sumProd = FALSE,
   optExpression = TRUE, ci = 0.95, useColor = crayon::has_color(),
   boundTol = NULL, calcTables = TRUE, noAbort = TRUE,
   interaction = TRUE, cholSEtol = (.Machine$double.eps)^(1/3),
   cholAccept = 0.001, resetEtaP = 0.1, diagOmegaBoundUpper = 5,
   diagOmegaBoundLower = 100, cholSEOpt = FALSE, cholSECov = FALSE,
-  fo = FALSE, covTryHarder = FALSE, outerOpt = c("bobyqa",
-  "L-BFGS-B", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
+  fo = FALSE, covTryHarder = FALSE, outerOpt = c("lbfgsb3c",
+  "bobyqa", "L-BFGS-B", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
   innerOpt = c("n1qn1", "BFGS"), rhobeg = 0.2, rhoend = NULL,
   npt = NULL, rel.tol = NULL, x.tol = NULL, eval.max = 4000,
   iter.max = 2000, abstol = NULL, reltol = NULL,
-  resetHessianAndEta = FALSE, stateTrim = Inf, ..., stiff)
+  resetHessianAndEta = FALSE, stateTrim = Inf, gillK = 3L,
+  gillRtol = sqrt(.Machine$double.eps), ..., stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -137,17 +142,9 @@ parameter estimates/gradient}
 By default this is 1.  When zero or below, no scaling is performed.}
 
 \item{scaleObjective}{Scale the initial objective function to this
-    value.  By default this is 1.  When \code{scaleObjective} is
-    greater than zero, this scaling is performed by:
+value.  By default this is 1.  The type of scaling is determined by scaleObjectiveType}
 
-     \code{scaledObj = currentObj / \|initialObj\| * scaleObjective}
-
-    Therefore, if the initial objective function is negative, the
-    initial scaled objective function would be negative as well.
-    When \code{scaleObjective} is less than zero, no scaling is
-    performed.}
-
-\item{derivEps}{Central/Forward difference tolerances, which is a
+\item{derivEps}{Forward difference tolerances, which is a
     vector of relative difference and absolute difference.  The
     central/forward difference step size h is calculated as:
 
@@ -187,10 +184,9 @@ derivatives while calculating the covariance components
 
 \item{hessEps}{is a double value representing the epsilon for the Hessian calculation.}
 
-\item{covDerivEps}{Central/Forward difference tolerances while
-    calculating the covariance matrices.  This is a numeric vector
-    of relative difference and absolute difference.  The
-    central/forward difference step size h is calculated as:
+\item{centralDerivEps}{Central difference tolerances.  This is a
+    numeric vector of relative difference and absolute difference.
+    The central/forward difference step size h is calculated as:
 
         \code{h = abs(x)*derivEps[1] + derivEps[2]}}
 
@@ -339,6 +335,15 @@ option \code{resetEtaP}.}
 
 \item{stateTrim}{Trim state amounts/concentrations to this value.}
 
+\item{gillK}{The total number of possible steps to determine the
+optimal forward/central difference step size per parameter (by
+the Gill 1983 method).  If 0, no optimal step size is
+determined.  Otherwise this is the optimal step size
+determined.}
+
+\item{gillRtol}{The relative tolerance used for Gill 1983
+determination of optimal step size.}
+
 \item{...}{Ignored parameters}
 
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
@@ -354,6 +359,21 @@ option \code{resetEtaP}.}
     DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
     Dormand and Prince as implemented in C by Hairer and Wanner
     (1993).}
+
+\item{scaleObjectiveType}{This can be "times" or "add1".
+
+    When \code{scaleObjectiveType} is "times" and \code{scaleObjective}
+    greater than zero, this scaling is performed by:
+
+     \code{scaledObj = currentObj / \|initialObj\| * scaleObjective}
+
+    Therefore, if the initial objective function is negative, the
+    initial scaled objective function would be negative as well.
+
+    When \code{scaleObjectiveType} is "add" and \code{scaleObjective}
+    greater than zero, this scaling is performed by:
+
+    \code{scaledObj = (currentObj -  initialObj) + scaleObjective}}
 }
 \description{
 Control Options for FOCEi

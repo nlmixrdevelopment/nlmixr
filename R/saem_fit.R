@@ -395,19 +395,28 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   is.ode = class(model) == "RxODE"
   is.win <- .Platform$OS.type=="windows"
   env = environment()
-  ## if (getOption("RxODE.tempfiles",TRUE)){
-  ##     saem.cpp <- paste0(tempfile(pattern="saem", getwd()), .Platform$r_arch);
-  ## } else {
+  lwd <- getwd();
+  if (getOption("RxODE.tempfiles",TRUE)){
+      ## .wd <- tempfile()
+      ## dir.create(.wd, recursive = TRUE)
+      ## setwd(.wd)
+      .wd <- Sys.getenv("rxTempDir");
+      if (.wd == ""){
+          .wd <- tempfile()
+          dir.create(.wd, recursive = TRUE)
+          setwd(.wd);
+          on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
+      } else {
+          setwd(.wd);
+          on.exit({setwd(lwd)});
+      }
+  }
   saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
   ## }
   saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
   saem.cpp <- paste0(saem.cpp, ".cpp");
-  lwd <- getwd();
-  .wd <- tempfile()
-  dir.create(.wd, recursive = TRUE)
-  setwd(.wd)
-  on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
+
 
   if (is.ode) {
     modelVars = model$cmpMgr$get.modelVars()
@@ -504,10 +513,10 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   shlib = sprintf('%s CMD SHLIB %s -o %s', rexec, saem.cpp, saem.dll)
   ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
   do.call("system", list(shlib))
-  file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
-  file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
-  setwd(lwd);
-  saem.dll <- file.path(lwd, saem.dll);
+  ## file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
+  ## file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
+  ## setwd(lwd);
+  saem.dll <- file.path(getwd(), saem.dll);
 
   if(is.ode) RxODE::rxLoad(model)
   `.DLL` <- dyn.load(saem.dll);
@@ -1383,7 +1392,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .sqrtm <- FALSE
     if (inherits(.tmp, "try-error")){
         .tmp <- object$Ha[1:.nth,1:.nth]
-        .tmp <- try(RxODE::sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+        .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
         if (inherits(.tmp, "try-error")){
             .addCov <- FALSE;
         } else {

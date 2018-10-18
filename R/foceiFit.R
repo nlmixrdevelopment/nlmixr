@@ -51,17 +51,24 @@ is.latex <- function() {
 ##'     By default this is 1.  When zero or below, no scaling is performed.
 ##'
 ##' @param scaleObjective Scale the initial objective function to this
-##'     value.  By default this is 1.  When \code{scaleObjective} is
+##'     value.  By default this is 1.  The type of scaling is determined by scaleObjectiveType
+##'
+##' @param scaleObjectiveType This can be "times" or "add1".
+##'
+##'     When \code{scaleObjectiveType} is "times" and \code{scaleObjective}
 ##'     greater than zero, this scaling is performed by:
 ##'
 ##'      \code{scaledObj = currentObj / \|initialObj\| * scaleObjective}
 ##'
 ##'     Therefore, if the initial objective function is negative, the
 ##'     initial scaled objective function would be negative as well.
-##'     When \code{scaleObjective} is less than zero, no scaling is
-##'     performed.
 ##'
-##' @param derivEps Central/Forward difference tolerances, which is a
+##'     When \code{scaleObjectiveType} is "add" and \code{scaleObjective}
+##'     greater than zero, this scaling is performed by:
+##'
+##'     \code{scaledObj = (currentObj -  initialObj) + scaleObjective}
+##'
+##' @param derivEps Forward difference tolerances, which is a
 ##'     vector of relative difference and absolute difference.  The
 ##'     central/forward difference step size h is calculated as:
 ##'
@@ -105,10 +112,9 @@ is.latex <- function() {
 ##'
 ##' @param hessEps is a double value representing the epsilon for the Hessian calculation.
 ##'
-##' @param covDerivEps Central/Forward difference tolerances while
-##'     calculating the covariance matrices.  This is a numeric vector
-##'     of relative difference and absolute difference.  The
-##'     central/forward difference step size h is calculated as:
+##' @param centralDerivEps Central difference tolerances.  This is a
+##'     numeric vector of relative difference and absolute difference.
+##'     The central/forward difference step size h is calculated as:
 ##'
 ##'         \code{h = abs(x)*derivEps[1] + derivEps[2]}
 ##'
@@ -263,6 +269,15 @@ is.latex <- function() {
 ##' @param abstol Absolute tolerance for nlmixr
 ##' @param reltol  tolerance for nlmixr
 ##'
+##' @param gillK The total number of possible steps to determine the
+##'     optimal forward/central difference step size per parameter (by
+##'     the Gill 1983 method).  If 0, no optimal step size is
+##'     determined.  Otherwise this is the optimal step size
+##'     determined.
+##'
+##' @param gillRtol The relative tolerance used for Gill 1983
+##'     determination of optimal step size.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##'
@@ -293,7 +308,7 @@ is.latex <- function() {
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @seealso \code{\link[RxODE]{rxSolve}}
 ##' @export
-foceiControl <- function(sigdig=4,
+foceiControl <- function(sigdig=3,
                          epsilon=NULL, #1e-4,
                          maxInnerIterations=1000,
                          maxOuterIterations=5000,
@@ -307,19 +322,24 @@ foceiControl <- function(sigdig=4,
                          printNcol=floor((getOption("width") - 23)/12) ,
                          scaleTo=1.0,
                          scaleObjective=1.0,
+                         normType=c("rescale2", "rescale", "mean", "std", "len", "constant"),
+                         scaleType=c("nlmixr", "norm", "mult", "multAdd"),
+                         scaleCmax=1e5,
+                         scaleCmin=1e-5,
+                         scaleC=NULL,
                          derivEps=rep(20*sqrt(.Machine$double.eps), 2),
                          derivMethod=c("switch", "forward", "central"),
                          derivSwitchTol=NULL,
                          covDerivMethod=c("central", "forward"),
                          covMethod=c("r,s", "r", "s", ""),
-                         hessEps=1e-3,
-                         covDerivEps=c(0, 1e-3),
+                         hessEps=(.Machine$double.eps) ^ (1 / 3),
+                         centralDerivEps=rep(20*sqrt(.Machine$double.eps), 2),
                          lbfgsLmm=7L,
                          lbfgsPgtol=0,
                          lbfgsFactr=NULL,
                          eigen=TRUE,
                          addPosthoc=TRUE,
-                         diagXform=c("sqrt", "log", "identity"),
+                         diagXform=c("identity", "log", "sqrt"),
                          sumProd=FALSE,
                          optExpression=TRUE,
                          ci=0.95,
@@ -345,7 +365,7 @@ foceiControl <- function(sigdig=4,
                          ## mma: 20974.20 (Time: Opt: 3000.501 Cov: 467.287)
                          ## slsqp: 21023.89 (Time: Opt: 460.099; Cov: 488.921)
                          ## lbfgsbLG: 20974.74 (Time: Opt: 946.463; Cov:397.537)
-                         outerOpt=c("bobyqa", "L-BFGS-B", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
+                         outerOpt=c("lbfgsb3c", "bobyqa", "L-BFGS-B", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
                          innerOpt=c("n1qn1", "BFGS"),
                          ##
                          rhobeg=.2,
@@ -360,6 +380,8 @@ foceiControl <- function(sigdig=4,
                          reltol=NULL,
                          resetHessianAndEta=FALSE,
                          stateTrim=Inf,
+                         gillK=3L,
+                         gillRtol=sqrt(.Machine$double.eps),
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -392,8 +414,13 @@ foceiControl <- function(sigdig=4,
         x.tol <- 10 ^ (-sigdig - 1);
     }
     if (is.null(derivSwitchTol)){
-        derivSwitchTol <- 70 ^ (-sigdig);
+        derivSwitchTol <- 2 * 10 ^ (-sigdig-1);
     }
+    ## if (is.null(gillRtol)){
+    ##     ## FIXME: there is a way to calculate this according to the
+    ##     ## Gill paper but it is buried in their optimization book.
+    ##     gillRtol <- 10 ^ (-sigdig - 1);
+    ## }
     .xtra <- list(...);
     if (is.null(transitAbs) && !is.null(.xtra$transit_abs)){  # nolint
         transitAbs <- .xtra$transit_abs;  # nolint
@@ -419,6 +446,14 @@ foceiControl <- function(sigdig=4,
     }
     .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
     method <- as.integer(.methodIdx[method]);
+    if (RxODE::rxIs(scaleType, "character")){
+        .scaleTypeIdx <- c("norm"=1L, "nlmixr"=2L, "mult"=3L, "multAdd"=4L);
+        scaleType <- as.integer(.scaleTypeIdx[match.arg(scaleType)]);
+    }
+    if (RxODE::rxIs(normType, "character")){
+        .normTypeIdx <- c("rescale2"=1L, "rescale"=2L, "mean"=3L, "std"=4L, "len"=5L, "constant"=6);
+        normType <- as.integer(.normTypeIdx[match.arg(normType)]);
+    }
     derivMethod <- match.arg(derivMethod);
     .methodIdx <- c("forward"=0L, "central"=1L, "switch"=3L);
     derivMethod <- as.integer(.methodIdx[derivMethod])
@@ -465,8 +500,11 @@ foceiControl <- function(sigdig=4,
             outerOptFun <- .lbfgsbLG;
             outerOpt <- -1L;
         } else {
-            .outerOptIdx <- c("L-BFGS-B"=0L);
+            .outerOptIdx <- c("L-BFGS-B"=0L, "lbfgsb3c"=1L);
             outerOpt <- .outerOptIdx[outerOpt]
+            if (outerOpt == 1L){
+                RxODE::rxReq("lbfgsb3c")
+            }
             outerOptFun <- NULL
         }
     } else if (is(outerOpt, "function")) {
@@ -511,7 +549,7 @@ foceiControl <- function(sigdig=4,
                  derivMethod=derivMethod,
                  covDerivMethod=covDerivMethod,
                  covMethod=covMethod,
-                 covDerivEps=covDerivEps,
+                 centralDerivEps=centralDerivEps,
                  eigen=as.integer(eigen),
                  addPosthoc=as.integer(addPosthoc),
                  diagXform=match.arg(diagXform),
@@ -554,6 +592,13 @@ foceiControl <- function(sigdig=4,
                  derivSwitchTol=derivSwitchTol,
                  resetHessianAndEta=as.integer(resetHessianAndEta),
                  stateTrim=as.double(stateTrim),
+                 gillK=as.integer(gillK),
+                 gillRtol=as.double(gillRtol),
+                 scaleType=scaleType,
+                 normType=normType,
+                 scaleC=scaleC,
+                 scaleCmin=as.double(scaleCmin),
+                 scaleCmax=as.double(scaleCmax),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -951,7 +996,7 @@ constructLinCmt <- function(fun){
 ##'
 ##' fitIVp <- nlmixr(one.compartment.IV.model, datr, "focei");
 ##'
-##' ## You can also use the Cox-Box Transform of both sides with
+##' ## You can also use the Box-Cox Transform of both sides with
 ##' ## proportional error (Donse 2016)
 ##'
 ##' one.compartment.IV.model <- function(){
@@ -1357,6 +1402,7 @@ foceiFit.data.frame0 <- function(data,
         .ret$etaNames <- sprintf("ETA[%d]", seq(1, dim(.om0)[1]))
     }
     .ret$rxInv <- RxODE::rxSymInvCholCreate(mat=.om0, diag.xform=control$diagXform);
+    .ret$xType <- .ret$rxInv$xType
     .om0a <- .om0
     diag(.om0a) <- diag(.om0a) / control$diagOmegaBoundLower;
     .om0b <- .om0
@@ -1376,9 +1422,56 @@ foceiFit.data.frame0 <- function(data,
 
     .ret$thetaIni <- inits$THTA
 
-    if (any(.ret$thetaIni == 0 && control$scaleTo > 0)){
-        warning("Some of the initial conditions were 0, changing to 0.0001");
-        .ret$thetaIni[.ret$thetaIni == 0] <- 0.0001;
+    .scaleC <- double(length(lower));
+    if (is.null(control$scaleC)){
+        .scaleC <- rep(NA_real_, length(lower))
+    } else {
+        .scaleC <- as.double(control$scaleC);
+        if (length(lower) > length(.scaleC)){
+            .scaleC <- c(.scaleC, rep(NA_real_, length(lower) - length(.scaleC)));
+        } else if (length(lower) < length(.scaleC)){
+            .scaleC <- .scaleC[seq(1, length(lower))];
+            warning("scaleC control option has more options than estimated population parameters, please check.")
+        }
+    }
+
+    .ret$scaleC <- .scaleC;
+    if (exists("uif", envir=.ret)){
+        .ini <- as.data.frame(.ret$uif$ini)[!is.na(.ret$uif$ini$err), c("est", "err", "ntheta")]
+        for (.i in seq_along(.ini$err)){
+            if (is.na(.ret$scaleC[.ini$ntheta[.i]])){
+                if (any(.ini$err[.i] == c("boxCox", "yeoJohnson", "pow2", "tbs", "tbsYj"))){
+                    .ret$scaleC[.ini$ntheta[.i]] <- 1
+                } else if (any(.ini$err[.i] == c("prop", "add", "norm", "dnorm", "logn", "dlogn", "lnorm", "dlnorm"))){
+                    .ret$scaleC[.ini$ntheta[.i]] <- 0.5 * abs(.ini$est[.i]);
+                }
+            }
+        }
+
+        for (.i in .ini$model$extraProps$powTheta){
+            if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1; ## Powers are log-scaled
+        }
+        .ini <- as.data.frame(.ret$uif$ini)
+        for (.i in .ini$model$extraProps$factorial){
+            if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- abs(1 / digamma(.ini$est[.i] + 1));
+        }
+        for (.i in .ini$model$extraProps$gamma){
+            if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- abs(1 / digamma(.ini$est[.i]));
+        }
+        for (.i in .ini$model$extraProps$log){
+            if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- log(abs(.ini$est[.i])) * abs(.ini$est[.i]);
+        }
+        ## FIXME: needs to be based on actual initial values in sin because typically change to correct scale
+        ## Ctime is also usually used for circadian rhythm models
+        ## for (.i in .ini$model$extraProps$sin){
+        ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(tan(.ini$est[.i]));
+        ## }
+        ## for (.i in .ini$model$extraProps$cos){
+        ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(1 / tan(.ini$est[.i]));
+        ## }
+        ## for (.i in .ini$model$extraProps$tan){
+        ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(2 * sin(2 * .ini$est[.i]));
+        ## }
     }
     names(.ret$thetaIni) <- sprintf("THETA[%d]", seq_along(.ret$thetaIni))
     .ret$etaMat <- etaMat
@@ -1395,7 +1488,7 @@ foceiFit.data.frame0 <- function(data,
             .ret$nobs <- sum(data$EVID == 0)
         }
     }
-    .ret <- RxODE::foceiFitCpp_(.ret);
+    .ret <- foceiFitCpp_(.ret);
     if (!control$calcTables){
         return(.ret);
     }
@@ -1491,6 +1584,14 @@ foceiFit.data.frame0 <- function(data,
     class(.df) <- .cls;
     message("done.")
     return(.df)
+}
+
+##'@export
+print.nlmixrClass <- function(x, ...){
+    tmp <- x;
+    attr(tmp, ".foceiEnv") <- NULL
+    class(tmp) <- NULL
+    print(tmp);
 }
 
 
@@ -1759,47 +1860,57 @@ print.nlmixrFitCore <- function(x, ...){
         .pf <- gsub(rex::rex(capture(.regNum), "%", or(">", "=", "<")), "\\1% ", .pf, perl=TRUE)
         .pf <- gsub(rex::rex(capture(.regNum), "="), "\\1 ", .pf, perl=TRUE)
     }
-    message(paste(.pf, collapse="\n"), "\n")
+    cat(paste(.pf, collapse="\n"), "\n")
+    .mu <- dim(x$omega)[1] == length(x$mu.ref)
+    if (!.mu){
+        message(paste0("\n", cli::rule(paste0(crayon::bold("BSV Covariance"), " (", crayon::yellow(.bound), crayon::bold$blue("$omega"), "):"))));
+        print(x$omega);
+        cat(paste0("\n  Not all variables are ", ifelse(use.utf(), "\u03bc", "mu"), "-referenced.\n  Can also see BSV Correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n"))
+    } else {
+        cat("\n");
+    }
     ## Correlations
     .tmp <- x$omega
     diag(.tmp) <- 0;
-    message(paste0("\n  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
-                   crayon::bold(x$covMethod)))
-    if (all(.tmp == 0)){
-        message("  No correlations in between subject variability (BSV) matrix")
-    } else {
-        message("  Correlations in between subject variability (BSV) matrix:")
-        .rs <- x$omegaR
-        .lt <- lower.tri(.rs);
-        .dn1 <- dimnames(x$omegaR)[[2]]
-        .nms <- apply(which(.lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(.dn1[x],collapse=", "))});
-        .lt <- structure(.rs[.lt], .Names=.nms)
-        .lt <- .lt[.lt != 0]
-        .digs <- 3;
-        .lts <- sapply(.lt, function(x){
-            x <- abs(.lt);
-            .ret <- "<"
-            if (x > 0.7){
-                .ret <- ">" ## Strong
-            } else if (x > 0.3){
-                .ret <- "=" ## Moderate
-            }
-            return(.ret)
-        })
-        .nms <- names(.lt);
-        .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), .lts)
-        names(.lt) <- .nms;
-        .lt <- gsub(rex::rex("\""), "", paste0("    ", R.utils::captureOutput(print(.lt))));
-        if (crayon::has_color()){
-            .lt <- gsub(rex::rex(capture(.regNum), ">"), "\033[1m\033[31m\\1 \033[39m\033[22m", .lt, perl=TRUE)
-            .lt <- gsub(rex::rex(capture(.regNum), "="), "\033[1m\033[32m\\1 \033[39m\033[22m", .lt, perl=TRUE)
-            .lt <- gsub(rex::rex(capture(.regNum), "<"), "\\1 ", .lt, perl=TRUE)
+    cat(paste0("  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
+               crayon::bold(x$covMethod), "\n"))
+    if (.mu){
+        if (all(.tmp == 0)){
+            cat("  No correlations in between subject variability (BSV) matrix\n")
         } else {
-            .lt <- gsub(rex::rex(capture(.regNum), or(">", "=", "<")), "\\1 ", .lt, perl=TRUE)
+            cat("  Correlations in between subject variability (BSV) matrix:\n")
+            .rs <- x$omegaR
+            .lt <- lower.tri(.rs);
+            .dn1 <- dimnames(x$omegaR)[[2]]
+            .nms <- apply(which(.lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(.dn1[x],collapse=", "))});
+            .lt <- structure(.rs[.lt], .Names=.nms)
+            .lt <- .lt[.lt != 0]
+            .digs <- 3;
+            .lts <- sapply(.lt, function(x){
+                x <- abs(.lt);
+                .ret <- "<"
+                if (x > 0.7){
+                    .ret <- ">" ## Strong
+                } else if (x > 0.3){
+                    .ret <- "=" ## Moderate
+                }
+                return(.ret)
+            })
+            .nms <- names(.lt);
+            .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), .lts)
+            names(.lt) <- .nms;
+            .lt <- gsub(rex::rex("\""), "", paste0("    ", R.utils::captureOutput(print(.lt))));
+            if (crayon::has_color()){
+                .lt <- gsub(rex::rex(capture(.regNum), ">"), "\033[1m\033[31m\\1 \033[39m\033[22m", .lt, perl=TRUE)
+                .lt <- gsub(rex::rex(capture(.regNum), "="), "\033[1m\033[32m\\1 \033[39m\033[22m", .lt, perl=TRUE)
+                .lt <- gsub(rex::rex(capture(.regNum), "<"), "\\1 ", .lt, perl=TRUE)
+            } else {
+                .lt <- gsub(rex::rex(capture(.regNum), or(">", "=", "<")), "\\1 ", .lt, perl=TRUE)
+            }
+            cat(paste(.lt, collapse="\n"), "\n\n")
         }
-        message(paste(.lt, collapse="\n"), "\n")
+        message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"));
     }
-    message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"));
     message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                    crayon::yellow(.bound), crayon::bold$blue("$shrink")));
     if (RxODE::rxIs(x, "nlmixrFitData")){
@@ -1864,7 +1975,7 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     .pt <- proc.time();
     .args <- list(...);
     .control <- .env$control;
-    .control$maxInnerIterations <- 0L;
+    ## .control$maxInnerIterations <- 0L;
     .control$maxOuterIterations <- 0L;
     .control$boundTol <- 0
     .control$calcTables <- FALSE;
@@ -1894,6 +2005,7 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     .env$cov <- .fit2$cov;
     .env$popDf <- .fit2$popDf;
     .env$popDfSig <- .fit2$popDfSig;
+    .env$covMethod <- .fit2$covMethod
     .updateParFixed(.env);
     .parent <- parent.frame(2);
     .bound <- do.call("c", lapply(ls(.parent), function(.cur){
@@ -1976,3 +2088,26 @@ focei.theta <- function(object, uif, ...){
     UseMethod("focei.theta");
 }
 
+##
+
+##' Cox Box transformation
+##'
+##' @param x data to transform
+##' @param lambda Cox-box lambda parameter
+##' @return Cox-Box Transformed Data
+##' @author Matthew L. Fidler
+##' @export
+coxBox <- function(x, lambda=1){
+    .Call(`_RxODE_coxBox_`, x, lambda, 0L)
+}
+
+##' Yeo-Johnson Transformation
+##'
+##' @param x data to transform
+##' @param lambda Cox-box lambda parameter
+##' @return Yeo-Johnson  Transformed Data
+##' @author Matthew L. Fidler
+##' @export
+yeoJohnson <- function(x, lambda=1){
+    .Call(`_RxODE_coxBox_`, x, lambda, 1L)
+}
