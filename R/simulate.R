@@ -168,9 +168,15 @@ nlmixrSim <- function(object, ...){
 
     if (any(names(.xtra) == "omega")){
         .si$omega <- .xtra$omega;
+        if (is.na(.xtra$omega)){
+            .si$omega <- NULL
+        }
     }
     if (any(names(.xtra) == "sigma")){
         .si$sigma <- .xtra$sigma;
+        if (is.na(.xtra$sigma)){
+            .si$sigma <- NULL
+        }
     }
     if (any(names(.xtra) == "events") &&
         RxODE::rxIs(.xtra$events, "rx.event")){

@@ -34,6 +34,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         .xtra$object <- fit;
         ## .xtra$returnType <- "data.frame";
         .xtra$returnType <- "rxSolve";
+        .xtra$modelName <- "VPC"
         pt <- proc.time();
         if (is.null(data)){
             dat <- nlmixrData(getData(fit));
@@ -52,7 +53,20 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         sim0 <- sim;
         sim <- sim[, c("id", "time", "sim")]
         names(sim)[3] <- "dv";
-
+        .si <- fit$simInfo;
+        if (pred_corr){
+            .xtra.prd <- .xtra;
+            .xtra.prd$modelName <- "Pred (for pcVpc)"
+            .xtra.prd$params <- c(.si$params, setNames(rep(0, dim(.si$omega)[1]), dimnames(.si$omega)[[2]]),
+                                  setNames(rep(0, dim(.si$sigma)[1]), dimnames(.si$sigma)[[2]]))
+            .xtra.prd$omega <- NA
+            .xtra.prd$sigma <- NA
+            .xtra.prd$returnType <- "data.frame";
+            .xtra.prd$nStud <- 1;
+            .xtra.prd$nsim <- NULL;
+            sim2 <- do.call("nlmixrSim", .xtra.prd);
+            sim$pred <- sim2$sim
+        }
         diff <- proc.time() - pt;
         message(sprintf("done (%.2f sec)", diff["elapsed"]));
         onames <- names(dat)
