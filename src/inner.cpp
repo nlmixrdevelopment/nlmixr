@@ -2482,8 +2482,10 @@ void foceiCustomFun(Environment e){
   }
   std::copy(&op_focei.upper[0], &op_focei.upper[0]+op_focei.npars, &upper[0]);
   std::copy(&op_focei.lower[0], &op_focei.lower[0]+op_focei.npars, &lower[0]);
-  Function f = RxODE::getRxFn("foceiOuterF");
-  Function g = RxODE::getRxFn("foceiOuterG");
+  Function loadNamespace("loadNamespace", R_BaseNamespace);
+  Environment nlmixr = loadNamespace("nlmixr");
+  Function f = as<Function>(nlmixr["foceiOuterF"]);
+  Function g = as<Function>(nlmixr["foceiOuterG"]);
   List ctl = e["control"];
   Function opt = as<Function>(ctl["outerOptFun"]);
   //.bobyqa <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...)
@@ -3539,6 +3541,8 @@ void foceiFinalizeTables(Environment e){
     } else {
       e["extra"] = "";
     }
+    List ctl = e["control"];
+    e["extra"] = as<std::string>(e["extra"]) + " (outer: " + as<std::string>(ctl["outerOptTxt"]) +")";
   }
   RxODE::rxSolveFree();
   e.attr("class") = "nlmixrFitCore";
