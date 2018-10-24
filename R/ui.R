@@ -1900,6 +1900,22 @@ nlmixrUI.model.desc <- function(obj){
     }
 }
 
+nlmixrUI.lincmt.dvdx <- function(obj){
+    if (is.null(obj$rxode.pred)){
+        .df <- as.data.frame(obj$ini)
+        .dft <- .df[!is.na(.df$ntheta), ];
+        .unfixed <- with(.dft, sprintf("%s=THETA[%d]", name, seq_along(.dft$name)))
+        .eta <- .df[!is.na(.df$neta1), ];
+        .eta <- .eta[.eta$neta1 == .eta$neta2, ];
+        .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
+        .txt <- deparse(body(obj$rest))[-1]
+        .txt[length(.txt)] <- obj$lin.solved$extra.lines
+        .txt <- paste(c(.unfixed, .eta, .txt), collapse="\n")
+        .txt <- substring(.txt, 0, nchar(.txt) - 1)
+        return(RxODE::rxSymPyLincmtDvdx(.txt, obj$lin.solved$ncmt, obj$lin.solved$parameterization))
+    }
+    return(NULL)
+}
 
 nlmixrUI.poped.notfixed_bpop <- function(obj){
     .df <- as.data.frame(obj$ini);
@@ -2006,6 +2022,8 @@ nlmixrUI.poped.ff_fun <- function(obj){
         return(x$meta);
     } else if (arg == "saem.distribution"){
         return(nlmixrUI.saem.distribution(obj))
+    } else if (arg == "lincmt.dvdx"){
+        return(nlmixrUI.lincmt.dvdx(obj));
     } else if (arg == "notfixed_bpop" || arg == "poped.notfixed_bpop"){
         return(nlmixrUI.poped.notfixed_bpop(obj));
     } else if (arg == "poped.ff_fun"){
@@ -2040,6 +2058,8 @@ nlmixrUI.poped.ff_fun <- function(obj){
     }
     ret
 }
+
+
 
 ##' @export
 str.nlmixrUI <- function(object, ...){

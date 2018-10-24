@@ -1,6 +1,6 @@
 // [[Rcpp::plugins(openmp)]]
 #define ARMA_DONT_PRINT_ERRORS
-#define ARMA_DONT_USE_OPENMP // Known to cause speed
+#define ARMA_DONT_USE_OPENMP // Known to cause speed problems
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -71,6 +71,10 @@ extern "C"{
   isRstudio_t isRstudio;
   getRxSolve_t getRx;
 }
+
+extern void lin_cmt_stanC(double *obs_timeD, const int nobs, double *dose_timeD, const int ndose, double *doseD, double *TinfD,
+			  double *paramsD, const int oral, const int infusion, const int ncmt, const int parameterization,
+			  const int neta, double *fxD, double *dvdxD, double *fpD);
 
 List _rxInv;
 

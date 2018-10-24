@@ -11,14 +11,14 @@ using namespace Rcpp;
 
 //[[Rcpp::export]]
 SEXP lin_cmt_stan(Eigen::Map<Eigen::VectorXd> obs_time,
-			 Eigen::Map<Eigen::VectorXd> dose_time,
-			 Eigen::Map<Eigen::VectorXd> dose,
-			 Eigen::Map<Eigen::VectorXd> Tinf,
-			 Eigen::Map<Eigen::VectorXd> params,
-			 SEXP oralSEXP,
-			 SEXP infusionSEXP,
-			 SEXP ncmtSEXP,
-			 SEXP parameterizationSEXP ) {
+		  Eigen::Map<Eigen::VectorXd> dose_time,
+		  Eigen::Map<Eigen::VectorXd> dose,
+		  Eigen::Map<Eigen::VectorXd> Tinf,
+		  Eigen::Map<Eigen::VectorXd> params,
+		  SEXP oralSEXP,
+		  SEXP infusionSEXP,
+		  SEXP ncmtSEXP,
+		  SEXP parameterizationSEXP ) {
   const int oral = as<int>(oralSEXP);
   const int infusion = as<int>(infusionSEXP);
   const int ncmt = as<int>(ncmtSEXP);
@@ -26,10 +26,36 @@ SEXP lin_cmt_stan(Eigen::Map<Eigen::VectorXd> obs_time,
   stan::math::lin_cmt_fun f(obs_time, dose_time, dose, Tinf, ncmt, oral, infusion, parameterization);
   Eigen::VectorXd fx;
   Eigen::Matrix<double, -1, -1> J;
+  // ncol = npar
+  /// nrow = nobs
   stan::math::jacobian(f, params, fx, J);
 
   return Rcpp::List::create(Rcpp::Named("fx") = wrap(fx),
 			    Rcpp::Named("J") = wrap(J));
+}
+
+extern void lin_cmt_stanC(double *obs_timeD, const int nobs, double *dose_timeD, const int ndose, double *doseD, double *TinfD,
+			  double *paramsD, const int oral, const int infusion, const int ncmt, const int parameterization,
+			  const int neta, double *fxD, double *dvdxD, double *fpD){
+  Eigen::Map<Eigen::VectorXd> obs_time(obs_timeD, nobs);
+  Eigen::Map<Eigen::VectorXd> dose_time(dose_timeD, ndose);
+  Eigen::Map<Eigen::VectorXd> dose(doseD, ndose);
+  Eigen::Map<Eigen::VectorXd> Tinf(TinfD, ndose);
+  Eigen::Map<Eigen::VectorXd> params(paramsD, (int)(2*ncmt+2));
+  stan::math::lin_cmt_fun f(obs_time, dose_time, dose, Tinf, ncmt, oral, infusion, parameterization);
+  Eigen::VectorXd fx;
+  Eigen::Matrix<double, -1, -1> J;
+  // Jacobian ncols=npars
+  // nrows=nobs
+  
+  stan::math::jacobian(f, params, fx, J);
+  std::copy(&fx[0],&fx[0]+nobs, fpD);
+  // dvdx
+  // ncol = netas
+  // nrow = npars
+  Eigen::Map<Eigen::MatrixXd> dvdx(dvdxD, 2*ncmt+2, neta);
+  Eigen::Map<Eigen::MatrixXd> fp(fpD, nobs, neta);
+  fp = J.transpose() * dvdx;
 }
 
 
