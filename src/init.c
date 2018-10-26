@@ -64,6 +64,7 @@ SEXP _nlmixr_sqrtm(SEXP);
 SEXP _nlmixr_foceiCalcCov(SEXP);
 SEXP _nlmixr_foceiFitCpp_(SEXP);
 SEXP _nlmixr_coxBox_(SEXP, SEXP, SEXP);
+SEXP _nlmixr_freeFocei();
 
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
@@ -72,6 +73,7 @@ static const R_CMethodDef CEntries[] = {
 };
 
 static const R_CallMethodDef CallEntries[] = {
+  {"_nlmixr_freeFocei", (DL_FUNC) &_nlmixr_freeFocei, 0},
   {"_nlmixr_chkSolvedInf",(DL_FUNC) &_nlmixr_chkSolvedInf, 2},
   {"neldermead_wrap",      (DL_FUNC) &neldermead_wrap,      11},
   /* {"n1qn1_wrap",           (DL_FUNC) &n1qn1_wrap,           13}, */

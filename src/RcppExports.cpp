@@ -7,6 +7,15 @@
 
 using namespace Rcpp;
 
+// freeFocei
+void freeFocei();
+RcppExport SEXP _nlmixr_freeFocei() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    freeFocei();
+    return R_NilValue;
+END_RCPP
+}
 // foceiInnerLp
 NumericVector foceiInnerLp(NumericVector eta, int id);
 RcppExport SEXP _nlmixr_foceiInnerLp(SEXP etaSEXP, SEXP idSEXP) {

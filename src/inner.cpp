@@ -378,6 +378,11 @@ extern "C" void rxOptionsFreeFocei(){
   if (op_focei.gillErr != NULL) Free(op_focei.gillErr);
 }
 
+//[[Rcpp::export]]
+void freeFocei(){
+  rxOptionsFreeFocei();
+}
+
 focei_ind *rxFoceiEnsure(int mx){
   if (mx >= max_inds_focei){
     Free(inds_focei);

@@ -1225,7 +1225,7 @@ foceiFit.data.frame0 <- function(data,
                                 etaMat=NULL,
                                 ...,
                                 env=NULL){
-    on.exit({RxODE::rxSolveFree()});
+    on.exit({RxODE::rxSolveFree(); freeFocei();});
     .pt <- proc.time();
     loadNamespace("n1qn1");
     if (!RxODE::rxIs(control, "foceiControl")){
