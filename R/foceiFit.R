@@ -1609,6 +1609,12 @@ print.nlmixrClass <- function(x, ...){
     if (arg == "theta") arg <- "fixef"
     if (arg == "varFix") arg <- "cov"
     if (arg == "thetaMat") arg <- "cov"
+    if (arg == "seed" && exists("saem", .env)){
+        return(attr(.env$saem, "saem.cfg")$seed);
+    }
+    if (arg == "saem.cfg" && exists("saem", .env)){
+        return(attr(.env$saem, "saem.cfg"));
+    }
     if (exists(arg, envir=.env)){
         return(get(arg, envir=.env));
     }
