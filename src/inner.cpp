@@ -3717,9 +3717,22 @@ Environment foceiFitCpp_(Environment e){
   }
   e["scaleC"] = scaleSave;
   IntegerVector gillRet(op_focei.ntheta+op_focei.omegan);
+  NumericVector gillAEps(op_focei.ntheta+op_focei.omegan,NA_REAL);
+  NumericVector gillREps(op_focei.ntheta+op_focei.omegan,NA_REAL);
+  NumericVector gillAEpsC(op_focei.ntheta+op_focei.omegan,NA_REAL);
+  NumericVector gillREpsC(op_focei.ntheta+op_focei.omegan,NA_REAL);
+  NumericVector gillCAEpsC(op_focei.ntheta+op_focei.omegan,NA_REAL);
+  NumericVector gillCREpsC(op_focei.ntheta+op_focei.omegan,NA_REAL);
   bool warnGill = false;
+  j = op_focei.npars;
   for (int i = op_focei.ntheta+op_focei.omegan; i--;){
     gillRet[i] = op_focei.gillRet[i]+1;
+    if (gillRet[i] != 1) {
+      gillAEps[i] = op_focei.aEps[--j];
+      gillREps[i] = op_focei.rEps[j];
+      gillAEpsC[i] = op_focei.aEpsC[j];
+      gillREpsC[i] = op_focei.rEpsC[j];
+    }
     if (gillRet[i] >= 3) warnGill=true;
   }
   CharacterVector gillLvl = CharacterVector::create("Not Assessed","Good","High Grad Error", "Constant Grad","Odd/Linear Grad",
@@ -3731,9 +3744,14 @@ Environment foceiFitCpp_(Environment e){
   foceiCalcCov(e);
   IntegerVector gillRetC(op_focei.ntheta+op_focei.omegan);
   bool warnGillC = false;
+  j = op_focei.npars;
   for (int i = op_focei.ntheta+op_focei.omegan; i--;){
     gillRetC[i] = op_focei.gillRetC[i]+1;
     if (gillRetC[i] >= 3) warnGillC=true;
+    if (gillRetC[i] != 1) {
+      gillCAEpsC[i] = op_focei.aEpsC[--j];
+      gillCREpsC[i] = op_focei.rEpsC[j];
+    }
   }
   gillRetC.attr("levels") = gillLvl;
   gillRetC.attr("class") = "factor";
@@ -3749,8 +3767,18 @@ Environment foceiFitCpp_(Environment e){
   e["time"] = timeDf;
   List scaleInfo = List::create(as<NumericVector>(e["fullTheta"]),
 				as<NumericVector>(e["scaleC"]), gillRet,
-				gillRetC);
-  scaleInfo.attr("names") = CharacterVector::create("est","scaleC","Initial Gradient","Covariance Gradient");
+				gillAEps,
+				gillREps,
+				gillAEpsC,
+				gillREpsC,
+				gillRetC,
+				gillCAEpsC,
+				gillCREpsC);
+  scaleInfo.attr("names") = CharacterVector::create("est","scaleC","Initial Gradient",
+						    "Forward aEps","Forward rEps",
+						    "Central aEps","Central rEps",
+						    "Covariance Gradient",
+						    "Covariance aEps","Covariance rEps");
   scaleInfo.attr("class") = "data.frame";
   scaleInfo.attr("row.names") = IntegerVector::create(NA_INTEGER,-gillRet.size());
   e["scaleInfo"] = scaleInfo;
