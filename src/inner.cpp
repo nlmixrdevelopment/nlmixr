@@ -219,7 +219,10 @@ typedef struct {
   int covTryHarder;
   // Gill options
   int gillK;
+  double gillStep;
   double gillRtol;
+  int gillKcov;
+  double gillStepCov;
   int didGill;
 } focei_options;
 
@@ -1384,7 +1387,7 @@ static inline double phiB(double f, double fn, double h){
 //         4 -- Function odd or nearly linear, df = K, df2 ~ 0
 //         5 -- df2 increases rapidly as h decreases
 int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
-	   double *theta, int cpar, double epsR, int K){
+	   double *theta, int cpar, double epsR, int K, double gillStep){
   op_focei.calcGrad=1;
   double f= op_focei.lastOfv , x, hbar, h0, fp, fn, phif, phib, phic, phicc = 0, phi, Chf, Chb, Ch, hs, hphi, hk, tmp, ehat;
   int k = 0;
@@ -1424,7 +1427,7 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   }
  FD3: // Increase h
   k++;
-  hk=hk*10;
+  hk=hk*pow(10, gillStep);
   // Compute the associated finite difference estimates and their
   // relative condition errors.
   theta[cpar] = x + hk;
@@ -1452,7 +1455,7 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   goto FD3;
  FD4: // Decrease h
   k++;
-  hk=hk/10;
+  hk=hk/pow(10, gillStep);
   // Compute the associated finite difference estimates and their
   // relative condition errors.
   theta[cpar] = x + hk;
@@ -1538,7 +1541,7 @@ void numericGrad(double *theta, double *g){
     double hf, hphif, err;
     for (int cpar = op_focei.npars; cpar--;){
       op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
-				      theta, cpar, op_focei.gillRtol, op_focei.gillK);
+				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep);
       err = 1/(std::fabs(theta[cpar])+1); 
       // h=aEps*(|x|+1)/sqrt(1+fabs(f));
       // h*sqrt(1+fabs(f))/(|x|+1) = aEps
@@ -2060,6 +2063,9 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.covTryHarder=as<int>(odeO["covTryHarder"]);
   op_focei.resetHessianAndEta=as<int>(odeO["resetHessianAndEta"]);
   op_focei.gillK = as<int>(odeO["gillK"]);
+  op_focei.gillKcov = as<int>(odeO["gillKcov"]);
+  op_focei.gillStep    = fabs(as<double>(odeO["gillStep"]));
+  op_focei.gillStepCov = fabs(as<double>(odeO["gillStepCov"]));
   op_focei.didGill = 0;
   op_focei.gillRtol = as<double>(odeO["gillRtol"]);
   op_focei.scaleType = as<int>(odeO["scaleType"]);
@@ -2885,21 +2891,29 @@ NumericMatrix foceiCalcCov(Environment e){
       }
       std::copy(&theta[0], &theta[0] + op_focei.npars, &op_focei.theta[0]);
       for (int cpar = op_focei.npars; cpar--;){
-	op_focei.gillRetC[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
-					 &theta[0], cpar, op_focei.hessEps, op_focei.gillK);
 	err = 1/(std::fabs(theta[cpar])+1);
-	// h=aEps*(|x|+1)/sqrt(1+fabs(f));
-	// h*sqrt(1+fabs(f))/(|x|+1) = aEps
-	// let err=2*sqrt(epsA/(1+f))
-	// err*(aEps+|x|rEps) = h
-	// Let aEps = rEps (could be a different ratio)
-	// h/err = aEps(1+|x|)
-	// aEps=h/err/(1+|x|)
-	//
-	op_focei.aEps[cpar]  = hf*err;
-	op_focei.rEps[cpar]  = hf*err;
-	op_focei.aEpsC[cpar] = hphif*err;
-	op_focei.rEpsC[cpar] = hphif*err;
+	if (op_focei.gillKcov != 0){
+	  op_focei.gillRetC[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+					   &theta[0], cpar, op_focei.hessEps, op_focei.gillKcov, op_focei.gillStepCov);
+	  // h=aEps*(|x|+1)/sqrt(1+fabs(f));
+	  // h*sqrt(1+fabs(f))/(|x|+1) = aEps
+	  // let err=2*sqrt(epsA/(1+f))
+	  // err*(aEps+|x|rEps) = h
+	  // Let aEps = rEps (could be a different ratio)
+	  // h/err = aEps(1+|x|)
+	  // aEps=h/err/(1+|x|)
+	  //
+	  op_focei.aEps[cpar]  = hf*err;
+	  op_focei.rEps[cpar]  = hf*err;
+	  op_focei.aEpsC[cpar] = hphif*err;
+	  op_focei.rEpsC[cpar] = hphif*err;
+	} else {
+	  hf = op_focei.hessEps;
+	  op_focei.aEps[cpar]  = hf*err;
+	  op_focei.rEps[cpar]  = hf*err;
+	  op_focei.aEpsC[cpar] = hf*err;
+	  op_focei.rEpsC[cpar] = hf*err;
+	}
 	op_focei.cur++;
 	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
       }
