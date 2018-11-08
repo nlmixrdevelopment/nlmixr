@@ -45,8 +45,53 @@ rxPermissive({
         runno <- "N068"
 
         dat <- datr[datr$SD == 1,]
-
+    })
+    test_that("Linux", {
+        skip_on_os("mac")
+        skip_on_os("windows")
+        skip_on_os("solaris")
         fit <-
+          nlme_ode(
+            dat,
+            model = ode2MMKA,
+            par_model = specs9,
+            par_trans = mypar9,
+            response = "centr",
+            response.scaler = "V",
+            verbose = TRUE,
+            weight = varPower(fixed = c(1)),
+            control = nlmeControl(pnlsTol = .08, msVerbose = TRUE, msMaxIter=1000)
+          )
+
+        z <- VarCorr(fit)
+
+        expect_equal(signif(as.numeric(fit$logLik), 6), -11755.9)
+        expect_equal(signif(AIC(fit), 6), 23537.9)
+        expect_equal(signif(BIC(fit), 6), 23612.4)
+
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[1]), 3), 7.33)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[2]), 3), 6.1)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[3]), 3), 4.24)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[4]), 3), 1.39)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[5]), 3), 3.75)
+        expect_equal(signif(as.numeric(fit$coefficients$fixed[6]), 3), -0.0271)
+
+        expect_equal(signif(as.numeric(z[1, "StdDev"]), 3),  0.189)
+        expect_equal(signif(as.numeric(z[2, "StdDev"]), 3), 0.331)
+        expect_equal(signif(as.numeric(z[3, "StdDev"]), 3), 0.343)
+        # This parameter is notably different between platforms
+        #expect_equal(signif(as.numeric(z[4, "StdDev"]), 3), 0.000205) # Windows
+        expect_true(abs(as.numeric(z[4, "StdDev"])) < 100*sqrt(.Machine$double.eps)) # Linux (Docker)
+        expect_equal(signif(as.numeric(z[5, "StdDev"]), 3), 0.248)
+        expect_equal(signif(as.numeric(z[6, "StdDev"]), 3), 0.277)
+
+        expect_equal(signif(fit$sigma, 3), 0.205)
+    });
+    test_that("Windows", {
+        skip_on_os("mac")
+        skip_on_os("linux")
+        skip_on_os("solaris")
+                fit <-
             nlme_ode(
                 dat,
                 model = ode2MMKA,
@@ -81,4 +126,5 @@ rxPermissive({
 
         expect_equal(signif(fit$sigma, 3), 0.205)
     })
+
 })
