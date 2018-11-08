@@ -224,6 +224,9 @@ typedef struct {
   int gillKcov;
   double gillStepCov;
   int didGill;
+  int smatNorm;
+  int rmatNorm;
+  int covGillF;
 } focei_options;
 
 focei_options op_focei;
@@ -2074,6 +2077,9 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.scaleCmax=as<double>(odeO["scaleCmax"]);
   op_focei.abstol=as<double>(odeO["abstol"]);
   op_focei.reltol=as<double>(odeO["reltol"]);
+  op_focei.smatNorm=as<int>(odeO["smatNorm"]);
+  op_focei.rmatNorm=as<int>(odeO["rmatNorm"]);
+  op_focei.covGillF=as<int>(odeO["covGillF"]);
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
   for (unsigned int k = op_focei.npars; k--;){
@@ -2724,11 +2730,20 @@ void foceiS(double *theta, Environment e){
     }
   }
   for (cpar = npars; cpar--;){
-    if (doForward){
-      delta = (std::fabs(theta[cpar])*op_focei.rEps[cpar] + op_focei.aEps[cpar])/sqrt(1+std::fabs(min2(op_focei.initObjective, op_focei.lastOfv)));
+    if (op_focei.smatNorm){
+      if (doForward){
+	delta = (std::fabs(theta[cpar])*op_focei.rEps[cpar] + op_focei.aEps[cpar])/sqrt(1+std::fabs(min2(op_focei.initObjective, op_focei.lastOfv)));
+      } else {
+	delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar])/sqrt(1+std::fabs(min2(op_focei.initObjective, op_focei.lastOfv)));
+      }
     } else {
-      delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar])/sqrt(1+std::fabs(min2(op_focei.initObjective, op_focei.lastOfv)));
+      if (doForward){
+	delta = std::fabs(theta[cpar])*op_focei.rEps[cpar] + op_focei.aEps[cpar];
+      } else {
+	delta = std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar];
+      }
     }
+    
     std::fill_n(&op_focei.goldEta[0], op_focei.gEtaGTransN, -42.0); // All etas = -42;  Unlikely if normal
     cur = theta[cpar];
     theta[cpar] = cur + delta;
@@ -2891,7 +2906,7 @@ NumericMatrix foceiCalcCov(Environment e){
       }
       std::copy(&theta[0], &theta[0] + op_focei.npars, &op_focei.theta[0]);
       for (int cpar = op_focei.npars; cpar--;){
-	err = 1/(std::fabs(theta[cpar])+1);
+	err = op_focei.rmatNorm ? 1/(std::fabs(theta[cpar])+1) : 1;
 	if (op_focei.gillKcov != 0){
 	  op_focei.gillRetC[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
 					   &theta[0], cpar, op_focei.hessEps, op_focei.gillKcov, op_focei.gillStepCov);
@@ -2903,10 +2918,16 @@ NumericMatrix foceiCalcCov(Environment e){
 	  // h/err = aEps(1+|x|)
 	  // aEps=h/err/(1+|x|)
 	  //
+	  
 	  op_focei.aEps[cpar]  = hf*err;
 	  op_focei.rEps[cpar]  = hf*err;
-	  op_focei.aEpsC[cpar] = hphif*err;
-	  op_focei.rEpsC[cpar] = hphif*err;
+	  if (op_focei.covGillF){
+	    op_focei.aEpsC[cpar] = hf*err;
+	    op_focei.rEpsC[cpar] = hf*err;
+	  } else {
+	    op_focei.aEpsC[cpar] = hphif*err;
+	    op_focei.rEpsC[cpar] = hphif*err;
+	  }
 	} else {
 	  hf = op_focei.hessEps;
 	  op_focei.aEps[cpar]  = hf*err;
