@@ -33,6 +33,7 @@ Authors@R: c(person("Matthew","Fidler",
    person("Robert B.", "Schnabel",role="ctb"),
    person("Elizabeth", "Eskow", role="ctb"), 
    person("David","Ardia",role = "cph"),
+   person("Bill", "Denny", role="ctb"),
    person("Katharine","Mullen",role = "cph")
    )
 Description: Fit and compare nonlinear mixed-effects models in differential
