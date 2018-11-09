@@ -168,13 +168,13 @@ nlmixrSim <- function(object, ...){
 
     if (any(names(.xtra) == "omega")){
         .si$omega <- .xtra$omega;
-        if (is.na(.xtra$omega)){
+        if (any(is.na(.xtra$omega))){
             .si$omega <- NULL
         }
     }
     if (any(names(.xtra) == "sigma")){
         .si$sigma <- .xtra$sigma;
-        if (is.na(.xtra$sigma)){
+        if (any(is.na(.xtra$sigma))){
             .si$sigma <- NULL
         }
     }
