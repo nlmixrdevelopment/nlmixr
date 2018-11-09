@@ -1,5 +1,7 @@
 library(testthat)
 library(nlmixr)
+if (!exists("verbose_minimization")) verbose_minimization <- FALSE
+
 rxPermissive({
     context("NLME35: two-compartment oral, multiple-dose")
     test_that("Closed-form", {
@@ -46,7 +48,7 @@ rxPermissive({
                 dat,
                 par_model = specs6,
                 ncmt = 2,
-                verbose = TRUE,
+                verbose = verbose_minimization,
                 oral = FALSE,
                 weight = varPower(fixed = c(1))
             )
@@ -115,9 +117,9 @@ rxPermissive({
                 par_trans = mypar6,
                 response = "centr",
                 response.scaler = "V",
-                verbose = TRUE,
+                verbose = verbose_minimization,
                 weight = varPower(fixed = c(1)),
-                control = nlmeControl(pnlsTol = .3, msVerbose = TRUE)
+                control = nlmeControl(pnlsTol = 0.3, msVerbose = verbose_minimization)
             )
 
         z <- VarCorr(fitODE)

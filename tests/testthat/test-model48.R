@@ -1,6 +1,7 @@
 library(testthat)
 library(nlmixr)
 library(reshape2)
+if (!exists("verbose_minimization")) verbose_minimization <- FALSE
 
 rxPermissive({
     context("NLME48: two-compartment infusion, steady-state")
@@ -69,13 +70,13 @@ rxPermissive({
                 dat,
                 par_model = specs6,
                 ncmt = 2,
-                verbose = TRUE,
+                verbose = verbose_minimization,
                 oral = FALSE,
                 infusion = TRUE,
                 weight = varPower(fixed = c(1)),
                 control = nlmeControl(
                     pnlsTol = .1,
-                    msVerbose = TRUE,
+                    msVerbose = verbose_minimization,
                     maxIter = 200
                 )
             )
@@ -182,9 +183,9 @@ rxPermissive({
                 par_trans = mypar6,
                 response = "centr",
                 response.scaler = "V",
-                verbose = TRUE,
+                verbose = verbose_minimization,
                 weight = varPower(fixed = c(1)),
-                control = nlmeControl(pnlsTol = .1, msVerbose = TRUE)
+                control = nlmeControl(pnlsTol = .1, msVerbose = verbose_minimization)
             )
 
         z <- VarCorr(fitODE)
