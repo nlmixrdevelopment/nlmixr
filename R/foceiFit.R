@@ -387,7 +387,8 @@ foceiControl <- function(sigdig=3,
                          gillStepCov=1,
                          rmatNorm=TRUE,
                          smatNorm=TRUE,
-                         covGillF=FALSE,
+                         covGillF=TRUE,
+                         optGillF=TRUE,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -614,6 +615,7 @@ foceiControl <- function(sigdig=3,
                  rmatNorm=as.integer(rmatNorm),
                  smatNorm=as.integer(smatNorm),
                  covGillF=as.integer(covGillF),
+                 optGillF=as.integer(optGillF),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
