@@ -1464,11 +1464,11 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         }
         if (is.na(calcResid)){
             if (is.na(.saemObf)){
-                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
+                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), ifelse(uif$predSys, "PRED", "ODE"), "Solved")),
                                      " ",crayon::bold$blue(uif$saem.distribution), ") ",
                                      crayon::blurred$italic("OBJF not calculated"))
             } else {
-                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),
+                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), ifelse(uif$predSys, "PRED", "ODE"), "Solved")),
                                      " ",crayon::bold$blue(uif$saem.distribution), "); ",
                                      crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
             }
@@ -1481,13 +1481,13 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
             .env$noLik <- FALSE;
             .env$objective <- .saemObf;
         } else if (calcResid){
-            .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")), "); ",
+            .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), ifelse(uif$predSys, "PRED", "ODE"), "Solved")), "); ",
                                  crayon::blurred$italic("OBJF calculated from FOCEi approximation"))
         } else {
             if (!is.na(.saemObf)){
-                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
+                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), ifelse(uif$predSys, "PRED", "ODE"), "Solved")),"); ", crayon::blurred$italic("OBJF by SAEM Gaussian quadrature"))
             } else {
-                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), "ODE", "Solved")),"); ", crayon::blurred$italic("OBJF not calculated"))
+                .env$extra <- paste0("(", crayon::italic(ifelse(is.null(uif$nmodel$lin.solved), ifelse(uif$predSys, "PRED", "ODE"), "Solved")),"); ", crayon::blurred$italic("OBJF not calculated"))
             }
             .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
             .env$fullTheta <- setNames(init$THTA, uif$focei.names)

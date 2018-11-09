@@ -1085,6 +1085,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (inherits(nlme.mu.fun, "try-error")){
         nlme.mu.fun <- NULL
     }
+    .pred <- FALSE
+    if (!rxode && all(regexpr(rex::rex("linCmt("), deparse(body(fun))) == -1)){
+        rxode <- TRUE
+        .pred <- TRUE
+    }
     if (rxode){
         rx.txt <- deparse(body(rest))[-1]
         rx.txt <- rx.txt[-length(rx.txt)];
@@ -1289,7 +1294,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
                             log.theta=log.theta,
                             log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
-                            predDf=.predDf, predSaem =.predSaem, env=env))
+                            predDf=.predDf, predSaem =.predSaem, env=env, predSys=.pred))
     return(ret)
 }
 ##' Create the nlme specs list for nlmixr nlme solving
@@ -1719,7 +1724,7 @@ nlmixrUI.saem.fit <- function(obj){
         return(obj$env$saem.fit)
     } else if (!is.null(obj$rxode)) {
         ## RxODE function
-        message("Compiling RxODE differential equations...", appendLF=FALSE)
+        message("Compiling RxODE equations...", appendLF=FALSE)
         if (obj$env$sum.prod){
             ode <- RxODE::RxODE(RxODE::rxSumProdModel(obj$rxode));
         } else {
@@ -1885,7 +1890,11 @@ nlmixrUI.saem.init <- function(obj){
 
 nlmixrUI.model.desc <- function(obj){
     if (!is.null(obj$rxode.pred)){
-        return("RxODE-based model")
+        if (obj$predSys){
+            return("RxODE-based Pred model")
+        } else {
+            return("RxODE-based ODE model")
+        }
         ## n.cmt <- length(RxODE::rxState(RxODE::rxGetModel(obj$rxode.pred)));
         ## if (n.cmt == 0){
         ##     return("Compiled Model (with no ODEs)");
