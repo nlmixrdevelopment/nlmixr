@@ -1,5 +1,6 @@
 library(testthat)
 library(nlmixr)
+if (!exists("verbose_minimization")) verbose_minimization <- FALSE
 
 rxPermissive({
     context("NLME09: one-compartment bolus, Michaelis-Menten, single-dose")
@@ -38,9 +39,9 @@ d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);
                 par_trans = mypar3,
                 response = "centr",
                 response.scaler = "V",
-                verbose = TRUE,
+                verbose = verbose_minimization,
                 weight = varPower(fixed = c(1)),
-                control = nlmeControl(pnlsTol = .01, msVerbose = TRUE)
+                control = nlmeControl(pnlsTol = .01, msVerbose = verbose_minimization)
             )
 
         z <- summary(fit)
