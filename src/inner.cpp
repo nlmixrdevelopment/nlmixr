@@ -3244,7 +3244,11 @@ void foceiFinalizeTables(Environment e){
   arma::mat cov;
   bool covExists = e.exists("cov");
   if (covExists){
-    cov= as<arma::mat>(e["cov"]);
+    if (RxODE::rxIs(e["cov"], "matrix")){
+      cov= as<arma::mat>(e["cov"]);
+    } else {
+      covExists = false;
+    }
   }
   LogicalVector skipCov = e["skipCov"];
 
@@ -3454,7 +3458,7 @@ void foceiFinalizeTables(Environment e){
   std::string bt = "Back-transformed(" + std::to_string((int)(op_focei.ci*100)) + "%CI)";
   
   List popDfSig;
-  if (e.exists("cov")){
+  if (e.exists("cov") && RxODE::rxIs(e["cov"], "matrix")){
     popDfSig = List::create(_["Est."]=EstS, 
                    _["SE"]=SeS, 
                    _["%RSE"]=rseS,
@@ -3478,7 +3482,7 @@ void foceiFinalizeTables(Environment e){
   e["se"] = tmpNV;
 
   // Now get covariance names
-  if (e.exists("cov")){
+  if (e.exists("cov")  && RxODE::rxIs(e["cov"], "matrix")){
     tmpNM = as<NumericMatrix>(e["cov"]);
     CharacterVector thetaCovN(tmpNM.nrow());
     LogicalVector skipCov = e["skipCov"];
@@ -3493,62 +3497,62 @@ void foceiFinalizeTables(Environment e){
     List thetaDim = List::create(thetaCovN,thetaCovN);
     tmpNM.attr("dimnames") = thetaDim;
     e["cov"]=tmpNM;
-    if (e.exists("Rinv")){
+    if (e.exists("Rinv") && RxODE::rxIs(e["Rinv"], "matrix")){
       tmpNM = as<NumericMatrix>(e["Rinv"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["Rinv"]=tmpNM;
     }
-    if (e.exists("Sinv")){
+    if (e.exists("Sinv") && RxODE::rxIs(e["Sinv"], "matrix")){
       tmpNM = as<NumericMatrix>(e["Sinv"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["Sinv"]=tmpNM;
     }
-    if (e.exists("S")){
+    if (e.exists("S") && RxODE::rxIs(e["S"], "matrix")){
       tmpNM = as<NumericMatrix>(e["S"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["S"]=tmpNM;
     }
-    if (e.exists("R")){
+    if (e.exists("R") && RxODE::rxIs(e["R"], "matrix")){
       tmpNM = as<NumericMatrix>(e["R"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["R"]=tmpNM;
     }
-    if (e.exists("covR")){
+    if (e.exists("covR") && RxODE::rxIs(e["covR"], "matrix")){
       tmpNM = as<NumericMatrix>(e["covR"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["covR"]=tmpNM;
     }
-    if (e.exists("covRS")){
+    if (e.exists("covRS") && RxODE::rxIs(e["covRS"], "matrix")){
       tmpNM = as<NumericMatrix>(e["covRS"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["covRS"]=tmpNM;
     }
-    if (e.exists("covS")){
+    if (e.exists("covS") && RxODE::rxIs(e["covS"], "matrix")){
       tmpNM = as<NumericMatrix>(e["covS"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["covS"]=tmpNM;
     }
-    if (e.exists("R.1")){
+    if (e.exists("R.1") && RxODE::rxIs(e["R.1"], "matrix")){
       tmpNM = as<NumericMatrix>(e["R.1"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["R.1"]=tmpNM;
     }
-    if (e.exists("R.2")){
+    if (e.exists("R.2") && RxODE::rxIs(e["R.2"], "matrix")){
       tmpNM = as<NumericMatrix>(e["R.2"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["R.2"]=tmpNM;
     }
-    if (e.exists("cholR")){
+    if (e.exists("cholR") && RxODE::rxIs(e["cholR"], "matrix")){
       tmpNM = as<NumericMatrix>(e["cholR"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["cholR"]=tmpNM;
     }
-    if (e.exists("cholR2")){
+    if (e.exists("cholR2") && RxODE::rxIs(e["cholR2"], "matrix")){
       tmpNM = as<NumericMatrix>(e["cholR2"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["cholR2"]=tmpNM;
     }
-    if (e.exists("cholS")){
+    if (e.exists("cholS") && RxODE::rxIs(e["cholS"], "matrix")){
       tmpNM = as<NumericMatrix>(e["cholS"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["cholS"]=tmpNM;
