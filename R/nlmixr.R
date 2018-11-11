@@ -595,6 +595,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             if (any(names(.tmp1) == "Condition Number")) .objDf <- data.frame(.objDf, "Condition Number"=NA, check.names=FALSE);
             env$objDf <- rbind(.tmp1, .objDf);
             row.names(env$objDf) <- c(ifelse(est == "fo", "FOCE", "FOCEi"), "FO");
+            env$objDf <- env$objDf[, c("OBJF", "AIC", "BIC", "Log-likelihood", "Condition Number")]
+            setOfv(env, "fo")
         }
         fit <- fix.dat(fit);
         fit <- .addNpde(fit);

@@ -2134,3 +2134,38 @@ coxBox <- function(x, lambda=1){
 yeoJohnson <- function(x, lambda=1){
     .Call(`_RxODE_coxBox_`, x, lambda, 1L)
 }
+
+##' Set Objective function type for a nlmixr object
+##'
+##'
+##' @param x nlmixr fit object
+##' @param type Type of objective function to use for AIC, BIC, and $objective
+##' @return Nothing
+##' @author Matthew L. Fidler
+setOfv <- function(x, type){
+    if (inherits(x, "nlmixrFitCore")){
+        .objDf <- x$objDf
+        .w <- which(tolower(row.names(.objDf)) == tolower(type))
+        if (length(.w) == 1){
+            .env <- x$env;
+            .objf <- .objDf[.w, "OBJF"];
+            .lik <- -.objf/2;
+            attr(.lik, "df") <- attr(x$logLik, "df")
+            attr(.lik, "nobs") = attr(x$logLik, "nobs");
+            class(.lik) <- "logLik"
+            .bic <- .objDf[.w, "BIC"];
+            .aic <- .objDf[.w, "AIC"];
+            .env$OBJF <- .objf
+            .env$objf <- .objf
+            .env$objective <- .objf
+            .env$logLik <- .lik;
+            .env$AIC <- .aic
+            .env$BIC <- .bic
+            invisible(NULL)
+        } else {
+            stop("Cannot switch objective function to '%s' type.", type);
+        }
+    } else {
+        stop("Wrong type of object.");
+    }
+}

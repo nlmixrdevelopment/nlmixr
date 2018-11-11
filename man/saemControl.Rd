@@ -39,33 +39,6 @@ computation.  In Monolix this is equivalent to \code{L}}
     The third value represents the number of bootstrap/reshuffling or
     uni-dimensional random samples are taken.}
 
-\item{atol}{a numeric absolute tolerance (1e-8 by default) used
-by the ODE solver to determine if a good solution has been
-achieved;  This is also used in the solved linear model to check
-if prior doses do not add anything to the solution.}
-
-\item{rtol}{a numeric relative tolerance (1e-6 by default) used
-by the ODE solver to determine if a good solution has been
-achieved. This is also used in the solved linear model to check
- if prior doses do not add anything to the solution.}
-
-\item{stiff}{a logical (\code{TRUE} by default) indicating whether
-    the ODE system is stiff or not.
-
-    For stiff ODE sytems (\code{stiff = TRUE}), \code{RxODE} uses the
-    LSODA (Livermore Solver for Ordinary Differential Equations)
-    Fortran package, which implements an automatic method switching
-    for stiff and non-stiff problems along the integration
-    interval, authored by Hindmarsh and Petzold (2003).
-
-    For non-stiff systems (\code{stiff = FALSE}), \code{RxODE} uses
-    DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
-    Dormand and Prince as implemented in C by Hairer and Wanner
-    (1993).}
-
-\item{transitAbs}{boolean indicating if this is a transit
-compartment absorption}
-
 \item{print}{The number it iterations that are completed before
 anything is printed to the console.  By default, this is 1.}
 

@@ -10,15 +10,6 @@ nlmixrPred(object, ..., ipred = FALSE)
 \method{predict}{nlmixrFitData}(object, ...)
 }
 \arguments{
-\item{object}{is a either a RxODE family of objects, or a file-name
-with a RxODE model specification, or a string with a RxODE
-model specification.}
-
-\item{...}{Other arguments including scaling factors for each
-compartment.  This includes S# = numeric will scale a compartment
-# by a dividing the compartment amount by the scale factor,
-like NONMEM.}
-
 \item{ipred}{Flag to calculate individual predictions. When
 \code{ipred} is \code{TRUE}, calculate individual predictions.
 When \code{ipred} is \code{FALSE}, set calculate typical population predations.
