@@ -33,7 +33,9 @@ Authors@R: c(person("Matthew","Fidler",
    person("Robert B.", "Schnabel",role="ctb"),
    person("Elizabeth", "Eskow", role="ctb"), 
    person("David","Ardia",role = "cph"),
-   person("Bill", "Denny", role="ctb"),
+   person("Bill", "Denney", role=c("ctb"),
+      email="wdenney@humanpredictions.com",
+      comment=c(ORCID="0000-0002-5759-428X")),
    person("Katharine","Mullen",role = "cph")
    )
 Description: Fit and compare nonlinear mixed-effects models in differential
