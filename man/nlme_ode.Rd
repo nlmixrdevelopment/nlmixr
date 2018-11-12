@@ -28,6 +28,40 @@ nlmeOde(dat.o, model, parModel, parTrans, response,
 
 \item{responseScaler}{optional response variable scaler. default is NULL}
 
+\item{transitAbs}{boolean indicating if this is a transit
+compartment absorption}
+
+\item{atol}{a numeric absolute tolerance (1e-8 by default) used
+by the ODE solver to determine if a good solution has been
+achieved;  This is also used in the solved linear model to check
+if prior doses do not add anything to the solution.}
+
+\item{rtol}{a numeric relative tolerance (1e-6 by default) used
+by the ODE solver to determine if a good solution has been
+achieved. This is also used in the solved linear model to check
+ if prior doses do not add anything to the solution.}
+
+\item{maxsteps}{maximum number of (internally defined) steps allowed
+during one call to the solver. (5000 by default)}
+
+\item{hmin}{The minimum absolute step size allowed. The default
+value is 0.}
+
+\item{hmax}{The maximum absolute step size allowed.  The default
+checks for the maximum difference in times in your sampling and
+events, and uses this value.  The value 0 is equivalent to
+infinite maximum absolute step size.}
+
+\item{hini}{The step size to be attempted on the first step. The
+default value is determined by the solver (when hini = 0)}
+
+\item{maxordn}{The maximum order to be allowed for the nonstiff
+(Adams) method.  The default is 12.  It can be between 1 and
+12.}
+
+\item{maxords}{The maximum order to be allowed for the stiff (BDF)
+method.  The default value is 5.  This can be between 1 and 5.}
+
 \item{debugODE}{a logical if debugging is enabled}
 
 \item{mcCores}{number of cores used in fitting (only for Linux)}

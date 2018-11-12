@@ -62,7 +62,71 @@ for outer problem.}
 \item{n1qn1nsim}{Number of function evaluations for n1qn1
 optimization.}
 
+\item{method}{The method for solving ODEs.  Currently this supports:
+
+\itemize{
+\item \code{"liblsoda"} thread safe lsoda.  This supports parallel
+           thread-based solving, and ignores user Jacobian specification.
+\item \code{"lsoda"} -- LSODA solver.  Does not support parallel thread-based
+      solving, but allows user Jacobian specification.
+\item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
+        solving nor user Jacobain specification
+}}
+
+\item{transitAbs}{boolean indicating if this is a transit
+compartment absorption}
+
+\item{atol}{a numeric absolute tolerance (1e-8 by default) used
+by the ODE solver to determine if a good solution has been
+achieved;  This is also used in the solved linear model to check
+if prior doses do not add anything to the solution.}
+
+\item{rtol}{a numeric relative tolerance (1e-6 by default) used
+by the ODE solver to determine if a good solution has been
+achieved. This is also used in the solved linear model to check
+ if prior doses do not add anything to the solution.}
+
 \item{maxstepsOde}{Maximum number of steps for ODE solver.}
+
+\item{hmin}{The minimum absolute step size allowed. The default
+value is 0.}
+
+\item{hmax}{The maximum absolute step size allowed.  The default
+checks for the maximum difference in times in your sampling and
+events, and uses this value.  The value 0 is equivalent to
+infinite maximum absolute step size.}
+
+\item{hini}{The step size to be attempted on the first step. The
+default value is determined by the solver (when hini = 0)}
+
+\item{maxordn}{The maximum order to be allowed for the nonstiff
+(Adams) method.  The default is 12.  It can be between 1 and
+12.}
+
+\item{maxords}{The maximum order to be allowed for the stiff (BDF)
+method.  The default value is 5.  This can be between 1 and 5.}
+
+\item{cores}{Number of cores used in parallel ODE solving.  This
+defaults to the number or system cores determined by
+\code{\link{rxCores}} for methods that support parallel
+solving (ie thread-safe methods like "liblsoda").}
+
+\item{covsInterpolation}{specifies the interpolation method for
+    time-varying covariates. When solving ODEs it often samples
+    times outside the sampling time specified in \code{events}.
+    When this happens, the time varying covariates are
+    interpolated.  Currently this can be:
+
+\itemize{
+\item \code{"linear"} interpolation (the default), which interpolates the covariate
+    by solving the line between the observed covariates and extrapolating the new
+    covariate value.
+\item \code{"constant"} -- Last observation carried forward.
+\item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
+      that NONMEM uses.
+\item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
+  carried backward to midpoint.
+}}
 
 \item{printInner}{Integer representing when the inner step is
 printed. By default this is 0 or do not print.  1 is print
@@ -283,6 +347,20 @@ determined.}
 determination of optimal step size.}
 
 \item{...}{Ignored parameters}
+
+\item{stiff}{a logical (\code{TRUE} by default) indicating whether
+    the ODE system is stiff or not.
+
+    For stiff ODE sytems (\code{stiff = TRUE}), \code{RxODE} uses the
+    LSODA (Livermore Solver for Ordinary Differential Equations)
+    Fortran package, which implements an automatic method switching
+    for stiff and non-stiff problems along the integration
+    interval, authored by Hindmarsh and Petzold (2003).
+
+    For non-stiff systems (\code{stiff = FALSE}), \code{RxODE} uses
+    DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
+    Dormand and Prince as implemented in C by Hairer and Wanner
+    (1993).}
 
 \item{scaleObjectiveType}{This can be "times" or "add1".
 

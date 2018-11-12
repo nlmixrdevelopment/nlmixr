@@ -937,3 +937,21 @@ nlme.cleanup <- function(x){
         RxODE::rxUnload(x$env$m1);
     }
 }
+##' Return VarCorr for nlmixr nlme
+##'
+##' This returns a numeric matrix instead of character matrix
+##' @inheritParams nlme::VarCorr
+##' @author Matthew L. Fidler
+##' @export
+VarCorr.nlmixrNlme <- function(x, sigma = 1, ...){
+    .tmp <- x
+    class(.tmp) <- class(.tmp)[class(.tmp) != "nlmixrNlme"];
+    .vc <- VarCorr(.tmp, sigma=sigma, ...);
+    .vc2 <- as.numeric(.vc)
+    dim(.vc2) <- dim(.vc)
+    dimnames(.vc2) <- dimnames(.vc)
+    attr(.vc2, "title") <- attr(.vc, "title")
+    class(.vc2) <- "VarCorr.lme"
+    return(.vc2)
+}
+
