@@ -12,7 +12,8 @@ Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3, testthat,
         madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf
 Version: 1.0.0-8
 Authors@R: c(person("Matthew","Fidler",
-      role = "aut", email = "matthew.fidler@gmail.com"),      
+      role = "aut", email = "matthew.fidler@gmail.com",
+      comment=c(ORCID="0000-0001-8538-6691")),
    person("Yuan", "Xiong", 
       role = "aut", email = "yuan.xiong@gmail.com"),
    person("Rik", "Schoemaker", 
