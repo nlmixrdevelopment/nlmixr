@@ -1,6 +1,6 @@
 source("tests/testthat/models/helper-prep_fit.R")
-context("NLME01: one-compartment bolus, single-dose")
-runno <- "N001_ode"
+context("NLME02: one-compartment bolus, multiple-dose")
+runno <- "N002_ode"
 
 datr <- Bolus_1CPT
 datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
@@ -13,11 +13,11 @@ specs1 <-
     start = c(lCL = 1.6, lV = 4.5)
   )
 
-dat <- datr[datr$SD == 1, ]
+dat <- datr[datr$SD == 0, ]
 
 ode1 <- "
-d/dt(centr)  = -(CL/V)*centr;
-"
+    d/dt(centr)  = -(CL/V)*centr;
+    "
 
 mypar1 <- function(lCL, lV)
 {
@@ -41,8 +41,8 @@ fit[[runno]] <-
 # Generate this with generate_expected_values(fit[[runno]])
 expected_values <-
   list(
-    lik = c(-12119.41, 24248.81, 24277.46),
-    param = c(1.3641, 4.2025),
-    stdev_param = c(1.3436, 1.5226),
-    sigma = 0.19888
+    lik=c(-26811.52, 53633.04, 53665.29),
+    param=c(1.3594, 4.1967),
+    stdev_param=c(1.3233, 1.5183),
+    sigma=c(0.20503)
   )

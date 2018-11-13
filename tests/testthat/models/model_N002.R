@@ -1,10 +1,10 @@
 source("tests/testthat/models/helper-prep_fit.R")
-context("NLME01: one-compartment bolus, single-dose")
-runno <- "N001"
+context("NLME02: one-compartment bolus, multiple-dose")
+runno <- "N002"
 
 datr <- Bolus_1CPT
 datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
-datr <- datr[datr$EVID != 2, ]
+datr <- datr[datr$EVID != 2,]
 
 specs1 <-
   list(
@@ -13,24 +13,24 @@ specs1 <-
     start = c(lCL = 1.6, lV = 4.5)
   )
 
-dat <- datr[datr$SD == 1, ]
+dat <- datr[datr$SD == 0,]
 
 fit[[runno]] <-
   nlme_lin_cmpt(
     dat,
     par_model = specs1,
     ncmt = 1,
-    verbose = verbose_minimization,
     oral = FALSE,
     weight = varPower(fixed = c(1)),
+    verbose = verbose_minimization,
     control = default_control
   )
 
-# Generate this with dput(generate_expected_values(fit[[runno]]))
+# Generate this with generate_expected_values(fit[[runno]])
 expected_values <-
   list(
-    lik = c(-12119.4, 24248.8, 24277.45),
-    param = c(1.3641, 4.2025),
-    stdev_param = c(1.3436, 1.5226),
-    sigma = 0.19888
+    lik=c(-26811.54, 53633.07, 53665.32),
+    param=c(1.3593, 4.1966),
+    stdev_param=c(1.3234, 1.5182),
+    sigma=c(0.20503)
   )
