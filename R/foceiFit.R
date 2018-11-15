@@ -392,6 +392,7 @@ foceiControl <- function(sigdig=3,
                          covGillF=TRUE,
                          optGillF=TRUE,
                          covSmall=1e-5,
+                         adjLik=TRUE, ## Adjust likelihood by 2pi for FOCEi methods
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -622,6 +623,7 @@ foceiControl <- function(sigdig=3,
                  gillFtol=as.double(gillFtol),
                  gillFtolCov=as.double(gillFtolCov),
                  covSmall=as.double(covSmall),
+                 adjLik=adjLik,
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -1274,6 +1276,7 @@ foceiFit.data.frame0 <- function(data,
         err <-eval(parse(text=paste0("function(){err",paste(inits$ERROR[[1]],collapse=""),"}")));
     }
     .covNames <- .parNames <- c();
+    .ret$adjLik <- control$adjLik;
     if (!exists("noLik", envir=.ret)){
         .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
                                               pred.minus.dv=TRUE, sum.prod=control$sumProd,
