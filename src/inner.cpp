@@ -225,6 +225,7 @@ typedef struct {
   int gillKcov;
   double gillStepCov;
   double gillFtolCov;
+  double covSmall;
   int didGill;
   int smatNorm;
   int rmatNorm;
@@ -1397,7 +1398,7 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
 	   double fTol){
   op_focei.calcGrad=1;
   double f= op_focei.lastOfv , x, hbar, h0, fp, fn, phif, phib, phic, phicc = 0, phi, Chf, Chb, Ch, hs, hphi, hk, tmp, ehat,
-    lasth, lastfp, lastht=NA_REAL, lastfpt=NA_REAL,hphit=NA_REAL, phict=NA_REAL;
+    lasth, lastht=NA_REAL, lastfpt=NA_REAL, phict=NA_REAL;
   int k = 0;
   // Relative error should be given by the tolerances, I believe.
   double epsA=std::fabs(f)*epsR;
@@ -1409,7 +1410,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   theta[cpar] = x + h0;
   updateTheta(theta);
   fp = foceiOfv0(theta);
-  lastfp = fp;
   theta[cpar] = x-h0;
   updateTheta(theta);
   fn = foceiOfv0(theta);
@@ -1433,7 +1433,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
     if (fTol != 0 && fabs(phif) < fTol){
       lastfpt = fp;
       lastht  = lasth;
-      hphit = hphi;
       phict=phic;
     }
     goto FD5;
@@ -1441,7 +1440,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   if (fTol != 0 && fabs(phif) < fTol){
     lastfpt = fp;
     lastht  = lasth;
-    hphit = hphi;
     phict=phic;
   }
   if (Ch < 0.001){
@@ -1456,7 +1454,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   theta[cpar] = x + hk;
   updateTheta(theta);
   fp = foceiOfv0(theta);
-  lastfp = fp;
   theta[cpar] = x-hk;
   updateTheta(theta);
   fn = foceiOfv0(theta);
@@ -1476,7 +1473,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
     if (fTol != 0 && fabs(phif) < fTol){
       lastfpt = fp;
       lastht  = lasth;
-      hphit = hphi;
       phict=phic;
     }
     goto FD5;
@@ -1484,7 +1480,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   if (fTol != 0 && fabs(phif) < fTol){
     lastfpt = fp;
     lastht  = lasth;
-    hphit = hphi;
     phict=phic;
   }
   if (k == K) goto FD6;
@@ -1498,7 +1493,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   theta[cpar] = x + hk;
   updateTheta(theta);
   fp = foceiOfv0(theta);
-  lastfp = fp;
   theta[cpar] = x-hk;
   updateTheta(theta);
   fn = foceiOfv0(theta);
@@ -1516,7 +1510,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
     if (fTol != 0 && fabs(phif) < fTol){
       lastfpt = fp;
       lastht  = lasth;
-      hphit = hphi;
       phict=phic;
     }
     goto FD5;
@@ -1529,7 +1522,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
     if (fTol != 0 && fabs(phif) < fTol){
       lastfpt = fp;
       lastht  = lasth;
-      hphit = hphi;
       phict=phic;
     }
     goto FD5;
@@ -1537,7 +1529,6 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   if (fTol != 0 && fabs(phif) < fTol){
     lastfpt = fp;
     lastht  = lasth;
-    hphit = hphi;
     phict=phic;
   }
   if (k == K) goto FD6;
@@ -1560,7 +1551,7 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   } else {
     // warning("The finite difference derivative err more than 50%% of the slope; Consider a different starting point.");
     if (!ISNA(lastht)){
-      // Could be used;  Stick with the last below Ftol, or current h estimation.
+      // Could be used;  Stick with the last below Ftol
       // *hf = lasth;
       // fp = lastfp;
       // *df = phiF(f, fp, *hf);
@@ -2157,6 +2148,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.rmatNorm=as<int>(odeO["rmatNorm"]);
   op_focei.covGillF=as<int>(odeO["covGillF"]);
   op_focei.optGillF=as<int>(odeO["optGillF"]);
+  op_focei.covSmall = as<double>(odeO["covSmall"]);  
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
   for (unsigned int k = op_focei.npars; k--;){
@@ -3189,12 +3181,23 @@ NumericMatrix foceiCalcCov(Environment e){
 		Sinv = Sinv * Sinv.t();
 		e["covS"]= 4 * Sinv;
 		// Now check sandwich matrix against R and S methods
+		bool covRSsmall = arma::any(abs(covRS.diag()) < op_focei.covSmall);
 		double covRSd= sum(covRS.diag());
 		arma::mat covR = as<arma::mat>(e["covR"]);
+		bool covRsmall = arma::any(abs(covR.diag()) < op_focei.covSmall);
 		double covRd= sum(covR.diag());
 		arma::mat covS = as<arma::mat>(e["covS"]);
+		bool covSsmall = arma::any(abs(covS.diag()) < op_focei.covSmall);
 		double  covSd= sum(covS.diag());
-		if (covRSd > covRd){
+		if ((covRSsmall && covSsmall && covRsmall)){
+		  e["cov"] = covRS;
+		} else if (covRSsmall && !covSsmall && covRsmall) {
+		  e["cov"] = covS;
+		  op_focei.covMethod=3;
+		} else if (covRSsmall && covSsmall && !covRsmall) {
+		  e["cov"] = covR;
+		  op_focei.covMethod=2;
+		} else if (covRSd > covRd){
 		  // SE(RS) > SE(R)
 		  if (covRd > covSd){
 		    // SE(R) > SE(S)

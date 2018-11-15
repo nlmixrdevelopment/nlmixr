@@ -386,11 +386,12 @@ foceiControl <- function(sigdig=3,
                          gillRtol=sqrt(.Machine$double.eps),
                          gillKcov=5L,
                          gillStepCov=4,
-                         gillFtolCov=1e4,
+                         gillFtolCov=0,
                          rmatNorm=TRUE,
                          smatNorm=TRUE,
                          covGillF=TRUE,
                          optGillF=TRUE,
+                         covSmall=1e-5,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -620,6 +621,7 @@ foceiControl <- function(sigdig=3,
                  optGillF=as.integer(optGillF),
                  gillFtol=as.double(gillFtol),
                  gillFtolCov=as.double(gillFtolCov),
+                 covSmall=as.double(covSmall),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
