@@ -24,7 +24,7 @@ generate_expected_values <- function(x) {
     list(
       lik=round(c(logLik(fit[[runno]]), AIC(fit[[runno]]), BIC(fit[[runno]])), 2),
       param=unname(signif(fixef(fit[[runno]]), 5)),
-      stdev_param=unname(signif(VarCorr(fit[[runno]])[1:length(fixef(fit[[runno]])), "StdDev"], 5)),
+      stdev_param=unname(signif(as.numeric(VarCorr(fit[[runno]])[1:length(fixef(fit[[runno]])), "StdDev"]), 5)),
       sigma=signif(fit[[runno]]$sigma, 5)
     )
   cat(
