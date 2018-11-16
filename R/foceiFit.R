@@ -2001,18 +2001,71 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     } else {
         class(.env) <- NULL
     }
-    if (exists("cov", envir=.env)){
+    .force <- FALSE;
+    .args <- list(...);
+    if (!is.null(.args$force)){
+        .force <- .args$force;
+    }
+    if (exists("cov", envir=.env) && !.force){
         if (RxODE::rxIs(.env$cov, "matrix")) return(.env$cov);
     }
     .pt <- proc.time();
-    .args <- list(...);
     .control <- .env$control;
     ## .control$maxInnerIterations <- 0L;
     .control$maxOuterIterations <- 0L;
     .control$boundTol <- 0
     .control$calcTables <- FALSE;
-    if (.control$covMethod == 0L){
+    .lst <- list(...)
+    if (!is.null(.lst$covMethod)){
+        if (length(.lst$covMethod) == 1){
+            if (.lst$covMethod == ""){
+                .control$covMethod <- 0L
+            }
+        }
+        if (RxODE::rxIs(.lst$covMethod, "character")){
+            .lst$covMethod <- match.arg(.lst$covMethod, c("r,s", "r", "s"));
+            .covMethodIdx <- c("r,s" = 1L, "r"=2L, "s"=3L);
+            .control$covMethod <- .covMethodIdx[.lst$covMethod];
+        }
+    } else if (.control$covMethod == 0L){
         .control$covMethod <- 1L;
+    }
+    .lst$covMethod <- NULL
+    ##covDerivMethod=c("central", "forward"),
+    if (!is.null(.lst$hessEps)){
+        .control$hessEps <- .lst$hessEps
+        .lst$hessEps <- NULL
+    }
+    if (!is.null(.lst$gillKcov)){
+        .control$gillKcov <- .lst$gillKcov
+        .lst$gillKcov <- NULL
+    }
+    if (!is.null(.lst$gillStepCov)){
+        .control$gillStepCov <- .lst$gillStepCov
+        .lst$gillStepCov <- NULL
+    }
+    if (!is.null(.lst$gillFtolCov)){
+        .control$gillFtolCov <- .lst$gillFtolCov
+        .lst$gillFtolCov <- NULL
+    }
+    if (!is.null(.lst$rmatNorm)){
+        .control$rmatNorm <- .lst$rmatNorm
+        .lst$rmatNorm <- NULL
+    }
+    if (!is.null(.lst$smatNorm)){
+        .control$smatNorm <- .lst$smatNorm
+        .lst$smatNorm <- NULL
+    }
+    if (!is.null(.lst$covGillF)){
+        .control$covGillF <- .lst$covGillF
+        .lst$covGillF <- NULL
+    }
+    if (!is.null(.lst$covSmall)){
+        .control$covSmall <- .lst$covSmall
+        .lst$covSmall <- NULL
+    }
+    for (.n in names(.lst)){
+        .control[[.n]] <- .lst[[.n]];
     }
     .dat <- getData(obj);
     .uif <- obj$uif;
