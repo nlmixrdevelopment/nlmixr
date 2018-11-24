@@ -2,6 +2,7 @@
 # platforms
 if (!exists("fit")) {
   fit <- list()
+  expected_values <- list()
 }
 if (!exists("verbose_minimization")) verbose_minimization <- FALSE
 default_control <-
@@ -12,12 +13,6 @@ default_control <-
     pnlsMaxIter = 100,
     msVerbose = verbose_minimization
   )
-  # nlmeControl(
-  #   returnObject=TRUE,
-  #   msMaxIter=1L,
-  #   maxIter=1L,
-  #   pnlsMaxIter=1L
-  # )
 
 generate_expected_values <- function(x) {
   ret <-
@@ -28,7 +23,7 @@ generate_expected_values <- function(x) {
       sigma=signif(fit[[runno]]$sigma, 5)
     )
   cat(
-    "expected_values <-\n",
+    "expected_values[[runno]] <-\n",
     "  list(\n",
     "    lik=c(", paste(ret$lik, collapse=", "), "),\n",
     "    param=c(", paste(ret$param, collapse=", "), "),\n",

@@ -39,7 +39,7 @@ fit[[runno]] <-
   )
 
 # Generate this with generate_expected_values(fit[[runno]])
-expected_values <-
+expected_values[[runno]] <-
   list(
     lik=c(-11867.37, 23744.74, 23773.39),
     param=c(1.3898, 4.2657),
