@@ -1,4 +1,4 @@
-source("tests/testthat/models/helper-prep_fit.R")
+source("helper-prep_fit.R")
 context("NLME03: one-compartment bolus, steady-state")
 runno <- "N003_ode"
 

@@ -1,9 +1,9 @@
-source("tests/testthat/models/helper-prep_fit.R")
+source("helper-prep_fit.R")
 context("NLME12: one-compartment infusion, single-dose")
 runno <- "N012"
 
 datr <-
-  read.csv("Infusion_1CPT.csv",
+  read.csv("../Infusion_1CPT.csv",
            header = TRUE,
            stringsAsFactors = F)
 datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)

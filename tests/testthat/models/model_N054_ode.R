@@ -1,4 +1,4 @@
-source("tests/testthat/models/helper-prep_fit.R")
+source("helper-prep_fit.R")
 context("NLME54: two-compartment infusion Michaelis-Menten, single-dose")
 runno <- "N054_ode"
 

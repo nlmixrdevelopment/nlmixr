@@ -4,12 +4,12 @@ library(nlmixr)
 rxPermissive({
   context("Test all models")
   test_that("Models", {
-    files <- list.files(path="tests/testthat/models/", full.names=TRUE, pattern="^model*")
+    files <- list.files(path="models/", full.names=TRUE, pattern="^model*")
     run_duration <- c()
     for (current_file in files) {
       start_time <- Sys.time()
       message(current_file, " at ", as.character(start_time))
-      source(current_file)
+      source(current_file, chdir = TRUE)
       end_time <- Sys.time()
       run_duration[runno] <- difftime(end_time, start_time, units="secs")
       message("Took ", as.character(run_duration[runno]))

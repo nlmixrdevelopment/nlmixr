@@ -1,4 +1,4 @@
-source("tests/testthat/models/helper-prep_fit.R")
+source("helper-prep_fit.R")
 context("NLME09: one-compartment bolus, Michaelis-Menten, single-dose")
 runno <- "N009_ode"
 
@@ -40,8 +40,8 @@ fit[[runno]] <-
 # Generate this with generate_expected_values(fit[[runno]])
 expected_values[[runno]] <-
   list(
-    lik=c(-13285.23, 26580.47, 26609.12),
-    param=c(1.4221, 4.3410),
-    stdev_param=c(0.84730, 0),
-    sigma=0.43887
+    lik=c(-12565.29, 25144.58, 25184.68),
+    param=c(6.7954, 5.329, 4.1816),
+    stdev_param=c(1.4932, 1.2698, 1.4879),
+    sigma=c(0.19977)
   )
