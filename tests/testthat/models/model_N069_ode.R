@@ -59,8 +59,8 @@ fit[[runno]] <-
 # Generate this with generate_expected_values(fit[[runno]])
 expected_values[[runno]] <-
   list(
-    lik=c(-13285.23, 26580.47, 26609.12),
-    param=c(1.4221, 4.3410),
-    stdev_param=c(0.84730, 0),
-    sigma=0.43887
+    lik=c(-29757.67, 59541.35, 59625.21),
+    param=c(7.3441, 6.4851, 4.2823, 1.159, 3.5585, 0.00058257),
+    stdev_param=c(0.92572, 2.4518, 1.5359, 0.0027169, 1.7548, 2.6208e-05),
+    sigma=c(0.20507)
   )

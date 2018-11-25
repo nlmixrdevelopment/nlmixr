@@ -44,6 +44,6 @@ expected_values[[runno]] <-
   list(
     lik=c(-26406.19, 52822.38, 52854.63),
     param=c(1.3855, 4.2658),
-    stdev_param=c(0.28146, 0.29631),
-    sigma=0.20063
+    stdev_param=c(1.4029, 1.4769),
+    sigma=c(0.20063)
   )

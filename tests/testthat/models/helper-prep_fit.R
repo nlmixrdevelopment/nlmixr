@@ -32,5 +32,18 @@ generate_expected_values <- function(x) {
     "  )\n",
     sep=""
   )
+  clip_con <- file(description="clipboard", open="w")
+  cat(
+    "expected_values[[runno]] <-\n",
+    "  list(\n",
+    "    lik=c(", paste(ret$lik, collapse=", "), "),\n",
+    "    param=c(", paste(ret$param, collapse=", "), "),\n",
+    "    stdev_param=c(", paste(ret$stdev_param, collapse=", "), "),\n",
+    "    sigma=c(", paste(ret$sigma, collapse=", "), ")\n",
+    "  )\n",
+    file=clip_con,
+    sep=""
+  )
+  close(con=clip_con)
   invisible(ret)
 }
