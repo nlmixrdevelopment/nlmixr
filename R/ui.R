@@ -40,6 +40,110 @@ ini <- function(ini, ...){
             }
         }
         return(.fb);
+    } else {
+        if (inherits(ini, "nlmixrFitCore")){
+            .uif <- ini$uif
+        } else if (inherits(ini, "nlmixrUI")){
+            .uif <- ini
+        } else {
+            stop("Do not know how to handle object");
+        }
+        .ini <- .uif$ini
+        .call <- match.call(expand.dots=TRUE)[-1];
+        .call <- .call[-1];
+        .ns <- names(.call)
+        if (!is.null(.ns)){
+            .ini <- .uif$ini
+            for (.n in .ns){
+                .w <- which(.n == .ini$name)
+                if (length(.w) == 1){
+                    if (any(deparse(.call[[.n]]) == c("fix", "fixed", "FIX", "FIXED"))){
+                        if (.uif$ini$fix[.w]){
+                            warning(sprintf("Trying to fix '%s', but already fixed.", .n))
+                        } else {
+                            .uif$ini$fix[.w] <- TRUE;
+                        }
+                    } else if (any(deparse(.call[[.n]]) == c("unfix", "unfixed", "UNFIX", "UNFIXED"))){
+                        if (.uif$ini$fix[.w]){
+                            .uif$ini$fix[.w] <- FALSE;
+                        } else {
+                            warning(sprintf("Trying to unfix '%s', but not fixed.", .n))
+                        }
+                    } else if (regexpr(rex::rex(or(c("fix", "fixed", "FIX", "FIXED")), "(", anything, ")"), deparse(.call[[.n]])) != -1){
+                        .val <- eval(.call[[.n]][[2]]);
+                        if (.uif$ini$fix[.w]){
+                            warning(sprintf("Trying to fix '%s', but already fixed.  Still assigned to '%s'", .n, .val))
+                        } else {
+                            .uif$ini$fix[.w] <- TRUE;
+                        }
+                        .uif$ini$est[.w] <- .val;
+                    } else if (regexpr(rex::rex(or(c("unfix", "unfixed", "UNFIX", "UNFIXED")), "(", anything, ")"), deparse(.call[[.n]])) != -1){
+                        .val <- eval(.call[[.n]][[2]]);
+                        if (.uif$ini$fix[.w]){
+                            .uif$ini$fix[.w] <- FALSE;
+                        } else {
+                            warning(sprintf("Trying to unfix '%s', but not fixed.  Still assigned to '%s'", .n, .val))
+                        }
+                        .uif$ini$est[.w] <- .val;
+                    } else {
+                        .val <- eval(.call[[.n]]);
+                        if (length(.val) == 1){
+                            .uif$ini$est[.w] <- .val;
+                        } else if (length(.val) == 2){
+                            .uif$ini$lower[.w] <- .val[1];
+                            .uif$ini$est[.w] <- .val[2];
+                            ## Warning here? The upper should be inf?
+                            .uif$ini$est[.w] <- Inf;
+                        } else if (length(.val) == 3){
+                            .uif$ini$lower[.w] <- .val[1];
+                            .uif$ini$est[.w] <- .val[2];
+                            ## Warning here? The upper should be inf?
+                            .uif$ini$upper[.w] <- .val[3];
+                        } else {
+                            stop(sprintf("Cannot figure out what you are trying to do to the '%s' estimate.", .n))
+                        }
+                    }
+                } else {
+                    warning(sprintf("The model does not have a parameter named '%s', modification ignored.", .n))
+                }
+            }
+        } else if (length(.call) == 1){
+            .lst <- eval(.call[[1]]);
+            .ns <- names(.lst);
+            if (inherits(.lst, "list") && !is.null(.ns)){
+                for (.n in .ns){
+                    .w <- which(.n == .ini$name)
+                    if (length(.w) == 1){
+                        .val <- .lst[[.n]];
+                        if (length(.val) == 1){
+                            .uif$ini$est[.w] <- .val
+                        } else if (length(.val) == 2){
+                            .uif$ini$lower[.w] <- .val[1]
+                            .uif$ini$est[.w] <- .val[2]
+                            .uif$ini$upper[.w] <- Inf
+                        } else if (length(.val) == 3){
+                            .uif$ini$lower[.w] <- .val[1]
+                            .uif$ini$est[.w] <- .val[2]
+                            .uif$ini$upper[.w] <- .val[3];
+                        } else {
+                            stop(sprintf("Cannot figure out what to do with '%s'", .n))
+                        }
+                    }
+                }
+            } else if (inherits(.lst, "numeric") && !is.null(.ns)) {
+                for (.n in .ns){
+                    .w <- which(.n == .ini$name)
+                    if (length(.w) == 1){
+                        .uif$ini$est[.w] <- .lst[.n];
+                    }
+                }
+            } else {
+                stop("Arguments must be named")
+            }
+        } else {
+            stop("Do not know what to do with the model's ini call.")
+        }
+        return(.uif)
     }
 }
 

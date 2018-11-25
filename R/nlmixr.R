@@ -128,6 +128,7 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
 ##' @rdname nlmixr
 ##' @export
 nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...){
+    .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .uif <- object
     if (missing(data) && missing(est)){
         return(.uif)

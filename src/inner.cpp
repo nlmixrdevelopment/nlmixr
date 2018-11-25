@@ -220,9 +220,12 @@ typedef struct {
   // Gill options
   int gillK;
   double gillStep;
+  double gillFtol;
   double gillRtol;
   int gillKcov;
   double gillStepCov;
+  double gillFtolCov;
+  double covSmall;
   int didGill;
   int smatNorm;
   int rmatNorm;
@@ -1391,16 +1394,19 @@ static inline double phiB(double f, double fn, double h){
 //         4 -- Function odd or nearly linear, df = K, df2 ~ 0
 //         5 -- df2 increases rapidly as h decreases
 int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
-	   double *theta, int cpar, double epsR, int K, double gillStep){
+	   double *theta, int cpar, double epsR, int K, double gillStep,
+	   double fTol){
   op_focei.calcGrad=1;
-  double f= op_focei.lastOfv , x, hbar, h0, fp, fn, phif, phib, phic, phicc = 0, phi, Chf, Chb, Ch, hs, hphi, hk, tmp, ehat;
+  double f= op_focei.lastOfv , x, hbar, h0, fp, fn, phif, phib, phic, phicc = 0, phi, Chf, Chb, Ch, hs, hphi, hk, tmp, ehat,
+    lasth, lastht=NA_REAL, lastfpt=NA_REAL, phict=NA_REAL;
   int k = 0;
   // Relative error should be given by the tolerances, I believe.
   double epsA=std::fabs(f)*epsR;
   x = theta[cpar];
   // FD1: // Initialization
   hbar = 2*(1+std::fabs(x))*sqrt(epsA/(1+std::fabs(f)));
-  h0 = 10*hbar;
+  h0 = gillStep*hbar;
+  lasth=h0;
   theta[cpar] = x + h0;
   updateTheta(theta);
   fp = foceiOfv0(theta);
@@ -1424,14 +1430,25 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   if (0.001 <= Ch && Ch <= 0.1){
     phicc=phic;
     hphi=h0;
+    if (fTol != 0 && fabs(phif) < fTol){
+      lastfpt = fp;
+      lastht  = lasth;
+      phict=phic;
+    }
     goto FD5;
+  }
+  if (fTol != 0 && fabs(phif) < fTol){
+    lastfpt = fp;
+    lastht  = lasth;
+    phict=phic;
   }
   if (Ch < 0.001){
     goto FD4;
   }
  FD3: // Increase h
   k++;
-  hk=hk*pow(10, gillStep);
+  hk=hk*gillStep;
+  lasth=hk;
   // Compute the associated finite difference estimates and their
   // relative condition errors.
   theta[cpar] = x + hk;
@@ -1453,13 +1470,24 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   if (Ch <= 0.1){
     phicc=phic;
     hphi = hk;
+    if (fTol != 0 && fabs(phif) < fTol){
+      lastfpt = fp;
+      lastht  = lasth;
+      phict=phic;
+    }
     goto FD5;
+  }
+  if (fTol != 0 && fabs(phif) < fTol){
+    lastfpt = fp;
+    lastht  = lasth;
+    phict=phic;
   }
   if (k == K) goto FD6;
   goto FD3;
  FD4: // Decrease h
   k++;
-  hk=hk/pow(10, gillStep);
+  hk=hk/gillStep;
+  lasth=hk;
   // Compute the associated finite difference estimates and their
   // relative condition errors.
   theta[cpar] = x + hk;
@@ -1478,7 +1506,12 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   Ch = ChatP(phi, hk, epsA);  
   if (Ch > .1){
     phicc=tmp;
-    hphi=hk*10; // hphi = h_k-1
+    hphi=hk*gillStep; // hphi = h_k-1
+    if (fTol != 0 && fabs(phif) < fTol){
+      lastfpt = fp;
+      lastht  = lasth;
+      phict=phic;
+    }
     goto FD5;
   }
   if (max2(Chf, Chb) <= 0.1){
@@ -1486,7 +1519,17 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   }
   if (0.001 <= Ch && Ch <= 1){
     hphi = hk;
+    if (fTol != 0 && fabs(phif) < fTol){
+      lastfpt = fp;
+      lastht  = lasth;
+      phict=phic;
+    }
     goto FD5;
+  }
+  if (fTol != 0 && fabs(phif) < fTol){
+    lastfpt = fp;
+    lastht  = lasth;
+    phict=phic;
   }
   if (k == K) goto FD6;
   goto FD4;
@@ -1507,6 +1550,22 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
     return 1;
   } else {
     // warning("The finite difference derivative err more than 50%% of the slope; Consider a different starting point.");
+    if (!ISNA(lastht)){
+      // Could be used;  Stick with the last below Ftol
+      // *hf = lasth;
+      // fp = lastfp;
+      // *df = phiF(f, fp, *hf);
+      // *df2=0;
+      // // *df = 0.0; // Doesn't move.
+      // *hphif=2*(*hf);
+    // } else {
+      *hf = lastht;
+      fp = lastfpt;
+      *df = phiF(f, fp, *hf);
+      *df2=phic;
+      // *df = 0.0; // Doesn't move.
+      *hphif=phict;
+    }
     return 2;
   }
  FD6: // Check unsatisfactory cases
@@ -1545,7 +1604,7 @@ void numericGrad(double *theta, double *g){
     double hf, hphif, err;
     for (int cpar = op_focei.npars; cpar--;){
       op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
-				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep);
+				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
       err = 1/(std::fabs(theta[cpar])+1); 
       // h=aEps*(|x|+1)/sqrt(1+fabs(f));
       // h*sqrt(1+fabs(f))/(|x|+1) = aEps
@@ -2075,6 +2134,8 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.gillKcov = as<int>(odeO["gillKcov"]);
   op_focei.gillStep    = fabs(as<double>(odeO["gillStep"]));
   op_focei.gillStepCov = fabs(as<double>(odeO["gillStepCov"]));
+  op_focei.gillFtol    = fabs(as<double>(odeO["gillFtol"]));
+  op_focei.gillFtolCov = fabs(as<double>(odeO["gillFtolCov"]));
   op_focei.didGill = 0;
   op_focei.gillRtol = as<double>(odeO["gillRtol"]);
   op_focei.scaleType = as<int>(odeO["scaleType"]);
@@ -2087,6 +2148,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.rmatNorm=as<int>(odeO["rmatNorm"]);
   op_focei.covGillF=as<int>(odeO["covGillF"]);
   op_focei.optGillF=as<int>(odeO["optGillF"]);
+  op_focei.covSmall = as<double>(odeO["covSmall"]);  
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
   for (unsigned int k = op_focei.npars; k--;){
@@ -2188,29 +2250,38 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
     e["omegaR"] = wrap(cor); 
     if (op_focei.scaleObjective){
       fmin = fmin * op_focei.initObjective / op_focei.scaleObjectiveTo;
-    } 
+    }
+    bool doAdj = false;
     if (!e.exists("objective")){
       e["objective"] = fmin;
+      if (as<bool>(e["adjLik"])){
+	doAdj = true;
+      }
     } else {
       fmin = as<double>(e["objective"]);
     }
     e["OBJF"] = fmin;
     e["objf"] = fmin;
     NumericVector logLik(1);
-    logLik[0]=-fmin/2;
+    double adj= 0;
+    if (doAdj){
+      adj=rx->nobs*log(2*M_PI)/2;
+    }
+    e["adj"]=adj;
+    logLik[0]=-fmin/2-adj;
     logLik.attr("df") = op_focei.npars;
     if (e.exists("nobs")){
       logLik.attr("nobs") = e["nobs"];
-      e["BIC"] = fmin + log(as<double>(e["nobs"]))*op_focei.npars;
+      e["BIC"] = fmin+2*adj + log(as<double>(e["nobs"]))*op_focei.npars;
     } else {
       logLik.attr("nobs") = rx->nobs;
-      e["BIC"] = fmin + log((double)rx->nobs)*op_focei.npars;
+      e["BIC"] = fmin + 2*adj + log((double)rx->nobs)*op_focei.npars;
       e["nobs"] = rx->nobs;
     }
     logLik.attr("class") = "logLik";
     e["logLik"] = logLik;
 
-    e["AIC"] = fmin+2*op_focei.npars;
+    e["AIC"] = fmin+2*adj+2*op_focei.npars;
     return true;
   } else {
     stop("Not Setup right.........");
@@ -2916,7 +2987,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	err = op_focei.rmatNorm ? 1/(std::fabs(theta[cpar])+1) : 1;
 	if (op_focei.gillKcov != 0){
 	  op_focei.gillRetC[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
-					   &theta[0], cpar, op_focei.hessEps, op_focei.gillKcov, op_focei.gillStepCov);
+					   &theta[0], cpar, op_focei.hessEps, op_focei.gillKcov, op_focei.gillStepCov, op_focei.gillFtolCov);
 	  // h=aEps*(|x|+1)/sqrt(1+fabs(f));
 	  // h*sqrt(1+fabs(f))/(|x|+1) = aEps
 	  // let err=2*sqrt(epsA/(1+f))
@@ -3119,12 +3190,23 @@ NumericMatrix foceiCalcCov(Environment e){
 		Sinv = Sinv * Sinv.t();
 		e["covS"]= 4 * Sinv;
 		// Now check sandwich matrix against R and S methods
+		bool covRSsmall = arma::any(abs(covRS.diag()) < op_focei.covSmall);
 		double covRSd= sum(covRS.diag());
 		arma::mat covR = as<arma::mat>(e["covR"]);
+		bool covRsmall = arma::any(abs(covR.diag()) < op_focei.covSmall);
 		double covRd= sum(covR.diag());
 		arma::mat covS = as<arma::mat>(e["covS"]);
+		bool covSsmall = arma::any(abs(covS.diag()) < op_focei.covSmall);
 		double  covSd= sum(covS.diag());
-		if (covRSd > covRd){
+		if ((covRSsmall && covSsmall && covRsmall)){
+		  e["cov"] = covRS;
+		} else if (covRSsmall && !covSsmall && covRsmall) {
+		  e["cov"] = covS;
+		  op_focei.covMethod=3;
+		} else if (covRSsmall && covSsmall && !covRsmall) {
+		  e["cov"] = covR;
+		  op_focei.covMethod=2;
+		} else if (covRSd > covRd){
 		  // SE(RS) > SE(R)
 		  if (covRd > covSd){
 		    // SE(R) > SE(S)
@@ -3561,11 +3643,11 @@ void foceiFinalizeTables(Environment e){
   List objDf;
   if (e.exists("conditionNumber")){
     objDf = List::create(_["OBJF"] = as<double>(e["objective"]), _["AIC"]=as<double>(e["AIC"]), 
-                         _["BIC"] = as<double>(e["BIC"]), _["Log-likelihood"]=-as<double>(e["objective"])/2, 
+                         _["BIC"] = as<double>(e["BIC"]), _["Log-likelihood"]=as<double>(e["logLik"]), 
                          _["Condition Number"]=as<double>(e["conditionNumber"]));
   } else {
     objDf = List::create(_["OBJF"] = as<double>(e["objective"]), _["AIC"]=as<double>(e["AIC"]), 
-                         _["BIC"] = as<double>(e["BIC"]), _["Log-likelihood"]=-as<double>(e["objective"])/2);
+                         _["BIC"] = as<double>(e["BIC"]), _["Log-likelihood"]=as<double>(e["logLik"]));
   }
   if (op_focei.fo){
     objDf.attr("row.names") = CharacterVector::create("FO");

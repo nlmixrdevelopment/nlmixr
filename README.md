@@ -173,29 +173,35 @@ distributions are supported, in principle.
    - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
  
 # Installation on macOS
-Instructions for macOS 10.12 Sierra are provided here. They should be broadly extensible to all recent releases of macOS, however.
 
-1. Install R 3.4.1 (or later) from the R website.
+Instructions for macOS 10.12 Sierra are provided here. They should be
+broadly extensible to all recent releases of macOS, however.
+
+1. Install R 3.5.1 (or later) from the R website.
    - Download and install `R-3.4.1.pkg` (or later) from [CRAN](http://cran.r-project.org/bin/macosx/).
 2. Install Python dependencies.
    - Install `pip` from the macOS terminal prompt: `sudo easy_install pip`.
+     - If `easy_install` doesn't work, you can download by `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py` and then run `sudo python get-pip.py`
    - Install `sympy` using `pip`: `sudo -H pip install sympy`.
 3. Install `devtools` and dependencies.
    - This package is required to install packages from Github, amongst other things.
    - Install `devtools` from a clean R session by entering `install.packages("devtools")`.
 4. In R, load `devtools` using `library(devtools)`.
 5. Install build tools.
-   - Install Xcode from the App Store. 
-   - Read the license by entering the following at the macOS terminal:
-     `sudo xcodebuild -license`
-   - Scroll through it all, reading it carefully, and type `agree` at the end. (If you don't, you can't use `nlmixr` or anything else that requires compilation on macOS. Don't yell at us, yell at Apple.) 
-   - Install `gfortran`: download the appropriate macOS installer from [here](https://gcc.gnu.org/wiki/GFortranBinaries) and run it.
+   - Install Mac Rtools for clang and gfortran from [CRAN Rtools](http://cran.r-project.org/bin/macosx/tools/)
+   - Install Mac OSX command like tools by typing `xcode-select --install` and then choose `install`.  This allows you to compile the package without downloading the entire (large) Xcode package.
+   - Change `~/.Rprofile` to have the following line to adjust the paths in R to use the CRAN compilers:
+```R
+Sys.setenv("PATH"=paste0("/usr/local/clang6/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
+
+```
+
 6. Install `RxODE`.
    - Currently the new version of `RxODE` is in the process of being
      uploaded to CRAN.  `nlmixr` needs this newer version of `RxODE` to
      function correctly. To install this version, use the command:
      `install_github("nlmixrdevelopment/RxODE")`.
-   - Install `SnakeCharmR` using `install_github("nlmixrdevelopment/SnakeCharmR")`.
+   - Install `SnakeCharmR` using `install_github("nlmixrdevelopment/SnakeCharmR")` or install `reticulate` using `install.packages("reticulate")`.
    - Restart your R session.
    - As a quick test, you can make sure that R and Python can
      communicate by typing the command `library(SnakeCharmR)`.
