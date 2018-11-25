@@ -4,15 +4,23 @@ library(nlmixr)
 rxPermissive({
   context("Test all models")
   test_that("Models", {
+    # Run all the models
     files <- list.files(path="models/", full.names=TRUE, pattern="^model*")
     run_duration <- c()
     for (current_file in files) {
       start_time <- Sys.time()
+      old_names <- names(fit)
       message(current_file, " at ", as.character(start_time))
       source(current_file, chdir = TRUE)
       end_time <- Sys.time()
       run_duration[runno] <- difftime(end_time, start_time, units="secs")
       message("Took ", as.character(run_duration[runno]))
+      if (runno %in% old_names) {
+        stop("Duplicated runno: ", runno)
+      }
+    }
+    # Test that results are correct for all run models
+    for (runno in names(fit)) {
       z <- VarCorr(fit[[runno]])
     
       expect_equal(
