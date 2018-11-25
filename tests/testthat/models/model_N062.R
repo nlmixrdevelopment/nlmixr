@@ -2,7 +2,7 @@ source("helper-prep_fit.R")
 context("NLME62: two-compartment oral, steady-state, multiple-dose")
 runno <- "N062"
 
-datr <- read.csv("Oral_2CPT.csv",
+datr <- read.csv("../Oral_2CPT.csv",
                  header = TRUE,
                  stringsAsFactors = F)
 datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
@@ -24,7 +24,7 @@ datSSD$V6 <- datSSD$TIME - 6 * datSSD$II
 datSSD$TIME <- NULL
 datSSD$II <- NULL
 
-index <- melt(datSSD, id.vars = c("ID"), value.name = "TIMED")
+index <- reshape2::melt(datSSD, id.vars = c("ID"), value.name = "TIMED")
 index$variable <- NULL
 index <- index[index$TIMED > 0, ]
 index <- index[order(index$ID, index$TIMED), ]

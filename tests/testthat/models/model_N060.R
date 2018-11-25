@@ -2,7 +2,7 @@ source("helper-prep_fit.R")
 context("NLME60: two-compartment oral, single-dose")
 runno <- "N060"
 
-datr <- read.csv("Oral_2CPT.csv",
+datr <- read.csv("../Oral_2CPT.csv",
                  header = TRUE,
                  stringsAsFactors = F)
 datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)

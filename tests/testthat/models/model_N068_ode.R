@@ -3,7 +3,7 @@ context("NLME68: two-compartment oral Michaelis-Menten, single-dose")
 runno <- "N068_ode"
 
 datr <-
-  read.csv("Oral_2CPTMM.csv",
+  read.csv("../Oral_2CPTMM.csv",
            header = TRUE,
            stringsAsFactors = F)
 datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)

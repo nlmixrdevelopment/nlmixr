@@ -29,7 +29,7 @@ specs5i <-
   )
 
 datr <-
-  read.csv("Oral_1CPTMM.csv",
+  read.csv("../Oral_1CPTMM.csv",
            header = TRUE,
            stringsAsFactors = F)
 datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)

@@ -3,7 +3,7 @@ context("NLME48: two-compartment infusion, steady-state")
 runno <- "N048"
 
 datr <-
-  read.csv("Infusion_2CPT.csv",
+  read.csv("../Infusion_2CPT.csv",
            header = TRUE,
            stringsAsFactors = F)
 datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
@@ -26,7 +26,7 @@ datSSD$V6<-datSSD$TIME-6*datSSD$II
 datSSD$TIME<-NULL
 datSSD$II<-NULL
 
-index <- melt(datSSD, id.vars = c("ID"), value.name = "TIMED")
+index <- reshape2::melt(datSSD, id.vars = c("ID"), value.name = "TIMED")
 index$variable <- NULL
 index <- index[index$TIMED > 0,]
 index<-index[order(index$ID,index$TIMED),]

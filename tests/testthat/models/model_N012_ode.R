@@ -3,7 +3,7 @@ context("NLME12: one-compartment infusion, single-dose")
 runno <- "N012.ode"
 
 datr <-
-  read.csv("Infusion_1CPT.csv",
+  read.csv("../Infusion_1CPT.csv",
            header = TRUE,
            stringsAsFactors = F)
 
