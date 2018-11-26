@@ -6,7 +6,7 @@ if (!exists("fit")) {
 }
 if (!exists("verbose_minimization")) verbose_minimization <- FALSE
 default_control <-
-  nlmeControl(
+  nlme::nlmeControl(
     returnObject=TRUE,
     msMaxiter = 100,
     maxIter = 100,

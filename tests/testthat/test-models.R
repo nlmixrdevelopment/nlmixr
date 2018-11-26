@@ -9,7 +9,12 @@ rxPermissive({
     run_duration <- c()
     for (current_file in files) {
       start_time <- Sys.time()
-      old_names <- names(fit)
+      old_names <-
+        if (exists(fit)) {
+          names(fit)
+        } else {
+          character(0)
+        }
       message(current_file, " at ", as.character(start_time))
       source(current_file, chdir = TRUE)
       end_time <- Sys.time()
