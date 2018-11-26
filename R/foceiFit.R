@@ -393,6 +393,7 @@ foceiControl <- function(sigdig=3,
                          optGillF=TRUE,
                          covSmall=1e-5,
                          adjLik=TRUE, ## Adjust likelihood by 2pi for FOCEi methods
+                         gradTrim=1e5,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -624,6 +625,7 @@ foceiControl <- function(sigdig=3,
                  gillFtolCov=as.double(gillFtolCov),
                  covSmall=as.double(covSmall),
                  adjLik=adjLik,
+                 gradTrim=as.double(gradTrim),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);

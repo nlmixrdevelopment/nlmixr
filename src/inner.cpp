@@ -231,6 +231,7 @@ typedef struct {
   int rmatNorm;
   int covGillF;
   int optGillF;
+  double gradTrim;
 } focei_options;
 
 focei_options op_focei;
@@ -1669,6 +1670,11 @@ void numericGrad(double *theta, double *g){
 	  theta[cpar] = cur - delta;
 	  g[cpar] = (f-foceiOfv0(theta))/(2*delta);
 	}
+	if (g[cpar] > op_focei.gradTrim){
+	  g[cpar]=op_focei.gradTrim;
+	} else if (g[cpar] < -op_focei.gradTrim){
+	  g[cpar]=-op_focei.gradTrim;
+	}
 	theta[cpar] = cur;
       }
     op_focei.calcGrad=0;
@@ -2148,7 +2154,8 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.rmatNorm=as<int>(odeO["rmatNorm"]);
   op_focei.covGillF=as<int>(odeO["covGillF"]);
   op_focei.optGillF=as<int>(odeO["optGillF"]);
-  op_focei.covSmall = as<double>(odeO["covSmall"]);  
+  op_focei.covSmall = as<double>(odeO["covSmall"]);
+  op_focei.gradTrim = as<double>(odeO["gradTrim"]);
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
   for (unsigned int k = op_focei.npars; k--;){
