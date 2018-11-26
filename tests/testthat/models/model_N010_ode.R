@@ -1,6 +1,6 @@
 source("helper-prep_fit.R")
 context("NLME10: one-compartment bolus, Michaelis-Menten, multiple-dose")
-runno <- "N010.ode"
+runno <- "N010_ode"
 
 ode1MM <- "
 d/dt(centr)  = -(VM*centr/V)/(KM+centr/V);

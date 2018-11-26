@@ -1,6 +1,6 @@
 source("helper-prep_fit.R")
 context("NLME12: one-compartment infusion, single-dose")
-runno <- "N012.ode"
+runno <- "N012_ode"
 
 datr <-
   read.csv("../Infusion_1CPT.csv",
