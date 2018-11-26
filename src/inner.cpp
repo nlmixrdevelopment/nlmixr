@@ -231,7 +231,9 @@ typedef struct {
   int rmatNorm;
   int covGillF;
   int optGillF;
+  int mixDeriv;
   double gradTrim;
+  double gradCalcCentral;
 } focei_options;
 
 focei_options op_focei;
@@ -1608,6 +1610,7 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
 
 
 void numericGrad(double *theta, double *g){
+  op_focei.mixDeriv=0;
   if (op_focei.nF == 1 && op_focei.gillK > 0){
     double hf, hphif, err;
     for (int cpar = op_focei.npars; cpar--;){
@@ -1639,7 +1642,7 @@ void numericGrad(double *theta, double *g){
     rx = getRx();
     int npars = op_focei.npars;
     int cpar;
-    double cur, delta;
+    double cur, delta, tmp;
     double f=0;
     // Do Forward difference if the OBJF for *theta has already been calculated.
     bool doForward=false;
@@ -1671,7 +1674,8 @@ void numericGrad(double *theta, double *g){
       cur = theta[cpar];
       theta[cpar] = cur + delta;
       if (doForward){
-	g[cpar] = (foceiOfv0(theta)-f)/delta;
+	tmp = foceiOfv0(theta);
+	g[cpar] = (tmp-f)/delta;
       } else {
 	f = foceiOfv0(theta);
 	theta[cpar] = cur - delta;
@@ -1679,10 +1683,9 @@ void numericGrad(double *theta, double *g){
       }
       if (g[cpar] > op_focei.gradTrim){
 	if (doForward){
-	  delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
-	  f = foceiOfv0(theta);
+	  op_focei.mixDeriv=1;
 	  theta[cpar] = cur - delta;
-	  g[cpar] = (f-foceiOfv0(theta))/(2*delta);
+	  g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
 	  if (g[cpar] > op_focei.gradTrim){
 	    g[cpar]=op_focei.gradTrim;
 	  } else if (g[cpar] < op_focei.gradTrim){
@@ -1695,10 +1698,9 @@ void numericGrad(double *theta, double *g){
 	}
       } else if (g[cpar] < -op_focei.gradTrim){
 	if (doForward){
-	  delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
-	  f = foceiOfv0(theta);
+	  op_focei.mixDeriv=1;
 	  theta[cpar] = cur - delta;
-	  g[cpar] = (f-foceiOfv0(theta))/(2*delta);
+	  g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
 	  if (g[cpar] > op_focei.gradTrim){
 	    g[cpar]=op_focei.gradTrim;
 	  } else if (g[cpar] < op_focei.gradTrim){
@@ -1711,10 +1713,9 @@ void numericGrad(double *theta, double *g){
 	}
       } else if (ISNA(g[cpar])){
 	if (doForward){
-	  delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
-	  f = foceiOfv0(theta);
+	  op_focei.mixDeriv=1;
 	  theta[cpar] = cur - delta;
-	  g[cpar] = (f-foceiOfv0(theta))/(2*delta);
+	  g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
 	  if (g[cpar] > op_focei.gradTrim){
 	    g[cpar]=op_focei.gradTrim;
 	  } else if (g[cpar] < op_focei.gradTrim){
@@ -1725,6 +1726,10 @@ void numericGrad(double *theta, double *g){
 	} else {
 	  g[cpar]=op_focei.gradTrim;
 	}
+      } else if (doForward && fabs(g[cpar]) < op_focei.gradCalcCentral){
+	op_focei.mixDeriv=1;
+	theta[cpar] = cur - delta;
+	g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
       }
       theta[cpar] = cur;
     }
@@ -2207,6 +2212,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.optGillF=as<int>(odeO["optGillF"]);
   op_focei.covSmall = as<double>(odeO["covSmall"]);
   op_focei.gradTrim = as<double>(odeO["gradTrim"]);
+  op_focei.gradCalcCentral = as<double>(odeO["gradCalcCentral"]);
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
   for (unsigned int k = op_focei.npars; k--;){
