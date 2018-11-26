@@ -157,7 +157,7 @@ typedef struct {
   int nzm;
 
   int imp;
-  int printInner;
+  // int printInner;
   int printOuter;
   
 
@@ -1063,6 +1063,13 @@ double LikInner2(double *eta, int likId){
 // Scli-lab style cost function for inner
 void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float *tr, double *td){
   int id = (int)(x[op_focei.neta]);
+  rx = getRx();
+  if (id < 0 || id >= rx->nsub){
+    // Stops from accessing bad memory, but it doesn't fix any
+    // problems here.  Rather, this allows the error without a R
+    // session crash.
+    stop("Unexpected id for solving (id=%d and should be between 0 and %d)", id, rx->nsub);
+  }
   focei_ind *fInd = &(inds_focei[id]);
 
   if (*ind==2 || *ind==4) {
@@ -1070,11 +1077,10 @@ void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float
     // Make sure ID remains installed
     *f = likInner0(x);
     fInd->nInnerF++;
-    if (op_focei.printInner != 0 && fInd->nInnerF % op_focei.printInner == 0){
-      Rprintf(" %d(id:%d):%#14.8g:", fInd->nInnerF, id, *f);
-      for (int i = 0; i < *n; i++) Rprintf(" %#10g", x[i]);
-      Rprintf(" (nG: %d)\n", fInd->nInnerG);
-    }
+    // if (op_focei.printInner != 0 && fInd->nInnerF % op_focei.printInner == 0){
+    //   for (int i = 0; i < *n; i++) Rprintf(" %#10g", x[i]);
+    //   Rprintf(" (nG: %d)\n", fInd->nInnerG);
+    // }
   }
   if (*ind==3 || *ind==4) {
     // Gradient
@@ -1082,6 +1088,7 @@ void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float
     g[op_focei.neta] = 0; // Id shouldn't change.
     fInd->nInnerG++;
   }
+  x[op_focei.neta] = (double)(id);
 }
 
 static inline void innerEval(int id){
@@ -1656,27 +1663,71 @@ void numericGrad(double *theta, double *g){
       }
     }
     for (cpar = npars; cpar--;){
-      	if (doForward){
-	  delta = (std::fabs(theta[cpar])*op_focei.rEps[cpar] + op_focei.aEps[cpar]);
-	} else {
-	  delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
-	}
-	cur = theta[cpar];
-	theta[cpar] = cur + delta;
+      if (doForward){
+	delta = (std::fabs(theta[cpar])*op_focei.rEps[cpar] + op_focei.aEps[cpar]);
+      } else {
+	delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
+      }
+      cur = theta[cpar];
+      theta[cpar] = cur + delta;
+      if (doForward){
+	g[cpar] = (foceiOfv0(theta)-f)/delta;
+      } else {
+	f = foceiOfv0(theta);
+	theta[cpar] = cur - delta;
+	g[cpar] = (f-foceiOfv0(theta))/(2*delta);
+      }
+      if (g[cpar] > op_focei.gradTrim){
 	if (doForward){
-	  g[cpar] = (foceiOfv0(theta)-f)/delta;
-	} else {
+	  delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
 	  f = foceiOfv0(theta);
 	  theta[cpar] = cur - delta;
 	  g[cpar] = (f-foceiOfv0(theta))/(2*delta);
-	}
-	if (g[cpar] > op_focei.gradTrim){
+	  if (g[cpar] > op_focei.gradTrim){
+	    g[cpar]=op_focei.gradTrim;
+	  } else if (g[cpar] < op_focei.gradTrim){
+	    g[cpar]=-op_focei.gradTrim;
+	  } else if (ISNA(g[cpar])) {
+	    g[cpar]=op_focei.gradTrim;
+	  }
+	} else {
 	  g[cpar]=op_focei.gradTrim;
-	} else if (g[cpar] < -op_focei.gradTrim){
+	}
+      } else if (g[cpar] < -op_focei.gradTrim){
+	if (doForward){
+	  delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
+	  f = foceiOfv0(theta);
+	  theta[cpar] = cur - delta;
+	  g[cpar] = (f-foceiOfv0(theta))/(2*delta);
+	  if (g[cpar] > op_focei.gradTrim){
+	    g[cpar]=op_focei.gradTrim;
+	  } else if (g[cpar] < op_focei.gradTrim){
+	    g[cpar]=-op_focei.gradTrim;
+	  } else if (ISNA(g[cpar])) {
+	    g[cpar]=op_focei.gradTrim;
+	  }
+	} else {
 	  g[cpar]=-op_focei.gradTrim;
 	}
-	theta[cpar] = cur;
+      } else if (ISNA(g[cpar])){
+	if (doForward){
+	  delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
+	  f = foceiOfv0(theta);
+	  theta[cpar] = cur - delta;
+	  g[cpar] = (f-foceiOfv0(theta))/(2*delta);
+	  if (g[cpar] > op_focei.gradTrim){
+	    g[cpar]=op_focei.gradTrim;
+	  } else if (g[cpar] < op_focei.gradTrim){
+	    g[cpar]=-op_focei.gradTrim;
+	  } else if (ISNA(g[cpar])) {
+	    g[cpar]=op_focei.gradTrim;
+	  }
+	} else {
+	  g[cpar]=op_focei.gradTrim;
+	}
       }
+      theta[cpar] = cur;
+    }
     op_focei.calcGrad=0;
   }
 }
@@ -2007,13 +2058,13 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.epsilon=as<double>(odeO["epsilon"]);
   op_focei.nsim=as<int>(odeO["n1qn1nsim"]);
   op_focei.imp=0;
-  op_focei.printInner=as<int>(odeO["printInner"]);
-  if (op_focei.printInner < 0) op_focei.printInner = -op_focei.printInner;
+  // op_focei.printInner=as<int>(odeO["printInner"]);
+  // if (op_focei.printInner < 0) op_focei.printInner = -op_focei.printInner;
   op_focei.printOuter=as<int>(odeO["print"]);
   if (op_focei.printOuter < 0) op_focei.printOuter = -op_focei.printOuter;
-  if (op_focei.printInner > 0){
-    rx->op->cores=1;
-  }
+  // if (op_focei.printInner > 0){
+  //   rx->op->cores=1;
+  // }
   int totN=op_focei.thetan + op_focei.omegan;
   NumericVector cEps=odeO["derivEps"];
   if (cEps.size() != 2){
