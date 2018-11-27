@@ -10,7 +10,7 @@ rxPermissive({
     for (current_file in files) {
       start_time <- Sys.time()
       old_names <-
-        if (exists(fit)) {
+        if (exists("fit")) {
           names(fit)
         } else {
           character(0)
