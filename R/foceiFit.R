@@ -389,7 +389,7 @@ foceiControl <- function(sigdig=3,
                          covSmall=1e-5,
                          adjLik=TRUE, ## Adjust likelihood by 2pi for FOCEi methods
                          gradTrim=1e5,
-                         gradCalcCentral=1e-5,
+                         gradCalcCentral=1e-8,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
