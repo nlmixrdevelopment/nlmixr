@@ -636,7 +636,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
 
     find.theta <- function(x){
-        if (length(x) == 1 && any.theta.names(as.character(x), theta.names)){
+        if (length(x)== 0){
+        } else if (length(x) == 1 && any.theta.names(as.character(x), theta.names)){
             return(as.character(x));
         } else if (identical(x[[1]], quote(`+`))){
             th <- c();
