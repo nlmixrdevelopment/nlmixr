@@ -38,10 +38,6 @@ is.latex <- function() {
 ##'
 ##' @param maxstepsOde Maximum number of steps for ODE solver.
 ##'
-##' @param printInner Integer representing when the inner step is
-##'     printed. By default this is 0 or do not print.  1 is print
-##'     every function evaluation, 5 is print every 5 evaluations.
-##'
 ##' @param print Integer representing when the outer step is
 ##'     printed. When this is 0 or do not print the iterations.  1 is
 ##'     print every function evaluation (default), 5 is print every 5
@@ -317,7 +313,6 @@ foceiControl <- function(sigdig=3,
                          transitAbs = NULL, atol = NULL, rtol = NULL,
                          maxstepsOde = 5000L, hmin = 0L, hmax = NULL, hini = 0, maxordn = 12L, maxords = 5L, cores,
                          covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
-                         printInner=0L,
                          print=1L,
                          printNcol=floor((getOption("width") - 23)/12) ,
                          scaleTo=1.0,
@@ -393,6 +388,8 @@ foceiControl <- function(sigdig=3,
                          optGillF=TRUE,
                          covSmall=1e-5,
                          adjLik=TRUE, ## Adjust likelihood by 2pi for FOCEi methods
+                         gradTrim=1e5,
+                         gradCalcCentral=1e-8,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -551,7 +548,6 @@ foceiControl <- function(sigdig=3,
                  cores=cores,
                  covsInterpolation=covsInterpolation,
                  n1qn1nsim=as.integer(n1qn1nsim),
-                 printInner=as.integer(printInner),
                  print=as.integer(print),
                  lbfgsLmm=as.integer(lbfgsLmm),
                  lbfgsPgtol=as.double(lbfgsPgtol),
@@ -624,6 +620,8 @@ foceiControl <- function(sigdig=3,
                  gillFtolCov=as.double(gillFtolCov),
                  covSmall=as.double(covSmall),
                  adjLik=adjLik,
+                 gradTrim=as.double(gradTrim),
+                 gradCalcCentral=as.double(gradCalcCentral),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);

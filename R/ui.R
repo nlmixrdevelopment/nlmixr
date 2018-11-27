@@ -636,7 +636,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
 
     find.theta <- function(x){
-        if (length(x) == 1 && any.theta.names(as.character(x), theta.names)){
+        if (length(x)== 0){
+        } else if (length(x) == 1 && any.theta.names(as.character(x), theta.names)){
             return(as.character(x));
         } else if (identical(x[[1]], quote(`+`))){
             th <- c();
@@ -1226,7 +1227,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         all.covs <- all.covs[!(all.covs %in% RxODE::rxState(rxode))]
         all.covs <- setdiff(all.covs,c("t", "time", "podo", "M_E","M_LOG2E","M_LOG10E","M_LN2","M_LN10","M_PI","M_PI_2","M_PI_4","M_1_PI",
                                        "M_2_PI","M_2_SQRTPI","M_SQRT2","M_SQRT1_2","M_SQRT_3","M_SQRT_32","M_LOG10_2","M_2PI","M_SQRT_PI",
-                                       "M_1_SQRT_2PI","M_SQRT_2dPI","M_LN_SQRT_PI","M_LN_SQRT_2PI","M_LN_SQRT_PId2","pi"))
+                                       "M_1_SQRT_2PI","M_SQRT_2dPI","M_LN_SQRT_PI","M_LN_SQRT_2PI","M_LN_SQRT_PId2","pi",
+                                       nlmixrfindLhs(body(rest))))
+
         .tmp <- RxODE::rxState(rxode);
         .tmp <- data.frame(cmt=seq_along(.tmp), cond=.tmp)
         .predDf <- merge(.predDf, .tmp, all.x=TRUE)

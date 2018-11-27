@@ -157,7 +157,7 @@ typedef struct {
   int nzm;
 
   int imp;
-  int printInner;
+  // int printInner;
   int printOuter;
   
 
@@ -231,6 +231,9 @@ typedef struct {
   int rmatNorm;
   int covGillF;
   int optGillF;
+  int mixDeriv;
+  double gradTrim;
+  double gradCalcCentral;
 } focei_options;
 
 focei_options op_focei;
@@ -1062,6 +1065,13 @@ double LikInner2(double *eta, int likId){
 // Scli-lab style cost function for inner
 void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float *tr, double *td){
   int id = (int)(x[op_focei.neta]);
+  rx = getRx();
+  if (id < 0 || id >= rx->nsub){
+    // Stops from accessing bad memory, but it doesn't fix any
+    // problems here.  Rather, this allows the error without a R
+    // session crash.
+    stop("Unexpected id for solving (id=%d and should be between 0 and %d)", id, rx->nsub);
+  }
   focei_ind *fInd = &(inds_focei[id]);
 
   if (*ind==2 || *ind==4) {
@@ -1069,11 +1079,10 @@ void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float
     // Make sure ID remains installed
     *f = likInner0(x);
     fInd->nInnerF++;
-    if (op_focei.printInner != 0 && fInd->nInnerF % op_focei.printInner == 0){
-      Rprintf(" %d(id:%d):%#14.8g:", fInd->nInnerF, id, *f);
-      for (int i = 0; i < *n; i++) Rprintf(" %#10g", x[i]);
-      Rprintf(" (nG: %d)\n", fInd->nInnerG);
-    }
+    // if (op_focei.printInner != 0 && fInd->nInnerF % op_focei.printInner == 0){
+    //   for (int i = 0; i < *n; i++) Rprintf(" %#10g", x[i]);
+    //   Rprintf(" (nG: %d)\n", fInd->nInnerG);
+    // }
   }
   if (*ind==3 || *ind==4) {
     // Gradient
@@ -1081,6 +1090,7 @@ void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float
     g[op_focei.neta] = 0; // Id shouldn't change.
     fInd->nInnerG++;
   }
+  x[op_focei.neta] = (double)(id);
 }
 
 static inline void innerEval(int id){
@@ -1600,6 +1610,7 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
 
 
 void numericGrad(double *theta, double *g){
+  op_focei.mixDeriv=0;
   if (op_focei.nF == 1 && op_focei.gillK > 0){
     double hf, hphif, err;
     for (int cpar = op_focei.npars; cpar--;){
@@ -1631,7 +1642,7 @@ void numericGrad(double *theta, double *g){
     rx = getRx();
     int npars = op_focei.npars;
     int cpar;
-    double cur, delta;
+    double cur, delta, tmp;
     double f=0;
     // Do Forward difference if the OBJF for *theta has already been calculated.
     bool doForward=false;
@@ -1655,22 +1666,73 @@ void numericGrad(double *theta, double *g){
       }
     }
     for (cpar = npars; cpar--;){
-      	if (doForward){
-	  delta = (std::fabs(theta[cpar])*op_focei.rEps[cpar] + op_focei.aEps[cpar]);
-	} else {
-	  delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
-	}
-	cur = theta[cpar];
-	theta[cpar] = cur + delta;
-	if (doForward){
-	  g[cpar] = (foceiOfv0(theta)-f)/delta;
-	} else {
-	  f = foceiOfv0(theta);
-	  theta[cpar] = cur - delta;
-	  g[cpar] = (f-foceiOfv0(theta))/(2*delta);
-	}
-	theta[cpar] = cur;
+      if (doForward){
+	delta = (std::fabs(theta[cpar])*op_focei.rEps[cpar] + op_focei.aEps[cpar]);
+      } else {
+	delta = (std::fabs(theta[cpar])*op_focei.rEpsC[cpar] + op_focei.aEpsC[cpar]);
       }
+      cur = theta[cpar];
+      theta[cpar] = cur + delta;
+      if (doForward){
+	tmp = foceiOfv0(theta);
+	g[cpar] = (tmp-f)/delta;
+      } else {
+	f = foceiOfv0(theta);
+	theta[cpar] = cur - delta;
+	g[cpar] = (f-foceiOfv0(theta))/(2*delta);
+      }
+      if (g[cpar] > op_focei.gradTrim){
+	if (doForward){
+	  op_focei.mixDeriv=1;
+	  theta[cpar] = cur - delta;
+	  g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
+	  if (g[cpar] > op_focei.gradTrim){
+	    g[cpar]=op_focei.gradTrim;
+	  } else if (g[cpar] < op_focei.gradTrim){
+	    g[cpar]=-op_focei.gradTrim;
+	  } else if (ISNA(g[cpar])) {
+	    g[cpar]=op_focei.gradTrim;
+	  }
+	} else {
+	  g[cpar]=op_focei.gradTrim;
+	}
+      } else if (g[cpar] < -op_focei.gradTrim){
+	if (doForward){
+	  op_focei.mixDeriv=1;
+	  theta[cpar] = cur - delta;
+	  g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
+	  if (g[cpar] > op_focei.gradTrim){
+	    g[cpar]=op_focei.gradTrim;
+	  } else if (g[cpar] < op_focei.gradTrim){
+	    g[cpar]=-op_focei.gradTrim;
+	  } else if (ISNA(g[cpar])) {
+	    g[cpar]=op_focei.gradTrim;
+	  }
+	} else {
+	  g[cpar]=-op_focei.gradTrim;
+	}
+      } else if (ISNA(g[cpar])){
+	if (doForward){
+	  op_focei.mixDeriv=1;
+	  theta[cpar] = cur - delta;
+	  g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
+	  if (g[cpar] > op_focei.gradTrim){
+	    g[cpar]=op_focei.gradTrim;
+	  } else if (g[cpar] < op_focei.gradTrim){
+	    g[cpar]=-op_focei.gradTrim;
+	  } else if (ISNA(g[cpar])) {
+	    g[cpar]=op_focei.gradTrim;
+	  }
+	} else {
+	  g[cpar]=op_focei.gradTrim;
+	}
+      } else if (doForward && fabs(g[cpar]) < op_focei.gradCalcCentral){
+	op_focei.mixDeriv=1;
+	theta[cpar] = cur - delta;
+	g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
+      }
+      theta[cpar] = cur;
+    }
     op_focei.calcGrad=0;
   }
 }
@@ -2001,13 +2063,13 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.epsilon=as<double>(odeO["epsilon"]);
   op_focei.nsim=as<int>(odeO["n1qn1nsim"]);
   op_focei.imp=0;
-  op_focei.printInner=as<int>(odeO["printInner"]);
-  if (op_focei.printInner < 0) op_focei.printInner = -op_focei.printInner;
+  // op_focei.printInner=as<int>(odeO["printInner"]);
+  // if (op_focei.printInner < 0) op_focei.printInner = -op_focei.printInner;
   op_focei.printOuter=as<int>(odeO["print"]);
   if (op_focei.printOuter < 0) op_focei.printOuter = -op_focei.printOuter;
-  if (op_focei.printInner > 0){
-    rx->op->cores=1;
-  }
+  // if (op_focei.printInner > 0){
+  //   rx->op->cores=1;
+  // }
   int totN=op_focei.thetan + op_focei.omegan;
   NumericVector cEps=odeO["derivEps"];
   if (cEps.size() != 2){
@@ -2148,7 +2210,9 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.rmatNorm=as<int>(odeO["rmatNorm"]);
   op_focei.covGillF=as<int>(odeO["covGillF"]);
   op_focei.optGillF=as<int>(odeO["optGillF"]);
-  op_focei.covSmall = as<double>(odeO["covSmall"]);  
+  op_focei.covSmall = as<double>(odeO["covSmall"]);
+  op_focei.gradTrim = as<double>(odeO["gradTrim"]);
+  op_focei.gradCalcCentral = as<double>(odeO["gradCalcCentral"]);
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
   for (unsigned int k = op_focei.npars; k--;){
