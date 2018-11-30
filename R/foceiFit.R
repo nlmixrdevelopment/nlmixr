@@ -49,21 +49,6 @@ is.latex <- function() {
 ##' @param scaleObjective Scale the initial objective function to this
 ##'     value.  By default this is 1.  The type of scaling is determined by scaleObjectiveType
 ##'
-##' @param scaleObjectiveType This can be "times" or "add1".
-##'
-##'     When \code{scaleObjectiveType} is "times" and \code{scaleObjective}
-##'     greater than zero, this scaling is performed by:
-##'
-##'      \code{scaledObj = currentObj / \|initialObj\| * scaleObjective}
-##'
-##'     Therefore, if the initial objective function is negative, the
-##'     initial scaled objective function would be negative as well.
-##'
-##'     When \code{scaleObjectiveType} is "add" and \code{scaleObjective}
-##'     greater than zero, this scaling is performed by:
-##'
-##'     \code{scaledObj = (currentObj -  initialObj) + scaleObjective}
-##'
 ##' @param derivEps Forward difference tolerances, which is a
 ##'     vector of relative difference and absolute difference.  The
 ##'     central/forward difference step size h is calculated as:
@@ -93,11 +78,14 @@ is.latex <- function() {
 ##'
 ##' \itemize{
 ##'
-##'  \item "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \code{solve(R) \%*\% S \%*\% solve(R)}
+##'  \item "\code{r,s}" Uses the sandwich matrix to calculate the
+##'  covariance, that is: \code{solve(R) \%*\% S \%*\% solve(R)}
 ##'
-##'  \item "\code{r}" Uses the Hessian matrix to calculate the covariance as \code{2 \%*\% solve(R)}
+##'  \item "\code{r}" Uses the Hessian matrix to calculate the
+##'  covariance as \code{2 \%*\% solve(R)}
 ##'
-##'  \item "\code{s}" Uses the crossproduct matrix to calculate the covariance as \code{4 \%*\% solve(S)}
+##'  \item "\code{s}" Uses the cross-product matrix to calculate the
+##'  covariance as \code{4 \%*\% solve(S)}
 ##'
 ##'  \item "" Does not calculate the covariance step.
 ##' }
@@ -199,7 +187,7 @@ is.latex <- function() {
 ##' @param cholSECov Boolean indicating if the generalized Cholesky
 ##'     should be used while calculating the Covariance Matrix.
 ##'
-##' @param fo is a boolean indicating if this is a fo approximation routine.
+##' @param fo is a boolean indicating if this is a FO approximation routine.
 ##'
 ##' @param cholSEtol tolerance for Generalized Cholesky
 ##'     Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)
@@ -261,8 +249,11 @@ is.latex <- function() {
 ##' @param iter.max Maximum number of iterations allowed.
 ##'
 ##' @param rel.tol Relative tolerance before nlminb stops.
-##' @param x.tol X tolerance
-##' @param abstol Absolute tolerance for nlmixr
+##'
+##' @param x.tol X tolerance for nlmixr optimizers
+##'
+##' @param abstol Absolute tolerance for nlmixr optimizer
+##'
 ##' @param reltol  tolerance for nlmixr
 ##'
 ##' @param gillK The total number of possible steps to determine the
@@ -274,6 +265,217 @@ is.latex <- function() {
 ##' @param gillRtol The relative tolerance used for Gill 1983
 ##'     determination of optimal step size.
 ##'
+##' @param scaleType The scaling scheme for nlmixr.  The supported types are:
+##'
+##' \itemize{
+##' \item \code{nlmixr}  In this approach the scaling is performed by the following equation:
+##'
+##'    v_{scaled} = (v_{current} - v_{init})/scaleC[i] + scaleTo
+##'
+##' The \code{scaleTo} parameter is specified by the \code{normType},
+##' and the scales are specified by \code{scaleC}.
+##'
+##' \item \code{norm} This approach uses the simple scaling provided
+##'     by the \code{normType} argument.
+##'
+##' \item \code{mult} This approach does not use the data
+##' normalization provided by \code{normType}, but rather uses
+##' multiplicitve scaling to a constant provided by the \code{scaleTo}
+##' argument.
+##'
+##'   In this case:
+##'
+##'   v_{scaled} = v_{current}/v_{init}*scaleTo
+##'
+##' \item \code{multAdd} This approach changes the scaling based on
+##' the parameter being specified.  If a parameter is defined in an
+##' exponenital block (ie exp(theta)), then it is scaled on a
+##' linearly, that is:
+##'
+##'   v_{scaled} = (v_{current}-v_{init}) + scaleTo
+##'
+##' Otherwise the parameter is scaled multiplicatively.
+##'
+##'    v_{scaled} = v_{current}/v_{init}*scaleTo
+##'
+##' }
+##'
+##' @param scaleC The scaling constant used with
+##'     \code{scaleType=nlmixr}.  When not specified, it is based on
+##'     the type of parameter that is estimated.  The idea is to keep
+##'     the derivatives similar on a log scale to have similar
+##'     gradient sizes.  Hence parameters like log(exp(theta)) would
+##'     have a scaling factor of 1 and log(theta) would have a scaling
+##'     factor of ini_value (to scale by 1/value; ie
+##'     d/dt(log(ini_value)) = 1/ini_value or scaleC=ini_value)
+##'
+##'    \itemize{
+##'
+##'    \item For parameters in an exponential (ie exp(theta)) or
+##'    parameters specifying powers, boxCox or yeoJohnson
+##'    transformations , this is 1.
+##'
+##'    \item For additive, proportional, lognormal error structures,
+##'    these are given by 0.5*abs(initial_estimate)
+##'
+##'    \item Factorials are scaled by abs(1/digamma(inital_estimate+1))
+##'
+##'    \item parameters in a log scale (ie log(theta)) are transformed
+##'    by log(abs(initial_estimate))*abs(initial_estimate)
+##'
+##'    }
+##'
+##'    These parameter scaling coefficients are chose to try to keep
+##'    similar slopes among parameters.  That is they all follow the
+##'    slopes approximately on a log-scale.
+##'
+##'    While these are chosen in a logical manner, they may not always
+##'    apply.  You can specify each parameters scaling factor by this
+##'    parameter if you wish.
+##'
+##' @param scaleCmax Maximum value of the scaleC to prevent overflow.
+##'
+##' @param scaleCmin Minimum value of the scaleC to prevent underflow.
+##'
+##' @param normType This is the type of parameter
+##'     normalization/scaling used to get the scaled initial valuse
+##'     for nlmixr.  These are used with \code{scaleType} of.
+##'
+##'     With the exception of \code{rescale2}, these come
+##'     from
+##'     \href{https://en.wikipedia.org/wiki/Feature_scaling}{Feature
+##'     Scaling}. The \code{rescale2} The rescaling is the same type
+##'     described in the
+##'     \href{http://apmonitor.com/me575/uploads/Main/optimization_book.pdf}{OptdesX}
+##'     software manual.
+##'
+##'     In general, all all scaling formula can be described by:
+##'
+##'     v_{scaled} = (v_{unscaled}-C_{1})/C_{2}
+##'
+##'     Where
+##'
+##'
+##'     The other data normalization approaches follow the following formula
+##'
+##'     v_{scaled} = (v_{unscaled}-C_{1})/C_{2};
+##'
+##' \itemize{
+##'
+##' \item \code{rescale2} This scales all parameters from (-1 to 1).
+##'     The relative differences between the parameters are preserved
+##'     with this approach and the constants are:
+##'
+##'     C_{1} = (max(all unscaled values)+min(all unscaled values))/2
+##'
+##'     C_{2} = (max(all unscaled values) - min(all unscaled values))/2
+##'
+##'
+##' \item \code{rescale} or min-max normalization. This rescales all
+##'     parmeters from (0 to 1).  As in the \code{rescale2} the
+##'     relative differences are preserved.  In this approach:
+##'
+##'     C_{1} = min(all unscaled values)
+##'
+##'     C_{2} = max(all unscaled values) - min(all unscaled values)
+##'
+##'
+##' \item \code{mean} or mean normalization.  This rescales to center
+##'     the parameters around the mean but the parameters are from 0
+##'     to 1.  In this approach:
+##'
+##'     C_{1} = mean(all unscaled values)
+##'
+##'     C_{2} = max(all unscaled values) - min(all unscaled values)
+##'
+##' \item \code{std} or standardization.  This standardizes by the mean
+##'      and standard deviation.  In this approach:
+##'
+##'     C_{1} = mean(all unscaled values)
+##'
+##'     C_{2} = sd(all unscaled values)
+##'
+##' \item \code{len} or unit length scaling.  This scales the
+##'    parameters to the unit length.  For this approach we use the Euclidean length, that
+##'    is:
+##'
+##'     C_{1} = 0
+##'
+##'     C_{2} = sqrt(v_1^2 + v_2^2 + ... + v_n^2)
+##'
+##'
+##' \item \code{constant} which does not perform data normalization. That is
+##'
+##'     C_{1} = 0
+##'
+##'     C_{2} = 1
+##'
+##' }
+##'
+##' @param gillStep When looking for the optimal forward difference
+##'     step size, this is This is the step size to increase the
+##'     initial estimate by.  So each iteration the new step size =
+##'     (prior step size)*gillStep
+##'
+##' @param gillFtol The gillFtol is the gradient error tolerance that
+##'     is accepable before issuing a warning/error about the gradient estimates.
+##'
+##' @param gillKcov The total number of possible steps to determine
+##'     the optimal forward/central difference step size per parameter
+##'     (by the Gill 1983 method) during the covariance step.  If 0,
+##'     no optimal step size is determined.  Otherwise this is the
+##'     optimal step size determined.
+##'
+##' @param gillStepCov When looking for the optimal forward difference
+##'     step size, this is This is the step size to increase the
+##'     initial estimate by.  So each iteration during the covariance
+##'     step is equalt new step size = (prior step size)*gillStepCov
+##'
+##' @param gillFtolCov The gillFtol is the gradient error tolerance
+##'     that is acceptable before issuing a warning/error about the
+##'     gradient estimates during the covariance step.
+##'
+##' @param rmatNorm A parameter to normalize gradient step size by the
+##'     parameter value during the calculation of the R matrix
+##'
+##' @param smatNorm A parameter to normalize gradient step size by the
+##'     parameter value during the calculation of the S matrix
+##'
+##' @param covGillF Use the Gill calculated optimal Forward difference
+##'     step size for the instead of the central difference step size
+##'     during the central difference gradient calculation.
+##'
+##' @param optGillF Use the Gill calculated optimal Forward difference
+##'     step size for the instead of the central difference step size
+##'     during the central differences for optimization.
+##'
+##' @param covSmall The covSmall is the small number to compare
+##'     covariance numbers before rejecting an estimate of the
+##'     covariance as the final estimate (when comparing sandwich vs
+##'     R/S matrix estimates of the covariance).  This number controls
+##'     how small the variance is before the covariance matrix is
+##'     rejected.
+##'
+##' @param adjLik In nlmixr, the objective function matches NONMEM's
+##'     objective function, which removes a 2*pi constant from the
+##'     likelihood calculation. If this is TRUE, the likelihood
+##'     function is adjusted by this 2*pi factor.  When adjusted this
+##'     number more closely matches the likelihood approximations of
+##'     nlme, and SAS approximations.  Regardless of if this is turned
+##'     on or off the objective function matches NONMEM's objective
+##'     function.
+##'
+##' @param gradTrim The parameter to adjust the gradient to if the
+##'     |gradient| is very large.
+##'
+##' @param gradCalcCentralSmall A small number that represents the value
+##'     where |grad| < gradCalcCentralSmall where forward differences
+##'     switch to central differences.
+##'
+##' @param gradCalcCentralLarge A large number that represents the value
+##'     where |grad| > gradCalcCentralLarge where forward differences
+##'     switch to central differences.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##'
@@ -283,12 +485,6 @@ is.latex <- function() {
 ##' outer problem and the BFGS \code{\link[n1qn1]{n1qn1}} with that
 ##' allows restoring the prior individual Hessian (for faster
 ##' optimization speed).
-##'
-##' By default FOCEi scales the outer problem parameters to 1.0 for
-##' the initial parameter estimates and scales the objective function
-##' to 1.0, as suggested by the
-##' \href{https://www.nag.com/numeric/fl/nagdoc_fl25/html/e04/e04intro.html}{NAG library}
-##' and \href{scipy}{https://www.scipy-lectures.org/advanced/mathematical_optimization/}.
 ##'
 ##' However the inner problem is not scaled.  Since most eta estimates
 ##' start near zero, scaling for these parameters do not make sense.
@@ -388,8 +584,9 @@ foceiControl <- function(sigdig=3,
                          optGillF=TRUE,
                          covSmall=1e-5,
                          adjLik=TRUE, ## Adjust likelihood by 2pi for FOCEi methods
-                         gradTrim=1e5,
-                         gradCalcCentral=1e-8,
+                         gradTrim=1e8,
+                         gradCalcCentralSmall=1e-4,
+                         gradCalcCentralLarge=1e4,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -621,7 +818,8 @@ foceiControl <- function(sigdig=3,
                  covSmall=as.double(covSmall),
                  adjLik=adjLik,
                  gradTrim=as.double(gradTrim),
-                 gradCalcCentral=as.double(gradCalcCentral),
+                 gradCalcCentralSmall=as.double(gradCalcCentralSmall),
+                 gradCalcCentralLarge=as.double(gradCalcCentralLarge),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);
@@ -2181,7 +2379,7 @@ focei.theta <- function(object, uif, ...){
 ##' @author Matthew L. Fidler
 ##' @export
 coxBox <- function(x, lambda=1){
-    .Call(`_RxODE_coxBox_`, x, lambda, 0L)
+    .Call(`_nlmixr_coxBox_`, x, lambda, 0L)
 }
 
 ##' Yeo-Johnson Transformation
@@ -2192,7 +2390,7 @@ coxBox <- function(x, lambda=1){
 ##' @author Matthew L. Fidler
 ##' @export
 yeoJohnson <- function(x, lambda=1){
-    .Call(`_RxODE_coxBox_`, x, lambda, 1L)
+    .Call(`_nlmixr_coxBox_`, x, lambda, 1L)
 }
 
 ##' Set Objective function type for a nlmixr object
@@ -2229,3 +2427,5 @@ setOfv <- function(x, type){
         stop("Wrong type of object.");
     }
 }
+
+##  LocalWords:  covariance

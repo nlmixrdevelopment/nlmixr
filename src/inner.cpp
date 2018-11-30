@@ -233,7 +233,8 @@ typedef struct {
   int optGillF;
   int mixDeriv;
   double gradTrim;
-  double gradCalcCentral;
+  double gradCalcCentralSmall;
+  double gradCalcCentralLarge;
 } focei_options;
 
 focei_options op_focei;
@@ -546,7 +547,7 @@ static inline double unscalePar(double *x, int i){
   case 1: // normalized
     return x[i]*op_focei.c2+op_focei.c1;
     break;
-  case 2: // log vs linear scales and/or range
+  case 2: // log vs linear scales and/or ranges
     if (op_focei.normType <= 5){
       scaleTo = (op_focei.initPar[i]-op_focei.c1)/op_focei.c2;
     } else if (scaleTo == 0){
@@ -1681,6 +1682,12 @@ void numericGrad(double *theta, double *g){
 	theta[cpar] = cur - delta;
 	g[cpar] = (f-foceiOfv0(theta))/(2*delta);
       }
+      if (doForward && fabs(g[cpar]) > op_focei.gradCalcCentralLarge){
+	doForward = false;
+	theta[cpar] = cur - delta;
+	g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
+	op_focei.mixDeriv=1;
+      }
       if (g[cpar] > op_focei.gradTrim){
 	if (doForward){
 	  op_focei.mixDeriv=1;
@@ -1726,10 +1733,10 @@ void numericGrad(double *theta, double *g){
 	} else {
 	  g[cpar]=op_focei.gradTrim;
 	}
-      } else if (doForward && fabs(g[cpar]) < op_focei.gradCalcCentral){
-	op_focei.mixDeriv=1;
-	theta[cpar] = cur - delta;
-	g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
+      } else if (doForward && fabs(g[cpar]) < op_focei.gradCalcCentralSmall){
+	op_focei.mixDeriv = 1;
+	theta[cpar]       = cur - delta;
+	g[cpar]           = (tmp-foceiOfv0(theta))/(2*delta);
       }
       theta[cpar] = cur;
     }
@@ -2212,7 +2219,8 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.optGillF=as<int>(odeO["optGillF"]);
   op_focei.covSmall = as<double>(odeO["covSmall"]);
   op_focei.gradTrim = as<double>(odeO["gradTrim"]);
-  op_focei.gradCalcCentral = as<double>(odeO["gradCalcCentral"]);
+  op_focei.gradCalcCentralLarge = as<double>(odeO["gradCalcCentralLarge"]);
+  op_focei.gradCalcCentralSmall = as<double>(odeO["gradCalcCentralSmall"]);
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
   for (unsigned int k = op_focei.npars; k--;){
@@ -2284,7 +2292,7 @@ NumericVector foceiSetup_(const RObject &obj,
     for (unsigned int k = op_focei.npars-1; k--;){
       len += op_focei.initPar[k]*op_focei.initPar[k];
     }
-    op_focei.c1 = mean;
+    op_focei.c1 = 0;
     op_focei.c2 = sqrt(len);
     break;
   case 6:
@@ -2522,6 +2530,8 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
       case 0:
 	if (op_focei.nF == 1 && op_focei.gillK > 0){
 	  Rprintf("|\033[4m    G|    Gill Diff. |");
+	} else if (op_focei.mixDeriv){
+	  Rprintf("|\033[4m    M|   Mixed Diff. |");
 	} else {
 	  Rprintf("|\033[4m    G| Forward Diff. |");
 	}
@@ -2535,6 +2545,8 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
       case 0:
 	if (op_focei.nF == 1 && op_focei.gillK > 0){
 	  Rprintf("|    G|    Gill Diff. |");
+	} else if (op_focei.mixDeriv){
+	  Rprintf("|    M|   Mixed Diff. |");
 	} else {
 	  Rprintf("|    G| Forward Diff. |");
 	}

@@ -122,7 +122,7 @@ rxPermissive({
     d3$AMT <- 0;
 
     test_that("EVID warning", {
-        expect_warning(nmDataConvert(d3), rex::rex("Assumed all DV values are observations. (EVID=0)"));
+        expect_warning(nmDataConvert(d3), rex::rex("Assumed all AMT=0 values are observations. (EVID=0)"));
     })
 
     d3 <- d2
