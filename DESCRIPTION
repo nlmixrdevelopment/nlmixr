@@ -9,7 +9,8 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
 	RxODE(>= 0.8.1-0), nlme, magrittr, tidyr
 Suggests: knitr, rmarkdown, dplyr, data.table, llbfgsb3c, testthat,
-        madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf
+        madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf,
+	Rvmmin
 Version: 1.0.0-8
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",

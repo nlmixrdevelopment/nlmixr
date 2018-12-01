@@ -556,7 +556,7 @@ foceiControl <- function(sigdig=3,
                          ## mma: 20974.20 (Time: Opt: 3000.501 Cov: 467.287)
                          ## slsqp: 21023.89 (Time: Opt: 460.099; Cov: 488.921)
                          ## lbfgsbLG: 20974.74 (Time: Opt: 946.463; Cov:397.537)
-                         outerOpt=c("bobyqa", "L-BFGS-B", "lbfgsb3c", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
+                         outerOpt=c("bobyqa", "L-BFGS-B", "lbfgsb3c", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
                          innerOpt=c("n1qn1", "BFGS"),
                          ##
                          rhobeg=.2,
@@ -571,8 +571,8 @@ foceiControl <- function(sigdig=3,
                          reltol=NULL,
                          resetHessianAndEta=FALSE,
                          stateTrim=Inf,
-                         gillK=4L,
-                         gillStep=8,
+                         gillK=10L,
+                         gillStep=2,
                          gillFtol=0,
                          gillRtol=sqrt(.Machine$double.eps),
                          gillKcov=10L,
@@ -705,6 +705,9 @@ foceiControl <- function(sigdig=3,
             outerOpt <- -1L;
         } else if (outerOpt == "lbfgsbLG"){
             outerOptFun <- .lbfgsbLG;
+            outerOpt <- -1L;
+        } else if (outerOpt == "Rvmmin"){
+            outerOptFun <- .Rvmmin;
             outerOpt <- -1L;
         } else {
             .outerOptIdx <- c("L-BFGS-B"=0L, "lbfgsb3c"=1L);
@@ -874,19 +877,19 @@ foceiControl <- function(sigdig=3,
     return(.ret);
 }
 
-## .Rvmmin <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
-##     ## Very very slow.
-##     ## Also gives unreasonable estimates
-##     .masked <- rep_len(1, length(par))
-##     .ctl <- list(maxit=control$maxOuterIterations,
-##                  ## maxfevals
-##                  trace=0, dowarn=FALSE, checkgrad=FALSE, checkbounds=FALSE,
-##                  keepinputpar=FALSE, eps=control$abstol);
-##     .ret <- Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, bdmsk=.masked, control = list(), ...);
-##     .ret$x <- .ret$par
-##     .ret$message <- .ret$message
-##     ret(.ret)
-## }
+.Rvmmin <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    ## Also gives unreasonable estimates
+    RxODE::rxReq("Rvmmin");
+    .masked <- rep_len(1, length(par))
+    .ctl <- list(maxit=control$maxOuterIterations,
+                 ## maxfevals
+                 trace=0, dowarn=FALSE, checkgrad=FALSE, checkbounds=FALSE,
+                 keepinputpar=FALSE, eps=control$abstol);
+    .ret <- Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, bdmsk=.masked, control = list(), ...);
+    .ret$x <- .ret$par
+    .ret$message <- .ret$message
+    ret(.ret)
+}
 
 .nloptr <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ..., nloptrAlgoritm="NLOPT_LD_MMA"){
     RxODE::rxReq("nloptr")
