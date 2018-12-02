@@ -47,7 +47,7 @@ is.latex <- function() {
 ##'     By default this is 1.  When zero or below, no scaling is performed.
 ##'
 ##' @param scaleObjective Scale the initial objective function to this
-##'     value.  By default this is 1.  The type of scaling is determined by scaleObjectiveType
+##'     value.  By default this is 1.
 ##'
 ##' @param derivEps Forward difference tolerances, which is a
 ##'     vector of relative difference and absolute difference.  The
@@ -512,8 +512,8 @@ foceiControl <- function(sigdig=3,
                          print=1L,
                          printNcol=floor((getOption("width") - 23)/12) ,
                          scaleTo=1.0,
-                         scaleObjective=1.0,
-                         normType=c("rescale2", "rescale", "mean", "std", "len", "constant"),
+                         scaleObjective=0,
+                         normType=c("rescale2", "mean", "rescale", "std", "len", "constant"),
                          scaleType=c("nlmixr", "norm", "mult", "multAdd"),
                          scaleCmax=1e5,
                          scaleCmin=1e-5,
@@ -556,7 +556,7 @@ foceiControl <- function(sigdig=3,
                          ## mma: 20974.20 (Time: Opt: 3000.501 Cov: 467.287)
                          ## slsqp: 21023.89 (Time: Opt: 460.099; Cov: 488.921)
                          ## lbfgsbLG: 20974.74 (Time: Opt: 946.463; Cov:397.537)
-                         outerOpt=c("bobyqa", "L-BFGS-B", "lbfgsb3c", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
+                         outerOpt=c("bobyqa", "nlminb", "lbfgsb3c", "L-BFGS-B","mma", "lbfgsbLG", "slsqp", "Rvmmin"),
                          innerOpt=c("n1qn1", "BFGS"),
                          ##
                          rhobeg=.2,
@@ -571,8 +571,8 @@ foceiControl <- function(sigdig=3,
                          reltol=NULL,
                          resetHessianAndEta=FALSE,
                          stateTrim=Inf,
-                         gillK=10L,
-                         gillStep=2,
+                         gillK=5L,
+                         gillStep=4,
                          gillFtol=0,
                          gillRtol=sqrt(.Machine$double.eps),
                          gillKcov=10L,
@@ -584,7 +584,7 @@ foceiControl <- function(sigdig=3,
                          optGillF=TRUE,
                          covSmall=1e-5,
                          adjLik=TRUE, ## Adjust likelihood by 2pi for FOCEi methods
-                         gradTrim=1e8,
+                         gradTrim=Inf,
                          gradCalcCentralSmall=1e-4,
                          gradCalcCentralLarge=1e4,
                          ..., stiff){
