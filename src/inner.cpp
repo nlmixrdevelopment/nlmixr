@@ -1643,7 +1643,7 @@ void numericGrad(double *theta, double *g){
     rx = getRx();
     int npars = op_focei.npars;
     int cpar;
-    double cur, delta, tmp, tmp0;
+    double cur, delta, tmp, tmp0=NA_REAL;
     double f=0;
     // Do Forward difference if the OBJF for *theta has already been calculated.
     bool doForward=false;
