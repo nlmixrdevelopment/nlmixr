@@ -2991,7 +2991,8 @@ NumericMatrix foceiCalcCov(Environment e){
       }
     }
     if (op_focei.boundTol > 0){
-      for (k = op_focei.npars; k--;){
+      // Subtract omegan so that Omega boundaries are not counted.
+      for (k = op_focei.npars-op_focei.omegan; k--;){
         if (op_focei.nbd[k] != 0){
           // bounds
           j=op_focei.fixedTrans[k];
@@ -3403,6 +3404,7 @@ NumericMatrix foceiCalcCov(Environment e){
     } else {
       if (boundary){
         warning("Parameter estimate near boundary; covariance not caculated. Use getVarCov to calculate anyway.");
+	e["covMethod"] = "Boundary issue; Get SEs with getVarCov";
       }
       op_focei.cur=op_focei.totTick;
       op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
