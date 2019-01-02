@@ -1722,6 +1722,14 @@ foceiFit.data.frame0 <- function(data,
     if (!control$calcTables){
         return(.ret);
     }
+    .solve <- function(...){
+        .ret <- RxODE::rxSolve(...);
+        if (names(.ret)[1] == "time"){
+            ## For single subject ID is dropped.
+            .ret <- data.frame(ID=1, .ret);
+        }
+        return(.ret)
+    }
     if (exists("noLik", envir=.ret)){
         if (.ret$noLik){
             message("Calculating residuals/tables")
@@ -1729,22 +1737,24 @@ foceiFit.data.frame0 <- function(data,
             .etas <- .ret$ranef
             .thetas <- .ret$fixef
             .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
-            .preds <- list(ipred=RxODE::rxSolve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
-                                                atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
-                                                hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                                                transitAbs = .ret$control$TransitAbs,
-                                                maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                                                method=.ret$control$method),
-                           pred=RxODE::rxSolve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
-                                               atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
-                                               hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                                               transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
-                                               maxords = .ret$control$maxords, method=.ret$control$method),
+            .preds <- list(ipred=.solve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
+                                        atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                        hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                                        transitAbs = .ret$control$TransitAbs,
+                                        maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                                        method=.ret$control$method),
+                           pred=.solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
+                                       atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                       hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                                       transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
+                                       maxords = .ret$control$maxords, method=.ret$control$method),
                            cwres=FALSE);
         } else {
             .pt <- proc.time();
             .etas <- .ret$ranef
             .thetas <- .ret$fixef
+            print(.etas)
+            print(.thetas)
             .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
             .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)]);
             .updateParFixed(.ret);
@@ -1764,17 +1774,17 @@ foceiFit.data.frame0 <- function(data,
         .etas <- .ret$ranef
         .thetas <- .ret$fixef
         .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
-        .preds <- list(ipred=RxODE::rxSolve(.ret$model$inner, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
-                                            atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
-                                            hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                                            transitAbs = .ret$control$TransitAbs,
-                                            maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                                            method=.ret$control$method),
-                       pred=RxODE::rxSolve(.ret$model$inner, .pars$pred, .ret$dataSav, returnType="data.frame",
-                                           atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
-                                           hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                                           transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
-                                           maxords = .ret$control$maxords, method=.ret$control$method));
+        .preds <- list(ipred=.solve(.ret$model$inner, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
+                                    atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                    hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                                    transitAbs = .ret$control$TransitAbs,
+                                    maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                                    method=.ret$control$method),
+                       pred=.solve(.ret$model$inner, .pars$pred, .ret$dataSav, returnType="data.frame",
+                                   atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                   hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                                   transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
+                                   maxords = .ret$control$maxords, method=.ret$control$method));
     }
     .lst <- .Call(`_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, .preds$ipred$rxLambda, .preds$ipred$rxYj, .etas, .pars$eta.lst);
     if (is.null(.preds$cwres)){
