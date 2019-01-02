@@ -1007,7 +1007,7 @@ constructLinCmt <- function(fun){
     lines <- deparse(body(fun))[-1];
     lines <- lines[-length(lines)];
     ret <- RxODE::rxLinCmtTrans(sprintf("%s\nCentral=linCmt(%s);\n", paste(lines, collapse="\n"), paste(pars, collapse=", ")));
-    ret <- strsplit(ret, "\n")[[1]];
+    ret <- strsplit(RxODE::rxNorm(ret), "\n")[[1]];
     ret <- paste(ret[-seq_along(lines)], collapse="\n");
     return(ret)
 }
