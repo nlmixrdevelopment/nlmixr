@@ -1345,6 +1345,11 @@ constructLinCmt <- function(fun){
 foceiFit <- function(data, ...){
     UseMethod("foceiFit")
 }
+
+##'@rdname foceiFit
+##'@export
+focei.fit <- foceiFit;
+
 ##'@rdname foceiFit
 ##'@export
 foceiFit.data.frame <- function(data, ...){

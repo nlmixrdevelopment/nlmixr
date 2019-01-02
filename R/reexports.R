@@ -164,3 +164,7 @@ nlme::groupedData
 ##' @importFrom nlme getData
 ##' @export
 nlme::getData
+
+##' @importFrom RxODE rxSymPySetupPred
+##' @export
+RxODE::rxSymPySetupPred

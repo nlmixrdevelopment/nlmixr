@@ -11,7 +11,7 @@ foceiControl(sigdig = 3, epsilon = NULL, maxInnerIterations = 1000,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
   "linear", "nocb", "midpoint"), print = 1L,
   printNcol = floor((getOption("width") - 23)/12), scaleTo = 1,
-  scaleObjective = 1, normType = c("rescale2", "rescale", "mean",
+  scaleObjective = 0, normType = c("rescale2", "mean", "rescale",
   "std", "len", "constant"), scaleType = c("nlmixr", "norm", "mult",
   "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
   derivEps = rep(20 * sqrt(.Machine$double.eps), 2),
@@ -27,18 +27,18 @@ foceiControl(sigdig = 3, epsilon = NULL, maxInnerIterations = 1000,
   interaction = TRUE, cholSEtol = (.Machine$double.eps)^(1/3),
   cholAccept = 0.001, resetEtaP = 0.1, diagOmegaBoundUpper = 5,
   diagOmegaBoundLower = 100, cholSEOpt = FALSE, cholSECov = FALSE,
-  fo = FALSE, covTryHarder = FALSE, outerOpt = c("bobyqa",
-  "L-BFGS-B", "lbfgsb3c", "lbfgsb3", "nlminb", "mma", "lbfgsbLG", "slsqp"),
+  fo = FALSE, covTryHarder = FALSE, outerOpt = c("bobyqa", "nlminb",
+  "lbfgsb3c", "L-BFGS-B", "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
   innerOpt = c("n1qn1", "BFGS"), rhobeg = 0.2, rhoend = NULL,
   npt = NULL, rel.tol = NULL, x.tol = NULL, eval.max = 4000,
   iter.max = 2000, abstol = NULL, reltol = NULL,
-  resetHessianAndEta = FALSE, stateTrim = Inf, gillK = 10L,
-  gillStep = 2, gillFtol = 0, gillRtol = sqrt(.Machine$double.eps),
+  resetHessianAndEta = FALSE, stateTrim = Inf, gillK = 5L,
+  gillStep = 4, gillFtol = 0, gillRtol = sqrt(.Machine$double.eps),
   gillKcov = 10L, gillStepCov = 2, gillFtolCov = 0,
   rmatNorm = TRUE, smatNorm = TRUE, covGillF = TRUE,
-  optGillF = TRUE, covSmall = 1e-05, adjLik = TRUE,
-  gradTrim = 1e+08, gradCalcCentralSmall = 1e-04,
-  gradCalcCentralLarge = 10000, ..., stiff)
+  optGillF = TRUE, covSmall = 1e-05, adjLik = TRUE, gradTrim = Inf,
+  gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000, ...,
+  stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -143,7 +143,7 @@ parameter estimates/gradient}
 By default this is 1.  When zero or below, no scaling is performed.}
 
 \item{scaleObjective}{Scale the initial objective function to this
-value.  By default this is 1.  The type of scaling is determined by scaleObjectiveType}
+value.  By default this is 1.}
 
 \item{normType}{This is the type of parameter
     normalization/scaling used to get the scaled initial valuse

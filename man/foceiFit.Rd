@@ -2,11 +2,14 @@
 % Please edit documentation in R/foceiFit.R
 \name{foceiFit}
 \alias{foceiFit}
+\alias{focei.fit}
 \alias{foceiFit.data.frame}
 \alias{foceiFit.data.frame0}
 \title{FOCEi fit}
 \usage{
 foceiFit(data, ...)
+
+focei.fit(data, ...)
 
 \method{foceiFit}{data.frame}(data, ...)
 
