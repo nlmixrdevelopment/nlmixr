@@ -1861,6 +1861,7 @@ print.nlmixrClass <- function(x, ...){
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
     .env <- obj;
+    if (arg == "sigma") return(.sigma(obj))
     if (arg == "coefficients"){
         return(list(fixed=fixef(obj),
                     random=ranef(obj)))
@@ -1887,7 +1888,6 @@ print.nlmixrClass <- function(x, ...){
     }
     if (exists("uif", .env)){
         .uif <- .env$uif;
-        if (arg == "sigma") return(.sigma(obj))
         if (arg == "modelName") arg <- "model.name"
         if (arg == "dataName") arg <- "data.name"
         .ret <- `$.nlmixrUI`(.uif, arg);
@@ -1951,7 +1951,7 @@ VarCorr.nlmixrFitCore <- function(x, sigma = 1, ...){
         .ret <- .ret[!is.na(.ret[, 1]), ]
         return(.ret);
     } else {
-        VarCorr(as.nlme(.ret), sigma=sigma, ...)
+        VarCorr(as.nlme(x), sigma=sigma, ...)
     }
 }
 
@@ -1964,7 +1964,7 @@ VarCorr.nlmixrFitCore <- function(x, sigma = 1, ...){
             return(fixef(x)[.errs]);
         }
     } else {
-        return(.ret$nlme$sigma);
+        return(.ret$sigma);
     }
 }
 
