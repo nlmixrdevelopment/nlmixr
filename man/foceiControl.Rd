@@ -37,8 +37,8 @@ foceiControl(sigdig = 3, epsilon = NULL, maxInnerIterations = 1000,
   gillKcov = 10L, gillStepCov = 2, gillFtolCov = 0,
   rmatNorm = TRUE, smatNorm = TRUE, covGillF = TRUE,
   optGillF = TRUE, covSmall = 1e-05, adjLik = TRUE, gradTrim = Inf,
-  gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000, ...,
-  stiff)
+  gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
+  etaNudge = 0.01, ..., stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -558,6 +558,15 @@ switch to central differences.}
 \item{gradCalcCentralLarge}{A large number that represents the value
 where |grad| > gradCalcCentralLarge where forward differences
 switch to central differences.}
+
+\item{etaNudge}{By default initial ETA estimates start at zero;
+Sometimes this doesn't optimize appropriately.  If this value
+is non-zero, when the n1qn1 optimization didn't perform
+appropriately, reset the Hessian, and nudge the ETA up by this
+value; If the ETA still doesn't move, nudge the ETA down by
+this value.  Finally if it doesn't move, reset it to zero and
+do not perform the optimization again.  This ETA nudge is only
+done on the first ETA optimization.}
 
 \item{...}{Ignored parameters}
 

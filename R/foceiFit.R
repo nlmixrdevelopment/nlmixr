@@ -482,7 +482,8 @@ is.latex <- function() {
 ##'     appropriately, reset the Hessian, and nudge the ETA up by this
 ##'     value; If the ETA still doesn't move, nudge the ETA down by
 ##'     this value.  Finally if it doesn't move, reset it to zero and
-##'     do not perform the optimization again.
+##'     do not perform the optimization again.  This ETA nudge is only
+##'     done on the first ETA optimization.
 ##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa

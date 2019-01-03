@@ -1173,7 +1173,7 @@ static inline void innerOpt1(int id, int likId){
 	 fInd->zm, 
 	 &izs, &rzs, &dzs);
   // If stays at zero try another point?
-  if (op_focei.etaNudge != 0 && fInd->doEtaNudge == 1){
+  if (fInd->doEtaNudge == 1 && op_focei.etaNudge != 0.0){
     bool tryAgain=true;
     for (int i = fop->neta; i--;){
       if (fInd->x[i] != 0){
@@ -1221,6 +1221,8 @@ static inline void innerOpt1(int id, int likId){
       }
     }
   }
+  // only nudge once
+  fInd->doEtaNudge=0;
   
   std::copy(&fInd->x[0],&fInd->x[0]+fop->neta,&fInd->eta[0]);
   // Update variances
