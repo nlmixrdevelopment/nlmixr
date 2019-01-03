@@ -1243,7 +1243,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
         if (length(.w) > 0L){
             stop(sprintf("The conditional statements (%s) are not in terms of the RxODE states: %s", paste(.predDf[.w, "cond"], collapse=", "),
-                     paste(rxState(rxode), collapse=", ")))
+                     paste(RxODE::rxState(rxode), collapse=", ")))
         }
     } else {
         .predDf$cmt <- -1
