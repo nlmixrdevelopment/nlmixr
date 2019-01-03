@@ -1383,33 +1383,35 @@ foceiFit.data.frame <- function(data, ...){
             .digs <- .ret$control$sigdig;
             .cvOnly <- TRUE;
             .sdOnly <- TRUE;
-            .cvp <- sapply(row.names(.ret$popDfSig), function(x){
+            .cvp <- lapply(row.names(.ret$popDfSig), function(x){
                 .y <- .muRef[x];
-                if (is.na(.y)) return(" ");
+                if (is.na(.y)) return(data.frame(ch=" ", v=NA_real_));
                 .v <- .ome[.y, .y];
                 if (any(.y == .logEta)){
                     .sdOnly <<- FALSE;
-                    sprintf("%s%%", formatC(signif(sqrt(exp(.v) - 1) * 100, digits=.digs),
-                                            digits=.digs, format="fg", flag="#"));
+                    return(data.frame(ch=sprintf("%s%%", formatC(signif(sqrt(exp(.v) - 1) * 100, digits=.digs),
+                                                                 digits=.digs, format="fg", flag="#")),
+                                      v=sqrt(exp(.v) - 1) * 100));
                 } else {
                     .cvOnly <<- FALSE;
-                    sprintf("%s", formatC(signif(sqrt(.v),digits=.digs),
-                                          digits=.digs, format="fg", flag="#"));
+                    return(data.frame(ch=sprintf("%s", formatC(signif(sqrt(.v),digits=.digs),
+                                                               digits=.digs, format="fg", flag="#")),
+                                      v=.v));
                 }
             })
-
+            .cvp <- do.call("rbind", .cvp);
             .shrink <- .ret$shrink;
             .errs <- as.data.frame(.uif$ini);
             .errs <- paste(.errs[which(!is.na(.errs$err)), "name"]);
-            .sh <- sapply(row.names(.ret$popDfSig), function(x){
+            .sh <- lapply(row.names(.ret$popDfSig), function(x){
                 .y <- .muRef[x];
                 if (is.na(.y)) {
                     if (any(x == .errs)){
                         .v <- .shrink[7, "IWRES"];
-                        if (length(.v) != 0) return(" ")
-                        if (is.null(.v)) return(" ")
+                        if (length(.v) != 0) return(data.frame(ch=" ", v=NA_real_))
+                        if (is.null(.v)) return(data.frame(ch=" ", v=NA_real_))
                         if (is.na(.v)){
-                            return(" ")
+                            return(data.frame(ch=" ", v=NA_real_))
                         }
                     } else {
                         return(" ")
@@ -1417,7 +1419,7 @@ foceiFit.data.frame <- function(data, ...){
                 } else {
                     .v <- .shrink[7, .y];
                 }
-                if (length(.v) != 1) return(" ");
+                if (length(.v) != 1) return(data.frame(ch=" ", v=NA_real_));
                 .t <- ">"
                 if (.v < 0){
                 } else  if (.v < 20){
@@ -1425,21 +1427,31 @@ foceiFit.data.frame <- function(data, ...){
                 } else if (.v < 30){
                     .t <- "="
                 }
-                sprintf("%s%%%s", formatC(signif(.v, digits=.digs),
-                                          digits=.digs, format="fg", flag="#"), .t);
+                return(data.frame(ch=sprintf("%s%%%s", formatC(signif(.v, digits=.digs),
+                                                  digits=.digs, format="fg", flag="#"), .t),
+                           v=.v));
             })
-            .ret$parFixed <- data.frame(.ret$popDfSig, "BSD"=.cvp, "Shrink(SD)%"=.sh, check.names=FALSE);
+            .sh <- do.call("rbind", .sh);
+            .ret$parFixed <- data.frame(.ret$popDfSig, "BSD"=.cvp$ch, "Shrink(SD)%"=.sh$ch, check.names=FALSE);
+            .ret$parFixedDf <- data.frame(.ret$popDf, "BSD"=.cvp$v, "Shrink(SD)%"=.sh$v, check.names=FALSE);
             .w <- which(names(.ret$parFixed) == "BSD")
-            if (length(.w) >= 1)
+            if (length(.w) >= 1){
                 names(.ret$parFixed)[.w] <- ifelse(.sdOnly, "BSV(SD)", ifelse(.cvOnly, "BSV(CV%)", "BSV(CV% or SD)"))
+            }
+            .w <- which(names(.ret$parFixedDf) == "BSD")
+            if (length(.w) >= 1){
+                names(.ret$parFixedDf)[.w] <- ifelse(.sdOnly, "BSV(SD)", ifelse(.cvOnly, "BSV(CV%)", "BSV(CV% or SD)"))
+            }
             if (!all(.lab == "")){
                 .ret$parFixed <- data.frame(Parameter=.lab, .ret$parFixed, check.names=FALSE)
             }
         } else {
             .ret$parFixed <- .ret$popDfSig
+            .ret$parFixedDf <- .ret$popDfSig
         }
     } else {
         .ret$parFixed <- .ret$popDfSig
+        .ret$parFixedDf <- .ret$popDf
     }
     class(.ret$parFixed) <- c("nlmixrParFixed", "data.frame");
 }
@@ -1849,6 +1861,10 @@ print.nlmixrClass <- function(x, ...){
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
     .env <- obj;
+    if (arg == "coefficients"){
+        return(list(fixed=fixef(obj),
+                    random=ranef(obj)))
+    }
     if (arg == "par.hist") arg <- "parHist"
     if (arg == "par.hist.stacked") arg <- "parHistStacked"
     if (arg == "omega.R") arg <- "omegaR"
@@ -1871,6 +1887,7 @@ print.nlmixrClass <- function(x, ...){
     }
     if (exists("uif", .env)){
         .uif <- .env$uif;
+        if (arg == "sigma") return(.sigma(obj))
         if (arg == "modelName") arg <- "model.name"
         if (arg == "dataName") arg <- "data.name"
         .ret <- `$.nlmixrUI`(.uif, arg);
@@ -1879,6 +1896,7 @@ print.nlmixrClass <- function(x, ...){
         if (exists(arg, envir=.env2)){
             return(get(arg, envir=.env2))
         }
+
     }
 }
 
@@ -1926,7 +1944,28 @@ as.saem <- function(x){
 ##' @importFrom nlme VarCorr
 ##' @export
 VarCorr.nlmixrFitCore <- function(x, sigma = 1, ...){
-    VarCorr(as.nlme(x), sigma=sigma, ...)
+    .ret <- x$nlme
+    if (is.null(.ret)) {
+        .ret <- data.frame(Variance=x$parFixedDf$SE ^ 2, StdDev=x$parFixedDf$SE,
+                           row.names=row.names(x$parFixedDf));
+        .ret <- .ret[!is.na(.ret[, 1]), ]
+        return(.ret);
+    } else {
+        VarCorr(as.nlme(.ret), sigma=sigma, ...)
+    }
+}
+
+.sigma <- function(x){
+    .ret <- x$nlme
+    if (is.null(.ret)) {
+        if (exists("uif", envir=x$env)){
+            .df <- as.data.frame(x$uif$ini)
+            .errs <- paste(.df[which(!is.na(.df$err)), "name"])
+            return(fixef(x)[.errs]);
+        }
+    } else {
+        return(.ret$nlme$sigma);
+    }
 }
 
 ##' @export
@@ -1942,11 +1981,13 @@ str.nlmixrFitData <- function(object, ...){
     cat(" $ theta            : Fixed Parameter Estimates\n")
     cat(" $ eta              : Individual Parameter Estimates\n")
     cat(" $ seed             : Seed (if applicable)\n");
+    cat(" $ coefficients     : Fixed and random coefficients\n")
     if (exists("uif", envir=object$env)){
         cat(" $ meta             : Model meta information environment\n");
         cat(" $ modelName        : Model name (from R function)\n");
         cat(" $ dataName         : Name of R data input\n");
         cat(" $ simInfo          : RxODE list for simulation\n");
+        cat(" $ sigma            : List of sigma components and their values\n")
     }
 
 }
@@ -2101,7 +2142,7 @@ print.nlmixrFitCore <- function(x, ...){
     print(x$objDf)
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)
-    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), "):"))));
+    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))));
     .pf <- R.utils::captureOutput(print(x$parFixed))
     if (crayon::has_color()){
         .pf <- gsub(rex::rex(capture(.regNum), "%>"), "\033[1;31m\\1%\033[0m ", .pf, perl=TRUE)
