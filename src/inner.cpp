@@ -235,6 +235,7 @@ typedef struct {
   double gradTrim;
   double gradCalcCentralSmall;
   double gradCalcCentralLarge;
+  double etaNudge;
 } focei_options;
 
 focei_options op_focei;
@@ -349,6 +350,7 @@ typedef struct {
   double *x;
   unsigned int uzm;
   int doChol;
+  int doEtaNudge;
 } focei_ind;
 
 focei_ind *inds_focei = NULL;
@@ -692,9 +694,9 @@ double likInner0(double *eta){
     fInd->a   = arma::mat(fInd->nobs, op_focei.neta);
     fInd->B   = arma::mat(fInd->nobs, 1);
     mat Vid;
-    if (op_focei.fo){
+    if (op_focei.fo == 1){
       Vid = arma::mat(fInd->nobs, fInd->nobs, fill::zeros);
-    } else if (op_focei.interaction){
+    } else if (op_focei.interaction == 1){
       fInd->c   = arma::mat(fInd->nobs, op_focei.neta);
     }
     for (j = op_focei.neta; j--;){
@@ -754,8 +756,8 @@ double likInner0(double *eta){
             fInd->llik += err * err/r + lnr;
           } else if (op_focei.interaction == 0){
             for (i = op_focei.neta; i--; ){
-              fpm = fInd->a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
-              fInd->lp(i, 0)  -= 0.5 * err * fpm * fInd->B(k, 0);
+              fpm = fInd->a(k, i) = ind->lhs[i + 1];
+              fInd->lp(i, 0) -= 0.5 * err * fpm * fInd->B(k, 0);
             }
             // Eq #10
             //llik <- -0.5 * sum(err ^ 2 / R + log(R));
@@ -1170,6 +1172,56 @@ static inline void innerOpt1(int id, int likId){
 	 &imp, &lp, 
 	 fInd->zm, 
 	 &izs, &rzs, &dzs);
+  // If stays at zero try another point?
+  if (op_focei.etaNudge != 0 && fInd->doEtaNudge == 1){
+    bool tryAgain=true;
+    for (int i = fop->neta; i--;){
+      if (fInd->x[i] != 0){
+	tryAgain=false;
+	break;
+      }
+    }
+    if (tryAgain){
+      fInd->mode = 1;
+      fInd->uzm = 1;
+      std::fill_n(fInd->x, fop->neta, 0.01);
+      n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g, 
+	     fInd->var, &epsilon,
+	     &mode, &maxInnerIterations, &nsim, 
+	     &imp, &lp, 
+	     fInd->zm, 
+	     &izs, &rzs, &dzs);
+      for (int i = fop->neta; i--;){
+	if (fInd->x[i] != 0.01){
+	  tryAgain=false;
+	  break;
+	}
+      }
+      if (tryAgain){
+	fInd->mode = 1;
+	fInd->uzm = 1;
+	std::fill_n(fInd->x, fop->neta, -0.01);
+	n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g, 
+	       fInd->var, &epsilon,
+	       &mode, &maxInnerIterations, &nsim, 
+	       &imp, &lp, 
+	       fInd->zm, 
+	       &izs, &rzs, &dzs);
+	for (int i = fop->neta; i--;){
+	  if (fInd->x[i] != 0.01){
+	    tryAgain=false;
+	    break;
+	  }
+	}
+	if (tryAgain){
+	  std::fill_n(fInd->x, fop->neta, 0);
+	  fInd->doEtaNudge=0;
+	  tryAgain=false;
+	}
+      }
+    }
+  }
+  
   std::copy(&fInd->x[0],&fInd->x[0]+fop->neta,&fInd->eta[0]);
   // Update variances
   std::copy(&fInd->eta[0], &fInd->eta[0] + op_focei.neta, etaMat.begin());
@@ -1902,6 +1954,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
 
     fInd->mode = 1;
     fInd->uzm = 1;
+    fInd->doEtaNudge=1;
   }
   op_focei.thetaGrad = &op_focei.gthetaGrad[jj];
 }
@@ -2238,6 +2291,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.gradTrim = as<double>(odeO["gradTrim"]);
   op_focei.gradCalcCentralLarge = as<double>(odeO["gradCalcCentralLarge"]);
   op_focei.gradCalcCentralSmall = as<double>(odeO["gradCalcCentralSmall"]);
+  op_focei.etaNudge = as<double>(odeO["etaNudge"]);
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
   for (unsigned int k = op_focei.npars; k--;){

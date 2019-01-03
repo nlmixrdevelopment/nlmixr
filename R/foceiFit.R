@@ -476,6 +476,14 @@ is.latex <- function() {
 ##'     where |grad| > gradCalcCentralLarge where forward differences
 ##'     switch to central differences.
 ##'
+##' @param etaNudge By default initial ETA estimates start at zero;
+##'     Sometimes this doesn't optimize appropriately.  If this value
+##'     is non-zero, when the n1qn1 optimization didn't perform
+##'     appropriately, reset the Hessian, and nudge the ETA up by this
+##'     value; If the ETA still doesn't move, nudge the ETA down by
+##'     this value.  Finally if it doesn't move, reset it to zero and
+##'     do not perform the optimization again.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##'
@@ -587,6 +595,7 @@ foceiControl <- function(sigdig=3,
                          gradTrim=Inf,
                          gradCalcCentralSmall=1e-4,
                          gradCalcCentralLarge=1e4,
+                         etaNudge=0.01,
                          ..., stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -823,6 +832,7 @@ foceiControl <- function(sigdig=3,
                  gradTrim=as.double(gradTrim),
                  gradCalcCentralSmall=as.double(gradCalcCentralSmall),
                  gradCalcCentralLarge=as.double(gradCalcCentralLarge),
+                 etaNudge=as.double(etaNudge),
                  ...);
     class(.ret) <- "foceiControl"
     return(.ret);

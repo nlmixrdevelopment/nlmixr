@@ -52,3 +52,6 @@ nlmixrValidate <- function(full=FALSE){
         }
     }
 }
+##'@rdname nlmixrValidate
+##'@export
+nmTest <- nlmixrValidate

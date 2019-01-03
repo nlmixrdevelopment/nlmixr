@@ -2,9 +2,12 @@
 % Please edit documentation in R/validate.R
 \name{nlmixrValidate}
 \alias{nlmixrValidate}
+\alias{nmTest}
 \title{Validate nlmixr}
 \usage{
 nlmixrValidate(full = FALSE)
+
+nmTest(full = FALSE)
 }
 \arguments{
 \item{full}{Should a full validation be performed?  (By default
