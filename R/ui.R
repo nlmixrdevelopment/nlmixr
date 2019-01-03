@@ -1233,17 +1233,19 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .tmp <- data.frame(cmt=seq_along(.tmp), cond=.tmp)
         .predDf <- merge(.predDf, .tmp, all.x=TRUE)
         .w <- which(is.na(.predDf$cmt))
-        if (length(.w) > 0L){
-            .nums <- suppressWarnings(as.numeric(paste(.predDf[.w, "cond"])))
-            .w2 <- which(!is.na(.nums))
-            if (length(.w2) > 0L){
-                .predDf[.w[.w2], "cmt"] <- .nums[.w2];
-                .w <- which(is.na(.predDf$cmt))
+        if (length(.predDf$cmt) > 1L){
+            if (length(.w) > 0L){
+                .nums <- suppressWarnings(as.numeric(paste(.predDf[.w, "cond"])))
+                .w2 <- which(!is.na(.nums))
+                if (length(.w2) > 0L){
+                    .predDf[.w[.w2], "cmt"] <- .nums[.w2];
+                    .w <- which(is.na(.predDf$cmt))
+                }
             }
-        }
-        if (length(.w) > 0L){
-            stop(sprintf("The conditional statements (%s) are not in terms of the RxODE states: %s", paste(.predDf[.w, "cond"], collapse=", "),
-                     paste(RxODE::rxState(rxode), collapse=", ")))
+            if (length(.w) > 0L){
+                stop(sprintf("The conditional statements (%s) are not in terms of the RxODE states: %s", paste(.predDf[.w, "cond"], collapse=", "),
+                             paste(RxODE::rxState(rxode), collapse=", ")))
+            }
         }
     } else {
         .predDf$cmt <- -1
