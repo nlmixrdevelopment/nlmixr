@@ -737,6 +737,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 assign("errn", errn + 1, this.env);
                 assign("add.prop.errs", rbind(add.prop.errs,
                                               data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
+            } else if (any(paste(tmp$err) == "prop")){
+                assign("errn", errn + 1, this.env);
+                assign("add.prop.errs", rbind(add.prop.errs,
+                                              data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
             }
             return(bquote(return(.(sprintf("Y%02d", errn)))));
         } else {
