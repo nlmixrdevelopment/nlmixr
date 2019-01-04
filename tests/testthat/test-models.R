@@ -23,37 +23,38 @@ rxPermissive({
       if (runno %in% old_names) {
         stop("Duplicated runno: ", runno)
       }
-    }
-    # Test that results are correct for all run models
-    for (runno in names(fit)) {
-      z <- VarCorr(fit[[runno]])
-    
-      expect_equal(
-        round(c(fit[[runno]]$logLik, AIC(fit[[runno]]), BIC(fit[[runno]])), 2),
-        expected_values[[runno]]$lik,
-        info=paste("Likelihood for", runno)
-      )
+      new_names <- names(fit)[!(names(fit) %in% old_names)];
+      for (runno in new_names){
+          # Test that results are correct for new runs
+          z <- VarCorr(fit[[runno]])
 
-      expect_equal(
-        unname(fit[[runno]]$coefficients$fixed),
-        expected_values[[runno]]$param,
-        tol=1e-3,
-        info=paste("Parameters for", runno)
-      )
+          expect_equal(
+              round(c(fit[[runno]]$logLik, AIC(fit[[runno]]), BIC(fit[[runno]])), 2),
+              expected_values[[runno]]$lik,
+              info=paste("Likelihood for", runno)
+          )
 
-      expect_equal(
-        unname(z[-nrow(z), "StdDev"]),
-        expected_values[[runno]]$stdev_param,
-        tol=1e-3,
-        info=paste("Parameter stdev for", runno)
-      )
-    
-      expect_equal(
-        fit[[runno]]$sigma,
-        expected_values[[runno]]$sigma,
-        tol=1e-3,
-        info=paste("Sigma for", runno)
-      )
+          expect_equal(
+              unname(fit[[runno]]$coefficients$fixed),
+              expected_values[[runno]]$param,
+              tol=1e-3,
+              info=paste("Parameters for", runno)
+          )
+
+          expect_equal(
+              unname(z[-nrow(z), "StdDev"]),
+              expected_values[[runno]]$stdev_param,
+              tol=1e-3,
+              info=paste("Parameter stdev for", runno)
+          )
+
+          expect_equal(
+              fit[[runno]]$sigma,
+              expected_values[[runno]]$sigma,
+              tol=1e-3,
+              info=paste("Sigma for", runno)
+          )
+      }
     }
   })
 }, on.validate="NLMIXR_VALIDATION_FULL",silent=TRUE)
