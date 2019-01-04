@@ -1,21 +1,10 @@
 source("helper-prep_fit.R")
+context("NLME41: two-compartment infusion Michaelis-Menten, multiple-dose")
+runno <- "N041_ode"
 
-datr <-
-  read.csv("../Infusion_2CPTMM.csv",
-           header = TRUE,
-           stringsAsFactors = F)
-datr$EVID <- ifelse(datr$EVID == 1, 10101, datr$EVID)
-
+datr <- Bolus_2CPTMM
+datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
 datr <- datr[datr$EVID != 2,]
-datIV <- datr[datr$AMT > 0,]
-datIV$TIME <- datIV$TIME + (datIV$AMT/datIV$RATE)
-datIV$AMT <- -1*datIV$AMT
-datr <- rbind(datr, datIV)
-datr <- datr[order(datr$ID, datr$TIME),]
-
-dat <- datr[datr$SD == 1,]
-
-
 
 two.compartment.IV.MM.model2 <- function(){
     ini({ # Where initial conditions/variables are specified
@@ -56,12 +45,14 @@ two.compartment.IV.MM.model2 <- function(){
     })
 }
 
+dat <- datr
+
 mod <- nlmixr(two.compartment.IV.MM.model2);
 
 opts <- c("nlme", "saem", "fo", "foi", "foce", "focei")
 for (opt in opts){
-    context(sprintf("%s-UI-054: two-compartment infusion Michaelis-Menten, single-dose", opt))
-    runno <- paste0(opt, "N054_ode")
+    context(sprintf("%s-UI-041: two-compartment infusion Michaelis-Menten, multiple-dose", opt))
+    runno <- paste0(opt, "N041_ode")
     fit[[runno]] <- nlmixr(mod, datr, opt, control=defaultControl(opt), table=tableControl(cwres=TRUE))
     source(genIfNeeded())
 }
