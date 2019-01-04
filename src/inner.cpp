@@ -3341,11 +3341,11 @@ NumericMatrix foceiCalcCov(Environment e){
 		e["covS"]= 4 * Sinv;
 		if (rstr == "r"){
 		  // Use covR
-		  e["cov"] = covR;
+		  e["cov"] = as<NumericMatrix>(e["covR"]);
 		  op_focei.covMethod=2;
 		} else if (sstr == "s"){
 		  // use covS
-		  e["cov"] = covS;
+		  e["cov"] = as<NumericMatrix>(e["covS"]);
 		  op_focei.covMethod=3;
 		} else {
 		  // Now check sandwich matrix against R and S methods
