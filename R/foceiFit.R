@@ -2093,7 +2093,10 @@ print.nlmixrFitCore <- function(x, ...){
     }
     .posthoc <- (x$control$maxOuterIterations == 0L & x$control$maxInnerIterations > 0L)
     .posthoc <- ifelse(.posthoc, paste0(ifelse(x$method == "FO",
-                                        ifelse(RxODE::rxIs(x, "nlmixrFitData"), paste0(" estimation with ", crayon::bold$yellow("FOCE"), x$extra, crayon::bold(" posthoc")),
+                                        ifelse(RxODE::rxIs(x, "nlmixrFitData"),
+                                               paste0(" estimation with ", crayon::bold$yellow("FOCE"),
+                                                      gsub(rex::rex(any_spaces, "(", anything, ")"), "", x$extra),
+                                                      crayon::bold(" posthoc")),
                                                ""),
                                                crayon::bold(" posthoc")), " estimation"), " fit");
     message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
