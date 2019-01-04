@@ -3339,38 +3339,48 @@ NumericMatrix foceiCalcCov(Environment e){
 		}
 		Sinv = Sinv * Sinv.t();
 		e["covS"]= 4 * Sinv;
-		// Now check sandwich matrix against R and S methods
-		bool covRSsmall = arma::any(abs(covRS.diag()) < op_focei.covSmall);
-		double covRSd= sum(covRS.diag());
-		arma::mat covR = as<arma::mat>(e["covR"]);
-		bool covRsmall = arma::any(abs(covR.diag()) < op_focei.covSmall);
-		double covRd= sum(covR.diag());
-		arma::mat covS = as<arma::mat>(e["covS"]);
-		bool covSsmall = arma::any(abs(covS.diag()) < op_focei.covSmall);
-		double  covSd= sum(covS.diag());
-		if ((covRSsmall && covSsmall && covRsmall)){
-		  e["cov"] = covRS;
-		} else if (covRSsmall && !covSsmall && covRsmall) {
-		  e["cov"] = covS;
-		  op_focei.covMethod=3;
-		} else if (covRSsmall && covSsmall && !covRsmall) {
+		if (rstr == "r"){
+		  // Use covR
 		  e["cov"] = covR;
 		  op_focei.covMethod=2;
-		} else if (covRSd > covRd){
-		  // SE(RS) > SE(R)
-		  if (covRd > covSd){
-		    // SE(R) > SE(S)
-		    e["cov"] = covS;
-		    op_focei.covMethod=3;
-		  } else {
-		    e["cov"] = covR;
-		    op_focei.covMethod=2;
-		  }
-		} else if (covRSd > covSd){
+		} else if (sstr == "s"){
+		  // use covS
 		  e["cov"] = covS;
 		  op_focei.covMethod=3;
 		} else {
-		  e["cov"] = covRS;
+		  // Now check sandwich matrix against R and S methods
+		  bool covRSsmall = arma::any(abs(covRS.diag()) < op_focei.covSmall);
+		  double covRSd= sum(covRS.diag());
+		  arma::mat covR = as<arma::mat>(e["covR"]);
+		  bool covRsmall = arma::any(abs(covR.diag()) < op_focei.covSmall);
+		  double covRd= sum(covR.diag());
+		  arma::mat covS = as<arma::mat>(e["covS"]);
+		  bool covSsmall = arma::any(abs(covS.diag()) < op_focei.covSmall);
+		  double  covSd= sum(covS.diag());
+		  if ((covRSsmall && covSsmall && covRsmall)){
+		    e["cov"] = covRS;
+		  } else if (covRSsmall && !covSsmall && covRsmall) {
+		    e["cov"] = covS;
+		    op_focei.covMethod=3;
+		  } else if (covRSsmall && covSsmall && !covRsmall) {
+		    e["cov"] = covR;
+		    op_focei.covMethod=2;
+		  } else if (covRSd > covRd){
+		    // SE(RS) > SE(R)
+		    if (covRd > covSd){
+		      // SE(R) > SE(S)
+		      e["cov"] = covS;
+		      op_focei.covMethod=3;
+		    } else {
+		      e["cov"] = covR;
+		      op_focei.covMethod=2;
+		    }
+		  } else if (covRSd > covSd){
+		    e["cov"] = covS;
+		    op_focei.covMethod=3;
+		  } else {
+		    e["cov"] = covRS;
+		  }
 		}
 	      } else {
 		e["cov"] = covRS;
