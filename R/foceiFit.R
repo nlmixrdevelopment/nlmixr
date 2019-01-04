@@ -704,9 +704,6 @@ foceiControl <- function(sigdig=3,
         } else if (outerOpt == "nlminb"){
             outerOptFun <- .nlminb;
             outerOpt <- -1L;
-        } else if (outerOpt == "lbfgsb3"){
-            outerOptFun <- .lbfgsb3;
-            outerOpt <- -1L;
         } else if (outerOpt == "mma"){
             outerOptFun <- .nloptr;
             outerOpt <- -1L;
@@ -877,17 +874,6 @@ foceiControl <- function(sigdig=3,
     return(.ret);
 }
 
-.lbfgsb3 <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
-    .ctl <- list(iprint= -1L, trace=0L)
-    .ctl$factr <- control$lbfgsFactr
-    .ctl$pgtol <- control$pgtol
-    .ret <- lbfgsb3::lbfgsb3(prm=par, fn=fn, gr=gr, lower=lower, control=.ctl);
-    .ret$x <- .ret$prm
-    .ret$message <- "lbfgsb3"
-    .ret$convergence <- 0L;
-    return(.ret);
-}
-
 .Rvmmin <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
     ## Also gives unreasonable estimates
     RxODE::rxReq("Rvmmin");
@@ -899,7 +885,7 @@ foceiControl <- function(sigdig=3,
     .ret <- Rvmmin::Rvmmin(par=par, fn=fn, gr=gr, lower=lower, upper=upper, bdmsk=.masked, control = list(), ...);
     .ret$x <- .ret$par
     .ret$message <- .ret$message
-    ret(.ret)
+    return(.ret)
 }
 
 .nloptr <- function(par, fn, gr, lower= -Inf, upper=Inf, control=list(), ..., nloptrAlgoritm="NLOPT_LD_MMA"){

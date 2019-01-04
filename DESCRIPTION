@@ -5,7 +5,7 @@ Title: Nonlinear Mixed Effects Models in Population Pharmacokinetics
 Depends: R (>= 3.2)
 Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
-        numDeriv, R.utils, n1qn1, PreciseSums, fastGHQuad,
+        R.utils, n1qn1, PreciseSums, fastGHQuad,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
 	RxODE(>= 0.8.1-0), nlme, magrittr, tidyr
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3c, testthat,
