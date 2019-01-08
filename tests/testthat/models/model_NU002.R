@@ -1,9 +1,9 @@
 source("helper-prep_fit.R")
-
+context("NLME02: one-compartment bolus, multiple-dose")
 datr <- Bolus_1CPT
 datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
 datr <- datr[datr$EVID != 2, ]
-dat <- datr[datr$SD == 1, ]
+dat <- datr[datr$SD == 0, ]
 
 one.compartment.IV.model <- function(){
     ini({ # Where initial conditions/variables are specified
@@ -23,21 +23,18 @@ one.compartment.IV.model <- function(){
         # The model uses the ini-defined variable names
         Vc <- exp(lVc + eta.Vc)
         Cl <- exp(lCl + eta.Cl)
-        # RxODE-style differential equations are supported
-        d / dt(centr) = -(Cl / Vc) * centr;
-        ## Concentration is calculated
-        cp = centr / Vc;
         # And is assumed to follow proportional error estimated by prop.err
-        cp ~ prop(prop.err)
+        linCmt() ~ prop(prop.err)
     })
 }
+
 
 mod <- nlmixr(one.compartment.IV.model);
 
 opts <- c("nlme", "saem", "fo", "foi", "foce", "focei")
 for (opt in opts){
-    context(sprintf("%s-UI-001: one-compartment bolus, single-dose", opt))
-    runno <- paste0(opt, "U001ode")
+    context(sprintf("%s-UI-002: one-compartment bolus, single-dose", opt))
+    runno <- paste0(opt, "U002ode")
     fit[[runno]] <- nlmixr(mod, dat, opt, control=defaultControl(opt), table=tableControl(cwres=TRUE))
     source(genIfNeeded())
 }

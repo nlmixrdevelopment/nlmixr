@@ -3,6 +3,7 @@ source("helper-prep_fit.R")
 datr <- Bolus_1CPT
 datr$EVID <- ifelse(datr$EVID == 1, 101, datr$EVID)
 datr <- datr[datr$EVID != 2, ]
+dat <- datr[datr$SD == 1, ]
 
 one.compartment.IV.model <- function(){
     ini({ # Where initial conditions/variables are specified
@@ -34,6 +35,6 @@ opts <- c("nlme", "saem", "fo", "foi", "foce", "focei")
 for (opt in opts){
     context(sprintf("%s-UI-001: one-compartment bolus, single-dose", opt))
     runno <- paste0(opt, "U001")
-    fit[[runno]] <- nlmixr(mod, datr, opt, control=defaultControl(opt), table=tableControl(cwres=TRUE))
+    fit[[runno]] <- nlmixr(mod, dat, opt, control=defaultControl(opt), table=tableControl(cwres=TRUE))
     source(genIfNeeded())
 }
