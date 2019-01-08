@@ -62,6 +62,6 @@ opts <- c("nlme", "saem", "fo", "foi", "foce", "focei")
 for (opt in opts){
     context(sprintf("%s-UI-054: two-compartment infusion Michaelis-Menten, single-dose", opt))
     runno <- paste0(opt, "N054_ode")
-    fit[[runno]] <- nlmixr(mod, datr, opt, control=defaultControl(opt), table=tableControl(cwres=TRUE))
+    fit[[runno]] <- nlmixr(mod, dat, opt, control=defaultControl(opt), table=tableControl(cwres=TRUE))
     source(genIfNeeded())
 }
