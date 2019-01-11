@@ -3,6 +3,7 @@
 \name{nlmixr}
 \alias{nlmixr}
 \alias{nlmixr.function}
+\alias{nlmixr.nlmixrFitCore}
 \alias{nlmixr.nlmixrUI}
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
@@ -11,6 +12,9 @@ nlmixr(object, data, est = NULL, control = list(),
 
 \method{nlmixr}{function}(object, data, est = NULL, control = list(),
   table = tableControl(), ...)
+
+\method{nlmixr}{nlmixrFitCore}(object, data, est = NULL,
+  control = list(), table = tableControl(), ...)
 
 \method{nlmixr}{nlmixrUI}(object, data, est = NULL, control = list(),
   ...)
