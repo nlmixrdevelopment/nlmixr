@@ -125,6 +125,19 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
     }
 }
 
+##'@rdname nlmixr
+##'@export
+nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=tableControl(), ...){
+    .uif <- object$uif;
+    if (missing(data)){
+        data <- getData(object);
+    }
+    .args <- as.list(match.call(expand.dots=TRUE))[-1]
+    .args$data <- data;
+    .args <- c(list(uif=.uif), .args[-1]);
+    return(do.call(nlmixr_fit, .args))
+}
+
 ##' @rdname nlmixr
 ##' @export
 nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...){
@@ -634,6 +647,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                         etaNames=uif$eta.names,
                         control=control,
                         ...)
+        assign("uif", uif, fit$env)
         ## assign("start.time", start.time, env);
         ## assign("est", est, env);
         ## assign("stop.time", Sys.time(), env);
