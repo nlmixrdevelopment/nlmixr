@@ -17,6 +17,8 @@ datIV$AMT  <- -1*datIV$AMT
 datr <- rbind(datr, datIV)
 datr <- datr[order(datr$ID, datr$TIME),]
 
+dat <- datr[datr$SD == 1,]
+
 two.compartment.IV.model <- function(){
     ini({ # Where initial conditions/variables are specified
           # '<-' or '=' defines population parameters
@@ -47,15 +49,12 @@ two.compartment.IV.model <- function(){
     })
 }
 
-
-dat <- datr
-
 mod <- nlmixr(two.compartment.IV.model);
 
 opts <- c("nlme", "saem", "fo", "foi", "foce", "focei")
 for (opt in opts){
     context(sprintf("%s-UI-046: two-compartment infusion, single-dose", opt))
     runno <- paste0(opt, "N046")
-    fit[[runno]] <- nlmixr(mod, datr, opt, control=defaultControl(opt), table=tableControl(cwres=TRUE))
+    fit[[runno]] <- nlmixr(mod, dat, opt, control=defaultControl(opt), table=tableControl(cwres=TRUE))
     source(genIfNeeded())
 }
