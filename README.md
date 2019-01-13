@@ -174,20 +174,16 @@ distributions are supported, in principle.
  
 # Installation on macOS
 
-Instructions for macOS 10.12 Sierra are provided here. They should be
+Instructions for macOS 10.13 Mojave are provided here. They should be
 broadly extensible to all recent releases of macOS, however.
 
-1. Install R 3.5.1 (or later) from the R website.
-   - Download and install `R-3.4.1.pkg` (or later) from [CRAN](http://cran.r-project.org/bin/macosx/).
+1. Install R 3.5.2 (or later) from the R website.
+   - Download and install `R-3.5.2.pkg` (or later) from [CRAN](http://cran.r-project.org/bin/macosx/).
 2. Install Python dependencies.
    - Install `pip` from the macOS terminal prompt: `sudo easy_install pip`.
      - If `easy_install` doesn't work, you can download by `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py` and then run `sudo python get-pip.py`
    - Install `sympy` using `pip`: `sudo -H pip install sympy`.
-3. Install `devtools` and dependencies.
-   - This package is required to install packages from Github, amongst other things.
-   - Install `devtools` from a clean R session by entering `install.packages("devtools")`.
-4. In R, load `devtools` using `library(devtools)`.
-5. Install build tools.
+w. Install build tools.
    - Install Mac Rtools for clang and gfortran from [CRAN Rtools](http://cran.r-project.org/bin/macosx/tools/)
    - Install Mac OSX command like tools by typing `xcode-select --install` and then choose `install`.  This allows you to compile the package without downloading the entire (large) Xcode package.
    - Change `~/.Rprofile` to have the following line to adjust the paths in R to use the CRAN compilers:
@@ -195,7 +191,10 @@ broadly extensible to all recent releases of macOS, however.
 Sys.setenv("PATH"=paste0("/usr/local/clang6/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
 
 ```
-
+4. Install `devtools` and dependencies.
+   - This package is required to install packages from Github, amongst other things.
+   - Install `devtools` from a clean R session by entering `install.packages("devtools")`.
+5. In R, load `devtools` using `library(devtools)`.
 6. Install `RxODE`.
    - Currently the new version of `RxODE` is in the process of being
      uploaded to CRAN.  `nlmixr` needs this newer version of `RxODE` to
