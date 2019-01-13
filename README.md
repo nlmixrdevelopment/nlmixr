@@ -186,6 +186,13 @@ broadly extensible to all recent releases of macOS, however.
 w. Install build tools.
    - Install Mac Rtools for clang and gfortran from [CRAN Rtools](http://cran.r-project.org/bin/macosx/tools/)
    - Install Mac OSX command like tools by typing `xcode-select --install` and then choose `install`.  This allows you to compile the package without downloading the entire (large) Xcode package.
+   - If you are using Mojave you have to also type the following in the terminal to install the compiler hearders:
+   
+```sh
+sudo installer -pkg \
+/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg \
+-target /
+```
    - Change `~/.Rprofile` to have the following line to adjust the paths in R to use the CRAN compilers:
 ```R
 Sys.setenv("PATH"=paste0("/usr/local/clang6/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
