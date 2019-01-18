@@ -804,6 +804,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     .notCalced <- TRUE;
     while (.notCalced){
         env <- new.env(parent=emptyenv());
+        env$covMethod <- "nlme";
         env$method <- "nlme"
         env$uif <- uif
         env$nlme <- object;
@@ -955,3 +956,5 @@ VarCorr.nlmixrNlme <- function(x, sigma = 1, ...){
     return(.vc2)
 }
 
+##'@export
+varCorr <- nlme::VarCorr
