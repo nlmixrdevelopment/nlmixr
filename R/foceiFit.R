@@ -2116,7 +2116,22 @@ print.nlmixrFitCore <- function(x, ...){
         .bound <- ""
     } else if (length(.bound) > 2){
         .bound <- .bound[order(sapply(.bound, nchar))];
+        if (.bound[1]=="x"){
+            .bound <- .bound[-1];
+        }
         .bound <- .bound[1];
+    } else if (.bound=="x"){
+        .parent <- globalenv();
+        .bound2 <- do.call("c", lapply(ls(.parent), function(.cur){
+                               if (identical(.parent[[.cur]], x)){
+                                   return(.cur)
+                               }
+                               return(NULL);
+                               }))
+        if (length(.bound2) > 0){
+            .bound <- .bound2[order(sapply(.bound2, nchar))];
+            .bound <- .bound[1]
+        }
     }
     .posthoc <- (x$control$maxOuterIterations == 0L & x$control$maxInnerIterations > 0L)
     .posthoc <- ifelse(.posthoc, paste0(ifelse(x$method == "FO",
