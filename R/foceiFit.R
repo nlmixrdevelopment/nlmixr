@@ -565,7 +565,7 @@ foceiControl <- function(sigdig=3,
                          ## mma: 20974.20 (Time: Opt: 3000.501 Cov: 467.287)
                          ## slsqp: 21023.89 (Time: Opt: 460.099; Cov: 488.921)
                          ## lbfgsbLG: 20974.74 (Time: Opt: 946.463; Cov:397.537)
-                         outerOpt=c("bobyqa", "nlminb", "lbfgsb3c", "L-BFGS-B","mma", "lbfgsbLG", "slsqp", "Rvmmin"),
+                         outerOpt=c("nlminb", "bobyqa", "lbfgsb3c", "L-BFGS-B","mma", "lbfgsbLG", "slsqp", "Rvmmin"),
                          innerOpt=c("n1qn1", "BFGS"),
                          ##
                          rhobeg=.2,
