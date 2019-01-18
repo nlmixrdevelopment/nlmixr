@@ -5,9 +5,8 @@ language: r
 cache: packages
 
 r:
-  - 3.2
-  - 3.3
   - 3.4
+  - 3.5
   - devel
   
 os:
@@ -21,9 +20,9 @@ matrix:
     os: linux
   - r: devel
     os: osx
-  - r: 3.3
+  - r: 3.4
     os: osx
-  - r: 3.2
+  - r: 3.5
     os: osx
 
 before_install:

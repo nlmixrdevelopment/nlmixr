@@ -2,10 +2,10 @@ Package: nlmixr
 Type: Package
 Title: Nonlinear Mixed Effects Models in Population Pharmacokinetics
         and Pharmacodynamics
-Depends: R (>= 3.2)
+Depends: R (>= 3.4)
 Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
-        R.utils, n1qn1, PreciseSums, fastGHQuad,
+        R.utils, n1qn1, fastGHQuad,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
 	RxODE(>= 0.8.1-0), nlme, magrittr, tidyr
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3c, testthat,

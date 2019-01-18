@@ -261,10 +261,10 @@ nlmixrUI <- function(fun){
     if (inherits(.ini, "try-error")){
         stop("Error parsing initial estimates.")
     }
-    fun2 <- try(nlmixrUIModel(.model,ini,fun));
-    if (inherits(fun2, "try-error")){
-        stop("Error parsing model.")
-    }
+    fun2 <- nlmixrUIModel(.model,ini,fun);
+    ## if (inherits(fun2, "try-error")){
+    ##     stop("Error parsing model.")
+    ## }
     class(fun2) <- "nlmixrUI";
     var.ini <- c(fun2$focei.names, fun2$eta.names)
     var.def <- fun2$all.vars;
@@ -1260,10 +1260,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     fun2 <- as.character(attr(fun, "srcref"), useSource=TRUE)
     fun2[1] <- "function(){"
     fun2[length(fun2)] <- "}";
-    fun2 <- try(eval(parse(text=paste0(fun2, collapse = "\n"), keep.source=TRUE)), silent=TRUE);
-    if (inherits(fun2, "try-error")){
-        stop("Error parsing model")
-    }
+    fun2 <- parse(text=paste0(fun2, collapse = "\n"), keep.source=TRUE)
+    ## if (inherits(fun2, "try-error")){
+    ##     stop("Error parsing model")
+    ## }
     fun2 <- as.character(attr(fun2, "srcref"), useSource=TRUE);
     fun3 <- fun2
     fun3 <- fun3[-1];
