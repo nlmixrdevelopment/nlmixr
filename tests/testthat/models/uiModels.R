@@ -666,6 +666,9 @@ env <- environment()
 
 ns <- loadNamespace("nlmixr")
 
+os <- .Platform$OS.type ## On mac this is "unix"
+if (Sys.info()["sysname"]=="Darwin") os <- "mac"
+
 for (opt in opts){
     for (i in seq_along(mod2$model)){
         with(mod2[i,],{
@@ -683,7 +686,7 @@ for (opt in opts){
                 context(.msg)
                 runno <- paste0(model,"_",opt);
                 assign("runno",runno,globalenv())
-                rds <- paste0(runno,"-", .Platform$OS.type, ".rds")
+                rds <- paste0(runno,"-", os, ".rds")
                 .success <- TRUE
                 if (file.exists(rds)){
                     fit <- get("fit",envir=env);

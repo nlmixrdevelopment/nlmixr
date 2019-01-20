@@ -76,7 +76,9 @@ generate_expected_values <- function(x=FALSE) {
 
 
 genIfNeeded <- function(){
-    .ret <- paste0("values-",runno, "-", .Platform$OS.type, ".R");
+    .os <- .Platform$OS.type;
+    if (Sys.info()["sysname"]=="Darwin") .os <- "mac"
+    .ret <- paste0("values-",runno, "-", .os, ".R");
     if (!file.exists(.ret)){
         generate_expected_values(TRUE);
     }
