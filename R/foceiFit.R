@@ -2217,6 +2217,10 @@ print.nlmixrFitCore <- function(x, ...){
                    crayon::yellow(.bound), crayon::bold$blue("$shrink")));
     if (exists("message", x$env)){
         message(paste0("  Minimization message (",crayon::yellow(.bound), crayon::bold$blue("$message"), "): ", x$message));
+        if (x$message=="false convergence (8)"){
+            message("  In an ODE system, false convergence may mean \"useless\" evaluations were performed.")
+            message("  See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean")
+        }
     }
     if (RxODE::rxIs(x, "nlmixrFitData")){
         .dfName <- "data.frame";
