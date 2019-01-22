@@ -418,7 +418,7 @@ prepEv <- function(dati, theta)
 nlme_ode <- function(dat.o, model, parModel, parTrans,
                      response, responseScaler=NULL,
                      transitAbs = FALSE,
-                     atol = 1e-06, rtol=1.0e-4, maxsteps = 5000,
+                     atol = 1e-08, rtol=1.0e-6, maxsteps = 5000,
                      hmin = 0, hmax = NULL,
                      hini = 0, maxordn = 12, maxords = 5,
                      debugODE=FALSE, mcCores=1, ...)
