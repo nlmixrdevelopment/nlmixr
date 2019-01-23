@@ -388,7 +388,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
                 return(fun(new.time))
             }))})
         names(new.cov) <- all.covs;
-        new.pts <- cbind(new.pts, all.covs);
+        new.pts <- cbind(new.pts, new.covs);
     }
     new.pts$EVID <- 0
     new.pts$AMT <- 0
