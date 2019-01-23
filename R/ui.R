@@ -1862,17 +1862,14 @@ nlmixrUI.saem.fit <- function(obj){
         inPars <- obj$saem.inPars;
         if (length(inPars) == 0) inPars <- NULL
         saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=obj$predSaem, inPars=inPars);
-        message("done.")
         obj$env$saem.fit <- saem.fit;
         return(obj$env$saem.fit);
     } else if (!is.null(obj$lin.solved)) {
-        message("Compiling SAEM user function...", appendLF=FALSE)
         saem.fit <- gen_saem_user_fn(model=lincmt(ncmt=obj$lin.solved$ncmt,
                                                   oral=obj$lin.solved$oral,
                                                   tlag=obj$lin.solved$tlag,
                                                   infusion = obj$env$infusion,
                                                   parameterization = obj$lin.solved$parameterization))
-        message("done.")
         obj$env$saem.fit <- saem.fit;
         return(obj$env$saem.fit);
     }

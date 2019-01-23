@@ -411,7 +411,10 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
           on.exit({setwd(lwd)});
       }
   }
-  saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
+
+  saem.cpp <- paste0("saem",digest::digest(list(ifelse(is.ode,RxODE::rxNorm(model),deparse(model)),
+                                                deparse(PKpars),deparse(pred),
+                                                deparse(inPars))), .Platform$r_arch);
   ## }
   saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
@@ -506,13 +509,30 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
   make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
   make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), "")
-  cat(make_str, file="Makevars")
-  cat(make_str)
+
+  cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
+  ## cat(make_str)
 
   rexec = paste(R.home(component="bin"), .Platform$file.sep, "R", sep="")
-  shlib = sprintf('%s CMD SHLIB %s -o %s', rexec, saem.cpp, saem.dll)
-  ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
-  do.call("system", list(shlib))
+  if (!file.exists(file.path(getwd(), saem.dll))){
+      args  = c("CMD", "SHLIB", saem.cpp, "-o", saem.dll)
+      ## do.call("system", list(shlib))
+      .badBuild <- function(msg,stop=TRUE){
+          message(msg);
+          message(cli::rule(left="stdout output"));
+          message(paste(rawToChar(.out$stdout),sep="\n"))
+          message(cli::rule(left="stderr output"));
+          message(paste(rawToChar(.out$stderr),sep="\n"))
+          if (stop) stop(msg, call.=FALSE);
+      }
+      message("Building SAEM model...",appendLF=FALSE)
+      .out <- sys::exec_internal(cmd=rexec, args=args)
+      if (!(.out$status==0 & file.exists(saem.dll))){
+          message("error")
+          .badBuild("Error building SAEM model");
+      }
+      message("done")
+  }
   ## file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
   ## file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
   ## setwd(lwd);
@@ -557,8 +577,6 @@ saem.cleanup <- function(env){
     if (is(env, "saemFit")) env <- attr(env, "env");
     if (env$is.ode) try({RxODE::rxUnload(env$model)}, silent=TRUE)
     try({dyn.unload(env$saem.dll)}, silent=TRUE);
-    ## if (file.exists(env$saem.dll))
-    ##     unlink(env$saem.dll);
     if (file.exists(env$saem.cpp))
         unlink(env$saem.cpp);
 }
