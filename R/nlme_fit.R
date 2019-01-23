@@ -418,7 +418,7 @@ prepEv <- function(dati, theta)
 nlme_ode <- function(dat.o, model, parModel, parTrans,
                      response, responseScaler=NULL,
                      transitAbs = FALSE,
-                     atol = 1e-08, rtol=1.0e-6, maxsteps = 5000,
+                     atol = 1e-08, rtol=1.0e-8, maxsteps = 5000,
                      hmin = 0, hmax = NULL,
                      hini = 0, maxordn = 12, maxords = 5,
                      debugODE=FALSE, mcCores=1, ...)
@@ -780,7 +780,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     var <- setNames(as.numeric(var), uif$focei.names);
     var <- var[!is.na(var)];
     cov <- diag(length(var))
-    diag(cov) <- var;
+    diag(cov) <- var*var;
     attr(cov, "dimnames") <- list(names(var), names(var));
     .ini <- as.data.frame(uif$ini)
     .ini <- .ini[!is.na(.ini$ntheta),];
