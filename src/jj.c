@@ -347,14 +347,14 @@ void codegen(FILE *outpt, int dosep) {
     for (i=0, j=0; i<symtab.nvar; i++) {
       if (symtab.is_lhs[i]) continue;
       retieve_var(i, buf);
-      fprintf(outpt, "  %s = phi(i, %d);\n", buf, j++);
+      fprintf(outpt, "  %s = _phi(_i, %d);\n", buf, j++);
     }
 
     if (dosep) fprintf(outpt, "/*=================*/\n");
 
     for (i=0; i<symtab.nder; i++) {            /* name state vars */
       retieve_var(symtab.der_ix[i], buf);
-      fprintf(outpt, "  %s = x[%d];\n", buf, i);
+      fprintf(outpt, "  %s = _x[%d];\n", buf, i);
     }
     fprintf(outpt,"\n");
 
@@ -366,7 +366,7 @@ void codegen(FILE *outpt, int dosep) {
 	  s = strstr(sLine, "= 9999.999 + - 9999.999;");
 	  if (s) {
         s[0] = '\0';
-        fprintf(outpt, "  %s = ptr_cov[%d];\n", sLine, ncov++);
+        fprintf(outpt, "  %s = _ptr_cov[%d];\n", sLine, ncov++);
 	  }
 	  else {
         fprintf(outpt, "  %s", sLine);
