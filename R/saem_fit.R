@@ -63,112 +63,112 @@ vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
 }
 
 
-vec user_function(const mat &phi, const mat &evt, const List &opt) {
-  uvec ix;
-  vec id = evt.col(0);
-  mat wm;
-  vec wv;
-  int DEBUG = opt["DEBUG"];
+vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
+  uvec _ix;
+  vec _id = _evt.col(0);
+  mat _wm;
+  vec _wv;
+  int _DEBUG = _opt["DEBUG"];
 
-  ix = find(evt.col(2) == 0);
-  vec yp(ix.n_elem);
-  double *p=yp.memptr();
-  int N=id.max()+1;
+  _ix = find(_evt.col(2) == 0);
+  vec _yp(_ix.n_elem);
+  double *_p=_yp.memptr();
+  int _N=_id.max()+1;
 
 <%=declPars%>
 
-  for (int i=0; i<N; i++) {
+  for (int _i=0; _i<_N; _i++) {
 <%=assgnPars%>
 
-    wm = evt.rows( find(id == i) );
-    if(wm.n_rows==0) {
-      Rcout << "ID = " << i+1 << " has no data. Please check." << endl;
+    _wm = _evt.rows( find(_id == _i) );
+    if(_wm.n_rows==0) {
+      Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
       arma_stop_runtime_error("");
     }
 
-    vec time__;
-    time__ = wm.col(1);
-    int ntime = time__.n_elem;
-    wv = wm.col(2);
-    ivec evid(ntime);
-    for (int k=0; k<ntime; ++k) evid(k) = wv(k);
-    wv = wm.col(4);
-    ivec cmt(ntime);
-    for (int k=0; k<ntime; ++k) cmt(k) = wv(k);
-    wv = wm.col(3);
-    vec amt;
-    amt = wv( find(evid > 0) );
+    vec _time__;
+    _time__ = _wm.col(1);
+    int _ntime = _time__.n_elem;
+    _wv = _wm.col(2);
+    ivec _evid(_ntime);
+    for (int _k=0; _k<_ntime; ++_k) _evid(_k) = _wv(_k);
+    _wv = _wm.col(4);
+    ivec _cmt(_ntime);
+    for (int _k=0; _k<_ntime; ++_k) _cmt(_k) = _wv(_k);
+    _wv = _wm.col(3);
+    vec _amt;
+    _amt = _wv( find(_evid > 0) );
 
-    int neq=as<int>(opt["neq"]);
-    vec inits(neq);
-    inits.zeros(); //as<vec>(opt["inits"]);	//FIXME
+    int _neq=as<int>(_opt["neq"]);
+    vec _inits(_neq);
+    _inits.zeros(); //as<vec>(_opt["inits"]);	//FIXME
 
 <%=foo%>
 
 <%=pars%>
 <%=inits%>
 
-    int stiff=as<int>(opt["stiff"]);
-    int transit_abs=as<int>(opt["transitAbs"]);
-    int nlhs=as<int>(opt["nlhs"]);
-    double atol=as<double>(opt["atol"]);
-    double rtol=as<double>(opt["rtol"]);
-    int rc=0;
+    int _stiff=as<int>(_opt["stiff"]);
+    int _transit_abs=as<int>(_opt["transitAbs"]);
+    int _nlhs=as<int>(_opt["nlhs"]);
+    double _atol=as<double>(_opt["atol"]);
+    double _rtol=as<double>(_opt["rtol"]);
+    int _rc=0;
 
-    mat ret(neq, ntime);
-    mat lhs(nlhs, ntime);
+    mat _ret(_neq, _ntime);
+    mat _lhs(_nlhs, _ntime);
 
-	<%=ode_solver%>(&neq, params.memptr(), time__.memptr(),
-	    evid.memptr(), &ntime, inits.memptr(), amt.memptr(), ret.memptr(),
-	    &atol, &rtol, &stiff, &transit_abs, &nlhs, lhs.memptr(), &rc);
+	<%=ode_solver%>(&_neq, _params.memptr(), _time__.memptr(),
+	    _evid.memptr(), &_ntime, _inits.memptr(), _amt.memptr(), _ret.memptr(),
+	    &_atol, &_rtol, &_stiff, &_transit_abs, &_nlhs, _lhs.memptr(), &_rc);
 
-    if ( DEBUG > 4 && rc != 0 ) {
-        Rcout << "pars: " << params.t();
-        Rcout << "inits: " << inits.t();
-        Rcout << "LSODA return code: " << rc << endl;
-        Rcout << wm << endl;
+    if ( _DEBUG > 4 && _rc != 0 ) {
+        Rcout << "pars: " << _params.t();
+        Rcout << "_inits: " << _inits.t();
+        Rcout << "LSODA return code: " << _rc << endl;
+        Rcout << _wm << endl;
     }
-	ret = join_cols(join_cols(time__.t(), ret), lhs).t();
-	uvec r  = find(evid == 0);
-	ret = ret.rows(r);
-	ivec cmtObs = cmt(r);
+	_ret = join_cols(join_cols(_time__.t(), _ret), _lhs).t();
+	uvec _r  = find(_evid == 0);
+	_ret = _ret.rows(_r);
+	ivec _cmtObs = _cmt(_r);
 
 <%=model_vars_decl%>
 
-mat g(time.n_elem, <%=nendpnt%>);
+mat _g(time.n_elem, <%=nendpnt%>);
 <%=pred_expr%>
 
-if (g.has_nan()) {
+if (_g.has_nan()) {
 	Rcout << "NaN in prediction. Consider to: relax atol & rtol; change initials; change seed; change structure model." << endl;
-    if ( DEBUG > 4) {
-	Rcout << "pars: " << params.t();
-	Rcout << "inits: " << inits.t();
-	Rcout << "LSODA code: " << rc << endl;
+    if ( _DEBUG > 4) {
+	Rcout << "pars: " << _params.t();
+	Rcout << "inits: " << _inits.t();
+	Rcout << "LSODA code: " << _rc << endl;
 	Rcout << "input data:" << endl;
-	Rcout << wm;
+	Rcout << _wm;
 	Rcout << "LSODA solutions:" << endl;
-	Rcout << ret << endl;
+	Rcout << _ret << endl;
 	}
-	g.replace(datum::nan, 1.0e99);
+	_g.replace(datum::nan, 1.0e99);
 }
 
-int nendpnt = <%=nendpnt%>;
-uvec cmt_endpnt = opt["cmt_endpnt"];
-uvec b0(1), b1(1); b0(0) = 0;
+int _nendpnt = <%=nendpnt%>;
+uvec _cmt_endpnt = _opt["cmt_endpnt"];
+uvec _b0(1), _b1(1); _b0(0) = 0;
 
-for (int b=1; b<nendpnt; ++b) {
-  b1(0) = b;
-  uvec r;
-  r = find( cmtObs==cmt_endpnt(b) );
-  g.submat(r, b0) = g.submat(r, b1);
+for (int _b=1; _b<_nendpnt; ++_b) {
+  _b1(0) = _b;
+  uvec _r;
+  _r = find( _cmtObs==_cmt_endpnt(_b) );
+  _g.submat(_r, _b0) = _g.submat(_r, _b1);
 }
 
-    int no = cmtObs.n_elem;
-    memcpy(p, g.memptr(), no*sizeof(double));
-    p += no;
+    int _no = _cmtObs.n_elem;
+    memcpy(_p, _g.memptr(), _no*sizeof(double));
+    _p += _no;
   }
 
-  return yp;
+  return _yp;
 }
 
 // definition
@@ -251,67 +251,67 @@ vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
 }
 
 
-vec user_function(const mat &phi, const mat &evt, const List &opt) {
-  uvec ix;
-  vec id = evt.col(0);
-  mat wm;
-  vec obs_time, dose_time, dose, wv;
+vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
+  uvec _ix;
+  vec _id = _evt.col(0);
+  mat _wm;
+  vec _obs_time, _dose_time, _dose, _wv;
 
-  ix = find(evt.col(2) == 0);
-  vec yp(ix.n_elem);
-  double *p=yp.memptr();
-  int N=id.max()+1;
+  _ix = find(_evt.col(2) == 0);
+  vec _yp(_ix.n_elem);
+  double *_p=_yp.memptr();
+  int _N=_id.max()+1;
 
-  for (int i=0; i<N; i++) {
-    ix = find(id == i);
-    wm = evt.rows(ix);
+  for (int _i=0; _i<_N; _i++) {
+    _ix = find(_id == _i);
+    _wm = _evt.rows(_ix);
 
-    ix = find(wm.col(2) == 0);
-    wv = wm.col(1);
-    wv = wv(ix);
-    const Map<MatrixXd> _obs_time(wv.memptr(), wv.n_elem, 1);
-    const VectorXd obs_time(_obs_time);
+    _ix = find(_wm.col(2) == 0);
+    _wv = _wm.col(1);
+    _wv = _wv(_ix);
+    const Map<MatrixXd> __obs_time(_wv.memptr(), _wv.n_elem, 1);
+    const VectorXd _obs_time(__obs_time);
 
-    ix = find(wm.col(2) > 0);
-    wv = wm.col(1);
-    wv = wv(ix);
-    const Map<MatrixXd> _dose_time(wv.memptr(), wv.n_elem, 1);
-    const VectorXd dose_time(_dose_time);
+    _ix = find(_wm.col(2) > 0);
+    _wv = _wm.col(1);
+    _wv = _wv(_ix);
+    const Map<MatrixXd> __dose_time(_wv.memptr(), _wv.n_elem, 1);
+    const VectorXd _dose_time(__dose_time);
 
-    wv = wm.col(3);
-    wv = wv(ix);
-    const Map<MatrixXd> _dose(wv.memptr(), wv.n_elem, 1);
-    const VectorXd dose(_dose);
+    _wv = _wm.col(3);
+    _wv = _wv(_ix);
+    const Map<MatrixXd> __dose(_wv.memptr(), _wv.n_elem, 1);
+    const VectorXd _dose(__dose);
 
-    wv = wm.col(4);
-    wv = wv(ix);
-    const Map<MatrixXd> _Tinf(wv.memptr(), wv.n_elem, 1);
-    const VectorXd Tinf(_Tinf);
+    _wv = _wm.col(4);
+    _wv = _wv(_ix);
+    const Map<MatrixXd> __Tinf(_wv.memptr(), _wv.n_elem, 1);
+    const VectorXd _Tinf(__Tinf);
 
 <%=foo%>
 <%=pars%>
 
-    int no=obs_time.size();
-    VectorXd g(obs_time.size());
-    int ncmt=<%=ncmt%>, oral=<%=oral%>, infusion=<%=infusion%>, parameterization=<%=parameterization%>;
+    int _no=_obs_time.size();
+    VectorXd _g(_obs_time.size());
+    int _ncmt=<%=ncmt%>, _oral=<%=oral%>, _infusion=<%=infusion%>, _parameterization=<%=parameterization%>;
 
-	g = generic_cmt_interface(
-      obs_time,
-      dose_time,
-      dose,
-      Tinf,
-      params,
-      ncmt,
-      oral,
-      infusion,
-      parameterization);
+	_g = generic_cmt_interface(
+      _obs_time,
+      _dose_time,
+      _dose,
+      _Tinf,
+      _params,
+      _ncmt,
+      _oral,
+      _infusion,
+      _parameterization);
 
-    memcpy(p, g.data(), no*sizeof(double));
-    p += no;
-	//cout << "ok " << i <<endl;
+    memcpy(_p, _g.data(), _no*sizeof(double));
+    _p += _no;
+	//cout << "ok " << _i <<endl;
   }
 
-  return yp;
+  return _yp;
 }
 
 // definition
@@ -411,7 +411,10 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
           on.exit({setwd(lwd)});
       }
   }
-  saem.cpp <- paste0(basename(tempfile(pattern="saem", getwd())), .Platform$r_arch);
+
+  saem.cpp <- paste0("saem",digest::digest(list(ifelse(is.ode,RxODE::rxNorm(model),deparse(model)),
+                                                deparse(PKpars),deparse(pred),
+                                                deparse(inPars))), .Platform$r_arch);
   ## }
   saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
@@ -423,13 +426,13 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
     pars = modelVars$params
     npar = length(pars)
     pars = paste(c(
-    sprintf("    vec params(%d);\n", npar),
-    sprintf("    params(%d) = %s;\n", 1:npar-1, pars)
+    sprintf("    vec _params(%d);\n", npar),
+    sprintf("    _params(%d) = %s;\n", 1:npar-1, pars)
     ), collapse="")
 
 	model_vars = names=c("time", modelVars$state, modelVars$lhs)
 	s = lapply(1:length(model_vars), function(k) {
-		sprintf("vec %s;\n%s=ret.col(%d);\n", model_vars[k], model_vars[k], k-1)
+		sprintf("vec %s;\n%s=_ret.col(%d);\n", model_vars[k], model_vars[k], k-1)
 	})
 	model_vars_decl = paste0(s, collapse="")
 
@@ -444,7 +447,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
     x = if(x[1]=="{") x[2:(len-1)] else x
     len = length(x)
     nendpnt = len
-    pred_expr = paste(paste("g.col(", 1:len-1, ") = ", x, ";", sep=""), collapse="\n")
+    pred_expr = paste(paste("_g.col(", 1:len-1, ") = ", x, ";", sep=""), collapse="\n")
 
   } else {
 	neq = nlhs = 0
@@ -489,9 +492,9 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   if (is.null(inPars)) {
     assgnPars = declPars = ""
   } else {
-    s = sprintf("      %s = mPars(i,%d);", inPars, 1:length(inPars)-1)
+    s = sprintf("      %s = _mPars(i,%d);", inPars, 1:length(inPars)-1)
     assgnPars = paste0(s, collapse="\n")
-    s = "mat mPars=as<mat>(opt[\"mPars\"]);"
+    s = "mat _mPars=as<mat>(opt[\"mPars\"]);"
     declPars = sprintf("\tdouble %s;\n\t%s", paste0(inPars, collapse=", "), s)
   }
   brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
@@ -506,13 +509,30 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
   make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
   make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), "")
-  cat(make_str, file="Makevars")
-  cat(make_str)
+
+  cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
+  ## cat(make_str)
 
   rexec = paste(R.home(component="bin"), .Platform$file.sep, "R", sep="")
-  shlib = sprintf('%s CMD SHLIB %s -o %s', rexec, saem.cpp, saem.dll)
-  ## shlib = sprintf(shlib, system.file("include/neldermead.cpp", package = "nlmixr"))
-  do.call("system", list(shlib))
+  if (!file.exists(file.path(getwd(), saem.dll))){
+      args  = c("CMD", "SHLIB", saem.cpp, "-o", saem.dll)
+      ## do.call("system", list(shlib))
+      .badBuild <- function(msg,stop=TRUE){
+          message(msg);
+          message(cli::rule(left="stdout output"));
+          message(paste(rawToChar(.out$stdout),sep="\n"))
+          message(cli::rule(left="stderr output"));
+          message(paste(rawToChar(.out$stderr),sep="\n"))
+          if (stop) stop(msg, call.=FALSE);
+      }
+      message("Building SAEM model...",appendLF=FALSE)
+      .out <- sys::exec_internal(cmd=rexec, args=args)
+      if (!(.out$status==0 & file.exists(saem.dll))){
+          message("error")
+          .badBuild("Error building SAEM model");
+      }
+      message("done")
+  }
   ## file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
   ## file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
   ## setwd(lwd);
@@ -557,8 +577,6 @@ saem.cleanup <- function(env){
     if (is(env, "saemFit")) env <- attr(env, "env");
     if (env$is.ode) try({RxODE::rxUnload(env$model)}, silent=TRUE)
     try({dyn.unload(env$saem.dll)}, silent=TRUE);
-    ## if (file.exists(env$saem.dll))
-    ##     unlink(env$saem.dll);
     if (file.exists(env$saem.cpp))
         unlink(env$saem.cpp);
 }
@@ -619,8 +637,8 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 	if (!tlag) pars[2*ncmt+2] = "0"
 	if (!oral) pars = pars[1:(2*ncmt)]
 	npar = length(pars)
-	s = sprintf("params(%d) = %s;", 1:npar-1, pars)
-	pars = paste(c(sprintf("VectorXd params(%d);", 2*ncmt+2), s), collapse="\n")
+	s = sprintf("_params(%d) = %s;", 1:npar-1, pars)
+	pars = paste(c(sprintf("VectorXd _params(%d);", 2*ncmt+2), s), collapse="\n")
 	attr(pars, "calls") = list(ncmt=ncmt, oral=oral, tlag=tlag, infusion=infusion, parameterization=parameterization)
 	ix = (parameterization-1)*9+(ncmt-1)*3+oral+tlag+1
 	attr(pars, "default.pars") = parfn.list[[ix]]
