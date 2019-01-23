@@ -775,7 +775,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     } else {
         dat <- data;
     }
-    var <- as.matrix(nlme::VarCorr(object))[,"Variance"]
+    var <- summary(object)$tTable[,"Std.Error"]
     var <- var[uif$focei.names]
     var <- setNames(as.numeric(var), uif$focei.names);
     var <- var[!is.na(var)];
