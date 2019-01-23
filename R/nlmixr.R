@@ -228,8 +228,8 @@ nlmixrData.default <- function(data){
             backSort2 <- seq_along(backSort)
             dat$ID <- as.integer(dat$ID);
         } else if (idSort == 0L){
-            warning("Sorting by ID, TIME; Output fit may not be in the same order as input dataset.")
-            dat <- dat[order(dat$ID, dat$TIME), ];
+            warning("Sorted by ID, TIME, -EVID (ie doses before observations)")
+            dat <- dat[order(dat$ID, dat$TIME,-dat$EVID), ];
             dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
             lvl <- unique(dat$ID);
             lab <- paste(lvl)
