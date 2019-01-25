@@ -228,8 +228,8 @@ nlmixrData.default <- function(data){
             backSort2 <- seq_along(backSort)
             dat$ID <- as.integer(dat$ID);
         } else if (idSort == 0L){
-            warning("Sorting by ID, TIME; Output fit may not be in the same order as input dataset.")
-            dat <- dat[order(dat$ID, dat$TIME), ];
+            warning("Sorted by ID, TIME, -EVID (ie doses before observations)")
+            dat <- dat[order(dat$ID, dat$TIME,-dat$EVID), ];
             dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
             lvl <- unique(dat$ID);
             lab <- paste(lvl)
@@ -514,6 +514,10 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             } else {
                 rxode <- uif$rxode.pred;
             }
+            .atol <- 1e-8
+            if (!is.null(control$atol)) .atol <- control$atol
+            .rtol <- 1e-8
+            if (!is.null(control$rtol)) .rtol <- control$rtol
             fit <- nlme_ode(dat,
                             model=rxode,
                             par_model=specs,
@@ -522,6 +526,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                             weight=weight,
                             verbose=TRUE,
                             control=control,
+                            atol=.atol,
+                            rtol=.rtol,
                             ...);
         }
         class(fit) <- c(est.type, class(fit));
@@ -654,6 +660,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         ## assign("start.time", start.time, env);
         ## assign("est", est, env);
         ## assign("stop.time", Sys.time(), env);
+        assign("origControl",control,fit$env);
         return(fit);
     }
 }
