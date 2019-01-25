@@ -4,7 +4,7 @@
 \alias{VarCorr.nlmixrNlme}
 \title{Return VarCorr for nlmixr nlme}
 \usage{
-\method{VarCorr}{nlmixrNlme}(x, sigma = 1, ...)
+\method{VarCorr}{nlmixrNlme}(x, sigma = NULL, ...)
 }
 \arguments{
 \item{x}{a fitted model object, usually an object inheriting from
