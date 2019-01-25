@@ -1929,15 +1929,16 @@ as.saem <- function(x){
 
 ##' @importFrom nlme VarCorr
 ##' @export
-VarCorr.nlmixrFitCore <- function(x, sigma = 1, ...){
+VarCorr.nlmixrFitCore <- function(x, sigma=NULL, ...){
     .ret <- x$nlme
     if (is.null(.ret)) {
-        .ret <- data.frame(Variance=x$parFixedDf$SE ^ 2, StdDev=x$parFixedDf$SE,
-                           row.names=row.names(x$parFixedDf));
+        .var <- diag(x$omega);
+        .ret <- data.frame(Variance=.var, StdDev=sqrt(.var),
+                           row.names=names(.var));
         .ret <- .ret[!is.na(.ret[, 1]), ]
         return(.ret);
     } else {
-        VarCorr(as.nlme(x), sigma=sigma, ...)
+        VarCorr(.ret, ...)
     }
 }
 

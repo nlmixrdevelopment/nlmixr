@@ -944,9 +944,10 @@ nlme.cleanup <- function(x){
 ##' @inheritParams nlme::VarCorr
 ##' @author Matthew L. Fidler
 ##' @export
-VarCorr.nlmixrNlme <- function(x, sigma = 1, ...){
+VarCorr.nlmixrNlme <- function(x, sigma = NULL, ...){
     .tmp <- x
     class(.tmp) <- class(.tmp)[class(.tmp) != "nlmixrNlme"];
+    if (is.null(sigma)) sigma = .tmp$sigma
     .vc <- VarCorr(.tmp, sigma=sigma, ...);
     .vc2 <- as.numeric(.vc)
     dim(.vc2) <- dim(.vc)

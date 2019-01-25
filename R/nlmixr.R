@@ -514,9 +514,9 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             } else {
                 rxode <- uif$rxode.pred;
             }
-            .atol <- 1e-6
+            .atol <- 1e-8
             if (!is.null(control$atol)) .atol <- control$atol
-            .rtol <- 1e-6
+            .rtol <- 1e-8
             if (!is.null(control$rtol)) .rtol <- control$rtol
             fit <- nlme_ode(dat,
                             model=rxode,
@@ -660,6 +660,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         ## assign("start.time", start.time, env);
         ## assign("est", est, env);
         ## assign("stop.time", Sys.time(), env);
+        assign("origControl",control,fit$env);
         return(fit);
     }
 }
