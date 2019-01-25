@@ -514,6 +514,10 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             } else {
                 rxode <- uif$rxode.pred;
             }
+            .atol <- 1e-6
+            if (!is.null(control$atol)) .atol <- control$atol
+            .rtol <- 1e-6
+            if (!is.null(control$rtol)) .rtol <- control$rtol
             fit <- nlme_ode(dat,
                             model=rxode,
                             par_model=specs,
@@ -522,6 +526,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                             weight=weight,
                             verbose=TRUE,
                             control=control,
+                            atol=.atol,
+                            rtol=.rtol,
                             ...);
         }
         class(fit) <- c(est.type, class(fit));
