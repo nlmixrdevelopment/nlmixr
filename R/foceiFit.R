@@ -1847,6 +1847,7 @@ print.nlmixrClass <- function(x, ...){
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
     .env <- obj;
+    if (arg == "value") arg <- "objf"
     if (arg == "sigma") return(.sigma(obj))
     if (arg == "coefficients"){
         return(list(fixed=fixef(obj),
@@ -1876,7 +1877,6 @@ print.nlmixrClass <- function(x, ...){
         .uif <- .env$uif;
         if (arg == "modelName") arg <- "model.name"
         if (arg == "dataName") arg <- "data.name"
-        if (arg == "value") arg <- "objf"
         .ret <- `$.nlmixrUI`(.uif, arg);
         if (!is.null(.ret)) return(.ret)
         .env2  <- `$.nlmixrUI`(.uif, "env");
