@@ -1876,6 +1876,7 @@ print.nlmixrClass <- function(x, ...){
         .uif <- .env$uif;
         if (arg == "modelName") arg <- "model.name"
         if (arg == "dataName") arg <- "data.name"
+        if (arg == "value") arg <- "objf"
         .ret <- `$.nlmixrUI`(.uif, arg);
         if (!is.null(.ret)) return(.ret)
         .env2  <- `$.nlmixrUI`(.uif, "env");
@@ -2216,7 +2217,7 @@ print.nlmixrFitCore <- function(x, ...){
     }
     message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                    crayon::yellow(.bound), crayon::bold$blue("$shrink")));
-    if (exists("message", x$env)){
+    if (exists("message", x$env) && regexpr("^FO", x$method) != -1){
         message(paste0("  Minimization message (",crayon::yellow(.bound), crayon::bold$blue("$message"), "): ", x$message));
     }
     if (RxODE::rxIs(x, "nlmixrFitData")){
