@@ -715,6 +715,17 @@ focei.eta.nlmixrNlme <- function(object, ...){
     n
 }
 
+##' @author Farkad Ezzet & Matthew Fidler
+.getRanPars = function(object)  {
+    ## extract variance-covariance components estimates and var-cov matrix of nlme object
+    aux <- object$apVar
+    if (!is.numeric(aux)) stop(aux)
+    val <- list(coef = attr(aux, "Pars"))
+    attr(aux, "Pars") <- attr(aux, "natural") <- attr(aux, "natUncons") <- NULL
+    val$var <- aux
+    val
+}
+
 ##' @rdname focei.theta
 focei.theta.nlmixrNlme <- function(object, uif, ...){
     if (class(uif) == "function"){
