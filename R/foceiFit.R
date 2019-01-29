@@ -2217,7 +2217,7 @@ print.nlmixrFitCore <- function(x, ...){
     }
     message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                    crayon::yellow(.bound), crayon::bold$blue("$shrink")));
-    if (exists("message", x$env) && regexpr("^FO", x$method) != -1){
+    if (x$message != ""){
         message(paste0("  Minimization message (",crayon::yellow(.bound), crayon::bold$blue("$message"), "): ", x$message));
     }
     if (RxODE::rxIs(x, "nlmixrFitData")){

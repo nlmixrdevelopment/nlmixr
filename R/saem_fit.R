@@ -1567,6 +1567,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     } else {
         .env$time <- data.frame(saem=.saemTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
     }
+    .env$message <- "";
     if (is.na(calcResid)){
         row.names(.env$objDf) <- "SAEMg";
     } else if (calcResid){

@@ -715,17 +715,6 @@ focei.eta.nlmixrNlme <- function(object, ...){
     n
 }
 
-##' @author Farkad Ezzet & Matthew Fidler
-.getRanPars = function(object)  {
-    ## extract variance-covariance components estimates and var-cov matrix of nlme object
-    aux <- object$apVar
-    if (!is.numeric(aux)) stop(aux)
-    val <- list(coef = attr(aux, "Pars"))
-    attr(aux, "Pars") <- attr(aux, "natural") <- attr(aux, "natUncons") <- NULL
-    val$var <- aux
-    val
-}
-
 ##' @rdname focei.theta
 focei.theta.nlmixrNlme <- function(object, uif, ...){
     if (class(uif) == "function"){
@@ -746,8 +735,13 @@ focei.theta.nlmixrNlme <- function(object, uif, ...){
         ## Addititive + proportional
         add <- which(sapply(err.type, function(x)any(x == c("add", "norm", "dnorm"))))
         prop <- which(err.type == "prop")
-        thetas[prop] <- object$modelStruct$varStruct$const;
-        thetas[add] <- object$sigma;
+        if (length(add)==0){
+            thetas[prop] <- object$sigma;
+        } else {
+            .const <- coef(object$modelStruct$varStruct,  uncons = FALSE);
+            thetas[prop] <- object$sigma
+            thetas[add] <- .const
+        }
     } else if (is(err, "varPower")){
         ## Proportional
         prop <- which(err.type == "prop")
@@ -879,6 +873,11 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
         } else {
             .notCalced <- FALSE;
         }
+    }
+    if (is(object$apVar,"character")){
+        env$message <- object$apVar;
+    } else {
+        env$message <- "";
     }
     if (is.na(calcResid)){
         row.names(env$objDf) <- "nlme";
