@@ -1739,6 +1739,39 @@ foceiFit.data.frame0 <- function(data,
         }
         return(.ret)
     }
+
+    .solvePred <- function(){
+        .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
+                       atol=.ret$control$atol, rtol=.ret$control$rtol,
+                       maxsteps=.ret$control$maxstepsOde,
+                       hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                       transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
+                       maxords = .ret$control$maxords, method=.ret$control$method)
+        if (any(is.na(.res$rx_pred_)) && .ret$control$method == 2L){
+            .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
+                           atol=.ret$control$atol, rtol=.ret$control$rtol,
+                           maxsteps=.ret$control$maxstepsOde*2,
+                           hmin = .ret$control$hmin, hmax = .ret$control$hmax/2, hini = .ret$control$hini,
+                           transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
+                           maxords = .ret$control$maxords, method="lsoda")
+            if (any(is.na(.res$rx_pred_))){
+                .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
+                               atol=.ret$control$atol, rtol=.ret$control$rtol,
+                               maxsteps=.ret$control$maxstepsOde*2,
+                               hmin = .ret$control$hmin, hmax = .ret$control$hmax/2, hini = .ret$control$hini,
+                               transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
+                               maxords = .ret$control$maxords, method="dop853")
+                if (any(is.na(.res$rx_pred_))){
+                    warning("Problems solving pred/wres liblsoda, lsoda and dop853")
+                } else {
+                    warning("Problems solving pred/wres liblsoda and lsoda switched to dop853")
+                }
+            } else {
+                warning("Problems solving pred/wres liblsoda switched to lsoda")
+            }
+        }
+        return(.res)
+    }
     if (exists("noLik", envir=.ret)){
         if (.ret$noLik){
             message("Calculating residuals/tables")
@@ -1752,12 +1785,7 @@ foceiFit.data.frame0 <- function(data,
                                         transitAbs = .ret$control$TransitAbs,
                                         maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
                                         method=.ret$control$method),
-                           pred=.solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
-                                       atol=exp(log(.ret$control$atol)-3), rtol=exp(log(.ret$control$rtol)-3),
-                                       maxsteps=.ret$control$maxstepsOde*2,
-                                       hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                                       transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
-                                       maxords = .ret$control$maxords, method=.ret$control$method),
+                           pred=.solvePred(),
                            cwres=FALSE);
         } else {
             .pt <- proc.time();
@@ -1790,12 +1818,7 @@ foceiFit.data.frame0 <- function(data,
                                     transitAbs = .ret$control$TransitAbs,
                                     maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
                                     method=.ret$control$method),
-                       pred=.solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
-                                   atol=.ret$control$atol, rtol=.ret$control$rtol,
-                                   maxsteps=.ret$control$maxstepsOde,
-                                   hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                                   transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
-                                   maxords = .ret$control$maxords, method=.ret$control$method));
+                       pred=.solvePred());
     }
     .lst <- .Call(`_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, .preds$ipred$rxLambda, .preds$ipred$rxYj, .etas, .pars$eta.lst);
     if (is.null(.preds$cwres)){
