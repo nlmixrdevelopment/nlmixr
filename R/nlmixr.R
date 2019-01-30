@@ -1,4 +1,4 @@
-.onAttach <- function(libname, pkgname){ ## nocov start
+orig.onAttach <- function(libname, pkgname){ ## nocov start
     ## Setup RxODE.prefer.tbl
     nlmixrSetupMemoize()
     options(keep.source=TRUE)
@@ -263,6 +263,8 @@ nlmixrData.default <- function(data){
 ##' @export
 nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                        sum.prod=FALSE, table=tableControl()){
+    .modelId <- digest::digest(list(sessionInfo()$otherPkgs$nlmixr$Version,
+                                    uif, data, est, control, sum.prod, table,...));
     .meta <- uif$meta
     .missingEst <- is.null(est);
     if (.missingEst & exists("est", envir=.meta)){
@@ -457,6 +459,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             assign("est", est, .env);
             assign("stopTime", Sys.time(), .env);
         }
+        assign("origControl",control,.env);
+        assign("modelId",.modelId,.env);
         return(.ret);
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
         if (length(uif$predDf$cond) > 1) stop("nlmixr nlme does not support multiple endpoints.")
@@ -542,6 +546,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             assign("est", est, .env);
             assign("stopTime", Sys.time(), .env);
         }
+        assign("origControl",control,.env);
+        assign("modelId",.modelId,.env);
         return(.ret)
     } else if (any(est == c("foce", "focei", "fo", "foi"))){
         if (any(est == c("foce", "fo"))){
@@ -635,6 +641,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         assign("start.time", start.time, env);
         assign("est", est, env);
         assign("stop.time", Sys.time(), env);
+        assign("origControl",control,fit$env);
+        assign("modelId",.modelId,fit$env);
         return(fit);
     } else if (est == "posthoc"){
         control <- do.call(nlmixr::foceiControl, control);
@@ -661,6 +669,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         ## assign("est", est, env);
         ## assign("stop.time", Sys.time(), env);
         assign("origControl",control,fit$env);
+        assign("modelId",.modelId,fit$env);
         return(fit);
     }
 }
