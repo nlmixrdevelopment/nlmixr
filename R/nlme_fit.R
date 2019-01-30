@@ -419,7 +419,7 @@ nlme_ode <- function(dat.o, model, parModel, parTrans,
                      response, responseScaler=NULL,
                      transitAbs = FALSE,
                      atol = 1e-08, rtol=1.0e-8, maxsteps = 5000,
-                     hmin = 0, hmax = NULL,
+                     hmin = 0, hmax = NA_real_,
                      hini = 0, maxordn = 12, maxords = 5,
                      debugODE=FALSE, mcCores=1, ...)
 {
