@@ -289,7 +289,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   arma::vec wres, cwres;
   NumericVector cpredI, cresI, cres, cpred;
   if (doCwres){
-    wres = resv/sqrt(Vfop+rpv);
+    wres = resv/sqrt(abs(Vfop+rpv));
     // For CPRED, CRES and CWRES
     cpred = iprednv - dErr_dEta_i;
     cpredI = NumericVector(cpred.size());
