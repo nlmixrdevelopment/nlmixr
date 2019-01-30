@@ -526,7 +526,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
           if (stop) stop(msg, call.=FALSE);
       }
       message("Building SAEM model...",appendLF=FALSE)
-      .out <- sys::exec_internal(cmd=rexec, args=args)
+      .out <- sys::exec_internal(cmd=rexec, args=args, error=FALSE)
       if (!(.out$status==0 & file.exists(saem.dll))){
           message("error")
           .badBuild("Error building SAEM model");
