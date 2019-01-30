@@ -35,6 +35,8 @@ defaultControl <- function(x){
 defaultTable <- tableControl(cwres=TRUE); ## CWRES needed for FOCEi likelihood
 
 generate_expected_values <- function(x=FALSE) {
+  .os <- .Platform$OS.type;
+  if (Sys.info()["sysname"]=="Darwin") .os <- "mac"
   ret <-
     list(
       lik=round(c(logLik(fit[[runno]]), AIC(fit[[runno]]), BIC(fit[[runno]])), 2),
@@ -43,7 +45,7 @@ generate_expected_values <- function(x=FALSE) {
       sigma=signif(fit[[runno]]$sigma, 5)
     )
   if (x){
-      sink(paste0("values-", runno, "-", .Platform$OS.type, ".R"))
+      sink(paste0("values-", runno, "-", .os, ".R"))
       on.exit(sink());
   }
   cat(
@@ -76,7 +78,9 @@ generate_expected_values <- function(x=FALSE) {
 
 
 genIfNeeded <- function(){
-    .ret <- paste0("values-",runno, "-", .Platform$OS.type, ".R");
+    .os <- .Platform$OS.type;
+    if (Sys.info()["sysname"]=="Darwin") .os <- "mac"
+    .ret <- paste0("values-",runno, "-", .os, ".R");
     if (!file.exists(.ret)){
         generate_expected_values(TRUE);
     }

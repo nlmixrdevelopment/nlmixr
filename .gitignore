@@ -8,3 +8,4 @@ saem*.*
 inst/doc
 .Rproj.user
 nlmixr.Rproj
+*.so
