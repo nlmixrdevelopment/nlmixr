@@ -1872,7 +1872,7 @@ print.nlmixrClass <- function(x, ...){
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
     .env <- obj;
-    if (arg == "value") arg <- "objf"
+    if (any(arg == c("value","obf","ofv"))) arg <- "objf"
     if (arg == "sigma") return(.sigma(obj))
     if (arg == "coefficients"){
         return(list(fixed=fixef(obj),
