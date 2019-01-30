@@ -492,9 +492,9 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   if (is.null(inPars)) {
     assgnPars = declPars = ""
   } else {
-    s = sprintf("      %s = _mPars(i,%d);", inPars, 1:length(inPars)-1)
+    s = sprintf("      %s = _mPars(_i,%d);", inPars, 1:length(inPars)-1)
     assgnPars = paste0(s, collapse="\n")
-    s = "mat _mPars=as<mat>(opt[\"mPars\"]);"
+    s = "mat _mPars=as<mat>(_opt[\"mPars\"]);"
     declPars = sprintf("\tdouble %s;\n\t%s", paste0(inPars, collapse=", "), s)
   }
   brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
