@@ -458,9 +458,9 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             assign("startTime", start.time, .env);
             assign("est", est, .env);
             assign("stopTime", Sys.time(), .env);
+            assign("origControl", control, .env);
+            assign("modelId", .modelId, .env);
         }
-        assign("origControl",control,.env);
-        assign("modelId",.modelId,.env);
         return(.ret);
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
         if (length(uif$predDf$cond) > 1) stop("nlmixr nlme does not support multiple endpoints.")
@@ -545,9 +545,9 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             assign("startTime", start.time, .env);
             assign("est", est, .env);
             assign("stopTime", Sys.time(), .env);
+            assign("origControl",control,.env);
+            assign("modelId",.modelId,.env);
         }
-        assign("origControl",control,.env);
-        assign("modelId",.modelId,.env);
         return(.ret)
     } else if (any(est == c("foce", "focei", "fo", "foi"))){
         if (any(est == c("foce", "fo"))){
@@ -641,8 +641,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         assign("start.time", start.time, env);
         assign("est", est, env);
         assign("stop.time", Sys.time(), env);
-        assign("origControl",control,fit$env);
-        assign("modelId",.modelId,fit$env);
+        assign("origControl",control, env);
+        assign("modelId",.modelId, env);
         return(fit);
     } else if (est == "posthoc"){
         control <- do.call(nlmixr::foceiControl, control);
