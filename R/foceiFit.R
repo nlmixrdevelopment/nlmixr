@@ -2173,7 +2173,8 @@ print.nlmixrFitCore <- function(x, ...){
     print(x$objDf)
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)
-    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))));
+    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ",
+                                          crayon::bold$blue("$parFixedDf"), "):"))));
     .pf <- R.utils::captureOutput(print(x$parFixed))
     if (crayon::has_color()){
         .pf <- gsub(rex::rex(capture(.regNum), "%>"), "\033[1;31m\\1%\033[0m ", .pf, perl=TRUE)
