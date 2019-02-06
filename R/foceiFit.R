@@ -2175,9 +2175,9 @@ print.nlmixrFitCore <- function(x, ...){
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)
     .boundChar <- nchar(.bound);
-    if (2*.boundChar+51 > .width){
+    if (2*.boundChar+54 > .width){
         message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))));
-    } else if (.boundChar+51 > .width) {
+    } else if (.boundChar+54 > .width) {
         message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))));
     } else {
         message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))))
