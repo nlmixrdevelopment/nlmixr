@@ -2132,6 +2132,7 @@ fixef.nlmixrFitCore <- function(object, ...){
 
 ##'@export
 print.nlmixrFitCore <- function(x, ...){
+    .width <- getOption("width");
     .parent <- parent.frame(2);
     .bound <- do.call("c", lapply(ls(.parent), function(.cur){
                                if (identical(.parent[[.cur]], x)){
@@ -2173,7 +2174,13 @@ print.nlmixrFitCore <- function(x, ...){
     print(x$objDf)
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)
-    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))));
+    .boundChar <- nchar(.bound);
+    if (.boundChar+51 > .width){
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))));
+    } else {
+        message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))))
+    }
+
     .pf <- R.utils::captureOutput(print(x$parFixed))
     if (crayon::has_color()){
         .pf <- gsub(rex::rex(capture(.regNum), "%>"), "\033[1;31m\\1%\033[0m ", .pf, perl=TRUE)
@@ -2238,10 +2245,27 @@ print.nlmixrFitCore <- function(x, ...){
             }
             cat(paste(.lt, collapse="\n"), "\n\n")
         }
-        message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"));
+        if (.boundChar*2+70 < .width){
+            message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"));
+        } else {
+            if (.boundChar+43 < .width){
+                message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"));
+                message("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)");
+            } else {
+                message(paste0("  Full BSV covariance (", crayon::bold$blue("$omega"), ")"));
+                message("    or correlation (", crayon::bold$blue("$omegaR"), "; diagonals=SDs)");
+            }
+        }
+
     }
-    message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
-                   crayon::yellow(.bound), crayon::bold$blue("$shrink")));
+    if (.boundChar+74 < .width){
+        message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+                       crayon::yellow(.bound), crayon::bold$blue("$shrink")));
+    } else {
+        message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+                       crayon::bold$blue("$shrink")));
+    }
+
     if (x$message != ""){
         message(paste0("  Minimization message (",crayon::yellow(.bound), crayon::bold$blue("$message"), "): ", x$message));
         if (x$message=="false convergence (8)"){
