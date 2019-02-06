@@ -2182,9 +2182,6 @@ print.nlmixrFitCore <- function(x, ...){
     } else {
         message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))))
     }
-
-    message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ",
-                                          crayon::bold$blue("$parFixedDf"), "):"))));
     .pf <- R.utils::captureOutput(print(x$parFixed))
     if (crayon::has_color()){
         .pf <- gsub(rex::rex(capture(.regNum), "%>"), "\033[1;31m\\1%\033[0m ", .pf, perl=TRUE)
