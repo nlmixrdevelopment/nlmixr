@@ -96,6 +96,11 @@ typedef struct {
   double *gVar;
   double *gX;
 
+  double *glp;
+  double *ga;
+  double *gB;
+  double *gc;
+
   double *likSav;
   
   // Integer of ETAs
@@ -392,6 +397,10 @@ extern "C" void rxOptionsFreeFocei(){
   if (op_focei.gillDf != NULL)  Free(op_focei.gillDf);
   if (op_focei.gillDf2 != NULL) Free(op_focei.gillDf2);
   if (op_focei.gillErr != NULL) Free(op_focei.gillErr);
+  Free(op_focei.glp);
+  Free(op_focei.ga);
+  Free(op_focei.gB);
+  Free(op_focei.gc);
 }
 
 //[[Rcpp::export]]
@@ -677,10 +686,10 @@ double likInner0(double *eta){
   bool recalc = false;
   if (!fInd->setup){
     recalc=true;
-    fInd->lp = Calloc(op_focei.neta, double);
-    fInd->a = Calloc((ind->n_all_times - ind->ndoses)* op_focei.neta, double);
-    fInd->B = Calloc((ind->n_all_times - ind->ndoses), double);
-    fInd->c = Calloc((ind->n_all_times - ind->ndoses)* op_focei.neta, double);
+    // fInd->lp = Calloc(op_focei.neta, double);
+    // fInd->a = Calloc((ind->n_all_times - ind->ndoses)* op_focei.neta, double);
+    // fInd->B = Calloc((ind->n_all_times - ind->ndoses), double);
+    // fInd->c = Calloc((ind->n_all_times - ind->ndoses)* op_focei.neta, double);
     fInd->setup = 1;
   } else {
     // Check to see if old ETA matches.
@@ -1952,10 +1961,15 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   op_focei.etaM = mat(op_focei.neta, 1, fill::zeros);
   op_focei.etaS = mat(op_focei.neta, 1, fill::zeros);
   op_focei.eta1SD = mat(op_focei.neta, 1, fill::zeros);
-  unsigned int i, j = 0, k = 0, ii=0, jj = 0;
+  op_focei.glp = Calloc((op_focei.neta +1) * rx->nsub, double);
+  op_focei.ga  = Calloc(op_focei.neta * rx->nall, double);
+  op_focei.gB  = Calloc(rx->nall, double);
+  op_focei.gc  = Calloc(op_focei.neta * rx->nall, double);
+  unsigned int i, j = 0, k = 0, ii=0, jj = 0, iA=0, iB=0;
   focei_ind *fInd;
   for (i = rx->nsub; i--;){
     fInd = &(inds_focei[i]);
+    rx_solving_options_ind *ind = &(rx->subjects[i]);
     fInd->doChol=!(op_focei.cholSEOpt);
     // ETA ini
     fInd->eta = &op_focei.geta[j];
@@ -1964,6 +1978,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
     fInd->g = &op_focei.gG[j];
     fInd->x = &op_focei.gX[j];
     fInd->var = &op_focei.gVar[j];
+    fInd->lp = &op_focei.glp[j];
 
     // Copy in etaMat0 to the inital eta stored (0 if unspecified)
     // std::copy(&etaMat0[i*op_focei.neta], &etaMat0[(i+1)*op_focei.neta], &fInd->saveEta[0]);
@@ -1972,9 +1987,17 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
     fInd->eta[op_focei.neta] = i;
     fInd->saveEta[op_focei.neta] = i;
     fInd->oldEta[op_focei.neta] = i;
+
     j+=op_focei.neta+1;
 
     k+=op_focei.neta;
+
+    fInd->a = &op_focei.ga[iA];
+    fInd->c = &op_focei.gc[iA];
+    iA += op_focei.neta * (ind->n_all_times - ind->ndoses);
+
+    fInd->B = &op_focei.gB[iB];
+    iB += (ind->n_all_times - ind->ndoses);
 
     fInd->zm = &op_focei.gZm[ii];
     ii+=(op_focei.neta+1) * (op_focei.neta + 2) / 2 + 6*(op_focei.neta + 1)+1;
@@ -2805,17 +2828,6 @@ Environment foceiOuter(Environment e){
       break;
     case -1:
       foceiCustomFun(e);
-    }
-    // Clear matrices
-    for (int id=rx->nsub; id--;){
-      focei_ind *fInd = &(inds_focei[id]);
-      if (fInd->setup == 1){
-	Free(fInd->lp);
-	Free(fInd->a);
-	Free(fInd->B);
-	Free(fInd->c);
-	fInd->setup=0;
-      }
     }
   } else {
     NumericVector x(op_focei.npars);
@@ -3881,7 +3893,7 @@ void foceiFinalizeTables(Environment e){
     List ctl = e["control"];
     e["extra"] = as<std::string>(e["extra"]) + " (outer: " + as<std::string>(ctl["outerOptTxt"]) +")";
   }
-  RxODE::rxSolveFree();
+  // RxODE::rxSolveFree();
   e.attr("class") = "nlmixrFitCore";
 }
 
