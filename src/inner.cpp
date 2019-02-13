@@ -697,116 +697,121 @@ double likInner0(double *eta){
     }
     // Solve ODE
     innerOde(id);
-    // Update eta.
-    arma::mat lp(op_focei.neta, 1, fill::zeros);
-    arma::mat a(ind->n_all_times - ind->ndoses, op_focei.neta);
-    arma::mat B(ind->n_all_times - ind->ndoses, 1);
-    arma::mat c;
-    mat Vid;
-    if (op_focei.fo == 1){
-      Vid = arma::mat(ind->n_all_times - ind->ndoses, ind->n_all_times - ind->ndoses, fill::zeros);
-    } else if (op_focei.interaction == 1){
-      c   = arma::mat(ind->n_all_times - ind->ndoses, op_focei.neta);
-    }
-    
-    // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
-    // Calculate matricies
-    int k = ind->n_all_times - ind->ndoses - 1;
-    fInd->llik=0.0;
-    fInd->tbsLik=0.0;
-    double f, err, r, fpm, rp,lnr;
-    for (j = ind->n_all_times; j--;){
-      if (ind->evid[j]){
-	ind->tlast = ind->all_times[j];
-      } else {
-	ind->idx=j;
-	inner_calc_lhs((int)id, ind->all_times[j], &ind->solve[j * op->neq], ind->lhs);
-        f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
-	if (ISNA(f)) throw std::runtime_error("bad solve");
-	// fInd->f(k, 0) = ind->lhs[0];
-	err = f - tbs(ind->dv[j]);
-	fInd->tbsLik+=tbsL(ind->dv[j]);
-	// fInd->err(k, 0) = ind->lhs[0] - ind->dv[k]; // pred-dv
-        if (ISNA(ind->lhs[op_focei.neta + 1])) throw std::runtime_error("bad solve");
-	r = _safe_zero(ind->lhs[op_focei.neta + 1]);
-        if (op_focei.fo){
-          // FO
-          B(k, 0) = err; // res
-	  Vid(k, k) = r;
-          for (i = op_focei.neta; i--; ){
-            a(k, i) = ind->lhs[i+1];
-          }
-          // Ci = fpm %*% omega %*% t(fpm) + Vi; Vi=diag(r)
-        } else {
-          lnr =_safe_log(ind->lhs[op_focei.neta + 1]);
-          // fInd->r(k, 0) = ind->lhs[op_focei.neta+1];
-          // B(k, 0) = 2.0/ind->lhs[op_focei.neta+1];
-          // lhs 0 = F
-          // lhs 1-eta = df/deta
-          // FIXME faster initiliaitzation via copy or elim
-	  // Rprintf("id: %d k: %d j: %d\n", id, k, j);
-          B(k, 0) = 2.0/r;
-          if (op_focei.interaction == 1){
-            for (i = op_focei.neta; i--; ){
-              fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
-              rp  = ind->lhs[i + op_focei.neta + 2];
-              c(k, i) = rp/r;
-              // lp is eq 12 in Almquist 2015
-              // // .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
-              lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) - 0.5 * c(k, i) - 
-                0.5 * err * fpm * B(k, 0);
-            }
-            // Eq #10
-            //llik <- -0.5 * sum(err ^ 2 / R + log(R));
-            fInd->llik += err * err/r + lnr;
-          } else if (op_focei.interaction == 0){
-            for (i = op_focei.neta; i--; ){
-              fpm = a(k, i) = ind->lhs[i + 1];
-              lp(i, 0) -= 0.5 * err * fpm * B(k, 0);
-            }
-            // Eq #10
-            //llik <- -0.5 * sum(err ^ 2 / R + log(R));
-            fInd->llik += err * err/r + lnr;
-          }
-        }
-        k--;
-      }
-    }
-    if (op_focei.fo){
-      mat Ci = a * op_focei.omega * trans(a) + Vid;
-      mat cholCi = cholSE__(Ci, op_focei.cholSEtol);
-      mat CiInv;
-      bool success  = inv(CiInv, trimatu(cholCi));
-      if (!success){
-        CiInv = pinv(trimatu(cholCi));
-      }
-      CiInv = CiInv * CiInv.t();
-      double lik = 0;
-      // 2*sum(log(diag(chol(Ci))))
-      for (unsigned int j = cholCi.n_rows; j--;){
-        lik += 2*_safe_log(cholCi(j,j));
-      }
-      // + t(.$Ri) %*% solve(Ci) %*% .$Ri
-      mat rest =trans(B) * CiInv * B;
-      lik += rest(0,0);
-      // lik = -2*ll
-      fInd->llik = -0.5*lik;
+    if (ISNA(ind->solve[0])){
+      return 1e300;
     } else {
-      fInd->llik = -0.5*fInd->llik;
-      // Now finalize lp
-      mat etam = arma::mat(op_focei.neta, 1);
-      std::copy(&eta[0], &eta[0] + op_focei.neta, etam.begin()); // fill in etam
-      // Finalize eq. #12
-      lp = -(lp - op_focei.omegaInv * etam);
-      // Partially finalize #10
-      fInd->llik = -trace(fInd->llik - 0.5*(etam.t() * op_focei.omegaInv * etam));
-      // print(wrap(fInd->llik));
-      std::copy(&eta[0], &eta[0] + op_focei.neta, &fInd->oldEta[0]);
+      // Update eta.
+      arma::mat lp(op_focei.neta, 1, fill::zeros);
+      arma::mat a(ind->n_all_times - ind->ndoses, op_focei.neta);
+      arma::mat B(ind->n_all_times - ind->ndoses, 1);
+      arma::mat c;
+      mat Vid;
+      if (op_focei.fo == 1){
+	Vid = arma::mat(ind->n_all_times - ind->ndoses, ind->n_all_times - ind->ndoses, fill::zeros);
+      } else if (op_focei.interaction == 1){
+	c   = arma::mat(ind->n_all_times - ind->ndoses, op_focei.neta);
+      }
+    
+      // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
+      // Calculate matricies
+      int k = ind->n_all_times - ind->ndoses - 1;
+      fInd->llik=0.0;
+      fInd->tbsLik=0.0;
+      double f, err, r, fpm, rp,lnr;
+      for (j = ind->n_all_times; j--;){
+	if (ind->evid[j]){
+	  ind->tlast = ind->all_times[j];
+	} else {
+	  ind->idx=j;
+	  inner_calc_lhs((int)id, ind->all_times[j], &ind->solve[j * op->neq], ind->lhs);
+	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
+	  if (ISNA(f)) throw std::runtime_error("bad solve");
+	  // fInd->f(k, 0) = ind->lhs[0];
+	  err = f - tbs(ind->dv[j]);
+	  fInd->tbsLik+=tbsL(ind->dv[j]);
+	  // fInd->err(k, 0) = ind->lhs[0] - ind->dv[k]; // pred-dv
+	  if (ISNA(ind->lhs[op_focei.neta + 1])) throw std::runtime_error("bad solve");
+	  r = _safe_zero(ind->lhs[op_focei.neta + 1]);
+	  if (op_focei.fo){
+	    // FO
+	    B(k, 0) = err; // res
+	    Vid(k, k) = r;
+	    for (i = op_focei.neta; i--; ){
+	      a(k, i) = ind->lhs[i+1];
+	    }
+	    // Ci = fpm %*% omega %*% t(fpm) + Vi; Vi=diag(r)
+	  } else {
+	    lnr =_safe_log(ind->lhs[op_focei.neta + 1]);
+	    // fInd->r(k, 0) = ind->lhs[op_focei.neta+1];
+	    // B(k, 0) = 2.0/ind->lhs[op_focei.neta+1];
+	    // lhs 0 = F
+	    // lhs 1-eta = df/deta
+	    // FIXME faster initiliaitzation via copy or elim
+	    // Rprintf("id: %d k: %d j: %d\n", id, k, j);
+	    B(k, 0) = 2.0/r;
+	    if (op_focei.interaction == 1){
+	      for (i = op_focei.neta; i--; ){
+		fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
+		rp  = ind->lhs[i + op_focei.neta + 2];
+		c(k, i) = rp/r;
+		// lp is eq 12 in Almquist 2015
+		// // .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
+		lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) - 0.5 * c(k, i) - 
+		  0.5 * err * fpm * B(k, 0);
+	      }
+	      // Eq #10
+	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
+	      fInd->llik += err * err/r + lnr;
+	    } else if (op_focei.interaction == 0){
+	      for (i = op_focei.neta; i--; ){
+		fpm = a(k, i) = ind->lhs[i + 1];
+		lp(i, 0) -= 0.5 * err * fpm * B(k, 0);
+	      }
+	      // Eq #10
+	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
+	      fInd->llik += err * err/r + lnr;
+	    }
+	  }
+	  k--;
+	}
+      }
+      if (op_focei.fo){
+	mat Ci = a * op_focei.omega * trans(a) + Vid;
+	mat cholCi = cholSE__(Ci, op_focei.cholSEtol);
+	mat CiInv;
+	bool success  = inv(CiInv, trimatu(cholCi));
+	if (!success){
+	  CiInv = pinv(trimatu(cholCi));
+	}
+	CiInv = CiInv * CiInv.t();
+	double lik = 0;
+	// 2*sum(log(diag(chol(Ci))))
+	for (unsigned int j = cholCi.n_rows; j--;){
+	  lik += 2*_safe_log(cholCi(j,j));
+	}
+	// + t(.$Ri) %*% solve(Ci) %*% .$Ri
+	mat rest =trans(B) * CiInv * B;
+	lik += rest(0,0);
+	// lik = -2*ll
+	fInd->llik = -0.5*lik;
+      } else {
+	fInd->llik = -0.5*fInd->llik;
+	// Now finalize lp
+	mat etam = arma::mat(op_focei.neta, 1);
+	std::copy(&eta[0], &eta[0] + op_focei.neta, etam.begin()); // fill in etam
+	// Finalize eq. #12
+	lp = -(lp - op_focei.omegaInv * etam);
+	// Partially finalize #10
+	fInd->llik = -trace(fInd->llik - 0.5*(etam.t() * op_focei.omegaInv * etam));
+	// print(wrap(fInd->llik));
+	std::copy(&eta[0], &eta[0] + op_focei.neta, &fInd->oldEta[0]);
+      }
+      std::copy(lp.begin(), lp.end(), &fInd->lp[0]);
+      std::copy(a.begin(), a.end(), &fInd->a[0]);
+      std::copy(B.begin(), B.end(), &fInd->B[0]);
+      std::copy(c.begin(), c.end(), &fInd->c[0]);    
+
     }
-    std::copy(lp.begin(), lp.end(), &fInd->lp[0]);
-    std::copy(a.begin(), a.end(), &fInd->a[0]);
-    std::copy(B.begin(), B.end(), &fInd->B[0]);
-    std::copy(c.begin(), c.end(), &fInd->c[0]);
   }
   return fInd->llik;
 }
@@ -1025,6 +1030,9 @@ double LikInner2(double *eta, int likId){
     // print(wrap(lik));
     rx = getRx();
     rx_solving_options_ind *ind = &(rx->subjects[id]);
+    if (ISNA(ind->solve[0])){
+      return 1e300;
+    }
     // Calclaute lik first to calculate components for Hessian
     // Hessian 
     mat H(op_focei.neta, op_focei.neta, fill::zeros);
