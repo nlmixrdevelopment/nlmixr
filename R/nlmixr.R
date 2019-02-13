@@ -645,7 +645,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         assign("modelId",.modelId, env);
         return(fit);
     } else if (est == "posthoc"){
-        control <- do.call(nlmixr::foceiControl, control);
+        if (class(control) !="foceiControl") control <- do.call(nlmixr::foceiControl, control);
         control$covMethod <- 0L
         control$maxOuterIterations <- 0L;
         fit <- foceiFit(dat,
