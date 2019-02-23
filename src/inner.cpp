@@ -1960,7 +1960,6 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   rx = getRx();
   rxFoceiEnsure(rx->nsub);
   etaMat0 = transpose(etaMat0);
-  Rprintf("Setup %d for eta\n nsub: %d\n",(op_focei.neta+1)*rx->nsub, rx->nsub);
   foceiGEtaN((op_focei.neta+1)*rx->nsub);
   foceiGThetaN(op_focei.npars*(rx->nsub + 1));
   foceiGgZm(((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub);
