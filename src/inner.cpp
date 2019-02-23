@@ -254,7 +254,7 @@ extern "C" void rxOptionsIniFocei(){
 
 void foceiThetaN(unsigned int n){
   if (op_focei.thetaTransN < n){
-    unsigned int cur = n+2;
+    unsigned int cur = n;
     Free(op_focei.thetaTrans);
     Free(op_focei.theta);
     Free(op_focei.fullTheta);
@@ -275,7 +275,7 @@ void foceiThetaN(unsigned int n){
 
 void foceiEtaN(unsigned int n){
   if (op_focei.etaTransN < n){
-    unsigned int cur = n+2;
+    unsigned int cur = n;
     Free(op_focei.etaTrans);
     op_focei.etaTrans = Calloc(cur, int);
     op_focei.etaTransN=cur;
@@ -284,7 +284,7 @@ void foceiEtaN(unsigned int n){
 
 void foceiGThetaN(unsigned int n){
   if (op_focei.gThetaGTransN < n){
-    unsigned int cur = n+2;
+    unsigned int cur = n;
     Free(op_focei.gthetaGrad);
     op_focei.gthetaGrad = Calloc(cur, double);
     op_focei.gThetaGTransN=cur;
@@ -293,7 +293,7 @@ void foceiGThetaN(unsigned int n){
 
 void foceiGEtaN(unsigned int n){
   if (op_focei.gEtaGTransN < n){
-    unsigned int cur = n+2;
+    unsigned int cur = n;
     Free(op_focei.geta);
     Free(op_focei.goldEta);
     Free(op_focei.gsaveEta);
@@ -814,6 +814,11 @@ double likInner0(double *eta){
 	fInd->llik = -trace(fInd->llik - 0.5*(etam.t() * op_focei.omegaInv * etam));
 	// print(wrap(fInd->llik));
 	std::copy(&eta[0], &eta[0] + op_focei.neta, &fInd->oldEta[0]);
+	// for (int ssi = op_focei.neta; ssi--;){
+	//   // Rprintf("ssi: %d :%d;\n",id, ssi);
+	//   // Rprintf("eta: %f\n", eta[ssi]);
+	//   fInd->oldEta[ssi] = eta[ssi];
+	// }
       }
       std::copy(lp.begin(), lp.end(), &fInd->lp[0]);
       std::copy(a.begin(), a.end(), &fInd->a[0]);
@@ -1420,8 +1425,8 @@ double foceiOfv(NumericVector theta){
 
 //[[Rcpp::export]]
 List foceiEtas(){
-  List ret(op_focei.neta+2);
-  CharacterVector nm(op_focei.neta+2);
+  List ret(op_focei.neta);
+  CharacterVector nm(op_focei.neta);
   rx = getRx();
   IntegerVector ids(rx->nsub);
   NumericVector ofv(rx->nsub);
@@ -1955,6 +1960,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   rx = getRx();
   rxFoceiEnsure(rx->nsub);
   etaMat0 = transpose(etaMat0);
+  Rprintf("Setup %d for eta\n nsub: %d\n",(op_focei.neta+1)*rx->nsub, rx->nsub);
   foceiGEtaN((op_focei.neta+1)*rx->nsub);
   foceiGThetaN(op_focei.npars*(rx->nsub + 1));
   foceiGgZm(((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub);
