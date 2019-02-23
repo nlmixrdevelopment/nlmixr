@@ -25,9 +25,12 @@ matrix:
   - r: 3.5
     os: osx
 
-before_install:
-- sudo apt-get update -qq
-- sudo apt-get install -qq python python-sympy
+addons:
+  apt:
+    packages:
+      - libudunits2-dev
+      - python
+      - python-sympy
 
 r_github_packages:
   - jimhester/covr
