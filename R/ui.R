@@ -192,8 +192,8 @@ nlmixrUI <- function(fun){
         assign("fun", fun, env)
         fun2 <- attr(fun,"srcref");
         if (is.null(fun2)){
+            stop("option \"keep.source\" must be TRUE for nlmixr models.\nTry running R -e 'source(\"script\", keep.source=TRUE) instead.'");
             return(eval(fun(),parent.frame(1)));
-            stop("option \"keep.source\" must be TRUE for nlmixr models.")
         }
         fun2 <- as.character(fun2, useSource=TRUE)
         rg <- rex::rex("function", any_spaces, "(", anything, ")")
