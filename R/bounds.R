@@ -6,7 +6,11 @@
 ##' @export
 ##' @keywords internal
 nlmixrBounds <- function(fun){
-    fun2 <- as.character(attr(fun,"srcref"),useSource=TRUE);
+    if (!is.null(attr(fun, "srcref"))){
+        fun2 <- as.character(attr(fun,"srcref"),useSource=TRUE);
+    } else {
+        return(eval(fun(),parent.frame(1)));
+    }
     w <- which(regexpr("^ *#+.*", fun2) == 1);
     if (length(w) > 0){
         fun2 <- fun2[-w];
