@@ -289,7 +289,11 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
     }
     start.time <- Sys.time();
     if (!is(table, "tableControl")){
-        table <- do.call(tableControl, table);
+        if (is(table, "list")){
+            table <- do.call(tableControl, table);
+        } else {
+            table <- tableControl();
+        }
     }
     dat <- nlmixrData(data);
     up.covs <- toupper(uif$all.covs);
