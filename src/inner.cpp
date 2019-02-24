@@ -1715,10 +1715,10 @@ void numericGrad(double *theta, double *g){
     // op_focei.t0 = clock();
     // Rprintf("Calculate Gill Difference and optimize forward difference step size:\n");
     for (int cpar = op_focei.npars; cpar--;){
-      // op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
-      // 				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+      op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+      				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
       err = 1/(std::fabs(theta[cpar])+1); 
-      // h=aEps*(|x|+1)/sqrt(1+fabs(f));
+      h=aEps*(|x|+1)/sqrt(1+fabs(f));
       // h*sqrt(1+fabs(f))/(|x|+1) = aEps
       // let err=2*sqrt(epsA/(1+f))
       // err*(aEps+|x|rEps) = h
