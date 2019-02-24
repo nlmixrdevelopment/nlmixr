@@ -1425,8 +1425,8 @@ double foceiOfv(NumericVector theta){
 
 //[[Rcpp::export]]
 List foceiEtas(){
-  List ret(op_focei.neta);
-  CharacterVector nm(op_focei.neta);
+  List ret(op_focei.neta+2);
+  CharacterVector nm(op_focei.neta+2);
   rx = getRx();
   IntegerVector ids(rx->nsub);
   NumericVector ofv(rx->nsub);
@@ -1710,9 +1710,13 @@ void numericGrad(double *theta, double *g){
   op_focei.mixDeriv=0;
   if (op_focei.nF == 1 && op_focei.gillK > 0){
     double hf, hphif, err;
+    // op_focei.cur = 0;
+    // op_focei.totTick = op_focei.npars;
+    // op_focei.t0 = clock();
+    // Rprintf("Calculate Gill Difference and optimize forward difference step size:\n");
     for (int cpar = op_focei.npars; cpar--;){
-      op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
-				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+      // op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+      // 				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
       err = 1/(std::fabs(theta[cpar])+1); 
       // h=aEps*(|x|+1)/sqrt(1+fabs(f));
       // h*sqrt(1+fabs(f))/(|x|+1) = aEps
@@ -1732,7 +1736,11 @@ void numericGrad(double *theta, double *g){
 	op_focei.rEpsC[cpar] = hphif*err;
       }
       g[cpar] = op_focei.gillDf[cpar];
+      op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
     }
+    // op_focei.cur=op_focei.totTick;
+    // op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+    // Rprintf("\n");
     op_focei.didGill=1;
   } else {
     op_focei.calcGrad=1;
