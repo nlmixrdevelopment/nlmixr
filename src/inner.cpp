@@ -1311,60 +1311,60 @@ void innerOpt(){
 // #endif    
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
-      // try {
+      try {
         innerOpt1(id, 0);
-      // } catch (...){
-      // 	// First try resetting ETA
-      // 	std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      // 	try {
-      // 	  innerOpt1(id, 0);
-      //   } catch (...) {
-      // 	  // Now try resetting Hessian, and ETA
-      // 	  // Rprintf("Hessian Reset for ID: %d\n", id+1);
-      //     indF->mode = 1;
-      //     indF->uzm = 1;
-      //     std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      // 	  try {
-      //       // Rprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
-      //       innerOpt1(id, 0);
-      //     } catch (...){
-      //       indF->mode = 1;
-      //       indF->uzm = 1;
-      //       std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      //       if(!op_focei.noabort){
-      //         stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
-      // 	    } else if (indF->doChol == 1){
-      // 	      indF->doChol = 0; // Use generalized cholesky decomposition
-      //         indF->mode = 1;
-      //         indF->uzm = 1;
-      //         std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      // 	      try {
-      // 		innerOpt1(id, 0);
-      // 		indF->doChol = 1; // Use cholesky again.
-      // 	      } catch (...){
-      // 		// Just use ETA=0
-      //           std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      //           try{
-      //             innerEval(id);
-      //           } catch(...){
-      // 		  warning("Bad solve during optimization.");
-      // 		  // ("Cannot correct.");
-      //           }
-      //         }
-      // 	    } else {
-      //         // Just use ETA=0
-      //         std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      //         try{
-      //           innerEval(id);
-      //         } catch(...){
-      //           warning("Bad solve during optimization.");
-      //           // ("Cannot correct.");
-      //         }
-      //       }
-      //       // 
-      //     }
-      //   }
-      // }
+      } catch (...){
+      	// First try resetting ETA
+      	std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      	try {
+      	  innerOpt1(id, 0);
+        } catch (...) {
+      	  // Now try resetting Hessian, and ETA
+      	  // Rprintf("Hessian Reset for ID: %d\n", id+1);
+          indF->mode = 1;
+          indF->uzm = 1;
+          std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      	  try {
+            // Rprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
+            innerOpt1(id, 0);
+          } catch (...){
+            indF->mode = 1;
+            indF->uzm = 1;
+            std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+            if(!op_focei.noabort){
+              stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
+      	    } else if (indF->doChol == 1){
+      	      indF->doChol = 0; // Use generalized cholesky decomposition
+              indF->mode = 1;
+              indF->uzm = 1;
+              std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      	      try {
+      		innerOpt1(id, 0);
+      		indF->doChol = 1; // Use cholesky again.
+      	      } catch (...){
+      		// Just use ETA=0
+                std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+                try{
+                  innerEval(id);
+                } catch(...){
+      		  warning("Bad solve during optimization.");
+      		  // ("Cannot correct.");
+                }
+              }
+      	    } else {
+              // Just use ETA=0
+              std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+              try{
+                innerEval(id);
+              } catch(...){
+                warning("Bad solve during optimization.");
+                // ("Cannot correct.");
+              }
+            }
+            // 
+          }
+        }
+      }
     }
     // Reset ETA variances for next step
     op_focei.eta1SD = 1/sqrt(op_focei.etaS);
