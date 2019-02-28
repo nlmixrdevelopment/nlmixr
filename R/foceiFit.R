@@ -659,8 +659,8 @@ foceiControl <- function(sigdig=3,
     }  else {
         method <- match.arg(method);
     }
-    .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
-    method <- as.integer(.methodIdx[method]);
+    ## .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
+    ## method <- as.integer(.methodIdx[method]);
     if (RxODE::rxIs(scaleType, "character")){
         .scaleTypeIdx <- c("norm"=1L, "nlmixr"=2L, "mult"=3L, "multAdd"=4L);
         scaleType <- as.integer(.scaleTypeIdx[match.arg(scaleType)]);
@@ -676,8 +676,8 @@ foceiControl <- function(sigdig=3,
     if (length(covsInterpolation) > 1) covsInterpolation <- covsInterpolation[1];
     covsInterpolation <- tolower(match.arg(covsInterpolation,
                                            c("linear", "locf", "LOCF", "constant", "nocb", "NOCB", "midpoint")))
-    if (covsInterpolation == "constant") covsInterpolation <- "locf";
-    covsInterpolation  <- as.integer(which(covsInterpolation == c("linear", "locf", "nocb", "midpoint")) - 1);
+    ## if (covsInterpolation == "constant") covsInterpolation <- "locf";
+    ## covsInterpolation  <- as.integer(which(covsInterpolation == c("linear", "locf", "nocb", "midpoint")) - 1);
     if (missing(cores)){
         cores <- RxODE::rxCores();
     }
@@ -832,6 +832,10 @@ foceiControl <- function(sigdig=3,
                  gradCalcCentralLarge=as.double(gradCalcCentralLarge),
                  etaNudge=as.double(etaNudge),
                  ...);
+    .tmp <- .ret
+    .tmp$maxsteps <- maxstepsOde
+    .tmp <- do.call(RxODE::rxControl, .tmp);
+    .ret$rxControl <- .tmp;
     class(.ret) <- "foceiControl"
     return(.ret);
 }
