@@ -15,9 +15,10 @@
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
+## along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
 saem_ode_str = '#include <RcppArmadillo.h>
+#include <RxODE.h>
 #include "saem_class_rcpp.hpp"
 
 
@@ -25,21 +26,29 @@ using namespace std;
 using namespace arma;
 
 extern "C" {
-  typedef void (*ode_solver_c)(int *neq, double *theta, double *time, int *evid,
-                               int *ntime, double *inits, double *dose,
-                               double *ret, double *atol, double *rtol,
-                               int *stiff, int *transit_abs, int *nlhs,
-                               double *lhs, int *rc);
 
-  void <%=ode_solver%>(int *neq, double *theta, double *time, int *evid, int *ntime,
-                       double *inits, double *dose, double *ret, double *atol,
-                       double *rtol, int *stiff, int *transit_abs, int *nlhs,
-                       double *lhs, int *rc){
-    static ode_solver_c fun=NULL;
-    if (fun == NULL) fun = (ode_solver_c) R_GetCCallable("<%=dll%>","<%=ode_solver%>");
-    fun(neq, theta, time, evid, ntime, inits, dose, ret, atol,
-        rtol, stiff, transit_abs, nlhs, lhs, rc);
-  }
+typedef void (*rxSingleSolve_t)(double *_theta, double *timep,
+                                int *evidp, int *ntime,
+                                double *initsp, double *dosep,
+                                double *ii, double *retp,
+                                double *lhsp, int *rc);
+
+void rxSingleSolve(double *_theta, double *timep,
+                   int *evidp, int *ntime, double *initsp,
+                   double *dosep, double *ii, double *retp,
+                   double *lhsp, int *rc){
+    static rxSingleSolve_t fun=NULL;
+    if (fun == NULL) fun = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
+    fun(_theta, timep, evidp, ntime, initsp, dosep, ii, retp, lhsp, rc);
+}
+
+typedef rx_solve *(*getRxSolve_t)();
+
+rx_solve *getRxSolve_(){
+  static getRxSolve_t fun=NULL;
+  if (fun == NULL) fun = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+  return fun();
+}
 
 }
 
@@ -64,6 +73,9 @@ vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
 
 
 vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
+  rx_solve* _rx = getRxSolve_();
+  rx_solving_options* _op = _rx->op;
+  int _nlhs = _op->nlhs;
   uvec _ix;
   vec _id = _evt.col(0);
   mat _wm;
@@ -92,35 +104,34 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     _wv = _wm.col(2);
     ivec _evid(_ntime);
     for (int _k=0; _k<_ntime; ++_k) _evid(_k) = _wv(_k);
-    _wv = _wm.col(4);
+    _wv = _wm.col(5);
     ivec _cmt(_ntime);
     for (int _k=0; _k<_ntime; ++_k) _cmt(_k) = _wv(_k);
     _wv = _wm.col(3);
     vec _amt;
     _amt = _wv( find(_evid > 0) );
+    _wv = _wm.col(4);
+    vec _ii;
+    _ii = _wv( find(_evid > 0) );
 
     int _neq=as<int>(_opt["neq"]);
     vec _inits(_neq);
-    _inits.zeros(); //as<vec>(_opt["inits"]);	//FIXME
+    std::copy(&_op->inits[0], &_op->inits[0]+_neq, &_inits[0]);
+    //_inits.zeros(); //as<vec>(_opt["inits"]);	//FIXME
 
 <%=foo%>
 
 <%=pars%>
 <%=inits%>
 
-    int _stiff=as<int>(_opt["stiff"]);
-    int _transit_abs=as<int>(_opt["transitAbs"]);
-    int _nlhs=as<int>(_opt["nlhs"]);
-    double _atol=as<double>(_opt["atol"]);
-    double _rtol=as<double>(_opt["rtol"]);
     int _rc=0;
 
     mat _ret(_neq, _ntime);
     mat _lhs(_nlhs, _ntime);
 
-	<%=ode_solver%>(&_neq, _params.memptr(), _time__.memptr(),
-	    _evid.memptr(), &_ntime, _inits.memptr(), _amt.memptr(), _ret.memptr(),
-	    &_atol, &_rtol, &_stiff, &_transit_abs, &_nlhs, _lhs.memptr(), &_rc);
+    rxSingleSolve(_params.memptr(), _time__.memptr(),
+	    _evid.memptr(), &_ntime, _inits.memptr(), _amt.memptr(), _ii.memptr(),
+            _ret.memptr(), _lhs.memptr(), &_rc);
 
     if ( _DEBUG > 4 && _rc != 0 ) {
         Rcout << "pars: " << _params.t();
@@ -218,7 +229,7 @@ END_RCPP
 '
 
 
-saem_cmt_str = '#include <RcppArmadillo.h>
+saem_cmt_str <- '#include <RcppArmadillo.h>
 #include <R_ext/Rdynload.h>
 #include <Eigen/Dense>
 #include "saem_class_rcpp.hpp"
@@ -508,7 +519,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
   make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
-  make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH")), "")
+  make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
 
   cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
   ## cat(make_str)
@@ -710,7 +721,7 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @export
 configsaem <- function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
-	ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transitAbs=0),
+	ODEopt = list(atol=1e-6, rtol=1e-4, method="lsoda", transitAbs=FALSE),
 	distribution=c("normal","poisson","binomial"),
 	seed=99, fixed=NULL, DEBUG=0)
 {
@@ -719,6 +730,8 @@ configsaem <- function(model, data, inits,
   set.seed(seed)
   distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
   distribution = match.arg(distribution)
+  .data = data;
+  ##RxODE::rxTrans(data, model)
   data = list(nmdat=data)
 
   neq  = attr(model$saem_mod, "neq")
@@ -817,6 +830,7 @@ configsaem <- function(model, data, inits,
   ntotal = length(id)
   N = length(unique(id))
   covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
+  print(covariables);
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
   ncov = data$N.covar + 1
@@ -841,19 +855,35 @@ configsaem <- function(model, data, inits,
   if (any(is.na(data$nmdat$CMT))) {
     stop("'CMT' has NA(s)")
   }
-  dat = data$nmdat[,c("ID", "TIME", "EVID", "AMT", "CMT")]		## CHECKME
+  ## CHECKME
   form = attr(model$saem_mod, "form")
-  infusion = max(dat$EVID)>10000
-  if (form=="cls" && infusion) {
-      dat <- .fmtInfusionData(dat)
+  if (form!="cls"){
+    dat = RxODE::etTrans(data$nmdat,attr(model$saem_mod,"rx"), TRUE);
+    ## if(length(dat) !=7) stop("SAEM doesn't support time varying covariates yet.");
+    .rx <- attr(model$saem_mod,"rx");
+    .pars <- .rx$params
+    .pars <- setNames(rep(1.1,length(.pars)),.pars);
+    if (ODEopt$method=="liblsoda") stop("liblsoda isn't supported with saem yet");
+    do.call(RxODE:::rxSolve.default,
+            c(list(object=.rx, params=.pars,
+                   events=dat,.setupOnly=2L),ODEopt));
+    dat <- as.data.frame(dat[,-6]);
+    names(dat) <- toupper(names(dat));
+    dat$ID <- as.integer(dat$ID);
   } else {
-	  dat$DUR = -1
+     dat = data$nmdat[,c("ID", "TIME", "EVID", "AMT", "CMT")]
+     infusion = max(dat$EVID)>10000
+     if (infusion) {
+         dat <- .fmtInfusionData(dat)
+     } else {
+         dat$DUR = -1
+     }
   }
+
   evt = dat
   evt$ID = evt$ID -1
   evtM = evt[rep(1:dim(evt)[1], nmc),]
   evtM$ID = cumsum(c(FALSE, diff(evtM$ID) != 0))
-
 
   i1 = grep(1, diag(covstruct))
   i0 = grep(0, diag(covstruct))
@@ -890,7 +920,6 @@ configsaem <- function(model, data, inits,
   ipcl1=ipc[jlog1]
   for (x in jlog1) inits$theta[1,x] = log(inits$theta[1,x])
 
-
   idx = as.vector(mcov1>0)
   COV1 = Mcovariables[, row(mcov1)[idx]]
   dim(COV1) = c(N, sum(idx))
@@ -912,7 +941,6 @@ configsaem <- function(model, data, inits,
   diag(x1) = inits$theta[,i1][idx]
   MCOV1 = x1 %*% LCOV1
   jcov1 = grep(1,LCOV1) - 1
-
 
   idx = as.vector(mcov0>0)
   COV0 = Mcovariables[, row(mcov0)[idx]]
@@ -1204,7 +1232,7 @@ saem.fit <- function(model, data, inits,
                      PKpars=NULL, pred=NULL,
                      covars=NULL,
                      mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                     ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs = 0),
+                     ODEopt = list(atol = 1e-06, rtol = 1e-04, method="lsoda", transitAbs = FALSE),
                      distribution=c("normal","poisson","binomial"),
                      seed = 99)
 {
@@ -1220,7 +1248,7 @@ saem.fit.nlmixr.ui.nlme <- function(model, data, inits,
                                     PKpars=NULL, pred=NULL,
                                     covars=NULL,
                                     mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                                    ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs = 0),
+                                    ODEopt = list(atol = 1e-06, rtol = 1e-04, method="lsoda", transitAbs = FALSE),
                                     distribution=c("normal","poisson","binomial"),
                                     seed = 99){
     call <- as.list(match.call(expand.dots=TRUE))[-1];
@@ -1243,7 +1271,7 @@ saem.fit.RxODE <- function(model, data, inits,
                            PKpars=NULL, pred=NULL,
                            covars=NULL,
                            mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                           ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs = 0),
+                           ODEopt = list(atol = 1e-06, rtol = 1e-04, method="lsoda", transitAbs = FALSE),
                            distribution=c("normal","poisson","binomial"),
                            seed = 99){
     saem_fit = gen_saem_user_fn(model, PKpars, pred)
@@ -1260,7 +1288,7 @@ saem.fit.default <- function(model, data, inits,
                              PKpars=NULL, pred=NULL,
                              covars=NULL,
                              mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
-                             ODEopt = list(atol = 1e-06, rtol = 1e-04, stiff = 1, transitAbs = 0),
+                             ODEopt = list(atol = 1e-06, rtol = 1e-04, method="lsoda", transitAbs = FALSE),
                              distribution=c("normal","poisson","binomial"),
                              seed = 99){
     saem_fit = gen_saem_user_fn(model)
@@ -1397,10 +1425,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if(is.null(atol))atol <- 1e-6
     rtol <- uif$env$ODEopt$rtol;
     if(is.null(rtol))rtol <- 1e-4
-    .stiff <- uif$env$ODEopt$stiff;
-    if(is.null(.stiff)) .stiff <- 1L
-    if (.stiff == 1L) .method <- "lsoda"
-    if (.stiff == 0L) .method <- "dop853"
+    .method <- uif$env$ODEopt$method;
+    ## if(is.null(.stiff)) .stiff <- 1L
+    ## if (.stiff == 1L) .method <- "lsoda"
+    ## if (.stiff == 0L) .method <- "dop853"
     transitAbs <- uif$env$ODEopt$transitAbs;
     if(is.null(transitAbs)) transitAbs<- 0L
     .tn <-uif$saem.theta.name;
