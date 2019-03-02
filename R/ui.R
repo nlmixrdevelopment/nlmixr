@@ -1248,8 +1248,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 }
             }
             if (length(.w) > 0L){
-                stop(sprintf("The conditional statements (%s) are not in terms of the RxODE states: %s", paste(.predDf[.w, "cond"], collapse=", "),
-                             paste(RxODE::rxState(rxode), collapse=", ")))
+                if (any(is.na(.predDf[.w,"cmt"]))){
+                    stop(sprintf("In this multiple-endpoint model, You cannot mix unconditional errors (%s), with conditional errors (%s)",
+                                 paste(.predDf[is.na(.predDf$cmt),"var"], collapse=", "),
+                                 paste(.predDf[!is.na(.predDf$cmt),"cond"], collapse=", ")))
+                } else {
+                    stop(sprintf("The conditional statements (%s) are not in terms of the RxODE states: %s", paste(.predDf[.w, "cond"], collapse=", "),
+                                 paste(RxODE::rxState(rxode), collapse=", ")))
+                }
             }
         }
     } else {

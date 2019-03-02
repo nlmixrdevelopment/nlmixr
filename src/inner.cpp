@@ -1311,60 +1311,60 @@ void innerOpt(){
 // #endif    
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
-      // try {
+      try {
         innerOpt1(id, 0);
-      // } catch (...){
-      // 	// First try resetting ETA
-      // 	std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      // 	try {
-      // 	  innerOpt1(id, 0);
-      //   } catch (...) {
-      // 	  // Now try resetting Hessian, and ETA
-      // 	  // Rprintf("Hessian Reset for ID: %d\n", id+1);
-      //     indF->mode = 1;
-      //     indF->uzm = 1;
-      //     std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      // 	  try {
-      //       // Rprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
-      //       innerOpt1(id, 0);
-      //     } catch (...){
-      //       indF->mode = 1;
-      //       indF->uzm = 1;
-      //       std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      //       if(!op_focei.noabort){
-      //         stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
-      // 	    } else if (indF->doChol == 1){
-      // 	      indF->doChol = 0; // Use generalized cholesky decomposition
-      //         indF->mode = 1;
-      //         indF->uzm = 1;
-      //         std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      // 	      try {
-      // 		innerOpt1(id, 0);
-      // 		indF->doChol = 1; // Use cholesky again.
-      // 	      } catch (...){
-      // 		// Just use ETA=0
-      //           std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      //           try{
-      //             innerEval(id);
-      //           } catch(...){
-      // 		  warning("Bad solve during optimization.");
-      // 		  // ("Cannot correct.");
-      //           }
-      //         }
-      // 	    } else {
-      //         // Just use ETA=0
-      //         std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      //         try{
-      //           innerEval(id);
-      //         } catch(...){
-      //           warning("Bad solve during optimization.");
-      //           // ("Cannot correct.");
-      //         }
-      //       }
-      //       // 
-      //     }
-      //   }
-      // }
+      } catch (...){
+      	// First try resetting ETA
+      	std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      	try {
+      	  innerOpt1(id, 0);
+        } catch (...) {
+      	  // Now try resetting Hessian, and ETA
+      	  // Rprintf("Hessian Reset for ID: %d\n", id+1);
+          indF->mode = 1;
+          indF->uzm = 1;
+          std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      	  try {
+            // Rprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
+            innerOpt1(id, 0);
+          } catch (...){
+            indF->mode = 1;
+            indF->uzm = 1;
+            std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+            if(!op_focei.noabort){
+              stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
+      	    } else if (indF->doChol == 1){
+      	      indF->doChol = 0; // Use generalized cholesky decomposition
+              indF->mode = 1;
+              indF->uzm = 1;
+              std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      	      try {
+      		innerOpt1(id, 0);
+      		indF->doChol = 1; // Use cholesky again.
+      	      } catch (...){
+      		// Just use ETA=0
+                std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+                try{
+                  innerEval(id);
+                } catch(...){
+      		  warning("Bad solve during optimization.");
+      		  // ("Cannot correct.");
+                }
+              }
+      	    } else {
+              // Just use ETA=0
+              std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+              try{
+                innerEval(id);
+              } catch(...){
+                warning("Bad solve during optimization.");
+                // ("Cannot correct.");
+              }
+            }
+            // 
+          }
+        }
+      }
     }
     // Reset ETA variances for next step
     op_focei.eta1SD = 1/sqrt(op_focei.etaS);
@@ -2154,52 +2154,13 @@ NumericVector foceiSetup_(const RObject &obj,
   params.attr("row.names") = IntegerVector::create(NA_INTEGER,-nsub);
   // Now pre-fill parameters.
   if (!RxODE::rxIs(obj, "NULL")){
-    RxODE::rxSolveC(obj,
-	     R_NilValue,//const Nullable<CharacterVector> &specParams = 
-	     R_NilValue,//const Nullable<List> &extraArgs = 
-	     as<RObject>(params),//const RObject &params = 
-	     data,//const RObject &events = 
-	     R_NilValue,//const RObject &inits = 
-	     R_NilValue,//const RObject &scale = 
-	     R_NilValue,//const RObject &covs  = 
-	     as<int>(odeO["method"]), // const int method = 
-	     odeO["transitAbs"], //1
-	     as<double>(odeO["atol"]),//const double atol = 1.0e-6
-	     as<double>(odeO["rtol"]),// const double rtol = 1.0e-4
-	     as<double>(odeO["maxstepsOde"]),//const int  = 5000, //4
-	     as<double>(odeO["hmin"]),
-	     odeO["hmax"], //6
-	     as<double>(odeO["hini"]), //7
-	     as<int>(odeO["maxordn"]), //8
-	     as<int>(odeO["maxords"]), //9
-	     as<int>(odeO["cores"]), //10
-	     as<int>(odeO["covsInterpolation"]), //11
-	     false, // bool addCov = false
-	     0,//int matrix = 0, //13
-	     R_NilValue,//const Nullable<NumericMatrix> &sigma= R_NilValue, //14
-	     R_NilValue,//const Nullable<NumericVector> &sigmaDf= R_NilValue, //15
-	     1, //const int &nCoresRV= 1, //16
-	     false,//const bool &sigmaIsChol= false,
-	     10000,//const int &nDisplayProgress = 10000,
-	     NA_STRING,//const CharacterVector &amountUnits = NA_STRING,
-	     "hours",//const character_vector &timeUnits = "hours",
-	     false,//const bool addDosing = false,
-	     as<double>(odeO["stateTrim"]),//const double stateTrim = R_PosInf,
-	     R_NilValue,//const RObject &theta = R_NilValue,
-	     R_NilValue,//const RObject &eta = R_NilValue,
-	     false,//const bool updateObject = false,
-	     true,//const bool doSolve = true,
-	     R_NilValue,//const Nullable<NumericMatrix> &omega = R_NilValue, 
-	     R_NilValue,//const Nullable<NumericVector> &omegaDf = R_NilValue, 
-	     false,//const bool &omegaIsChol = false,
-	     1,//const unsigned int nSub = 1, 
-	     R_NilValue,//const Nullable<NumericMatrix> &thetaMat = R_NilValue, 
-	     R_NilValue,//const Nullable<NumericVector> &thetaDf = R_NilValue, 
-	     false,//const bool &thetaIsChol = false,
-	     1,//const unsigned int nStud = 1, 
-	     0.0,//const double dfSub=0.0,
-	     0.0,//const double dfObs=0.0,
-	     1);//const int setupOnly = 0
+    RxODE::rxSolve_(obj, odeO["rxControl"],
+		    R_NilValue,//const Nullable<CharacterVector> &specParams = 
+		    R_NilValue,//const Nullable<List> &extraArgs = 
+		    as<RObject>(params),//const RObject &params = 
+		    data,//const RObject &events = 
+		    R_NilValue, // inits
+		    1);//const int setupOnly = 0
     rx = getRx();
     foceiSetupEta_(etaMat0);
   }
