@@ -1210,7 +1210,25 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
         ## Separate ode and pred
         w <- max(w);
-        if (any(regexpr(rex::rex(or("d/dt(", group("(0)", any_spaces, or("=", "~")))), rx.txt[1:w]) != -1)){
+        .re <- rex::rex("(0)", any_spaces, or("=", "~", "<-"));
+        if (any(regexpr(.re, rx.txt[1:w]))){
+            ## ini(0) = ini0 + eta
+            ## This is RxODE with mixed parameters.
+            ## This tries to separate out these parameters.
+            .rxBegin <- rx.txt[1:w];
+            .lines <- rx.txt[regexpr(.re,rx.txt) != -1];
+            .rxBegin <- gsub(rex::rex(capture(any_spaces),capture(anything),"(0)", capture(any_spaces, or("=", "~", "<-"))),
+                             "\\1nlmixr_\\2_0\\3", .rxBegin,perl=TRUE);
+            .lines <- gsub(rex::rex(capture(any_spaces),
+                                    capture(anything),"(0)",
+                                    capture(any_spaces, or("=", "~", "<-")),anything),
+                           "\\1\\2(0)\\3 nlmixr_\\2_0;", .lines);
+            .rxEnd <- rx.txt[-(1:w)];
+            rx.txt <- c(.rxBegin, .lines, .rxEnd);
+            w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+            w <- max(w);
+        }
+        if (any(regexpr(rex::rex(or("d/dt(", group("(0)", any_spaces, or("=", "~", "<-")))), rx.txt[1:w]) != -1)){
             ## mixed PK parameters and ODEs
             stop("Mixed PK/ODEs")
         } else {
