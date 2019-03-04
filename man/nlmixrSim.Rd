@@ -51,12 +51,8 @@ compartments);}
 parameters of the system.  The names must correstond to the
 parameter identifiers in the ODE specification. Each of the
 ODE variables will be divided by the scaling factor.  For
-example \code{scale=(center=2)} will divide the center ODE
+example \code{scale=c(center=2)} will divide the center ODE
 variable by 2.}
-
-\item{covs}{a matrix or dataframe the same number of rows as the
-sampling points defined in the events \code{eventTable}.  This
-is for time-varying covariates.}
 
 \item{method}{The method for solving ODEs.  Currently this supports:
 
@@ -195,9 +191,6 @@ RxODE solved object (when supplying an RxODE solved object) as
 well as returning a new object.  You probably should not
 modify it's \code{FALSE} default unless you are willing to
 have unexpected results.}
-
-\item{doSolve}{Internal flag.  By default this is \code{TRUE},
-when \code{FALSE} a list of solving options is returned.}
 
 \item{omega}{Named omega matrix.}
 

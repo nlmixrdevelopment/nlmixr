@@ -1321,6 +1321,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 misplaced.dists <- character();
             }
         }
+    } else if (length(misplaced.dists)==2){
+        .tmp <- order(misplaced.dists)
+        .tmp <- misplaced.dists[.tmp];
+        if (all(misplaced.dists==c("dt","f"))){
+            if (!any(regexpr("[^/]\\bdt[(]", deparse(rest), perl=TRUE) != -1)){
+                misplaced.dists <- character();
+            }
+        }
     }
     if (length(misplaced.dists) > 0){
         stop(sprintf("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): %s", paste(misplaced.dists, collapse=", ")))

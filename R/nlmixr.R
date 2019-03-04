@@ -308,7 +308,9 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
     ## backSort2 <- attr(dat, "backSort2");
     ## attr(dat, "backSort") <- NULL;
     ## attr(dat, "backSort2") <- NULL;
-    uif$env$infusion <- .Call(`_nlmixr_chkSolvedInf`, as.double(dat$EVID), as.integer(!is.null(uif$nmodel$lin.solved)));
+    if (!is.null(uif$nmodel$lin.solved)==1L){
+        uif$env$infusion <- max(dat$EVID)>10000
+    }
     bad.focei <- "Problem calculating residuals, returning fit without residuals.";
     fix.dat <- function(x){
         ## if (length(backSort) > 0){

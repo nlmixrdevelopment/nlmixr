@@ -5,7 +5,7 @@
 \title{Control Options for SAEM}
 \usage{
 saemControl(seed = 99, nBurn = 200, nEm = 300, nmc = 3, nu = c(2,
-  2, 2), atol = 1e-06, rtol = 1e-04, stiff = TRUE,
+  2, 2), atol = 1e-06, rtol = 1e-04, method = "lsoda",
   transitAbs = FALSE, print = 1, trace = 0, covMethod = c("fim",
   "r,s", "r", "s"), logLik = FALSE, optExpression = TRUE, ...)
 }
@@ -49,19 +49,16 @@ by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
  if prior doses do not add anything to the solution.}
 
-\item{stiff}{a logical (\code{TRUE} by default) indicating whether
-    the ODE system is stiff or not.
+\item{method}{The method for solving ODEs.  Currently this supports:
 
-    For stiff ODE sytems (\code{stiff = TRUE}), \code{RxODE} uses the
-    LSODA (Livermore Solver for Ordinary Differential Equations)
-    Fortran package, which implements an automatic method switching
-    for stiff and non-stiff problems along the integration
-    interval, authored by Hindmarsh and Petzold (2003).
-
-    For non-stiff systems (\code{stiff = FALSE}), \code{RxODE} uses
-    DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
-    Dormand and Prince as implemented in C by Hairer and Wanner
-    (1993).}
+\itemize{
+\item \code{"liblsoda"} thread safe lsoda.  This supports parallel
+           thread-based solving, and ignores user Jacobian specification.
+\item \code{"lsoda"} -- LSODA solver.  Does not support parallel thread-based
+      solving, but allows user Jacobian specification.
+\item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
+        solving nor user Jacobain specification
+}}
 
 \item{transitAbs}{boolean indicating if this is a transit
 compartment absorption}
