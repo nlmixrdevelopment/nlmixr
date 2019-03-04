@@ -1208,6 +1208,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         if (length(w) == 0){
             stop("Error parsing model -- no parameters found.")
         }
+        .lhs <- nlmixrfindLhs(body(eval(parse(text=paste("function(){",
+                                                    paste(rx.txt,collapse="\n"),
+                                                    "}")))));
+        .lhsReg <- rex::rex(boundary, or(.lhs), boundary);
         ## Separate ode and pred
         w <- max(w);
         .re <- rex::rex("(0)", any_spaces, or("=", "~", "<-"));
@@ -1216,17 +1220,25 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             ## This is RxODE with mixed parameters.
             ## This tries to separate out these parameters.
             .rxBegin <- rx.txt[1:w];
-            .lines <- rx.txt[regexpr(.re,rx.txt) != -1];
-            .rxBegin <- gsub(rex::rex(capture(any_spaces),capture(anything),"(0)", capture(any_spaces, or("=", "~", "<-"))),
+            .rxEnd <- rx.txt[-(1:w)];
+            .lines <- .rxBegin[regexpr(.re,.rxBegin) != -1];
+            .rxBegin <- gsub(rex::rex(capture(any_spaces),capture(anything),"(0)",
+                                      capture(any_spaces, or("=", "~", "<-"))),
                              "\\1nlmixr_\\2_0\\3", .rxBegin,perl=TRUE);
             .lines <- gsub(rex::rex(capture(any_spaces),
                                     capture(anything),"(0)",
                                     capture(any_spaces, or("=", "~", "<-")),anything),
                            "\\1\\2(0)\\3 nlmixr_\\2_0;", .lines);
-            .rxEnd <- rx.txt[-(1:w)];
-            rx.txt <- c(.rxBegin, .lines, .rxEnd);
-            w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
-            w <- max(w);
+            .rxEnd <- c(rx.txt[-(1:w)], .lines);
+            .cnd <- gsub(rex::rex(any_spaces,capture(anything),"(0)",any_spaces,
+                                  or("=", "~", "<-")),"\\1",.rxEnd);
+            if (any(duplicated(.cnd))){
+                ## stop("Conditional initializations depend on parameter values.");
+            } else {
+                rx.txt <- c(.rxBegin, .rxEnd);
+                w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+                w <- max(w);
+            }
         }
         if (any(regexpr(rex::rex(or("d/dt(", group("(0)", any_spaces, or("=", "~", "<-")))), rx.txt[1:w]) != -1)){
             ## mixed PK parameters and ODEs
