@@ -1285,10 +1285,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     fun2 <- as.character(attr(fun, "srcref"), useSource=TRUE)
     fun2[1] <- "function(){"
     fun2[length(fun2)] <- "}";
-    fun2 <- parse(text=paste0(fun2, collapse = "\n"), keep.source=TRUE)
-    ## if (inherits(fun2, "try-error")){
-    ##     stop("Error parsing model")
-    ## }
+    fun2 <- eval(parse(text=paste0(fun2, collapse = "\n"), keep.source=TRUE))
     fun2 <- as.character(attr(fun2, "srcref"), useSource=TRUE);
     fun3 <- fun2
     fun3 <- fun3[-1];
