@@ -1290,7 +1290,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             w <- which(regexpr(reg, funTxt, perl=TRUE) != -1);
             w <- max(w);
             funTxt <- .fun0(reg0=rex::rex(capture(or("r(","rate(")),capture(except_any_of("()\n; ")),capture(")")),
-                            reg00=rex::rex(or("r(","rate(")),reg01=")",repE="lag");
+                            reg00=rex::rex(or("r(","rate(")),reg01=")",repE="rate");
             w <- which(regexpr(reg, funTxt, perl=TRUE) != -1);
             w <- max(w);
 
