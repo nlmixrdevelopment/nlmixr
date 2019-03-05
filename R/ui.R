@@ -1208,51 +1208,146 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         if (length(w) == 0){
             stop("Error parsing model -- no parameters found.")
         }
-        .lhs <- nlmixrfindLhs(body(eval(parse(text=paste("function(){",
-                                                    paste(rx.txt,collapse="\n"),
-                                                    "}")))));
+        .lhs <- nlmixrfindLhs(body(
+            eval(parse(text=paste("function(){",
+                                  paste(rx.txt,collapse="\n"),
+                                  "}")))));
         .lhsReg <- rex::rex(boundary, or(.lhs), boundary);
         ## Separate ode and pred
         w <- max(w);
-        .re <- rex::rex("(0)", any_spaces, or("=", "~", "<-"));
-        if (any(regexpr(.re, rx.txt[1:w]))){
-            ## ini(0) = ini0 + eta
-            ## This is RxODE with mixed parameters.
-            ## This tries to separate out these parameters.
-            .rxBegin <- rx.txt[1:w];
-            .rxEnd <- rx.txt[-(1:w)];
-            .lines <- .rxBegin[regexpr(.re,.rxBegin) != -1];
-            .rxBegin <- gsub(rex::rex(capture(any_spaces),capture(anything),"(0)",
-                                      capture(any_spaces, or("=", "~", "<-"))),
-                             "\\1nlmixr_\\2_0\\3", .rxBegin,perl=TRUE);
-            .lines <- gsub(rex::rex(capture(any_spaces),
-                                    capture(anything),"(0)",
-                                    capture(any_spaces, or("=", "~", "<-")),anything),
-                           "\\1\\2(0)\\3 nlmixr_\\2_0;", .lines);
-            .rxEnd <- c(rx.txt[-(1:w)], .lines);
-            .cnd <- gsub(rex::rex(any_spaces,capture(anything),"(0)",any_spaces,
-                                  or("=", "~", "<-")),"\\1",.rxEnd);
-            if (any(duplicated(.cnd))){
-                ## stop("Conditional initializations depend on parameter values.");
-            } else {
-                rx.txt <- c(.rxBegin, .rxEnd);
+        .regRx <- rex::rex(or("d/dt(", "f(", "F(", "dur(", "d(",
+                                        "lag(", "alag(", "r(", "rate(",
+                              group("(0)", any_spaces, or("=", "~", "<-"))));
+        .fun0 <- function(reg0=rex::rex(capture(any_spaces),
+                                        capture(except_any_of("()\n; ")),
+                                        capture(any_spaces)),
+                          reg00="",reg01="",repE="expr"){
+            if (any(regexpr(.regRx, rx.txt[1:w]) != -1)){
+
+                .rxBegin <- rx.txt[1:w];
+                .re <- rex::rex(start, capture(any_spaces),reg0,
+                                capture(any_spaces, or("=", "~", "<-")),
+                                capture(anything));
+                .w <- which(regexpr(.re,.rxBegin) != -1);
+                .lines <- rx.txt[.w];
+                ## Extract any estimated parameter only expressions and promote them.
+                .w2 <- which(regexpr(rex::rex(anything, or("=", "~", "<-"), .lhsReg),.lines) != -1)
+                .doIt <- TRUE;
+                if (length(.w2)>0) {
+                    ## Remove any parameters that depend on prior values and not covariates/expressions.
+                    .w <- .w[-.w2];
+                    if (length(.w)==0){
+                        .doIt <- FALSE;
+                    } else {
+                        .lines <- rx.txt[.w];
+                    }
+                }
+                if (.doIt){
+                    ## Now remove any variables that are duplicated.  This often happens when
+                    ## if (x){y=a;}else{y=b;} blocks.
+                    .rxBegin <- rx.txt[.w];
+                    .dups <- rx.txt[regexpr(rex::rex(or("=", "~", "<-")), rx.txt) != -1];
+                    .dups <- gsub(rex::rex(start,any_spaces,reg0,any_spaces,
+                                           or("=", "~", "<-"),anything),"\\2", .dups);
+                    .dups <- unique(.dups[duplicated(.dups)]);
+                    .w2 <- which(regexpr(rex::rex(start, any_spaces,
+                                                  reg00, or(.dups), reg01, any_spaces,
+                                                  or("=", "~", "<-"), anything), .lines) != -1)
+                    if (length(.w2) > 0){
+                        .w <- .w[-.w2];
+                        if (length(.w)==0){
+                            .doIt <- FALSE;
+                        } else {
+                            .lines <- rx.txt[.w];
+                        }
+                    }
+                    if (.doIt){
+                        .rxBegin <- rx.txt;
+                        .rxBegin[.w] <- gsub(.re,paste0("\\1\\2\\3\\4\\5nlmixr_\\3_",repE),
+                                             .rxBegin[.w], perl=TRUE);
+                        .lines <- gsub(rex::rex(.re, anything),
+                                       paste0("\\1nlmixr_\\3_",repE,"\\5\\6"), .lines);
+                        return(c(.lines, .rxBegin));
+                    }
+                }
+            }
+            return(rx.txt);
+        }
+        rx.txt <- .fun0(reg0=rex::rex(capture(or("f(","F(")),capture(except_any_of("()\n; ")),capture(")")),
+                        reg00=rex::rex(or("f(","F(")),reg01=")",repE="F");
+        w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+        w <- max(w);
+        rx.txt <- .fun0(reg0=rex::rex(capture(or("dur(","d(")),capture(except_any_of("()\n; ")),capture(")")),
+                        reg00=rex::rex(or("dur(","d(")),reg01=")",repE="dur");
+        w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+        w <- max(w);
+        rx.txt <- .fun0(reg0=rex::rex(capture(or("lag(","alag(")),capture(except_any_of("()\n; ")),capture(")")),
+                        reg00=rex::rex(or("lag(","alag(")),reg01=")",repE="lag");
+        w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+        w <- max(w);
+        rx.txt <- .fun0(reg0=rex::rex(capture(or("r(","rate(")),capture(except_any_of("()\n; ")),capture(")")),
+                        reg00=rex::rex(or("r(","rate(")),reg01=")",repE="lag");
+        w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+        w <- max(w);
+
+        rx.txt <- .fun0(reg0=rex::rex(capture(any_spaces),capture(except_any_of("()\n; ")),capture("(0)")),
+                        reg00="",reg01="(0)",repE="ini");
+        w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+        w <- max(w);
+
+        rx.txt <- .fun0();
+        w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
+        w <- max(w);
+
+
+        if (any(regexpr(rex::rex(or("d/dt(", "f(", "F(", "dur(", "d(",
+                                    "lag(", "alag(", "r(", "rate(",
+                                    group("(0)", any_spaces, or("=", "~", "<-")))), rx.txt[1:w]) != -1)){
+            ## There are still mixed PK parameters and ODEs
+            w <- which(regexpr(.regRx, rx.txt, perl=TRUE) != -1);
+            w <- min(w)-1;
+            if (w > 0){
+                .env <- new.env(parent=emptyenv());
+                assign("extra",NULL,.env);
+                .subs <- function(x){
+                    if (is.atomic(x)) {
+                        x
+                    } else if (is.name(x)) {
+                        if (any(as.character(x) == ini$name)){
+                            assign("extra",unique(c(.env$extra, as.character(x))), .env);
+                            return(eval(parse(text=sprintf("quote(nlmixr_%s_par)", as.character(x)))));
+                        } else {
+                            return(x);
+                        }
+                    } else if (is.call(x)) {
+                        as.call(lapply(x, .subs))
+                    } else if (is.pairlist(x)) {
+                        as.pairlist(lapply(x, .subs))
+                    } else {
+                        return(x);
+                    }
+                }
+                .x <- deparse(.subs(body(eval(parse(text=paste("function(){\n",paste(rx.txt[-(1:w)],collapse="\n"),"\n}"))))));
+                .x <- .x[-1];
+                .x <- .x[-length(.x)];
+                rx.txt <- c(rx.txt[1:w],paste0("nlmixr_",.env$extra,"_par <- ",.env$extra),.x);
                 w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
                 w <- max(w);
+                if (any(regexpr(rex::rex(or("d/dt(", "f(", "F(", "dur(", "d(",
+                                    "lag(", "alag(", "r(", "rate(",
+                                    group("(0)", any_spaces, or("=", "~", "<-")))), rx.txt[1:w]) != -1)){
+                    stop("Mixed estimation types and ODEs.")
+                }
             }
         }
-        if (any(regexpr(rex::rex(or("d/dt(", group("(0)", any_spaces, or("=", "~", "<-")))), rx.txt[1:w]) != -1)){
-            ## mixed PK parameters and ODEs
-            stop("Mixed PK/ODEs")
-        } else {
-            rx.ode <- rx.txt[-(1:w)];
-            rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n")))
-            ## Now separate out parameters for SAEM.
-            w <- max(which(regexpr(reg, saem.pars, perl=TRUE) != -1));
-            saem.pars <- c(saem.pars[1:w], "");
-            nlme.mu.fun2 <- saem.pars;
-            w <- max(which(regexpr(reg, nlme.mu.fun, perl=TRUE) != -1));
-            nlme.mu.fun <- c(nlme.mu.fun[1:w], "");
-        }
+        rx.ode <- rx.txt[-(1:w)];
+        rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n")))
+        ## Now separate out parameters for SAEM.
+        w <- max(which(regexpr(reg, saem.pars, perl=TRUE) != -1));
+        saem.pars <- c(saem.pars[1:w], "");
+        nlme.mu.fun2 <- saem.pars;
+        w <- max(which(regexpr(reg, nlme.mu.fun, perl=TRUE) != -1));
+        nlme.mu.fun <- c(nlme.mu.fun[1:w], "");
         rxode <- paste(rx.ode, collapse="\n")
         rest <- rx.pred;
         all.vars <- all.vars[!(all.vars %in% RxODE::rxState(rxode))]
