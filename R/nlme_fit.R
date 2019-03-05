@@ -445,11 +445,8 @@ nlme_ode <- function(dat.o, model, parModel, parTrans,
         mcCores <- .xtra$mc.cores;
         .rm <- c(.rm, "mc.cores")
     }
-    if (any(dat.o$EVID[dat.o$EVID>0]<101))
-        stop("incompatible EVID values")
-
-                                        #a new env with a ref in .GlobalEnv, holding model components
-                                        #a hack due to non-std call by nlme
+    ##a new env with a ref in .GlobalEnv, holding model components
+    ##a hack due to non-std call by nlme
     ## assign("..ModList", new.env(), envir=.GlobalEnv)
 
                                         #prep ode
