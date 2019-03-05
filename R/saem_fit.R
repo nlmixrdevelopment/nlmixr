@@ -17,7 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
-saem_ode_str = '#include <RcppArmadillo.h>
+saem_ode_str = '#define ARMA_DONT_PRINT_ERRORS
+#define ARMA_DONT_USE_OPENMP // Known to cause speed problems
+#include <RcppArmadillo.h>
 #include <RxODE.h>
 #include "saem_class_rcpp.hpp"
 
@@ -31,15 +33,17 @@ typedef void (*rxSingleSolve_t)(double *_theta, double *timep,
                                 int *evidp, int *ntime,
                                 double *initsp, double *dosep,
                                 double *ii, double *retp,
-                                double *lhsp, int *rc);
+                                double *lhsp, int *rc,
+                                double *newTime, int *newEvid);
 
 void rxSingleSolve(double *_theta, double *timep,
                    int *evidp, int *ntime, double *initsp,
                    double *dosep, double *ii, double *retp,
-                   double *lhsp, int *rc){
+                   double *lhsp, int *rc,
+                   double *newTime, int *newEvid){
     static rxSingleSolve_t fun=NULL;
     if (fun == NULL) fun = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
-    fun(_theta, timep, evidp, ntime, initsp, dosep, ii, retp, lhsp, rc);
+    fun(_theta, timep, evidp, ntime, initsp, dosep, ii, retp, lhsp, rc, newTime, newEvid);
 }
 
 typedef rx_solve *(*getRxSolve_t)();
@@ -91,7 +95,6 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 
   for (int _i=0; _i<_N; _i++) {
 <%=assgnPars%>
-
     _wm = _evt.rows( find(_id == _i) );
     if(_wm.n_rows==0) {
       Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
@@ -101,22 +104,24 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     vec _time__;
     _time__ = _wm.col(1);
     int _ntime = _time__.n_elem;
+    vec _newTime(_ntime);
     _wv = _wm.col(2);
     ivec _evid(_ntime);
+    ivec _evid2(_ntime);
     for (int _k=0; _k<_ntime; ++_k) _evid(_k) = _wv(_k);
     _wv = _wm.col(5);
     ivec _cmt(_ntime);
     for (int _k=0; _k<_ntime; ++_k) _cmt(_k) = _wv(_k);
     _wv = _wm.col(3);
+    uvec _ds  = find(_evid > 99 || _evid == 3);
     vec _amt;
-    _amt = _wv( find(_evid > 0) );
+    _amt = _wv(_ds);
     _wv = _wm.col(4);
     vec _ii;
-    _ii = _wv( find(_evid > 0) );
+    _ii = _wv(_ds);
 
-    int _neq=as<int>(_opt["neq"]);
-    vec _inits(_neq);
-    std::copy(&_op->inits[0], &_op->inits[0]+_neq, &_inits[0]);
+    vec _inits(_op->neq);
+    std::copy(&_op->inits[0], &_op->inits[0]+_op->neq, &_inits[0]);
     //_inits.zeros(); //as<vec>(_opt["inits"]);	//FIXME
 
 <%=foo%>
@@ -126,12 +131,12 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 
     int _rc=0;
 
-    mat _ret(_neq, _ntime);
+    mat _ret(_op->neq, _ntime);
     mat _lhs(_nlhs, _ntime);
 
     rxSingleSolve(_params.memptr(), _time__.memptr(),
 	    _evid.memptr(), &_ntime, _inits.memptr(), _amt.memptr(), _ii.memptr(),
-            _ret.memptr(), _lhs.memptr(), &_rc);
+            _ret.memptr(), _lhs.memptr(), &_rc, _newTime.memptr(), _evid2.memptr());
 
     if ( _DEBUG > 4 && _rc != 0 ) {
         Rcout << "pars: " << _params.t();
@@ -139,10 +144,10 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
         Rcout << "LSODA return code: " << _rc << endl;
         Rcout << _wm << endl;
     }
-	_ret = join_cols(join_cols(_time__.t(), _ret), _lhs).t();
-	uvec _r  = find(_evid == 0);
+	_ret = join_cols(join_cols(_newTime.t(), _ret), _lhs).t();
+	uvec _r  = find(_evid2 == 0);
 	_ret = _ret.rows(_r);
-	ivec _cmtObs = _cmt(_r);
+	ivec _cmtObs = _cmt(find(_evid==0));
 
 <%=model_vars_decl%>
 
@@ -476,7 +481,6 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   } else {
 	inits = ""
   }
-##print(inits);print(x)
 
 
   len = length(x)
@@ -1320,9 +1324,6 @@ focei.theta.saemFit <- function(object, uif, ...){
     for (n in names(sf)){
         thetas[n] <- sf[n];
     }
-    ##(object$resMat)
-    ## print(object$resMat)
-    ## print(object$sig2)
     .predDf <- uif$predDf;
     .ini <- as.data.frame(uif$ini);
     .resMat <- object$resMat;
