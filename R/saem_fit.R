@@ -100,7 +100,6 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
       Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
       arma_stop_runtime_error("");
     }
-
     vec _time__;
     _time__ = _wm.col(1);
     int _ntime = _time__.n_elem;
@@ -108,10 +107,10 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     _wv = _wm.col(2);
     ivec _evid(_ntime);
     ivec _evid2(_ntime);
-    for (int _k=0; _k<_ntime; ++_k) _evid(_k) = _wv(_k);
+    for (int _k=_ntime; _k--;) _evid(_k) = _wv(_k);
     _wv = _wm.col(5);
     ivec _cmt(_ntime);
-    for (int _k=0; _k<_ntime; ++_k) _cmt(_k) = _wv(_k);
+    for (int _k=_ntime; _k--;) _cmt(_k) = _wv(_k);
     _wv = _wm.col(3);
     uvec _ds  = find(_evid > 99 || _evid == 3);
     vec _amt;
@@ -119,9 +118,9 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     _wv = _wm.col(4);
     vec _ii;
     _ii = _wv(_ds);
-
     vec _inits(_op->neq);
-    std::copy(&_op->inits[0], &_op->inits[0]+_op->neq, &_inits[0]);
+    _inits.zeros();
+    //std::copy(&_op->inits[0], &_op->inits[0]+_op->neq, &_inits[0]);
     //_inits.zeros(); //as<vec>(_opt["inits"]);	//FIXME
 
 <%=foo%>
