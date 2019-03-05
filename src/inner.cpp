@@ -2919,10 +2919,10 @@ void foceiCalcR(Environment e){
       }
     }
   }
-  // // R matrix = Hessian/2
+  // R matrix = Hessian/2
   H = H*0.5;
-  // // https://github.com/cran/nmw/blob/59478fcc91f368bb3bbc23e55d8d1d5d53726a4b/R/CovStep.R
-  // // H = 0.25*H + 0.25*H.t();
+  // https://github.com/cran/nmw/blob/59478fcc91f368bb3bbc23e55d8d1d5d53726a4b/R/CovStep.R
+  // H = 0.25*H + 0.25*H.t();
   if (e.exists("R.1")){
     // This is the 2nd attempt
     arma::mat H2 = 0.5*H + 0.5*as<arma::mat>(e["R.1"]);

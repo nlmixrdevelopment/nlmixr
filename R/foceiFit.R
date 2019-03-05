@@ -1795,8 +1795,6 @@ foceiFit.data.frame0 <- function(data,
             .pt <- proc.time();
             .etas <- .ret$ranef
             .thetas <- .ret$fixef
-            print(.etas)
-            print(.thetas)
             .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
             .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)]);
             .updateParFixed(.ret);

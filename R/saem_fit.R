@@ -830,7 +830,6 @@ configsaem <- function(model, data, inits,
   ntotal = length(id)
   N = length(unique(id))
   covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
-  print(covariables);
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
   ncov = data$N.covar + 1
