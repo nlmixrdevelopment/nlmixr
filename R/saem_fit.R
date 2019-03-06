@@ -22,6 +22,9 @@ saem_ode_str = '#define ARMA_DONT_PRINT_ERRORS
 #include <RcppArmadillo.h>
 #include <RxODE.h>
 #include "saem_class_rcpp.hpp"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 
 using namespace std;
@@ -38,7 +41,7 @@ typedef void (*rxSingleSolve_t)(int subid, double *_theta, double *timep,
 			  int *on, int *ix,
 			  int *slvr_counter, int *dadt_counter, int *jac_counter,
 			  double *InfusionRate, int *BadDose, int *idose,
-			  double *scale, int *stateIgnore);
+			  double *scale, int *stateIgnore, double *mtime, double *solveSave);
 
 void rxSingleSolve(int subid, double *_theta, double *timep,
 			  int *evidp, int *ntime,
@@ -49,12 +52,12 @@ void rxSingleSolve(int subid, double *_theta, double *timep,
 			  int *on, int *ix,
 			  int *slvr_counter, int *dadt_counter, int *jac_counter,
 			  double *InfusionRate, int *BadDose, int *idose,
-			  double *scale, int *stateIgnore){
+			  double *scale, int *stateIgnore, double *mtime, double *solveSave){
     static rxSingleSolve_t fun=NULL;
     if (fun == NULL) fun = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
     fun(subid, _theta, timep, evidp, ntime, initsp, dosep, ii, retp, lhsp, rc, newTime, newEvid,
         on, ix, slvr_counter, dadt_counter, jac_counter, InfusionRate, BadDose, idose,
-        scale, stateIgnore);
+        scale, stateIgnore, mtime, solveSave);
 }
 
 typedef void (*rxOptionsIniEnsure0_t)(int mx);
@@ -114,11 +117,16 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   vec _inits(_op->neq, fill::zeros);
   vec _scale(_op->neq, fill::ones);
   ivec _stateIgnore(_op->neq, fill::zeros);
-  rxOptionsIniEnsure0(_N+10);
+  rxOptionsIniEnsure0(_N);
+// int _cores = _op->cores;
+//#ifdef _OPENMP
+//#pragma omp parallel for num_threads(_cores)
+//#endif
   for (int _i=0; _i<_N; _i++) {
 <%=assgnPars%>
      vec _InfusionRate(_op->neq, fill::zeros);
      ivec _BadDose(_op->neq, fill::zeros);
+     vec _solveSave(_op->neq);
      ivec _on(_op->neq, fill::ones);
     _wm = _evt.rows( find(_id == _i) );
     if(_wm.n_rows==0) {
@@ -149,6 +157,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 
     ivec _ix(_ntime);
     std::iota(_ix.memptr(),_ix.memptr()+_ntime, 0); // 0, 1, 2, 3...
+    vec _mtime(<%=nmtime%>, fill::zeros);
 
     // _inits.zeros();
     //std::copy(&_op->inits[0], &_op->inits[0]+_op->neq, &_inits[0]);
@@ -169,7 +178,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
             _ret.memptr(), _lhs.memptr(), &_rc, _newTime.memptr(), _evid2.memptr(),
             _on.memptr(), _ix.memptr(), &_slvr_counter,&_dadt_counter, &_jac_counter,
             _InfusionRate.memptr(), _BadDose.memptr(), _idose.memptr(), _scale.memptr(),
-            _stateIgnore.memptr());
+            _stateIgnore.memptr(), _mtime.memptr(), _solveSave.memptr());
 
     if ( _DEBUG > 4 && _rc != 0 ) {
         Rcout << "pars: " << _params.t();
@@ -545,6 +554,11 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
     s = "mat _mPars=as<mat>(_opt[\"mPars\"]);"
     declPars = sprintf("\tdouble %s;\n\t%s", paste0(inPars, collapse=", "), s)
   }
+  nmtime = 0
+  if (is.ode){
+      nmtime = RxODE::rxModelVars(model)$nMtime;
+  }
+
   brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
   #unlink(c("eqn__.txt", "foo__.txt"))
   #if (inPars == "") inPars = NULL
