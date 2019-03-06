@@ -29,21 +29,39 @@ using namespace arma;
 
 extern "C" {
 
-typedef void (*rxSingleSolve_t)(double *_theta, double *timep,
-                                int *evidp, int *ntime,
-                                double *initsp, double *dosep,
-                                double *ii, double *retp,
-                                double *lhsp, int *rc,
-                                double *newTime, int *newEvid);
+typedef void (*rxSingleSolve_t)(int subid, double *_theta, double *timep,
+			  int *evidp, int *ntime,
+			  double *initsp, double *dosep,
+			  double *ii, double *retp,
+			  double *lhsp, int *rc,
+			  double *newTime, int *newEvid,
+			  int *on, int *ix,
+			  int *slvr_counter, int *dadt_counter, int *jac_counter,
+			  double *InfusionRate, int *BadDose, int *idose,
+			  double *scale, int *stateIgnore);
 
-void rxSingleSolve(double *_theta, double *timep,
-                   int *evidp, int *ntime, double *initsp,
-                   double *dosep, double *ii, double *retp,
-                   double *lhsp, int *rc,
-                   double *newTime, int *newEvid){
+void rxSingleSolve(int subid, double *_theta, double *timep,
+			  int *evidp, int *ntime,
+			  double *initsp, double *dosep,
+			  double *ii, double *retp,
+			  double *lhsp, int *rc,
+			  double *newTime, int *newEvid,
+			  int *on, int *ix,
+			  int *slvr_counter, int *dadt_counter, int *jac_counter,
+			  double *InfusionRate, int *BadDose, int *idose,
+			  double *scale, int *stateIgnore){
     static rxSingleSolve_t fun=NULL;
     if (fun == NULL) fun = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
-    fun(_theta, timep, evidp, ntime, initsp, dosep, ii, retp, lhsp, rc, newTime, newEvid);
+    fun(subid, _theta, timep, evidp, ntime, initsp, dosep, ii, retp, lhsp, rc, newTime, newEvid,
+        on, ix, slvr_counter, dadt_counter, jac_counter, InfusionRate, BadDose, idose,
+        scale, stateIgnore);
+}
+
+typedef void (*rxOptionsIniEnsure0_t)(int mx);
+void rxOptionsIniEnsure0(int mx){
+   static rxOptionsIniEnsure0_t fun = NULL;
+   if (fun == NULL) fun = (rxOptionsIniEnsure0_t) R_GetCCallable("RxODE","rxOptionsIniEnsure0");
+   fun(mx);
 }
 
 typedef rx_solve *(*getRxSolve_t)();
@@ -92,9 +110,16 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   int _N=_id.max()+1;
 
 <%=declPars%>
-
+  int _slvr_counter=0, _dadt_counter=0, _jac_counter=0;
+  vec _inits(_op->neq, fill::zeros);
+  vec _scale(_op->neq, fill::ones);
+  ivec _stateIgnore(_op->neq, fill::zeros);
+  rxOptionsIniEnsure0(_N+10);
   for (int _i=0; _i<_N; _i++) {
 <%=assgnPars%>
+     vec _InfusionRate(_op->neq, fill::zeros);
+     ivec _BadDose(_op->neq, fill::zeros);
+     ivec _on(_op->neq, fill::ones);
     _wm = _evt.rows( find(_id == _i) );
     if(_wm.n_rows==0) {
       Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
@@ -115,11 +140,15 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     uvec _ds  = find(_evid > 99 || _evid == 3);
     vec _amt;
     _amt = _wv(_ds);
+    ivec _idose(_amt.n_elem);
     _wv = _wm.col(4);
     vec _ii;
     _ii = _wv(_ds);
-    vec _inits(_op->neq);
-    _inits.zeros();
+
+    ivec _ix(_ntime);
+    std::iota(_ix.memptr(),_ix.memptr()+_ntime, 0); // 0, 1, 2, 3...
+
+    // _inits.zeros();
     //std::copy(&_op->inits[0], &_op->inits[0]+_op->neq, &_inits[0]);
     //_inits.zeros(); //as<vec>(_opt["inits"]);	//FIXME
 
@@ -133,9 +162,12 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     mat _ret(_op->neq, _ntime);
     mat _lhs(_nlhs, _ntime);
 
-    rxSingleSolve(_params.memptr(), _time__.memptr(),
+    rxSingleSolve(_i, _params.memptr(), _time__.memptr(),
 	    _evid.memptr(), &_ntime, _inits.memptr(), _amt.memptr(), _ii.memptr(),
-            _ret.memptr(), _lhs.memptr(), &_rc, _newTime.memptr(), _evid2.memptr());
+            _ret.memptr(), _lhs.memptr(), &_rc, _newTime.memptr(), _evid2.memptr(),
+            _on.memptr(), _ix.memptr(), &_slvr_counter,&_dadt_counter, &_jac_counter,
+            _InfusionRate.memptr(), _BadDose.memptr(), _idose.memptr(), _scale.memptr(),
+            _stateIgnore.memptr());
 
     if ( _DEBUG > 4 && _rc != 0 ) {
         Rcout << "pars: " << _params.t();
