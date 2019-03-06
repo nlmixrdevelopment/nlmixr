@@ -101,7 +101,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   uvec _ix;
   vec _id = _evt.col(0);
   mat _wm;
-  vec _wv;
+  vec _wv, _wv2;
   int _DEBUG = _opt["DEBUG"];
 
   _ix = find(_evt.col(2) == 0);
@@ -132,10 +132,12 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     _wv = _wm.col(2);
     ivec _evid(_ntime);
     ivec _evid2(_ntime);
-    for (int _k=_ntime; _k--;) _evid(_k) = _wv(_k);
-    _wv = _wm.col(5);
+    _wv2 = _wm.col(5);
     ivec _cmt(_ntime);
-    for (int _k=_ntime; _k--;) _cmt(_k) = _wv(_k);
+    for (int _k=_ntime; _k--;){
+      _evid(_k) = _wv(_k);
+      _cmt(_k) = _wv2(_k);
+    }
     _wv = _wm.col(3);
     uvec _ds  = find(_evid > 99 || _evid == 3);
     vec _amt;
@@ -553,7 +555,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
   ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
-  make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
+  make_str = 'PKG_CXXFLAGS=%s -fopenmp\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
   make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
 
   cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
@@ -897,7 +899,6 @@ configsaem <- function(model, data, inits,
     .rx <- attr(model$saem_mod,"rx");
     .pars <- .rx$params
     .pars <- setNames(rep(1.1,length(.pars)),.pars);
-    if (ODEopt$method=="liblsoda") stop("liblsoda isn't supported with saem yet");
     do.call(RxODE:::rxSolve.default,
             c(list(object=.rx, params=.pars,
                    events=dat,.setupOnly=2L),ODEopt));
