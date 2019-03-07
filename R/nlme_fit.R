@@ -277,7 +277,7 @@ nlmeLinCmt <- nlme_lin_cmpt
                            m <- nlmixr::nlmeModList("m1")$run(theta, ev, inits, transitAbs=.(transitAbs), atol=.(atol), rtol=.(rtol),
                                                               hmin=.(hmin), hmax=.(hmax), hini=.(hini), maxsteps = .(maxsteps),
                                                               maxordn=.(maxordn), maxords=.(maxords),
-                                                              addDosing=NA);
+                                                              addDosing=NULL);
                            if (is.null(dim(m)))
                                m <- t(as.matrix(m))
                            den <- ifelse(is.null(nlmixr::nlmeModList("responseScaler")), 1, theta[nlmixr::nlmeModList("responseScaler")])
