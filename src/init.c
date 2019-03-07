@@ -22,7 +22,7 @@ extern SEXP _nlmixr_llik_binomial_c(SEXP, SEXP, SEXP);
 extern SEXP slice_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 extern SEXP _nlmixr_npde(SEXP, SEXP, SEXP, SEXP, SEXP, 
-			 SEXP);
+			 SEXP, SEXP, SEXP);
 
 extern SEXP _nlmixr_llik_poisson(SEXP, SEXP);
 extern SEXP _nlmixr_llik_normal(SEXP, SEXP);
@@ -35,7 +35,7 @@ extern SEXP _nlmixr_llik_neg_binomial(SEXP, SEXP);
 // FOCEi
 extern SEXP _nlmixr_nlmixrParameters(SEXP, SEXP);
 extern SEXP _nlmixr_nlmixrResid(SEXP, SEXP, SEXP, SEXP, SEXP, 
-				SEXP, SEXP);
+				SEXP, SEXP, SEXP);
 extern SEXP _nlmixr_nlmixrShrink(SEXP, SEXP, SEXP);
 
 SEXP _nlmixr_foceiInnerLp(SEXP, SEXP);
@@ -82,9 +82,9 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_llik_neg_binomial", (DL_FUNC) &_nlmixr_llik_neg_binomial, 2},
   {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
   {"_nlmixr_nlmixrParameters", (DL_FUNC) &_nlmixr_nlmixrParameters, 2},
-  {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 7},
+  {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 8},
   {"_nlmixr_nlmixrShrink", (DL_FUNC) &_nlmixr_nlmixrShrink, 3},
-  {"_nlmixr_npde", (DL_FUNC) &_nlmixr_npde, 6},
+  {"_nlmixr_npde", (DL_FUNC) &_nlmixr_npde, 8},
   // FOCEi
   {"_nlmixr_foceiInnerLp", (DL_FUNC) &_nlmixr_foceiInnerLp, 2},
   {"_nlmixr_cholSE_", (DL_FUNC) &_nlmixr_cholSE_, 2},

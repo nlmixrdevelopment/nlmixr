@@ -728,9 +728,9 @@ double likInner0(double *eta){
       fInd->tbsLik=0.0;
       double f, err, r, fpm, rp,lnr;
       for (j = ind->n_all_times; j--;){
-	if (ind->evid[j]){
+	if (isDose(ind->evid[j])){
 	  ind->tlast = ind->all_times[j];
-	} else {
+	} else if (ind->evid[j] == 0) {
 	  ind->idx=j;
 	  inner_calc_lhs((int)id, ind->all_times[j], &ind->solve[j * op->neq], ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
@@ -2435,7 +2435,7 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
     NumericVector logLik(1);
     double adj= 0;
     if (doAdj){
-      adj=rx->nobs*log(2*M_PI)/2;
+      adj=rx->nobs2*log(2*M_PI)/2;
     }
     e["adj"]=adj;
     logLik[0]=-fmin/2-adj;
@@ -2444,9 +2444,9 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
       logLik.attr("nobs") = e["nobs"];
       e["BIC"] = fmin+2*adj + log(as<double>(e["nobs"]))*op_focei.npars;
     } else {
-      logLik.attr("nobs") = rx->nobs;
-      e["BIC"] = fmin + 2*adj + log((double)rx->nobs)*op_focei.npars;
-      e["nobs"] = rx->nobs;
+      logLik.attr("nobs") = rx->nobs2;
+      e["BIC"] = fmin + 2*adj + log((double)rx->nobs2)*op_focei.npars;
+      e["nobs"] = rx->nobs2;
     }
     logLik.attr("class") = "logLik";
     e["logLik"] = logLik;

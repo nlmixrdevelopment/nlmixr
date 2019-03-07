@@ -11,7 +11,7 @@
 ##' @return New nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, ...){
+addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, cholSEtol=(.Machine$double.eps)^(1/3),...){
     .objName <- substitute(object);
     if (any(names(object) == "NPDE")){
         warning("Already contains NPDE")
@@ -40,7 +40,12 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, .
     .dv <- object$DV;
     .dvl <- length(.dv)
     .cls <- class(object)
-    .new <- cbind(object, .Call(`_nlmixr_npde`, object$ID, .dv, .sim$sim, .sim$rxLambda, .sim$rxYj, ties=ties))
+    .evid <- rep(0L,.dvl);
+    .evid[is.na(object$RES) & !is.na(object$PRED)] <- 2L;
+    assign(".sim",.sim,globalenv());
+    assign(".dv",.dv,globalenv());
+    assign(".evid",.evid,globalenv());
+    .new <- cbind(object, .Call(`_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj, ties, cholSEtol))
     class(.new) <- .cls;
     if (updateObject){
         .parent <- parent.frame(2);

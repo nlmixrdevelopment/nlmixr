@@ -1,4 +1,6 @@
 #include <stdarg.h>
+#define ARMA_DONT_PRINT_ERRORS
+#define ARMA_DONT_USE_OPENMP // Known to cause speed problems
 #include <RcppArmadillo.h>
 #include <R.h>
 #include <Rmath.h>
@@ -101,7 +103,9 @@ List nlmixrShrink(NumericMatrix &omegaMat,DataFrame etasDf, List etaLst){
 }
 
 // [[Rcpp::export]]
-List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, NumericVector &lambda, NumericVector &yj, DataFrame etasDf, List etaLst){
+List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv,
+		 IntegerVector &evid, NumericVector &lambda, NumericVector &yj,
+		 DataFrame etasDf, List etaLst){
   bool doCwres = (innerList.size() == 2);
   DataFrame pred = as<DataFrame>(innerList["pred"]);
   IntegerVector ID= as<IntegerVector>(pred[0]);
@@ -326,15 +330,19 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   unsigned int n =0, n1 = 0;
   double M1 =  0, M2 = 0, M3 = 0, M4 =0, term1, delta, delta_n, delta_n2;
   for (unsigned int i = iprednv.size(); i--;){
-    n1=n; n++;
-    delta = iwres[i] - M1;
-    delta_n = delta / n;
-    delta_n2 = delta_n * delta_n;
-    term1 = delta * delta_n * n1;
-    M1 += delta_n;
-    M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
-    M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
-    M2 += term1;
+    if (evid[i] == 0){
+      n1=n; n++;
+      delta = iwres[i] - M1;
+      delta_n = delta / n;
+      delta_n2 = delta_n * delta_n;
+      term1 = delta * delta_n * n1;
+      M1 += delta_n;
+      M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
+      M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
+      M2 += term1;    
+    } else {
+      iwres[i] = NA_REAL;
+    }
   }
   stat[0] = M1;
   stat[1] = M2/((double)n1);
@@ -348,20 +356,36 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   List ret(3);
   // Now do inverse TBS to backtransform
   if (doCwres){
+    NumericVector ires = dv-iprednvI;
+    for (i = cwres.size(); i--;){
+      if (evid[i] != 0){
+	wres[i] = NA_REAL;
+	cwres[i] = NA_REAL;
+	resI[i] = NA_REAL;
+	ires[i] = NA_REAL;
+      }
+    }
     ret[0] = DataFrame::create(_["PRED"]=prednvI,
 			       _["RES"]=resI,
 			       _["WRES"]=wrap(wres),
 			       _["IPRED"]=iprednvI,
-			       _["IRES"]=dv-iprednvI,
+			       _["IRES"]=ires,
 			       _["IWRES"]=iwres,
 			       _["CPRED"]=cpredI,
 			       _["CRES"]=cresI,
 			       _["CWRES"]=cwres);
   } else {
+    NumericVector ires = dv-iprednvI;
+    for (i = ires.size(); i--;){
+      if (evid[i] != 0){
+	resI[i] = NA_REAL;
+	ires[i] = NA_REAL;
+      }
+    }
     ret[0] = DataFrame::create(_["PRED"]=prednvI,
                                _["RES"]=resI,
                                _["IPRED"]=iprednvI,
-                               _["IRES"]=dv-iprednvI,
+                               _["IRES"]=ires,
                                _["IWRES"]=iwres);
   }
   ret[1] = etaLst;
@@ -375,8 +399,12 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv, Nu
   return ret;
 }
 
+arma::mat cholSE__(arma::mat A, double tol);
+
 // [[Rcpp::export]]
-List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector lambda, NumericVector yj, bool ties = false){
+List npde(IntegerVector id, NumericVector dv, IntegerVector evid,
+	  NumericVector sim, NumericVector lambda, NumericVector yj,
+	  bool ties, double tolChol){
   bool warn1 = false;
   bool warn2 = false;
   bool warn3=false;
@@ -424,6 +452,7 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
     dvt[i] = powerD(dv[i], lambda[i], (int)yj[i]);
     epred[i] = powerDi(epredt[i], lambda[i], (int)yj[i]);
     eres[i] = dv[i] - epred[i];
+    if (evid[i] != 0) eres[i] = NA_REAL;
     erest[i] = dvt[i] - epredt[i];
     // Calculate simRESt
     for (int j = K; j--; ){
@@ -435,29 +464,34 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
   // Even though we are using matrix algebra, we are still using Welford's method
   double d;
   for (int i = 0; i < nid; i++){
-    arma::mat d1(idLoc[i+1]-idLoc[i], 1);
+    arma::vec d1(idLoc[i+1]-idLoc[i]);
     std::copy(simrest.begin()+idLoc[i], simrest.begin()+idLoc[i+1], d1.begin());
+    arma::ivec evid1(idLoc[i+1]-idLoc[i]);
+    std::copy(evid.begin()+idLoc[i], evid.begin()+idLoc[i+1], evid1.begin());
+    arma::uvec evid0 = find(evid1 == 0);
+    arma::vec d2 = d1(evid0);
     bool anyNa = false;
-    for (int j = d1.size(); j--;){
-      if (ISNAN(d1[j])){
+    for (int j = d2.size(); j--;){
+      if (ISNAN(d2[j])){
         anyNa=true;
 	break;
       }
     }
-    mat vYi(idLoc[i+1]-idLoc[i], idLoc[i+1]-idLoc[i], fill::zeros);
+    mat vYi(d2.size(), d2.size(), fill::zeros);
     k2=0;
     if (anyNa) {
       warn3=true;
     } else {
       k2++;
-      vYi = d1 * trans(d1);
+      vYi = d2 * trans(d2);
     }
     mat vYi2;
     for (int j = 1; j < K; j++){
       std::copy(simrest.begin()+idLoc[i]+nobs*j, simrest.begin()+idLoc[i+1]+nobs*j, d1.begin());
+      d2 = d1(evid0);
       anyNa=false;
-      for (int k = d1.size(); k--;){
-        if (ISNAN(d1[k])){
+      for (int k = d2.size(); k--;){
+        if (ISNAN(d2[k])){
           anyNa=true;
           break;
         }
@@ -467,7 +501,7 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
       } else {
         k2++;
         d=k2;
-        vYi2=d1 * trans(d1);
+        vYi2=d2 * trans(d2);
         vYi = vYi + (vYi2 - vYi)/d;
       }
     }
@@ -482,15 +516,10 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
     try {
       ch = chol(vYi);
     } catch (...){
-      Function loadNamespace("loadNamespace", R_BaseNamespace);
-      Environment rx = loadNamespace("RxODE");
-      Function nearpd = rx[".nearPd"];    
-
       // Try nearPD from R/RxODE
       warn1 = true;
-      ch = as<mat>(nearpd(wrap(vYi)));
       try {
-	ch = chol(ch);
+	ch = cholSE__(vYi, tolChol);
       } catch (...){
 	stop("The simulated data covariance matrix Cholesky decomposition could not be obtained for %d.", i+1);
       }
@@ -507,34 +536,49 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
     }
     // Now calculate  Y_{i,sim} and Y_i
     std::copy(erest.begin()+idLoc[i], erest.begin()+idLoc[i+1], d1.begin());
-    mat Yi = vYi*d1;
+    d2 = d1(evid0);
+    mat Yi = vYi*d2;
     mat Yis;
     std::copy(simrest.begin()+idLoc[i], simrest.begin()+idLoc[i+1], d1.begin());
-    Yis = vYi*d1;
+    d2 = d1(evid0);
+    Yis = vYi*d2;
+    int kk = idLoc[i];
     for (int k = idLoc[i]; k < idLoc[i+1]; k++){
-      if (Yi[k-idLoc[i]] < Yis[k-idLoc[i]]){
-        pd[k] = 1.0;
+      if (evid1[k-idLoc[i]] == 0){
+	if (Yi[kk-idLoc[i]] < Yis[kk-idLoc[i]]){
+	  pd[k] = 1.0;
+	} else {
+	  pd[k] = 0.0;
+	}
+	kk++;
       } else {
-	pd[k] = 0.0;
+	pd[k] = NA_REAL;
       }
     }
     double de;
     k2 = 0;
     for (int j = 1; j < K; j++){
       std::copy(simrest.begin()+idLoc[i]+j*nobs, simrest.begin()+idLoc[i+1]+j*nobs, d1.begin());
-      Yis = vYi*d1;        
+      d2 = d1(evid0);
+      Yis = vYi*d2;
+      int kk = idLoc[i];
       for (int k = idLoc[i]; k < idLoc[i+1]; k++){
-	if (ISNAN(Yis[k-idLoc[i]])){
-	  warn3=true;
-	} else if (Yi[k-idLoc[i]] < Yis[k-idLoc[i]]){
-	  k2++;
-	  de = k2;
-          pd[k] = pd[k]+(1-pd[k])/de;
-        } else {
-          k2++;
-          de = k2;
-          pd[k] = pd[k]-pd[k]/de;
-        }
+	if (evid1[k-idLoc[i]] == 0){
+	  if (ISNAN(Yis[kk-idLoc[i]])){
+	    warn3=true;
+	  } else if (Yi[kk-idLoc[i]] < Yis[k-idLoc[i]]){
+	    k2++;
+	    de = k2;
+	    pd[k] = pd[k]+(1-pd[k])/de;
+	  } else {
+	    k2++;
+	    de = k2;
+	    pd[k] = pd[k]-pd[k]/de;
+	  }
+	  kk++;
+	} else {
+	  pd[k] = NA_REAL;
+	}
       }
     }
   }
@@ -542,30 +586,40 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
   // random noise in.
   if (ties){
     for (int i = pd.size(); i--;){
-      if (fabs(pd[i]) < DOUBLE_EPS){
-	pd[i] = 1 / (2.0 * K);
-      } else if (fabs(1-pd[i]) < DOUBLE_EPS){
-	pd[i] = 1 - 1 / (2.0 * K);
+      if (evid[i] == 0){
+	if (fabs(pd[i]) < DOUBLE_EPS){
+	  pd[i] = 1 / (2.0 * K);
+	} else if (fabs(1-pd[i]) < DOUBLE_EPS){
+	  pd[i] = 1 - 1 / (2.0 * K);
+	}
+	npde[i] = -qnorm(pd[i], 0.0, 1.0, true, false);
+      } else {
+	pd[i] = NA_REAL;
+	npde[i] = NA_REAL;
       }
-      npde[i] = -qnorm(pd[i], 0.0, 1.0, true, false);
     }
   } else {
     // This is a little different than the NPDE manual
     // the bounds are 1/(2K) to 1 - 1/(2K) instead of 0 to 1
     for (int i = pd.size(); i--;){
-      if (fabs(pd[i]) < DOUBLE_EPS){
-        pd[i] = Rf_runif(0, 1/K);
-      } else if (fabs(1-pd[i]) < DOUBLE_EPS){
-        pd[i] = Rf_runif(1.0 - 1/K, 1.0);
+      if (evid[i] == 0){
+	if (fabs(pd[i]) < DOUBLE_EPS){
+	  pd[i] = Rf_runif(0, 1/K);
+	} else if (fabs(1-pd[i]) < DOUBLE_EPS){
+	  pd[i] = Rf_runif(1.0 - 1/K, 1.0);
+	} else {
+	  pd[i] = Rf_runif(0, 1/K) + pd[i];
+	}
+	if (fabs(pd[i]) < 1 / (2.0 * K)){
+	  pd[i] = 1 / (2.0 * K);
+	} else if (fabs(1-pd[i]) < 1 / (2.0 * K)){
+	  pd[i] = 1 - 1 / (2.0 * K);
+	}
+	npde[i] = -qnorm(pd[i], 0.0, 1.0, true, false);
       } else {
-	pd[i] = Rf_runif(0, 1/K) + pd[i];
+	npde[i] = NA_REAL;
+	pd[i] = NA_REAL;
       }
-      if (fabs(pd[i]) < 1 / (2.0 * K)){
-        pd[i] = 1 / (2.0 * K);
-      } else if (fabs(1-pd[i]) < 1 / (2.0 * K)){
-        pd[i] = 1 - 1 / (2.0 * K);
-      }
-      npde[i] = -qnorm(pd[i], 0.0, 1.0, true, false);
     }
   }
   List ret(3);
@@ -576,7 +630,7 @@ List npde(IntegerVector id, NumericVector dv, NumericVector sim, NumericVector l
   ret.attr("row.names") = IntegerVector::create(NA_INTEGER, -nobs);
   ret.attr("class") = "data.frame";
   if (warn1){
-    warning("Some subjects simulated data covariance matrix were corrected with Matrix::nearPD");
+    warning("Some subjects simulated data covariance matrix used a generalized Cholesky decomposition.");
   }
   if (warn2){
     warning("Some subjects simulated data covariance matrix were inverted by a psuedo-inverse");
