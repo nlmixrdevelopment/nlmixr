@@ -100,38 +100,51 @@ vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
 vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   rx_solve* _rx = getRxSolve_();
   rx_solving_options* _op = _rx->op;
-  int _nlhs = _op->nlhs;
-  uvec _ix;
   vec _id = _evt.col(0);
-  mat _wm;
-  vec _wv, _wv2;
-  int _DEBUG = _opt["DEBUG"];
-
-  _ix = find(_evt.col(2) == 0);
-  vec _yp(_ix.n_elem);
-  double *_p=_yp.memptr();
   int _N=_id.max()+1;
 
-<%=declPars%>
-  int _slvr_counter=0, _dadt_counter=0, _jac_counter=0;
-  vec _inits(_op->neq, fill::zeros);
-  vec _scale(_op->neq, fill::ones);
-  ivec _stateIgnore(_op->neq, fill::zeros);
   rxOptionsIniEnsure0(_N);
-// int _cores = _op->cores;
-//#ifdef _OPENMP
-//#pragma omp parallel for num_threads(_cores)
-//#endif
+  int _cores = 1;//_op->cores;
+  uvec _ix;
+  _ix = find(_evt.col(2) == 0);
+  vec _yp(_ix.n_elem);
+  vec _id0 = _id(_ix);
+  int _DEBUG = _opt["DEBUG"];
+  uvec _cmt_endpnt = _opt["cmt_endpnt"];
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(_cores) shared(_yp, _id0, _cmt_endpnt, _DEBUG, _ix, _id)
+#endif
   for (int _i=0; _i<_N; _i++) {
+     int _nlhs = _op->nlhs;
+     vec _inits(_op->neq, fill::zeros);
+     vec _scale(_op->neq, fill::ones);
+     ivec _stateIgnore(_op->neq, fill::zeros);
+
+     mat _wm;
+     vec _wv, _wv2;
+
+     //////////////////////////////////////////////////////////////////////
+     // declPars
+<%=declPars%>
+     int _slvr_counter=0, _dadt_counter=0, _jac_counter=0;
+
+     //////////////////////////////////////////////////////////////////////
+     // assgnPars
 <%=assgnPars%>
+
      vec _InfusionRate(_op->neq, fill::zeros);
      ivec _BadDose(_op->neq, fill::zeros);
      vec _solveSave(_op->neq);
      ivec _on(_op->neq, fill::ones);
     _wm = _evt.rows( find(_id == _i) );
     if(_wm.n_rows==0) {
-      Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
-      arma_stop_runtime_error("");
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+     {
+        Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
+        arma_stop_runtime_error("");
+     }
     }
     vec _time__;
     _time__ = _wm.col(1);
@@ -155,8 +168,8 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     vec _ii;
     _ii = _wv(_ds);
 
-    ivec _ix(_ntime);
-    std::iota(_ix.memptr(),_ix.memptr()+_ntime, 0); // 0, 1, 2, 3...
+    ivec _ix2(_ntime);
+    std::iota(_ix2.memptr(),_ix2.memptr()+_ntime, 0); // 0, 1, 2, 3...
     vec _mtime(<%=nmtime%>, fill::zeros);
 
     // _inits.zeros();
@@ -176,15 +189,21 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     rxSingleSolve(_i, _params.memptr(), _time__.memptr(),
 	    _evid.memptr(), &_ntime, _inits.memptr(), _amt.memptr(), _ii.memptr(),
             _ret.memptr(), _lhs.memptr(), &_rc, _newTime.memptr(), _evid2.memptr(),
-            _on.memptr(), _ix.memptr(), &_slvr_counter,&_dadt_counter, &_jac_counter,
+            _on.memptr(), _ix2.memptr(), &_slvr_counter,&_dadt_counter, &_jac_counter,
             _InfusionRate.memptr(), _BadDose.memptr(), _idose.memptr(), _scale.memptr(),
             _stateIgnore.memptr(), _mtime.memptr(), _solveSave.memptr());
 
     if ( _DEBUG > 4 && _rc != 0 ) {
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+     {
+
         Rcout << "pars: " << _params.t();
         Rcout << "_inits: " << _inits.t();
         Rcout << "LSODA return code: " << _rc << endl;
         Rcout << _wm << endl;
+     }
     }
 	_ret = join_cols(join_cols(_newTime.t(), _ret), _lhs).t();
 	uvec _r  = find(_evid2 == 0);
@@ -197,6 +216,10 @@ mat _g(time.n_elem, <%=nendpnt%>);
 <%=pred_expr%>
 
 if (_g.has_nan()) {
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+{
 	Rcout << "NaN in prediction. Consider to: relax atol & rtol; change initials; change seed; change structure model." << endl;
     if ( _DEBUG > 4) {
 	Rcout << "pars: " << _params.t();
@@ -207,25 +230,29 @@ if (_g.has_nan()) {
 	Rcout << "LSODA solutions:" << endl;
 	Rcout << _ret << endl;
 	}
+}
 	_g.replace(datum::nan, 1.0e99);
 }
 
-int _nendpnt = <%=nendpnt%>;
-uvec _cmt_endpnt = _opt["cmt_endpnt"];
 uvec _b0(1), _b1(1); _b0(0) = 0;
 
-for (int _b=1; _b<_nendpnt; ++_b) {
+for (int _b=1; _b< <%=nendpnt%>; ++_b) {
   _b1(0) = _b;
   uvec _r;
   _r = find( _cmtObs==_cmt_endpnt(_b) );
   _g.submat(_r, _b0) = _g.submat(_r, _b1);
 }
 
-    int _no = _cmtObs.n_elem;
-    memcpy(_p, _g.memptr(), _no*sizeof(double));
-    _p += _no;
+    //int _no = _cmtObs.n_elem;
+    //std::copy(_g.memptr(),_g.memptr()+_no,_yp.memptr()+_no*_i);
+#ifdef _OPENMP
+#pragma omp critical
+#endif
+{
+    _yp.elem(find(_id0==_i)) = _g;
+}
+    //memcpy(_p, _g.memptr(), _no*sizeof(double));
   }
-
   return _yp;
 }
 
@@ -569,7 +596,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
   ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
-  make_str = 'PKG_CXXFLAGS=%s -fopenmp\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
+  make_str = 'PKG_CXXFLAGS=%s -g -fopenmp\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
   make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
 
   cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
