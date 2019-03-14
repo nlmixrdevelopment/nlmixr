@@ -432,165 +432,6 @@ unsupported.dists <- c("dchisq", "chisq", "dexp", "df", "f", "dgeom", "geom",
                        "nlmixrDist")
 add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj", "boxCox", "yeoJohnson");
 
-
-##' Build linear solved information based on defined parameters.
-##'
-##' @param lhs List of defined parameters
-##' @return List containing the translation parmateres (extra lines)
-##'     to give what nlmixr expects, and model properties
-##'     (parameterization, ncmt, oral, and tlag).  The infusion needs
-##'     to be guessed from the data and is not included in this function's output
-##' @author Matthew L. Fidler
-nlmixrUILinCmt <- function(lhs){
-    reg <- rex::rex(start, one_of("V", "v"), capture(number), end);
-    w <- which(regexpr(reg, lhs) != -1);
-    if (any(lhs == "V") || any(lhs == "v")){
-        if (length(w) > 0){
-            min.v <- min(as.numeric(gsub(reg, "\\1", lhs[w])));
-            vs <- c("V", paste0("V", seq(min.v, min.v + 1)))
-        } else {
-            vs <- c("V", paste0("V", 1:2));
-        }
-    } else {
-        if (length(w) > 0){
-            min.v <- min(as.numeric(gsub(reg, "\\1", lhs[w])));
-            vs <- paste0("V", seq(min.v, min.v + 2))
-        } else {
-            vs <- paste0("V", 1:3);
-        }
-    }
-
-    par1 <- list(CL  =c("CL"),
-                 V   =c("V", "VC", vs[1]),
-                 CLD =c("Q", "CLD"),
-                 VT  =c("VT", "VP", vs[2]),
-                 CLD2=c("CLD2", "Q2"),
-                 VT2 =c("VT2", "VP2", vs[3]));
-    ## If Cmt #1 is the central depot compartment then
-    ## K12, K21 = 2 cmt model
-    ## K13, K31 = 3 compartment model
-    ## K10 = elimination
-    ## K01 = absoprtion
-    ##
-    ## If Cmt #2 is the central compartment then
-    ## K23, K32 = 2 cmt model
-    ## K24, K42 = 3 cmt model
-    ## K20 = elimination
-    ## K12 = absorption
-    ##
-    ## Both ways completely identify the 2/3 compartment model and are unique.
-    par2 <- list(KE=c("KE", "KEL", "K", "K10", "K20"),
-                 K12=c("K12", "K23"),
-                 K21=c("K21", "K32"),
-                 K13=c("K13", "K24"),
-                 K31=c("K31", "K42"));
-    oral.pars <- c("KA", "K12", "K01");
-    tlag.pars <- c("TLAG");
-    lhs.up <- toupper(lhs);
-    npars <- 0;
-    extra.lines <- c();
-    par.trans <- list();
-    for (i in seq_along(par1)){
-        possible <- par1[[i]];
-        val <- intersect(possible, lhs.up);
-        if (length(val) == 1){
-            npars <- npars + 1;
-            if (i == 2 && npars == 1){
-                stop(sprintf("Clearance (%s) and Volume (%s) both have to be specified in this 1-cmt solved paramterization.",
-                             paste(par1[["CL"]], collapse=", "), paste(par1[["V"]], collapse=", ")));
-            }
-            if (i == 4 && npars < 4){
-                stop(sprintf("Distribtuional Clearance (%s) and Peripheral Volume (%s) both have to be specified in this 2-cmt solved paramterization.",
-                             paste(par1[["CLD"]], collapse=", "), paste(par1[["VT"]], collapse=", ")))
-            }
-            if (i == 6 && npars < 6){
-                stop(sprintf("Distribtuional Clearance #2 (%s) and Peripheral Volume #2 (%s) both have to be specified in 3-cmt this solved paramterization.",
-                             paste(par1[["CLD"]], collapse=", "), paste(par1[["VT"]], collapse=", ")))
-            }
-            cur <- names(par1)[i]
-            w <- which(lhs.up == val);
-            cur.lhs <- lhs[w];
-            par.trans[[length(par.trans) + 1]] <- c(cur, cur.lhs);
-            if (cur != cur.lhs){
-                extra.lines[length(extra.lines) + 1] <- sprintf("%s = %s;", cur, cur.lhs);
-            }
-        } else if (length(val) > 2){
-            stop(sprintf("Need clearer paramterization for %s; Currently defined these similiar parameters: %s",
-                         names(par1)[i], paste(val, collapse=", ")))
-        }
-    }
-    param <- 0;
-    if (npars > 1){
-        param <- 1;
-        ncmt <- npars / 2;
-    } else {
-        for (i in seq_along(par2)){
-            possible <- par2[i];
-            val <- intersect(possible, lhs.up);
-            if (length(val) == 1){
-                npars <- npars + 1;
-                if ((i == 2 && npars == 1) ||
-                    (i == 4 && npars < 4) ||
-                    (i == 6 && npars < 6)){
-                    stop("Not all the appropriate micro-constants have been specified this solved paramterization.");
-                }
-                cur <- names(par2)[i]
-                w <- which(lhs.up == val);
-                cur.lhs <- lhs[w];
-                par.trans[[length(par.trans) + 1]] <- c(cur, cur.lhs);
-                if (cur != cur.lhs){
-                    extra.lines[length(extra.lines) +1] <- sprintf("%s <- %s;", cur, cur.lhs);
-                }
-            } else if (length(val) > 2){
-                stop(sprintf("Need clearer paramterization for %s; Currently defined these similiar parameters: %s",
-                             names(par2)[i], paste(val, collapse=", ")))
-            }
-        }
-        if (npars > 1){
-            param <- 2;
-            ncmt <- npars / 2;
-        }
-    }
-    if (param == 0){
-        return(NULL);
-    }
-    ## Now get oral / tlag
-    oral <- FALSE;
-    val <- intersect(oral.pars, lhs.up);
-    if (length(val) == 1){
-        w <- which(val == lhs.up);
-        if (length(w) > 0){
-            cur.lhs <- lhs[w]
-            par.trans[[length(par.trans) + 1]] <- c("KA", cur.lhs);
-            if (cur.lhs != "KA"){
-                extra.lines[length(extra.lines) +1] <- sprintf("KA <- %s;", cur.lhs)
-            }
-        }
-        oral <- TRUE
-    } else if (length(val) == 2){
-        stop(sprintf("Ambiguous Absorption constant; Could be: %s", paste(val, collapse=", ")));
-    }
-    tlag <- FALSE
-    val <- intersect(tlag.pars, lhs.up);
-    if (length(val) == 1){
-        w <- which(val == lhs.up);
-        cur.lhs <- lhs[w]
-        par.trans[[length(par.trans) + 1]] <- c("TLAG", cur.lhs);
-        if (cur.lhs != "TLAG"){
-            extra.lines[length(extra.lines) +1] <- sprintf("TLAG <- %s;", cur.lhs)
-        }
-        if (!oral){
-            stop("Absorpation lag time requires an solved oral compartmental model.");
-        }
-        tlag <- TRUE
-    } else if (length(val) == 2){
-        stop(sprintf("Ambiguous Lag-time constant; Could be: %s", paste(val, collapse=", ")));
-    }
-    extra.lines <- paste(extra.lines, collapse="\n");
-    return(list(extra.lines=extra.lines,
-                ncmt=ncmt, parameterization=param, oral=oral, tlag=tlag, par.trans=par.trans))
-}
-
 nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     ## Parses the UI function to extract predictions and errors, and the other model specification.
     rxode <- FALSE
@@ -1336,9 +1177,55 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         nlme.mu.fun <- NULL
     }
     .pred <- FALSE
-    if (!rxode && all(regexpr(rex::rex("linCmt("), deparse(body(fun))) == -1)){
+    if (!rxode){
         rxode <- TRUE
         .pred <- TRUE
+    }
+    .linCmt <- FALSE;
+    if (any(regexpr(rex::rex("linCmt("), deparse(body(fun))) == -1)){
+        .linCmt  <- TRUE;
+        .hasLinCmt <- any(regexpr(rex::rex("linCmt("), deparse(body(rest))) == -1);
+        rx.txt <- deparse(body(rest))[-1];
+        rx.txt <- rx.txt[-length(rx.txt)];
+        .regLin <- rex::rex(start,any_spaces,
+                            capture(
+                                or(group(one_of("Kk"),some_of("AaEe0123456789")),
+                                   group(one_of("V","v"),
+                                         any_of("c","C","P","p","T","t","S","s","0","1","2","3","4","5","6","7","8","9")),
+                                   group(one_of("Cc"),one_of("Ll"),any_of("Dd2")),
+                                   "aob","AOB","alpha","ALPHA","Alpha",
+                                   "beta","BETA","Beta"
+                                   )),any_spaces,or("=","<-"),
+                            capture(anything))
+        .pred <- gsub(.regLin,
+                      "nlmixr_lincmt_\\1 <- \\2", rx.txt)
+        .rx <- gsub(rex::rex(start,any_spaces,capture(except_any_of(" \n=<-")),any_spaces,or("=","<-"),
+                               capture(anything)),
+                    "\\1 <- nlmixr_lincmt_\\1", rx.txt)
+        rest <- eval(parse(text=paste(c("function(){",
+                                 .pred,.rx,
+                                 ifelse(.hasLinCmt, "nlmixr_lincmt_pred <- linCmt()\n}","}")),
+                                 collapse="\n")))
+        if (!is.null(saem.pars)){
+            saem.pars <- gsub(.regLin,
+                          "nlmixr_lincmt_\\1 = \\2", saem.pars);
+        }
+        if (!is.null(nlme.mu.fun)){
+            nlme.mu.fun <- gsub(.regLin,
+                          "nlmixr_lincmt_\\1 = \\2", nlme.mu.fun);
+        }
+        pred.txt  <- gsub(rex::rex("linCmt(",any_spaces,")"),
+                          "nlmixr_lincmt_pred", pred.txt);
+        rest.txt <- gsub(.regLin,"nlmixr_lincmt_\\1 = \\2", rest.txt);
+        .tmp <- as.character(attr(fun, "srcref"), useSource=TRUE);
+        .tmp <- .tmp[-1];
+        .tmp <- .tmp[-length(.tmp)];
+        .tmp <- .tmp[regexpr("~",.tmp) != -1];
+        .tmp <- gsub(rex::rex("linCmt(",any_spaces,")"), "nlmixr_lincmt_pred",.tmp);
+        .tmp <- c("function()({",.pred,.rx, ifelse(.hasLinCmt, "nlmixr_lincmt_pred <- linCmt()",""),"})");
+        fun <- eval(parse(text=paste(.tmp,collapse="\n"), keep.source=TRUE))
+        rxode  <- TRUE;
+        .pred <- FALSE
     }
     if (rxode){
         rx.txt <- deparse(body(rest))[-1]
@@ -1370,6 +1257,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         w <- max(which(regexpr(reg, nlme.mu.fun, perl=TRUE) != -1));
         nlme.mu.fun <- c(nlme.mu.fun[1:w], "");
         rxode <- paste(rx.ode, collapse="\n")
+        if (.linCmt){
+            rxode <- RxODE::rxNorm(RxODE::rxLinCmtTrans(rxode))
+        }
         rest <- rx.pred;
         all.vars <- all.vars[!(all.vars %in% RxODE::rxState(rxode))]
         rest.vars <- rest.vars[!(rest.vars %in% RxODE::rxState(rxode))]
@@ -1449,57 +1339,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (length(misplaced.dists) > 0){
         stop(sprintf("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): %s", paste(misplaced.dists, collapse=", ")))
     }
+    tmp <- gsub(rex::rex("linCmt(",any_spaces,")"), "nlmixr_lincmt_pred", deparse(pred));
+    pred <- eval(parse(text=paste(tmp,collapse="\n")));
     lin.solved <- NULL;
-    tmp <- deparse(pred);
     tmp <- tmp[regexpr(rex::rex("nlmixr_pred <- "), tmp) != -1];
-    if (length(tmp) > 0){
-        if (all(regexpr(rex::rex("nlmixr_pred <- linCmt()"), tmp) != -1)){
-            lin.solved <- nlmixrUILinCmt(all.lhs)
-            par.ord <- as.list(lin.solved$par.trans);
-            ## The theta.ord has to be adjusted...
-            theta.ord2 <- c();
-            log.theta2 <- c();
-            log.eta2 <- c();
-            saem.pars <- c("({", unlist(lapply(par.ord, function(x){
-                x1 <- gsub(" *$", "", x[1]);
-                x2 <- gsub(";", "", gsub("^ *", "", x[2]));
-                reg <- rex::rex(start, any_spaces, x2, any_spaces, or("=", "<-"), any_spaces)
-                w <- which(regexpr(reg, saem.pars) != -1);
-                w2 <- which(regexpr(reg, rest.txt) != -1);
-                if (length(w) == 1){
-                    for (v in theta.ord){
-                        if (regexpr(rex::rex(boundary, v, boundary), rest.txt[w2], perl=TRUE) != -1){
-                            assign("theta.ord2", c(theta.ord2, v), this.env);
-                        }
-                    }
-                    for (v in log.theta){
-                        if (regexpr(rex::rex(boundary, v, boundary), rest.txt[w2], perl=TRUE) != -1){
-                            assign("log.theta2", c(log.theta2, v), this.env);
-                        }
-                    }
-                    for (v in log.eta){
-                        if (regexpr(rex::rex(boundary, v, boundary), rest.txt[w2], perl=TRUE) != -1){
-                            assign("log.eta2", c(log.eta2, v), this.env);
-                        }
-                    }
-                    return(gsub(reg, paste0(x1, " = "), saem.pars[w]));
-                } else {
-                    return("error")
-                }
-                })), "})");
-            theta.ord <- theta.ord2;
-            log.theta <- log.theta2;
-            log.eta <- log.eta2;
-        }
-    } else {
-        add <- linCmt <- function(...) NULL
-        pred <- function(){return(linCmt())}
-        err <- function(){return(add(0.1))}
-        grp.fn <- function(){return("Y01")};
-        errs.specified <- c("add");
-        add.prop.errs <- data.frame(y="Y1", add=TRUE, prop=FALSE);
-        lin.solved <- nlmixrUILinCmt(all.lhs)
-    }
     if (!is.null(saem.pars)){
         saem.pars <- new.fn(saem.pars)
         saem.theta.trans <- rep(NA, length(theta.names));
@@ -1568,6 +1411,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .predDf <- .predDf[order(.predDf$cmt), ];
     .w <- which(is.na(.predDf$cond))
     if (length(.w) > 0) .predDf$cond[.w] <- ""
+    .predDf$var <- gsub(rex::rex("linCmt(",any_spaces,")"),"nlmixr_lincmt_pred",paste(.predDf$var));
     .predSaem <- eval(parse(text=sprintf("function(){\n%s;\n}", paste(paste(.predDf$var), collapse=";\n"))))
     ret <- list(ini=bounds, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
@@ -2020,14 +1864,6 @@ nlmixrUI.saem.fit <- function(obj){
         inPars <- obj$saem.inPars;
         if (length(inPars) == 0) inPars <- NULL
         saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=obj$predSaem, inPars=inPars);
-        obj$env$saem.fit <- saem.fit;
-        return(obj$env$saem.fit);
-    } else if (!is.null(obj$lin.solved)) {
-        saem.fit <- gen_saem_user_fn(model=lincmt(ncmt=obj$lin.solved$ncmt,
-                                                  oral=obj$lin.solved$oral,
-                                                  tlag=obj$lin.solved$tlag,
-                                                  infusion = obj$env$infusion,
-                                                  parameterization = obj$lin.solved$parameterization))
         obj$env$saem.fit <- saem.fit;
         return(obj$env$saem.fit);
     }
