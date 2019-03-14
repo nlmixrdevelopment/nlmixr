@@ -1182,7 +1182,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .pred <- TRUE
     }
     .linCmt <- FALSE;
-    if (any(regexpr(rex::rex("linCmt("), deparse(body(fun))) == -1)){
+    if (any(regexpr(rex::rex("linCmt("), deparse(body(fun))) != -1)){
         .linCmt  <- TRUE;
         .hasLinCmt <- any(regexpr(rex::rex("linCmt("), deparse(body(rest))) == -1);
         rx.txt <- deparse(body(rest))[-1];
