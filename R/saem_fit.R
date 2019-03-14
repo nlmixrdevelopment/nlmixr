@@ -43,37 +43,13 @@ typedef void (*rxSingleSolve_t)(int subid, double *_theta, double *timep,
 			  double *InfusionRate, int *BadDose, int *idose,
 			  double *scale, int *stateIgnore, double *mtime, double *solveSave);
 
-void rxSingleSolve(int subid, double *_theta, double *timep,
-			  int *evidp, int *ntime,
-			  double *initsp, double *dosep,
-			  double *ii, double *retp,
-			  double *lhsp, int *rc,
-			  double *newTime, int *newEvid,
-			  int *on, int *ix,
-			  int *slvr_counter, int *dadt_counter, int *jac_counter,
-			  double *InfusionRate, int *BadDose, int *idose,
-			  double *scale, int *stateIgnore, double *mtime, double *solveSave){
-    static rxSingleSolve_t fun=NULL;
-    if (fun == NULL) fun = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
-    fun(subid, _theta, timep, evidp, ntime, initsp, dosep, ii, retp, lhsp, rc, newTime, newEvid,
-        on, ix, slvr_counter, dadt_counter, jac_counter, InfusionRate, BadDose, idose,
-        scale, stateIgnore, mtime, solveSave);
-}
+rxSingleSolve_t rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
 
 typedef void (*rxOptionsIniEnsure0_t)(int mx);
-void rxOptionsIniEnsure0(int mx){
-   static rxOptionsIniEnsure0_t fun = NULL;
-   if (fun == NULL) fun = (rxOptionsIniEnsure0_t) R_GetCCallable("RxODE","rxOptionsIniEnsure0");
-   fun(mx);
-}
+rxOptionsIniEnsure0_t rxOptionsIniEnsure0 = (rxOptionsIniEnsure0_t) R_GetCCallable("RxODE","rxOptionsIniEnsure0");
 
 typedef rx_solve *(*getRxSolve_t)();
-
-rx_solve *getRxSolve_(){
-  static getRxSolve_t fun=NULL;
-  if (fun == NULL) fun = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
-  return fun();
-}
+getRxSolve_t getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
 
 }
 
@@ -98,7 +74,7 @@ vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
 
 
 vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
-  rx_solve* _rx = getRxSolve_();
+  rx_solve* _rx = getRx();
   rx_solving_options* _op = _rx->op;
   vec _id = _evt.col(0);
   int _N=_id.max()+1;

@@ -180,67 +180,6 @@ nlmixrData.character <- function(data){
 ##' @rdname nlmixrData
 nlmixrData.default <- function(data){
     dat <- as.data.frame(data);
-    ## nm1 <- toupper(names(dat));
-    ## for (n in c("ID", "EVID", "TIME", "DV", "AMT")){
-    ##     w <- which(nm1 == n)
-    ##     if (length(w) == 1L){
-    ##         names(dat)[w] <- n;
-    ##     } else if (length(w) == 0L){
-    ##         stop(sprintf("Need '%s' data item in dataset.", n))
-    ##     } else {
-    ##         stop(sprintf("Multiple '%s' columns in dataset.", n))
-    ##     }
-    ## }
-    ## if (is(dat$ID, "factor")){
-    ##     dat$ID <- paste(dat$ID);
-    ## }
-    ## idSort <- .Call(`_nlmixr_chkSortIDTime`, as.integer(dat$ID), as.double(dat$TIME), as.integer(dat$EVID));
-    ## if (idSort == 3L){
-    ##     dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
-    ##     ## warning("NONMEM-style data converted to nlmixr/RxODE-style data.");
-    ##     return(nlmixrData.default(nmDataConvert(dat)));
-    ## }
-    ## backSort <- c()
-    ## backSort2 <- c();
-    ## if (is(dat$ID, "character")){
-    ##     ## Character need to sort first
-    ##     lvl <- unique(dat$ID);
-    ##     lab <- paste(lvl)
-    ##     dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
-    ##     dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ];
-    ##     ## Dropped some IDs?  Need to make sure they are still sequential
-    ##     dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
-    ##     ## Get new factor level
-    ##     dat$ID <- paste(dat$ID);
-    ##     lvl <- unique(dat$ID);
-    ##     lab <- paste(lvl)
-    ##     dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
-    ##     backSort <- levels(dat$ID);
-    ##     backSort2 <- seq_along(backSort)
-    ##     dat$ID <- as.integer(dat$ID);
-    ## } else {
-    ##     if (idSort == 2L){
-    ##         dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ];
-    ##         lvl <- unique(dat$ID);
-    ##         lab <- paste(lvl)
-    ##         dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
-    ##         backSort <- levels(dat$ID);
-    ##         backSort2 <- seq_along(backSort)
-    ##         dat$ID <- as.integer(dat$ID);
-    ##     } else if (idSort == 0L){
-    ##         warning("Sorted by ID, TIME, -EVID (ie doses before observations)")
-    ##         dat <- dat[order(dat$ID, dat$TIME,-dat$EVID), ];
-    ##         dat <- dat[.Call(`_nlmixr_allDose`, as.integer(dat$EVID), as.integer(dat$ID)), ]
-    ##         lvl <- unique(dat$ID);
-    ##         lab <- paste(lvl)
-    ##         dat$ID <- factor(dat$ID, levels=lvl, labels=lab);
-    ##         backSort <- levels(dat$ID);
-    ##         backSort2 <- seq_along(backSort)
-    ##         dat$ID <- as.integer(dat$ID);
-    ##     }
-    ## }
-    ## attr(dat, "backSort") <- backSort;
-    ## attr(dat, "backSort2") <- backSort2;
     return(dat);
 }
 
@@ -751,7 +690,7 @@ saemControl <- function(seed=99,
                         print=1,
                         trace=0,
                         covMethod=c("fim", "r,s", "r", "s"),
-                        logLik=FALSE,
+                        logLik=TRUE,
                         optExpression=TRUE,
                         ...){
     .xtra <- list(...);
