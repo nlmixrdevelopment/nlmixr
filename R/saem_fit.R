@@ -22,9 +22,7 @@ saem_ode_str = '#define ARMA_DONT_PRINT_ERRORS
 #include <RcppArmadillo.h>
 #include <RxODE.h>
 #include "saem_class_rcpp.hpp"
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+//#include <omp.h>
 
 
 using namespace std;
@@ -111,9 +109,9 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   vec _id0 = _id(_ix);
   int _DEBUG = _opt["DEBUG"];
   uvec _cmt_endpnt = _opt["cmt_endpnt"];
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(_cores) shared(_yp, _id0, _cmt_endpnt, _DEBUG, _ix, _id)
-#endif
+//#ifdef _OPENMP
+//#pragma omp parallel for num_threads(_cores) shared(_yp, _id0, _cmt_endpnt, _DEBUG, _ix, _id)
+//#endif
   for (int _i=0; _i<_N; _i++) {
      int _nlhs = _op->nlhs;
      vec _inits(_op->neq, fill::zeros);
@@ -138,9 +136,9 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
      ivec _on(_op->neq, fill::ones);
     _wm = _evt.rows( find(_id == _i) );
     if(_wm.n_rows==0) {
-#ifdef _OPENMP
-#pragma omp critical
-#endif
+//#ifdef _OPENMP
+//#pragma omp critical
+//#endif
      {
         Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
         arma_stop_runtime_error("");
@@ -169,7 +167,8 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     _ii = _wv(_ds);
 
     ivec _ix2(_ntime);
-    std::iota(_ix2.memptr(),_ix2.memptr()+_ntime, 0); // 0, 1, 2, 3...
+    for (int _jj = _ntime; _jj--;) _ix2[_jj] = _jj;
+    //std::iota(_ix2.memptr(),_ix2.memptr()+_ntime, 0); // 0, 1, 2, 3...
     vec _mtime(<%=nmtime%>, fill::zeros);
 
     // _inits.zeros();
@@ -194,9 +193,9 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
             _stateIgnore.memptr(), _mtime.memptr(), _solveSave.memptr());
 
     if ( _DEBUG > 4 && _rc != 0 ) {
-#ifdef _OPENMP
-#pragma omp critical
-#endif
+//#ifdef _OPENMP
+//#pragma omp critical
+//#endif
      {
 
         Rcout << "pars: " << _params.t();
@@ -216,9 +215,9 @@ mat _g(time.n_elem, <%=nendpnt%>);
 <%=pred_expr%>
 
 if (_g.has_nan()) {
-#ifdef _OPENMP
-#pragma omp critical
-#endif
+//#ifdef _OPENMP
+//#pragma omp critical
+//#endif
 {
 	Rcout << "NaN in prediction. Consider to: relax atol & rtol; change initials; change seed; change structure model." << endl;
     if ( _DEBUG > 4) {
@@ -245,9 +244,9 @@ for (int _b=1; _b< <%=nendpnt%>; ++_b) {
 
     //int _no = _cmtObs.n_elem;
     //std::copy(_g.memptr(),_g.memptr()+_no,_yp.memptr()+_no*_i);
-#ifdef _OPENMP
-#pragma omp critical
-#endif
+//#ifdef _OPENMP
+//#pragma omp critical
+//#endif
 {
     _yp.elem(find(_id0==_i)) = _g;
 }
