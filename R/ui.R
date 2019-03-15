@@ -19,6 +19,22 @@
 ## SAEM:
 ## - Covariate part
 
+.deparse <- function(expr){
+    deparse(expr,width=500)
+}
+
+.getUif <- function(what){
+    if (inherits(what, "nlmixrFitCore")){
+        .uif <- what$uif
+    } else if (inherits(what, "nlmixrUI")){
+        .uif <- what
+    } else if (inherits(what,"function")){
+        .uif <- nlmixrUI(what);
+    } else {
+        stop("Do not know how to handle object");
+    }
+    return(.uif);
+}
 
 ##' nlmixr ini block handling
 ##'
@@ -29,7 +45,7 @@
 ##' @export
 ini <- function(ini, ...){
     if (is(substitute(ini), "{")){
-        .f <- eval(parse(text=sprintf("function() %s", paste(deparse(substitute(ini)), collapse="\n"))))
+        .f <- eval(parse(text=sprintf("function() %s", paste(.deparse(substitute(ini)), collapse="\n"))))
         .fb <- nlmixrBounds(.f)
         if (!exists(".ini", parent.frame(1))){
             assign(".ini", .f, parent.frame(1));
@@ -41,13 +57,7 @@ ini <- function(ini, ...){
         }
         return(.fb);
     } else {
-        if (inherits(ini, "nlmixrFitCore")){
-            .uif <- ini$uif
-        } else if (inherits(ini, "nlmixrUI")){
-            .uif <- ini
-        } else {
-            stop("Do not know how to handle object");
-        }
+        .uif  <- .getUif(ini);
         .ini <- .uif$ini
         .call <- match.call(expand.dots=TRUE)[-1];
         .call <- .call[-1];
@@ -57,19 +67,19 @@ ini <- function(ini, ...){
             for (.n in .ns){
                 .w <- which(.n == .ini$name)
                 if (length(.w) == 1){
-                    if (any(deparse(.call[[.n]]) == c("fix", "fixed", "FIX", "FIXED"))){
+                    if (any(.deparse(.call[[.n]]) == c("fix", "fixed", "FIX", "FIXED"))){
                         if (.uif$ini$fix[.w]){
                             warning(sprintf("Trying to fix '%s', but already fixed.", .n))
                         } else {
                             .uif$ini$fix[.w] <- TRUE;
                         }
-                    } else if (any(deparse(.call[[.n]]) == c("unfix", "unfixed", "UNFIX", "UNFIXED"))){
+                    } else if (any(.deparse(.call[[.n]]) == c("unfix", "unfixed", "UNFIX", "UNFIXED"))){
                         if (.uif$ini$fix[.w]){
                             .uif$ini$fix[.w] <- FALSE;
                         } else {
                             warning(sprintf("Trying to unfix '%s', but not fixed.", .n))
                         }
-                    } else if (regexpr(rex::rex(or(c("fix", "fixed", "FIX", "FIXED")), "(", anything, ")"), deparse(.call[[.n]])) != -1){
+                    } else if (regexpr(rex::rex(or(c("fix", "fixed", "FIX", "FIXED")), "(", anything, ")"), .deparse(.call[[.n]])) != -1){
                         .val <- eval(.call[[.n]][[2]]);
                         if (.uif$ini$fix[.w]){
                             warning(sprintf("Trying to fix '%s', but already fixed.  Still assigned to '%s'", .n, .val))
@@ -77,7 +87,7 @@ ini <- function(ini, ...){
                             .uif$ini$fix[.w] <- TRUE;
                         }
                         .uif$ini$est[.w] <- .val;
-                    } else if (regexpr(rex::rex(or(c("unfix", "unfixed", "UNFIX", "UNFIXED")), "(", anything, ")"), deparse(.call[[.n]])) != -1){
+                    } else if (regexpr(rex::rex(or(c("unfix", "unfixed", "UNFIX", "UNFIXED")), "(", anything, ")"), .deparse(.call[[.n]])) != -1){
                         .val <- eval(.call[[.n]][[2]]);
                         if (.uif$ini$fix[.w]){
                             .uif$ini$fix[.w] <- FALSE;
@@ -147,6 +157,13 @@ ini <- function(ini, ...){
     }
 }
 
+
+.thetaModelReg <- rex::rex(or(group(start,or("tv","t","pop","POP","Pop","TV","T","cov","err")),
+                         group(or("tv","pop","POP","pop","TV","cov","err"),end)))
+
+.etaParts <- c("eta","ppv","PPV","ETA","Ppv","iiv","Iiv","bsv","Bsv","BSV")
+.etaModelReg <- rex::rex(or(group(start,or(.etaParts)),group(or(.etaParts),end)))
+
 ##' nlmixr model block
 ##'
 ##' @param model Model specification
@@ -156,7 +173,7 @@ ini <- function(ini, ...){
 ##' @export
 model <- function(model, ...){
     if (is(substitute(model), "{")){
-        .f <- eval(parse(text=sprintf("function() %s", paste(deparse(substitute(model)), collapse="\n"))))
+        .f <- eval(parse(text=sprintf("function() %s", paste(.deparse(substitute(model)), collapse="\n"))))
         if (!exists(".model", parent.frame(1))){
             assign(".model", .f, parent.frame(1));
         } else {
@@ -173,7 +190,107 @@ model <- function(model, ...){
             }
         }
         return(.f);
+    } else {
+        .uif  <- .getUif(model);
+        .ini <- as.data.frame(.uif$ini);
+        .call <- match.call(expand.dots=TRUE)[-(1:2)];
+        .lines <- .deparse(.call[[1]]);
+        .f <- try(eval(parse(text=sprintf("function() %s", paste(.lines, collapse="\n")))),silent=TRUE);
+        .fNew <- .uif$fun;
+        if (!inherits(.f, "try-error")){
+            .fOrig <- eval(parse(text=paste(.fNew,collapse="\n")))
+            .lhsOrig <- nlmixrfindLhs(body(.fOrig));
+            .lhsNew <- nlmixrfindLhs(body(.f));
+            .shared <- intersect(.lhsNew,.lhsOrig);
+            if (length(.shared)==0) stop("Could not find a part of the model to modify.");
+            for (.v in .shared){
+                .regShared <- rex::rex(start,any_spaces,.v,any_spaces,or("=","<-"));
+                .newLine <- .lines[regexpr(.regShared,.lines) != -1];
+                .oldLine <- .uif$fun[regexpr(.regShared,.uif$fun) != -1];
+                .w <- which(regexpr(.regShared, .fNew)!=-1)
+                if (length(.w) > 1) stop("Cannot modify a multi-line definition");
+                .fNew[.w] <- .newLine;
+                .oldVarsL  <- allVars(body(eval(parse(text=sprintf("function(){%s}",.oldLine)))));
+                .newVarsL  <- allVars(body(eval(parse(text=sprintf("function(){%s}",.newLine)))));
+                .rmVars <- setdiff(.oldVarsL, .newVarsL);
+                .addVars <- setdiff(.newVarsL, .oldVarsL);
+                for (.rm in .rmVars){
+                    .wh <- .ini[.ini$name == .rm,];
+                    if (length(.wh$name)==1){
+                        if (is.na(.wh$ntheta)){
+                            ## removing eta
+                            .curEta <- .wh$neta1;
+                            .maxEta <- max(.ini$neta1,na.rm=TRUE);
+                            .s <- seq(.curEta,.maxEta)
+                            .s <- .s[-length(.s)];
+                            .w <- unique(sort(c(which(is.na(.ini$neta1)),
+                                                which(.ini$neta1 !=.curEta),
+                                                which(.ini$neta2 !=.curEta))));
+                            .ini <- .ini[.w,];
+                            for (.rmI in .s){
+                                .ini$neta1[.ini$neta1 == .rmI+1] <- .rmI
+                                .ini$neta2[.ini$neta2 == .rmI+1] <- .rmI
+                            }
+                        } else {
+                            .curTheta <- .wh$ntheta;
+                            .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
+                            .s <- seq(.curTheta,.maxTheta)
+                            .s <- .s[-length(.s)];
+                            .w <- unique(sort(c(which(is.na(.ini$ntheta)),
+                                                which(.ini$ntheta !=.curTheta))));
+                            .ini <- .ini[.w,];
+                            for (.rmI in .s){
+                                .ini$ntheta[.ini$ntheta == .rmI+1] <- .rmI
+                            }
+                        }
+                    }
+                }
+                ## Now add variables; Currently parsed based on variable name; Perhaps something better?
+                for (.new in .addVars){
+                    if (!any(.ini$name==.new)){
+                        if (regexpr(.etaModelReg,.new) !=-1){
+                            .maxEta <- max(.ini$neta1,na.rm=TRUE);
+                            .ini <- rbind(.ini,
+                                          data.frame(ntheta=NA, neta1=.maxEta+1, neta2=.maxEta+1,
+                                                     name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
+                                                     err=NA,label=NA,condition="ID"))
+
+                        } else if (regexpr(.thetaModelReg, .new) !=-1) {
+                            .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
+                            .ini <- rbind(.ini,
+                                          data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
+                                                     name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
+                                                     err=NA,label=NA,condition=NA))
+                        }
+                    }
+                }
+            }
+            class(.ini) <- c("nlmixrBounds", "data.frame");
+            .model <- eval(parse(text=paste(.fNew,collapse="\n"),keep.source=TRUE))
+            return(.finalizeUiModel(nlmixrUIModel(.model,.ini,NULL),
+                                    as.list(.uif$meta)));
+        }
     }
+}
+
+.finalizeUiModel <- function(fun2,meta){
+    class(fun2) <- "nlmixrUI";
+    var.ini <- c(fun2$focei.names, fun2$eta.names)
+    var.def <- fun2$all.vars;
+    diff <- setdiff(var.ini, var.def);
+    if (length(diff) > 0){
+        stop(sprintf("Model error: initial estimates provided without variables being used: %s", paste(diff, collapse=", ")))
+    }
+    ns <- fun2$name[which(!is.na(fun2$neta1) & !is.na(fun2$err))]
+    if (length(ns) > 0){
+        stop(sprintf("Residual error component(s) need to be defined with assignment ('=' or '<-') in ini block (not '~'): %s", paste(ns, collapse=", ")))
+    }
+    ns <- fun2$name[is.na(fun2$est)];
+    if (length(ns) > 0){
+        stop(sprintf("The following parameters initial estimates are NA: %s", paste(ns, collapse=", ")))
+    }
+    fun2$meta <- list2env(meta, parent=emptyenv());
+    return(fun2)
 }
 
 ##' Prepares the UI function and returns a list.
@@ -236,7 +353,7 @@ nlmixrUI <- function(fun){
                       paste(sapply(lhs0, function(var){
                           if (exists(var, envir=env.here)){
                               if (!inherits(get(var, envir=env.here), "function")){
-                                  return(sprintf("\n%s <- %s;", var, deparse(get(var, envir=env.here))))
+                                  return(sprintf("\n%s <- %s;", var, .deparse(get(var, envir=env.here))))
                               } else {
                                   return("");
                               }
@@ -245,8 +362,8 @@ nlmixrUI <- function(fun){
                           }
 
                       }), collapse=""),
-                      sprintf("\nini(%s)", paste(deparse(body(.ini)), collapse="\n")),
-                      sprintf("\nmodel(%s)", paste(deparse(body(.model)), collapse="\n")),
+                      sprintf("\nini(%s)", paste(.deparse(body(.ini)), collapse="\n")),
+                      sprintf("\nmodel(%s)", paste(.deparse(body(.model)), collapse="\n")),
                       "\n}");
         fun <- eval(parse(text=fun));
         assign("fun", fun, env)
@@ -266,23 +383,7 @@ nlmixrUI <- function(fun){
     ## if (inherits(fun2, "try-error")){
     ##     stop("Error parsing model.")
     ## }
-    class(fun2) <- "nlmixrUI";
-    var.ini <- c(fun2$focei.names, fun2$eta.names)
-    var.def <- fun2$all.vars;
-    diff <- setdiff(var.ini, var.def);
-    if (length(diff) > 0){
-        stop(sprintf("Model error: initial estimates provided without variables being used: %s", paste(diff, collapse=", ")))
-    }
-    ns <- fun2$name[which(!is.na(fun2$neta1) & !is.na(fun2$err))]
-    if (length(ns) > 0){
-        stop(sprintf("Residual error component(s) need to be defined with assignment ('=' or '<-') in ini block (not '~'): %s", paste(ns, collapse=", ")))
-    }
-    ns <- fun2$name[is.na(fun2$est)];
-    if (length(ns) > 0){
-        stop(sprintf("The following parameters initial estimates are NA: %s", paste(ns, collapse=", ")))
-    }
-    fun2$meta <- list2env(meta, parent=emptyenv());
-    return(fun2)
+    return(.finalizeUiModel(fun2,meta))
 }
 ##' Print UI function
 ##'
@@ -543,7 +644,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             .tmp <- bounds;
             .tmp$err[.w] <- ifelse(.i == 1, distName, paste0(distName, .i));
             if (!is.null(curCond)){
-                .tmp$condition[.w] <- sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", deparse(curCond));
+                .tmp$condition[.w] <- sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond));
             } else {
                 .tmp$condition[.w] <- "";
             }
@@ -564,12 +665,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             if (is.null(curCond)){
                 assign(".predDf", rbind(.predDf,
                                         data.frame(cond="",
-                                                   var=deparse(x2))), this.env)
+                                                   var=.deparse(x2))), this.env)
                 return(bquote(nlmixr_pred <- .(x2)));
             } else {
                 assign(".predDf", rbind(.predDf,
-                                        data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", deparse(curCond)),
-                                                   var=deparse(x2))), this.env)
+                                        data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond)),
+                                                   var=.deparse(x2))), this.env)
                 return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
             }
         } else if (do.pred == 3){
@@ -611,12 +712,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 if (is.null(curCond)){
                     assign(".predDf", rbind(.predDf,
                                             data.frame(cond="",
-                                                       var=deparse(x2))), this.env)
+                                                       var=.deparse(x2))), this.env)
                     return(bquote(nlmixr_pred <- .(x2)));
                 } else {
                     assign(".predDf", rbind(.predDf,
-                                            data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", deparse(curCond)),
-                                                       var=deparse(x2))), this.env)
+                                            data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond)),
+                                                       var=.deparse(x2))), this.env)
                     return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
                 }
             } else if (do.pred == 3){
@@ -664,12 +765,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 if (is.null(curCond)){
                     assign(".predDf", rbind(.predDf,
                                             data.frame(cond="",
-                                                       var=deparse(x2))), this.env)
+                                                       var=.deparse(x2))), this.env)
                     return(bquote(nlmixr_pred <- .(x2)));
                 } else {
                     assign(".predDf", rbind(.predDf,
-                                            data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", deparse(curCond)),
-                                                       var=deparse(x2))), this.env)
+                                            data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond)),
+                                                       var=.deparse(x2))), this.env)
                     return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
                 }
             } else if (do.pred == 3){
@@ -709,7 +810,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 if (length(x[[3]][[3]]) == 1){
                     curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
                 } else {
-                    curCond <- deparse(x[[3]][[3]]);
+                    curCond <- .deparse(x[[3]][[3]]);
                 }
                 curCond <- eval(parse(text=sprintf("quote(%s)", curCond)));
                 if (length(ch.dist) == 1){
@@ -738,7 +839,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 if (length(x[[3]][[3]]) == 1){
                     curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
                 } else {
-                    curCond <- deparse(x[[3]][[3]]);
+                    curCond <- .deparse(x[[3]][[3]]);
                 }
                 curCond <- eval(parse(text=sprintf("quote(%s)", curCond)));
                 .doDist2(err1, err1.v, err1.args, err2, err2.v, err2.args, x[[2]], x[[3]][[2]], curCond=curCond)
@@ -759,7 +860,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 if (length(x[[3]][[3]]) == 1){
                     curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
                 } else {
-                    curCond <- deparse(x[[3]][[3]]);
+                    curCond <- .deparse(x[[3]][[3]]);
                 }
                 curCond <- eval(parse(text=sprintf("quote(%s)", curCond)));
                 .doDist3(err1, err1.v, err1.args, err2, err2.v, err2.args, err3, err3.v, err3.args, x[[2]], x[[3]][[2]], curCond=curCond)
@@ -1125,7 +1226,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             return(x);
                         }
                     }
-                    .x <- deparse(.subs(body(eval(parse(text=paste("function(){\n",paste(funTxt[-(1:w)],collapse="\n"),"\n}"))))));
+                    .x <- .deparse(.subs(body(eval(parse(text=paste("function(){\n",paste(funTxt[-(1:w)],collapse="\n"),"\n}"))))));
                     .x <- .x[-1];
                     .x <- .x[-length(.x)];
                     return(c(funTxt[1:w],paste0("nlmixr_",.env$extra,"_par <- ",.env$extra),.x))
@@ -1137,7 +1238,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         funTxt <- .finalFix();
         return(funTxt);
     }
-    .tmp <- deparse(body(fun));
+    .tmp <- .deparse(body(fun));
     .tmp <- .tmp[-1]
     .tmp <- .tmp[-length(.tmp)];
     ## Assume ~ is boundaries
@@ -1153,26 +1254,26 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     fun <- eval(parse(text=paste(c("function()({",.fun00(.tmp),"})"),collapse="\n")));
     all.covs <- character();
     do.pred <- 1;
-    pred.txt <- deparse(f(body(fun)))
+    pred.txt <- .deparse(f(body(fun)))
     pred <- new.fn(pred.txt);
     do.pred <- 0;
-    err <- new.fn(deparse(f(body(fun))));
+    err <- new.fn(.deparse(f(body(fun))));
     do.pred <- 2;
-    rest.txt <- deparse(f(body(fun)))
+    rest.txt <- .deparse(f(body(fun)))
     rest <- new.fn(rest.txt);
     rest.funs <- allCalls(body(rest));
     rest.vars <- allVars(body(rest));
     all.covs <- setdiff(rest.vars,paste0(bounds$name))
     do.pred <- 3;
-    grp.fn <- new.fn(deparse(f(body(fun))));
+    grp.fn <- new.fn(.deparse(f(body(fun))));
     do.pred <- 4;
-    saem.pars <- try(deparse(f(body(fun))), silent=TRUE);
+    saem.pars <- try(.deparse(f(body(fun))), silent=TRUE);
     nlme.mu.fun2 <- NULL
     if (inherits(saem.pars, "try-error")){
         saem.pars <- NULL
     }
     do.pred <- 5;
-    nlme.mu.fun <- try(deparse(f(body(fun))), silent=TRUE);
+    nlme.mu.fun <- try(.deparse(f(body(fun))), silent=TRUE);
     if (inherits(nlme.mu.fun, "try-error")){
         nlme.mu.fun <- NULL
     }
@@ -1182,10 +1283,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .pred <- TRUE
     }
     .linCmt <- FALSE;
-    if (any(regexpr(rex::rex("linCmt("), deparse(body(fun))) != -1)){
+    if (any(regexpr(rex::rex("linCmt("), .deparse(body(fun))) != -1)){
         .linCmt  <- TRUE;
-        .hasLinCmt <- any(regexpr(rex::rex("linCmt("), deparse(body(rest))) == -1);
-        rx.txt <- deparse(body(rest))[-1];
+        .hasLinCmt <- any(regexpr(rex::rex("linCmt("), .deparse(body(rest))) == -1);
+        rx.txt <- .deparse(body(rest))[-1];
         rx.txt <- rx.txt[-length(rx.txt)];
         .regLin <- rex::rex(start,any_spaces,
                             capture(
@@ -1228,7 +1329,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .pred <- FALSE
     }
     if (rxode){
-        rx.txt <- deparse(body(rest))[-1]
+        rx.txt <- .deparse(body(rest))[-1]
         rx.txt <- rx.txt[-length(rx.txt)];
 
         w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
@@ -1323,7 +1424,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     misplaced.dists <- intersect(rest.funs, c(names(dists), unsupported.dists));
     if (length(misplaced.dists) == 1){
         if (misplaced.dists == "dt"){
-            if (!any(regexpr("[^/]\\bdt[(]", deparse(rest), perl=TRUE) != -1)){
+            if (!any(regexpr("[^/]\\bdt[(]", .deparse(rest), perl=TRUE) != -1)){
                 misplaced.dists <- character();
             }
         }
@@ -1331,7 +1432,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .tmp <- order(misplaced.dists)
         .tmp <- misplaced.dists[.tmp];
         if (all(misplaced.dists==c("dt","f"))){
-            if (!any(regexpr("[^/]\\bdt[(]", deparse(rest), perl=TRUE) != -1)){
+            if (!any(regexpr("[^/]\\bdt[(]", .deparse(rest), perl=TRUE) != -1)){
                 misplaced.dists <- character();
             }
         }
@@ -1339,7 +1440,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (length(misplaced.dists) > 0){
         stop(sprintf("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): %s", paste(misplaced.dists, collapse=", ")))
     }
-    tmp <- gsub(rex::rex("linCmt(",any_spaces,")"), "nlmixr_lincmt_pred", deparse(pred));
+    tmp <- gsub(rex::rex("linCmt(",any_spaces,")"), "nlmixr_lincmt_pred", .deparse(pred));
     pred <- eval(parse(text=paste(tmp,collapse="\n")));
     lin.solved <- NULL;
     tmp <- tmp[regexpr(rex::rex("nlmixr_pred <- "), tmp) != -1];
@@ -1500,7 +1601,7 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
             if (length(object$mu.ref) == 0L) return(NULL)
             .all <- object$ini$name[which(object$ini$neta1 == object$ini$neta2)] %in% names(object$mu.ref)
             if (!all(.all)) return(NULL)
-            bod <- deparse(body(object$nlme.mu.fun));
+            bod <- .deparse(body(object$nlme.mu.fun));
             bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
             bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
             fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unique(c(names(object$ini$theta), object$all.covs)), collapse=", "))));
@@ -1508,7 +1609,7 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
             return(fn);
         } else if (mu.type == "covariates"){
             if (length(object$mu.ref) == 0L) return(NULL)
-            bod <- deparse(body(object$nlme.mu.fun2));
+            bod <- .deparse(body(object$nlme.mu.fun2));
             bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
             bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
             vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
@@ -1518,7 +1619,7 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
             if (length(vars) != length(vars2)) return(NULL);
             return(fn);
         } else {
-            bod <- deparse(body(object$rest));
+            bod <- .deparse(body(object$rest));
             bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
             bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
             fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))));
@@ -1593,7 +1694,7 @@ nlmixrUI.rxode.pred <- function(object){
     if (is.null(object$rxode)){
         return(NULL)
     } else {
-        tmp <- deparse(body(object$pred))[-1]
+        tmp <- .deparse(body(object$pred))[-1]
         tmp <- tmp[-length(tmp)]
         return(paste(c(object$rxode, tmp), collapse="\n"));
     }
@@ -1610,7 +1711,7 @@ nlmixrUI.theta.pars <- function(obj){
     .eta <- .df[!is.na(.df$neta1), ];
     .eta <- .eta[.eta$neta1 == .eta$neta2, ];
     .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
-    .f <- deparse(body(obj$rest))[-1]
+    .f <- .deparse(body(obj$rest))[-1]
     .f <- eval(parse(text=paste(c("function(){", .unfixed, .eta, .f[-length(.f)], "}"), collapse="\n")))
     return(.f)
 }
@@ -1690,7 +1791,7 @@ nlmixrUI.focei.inits <- function(obj){
             cur.rhs <- c(cur.rhs, eta$est[i]);
             if (last.block){
                 ome[length(ome) + 1] <- sprintf("%s ~ %s", paste(cur.lhs, collapse=" + "),
-                                                paste(deparse(cur.rhs), collapse=" "));
+                                                paste(.deparse(cur.rhs), collapse=" "));
                 cur.lhs <- character();
                 cur.rhs <- numeric()
             }
@@ -2033,7 +2134,7 @@ nlmixrUI.lincmt.dvdx <- function(obj){
         .eta <- .df[!is.na(.df$neta1), ];
         .eta <- .eta[.eta$neta1 == .eta$neta2, ];
         .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
-        .txt <- deparse(body(obj$rest))[-1]
+        .txt <- .deparse(body(obj$rest))[-1]
         .txt[length(.txt)] <- obj$lin.solved$extra.lines
         .txt <- paste(c(.unfixed, .eta, .txt), collapse="\n")
         .txt <- substring(.txt, 0, nchar(.txt) - 1)
@@ -2072,7 +2173,7 @@ nlmixrUI.poped.ff_fun <- function(obj){
         .eta <- .eta[.eta$neta1 == .eta$neta2, ];
         .eta <- with(.eta, sprintf("%s=b[%d]", name, .eta$neta1))
         .lhs <- nlmixrfindLhs(body(obj$rest));
-        .f <- deparse(body(obj$rest))[-1]
+        .f <- .deparse(body(obj$rest))[-1]
         .lhs <- sprintf("return(c(%s))", paste(sprintf("\"%s\"=%s", .lhs, .lhs), collapse=", "));
         .f <- eval(parse(text=paste(c("function(x,a,bpop,b,bocc){", .unfixed, .eta, .f[-length(.f)], .lhs, "}"), collapse="\n")))
         return(.f)
