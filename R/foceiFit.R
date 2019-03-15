@@ -2052,7 +2052,7 @@ plot.nlmixrFitData <- function(x, ...) {
         .d1 <- data.frame(DV=.dat0$DV, stack(.dat0[, c("PRED", "IPRED")]))
         .p1 <- ggplot2::ggplot(.d1, aes(values, DV)) + ggplot2::facet_wrap( ~ ind) +
             ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
-            ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
+            ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
             ggplot2::geom_point() + xlab("Predictions") +
             ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
         print(.p1);
