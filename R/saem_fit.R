@@ -66,7 +66,6 @@ vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
   NumericVector g;
   g = ff(phi, evt);
   vec yp(g);
-
   return yp;
 }
 
@@ -76,18 +75,15 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   rx_solving_options* _op = _rx->op;
   vec _id = _evt.col(0);
   int _N=_id.max()+1;
-
   rxOptionsIniEnsure0(_N);
   int _cores = 1;//_op->cores;
   uvec _ix;
   _ix = find(_evt.col(2) == 0);
   vec _yp(_ix.n_elem);
+  double *_p=_yp.memptr();
   vec _id0 = _id(_ix);
   int _DEBUG = _opt["DEBUG"];
   uvec _cmt_endpnt = _opt["cmt_endpnt"];
-//#ifdef _OPENMP
-//#pragma omp parallel for num_threads(_cores) shared(_yp, _id0, _cmt_endpnt, _DEBUG, _ix, _id)
-//#endif
   for (int _i=0; _i<_N; _i++) {
      int _nlhs = _op->nlhs;
      vec _inits(_op->neq, fill::zeros);
@@ -112,13 +108,8 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
      ivec _on(_op->neq, fill::ones);
     _wm = _evt.rows( find(_id == _i) );
     if(_wm.n_rows==0) {
-//#ifdef _OPENMP
-//#pragma omp critical
-//#endif
-     {
         Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
         arma_stop_runtime_error("");
-     }
     }
     vec _time__;
     _time__ = _wm.col(1);
@@ -141,7 +132,6 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     _wv = _wm.col(4);
     vec _ii;
     _ii = _wv(_ds);
-
     ivec _ix2(_ntime);
     for (int _jj = _ntime; _jj--;) _ix2[_jj] = _jj;
     //std::iota(_ix2.memptr(),_ix2.memptr()+_ntime, 0); // 0, 1, 2, 3...
@@ -156,6 +146,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 <%=pars%>
 <%=inits%>
 
+
     int _rc=0;
 
     mat _ret(_op->neq, _ntime);
@@ -169,16 +160,11 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
             _stateIgnore.memptr(), _mtime.memptr(), _solveSave.memptr());
 
     if ( _DEBUG > 4 && _rc != 0 ) {
-//#ifdef _OPENMP
-//#pragma omp critical
-//#endif
-     {
 
         Rcout << "pars: " << _params.t();
         Rcout << "_inits: " << _inits.t();
         Rcout << "LSODA return code: " << _rc << endl;
         Rcout << _wm << endl;
-     }
     }
 	_ret = join_cols(join_cols(_newTime.t(), _ret), _lhs).t();
 	uvec _r  = find(_evid2 == 0);
@@ -187,14 +173,11 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 
 <%=model_vars_decl%>
 
+
 mat _g(time.n_elem, <%=nendpnt%>);
 <%=pred_expr%>
 
 if (_g.has_nan()) {
-//#ifdef _OPENMP
-//#pragma omp critical
-//#endif
-{
 	Rcout << "NaN in prediction. Consider to: relax atol & rtol; change initials; change seed; change structure model." << endl;
     if ( _DEBUG > 4) {
 	Rcout << "pars: " << _params.t();
@@ -205,7 +188,6 @@ if (_g.has_nan()) {
 	Rcout << "LSODA solutions:" << endl;
 	Rcout << _ret << endl;
 	}
-}
 	_g.replace(datum::nan, 1.0e99);
 }
 
@@ -218,15 +200,10 @@ for (int _b=1; _b< <%=nendpnt%>; ++_b) {
   _g.submat(_r, _b0) = _g.submat(_r, _b1);
 }
 
-    //int _no = _cmtObs.n_elem;
-    //std::copy(_g.memptr(),_g.memptr()+_no,_yp.memptr()+_no*_i);
-//#ifdef _OPENMP
-//#pragma omp critical
-//#endif
-{
-    _yp.elem(find(_id0==_i)) = _g;
-}
-    //memcpy(_p, _g.memptr(), _no*sizeof(double));
+
+    int _no = _cmtObs.n_elem;
+    memcpy(_p, _g.memptr(), _no*sizeof(double));
+    _p += _no;
   }
   return _yp;
 }
