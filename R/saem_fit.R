@@ -1182,7 +1182,7 @@ getInits = function(x, re, collapse=TRUE) {
 	s = strsplit(inits, ",")[[1]]
 
 	if (collapse)
-		paste0(sprintf("\tinits[%d] = %s;", 1:length(s)-1, s), collapse="\n")
+		paste0(sprintf("\t_inits[%d] = %s;", 1:length(s)-1, s), collapse="\n")
 	else s
 }
 
