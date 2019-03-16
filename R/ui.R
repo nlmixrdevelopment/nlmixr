@@ -1293,6 +1293,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                 or(group(one_of("Kk"),some_of("AaEe0123456789")),
                                    group(one_of("V","v"),
                                          any_of("c","C","P","p","T","t","S","s","0","1","2","3","4","5","6","7","8","9")),
+                                   group(one_of("Qq"),any_of("0":"9","p","c")),
                                    group(one_of("Cc"),one_of("Ll"),any_of("Dd2")),
                                    "aob","AOB","alpha","ALPHA","Alpha",
                                    "beta","BETA","Beta"
