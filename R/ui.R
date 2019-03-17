@@ -535,6 +535,7 @@ add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm",
 
 nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     ## Parses the UI function to extract predictions and errors, and the other model specification.
+    .fun000 <- fun
     rxode <- FALSE
     all.names <- allNames(body(fun));
     if (any(regexpr(rex::rex(start, or("rx_", "nlmixr_")), paste(all.names)) != -1)){
@@ -1407,9 +1408,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     fun2[length(fun2)] <- "}";
     fun2 <- eval(parse(text=paste0(fun2, collapse = "\n"), keep.source=TRUE))
     fun2 <- as.character(attr(fun2, "srcref"), useSource=TRUE);
-    fun3 <- fun2
+    fun3 <- as.character(attr(.fun000,"srcref"), useSource=TRUE);
     fun3 <- fun3[-1];
-    fun3 <- fun3[-length(fun3)]
     fun3 <- fun3[-length(fun3)]
     fun3 <- paste0(fun3, collapse="\n");
     if(length(.predDf$cond) != 1L){
