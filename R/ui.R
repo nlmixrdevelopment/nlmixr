@@ -158,8 +158,8 @@ ini <- function(ini, ...){
 }
 
 
-.thetaModelReg <- rex::rex(or(group(start,or("tv","t","pop","POP","Pop","TV","T","cov","err")),
-                         group(or("tv","pop","POP","pop","TV","cov","err"),end)))
+.thetaModelReg <- rex::rex(or(group(start,or("tv","t","pop","POP","Pop","TV","T","cov","err","eff")),
+                         group(or("tv","pop","POP","pop","TV","cov","err","eff"),end)))
 
 .etaParts <- c("eta","ppv","PPV","ETA","Ppv","iiv","Iiv","bsv","Bsv","BSV")
 .etaModelReg <- rex::rex(or(group(start,or(.etaParts)),group(or(.etaParts),end)))
