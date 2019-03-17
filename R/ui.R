@@ -196,75 +196,84 @@ model <- function(model, ...){
         .call <- match.call(expand.dots=TRUE)[-(1:2)];
         .lines <- .deparse(.call[[1]]);
         .f <- try(eval(parse(text=sprintf("function() %s", paste(.lines, collapse="\n")))),silent=TRUE);
-        .fNew <- .uif$fun;
+        .origLines <- strsplit(.uif$fun.txt,"\n")[[1]];
+        .fNew <- c("function(){",.origLines,"}");
+        .origLines <- .fNew;
         if (!inherits(.f, "try-error")){
             .fOrig <- eval(parse(text=paste(.fNew,collapse="\n")))
             .lhsOrig <- nlmixrfindLhs(body(.fOrig));
             .lhsNew <- nlmixrfindLhs(body(.f));
             .shared <- intersect(.lhsNew,.lhsOrig);
-            if (length(.shared)==0) stop("Could not find a part of the model to modify.");
-            for (.v in .shared){
-                .regShared <- rex::rex(start,any_spaces,.v,any_spaces,or("=","<-"));
-                .newLine <- .lines[regexpr(.regShared,.lines) != -1];
-                .oldLine <- .uif$fun[regexpr(.regShared,.uif$fun) != -1];
-                .w <- which(regexpr(.regShared, .fNew)!=-1)
-                if (length(.w) > 1) stop("Cannot modify a multi-line definition");
-                .fNew[.w] <- .newLine;
-                .oldVarsL  <- allVars(body(eval(parse(text=sprintf("function(){%s}",.oldLine)))));
-                .newVarsL  <- allVars(body(eval(parse(text=sprintf("function(){%s}",.newLine)))));
-                .rmVars <- setdiff(.oldVarsL, .newVarsL);
-                .addVars <- setdiff(.newVarsL, .oldVarsL);
-                for (.rm in .rmVars){
-                    .wh <- .ini[.ini$name == .rm,];
-                    if (length(.wh$name)==1){
-                        if (is.na(.wh$ntheta)){
-                            ## removing eta
-                            .curEta <- .wh$neta1;
-                            .maxEta <- max(.ini$neta1,na.rm=TRUE);
-                            .s <- seq(.curEta,.maxEta)
-                            .s <- .s[-length(.s)];
-                            .w <- unique(sort(c(which(is.na(.ini$neta1)),
-                                                which(.ini$neta1 !=.curEta),
-                                                which(.ini$neta2 !=.curEta))));
-                            .ini <- .ini[.w,];
-                            for (.rmI in .s){
-                                .ini$neta1[.ini$neta1 == .rmI+1] <- .rmI
-                                .ini$neta2[.ini$neta2 == .rmI+1] <- .rmI
-                            }
-                        } else {
-                            .curTheta <- .wh$ntheta;
-                            .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
-                            .s <- seq(.curTheta,.maxTheta)
-                            .s <- .s[-length(.s)];
-                            .w <- unique(sort(c(which(is.na(.ini$ntheta)),
-                                                which(.ini$ntheta !=.curTheta))));
-                            .ini <- .ini[.w,];
-                            for (.rmI in .s){
-                                .ini$ntheta[.ini$ntheta == .rmI+1] <- .rmI
+            .distOrig <- .findDist(body(.fOrig));
+            .distNew <- .findDist(body(.f));
+            .sharedDist <- intersect(.distNew,.distOrig);
+            if (length(.shared)==0 && length(.sharedDist)==0)
+                stop("Could not find a part of the model to modify.");
+            if (length(.shared) > 0){
+                for (.v in .shared){
+                    .regShared <- rex::rex(start,any_spaces,.v,any_spaces,or("=","<-"));
+                    .newLine <- .lines[regexpr(.regShared,.lines) != -1];
+                    .oldLine <- .origLines[regexpr(.regShared,.origLines) != -1];
+                    .w <- which(regexpr(.regShared, .fNew)!=-1)
+                    if (length(.w) > 1) stop("Cannot modify a multi-line definition");
+                    .fNew[.w] <- .newLine;
+                    .oldVarsL  <- allVars(body(eval(parse(text=sprintf("function(){%s}",.oldLine)))));
+                    .newVarsL  <- allVars(body(eval(parse(text=sprintf("function(){%s}",.newLine)))));
+                    .rmVars <- setdiff(.oldVarsL, .newVarsL);
+                    .addVars <- setdiff(.newVarsL, .oldVarsL);
+                    for (.rm in .rmVars){
+                        .wh <- .ini[.ini$name == .rm,];
+                        if (length(.wh$name)==1){
+                            if (is.na(.wh$ntheta)){
+                                ## removing eta
+                                .curEta <- .wh$neta1;
+                                .maxEta <- max(.ini$neta1,na.rm=TRUE);
+                                .s <- seq(.curEta,.maxEta)
+                                .s <- .s[-length(.s)];
+                                .w <- unique(sort(c(which(is.na(.ini$neta1)),
+                                                    which(.ini$neta1 !=.curEta),
+                                                    which(.ini$neta2 !=.curEta))));
+                                .ini <- .ini[.w,];
+                                for (.rmI in .s){
+                                    .ini$neta1[.ini$neta1 == .rmI+1] <- .rmI
+                                    .ini$neta2[.ini$neta2 == .rmI+1] <- .rmI
+                                }
+                            } else {
+                                .curTheta <- .wh$ntheta;
+                                .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
+                                .s <- seq(.curTheta,.maxTheta)
+                                .s <- .s[-length(.s)];
+                                .w <- unique(sort(c(which(is.na(.ini$ntheta)),
+                                                    which(.ini$ntheta !=.curTheta))));
+                                .ini <- .ini[.w,];
+                                for (.rmI in .s){
+                                    .ini$ntheta[.ini$ntheta == .rmI+1] <- .rmI
+                                }
                             }
                         }
                     }
-                }
-                ## Now add variables; Currently parsed based on variable name; Perhaps something better?
-                for (.new in .addVars){
-                    if (!any(.ini$name==.new)){
-                        if (regexpr(.etaModelReg,.new) !=-1){
-                            .maxEta <- max(.ini$neta1,na.rm=TRUE);
-                            .ini <- rbind(.ini,
-                                          data.frame(ntheta=NA, neta1=.maxEta+1, neta2=.maxEta+1,
-                                                     name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
-                                                     err=NA,label=NA,condition="ID"))
+                    ## Now add variables; Currently parsed based on variable name; Perhaps something better?
+                    for (.new in .addVars){
+                        if (!any(.ini$name==.new)){
+                            if (regexpr(.etaModelReg,.new) !=-1){
+                                .maxEta <- max(.ini$neta1,na.rm=TRUE);
+                                .ini <- rbind(.ini,
+                                              data.frame(ntheta=NA, neta1=.maxEta+1, neta2=.maxEta+1,
+                                                         name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
+                                                         err=NA,label=NA,condition="ID"))
 
-                        } else if (regexpr(.thetaModelReg, .new) !=-1) {
-                            .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
-                            .ini <- rbind(.ini,
-                                          data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
-                                                     name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
-                                                     err=NA,label=NA,condition=NA))
+                            } else if (regexpr(.thetaModelReg, .new) !=-1) {
+                                .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
+                                .ini <- rbind(.ini,
+                                              data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
+                                                         name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
+                                                         err=NA,label=NA,condition=NA))
+                            }
                         }
                     }
                 }
             }
+
             class(.ini) <- c("nlmixrBounds", "data.frame");
             .model <- eval(parse(text=paste(.fNew,collapse="\n"),keep.source=TRUE))
             return(.finalizeUiModel(nlmixrUIModel(.model,.ini,NULL),
@@ -517,6 +526,26 @@ nlmixrfindLhs <- function(x) {
         unique(c(lhs, unlist(lapply(x, nlmixrfindLhs))))
     } else if (is.pairlist(x)) {
         unique(unlist(lapply(x, nlmixrfindLhs)))
+    } else {
+        stop("Don't know how to handle type ", typeof(x),
+             call. = FALSE)
+    }
+}
+
+.findDist <- function(x) {
+    ## Modified from http://adv-r.had.co.nz/Expressions.html find_assign4
+    if (is.atomic(x) || is.name(x)) {
+        character()
+    } else if (is.call(x)) {
+        if (identical(x[[1]], quote(`~`)) &&
+            is.name(x[[2]])) {
+            lhs <- as.character(x[[2]])
+        } else {
+            lhs <- character()
+        }
+        unique(c(lhs, unlist(lapply(x, .findDist))))
+    } else if (is.pairlist(x)) {
+        unique(unlist(lapply(x, .findDist)))
     } else {
         stop("Don't know how to handle type ", typeof(x),
              call. = FALSE)
@@ -1517,9 +1546,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .predSaem <- eval(parse(text=sprintf("function(){\n%s;\n}", paste(paste(.predDf$var), collapse=";\n"))))
     ret <- list(ini=bounds, model=bigmodel,
                 nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
-                            all.vars=all.vars, rest.vars=rest.vars, all.names=all.names, all.funs=all.funs, all.lhs=all.lhs,
-                            all.covs=all.covs, saem.all.covs=saem.all.covs, saem.inPars=saem.inPars, lin.solved=lin.solved,
-                            errs.specified=errs.specified, add.prop.errs=add.prop.errs, grp.fn=grp.fn, mu.ref=.mu.ref, cov.ref=cov.ref,
+                            all.vars=all.vars, rest.vars=rest.vars, all.names=all.names,
+                            all.funs=all.funs, all.lhs=all.lhs,
+                            all.covs=all.covs, saem.all.covs=saem.all.covs,
+                            saem.inPars=saem.inPars, lin.solved=lin.solved,
+                            errs.specified=errs.specified, add.prop.errs=add.prop.errs,
+                            grp.fn=grp.fn, mu.ref=.mu.ref, cov.ref=cov.ref,
                             saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
                             log.theta=log.theta,
                             log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
