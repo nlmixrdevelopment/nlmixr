@@ -764,15 +764,7 @@ configsaem <- function(model, data, inits,
   set.seed(seed)
   distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
   distribution = match.arg(distribution)
-  form = attr(model$saem_mod, "form")
-  if (form!="cls"){
-    .data = as.data.frame(RxODE::etTrans(data,attr(model$saem_mod,"rx"), TRUE));
-    names(.data) = toupper(names(.data));
-    .oldData <- data[,!(names(data) %in% c("TIME", "EVID", "AMT", "II", "DV", "CMT"))];
-    .oldData <- .oldData[!duplicated(.oldData$ID),];
-    .data <- merge(.data,.oldData);
-    data <- .data;
-  }
+  .data = data;
   ##RxODE::rxTrans(data, model)
   data = list(nmdat=data)
 
@@ -899,6 +891,17 @@ configsaem <- function(model, data, inits,
   ## CHECKME
   form = attr(model$saem_mod, "form")
   if (form!="cls"){
+    dat = RxODE::etTrans(data$nmdat,attr(model$saem_mod,"rx"), TRUE);
+    ## if(length(dat) !=7) stop("SAEM doesn't support time varying covariates yet.");
+    .rx <- attr(model$saem_mod,"rx");
+    .pars <- .rx$params
+    .pars <- setNames(rep(1.1,length(.pars)),.pars);
+    do.call(RxODE:::rxSolve.default,
+            c(list(object=.rx, params=.pars,
+                   events=dat,.setupOnly=2L),ODEopt));
+    dat <- as.data.frame(dat[,-6]);
+    names(dat) <- toupper(names(dat));
+    dat$ID <- as.integer(dat$ID);
   } else {
      dat = data$nmdat[,c("ID", "TIME", "EVID", "AMT", "CMT")]
      infusion = max(dat$EVID)>10000
@@ -913,6 +916,7 @@ configsaem <- function(model, data, inits,
   evt$ID = evt$ID -1
   evtM = evt[rep(1:dim(evt)[1], nmc),]
   evtM$ID = cumsum(c(FALSE, diff(evtM$ID) != 0))
+
   i1 = grep(1, diag(covstruct))
   i0 = grep(0, diag(covstruct))
   nphi1 = sum(diag(covstruct))
@@ -1042,15 +1046,6 @@ configsaem <- function(model, data, inits,
   i1 = i1 - 1
   i0 = i0 - 1
 
-  ## if(length(dat) !=7) stop("SAEM doesn't support time varying covariates yet.");
-  if (form!="cls"){
-      .rx <- attr(model$saem_mod,"rx");
-      .pars <- .rx$params
-      .pars <- setNames(rep(1.1,length(.pars)),.pars);
-      do.call(RxODE:::rxSolve.default,
-              c(list(object=.rx, params=.pars,
-                     events=as.data.frame(evtM),.setupOnly=2L),ODEopt));
-  }
   cfg=list(
     nu=mcmc$nu,
     niter=niter,
