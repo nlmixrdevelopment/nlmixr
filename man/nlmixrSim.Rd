@@ -181,10 +181,35 @@ added to parameters}
 added to parameters}
 
 \item{addDosing}{Boolean indicating if the solve should add RxODE
-evid and amt columns.  This will also include dosing
-information and estimates at the doses.  Be default, RxODE
-only includes estimates at the observations. (default
-\code{FALSE}).}
+    EVID and related columns.  This will also include dosing
+    information and estimates at the doses.  Be default, RxODE
+    only includes estimates at the observations. (default
+    \code{FALSE}). When \code{addDosing} is \code{NULL}, only
+    include \code{EVID=0} on solve and exclude any model-times or
+    \code{EVID=2}. If \code{addDosing} is \code{NA} the
+    classic \code{RxODE} EVID events. When \code{addDosing} is
+    \code{TRUE} add the event information in NONMEM-style format,
+    with extra event types (\code{EVID}) for ending infusion and
+    modeled times:
+
+\itemize{
+
+\item \code{EVID=-1} when the modeled rate infusions are turned
+off (matches \code{rate=-1})
+
+\item \code{EVID=-2} When the modeled duration infusions are
+turned off (matches \code{rate=-2})
+
+\item \code{EVID=-10} When the specified \code{rate} infusions are
+turned off (matches \code{rate>0})
+
+\item \code{EVID=-20} When the specified \code{dur} infusions are
+turned off (matches \code{dur>0})
+
+\item \code{EVID=101,102,103,...} Modeled time where 101 is the
+first model time, 102 is the second etc.
+
+}}
 
 \item{updateObject}{This is an internally used flag to update the
 RxODE solved object (when supplying an RxODE solved object) as

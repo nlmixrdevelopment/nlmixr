@@ -4,6 +4,19 @@ orig.onAttach <- function(libname, pkgname){ ## nocov start
     options(keep.source=TRUE)
 }
 
+##' Convert data to RxODE format (depreciated)
+##'
+##' @param data Data to "convert"
+##'
+##' @return Exact same data as was input
+##'
+##' @keywords internal
+##' @export
+nmDataConvert <- function(data){
+    warning("nmDataConvert is depreciated and no longer needed.");
+    data
+}
+
 nlmixrSetupMemoize <- function(){
     reSlow <- rex::rex(".slow", end)
     f <- sys.function(-1)
