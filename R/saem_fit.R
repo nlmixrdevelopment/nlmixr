@@ -449,7 +449,11 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       }
   }
 
-  saem.cpp <- paste0("saem",digest::digest(list(ifelse(is.ode,RxODE::rxNorm(model),deparse(model)),
+  saem.cpp <- paste0("saem",digest::digest(list(ifelse(is.ode,RxODE::rxModelVars(model)$trans["lib.name"],
+                                                       ## lib.name includes RxODE version MD5
+                                                       deparse(model)),
+                                                ## Should give different models for different nlmixr versions
+                                                sessionInfo()$otherPkgs$nlmixr$Version,
                                                 deparse(PKpars),deparse(pred),
                                                 deparse(inPars))), .Platform$r_arch);
   ## }

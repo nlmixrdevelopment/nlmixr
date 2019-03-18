@@ -215,6 +215,11 @@ nlmixrData.default <- function(data){
 ##' @export
 nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                        sum.prod=FALSE, table=tableControl()){
+    .wId <- which(tolower(names(data)) == "id")
+    .lvl <- unique(data[,.wId]);
+    .lab <- paste(.lvl)
+    data[,.wId] <- factor(data[,.wId],levels=.lvl, labels=.lab);
+    data[,.wId] <- as.integer(data[,.wId]);
     .modelId <- digest::digest(list(sessionInfo()$otherPkgs$nlmixr$Version,
                                     uif, data, est, control, sum.prod, table,...));
     .meta <- uif$meta
@@ -265,12 +270,11 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
     }
     bad.focei <- "Problem calculating residuals, returning fit without residuals.";
     fix.dat <- function(x){
-        ## if (length(backSort) > 0){
-        ##     cls <- class(x);
-        ##     class(x) <- "data.frame";
-        ##     x$ID <- factor(x$ID, backSort2, labels=backSort);
-        ##     class(x) <- cls;
-        ## }
+        .cls <- class(x);
+        class(x) <- "data.frame";
+        attr(x$ID, "levels") <- .lab;
+        class(x$ID) <- "factor";
+        class(x) <- .cls;
         .uif <- x$uif;
         .thetas <- x$theta;
         for (.n in names(.thetas)){
