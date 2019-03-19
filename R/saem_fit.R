@@ -450,8 +450,10 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
           setwd(.wd);
           on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
       } else {
+          ## This makes all the parsing files, cpp and so in their own
+          ## directory.  No collisions.
           .wd  <- file.path(.wd,paste0(.md5,".saemd"));
-          dir.create(.wd, recursive = TRUE);
+          suppressWarnings({dir.create(.wd, recursive = TRUE)});
           setwd(.wd);
           on.exit({setwd(lwd)});
       }
@@ -462,106 +464,121 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
   saem.cpp <- paste0(saem.cpp, ".cpp");
+  saem.lock  <- paste0(saem.cpp, ".lock");
+
+  if (!file.exists("saem.cpp")){
+      if (is.ode) {
+          modelVars = model$cmpMgr$get.modelVars()
+          pars = modelVars$params
+          npar = length(pars)
+          pars = paste(c(
+              sprintf("    vec _params(%d);\n", npar),
+              sprintf("    _params(%d) = %s;\n", 1:npar-1, pars)
+          ), collapse="")
+
+          model_vars = names=c("time", modelVars$state, modelVars$lhs)
+          s = lapply(1:length(model_vars), function(k) {
+              sprintf("vec %s;\n%s=_ret.col(%d);\n", model_vars[k], model_vars[k], k-1)
+          })
+          model_vars_decl = paste0(s, collapse="")
+
+          ode_solver = model$cmpMgr$ode_solver
+          dll = sub("[.].*","",basename(RxODE::rxDll(model)))
+
+          neq = length(modelVars$state)
+          nlhs = length(modelVars$lhs)
+
+          x = deparse(body(pred))
+          len = length(x)
+          x = if(x[1]=="{") x[2:(len-1)] else x
+          len = length(x)
+          nendpnt = len
+          pred_expr = paste(paste("_g.col(", 1:len-1, ") = ", x, ";", sep=""), collapse="\n")
+
+      } else {
+          neq = nlhs = 0
+          pars = model
+          list2env(attr(pars, "calls"), envir=env)
+      }
+                                        #str(ls(envir=env))
+
+### deal with explicit initCondition statement
+      x = deparse(body(PKpars))
+      ix = grep(reINITS, x, perl=T)
+      if (length(ix)>0) {
+          inits = getInits(x[ix], reINITS)
+          x = x[-ix]
+      } else {
+          inits = ""
+      }
 
 
-  if (is.ode) {
-    modelVars = model$cmpMgr$get.modelVars()
-    pars = modelVars$params
-    npar = length(pars)
-    pars = paste(c(
-    sprintf("    vec _params(%d);\n", npar),
-    sprintf("    _params(%d) = %s;\n", 1:npar-1, pars)
-    ), collapse="")
+      len = length(x)
+      cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
 
-	model_vars = names=c("time", modelVars$state, modelVars$lhs)
-	s = lapply(1:length(model_vars), function(k) {
-		sprintf("vec %s;\n%s=_ret.col(%d);\n", model_vars[k], model_vars[k], k-1)
-	})
-	model_vars_decl = paste0(s, collapse="")
+      nrhs = integer(1)
 
-    ode_solver = model$cmpMgr$ode_solver
-    dll = sub("[.].*","",basename(RxODE::rxDll(model)))
+      if (is.null(inPars)) {
+          offset = 0L
+          nignore  = 0L
+          ignore_vars = ""
+      } else {
+          offset = cumsum(c(0L, nchar(inPars)+1L))
+          nignore  = length(inPars)
+          ignore_vars = paste(c(inPars, ""), collapse=",")
+      }
 
-	neq = length(modelVars$state)
-	nlhs = length(modelVars$lhs)
+      RxODE::rxReq("dparser");
+      x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE), ignore_vars, offset, nignore)
+      nrhs = x[[3]]
+      foo = paste(readLines("foo__.txt"), collapse="\n")
 
-    x = deparse(body(pred))
-    len = length(x)
-    x = if(x[1]=="{") x[2:(len-1)] else x
-    len = length(x)
-    nendpnt = len
-    pred_expr = paste(paste("_g.col(", 1:len-1, ") = ", x, ";", sep=""), collapse="\n")
+      nm = system.file("", package = "nlmixr");
+      if (is.null(inPars)) {
+          assgnPars = declPars = ""
+      } else {
+          s = sprintf("      %s = _mPars(_i,%d);", inPars, 1:length(inPars)-1)
+          assgnPars = paste0(s, collapse="\n")
+          s = "mat _mPars=as<mat>(_opt[\"mPars\"]);"
+          declPars = sprintf("\tdouble %s;\n\t%s", paste0(inPars, collapse=", "), s)
+      }
+      nmtime = 0
+      if (is.ode){
+          nmtime = RxODE::rxModelVars(model)$nMtime;
+      }
 
-  } else {
-	neq = nlhs = 0
-	pars = model
-	list2env(attr(pars, "calls"), envir=env)
+      brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
   }
-  #str(ls(envir=env))
-
-  ### deal with explicit initCondition statement
-  x = deparse(body(PKpars))
-  ix = grep(reINITS, x, perl=T)
-  if (length(ix)>0) {
-	inits = getInits(x[ix], reINITS)
-	x = x[-ix]
-  } else {
-	inits = ""
+  .i <- 0;
+  while (file.exists(saem.lock) && .i < 100){
+      if (.i==0) message(sprintf("Waiting for %s to be removed", saem.lock))
+      .i <- .i+1;
+      Sys.sleep(1);
+      message(".",appendLF=FALSE)
   }
-
-
-  len = length(x)
-  cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
-
-  nrhs = integer(1)
-
-  if (is.null(inPars)) {
-    offset = 0L
-    nignore  = 0L
-    ignore_vars = ""
-  } else {
-    offset = cumsum(c(0L, nchar(inPars)+1L))
-    nignore  = length(inPars)
-    ignore_vars = paste(c(inPars, ""), collapse=",")
-  }
-
-  RxODE::rxReq("dparser");
-  x = .C("parse_pars", "eqn__.txt", "foo__.txt", nrhs, as.integer(FALSE), ignore_vars, offset, nignore)
-  nrhs = x[[3]]
-  foo = paste(readLines("foo__.txt"), collapse="\n")
-
-  nm = system.file("", package = "nlmixr");
-  if (is.null(inPars)) {
-    assgnPars = declPars = ""
-  } else {
-    s = sprintf("      %s = _mPars(_i,%d);", inPars, 1:length(inPars)-1)
-    assgnPars = paste0(s, collapse="\n")
-    s = "mat _mPars=as<mat>(_opt[\"mPars\"]);"
-    declPars = sprintf("\tdouble %s;\n\t%s", paste0(inPars, collapse=", "), s)
-  }
-  nmtime = 0
-  if (is.ode){
-      nmtime = RxODE::rxModelVars(model)$nMtime;
-  }
-
-  brew(text=c(saem_cmt_str, saem_ode_str)[1+is.ode], output=saem.cpp)
-  #unlink(c("eqn__.txt", "foo__.txt"))
-  #if (inPars == "") inPars = NULL
-
-  ##gen Markevars
-  ## if(is.win) x = gsub("\\\\", "/", utils::shortPathName(x))
-  ## x = sub("/nlmixr", "", x)
-  ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
-  ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
-
-  make_str = 'PKG_CXXFLAGS=%s -g -fopenmp\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
-  make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
-
-  cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
-  ## cat(make_str)
-
-  rexec = paste(R.home(component="bin"), .Platform$file.sep, "R", sep="")
+  if (.i > 0) message("");
   if (!file.exists(file.path(getwd(), saem.dll))){
+      sink(saem.lock)
+      cat("");
+      sink();
+      on.exit(if (file.exists(saem.lock)){unlink(saem.lock)},add=TRUE);
+      ##unlink(c("eqn__.txt", "foo__.txt"))
+      ##if (inPars == "") inPars = NULL
+
+      ##gen Markevars
+      ## if(is.win) x = gsub("\\\\", "/", utils::shortPathName(x))
+      ## x = sub("/nlmixr", "", x)
+      ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
+      ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
+
+      make_str = 'PKG_CXXFLAGS=%s -g -fopenmp\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
+      make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
+
+      cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
+      ## cat(make_str)
+
+      rexec = paste(R.home(component="bin"), .Platform$file.sep, "R", sep="")
+
       args  = c("CMD", "SHLIB", saem.cpp, "-o", saem.dll)
       ## do.call("system", list(shlib))
       .badBuild <- function(msg,stop=TRUE){
@@ -576,9 +593,11 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       .out <- sys::exec_internal(cmd=rexec, args=args, error=FALSE)
       if (!(.out$status==0 & file.exists(saem.dll))){
           message("error")
+          unlink(saem.lock);
           .badBuild("Error building SAEM model");
       }
       message("done")
+      unlink(saem.lock);
   }
   ## file.copy(file.path(.wd, saem.dll), file.path(lwd, saem.dll));
   ## file.copy(file.path(.wd, saem.cpp), file.path(lwd, saem.cpp));
