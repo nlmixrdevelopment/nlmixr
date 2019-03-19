@@ -450,7 +450,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
           setwd(.wd);
           on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
       } else {
-          .wd  <- file.path(.wd,paste0(digest,".saemd"));
+          .wd  <- file.path(.wd,paste0(.md5,".saemd"));
           dir.create(.wd, recursive = TRUE);
           setwd(.wd);
           on.exit({setwd(lwd)});
