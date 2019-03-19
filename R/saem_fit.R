@@ -39,7 +39,7 @@ typedef void (*rxSingleSolve_t)(int subid, double *_theta, double *timep,
 			  int *on, int *ix,
 			  int *slvr_counter, int *dadt_counter, int *jac_counter,
 			  double *InfusionRate, int *BadDose, int *idose,
-			  double *scale, int *stateIgnore, double *mtime, double *solveSave);
+			  double *scale, int *stateIgnore, double *mtime);
 
 rxSingleSolve_t rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
 
@@ -104,7 +104,6 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 
      vec _InfusionRate(_op->neq, fill::zeros);
      ivec _BadDose(_op->neq, fill::zeros);
-     vec _solveSave(_op->neq);
      ivec _on(_op->neq, fill::ones);
     _wm = _evt.rows( find(_id == _i) );
     if(_wm.n_rows==0) {
@@ -157,7 +156,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
             _ret.memptr(), _lhs.memptr(), &_rc, _newTime.memptr(), _evid2.memptr(),
             _on.memptr(), _ix2.memptr(), &_slvr_counter,&_dadt_counter, &_jac_counter,
             _InfusionRate.memptr(), _BadDose.memptr(), _idose.memptr(), _scale.memptr(),
-            _stateIgnore.memptr(), _mtime.memptr(), _solveSave.memptr());
+            _stateIgnore.memptr(), _mtime.memptr());
 
     if ( _DEBUG > 4 && _rc != 0 ) {
 
