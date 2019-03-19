@@ -432,6 +432,13 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   is.win <- .Platform$OS.type=="windows"
   env = environment()
   lwd <- getwd();
+  .md5  <- digest::digest(list(ifelse(is.ode,RxODE::rxModelVars(model)$trans["lib.name"],
+                                      ## lib.name includes RxODE version MD5
+                                      deparse(model)),
+                               ## Should give different models for different nlmixr versions
+                               sessionInfo()$otherPkgs$nlmixr$Version,
+                               deparse(PKpars),deparse(pred),
+                               deparse(inPars)))
   if (getOption("RxODE.tempfiles",TRUE)){
       ## .wd <- tempfile()
       ## dir.create(.wd, recursive = TRUE)
@@ -443,18 +450,14 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
           setwd(.wd);
           on.exit({setwd(lwd);unlink(.wd, recursive=TRUE, force=TRUE)});
       } else {
+          .wd  <- file.path(.wd,paste0(digest,".saemd"));
+          dir.create(.wd, recursive = TRUE);
           setwd(.wd);
           on.exit({setwd(lwd)});
       }
   }
 
-  saem.cpp <- paste0("saem",digest::digest(list(ifelse(is.ode,RxODE::rxModelVars(model)$trans["lib.name"],
-                                                       ## lib.name includes RxODE version MD5
-                                                       deparse(model)),
-                                                ## Should give different models for different nlmixr versions
-                                                sessionInfo()$otherPkgs$nlmixr$Version,
-                                                deparse(PKpars),deparse(pred),
-                                                deparse(inPars))), .Platform$r_arch);
+  saem.cpp <- paste0("saem",.md5, .Platform$r_arch);
   ## }
   saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
