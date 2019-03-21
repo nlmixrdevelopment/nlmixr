@@ -215,11 +215,10 @@ nlmixrData.default <- function(data){
 ##' @export
 nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                        sum.prod=FALSE, table=tableControl()){
-    .wId <- which(tolower(names(data)) == "id")
-    .lvl <- unique(data[,.wId]);
-    .lab <- paste(.lvl)
-    data[,.wId] <- factor(data[,.wId],levels=.lvl, labels=.lab);
-    data[,.wId] <- as.integer(data[,.wId]);
+    .tmp <- deparse(body(uif$theta.pars))[-1];
+    .tmp <- .tmp[-length(.tmp)];
+    data <- RxODE::etTrans(data,paste(paste(.tmp,collapse="\n"),"\n",uif$rxode),TRUE,TRUE);
+    .lab  <- attr(class(data),".RxODE.lst")$idLvl;
     .modelId <- digest::digest(list(sessionInfo()$otherPkgs$nlmixr$Version,
                                     uif, data, est, control, sum.prod, table,...));
     .meta <- uif$meta
@@ -425,6 +424,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         }
         return(.ret);
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
+        data <- as.data.frame(data)
         if (length(uif$predDf$cond) > 1) stop("nlmixr nlme does not support multiple endpoints.")
         pt <- proc.time()
         est.type <- est;
