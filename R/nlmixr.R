@@ -725,9 +725,8 @@ saemControl <- function(seed=99,
         .rm <- c(.rm, "n.em")
     }
     .ret <- list(mcmc=list(niter=c(nBurn, nEm), nmc=nmc, nu=nu),
-         ODEopt=list(atol=atol, rtol=rtol,
-                     method=method,
-                     transitAbs = transitAbs),
+                 ODEopt=RxODE::rxControl(atol=atol, rtol=rtol, method=method,
+                                         transitAbs = transitAbs,...),
          seed=seed,
          print=print,
          DEBUG=trace,

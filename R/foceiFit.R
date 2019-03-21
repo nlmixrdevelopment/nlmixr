@@ -509,7 +509,7 @@ is.latex <- function() {
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @seealso \code{\link[RxODE]{rxSolve}}
 ##' @export
-foceiControl <- function(sigdig=3,
+foceiControl <- function(sigdig=3,...,
                          epsilon=NULL, #1e-4,
                          maxInnerIterations=1000,
                          maxOuterIterations=5000,
@@ -596,8 +596,7 @@ foceiControl <- function(sigdig=3,
                          gradTrim=Inf,
                          gradCalcCentralSmall=1e-4,
                          gradCalcCentralLarge=1e4,
-                         etaNudge=0.01,
-                         ..., stiff){
+                         etaNudge=0.01, stiff){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
@@ -657,7 +656,9 @@ foceiControl <- function(sigdig=3,
             }
         }
     }  else {
-        method <- match.arg(method);
+        if (!RxODE::rxIs(method,"integer")){
+            method <- match.arg(method);
+        }
     }
     ## .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
     ## method <- as.integer(.methodIdx[method]);
@@ -674,8 +675,11 @@ foceiControl <- function(sigdig=3,
     derivMethod <- as.integer(.methodIdx[derivMethod])
     covDerivMethod <- .methodIdx[match.arg(covDerivMethod)];
     if (length(covsInterpolation) > 1) covsInterpolation <- covsInterpolation[1];
-    covsInterpolation <- tolower(match.arg(covsInterpolation,
-                                           c("linear", "locf", "LOCF", "constant", "nocb", "NOCB", "midpoint")))
+    if (!RxODE::rxIs(covsInterpolation, "integer")){
+        covsInterpolation <- tolower(match.arg(covsInterpolation,
+                                               c("linear", "locf", "LOCF", "constant", "nocb", "NOCB", "midpoint")))
+    }
+
     ## if (covsInterpolation == "constant") covsInterpolation <- "locf";
     ## covsInterpolation  <- as.integer(which(covsInterpolation == c("linear", "locf", "nocb", "midpoint")) - 1);
     if (missing(cores)){

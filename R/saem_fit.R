@@ -781,6 +781,7 @@ configsaem <- function(model, data, inits,
 	seed=99, fixed=NULL, DEBUG=0)
 {
     names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt));
+    ODEopt  <- do.call(RxODE::rxControl,ODEopt)
 #mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
   set.seed(seed)
   distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
@@ -1471,16 +1472,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     } else {
         dat <- data;
     }
-    atol <- uif$env$ODEopt$atol;
-    if(is.null(atol))atol <- 1e-6
-    rtol <- uif$env$ODEopt$rtol;
-    if(is.null(rtol))rtol <- 1e-4
-    .method <- uif$env$ODEopt$method;
-    ## if(is.null(.stiff)) .stiff <- 1L
-    ## if (.stiff == 1L) .method <- "lsoda"
-    ## if (.stiff == 0L) .method <- "dop853"
-    transitAbs <- uif$env$ODEopt$transitAbs;
-    if(is.null(transitAbs)) transitAbs<- 0L
     .tn <-uif$saem.theta.name;
     .nth <- length(.tn)
     .tmp <- try(chol(object$Ha[1:.nth,1:.nth]), silent=TRUE)
@@ -1594,6 +1585,15 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
             .env$noLik <- TRUE;
             .env$objective <- .saemObf;
         }
+        .ctl <- uif$env$ODEopt
+        names(.ctl) <- sub("maxsteps","maxstepsOde",names(.ctl));
+        .ctl  <- .ctl[names(.ctl) != "scale"];
+        .ctl$maxOuterIterations <- 0;
+        .ctl$maxInnerIterations  <- 0;
+        .ctl$covMethod <- .covMethod;
+        .ctl$sumProd <- uif$env$sum.prod;
+        .ctl$optExpression  <- uif$env$optExpression
+        .ctl <- do.call(foceiControl, .ctl)
         fit.f <- try(foceiFit.data.frame(data=dat,
                                          inits=init,
                                          PKpars=uif$theta.pars,
@@ -1609,16 +1609,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
                                          env=.env,
                                          fixed=.fixed,
                                          skipCov=.skipCov,
-                                         control=foceiControl(maxOuterIterations=0,
-                                                              maxInnerIterations=0,
-                                                              covMethod=.covMethod,
-                                                              cores=1,
-                                                              atol=atol,
-                                                              rtol=rtol,
-                                                              method=.method,
-                                                              transitAbs=transitAbs,
-                                                              sumProd=uif$env$sum.prod,
-                                                              optExpression=uif$env$optExpression)), silent=FALSE);
+                                         control=.ctl), silent=FALSE);
         if (inherits(fit.f, "try-error")){
             if (is.na(calcResid)){
                 warning("Error calculating nlmixr object, return classic object");
