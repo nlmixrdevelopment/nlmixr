@@ -776,7 +776,7 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @export
 configsaem <- function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
-	ODEopt = list(atol=1e-6, rtol=1e-4, method="lsoda", transitAbs=FALSE),
+	ODEopt = list(atol=1e-6, rtol=1e-4, method="lsoda", transitAbs=FALSE,maxeval=100000),
 	distribution=c("normal","poisson","binomial"),
 	seed=99, fixed=NULL, DEBUG=0)
 {
@@ -1593,6 +1593,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         .ctl$covMethod <- .covMethod;
         .ctl$sumProd <- uif$env$sum.prod;
         .ctl$optExpression  <- uif$env$optExpression
+        .ctl$scaleTo <- 0;
         .ctl <- do.call(foceiControl, .ctl)
         fit.f <- try(foceiFit.data.frame(data=dat,
                                          inits=init,

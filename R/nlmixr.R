@@ -709,6 +709,7 @@ saemControl <- function(seed=99,
                         covMethod=c("fim", "r,s", "r", "s"),
                         logLik=FALSE,
                         optExpression=TRUE,
+                        maxsteps=100000L,
                         ...){
     .xtra <- list(...);
     .rm <- c();
@@ -726,7 +727,7 @@ saemControl <- function(seed=99,
     }
     .ret <- list(mcmc=list(niter=c(nBurn, nEm), nmc=nmc, nu=nu),
                  ODEopt=RxODE::rxControl(atol=atol, rtol=rtol, method=method,
-                                         transitAbs = transitAbs,...),
+                                         transitAbs = transitAbs,maxsteps=maxsteps,...),
          seed=seed,
          print=print,
          DEBUG=trace,

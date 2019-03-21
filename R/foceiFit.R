@@ -516,7 +516,7 @@ foceiControl <- function(sigdig=3,...,
                          n1qn1nsim=NULL,
                          method = c("liblsoda", "lsoda", "dop853"),
                          transitAbs = NULL, atol = NULL, rtol = NULL,
-                         maxstepsOde = 5000L, hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
+                         maxstepsOde = 100000L, hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
                          covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
                          print=1L,
                          printNcol=floor((getOption("width") - 23)/12) ,
@@ -1468,6 +1468,7 @@ foceiFit.data.frame0 <- function(data,
                                 etaMat=NULL,
                                 ...,
                                 env=NULL){
+    RxODE::rxSolveFree(); freeFocei();
     on.exit({RxODE::rxSolveFree(); freeFocei();});
     .pt <- proc.time();
     loadNamespace("n1qn1");
