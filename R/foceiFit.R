@@ -1652,16 +1652,18 @@ foceiFit.data.frame0 <- function(data,
     .ret$rxInv <- RxODE::rxSymInvCholCreate(mat=.om0, diag.xform=control$diagXform);
     .ret$xType <- .ret$rxInv$xType
     .om0a <- .om0
-    diag(.om0a) <- diag(.om0a) / control$diagOmegaBoundLower;
+    .om0a <- .om0a / control$diagOmegaBoundLower;
     .om0b <- .om0
-    diag(.om0b) <- diag(.om0b) * control$diagOmegaBoundUpper;
+    .om0b <- .om0b * control$diagOmegaBoundUpper;
     .om0a <- RxODE::rxSymInvCholCreate(mat=.om0a, diag.xform=control$diagXform)
     .om0b <- RxODE::rxSymInvCholCreate(mat=.om0b, diag.xform=control$diagXform)
-    .omdf <- data.frame(a=.om0a$theta, m=.ret$rxInv$theta, b=.om0b$theta);
+    .omdf <- data.frame(a=.om0a$theta, m=.ret$rxInv$theta, b=.om0b$theta,diag=.om0a$theta.diag);
     .omdf$lower <- with(.omdf, ifelse(a > b, b, a))
     .omdf$lower <- with(.omdf, ifelse(lower == m, -Inf, lower));
+    .omdf$lower <- with(.omdf, ifelse(!diag, -Inf, lower));
     .omdf$upper <- with(.omdf, ifelse(a < b, b, a))
     .omdf$upper <- with(.omdf, ifelse(upper == m, Inf, upper));
+    .omdf$upper <- with(.omdf, ifelse(!diag, Inf, upper));
     lower <- c(lower, .omdf$lower)
     upper <- c(upper, .omdf$upper)
 
