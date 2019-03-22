@@ -1872,10 +1872,19 @@ print.nlmixrClass <- function(x, ...){
     print(tmp);
 }
 
-
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
     .env <- obj;
+    if (any(arg == c("logLik", "value", "obf", "ofv"))){
+        if (!is.null(obj$saem)){
+            .tmp <- obj$saem;
+            if (obj$nnodes.gq==1){
+                setOfv(obj, paste0("laplace",obj$nsd.gq))
+            } else {
+                setOfv(obj, paste0("gauss",obj$nnodes.gq, ".", obj$nsd.gq))
+            }
+        }
+    }
     if (any(arg == c("value","obf","ofv"))) arg <- "objf"
     if (arg == "sigma") return(.sigma(obj))
     if (arg == "coefficients"){
@@ -2507,8 +2516,6 @@ focei.theta <- function(object, uif, ...){
     UseMethod("focei.theta");
 }
 
-##
-
 ##' Cox Box transformation
 ##'
 ##' @param x data to transform
@@ -2533,9 +2540,9 @@ yeoJohnson <- function(x, lambda=1){
 
 ##' Set Objective function type for a nlmixr object
 ##'
-##'
 ##' @param x nlmixr fit object
-##' @param type Type of objective function to use for AIC, BIC, and $objective
+##' @param type Type of objective function to use for AIC, BIC, and
+##'     $objective
 ##' @return Nothing
 ##' @author Matthew L. Fidler
 setOfv <- function(x, type){
@@ -2546,20 +2553,60 @@ setOfv <- function(x, type){
             .env <- x$env;
             .objf <- .objDf[.w, "OBJF"];
             .lik <- -.objf/2;
-            attr(.lik, "df") <- attr(x$logLik, "df")
-            attr(.lik, "nobs") = attr(x$logLik, "nobs");
+            attr(.lik, "df") <- attr(get("logLik",.env), "df")
+            attr(.lik, "nobs") = attr(get("logLik",.env), "nobs");
             class(.lik) <- "logLik"
             .bic <- .objDf[.w, "BIC"];
             .aic <- .objDf[.w, "AIC"];
-            .env$OBJF <- .objf
-            .env$objf <- .objf
-            .env$objective <- .objf
-            .env$logLik <- .lik;
-            .env$AIC <- .aic
-            .env$BIC <- .bic
+            assign("OBJF", .objf,.env);
+            assign("objf", .objf,.env);
+            assign("objective", .objf, .env)
+            assign("logLik",.lik,.env)
+            assign("AIC", .aic, .env)
+            assign("BIC", .bic, .env)
             invisible(NULL)
         } else {
-            stop("Cannot switch objective function to '%s' type.", type);
+            if (tolower(type)=="focei") {
+                addCwres(x);
+                return(setOfv(x, "FOCEi"));
+            } else if (!is.null(x$saem)){
+                .ret <- x$saem
+                .reg  <- rex::rex(start,"laplace",capture(numbers),end);
+                .regG  <- rex::rex(start,"gauss",capture(numbers),".",capture(numbers),end);
+                if (regexpr(.reg,type) !=-1){
+                    .nnode <- 1;
+                    .nsd  <- as.numeric(sub(.reg,"\\1",type))
+                } else if (regexpr(.regG,type) !=-1){
+                    .nnode <- as.numeric(sub(.regG,"\\1",type));
+                    .nsd <- as.numeric(sub(.regG,"\\2",type));
+                } else {
+                    stop(sprintf("Cannot switch objective function to '%s' type.", type))
+                }
+                .saemObf <- calc.2LL(x$saem,nnodes.gq = .nnode, nsd.gq = .nsd);
+                .env <- x$env;
+                .llik <- -.saemObf / 2;
+                attr(.llik, "df") <- attr(get("logLik", .env), "df");
+                .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
+                               BIC=.saemObf + log(.env$nobs) * attr(get("logLik", .env), "df"),
+                               "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
+                if (any(names(.env$objDf) == "Condition Number")){
+                    .cn <- unique(.env$objDf[["Condition Number"]])
+                    .cn <- .cn[!is.na(.cn)];
+                    if (length(.cn)==1){
+                        .tmp <- data.frame(.tmp, "Condition Number"=.cn, check.names=FALSE);
+                    } else {
+                        .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
+                    }
+                }
+                .rn  <- row.names(.env$objDf);
+                .env$objDf  <- rbind(.env$objDf,
+                                     .tmp);
+                row.names(.env$objDf) <- c(.rn, type);
+                .env$objDf <- .env$objDf[order(row.names(.env$objDf)),];
+                .env$objDf <- .env$objDf[!is.na(.env$objDf$OBJF),];
+                return(setOfv(x,type));
+            }
+            stop(sprintf("Cannot switch objective function to '%s' type.", type));
         }
     } else {
         stop("Wrong type of object.");

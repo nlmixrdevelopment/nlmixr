@@ -426,6 +426,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         }
         if (inherits(.ret, "nlmixrFitCore")){
             .env <- .ret$env
+            .env$nnodes.gq  <- .nnodes.gq;
+            .env$nsd.gq  <- .nsd.gq;
             assign("startTime", start.time, .env);
             assign("est", est, .env);
             assign("stopTime", Sys.time(), .env);
@@ -756,7 +758,10 @@ saemControl <- function(seed=99,
          seed=seed,
          print=print,
          DEBUG=trace,
-         optExpression=optExpression, ...)
+         optExpression=optExpression,
+         nnodes.gq=nnodes.gq,
+         nsd.gq=nsd.gq,
+         ...)
     if (length(.rm) > 0){
         .ret <- .ret[!(names(.ret) %in% .rm)]
     }

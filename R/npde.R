@@ -110,7 +110,7 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, c
 tableControl <- function(npde=NULL,
                          cwres=NULL,
                          saemNPDE=FALSE,
-                         saemCWRES=TRUE,
+                         saemCWRES=FALSE,
                          nlmeNPDE=FALSE,
                          nlmeCWRES=FALSE,
                          foceiNPDE=FALSE,

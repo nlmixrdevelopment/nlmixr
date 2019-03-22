@@ -1518,15 +1518,26 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     }
     dimnames(.m) <- list(NULL, .allThetaNames);
     .fixedNames <- paste(uif$ini$name[which(uif$ini$fix)]);
+    .rn <- "SAEMg"
     if (is.na(obf)){
         .saemObf <- NA
     } else if (is.null(obf)){
         .saemObf <- calc.2LL(object,nnodes.gq = nnodes.gq, nsd.gq = nsd.gq);
+        if (nnodes.gq){
+            .rn <- paste0("laplace",nsd.gq);
+        } else {
+            .rn <- paste0("gauss",nnodes.gq,".", nsd.gq);
+        }
     } else if (is(obf, "logical")) {
         if (is.na(obf)){
             .saemObf <- NA;
         } else if (obf){
-            .saemObf <- calc.2LL(object);
+            .saemObf <- calc.2LL(object,nnodes.gq = nnodes.gq, nsd.gq = nsd.gq);
+            if (nnodes.gq){
+                .rn <- paste0("laplace",nsd.gq);
+            } else {
+                .rn <- paste0("gauss",nnodes.gq,".", nsd.gq);
+            }
         } else {
             .saemObf <- NA
         }
@@ -1640,21 +1651,21 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     }
     .env$message <- "";
     if (is.na(calcResid)){
-        row.names(.env$objDf) <- "SAEMg";
+        row.names(.env$objDf) <- .rn;
     } else if (calcResid){
         if (!is.na(.saemObf)){
             .llik <- -.saemObf / 2;
-            attr(.llik, "df") <- attr(.env$loglik, "df");
-            .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(.env$logLik, "df"),
-                               BIC=.saemObf + log(.env$nobs) * attr(.env$logLik, "df"),
+            attr(.llik, "df") <- attr(get("logLik", .env), "df");
+            .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
+                               BIC=.saemObf + log(.env$nobs) * attr(get("logLik", .env), "df"),
                                "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
             if (any(names(.env$objDf) == "Condition Number")) .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
             .env$objDf  <- rbind(.env$objDf,
                                  .tmp)
-            row.names(.env$objDf) <- c("FOCEi", "SAEMg");
+            row.names(.env$objDf) <- c("FOCEi", .rn);
         }
     } else {
-        row.names(.env$objDf) <- "SAEMg";
+        row.names(.env$objDf) <- .rn;
     }
     return(fit.f);
 }

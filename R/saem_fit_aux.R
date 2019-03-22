@@ -23,7 +23,6 @@
 ##' 20th meeting of the Population Approach Group in Europe, Athens, Greece
 ##' (2011), Abstr 2173.
 ##'
-##' @keywords internal
 ##' @export
 calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
     ##nnodes.gq=8, nsd.gq=4
@@ -80,7 +79,11 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
     b = (xmax-xmin)/2; dim(b) = c(N, nphi1)
 
     Q = 0
-    message("Calculating -2LL by Gaussian quadrature")
+    if (nnodes.gq==1){
+        message(sprintf("Calculating Laplace -2LL (nsd=%s)",nsd.gq))
+    } else {
+        message(sprintf("Calculating -2LL by Gaussian quadrature (nnodes=%s,nsd=%s)",nnodes.gq,nsd.gq))
+    }
     RxODE::rxProgress(nx)
     on.exit(RxODE::rxProgressAbort());
     for (j in 1:nx) {
