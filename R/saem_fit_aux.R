@@ -12,9 +12,6 @@
 ##'
 ##' @return log-likelihood calculated by Gaussian Quadrature
 ##'
-##' @author Wenping Wang, Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
-##' Marc Lavielle.
-##'
 ##' @references  Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
 ##' mixed effects models. Computational Statistics and Data Analysis 49, 4
 ##' (2005), 1020-1038.
