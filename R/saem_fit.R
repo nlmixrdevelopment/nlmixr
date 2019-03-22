@@ -1437,7 +1437,8 @@ focei.eta.saemFit <- function(object, uif, ...){
     return(ome)
 }
 
-as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL){
+as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
+                             nnodes.gq=1, nsd.gq=3){
     on.exit({RxODE::rxSolveFree()});
     .saemTime <- proc.time() - pt;
     if (class(uif) == "function"){
@@ -1520,7 +1521,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (is.na(obf)){
         .saemObf <- NA
     } else if (is.null(obf)){
-        .saemObf <- calc.2LL(object);
+        .saemObf <- calc.2LL(object,nnodes.gq = nnodes.gq, nsd.gq = nsd.gq);
     } else if (is(obf, "logical")) {
         if (is.na(obf)){
             .saemObf <- NA;

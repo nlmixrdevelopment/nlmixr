@@ -1,4 +1,30 @@
 ##FIXME: g by endpint
+
+##' Log-likelihood using Gaussian Quadrature
+##'
+##' Estimate the log-likelihood using Gaussian Quadrature (multidimensional
+##' grid)
+##'
+##'
+##' @param fit saemFit fit
+##'
+##' @inheritParams saemControl
+##'
+##' @return log-likelihood calculated by Gaussian Quadrature
+##'
+##' @author Wenping Wang, Emmanuelle Comets <emmanuelle.comets@@inserm.fr>, Audrey Lavenu,
+##' Marc Lavielle.
+##'
+##' @references  Kuhn E, Lavielle M. Maximum likelihood estimation in nonlinear
+##' mixed effects models. Computational Statistics and Data Analysis 49, 4
+##' (2005), 1020-1038.
+##'
+##' Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+##' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+##' (2011), Abstr 2173.
+##'
+##' @keywords internal
+##' @export
 calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
     ##nnodes.gq=8, nsd.gq=4
     .env <- attr(fit,"env");

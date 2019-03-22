@@ -198,9 +198,9 @@ nlmixrData.default <- function(data){
 
 ##' Fit a nlmixr model
 ##'
-##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).
 ##' @param data Dataset to estimate.  Needs to be RxODE compatible in
 ##'     EVIDs.
+##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).
 ##' @param est Estimation method
 ##' @param control Estimation control options.  They could be
 ##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
@@ -377,12 +377,21 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         } else {
             .logLik <- default$logLik
         }
+        if (any(names(control) == "nnodes.gq")){
+            .nnodes.gq <- control$nnodes.gq
+        } else {
+            .nnodes.gq <- default$nnodes.gq
+        }
+        if (any(names(control) == "nsd.gq")){
+            .nsd.gq <- control$nsd.gq
+        } else {
+            .nsd.gq <- default$nsd.gq
+        }
         if (any(names(control) == "optExpression")){
             uif$env$optExpression <- control$optExpression
         } else {
             uif$env$optExpression <- default$optExpression
         }
-
         if (is.null(uif$nlme.fun.mu)){
             stop("SAEM requires all ETAS to be mu-referenced")
         }
@@ -409,7 +418,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             cfg$print <- as.integer(print)
         }
         .fit <- model$saem_mod(cfg);
-        .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik);
+        .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik,
+                                 nnodes.gq=.nnodes.gq,nsd.gq=.nsd.gq);
         if (inherits(.ret, "nlmixrFitData")){
             .ret <- fix.dat(.ret);
             .ret <- .addNpde(.ret);
@@ -684,14 +694,27 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
 ##'  "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
 ##'
 ##'  "" Does not calculate the covariance step.
+##'
 ##' @param logLik boolean indicating that log-likelihood should be
 ##'     calculate by Gaussian quadrature.
+##'
 ##' @param trace An integer indicating if you want to trace(1) the
 ##'     SAEM algorithm process.  Useful for debugging, but not for
 ##'     typical fitting.
+##'
+##' @param nnodes.gq number of nodes to use for the Gaussian
+##'     quadrature when computing the likelihood with this method
+##'     (defaults to 1, equivalent to the Laplaclian likelihood)
+##'
+##' @param nsd.gq span (in SD) over which to integrate when computing
+##'     the likelihood by Gaussian quadrature. Defaults to 3 (eg 3
+##'     times the SD)
+##'
 ##' @param ... Other arguments to control SAEM.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams foceiControl
+##'
 ##' @return List of options to be used in \code{\link{nlmixr}} fit for
 ##'     SAEM.
 ##' @author Wenping Wang & Matthew L. Fidler
@@ -707,7 +730,9 @@ saemControl <- function(seed=99,
                         print=1,
                         trace=0,
                         covMethod=c("fim", "r,s", "r", "s"),
-                        logLik=FALSE,
+                        logLik=TRUE,
+                        nnodes.gq=1,
+                        nsd.gq=3,
                         optExpression=TRUE,
                         maxsteps=100000L,
                         ...){
