@@ -2112,6 +2112,76 @@ plot.nlmixrFitData <- function(x, ...) {
 
     }
 }
+##' Return the objective function
+##'
+##' @param x object to return objective function value
+##' @param type Objective function type value to retrieve or add.
+##'
+##' \itemize{
+##'
+##' \item{focei} For most models you can specify "focei" and it will
+##' add the focei objective function.
+##'
+##' \item{nlme} This switches/chooses the nlme objective function if
+##'    applicable.  This objective function cannot be added if it
+##'    isn't present.
+##'
+##' \item{fo} FO objective function value. Cannot be generated
+##'
+##' \item{foce} FOCE object function value. Cannot be generated
+##'
+##' \item{laplace#} This adds/retrieves  the Laplace objective function value.
+##' The \code{#} represents the number of standard deviations
+##' requested when expanding the Gaussian Quadrature.  This can
+##' currently only be used with saem fits.
+##'
+##' \item{gauss#.#} This adds/retrieves the Gaussian Quadrature
+##' approximation of the objective function.  The first number is the
+##' number of nodes to use in the approximation. The second number is
+##' the number of standard deviations to expand upon.
+##'
+##' }
+##'
+##' @param ... Other arguments sent to ofv for other methods.
+##'
+##' @return Objective function value
+##'
+##' @author Matthew Fidler
+##'
+##' @export
+ofv <- function(x,type,...){
+    UseMethod("ofv");
+}
+
+##' @export
+ofv.nlmixrFitData <- function(x,type,...){
+    if (!missing(type)) setOfv(x,type);
+    return(x$ofv)
+}
+
+##'@export
+logLik.nlmixrFitData <- function(object, ...){
+    .objName <- substitute(object);
+    .lst  <- list(...);
+    if (!is.null(.lst$type)){
+        .new <- setOfv(object,.lst$type);
+        .parent <- globalenv();
+        .bound <- do.call("c", lapply(ls(.parent, all.names=TRUE), function(.cur){
+                                   if (.cur == .objName && identical(.parent[[.cur]]$env, fit$env)){
+                                       return(.cur)
+                                   }
+                                   return(NULL);
+                               }))
+        if (length(.bound) == 1){
+            if (exists(.bound, envir=.parent)){
+                assign(.bound, .new, envir=.parent)
+            }
+        }
+        return(get("logLik",.new$env))
+    } else {
+        return(object$logLik);
+    }
+}
 
 ##'@export
 logLik.nlmixrFitCore <- function(object, ...){
@@ -2564,11 +2634,11 @@ setOfv <- function(x, type){
             assign("logLik",.lik,.env)
             assign("AIC", .aic, .env)
             assign("BIC", .bic, .env)
-            invisible(NULL)
+            invisible(x)
         } else {
             if (tolower(type)=="focei") {
-                addCwres(x);
-                return(setOfv(x, "FOCEi"));
+                .tmp <- addCwres(x,TRUE,globalenv());
+                return(setOfv(.tmp, "FOCEi"));
             } else if (!is.null(x$saem)){
                 .ret <- x$saem
                 .reg  <- rex::rex(start,"laplace",capture(numbers),end);

@@ -5,7 +5,7 @@
 \title{Output table/data.frame options}
 \usage{
 tableControl(npde = NULL, cwres = NULL, saemNPDE = FALSE,
-  saemCWRES = TRUE, nlmeNPDE = FALSE, nlmeCWRES = FALSE,
+  saemCWRES = FALSE, nlmeNPDE = FALSE, nlmeCWRES = FALSE,
   foceiNPDE = FALSE, foceNPDE = FALSE, nsim = 300, ties = TRUE,
   seed = 1009)
 }

@@ -7,7 +7,8 @@
 saemControl(seed = 99, nBurn = 200, nEm = 300, nmc = 3, nu = c(2,
   2, 2), atol = 1e-06, rtol = 1e-04, method = "lsoda",
   transitAbs = FALSE, print = 1, trace = 0, covMethod = c("fim",
-  "r,s", "r", "s"), logLik = FALSE, optExpression = TRUE, ...)
+  "r,s", "r", "s"), logLik = FALSE, nnodes.gq = 1, nsd.gq = 3,
+  optExpression = TRUE, maxsteps = 100000L, ...)
 }
 \arguments{
 \item{seed}{Random Seed for SAEM step.  (Needs to be set for
@@ -89,8 +90,19 @@ typical fitting.}
 \item{logLik}{boolean indicating that log-likelihood should be
 calculate by Gaussian quadrature.}
 
+\item{nnodes.gq}{number of nodes to use for the Gaussian
+quadrature when computing the likelihood with this method
+(defaults to 1, equivalent to the Laplaclian likelihood)}
+
+\item{nsd.gq}{span (in SD) over which to integrate when computing
+the likelihood by Gaussian quadrature. Defaults to 3 (eg 3
+times the SD)}
+
 \item{optExpression}{Optimize the RxODE expression to speed up
 calculation. By default this is turned on.}
+
+\item{maxsteps}{maximum number of (internally defined) steps allowed
+during one call to the solver. (5000 by default)}
 
 \item{...}{Other arguments to control SAEM.}
 }

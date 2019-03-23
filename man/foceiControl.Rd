@@ -4,10 +4,11 @@
 \alias{foceiControl}
 \title{Control Options for FOCEi}
 \usage{
-foceiControl(sigdig = 3, epsilon = NULL, maxInnerIterations = 1000,
-  maxOuterIterations = 5000, n1qn1nsim = NULL, method = c("liblsoda",
-  "lsoda", "dop853"), transitAbs = NULL, atol = NULL, rtol = NULL,
-  maxstepsOde = 5000L, hmin = 0L, hmax = NA_real_, hini = 0,
+foceiControl(sigdig = 3, ..., epsilon = NULL,
+  maxInnerIterations = 1000, maxOuterIterations = 5000,
+  n1qn1nsim = NULL, method = c("liblsoda", "lsoda", "dop853"),
+  transitAbs = NULL, atol = NULL, rtol = NULL,
+  maxstepsOde = 100000L, hmin = 0L, hmax = NA_real_, hini = 0,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
   "linear", "nocb", "midpoint"), print = 1L,
   printNcol = floor((getOption("width") - 23)/12), scaleTo = 1,
@@ -38,7 +39,7 @@ foceiControl(sigdig = 3, epsilon = NULL, maxInnerIterations = 1000,
   rmatNorm = TRUE, smatNorm = TRUE, covGillF = TRUE,
   optGillF = TRUE, covSmall = 1e-05, adjLik = TRUE, gradTrim = Inf,
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
-  etaNudge = 0.01, ..., stiff)
+  etaNudge = 0.01, stiff)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -53,6 +54,8 @@ foceiControl(sigdig = 3, epsilon = NULL, maxInnerIterations = 1000,
 
  \item The significant figures that some tables are rounded to.
 }}
+
+\item{...}{Ignored parameters}
 
 \item{epsilon}{Precision of estimate for n1qn1 optimization.}
 
@@ -568,8 +571,6 @@ value; If the ETA still doesn't move, nudge the ETA down by
 this value.  Finally if it doesn't move, reset it to zero and
 do not perform the optimization again.  This ETA nudge is only
 done on the first ETA optimization.}
-
-\item{...}{Ignored parameters}
 
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
     the ODE system is stiff or not.

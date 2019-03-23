@@ -776,20 +776,26 @@ saemControl <- function(seed=99,
 ##' This returns a new fit object with CWRES attached
 ##'
 ##' @param fit nlmixr fit without WRES/CWRES
-##' @param updateObject Boolean indicating if the original fit object should be updated. By default this is true.
+##' @param updateObject Boolean indicating if the original fit object
+##'     should be updated. By default this is true.
+##' @param envir Environment that should be checked for object to
+##'     update.  By default this is the global environment.
 ##' @return fit with CWRES
 ##' @author Matthew L. Fidler
 ##' @export
-addCwres <- function(fit, updateObject=TRUE){
+addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     .objName <- substitute(fit);
     if(any(names(fit) == "CWRES")){
-        warning("Already contains CWRES");
+        ## warning("Already contains CWRES");
         return(fit)
     }
     .uif <- fit$uif;
     .saem <- fit$saem
     if (!is.null(.saem)){
+        assign("saem",NULL,fit$env)
+        on.exit({assign("saem",.saem,fit$env)});
         .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=fit$objDf["SAEMg","OBJF"]);
+        assign("saem",.saem,fit$env);
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
     }
@@ -801,9 +807,9 @@ addCwres <- function(fit, updateObject=TRUE){
     }
     class(.new) <- class(.newFit)
     if (updateObject){
-        .parent <- parent.frame(2);
+        .parent <- envir;
         .bound <- do.call("c", lapply(ls(.parent, all.names=TRUE), function(.cur){
-                                   if (.cur == .objName && identical(.parent[[.cur]], fit)){
+                                   if (.cur == .objName && identical(.parent[[.cur]]$env, fit$env)){
                                        return(.cur)
                                    }
                                    return(NULL);

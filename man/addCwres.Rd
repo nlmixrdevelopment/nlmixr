@@ -4,12 +4,16 @@
 \alias{addCwres}
 \title{Add CWRES}
 \usage{
-addCwres(fit, updateObject = TRUE)
+addCwres(fit, updateObject = TRUE, envir = globalenv())
 }
 \arguments{
 \item{fit}{nlmixr fit without WRES/CWRES}
 
-\item{updateObject}{Boolean indicating if the original fit object should be updated. By default this is true.}
+\item{updateObject}{Boolean indicating if the original fit object
+should be updated. By default this is true.}
+
+\item{envir}{Environment that should be checked for object to
+update.  By default this is the global environment.}
 }
 \value{
 fit with CWRES

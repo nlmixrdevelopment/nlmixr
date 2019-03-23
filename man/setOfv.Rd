@@ -9,7 +9,8 @@ setOfv(x, type)
 \arguments{
 \item{x}{nlmixr fit object}
 
-\item{type}{Type of objective function to use for AIC, BIC, and $objective}
+\item{type}{Type of objective function to use for AIC, BIC, and
+$objective}
 }
 \value{
 Nothing
