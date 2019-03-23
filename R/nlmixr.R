@@ -794,7 +794,22 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     if (!is.null(.saem)){
         assign("saem",NULL,fit$env)
         on.exit({assign("saem",.saem,fit$env)});
-        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=fit$objDf["SAEMg","OBJF"]);
+        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=NA);
+        .ob1 <- .newFit$objDf
+        .ob2 <- fit$objDf
+        if (any(names(.ob2) == "Condition Number")){
+            .cn <- unique(.ob2[["Condition Number"]])
+            .cn <- .cn[!is.na(.cn)];
+            if (length(.cn)==1){
+                .ob1[,"Condition Number"] <- .cn
+            } else {
+                .ob1[,"Condition Number"] <- NA;
+            }
+        }
+        .ob1 <- rbind(.ob1,.ob2);
+        .ob1 <- .ob1[order(row.names(.ob1)),];
+        .ob1 <- .ob1[!is.na(.ob1$OBJF),];
+        assign("objDf", .ob1, envir=.newFit$env);
         assign("saem",.saem,fit$env);
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
