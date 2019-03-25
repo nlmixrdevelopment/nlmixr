@@ -23,6 +23,26 @@
     deparse(expr,width=500)
 }
 
+.bodyDewrap  <- function(ret){
+    .ret  <- ret
+    if (length(.ret) > 1){
+        .ret[1] <- sub(rex::rex(start,or(group("function",any_spaces,"(",any_spaces,")",any_spaces),""),
+                                any_spaces,any_of("("),any_spaces, "{",any_spaces),"",.ret[1], perl=TRUE);
+        if (.ret[1]=="") .ret <- .ret[-1];
+
+    }
+    if (length(.ret) > 1){
+        .len <- length(.ret);
+        .ret[.len] <- sub(rex::rex(any_spaces,"}",any_spaces,any_of(")"), any_spaces,end),"",.ret[.len]);
+        if (.ret[.len]=="") .ret <- .ret[-.len];
+    }
+    return(.ret)
+}
+
+.deparse1  <- function(expr){
+    return(.bodyDewrap(deparse(expr,width=500)));
+}
+
 .getUif <- function(what){
     if (inherits(what, "nlmixrFitCore")){
         .uif <- what$uif
@@ -346,7 +366,9 @@ nlmixrUI <- function(fun){
                     }
                 }
             }
-            desc <- paste(gsub(rex::rex(any_spaces, end), "", gsub(rex::rex(start, any_spaces, any_of("#"), any_spaces), "", fun2[w2])), collapse=" ");
+            desc <- paste(gsub(rex::rex(any_spaces, end), "",
+                               gsub(rex::rex(start, any_spaces, any_of("#"), any_spaces), "", fun2[w2])),
+                          collapse=" ");
             lhs0 <- c(lhs0, "desc");
         }
         .model <- .ini <- NULL; ## Rcheck hack
@@ -563,6 +585,50 @@ unsupported.dists <- c("dchisq", "chisq", "dexp", "df", "f", "dgeom", "geom",
 add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj", "boxCox", "yeoJohnson");
 
 nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
+    .md5  <- digest::digest(list(.deparse1(body(fun)), .deparse(ini), .deparse(bigmodel),
+                                 ## Should give different models for different nlmixr versions
+                                 sessionInfo()$otherPkgs$nlmixr$Version));
+    .wd <- RxODE::rxTempDir();
+    if (.wd == ""){
+        warning("rxTempDir did not work.");
+        .wd <- tempfile()
+        dir.create(.wd, recursive = TRUE)
+    } else {
+        ## This makes all the parsing files, cpp and so in their own
+        ## directory.  No collisions.
+        suppressWarnings({dir.create(.wd, recursive = TRUE)});
+    }
+    .uiFile <- file.path(.wd, paste0("ui-",.md5));
+    .uiLock <- paste0(.uiFile,".lock")
+    .uiBad <- paste0(.uiFile,".bad");
+    .uiFile <- paste0(.uiFile,".uid");
+    if (file.exists(.uiBad)){
+        stop(sprintf("Bad parsed model (cached %s).",.uiBad))
+    } else if (file.exists(.uiFile)){
+        load(file=.uiFile);
+        return(ret);
+    } else if (file.exists(.uiLock)){
+        message(sprintf("Waiting for UI to parse on another thread (%s)", .uiLock),appendLF=FALSE);
+        while(file.exists(.uiLock)){
+           Sys.sleep(0.5)
+           message(".",appendLF=FALSE)
+        }
+        message("")
+        if (file.exists(.uiBad)){
+            stop("Bad parsed model (another thread).")
+        }
+        load(file=.uiFile);
+        return(ret);
+    } else {
+        sink(.uiLock);cat("");sink(); on.exit({unlink(.uiLock)},add=TRUE);
+        sink(.uiBad);cat("");sink();
+        ret <- .nlmixrUIModel(fun, ini, bigmodel);
+        save(ret,file=.uiFile)
+        unlink(.uiBad);
+        return(ret);
+    }
+}
+.nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     ## Parses the UI function to extract predictions and errors, and the other model specification.
     .fun000 <- fun
     rxode <- FALSE
@@ -1137,8 +1203,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         if (do.pred == 2){
             assign("rxode", any(regexpr(rex::rex(start, any_spaces, "d/dt(", anything, ")", any_spaces, or("=", "<-")), x) != -1), this.env)
         }
-        x[1] <- paste0("function(){");
-        x[length(x)] <- "}"
+        x <- c("function(){",.bodyDewrap(x),"}");
         x <- eval(parse(text=paste(x, collapse="\n")))
         return(x)
     }
@@ -1268,18 +1333,16 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         funTxt <- .finalFix();
         return(funTxt);
     }
-    .tmp <- .deparse(body(fun));
-    .tmp <- .tmp[-1]
-    .tmp <- .tmp[-length(.tmp)];
+    .tmp <- .deparse1(body(fun));
     ## Assume ~ is boundaries
     reg <- rex::rex(or("=","<-"),anything,boundary, or(ini$name), boundary);
     .regRx <- rex::rex(or("d/dt(", "f(", "F(", "dur(", "d(",
                           "lag(", "alag(", "r(", "rate(",
                           group("(0)", any_spaces, or("=", "~", "<-"))));
     .lhs <- nlmixrfindLhs(body(
-            eval(parse(text=paste("function(){",
-                                  paste(.tmp,collapse="\n"),
-                                  "}")))));
+        eval(parse(text=paste("function(){",
+                              paste(.tmp,collapse="\n"),
+                              "}")))));
     .lhsReg <- rex::rex(boundary, or(.lhs), boundary);
     fun <- eval(parse(text=paste(c("function()({",.fun00(.tmp),"})"),collapse="\n")));
     all.covs <- character();
@@ -1316,8 +1379,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (any(regexpr(rex::rex("linCmt("), .deparse(body(fun))) != -1)){
         .linCmt  <- TRUE;
         .hasLinCmt <- any(regexpr(rex::rex("linCmt("), .deparse(body(rest))) == -1);
-        rx.txt <- .deparse(body(rest))[-1];
-        rx.txt <- rx.txt[-length(rx.txt)];
+        rx.txt <- .deparse1(body(rest));
         .regLin <- rex::rex(start,any_spaces,
                             capture(
                                 or(group(one_of("Kk"),some_of("AaEe0123456789")),
@@ -1332,26 +1394,24 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .pred <- gsub(.regLin,
                       "nlmixr_lincmt_\\1 <- \\2", rx.txt)
         .rx <- gsub(rex::rex(start,any_spaces,capture(except_any_of(" \n=<-")),any_spaces,or("=","<-"),
-                               capture(anything)),
+                             capture(anything)),
                     "\\1 <- nlmixr_lincmt_\\1", rx.txt)
         rest <- eval(parse(text=paste(c("function(){",
-                                 .pred,.rx,
-                                 ifelse(.hasLinCmt, "nlmixr_lincmt_pred <- linCmt()\n}","}")),
-                                 collapse="\n")))
+                                        .pred,.rx,
+                                        ifelse(.hasLinCmt, "nlmixr_lincmt_pred <- linCmt()\n}","}")),
+                                      collapse="\n")))
         if (!is.null(saem.pars)){
             saem.pars <- gsub(.regLin,
-                          "nlmixr_lincmt_\\1 = \\2", saem.pars);
+                              "nlmixr_lincmt_\\1 = \\2", saem.pars);
         }
         if (!is.null(nlme.mu.fun)){
             nlme.mu.fun <- gsub(.regLin,
-                          "nlmixr_lincmt_\\1 = \\2", nlme.mu.fun);
+                                "nlmixr_lincmt_\\1 = \\2", nlme.mu.fun);
         }
         pred.txt  <- gsub(rex::rex("linCmt(",any_spaces,")"),
                           "nlmixr_lincmt_pred", pred.txt);
         rest.txt <- gsub(.regLin,"nlmixr_lincmt_\\1 = \\2", rest.txt);
-        .tmp <- as.character(attr(fun, "srcref"), useSource=TRUE);
-        .tmp <- .tmp[-1];
-        .tmp <- .tmp[-length(.tmp)];
+        .tmp <- .bodyDewrap(as.character(attr(fun, "srcref"), useSource=TRUE));
         .tmp <- .tmp[regexpr("~",.tmp) != -1];
         .tmp <- gsub(rex::rex("linCmt(",any_spaces,")"), "nlmixr_lincmt_pred",.tmp);
         .tmp <- c("function()({",.pred,.rx, ifelse(.hasLinCmt, "nlmixr_lincmt_pred <- linCmt()",""),"})");
@@ -1360,8 +1420,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .pred <- FALSE
     }
     if (rxode){
-        rx.txt <- .deparse(body(rest))[-1]
-        rx.txt <- rx.txt[-length(rx.txt)];
+        rx.txt <- .deparse1(body(rest))
 
         w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
         if (length(w) == 0){
@@ -1432,14 +1491,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         nlme.mu.fun2 <- saem.pars
         rxode <- NULL
     }
-    fun2 <- as.character(attr(fun, "srcref"), useSource=TRUE)
-    fun2[1] <- "function(){"
-    fun2[length(fun2)] <- "}";
+    fun2 <- c("function(){",.bodyDewrap(as.character(attr(fun, "srcref"), useSource=TRUE)),"}");
     fun2 <- eval(parse(text=paste0(fun2, collapse = "\n"), keep.source=TRUE))
     fun2 <- as.character(attr(fun2, "srcref"), useSource=TRUE);
-    fun3 <- as.character(attr(.fun000,"srcref"), useSource=TRUE);
-    fun3 <- fun3[-1];
-    fun3 <- fun3[-length(fun3)]
+    fun3 <- c(.bodyDewrap(as.character(attr(.fun000,"srcref"), useSource=TRUE)));
     fun3 <- paste0(fun3, collapse="\n");
     if(length(.predDf$cond) != 1L){
         if (any(.predDf$cond == "")){
@@ -1510,7 +1565,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
     }
     env <- new.env(parent=emptyenv());
-    env$infusion <- FALSE
     env$sum.prod <- FALSE
     ## Split out inPars
     saem.all.covs <- all.covs[all.covs %in% names(cov.ref)]
@@ -1727,8 +1781,7 @@ nlmixrUI.rxode.pred <- function(object){
     if (is.null(object$rxode)){
         return(NULL)
     } else {
-        tmp <- .deparse(body(object$pred))[-1]
-        tmp <- tmp[-length(tmp)]
+        tmp <- .deparse1(body(object$pred))
         return(paste(c(object$rxode, tmp), collapse="\n"));
     }
 }
@@ -1744,8 +1797,8 @@ nlmixrUI.theta.pars <- function(obj){
     .eta <- .df[!is.na(.df$neta1), ];
     .eta <- .eta[.eta$neta1 == .eta$neta2, ];
     .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
-    .f <- .deparse(body(obj$rest))[-1]
-    .f <- eval(parse(text=paste(c("function(){", .unfixed, .eta, .f[-length(.f)], "}"), collapse="\n")))
+    .f <- .deparse1(body(obj$rest))
+    .f <- eval(parse(text=paste(c("function(){", .unfixed, .eta, .f, "}"), collapse="\n")))
     return(.f)
 }
 ##' Get SAEM distribution
@@ -2167,8 +2220,8 @@ nlmixrUI.lincmt.dvdx <- function(obj){
         .eta <- .df[!is.na(.df$neta1), ];
         .eta <- .eta[.eta$neta1 == .eta$neta2, ];
         .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
-        .txt <- .deparse(body(obj$rest))[-1]
-        .txt[length(.txt)] <- obj$lin.solved$extra.lines
+        .txt <- .deparse1(body(obj$rest))
+        .txt[length(.txt)+1] <- obj$lin.solved$extra.lines
         .txt <- paste(c(.unfixed, .eta, .txt), collapse="\n")
         .txt <- substring(.txt, 0, nchar(.txt) - 1)
         return(RxODE::rxSymPyLincmtDvdx(.txt, obj$lin.solved$ncmt, obj$lin.solved$parameterization))

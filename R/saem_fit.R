@@ -443,7 +443,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       ## .wd <- tempfile()
       ## dir.create(.wd, recursive = TRUE)
       ## setwd(.wd)
-      .wd <- Sys.getenv("rxTempDir");
+      .wd <- RxODE::rxTempDir();
       if (.wd == ""){
           .wd <- tempfile()
           dir.create(.wd, recursive = TRUE)
