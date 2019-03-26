@@ -602,12 +602,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .uiLock <- paste0(.uiFile,".lock")
     .uiBad <- paste0(.uiFile,".bad");
     .uiFile <- paste0(.uiFile,".uid");
-    if (file.exists(.uiBad)){
-        stop(sprintf("Bad parsed model (cached %s).",.uiBad))
-    } else if (file.exists(.uiFile)){
-        load(file=.uiFile);
-        return(ret);
-    } else if (file.exists(.uiLock)){
+    if (file.exists(.uiLock)){
         message(sprintf("Waiting for UI to parse on another thread (%s)", .uiLock),appendLF=FALSE);
         while(file.exists(.uiLock)){
            Sys.sleep(0.5)
@@ -617,6 +612,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         if (file.exists(.uiBad)){
             stop("Bad parsed model (another thread).")
         }
+        load(file=.uiFile);
+        return(ret);
+    } else if (file.exists(.uiBad)){
+        stop(sprintf("Bad parsed model (cached %s).",.uiBad))
+    } else if (file.exists(.uiFile)){
         load(file=.uiFile);
         return(ret);
     } else {
