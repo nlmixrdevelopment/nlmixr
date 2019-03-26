@@ -608,18 +608,35 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   `.DLL` <- dyn.load(saem.dll);
   fn.pred <- sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred')
   fn1 <- sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
-  fn <- eval(bquote(function(a, b, c){
+  if (is.ode){
+    fn <- eval(bquote(function(a, b, c){
+      RxODE::rxLoad(.(model))
       if (missing(b) && missing(c)){
-          cur.fn <- .(fn1)
-          ret <- cur.fn(a)
-          attr(ret, "dopred") <- .(fn.pred);
-          attr(ret, "env") <- .(env);
-          return(ret);
+        cur.fn <- .(fn1)
+        ret <- cur.fn(a)
+        attr(ret, "dopred") <- .(fn.pred);
+        attr(ret, "env") <- .(env);
+        return(ret);
       } else {
-          cur.fn <- .(fn.pred)
-          return(cur.fn(a, b, c));
+        cur.fn <- .(fn.pred)
+        return(cur.fn(a, b, c));
       }
-  }))
+    }))
+  } else {
+    fn <- eval(bquote(function(a, b, c){
+      if (missing(b) && missing(c)){
+        cur.fn <- .(fn1)
+        ret <- cur.fn(a)
+        attr(ret, "dopred") <- .(fn.pred);
+        attr(ret, "env") <- .(env);
+        return(ret);
+      } else {
+        cur.fn <- .(fn.pred)
+        return(cur.fn(a, b, c));
+      }
+    }))
+  }
+
   attr(fn, "form") = if (is.ode) "ode" else "cls"
   attr(fn, "neq") = neq
   attr(fn, "nlhs") = nlhs
