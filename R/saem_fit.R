@@ -437,7 +437,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
                                       deparse(model)),
                                ## Should give different models for different nlmixr versions
                                sessionInfo()$otherPkgs$nlmixr$Version,
-                               deparse(PKpars),deparse(pred),
+                               deparse(body(PKpars)),deparse(body(pred)),
                                deparse(inPars)))
   if (getOption("RxODE.tempfiles",TRUE)){
       ## .wd <- tempfile()
