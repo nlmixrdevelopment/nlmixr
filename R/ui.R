@@ -1626,13 +1626,18 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             all.vars=all.vars, rest.vars=rest.vars, all.names=all.names,
                             all.funs=all.funs, all.lhs=all.lhs,
                             all.covs=all.covs, saem.all.covs=saem.all.covs,
-                            saem.inPars=saem.inPars, lin.solved=ifelse(.linCmt,.linCmt,NULL),
+                            saem.inPars=saem.inPars,
                             errs.specified=errs.specified, add.prop.errs=add.prop.errs,
                             grp.fn=grp.fn, mu.ref=.mu.ref, cov.ref=cov.ref,
                             saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
                             log.theta=log.theta,
                             log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
                             predDf=.predDf, predSaem =.predSaem, env=env, predSys=.pred))
+    if (.linCmt){
+        ret$nmodel$lin.solved <- TRUE
+    } else {
+        ret$nmodel$lin.solved  <- NULL;
+    }
     return(ret)
 }
 ##' Create the nlme specs list for nlmixr nlme solving
