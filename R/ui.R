@@ -610,20 +610,44 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
         message("")
         if (file.exists(.uiBad)){
-            stop("Bad parsed model (another thread).")
+            load(.uiBad);
+            for (.w in .lst$ws){
+                warning(.w);
+            }
+            stop(paste(.lst$em,"(another thread)"));
         }
         load(file=.uiFile);
         return(ret);
     } else if (file.exists(.uiBad)){
-        stop(sprintf("Bad parsed model (cached %s).",.uiBad))
+        load(.uiBad);
+        for (.w in .lst$ws){
+            warning(.w);
+        }
+        stop(sprintf("%s\nBad parsed model (cached %s).",.lst$em,.uiBad))
     } else if (file.exists(.uiFile)){
         load(file=.uiFile);
         return(ret);
     } else {
         sink(.uiLock);cat("");sink(); on.exit({unlink(.uiLock)},add=TRUE);
         sink(.uiBad);cat("");sink();
-        ret <- .nlmixrUIModel(fun, ini, bigmodel);
-        save(ret,file=.uiFile)
+        .thisEnv <- environment()
+        .thisEnv$ws <- character(0);
+        ret <- tryCatch(suppressWarnings(withCallingHandlers(.nlmixrUIModel(fun, ini, bigmodel),
+                                                    warning=function(w){
+            assign("ws", unique(c(w$message, ws)), .thisEnv);
+        })),error=function(e){assign("em",e$message,.thisEnv)});
+        .lst <- list();
+        if (exists("ws",envir=.thisEnv)){
+            .lst$ws  <-  .thisEnv$ws;
+        }
+        if (exists("em",envir=.thisEnv)){
+            .lst$em <- .thisEnv$em
+            save(.lst,file=.uiBad);
+            ## stop(.lst$em);
+            ## Let it error out on its own for the backtrace...
+            ret <- .nlmixrUIModel(fun, ini, bigmodel);
+        }
+        save(ret,.lst, file=.uiFile)
         unlink(.uiBad);
         return(ret);
     }
