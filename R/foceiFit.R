@@ -1875,7 +1875,7 @@ print.nlmixrClass <- function(x, ...){
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
     .env <- obj;
-    if (any(arg == c("logLik", "value", "obf", "ofv"))){
+    if (any(arg == c("logLik", "value", "obf", "ofv", "objf", "OBJF", "objective", "AIC", "BIC"))){
         if (!is.null(obj$saem)){
             .tmp <- obj$saem;
             if (obj$nnodes.gq==1){
@@ -2254,7 +2254,14 @@ print.nlmixrFitCore <- function(x, ...){
                                                crayon::bold(" posthoc")), " estimation"), " fit");
     message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
                              x$extra, .posthoc)))
-    print(x$objDf)
+    if (is.na(get("objective",x$env))){
+        message(sprintf("  Likelihoods will be calculated with: addCwres(%s), AIC(%s) or %s etc.",
+                        crayon::yellow(.bound),
+                        crayon::yellow(.bound),
+                        paste0(crayon::yellow(.bound),crayon::bold$blue("$objf"))))
+    } else {
+        print(x$objDf)
+    }
     message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
     print(x$time)
     .boundChar <- nchar(.bound);
@@ -2608,6 +2615,31 @@ yeoJohnson <- function(x, lambda=1){
     .Call(`_nlmixr_coxBox_`, x, lambda, 1L)
 }
 
+.setSaemExtra  <- function(.env,type){
+    .uif <- .env$uif;
+    .txt <- paste0("(", crayon::italic(ifelse(is.null(.uif$nmodel$lin.solved), ifelse(.uif$predSys, "PRED", "ODE"), "Solved")),"); ");
+    if (type=="FOCEi"){
+        .txt <- paste0(.txt,crayon::blurred$italic("OBJF by FOCEi approximation"));
+    } else if (type=="") {
+        .txt  <- paste0(.txt,crayon::blurred$italic("OBJF not calculated"));
+    } else {
+        .reg  <- rex::rex(start,"laplace",capture(numbers),end);
+        .regG  <- rex::rex(start,"gauss",capture(numbers),".",capture(numbers),end);
+        if (regexpr(.reg,type) !=-1){
+            .nnode <- 1;
+            .nsd  <- as.numeric(sub(.reg,"\\1",type))
+        } else if (regexpr(.regG,type) !=-1){
+            .nnode <- as.numeric(sub(.regG,"\\1",type));
+            .nsd <- as.numeric(sub(.regG,"\\2",type));
+        } else {
+            stop("unknown error");
+        }
+        .txt <- paste0(.txt,crayon::blurred$italic(sprintf("OBJF by %s",paste0(ifelse(.nnode==1,"Lapalcian (n.sd=",sprintf("Gaussian Quadrature (n.nodes=%s, n.sd=",.nnode)),.nsd,")"))))
+    }
+    .env$extra <- .txt
+    return(invisible(.txt));
+}
+
 ##' Set Objective function type for a nlmixr object
 ##'
 ##' @param x nlmixr fit object
@@ -2634,6 +2666,9 @@ setOfv <- function(x, type){
             assign("logLik",.lik,.env)
             assign("AIC", .aic, .env)
             assign("BIC", .bic, .env)
+            if (!is.null(x$saem)){
+                .setSaemExtra(.env,type)
+            }
             invisible(x)
         } else {
             if (tolower(type)=="focei") {

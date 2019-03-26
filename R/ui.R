@@ -1527,7 +1527,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
     tmp <- gsub(rex::rex("linCmt(",any_spaces,")"), "nlmixr_lincmt_pred", .deparse(pred));
     pred <- eval(parse(text=paste(tmp,collapse="\n")));
-    lin.solved <- NULL;
     tmp <- tmp[regexpr(rex::rex("nlmixr_pred <- "), tmp) != -1];
     if (!is.null(saem.pars)){
         saem.pars <- new.fn(saem.pars)
@@ -1603,7 +1602,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                             all.vars=all.vars, rest.vars=rest.vars, all.names=all.names,
                             all.funs=all.funs, all.lhs=all.lhs,
                             all.covs=all.covs, saem.all.covs=saem.all.covs,
-                            saem.inPars=saem.inPars, lin.solved=lin.solved,
+                            saem.inPars=saem.inPars, lin.solved=ifelse(.linCmt,.linCmt,NULL),
                             errs.specified=errs.specified, add.prop.errs=add.prop.errs,
                             grp.fn=grp.fn, mu.ref=.mu.ref, cov.ref=cov.ref,
                             saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
@@ -1682,57 +1681,24 @@ nlmixrUI.nlme.specs <- function(object, mu.type=c("thetas", "covariates", "none"
 nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
     ## create nlme function
     mu.type <- match.arg(mu.type);
-    if (!is.null(object$lin.solved)){
-        ## This is only a solved system.
-        if (mu.type == "thetas"){
-            if (length(object$mu.ref) == 0L) return(NULL)
-            .all <- object$ini$name[which(object$ini$neta1 == object$ini$neta2)] %in% names(object$mu.ref)
-            if (!all(.all)) return(NULL)
-            bod <- .deparse(body(object$nlme.mu.fun));
-            bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
-            bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unique(c(names(object$ini$theta), object$all.covs)), collapse=", "))));
-            body(fn) <- bod
-            return(fn);
-        } else if (mu.type == "covariates"){
-            if (length(object$mu.ref) == 0L) return(NULL)
-            bod <- .deparse(body(object$nlme.mu.fun2));
-            bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
-            bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
-            vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(vars, collapse=", "))));
-            vars2 <- allVars(bod);
-            body(fn) <- bod;
-            if (length(vars) != length(vars2)) return(NULL);
-            return(fn);
-        } else {
-            bod <- .deparse(body(object$rest));
-            bod[length(bod)] <- paste0(object$lin.solved$extra.lines, "\n}");
-            bod <- eval(parse(text=sprintf("quote(%s)", paste0(bod, collapse="\n"))));
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))));
-            body(fn) <- bod
-            return(fn);
+    if (mu.type == "thetas"){
+        if (length(object$mu.ref) == 0L) return(NULL)
+        .all <- object$ini$name[which(object$ini$neta1 == object$ini$neta2)] %in% names(object$mu.ref)
+        if (!all(.all)) return(NULL)
+        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unique(c(names(object$ini$theta), object$all.covs)), collapse=", "))))
+        body(fn) <- body(object$nlme.mu.fun);
+    } else if (mu.type == "covariates"){
+        if (length(object$mu.ref) == 0L) return(NULL)
+        vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
+        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(vars, collapse=", "))))
+        body(fn) <- body(object$nlme.mu.fun2);
+        vars2 <- allVars(body(fn));
+        if (length(vars) != length(vars2)){
+            return(NULL);
         }
     } else {
-        if (mu.type == "thetas"){
-            if (length(object$mu.ref) == 0L) return(NULL)
-            .all <- object$ini$name[which(object$ini$neta1 == object$ini$neta2)] %in% names(object$mu.ref)
-            if (!all(.all)) return(NULL)
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(unique(c(names(object$ini$theta), object$all.covs)), collapse=", "))))
-            body(fn) <- body(object$nlme.mu.fun);
-        } else if (mu.type == "covariates"){
-            if (length(object$mu.ref) == 0L) return(NULL)
-            vars <- unique(c(unlist(object$mu.ref), unlist(object$cov.ref)));
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(vars, collapse=", "))))
-            body(fn) <- body(object$nlme.mu.fun2);
-            vars2 <- allVars(body(fn));
-            if (length(vars) != length(vars2)){
-                return(NULL);
-            }
-        } else {
-            fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))))
-            body(fn) <- body(object$rest);
-        }
+        fn <- eval(parse(text=sprintf("function(%s) NULL", paste(object$rest.vars, collapse=", "))))
+        body(fn) <- body(object$rest);
     }
     return(fn)
 }
@@ -2192,23 +2158,22 @@ nlmixrUI.saem.init <- function(obj){
 }
 
 nlmixrUI.model.desc <- function(obj){
-    if (!is.null(obj$rxode.pred)){
-        if (obj$predSys){
-            return("RxODE-based Pred model")
-        } else {
-            return("RxODE-based ODE model")
-        }
-        ## n.cmt <- length(RxODE::rxState(RxODE::rxGetModel(obj$rxode.pred)));
-        ## if (n.cmt == 0){
-        ##     return("Compiled Model (with no ODEs)");
-        ## } else {
-        ##     return(sprintf("ODE(%d compartments)", n.cmt));
-        ## }
+    .mv <- RxODE::rxModelVars(obj$rxode.pred);
+    if (obj$predSys){
+        return("RxODE-based Pred model")
+    } else if (.mv$extraCmt==0){
+        return("RxODE-based ODE model")
     } else {
-        return(sprintf("%s-compartment model%s%s", obj$lin.solved$ncmt,
-                       ifelse(obj$lin.solved$oral, " with first-order absorption", ""),
-                       ifelse(obj$lin.solved$parameterization == 1, " in terms of Cl", " in terms of micro-constants"),
-                       ifelse(obj$lin.solved$tlag, " (with lag time)", "")));
+        .pred <- obj$rxode.pred;
+        if (regexpr(rex::rex("rx_B~0;"),.pred)){
+            .ncmt <- 1;
+        } else if (regexpr(rex::rex("rx_C~0;"),.pred)){
+            .ncmt  <- 2;
+        } else {
+            .ncmt  <- 3;
+        }
+        return(sprintf("RxODE-based %s-compartment model%s", .ncmt,
+                       ifelse(.mv$extraCmt==2, " with first-order absorption", "")))
     }
 }
 

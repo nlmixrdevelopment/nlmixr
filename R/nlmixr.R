@@ -474,40 +474,26 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         }));
         dat$nlmixr.num <- seq_along(dat$nlmixr.grp)
         weight <- uif$nlme.var
-        if (!is.null(uif$nmodel$lin.solved)){
-            fit <- nlme_lin_cmpt(dat, par_model=specs,
-                                 ncmt=uif$nmodel$lin.solved$ncmt,
-                                 oral=uif$nmodel$lin.solved$oral,
-                                 tlag=uif$nmodel$lin.solved$tlag,
-                                 infusion=uif$env$infusion,
-                                 parameterization=uif$nmodel$lin.solved$parameterization,
-                                 par_trans=fun,
-                                 weight=weight,
-                                 verbose=TRUE,
-                                 control=control,
-                                 ...);
+        if (sum.prod){
+            rxode <- RxODE::rxSumProdModel(uif$rxode.pred);
         } else {
-            if (sum.prod){
-                rxode <- RxODE::rxSumProdModel(uif$rxode.pred);
-            } else {
-                rxode <- uif$rxode.pred;
-            }
-            .atol <- 1e-8
-            if (!is.null(control$atol)) .atol <- control$atol
-            .rtol <- 1e-8
-            if (!is.null(control$rtol)) .rtol <- control$rtol
-            fit <- nlme_ode(dat,
-                            model=rxode,
-                            par_model=specs,
-                            par_trans=fun,
-                            response="nlmixr_pred",
-                            weight=weight,
-                            verbose=TRUE,
-                            control=control,
-                            atol=.atol,
-                            rtol=.rtol,
-                            ...);
+            rxode <- uif$rxode.pred;
         }
+        .atol <- 1e-8
+        if (!is.null(control$atol)) .atol <- control$atol
+        .rtol <- 1e-8
+        if (!is.null(control$rtol)) .rtol <- control$rtol
+        fit <- nlme_ode(dat,
+                        model=rxode,
+                        par_model=specs,
+                        par_trans=fun,
+                        response="nlmixr_pred",
+                        weight=weight,
+                        verbose=TRUE,
+                        control=control,
+                        atol=.atol,
+                        rtol=.rtol,
+                        ...);
         class(fit) <- c(est.type, class(fit));
         .ret <- as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=calc.resid);
         if (inherits(.ret, "nlmixrFitData")){
