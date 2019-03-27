@@ -1878,10 +1878,21 @@ print.nlmixrClass <- function(x, ...){
     if (any(arg == c("logLik", "value", "obf", "ofv", "objf", "OBJF", "objective", "AIC", "BIC"))){
         if (!is.null(obj$saem)){
             .tmp <- obj$saem;
-            if (obj$nnodes.gq==1){
-                setOfv(obj, paste0("laplace",obj$nsd.gq))
-            } else {
-                setOfv(obj, paste0("gauss",obj$nnodes.gq, ".", obj$nsd.gq))
+            .curObj <- get("objective",.env);
+            if (is.na(.curObj)){
+                .nnodes <- 1;
+                if (exists("nnodes.gq",.env)){
+                    .nnodes <- .env$nnodes.gq;
+                }
+                .nsd  <- 3;
+                if (exists("nsd.gq",.env)){
+                    .nsd <- .env$nsd.gq;
+                }
+                if (.nnodes==1){
+                    setOfv(obj, paste0("laplace",.nsd))
+                } else {
+                    setOfv(obj, paste0("gauss",.nnodes, ".", .nsd))
+                }
             }
         }
     }
