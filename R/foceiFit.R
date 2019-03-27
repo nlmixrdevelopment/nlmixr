@@ -2255,10 +2255,11 @@ print.nlmixrFitCore <- function(x, ...){
     message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
                              x$extra, .posthoc)))
     if (is.na(get("objective",x$env))){
-        message(sprintf("  Likelihoods will be calculated with: addCwres(%s), AIC(%s) or %s etc.",
-                        crayon::yellow(.bound),
+        message(sprintf("  Gaussian/Laplacian Likelihoods: AIC(%s) or %s etc.",
                         crayon::yellow(.bound),
                         paste0(crayon::yellow(.bound),crayon::bold$blue("$objf"))))
+        message(sprintf(" FOCEi CWRES & Likelihoods: addCwres(%s)",
+                        crayon::yellow(.bound)))
     } else {
         print(x$objDf)
     }
