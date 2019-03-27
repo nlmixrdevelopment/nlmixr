@@ -229,6 +229,62 @@ model <- function(model, ...){
       .sharedDist <- intersect(.distNew,.distOrig);
       if (length(.shared)==0 && length(.sharedDist)==0)
         stop("Could not find a part of the model to modify.");
+      if (length(.sharedDist) > 0){
+        for (.v in .sharedDist){
+          .regShared <- rex::rex(start,any_spaces,.v,any_spaces,"~");
+          .newLine <- .lines[regexpr(.regShared,.lines) != -1];
+          .oldLine <- .origLines[regexpr(.regShared,.origLines) != -1];
+          .w <- which(regexpr(.regShared, .fNew)!=-1)
+          if (length(.w) > 1) stop("Cannot modify a multi-line definition");
+          .fNew[.w] <- .newLine;
+          .oldVarsL  <- allVars(body(eval(parse(text=sprintf("function(){%s}",.oldLine)))));
+          .newVarsL  <- allVars(body(eval(parse(text=sprintf("function(){%s}",.newLine)))));
+          .rmVars <- setdiff(.oldVarsL, .newVarsL);
+          .addVars <- setdiff(.newVarsL, .oldVarsL);
+          for (.rm in .rmVars){
+            .wh <- .ini[.ini$name == .rm,];
+            if (length(.wh$name)==1){
+              if (is.na(.wh$ntheta)){
+                ## removing eta
+                .curEta <- .wh$neta1;
+                .maxEta <- max(.ini$neta1,na.rm=TRUE);
+                .s <- seq(.curEta,.maxEta)
+                .s <- .s[-length(.s)];
+                .w <- unique(sort(c(which(is.na(.ini$neta1)),
+                                    which(.ini$neta1 !=.curEta),
+                                    which(.ini$neta2 !=.curEta))));
+                .ini <- .ini[.w,];
+                for (.rmI in .s){
+                  .ini$neta1[.ini$neta1 == .rmI+1] <- .rmI
+                  .ini$neta2[.ini$neta2 == .rmI+1] <- .rmI
+                }
+              } else {
+                .curTheta <- .wh$ntheta;
+                .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
+                .s <- seq(.curTheta,.maxTheta)
+                .s <- .s[-length(.s)];
+                .w <- unique(sort(c(which(is.na(.ini$ntheta)),
+                                    which(.ini$ntheta !=.curTheta))));
+                .ini <- .ini[.w,];
+                for (.rmI in .s){
+                  .ini$ntheta[.ini$ntheta == .rmI+1] <- .rmI
+                }
+              }
+            }
+          }
+          ## Now add variables; Currently assume thetas; Perhaps something better?
+          ## Something other than thetas are not currently supported by UI currently.
+          for (.new in .addVars){
+            if (!any(.ini$name==.new)){
+              .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
+              .ini <- rbind(.ini,
+                            data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
+                                       name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
+                                       err=NA,label=NA,condition=NA))
+            }
+          }
+        }
+      }
       if (length(.shared) > 0){
         for (.v in .shared){
           .regShared <- rex::rex(start,any_spaces,.v,any_spaces,or("=","<-"));
