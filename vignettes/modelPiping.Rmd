@@ -1,0 +1,180 @@
+---
+title: "Modifying nlmixr models by piping"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Running PK models with nlmixr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+![nlmixr](logo.png)
+
+# Changing models via piping
+
+As in the running nlmixr vignette, Let's start with a very simple PK
+example, using the single-dose theophylline dataset generously
+provided by Dr. Robert A. Upton of the University of California, San
+Francisco:
+
+```{r}
+
+library(nlmixr)
+
+one.compartment <- function() {
+    ini({
+        tka <- .5   # Log Ka
+        tcl <- -3.2 # Log Cl
+        tv <- -1    # Log V
+        eta.ka ~ 1
+        eta.cl ~ 2
+        eta.v ~ 1
+        add.err <- 0.1
+    })
+    model({
+        ka <- exp(tka + eta.ka)
+        cl <- exp(tcl + eta.cl)
+        v <- exp(tv + eta.v)
+        d/dt(depot) = -ka * depot
+        d/dt(center) = ka * depot - cl / v * center
+        cp = center / v 
+        cp ~ add(add.err)
+    })
+}
+```
+
+We can try the First-Order Conditional Estimation with Interaction
+(FOCEi) method to find a good solution:
+
+```{r}
+fit <- nlmixr(one.compartment, theo_sd, est="focei")
+
+fit
+```
+
+# Changing and fixing parameter values in models
+
+Something that you may want to do is change initial estimates with a
+model.  It is simple to modify the model definition and change them
+yourself, but you may also want to change them in a specific way; For
+example try a range of starting values to see how the system behaves
+(either by full estimation or by a posthoc estimation). 
+In these situations it can be come tedious to modify the models by hand.
+
+nlmixr provides the ability to:
+
+1. Change parameter estimates before or after running a model. (ie
+   `ini(tka=0.5)`)
+2. Fix parameters to arbitrary values, or estimated values (ie
+   `ini(tka=fix(0.5))` or `ini(tka=fix)`)
+   
+The easiest way to illustrate this is by showing a few examples of
+piping changes to the model:
+
+```R
+## Example 1 -- Set inital estimate to 0.5 (shown w/posthoc)
+one.ka.0.5 <- fit %>%
+    ini(tka=0.5) %>% # FIXME nlmixr should know I used theo_sd
+    nlmixr(theo_sd, est="posthoc")
+
+one.ka.0.5
+```
+
+```{r}
+## Example 2 -- Fix tka to 0.5 and re-estimate.
+one.ka.0.5 <- fit %>%
+    ini(tka=fix(0.5)) %>% # FIXME nlmixr should know I used theo_sd
+    nlmixr(theo_sd, est="focei")
+
+one.ka.0.5
+```
+
+```{r}
+## Example 3 -- Fix tka to model estimated value and re-estimate.
+one.ka.0.5 <- fit %>%
+    ini(tka=fix) %>% # FIXME nlmixr should know I used theo_sd
+    nlmixr(theo_sd, est="focei")
+
+one.ka.0.5
+```
+
+```{r}
+## Example 4 -- Change tka to 0.7 in orginal model function and then estimate
+one.ka.0.7 <- one.compartment %>%
+    ini(tka=0.7) %>% # FIXME nlmixr should know I used theo_sd
+    nlmixr(theo_sd, est="focei")
+
+one.ka.0.7
+```
+
+# Changing model features
+
+When developing models, often you add and remove between subject
+variability to parameters, add covariates to the effects, and/or
+change the residual errors.  You can change lines in the model by
+piping the fit or the nlmixr model specification function to a `model`
+
+## Adding or Removing between subject variability 
+
+Often in developing a model you add and remove between subject
+variabilities to certain model parameters.  For example, you could
+remove the between subject variability in the ka parameter by changing that line in the model;  
+
+For example to remove a eta from a prior fit or prior model
+specification function, simply pipe it to the model function.  You can
+then re-estimate by piping it to the `nlmixr` function again.
+
+```{r}
+## Remove eta.ka on ka
+noEta <- fit %>%
+    model(ka <- exp(tka)) %>%
+    nlmixr(theo_sd,est="focei")
+
+noEta
+```
+
+Of course you could also add an eta on a parameter in the same way;
+
+```{r}
+addBackKa <- noEta %>%
+    model({ka <- exp(tka + bsv.ka)}) %>%
+    ini(bsv.ka=0.1) %>%
+    nlmixr(theo_sd,est="focei")
+
+addBackKa
+```
+
+You can see the name change by examining the `omega` matrix:
+
+```{r}
+addBackKa$omega
+```
+
+## Adding Covariate effects
+
+```{r}
+## Note currently cov is needed as a prefix so nlmixr knows this is an
+## estimated parameter not a parameter
+wt70 <- fit %>% ## FIXME could be based on if it finds the covarite in the last used nlmixr data.
+    model({cl <- exp(tcl + eta.cl)*(WT/70)^covWtPow}) %>%
+    ini(covWtPow=fix(0.75)) %>%
+    nlmixr(theo_sd,est="focei")
+
+wt70
+```
+
+## Changing residual errors
+
+Changing the residual errors is also just as easy, by simply specifying the error you wish to change:
+
+```{r}
+## Since there are 0 observations in the data, these are changed to 0.0150 to show proportional error change.
+d <- theo_sd
+d$DV[d$EVID == 0 & d$DV == 0] <- 0.0150
+
+addPropModel <- fit %>%
+    model({cp ~ add(add.err)+prop(prop.err)}) %>%
+    ini(prop.err=0.1) %>%
+    nlmixr(d,est="focei")
+
+addPropModel
+```
