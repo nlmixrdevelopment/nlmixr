@@ -825,6 +825,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
             env$noLik <- FALSE;
             env$objective <- -2 * as.numeric(logLik(object));
             env$objectiveType <- "nlme";
+            env$adjObf <- TRUE
             if (object$method == "REML") env$objectiveType <- "nlmeREML";
         } else if (!calcResid){
             env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
@@ -835,6 +836,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
             env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
             env$noLik <- TRUE;
             env$objective <- -2 * as.numeric(logLik(object));
+            env$adjObf <- TRUE
             env$objectiveType <- "nlme";
             if (object$method == "REML") env$objectiveType <- "nlmeREML";
             env$extra <- paste(env$extra, "nlme OBF")

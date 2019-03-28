@@ -1455,7 +1455,7 @@ focei.eta.saemFit <- function(object, uif, ...){
 }
 
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
-                             nnodes.gq=1, nsd.gq=3){
+                             nnodes.gq=1, nsd.gq=3, adjObj=TRUE){
   on.exit({RxODE::rxSolveFree()});
   .saemTime <- proc.time() - pt;
   if (class(uif) == "function"){
@@ -1564,6 +1564,9 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   .notCalced <- TRUE;
   while (.notCalced){
     .env <- new.env(parent=emptyenv());
+    .env$nnodes.gq  <- nnodes.gq;
+    .env$nsd.gq  <- nsd.gq;
+    .env$adjObj  <- adjObj
     .env$method <- "SAEM";
     .env$uif <- uif;
     .env$saem <- object;
@@ -1659,8 +1662,14 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   } else if (calcResid){
     if (!is.na(.saemObf)){
       .llik <- -.saemObf / 2;
+      .nobs  <- .env$nobs
       attr(.llik, "df") <- attr(get("logLik", .env), "df");
-      .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
+      .objf <- ifelse(.env$adjObj,.saemObf - .nobs*log(2*pi),.saemObf);
+      for (.t in c("OBJF","objective", "objf")){
+        assign(.t,.objf,.env);
+      }
+      .tmp <- data.frame(OBJF=.objf,
+                         AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
                          BIC=.saemObf + log(.env$nobs) * attr(get("logLik", .env), "df"),
                          "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
       if (any(names(.env$objDf) == "Condition Number")) .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);

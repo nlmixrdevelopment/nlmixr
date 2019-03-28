@@ -2666,7 +2666,7 @@ setOfv <- function(x, type){
         if (length(.w) == 1){
             .env <- x$env;
             .objf <- .objDf[.w, "OBJF"];
-            .lik <- -.objf/2;
+            .lik <- .objDf[.w, "Log-likelihood"];
             attr(.lik, "df") <- attr(get("logLik",.env), "df")
             attr(.lik, "nobs") = attr(get("logLik",.env), "nobs");
             class(.lik) <- "logLik"
@@ -2702,8 +2702,10 @@ setOfv <- function(x, type){
                 .saemObf <- calc.2LL(x$saem,nnodes.gq = .nnode, nsd.gq = .nsd);
                 .env <- x$env;
                 .llik <- -.saemObf / 2;
+                .nobs  <- .env$nobs;
                 attr(.llik, "df") <- attr(get("logLik", .env), "df");
-                .tmp <- data.frame(OBJF=.saemObf, AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
+                .objf <- ifelse(.env$adjObj,.saemObf - .nobs*log(2*pi),.saemObf);
+                .tmp <- data.frame(OBJF=.objf, AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
                                BIC=.saemObf + log(.env$nobs) * attr(get("logLik", .env), "df"),
                                "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
                 if (any(names(.env$objDf) == "Condition Number")){

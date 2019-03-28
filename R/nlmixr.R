@@ -393,6 +393,11 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         } else {
             .nsd.gq <- default$nsd.gq
         }
+        if (any(names(control) == "adjObj")){
+            .adjObj <- control$adjObj;
+        } else {
+            .adjObj <- default$adjObj;
+        }
         if (any(names(control) == "optExpression")){
             uif$env$optExpression <- control$optExpression
         } else {
@@ -425,15 +430,13 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         }
         .fit <- model$saem_mod(cfg);
         .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik,
-                                 nnodes.gq=.nnodes.gq,nsd.gq=.nsd.gq);
+                                 nnodes.gq=.nnodes.gq, nsd.gq=.nsd.gq, adjObj=.adjObj);
         if (inherits(.ret, "nlmixrFitData")){
             .ret <- fix.dat(.ret);
             .ret <- .addNpde(.ret);
         }
         if (inherits(.ret, "nlmixrFitCore")){
             .env <- .ret$env
-            .env$nnodes.gq  <- .nnodes.gq;
-            .env$nsd.gq  <- .nsd.gq;
             assign("startTime", start.time, .env);
             assign("est", est, .env);
             assign("stopTime", Sys.time(), .env);
@@ -729,6 +732,7 @@ saemControl <- function(seed=99,
                         nsd.gq=2,
                         optExpression=TRUE,
                         maxsteps=100000L,
+                        adjObj=TRUE,
                         ...){
     .xtra <- list(...);
     .rm <- c();
@@ -747,13 +751,14 @@ saemControl <- function(seed=99,
     .ret <- list(mcmc=list(niter=c(nBurn, nEm), nmc=nmc, nu=nu),
                  ODEopt=RxODE::rxControl(atol=atol, rtol=rtol, method=method,
                                          transitAbs = transitAbs,maxsteps=maxsteps,...),
-         seed=seed,
-         print=print,
-         DEBUG=trace,
-         optExpression=optExpression,
-         nnodes.gq=nnodes.gq,
-         nsd.gq=nsd.gq,
-         ...)
+                 seed=seed,
+                 print=print,
+                 DEBUG=trace,
+                 optExpression=optExpression,
+                 nnodes.gq=nnodes.gq,
+                 nsd.gq=nsd.gq,
+                 adjObj=adjObj,
+                 ...)
     if (length(.rm) > 0){
         .ret <- .ret[!(names(.ret) %in% .rm)]
     }
