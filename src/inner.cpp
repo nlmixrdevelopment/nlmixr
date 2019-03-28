@@ -2435,7 +2435,7 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
     NumericVector logLik(1);
     double adj= 0;
     if (doAdj){
-      adj=rx->nobs2*log(2*M_PI)/2;
+      adj=(rx->nobs-rx->nobs2)*log(2*M_PI)/2;
     }
     e["adj"]=adj;
     logLik[0]=-fmin/2-adj;
@@ -2444,9 +2444,9 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
       logLik.attr("nobs") = e["nobs"];
       e["BIC"] = fmin+2*adj + log(as<double>(e["nobs"]))*op_focei.npars;
     } else {
-      logLik.attr("nobs") = rx->nobs2;
-      e["BIC"] = fmin + 2*adj + log((double)rx->nobs2)*op_focei.npars;
-      e["nobs"] = rx->nobs2;
+      logLik.attr("nobs") = (rx->nobs - rx->nobs2);
+      e["BIC"] = fmin + 2*adj + log((double)(rx->nobs - rx->nobs2))*op_focei.npars;
+      e["nobs"] = rx->nobs - rx->nobs2;
     }
     logLik.attr("class") = "logLik";
     e["logLik"] = logLik;
