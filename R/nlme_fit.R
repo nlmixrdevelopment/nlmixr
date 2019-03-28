@@ -884,11 +884,14 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     } else if (!calcResid){
         row.names(env$objDf) <- "nlme";
     } else {
-        .tmp <- data.frame(OBJF=-2 * as.numeric(logLik(object)), AIC=AIC(object), BIC=BIC(object),
+        env$adjObf <- TRUE
+        .tmp <- data.frame(OBJF=-2 * as.numeric(logLik(object))-
+                               ifelse(env$adjObf,nobs(object)*log(2*pi),0),
+                           AIC=AIC(object), BIC=BIC(object),
                            "Log-likelihood"=as.numeric(logLik(object)), check.names=FALSE);
-        if (any(names(env$objDf) == "Condition Number")) .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
-        env$objDf  <- rbind(env$objDf,
-                            .tmp)
+        if (any(names(env$objDf) == "Condition Number"))
+            .tmp <- data.frame(.tmp, "Condition Number"=env$objDf[,"Condition Number"], check.names=FALSE);
+        env$objDf  <- rbind(env$objDf, .tmp)
         row.names(env$objDf) <- c("FOCEi", "nlme");
     }
     .env <- fit.f$env;
