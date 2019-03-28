@@ -73,8 +73,8 @@ piping changes to the model:
 ```R
 ## Example 1 -- Set inital estimate to 0.5 (shown w/posthoc)
 one.ka.0.5 <- fit %>%
-    ini(tka=0.5) %>% # FIXME nlmixr should know I used theo_sd
-    nlmixr(theo_sd, est="posthoc")
+    ini(tka=0.5) %>% 
+    nlmixr(est="posthoc")
 
 one.ka.0.5
 ```
@@ -82,8 +82,8 @@ one.ka.0.5
 ```{r}
 ## Example 2 -- Fix tka to 0.5 and re-estimate.
 one.ka.0.5 <- fit %>%
-    ini(tka=fix(0.5)) %>% # FIXME nlmixr should know I used theo_sd
-    nlmixr(theo_sd, est="focei")
+    ini(tka=fix(0.5)) %>%
+    nlmixr(est="focei")
 
 one.ka.0.5
 ```
@@ -91,8 +91,8 @@ one.ka.0.5
 ```{r}
 ## Example 3 -- Fix tka to model estimated value and re-estimate.
 one.ka.0.5 <- fit %>%
-    ini(tka=fix) %>% # FIXME nlmixr should know I used theo_sd
-    nlmixr(theo_sd, est="focei")
+    ini(tka=fix) %>%
+    nlmixr(est="focei")
 
 one.ka.0.5
 ```
@@ -100,8 +100,8 @@ one.ka.0.5
 ```{r}
 ## Example 4 -- Change tka to 0.7 in orginal model function and then estimate
 one.ka.0.7 <- one.compartment %>%
-    ini(tka=0.7) %>% # FIXME nlmixr should know I used theo_sd
-    nlmixr(theo_sd, est="focei")
+    ini(tka=0.7) %>% 
+    nlmixr(est="focei")
 
 one.ka.0.7
 ```
@@ -116,7 +116,7 @@ piping the fit or the nlmixr model specification function to a `model`
 ## Adding or Removing between subject variability 
 
 Often in developing a model you add and remove between subject
-variabilities to certain model parameters.  For example, you could
+variability to certain model parameters.  For example, you could
 remove the between subject variability in the ka parameter by changing that line in the model;  
 
 For example to remove a eta from a prior fit or prior model
@@ -127,7 +127,7 @@ then re-estimate by piping it to the `nlmixr` function again.
 ## Remove eta.ka on ka
 noEta <- fit %>%
     model(ka <- exp(tka)) %>%
-    nlmixr(theo_sd,est="focei")
+    nlmixr(est="focei")
 
 noEta
 ```
@@ -138,7 +138,7 @@ Of course you could also add an eta on a parameter in the same way;
 addBackKa <- noEta %>%
     model({ka <- exp(tka + bsv.ka)}) %>%
     ini(bsv.ka=0.1) %>%
-    nlmixr(theo_sd,est="focei")
+    nlmixr(est="focei")
 
 addBackKa
 ```
@@ -149,6 +149,20 @@ You can see the name change by examining the `omega` matrix:
 addBackKa$omega
 ```
 
+Note that new between subject variability parameters are distinguished
+from other types of parameters (ie population parameters, and
+individual covariates) by their name. Parameters starting or ending
+with the following names are assumed to be between subject variability
+parameters:
+
+- eta (from NONMEM convention)
+- ppv (per patient variability)
+- psv (per subject variability)
+- iiv (inter-individual variability)
+- bsv (between subject variability)
+- bpv (between patient variability)
+
+
 ## Adding Covariate effects
 
 ```{r}
@@ -157,7 +171,7 @@ addBackKa$omega
 wt70 <- fit %>% ## FIXME could be based on if it finds the covarite in the last used nlmixr data.
     model({cl <- exp(tcl + eta.cl)*(WT/70)^covWtPow}) %>%
     ini(covWtPow=fix(0.75)) %>%
-    nlmixr(theo_sd,est="focei")
+    nlmixr(est="focei")
 
 wt70
 ```

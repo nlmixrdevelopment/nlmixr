@@ -43,9 +43,20 @@
   return(.bodyDewrap(deparse(expr,width=500)));
 }
 
+.pipedData  <- NULL;
+
+.clearPipedData <- function(){
+  assignInMyNamespace(".pipedData", NULL);
+}
+
+.getPipedData <- function(){
+  .pipedData
+}
+
 .getUif <- function(what){
   if (inherits(what, "nlmixrFitCore")){
     .uif <- what$uif
+    assignInMyNamespace(".pipedData", getData(what))
   } else if (inherits(what, "nlmixrUI")){
     .uif <- what
   } else if (inherits(what,"function")){
@@ -180,8 +191,8 @@ ini <- function(ini, ...){
 
 .thetaModelReg <- rex::rex(or(group(start,or("tv","t","pop","POP","Pop","TV","T","cov","err","eff")),
                               group(or("tv","pop","POP","pop","TV","cov","err","eff"),end)))
-
-.etaParts <- c("eta","ppv","PPV","ETA","Ppv","iiv","Iiv","bsv","Bsv","BSV")
+.etaParts <- c("eta","ETA", "Eta", "ppv","PPV","Ppv","iiv","Iiv","bsv","Bsv","BSV",
+               "bpv","Bpv","BPV", "psv", "PSV", "Psv")
 .etaModelReg <- rex::rex(or(group(start,or(.etaParts)),group(or(.etaParts),end)))
 
 ##' nlmixr model block

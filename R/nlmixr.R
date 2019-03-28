@@ -141,7 +141,7 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
 ##'@rdname nlmixr
 ##'@export
 nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=tableControl(), ...){
-    .uif <- object$uif;
+    .uif <- .getUif(object);
     if (missing(data)){
         data <- getData(object);
     }
@@ -160,8 +160,13 @@ nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...){
         return(.uif)
     } else {
         .args <- c(list(uif=.uif), .args[-1]);
-        .uif$nmodel$data.name <- deparse(substitute(data))
-        .args$data <- data;
+        if (missing(data) && !is.null(.getPipedData())){
+            data <- .getPipedData();
+            .args$data <- data;
+        } else {
+            .uif$nmodel$data.name <- deparse(substitute(data))
+            .args$data <- data;
+        }
         return(do.call(nlmixr_fit, .args));
     }
 }
@@ -215,6 +220,7 @@ nlmixrData.default <- function(data){
 ##' @export
 nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                        sum.prod=FALSE, table=tableControl()){
+    .clearPipedData();
     .tmp <- deparse(body(uif$theta.pars))[-1];
     .tmp <- .tmp[-length(.tmp)];
     data <- RxODE::etTrans(data,paste(paste(.tmp,collapse="\n"),"\n",uif$rxode),TRUE,TRUE);
