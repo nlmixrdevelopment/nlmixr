@@ -2636,13 +2636,13 @@ yeoJohnson <- function(x, lambda=1){
         .txt  <- paste0(.txt,crayon::blurred$italic("OBJF not calculated"));
     } else {
         .reg  <- rex::rex(start,"laplace",capture(.regNum),end);
-        .regG  <- rex::rex(start,"gauss",capture(.regNum),".",capture(.regNum),end);
-        if (regexpr(.reg,type) !=-1){
+        .regG  <- rex::rex(start,"gauss",capture(.regNum),"_",capture(.regNum),end);
+        if (regexpr(.reg,type,perl=TRUE) !=-1){
             .nnode <- 1;
-            .nsd  <- as.numeric(sub(.reg,"\\1",type))
-        } else if (regexpr(.regG,type) !=-1){
-            .nnode <- as.numeric(sub(.regG,"\\1",type));
-            .nsd <- as.numeric(sub(.regG,"\\2",type));
+            .nsd  <- as.numeric(sub(.reg,"\\1",type,perl=TRUE))
+        } else if (regexpr(.regG,type,perl=TRUE) !=-1){
+            .nnode <- as.numeric(sub(.regG,"\\1",type,perl=TRUE));
+            .nsd <- as.numeric(sub(.regG,"\\2",type,perl=TRUE));
         } else {
             stop("unknown error");
         }
@@ -2688,14 +2688,14 @@ setOfv <- function(x, type){
                 return(setOfv(.tmp, "FOCEi"));
             } else if (!is.null(x$saem)){
                 .ret <- x$saem
-                .reg  <- rex::rex(start,"laplace",capture(numbers),end);
-                .regG  <- rex::rex(start,"gauss",capture(numbers),"_",capture(numbers),end);
-                if (regexpr(.reg,type) !=-1){
+                .reg  <- rex::rex(start,"laplace",capture(.regNum),end);
+                .regG  <- rex::rex(start,"gauss",capture(.regNum),"_",capture(.regNum),end);
+                if (regexpr(.reg,type,perl=TRUE) !=-1){
                     .nnode <- 1;
-                    .nsd  <- as.numeric(sub(.reg,"\\1",type))
-                } else if (regexpr(.regG,type) !=-1){
-                    .nnode <- as.numeric(sub(.regG,"\\1",type));
-                    .nsd <- as.numeric(sub(.regG,"\\2",type));
+                    .nsd  <- as.numeric(sub(.reg,"\\1",type,perl=TRUE))
+                } else if (regexpr(.regG,type,perl=TRUE) !=-1){
+                    .nnode <- as.numeric(sub(.regG,"\\1",type,perl=TRUE));
+                    .nsd <- as.numeric(sub(.regG,"\\2",type,perl=TRUE));
                 } else {
                     stop(sprintf("Cannot switch objective function to '%s' type.", type))
                 }
