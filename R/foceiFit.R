@@ -2635,8 +2635,8 @@ yeoJohnson <- function(x, lambda=1){
     } else if (type=="") {
         .txt  <- paste0(.txt,crayon::blurred$italic("OBJF not calculated"));
     } else {
-        .reg  <- rex::rex(start,"laplace",capture(numbers),end);
-        .regG  <- rex::rex(start,"gauss",capture(numbers),".",capture(numbers),end);
+        .reg  <- rex::rex(start,"laplace",capture(.regNum),end);
+        .regG  <- rex::rex(start,"gauss",capture(.regNum),".",capture(.regNum),end);
         if (regexpr(.reg,type) !=-1){
             .nnode <- 1;
             .nsd  <- as.numeric(sub(.reg,"\\1",type))
