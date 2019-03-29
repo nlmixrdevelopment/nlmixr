@@ -31,10 +31,10 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         .rx <- .env$model
         .pars <- .rx$params
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
-        do.call(RxODE:::rxSolve.default,
-                c(list(object=.rx, params=.pars,
-                       events=.evtM,.setupOnly=2L),
-                  saem.cfg$optM));
+        suppessWarnings(do.call(RxODE:::rxSolve.default,
+                                c(list(object=.rx, params=.pars,
+                                       events=.evtM,.setupOnly=2L),
+                                  saem.cfg$optM)));
     }
     dopred = attr(fit, "dopred")
     resMat = fit$resMat
@@ -124,8 +124,18 @@ plot.saemFit = function(x,...) {
     CMT <- RES <- NULL
     fit = x
     .env <- attr(fit,"env");
-    if (.env$is.ode) .env$model$assignPtr()
-    saem.cfg = attr(fit, "saem.cfg")
+    saem.cfg  <-  attr(fit, "saem.cfg")
+    if (.env$is.ode){
+        ## .env$model$assignPtr()
+        .evtM  <- saem.cfg$evtM
+        .rx <- .env$model
+        .pars <- .rx$params
+        .pars <- setNames(rep(1.1,length(.pars)),.pars);
+        suppessWarnings(do.call(RxODE:::rxSolve.default,
+                                c(list(object=.rx, params=.pars,
+                                       events=.evtM,.setupOnly=2L),
+                                  saem.cfg$optM)));
+    }
     dat = as.data.frame(saem.cfg$evt)
     dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
     df = rbind(cbind(dat, grp = 1), cbind(dat, grp = 2), cbind(dat, grp = 3))

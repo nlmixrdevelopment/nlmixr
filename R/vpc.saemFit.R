@@ -24,8 +24,17 @@ rmvnorm = function(n, mu, vmat) multi2(mu, vmat, n)
 vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
   if (class(fit) == "nlmixr.ui.saem") fit = as.saem(fit)
   .env <- attr(fit,"env");
-  if (.env$is.ode) .env$model$assignPtr()
   saem.cfg = attr(fit, "saem.cfg")
+  if (.env$is.ode){
+      .evtM  <- saem.cfg$evtM
+      .rx <- .env$model
+      .pars <- .rx$params
+      .pars <- setNames(rep(1.1,length(.pars)),.pars);
+      suppessWarnings(do.call(RxODE:::rxSolve.default,
+                              c(list(object=.rx, params=.pars,
+                                     events=.evtM,.setupOnly=2L),
+                                saem.cfg$optM)));
+  }
   dopred <- attr(fit, "dopred")
   resMat = fit$resMat
   ares = resMat[, 1]
