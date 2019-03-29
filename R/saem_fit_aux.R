@@ -24,9 +24,19 @@
 calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
     ##nnodes.gq=8, nsd.gq=4
     .env <- attr(fit,"env");
-    if (.env$is.ode) .env$model$assignPtr()
+    saem.cfg  <-  attr(fit, "saem.cfg")
+    if (.env$is.ode){
+        ## .env$model$assignPtr()
+        .evtM  <- saem.cfg$evtM
+        .rx <- .env$model
+        .pars <- .rx$params
+        .pars <- setNames(rep(1.1,length(.pars)),.pars);
+        do.call(RxODE:::rxSolve.default,
+                c(list(object=.rx, params=.pars,
+                       events=.evtM,.setupOnly=2L),
+                  saem.cfg$optM));
+    }
     dopred = attr(fit, "dopred")
-    saem.cfg = attr(fit, "saem.cfg")
     resMat = fit$resMat
     ares = resMat[,1]
     bres = resMat[,2]
