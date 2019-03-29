@@ -1399,6 +1399,7 @@ static inline double foceiOfv0(double *theta){
   if (op_focei.scaleObjective == 2){
     ret = ret / op_focei.initObjective * op_focei.scaleObjectiveTo;
   }
+  if (isnan(ret)) stop("Objective function is NAN, stopping.");
   if (!op_focei.calcGrad){
     if (op_focei.derivMethodSwitch){
       double diff = std::fabs(op_focei.lastOfv-ret);
