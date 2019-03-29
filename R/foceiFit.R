@@ -1880,11 +1880,11 @@ print.nlmixrClass <- function(x, ...){
             .tmp <- obj$saem;
             .curObj <- get("objective",.env);
             if (is.na(.curObj)){
-                .nnodes <- 4;
+                .nnodes <- 3;
                 if (exists("nnodes.gq",.env)){
                     .nnodes <- .env$nnodes.gq;
                 }
-                .nsd  <- 2;
+                .nsd  <- 1.6;
                 if (exists("nsd.gq",.env)){
                     .nsd <- .env$nsd.gq;
                 }
