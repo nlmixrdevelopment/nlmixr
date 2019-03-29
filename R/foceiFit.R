@@ -1891,7 +1891,7 @@ print.nlmixrClass <- function(x, ...){
                 if (.nnodes==1){
                     setOfv(obj, paste0("laplace",.nsd))
                 } else {
-                    setOfv(obj, paste0("gauss",.nnodes, ".", .nsd))
+                    setOfv(obj, paste0("gauss",.nnodes, "_", .nsd))
                 }
             }
         }
@@ -2689,7 +2689,7 @@ setOfv <- function(x, type){
             } else if (!is.null(x$saem)){
                 .ret <- x$saem
                 .reg  <- rex::rex(start,"laplace",capture(numbers),end);
-                .regG  <- rex::rex(start,"gauss",capture(numbers),".",capture(numbers),end);
+                .regG  <- rex::rex(start,"gauss",capture(numbers),"_",capture(numbers),end);
                 if (regexpr(.reg,type) !=-1){
                     .nnode <- 1;
                     .nsd  <- as.numeric(sub(.reg,"\\1",type))

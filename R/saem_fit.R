@@ -1543,7 +1543,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (nnodes.gq==1){
       .rn <- paste0("laplace",nsd.gq);
     } else {
-      .rn <- paste0("gauss",nnodes.gq,".", nsd.gq);
+      .rn <- paste0("gauss",nnodes.gq,"_", nsd.gq);
     }
   } else if (is(obf, "logical")) {
     if (is.na(obf)){
@@ -1553,7 +1553,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       if (nnodes.gq==1){
         .rn <- paste0("laplace",nsd.gq);
       } else {
-        .rn <- paste0("gauss",nnodes.gq,".", nsd.gq);
+        .rn <- paste0("gauss",nnodes.gq,"_", nsd.gq);
       }
     } else {
       .saemObf <- NA
