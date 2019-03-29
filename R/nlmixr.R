@@ -811,6 +811,7 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
         .ob1 <- .ob1[!is.na(.ob1$OBJF),];
         assign("objDf", .ob1, envir=.newFit$env);
         assign("saem",.saem,fit$env);
+        assign("adjObj",fit$env$adjObj, .newFit$env)
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
     }
@@ -823,6 +824,7 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
             .time[[.n]] <- .time[[.n]] + .time2[[.n]];
         }
         assign("time",.time,.newFit$env);
+        assign("adjObj",fit$env$adjObj, .newFit$env)
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
     }
