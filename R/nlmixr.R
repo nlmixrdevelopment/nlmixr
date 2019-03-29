@@ -814,6 +814,12 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     .nlme <- fit$nlme
     if (!is.null(.nlme)){
         .newFit <- as.focei(.nlme, .uif, data=getData(fit), calcResid = TRUE);
+        .time <- fit$time
+        .time2  <- .newFit$time
+        for (.n in names(.time)){
+            .time[[.n]] <- .time[[.n]] + .time2[[.n]];
+        }
+        assign("time",.time,.newFit$env);
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
     }
