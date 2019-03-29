@@ -1399,7 +1399,6 @@ static inline double foceiOfv0(double *theta){
   if (op_focei.scaleObjective == 2){
     ret = ret / op_focei.initObjective * op_focei.scaleObjectiveTo;
   }
-  if (isnan(ret)) stop("Objective function is NAN, stopping.");
   if (!op_focei.calcGrad){
     if (op_focei.derivMethodSwitch){
       double diff = std::fabs(op_focei.lastOfv-ret);
@@ -1679,11 +1678,16 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
  FD6: // Check unsatisfactory cases
   if (hs < 0){
     // F nearly constant.
-    *hf = h0;//hbar;
-    *df=phic;
+    // Use sqrt(h0) as a last ditch effort.
+    *hf = pow(DOUBLE_EPS, 0.25);//hbar;
+    // *df=phic;
+    theta[cpar] = x + *hf;
+    updateTheta(theta);
+    fp = foceiOfv0(theta);
+    *df = phiF(f, fp, *hf);
     *df2=0;
     // *df = 0.0; // Doesn't move.
-    *hphif=2*h0;
+    *hphif=sqrt(h0);
     // warning("The surface around the initial estimate is nearly constant in one parameter grad=0.  Consider a different starting point.");
     return 3;
   }
@@ -1858,7 +1862,9 @@ void numericGrad(double *theta, double *g){
       } else if (doForward && fabs(g[cpar]) < op_focei.gradCalcCentralSmall){
 	op_focei.mixDeriv = 1;
 	theta[cpar]       = cur - delta;
+	tmp = g[cpar];
 	g[cpar]           = (tmp-foceiOfv0(theta))/(2*delta);
+	if (fabs(tmp) > fabs(g[cpar])) g[cpar] = tmp;
       }
       theta[cpar] = cur;
     }
@@ -2633,8 +2639,8 @@ double foceiOuterF(NumericVector &theta){
 extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
   numericGrad(par, gr);
   op_focei.nG++;
+  int finalize=0, i = 0;
   if (op_focei.printOuter != 0 && op_focei.nG % op_focei.printOuter == 0){
-    int finalize=0, i = 0;
     if (op_focei.useColor && op_focei.printNcol >= n){
       switch(op_focei.derivMethod){
       case 0:
@@ -2696,6 +2702,15 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
     }
     if (!op_focei.useColor){
       foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
+    }
+  }
+  for (i = n; i--;){
+    if (gr[i] == 0){
+      if (op_focei.nF == 1){
+	stop("On initial gradient evaluation, one or more parameters have a zero gradient\nLook at model, try different initial estimates or use outerOpt=\"bobyqa\")");
+      } else {
+	gr[i]=sqrt(DOUBLE_EPS);
+      }
     }
   }
 }
