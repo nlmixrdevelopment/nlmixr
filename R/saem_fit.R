@@ -1540,7 +1540,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .saemObf <- NA
   } else if (is.null(obf)){
     .saemObf <- calc.2LL(object,nnodes.gq = nnodes.gq, nsd.gq = nsd.gq);
-    if (nnodes.gq){
+    if (nnodes.gq==1){
       .rn <- paste0("laplace",nsd.gq);
     } else {
       .rn <- paste0("gauss",nnodes.gq,".", nsd.gq);
@@ -1550,7 +1550,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       .saemObf <- NA;
     } else if (obf){
       .saemObf <- calc.2LL(object,nnodes.gq = nnodes.gq, nsd.gq = nsd.gq);
-      if (nnodes.gq){
+      if (nnodes.gq==1){
         .rn <- paste0("laplace",nsd.gq);
       } else {
         .rn <- paste0("gauss",nnodes.gq,".", nsd.gq);

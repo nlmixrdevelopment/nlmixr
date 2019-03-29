@@ -2178,7 +2178,7 @@ logLik.nlmixrFitData <- function(object, ...){
         .new <- setOfv(object,.lst$type);
         .parent <- globalenv();
         .bound <- do.call("c", lapply(ls(.parent, all.names=TRUE), function(.cur){
-                                   if (.cur == .objName && identical(.parent[[.cur]]$env, fit$env)){
+                                   if (.cur == .objName && identical(.parent[[.cur]]$env, object$env)){
                                        return(.cur)
                                    }
                                    return(NULL);
