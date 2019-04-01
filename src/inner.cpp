@@ -1725,10 +1725,15 @@ void numericGrad(double *theta, double *g){
       op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
       				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
       err = 1/(std::fabs(theta[cpar])+1);
-      if (op_focei.gillDf == 0){
+      if (op_focei.gillDf[cpar] == 0){
 	op_focei.scaleC[cpar]=op_focei.scaleC0; 
 	op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
       				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+	if (op_focei.gillDf[cpar] == 0){
+	  op_focei.scaleC[cpar]=1/op_focei.scaleC0; 
+	  op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+					  theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+	}
       }
       // h=aEps*(|x|+1)/sqrt(1+fabs(f));
       // h*sqrt(1+fabs(f))/(|x|+1) = aEps
