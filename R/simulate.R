@@ -356,6 +356,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     }
     uif <- object$uif
     dat <- nlmixrData(getData(object))
+    names(dat)  <- toupper(names(dat))
     up.covs <- toupper(uif$all.covs);
     up.names <- toupper(names(dat))
     for (i in seq_along(up.covs)){
@@ -364,7 +365,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
             names(dat)[w] = uif$all.covs[i];
         }
     }
-    r <- range(dat$TIME)
+    r <- range(dat$TIME, na.rm=TRUE,finite=TRUE)
     if (is.null(minimum)){
         minimum <- r[1];
     }
