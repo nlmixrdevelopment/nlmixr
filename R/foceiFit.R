@@ -1377,6 +1377,9 @@ foceiFit.data.frame <- function(data, ...){
         if (length(.muRef) > 0){
             .nMuRef <- names(.muRef)
             .ome <- .ret$omega
+            .omegaFix <- as.data.frame(.ret$uif$ini);
+            .omegaFix <- .omegaFix[is.na(.omegaFix$ntheta),];
+            .omegaFix  <- setNames(.omegaFix$fix,paste(.omegaFix$name))
             .muRef <- structure(as.vector(.nMuRef), .Names=as.vector(.muRef));
             .logEta <- .uif$log.eta;
             .digs <- .ret$control$sigdig;
@@ -1388,13 +1391,17 @@ foceiFit.data.frame <- function(data, ...){
                 .v <- .ome[.y, .y];
                 if (any(.y == .logEta)){
                     .sdOnly <<- FALSE;
-                    return(data.frame(ch=sprintf("%s%%", formatC(signif(sqrt(exp(.v) - 1) * 100, digits=.digs),
-                                                                 digits=.digs, format="fg", flag="#")),
+                    return(data.frame(ch=paste0(ifelse(.omegaFix[.y],"fix(",""),
+                                                formatC(signif(sqrt(exp(.v) - 1) * 100, digits=.digs),
+                                                        digits=.digs, format="fg", flag="#"),
+                                                ifelse(.omegaFix[.y],")","")),
                                       v=sqrt(exp(.v) - 1) * 100));
                 } else {
                     .cvOnly <<- FALSE;
-                    return(data.frame(ch=sprintf("%s", formatC(signif(sqrt(.v),digits=.digs),
-                                                               digits=.digs, format="fg", flag="#")),
+                    return(data.frame(ch=paste0(ifelse(.omegaFix[.y],"fix(",""),
+                                                formatC(signif(sqrt(.v),digits=.digs),
+                                                        digits=.digs, format="fg", flag="#"),
+                                                 ifelse(.omegaFix[.y],")","")),
                                       v=.v));
                 }
             })
@@ -2304,6 +2311,7 @@ print.nlmixrFitCore <- function(x, ...){
         .pf <- gsub(rex::rex(boundary,capture(or(.tmp)), boundary), "\033[1m\\1\033[0m", .pf, perl=TRUE);
         .pf <- gsub(rex::rex(capture(or(.tmp))), "\033[1m\\1\033[0m", .pf, perl=TRUE);
         .pf <- gsub(rex::rex("FIXED"), "\033[1;32mFIXED\033[0m", .pf, perl=TRUE)
+        .pf <- gsub(rex::rex("fix(",capture(.regNum),")"), "\033[1;32mfix(\\1)\033[0m", .pf, perl=TRUE)
     } else {
         .pf <- gsub(rex::rex(capture(.regNum), "%", or(">", "=", "<")), "\\1% ", .pf, perl=TRUE)
         .pf <- gsub(rex::rex(capture(.regNum), "="), "\\1 ", .pf, perl=TRUE)
