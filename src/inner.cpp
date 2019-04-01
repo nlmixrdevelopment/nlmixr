@@ -134,6 +134,7 @@ typedef struct {
   double *thetaGrad;
   double *initPar;
   double *scaleC;
+  double scaleC0;
   int *xPar;
   NumericVector lowerIn;
   double *lower;
@@ -1723,7 +1724,12 @@ void numericGrad(double *theta, double *g){
     for (int cpar = op_focei.npars; cpar--;){
       op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
       				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
-      err = 1/(std::fabs(theta[cpar])+1); 
+      err = 1/(std::fabs(theta[cpar])+1);
+      if (op_focei.gillDf == 0){
+	op_focei.scaleC[cpar]=op_focei.scaleC0; 
+	op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+      				      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+      }
       // h=aEps*(|x|+1)/sqrt(1+fabs(f));
       // h*sqrt(1+fabs(f))/(|x|+1) = aEps
       // let err=2*sqrt(epsA/(1+f))
@@ -2314,6 +2320,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.gillRtol = as<double>(odeO["gillRtol"]);
   op_focei.scaleType = as<int>(odeO["scaleType"]);
   op_focei.normType = as<int>(odeO["normType"]);
+  op_focei.scaleC0=as<double>(odeO["scaleC0"]);
   op_focei.scaleCmin=as<double>(odeO["scaleCmin"]);
   op_focei.scaleCmax=as<double>(odeO["scaleCmax"]);
   op_focei.abstol=as<double>(odeO["abstol"]);
@@ -2708,7 +2715,7 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
   for (i = n; i--;){
     if (gr[i] == 0){
       if (op_focei.nF == 1){
-	stop("On initial gradient evaluation, one or more parameters have a zero gradient\nLook at model, try different initial estimates or use outerOpt=\"bobyqa\")");
+	stop("On initial gradient evaluation, one or more parameters have a zero gradient\nChange model, try different initial estimates or use outerOpt=\"bobyqa\")");
       } else {
 	gr[i]=sqrt(DOUBLE_EPS);
       }

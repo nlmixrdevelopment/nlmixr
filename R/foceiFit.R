@@ -333,6 +333,9 @@ is.latex <- function() {
 ##'    apply.  You can specify each parameters scaling factor by this
 ##'    parameter if you wish.
 ##'
+##' @param scaleC0 Number to adjust the scaling factor by if the initial
+##'     gradient is zero.
+##'
 ##' @param scaleCmax Maximum value of the scaleC to prevent overflow.
 ##'
 ##' @param scaleCmin Minimum value of the scaleC to prevent underflow.
@@ -527,6 +530,7 @@ foceiControl <- function(sigdig=3,...,
                          scaleCmax=1e5,
                          scaleCmin=1e-5,
                          scaleC=NULL,
+                         scaleC0=1e4,
                          derivEps=rep(20*sqrt(.Machine$double.eps), 2),
                          derivMethod=c("switch", "forward", "central"),
                          derivSwitchTol=NULL,
@@ -822,6 +826,7 @@ foceiControl <- function(sigdig=3,...,
                  scaleC=scaleC,
                  scaleCmin=as.double(scaleCmin),
                  scaleCmax=as.double(scaleCmax),
+                 scaleC0=as.double(scaleC0),
                  outerOptTxt=.outerOptTxt,
                  rmatNorm=as.integer(rmatNorm),
                  smatNorm=as.integer(smatNorm),
