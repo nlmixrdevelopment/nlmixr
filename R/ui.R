@@ -1892,9 +1892,12 @@ nlmixrUI.saem.distribution <- function(obj){
 ##' @return logical vector of fixed THETA parameters
 ##' @author Matthew L. Fidler
 nlmixrUI.focei.fixed <- function(obj){
-  df <- as.data.frame(obj$ini);
-  dft <- df[!is.na(df$ntheta), ];
-  return(dft$fix)
+  .df <- as.data.frame(obj$ini);
+  .dft <- .df[!is.na(.df$ntheta), ];
+  .fix  <- .dft$fix;
+  .dft <- .df[is.na(.df$ntheta), ];
+  .fix  <- c(.fix,.dft$fix)
+  return(.fix)
 }
 ##' Get parameters that are fixed for SAEM
 ##'

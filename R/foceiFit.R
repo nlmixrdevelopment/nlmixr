@@ -1576,7 +1576,11 @@ foceiFit.data.frame0 <- function(data,
         if (is.null(fixed)){
             .tmp <- rep(FALSE, length(inits$THTA))
         } else {
-            .tmp <- c(fixed, rep(FALSE, length(inits$THTA) - length(fixed)))
+            if (length(fixed) < length(inits$THTA)){
+                .tmp <- c(fixed, rep(FALSE, length(inits$THTA) - length(fixed)))
+            } else {
+                .tmp  <- fixed[1:length(inits$THTA)];
+            }
         }
         if (exists("uif", envir=.ret)){
             .uifErr <- .ret$uif$ini$err[!is.na(.ret$uif$ini$ntheta)];
