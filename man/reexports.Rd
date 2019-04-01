@@ -45,6 +45,7 @@
 \alias{groupedData}
 \alias{getData}
 \alias{rxSymPySetupPred}
+\alias{et}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -52,7 +53,7 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{rxClean}}, \code{\link[RxODE]{rxCat}}, \code{\link[RxODE]{eventTable}}, \code{\link[RxODE]{add.dosing}}, \code{\link[RxODE]{add.sampling}}, \code{\link[RxODE]{rxPermissive}}, \code{\link[RxODE]{rxSymPySetupPred}}, \code{\link[RxODE]{rxSolve}}}
+  \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{rxClean}}, \code{\link[RxODE]{rxCat}}, \code{\link[RxODE]{eventTable}}, \code{\link[RxODE]{add.dosing}}, \code{\link[RxODE]{add.sampling}}, \code{\link[RxODE]{rxPermissive}}, \code{\link[RxODE]{rxSymPySetupPred}}, \code{\link[RxODE]{et}}, \code{\link[RxODE]{rxSolve}}}
 
   \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
 

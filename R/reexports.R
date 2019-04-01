@@ -168,3 +168,7 @@ nlme::getData
 ##' @importFrom RxODE rxSymPySetupPred
 ##' @export
 RxODE::rxSymPySetupPred
+
+##' @importFrom RxODE et
+##' @export
+RxODE::et
