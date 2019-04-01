@@ -413,17 +413,21 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         if (any(.low != -Inf) | any(.up != Inf)){
             warning("Bounds are ignored in SAEM")
         }
-        if (any(paste(uif$ini$name[uif$ini$fix]) %in% unlist(uif$mu.ref))){
-            stop("Fixed thetas cannot be associated with an ETA in SAEM")
-        }
         uif$env$mcmc <- mcmc;
         uif$env$ODEopt <- ODEopt;
         uif$env$sum.prod <- sum.prod
         uif$env$covMethod <- covMethod
         .dist <- uif$saem.distribution
         model <- uif$saem.model
-        cfg <- configsaem(model=model, data=dat, inits=uif$saem.init,
-                          mcmc=mcmc, ODEopt=ODEopt, seed=seed, fixed=uif$saem.fixed,
+        inits = uif$saem.init
+        if (length(uif$saem.fixed)>0) {
+			names(inits$theta) = rep("", length(inits$theta))
+			names(inits$theta)[uif$saem.fixed] = "FIXED"
+			print(uif$saem.fixed)
+			print(inits)
+		}
+        cfg <- configsaem(model=model, data=dat, inits=inits,
+                          mcmc=mcmc, ODEopt=ODEopt, seed=seed,
                           distribution=.dist, DEBUG=DEBUG);
         if (print > 1){
             cfg$print <- as.integer(print)
