@@ -706,7 +706,7 @@ double likInner0(double *eta){
     }
     // Solve ODE
     innerOde(id);
-    if (ISNA(ind->solve[0])){
+    if (op->neq > 0 && ISNA(ind->solve[0])){
       return 1e300;
     } else {
       // Update eta.
