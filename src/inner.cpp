@@ -1044,7 +1044,8 @@ double LikInner2(double *eta, int likId){
     // print(wrap(lik));
     rx = getRx();
     rx_solving_options_ind *ind = &(rx->subjects[id]);
-    if (ISNA(ind->solve[0])){
+    rx_solving_options *op = rx->op;
+    if (op->neq > 0 && ISNA(ind->solve[0])){
       return 1e300;
     }
     // Calclaute lik first to calculate components for Hessian
