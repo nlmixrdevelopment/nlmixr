@@ -31,7 +31,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         .rx <- .env$model
         .pars <- .rx$params
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
-        suppessWarnings(do.call(RxODE:::rxSolve.default,
+        suppressWarnings(do.call(RxODE:::rxSolve.default,
                                 c(list(object=.rx, params=.pars,
                                        events=.evtM,.setupOnly=2L),
                                   saem.cfg$optM)));
@@ -131,7 +131,7 @@ plot.saemFit = function(x,...) {
         .rx <- .env$model
         .pars <- .rx$params
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
-        suppessWarnings(do.call(RxODE:::rxSolve.default,
+        suppressWarnings(do.call(RxODE:::rxSolve.default,
                                 c(list(object=.rx, params=.pars,
                                        events=.evtM,.setupOnly=2L),
                                   saem.cfg$optM)));
