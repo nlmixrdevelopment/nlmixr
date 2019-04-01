@@ -825,6 +825,8 @@ configsaem <- function(model, data, inits,
   if (is.null(inits$ares)) inits$ares = 10
   if (is.null(inits$bres)) inits$bres = 1
   if (is.null(mcmc$print)) mcmc$print=1
+  if (is.null(names(inits$theta))) names(inits$theta)=rep("", length(inits$theta))
+  inits$theta.fix = matrix(names(inits$theta), byrow=T, ncol=model$N.eta)
   inits$theta = matrix(inits$theta, byrow=T, ncol=model$N.eta)
   model$cov.mod=1-is.na(inits$theta)
   data$N.covar=nrow(inits$theta)-1
@@ -970,11 +972,14 @@ configsaem <- function(model, data, inits,
   Mcovariables = cbind(rep(1, N), covariables)[,1:nrow(mcov)]
   dim(Mcovariables) = c(length(Mcovariables)/nrow(mcov), nrow(mcov))	#FIXME
 
-  wh = intersect(fixed, i1)
-  if (length(wh)) stop("FIXED pars cannot have ETA")
-  wh = setdiff(fixed, i0)
-  if (length(wh)) stop("invalid FIXED index")
-  fixed.ix = match(fixed, i0)-1
+  #get fixed ix
+  fixed = inits$theta.fix != ""
+  wh = fixed[,i1][mcov[,i1]==1]
+  len = length(wh)
+  fixed.i1 = (1:len)[wh]-1
+  wh = fixed[,i0][mcov[,i0]==1]
+  len = length(wh)
+  fixed.i0 = (1:len)[wh]-1
 
   jlog1 = grep(T, model$log.eta)
   jcov = grep(T, apply(mcov, 1, sum)>0)
@@ -1148,7 +1153,8 @@ configsaem <- function(model, data, inits,
     distribution=distribution.idx[distribution],
     par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2)),
     seed=seed,
-    fixed.ix = fixed.ix,
+    fixed.i1 = fixed.i1,
+    fixed.i0 = fixed.i0,
     ilambda1 = as.integer(ilambda1),
     ilambda0 = as.integer(ilambda0)
   )
@@ -1186,6 +1192,7 @@ configsaem <- function(model, data, inits,
 
   cfg
 }
+
 
 
 reINITS = "^\\s*initCondition\\s*=\\s*c\\((?<inits>.+)\\)\\s*$"
