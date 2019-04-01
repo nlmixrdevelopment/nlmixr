@@ -21,9 +21,8 @@ install.packages(c("tidyverse", "data.table",
                    "stringi", "lbfgsb3",
                    "lbfgsb3c", "madness", "expm", "matrixcalc", "bookdown", "roxygen2", "xpose",
                    ## "reticulate",
-                   "nloptr", "ucminf"))
+                   "nloptr", "ucminf", "vpc"))
 
-devtools::install_github("ronkeizer/vpc");
 devtools::install_github("nlmixrdevelopment/RxODE")
 library(RxODE)
 devtools::install_github("nlmixrdevelopment/SnakeCharmR")
