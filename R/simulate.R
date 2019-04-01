@@ -213,6 +213,12 @@ nlmixrSim <- function(object, ...){
         }
         .cls <- c("nlmixrSim", class(.ret));
         attr(.cls, ".RxODE.env") <- .rxEnv
+        if (any(names(.ret)=="CMT") && any(names(object)=="CMT")){
+            if (is(object$CMT,"factor")){
+                levels(.ret$CMT) <- levels(object$CMT);
+                class(.ret$CMT) <- "factor"
+            }
+        }
         class(.ret) <- .cls
     }
     return(.ret)

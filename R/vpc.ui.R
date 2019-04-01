@@ -93,6 +93,16 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                 names(sim) <- c(n, w);
             }
         }
+        if (any(names(sim)=="cmt") && any(names(fit)=="CMT")){
+            if (is(fit$CMT, "factor")){
+                sim$cmt  <- factor(sim$cmt,sort(unique(sim$cmt)), labels=levels(fit$CMT))
+            }
+        }
+        if (any(names(dat)=="cmt") && any(names(fit)=="CMT")){
+            if (is(fit$CMT, "factor")){
+                dat$cmt  <- factor(dat$cmt,sort(unique(dat$cmt)), labels=levels(fit$CMT))
+            }
+        }
         sim <- list(rxsim=sim0, sim=sim, obs=dat)
         attr(sim, "nsim") <- .xtra$nsim;
         class(sim) <- "nlmixrVpc";
@@ -111,7 +121,6 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     p = do.call(getFromNamespace(vpcn,"vpc"), c(sim, call), envir = parent.frame(1))
     print(p);
     sim$gg <- p;
-
     return(invisible(sim));
 }
 

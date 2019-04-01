@@ -65,21 +65,21 @@ vpc.default <- function(sim, ...){
     p = do.call(getFromNamespace(vpcn,"vpc"), call, envir = parent.frame(1))
 }
 
-#' Visual predictive check (VPC) for nlmixr nlme objects
-#'
-#' Do visual predictive check (VPC) plots for nlme-based non-linear mixed effect models
-#'
-#' @param fit nlme fit object
-#' @param nsim number of simulations
-#' @param condition conditional variable
-#' @param ... Additional arguments
-#' @inheritParams vpc::vpc
-#' @return NULL
-#' @examples
-#' specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
-#' fit <- nlme_lin_cmpt(theo_md, par_model=specs, ncmt=1, verbose=TRUE)
-#' vpc(fit, nsim = 100, condition = NULL)
-#' @export
+##' Visual predictive check (VPC) for nlmixr nlme objects
+##'
+##' Do visual predictive check (VPC) plots for nlme-based non-linear mixed effect models
+##'
+##' @param fit nlme fit object
+##' @param nsim number of simulations
+##' @param condition conditional variable
+##' @param ... Additional arguments
+##' @inheritParams vpc::vpc
+##' @return NULL
+##' @examples
+##' specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
+##' fit <- nlme_lin_cmpt(theo_md, par_model=specs, ncmt=1, verbose=TRUE)
+##' vpc(fit, nsim = 100, condition = NULL)
+##' @export
 vpc_nlmixr_nlme = function(fit, nsim=100, condition=NULL, ...)
 {
     nlmeModList(fit$env);
