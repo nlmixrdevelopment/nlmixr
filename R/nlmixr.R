@@ -223,6 +223,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
     .clearPipedData();
     .tmp <- deparse(body(uif$theta.pars))[-1];
     .tmp <- .tmp[-length(.tmp)];
+    .origData <- data;
     data <- RxODE::etTrans(data,paste(paste(.tmp,collapse="\n"),"\n",uif$rxode),TRUE,TRUE);
     .lab  <- attr(class(data),".RxODE.lst")$idLvl;
     .modelId <- digest::digest(list(sessionInfo()$otherPkgs$nlmixr$Version,
@@ -292,6 +293,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
             }
         }
         .env <- x$env
+        .env$origData <- .origData;
         .env$uif <- .uif;
         .predDf <- .uif$predDf;
         if (any(.predDf$cond != "") & any(names(x) == "CMT")){
@@ -424,7 +426,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
 			nphi = attr(model$saem_mod, "nrhs")
 			m = cumsum(!is.na(matrix(inits$theta, byrow=T, ncol=nphi)))
 			fixid = match(uif$saem.fixed, t(matrix(m,ncol=nphi)))
-			
+
 			names(inits$theta) = rep("", length(inits$theta))
 			names(inits$theta)[fixid] = "FIXED"
 			print(uif$saem.fixed)

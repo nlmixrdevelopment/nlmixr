@@ -118,7 +118,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     call$obs_cols = list(id="id", dv="dv", idv="time")
     call$sim_cols = list(id="id", dv="dv", idv="time")
     call$stratify = stratify
-    p = do.call(getFromNamespace(vpcn,"vpc"), c(sim, call), envir = parent.frame(1))
+    p = do.call(getFromNamespace(vpcn, "vpc"), c(sim, call), envir = parent.frame(1))
     print(p);
     sim$gg <- p;
     return(invisible(sim));
