@@ -1526,7 +1526,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   .ini <- .ini[!is.na(.ini$ntheta),];
   .skipCov <- !is.na(.ini$err);
   .fixed <- uif$focei.fixed
-  .skipCov <- .skipCov | .fixed
+  .skipCov <- .skipCov | .fixed[seq_along(.skipCov)]
   .covMethod <- uif$env$covMethod
   if (!any(.covMethod == c("r", "s", "r,s"))){
     .covMethod <- "";
@@ -1602,7 +1602,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       .setSaemExtra(.env,.rn);
     } else {
       .setSaemExtra(.env,.rn);
-      .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
+      .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed[seq_along(init$THTA)],
+                               row.names=uif$focei.names);
       .env$fullTheta <- setNames(init$THTA, uif$focei.names)
       .om0 <- .genOM(.parseOM(init$OMGA));
       attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
