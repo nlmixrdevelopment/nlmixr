@@ -108,7 +108,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         RxODE::rxTick();
     }
     RxODE::rxProgressStop();
-    ll2 = 2*sum(log(Q)+rowSums(log(b))) - N*log(det(Omega)) - (N*nphi1+ ntotal)*log(2*pi)
+    ll2 = 2*sum(log(Q)+rowSums(log(b))) - N*log(det(Omega)) - (N*nphi1+ ntotal)*log(2*pi) -2*saem.cfg$extraLL
     -ll2
 }
 

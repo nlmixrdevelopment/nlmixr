@@ -863,7 +863,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     } else if (do.pred == 3){
       .doDist(err1, err1.args, curCond)
       tmp <- bounds;
-      if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm") || any(paste(tmp$err) == "dnorm")) && any(paste(tmp$err) == "prop")){
+      if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm") || any(paste(tmp$err) == "dnorm") ||
+           any(paste(tmp$err) == "lnorm") || any(paste(tmp$err) == "dlnorm") || any(paste(tmp$err) == "logn") ||
+           any(paste(tmp$err) == "dlogn")) &&
+          any(paste(tmp$err) == "prop")){
         assign("errn", errn + 1, this.env);
         assign("add.prop.errs", rbind(add.prop.errs,
                                       data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
@@ -911,7 +914,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .doDist(err1, err1.args, curCond)
         .doDist(err2, err2.args, curCond)
         tmp <- bounds;
-        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm") || any(paste(tmp$err) == "dnorm")) && any(paste(tmp$err) == "prop")){
+        if ((any(paste(tmp$err) == "add") ||
+             any(paste(tmp$err) == "norm") ||
+             any(paste(tmp$err) == "dnorm") ||
+             any(paste(tmp$err) == "lnorm") ||
+             any(paste(tmp$err) == "dlnorm") ||
+             any(paste(tmp$err) == "logn") ||
+             any(paste(tmp$err) == "dlogn")
+        ) && any(paste(tmp$err) == "prop")){
           assign("errn", errn + 1, this.env);
           assign("add.prop.errs", rbind(add.prop.errs,
                                         data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
@@ -965,7 +975,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .doDist(err2, err2.args, curCond)
         .doDist(err3, err3.args, curCond)
         tmp <- bounds
-        if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "dnorm") || any(paste(tmp$err) == "norm")) && any(paste(tmp$err) == "prop")){
+        if ((any(paste(tmp$err) == "add") ||
+             any(paste(tmp$err) == "dnorm") ||
+             any(paste(tmp$err) == "norm") ||
+             any(paste(tmp$err) == "lnorm") ||
+             any(paste(tmp$err) == "dlnorm") ||
+             any(paste(tmp$err) == "logn") ||
+             any(paste(tmp$err) == "dlogn")
+        ) && any(paste(tmp$err) == "prop")){
           assign("errn", errn + 1, this.env);
           assign("add.prop.errs", rbind(add.prop.errs,
                                         data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
@@ -1884,6 +1901,7 @@ nlmixrUI.saem.distribution <- function(obj){
     return("binomial");
   }
   if (any(.df %in% c("dnorm", "norm", "prop", "add"))) return("normal");
+  if (any(.df %in% c("dlnorm", "lnorm", "logn","dlogn"))) return("lnorm");
   stop("Distribution unsupported by SAEM");
 }
 ##' Get parameters that are fixed
@@ -2008,7 +2026,9 @@ nlmixrUI.saem.res.mod <- function(obj){
   .ini <- .ini[!is.na(.ini$err), ];
   return(sapply(.predDf$cond, function(x){
     .tmp <- .ini[which(.ini$condition == x), ];
-    .hasAdd <- any(.tmp$err == "add");
+    .hasAdd <- any(.tmp$err == "add") | any(.tmp$err == "norm") | any(.tmp$err == "dnorm") |
+      any(.tmp$err == "dlnorm") | any(.tmp$err == "lnorm") | any(.tmp$err == "logn") |
+      any(.tmp$err == "dlogn");
     .hasProp <- any(.tmp$err == "prop");
     if (.hasAdd & .hasProp) return(3)
     if (.hasAdd) return(1)
@@ -2021,7 +2041,7 @@ nlmixrUI.saem.res.mod <- function(obj){
 ##' @return Names of error estimates for SAEM
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.res.name <- function(obj){
-  w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm"))));
+  w <- which(sapply(obj$err, function(x)any(x == c("add", "norm", "dnorm", "dlnorm", "lnorm", "logn", "dlogn"))));
   ret <- c();
   if (length(w) == 1){
     ret[length(ret) + 1] <- paste(obj$name[w])
@@ -2044,7 +2064,10 @@ nlmixrUI.saem.ares <- function(obj){
   .ini <- .ini[!is.na(.ini$err), ];
   return(sapply(.predDf$cond, function(x){
     .tmp <- .ini[which(.ini$condition == x), ];
-    .w <- which(sapply(.tmp$err, function(x)any(x == c("add", "norm", "dnorm", "dpois", "pois", "dbinom", "binom", "dbern", "bern"))));
+    .w <- which(sapply(.tmp$err, function(x)
+      any(x == c("add", "norm", "dnorm", "dpois",
+                 "pois", "dbinom", "binom", "dbern", "bern",
+                 "lnorm", "dlnorm", "logn", "dlogn"))));
     if (length(.w) == 1){
       return(.tmp$est[.w]);
     } else {

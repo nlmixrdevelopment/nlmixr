@@ -213,8 +213,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< mat& >::type phi(in_phi);
     Rcpp::traits::input_parameter< mat& >::type evt(in_evt);
     List opt(in_opt);
-
+    int distribution = as<int>(opt["distribution"]);
     vec g = user_function(phi, evt, opt);
+    if (distribution == 4) g = log(g);
     return Rcpp::wrap(g);
 END_RCPP
 }
@@ -356,7 +357,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< mat& >::type phi(in_phi);
     Rcpp::traits::input_parameter< mat& >::type evt(in_evt);
     List opt(in_opt);
+    int distribution = as<int>(opt["distribution"]);
     vec g = user_function(phi, evt, opt);
+    if (distribution == 4) g = log(g);
     return Rcpp::wrap(g);
 END_RCPP
 }
@@ -738,7 +741,7 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 #' @param mcmc a list of various mcmc options
 #' @param ODEopt optional ODE solving options
 #' @param seed seed for random number generator
-#' @param distribution one of c("normal","poisson","binomial")
+#' @param distribution one of c("normal","poisson","binomial", "lnorm")
 #' @param fixed a character vector of fixed effect only parameters (no random effects attached) to be fixed
 #' @param DEBUG Integer determining if debugging is enabled.
 #' @details
@@ -794,15 +797,22 @@ lincmt = function(ncmt, oral=T, tlag=F, infusion=F, parameterization=1) {
 configsaem <- function(model, data, inits,
 	mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2)),
 	ODEopt = list(atol=1e-6, rtol=1e-4, method="lsoda", transitAbs=FALSE,maxeval=100000),
-	distribution=c("normal","poisson","binomial"),
+	distribution=c("normal","poisson","binomial","lnorm"),
 	seed=99, fixed=NULL, DEBUG=0)
 {
     names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt));
     ODEopt  <- do.call(RxODE::rxControl,ODEopt)
 #mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
   set.seed(seed)
-  distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3)
+  distribution.idx = c("normal"=1,"poisson"=2,"binomial"=3,"lnorm"=4)
   distribution = match.arg(distribution)
+  distribution = distribution.idx[distribution];
+  .extraLL  <- 0;
+  if (distribution==4){
+    data$DV[data$EVID == 0] <- log(data$DV[data$EVID == 0]);
+    if (any(is.na(data$DV[data$EVID == 0]))) stop("Data must be positive for log-normally distributed data.")
+    .extraLL  <- sum(data$DV[data$EVID == 0]);
+  }
   .data = data;
   ##RxODE::rxTrans(data, model)
   data = list(nmdat=data)
@@ -896,8 +906,6 @@ configsaem <- function(model, data, inits,
   #if (check) stop("illegal initial sigma2")
   check = sum(diag(covstruct)==1)
   if (!check) stop("0 ETA's")
-
-
   y = data$data[,"DV"]
   id = data$data[,"ID"]
   check = any(diff(unique(id))!=1)
@@ -1089,7 +1097,7 @@ configsaem <- function(model, data, inits,
 
   i1 = i1 - 1
   i0 = i0 - 1
-
+  opt$distribution <- distribution;
   cfg=list(
     nu=mcmc$nu,
     niter=niter,
@@ -1150,13 +1158,14 @@ configsaem <- function(model, data, inits,
     opt=opt,
     optM=optM,
     print=mcmc$print,
-    distribution=distribution.idx[distribution],
+    distribution=distribution,
     par.hist = matrix(0, sum(niter), nlambda1+nlambda0+nphi1+1+(model$res.mod>2)),
     seed=seed,
     fixed.i1 = fixed.i1,
     fixed.i0 = fixed.i0,
     ilambda1 = as.integer(ilambda1),
-    ilambda0 = as.integer(ilambda0)
+    ilambda0 = as.integer(ilambda0),
+    extraLL=.extraLL
   )
 
 
@@ -1311,7 +1320,7 @@ saem.fit <- function(model, data, inits,
                      covars=NULL,
                      mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                      ODEopt = list(atol = 1e-06, rtol = 1e-04, method="lsoda", transitAbs = FALSE),
-                     distribution=c("normal","poisson","binomial"),
+                     distribution=c("normal","poisson","binomial","lnorm"),
                      seed = 99)
 {
     UseMethod("saem.fit");
@@ -1327,7 +1336,7 @@ saem.fit.nlmixr.ui.nlme <- function(model, data, inits,
                                     covars=NULL,
                                     mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                                     ODEopt = list(atol = 1e-06, rtol = 1e-04, method="lsoda", transitAbs = FALSE),
-                                    distribution=c("normal","poisson","binomial"),
+                                    distribution=c("normal","poisson","binomial","lnorm"),
                                     seed = 99){
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     names(call)[1] <- "object"
@@ -1350,7 +1359,7 @@ saem.fit.RxODE <- function(model, data, inits,
                            covars=NULL,
                            mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                            ODEopt = list(atol = 1e-06, rtol = 1e-04, method="lsoda", transitAbs = FALSE),
-                           distribution=c("normal","poisson","binomial"),
+                           distribution=c("normal","poisson","binomial","lnorm"),
                            seed = 99){
     saem_fit = gen_saem_user_fn(model, PKpars, pred)
     model = list(saem_mod=saem_fit, covars=covars)
@@ -1367,7 +1376,7 @@ saem.fit.default <- function(model, data, inits,
                              covars=NULL,
                              mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                              ODEopt = list(atol = 1e-06, rtol = 1e-04, method="lsoda", transitAbs = FALSE),
-                             distribution=c("normal","poisson","binomial"),
+                             distribution=c("normal","poisson","binomial","lnorm"),
                              seed = 99){
     saem_fit = gen_saem_user_fn(model)
     model = list(saem_mod=saem_fit, covars=covars)
@@ -1409,7 +1418,8 @@ focei.theta.saemFit <- function(object, uif, ...){
         if (length(.w) == 1){
             thetas[paste(.tmp$name[.w])]  <- .resMat[i, 2];
         }
-        .w <- which(sapply(.tmp$err, function(x)any(x == c("add", "norm", "dnorm"))));
+        .w <- which(sapply(.tmp$err, function(x)any(x == c("add", "norm", "dnorm", "lnorm", "dlnorm",
+                                                           "dlogn","logn"))));
         if (length(.w) == 1){
             thetas[paste(.tmp$name[.w])] <- .resMat[i, 1];
         }
