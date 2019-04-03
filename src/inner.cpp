@@ -159,6 +159,9 @@ typedef struct {
   int maxOuterIterations;
   int maxInnerIterations;
 
+  double odeRecalcFactor;
+  int maxOdeRecalc;
+
   int nsim;
   int nzm;
 
@@ -707,18 +710,14 @@ double likInner0(double *eta){
     }
     // Solve ODE
     innerOde(id);
-    if (op->badSolve){
-      RxODE::atolRtolFactor_(pow(10,0.5));
+    j=0;
+    while (op->badSolve && j < op_focei.maxOdeRecalc){
+      RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
       op->badSolve=0;
       innerOde(id);
-      if (op->badSolve){
-	op->badSolve=0;
-	RxODE::atolRtolFactor_(pow(10,0.5));
-	innerOde(id);
-	RxODE::atolRtolFactor_(pow(10,-0.5));
-      }
-      RxODE::atolRtolFactor_(pow(10,0.5));
+      j++;
     }
+    if (j != 0) RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -j));
     if (op->neq > 0 && ISNA(ind->solve[0])){
       return 1e300;
     } else {
@@ -2099,6 +2098,8 @@ NumericVector foceiSetup_(const RObject &obj,
   }
   op_focei.maxOuterIterations = as<int>(odeO["maxOuterIterations"]);
   op_focei.maxInnerIterations = as<int>(odeO["maxInnerIterations"]);
+  op_focei.maxOdeRecalc = as<int>(odeO["maxOdeRecalc"]);
+  op_focei.odeRecalcFactor = as<double>(odeO["odeRecalcFactor"]);
   if (op_focei.maxOuterIterations <= 0){
     // No scaling.
     foceiSetupTheta_(mvi, theta, thetaFixed, 0.0, !RxODE::rxIs(obj, "NULL"));

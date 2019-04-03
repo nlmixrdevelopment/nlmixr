@@ -496,6 +496,13 @@ is.latex <- function() {
 ##'     do not perform the optimization again.  This ETA nudge is only
 ##'     done on the first ETA optimization.
 ##'
+##' @param maxOdeRecalc Maximum number of times to reduce the ODE
+##'     tolerances and try to resolve the system if there was a bad
+##'     ODE solve.
+##'
+##' @param odeRecalcFactor The factor to increase the rtol/atol with
+##'     bad ODE solving.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##'
@@ -607,6 +614,8 @@ foceiControl <- function(sigdig=3,...,
                          covSmall=1e-5,
                          adjLik=TRUE, ## Adjust likelihood by 2pi for FOCEi methods
                          gradTrim=Inf,
+                         maxOdeRecalc=5,
+                         odeRecalcFactor=10^(0.5),
                          gradCalcCentralSmall=1e-4,
                          gradCalcCentralLarge=1e4,
                          etaNudge=0.01, stiff){
@@ -857,6 +866,8 @@ foceiControl <- function(sigdig=3,...,
                  gradCalcCentralSmall=as.double(gradCalcCentralSmall),
                  gradCalcCentralLarge=as.double(gradCalcCentralLarge),
                  etaNudge=as.double(etaNudge),
+                 maxOdeRecalc=as.integer(maxOdeRecalc),
+                 odeRecalcFactor=as.double(odeRecalcFactor),
                  ...);
     .tmp <- .ret
     .tmp$maxsteps <- maxstepsOde
