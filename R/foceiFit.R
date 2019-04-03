@@ -27,12 +27,20 @@ is.latex <- function() {
 ##'
 ##'  \item The tolerance of the inner and outer optimization is \code{10^-sigdig}
 ##'
-##'  \item The tolerance of the ODE solvers is \code{10^(-sigdig-1)}
+##'  \item The tolerance of the ODE solvers is
+##'  \code{0.5*10^(-sigdig-2)}; For the sensitivity equations the
+##'  default is \code{0.5*10^(-sigdig-1.5)} (only applicable for liblsoda)
 ##'
 ##'  \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
 ##'
 ##'  \item The significant figures that some tables are rounded to.
 ##' }
+##'
+##' @param atolSens Sensitivity atol, can be different than atol with
+##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
+##'
+##' @param rtolSens Sensitivity rtol, can be different than rtol with
+##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
 ##'
 ##' @param epsilon Precision of estimate for n1qn1 optimization.
 ##'
@@ -519,6 +527,7 @@ foceiControl <- function(sigdig=3,...,
                          n1qn1nsim=NULL,
                          method = c("liblsoda", "lsoda", "dop853"),
                          transitAbs = NULL, atol = NULL, rtol = NULL,
+                         atolSens=NULL, rtolSens=NULL,
                          maxstepsOde = 5000L, hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
                          covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
                          print=1L,
@@ -624,6 +633,12 @@ foceiControl <- function(sigdig=3,...,
     }
     if (is.null(rtol)){
         rtol <- 0.5 * 10 ^ (-sigdig - 2);
+    }
+    if (is.null(atolSens)){
+        atolSens <- 0.5 * 10 ^ (-sigdig-1.5);
+    }
+    if (is.null(rtolSens)){
+        rtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
     }
     if (is.null(rel.tol)){
         rel.tol <- 10 ^ (-sigdig - 1);
@@ -754,6 +769,8 @@ foceiControl <- function(sigdig=3,...,
                  transitAbs=transitAbs,
                  atol=atol,
                  rtol=rtol,
+                 atolSens=atolSens,
+                 rtolSens=rtolSens,
                  maxstepsOde=maxstepsOde,
                  hmin=hmin,
                  hmax=hmax,
@@ -1512,12 +1529,21 @@ foceiFit.data.frame0 <- function(data,
     .covNames <- .parNames <- c();
     .ret$adjLik <- control$adjLik;
     if (!exists("noLik", envir=.ret)){
+        .atol  <- rep(control$atol,length(RxODE::rxModelVars(model)$state))
+        .rtol  <- rep(control$rtol,length(RxODE::rxModelVars(model)$state))
         .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
                                               pred.minus.dv=TRUE, sum.prod=control$sumProd,
                                               theta.derivs=FALSE, optExpression=control$optExpression,
                                               interaction=(control$interaction == 1L),
                                               run.internal=TRUE);
-
+        .atol  <- c(.atol,rep(control$atolSens,
+                              length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                              length(.atol)))
+        .rtol  <- c(.rtol, rep(control$rtolSens,
+                               length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                               length(.rtol)));
+        .ret$control$rxControl$atol <- .atol
+        .ret$control$rxControl$rtol <- .rtol
         .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
         .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
         colnames(data) <- sapply(names(data), function(x){
@@ -1545,10 +1571,20 @@ foceiFit.data.frame0 <- function(data,
         .extraPars <- .ret$model$extra.pars
     } else {
         if (.ret$noLik){
+            .atol  <- rep(control$atol,length(RxODE::rxModelVars(model)$state))
+            .rtol  <- rep(control$rtol,length(RxODE::rxModelVars(model)$state))
             .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
                                                   pred.minus.dv=TRUE, sum.prod=control$sumProd,
                                                   theta.derivs=FALSE, optExpression=control$optExpression, run.internal=TRUE,
                                                   only.numeric=TRUE);
+            .atol  <- c(.atol,rep(control$atolSens,
+                              length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                              length(.atol)))
+            .rtol  <- c(.rtol, rep(control$rtolSens,
+                                   length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                                   length(.rtol)));
+            .ret$control$rxControl$atol <- .atol
+            .ret$control$rxControl$rtol <- .rtol
             .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
             .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
             colnames(data) <- sapply(names(data), function(x){
@@ -1627,7 +1663,7 @@ foceiFit.data.frame0 <- function(data,
         .ret$model$extra.pars <- eval(call(control$diagXform, .ret$model$extra.pars))
         if (length(.ret$model$extra.pars) > 0){
             inits$THTA <- c(inits$THTA, .ret$model$extra.pars);
-            .lowerErr <- rep(control$atol * 10, length(.ret$model$extra.pars));
+            .lowerErr <- rep(control$atol[1] * 10, length(.ret$model$extra.pars));
             .upperErr <- rep(Inf, length(.ret$model$extra.pars));
             lower <-c(lower, .lowerErr);
             upper <- c(upper, .upperErr);
@@ -1764,21 +1800,21 @@ foceiFit.data.frame0 <- function(data,
 
     .solvePred <- function(){
         .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
-                       atol=.ret$control$atol, rtol=.ret$control$rtol,
+                       atol=.ret$control$atol[1], rtol=.ret$control$rtol[1],
                        maxsteps=.ret$control$maxstepsOde,
                        hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
                        transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
                        maxords = .ret$control$maxords, method=.ret$control$method)
         if (any(is.na(.res$rx_pred_)) && .ret$control$method == 2L){
             .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
-                           atol=.ret$control$atol, rtol=.ret$control$rtol,
+                           atol=.ret$control$atol[1], rtol=.ret$control$rtol[1],
                            maxsteps=.ret$control$maxstepsOde*2,
                            hmin = .ret$control$hmin, hmax = .ret$control$hmax/2, hini = .ret$control$hini,
                            transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
                            maxords = .ret$control$maxords, method="lsoda")
             if (any(is.na(.res$rx_pred_))){
                 .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
-                               atol=.ret$control$atol, rtol=.ret$control$rtol,
+                               atol=.ret$control$atol[1], rtol=.ret$control$rtol[1],
                                maxsteps=.ret$control$maxstepsOde*2,
                                hmin = .ret$control$hmin, hmax = .ret$control$hmax/2, hini = .ret$control$hini,
                                transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
@@ -1802,7 +1838,7 @@ foceiFit.data.frame0 <- function(data,
             .thetas <- .ret$fixef
             .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
             .preds <- list(ipred=.solve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
-                                        atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                        atol=.ret$control$atol[1], rtol=.ret$control$rtol[1], maxsteps=.ret$control$maxstepsOde,
                                         hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
                                         transitAbs = .ret$control$TransitAbs,
                                         maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
@@ -1833,7 +1869,7 @@ foceiFit.data.frame0 <- function(data,
         .thetas <- .ret$fixef
         .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
         .preds <- list(ipred=.solve(.ret$model$inner, .pars$ipred, .ret$dataSav,returnType="data.frame.TBS",
-                                    atol=.ret$control$atol, rtol=.ret$control$rtol, maxsteps=.ret$control$maxstepsOde,
+                                    atol=.ret$control$atol[1], rtol=.ret$control$rtol[1], maxsteps=.ret$control$maxstepsOde,
                                     hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
                                     transitAbs = .ret$control$TransitAbs,
                                     maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
