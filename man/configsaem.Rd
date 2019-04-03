@@ -7,8 +7,8 @@
 configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3,
   nu = c(2, 2, 2)), ODEopt = list(atol = 1e-06, rtol = 1e-04, method =
   "lsoda", transitAbs = FALSE, maxeval = 1e+05),
-  distribution = c("normal", "poisson", "binomial"), seed = 99,
-  fixed = NULL, DEBUG = 0)
+  distribution = c("normal", "poisson", "binomial", "lnorm"),
+  seed = 99, fixed = NULL, DEBUG = 0)
 }
 \arguments{
 \item{model}{a compiled saem model by gen_saem_user_fn()}
@@ -21,7 +21,7 @@ configsaem(model, data, inits, mcmc = list(niter = c(200, 300), nmc = 3,
 
 \item{ODEopt}{optional ODE solving options}
 
-\item{distribution}{one of c("normal","poisson","binomial")}
+\item{distribution}{one of c("normal","poisson","binomial", "lnorm")}
 
 \item{seed}{seed for random number generator}
 

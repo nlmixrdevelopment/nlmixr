@@ -7,17 +7,18 @@
 foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxInnerIterations = 1000, maxOuterIterations = 5000,
   n1qn1nsim = NULL, method = c("liblsoda", "lsoda", "dop853"),
-  transitAbs = NULL, atol = NULL, rtol = NULL, maxstepsOde = 5000L,
-  hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L,
-  maxords = 5L, cores, covsInterpolation = c("locf", "linear", "nocb",
-  "midpoint"), print = 1L, printNcol = floor((getOption("width") -
-  23)/12), scaleTo = 1, scaleObjective = 0, normType = c("rescale2",
-  "mean", "rescale", "std", "len", "constant"), scaleType = c("nlmixr",
-  "norm", "mult", "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05,
-  scaleC = NULL, derivEps = rep(20 * sqrt(.Machine$double.eps), 2),
-  derivMethod = c("switch", "forward", "central"),
-  derivSwitchTol = NULL, covDerivMethod = c("central", "forward"),
-  covMethod = c("r,s", "r", "s", ""),
+  transitAbs = NULL, atol = NULL, rtol = NULL, atolSens = NULL,
+  rtolSens = NULL, maxstepsOde = 5000L, hmin = 0L, hmax = NA_real_,
+  hini = 0, maxordn = 12L, maxords = 5L, cores,
+  covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
+  print = 1L, printNcol = floor((getOption("width") - 23)/12),
+  scaleTo = 1, scaleObjective = 0, normType = c("rescale2", "mean",
+  "rescale", "std", "len", "constant"), scaleType = c("nlmixr", "norm",
+  "mult", "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05,
+  scaleC = NULL, scaleC0 = 1e+05, derivEps = rep(20 *
+  sqrt(.Machine$double.eps), 2), derivMethod = c("switch", "forward",
+  "central"), derivSwitchTol = NULL, covDerivMethod = c("central",
+  "forward"), covMethod = c("r,s", "r", "s", ""),
   hessEps = (.Machine$double.eps)^(1/3), centralDerivEps = rep(20 *
   sqrt(.Machine$double.eps), 2), lbfgsLmm = 7L, lbfgsPgtol = 0,
   lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
@@ -37,6 +38,7 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   gillKcov = 10L, gillStepCov = 2, gillFtolCov = 0,
   rmatNorm = TRUE, smatNorm = TRUE, covGillF = TRUE,
   optGillF = TRUE, covSmall = 1e-05, adjLik = TRUE, gradTrim = Inf,
+  maxOdeRecalc = 5, odeRecalcFactor = 10^(0.5),
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
   etaNudge = 0.01, stiff)
 }
@@ -47,7 +49,9 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
 
  \item The tolerance of the inner and outer optimization is \code{10^-sigdig}
 
- \item The tolerance of the ODE solvers is \code{10^(-sigdig-1)}
+ \item The tolerance of the ODE solvers is
+ \code{0.5*10^(-sigdig-2)}; For the sensitivity equations the
+ default is \code{0.5*10^(-sigdig-1.5)} (only applicable for liblsoda)
 
  \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
 
@@ -90,6 +94,12 @@ if prior doses do not add anything to the solution.}
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
  if prior doses do not add anything to the solution.}
+
+\item{atolSens}{Sensitivity atol, can be different than atol with
+liblsoda.  This allows a less accurate solve for gradients (if desired)}
+
+\item{rtolSens}{Sensitivity rtol, can be different than rtol with
+liblsoda.  This allows a less accurate solve for gradients (if desired)}
 
 \item{maxstepsOde}{Maximum number of steps for ODE solver.}
 
@@ -294,6 +304,9 @@ Otherwise the parameter is scaled multiplicatively.
    While these are chosen in a logical manner, they may not always
    apply.  You can specify each parameters scaling factor by this
    parameter if you wish.}
+
+\item{scaleC0}{Number to adjust the scaling factor by if the initial
+gradient is zero.}
 
 \item{derivEps}{Forward difference tolerances, which is a
     vector of relative difference and absolute difference.  The
@@ -553,6 +566,13 @@ function.}
 
 \item{gradTrim}{The parameter to adjust the gradient to if the
 |gradient| is very large.}
+
+\item{maxOdeRecalc}{Maximum number of times to reduce the ODE
+tolerances and try to resolve the system if there was a bad
+ODE solve.}
+
+\item{odeRecalcFactor}{The factor to increase the rtol/atol with
+bad ODE solving.}
 
 \item{gradCalcCentralSmall}{A small number that represents the value
 where |grad| < gradCalcCentralSmall where forward differences

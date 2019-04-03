@@ -2134,7 +2134,7 @@ plot.nlmixrFitData <- function(x, ...) {
     } else {
         levels(.dat$CMT) <- paste("Compartment: ", levels(.dat$CMT))
     }
-
+    print(summary(.dat))
     for (.cmt in levels(.dat$CMT)){
         .dat0 <- .dat[.dat$CMT == .cmt, ];
 
@@ -2189,6 +2189,11 @@ plot.nlmixrFitData <- function(x, ...) {
         }
 
     }
+}
+
+##'@export
+plot.nlmixrFitCore  <- function(x, ...){
+    stop("This is not a nlmixr data frame and cannot be plotted");
 }
 ##' Return the objective function
 ##'
