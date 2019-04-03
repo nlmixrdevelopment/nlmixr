@@ -1600,7 +1600,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     }
     if (is.na(calcResid)){
       .setSaemExtra(.env,.rn);
-      .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed, row.names=uif$focei.names);
+      .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed[seq_along(init$THTA)],
+                               row.names=uif$focei.names);
       .env$fullTheta <- setNames(init$THTA, uif$focei.names)
       .om0 <- .genOM(.parseOM(init$OMGA));
       attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)

@@ -1536,14 +1536,16 @@ foceiFit.data.frame0 <- function(data,
                                               theta.derivs=FALSE, optExpression=control$optExpression,
                                               interaction=(control$interaction == 1L),
                                               run.internal=TRUE);
-        .atol  <- c(.atol,rep(control$atolSens,
-                              length(RxODE::rxModelVars(.ret$model$inner)$state)-
-                              length(.atol)))
-        .rtol  <- c(.rtol, rep(control$rtolSens,
-                               length(RxODE::rxModelVars(.ret$model$inner)$state)-
-                               length(.rtol)));
-        .ret$control$rxControl$atol <- .atol
-        .ret$control$rxControl$rtol <- .rtol
+        if (!is.null(.ret$model$inner)){
+            .atol  <- c(.atol,rep(control$atolSens,
+                                  length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                                  length(.atol)))
+            .rtol  <- c(.rtol, rep(control$rtolSens,
+                                   length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                                   length(.rtol)));
+            .ret$control$rxControl$atol <- .atol
+            .ret$control$rxControl$rtol <- .rtol
+        }
         .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
         .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
         colnames(data) <- sapply(names(data), function(x){
@@ -1577,14 +1579,16 @@ foceiFit.data.frame0 <- function(data,
                                                   pred.minus.dv=TRUE, sum.prod=control$sumProd,
                                                   theta.derivs=FALSE, optExpression=control$optExpression, run.internal=TRUE,
                                                   only.numeric=TRUE);
-            .atol  <- c(.atol,rep(control$atolSens,
-                              length(RxODE::rxModelVars(.ret$model$inner)$state)-
-                              length(.atol)))
-            .rtol  <- c(.rtol, rep(control$rtolSens,
-                                   length(RxODE::rxModelVars(.ret$model$inner)$state)-
-                                   length(.rtol)));
-            .ret$control$rxControl$atol <- .atol
-            .ret$control$rxControl$rtol <- .rtol
+            if (!is.null(.ret$model$inner)){
+                .atol  <- c(.atol,rep(control$atolSens,
+                                      length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                                      length(.atol)))
+                .rtol  <- c(.rtol, rep(control$rtolSens,
+                                       length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                                       length(.rtol)));
+                .ret$control$rxControl$atol <- .atol
+                .ret$control$rxControl$rtol <- .rtol
+            }
             .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
             .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];
             colnames(data) <- sapply(names(data), function(x){
