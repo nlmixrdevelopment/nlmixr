@@ -245,6 +245,7 @@ typedef struct {
   double gradCalcCentralSmall;
   double gradCalcCentralLarge;
   double etaNudge;
+  int reducedTol;
 } focei_options;
 
 focei_options op_focei;
@@ -712,6 +713,7 @@ double likInner0(double *eta){
     innerOde(id);
     j=0;
     while (op->badSolve && j < op_focei.maxOdeRecalc){
+      op_focei.reducedTol=1;
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
       op->badSolve=0;
       innerOde(id);
@@ -2100,6 +2102,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.maxInnerIterations = as<int>(odeO["maxInnerIterations"]);
   op_focei.maxOdeRecalc = as<int>(odeO["maxOdeRecalc"]);
   op_focei.odeRecalcFactor = as<double>(odeO["odeRecalcFactor"]);
+  op_focei.reducedTol = 0;
   if (op_focei.maxOuterIterations <= 0){
     // No scaling.
     foceiSetupTheta_(mvi, theta, thetaFixed, 0.0, !RxODE::rxIs(obj, "NULL"));
@@ -4155,6 +4158,9 @@ Environment foceiFitCpp_(Environment e){
     warning("Gradient problems with initial estimate; see $scaleInfo");
   } else if (warnGillC){
     warning("Gradient problems with covariance; see $scaleInfo");
+  }
+  if (op_focei.reducedTol){
+    warning("Tolerances (atol/rtol) were temporarily reduced for some difficult ODE solving during the optimization.\nConsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model.");
   }
   foceiFinalizeTables(e);
   // NumericVector scaleC(op_focei.ntheta+op_focei.omegan);
