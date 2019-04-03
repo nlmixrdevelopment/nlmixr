@@ -1501,7 +1501,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                         capture(anything))
     .pred <- gsub(.regLin,
                   "nlmixr_lincmt_\\1 <- \\2", rx.txt)
-    .rx <- gsub(rex::rex(start,any_spaces,capture(except_any_of(" \n=<-")),any_spaces,or("=","<-"),
+    .pred  <- .pred[regexpr(rex::rex(start, any_spaces, or("dur", "d","rate", "r", "lag", "alag", "f", "F"),
+                                      any_spaces, "(",
+                                      any_spaces, or("depot","central"), any_spaces,
+                                      ")",any_spaces,or("=","<-"),any_spaces,capture(anything)), .pred) == -1]
+    .vars  <- gsub(.regLin,"\\1",rx.txt[regexpr(.regLin,rx.txt) !=0]);
+    .rx <- gsub(rex::rex(start,any_spaces,capture(or(.vars)),any_spaces,or("=","<-"),
                          capture(anything)),
                 "\\1 <- nlmixr_lincmt_\\1", rx.txt)
     rest <- eval(parse(text=paste(c("function(){",

@@ -134,6 +134,9 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
         class(.uif) <- "nlmixrUI"
         .args$data <- data;
         .args <- c(list(uif=.uif), .args[-1]);
+        if (is.null(est)){
+            stop("Need to supply an estimation routine with est=.");
+        }
         return(do.call(nlmixr_fit, .args))
     }
 }

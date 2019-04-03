@@ -2445,6 +2445,12 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
   if (e.exists("theta") && RxODE::rxIs(e["theta"], "data.frame") &&
       e.exists("omega") && RxODE::rxIs(e["omega"], "matrix") &&
       e.exists("etaObf") && RxODE::rxIs(e["etaObf"], "data.frame")){
+    int nobs2=0;
+    if (e.exists("nobs2")){
+      nobs2=as<int>(e["nobs2"]);
+    } else {
+      nobs2 = rx->nobs2;
+    }
     arma::mat omega = as<arma::mat>(e["omega"]);
     arma::mat D(omega.n_rows,omega.n_rows,fill::zeros);
     arma::mat cor(omega.n_rows,omega.n_rows);
@@ -2475,7 +2481,7 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
     NumericVector logLik(1);
     double adj= 0;
     if (doAdj){
-      adj=rx->nobs2*log(2*M_PI)/2;
+      adj=nobs2*log(2*M_PI)/2;
     }
     e["adj"]=adj;
     logLik[0]=-fmin/2-adj;
@@ -2484,8 +2490,8 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
       logLik.attr("nobs") = e["nobs"];
       e["BIC"] = fmin+2*adj + log(as<double>(e["nobs"]))*op_focei.npars;
     } else {
-      logLik.attr("nobs") = rx->nobs2;
-      e["BIC"] = fmin + 2*adj + log((double)rx->nobs2)*op_focei.npars;
+      logLik.attr("nobs") = nobs2;
+      e["BIC"] = fmin + 2*adj + log((double)nobs2)*op_focei.npars;
       e["nobs"] = rx->nobs;
     }
     logLik.attr("class") = "logLik";
@@ -2494,7 +2500,7 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
     e["AIC"] = fmin+2*adj+2*op_focei.npars;
     if (doObf){
       // -2 * object$logLik - object$dim$N * log(2 * pi)
-      adj = -2*as<double>(logLik) - (rx->nobs2)*log(2*M_PI);
+      adj = -2*as<double>(logLik) - (nobs2)*log(2*M_PI);
       e["OBJF"] = adj;
       e["objf"] = adj;
       e["objective"] = adj;

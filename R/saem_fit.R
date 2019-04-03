@@ -939,8 +939,10 @@ configsaem <- function(model, data, inits,
   }
   ## CHECKME
   form = attr(model$saem_mod, "form")
+  .nobs <- 0
   if (form!="cls"){
     dat = RxODE::etTrans(data$nmdat,attr(model$saem_mod,"rx"), TRUE);
+    .nobs  <- attr(class(dat),".RxODE.lst")$nobs;
     ## if(length(dat) !=7) stop("SAEM doesn't support time varying covariates yet.");
     .rx <- attr(model$saem_mod,"rx");
     .pars <- .rx$params
@@ -1165,7 +1167,8 @@ configsaem <- function(model, data, inits,
     fixed.i0 = fixed.i0,
     ilambda1 = as.integer(ilambda1),
     ilambda0 = as.integer(ilambda0),
-    extraLL=.extraLL
+    extraLL=.extraLL,
+    nobs=.nobs
   )
 
 
@@ -1474,6 +1477,7 @@ focei.eta.saemFit <- function(object, uif, ...){
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
                              nnodes.gq=1, nsd.gq=3, adjObf=TRUE){
   on.exit({RxODE::rxSolveFree()});
+  .saemCfg  <-  attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt;
   if (class(uif) == "function"){
     uif <- nlmixr(uif);
@@ -1581,6 +1585,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   .notCalced <- TRUE;
   while (.notCalced){
     .env <- new.env(parent=emptyenv());
+    .env$nobs2  <- .saemCfg$nobs
     .env$nnodes.gq  <- nnodes.gq;
     .env$nsd.gq  <- nsd.gq;
     .env$adjObf  <- adjObf
