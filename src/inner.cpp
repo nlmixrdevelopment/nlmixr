@@ -707,6 +707,18 @@ double likInner0(double *eta){
     }
     // Solve ODE
     innerOde(id);
+    if (op->badSolve){
+      RxODE::atolRtolFactor_(pow(10,0.5));
+      op->badSolve=0;
+      innerOde(id);
+      if (op->badSolve){
+	op->badSolve=0;
+	RxODE::atolRtolFactor_(pow(10,0.5));
+	innerOde(id);
+	RxODE::atolRtolFactor_(pow(10,-0.5));
+      }
+      RxODE::atolRtolFactor_(pow(10,0.5));
+    }
     if (op->neq > 0 && ISNA(ind->solve[0])){
       return 1e300;
     } else {
