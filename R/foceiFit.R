@@ -2134,7 +2134,6 @@ plot.nlmixrFitData <- function(x, ...) {
     } else {
         levels(.dat$CMT) <- paste("Compartment: ", levels(.dat$CMT))
     }
-    print(summary(.dat))
     for (.cmt in levels(.dat$CMT)){
         .dat0 <- .dat[.dat$CMT == .cmt, ];
 
