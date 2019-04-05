@@ -220,10 +220,13 @@ nlme_lin_cmpt <- function(dat, parModel,
     nlmixr::nlmeModList("dat.g", nlme::groupedData(DV~TIME|ID, dat));
     nlmixr::nlmeModList("PKpars", PKpars);
     nlmixr::nlmeModList("refpars", refpars);
+    nlmixr::nlmeModList("na.ignore", function(object,...){return(object)})
 
     mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmixr::nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
                       data = nlmixr::nlmeModList("dat.g"), fixed=parModel$fixed, random = parModel$random,
-                      start=parModel$start, ...);
+                      start=parModel$start,
+                      na.action=nlmixr::nlmeModList("na.ignore"),
+                      ...);
     if (length(.rm) > 0)
         mod.specs <- mod.specs[!(names(mod.specs) %in% .rm)]
     if (Sys.getenv("nlmixr_silent") == "TRUE"){
@@ -264,7 +267,6 @@ nlmeLinCmt <- nlme_lin_cmpt
                            if (match("RATE", names(theta), nomatch=0)) dati <- prepEv(dati, theta)
                            ev <- eventTable()
                            ev$import.EventTable(dati)
-
                            if (any(theta>1e38)) {
                                warning("large parameter values. may rewrite par_trans.")
                                print(theta)
@@ -484,10 +486,13 @@ nlme_ode <- function(dat.o, model, parModel, parTrans,
     nlmixr::nlmeModList("dat.o", dat.o);
     nlmixr::nlmeModList("PKpars", PKpars);
     nlmixr::nlmeModList("debugODE", debugODE);
+    nlmixr::nlmeModList("na.ignore", function(object,...){return(object)})
 
     mod.specs <- list(model=as.formula(sprintf("DV ~ (nlmixr::nlmeModList(\"user_fn\"))(%s, TIME, ID)", arg1)),
                       data = nlmixr::nlmeModList("dat.g"), fixed=parModel$fixed, random = parModel$random,
-                      start=parModel$start, ...)
+                      start=parModel$start,
+                      na.action=nlmixr::nlmeModList("na.ignore"),
+                      ...)
     if (length(.rm) > 0)
         mod.specs <- mod.specs[!(names(mod.specs) %in% .rm)]
     if (Sys.getenv("nlmixr_silent") == "TRUE"){
