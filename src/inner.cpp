@@ -2524,8 +2524,8 @@ void foceiOuterFinal(double *x, Environment e){
             fullTheta.begin());
   LogicalVector thetaFixed(op_focei.thetan);
   std::fill_n(thetaFixed.begin(),op_focei.thetan, true);
-  unsigned int j;
-  for (unsigned int k = op_focei.npars; k--;){
+  int j;
+  for (int k = op_focei.npars; k--;){
     j=op_focei.fixedTrans[k];
     if (j < thetaFixed.size()) thetaFixed[j]=false;
   }
@@ -3620,7 +3620,7 @@ void foceiFinalizeTables(Environment e){
   std::fill_n(&cv[0], theta.size(), NA_REAL);
   int j=0;
   if (covExists){
-    for (unsigned int k = 0; k < se.size(); k++){
+    for (int k = 0; k < se.size(); k++){
       if (k >= skipCov.size()) break;
       if (!skipCov[k]){
         se[k] = se1[j++];
@@ -3816,7 +3816,7 @@ void foceiFinalizeTables(Environment e){
     tmpNM = as<NumericMatrix>(e["cov"]);
     CharacterVector thetaCovN(tmpNM.nrow());
     LogicalVector skipCov = e["skipCov"];
-    unsigned int j=0;
+    int j=0;
     for (unsigned int k = 0; k < thetaNames.size(); k++){
       if (k >= skipCov.size()) break;
       if (j >= thetaCovN.size()) break;

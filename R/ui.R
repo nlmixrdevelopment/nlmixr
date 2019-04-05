@@ -756,12 +756,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   errn <- 0
 
   any.theta.names <- function(what, th.names){
-    ## for (i in th.names){
-    ##     if (any(what == i)){
-    ##         return(TRUE)
-    ##     }
-    ## }
-    ## return(FALSE)
     return(any(what[1] == th.names))
   }
 
@@ -788,7 +782,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       }
     }
   }
+  .regPar <- rex::rex("nlmixr_", capture(anything), "_par");
   .doDist <- function(distName, distArgs, curCond=NULL){
+    if (any(regexpr(.regPar,distArgs)!=-1)){
+      .tmp  <- distArgs[regexpr(.regPar, distArgs) != -1];
+      distArgs <- gsub(.regPar,"\\1", distArgs);
+    }
     if (!any(names(dists) == distName)){
       stop(sprintf("The %s distribution is currently unsupported.", distName))
     }
@@ -1402,9 +1401,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     w <- max(w);
 
     .finalFix <- function(){
-      if (any(regexpr(rex::rex(or("d/dt(", "f(", "F(", "dur(", "d(",
+      if (any(regexpr(rex::rex(start,any_spaces,or("d/dt(", "f(", "F(", "dur(", "d(",
                                   "lag(", "alag(", "r(", "rate(",
-                                  group("(0)", any_spaces, or("=", "~", "<-")))), funTxt[1:w]) != -1)){
+                                  group("(0)", any_spaces, or("=", "~", "<-")))), funTxt[1:w],
+                      perl=TRUE) != -1)){
         ## There are still mixed PK parameters and ODEs
         w <- which(regexpr(.regRx, funTxt, perl=TRUE) != -1);
         w <- min(w)-1;
@@ -1444,9 +1444,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   .tmp <- .deparse1(body(fun));
   ## Assume ~ is boundaries
   reg <- rex::rex(or("=","<-"),anything,boundary, or(ini$name), boundary);
-  .regRx <- rex::rex(or("d/dt(", "f(", "F(", "dur(", "d(",
+  .regRx <- rex::rex(start,any_spaces, or("d/dt(", "f(", "F(", "dur(", "d(",
                         "lag(", "alag(", "r(", "rate(",
-                        group("(0)", any_spaces, or("=", "~", "<-"))));
+                        group("(0)", any_spaces, or("=", "<-"))));
   .lhs <- nlmixrfindLhs(body(
     eval(parse(text=paste("function(){",
                           paste(.tmp,collapse="\n"),
@@ -1541,9 +1541,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
     w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
     w <- max(w);
-    if (any(regexpr(rex::rex(or("d/dt(", "f(", "F(", "dur(", "d(",
+    if (any(regexpr(rex::rex(start,any_spaces,
+                             or("d/dt(", "f(", "F(", "dur(", "d(",
                                 "lag(", "alag(", "r(", "rate(",
-                                group("(0)", any_spaces, or("=", "~", "<-")))), rx.txt[1:w]) != -1)){
+                                group("(0)", any_spaces, or("=", "<-")))),
+                    rx.txt[1:w], perl=TRUE) != -1)){
       stop("Mixed estimation types and ODEs.")
     }
     rx.ode <- rx.txt[-(1:w)];
@@ -1710,6 +1712,54 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   if (length(.w) > 0) .predDf$cond[.w] <- ""
   .predDf$var <- gsub(rex::rex("linCmt(",any_spaces,")"),"nlmixr_lincmt_pred",paste(.predDf$var));
   .predSaem <- eval(parse(text=sprintf("function(){\n%s;\n}", paste(paste(.predDf$var), collapse=";\n"))))
+  .w  <- which(!is.na(bounds$err))
+  .tmpErr <- paste(bounds$name[.w])
+  .errReg  <- rex::rex("nlmixr_",or(.tmpErr),"_par",any_spaces,or("<-", "="), any_spaces,or(.tmpErr));
+  .subs <- function(x){
+    if (is.atomic(x)) {
+      x
+    } else if (is.name(x)) {
+      .w  <- which(as.character(x) == paste0("nlmixr_",.tmpErr,"_par"));
+      if (length(.w)==1){
+        return(eval(parse(text=sprintf("quote(%s)", .tmpErr[.w]))));
+      } else {
+        return(x);
+      }
+    } else if (is.call(x)) {
+      as.call(lapply(x, .subs))
+    } else if (is.pairlist(x)) {
+      as.pairlist(lapply(x, .subs))
+    } else {
+      return(x);
+    }
+  }
+  ## Now fix the errors again...
+  fun2  <- fun2[regexpr(.errReg, fun2) == -1];
+  fun2 <- .deparse(.subs(body(eval(parse(text=paste(fun2,collapse="\n"))))));
+  fun2[1]  <- paste("function(){")
+  body(err) <- .subs(body(err));
+  .tmp  <- .deparse(body(rest))
+  .tmp  <- .tmp[regexpr(.errReg, .tmp) == -1]
+  .tmp[1]  <- "function(){";
+  rest  <- eval(parse(text=paste(.tmp, collapse="\n")))
+  if (!is.null(saem.pars)){
+    .tmp  <- .deparse(body(saem.pars))
+    .tmp  <- .tmp[regexpr(.errReg, .tmp) == -1]
+    .tmp[1]  <- "function(){";
+    saem.pars  <- eval(parse(text=paste(.tmp, collapse="\n")))
+  }
+  if (!is.null(nlme.mu.fun)){
+    .tmp  <- .deparse(body(nlme.mu.fun))
+    .tmp  <- .tmp[regexpr(.errReg, .tmp) == -1]
+    .tmp[1]  <- "function(){";
+    nlme.mu.fun  <- eval(parse(text=paste(.tmp, collapse="\n")))
+  }
+  if (!is.null(nlme.mu.fun2)){
+    .tmp  <- .deparse(body(nlme.mu.fun2))
+    .tmp  <- .tmp[regexpr(.errReg, .tmp) == -1]
+    .tmp[1]  <- "function(){";
+    nlme.mu.fun2  <- eval(parse(text=paste(.tmp, collapse="\n")))
+  }
   ret <- list(ini=bounds, model=bigmodel,
               nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
                           all.vars=all.vars, rest.vars=rest.vars, all.names=all.names,
