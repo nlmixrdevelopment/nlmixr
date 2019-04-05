@@ -473,6 +473,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       if (is.ode) {
           modelVars = model$cmpMgr$get.modelVars()
           pars = modelVars$params
+          pars = gsub("[.]", "_DoT_", pars);
           npar = length(pars)
           pars = paste(c(
               sprintf("    vec _params(%d);\n", npar),
@@ -515,6 +516,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
           inits = ""
       }
 
+      x <- gsub("[.]", "_DoT_", x);
 
       len = length(x)
       cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
