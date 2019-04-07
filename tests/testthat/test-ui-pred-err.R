@@ -19,8 +19,6 @@ rxPermissive({
         linCmt() ~ prop()
     }
 
-
-
     fn4 <- function(){
         KA = KA + eta.KA
         CL <- CL + eta.CL
@@ -196,9 +194,16 @@ rxPermissive({
     }
 
     fn32 <- function(){
-        KA = KA + eta.KA
-        CL <- CL + eta.CL + add(par1)
-        linCmt() ~ pois()
+        ini({
+            KA <- c(0, 1)
+            CL <- c(0, 0.5)
+        })
+        model({
+            KA = KA + eta.KA
+            CL <- CL + eta.CL + add(par1)
+            v1 <- 1
+            linCmt() ~ pois()
+        })
     }
 
     fn33 <- function(){
@@ -206,19 +211,6 @@ rxPermissive({
         CL <- CL + eta.CL
         linCmt() ~ add(par1) + pois(par2)
     }
-
-    fn34 <- function(){
-        KA = KA + eta.KA
-        CL <- CL + eta.CL
-        linCmt() ~ add(par1) + prop(par2)
-    }
-
-    fn35 <- function(){
-        KA = KA + eta.KA
-        CL <- CL + eta.CL
-        linCmt() ~  prop(par1) + add(par2)
-    }
-
 
     fn36 <- function(){
         KA = KA + eta.KA
@@ -260,15 +252,59 @@ rxPermissive({
         expect_error(nlmixr:::nlmixrUIModel(fn29), "The dnorm distribution requires 1 argument.")
         expect_error(nlmixr:::nlmixrUIModel(fn30), "The dnorm distribution requires 1 argument.")
         expect_error(nlmixr:::nlmixrUIModel(fn31), "The nlmixrDist distribution is currently unsupported.")
-        expect_error(nlmixr:::nlmixrUIModel(fn32), rex::rex("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): add"));
+        expect_error(nlmixr(fn32), rex::rex("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): add"));
         expect_error(nlmixr:::nlmixrUIModel(fn33), rex::rex("The add and pois distributions cannot be combined\nCurrently can combine: add, prop"))
     })
 
     context("Proper Variances")
+
+    fn1 <- function(){
+        ini({
+            KA <- c(0, 1)
+            CL <- c(0, 0.5)
+        })
+        model({
+            KA = KA + eta.KA
+            CL <- CL + eta.CL
+            v1 <- 1
+            linCmt() ~ pois()
+        })
+    }
+
+    fn34 <- function(){
+        ini({
+            KA <- c(0, 1)
+            CL <- c(0, 0.5)
+            par1 <- 1
+            par2 <- 2
+        })
+        model({
+            KA = KA + eta.KA
+            CL <- CL + eta.CL
+            v1 <- 1
+            linCmt() ~ add(par1) + prop(par2)
+        })
+    }
+
+    fn35 <- function(){
+        ini({
+            KA <- c(0, 1)
+            CL <- c(0, 0.5)
+            par1 <- 1
+            par2 <- 2
+        })
+        model({
+            KA = KA + eta.KA
+            CL <- CL + eta.CL
+            v1 <- 1
+            linCmt() ~  prop(par1) + add(par2)
+        })
+    }
+
     test_that("Good Parsing of proper variance specifications", {
-        expect_equal(class(nlmixr:::nlmixrUIModel(fn1)), "list")
-        expect_equal(class(nlmixr:::nlmixrUIModel(fn34)), "list")
-        expect_equal(class(nlmixr:::nlmixrUIModel(fn35)), "list")
+        expect_equal(class(nlmixr:::nlmixr(fn1)), "nlmixrUI")
+        expect_equal(class(nlmixr:::nlmixr(fn34)), "nlmixrUI")
+        expect_equal(class(nlmixr:::nlmixr(fn35)), "nlmixrUI")
     })
 
 }, cran=TRUE)
