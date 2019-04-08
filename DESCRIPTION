@@ -7,11 +7,11 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
         R.utils, n1qn1, fastGHQuad,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
-	RxODE(>= 0.8.1-0), nlme, magrittr, tidyr, sys
+	RxODE(>= 0.9.0-0), nlme, magrittr, tidyr, sys
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3c, testthat,
         madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf,
 	Rvmmin
-Version: 1.0.0-8
+Version: 1.1.0-0
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",
       comment=c(ORCID="0000-0001-8538-6691")),
