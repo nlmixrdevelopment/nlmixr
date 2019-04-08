@@ -1410,18 +1410,18 @@ static inline double foceiOfv0(double *theta){
     RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -op_focei.objfRecalN));
   }
   double ret = -2*foceiLik0(theta);
-  while ((std::isnan(ret) || std::isinf(ret)) && op_focei.objfRecalN < op_focei.maxOdeRecalc){
+  while (!op_focei.calcGrad && (std::isnan(ret) || std::isinf(ret)) && op_focei.objfRecalN < op_focei.maxOdeRecalc){
       op_focei.reducedTol=1;
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
       ret = -2*foceiLik0(theta);
       op_focei.objfRecalN++;
   }
-  if (std::isnan(ret) || std::isinf(ret)){
-    stop("Infinite/NaN while evaluating objective function");
-  }
   if (!op_focei.initObj){
     op_focei.initObj=1;
     op_focei.initObjective=std::fabs(ret);
+    if (std::isnan(ret) || std::isinf(ret)){
+      stop("Infinite/NaN while evaluating initial objective function");
+    }
     if (op_focei.scaleObjective == 1) op_focei.scaleObjective=2;
   }
   if (op_focei.scaleObjective == 2){
