@@ -1857,6 +1857,16 @@ foceiFit.data.frame0 <- function(data,
                 .ret$rxInv$theta <- .thetaReset$omegaTheta;
                 .ret$control$printTop <- FALSE
                 .ret$control$nF <- .thetaReset$nF;
+                .ret$control$gillRetC <- .thetaReset$gillRetC
+                .ret$control$gillRet <- .thetaReset$gillRet
+                .ret$control$gillRet <- .thetaReset$gillRet
+                .ret$control$gillDf <- .thetaReset$gillDf
+                .ret$control$gillDf2 <- .thetaReset$gillDf2
+                .ret$control$gillErr <- .thetaReset$gillErr
+                .ret$control$rEps <- .thetaReset$rEps
+                .ret$control$aEps <- .thetaReset$aEps
+                .ret$control$rEpsC <- .thetaReset$rEpsC
+                .ret$control$aEpsC <- .thetaReset$aEpsC
                 message("Theta reset")
             }
         }

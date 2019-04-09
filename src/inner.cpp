@@ -1421,6 +1421,34 @@ void innerOpt(){
 	  thetaReset["thetaIni"]= thetaIni;
 	  thetaReset["omegaTheta"] = omegaTheta;
 	  thetaReset["nF"] = op_focei.nF+op_focei.nF2;
+	  // Save gill info to skip recalc.
+	  IntegerVector gillRetC(op_focei.npars);
+	  std::copy(&op_focei.gillRetC[0], &op_focei.gillRetC[0]+op_focei.npars, gillRetC.begin());
+	  thetaReset["gillRetC"] = gillRetC;
+	  IntegerVector gillRet(op_focei.npars);
+	  std::copy(&op_focei.gillRet[0], &op_focei.gillRet[0]+op_focei.npars, gillRet.begin());
+	  thetaReset["gillRet"] = gillRet;
+	  NumericVector gillDf(op_focei.npars);
+	  std::copy(&op_focei.gillDf[0], &op_focei.gillDf[0]+op_focei.npars, gillDf.begin());
+	  thetaReset["gillDf"] = gillDf;
+	  NumericVector gillDf2(op_focei.npars);
+	  std::copy(&op_focei.gillDf2[0], &op_focei.gillDf2[0]+op_focei.npars, gillDf2.begin());
+	  thetaReset["gillDf2"] = gillDf2;
+	  NumericVector gillErr(op_focei.npars);
+	  std::copy(&op_focei.gillErr[0], &op_focei.gillErr[0]+op_focei.npars, gillErr.begin());
+	  thetaReset["gillErr"] = gillErr;
+	  NumericVector rEps(op_focei.npars);
+	  std::copy(&op_focei.rEps[0], &op_focei.rEps[0]+op_focei.npars, rEps.begin());
+	  thetaReset["rEps"] = rEps;
+	  NumericVector aEps(op_focei.npars);
+	  std::copy(&op_focei.aEps[0], &op_focei.aEps[0]+op_focei.npars, aEps.begin());
+	  thetaReset["aEps"] = aEps;
+	  NumericVector rEpsC(op_focei.npars);
+	  std::copy(&op_focei.rEpsC[0], &op_focei.rEpsC[0]+op_focei.npars, rEpsC.begin());
+	  thetaReset["rEpsC"] = rEpsC;
+	  NumericVector aEpsC(op_focei.npars);
+	  std::copy(&op_focei.aEpsC[0], &op_focei.aEpsC[0]+op_focei.npars, aEpsC.begin());
+	  thetaReset["aEpsC"] = aEpsC;
 	  stop("theta reset");
 	}
       }
@@ -1787,7 +1815,7 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
 
 void numericGrad(double *theta, double *g){
   op_focei.mixDeriv=0;
-  if (op_focei.nF == 1 && op_focei.gillK > 0){
+  if (op_focei.nF + op_focei.nF2 == 1 && op_focei.gillK > 0){
     double hf, hphif, err;
     // op_focei.cur = 0;
     // op_focei.totTick = op_focei.npars;
@@ -2307,18 +2335,39 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.rEpsC=Calloc(totN, double);
   if (op_focei.aEpsC != NULL) Free(op_focei.aEpsC);
   op_focei.aEpsC=Calloc(totN, double);
-  
-  if (op_focei.derivMethod){
-    std::fill_n(&op_focei.rEps[0], totN, std::fabs(cEps[0])/2.0);
-    std::fill_n(&op_focei.aEps[0], totN, std::fabs(cEps[1])/2.0);
-    std::fill_n(&op_focei.rEpsC[0], totN, std::fabs(covDerivEps[0])/2.0);
-    std::fill_n(&op_focei.aEpsC[0], totN, std::fabs(covDerivEps[1])/2.0);
+  if (op_focei.nF2 != 0){
+    // Restore Gill information
+    IntegerVector gillRetC =as<IntegerVector>(odeO["gillRetC"]);
+    IntegerVector gillRet =as<IntegerVector>(odeO["gillRet"]);
+    NumericVector gillDf = as<NumericVector>(odeO["gillDf"]);
+    NumericVector gillDf2 = as<NumericVector>(odeO["gillDf2"]);
+    NumericVector gillErr = as<NumericVector>(odeO["gillErr"]);
+    NumericVector rEps = as<NumericVector>(odeO["rEps"]);
+    NumericVector aEps = as<NumericVector>(odeO["aEps"]);
+    NumericVector rEpsC = as<NumericVector>(odeO["rEpsC"]);
+    NumericVector aEpsC = as<NumericVector>(odeO["aEpsC"]);
+    std::copy(gillRetC.begin(), gillRetC.end(), &op_focei.gillRetC[0]);
+    std::copy(gillRet.begin(), gillRet.end(), &op_focei.gillRet[0]);
+    std::copy(gillDf.begin(), gillDf.end(), &op_focei.gillDf[0]);
+    std::copy(gillDf2.begin(), gillDf2.end(), &op_focei.gillDf2[0]);
+    std::copy(gillErr.begin(), gillErr.end(), &op_focei.gillErr[0]);
+    std::copy(rEps.begin(), rEps.end(), &op_focei.rEps[0]);
+    std::copy(aEps.begin(), aEps.end(), &op_focei.aEps[0]);
+    std::copy(rEpsC.begin(), rEpsC.end(), &op_focei.rEpsC[0]);
+    std::copy(aEpsC.begin(), aEpsC.end(), &op_focei.aEpsC[0]);
   } else {
-    std::fill_n(&op_focei.rEps[0], totN, std::fabs(cEps[0]));
-    std::fill_n(&op_focei.aEps[0], totN, std::fabs(cEps[1]));
-    std::fill_n(&op_focei.rEpsC[0], totN, std::fabs(covDerivEps[0]));
-    std::fill_n(&op_focei.aEpsC[0], totN, std::fabs(covDerivEps[1]));
-  }  
+    if (op_focei.derivMethod){
+      std::fill_n(&op_focei.rEps[0], totN, std::fabs(cEps[0])/2.0);
+      std::fill_n(&op_focei.aEps[0], totN, std::fabs(cEps[1])/2.0);
+      std::fill_n(&op_focei.rEpsC[0], totN, std::fabs(covDerivEps[0])/2.0);
+      std::fill_n(&op_focei.aEpsC[0], totN, std::fabs(covDerivEps[1])/2.0);
+    } else {
+      std::fill_n(&op_focei.rEps[0], totN, std::fabs(cEps[0]));
+      std::fill_n(&op_focei.aEps[0], totN, std::fabs(cEps[1]));
+      std::fill_n(&op_focei.rEpsC[0], totN, std::fabs(covDerivEps[0]));
+      std::fill_n(&op_focei.aEpsC[0], totN, std::fabs(covDerivEps[1]));
+    }  
+  }
   NumericVector lowerIn(totN);
   NumericVector upperIn(totN);
   if (lower.isNull()){
@@ -2753,7 +2802,7 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
     if (op_focei.useColor && op_focei.printNcol >= n){
       switch(op_focei.derivMethod){
       case 0:
-	if (op_focei.nF == 1 && op_focei.gillK > 0){
+	if (op_focei.nF + op_focei.nF2 == 1 && op_focei.gillK > 0){
 	  Rprintf("|\033[4m    G|    Gill Diff. |");
 	} else if (op_focei.mixDeriv){
 	  Rprintf("|\033[4m    M|   Mixed Diff. |");
@@ -2768,7 +2817,7 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
     } else {
       switch(op_focei.derivMethod){
       case 0:
-	if (op_focei.nF == 1 && op_focei.gillK > 0){
+	if (op_focei.nF + op_focei.nF2 == 1 && op_focei.gillK > 0){
 	  Rprintf("|    G|    Gill Diff. |");
 	} else if (op_focei.mixDeriv){
 	  Rprintf("|    M|   Mixed Diff. |");
@@ -3307,7 +3356,6 @@ NumericMatrix foceiCalcCov(Environment e){
 	  // h/err = aEps(1+|x|)
 	  // aEps=h/err/(1+|x|)
 	  //
-	  
 	  op_focei.aEps[cpar]  = hf*err;
 	  op_focei.rEps[cpar]  = hf*err;
 	  if (op_focei.covGillF){
