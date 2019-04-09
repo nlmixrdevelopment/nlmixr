@@ -230,6 +230,10 @@ is.latex <- function() {
 ##' @param resetThetaCheckPer represents objective function
 ##'     %percentage below which resetThetaP is checked.
 ##'
+##' @param resetThetaFinalP represents the p-value for reseting the
+##'     population mu-referenced THETA parameters based on ETA drift
+##'     during optimization, and resetting the optimization one final time.
+##'
 ##' @param resetHessianAndEta is a boolean representing if the
 ##'     individual Hessian is reset when ETAs are reset using the
 ##'     option \code{resetEtaP}.
@@ -585,6 +589,7 @@ foceiControl <- function(sigdig=3,...,
                          cholAccept=1e-3,
                          resetEtaP=0.15,
                          resetThetaP=0.05,
+                         resetThetaFinalP=0.15,
                          diagOmegaBoundUpper=5, #diag(omega) = diag(omega)*diagOmegaBoundUpper; =1 no upper
                          diagOmegaBoundLower=100, #diag(omega) = diag(omega)/diagOmegaBoundLower; = 1 no lower
                          cholSEOpt=FALSE,
@@ -798,6 +803,13 @@ foceiControl <- function(sigdig=3,...,
     } else {
         stop("Cannot always reset THETAs");
     }
+    if (resetThetaFinalP > 0 & resetThetaFinalP < 1){
+        .resetThetaFinalSize <- qnorm(1 - (resetThetaFinalP / 2));
+    } else if (resetThetaP <= 0){
+        .resetThetaFinalSize <- Inf;
+    } else {
+        stop("Cannot always reset THETAs");
+    }
     .ret <- list(maxOuterIterations=as.integer(maxOuterIterations),
                  maxInnerIterations=as.integer(maxInnerIterations),
                  method=method,
@@ -846,6 +858,7 @@ foceiControl <- function(sigdig=3,...,
                  cholAccept=as.double(cholAccept),
                  resetEtaSize=as.double(.resetEtaSize),
                  resetThetaSize=as.double(.resetThetaSize),
+                 resetThetaFinalSize=as.double(.resetThetaFinalSize),
                  diagOmegaBoundUpper=diagOmegaBoundUpper,
                  diagOmegaBoundLower=diagOmegaBoundLower,
                  cholSEOpt=as.integer(cholSEOpt),
@@ -1867,6 +1880,8 @@ foceiFit.data.frame0 <- function(data,
                 .ret$control$aEps <- .thetaReset$aEps
                 .ret$control$rEpsC <- .thetaReset$rEpsC
                 .ret$control$aEpsC <- .thetaReset$aEpsC
+                .ret$control$c1 <- .thetaReset$c1
+                .ret$control$c2 <- .thetaReset$c2
                 message("Theta reset")
             }
         }

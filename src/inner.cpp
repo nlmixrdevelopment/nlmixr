@@ -226,6 +226,7 @@ typedef struct {
   double cholAccept;
   double resetEtaSize;
   double resetThetaSize;
+  double resetThetaFinalSize;
   int checkTheta;
   int *muRef;
   int muRefN;
@@ -1307,6 +1308,66 @@ static inline void innerOpt1(int id, int likId){
   LikInner2(fInd->eta, likId);
 }
 
+void thetaReset(double size){
+  mat etaRes =  op_focei.eta1SD % op_focei.etaM; //op_focei.cholOmegaInv * etaMat;    
+  for (unsigned int j = etaRes.n_rows; j--;){
+    if (std::fabs(etaRes(j, 0)) >= size){
+      NumericVector thetaIni(op_focei.thetan);
+      for (int ii = op_focei.thetan; ii--;){
+	thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
+      }
+      for (int ii = op_focei.muRefN; ii--;){
+	if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < op_focei.thetan){
+	  thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
+	}
+      }
+      // Update omega estimates
+      NumericVector omegaTheta(op_focei.omegan);
+	  
+      std::copy(&op_focei.fullTheta[0] + op_focei.thetan, 
+		&op_focei.fullTheta[0] + op_focei.thetan + op_focei.omegan, 
+		omegaTheta.begin());
+      Function loadNamespace("loadNamespace", R_BaseNamespace);
+      Environment nlmixr = loadNamespace("nlmixr");
+      Environment thetaReset = nlmixr[".thetaReset"];
+      thetaReset["thetaIni"]= thetaIni;
+      thetaReset["omegaTheta"] = omegaTheta;
+      thetaReset["nF"] = op_focei.nF+op_focei.nF2;
+      // Save gill info to skip recalc.
+      IntegerVector gillRetC(op_focei.npars);
+      std::copy(&op_focei.gillRetC[0], &op_focei.gillRetC[0]+op_focei.npars, gillRetC.begin());
+      thetaReset["gillRetC"] = gillRetC;
+      IntegerVector gillRet(op_focei.npars);
+      std::copy(&op_focei.gillRet[0], &op_focei.gillRet[0]+op_focei.npars, gillRet.begin());
+      thetaReset["gillRet"] = gillRet;
+      NumericVector gillDf(op_focei.npars);
+      std::copy(&op_focei.gillDf[0], &op_focei.gillDf[0]+op_focei.npars, gillDf.begin());
+      thetaReset["gillDf"] = gillDf;
+      NumericVector gillDf2(op_focei.npars);
+      std::copy(&op_focei.gillDf2[0], &op_focei.gillDf2[0]+op_focei.npars, gillDf2.begin());
+      thetaReset["gillDf2"] = gillDf2;
+      NumericVector gillErr(op_focei.npars);
+      std::copy(&op_focei.gillErr[0], &op_focei.gillErr[0]+op_focei.npars, gillErr.begin());
+      thetaReset["gillErr"] = gillErr;
+      NumericVector rEps(op_focei.npars);
+      std::copy(&op_focei.rEps[0], &op_focei.rEps[0]+op_focei.npars, rEps.begin());
+      thetaReset["rEps"] = rEps;
+      NumericVector aEps(op_focei.npars);
+      std::copy(&op_focei.aEps[0], &op_focei.aEps[0]+op_focei.npars, aEps.begin());
+      thetaReset["aEps"] = aEps;
+      NumericVector rEpsC(op_focei.npars);
+      std::copy(&op_focei.rEpsC[0], &op_focei.rEpsC[0]+op_focei.npars, rEpsC.begin());
+      thetaReset["rEpsC"] = rEpsC;
+      NumericVector aEpsC(op_focei.npars);
+      std::copy(&op_focei.aEpsC[0], &op_focei.aEpsC[0]+op_focei.npars, aEpsC.begin());
+      thetaReset["aEpsC"] = aEpsC;
+      thetaReset["c1"] = op_focei.c1;
+      thetaReset["c2"] = op_focei.c2;
+      stop("theta reset");
+    }
+  }
+}
+
 void innerOpt(){
 // #ifdef _OPENMP
 //   int cores = rx->op->cores;
@@ -1397,62 +1458,8 @@ void innerOpt(){
     op_focei.eta1SD = 1/sqrt(op_focei.etaS);
     if (!op_focei.calcGrad && op_focei.maxOuterIterations > 0 && (!op_focei.initObj || op_focei.checkTheta==1) &&
 	R_FINITE(op_focei.resetThetaSize)){
-      mat etaRes =  op_focei.eta1SD % op_focei.etaM; //op_focei.cholOmegaInv * etaMat;    
-      for (unsigned int j = etaRes.n_rows; j--;){
-	if (std::fabs(etaRes(j, 0)) >= op_focei.resetThetaSize){
-	  NumericVector thetaIni(op_focei.thetan);
-	  for (int ii = op_focei.thetan; ii--;){
-	    thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
-	  }
-	  for (int ii = op_focei.muRefN; ii--;){
-	    if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < op_focei.thetan){
-	      thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
-	    }
-	  }
-	  // Update omega estimates
-	  NumericVector omegaTheta(op_focei.omegan);
-	  
-	  std::copy(&op_focei.fullTheta[0] + op_focei.thetan, 
-		    &op_focei.fullTheta[0] + op_focei.thetan + op_focei.omegan, 
-		    omegaTheta.begin());
-	  Function loadNamespace("loadNamespace", R_BaseNamespace);
-	  Environment nlmixr = loadNamespace("nlmixr");
-	  Environment thetaReset = nlmixr[".thetaReset"];
-	  thetaReset["thetaIni"]= thetaIni;
-	  thetaReset["omegaTheta"] = omegaTheta;
-	  thetaReset["nF"] = op_focei.nF+op_focei.nF2;
-	  // Save gill info to skip recalc.
-	  IntegerVector gillRetC(op_focei.npars);
-	  std::copy(&op_focei.gillRetC[0], &op_focei.gillRetC[0]+op_focei.npars, gillRetC.begin());
-	  thetaReset["gillRetC"] = gillRetC;
-	  IntegerVector gillRet(op_focei.npars);
-	  std::copy(&op_focei.gillRet[0], &op_focei.gillRet[0]+op_focei.npars, gillRet.begin());
-	  thetaReset["gillRet"] = gillRet;
-	  NumericVector gillDf(op_focei.npars);
-	  std::copy(&op_focei.gillDf[0], &op_focei.gillDf[0]+op_focei.npars, gillDf.begin());
-	  thetaReset["gillDf"] = gillDf;
-	  NumericVector gillDf2(op_focei.npars);
-	  std::copy(&op_focei.gillDf2[0], &op_focei.gillDf2[0]+op_focei.npars, gillDf2.begin());
-	  thetaReset["gillDf2"] = gillDf2;
-	  NumericVector gillErr(op_focei.npars);
-	  std::copy(&op_focei.gillErr[0], &op_focei.gillErr[0]+op_focei.npars, gillErr.begin());
-	  thetaReset["gillErr"] = gillErr;
-	  NumericVector rEps(op_focei.npars);
-	  std::copy(&op_focei.rEps[0], &op_focei.rEps[0]+op_focei.npars, rEps.begin());
-	  thetaReset["rEps"] = rEps;
-	  NumericVector aEps(op_focei.npars);
-	  std::copy(&op_focei.aEps[0], &op_focei.aEps[0]+op_focei.npars, aEps.begin());
-	  thetaReset["aEps"] = aEps;
-	  NumericVector rEpsC(op_focei.npars);
-	  std::copy(&op_focei.rEpsC[0], &op_focei.rEpsC[0]+op_focei.npars, rEpsC.begin());
-	  thetaReset["rEpsC"] = rEpsC;
-	  NumericVector aEpsC(op_focei.npars);
-	  std::copy(&op_focei.aEpsC[0], &op_focei.aEpsC[0]+op_focei.npars, aEpsC.begin());
-	  thetaReset["aEpsC"] = aEpsC;
-	  stop("theta reset");
-	}
-      }
-    }    
+      thetaReset(op_focei.resetThetaSize);
+    }
     std::fill(op_focei.etaM.begin(),op_focei.etaM.end(), 0.0);
     std::fill(op_focei.etaS.begin(),op_focei.etaS.end(), 0.0);
     op_focei.n = 0.0;
@@ -2438,6 +2445,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.cholAccept=as<double>(odeO["cholAccept"]);
   op_focei.resetEtaSize=as<double>(odeO["resetEtaSize"]);
   op_focei.resetThetaSize=as<double>(odeO["resetThetaSize"]);
+  op_focei.resetThetaFinalSize = as<double>(odeO["resetThetaFinalSize"]);
   IntegerVector muRef = as<IntegerVector>(odeO["focei.mu.ref"]);
   if (muRef.size() == 0){
     op_focei.resetThetaSize = R_PosInf;
@@ -2504,63 +2512,69 @@ NumericVector foceiSetup_(const RObject &obj,
   double mn = op_focei.initPar[op_focei.npars-1], mx=op_focei.initPar[op_focei.npars-1],mean=0, oN=0, oM=0,s=0;
   double len=0;
   unsigned int k;
-  switch (op_focei.normType){
-  case 1:
-    // OptdesX
-    // http://apmonitor.com/me575/uploads/Main/optimization_book.pdf
-    for (k = op_focei.npars-1; k--;){
-      mn = min2(op_focei.initPar[k],mn);
-      mx = max2(op_focei.initPar[k],mx);
+  if (op_focei.nF > 0){
+    op_focei.c1 = odeO["c1"];
+    op_focei.c2 = odeO["c2"];
+  } else {
+    switch (op_focei.normType){
+    case 1:
+      // OptdesX
+      // http://apmonitor.com/me575/uploads/Main/optimization_book.pdf
+      for (k = op_focei.npars-1; k--;){
+	mn = min2(op_focei.initPar[k],mn);
+	mx = max2(op_focei.initPar[k],mx);
+      }
+      op_focei.c1 = (mx+mn)/2;
+      op_focei.c2 = (mx-mn)/2;
+      break;
+    case 2: // Rescaling (min-max normalization)
+      for (k = op_focei.npars-1; k--;){
+	mn = min2(op_focei.initPar[k],mn);
+	mx = max2(op_focei.initPar[k],mx);
+      }
+      op_focei.c1 = mn;
+      op_focei.c2 = (mx-mn);
+      break;
+    case 3: // Mean normalization
+      for (k = op_focei.npars-1; k--;){
+	mn = min2(op_focei.initPar[k],mn);
+	mx = max2(op_focei.initPar[k],mx);
+	oN++;
+	mean += (op_focei.initPar[k]-mean)/oN;
+      }
+      op_focei.c1 = mean;
+      op_focei.c2 = (mx-mn);
+      break;
+    case 4: // Standardization
+      for (k = op_focei.npars-1; k--;){
+	mn = min2(op_focei.initPar[k],mn);
+	mx = max2(op_focei.initPar[k],mx);
+	oM= mean;
+	oN++;
+	mean += (op_focei.initPar[k]-mean)/oN;
+	s += (op_focei.initPar[k]-mean)*(op_focei.initPar[k]-oM);
+      }
+      op_focei.c1 = mean;
+      op_focei.c2 = _safe_sqrt(s/(oN-1));
+      break;
+    case 5: // Normalize to length.
+      for (unsigned int k = op_focei.npars-1; k--;){
+	len += op_focei.initPar[k]*op_focei.initPar[k];
+      }
+      op_focei.c1 = 0;
+      op_focei.c2 = _safe_sqrt(len);
+      break;
+    case 6:
+      // No Normalization
+      op_focei.c1 = 0;
+      op_focei.c2 = 1;
+      break;
+    default:
+      stop("Unrecognized normalization (normType=%d)",op_focei.normType);
     }
-    op_focei.c1 = (mx+mn)/2;
-    op_focei.c2 = (mx-mn)/2;
-    break;
-  case 2: // Rescaling (min-max normalization)
-    for (k = op_focei.npars-1; k--;){
-      mn = min2(op_focei.initPar[k],mn);
-      mx = max2(op_focei.initPar[k],mx);
-    }
-    op_focei.c1 = mn;
-    op_focei.c2 = (mx-mn);
-    break;
-  case 3: // Mean normalization
-    for (k = op_focei.npars-1; k--;){
-      mn = min2(op_focei.initPar[k],mn);
-      mx = max2(op_focei.initPar[k],mx);
-      oN++;
-      mean += (op_focei.initPar[k]-mean)/oN;
-    }
-    op_focei.c1 = mean;
-    op_focei.c2 = (mx-mn);
-    break;
-  case 4: // Standardization
-    for (k = op_focei.npars-1; k--;){
-      mn = min2(op_focei.initPar[k],mn);
-      mx = max2(op_focei.initPar[k],mx);
-      oM= mean;
-      oN++;
-      mean += (op_focei.initPar[k]-mean)/oN;
-      s += (op_focei.initPar[k]-mean)*(op_focei.initPar[k]-oM);
-    }
-    op_focei.c1 = mean;
-    op_focei.c2 = _safe_sqrt(s/(oN-1));
-    break;
-  case 5: // Normalize to length.
-    for (unsigned int k = op_focei.npars-1; k--;){
-      len += op_focei.initPar[k]*op_focei.initPar[k];
-    }
-    op_focei.c1 = 0;
-    op_focei.c2 = _safe_sqrt(len);
-    break;
-  case 6:
-    // No Normalization
-    op_focei.c1 = 0;
-    op_focei.c2 = 1;
-    break;
-  default:
-    stop("Unrecognized normalization (normType=%d)",op_focei.normType);
+
   }
-  // }
+    // }
   return ret;
 }
 
@@ -4208,6 +4222,23 @@ Environment foceiFitCpp_(Environment e){
     }
   } else {
     foceiOuter(e);
+    if (op_focei.maxOuterIterations > 0  && R_FINITE(op_focei.resetThetaFinalSize)){
+      focei_options *fop = &op_focei;
+      std::fill(op_focei.etaM.begin(),op_focei.etaM.end(), 0.0);
+      std::fill(op_focei.etaS.begin(),op_focei.etaS.end(), 0.0);
+      double n = 1.0;
+      for (int id=rx->nsub; id--;){
+	focei_ind *fInd = &(inds_focei[id]);
+	mat etaMat(fop->neta, 1);
+	std::copy(&fInd->eta[0], &fInd->eta[0] + op_focei.neta, etaMat.begin());
+	mat oldM = op_focei.etaM;
+	op_focei.etaM = op_focei.etaM + (etaMat - op_focei.etaM)/n;
+	op_focei.etaS = op_focei.etaS + (etaMat - op_focei.etaM) %  (etaMat - oldM);
+	n += 1.0;
+      }
+      op_focei.eta1SD = 1/sqrt(op_focei.etaS);
+      thetaReset(op_focei.resetThetaFinalSize);
+    }
   }
   NumericVector scaleSave(op_focei.ntheta+op_focei.omegan);
   for (unsigned int i =op_focei.ntheta+op_focei.omegan;i--;){
