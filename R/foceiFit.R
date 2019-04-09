@@ -217,6 +217,19 @@ is.latex <- function() {
 ##'     indicates the ETAs never reset.  A p-value of 1 indicates the
 ##'     ETAs always reset.
 ##'
+##' @param resetThetaP represents the p-value for reseting the
+##'     population mu-referenced THETA parameters based on ETA drift
+##'     during optimization, and resetting the optimization.  A
+##'     p-value of 0 indicates the THETAs never reset.  A p-value of 1
+##'     indicates the THETAs always reset and is not allowed.  The
+##'     theta reset is checked at the beginning and when nearing a
+##'     local minima.  The percent change in objective function where
+##'     a theta reset check is initiated is controlled in
+##'     \code{resetThetaCheckPer}.
+##'
+##' @param resetThetaCheckPer represents objective function
+##'     %percentage below which resetThetaP is checked.
+##'
 ##' @param resetHessianAndEta is a boolean representing if the
 ##'     individual Hessian is reset when ETAs are reset using the
 ##'     option \code{resetEtaP}.
@@ -570,7 +583,8 @@ foceiControl <- function(sigdig=3,...,
                          interaction=TRUE,
                          cholSEtol=(.Machine$double.eps)^(1/3),
                          cholAccept=1e-3,
-                         resetEtaP=0.1,
+                         resetEtaP=0.15,
+                         resetThetaP=0.05,
                          diagOmegaBoundUpper=5, #diag(omega) = diag(omega)*diagOmegaBoundUpper; =1 no upper
                          diagOmegaBoundLower=100, #diag(omega) = diag(omega)/diagOmegaBoundLower; = 1 no lower
                          cholSEOpt=FALSE,
@@ -618,7 +632,11 @@ foceiControl <- function(sigdig=3,...,
                          odeRecalcFactor=10^(0.5),
                          gradCalcCentralSmall=1e-4,
                          gradCalcCentralLarge=1e4,
-                         etaNudge=0.01, stiff){
+                         etaNudge=0.01, stiff,
+                         nRetries=3,
+                         seed=42,
+                         badEtaPenalty=0.05,
+                         resetThetaCheckPer=0.1){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
@@ -772,6 +790,14 @@ foceiControl <- function(sigdig=3,...,
     } else {
         .resetEtaSize <- 0;
     }
+
+    if (resetThetaP > 0 & resetThetaP < 1){
+        .resetThetaSize <- qnorm(1 - (resetThetaP / 2));
+    } else if (resetThetaP <= 0){
+        .resetThetaSize <- Inf;
+    } else {
+        stop("Cannot always reset THETAs");
+    }
     .ret <- list(maxOuterIterations=as.integer(maxOuterIterations),
                  maxInnerIterations=as.integer(maxInnerIterations),
                  method=method,
@@ -819,6 +845,7 @@ foceiControl <- function(sigdig=3,...,
                  hessEps=as.double(hessEps),
                  cholAccept=as.double(cholAccept),
                  resetEtaSize=as.double(.resetEtaSize),
+                 resetThetaSize=as.double(.resetThetaSize),
                  diagOmegaBoundUpper=diagOmegaBoundUpper,
                  diagOmegaBoundLower=diagOmegaBoundLower,
                  cholSEOpt=as.integer(cholSEOpt),
@@ -868,6 +895,9 @@ foceiControl <- function(sigdig=3,...,
                  etaNudge=as.double(etaNudge),
                  maxOdeRecalc=as.integer(maxOdeRecalc),
                  odeRecalcFactor=as.double(odeRecalcFactor),
+                 nRetries=nRetries,
+                 seed=seed,
+                 resetThetaCheckPer=resetThetaCheckPer,
                  ...);
     .tmp <- .ret
     .tmp$maxsteps <- maxstepsOde
@@ -1490,6 +1520,7 @@ foceiFit.data.frame <- function(data, ...){
     class(.ret$parFixed) <- c("nlmixrParFixed", "data.frame");
 }
 
+.thetaReset <- new.env(parent=emptyenv())
 ##'@rdname foceiFit
 ##'@export
 foceiFit.data.frame0 <- function(data,
@@ -1508,6 +1539,7 @@ foceiFit.data.frame0 <- function(data,
                                 etaMat=NULL,
                                 ...,
                                 env=NULL){
+    set.seed(control$seed);
     RxODE::rxSolveFree(); freeFocei();
     on.exit({RxODE::rxSolveFree(); freeFocei();});
     .pt <- proc.time();
@@ -1630,6 +1662,7 @@ foceiFit.data.frame0 <- function(data,
         }
     }
     .ret$skipCov <- skipCov;
+    .ret$control$focei.mu.ref <- integer(0);
     if (is.null(skipCov)){
         if (is.null(fixed)){
             .tmp <- rep(FALSE, length(inits$THTA))
@@ -1650,6 +1683,7 @@ foceiFit.data.frame0 <- function(data,
         }
         .ret$skipCov <- c(.tmp,
                           rep(TRUE, length(.extraPars)))
+        .ret$control$focei.mu.ref <- .ret$uif$focei.mu.ref;
     }
     if (is.null(.extraPars)){
         .nms <- c(sprintf("THETA[%s]", seq_along(inits$THTA)))
@@ -1800,7 +1834,62 @@ foceiFit.data.frame0 <- function(data,
             .ret$nobs <- sum(data$EVID == 0)
         }
     }
-    .ret <- foceiFitCpp_(.ret);
+    .ret$control$printTop <- TRUE
+    .ret$control$nF <- 0
+    .est0 <- .ret$thetaIni;
+    .fitFun <- function(.ret){
+        this.env <- environment()
+        assign("err", "theta reset", this.env)
+        while (this.env$err == "theta reset"){
+            assign("err", "", this.env);
+            RxODE::rxSolveFree(); freeFocei();
+            .ret0 <- tryCatch({foceiFitCpp_(.ret)},
+                              error=function(e){
+                if (regexpr("theta reset", e$message) != -1){
+                    assign("err", "theta reset", this.env);
+                } else {
+                    assign("err", e$message, this.env);
+                }
+            })
+            if (this.env$err == "theta reset"){
+                .nm <- names(.ret$thetaIni);
+                .ret$thetaIni <- setNames(.thetaReset$thetaIni + 0.0, .nm);
+                .ret$rxInv$theta <- .thetaReset$omegaTheta;
+                .ret$control$printTop <- FALSE
+                .ret$control$nF <- .thetaReset$nF;
+                message("Theta reset")
+            }
+        }
+        if (this.env$err != ""){
+            stop(this.env$err);
+        } else {
+            return(.ret0);
+        }
+    }
+    .ret0 <- try(.fitFun(.ret));
+    .n <- 1;
+    while (inherits(.ret0, "try-error") && control$maxOuterIterations != 0 && .n <= control$nRetries){
+        ## Maybe change scale?
+        message(sprintf("Restart %s", .n));
+        .estNew <- .est0 + 0.2 * .n * abs(.est0) * runif(length(.est0)) - 0.1 * .n;
+        .estNew <- sapply(seq_along(.est0),
+                          function(.i){
+            if (.ret$thetaFixed[.i]){
+                return(.est0[.i]);
+            } else if (.estNew[.i] < lower[.i]){
+                return(lower + (.Machine$double.eps)^(1/7))
+            } else if (.estNew[.i] > upper[.i]){
+                return(upper - (.Machine$double.eps)^(1/7))
+            } else {
+                return(.estNew[.i]);
+            }
+        })
+        .ret$thetaIni <- .estNew
+        .ret0 <- try(.fitFun(.ret));
+        .n <- .n + 1;
+    }
+    if (inherits(.ret0, "try-error")) stop("Could not fit data.");
+    .ret <- .ret0
     if (!control$calcTables){
         return(.ret);
     }
@@ -1812,7 +1901,6 @@ foceiFit.data.frame0 <- function(data,
         }
         return(.ret)
     }
-
     .solvePred <- function(){
         .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav, returnType="data.frame",
                        atol=.ret$control$atol[1], rtol=.ret$control$rtol[1],

@@ -1509,6 +1509,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .rx <- gsub(rex::rex(start,any_spaces,capture(or(.vars)),any_spaces,or("=","<-"),
                          capture(anything)),
                 "\\1 <- nlmixr_lincmt_\\1", rx.txt)
+    .pred <- .pred[regexpr(rex::rex("linCmt("), .pred) == -1];
+    if (any(regexpr(rex::rex("linCmt("), .rx)!= -1)) .hasLinCmt <- FALSE
     rest <- eval(parse(text=paste(c("function(){",
                                     .pred,.rx,
                                     ifelse(.hasLinCmt, "nlmixr_lincmt_pred <- linCmt()\n}","}")),
@@ -2334,6 +2336,20 @@ nlmixrUI.saem.init <- function(obj){
   return(ret);
 }
 
+nlmixrUI.focei.mu.ref <- function(obj){
+  .muRef <- obj$mu.ref;
+  .tn <- obj$focei.names
+  sapply(seq_along(.muRef), function(x){
+    .cur <- .muRef[[x]]
+    .w <- which(.tn == .cur);
+    if (length(.w) == 1){
+      return(.w - 1)
+    } else {
+      return(-1);
+    }
+  })
+}
+
 nlmixrUI.model.desc <- function(obj){
   .mv <- RxODE::rxModelVars(obj$rxode.pred);
   if (obj$predSys){
@@ -2440,6 +2456,8 @@ nlmixrUI.poped.ff_fun <- function(obj){
     return(nlmixrUI.focei.inits(obj));
   } else if (arg == "focei.fixed"){
     return(nlmixrUI.focei.fixed(obj));
+  } else if (arg == "focei.mu.ref"){
+    return(nlmixrUI.focei.mu.ref(obj));
   } else if (arg == "saem.fixed"){
     return(nlmixrUI.saem.fixed(obj));
   } else if (arg == "saem.theta.name"){
@@ -2532,6 +2550,7 @@ str.nlmixrUI <- function(object, ...){
   cat(" $ theta.pars: Parameters in terms of THETA[#] and ETA[#]\n")
   cat(" $ focei.inits: Initialization for FOCEi style blocks\n")
   cat(" $ focei.fixed: Logical vector of FOCEi fixed parameters\n")
+  cat(" $ focei.mu.ref: Integer Vector of focei.mu.ref\n");
   cat(" $ saem.eta.trans: UI ETA -> SAEM ETA\n")
   cat(" $ saem.model.omega: model$omega for SAEM\n")
   cat(" $ saem.res.mod: model$res.mod for SAEM\n")
