@@ -20,7 +20,7 @@
 ## - Covariate part
 
 .deparse <- function(expr){
-  deparse(expr,width=500)
+  deparse(expr,width=500, control = "useSource");
 }
 
 .bodyDewrap  <- function(ret){
