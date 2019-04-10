@@ -357,6 +357,7 @@ predict.nlmixrFitData <- function(object, ...){
 ##' @export
 nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
                           primary=NULL, minimum = NULL, maximum = NULL, length.out = 51L){
+    force(object);
     if (!inherits(object, "nlmixrFitData")){
         stop("Need a nlmixr fit object")
     }
@@ -405,6 +406,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     dat <- dat[!duplicated(paste(dat$ID, dat$TIME)), ];
     lst <- as.list(match.call()[-1])
     lst <- lst[!(names(lst) %in% c("primary", "minimum", "maximum", "length.out"))]
+    lst$object <- object
     lst$ipred <- NA
     lst$events <- dat
     lst$params <- NULL;
@@ -421,13 +423,14 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
 
 ##' @rdname nlmixrAugPred
 ##' @export
-augPred.nlmixrFitData <- function(object, primary = NULL, minimum = min(primary), maximum = max(primary),
+augPred.nlmixrFitData <- memoise::memoise(function(object, primary = NULL, minimum = min(primary), maximum = max(primary),
                               length.out = 51, ...){
     lst <- as.list(match.call()[-1])
+    lst$object <- object
     ret <- do.call("nlmixrAugPred", lst, envir=parent.frame(2))
     class(ret) <- c("nlmixrAugPred", "data.frame")
     return(ret)
-}
+})
 
 ##' @export
 plot.nlmixrAugPred <- function(x, y, ...){

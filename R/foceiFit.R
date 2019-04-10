@@ -2234,6 +2234,7 @@ residuals.nlmixrFitData <- function(object, ..., type=c("ires", "res", "iwres", 
 #' @author Wenping Wang & Matthew Fidler
 #' @export
 plot.nlmixrFitData <- function(x, ...) {
+    object <- x
     IWRES <- NULL
     traceplot(x);
     .dat <- as.data.frame(x);
@@ -2282,7 +2283,7 @@ plot.nlmixrFitData <- function(x, ...) {
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
         print(.p2)
-        .idPlot <- try(print(augPred(x)));
+        .idPlot <- try(plot.nlmixrAugPred(nlmixrAugPred(object)));
         if (inherits(.idPlot, "try-error")){
             .ids <- unique(.dat0$ID)
             .s <- seq(1, length(.ids), by=16)
@@ -2513,11 +2514,11 @@ print.nlmixrFitCore <- function(x, ...){
             .lt <- .lt[.lt != 0]
             .digs <- 3;
             .lts <- sapply(.lt, function(x){
-                x <- abs(.lt);
+                .x <- abs(.lt);
                 .ret <- "<"
-                if (x > 0.7){
+                if (.x > 0.7){
                     .ret <- ">" ## Strong
-                } else if (x > 0.3){
+                } else if (.x > 0.3){
                     .ret <- "=" ## Moderate
                 }
                 return(.ret)
