@@ -2512,7 +2512,7 @@ NumericVector foceiSetup_(const RObject &obj,
   double mn = op_focei.initPar[op_focei.npars-1], mx=op_focei.initPar[op_focei.npars-1],mean=0, oN=0, oM=0,s=0;
   double len=0;
   unsigned int k;
-  if (op_focei.nF > 0){
+  if (op_focei.nF2 > 0 && odeO.containsElementNamed("c1") && odeO.containsElementNamed("c2")){
     op_focei.c1 = odeO["c1"];
     op_focei.c2 = odeO["c2"];
   } else {
