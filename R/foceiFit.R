@@ -2282,25 +2282,26 @@ plot.nlmixrFitData <- function(x, ...) {
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
         print(.p2)
+        .idPlot <- try(print(augPred(x)));
+        if (inherits(.idPlot, "try-error")){
+            .ids <- unique(.dat0$ID)
+            .s <- seq(1, length(.ids), by=16)
+            .j <- 0;
+            for (i  in .s){
+                .j <- .j + 1
+                .tmp <- .ids[seq(i, i + 15)]
+                .tmp <- .tmp[!is.na(.tmp)];
+                .d1 <- .dat0[.dat0$ID %in% .tmp, ];
 
-        .ids <- unique(.dat0$ID)
-        .s <- seq(1, length(.ids), by=16)
-        .j <- 0;
-        for (i  in .s){
-            .j <- .j + 1
-            .tmp <- .ids[seq(i, i + 15)]
-            .tmp <- .tmp[!is.na(.tmp)];
-            .d1 <- .dat0[.dat0$ID %in% .tmp, ];
-
-            .p3 <- ggplot2::ggplot(.d1, aes(x=TIME, y=DV)) +
-                ggplot2::geom_point() +
-                ggplot2::geom_line(aes(x=TIME, y=IPRED), col="red", size=1.2) +
-                ggplot2::geom_line(aes(x=TIME, y=PRED), col="blue", size=1.2) +
-                ggplot2::facet_wrap(~ID) +
-                ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s)))
-            print(.p3)
+                .p3 <- ggplot2::ggplot(.d1, aes(x=TIME, y=DV)) +
+                    ggplot2::geom_point() +
+                    ggplot2::geom_line(aes(x=TIME, y=IPRED), col="red", size=1.2) +
+                    ggplot2::geom_line(aes(x=TIME, y=PRED), col="blue", size=1.2) +
+                    ggplot2::facet_wrap(~ID) +
+                    ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s)))
+                print(.p3)
+            }
         }
-
     }
 }
 
