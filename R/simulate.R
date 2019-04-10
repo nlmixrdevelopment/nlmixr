@@ -409,6 +409,8 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     lst$events <- dat
     lst$params <- NULL;
     dat.new <- do.call("nlmixrPred", lst, envir=parent.frame(2))
+    dat.new$id <- factor(dat.new$id)
+    levels(dat.new$id) <- levels(object$ID)
     dat.new <- data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2)]))
     levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
     names(dat.old) <- tolower(names(dat.old))
