@@ -1504,7 +1504,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .pred  <- .pred[regexpr(rex::rex(start, any_spaces, or("dur", "d","rate", "r", "lag", "alag", "f", "F"),
                                       any_spaces, "(",
                                       any_spaces, or("depot","central"), any_spaces,
-                                      ")",any_spaces,or("=","<-"),any_spaces,capture(anything)), .pred) == -1]
+                                     ")",any_spaces,or("=","<-"),any_spaces,capture(anything)), .pred) == -1]
     .vars  <- gsub(.regLin,"\\1",rx.txt[regexpr(.regLin,rx.txt) !=0]);
     .rx <- gsub(rex::rex(start,any_spaces,capture(or(.vars)),any_spaces,or("=","<-"),
                          capture(anything)),
@@ -1536,7 +1536,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   }
   if (rxode){
     rx.txt <- .deparse1(body(rest))
-
     w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
     if (length(w) == 0){
       stop("Error parsing model -- no parameters found.")
@@ -1630,11 +1629,19 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         misplaced.dists <- character();
       }
     }
+    if (misplaced.dists == "f"){
+      if (!any(regexpr(rex::rex(one_of("Ff"), any_spaces, "(", except_some_of(")\n"), ")", any_spaces, or("<-", "=")), .deparse(rest), perl=TRUE) != -1)){
+        misplaced.dists <- character();
+      }
+    }
   } else if (length(misplaced.dists)==2){
     .tmp <- order(misplaced.dists)
     .tmp <- misplaced.dists[.tmp];
     if (all(misplaced.dists==c("dt","f"))){
       if (!any(regexpr("[^/]\\bdt[(]", .deparse(rest), perl=TRUE) != -1)){
+        misplaced.dists <- character();
+      }
+      if (!any(regexpr(rex::rex(one_of("Ff"), any_spaces, "(", except_some_of(")\n"), ")", any_spaces, or("<-", "=")), .deparse(rest), perl=TRUE) != -1)){
         misplaced.dists <- character();
       }
     }
