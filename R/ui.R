@@ -1629,9 +1629,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         misplaced.dists <- character();
       }
     }
-    if (misplaced.dists == "f"){
-      if (!any(regexpr(rex::rex(one_of("Ff"), any_spaces, "(", except_some_of(")\n"), ")", any_spaces, or("<-", "=")), .deparse(rest), perl=TRUE) != -1)){
-        misplaced.dists <- character();
+    if (length(misplaced.dists) == 1){
+      if (misplaced.dists == "f"){
+        if (!any(regexpr(rex::rex(one_of("Ff"), any_spaces, "(", except_some_of(")\n"), ")", any_spaces, or("<-", "=")), .deparse(rest), perl=TRUE) != -1)){
+          misplaced.dists <- character();
+        }
       }
     }
   } else if (length(misplaced.dists)==2){
