@@ -405,7 +405,8 @@ nlmixrUI <- function(fun){
     assign("fun", fun, env)
     fun2 <- attr(fun,"srcref");
     if (is.null(fun2)){
-      stop("option \"keep.source\" must be TRUE for nlmixr models.\nTry running:\nR -e 'source(\"script\", keep.source=TRUE)'");
+      message(sprintf("Cannot run this way in non-interactive mode.\nTry running:\n\nR -e 'source(\"script\", keep.source=TRUE)'\n\nFor Batch-mode type of running, you can use:\n\nR -e \"source('script.R', keep.source=TRUE, echo=TRUE)\" %s> script.Rout 2>&1", ifelse((.Platform$OS.type == "unix"), "", "1")))
+      stop("option \"keep.source\" must be TRUE for nlmixr models.");
       return(eval(fun(),parent.frame(1)));
     }
     fun2 <- as.character(fun2, useSource=TRUE)
