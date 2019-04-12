@@ -2283,8 +2283,8 @@ plot.nlmixrFitData <- function(x, ...) {
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
         print(.p2)
-        .idPlot <- try(plot.nlmixrAugPred(nlmixrAugPred(object)));
-        if (inherits(.idPlot, "try-error")){
+        ## .idPlot <- try(plot.nlmixrAugPred(nlmixrAugPred(object)));
+        ## if (inherits(.idPlot, "try-error")){
             .ids <- unique(.dat0$ID)
             .s <- seq(1, length(.ids), by=16)
             .j <- 0;
@@ -2302,7 +2302,7 @@ plot.nlmixrFitData <- function(x, ...) {
                     ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s)))
                 print(.p3)
             }
-        }
+        ## }
     }
 }
 
