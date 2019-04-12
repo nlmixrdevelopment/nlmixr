@@ -525,7 +525,7 @@ void saem_fit() {
     Plambda(ilambda0) = Plambda0;
 
     par_hist.row(kiter) = join_cols(join_cols(Plambda, Gamma2_phi1.diag()), vcsig2).t();
-    if (print>0 && (kiter==0 || (kiter+1)%print==0))
+    if (print != 0 && (kiter==0 || (kiter+1)%print==0))
     Rcout << kiter+1
           << ": "
           << par_hist.row(kiter);

@@ -4168,7 +4168,7 @@ Environment foceiFitCpp_(Environment e){
     }
   }
   std::string tmpS;
-  if (op_focei.maxOuterIterations > 0 && op_focei.printTop == 1){
+  if (op_focei.maxOuterIterations > 0 && op_focei.printTop == 1 && op_focei.printOuter != 0){
     if (op_focei.useColor)
       Rprintf("\033[1mKey:\033[0m ");
     else 

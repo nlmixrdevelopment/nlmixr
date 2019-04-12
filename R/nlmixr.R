@@ -436,7 +436,7 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         cfg <- configsaem(model=model, data=dat, inits=inits,
                           mcmc=mcmc, ODEopt=ODEopt, seed=seed,
                           distribution=.dist, DEBUG=DEBUG);
-        if (print > 1){
+        if (is(print, "numeric")){
             cfg$print <- as.integer(print)
         }
         .fit <- model$saem_mod(cfg);
