@@ -296,9 +296,9 @@ cutoff = function (x, cut = .Machine$double.xmin) {
     x
 }
 
-##' Standard error by Fisher Information Matrix via linearization 
+##' Covariance matrix by Fisher Information Matrix via linearization 
 ##'
-##' Estimate the standard error of fixed effects via calculating Fisher Information Matrix by linearization
+##' Get the covariance matrix of fixed effect estimates via calculating Fisher Information Matrix by linearization
 ##'
 ##' @param fit saemFit fit
 ##'
@@ -308,7 +308,7 @@ cutoff = function (x, cut = .Machine$double.xmin) {
 ##' 20th meeting of the Population Approach Group in Europe, Athens, Greece
 ##' (2011), Abstr 2173.
 ##'
-calc.SE = function(fit0) {
+calc.COV = function(fit0) {
 	fit = as.saem(fit0)
 	.env <- attr(fit,"env");
 	saem.cfg  <-  attr(fit, "saem.cfg")
@@ -355,7 +355,8 @@ calc.SE = function(fit0) {
 	MFi = sapply(1:N, function(i) {
 	  ix <- id == i
 	  DFi <- DF[ix,]
-	  Vi <- DFi %*% omega %*% t(DFi) + diag((g[ix])^2)
+	  DFi.i1 <- DFi[,i1]
+	  Vi <- DFi.i1 %*% omega %*% t(DFi.i1) + diag((g[ix])^2)
 	  VD <- try(eigen(Vi, symmetric=TRUE))
 	  if (class(VD) == "try-error") stop("Spectral decom failure when computing FIM")
 	  D <- Re(VD$values)
@@ -372,5 +373,5 @@ calc.SE = function(fit0) {
 	D <- Re(ID$values)
 	V <- Re(ID$vectors)
 	invI.5 <- diag(1/sqrt(D)) %*% t(V) 
-	sqrt(diag(crossprod(invI.5)))
+	crossprod(invI.5)
 }
