@@ -355,13 +355,19 @@ calc.COV = function(fit0) {
 	MFi = sapply(1:N, function(i) {
 	  ix <- id == i
 	  DFi <- DF[ix,]
-	  DFi.i1 <- DFi[,i1]
-	  Vi <- DFi.i1 %*% omega %*% t(DFi.i1) + diag((g[ix])^2)
+      dim(DFi) = c(sum(ix), nphi)
+      DFi.i1 <- DFi[,i1]
+      dim(DFi.i1) = c(sum(ix), nphi1)
+      m = diag(sum(ix))
+      diag(m) = g[ix]^2
+      Vi <- DFi.i1 %*% omega %*% t(DFi.i1) + m
 	  VD <- try(eigen(Vi, symmetric=TRUE))
 	  if (class(VD) == "try-error") stop("Spectral decom failure when computing FIM")
 	  D <- Re(VD$values)
 	  V <- Re(VD$vectors)
-	  invVi.5 <- diag(1/sqrt(D)) %*% t(V) #backsolve(chol(Vi), diag(11)); chol() is worse
+      m = diag(length(D))
+      diag(m) = 1/sqrt(D)
+      invVi.5 <- m %*% t(V) #backsolve(chol(Vi), diag(11)); chol() is worse
 	  Ai   <- kronecker(diag(nphi), saem.cfg$Mcovariables[i,])
 	  DFAi <- DFi %*% Ai  #CHECK!
 	  crossprod(invVi.5 %*% DFAi)
