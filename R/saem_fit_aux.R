@@ -290,3 +290,94 @@ gqg.mlx<-function(dim,nnodes.gq) {
 	weights<-apply(mw,1,prod)
 	return(list(nodes=nodes,weights=weights))
 }
+
+cutoff = function (x, cut = .Machine$double.xmin) {
+    x[x < cut] <- cut
+    x
+}
+
+##' Covariance matrix by Fisher Information Matrix via linearization 
+##'
+##' Get the covariance matrix of fixed effect estimates via calculating Fisher Information Matrix by linearization
+##'
+##' @param fit saemFit fit
+##'
+##' @return standard error of fixed effects 
+##'
+##' @references Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
+##' 20th meeting of the Population Approach Group in Europe, Athens, Greece
+##' (2011), Abstr 2173.
+##'
+calc.COV = function(fit0) {
+	fit = as.saem(fit0)
+	.env <- attr(fit,"env");
+	saem.cfg  <-  attr(fit, "saem.cfg")
+	if (.env$is.ode){
+	  ## .env$model$assignPtr()
+	  .evtM  <- saem.cfg$evtM
+	  .rx <- .env$model
+	  .pars <- .rx$params
+	  .pars <- setNames(rep(1.1,length(.pars)),.pars);
+	  suppressWarnings(do.call(RxODE:::rxSolve.default,
+							   c(list(object=.rx, params=.pars,
+									  events=.evtM,.setupOnly=2L),
+								 saem.cfg$optM)));
+	}
+	dopred = attr(fit, "dopred")
+	resMat = fit$resMat
+	ares = resMat[,1]
+	bres = resMat[,2]
+	i1 = saem.cfg$i1+1
+	nphi1 = saem.cfg$nphi1
+	nphi0 = saem.cfg$nphi0
+	nphi = nphi0 + nphi1
+	N = saem.cfg$N
+	ntotal = saem.cfg$ntotal
+	ix_endpnt = saem.cfg$ix_endpnt[1:ntotal]+1
+	ares = ares[ix_endpnt]
+	bres = bres[ix_endpnt]
+
+	phi = hat.phi = fit$mpost_phi
+	omega = fit$Gamma2_phi1
+	evt = saem.cfg$evt
+	id = evt[evt[,"EVID"]==0,"ID"] + 1
+
+	dphi = cutoff(abs(phi)*1e-4, 1e-10)
+	f1 = sapply(1:nphi, function(j) {
+	  phi[,j] <- hat.phi[,j] + dphi[,j]
+	  as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt))
+	})
+	f0 = as.vector(dopred(hat.phi, saem.cfg$evt, saem.cfg$opt))
+	DF = (f1-f0)/dphi[id,]
+	g  = ares + bres*abs(f0)
+
+	#spectral decom for invVi, idea from saemix
+	MFi = sapply(1:N, function(i) {
+	  ix <- id == i
+	  DFi <- DF[ix,]
+      dim(DFi) = c(sum(ix), nphi)
+      DFi.i1 <- DFi[,i1]
+      dim(DFi.i1) = c(sum(ix), nphi1)
+      m = diag(sum(ix))
+      diag(m) = g[ix]^2
+      Vi <- DFi.i1 %*% omega %*% t(DFi.i1) + m
+	  VD <- try(eigen(Vi, symmetric=TRUE))
+	  if (class(VD) == "try-error") stop("Spectral decom failure when computing FIM")
+	  D <- Re(VD$values)
+	  V <- Re(VD$vectors)
+      m = diag(length(D))
+      diag(m) = 1/sqrt(D)
+      invVi.5 <- m %*% t(V) #backsolve(chol(Vi), diag(11)); chol() is worse
+	  Ai   <- kronecker(diag(nphi), saem.cfg$Mcovariables[i,])
+	  DFAi <- DFi %*% Ai  #CHECK!
+	  crossprod(invVi.5 %*% DFAi)
+	})
+	I = matrix(rowSums(MFi), nphi, nphi)  #CHECK!
+
+	ID <- try(eigen(I, symmetric=TRUE))
+	if (class(ID) == "try-error") stop("Spectral decom failure when computing FIM")
+	D <- Re(ID$values)
+	V <- Re(ID$vectors)
+	invI.5 <- diag(1/sqrt(D)) %*% t(V) 
+	crossprod(invI.5)
+}
