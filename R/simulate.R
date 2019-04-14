@@ -40,10 +40,9 @@
     .etaN <- dimnames(.omega)[[1]]
     .params <- nlme::fixed.effects(object);
     .thetaN <- names(.params);
-    .newMod <- paste0(gsub("~~", "==",
-                           gsub(rex::rex(start, any_spaces, capture(or(.lhs)), any_spaces, or("=", "~"), except_any_of("\n;"),any_of("\n;")), "",
-                                gsub(rex::rex(start, any_spaces, capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
-                                     .repThetaEta(.mod, theta=.thetaN, eta=.etaN)))),
+    .newMod <- paste0(gsub(rex::rex(capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),any_of("\n;")), "",
+                           gsub(rex::rex(capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
+                                .repThetaEta(.mod, theta=.thetaN, eta=.etaN))),
                       "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);");
     .sim <- "\nsim=rxTBSi(rx_pred_+rx_r_"
     .err <- object$uif$err;
@@ -291,15 +290,13 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
             lst$params <- NULL;
         }
     }
-    message("Compiling model...", appendLF=FALSE)
-    lst$object <- RxODE::RxODE(gsub("!=", "!~", gsub("~~", "==",
-                                    gsub(rex::rex("(0)~"), "(0)=",
-                                    paste0(gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE),
-                                           "\npred=rx_pred_")))));
     if (!RxODE::rxIs(lst$events, "rx.event")){
-        lst$events <- RxODE::etTrans(getData(object), lst$object, TRUE);
+        lst$events <- nlmixrData(getData(object));
     }
-
+    message("Compiling model...", appendLF=FALSE)
+    lst$object <- RxODE::RxODE(gsub(rex::rex("(0)~"), "(0)=",
+                                    paste0(gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE),
+                                           "\npred=rx_pred_")));
     message("done")
     params <- fixed.effects(object);
     names(params) <- sprintf("THETA[%d]", seq_along(params))
@@ -365,9 +362,9 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
         stop("Need a nlmixr fit object")
     }
     uif <- object$uif
-    dat <- getData(object)
+    dat <- nlmixrData(getData(object))
     names(dat)  <- toupper(names(dat))
-    up.covs <- c(toupper(uif$all.covs), "CMT");
+    up.covs <- toupper(uif$all.covs);
     up.names <- toupper(names(dat))
     for (i in seq_along(up.covs)){
         w <- which(up.covs[i] == up.names)
@@ -387,7 +384,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     new.pts <- expand.grid(TIME=new.time, ID=ids);
     ## Add covariates in the augmented prediction
     covsi <- match.arg(covsInterpolation)
-    all.covs <- uif$all.cov
+    all.covs <- uif$all.covs
     if (length(all.covs) > 0){
         fs <- c(locf=0, nocb=1, midpoint=0.5, linear=0)
         new.cov<- lapply(all.covs, function(cov){
@@ -399,7 +396,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
                 return(fun(new.time))
             }))})
         names(new.cov) <- all.covs;
-        new.pts <- cbind(new.pts, new.cov);
+        new.pts <- cbind(new.pts, new.covs);
     }
     new.pts$EVID <- 0
     new.pts$AMT <- 0
@@ -426,23 +423,10 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
 
 ##' @rdname nlmixrAugPred
 ##' @export
-augPred.nlmixrFitData <- memoise::memoise(function(object, primary = NULL, minimum = NULL, maximum = NULL,
+augPred.nlmixrFitData <- memoise::memoise(function(object, primary = NULL, minimum = min(primary), maximum = max(primary),
                               length.out = 51, ...){
     lst <- as.list(match.call()[-1])
     lst$object <- object
-    if (is.null(primary)){
-        primary <- object$TIME
-    }
-    lst$primary <- primary
-    if (is.null(minimum)){
-        minimum <- min(primary)
-    }
-    lst$minimum <- minimum
-    if (is.null(minimum)){
-        minimum <- min(primary)
-    }
-    lst$maximum <- maximum
-    lst$length.out <- length.out
     ret <- do.call("nlmixrAugPred", lst, envir=parent.frame(2))
     class(ret) <- c("nlmixrAugPred", "data.frame")
     return(ret)
