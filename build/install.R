@@ -25,6 +25,7 @@ install.packages(c("tidyverse", "data.table",
 
 devtools::install_github("nlmixrdevelopment/RxODE")
 library(RxODE)
+devtools::install_github("nlmixrdevelopment/rxModels")
 devtools::install_github("nlmixrdevelopment/SnakeCharmR")
 devtools::install_github("richardhooijmaijers/R3port")
 devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
