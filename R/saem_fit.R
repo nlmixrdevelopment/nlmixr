@@ -840,6 +840,7 @@ configsaem <- function(model, data, inits,
   if (is.null(inits$bres)) inits$bres = 1
   if (is.null(mcmc$print)) mcmc$print=1
   if (is.null(names(inits$theta))) names(inits$theta)=rep("", length(inits$theta))
+  inits.save = inits
   inits$theta.fix = matrix(names(inits$theta), byrow=T, ncol=model$N.eta)
   inits$theta = matrix(inits$theta, byrow=T, ncol=model$N.eta)
   model$cov.mod=1-is.na(inits$theta)
@@ -1105,6 +1106,7 @@ configsaem <- function(model, data, inits,
   i0 = i0 - 1
   opt$distribution <- distribution;
   cfg=list(
+    inits=inits.save,
     nu=mcmc$nu,
     niter=niter,
     nb_sa=nb_sa,
