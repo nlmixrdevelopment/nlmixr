@@ -519,7 +519,9 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       x <- gsub("[.]", "_DoT_", x);
 
       len = length(x)
-      cat(sprintf("%s;\n", x[2:(len-1)]), file="eqn__.txt")
+      .tmp <- sprintf("%s;\n", x[2:(len-1)]);
+      .tmp <- gsub("([{}]);", "\\1", .tmp)
+      cat(.tmp, file="eqn__.txt")
 
       nrhs = integer(1)
 
