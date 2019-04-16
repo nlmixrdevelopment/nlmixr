@@ -29,7 +29,6 @@
     .ret[1] <- sub(rex::rex(start,or(group("function",any_spaces,"(",any_spaces,")",any_spaces),""),
                             any_spaces,any_of("("),any_spaces, "{",any_spaces),"",.ret[1], perl=TRUE);
     if (.ret[1]=="") .ret <- .ret[-1];
-
   }
   if (length(.ret) > 1){
     .len <- length(.ret);
@@ -1551,7 +1550,35 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       stop("Mixed estimation types and ODEs.")
     }
     rx.ode <- rx.txt[-(1:w)];
-    rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n")))
+    rx.pred <- try(eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n"))), silent=TRUE)
+    if (inherits(rx.pred, "try-error")){
+      .w <- which(regexpr(rex::rex("}"), rx.ode) != -1);
+      if (length(.w) > 0){
+        .i <- 1;
+        .w0 <- w + .w[.i];
+        rx.pred <- rx.txt[1:.w0];
+        rx.ode <- rx.txt[-(1:.w0)];
+        if (regexpr(rex::rex("else"), rx.ode[1]) != -1){
+          .i <- .i + 1
+          .w0 <- w + .w[.i];
+          rx.pred <- rx.txt[1:.w0];
+          rx.ode <- rx.txt[-(1:.w0)];
+          w <- .w0;
+          if (regexpr(rex::rex("else"), rx.ode[1]) != -1){
+            stop("else if are not supported in nlmixr");
+          }
+        }
+        if (any(regexpr(rex::rex(start,any_spaces,
+                             or("d/dt(", "f(", "F(", "dur(", "d(",
+                                "lag(", "alag(", "r(", "rate(",
+                                group("(0)", any_spaces, or("=", "<-")))),
+                        rx.pred, perl=TRUE) != -1)){
+          stop("Mixed estimation types and ODEs #2.")
+        }
+      } else {
+        stop("Mixed estimation types and ODEs #3.")
+      }
+    }
     ## Now separate out parameters for SAEM.
     .tmp <- saem.pars;
     nlme.mu.fun2 <- saem.pars;
@@ -1560,9 +1587,40 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n")))
     ## Now separate out parameters for SAEM.
     w <- max(which(regexpr(reg, saem.pars, perl=TRUE) != -1));
+    .tmp <- try(parse(text=paste(c(saem.pars[1:w], "})"), collapse="\n")), silent=TRUE)
+    if (inherits(.tmp, "try-error")){
+      .saemPars2 <- saem.pars[-(1:w)];
+      .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
+      if (length(.w) > 0){
+        .i <- 1;
+        .w0 <- w + .w[.i];
+        .saemPars2 <- saem.pars[-(1:.w0)];
+        if (regexpr(rex::rex("else"), .saemPars2[1]) != -1){
+          .i <- .i + 1
+          .w0 <- w + .w[.i];
+          w <- .w0;
+        }
+      }
+    }
     saem.pars <- c(saem.pars[1:w], "");
+    ## sapply(saem.pars, message)
     nlme.mu.fun2 <- saem.pars;
     w <- max(which(regexpr(reg, nlme.mu.fun, perl=TRUE) != -1));
+    .tmp <- try(parse(text=paste(c(nlme.mu.fun[1:w], "})"), collapse="\n")), silent=TRUE)
+    if (inherits(.tmp, "try-error")){
+      .saemPars2 <- nlme.mu.fun[-(1:w)];
+      .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
+      if (length(.w) > 0){
+        .i <- 1;
+        .w0 <- w + .w[.i];
+        .saemPars2 <- nlme.mu.fun[-(1:.w0)];
+        if (regexpr(rex::rex("else"), .saemPars2[1]) != -1){
+          .i <- .i + 1
+          .w0 <- w + .w[.i];
+          w <- .w0;
+        }
+      }
+    }
     nlme.mu.fun <- c(nlme.mu.fun[1:w], "");
     rxode <- paste(rx.ode, collapse="\n")
     if (.linCmt){

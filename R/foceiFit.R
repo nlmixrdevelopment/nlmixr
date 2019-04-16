@@ -2423,7 +2423,7 @@ print.nlmixrFitCore <- function(x, ...){
                            }))
     if (length(.bound) == 0){
         .bound <- ""
-    } else if (length(.bound) > 2){
+    } else if (length(.bound) >= 2){
         .bound <- .bound[order(sapply(.bound, nchar))];
         if (.bound[1]=="x"){
             .bound <- .bound[-1];
@@ -2918,6 +2918,94 @@ setOfv <- function(x, type){
     } else {
         stop("Wrong type of object.");
     }
+}
+
+.fixNames <- function(.df){
+    names(.df) <- gsub("Estimate", "estimate", names(.df))
+    names(.df) <- gsub(".*RSE.*", "rse", names(.df))
+    names(.df) <- gsub("SE", "std.error", names(.df))
+    names(.df) <- gsub("CI Lower", "conf.low", names(.df))
+    names(.df) <- gsub("CI Upper", "conf.high", names(.df))
+    names(.df) <- gsub("BSV.*", "bsv", names(.df))
+    names(.df) <- gsub("Shrink.*", "shrink", names(.df));
+    names(.df) <- gsub("Back-", "back.", names(.df))
+    return(.df);
+}
+
+##'@export
+confint.NlmixrFitCore <- function(object, parm, level = 0.95, ...){
+    .extra <- list(...);
+    .exponentiate <- ifelse(any(names(.extra) == "exponentiate"), .extra$exponentiate, NA)
+    .ciNames <- ifelse(any(names(.extra) == "ciNames"), .extra$ciNames, TRUE)
+    .df <- .fixNames(object$parFixedDf);
+    if (!missing(parm)) .df <- .df[parm, ];
+    .zv <- qnorm(1 - (1 - level) / 2);
+    .low <- .df$estimate - .df$std.error * .zv
+    .hi <- .df$estimate + .df$std.error * .zv
+    if (is.na(.exponentiate)){
+        .exp <- abs(exp(.df$estimate) - .df$back.transformed) < 1e-6;
+        .hi[.exp] <- exp(.hi[.exp])
+        .low[.exp] <- exp(.low[.exp]);
+    } else if (.exponentiate) {
+        .hi <- exp(.hi);
+        .low <- exp(.low);
+    }
+    .df <- data.frame(estimate=.df$estimate, back.transformed=.df$back.transformed,  conf.low=.low, conf.high=.hi)
+    if (.ciNames) names(.df)[3:4] <- paste(c((1 - level) / 2, (1 - (1 - level) / 2)) * 100, "%")
+    .df
+}
+
+
+.nlmixrTidyFixed <- function(x, ...){
+    .extra <- list(...);
+    .conf.int <- ifelse(any(names(.extra) == "conf.int"), .extra$conf.int, ifelse(any(names(.extra) == "conf.level"), TRUE, FALSE));
+    .conf.level <- ifelse(any(names(.extra) == "conf.level"), .extra$conf.level, 0.95)
+    .exponentiate <- ifelse(any(names(.extra) == "exponentiate"), .extra$exponentiate, NA)
+    .quick <- ifelse(any(names(.extra) == "quick"), .extra$quick, FALSE)
+    if (.quick) warning("quick does not do anything for nlmixr fit objects");
+    .df <- .fixNames(x$parFixedDf);
+    if (.conf.int){
+        .ci <- confint.NlmixrFitCore(x, level=.conf.level, ciNames=FALSE, exponentiate=.exponentiate);
+        .df$conf.low <- .ci$conf.low
+        .df$conf.high <- .ci$conf.high
+    } else {
+        .df <- .df[, regexpr("^ci", names(.df)) == -1]
+    }
+    .df <- data.frame(term=row.names(.df), .df);
+    dplyr::as.tbl(.df)
+}
+
+.nlmixrTidyRandom <- function(x, ...){
+    .tmp <- stack(x$eta[,-1])
+    .df <- data.frame(group="ID", level=x$eta$ID, term=.tmp$ind, estimate=.tmp$values);
+    dplyr::as.tbl(.df)
+}
+
+##'@export
+tidy.nlmixrFitCore <- function(x, ...){
+    .extra <- list(...);
+    .effects <- ifelse(any(names(.extra) == "effects"), .extra$effects, "fixed")
+    .effects <- match.arg(.effects, c("fixed", "random", "ran_vals", "ran_pars"))
+    if (.effects == "fixed") return(.nlmixrTidyFixed(x, ...))
+    if (.effects == "random") return(.nlmixrTidyRandom(x, ...))
+    if (.effects == "ran_pars") {
+        stop("ran_pars not yet implemented for nonlinear models");
+    }
+    else return(.nlmixrTidyRandom(x, ...));
+}
+
+##'@export
+glance.nlmixrFitCore <- function(x, ...){
+    .aic <- AIC(x); ## To calculate AIC if needed
+    .df <- fit$objDf[fit$objDf$AIC == .aic, ];
+    names(.df) <- gsub("Log-likelihood", "logLik", names(.df));
+    names(.df) <- gsub("Condition Number", "conditionNumber", names(.df));
+    dplyr::as.tbl(.df)
+}
+
+##'@export
+augment.nlmixrFitCore <- function(x, ...){
+    stop("augment is not yet implemented for nlmixr models");
 }
 
 ##  LocalWords:  covariance

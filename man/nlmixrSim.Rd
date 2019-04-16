@@ -85,7 +85,7 @@ during one call to the solver. (5000 by default)}
 value is 0.}
 
 \item{hmax}{The maximum absolute step size allowed.  When
-\code{hmax=NA} (default), uses the avearge difference in times
+\code{hmax=NA} (default), uses the average difference (+hmaxSd*sd) in times
 and sampling events. When \code{hmax=NULL} RxODE uses the
 maximum difference in times in your sampling and events.  The
 value 0 is equivalent to infinite maximum absolute step size.}
@@ -186,11 +186,11 @@ added to parameters}
     only includes estimates at the observations. (default
     \code{FALSE}). When \code{addDosing} is \code{NULL}, only
     include \code{EVID=0} on solve and exclude any model-times or
-    \code{EVID=2}. If \code{addDosing} is \code{NA} the
-    classic \code{RxODE} EVID events. When \code{addDosing} is
-    \code{TRUE} add the event information in NONMEM-style format,
-    with extra event types (\code{EVID}) for ending infusion and
-    modeled times:
+    \code{EVID=2}. If \code{addDosing} is \code{NA} the classic
+    \code{RxODE} EVID events. When \code{addDosing} is \code{TRUE}
+    add the event information in NONMEM-style format; If
+    \code{subsetNonmem=FALSE} RxODE will also extra event types
+    (\code{EVID}) for ending infusion and modeled times:
 
 \itemize{
 
@@ -217,7 +217,9 @@ well as returning a new object.  You probably should not
 modify it's \code{FALSE} default unless you are willing to
 have unexpected results.}
 
-\item{omega}{Named omega matrix.}
+\item{omega}{Estimate of Covariance matrix. When omega is a list,
+assume it is a block matrix and convert it to a full matrix
+for simulations.}
 
 \item{omegaDf}{The degrees of freedom of a t-distribution for
 simulation.  By default this is \code{NULL} which is

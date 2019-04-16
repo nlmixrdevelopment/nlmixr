@@ -50,7 +50,7 @@ during one call to the solver. (5000 by default)}
 value is 0.}
 
 \item{hmax}{The maximum absolute step size allowed.  When
-\code{hmax=NA} (default), uses the avearge difference in times
+\code{hmax=NA} (default), uses the average difference (+hmaxSd*sd) in times
 and sampling events. When \code{hmax=NULL} RxODE uses the
 maximum difference in times in your sampling and events.  The
 value 0 is equivalent to infinite maximum absolute step size.}

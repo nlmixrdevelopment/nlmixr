@@ -46,6 +46,9 @@
 \alias{getData}
 \alias{rxSymPySetupPred}
 \alias{et}
+\alias{tidy}
+\alias{glance}
+\alias{augment}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -53,10 +56,12 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{rxClean}}, \code{\link[RxODE]{rxCat}}, \code{\link[RxODE]{eventTable}}, \code{\link[RxODE]{add.dosing}}, \code{\link[RxODE]{add.sampling}}, \code{\link[RxODE]{rxPermissive}}, \code{\link[RxODE]{rxSymPySetupPred}}, \code{\link[RxODE]{et}}, \code{\link[RxODE]{rxSolve}}}
+  \item{generics}{\code{\link[generics]{tidy}}, \code{\link[generics]{glance}}, \code{\link[generics]{glance}}, \code{\link[generics]{augment}}}
 
   \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
 
   \item{nlme}{\code{\link[nlme]{nlme}}, \code{\link[nlme]{ACF}}, \code{\link[nlme]{VarCorr}}, \code{\link[nlme]{getVarCov}}, \code{\link[nlme]{augPred}}, \code{\link[nlme]{fixef}}, \code{\link[nlme]{fixed.effects}}, \code{\link[nlme]{ranef}}, \code{\link[nlme]{random.effects}}, \code{\link[nlme]{nlmeControl}}, \code{\link[nlme]{pdDiag}}, \code{\link[nlme]{pdSymm}}, \code{\link[nlme]{pdLogChol}}, \code{\link[nlme]{pdIdent}}, \code{\link[nlme]{pdCompSymm}}, \code{\link[nlme]{pdBlocked}}, \code{\link[nlme]{pdNatural}}, \code{\link[nlme]{pdConstruct}}, \code{\link[nlme]{pdFactor}}, \code{\link[nlme]{pdMat}}, \code{\link[nlme]{pdMatrix}}, \code{\link[nlme]{reStruct}}, \code{\link[nlme]{varWeights}}, \code{\link[nlme]{varPower}}, \code{\link[nlme]{varFixed}}, \code{\link[nlme]{varFunc}}, \code{\link[nlme]{varExp}}, \code{\link[nlme]{varConstPower}}, \code{\link[nlme]{varIdent}}, \code{\link[nlme]{varComb}}, \code{\link[nlme]{groupedData}}, \code{\link[nlme]{getData}}}
+
+  \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{rxClean}}, \code{\link[RxODE]{rxCat}}, \code{\link[RxODE]{eventTable}}, \code{\link[RxODE]{add.dosing}}, \code{\link[RxODE]{add.sampling}}, \code{\link[RxODE]{rxPermissive}}, \code{\link[RxODE]{rxSymPySetupPred}}, \code{\link[RxODE]{et}}, \code{\link[RxODE]{rxSolve}}}
 }}
 

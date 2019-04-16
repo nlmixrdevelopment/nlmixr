@@ -8,8 +8,8 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxInnerIterations = 1000, maxOuterIterations = 5000,
   n1qn1nsim = NULL, method = c("liblsoda", "lsoda", "dop853"),
   transitAbs = NULL, atol = NULL, rtol = NULL, atolSens = NULL,
-  rtolSens = NULL, maxstepsOde = 5000L, hmin = 0L, hmax = NA_real_,
-  hini = 0, maxordn = 12L, maxords = 5L, cores,
+  rtolSens = NULL, maxstepsOde = 50000L, hmin = 0L,
+  hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
   covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
   print = 1L, printNcol = floor((getOption("width") - 23)/12),
   scaleTo = 1, scaleObjective = 0, normType = c("rescale2", "mean",
@@ -26,7 +26,8 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   optExpression = TRUE, ci = 0.95, useColor = crayon::has_color(),
   boundTol = NULL, calcTables = TRUE, noAbort = TRUE,
   interaction = TRUE, cholSEtol = (.Machine$double.eps)^(1/3),
-  cholAccept = 0.001, resetEtaP = 0.1, diagOmegaBoundUpper = 5,
+  cholAccept = 0.001, resetEtaP = 0.15, resetThetaP = 0.05,
+  resetThetaFinalP = 0.15, diagOmegaBoundUpper = 5,
   diagOmegaBoundLower = 100, cholSEOpt = FALSE, cholSECov = FALSE,
   fo = FALSE, covTryHarder = FALSE, outerOpt = c("nlminb", "bobyqa",
   "lbfgsb3c", "L-BFGS-B", "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
@@ -40,7 +41,8 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   optGillF = TRUE, covSmall = 1e-05, adjLik = TRUE, gradTrim = Inf,
   maxOdeRecalc = 5, odeRecalcFactor = 10^(0.5),
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
-  etaNudge = 0.01, stiff)
+  etaNudge = 0.01, stiff, nRetries = 3, seed = 42,
+  badEtaPenalty = 0.05, resetThetaCheckPer = 0.1)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -107,7 +109,7 @@ liblsoda.  This allows a less accurate solve for gradients (if desired)}
 value is 0.}
 
 \item{hmax}{The maximum absolute step size allowed.  When
-\code{hmax=NA} (default), uses the avearge difference in times
+\code{hmax=NA} (default), uses the average difference (+hmaxSd*sd) in times
 and sampling events. When \code{hmax=NULL} RxODE uses the
 maximum difference in times in your sampling and events.  The
 value 0 is equivalent to infinite maximum absolute step size.}
@@ -435,6 +437,20 @@ chol(omega^-1) %%*%% eta or eta/sd(allEtas).  A p-value of 0
 indicates the ETAs never reset.  A p-value of 1 indicates the
 ETAs always reset.}
 
+\item{resetThetaP}{represents the p-value for reseting the
+population mu-referenced THETA parameters based on ETA drift
+during optimization, and resetting the optimization.  A
+p-value of 0 indicates the THETAs never reset.  A p-value of 1
+indicates the THETAs always reset and is not allowed.  The
+theta reset is checked at the beginning and when nearing a
+local minima.  The percent change in objective function where
+a theta reset check is initiated is controlled in
+\code{resetThetaCheckPer}.}
+
+\item{resetThetaFinalP}{represents the p-value for reseting the
+population mu-referenced THETA parameters based on ETA drift
+during optimization, and resetting the optimization one final time.}
+
 \item{diagOmegaBoundUpper}{This represents the upper bound of the
 diagonal omega matrix.  The upper bound is given by
 diag(omega)*diagOmegaBoundUpper.  If
@@ -604,6 +620,12 @@ done on the first ETA optimization.}
     DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
     Dormand and Prince as implemented in C by Hairer and Wanner
     (1993).}
+
+\item{seed}{an object specifying if and how the random number
+generator should be initialized}
+
+\item{resetThetaCheckPer}{represents objective function
+%percentage below which resetThetaP is checked.}
 }
 \description{
 Control Options for FOCEi
