@@ -326,7 +326,7 @@ calc.COV = function(fit0) {
 	  suppressWarnings(do.call(RxODE:::rxSolve.default,
 							   c(list(object=.rx, params=.pars,
 									  events=.evtM,.setupOnly=2L),
-								 saem.cfg$optM)));
+								      saem.cfg$optM)));
 	}
 	dopred = attr(fit, "dopred")
 	resMat = fit$resMat
@@ -336,9 +336,9 @@ calc.COV = function(fit0) {
 	nphi1 = saem.cfg$nphi1
 	nphi0 = saem.cfg$nphi0
 	nphi = nphi0 + nphi1
-        N = saem.cfg$N
-        RxODE::rxProgress(N + nphi)
-        on.exit(RxODE::rxProgressAbort());
+    N = saem.cfg$N
+    RxODE::rxProgress(N + nphi)
+    on.exit(RxODE::rxProgressAbort());
 
 	ntotal = saem.cfg$ntotal
 	ix_endpnt = saem.cfg$ix_endpnt[1:ntotal]+1
@@ -362,7 +362,7 @@ calc.COV = function(fit0) {
 	g  = ares + bres*abs(f0)
 
 	#spectral decom for invVi, idea from saemix
-	MFi = sapply(1:N, function(i) {
+	Xi = sapply(1:N, function(i) {
 	  ix <- id == i
 	  DFi <- DF[ix,]
       dim(DFi) = c(sum(ix), nphi)
@@ -380,18 +380,15 @@ calc.COV = function(fit0) {
       invVi.5 <- m %*% t(V) #backsolve(chol(Vi), diag(11)); chol() is worse
 	  Ai   <- kronecker(diag(nphi), saem.cfg$Mcovariables[i,])
 	  DFAi <- DFi %*% Ai  #CHECK!
-	  ret <- crossprod(invVi.5 %*% DFAi)
-          RxODE::rxTick();
-          return(ret)
+	  ret <- invVi.5 %*% DFAi
+      RxODE::rxTick();
+      return(ret)
 	})
-	I = matrix(rowSums(MFi), nphi, nphi)  #CHECK!
-
-	ID <- try(eigen(I, symmetric=TRUE))
-	if (class(ID) == "try-error") stop("Spectral decom failure when computing FIM")
-	D <- Re(ID$values)
-	V <- Re(ID$vectors)
-	invI.5 <- diag(1/sqrt(D)) %*% t(V)
-        ret <- crossprod(invI.5)
+    X <- do.call("rbind", Xi)
+    Ri <- backsolve(qr.R(qr(X)), diag(nphi))
+    ret <- crossprod(t(Ri))
     RxODE::rxProgressStop();
     return(ret)
 }
+
+
