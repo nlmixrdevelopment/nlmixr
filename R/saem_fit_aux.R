@@ -296,20 +296,25 @@ cutoff = function (x, cut = .Machine$double.xmin) {
     x
 }
 
-##' Covariance matrix by Fisher Information Matrix via linearization 
+##' Covariance matrix by Fisher Information Matrix via linearization
 ##'
 ##' Get the covariance matrix of fixed effect estimates via calculating Fisher Information Matrix by linearization
 ##'
 ##' @param fit saemFit fit
 ##'
-##' @return standard error of fixed effects 
+##' @return standard error of fixed effects
 ##'
 ##' @references Comets E, Lavenu A, Lavielle M. SAEMIX, an R version of the SAEM algorithm.
 ##' 20th meeting of the Population Approach Group in Europe, Athens, Greece
 ##' (2011), Abstr 2173.
 ##'
 calc.COV = function(fit0) {
-	fit = as.saem(fit0)
+    message("Calculating covariance matrix")
+    if  (is(fit0, "saemFit")) {
+        fit <- fit0
+    } else {
+        fit <- as.saem(fit0)
+    }
 	.env <- attr(fit,"env");
 	saem.cfg  <-  attr(fit, "saem.cfg")
 	if (.env$is.ode){
@@ -331,7 +336,10 @@ calc.COV = function(fit0) {
 	nphi1 = saem.cfg$nphi1
 	nphi0 = saem.cfg$nphi0
 	nphi = nphi0 + nphi1
-	N = saem.cfg$N
+        N = saem.cfg$N
+        RxODE::rxProgress(N + nphi)
+        on.exit(RxODE::rxProgressAbort());
+
 	ntotal = saem.cfg$ntotal
 	ix_endpnt = saem.cfg$ix_endpnt[1:ntotal]+1
 	ares = ares[ix_endpnt]
@@ -344,8 +352,10 @@ calc.COV = function(fit0) {
 
 	dphi = cutoff(abs(phi)*1e-4, 1e-10)
 	f1 = sapply(1:nphi, function(j) {
-	  phi[,j] <- hat.phi[,j] + dphi[,j]
-	  as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt))
+            phi[,j] <- hat.phi[,j] + dphi[,j]
+            ret <- as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt))
+            RxODE::rxTick();
+            return(ret)
 	})
 	f0 = as.vector(dopred(hat.phi, saem.cfg$evt, saem.cfg$opt))
 	DF = (f1-f0)/dphi[id,]
@@ -370,7 +380,9 @@ calc.COV = function(fit0) {
       invVi.5 <- m %*% t(V) #backsolve(chol(Vi), diag(11)); chol() is worse
 	  Ai   <- kronecker(diag(nphi), saem.cfg$Mcovariables[i,])
 	  DFAi <- DFi %*% Ai  #CHECK!
-	  crossprod(invVi.5 %*% DFAi)
+	  ret <- crossprod(invVi.5 %*% DFAi)
+          RxODE::rxTick();
+          return(ret)
 	})
 	I = matrix(rowSums(MFi), nphi, nphi)  #CHECK!
 
@@ -378,6 +390,8 @@ calc.COV = function(fit0) {
 	if (class(ID) == "try-error") stop("Spectral decom failure when computing FIM")
 	D <- Re(ID$values)
 	V <- Re(ID$vectors)
-	invI.5 <- diag(1/sqrt(D)) %*% t(V) 
-	crossprod(invI.5)
+	invI.5 <- diag(1/sqrt(D)) %*% t(V)
+        ret <- crossprod(invI.5)
+    RxODE::rxProgressStop();
+    return(ret)
 }
