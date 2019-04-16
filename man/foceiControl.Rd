@@ -433,7 +433,7 @@ Decomposition for a R or S matrix.}
 \item{resetEtaP}{represents the p-value for reseting the
 individual ETA to 0 during optimization (instead of the saved
 value).  The two test statistics used in the z-test are either
-chol(omega^-1) %%*%% eta or eta/sd(allEtas).  A p-value of 0
+chol(omega^-1) \%*\% eta or eta/sd(allEtas).  A p-value of 0
 indicates the ETAs never reset.  A p-value of 1 indicates the
 ETAs always reset.}
 
@@ -625,7 +625,7 @@ done on the first ETA optimization.}
 generator should be initialized}
 
 \item{resetThetaCheckPer}{represents objective function
-%percentage below which resetThetaP is checked.}
+\% percentage below which resetThetaP is checked.}
 }
 \description{
 Control Options for FOCEi
