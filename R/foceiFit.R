@@ -2411,6 +2411,19 @@ fixef.nlmixrFitCore <- function(object, ...){
     object$fixef;
 }
 
+.getR <- function(x,sd=FALSE){
+    .rs <- x$omegaR
+    .lt <- lower.tri(.rs);
+    .dn1 <- dimnames(x$omegaR)[[2]]
+    .nms <- apply(which(.lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(.dn1[x],collapse=", "))});
+    .lt <- structure(.rs[.lt], .Names=.nms)
+    .lt <- .lt[.lt != 0];
+    if (sd){
+        .lt <- c(setNames(diag(x$omegaR),paste0("SD(",.dn1,")")),.lt);
+    }
+    return(.lt)
+}
+
 ##'@export
 print.nlmixrFitCore <- function(x, ...){
     .width <- getOption("width");
@@ -2506,12 +2519,7 @@ print.nlmixrFitCore <- function(x, ...){
             cat("  No correlations in between subject variability (BSV) matrix\n")
         } else {
             cat("  Correlations in between subject variability (BSV) matrix:\n")
-            .rs <- x$omegaR
-            .lt <- lower.tri(.rs);
-            .dn1 <- dimnames(x$omegaR)[[2]]
-            .nms <- apply(which(.lt,arr.ind=TRUE),1,function(x){sprintf("R(%s)",paste(.dn1[x],collapse=", "))});
-            .lt <- structure(.rs[.lt], .Names=.nms)
-            .lt <- .lt[.lt != 0]
+            .lt <- .getR(x)
             .digs <- 3;
             .lts <- sapply(.lt, function(x){
                 .x <- abs(.lt);
@@ -2921,57 +2929,91 @@ setOfv <- function(x, type){
 }
 
 .fixNames <- function(.df){
-    names(.df) <- gsub("Estimate", "estimate", names(.df))
+    names(.df) <- gsub("Back-.*", "estimate", names(.df))
+    names(.df) <- gsub("Estimate", "model.est", names(.df))
     names(.df) <- gsub(".*RSE.*", "rse", names(.df))
     names(.df) <- gsub("SE", "std.error", names(.df))
     names(.df) <- gsub("CI Lower", "conf.low", names(.df))
     names(.df) <- gsub("CI Upper", "conf.high", names(.df))
     names(.df) <- gsub("BSV.*", "bsv", names(.df))
     names(.df) <- gsub("Shrink.*", "shrink", names(.df));
-    names(.df) <- gsub("Back-", "back.", names(.df))
     return(.df);
 }
 
 ##'@export
-confint.NlmixrFitCore <- function(object, parm, level = 0.95, ...){
+confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
     .extra <- list(...);
     .exponentiate <- ifelse(any(names(.extra) == "exponentiate"), .extra$exponentiate, NA)
     .ciNames <- ifelse(any(names(.extra) == "ciNames"), .extra$ciNames, TRUE)
     .df <- .fixNames(object$parFixedDf);
     if (!missing(parm)) .df <- .df[parm, ];
     .zv <- qnorm(1 - (1 - level) / 2);
-    .low <- .df$estimate - .df$std.error * .zv
-    .hi <- .df$estimate + .df$std.error * .zv
+    .low <- .df$model.est - .df$std.error * .zv
+    .hi <- .df$model.est + .df$std.error * .zv
     if (is.na(.exponentiate)){
-        .exp <- abs(exp(.df$estimate) - .df$back.transformed) < 1e-6;
+        .exp <- abs(exp(.df$model.est) - .df$estimate) < 1e-6;
         .hi[.exp] <- exp(.hi[.exp])
         .low[.exp] <- exp(.low[.exp]);
     } else if (.exponentiate) {
         .hi <- exp(.hi);
         .low <- exp(.low);
     }
-    .df <- data.frame(estimate=.df$estimate, back.transformed=.df$back.transformed,  conf.low=.low, conf.high=.hi)
+    .df <- data.frame(model.est=.df$model.est, estimate=.df$estimate,  conf.low=.low, conf.high=.hi)
     if (.ciNames) names(.df)[3:4] <- paste(c((1 - level) / 2, (1 - (1 - level) / 2)) * 100, "%")
     .df
 }
 
 
-.nlmixrTidyFixed <- function(x, ...){
+.nlmixrTidyFixed <- function(x, ..., .ranpar=FALSE){
     .extra <- list(...);
     .conf.int <- ifelse(any(names(.extra) == "conf.int"), .extra$conf.int, ifelse(any(names(.extra) == "conf.level"), TRUE, FALSE));
     .conf.level <- ifelse(any(names(.extra) == "conf.level"), .extra$conf.level, 0.95)
     .exponentiate <- ifelse(any(names(.extra) == "exponentiate"), .extra$exponentiate, NA)
     .quick <- ifelse(any(names(.extra) == "quick"), .extra$quick, FALSE)
+    .rse <- ifelse(any(names(.extra) == "rse"), .extra$rse, FALSE)
+    .bsv <- ifelse(any(names(.extra) == "bsv"), .extra$bsv, FALSE)
+    .shrink <- ifelse(any(names(.extra) == "shrink"), .extra$shrink, FALSE)
     if (.quick) warning("quick does not do anything for nlmixr fit objects");
     .df <- .fixNames(x$parFixedDf);
+    .exp <- abs(exp(.df$model.est) - .df$estimate) < 1e-6;
+    if (is.na(.exponentiate)){
+        ## se(exp(x)) ~= exp(mu_x)*se_x
+        .df$std.error[.exp] <- exp(.df$model.est[.exp])*.df$std.error[.exp]
+    } else if (.exponentiate) {
+        .df$std.error <- exp(.df$model.est)*.df$std.error
+        .df$estimate <- exp(.df$model.est)
+    } else if (!.exponentiate){
+        .df$estimate <- .df$model.est;
+    }
     if (.conf.int){
-        .ci <- confint.NlmixrFitCore(x, level=.conf.level, ciNames=FALSE, exponentiate=.exponentiate);
+        .ci <- confint.nlmixrFitCore(x, level=.conf.level, ciNames=FALSE, exponentiate=.exponentiate);
         .df$conf.low <- .ci$conf.low
         .df$conf.high <- .ci$conf.high
     } else {
-        .df <- .df[, regexpr("^ci", names(.df)) == -1]
+        .df <- .df[, regexpr("^conf[.]", names(.df)) == -1]
     }
-    .df <- data.frame(term=row.names(.df), .df);
+    if (!.rse){
+        .df <- .df[,names(.df) != "rse"];
+    }
+    if (!.bsv){
+        .df <- .df[,names(.df) != "bsv"];
+    }
+    if (!.shrink){
+        .df <- .df[,names(.df) != "shrink"];
+    }
+    .ini  <- x$uif$ini$err[!is.na(x$uif$ini$ntheta)]
+    ## effect   group   term            estimate std.error statistic
+    .df <- data.frame(effect="fixed",
+                      term=row.names(.df), .df, stringsAsFactors=FALSE);
+    if (!.ranpar) {
+        .df  <- .df[is.na(x$uif$ini$err[!is.na(x$uif$ini$ntheta)]),];
+    } else {
+        .tmp <- x$uif$ini$err[!is.na(x$uif$ini$ntheta)];
+        .df  <- .df[!is.na(.tmp),];
+        .tmp <- .tmp[!is.na(.tmp)];
+        .df$group <- paste0("Residual(",.tmp,")");
+        .df$effect  <- "ran_pars"
+    }
     dplyr::as.tbl(.df)
 }
 
@@ -2981,23 +3023,67 @@ confint.NlmixrFitCore <- function(object, parm, level = 0.95, ...){
     dplyr::as.tbl(.df)
 }
 
+.nlmixrTidyRandomPar <- function(x,...){
+    .pars  <- .getR(x,TRUE)
+    .p1 <- data.frame(effect="ran_pars", group="ID", term=names(.pars),estimate=.pars, std.error=NA_real_,
+                      stringsAsFactors=FALSE) %>%
+        reorderCols();
+    .p2  <- data.frame(.nlmixrTidyFixed(x,.ranpar=TRUE), stringsAsFactors=FALSE)%>%
+        reorderCols();
+    .df  <- rbind(.p1,.p2);
+    if (all(is.na(.df$std.error))){
+        .df  <- .df[,names(.df) != "std.error"];
+    }
+    return(dplyr::as.tbl(.df))
+##   effect   group    term                  estimate std.error statistic
+##   <chr>    <chr>    <chr>                    <dbl>     <dbl>     <dbl>
+## 1 fixed    NA       (Intercept)           251.          6.82     36.8
+## 2 fixed    NA       Days                   10.5         1.55      6.77
+## 3 ran_pars Subject  sd__(Intercept)        24.7        NA        NA
+## 4 ran_pars Subject  sd__Days                5.92       NA        NA
+## 5 ran_pars Subject  cor__(Intercept).Days   0.0656     NA        NA
+## 6 ran_pars Residual sd__Observation        25.6        NA        NA
+}
+
+## Row names and order taken & adapted from
+## https://github.com/bbolker/broom.mixed/blob/master/R/utilities.R#L238-L248
+reorderCols <- function(x) {
+    allCols <- c(
+        "response","effect",
+        "component", ## glmmTMB, brms
+        "group", "level", "term", "index", "estimate",
+        "std.error", "statistic",
+        "df", "p.value",
+        "conf.low", "conf.high", "rhat", "ess"
+    )
+    return(x[,intersect(allCols, names(x))])
+}
+
 ##'@export
 tidy.nlmixrFitCore <- function(x, ...){
     .extra <- list(...);
-    .effects <- ifelse(any(names(.extra) == "effects"), .extra$effects, "fixed")
-    .effects <- match.arg(.effects, c("fixed", "random", "ran_vals", "ran_pars"))
-    if (.effects == "fixed") return(.nlmixrTidyFixed(x, ...))
-    if (.effects == "random") return(.nlmixrTidyRandom(x, ...))
-    if (.effects == "ran_pars") {
-        stop("ran_pars not yet implemented for nonlinear models");
+    if (any(names(.extra)=="effects")){
+        .effects <- .extra$effects
+    } else {
+        .effects <- c("fixed","ran_pars");
     }
-    else return(.nlmixrTidyRandom(x, ...));
+    .effects <- match.arg(.effects, c("fixed", "random", "ran_vals", "ran_pars"), several.ok=TRUE)
+    .ret <- list();
+    if (any(.effects =="fixed"))
+        .ret$fixed <- .nlmixrTidyFixed(x, ...);
+    if (any(.effects == "random") || any(.effects == "ran_vals"))
+        .ret$ran_vals <- .nlmixrTidyRandom(x, ...);
+    if (any(.effects == "ran_pars"))
+        .ret$ran_pars <- .nlmixrTidyRandomPar(x, ...);
+    return(dplyr::bind_rows(.ret, .id="effect") %>%
+           dplyr::as.tbl() %>%
+           reorderCols())
 }
 
 ##'@export
 glance.nlmixrFitCore <- function(x, ...){
     .aic <- AIC(x); ## To calculate AIC if needed
-    .df <- fit$objDf[fit$objDf$AIC == .aic, ];
+    .df <- x$objDf[x$objDf$AIC == .aic, ];
     names(.df) <- gsub("Log-likelihood", "logLik", names(.df));
     names(.df) <- gsub("Condition Number", "conditionNumber", names(.df));
     dplyr::as.tbl(.df)
