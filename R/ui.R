@@ -1586,42 +1586,50 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     rx.ode <- rx.txt[-(1:w)];
     rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n")))
     ## Now separate out parameters for SAEM.
-    w <- max(which(regexpr(reg, saem.pars, perl=TRUE) != -1));
-    .tmp <- try(parse(text=paste(c(saem.pars[1:w], "})"), collapse="\n")), silent=TRUE)
-    if (inherits(.tmp, "try-error")){
-      .saemPars2 <- saem.pars[-(1:w)];
-      .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
-      if (length(.w) > 0){
-        .i <- 1;
-        .w0 <- w + .w[.i];
-        .saemPars2 <- saem.pars[-(1:.w0)];
-        if (regexpr(rex::rex("else"), .saemPars2[1]) != -1){
-          .i <- .i + 1
+    if (!is.null(saem.pars)){
+      w <- max(which(regexpr(reg, saem.pars, perl=TRUE) != -1));
+      .tmp <- try(parse(text=paste(c(saem.pars[1:w], "})"), collapse="\n")), silent=TRUE)
+      if (inherits(.tmp, "try-error")){
+        print(w);
+        print(.saemPars2)
+        print(reg)
+        .saemPars2 <- saem.pars[-(1:w)];
+        print(.saemPars2);
+        .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
+        print(.w)
+        if (length(.w) > 0){
+          .i <- 1;
           .w0 <- w + .w[.i];
-          w <- .w0;
+          .saemPars2 <- saem.pars[-(1:.w0)];
+          if (regexpr(rex::rex("else"), .saemPars2[1]) != -1){
+            .i <- .i + 1
+            .w0 <- w + .w[.i];
+            w <- .w0;
+          }
         }
       }
-    }
-    saem.pars <- c(saem.pars[1:w], "");
-    ## sapply(saem.pars, message)
-    nlme.mu.fun2 <- saem.pars;
-    w <- max(which(regexpr(reg, nlme.mu.fun, perl=TRUE) != -1));
-    .tmp <- try(parse(text=paste(c(nlme.mu.fun[1:w], "})"), collapse="\n")), silent=TRUE)
-    if (inherits(.tmp, "try-error")){
-      .saemPars2 <- nlme.mu.fun[-(1:w)];
-      .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
-      if (length(.w) > 0){
-        .i <- 1;
-        .w0 <- w + .w[.i];
-        .saemPars2 <- nlme.mu.fun[-(1:.w0)];
-        if (regexpr(rex::rex("else"), .saemPars2[1]) != -1){
-          .i <- .i + 1
+      saem.pars <- c(saem.pars[1:w], "");
+      ## sapply(saem.pars, message)
+      nlme.mu.fun2 <- saem.pars;
+      w <- max(which(regexpr(reg, nlme.mu.fun, perl=TRUE) != -1));
+      .tmp <- try(parse(text=paste(c(nlme.mu.fun[1:w], "})"), collapse="\n")), silent=TRUE)
+      if (inherits(.tmp, "try-error")){
+        .saemPars2 <- nlme.mu.fun[-(1:w)];
+        .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
+        if (length(.w) > 0){
+          .i <- 1;
           .w0 <- w + .w[.i];
-          w <- .w0;
+          .saemPars2 <- nlme.mu.fun[-(1:.w0)];
+          if (regexpr(rex::rex("else"), .saemPars2[1]) != -1){
+            .i <- .i + 1
+            .w0 <- w + .w[.i];
+            w <- .w0;
+          }
         }
       }
+      nlme.mu.fun <- c(nlme.mu.fun[1:w], "");
     }
-    nlme.mu.fun <- c(nlme.mu.fun[1:w], "");
+
     rxode <- paste(rx.ode, collapse="\n")
     if (.linCmt){
       rxode <- RxODE::rxNorm(RxODE::rxLinCmtTrans(rxode))
