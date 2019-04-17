@@ -455,7 +455,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       } else {
           ## This makes all the parsing files, cpp and so in their own
           ## directory.  No collisions.
-          .wd  <- file.path(.wd,paste0(.md5,".saemd"));
+          .wd  <- file.path(.wd,paste0("saem-",.md5,".saemd"));
           suppressWarnings({dir.create(.wd, recursive = TRUE)});
           setwd(.wd);
           on.exit({setwd(lwd)});
