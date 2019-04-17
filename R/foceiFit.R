@@ -3027,9 +3027,9 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
     .pars  <- .getR(x,TRUE)
     .p1 <- data.frame(effect="ran_pars", group="ID", term=names(.pars),estimate=.pars, std.error=NA_real_,
                       stringsAsFactors=FALSE) %>%
-        reorderCols();
+        .reorderCols();
     .p2  <- data.frame(.nlmixrTidyFixed(x,.ranpar=TRUE), stringsAsFactors=FALSE)%>%
-        reorderCols();
+        .reorderCols();
     .df  <- rbind(.p1,.p2);
     if (all(is.na(.df$std.error))){
         .df  <- .df[,names(.df) != "std.error"];
@@ -3047,7 +3047,7 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
 
 ## Row names and order taken & adapted from
 ## https://github.com/bbolker/broom.mixed/blob/master/R/utilities.R#L238-L248
-reorderCols <- function(x) {
+.reorderCols <- function(x) {
     allCols <- c(
         "response","effect",
         "component", ## glmmTMB, brms
@@ -3065,7 +3065,11 @@ tidy.nlmixrFitCore <- function(x, ...){
     if (any(names(.extra)=="effects")){
         .effects <- .extra$effects
     } else {
-        .effects <- c("fixed","ran_pars");
+        if (any(names(.extra)=="effect")){
+            .effects <- .extra$effect
+        } else {
+            .effects <- c("fixed","ran_pars");
+        }
     }
     .effects <- match.arg(.effects, c("fixed", "random", "ran_vals", "ran_pars"), several.ok=TRUE)
     .ret <- list();
@@ -3077,7 +3081,7 @@ tidy.nlmixrFitCore <- function(x, ...){
         .ret$ran_pars <- .nlmixrTidyRandomPar(x, ...);
     return(dplyr::bind_rows(.ret, .id="effect") %>%
            dplyr::as.tbl() %>%
-           reorderCols())
+           .reorderCols())
 }
 
 ##'@export
