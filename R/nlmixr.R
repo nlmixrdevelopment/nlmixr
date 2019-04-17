@@ -341,6 +341,9 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
     }
     if (est == "saem"){
         pt <- proc.time()
+        if (length(uif$noMuEtas) > 0){
+            stop(sprintf("Cannot run SAEM since some of the parameters are not mu-referenced (%s)", paste(uif$noMuEtas, collapse=", ")))
+        }
         args <- as.list(match.call(expand.dots=TRUE))[-1]
         default <- saemControl();
         if (any(names(args) == "mcmc")){

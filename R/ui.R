@@ -760,24 +760,26 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   }
 
   find.theta <- function(x){
-    if (length(x)== 0){
-    } else if (length(x) == 1 && any.theta.names(as.character(x), theta.names)){
-      return(as.character(x));
-    } else if (identical(x[[1]], quote(`+`))){
-      th <- c();
-      if (length(x) >= 3){
-        if (any.theta.names(as.character(x[[3]]), theta.names)){
-          th <- as.character(x[[3]]);
-        }
-      }
-      if (length(x) >= 2){
-        if (length(x[[2]]) > 1){
-          return(c(th, find.theta(x[[2]])))
-        } else {
-          if (any.theta.names(as.character(x[[2]]), theta.names)){
-            th <- c(th, as.character(x[[2]]));
+    if (is.call(x) || is.pairlist(x)){
+      if (length(x)== 0){
+      } else if (length(x) == 1 && any.theta.names(as.character(x), theta.names)){
+        return(as.character(x));
+      } else if (identical(x[[1]], quote(`+`))){
+        th <- c();
+        if (length(x) >= 3){
+          if (any.theta.names(as.character(x[[3]]), theta.names)){
+            th <- as.character(x[[3]]);
           }
-          return(th)
+        }
+        if (length(x) >= 2){
+          if (length(x[[2]]) > 1){
+            return(c(th, find.theta(x[[2]])))
+          } else {
+            if (any.theta.names(as.character(x[[2]]), theta.names)){
+              th <- c(th, as.character(x[[2]]));
+            }
+            return(th)
+          }
         }
       }
     }
@@ -1586,6 +1588,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     rx.ode <- rx.txt[-(1:w)];
     rx.pred <- eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n")))
     ## Now separate out parameters for SAEM.
+    .no.mu.etas <- c()
     if (!is.null(saem.pars)){
       w <- max(which(regexpr(reg, saem.pars, perl=TRUE) != -1));
       .tmp <- try(parse(text=paste(c(saem.pars[1:w], "})"), collapse="\n")), silent=TRUE)
@@ -1609,25 +1612,34 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
       }
       saem.pars <- c(saem.pars[1:w], "");
-      ## sapply(saem.pars, message)
-      nlme.mu.fun2 <- saem.pars;
-      w <- max(which(regexpr(reg, nlme.mu.fun, perl=TRUE) != -1));
-      .tmp <- try(parse(text=paste(c(nlme.mu.fun[1:w], "})"), collapse="\n")), silent=TRUE)
-      if (inherits(.tmp, "try-error")){
-        .saemPars2 <- nlme.mu.fun[-(1:w)];
-        .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
-        if (length(.w) > 0){
-          .i <- 1;
-          .w0 <- w + .w[.i];
-          .saemPars2 <- nlme.mu.fun[-(1:.w0)];
-          if (regexpr(rex::rex("else"), .saemPars2[1]) != -1){
-            .i <- .i + 1
+      .no.mu.etas  <- intersect(paste(ini$name[!is.na(ini$neta1)]),
+                                allVars(eval(parse(text=paste0("quote({",paste(saem.pars[-1],collapse="\n"),"})")))));
+      if (length(.no.mu.etas) > 0){
+        saem.pars <- NULL;
+        nlme.mu.fun2 <- NULL;
+        nlme.mu.fun <- NULL;
+      } else {
+        ## sapply(saem.pars, message)
+        nlme.mu.fun2 <- saem.pars;
+        w <- max(which(regexpr(reg, nlme.mu.fun, perl=TRUE) != -1));
+        .tmp <- try(parse(text=paste(c(nlme.mu.fun[1:w], "})"), collapse="\n")), silent=TRUE)
+        if (inherits(.tmp, "try-error")){
+          .saemPars2 <- nlme.mu.fun[-(1:w)];
+          .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
+          if (length(.w) > 0){
+            .i <- 1;
             .w0 <- w + .w[.i];
-            w <- .w0;
+            .saemPars2 <- nlme.mu.fun[-(1:.w0)];
+            if (regexpr(rex::rex("else"), .saemPars2[1]) != -1){
+              .i <- .i + 1
+              .w0 <- w + .w[.i];
+              w <- .w0;
+            }
           }
         }
+        nlme.mu.fun <- c(nlme.mu.fun[1:w], "");
+
       }
-      nlme.mu.fun <- c(nlme.mu.fun[1:w], "");
     }
 
     rxode <- paste(rx.ode, collapse="\n")
@@ -1849,7 +1861,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                           saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
                           log.theta=log.theta,
                           log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
-                          predDf=.predDf, predSaem =.predSaem, env=env, predSys=.pred))
+                          predDf=.predDf, predSaem =.predSaem, env=env, predSys=.pred,
+                          noMuEtas=.no.mu.etas))
   if (.linCmt){
     ret$nmodel$lin.solved <- TRUE
   } else {
