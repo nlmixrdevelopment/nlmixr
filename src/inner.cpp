@@ -2446,7 +2446,11 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.resetEtaSize=as<double>(odeO["resetEtaSize"]);
   op_focei.resetThetaSize=as<double>(odeO["resetThetaSize"]);
   op_focei.resetThetaFinalSize = as<double>(odeO["resetThetaFinalSize"]);
-  IntegerVector muRef = as<IntegerVector>(odeO["focei.mu.ref"]);
+  
+  IntegerVector muRef;
+  if (odeO.containsElementNamed("focei.mu.ref")){
+    muRef = as<IntegerVector>(odeO["focei.mu.ref"]);
+  }
   if (muRef.size() == 0){
     op_focei.resetThetaSize = R_PosInf;
     op_focei.muRefN=0;

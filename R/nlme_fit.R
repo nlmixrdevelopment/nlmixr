@@ -901,10 +901,12 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     }
     .env <- fit.f$env;
     .env$time <- data.frame(nlme=.nlmeTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
-    ## if (fit.f$uif$.clean.dll){
-    ##     nlme.cleanup(fit.f);
-    ##     focei.cleanup(fit.f);
-    ## }
+    if (inherits(fit.f, "nlmixrFitData")){
+        .cls <- class(fit.f);
+        .env <- attr(.cls, ".foceiEnv");
+        .cls[1]  <- "nlmixrNlmeUI"
+        class(fit.f) <- .cls
+    }
     return(fit.f)
 }
 

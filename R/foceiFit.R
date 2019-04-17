@@ -1566,6 +1566,7 @@ foceiFit.data.frame0 <- function(data,
     .ret$etaNames <- etaNames;
     .ret$thetaFixed <- fixed;
     .ret$control <- control;
+    .ret$control$focei.mu.ref <- integer(0);
     if(is(model, "RxODE") || is(model, "character")) {
         .ret$ODEmodel <- TRUE
         if (class(pred) != "function"){
@@ -1675,7 +1676,6 @@ foceiFit.data.frame0 <- function(data,
         }
     }
     .ret$skipCov <- skipCov;
-    .ret$control$focei.mu.ref <- integer(0);
     if (is.null(skipCov)){
         if (is.null(fixed)){
             .tmp <- rep(FALSE, length(inits$THTA))
@@ -2038,7 +2038,12 @@ foceiFit.data.frame0 <- function(data,
         .df <- dplyr::as.tbl(.df);
     }
     .cls <- class(.df);
-    .cls <- c("nlmixrFitData", "nlmixrFitCore", .cls)
+    if (control$interaction){
+        .cls <- c(paste0("nlmixr", .ret$method, "i"), "nlmixrFitData", "nlmixrFitCore", .cls)
+    } else {
+        .cls <- c(paste0("nlmixr",.ret$method), "nlmixrFitData", "nlmixrFitCore", .cls)
+    }
+    class(.ret)  <- "nlmixrFitCoreSilent"
     attr(.cls, ".foceiEnv") <- .ret;
     class(.df) <- .cls;
     message("done.")
@@ -2117,6 +2122,9 @@ print.nlmixrClass <- function(x, ...){
 
     }
 }
+
+##'@export
+`$.nlmixrFitCoreSilent`  <- `$.nlmixrFitCore`
 
 ##' @export
 `$.nlmixrFitData` <-  function(obj, arg, exact = FALSE){
@@ -2423,6 +2431,11 @@ fixef.nlmixrFitCore <- function(object, ...){
         .lt <- c(setNames(diag(x$omegaR),paste0("SD(",.dn1,")")),.lt);
     }
     return(.lt)
+}
+
+##'@export
+print.nlmixrFitCoreSilent  <- function(x, ...){
+    return(invisible(x))
 }
 
 ##'@export
@@ -2861,7 +2874,7 @@ yeoJohnson <- function(x, lambda=1){
 ##' @return Nothing
 ##' @author Matthew L. Fidler
 setOfv <- function(x, type){
-    if (inherits(x, "nlmixrFitCore")){
+    if (inherits(x, "nlmixrFitCore") || inherits(x, "nlmixrFitCoreSilent")){
         .objDf <- x$objDf
         .w <- which(tolower(row.names(.objDf)) == tolower(type))
         if (length(.w) == 1){
@@ -2983,6 +2996,9 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
     .exp <- abs(exp(.df$model.est) - .df$estimate) < 1e-6;
     if (is.na(.exponentiate)){
         ## se(exp(x)) ~= exp(mu_x)*se_x
+        ##
+        ## Norris N. The Standard Errors of the Geometric and Harmonic Means and Their Application to Index Numbers
+        ## Ann. Math. Statist. Volume 11, Number 4 (1940), 445-448.
         .df$std.error[.exp] <- exp(.df$model.est[.exp])*.df$std.error[.exp]
     } else if (.exponentiate) {
         .df$std.error <- exp(.df$model.est)*.df$std.error

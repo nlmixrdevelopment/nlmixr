@@ -116,6 +116,8 @@ armaVersion <- function(){
 ##' @export
 nlmixr <- function(object, data, est=NULL, control=list(),
                    table=tableControl(), ...){
+    ## verbose?
+    ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
     UseMethod("nlmixr")
 }
 
@@ -644,6 +646,12 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
                         etaNames=uif$eta.names,
                         control=control,
                         ...)
+        if (inherits(fit, "nlmixrFitData")){
+            .cls <- class(fit);
+            .env <- attr(.cls, ".foceiEnv");
+            .cls[1]  <- "nlmixrPosthoc"
+            class(fit) <- .cls
+        }
         assign("uif", uif, fit$env)
         ## assign("start.time", start.time, env);
         ## assign("est", est, env);
@@ -654,6 +662,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         assign("origControl",control,fit$env);
         assign("modelId",.modelId,fit$env);
         return(fit);
+    } else {
+        stop(sprintf("Unknown estimation method est=\"%s\"",est));
     }
 }
 ##' Control Options for SAEM

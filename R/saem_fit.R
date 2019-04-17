@@ -1711,6 +1711,12 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   } else {
     row.names(.env$objDf) <- .rn;
   }
+  if (inherits(fit.f, "nlmixrFitData")){
+    .cls <- class(fit.f);
+    .env <- attr(.cls, ".foceiEnv");
+    .cls[1]  <- "nlmixrSaem"
+    class(fit.f) <- .cls
+  }
   return(fit.f);
 }
 
