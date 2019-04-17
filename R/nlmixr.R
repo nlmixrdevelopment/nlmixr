@@ -413,6 +413,9 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         } else {
             uif$env$optExpression <- default$optExpression
         }
+        if (uif$saemErr!=""){
+            stop(paste0("For SAEM:\n",uif$saemErr))
+        }
         if (is.null(uif$nlme.fun.mu)){
             stop("SAEM requires all ETAS to be mu-referenced")
         }

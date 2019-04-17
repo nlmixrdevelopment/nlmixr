@@ -1593,13 +1593,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       w <- max(which(regexpr(reg, saem.pars, perl=TRUE) != -1));
       .tmp <- try(parse(text=paste(c(saem.pars[1:w], "})"), collapse="\n")), silent=TRUE)
       if (inherits(.tmp, "try-error")){
-        print(w);
-        print(.saemPars2)
-        print(reg)
         .saemPars2 <- saem.pars[-(1:w)];
-        print(.saemPars2);
         .w <- which(regexpr(rex::rex("}"), .saemPars2) != -1);
-        print(.w)
         if (length(.w) > 0){
           .i <- 1;
           .w0 <- w + .w[.i];
@@ -1850,6 +1845,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .tmp[1]  <- "function(){";
     nlme.mu.fun2  <- eval(parse(text=paste(.tmp, collapse="\n")))
   }
+  .saemErr <- "";
+  if (length(intersect(c("t","time"),allVars(body(rest)))) !=0){
+    .saemErr  <- "Initial parameters defined based on ini({}) block variables cannot be defined in terms of time;\nTo fix:\n1. Define ini({}) variables/relationships first.\n2. Use the new variables in an time-based if/else clause later in the `model({})`";
+  }
   ret <- list(ini=bounds, model=bigmodel,
               nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
                           all.vars=all.vars, rest.vars=rest.vars, all.names=all.names,
@@ -1862,7 +1861,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                           log.theta=log.theta,
                           log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
                           predDf=.predDf, predSaem =.predSaem, env=env, predSys=.pred,
-                          noMuEtas=.no.mu.etas))
+                          noMuEtas=.no.mu.etas,
+                          saemErr=.saemErr))
   if (.linCmt){
     ret$nmodel$lin.solved <- TRUE
   } else {
