@@ -2051,6 +2051,7 @@ print.nlmixrClass <- function(x, ...){
     attr(tmp, ".foceiEnv") <- NULL
     class(tmp) <- NULL
     print(tmp);
+    return(invisible(x))
 }
 
 ##' @export
@@ -2592,6 +2593,7 @@ print.nlmixrFitCore <- function(x, ...){
             print(head(x));
         }
     }
+    return(invisible(x));
 }
 
 
