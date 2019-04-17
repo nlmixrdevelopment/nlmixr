@@ -2581,10 +2581,13 @@ print.nlmixrFitCore <- function(x, ...){
                                               crayon::yellow(.bound),
                                               " is a modified ", crayon::blue(.dfName), "):"))))
         if (RxODE::rxIs(x, "tbl") || RxODE::rxIs(x, "data.table")){
-            .oldOps <- options();
-            on.exit(options(.oldOps))
+            .oldOpts <- options("tibble.print_max", "tibble.print_min");
+            on.exit(options(tibble.print_max=.oldOpts$tibble.print_max,
+                            tibble.print_min=.oldOpts$tibble.print_min))
             options(tibble.print_max = 3, tibble.print_min = 3)
-            NextMethod(x)
+            NextMethod()
+            options(tibble.print_max=.oldOpts$tibble.print_max,
+                    tibble.print_min=.oldOpts$tibble.print_min)
         } else{
             print(head(x));
         }
