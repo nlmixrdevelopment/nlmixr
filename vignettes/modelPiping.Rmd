@@ -101,7 +101,7 @@ one.ka.0.5
 ## Example 4 -- Change tka to 0.7 in orginal model function and then estimate
 one.ka.0.7 <- one.compartment %>%
     ini(tka=0.7) %>% 
-    nlmixr(est="focei")
+    nlmixr(data=theo_sd,est="focei")
 
 one.ka.0.7
 ```
