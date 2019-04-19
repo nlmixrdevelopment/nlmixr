@@ -2449,7 +2449,10 @@ NumericVector foceiSetup_(const RObject &obj,
   
   IntegerVector muRef;
   if (odeO.containsElementNamed("focei.mu.ref")){
-    muRef = as<IntegerVector>(odeO["focei.mu.ref"]);
+    try {
+      muRef = as<IntegerVector>(odeO["focei.mu.ref"]);
+    } catch (...){
+    }
   }
   if (muRef.size() == 0){
     op_focei.resetThetaSize = R_PosInf;
