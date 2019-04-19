@@ -1,0 +1,149 @@
+template:
+  params:
+    bootswatch: flatly
+reference:
+- title: Interfacing nlmixr models
+  contents:
+  - '`nlmixr`'
+- title: Adding residuals & covariance to fit object
+  contents:
+  - '`addCwres`'
+  - '`addNpde`'
+  - '`getVarCov`'
+- title: Model diagnostics
+  contents: 
+  - '`vpc`'
+- title: Datasets
+  contents:
+  - '`Bolus_1CPTMM`'
+  - '`Bolus_1CPT`'
+  - '`Bolus_2CPTMM`'
+  - '`Bolus_2CPT`'
+  - '`Infusion_1CPT`'
+  - '`Oral_1CPT`'
+  - '`Wang2007`'
+  - '`pump`'
+  - '`rats`'
+- title: Options for fitting and output
+  contents:
+  - '`saemControl`'
+  - '`foceiControl`'
+  - '`nlmeControl`'
+  - '`tableControl`'
+- title: Low level estimation routines
+  contents:
+  - '`gnlmm`'
+  - '`foceiFit`'
+  - '`saem.fit`'
+  - '`dynmodel`'
+  - '`dynmodel.mcmc`'
+  - '`nlme_lin_cmpt`'
+  - '`nlme_ode`'
+- title: Unit tests and validation functions
+  contents:
+  - '`nlmixrValidate`'
+- title: Internal functions
+  contents:
+  - '`as.focei`'
+  - '`bootdata`'
+  - '`calc.2LL`'
+  - '`calc.COV`'
+  - '`calcCov`'
+  - '`cholSE`'
+  - '`configsaem`'
+  - '`coxBox`'
+  - '`.collectWarnings`'
+  - '`focei.eta`'
+  - '`focei.theta`'
+  - '`frwd_selection`'
+  - '`gauss.quad`'
+  - '`gen_saem_user_fn`'
+  - '`getOMEGA`'
+  - '`ini`'
+  - '`instant.stan.extension`'
+  - '`invgaussian`'
+  - '`lin_cmt`'
+  - '`lincmt`'
+  - '`metabolite`'
+  - '`model`'
+  - '`nlme_gof`'
+  - '`nlmixr`'
+  - '`nlmixrAugPred`'
+  - '`nlmixrBounds.eta.names`'
+  - '`nlmixrBounds.focei.upper.lower`'
+  - '`nlmixrLogo`'
+  - '`nlmixrPred`'
+  - '`nlmixrSim`'
+  - '`nlmixrUI.focei.fixed`'
+  - '`nlmixrUI.focei.inits`'
+  - '`nlmixrUI.nlme.specs`'
+  - '`nlmixrUI.rxode.pred`'
+  - '`nlmixrUI.saem.ares`'
+  - '`nlmixrUI.saem.bres`'
+  - '`nlmixrUI.saem.distribution`'
+  - '`nlmixrUI.saem.eta.trans`'
+  - '`nlmixrUI.saem.fit`'
+  - '`nlmixrUI.saem.fixed`'
+  - '`nlmixrUI.saem.init`'
+  - '`nlmixrUI.saem.init.omega`'
+  - '`nlmixrUI.saem.init.theta`'
+  - '`nlmixrUI.saem.log.eta`'
+  - '`nlmixrUI.saem.model`'
+  - '`nlmixrUI.saem.model.omega`'
+  - '`nlmixrUI.saem.res.mod`'
+  - '`nlmixrUI.saem.res.name`'
+  - '`nlmixrUI.saem.theta.name`'
+  - '`nlmixrUI.theta.pars`'
+  - '`nlmixrVersion`'
+  - '`nlmixr_fit`'
+  - '`nmsimplex`'
+  - '`ofv`'
+  - '`plot.dyn.ID`'
+  - '`plot.dyn.mcmc`'
+  - '`plot.nlmixrFitData`'
+  - '`plot.saemFit`'
+  - '`prediction`'
+  - '`print.dyn.ID`'
+  - '`print.dyn.mcmc`'
+  - '`print.gnlmm.fit`'
+  - '`print.nlmixrUI`'
+  - '`print.saemFit`'
+  - '`residuals.nlmixrFitData`'
+  - '`saem.cleanup`'
+  - '`setOfv`'
+  - '`sqrtm`'
+  - '`summary.dyn.ID`'
+  - '`summary.dyn.mcmc`'
+  - '`summary.saemFit`'
+  - '`theo_md`'
+  - '`theo_sd`'
+  - '`traceplot`'
+  - '`vpc_nlmixr_nlme`'
+  - '`vpc_saemFit`'
+  - '`vpc_ui`'
+  - '`yeoJohnson`'
+navbar:
+  left:
+  - text: Articles
+    icon: fas fa-book
+    menu:
+        - text: "--------------------------"
+        - text: "Getting started"
+        - text: "Introduction to Running Nlmixr"
+          href: articles/running_nlmixr.html
+        - text: "--------------------------"
+        - text: "Going further"
+        - text: "Model Pipng"
+          href: articles/modelPipng.html
+  - text: "Cheat Sheet"
+    icon: fas fa-scroll
+    href: https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf
+  - text: "Functions"
+    icon: fa-file-code-o
+    href: reference/index.html
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/nlmixrdevelopment/nlmixr
+  - icon: fa-download
+    href: https://github.com/nlmixrdevelopment/nlmixr/releases
+    
