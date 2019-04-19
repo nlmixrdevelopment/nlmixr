@@ -1481,7 +1481,8 @@ focei.eta.saemFit <- function(object, uif, ...){
 }
 
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
-                             nnodes.gq=1, nsd.gq=3, adjObf=TRUE){
+                             nnodes.gq=1, nsd.gq=3, adjObf=TRUE,
+                             calcCov=TRUE){
   on.exit({RxODE::rxSolveFree()});
   .saemCfg  <-  attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt;
@@ -1519,26 +1520,66 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   }
   .tn <-uif$saem.theta.name;
   .nth <- length(.tn)
-  .tmp <- try(chol(object$Ha[1:.nth,1:.nth]), silent=TRUE)
-  .addCov <- TRUE
-  .sqrtm <- FALSE
-  if (inherits(.tmp, "try-error")){
-    .tmp <- object$Ha[1:.nth,1:.nth]
-    .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+  .covm <- object$Ha[1:.nth,1:.nth]
+  .calcCov  <- calcCov;
+  if (calcCov){
+    .covm <- calc.COV(object);
+    .tmp <- try(chol(.covm), silent=TRUE)
+    .addCov <- TRUE
+    .sqrtm <- FALSE
     if (inherits(.tmp, "try-error")){
-      .addCov <- FALSE;
+      .tmp <- .covm
+      .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+      if (inherits(.tmp, "try-error")){
+        .calcCov <- FALSE
+        .covm <- object$Ha[1:.nth,1:.nth]
+        .tmp <- try(chol(.covm), silent=TRUE)
+        .addCov <- TRUE
+        .sqrtm <- FALSE
+        if (inherits(.tmp, "try-error")){
+          .tmp <- object$Ha[1:.nth,1:.nth]
+          .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+          if (inherits(.tmp, "try-error")){
+            .addCov <- FALSE;
+          } else {
+            .sqrtm <- TRUE
+          }
+        } else {
+          .tmp <- object$Ha[1:.nth,1:.nth]
+        }
+      } else {
+        .sqrtm <- TRUE
+      }
     } else {
-      .sqrtm <- TRUE
+      .tmp <- .covm
     }
   } else {
-    .tmp <- object$Ha[1:.nth,1:.nth]
+    .tmp <- try(chol(.covm), silent=TRUE)
+    .addCov <- TRUE
+    .sqrtm <- FALSE
+    if (inherits(.tmp, "try-error")){
+      .tmp <- object$Ha[1:.nth,1:.nth]
+      .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+      if (inherits(.tmp, "try-error")){
+        .addCov <- FALSE;
+      } else {
+        .sqrtm <- TRUE
+      }
+    } else {
+      .tmp <- object$Ha[1:.nth,1:.nth]
+    }
   }
+
   .ini <- as.data.frame(uif$ini)
   .ini <- .ini[is.na(.ini$err),]
   .ini <- .ini[!is.na(.ini$ntheta),]
   .ini <- paste(.ini$name);
   if (.addCov){
-    .cov <- RxODE::rxInv(.tmp)
+    if (!.calcCov){
+      .cov <- RxODE::rxInv(.tmp)
+    } else {
+      .cov  <- .tmp
+    }
     attr(.cov, "dimnames") <- list(.tn, .tn)
     .cov <- .cov[.ini, .ini, drop = FALSE];
   }
@@ -1675,12 +1716,24 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     }
   }
   .env <- fit.f$env;
-  if (.addCov & .sqrtm){
-    .env$covMethod <- "|fim|";
-    warning("Covariance matrix non-positive definite, corrected by sqrtm(fim %*% fim)")
-  } else if (!.addCov){
-    warning("FIM non-positive definite and cannot be used to calculate the covariance")
+  if (.calcCov){
+    .env$covMethod <- "linFim";
+    if (.addCov & .sqrtm){
+      .env$covMethod <- "|linFim|";
+      warning("Covariance matrix non-positive definite, corrected by sqrtm(linFim %*% linFim)")
+    }
+  } else {
+    if (calcCov){
+      warning("Linearization of FIM could not be used to calculate covariance.");
+    }
+    if (.addCov & .sqrtm){
+      .env$covMethod <- "|fim|";
+      warning("Covariance matrix non-positive definite, corrected by sqrtm(fim %*% fim)")
+    } else if (!.addCov){
+      warning("FIM non-positive definite and cannot be used to calculate the covariance")
+    }
   }
+
   if (is.null(.env$time)){
     .env$time <- data.frame(saem=.saemTime["elapsed"], check.names=FALSE, row.names=c(""));
   } else {

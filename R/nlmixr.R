@@ -413,6 +413,11 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         } else {
             uif$env$optExpression <- default$optExpression
         }
+        if (any(names(control) == "covMethod")){
+            .addCov <- control$covMethod == "linFim";
+        } else {
+            .addCov <- default$covMethod == "linFim";
+        }
         if (uif$saemErr!=""){
             stop(paste0("For SAEM:\n",uif$saemErr))
         }
@@ -449,7 +454,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         }
         .fit <- model$saem_mod(cfg);
         .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik,
-                                 nnodes.gq=.nnodes.gq, nsd.gq=.nsd.gq, adjObf=.adjObf);
+                                 nnodes.gq=.nnodes.gq, nsd.gq=.nsd.gq, adjObf=.adjObf,
+                                 addCov=.addCov);
         if (inherits(.ret, "nlmixrFitData")){
             .ret <- fix.dat(.ret);
             .ret <- .addNpde(.ret);
@@ -712,6 +718,8 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
 ##'     gradient cross-product (evaluated at the individual empirical
 ##'     Bayes estimates).
 ##'
+##'  "\code{linFim}" Use the Linearized Fisher Information Matrix to calculate the covariance.
+##'
 ##'  "\code{fim}" Use the SAEM-calculated Fisher Information Matrix to calculate the covariance.
 ##'
 ##'  "\code{r,s}" Uses the sandwich matrix to calculate the covariance, that is: \eqn{R^-1 \times S \times R^-1}
@@ -756,7 +764,7 @@ saemControl <- function(seed=99,
                         transitAbs = FALSE,
                         print=1,
                         trace=0,
-                        covMethod=c("fim", "r,s", "r", "s"),
+                        covMethod=c("linFim", "fim", "r,s", "r", "s"),
                         logLik=FALSE,
                         nnodes.gq=3,
                         nsd.gq=1.6,
