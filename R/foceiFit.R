@@ -641,7 +641,8 @@ foceiControl <- function(sigdig=3,...,
                          nRetries=3,
                          seed=42,
                          badEtaPenalty=0.05,
-                         resetThetaCheckPer=0.1){
+                         resetThetaCheckPer=0.1,
+                         etaMat=NULL){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
@@ -911,7 +912,13 @@ foceiControl <- function(sigdig=3,...,
                  nRetries=nRetries,
                  seed=seed,
                  resetThetaCheckPer=resetThetaCheckPer,
+                 etaMat=etaMat,
                  ...);
+    if (!missing(etaMat) && missing(maxInnerIterations)){
+        warning("By supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0");
+        .ret$maxInnerIterations <- 0L
+        .ret$etaMat;
+    }
     .tmp <- .ret
     .tmp$maxsteps <- maxstepsOde
     .tmp <- do.call(RxODE::rxControl, .tmp);
@@ -1833,7 +1840,11 @@ foceiFit.data.frame0 <- function(data,
         ## }
     }
     names(.ret$thetaIni) <- sprintf("THETA[%d]", seq_along(.ret$thetaIni))
-    .ret$etaMat <- etaMat
+    if (is.null(etaMat) & !is.null(control$etaMat)){
+        .ret$etaMat <- control$etaMat
+    } else {
+        .ret$etaMat <- etaMat
+    }
     .ret$setupTime <- (proc.time() - .pt)["elapsed"];
     if (exists("uif", envir=.ret)){
         .uif <- .ret$uif
