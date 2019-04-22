@@ -3095,6 +3095,49 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
     return(x[,intersect(allCols, names(x))])
 }
 
+.coefPar  <- function(x, exponentiate=NA,...){
+    .muRef  <- x$mu.ref
+    .theta  <- x$theta
+    .df <- .fixNames(x$parFixedDf);
+    if (is.na(exponentiate)){
+        .exp <- abs(exp(.df$model.est) - .df$estimate) < 1e-6;
+    } else if (exponentiate) {
+        .exp  <- setNames(rep(TRUE,length(.theta)),names(.theta))
+    } else {
+        .exp  <- setNames(rep(TRUE,length(.theta)),names(.theta))
+    }
+    .eta <- x$eta
+    .noMuRef <- c();
+    .x <- setNames(
+        data.frame(lapply(names(.eta),function(n){
+            if (any(n==names(.muRef))){
+                .n <- .muRef[[n]];
+                .ret  <- .eta[[n]]+.theta[.n];
+                if (any(.n==names(.exp))){
+                    if (.exp[.n]){
+                        .ret  <- exp(.ret)
+                    }
+                }
+            } else {
+                .ret  <- .eta[[n]];
+                if (n!="ID"){
+                    warning(sprintf("The parameter '%s' is not mu-referenced and the coef will not be returned", n));
+                    .noMuRef <<- c(.noMuRef, n);
+                }
+            }
+            return(.ret)
+        })),sapply(names(.eta),function(n){
+                if (any(n==names(.muRef))){
+                    .n <- .muRef[[n]];
+                    return(.n)
+                }
+                return(n)
+            }));
+    .tmp <- stack(.x[,-1])
+    .df <- data.frame(group="ID", level=.x$ID, term=.tmp$ind, estimate=.tmp$values);
+    return(dplyr::as.tbl(.df))
+}
+
 ##'@export
 tidy.nlmixrFitCore <- function(x, ...){
     .extra <- list(...);
@@ -3107,7 +3150,8 @@ tidy.nlmixrFitCore <- function(x, ...){
             .effects <- c("fixed","ran_pars");
         }
     }
-    .effects <- match.arg(.effects, c("fixed", "random", "ran_vals", "ran_pars"), several.ok=TRUE)
+    .effects <- match.arg(.effects, c("fixed", "random", "ran_vals", "ran_pars", "ran_coef"),
+                          several.ok=TRUE)
     .ret <- list();
     if (any(.effects =="fixed"))
         .ret$fixed <- .nlmixrTidyFixed(x, ...);
@@ -3115,6 +3159,9 @@ tidy.nlmixrFitCore <- function(x, ...){
         .ret$ran_vals <- .nlmixrTidyRandom(x, ...);
     if (any(.effects == "ran_pars"))
         .ret$ran_pars <- .nlmixrTidyRandomPar(x, ...);
+    if (any(.effects == "ran_coef")){
+        .ret$ran_coef <- .coefPar(x, ...);
+    }
     return(dplyr::bind_rows(.ret, .id="effect") %>%
            dplyr::as.tbl() %>%
            .reorderCols())
