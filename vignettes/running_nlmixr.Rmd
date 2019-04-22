@@ -21,6 +21,12 @@ A. Upton of the University of California, San Francisco:
 library(ggplot2)
 library(nlmixr)
 
+## To allow nlmixr to reload runs without large run times
+## To run the actual models on your system, take the save options off.
+options(nlmixr.save=TRUE,
+        nlmixr.save.dir=system.file(package="nlmixr"));
+
+
 str(theo_sd)
 
 ggplot(theo_sd, aes(TIME, DV)) + geom_line(aes(group=ID), col="red") + scale_x_continuous("Time (h)") + scale_y_continuous("Concentration") + labs(title="Theophylline single-dose", subtitle="Concentration vs. time by individual")
@@ -59,14 +65,14 @@ print(fit)
 We can alternatively express the same model by ordinary differential equations (ODEs):
 
 ```{r}
-one.compartment.saem <- function() {
+one.compartment <- function() {
     ini({
         tka <- .5   # Log Ka
         tcl <- -3.2 # Log Cl
-        tv <- -1    # Log V
-        eta.ka ~ 1
-        eta.cl ~ 2
-        eta.v ~ 1
+        tv <- -0.6    # Log V
+        eta.ka ~ 0.5
+        eta.cl ~ 0.5
+        eta.v ~ 0.5
         add.err <- 0.1
     })
     model({
@@ -83,144 +89,36 @@ one.compartment.saem <- function() {
 
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
-```r
-fit <- nlmixr(one.compartment.saem, theo_sd, est="saem")
+```{r}
+fit <- nlmixr(one.compartment, theo_sd, est="saem")
 ```
 
-```c
-Compiling RxODE differential equations...c:/Rtools/mingw_64/bin/gcc  -I"C:/PROGRA~1/R/R-34~1.2/include" -DNDEBUG     -I"d:/Compiler/gcc-4.9.3/local330/include"     -O2 -Wall  -std=gnu99 -mtune=core2 -c rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.c -o rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.o
-c:/Rtools/mingw_64/bin/gcc -shared -s -static-libgcc -o rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.dll tmp.def rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.o -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lRblas -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lRlapack -lgfortran -lm -lquadmath -Ld:/Compiler/gcc-4.9.3/local330/lib/x64 -Ld:/Compiler/gcc-4.9.3/local330/lib -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lR
-done.
-C:/Rtools/mingw_64/bin/g++  -I"C:/PROGRA~1/R/R-34~1.2/include" -DNDEBUG     -I"d:/Compiler/gcc-4.9.3/local330/include"  -IC:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/nlmixr/include -IC:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/STANHE~1/include -IC:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/Rcpp/include -IC:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/RCPPAR~1/include -IC:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/RCPPEI~1/include -IC:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/BH/include   -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -c saem71e81ac5342dx64.cpp -o saem71e81ac5342dx64.o
-In file included from C:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/RCPPAR~1/include/armadillo:52:0,
-                 from C:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/RCPPAR~1/include/RcppArmadilloForward.h:46,
-                 from C:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/RCPPAR~1/include/RcppArmadillo.h:31,
-                 from saem71e81ac5342dx64.cpp:1:
-C:/Users/nlmixr/DOCUME~1/R/WIN-LI~1/3.4/RCPPAR~1/include/armadillo_bits/compiler_setup.hpp:474:96: note: #pragma message: WARNING: use of OpenMP disabled; this compiler doesn't support OpenMP 3.0+
-   #pragma message ("WARNING: use of OpenMP disabled; this compiler doesn't support OpenMP 3.0+")
-C:/Rtools/mingw_64/bin/g++ -shared -s -static-libgcc -o saem71e81ac5342dx64.dll tmp.def saem71e81ac5342dx64.o C:/Working/nlmixr/rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.dll -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lRblas -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lRlapack -lgfortran -lm -lquadmath -Ld:/Compiler/gcc-4.9.3/local330/lib/x64 -Ld:/Compiler/gcc-4.9.3/local330/lib -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lR
-done.
-1:     0.2936   -3.1515   -0.3166    0.9500    1.9000    1.9000   11.1432
-2:    0.4815  -3.3577  -0.4751   0.9577   1.8050   1.8050   5.7848
-3:    0.7435  -3.4761  -0.6772   0.9098   1.7147   1.7147   2.4877
-4:    0.6739  -3.5700  -0.6901   0.8643   1.6290   1.6290   1.7050
-5:    0.6951  -3.4874  -0.7071   0.8211   1.5476   1.5476   1.4010
-6:    0.5690  -3.3963  -0.7542   0.7800   1.4702   1.4702   0.9980
-7:    0.5346  -3.3423  -0.7814   0.7423   1.3967   1.3967   0.8210
-8:    0.4469  -3.2585  -0.8184   0.7052   1.3268   1.3268   0.7238
-9:    0.3935  -3.2638  -0.8330   0.6699   1.2605   1.2605   0.6806
-10:    0.4153  -3.2282  -0.8281   0.7129   1.1975   1.1975   0.6297      
-...
-491:    0.4472  -3.2115  -0.7879   0.4430   0.0712   0.0176   0.4754
-492:    0.4472  -3.2115  -0.7879   0.4429   0.0712   0.0176   0.4755
-493:    0.4472  -3.2115  -0.7879   0.4427   0.0712   0.0176   0.4755
-494:    0.4473  -3.2115  -0.7878   0.4424   0.0712   0.0176   0.4754
-495:    0.4474  -3.2115  -0.7878   0.4424   0.0712   0.0176   0.4753
-496:    0.4476  -3.2115  -0.7878   0.4423   0.0712   0.0176   0.4753
-497:    0.4476  -3.2116  -0.7878   0.4424   0.0712   0.0177   0.4753
-498:    0.4476  -3.2116  -0.7879   0.4423   0.0712   0.0176   0.4753
-499:    0.4475  -3.2115  -0.7879   0.4424   0.0712   0.0176   0.4753
-500:    0.4475  -3.2116  -0.7879   0.4426   0.0713   0.0176   0.4753
-```
-```r
-## Calculate ETA-based prediction and error derivatives:
-## Calculate d(f)/d(eta) 
-## ...
-## done
-## ...
-## done
-```
-```c
-c:/Rtools/mingw_64/bin/gcc  -I"C:/PROGRA~1/R/R-34~1.2/include" -DNDEBUG     -I"d:/Compiler/gcc-4.9.3/local330/include"     -O2 -Wall  -std=gnu99 -mtune=core2 -c rx_12307179f04e4af4f5a8f71b6545a28d_x64.c -o rx_12307179f04e4af4f5a8f71b6545a28d_x64.o
-c:/Rtools/mingw_64/bin/gcc -shared -s -static-libgcc -o rx_12307179f04e4af4f5a8f71b6545a28d_x64.dll tmp.def rx_12307179f04e4af4f5a8f71b6545a28d_x64.o -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lRblas -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lRlapack -lgfortran -lm -lquadmath -Ld:/Compiler/gcc-4.9.3/local330/lib/x64 -Ld:/Compiler/gcc-4.9.3/local330/lib -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lR
-c:/Rtools/mingw_64/bin/gcc  -I"C:/PROGRA~1/R/R-34~1.2/include" -DNDEBUG     -I"d:/Compiler/gcc-4.9.3/local330/include"     -O2 -Wall  -std=gnu99 -mtune=core2 -c rx_9bb7d7958abef0092fc2389e956d74b4_x64.c -o rx_9bb7d7958abef0092fc2389e956d74b4_x64.o
-c:/Rtools/mingw_64/bin/gcc -shared -s -static-libgcc -o rx_9bb7d7958abef0092fc2389e956d74b4_x64.dll tmp.def rx_9bb7d7958abef0092fc2389e956d74b4_x64.o -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lRblas -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lRlapack -lgfortran -lm -lquadmath -Ld:/Compiler/gcc-4.9.3/local330/lib/x64 -Ld:/Compiler/gcc-4.9.3/local330/lib -LC:/PROGRA~1/R/R-34~1.2/bin/x64 -lR
-```
-```r
-The model-based sensitivities have been calculated.
-It will be cached for future runs.
-Calculating Table Variables...
-done
+And if we wanted to, we could even apply the First-Order Conditional
+Estimation (FOCEi) method to this model:
+
+```{r}
+fitF <- nlmixr(one.compartment, theo_sd, est="focei")
 ```
 
-This Windows example delivers a complete model fit as the `fit`
+
+This example delivers a complete model fit as the `fit`
 object, including parameter history, a set of fixed effect estimates,
 and random effects for all included subjects.
 
-Also note that the `nlme` fit returned the traditional `nlme`
-object. You can instruct `nlmixr` to convert the `nlme` object to a
-`nlmixr` object and calculate quantities like `CWRES` by specifying
-`calc.resid=TRUE` or dropping this option entirely since it is turned
-on by default.
-
 Now back to the `saem` fit; Let's look at the fit using nlmixr's built-in diagnostics...
 
-```r
+```{r}
 plot(fit)
 ```
 
-![Individual plots](fitplots.png)
-
-```r
+```{r}
 fit
 ```
 
-```r
-> fit
--- nlmixr SAEM fit (ODE); OBJF calculated from FOCEi approximation -------------
-                                                         OBJF      AIC      BIC Log-likelihood Condition Number
-116.1543 130.1543 150.3339      -58.07713         140.8018
-
--- Time (sec; fit$time): -------------------------------------------------------
-    saem setup Likelihood Calculation covariance table
-elapsed 58.64 31.91                   0.31          0  0.44
-
--- Parameters (fit$par.fixed): -------------------------------------------------
-    Parameter Estimate     SE %RSE Back-transformed(95%CI) BSV(CV%)
-tka        Log Ka    0.455  0.198 43.4       1.58 (1.07, 2.32)    74.5%
-tcl        Log Cl    -3.22 0.0814 2.53 0.0401 (0.0342, 0.0471)    27.2%
-tv          Log V   -0.785 0.0426 5.43    0.456 (0.420, 0.496)    13.5%
-add.err   add.err    0.691                            0.691            
-Shrink(SD)%
-tka        -0.520% 
-tcl          3.76% 
-tv           11.0% 
-add.err      12.0% 
-
-  No correlations in between subject variability (BSV) matrix
-  Full BSV covariance (fit$omega) or correlation (fit$omega.R; diagonals=SDs)
-  Distribution stats (mean/skewness/kurtosis/p-value) available in fit$shrink
-
--- Fit Data (object fit is a modified data.frame): -----------------------------
-# A tibble: 132 x 21
-  ID     TIME    DV  PRED     RES    WRES IPRED   IRES  IWRES CPRED  CRES
-* <fct> <dbl> <dbl> <dbl>   <dbl>   <dbl> <dbl>  <dbl>  <dbl> <dbl> <dbl>
-1 1     0      0.74  0    0.74    1.07     0     0.74   1.07   0    0.74 
-2 1     0.25   2.84  2.84 0.00438 0.00254  3.86 -1.02  -1.48   2.68 0.164
-3 1     0.570  6.57  5.07 1.50    0.656    6.79 -0.219 -0.316  4.84 1.73 
-# ... with 129 more rows, and 10 more variables: CWRES <dbl>, eta.ka <dbl>,
-#   eta.cl <dbl>, eta.v <dbl>, depot <dbl>, center <dbl>, ka <dbl>, cl <dbl>,
-#   v <dbl>, cp <dbl>
-```
-
-```r
+```{r}
 fit$eta
 ```
-```r
-   ID      eta.ka       eta.cl       eta.v
-1   1  0.12895240 -0.629393083 -0.20786978
-2   2  0.24202824  0.085230344 -0.01555575
-3   3  0.39836641  0.005076775  0.04780371
-4   4 -0.26316679 -0.076702383 -0.04668235
-5   5 -0.07501618  0.076757369  0.06943232
-6   6 -0.32677312  0.215018594  0.09234601
-7   7 -0.83746008  0.236216832  0.08078046
-8   8 -0.17361996  0.141848820  0.07864429
-9   9  1.49070753 -0.181625209 -0.18270360
-10 10 -0.79851904 -0.207206272 -0.03595335
-11 11  0.75757178  0.338588793  0.19567123
-12 12 -0.56750540  0.012073101 -0.09261596
-```
+
 Default trace plots can be generated using:
 ```r
 traceplot(fit)
@@ -230,7 +128,7 @@ but with a little more work, we can get a nicer set of iteration trace
 plots ("wriggly worms")...
 
 
-```r
+```{r}
 
 iter <- fit$par.hist.stacked
 iter$Parameter[iter$par=="add.err"] <- "Additive error"
@@ -252,11 +150,10 @@ ggplot(iter, aes(iter, val)) +
   labs(title="Theophylline single-dose", subtitle="Parameter estimation iterations")
 
 ```
-![Iterations](iter.png)
 
 ... and some random-effects histograms...
 
-```r
+```{r}
 
 etas <- data.frame(eta = c(fit$eta$eta.ka, fit$eta$eta.cl, fit$eta$eta.v),
                    lab = rep(c("eta(ka)", "eta(CL/F)", "eta(V/F)"), each=nrow(fit$eta)))
@@ -272,7 +169,6 @@ ggplot(etas, aes(eta)) +
   labs(title="Theophylline single-dose", subtitle="IIV distributions")
 
 ```
-![IIV distributions](etas.png)
 
 
 ## xpose
@@ -280,16 +176,11 @@ ggplot(etas, aes(eta)) +
 This is all very nice. But what we really want is a complete suite of model diagnostic
 tools, like those available in [xpose](https://github.com/UUPharmacometrics/xpose), right?
 
-First, save the nlmixr `fit` object you created (this example assumes in the same folder you're working in...)
-
-```r
-save(fit, file="nlmixrFit.RData")
-```
-
 Restart R, and install xpose from CRAN, if you haven't already...
 
-```r
-install.packages("xpose")
+```{r}
+## install.packages("xpose")
+library(xpose)
 ```
 
 Now install the extension for nlmixr:
@@ -297,50 +188,35 @@ Now install the extension for nlmixr:
 ```r
 devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
 ```
-Now restore your session...
 
 ```r
-library(nlmixr)
-library(xpose)
 library(xpose.nlmixr)
-
-load("nlmixrFit.RData")
 ```
 
 ... and convert your nlmixr fit object into an xpose fit object.
 
 ```r
-xp <- xpose_data_nlmixr(fit)
-```
-
-Now let's look at some diagnostic plots!
-
-```r
 dv_vs_pred(xp)
 ```
 ![DV vs PRED](dv_vs_pred.png)
-
 ```r
 dv_vs_ipred(xp)
 ```
 ![DV vs IPRED](dv_vs_ipred.png)
-
 ```r
 pred_vs_pred(xp)
 ```
 ![CWRES vs PRED](cwres_vs_pred.png)
-
 ```r
 absval_res_vs_pred(xp, res="IWRES")
 ```
 ![abs(IWRES) vs PRED](iwres_vs_pred.png)
-
 We can also replicate some of nlmixr's internal plots...
-
 ```r
 ind_plots(xp, res="IWRES")
 ```
 ![Individual plots](ind_plots.png)
+
 
 For more information about using xpose, see the Uppsala pharmacometrics group's 
 comprehensive site [here](https://uupharmacometrics.github.io/xpose/).
@@ -574,26 +450,26 @@ the
 [magrittr] forward-pipe
 operator.
 
-```r
-fit <- nlmixr(one.compartment.model) %>% saem.fit(data)
+```{r}
+fit <- nlmixr(one.compartment) %>% saem.fit(data=theo_sd)
 ```
-```r
-fit <- nlmixr(one.compartment.model, dat, est="saem")
+```{r}
+fit2 <- nlmixr(one.compartment, data=theo_sd, est="saem")
 ```
-```r
-fit <- one.compartment.model %>% saem.fit(data)
+```{r}
+fit3 <- one.compartment %>% saem.fit(data=theo_sd)
 ```
 
 Options to the estimation routines can be specified using nlmeControl
 for nlme estimation:
 
-```r
-fit <- nlmixr(one.compartment.model,data,est="nlme",control = nlmeControl(pnlsTol = .1))
+```{r}
+fit4 <- nlmixr(one.compartment, theo_sd,est="nlme",control = nlmeControl(pnlsTol = .5))
 ```
 where options are specified in the `nlme` documentation.
 Options for saem can be specified using `saemControl`:
-```r
-fit <- nlmixr(one.compartment.model,data,est="saem",control=saemControl(n.burn=250,n.em=350,print=50))
+```{r}
+fit5 <- nlmixr(one.compartment,theo_sd,est="saem",control=saemControl(n.burn=250,n.em=350,print=50))
 ```
 
 this example specifies 250 burn-in iterations, 350 em iterations and a
@@ -605,7 +481,7 @@ Solved PK systems are also currently supported by nlmixr with the
 'linCmt()' pseudo-function. An annotated example of a solved system is
 below:
 
-```r
+```{r}
 f <- function(){
     ini({
         lCl <- 1.6      #log Cl (L/hr)
@@ -652,57 +528,10 @@ After specifying the model syntax you can check that nlmixr is
 interpreting it correctly by using the nlmixr function on it.  Using
 the above function we can get:
 
-```r
-> nlmixr(f)
-## 1-compartment model with first-order absorption in terms of Cl
-## Initialization:
-################################################################################
-Fixed Effects ($theta):
-    lCl     lVc     lKA
-1.60000 4.49981 0.10000
-
-Omega ($omega):
-     [,1] [,2] [,3]
-[1,]  0.1  0.0  0.0
-[2,]  0.0  0.1  0.0
-[3,]  0.0  0.0  0.1
-
-## Model:
-################################################################################
-Cl <- exp(lCl + eta.Cl)
-Vc = exp(lVc + eta.Vc)
-KA <- exp(lKA + eta.KA)
-## Instead of specifying the ODEs, you can use
-## the linCmt() function to use the solved system.
-##
-## This function determines the type of PK solved system
-## to use by the parameters that are defined.  In this case
-## it knows that this is a one-compartment model with first-order
-## absorption.
-linCmt() ~ prop(prop.err)
+```{r}
+nlmixr(f)
 ```
 
 In general this gives you information about the model (what type of
 solved system/RxODE), initial estimates as well as the code for the
 model block.
-
-## Using the model syntax for estimating a model 
-
-Once the model function has been created, you can use it combined with
-a dataset to estimate the parameters for a model given a dataset.
-This dataset has to have RxODE compatible events IDs. Both Monolix and
-NONMEM use a different dataset description. You may convert these
-datasets to RxODE-compatible datasets with the nmDataConvert
-function. Note that steady state doses are not supported by RxODE, and
-therefore not supported by the conversion function.
-
-As an example, you can use a simulated rich 1-compartment dataset.
-
-```r
- d <- Oral_1CPT
- d <- d[,names(d) != "SS"];
- d <- nmDataConvert(d); 
-```
-
-Once the data has been converted to the appropriate format, you can
-use the nlmixr function to run the appropriate code.

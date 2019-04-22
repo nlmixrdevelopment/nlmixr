@@ -111,11 +111,13 @@ armaVersion <- function(){
 ##' @param object Fitted object or function specifying the model.
 ##' @inheritParams nlmixr_fit
 ##' @param ... Other parameters
+##' @param save Boolean to save a nlmixr object in a rds file in the
+##'     working directory.
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
 nlmixr <- function(object, data, est=NULL, control=list(),
-                   table=tableControl(), ...){
+                   table=tableControl(), ...,save=getOption("nlmixr.save",FALSE)){
     ## verbose?
     ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
     UseMethod("nlmixr")
@@ -123,7 +125,8 @@ nlmixr <- function(object, data, est=NULL, control=list(),
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...){
+nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
+                            save=getOption("nlmixr.save", FALSE)){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .uif <- nlmixrUI(object);
     class(.uif) <- "list";
@@ -145,7 +148,8 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
 
 ##'@rdname nlmixr
 ##'@export
-nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=tableControl(), ...){
+nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
+                                 save=getOption("nlmixr.save", FALSE)){
     .uif <- .getUif(object);
     if (missing(data)){
         data <- getData(object);
@@ -158,7 +162,8 @@ nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=t
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...){
+nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
+                            save=getOption("nlmixr.save", FALSE)){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .uif <- object
     if (missing(data) && missing(est)){
@@ -205,25 +210,7 @@ nlmixrData.default <- function(data){
     dat <- as.data.frame(data);
     return(dat);
 }
-
-##' Fit a nlmixr model
-##'
-##' @param data Dataset to estimate.  Needs to be RxODE compatible in
-##'     EVIDs.
-##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).
-##' @param est Estimation method
-##' @param control Estimation control options.  They could be
-##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
-##'     \code{\link{foceiControl}}
-##' @param ... Parameters passed to estimation method.
-##' @param sum.prod Take the RxODE model and use more precise
-##'     products/sums.  Increases solving accuracy and solving time.
-##' @param table A list controlling the table options (i.e. CWRES,
-##'     NPDE etc).  See \code{\link{tableControl}}.
-##' @return nlmixr fit object
-##' @author Matthew L. Fidler
-##' @export
-nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
+nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                        sum.prod=FALSE, table=tableControl()){
     .clearPipedData();
     .tmp <- deparse(body(uif$theta.pars))[-1];
@@ -678,6 +665,57 @@ nlmixr_fit <- function(uif, data, est=NULL, control=list(), ...,
         stop(sprintf("Unknown estimation method est=\"%s\"",est));
     }
 }
+
+##' Fit a nlmixr model
+##'
+##' @param data Dataset to estimate.  Needs to be RxODE compatible in
+##'     EVIDs.
+##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).
+##' @param est Estimation method
+##' @param control Estimation control options.  They could be
+##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
+##'     \code{\link{foceiControl}}
+##' @param ... Parameters passed to estimation method.
+##' @param sum.prod Take the RxODE model and use more precise
+##'     products/sums.  Increases solving accuracy and solving time.
+##' @param table A list controlling the table options (i.e. CWRES,
+##'     NPDE etc).  See \code{\link{tableControl}}.
+##' @return nlmixr fit object
+##' @author Matthew L. Fidler
+##' @export
+nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
+                        sum.prod=FALSE, table=tableControl(),
+                        save=getOption("nlmixr.save", FALSE)){
+    if (save){
+        .modName  <- ifelse(is.null(uif$model.name),"",paste0(uif$model.name,"-"));
+        .dataName  <- ifelse(is.null(uif$data.name),"",paste0(uif$data.name,"-"));
+        .digest <- digest::digest(list(uif$fun.txt,
+                                       uif$ini,
+                                       data,
+                                       est,
+                                       control,
+                                       ...,
+                                       sum.prod,
+                                       table,
+                                       packageVersion("nlmixr"),
+                                       packageVersion("RxODE")))
+        .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
+                                paste0("nlmixr-",.modName,.dataName,est,"-",.digest,".rds"));
+        if (file.exists(.saveFile)){
+            message(sprintf("Loading model already run (%s)",.saveFile))
+            .ret  <- readRDS(.saveFile)
+            return(.ret)
+        }
+    }
+    .ret  <- nlmixr_fit0(uif=uif, data=data, est=est, control=control, ...,
+                         sum.prod=sum.prod, table=table);
+    if (save){
+        AIC(.ret); # Calculate SAEM AIC when saving...
+        saveRDS(.ret,file=.saveFile)
+    }
+    return(.ret);
+}
+
 ##' Control Options for SAEM
 ##'
 ##' @param seed Random Seed for SAEM step.  (Needs to be set for

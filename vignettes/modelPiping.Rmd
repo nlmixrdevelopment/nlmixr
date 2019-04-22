@@ -20,6 +20,12 @@ Francisco:
 
 library(nlmixr)
 
+## To allow nlmixr to reload runs without large run times
+## To run the actual models on your system, take the save options off.
+options(nlmixr.save=TRUE,
+        nlmixr.save.dir=system.file(package="nlmixr"));
+
+
 one.compartment <- function() {
     ini({
         tka <- .5   # Log Ka
