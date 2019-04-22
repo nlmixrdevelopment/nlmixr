@@ -2435,8 +2435,11 @@ fixef.nlmixrFitCore <- function(object, ...){
     .rs <- x$omegaR
     .lt <- lower.tri(.rs);
     .dn1 <- dimnames(x$omegaR)[[2]]
-    .nms <- apply(which(.lt,arr.ind=TRUE),1,function(x){sprintf("cor%s%s",getOption("broom.mixed.sep1","__"),
-                                                                paste(.dn1[x],collapse=getOption("broom.mixed.sep2",".")))});
+    .nms <- apply(which(.lt,arr.ind=TRUE),1,
+                  function(x){
+        sprintf("cor%s%s",getOption("broom.mixed.sep1","__"),
+                paste(.dn1[x],collapse=getOption("broom.mixed.sep2",".")))
+    });
     .lt <- structure(.rs[.lt], .Names=.nms)
     .lt <- .lt[.lt != 0];
     if (sd){
