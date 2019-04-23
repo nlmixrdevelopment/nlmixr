@@ -1893,15 +1893,7 @@ foceiFit.data.frame0 <- function(data,
                 .ret$control$aEpsC <- .thetaReset$aEpsC
                 .ret$control$c1 <- .thetaReset$c1
                 .ret$control$c2 <- .thetaReset$c2
-                .ret$control$doThetaReset <- 0L;
                 message("Theta reset")
-            }
-            if (!exists("err",this.env)){
-                this.env$err  <- "Error disappeared from environment"
-            } else if (is.na(this.env$err)){
-                this.env$err  <- "NA error in environment"
-            } else if (is.null(this.env$err)){
-                this.env$err  <- "NULL error in environment"
             }
         }
         if (this.env$err != ""){
