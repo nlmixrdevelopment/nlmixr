@@ -3112,7 +3112,7 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
     } else if (exponentiate) {
         .exp  <- setNames(rep(TRUE,length(.theta)),names(.theta))
     } else {
-        .exp  <- setNames(rep(TRUE,length(.theta)),names(.theta))
+        .exp  <- setNames(rep(FALSE,length(.theta)),names(.theta))
     }
     .eta <- x$eta
     .noMuRef <- c();
