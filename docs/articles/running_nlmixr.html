@@ -58,6 +58,20 @@
     </li>
   </ul>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fas fa fas fa-chalkboard-teacher"></span>
+     
+    Example models
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/addingCovariances.html">Phenobarbatol with covariances</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
     <span class="fas fa fas fa-scroll"></span>
@@ -100,7 +114,7 @@
     <div class="page-header toc-ignore">
       <h1>Running PK models with nlmixr</h1>
             
-            <h4 class="date">2019-04-22</h4>
+            <h4 class="date">2019-04-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd"><code>vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
@@ -157,7 +171,7 @@
 }</code></pre></div>
 <p>We can now run the model…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.cmt, theo_sd, <span class="dt">est=</span><span class="st">"nlme"</span>)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.cmt-theo_sd-nlme-95f683d3473029170e5461c0163d5ae0.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.cmt-theo_sd-nlme-7e4993e42dbddcbfd5130e441716d924.rds)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)</code></pre></div>
 <pre><code>## ── nlmixr nlme by [1m[33mmaximum likelihood[39m[22m ([3mSolved; μ-ref &amp; covs[23m) nlme OBF fit ──</code></pre>
 <pre><code>##          OBJF      AIC      BIC Log-likelihood Condition Number
@@ -165,7 +179,7 @@
 <pre><code>## 
 ## ── Time (sec; $time): ─────────────────────────────────────────────────────</code></pre>
 <pre><code>##    nlme    setup optimize covariance table
-##  14.759 0.808151  1.1e-05    1.2e-05 0.017</code></pre>
+##  16.476 4.927869    5e-06      6e-06 0.014</code></pre>
 <pre><code>## 
 ## ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</code></pre>
 <pre><code>##         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
@@ -196,13 +210,13 @@
 <p>We can alternatively express the same model by ordinary differential equations (ODEs):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>() {
     <span class="kw"><a href="../reference/ini.html">ini</a></span>({
-        tka &lt;-<span class="st"> </span>.<span class="dv">5</span>   <span class="co"># Log Ka</span>
-        tcl &lt;-<span class="st"> </span><span class="op">-</span><span class="fl">3.2</span> <span class="co"># Log Cl</span>
-        tv &lt;-<span class="st"> </span><span class="op">-</span><span class="fl">0.6</span>    <span class="co"># Log V</span>
-        eta.ka <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span>
-        eta.cl <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span>
-        eta.v <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span>
-        add.err &lt;-<span class="st"> </span><span class="fl">0.1</span>
+        tka &lt;-<span class="st"> </span><span class="fl">0.45</span> <span class="co"># Log Ka</span>
+        tcl &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># Log Cl</span>
+        tv &lt;-<span class="st"> </span><span class="fl">3.45</span>    <span class="co"># Log V</span>
+        eta.ka <span class="op">~</span><span class="st"> </span><span class="fl">0.6</span>
+        eta.cl <span class="op">~</span><span class="st"> </span><span class="fl">0.3</span>
+        eta.v <span class="op">~</span><span class="st"> </span><span class="fl">0.1</span>
+        add.err &lt;-<span class="st"> </span><span class="fl">0.7</span>
     })
     <span class="kw"><a href="../reference/model.html">model</a></span>({
         ka &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(tka <span class="op">+</span><span class="st"> </span>eta.ka)
@@ -210,16 +224,16 @@
         v &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(tv <span class="op">+</span><span class="st"> </span>eta.v)
         d<span class="op">/</span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/TDist">dt</a></span>(depot) =<span class="st"> </span><span class="op">-</span>ka <span class="op">*</span><span class="st"> </span>depot
         d<span class="op">/</span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/TDist">dt</a></span>(center) =<span class="st"> </span>ka <span class="op">*</span><span class="st"> </span>depot <span class="op">-</span><span class="st"> </span>cl <span class="op">/</span><span class="st"> </span>v <span class="op">*</span><span class="st"> </span>center
-        cp =<span class="st"> </span>center <span class="op">/</span><span class="st"> </span>v 
+        cp =<span class="st"> </span>center <span class="op">/</span><span class="st"> </span>v
         cp <span class="op">~</span><span class="st"> </span><span class="kw">add</span>(add.err)
     })
 }</code></pre></div>
 <p>We can try the Stochastic Approximation EM (SAEM) method to this model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"saem"</span>)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-4425fc1acffa4d2f0dc625e3f992ab10.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-1250c45e7f2b989f2dcbed06255cf167.rds)</code></pre>
 <p>And if we wanted to, we could even apply the First-Order Conditional Estimation (FOCEi) method to this model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fitF &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"focei"</span>)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-620a9555c0c939eaf4bd46a50f4d3031.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-8d6c82315654d2336d9fe104889adc92.rds)</code></pre>
 <p>This example delivers a complete model fit as the <code>fit</code> object, including parameter history, a set of fixed effect estimates, and random effects for all included subjects.</p>
 <p>Now back to the <code>saem</code> fit; Let’s look at the fit using nlmixr’s built-in diagnostics…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(fit)</code></pre></div>
@@ -227,22 +241,22 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit</code></pre></div>
 <pre><code>## ── nlmixr SAEM([3mODE[23m); [2m[3mOBJF by Gaussian Quadrature (n.nodes=3, n.sd=1.6)[23m[22m fit</code></pre>
 <pre><code>##                OBJF      AIC      BIC Log-likelihood Condition Number
-## gauss3_1.6 93.57199 350.1718 370.3514      -168.0859         19.09454</code></pre>
+## gauss3_1.6 122.9719 379.5717 399.7513      -182.7858         18.16213</code></pre>
 <pre><code>## 
 ## ── Time (sec; fit$time): ──────────────────────────────────────────────────</code></pre>
-<pre><code>##   saem    setup optimize covariance table
-##  5.113 0.307689    2e-06      3e-06 0.007</code></pre>
+<pre><code>##   saem   setup optimize covariance table
+##  4.755 0.85761  1.5e-05    1.7e-05 0.018</code></pre>
 <pre><code>## 
 ## ── Population Parameters (fit$parFixed or fit$parFixedDf): ────────────────</code></pre>
 <pre><code>##         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
-## tka        Log Ka 0.453  0.195 43.1       1.57 (1.07, 2.31)     71.4
-## tcl        Log Cl  1.01 0.0854 8.42       2.76 (2.33, 3.26)     27.7
-## tv          Log V  3.45 0.0455 1.32       31.5 (28.8, 34.5)     13.4
-## add.err           0.695                               0.695         
+## tka        Log Ka 0.451  0.196 43.5       1.57 (1.07, 2.31)     71.9
+## tcl        Log Cl  1.02 0.0836 8.22       2.77 (2.35, 3.26)     27.0
+## tv          Log V  3.45 0.0469 1.36       31.5 (28.7, 34.5)     14.0
+## add.err           0.692                               0.692         
 ##         Shrink(SD)%
-## tka        -0.233% 
-## tcl          4.36% 
-## tv           9.34% 
+## tka         0.411% 
+## tcl          3.36% 
+## tv           10.0% 
 ## add.err             
 ## 
 ##   Covariance Type (fit$covMethod): linFim
@@ -255,25 +269,25 @@
 <pre><code>## # A tibble: 132 x 18
 ##   ID     TIME    DV  EVID  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl
 ##   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-## 1 1     0      0.74     0  0     0.74   0     0.74   1.06   0.105 -0.488
-## 2 1     0.25   2.84     0  3.26 -0.423  3.87 -1.03  -1.48   0.105 -0.488
-## 3 1     0.570  6.57     0  5.84  0.728  6.82 -0.247 -0.355  0.105 -0.488
+## 1 1     0      0.74     0  0     0.74   0     0.74   1.07   0.105 -0.487
+## 2 1     0.25   2.84     0  3.26 -0.423  3.86 -1.02  -1.48   0.105 -0.487
+## 3 1     0.570  6.57     0  5.84  0.725  6.81 -0.235 -0.340  0.105 -0.487
 ## # … with 129 more rows, and 7 more variables: eta.v &lt;dbl&gt;, ka &lt;dbl&gt;,
 ## #   cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit<span class="op">$</span>eta</code></pre></div>
 <pre><code>##    ID      eta.ka      eta.cl        eta.v
-## 1   1  0.10526670 -0.48796249 -0.081824932
-## 2   2  0.21679271  0.14055941  0.018376758
-## 3   3  0.36992522  0.03093773  0.058155105
-## 4   4 -0.27318227 -0.01613196 -0.005716384
-## 5   5 -0.04017666 -0.15233365 -0.140451267
-## 6   6 -0.39274353  0.37717920  0.194121922
-## 7   7 -0.79635616  0.16870625  0.043765451
-## 8   8 -0.18574253  0.16857680  0.091722703
-## 9   9  1.43460629  0.03730799  0.015417761
-## 10 10 -0.72239227 -0.40238432 -0.160589271
-## 11 11  0.77801005  0.28344846  0.141351696
-## 12 12 -0.51805436 -0.12775097 -0.191641208</code></pre>
+## 1   1  0.10452828 -0.48672270 -0.080039134
+## 2   2  0.22113608  0.14424813  0.020615245
+## 3   3  0.36834661  0.03113880  0.057953035
+## 4   4 -0.27706329 -0.01495799 -0.007228148
+## 5   5 -0.04575097 -0.15498484 -0.141863965
+## 6   6 -0.38224999  0.36699784  0.202578960
+## 7   7 -0.79123852  0.16021400  0.046593476
+## 8   8 -0.18055726  0.16803215  0.095775394
+## 9   9  1.42015833  0.04231817  0.012132127
+## 10 10 -0.73780585 -0.39067576 -0.169553540
+## 11 11  0.79018509  0.28141067  0.145748346
+## 12 12 -0.52731794 -0.12649060 -0.198041122</code></pre>
 <p>Default trace plots can be generated using:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/traceplot.html">traceplot</a></span>(fit)</code></pre></div>
 <p>but with a little more work, we can get a nicer set of iteration trace plots (“wriggly worms”)…</p>
@@ -501,17 +515,17 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 <a href="#running-models" class="anchor"></a>Running models</h2>
 <p>Models can be fitted several ways, including via the [magrittr] forward-pipe operator.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/saem.fit.html">saem.fit</a></span>(<span class="dt">data=</span>theo_sd)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-saem-4425fc1acffa4d2f0dc625e3f992ab10.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-saem-1250c45e7f2b989f2dcbed06255cf167.rds)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, <span class="dt">data=</span>theo_sd, <span class="dt">est=</span><span class="st">"saem"</span>)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-4425fc1acffa4d2f0dc625e3f992ab10.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-1250c45e7f2b989f2dcbed06255cf167.rds)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit3 &lt;-<span class="st"> </span>one.compartment <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/saem.fit.html">saem.fit</a></span>(<span class="dt">data=</span>theo_sd)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-.-theo_sd-saem-4425fc1acffa4d2f0dc625e3f992ab10.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-theo_sd-saem-1250c45e7f2b989f2dcbed06255cf167.rds)</code></pre>
 <p>Options to the estimation routines can be specified using nlmeControl for nlme estimation:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit4 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd,<span class="dt">est=</span><span class="st">"nlme"</span>,<span class="dt">control =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/nlme/topics/nlmeControl">nlmeControl</a></span>(<span class="dt">pnlsTol =</span> .<span class="dv">5</span>))</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-nlme-b7f656f2bbbb08c249f343a9c517d2ab.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-nlme-072aa67f050d5536e56beba31bfc4766.rds)</code></pre>
 <p>where options are specified in the <code>nlme</code> documentation. Options for saem can be specified using <code>saemControl</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit5 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment,theo_sd,<span class="dt">est=</span><span class="st">"saem"</span>,<span class="dt">control=</span><span class="kw"><a href="../reference/saemControl.html">saemControl</a></span>(<span class="dt">n.burn=</span><span class="dv">250</span>,<span class="dt">n.em=</span><span class="dv">350</span>,<span class="dt">print=</span><span class="dv">50</span>))</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-292f2b3f75ac4db9e9d8b93272f5e4c6.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-f99f01a3bf15656466881f09d4346e52.rds)</code></pre>
 <p>this example specifies 250 burn-in iterations, 350 em iterations and a print progress every 50 runs.</p>
 </div>
 <div id="model-syntax-for-solved-pk-systems" class="section level2">

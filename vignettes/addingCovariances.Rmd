@@ -1,0 +1,67 @@
+---
+title: "Example Model: Phenobarbatol with covariances"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example Model: Phenobarbatol with covariances}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+![nlmixr](logo.png)
+
+# Adding Covariances between random effects
+
+You can simply add co-variances between two random effects by adding
+the effects together in the model specification block, that is
+`eta.cl+eta.v ~`.  After that statement, you specify the lower
+triangular matrix of the fit with `c()`.
+
+An example of this is the Phenobarbital data:
+
+```{r}
+## Load Phenobarb data
+library(nlmixr)
+
+## To allow nlmixr to reload runs without large run times
+## To run the actual models on your system, take the save options off.
+options(nlmixr.save=TRUE,
+        nlmixr.save.dir=system.file(package="nlmixr"));
+
+pheno <- function() {
+  ini({
+    tcl <- log(0.008) # typical value of clearance
+    tv <-  log(0.6)   # typical value of volume
+    ## var(eta.cl)
+    eta.cl + eta.v ~ c(1, 
+                       0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
+                      # interindividual variability on clearance and volume
+    add.err <- 0.1    # residual variability
+  })
+  model({
+    cl <- exp(tcl + eta.cl) # individual value of clearance
+    v <- exp(tv + eta.v)    # individual value of volume
+    ke <- cl / v            # elimination rate constant
+    d/dt(A1) = - ke * A1    # model differential equation
+    cp = A1 / v             # concentration in plasma
+    cp ~ add(add.err)       # define error model
+  })
+}
+
+fit <- nlmixr(pheno, pheno_sd, "saem")
+
+fit
+
+suppressWarnings(plot(fit))
+
+library(ggplot2)
+## A traditional VPC
+vpc(fit, show=list(obs_dv=TRUE))
+
+## A prediction-corrected VPC
+vpc(fit, pred_corr = TRUE, show=list(obs_dv=TRUE))
+```

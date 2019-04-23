@@ -3,7 +3,7 @@ title: "Modifying nlmixr models by piping"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Running PK models with nlmixr}
+  %\VignetteIndexEntry{Modifying nlmixr models by piping}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

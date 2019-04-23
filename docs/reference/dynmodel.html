@@ -92,6 +92,20 @@
     </li>
   </ul>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fas fa fas fa-chalkboard-teacher"></span>
+     
+    Example models
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/addingCovariances.html">Phenobarbatol with covariances</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
     <span class="fas fa fas fa-scroll"></span>
@@ -216,14 +230,14 @@
 <span class='no'>fixPars</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>CL</span><span class='kw'>=</span><span class='fl'>.0793</span>, <span class='kw'>V2</span><span class='kw'>=</span><span class='fl'>.64</span>, <span class='kw'>Q</span><span class='kw'>=</span><span class='fl'>.292</span>, <span class='kw'>V3</span><span class='kw'>=</span><span class='fl'>9.63</span>)
 <span class='no'>ev</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/RxODE/topics/eventTable'>eventTable</a></span>()
 <span class='no'>ev</span>$<span class='fu'><a href='https://www.rdocumentation.org/packages/RxODE/topics/add.sampling'>add.sampling</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>, <span class='no'>dat</span>$<span class='no'>time</span>))
-(<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>dynmodel</span>(<span class='no'>sys1</span>, <span class='no'>mod</span>, <span class='no'>ev</span>, <span class='no'>inits</span>, <span class='no'>dat</span>, <span class='no'>fixPars</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: NaNs produced</span></div><div class='output co'>#&gt;               est      %cv
-#&gt; MIT  191.92801080      NaN
-#&gt; CVI2   0.65545026      NaN
-#&gt; F      0.90606339      NaN
-#&gt; err    0.07868075 18.99873
+(<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>dynmodel</span>(<span class='no'>sys1</span>, <span class='no'>mod</span>, <span class='no'>ev</span>, <span class='no'>inits</span>, <span class='no'>dat</span>, <span class='no'>fixPars</span>))</div><div class='output co'>#&gt;               est       %cv
+#&gt; MIT  191.94356435  3.037210
+#&gt; CVI2   0.65553288  3.644888
+#&gt; F      0.90601154  2.302843
+#&gt; err    0.07864182 18.988001
 #&gt; 
 #&gt;    -loglik        AIC        BIC 
-#&gt; -5.5421498 -3.0842996 -0.5280703 
+#&gt; -5.5421508 -3.0843017 -0.5280723 
 #&gt; </div><div class='input'>
 </div></pre>
   </div>

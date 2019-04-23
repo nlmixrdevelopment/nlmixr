@@ -135,6 +135,11 @@ navbar:
         - text: "Going further"
         - text: "Model Piping"
           href: articles/modelPiping.html
+  - text: Example models
+    icon: fas fa-chalkboard-teacher
+    menu:
+        - text: "Phenobarbatol with covariances"
+          href: articles/addingCovariances.html
   - text: "Cheat Sheet"
     icon: fas fa-scroll
     href: https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf
