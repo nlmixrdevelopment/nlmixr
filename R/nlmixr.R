@@ -118,6 +118,7 @@ armaVersion <- function(){
 ##' @export
 nlmixr <- function(object, data, est=NULL, control=list(),
                    table=tableControl(), ...,save=getOption("nlmixr.save",FALSE)){
+    force(est)
     ## verbose?
     ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
     UseMethod("nlmixr")
@@ -138,6 +139,7 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
         .uif$nmodel$data.name <- deparse(substitute(data))
         class(.uif) <- "nlmixrUI"
         .args$data <- data;
+        .args$est  <- est
         .args <- c(list(uif=.uif), .args[-1]);
         if (is.null(est)){
             stop("Need to supply an estimation routine with est=.");
@@ -156,6 +158,7 @@ nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=t
     }
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .args$data <- data;
+    .args$est <- est;
     .args <- c(list(uif=.uif), .args[-1]);
     return(do.call(nlmixr_fit, .args))
 }
@@ -173,9 +176,11 @@ nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
         if (missing(data) && !is.null(.getPipedData())){
             data <- .getPipedData();
             .args$data <- data;
+            .args$est <- est;
         } else {
             .uif$nmodel$data.name <- deparse(substitute(data))
             .args$data <- data;
+            .args$est <- est;
         }
         return(do.call(nlmixr_fit, .args));
     }
@@ -688,17 +693,19 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
                         save=getOption("nlmixr.save", FALSE)){
     if (save){
         .modName  <- ifelse(is.null(uif$model.name),"",paste0(uif$model.name,"-"));
+        if (.modName==".-") .modName <- ""
         .dataName  <- ifelse(is.null(uif$data.name),"",paste0(uif$data.name,"-"));
-        .digest <- digest::digest(list(uif$fun.txt,
-                                       uif$ini,
+        if (.dataName==".-") .dataName <- ""
+        .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",uif$fun.txt)),
+                                       as.data.frame(uif$ini),
                                        data,
                                        est,
                                        control,
-                                       ...,
                                        sum.prod,
                                        table,
-                                       packageVersion("nlmixr"),
-                                       packageVersion("RxODE")))
+                                       ...,
+                                       as.character(packageVersion("nlmixr")),
+                                       as.character(packageVersion("RxODE"))))
         .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
                                 paste0("nlmixr-",.modName,.dataName,est,"-",.digest,".rds"));
         if (file.exists(.saveFile)){
