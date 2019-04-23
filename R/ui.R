@@ -201,7 +201,7 @@ ini <- function(ini, ...){
 ##' @return Parsed UI object
 ##' @author Matthew L. Fidler
 ##' @export
-model <- function(model, ...){
+model <- function(model, ..., .lines=NULL){
   if (is(substitute(model), "{")){
     .f <- eval(parse(text=sprintf("function() %s", paste(.deparse(substitute(model)), collapse="\n"))))
     if (!exists(".model", parent.frame(1))){
@@ -224,7 +224,9 @@ model <- function(model, ...){
     .uif  <- .getUif(model);
     .ini <- as.data.frame(.uif$ini);
     .call <- match.call(expand.dots=TRUE)[-(1:2)];
-    .lines <- .deparse(.call[[1]]);
+    if (is.null(.lines)){
+          .lines <- .deparse(.call[[1]]);
+    }
     .f <- try(eval(parse(text=sprintf("function() %s", paste(.lines, collapse="\n")))),silent=TRUE);
     .origLines <- strsplit(.uif$fun.txt,"\n")[[1]];
     .fNew <- c("function(){",.origLines,"}");
@@ -367,6 +369,67 @@ model <- function(model, ...){
     }
   }
 }
+
+.nlmixrUpdate  <- function(object, ...){
+  .uif  <- .getUif(object);
+  .iniNames <- paste(.uif$ini$name);
+  .call <- match.call(expand.dots=TRUE)[-c(1:2)];
+  .callNames  <- names(.call);
+  if (is.null(.callNames)){
+    .callNames  <- rep("",length(.call));
+  }
+  ## Any time the parameters are named, use ini call
+  .iniArgs  <- which(.callNames %in% .iniNames);
+  .iniNames2  <- .callNames[.iniArgs];
+  if (length(.iniArgs) > 0){
+    .uif <- do.call(ini, c(list(.uif), setNames(as.list(.call[.iniArgs]), .iniNames2)));
+    .iniI <- seq_along(.call)[-.iniArgs]
+  } else {
+    .iniI  <- seq_along(.call)
+  }
+  for (.i in .iniI){
+    ## Call model() multiple times if needed.
+    if (.callNames[.i]!=""){
+      ## construct model(.uif,{name()<-expr()})
+      .cn  <- eval(parse(text=paste0("quote(",.callNames[.i],")")))
+      .uif <- eval(as.call(list(`model`,quote(.uif),
+                                as.call(list(quote(`{`),
+                                             as.call(list(quote(`<-`),.cn,
+                                                          .call[[.i]])))))))
+    } else {
+      .x <- .call[[.i]]
+      .didCall  <- FALSE;
+      if (is.call(.x) || is.pairlist(.x)) {
+        if (identical(.x[[1]], quote(`c`)) ||
+            identical(.x[[1]], quote(`list`))){
+          .uif <- eval(as.call(list(`ini`,quote(.uif),.x)))
+          .didCall <- TRUE
+        }
+      } else if (is.name(.x)){
+        .tmp <- eval(.x);
+        if (is(.tmp,"list") || is(.tmp,"numeric") || is(.tmp,"integer")){
+          .uif <- ini(.uif, .tmp)
+        } else {
+          .uif <- model(.uif, .lines=.deparse(.tmp))
+        }
+        .didCall  <- TRUE
+      }
+      if (!.didCall){
+        .uif <- model(.uif, .lines=.deparse(.x))
+      }
+    }
+  }
+  return(.uif)
+}
+
+##'@export
+update.nlmixrUI  <- .nlmixrUpdate
+
+##'@export
+update.nlmixrFitCore  <- .nlmixrUpdate
+
+##'@export
+update.function  <- .nlmixrUpdate
 
 .finalizeUiModel <- function(fun2,meta){
   class(fun2) <- "nlmixrUI";

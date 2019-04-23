@@ -4,7 +4,7 @@
 \alias{model}
 \title{nlmixr model block}
 \usage{
-model(model, ...)
+model(model, ..., .lines = NULL)
 }
 \arguments{
 \item{model}{Model specification}
