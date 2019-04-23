@@ -5,7 +5,8 @@
 \title{Fit a nlmixr model}
 \usage{
 nlmixr_fit(uif, data, est = NULL, control = list(), ...,
-  sum.prod = FALSE, table = tableControl())
+  sum.prod = FALSE, table = tableControl(),
+  save = getOption("nlmixr.save", FALSE))
 }
 \arguments{
 \item{uif}{Parsed nlmixr model (by \code{nlmixr(mod.fn)}).}

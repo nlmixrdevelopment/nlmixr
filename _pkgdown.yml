@@ -133,8 +133,8 @@ navbar:
           href: articles/running_nlmixr.html
         - text: "--------------------------"
         - text: "Going further"
-        - text: "Model Pipng"
-          href: articles/modelPipng.html
+        - text: "Model Piping"
+          href: articles/modelPiping.html
   - text: "Cheat Sheet"
     icon: fas fa-scroll
     href: https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf

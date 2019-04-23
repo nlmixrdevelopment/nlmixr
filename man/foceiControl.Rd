@@ -42,7 +42,7 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxOdeRecalc = 5, odeRecalcFactor = 10^(0.5),
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
   etaNudge = 0.01, stiff, nRetries = 3, seed = 42,
-  badEtaPenalty = 0.05, resetThetaCheckPer = 0.1)
+  badEtaPenalty = 0.05, resetThetaCheckPer = 0.1, etaMat = NULL)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:

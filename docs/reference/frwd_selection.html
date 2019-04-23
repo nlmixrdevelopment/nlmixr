@@ -88,7 +88,7 @@
     <li class="divider"></li>
     <li class="dropdown-header">Going further</li>
     <li>
-      <a href="../articles/modelPipng.html">Model Pipng</a>
+      <a href="../articles/modelPiping.html">Model Piping</a>
     </li>
   </ul>
 </li>
@@ -185,43 +185,43 @@
 <span class='no'>cv</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>lCL</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"WT"</span>, <span class='st'>"TG"</span>), <span class='kw'>lV</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"WT"</span>))
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>frwd_selection</span>(<span class='no'>fit0</span>, <span class='no'>cv</span>, <span class='no'>dat</span>)</div><div class='output co'>#&gt; covariate selection process:
 #&gt; 
-#&gt; adding WT to lCL : p-val = 0.2434711
-#&gt; adding TG to lCL : p-val = 0.2783604
-#&gt; adding WT to lV : p-val = 0.001122798
+#&gt; adding WT to lCL : p-val = 0.209495
+#&gt; adding TG to lCL : p-val = 0.3052644
+#&gt; adding WT to lV : p-val = 0.01717673
 #&gt;  WT added to lV 
 #&gt; 
-#&gt; adding WT to lCL : p-val = 0.4261526
-#&gt; adding TG to lCL : p-val = 0.2445978
+#&gt; adding WT to lCL : p-val = 0.3170212
+#&gt; adding TG to lCL : p-val = 0.3082202
 #&gt; 
 #&gt; covariate selection finished.
 #&gt; 
 #&gt; </div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/summary'>summary</a></span>(<span class='no'>fit</span>))</div><div class='output co'>#&gt; Nonlinear mixed-effects model fit by maximum likelihood
 #&gt;   Model: DV ~ (nlmixr::nlmeModList("user_fn"))(lCL, lV, lKA, TIME, ID) 
 #&gt;        AIC      BIC    logLik
-#&gt;   850.8904 875.9221 -418.4452
+#&gt;   853.6537 878.6853 -419.8268
 #&gt; 
 #&gt; Random effects:
 #&gt;  Formula: list(lKA ~ 1, lCL ~ 1)
 #&gt;  Level: ID
 #&gt;  Structure: Diagonal
 #&gt;               lKA       lCL Residual
-#&gt; StdDev: 0.4226621 0.2414877 1.049153
+#&gt; StdDev: 0.4269525 0.2488361 1.053212
 #&gt; 
 #&gt; Fixed effects: list(lKA = lKA ~ 1, lCL = lCL ~ 1, lV = lV ~ 1 + WT) 
 #&gt;                    Value  Std.Error  DF   t-value p-value
-#&gt; lKA             0.247239 0.13288830 249   1.86050  0.0640
-#&gt; lCL            -3.178133 0.07333895 249 -43.33485  0.0000
-#&gt; lV.(Intercept) -0.217115 0.17928297 249  -1.21102  0.2270
-#&gt; lV.WT          -0.008875 0.00258047 249  -3.43926  0.0007
+#&gt; lKA            0.2474566 0.13415447 249  1.844565  0.0663
+#&gt; lCL            1.0538593 0.07540032 249 13.976856  0.0000
+#&gt; lV.(Intercept) 2.9654832 0.18025208 249 16.451867  0.0000
+#&gt; lV.WT          0.0062403 0.00259205 249  2.407470  0.0168
 #&gt;  Correlation: 
 #&gt;                lKA    lCL    lV.(I)
 #&gt; lCL            -0.012              
-#&gt; lV.(Intercept)  0.006  0.001       
-#&gt; lV.WT           0.030 -0.017 -0.990
+#&gt; lV.(Intercept)  0.008  0.000       
+#&gt; lV.WT           0.027 -0.015 -0.990
 #&gt; 
 #&gt; Standardized Within-Group Residuals:
 #&gt;         Min          Q1         Med          Q3         Max 
-#&gt; -5.00355872 -0.35865712  0.05778868  0.45974587  3.15430147 
+#&gt; -5.01682625 -0.38310129  0.04266484  0.45315198  3.15871326 
 #&gt; 
 #&gt; Number of Observations: 264
 #&gt; Number of Groups: 12 </div></pre>

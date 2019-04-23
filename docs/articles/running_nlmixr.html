@@ -54,7 +54,7 @@
     <li class="divider">
     <li class="dropdown-header">Going further</li>
     <li>
-      <a href="../articles/modelPipng.html">Model Pipng</a>
+      <a href="../articles/modelPiping.html">Model Piping</a>
     </li>
   </ul>
 </li>
@@ -100,7 +100,7 @@
     <div class="page-header toc-ignore">
       <h1>Running PK models with nlmixr</h1>
             
-            <h4 class="date">2019-04-19</h4>
+            <h4 class="date">2019-04-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd"><code>vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
@@ -120,12 +120,18 @@
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(nlmixr)
 
+## To allow nlmixr to reload runs without large run times
+## To run the actual models on your system, take the save options off.
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="dt">nlmixr.save=</span><span class="ot">TRUE</span>,
+        <span class="dt">nlmixr.save.dir=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="dt">package=</span><span class="st">"nlmixr"</span>));
+
+
 <span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(theo_sd)</code></pre></div>
 <pre><code>## 'data.frame':    144 obs. of  7 variables:
 ##  $ ID  : int  1 1 1 1 1 1 1 1 1 1 ...
 ##  $ TIME: num  0 0 0.25 0.57 1.12 2.02 3.82 5.1 7.03 9.05 ...
 ##  $ DV  : num  0 0.74 2.84 6.57 10.5 9.66 8.58 8.36 7.47 6.89 ...
-##  $ AMT : num  4.02 0 0 0 0 0 0 0 0 0 ...
+##  $ AMT : num  320 0 0 0 0 ...
 ##  $ EVID: int  101 0 0 0 0 0 0 0 0 0 ...
 ##  $ CMT : int  1 2 2 2 2 2 2 2 2 2 ...
 ##  $ WT  : num  79.6 79.6 79.6 79.6 79.6 79.6 79.6 79.6 79.6 79.6 ...</code></pre>
@@ -151,120 +157,26 @@
 }</code></pre></div>
 <p>We can now run the model…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.cmt, theo_sd, <span class="dt">est=</span><span class="st">"nlme"</span>)</code></pre></div>
-<pre><code>## Warning in nlmixrUI.nlme.var(obj): Initial condition for additive error
-## ignored with nlme</code></pre>
-<pre><code>## 
-## **Iteration 1
-## LME step: Loglik: -182.2318, nlminb iterations: 1
-## reStruct  parameters:
-##       ID1       ID2       ID3 
-## 0.2783009 1.0022617 2.0758984 
-##  Beginning PNLS step: ..  completed fit_nlme() step.
-## PNLS step: RSS =  63.1492 
-##  fixed effects: 0.4479981  -3.211935  -0.7859319  
-##  iterations: 7 
-## Convergence crit. (must all become &lt;= tolerance = 1e-05):
-##     fixed  reStruct 
-## 0.2723749 3.2673500 
-## 
-## **Iteration 2
-## LME step: Loglik: -179.291, nlminb iterations: 9
-## reStruct  parameters:
-##        ID1        ID2        ID3 
-## 0.08333469 0.96385386 1.63552496 
-##  Beginning PNLS step: ..  completed fit_nlme() step.
-## PNLS step: RSS =  63.28224 
-##  fixed effects: 0.4441499  -3.211529  -0.7863391  
-##  iterations: 7 
-## Convergence crit. (must all become &lt;= tolerance = 1e-05):
-##       fixed    reStruct 
-## 0.008664073 0.172140456 
-## 
-## **Iteration 3
-## LME step: Loglik: -179.337, nlminb iterations: 8
-## reStruct  parameters:
-##        ID1        ID2        ID3 
-## 0.07085101 0.96127445 1.63887834 
-##  Beginning PNLS step: ..  completed fit_nlme() step.
-## PNLS step: RSS =  63.21956 
-##  fixed effects: 0.445849  -3.211695  -0.7861748  
-##  iterations: 7 
-## Convergence crit. (must all become &lt;= tolerance = 1e-05):
-##       fixed    reStruct 
-## 0.003810966 0.083040769 
-## 
-## **Iteration 4
-## LME step: Loglik: -179.3201, nlminb iterations: 7
-## reStruct  parameters:
-##        ID1        ID2        ID3 
-## 0.07619041 0.96243387 1.63736919 
-##  Beginning PNLS step: ..  completed fit_nlme() step.
-## PNLS step: RSS =  63.24586 
-##  fixed effects: 0.4451181  -3.211622  -0.7862475  
-##  iterations: 7 
-## Convergence crit. (must all become &lt;= tolerance = 1e-05):
-##       fixed    reStruct 
-## 0.001641979 0.034519243 
-## 
-## **Iteration 5
-## LME step: Loglik: -179.328, nlminb iterations: 6
-## reStruct  parameters:
-##        ID1        ID2        ID3 
-## 0.07381939 0.96192229 1.63801880 
-##  Beginning PNLS step: ..  completed fit_nlme() step.
-## PNLS step: RSS =  63.23423 
-##  fixed effects: 0.4454379  -3.211654  -0.7862161  
-##  iterations: 7 
-## Convergence crit. (must all become &lt;= tolerance = 1e-05):
-##        fixed     reStruct 
-## 0.0007179333 0.0153297894 
-## 
-## **Iteration 6
-## LME step: Loglik: -179.3247, nlminb iterations: 5
-## reStruct  parameters:
-##        ID1        ID2        ID3 
-## 0.07486971 0.96215578 1.63772962 
-##  Beginning PNLS step: ..  completed fit_nlme() step.
-## PNLS step: RSS =  63.24087 
-##  fixed effects: 0.4454379  -3.211654  -0.7862161  
-##  iterations: 1 
-## Convergence crit. (must all become &lt;= tolerance = 1e-05):
-##       fixed    reStruct 
-## 0.000000000 0.008689492 
-## 
-## **Iteration 7
-## LME step: Loglik: -179.3247, nlminb iterations: 1
-## reStruct  parameters:
-##        ID1        ID2        ID3 
-## 0.07485046 0.96214641 1.63773356 
-##  Beginning PNLS step: ..  completed fit_nlme() step.
-## PNLS step: RSS =  63.24087 
-##  fixed effects: 0.4454379  -3.211654  -0.7862161  
-##  iterations: 1 
-## Convergence crit. (must all become &lt;= tolerance = 1e-05):
-##       fixed    reStruct 
-## 0.00000e+00 1.29286e-11</code></pre>
-<pre><code>## Calculating residuals/tables</code></pre>
-<pre><code>## done.</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.cmt-theo_sd-nlme-95f683d3473029170e5461c0163d5ae0.rds)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)</code></pre></div>
-<pre><code>## ── nlmixr nlme by maximum likelihood (Solved; μ-ref &amp; covs) nlme OBF fit ──</code></pre>
+<pre><code>## ── nlmixr nlme by [1m[33mmaximum likelihood[39m[22m ([3mSolved; μ-ref &amp; covs[23m) nlme OBF fit ──</code></pre>
 <pre><code>##          OBJF      AIC      BIC Log-likelihood Condition Number
-## nlme 116.0495 372.6493 392.8289      -179.3247         18.20717</code></pre>
+## nlme 116.8726 373.4723 393.6519      -179.7362         17.08703</code></pre>
 <pre><code>## 
 ## ── Time (sec; $time): ─────────────────────────────────────────────────────</code></pre>
 <pre><code>##    nlme    setup optimize covariance table
-##  17.913 0.877061    1e-05    1.2e-05 0.037</code></pre>
+##  14.759 0.808151  1.1e-05    1.2e-05 0.017</code></pre>
 <pre><code>## 
 ## ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</code></pre>
-<pre><code>##         Parameter   Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
-## tka        log Ka  0.445  0.198 44.4        1.56 (1.06, 2.3)     71.5
-## tcl        log Cl  -3.21 0.0845 2.63 0.0403 (0.0341, 0.0475)     26.9
-## tv          log V -0.786 0.0463 5.89    0.456 (0.416, 0.499)     13.5
-## add.err            0.692                               0.692         
+<pre><code>##         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
+## tka        log Ka 0.447  0.192   43       1.56 (1.07, 2.28)     68.7
+## tcl        log Cl  1.02 0.0847 8.31       2.77 (2.35, 3.27)     26.9
+## tv          log V  3.45 0.0464 1.35       31.5 (28.7, 34.5)     13.6
+## add.err           0.697                               0.697         
 ##         Shrink(SD)%
-## tka        0.0542% 
-## tcl          3.71% 
-## tv           10.2% 
+## tka         0.236% 
+## tcl          3.78% 
+## tv           10.0% 
 ## add.err             
 ## 
 ##   Covariance Type ($covMethod): nlme
@@ -276,20 +188,20 @@
 <pre><code>## # A tibble: 132 x 18
 ##   ID     TIME    DV  EVID  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl
 ##   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-## 1 1     0      0.74     0  0    0.74    0     0.74   1.07   0.124 -0.625
-## 2 1     0.25   2.84     0  2.82 0.0219  3.86 -1.02  -1.47   0.124 -0.625
-## 3 1     0.570  6.57     0  5.05 1.52    6.78 -0.207 -0.299  0.124 -0.625
+## 1 1     0      0.74     0  0     0.74   0     0.74   1.06   0.101 -0.479
+## 2 1     0.25   2.84     0  3.25 -0.410  3.84 -1.00  -1.44   0.101 -0.479
+## 3 1     0.570  6.57     0  5.83  0.744  6.78 -0.212 -0.305  0.101 -0.479
 ## # … with 129 more rows, and 7 more variables: eta.v &lt;dbl&gt;, rx1c &lt;dbl&gt;,
 ## #   ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, depot &lt;dbl&gt;, central &lt;dbl&gt;</code></pre>
 <p>We can alternatively express the same model by ordinary differential equations (ODEs):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">one.compartment.saem &lt;-<span class="st"> </span><span class="cf">function</span>() {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>() {
     <span class="kw"><a href="../reference/ini.html">ini</a></span>({
         tka &lt;-<span class="st"> </span>.<span class="dv">5</span>   <span class="co"># Log Ka</span>
         tcl &lt;-<span class="st"> </span><span class="op">-</span><span class="fl">3.2</span> <span class="co"># Log Cl</span>
-        tv &lt;-<span class="st"> </span><span class="op">-</span><span class="dv">1</span>    <span class="co"># Log V</span>
-        eta.ka <span class="op">~</span><span class="st"> </span><span class="dv">1</span>
-        eta.cl <span class="op">~</span><span class="st"> </span><span class="dv">2</span>
-        eta.v <span class="op">~</span><span class="st"> </span><span class="dv">1</span>
+        tv &lt;-<span class="st"> </span><span class="op">-</span><span class="fl">0.6</span>    <span class="co"># Log V</span>
+        eta.ka <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span>
+        eta.cl <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span>
+        eta.v <span class="op">~</span><span class="st"> </span><span class="fl">0.5</span>
         add.err &lt;-<span class="st"> </span><span class="fl">0.1</span>
     })
     <span class="kw"><a href="../reference/model.html">model</a></span>({
@@ -303,116 +215,69 @@
     })
 }</code></pre></div>
 <p>We can try the Stochastic Approximation EM (SAEM) method to this model:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment.saem, theo_sd, <span class="dt">est=</span><span class="st">"saem"</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c">Compiling RxODE differential equations...c:/Rtools/mingw_64/bin/gcc  -I<span class="st">"C:/PROGRA~1/R/R-34~1.2/include"</span> -DNDEBUG     -I<span class="st">"d:/Compiler/gcc-4.9.3/local330/include"</span>     -O2 -Wall  -std=gnu99 -mtune=core2 -c rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.c -o rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.o
-c:/Rtools/mingw_64/bin/gcc -shared -s -<span class="dt">static</span>-libgcc -o rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.dll tmp.def rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.o -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lRblas -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lRlapack -lgfortran -lm -lquadmath -Ld:/Compiler/gcc-<span class="fl">4.9</span>.<span class="dv">3</span>/local330/lib/x64 -Ld:/Compiler/gcc-<span class="fl">4.9</span>.<span class="dv">3</span>/local330/lib -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lR
-done.
-C:/Rtools/mingw_64/bin/g++  -I<span class="st">"C:/PROGRA~1/R/R-34~1.2/include"</span> -DNDEBUG     -I<span class="st">"d:/Compiler/gcc-4.9.3/local330/include"</span>  -IC:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/nlmixr/include -IC:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/STANHE~<span class="dv">1</span>/include -IC:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/Rcpp/include -IC:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/RCPPAR~<span class="dv">1</span>/include -IC:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/RCPPEI~<span class="dv">1</span>/include -IC:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/BH/include   -O3 -mtune=native -march=native -Wno-unused-variable -Wno-unused-function -c saem71e81ac5342dx64.cpp -o saem71e81ac5342dx64.o
-In file included from C:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/RCPPAR~<span class="dv">1</span>/include/armadillo:<span class="dv">52</span>:<span class="dv">0</span>,
-                 from C:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/RCPPAR~<span class="dv">1</span>/include/RcppArmadilloForward.h:<span class="dv">46</span>,
-                 from C:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/RCPPAR~<span class="dv">1</span>/include/RcppArmadillo.h:<span class="dv">31</span>,
-                 from saem71e81ac5342dx64.cpp:<span class="dv">1</span>:
-C:/Users/nlmixr/DOCUME~<span class="dv">1</span>/R/WIN-LI~<span class="dv">1</span>/<span class="fl">3.4</span>/RCPPAR~<span class="dv">1</span>/include/armadillo_bits/compiler_setup.hpp:<span class="dv">474</span>:<span class="dv">96</span>: note: #pragma message: WARNING: use of OpenMP disabled; this compiler doesn't support OpenMP <span class="fl">3.0</span>+
-   <span class="pp">#pragma message ("WARNING: use of OpenMP disabled; this compiler doesn't support OpenMP 3.0+")</span>
-C:/Rtools/mingw_64/bin/g++ -shared -s -<span class="dt">static</span>-libgcc -o saem71e81ac5342dx64.dll tmp.def saem71e81ac5342dx64.o C:/Working/nlmixr/rx_3b3c0f7e21991fad1e55c3077c46e24a_x64.dll -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lRblas -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lRlapack -lgfortran -lm -lquadmath -Ld:/Compiler/gcc-<span class="fl">4.9</span>.<span class="dv">3</span>/local330/lib/x64 -Ld:/Compiler/gcc-<span class="fl">4.9</span>.<span class="dv">3</span>/local330/lib -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lR
-done.
-<span class="dv">1</span>:     <span class="fl">0.2936</span>   -<span class="fl">3.1515</span>   -<span class="fl">0.3166</span>    <span class="fl">0.9500</span>    <span class="fl">1.9000</span>    <span class="fl">1.9000</span>   <span class="fl">11.1432</span>
-<span class="dv">2</span>:    <span class="fl">0.4815</span>  -<span class="fl">3.3577</span>  -<span class="fl">0.4751</span>   <span class="fl">0.9577</span>   <span class="fl">1.8050</span>   <span class="fl">1.8050</span>   <span class="fl">5.7848</span>
-<span class="dv">3</span>:    <span class="fl">0.7435</span>  -<span class="fl">3.4761</span>  -<span class="fl">0.6772</span>   <span class="fl">0.9098</span>   <span class="fl">1.7147</span>   <span class="fl">1.7147</span>   <span class="fl">2.4877</span>
-<span class="dv">4</span>:    <span class="fl">0.6739</span>  -<span class="fl">3.5700</span>  -<span class="fl">0.6901</span>   <span class="fl">0.8643</span>   <span class="fl">1.6290</span>   <span class="fl">1.6290</span>   <span class="fl">1.7050</span>
-<span class="dv">5</span>:    <span class="fl">0.6951</span>  -<span class="fl">3.4874</span>  -<span class="fl">0.7071</span>   <span class="fl">0.8211</span>   <span class="fl">1.5476</span>   <span class="fl">1.5476</span>   <span class="fl">1.4010</span>
-<span class="dv">6</span>:    <span class="fl">0.5690</span>  -<span class="fl">3.3963</span>  -<span class="fl">0.7542</span>   <span class="fl">0.7800</span>   <span class="fl">1.4702</span>   <span class="fl">1.4702</span>   <span class="fl">0.9980</span>
-<span class="dv">7</span>:    <span class="fl">0.5346</span>  -<span class="fl">3.3423</span>  -<span class="fl">0.7814</span>   <span class="fl">0.7423</span>   <span class="fl">1.3967</span>   <span class="fl">1.3967</span>   <span class="fl">0.8210</span>
-<span class="dv">8</span>:    <span class="fl">0.4469</span>  -<span class="fl">3.2585</span>  -<span class="fl">0.8184</span>   <span class="fl">0.7052</span>   <span class="fl">1.3268</span>   <span class="fl">1.3268</span>   <span class="fl">0.7238</span>
-<span class="dv">9</span>:    <span class="fl">0.3935</span>  -<span class="fl">3.2638</span>  -<span class="fl">0.8330</span>   <span class="fl">0.6699</span>   <span class="fl">1.2605</span>   <span class="fl">1.2605</span>   <span class="fl">0.6806</span>
-<span class="dv">10</span>:    <span class="fl">0.4153</span>  -<span class="fl">3.2282</span>  -<span class="fl">0.8281</span>   <span class="fl">0.7129</span>   <span class="fl">1.1975</span>   <span class="fl">1.1975</span>   <span class="fl">0.6297</span>      
-...
-<span class="dv">491</span>:    <span class="fl">0.4472</span>  -<span class="fl">3.2115</span>  -<span class="fl">0.7879</span>   <span class="fl">0.4430</span>   <span class="fl">0.0712</span>   <span class="fl">0.0176</span>   <span class="fl">0.4754</span>
-<span class="dv">492</span>:    <span class="fl">0.4472</span>  -<span class="fl">3.2115</span>  -<span class="fl">0.7879</span>   <span class="fl">0.4429</span>   <span class="fl">0.0712</span>   <span class="fl">0.0176</span>   <span class="fl">0.4755</span>
-<span class="dv">493</span>:    <span class="fl">0.4472</span>  -<span class="fl">3.2115</span>  -<span class="fl">0.7879</span>   <span class="fl">0.4427</span>   <span class="fl">0.0712</span>   <span class="fl">0.0176</span>   <span class="fl">0.4755</span>
-<span class="dv">494</span>:    <span class="fl">0.4473</span>  -<span class="fl">3.2115</span>  -<span class="fl">0.7878</span>   <span class="fl">0.4424</span>   <span class="fl">0.0712</span>   <span class="fl">0.0176</span>   <span class="fl">0.4754</span>
-<span class="dv">495</span>:    <span class="fl">0.4474</span>  -<span class="fl">3.2115</span>  -<span class="fl">0.7878</span>   <span class="fl">0.4424</span>   <span class="fl">0.0712</span>   <span class="fl">0.0176</span>   <span class="fl">0.4753</span>
-<span class="dv">496</span>:    <span class="fl">0.4476</span>  -<span class="fl">3.2115</span>  -<span class="fl">0.7878</span>   <span class="fl">0.4423</span>   <span class="fl">0.0712</span>   <span class="fl">0.0176</span>   <span class="fl">0.4753</span>
-<span class="dv">497</span>:    <span class="fl">0.4476</span>  -<span class="fl">3.2116</span>  -<span class="fl">0.7878</span>   <span class="fl">0.4424</span>   <span class="fl">0.0712</span>   <span class="fl">0.0177</span>   <span class="fl">0.4753</span>
-<span class="dv">498</span>:    <span class="fl">0.4476</span>  -<span class="fl">3.2116</span>  -<span class="fl">0.7879</span>   <span class="fl">0.4423</span>   <span class="fl">0.0712</span>   <span class="fl">0.0176</span>   <span class="fl">0.4753</span>
-<span class="dv">499</span>:    <span class="fl">0.4475</span>  -<span class="fl">3.2115</span>  -<span class="fl">0.7879</span>   <span class="fl">0.4424</span>   <span class="fl">0.0712</span>   <span class="fl">0.0176</span>   <span class="fl">0.4753</span>
-<span class="dv">500</span>:    <span class="fl">0.4475</span>  -<span class="fl">3.2116</span>  -<span class="fl">0.7879</span>   <span class="fl">0.4426</span>   <span class="fl">0.0713</span>   <span class="fl">0.0176</span>   <span class="fl">0.4753</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Calculate ETA-based prediction and error derivatives:
-## Calculate d(f)/d(eta) 
-## ...
-## done
-## ...
-## done</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c">c:/Rtools/mingw_64/bin/gcc  -I<span class="st">"C:/PROGRA~1/R/R-34~1.2/include"</span> -DNDEBUG     -I<span class="st">"d:/Compiler/gcc-4.9.3/local330/include"</span>     -O2 -Wall  -std=gnu99 -mtune=core2 -c rx_12307179f04e4af4f5a8f71b6545a28d_x64.c -o rx_12307179f04e4af4f5a8f71b6545a28d_x64.o
-c:/Rtools/mingw_64/bin/gcc -shared -s -<span class="dt">static</span>-libgcc -o rx_12307179f04e4af4f5a8f71b6545a28d_x64.dll tmp.def rx_12307179f04e4af4f5a8f71b6545a28d_x64.o -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lRblas -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lRlapack -lgfortran -lm -lquadmath -Ld:/Compiler/gcc-<span class="fl">4.9</span>.<span class="dv">3</span>/local330/lib/x64 -Ld:/Compiler/gcc-<span class="fl">4.9</span>.<span class="dv">3</span>/local330/lib -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lR
-c:/Rtools/mingw_64/bin/gcc  -I<span class="st">"C:/PROGRA~1/R/R-34~1.2/include"</span> -DNDEBUG     -I<span class="st">"d:/Compiler/gcc-4.9.3/local330/include"</span>     -O2 -Wall  -std=gnu99 -mtune=core2 -c rx_9bb7d7958abef0092fc2389e956d74b4_x64.c -o rx_9bb7d7958abef0092fc2389e956d74b4_x64.o
-c:/Rtools/mingw_64/bin/gcc -shared -s -<span class="dt">static</span>-libgcc -o rx_9bb7d7958abef0092fc2389e956d74b4_x64.dll tmp.def rx_9bb7d7958abef0092fc2389e956d74b4_x64.o -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lRblas -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lRlapack -lgfortran -lm -lquadmath -Ld:/Compiler/gcc-<span class="fl">4.9</span>.<span class="dv">3</span>/local330/lib/x64 -Ld:/Compiler/gcc-<span class="fl">4.9</span>.<span class="dv">3</span>/local330/lib -LC:/PROGRA~<span class="dv">1</span>/R/R-<span class="dv">34</span>~<span class="fl">1.2</span>/bin/x64 -lR</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">The model<span class="op">-</span>based sensitivities have been calculated.
-It will be cached <span class="cf">for</span> future runs.
-Calculating Table Variables...
-done</code></pre></div>
-<p>This Windows example delivers a complete model fit as the <code>fit</code> object, including parameter history, a set of fixed effect estimates, and random effects for all included subjects.</p>
-<p>Also note that the <code>nlme</code> fit returned the traditional <code>nlme</code> object. You can instruct <code>nlmixr</code> to convert the <code>nlme</code> object to a <code>nlmixr</code> object and calculate quantities like <code>CWRES</code> by specifying <code>calc.resid=TRUE</code> or dropping this option entirely since it is turned on by default.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"saem"</span>)</code></pre></div>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-4425fc1acffa4d2f0dc625e3f992ab10.rds)</code></pre>
+<p>And if we wanted to, we could even apply the First-Order Conditional Estimation (FOCEi) method to this model:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fitF &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"focei"</span>)</code></pre></div>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-620a9555c0c939eaf4bd46a50f4d3031.rds)</code></pre>
+<p>This example delivers a complete model fit as the <code>fit</code> object, including parameter history, a set of fixed effect estimates, and random effects for all included subjects.</p>
 <p>Now back to the <code>saem</code> fit; Let’s look at the fit using nlmixr’s built-in diagnostics…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(fit)</code></pre></div>
-<div class="figure">
-<img src="fitplots.png" alt="Individual plots"><p class="caption">Individual plots</p>
-</div>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-1.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-2.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-3.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-4.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-5.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-6.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-7.png" width="700"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span>fit
-<span class="op">--</span><span class="st"> </span>nlmixr SAEM <span class="kw">fit</span> (ODE); OBJF calculated from FOCEi approximation <span class="op">-------------</span>
-<span class="st">                                                         </span>OBJF      AIC      BIC Log<span class="op">-</span>likelihood Condition Number
-<span class="fl">116.1543</span> <span class="fl">130.1543</span> <span class="fl">150.3339</span>      <span class="op">-</span><span class="fl">58.07713</span>         <span class="fl">140.8018</span>
-
-<span class="op">--</span><span class="st"> </span><span class="kw">Time</span> (sec; fit<span class="op">$</span>time)<span class="op">:</span><span class="st"> </span><span class="op">-------------------------------------------------------</span>
-<span class="st">    </span>saem setup Likelihood Calculation covariance table
-elapsed <span class="fl">58.64</span> <span class="fl">31.91</span>                   <span class="fl">0.31</span>          <span class="dv">0</span>  <span class="fl">0.44</span>
-
-<span class="op">--</span><span class="st"> </span><span class="kw">Parameters</span> (fit<span class="op">$</span>par.fixed)<span class="op">:</span><span class="st"> </span><span class="op">-------------------------------------------------</span>
-<span class="st">    </span>Parameter Estimate     SE <span class="op">%RSE Back-transformed(95%</span>CI<span class="er">)</span> <span class="kw">BSV</span>(CV%)
-tka        Log Ka    <span class="fl">0.455</span>  <span class="fl">0.198</span> <span class="fl">43.4</span>       <span class="fl">1.58</span> (<span class="fl">1.07</span>, <span class="fl">2.32</span>)    <span class="fl">74.5</span>%
-tcl        Log Cl    <span class="op">-</span><span class="fl">3.22</span> <span class="fl">0.0814</span> <span class="fl">2.53</span> <span class="fl">0.0401</span> (<span class="fl">0.0342</span>, <span class="fl">0.0471</span>)    <span class="fl">27.2</span>%
-tv          Log V   <span class="op">-</span><span class="fl">0.785</span> <span class="fl">0.0426</span> <span class="fl">5.43</span>    <span class="fl">0.456</span> (<span class="fl">0.420</span>, <span class="fl">0.496</span>)    <span class="fl">13.5</span>%
-add.err   add.err    <span class="fl">0.691</span>                            <span class="fl">0.691</span>            
-<span class="kw">Shrink</span>(SD)%
-tka        <span class="op">-</span><span class="fl">0.520</span>% 
-tcl          <span class="fl">3.76</span>% 
-tv           <span class="fl">11.0</span>% 
-add.err      <span class="fl">12.0</span>% 
-
-  No correlations <span class="cf">in</span> between subject <span class="kw">variability</span> (BSV) matrix
-  Full BSV <span class="kw">covariance</span> (fit<span class="op">$</span>omega) or <span class="kw">correlation</span> (fit<span class="op">$</span>omega.R; <span class="dt">diagonals=</span>SDs)
-  Distribution <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/stats-package">stats</a></span> (mean<span class="op">/</span>skewness<span class="op">/</span>kurtosis<span class="op">/</span>p<span class="op">-</span>value) available <span class="cf">in</span> fit<span class="op">$</span>shrink
-
-<span class="op">--</span><span class="st"> </span>Fit <span class="kw">Data</span> (object fit is a modified data.frame)<span class="op">:</span><span class="st"> </span><span class="op">-----------------------------</span>
-<span class="co"># A tibble: 132 x 21</span>
-<span class="st">  </span>ID     TIME    DV  PRED     RES    WRES IPRED   IRES  IWRES CPRED  CRES
-<span class="op">*</span><span class="st"> </span><span class="er">&lt;</span>fct<span class="op">&gt;</span><span class="st"> </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st"> </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st"> </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st">   </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st">   </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st"> </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st">  </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st">  </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st"> </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span><span class="st"> </span><span class="er">&lt;</span>dbl<span class="op">&gt;</span>
-<span class="dv">1</span> <span class="dv">1</span>     <span class="dv">0</span>      <span class="fl">0.74</span>  <span class="dv">0</span>    <span class="fl">0.74</span>    <span class="fl">1.07</span>     <span class="dv">0</span>     <span class="fl">0.74</span>   <span class="fl">1.07</span>   <span class="dv">0</span>    <span class="fl">0.74</span> 
-<span class="dv">2</span> <span class="dv">1</span>     <span class="fl">0.25</span>   <span class="fl">2.84</span>  <span class="fl">2.84</span> <span class="fl">0.00438</span> <span class="fl">0.00254</span>  <span class="fl">3.86</span> <span class="op">-</span><span class="fl">1.02</span>  <span class="op">-</span><span class="fl">1.48</span>   <span class="fl">2.68</span> <span class="fl">0.164</span>
-<span class="dv">3</span> <span class="dv">1</span>     <span class="fl">0.570</span>  <span class="fl">6.57</span>  <span class="fl">5.07</span> <span class="fl">1.50</span>    <span class="fl">0.656</span>    <span class="fl">6.79</span> <span class="op">-</span><span class="fl">0.219</span> <span class="op">-</span><span class="fl">0.316</span>  <span class="fl">4.84</span> <span class="fl">1.73</span> 
-<span class="co"># ... with 129 more rows, and 10 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
-<span class="co">#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;,</span>
-<span class="co">#   v &lt;dbl&gt;, cp &lt;dbl&gt;</span></code></pre></div>
+<pre><code>## ── nlmixr SAEM([3mODE[23m); [2m[3mOBJF by Gaussian Quadrature (n.nodes=3, n.sd=1.6)[23m[22m fit</code></pre>
+<pre><code>##                OBJF      AIC      BIC Log-likelihood Condition Number
+## gauss3_1.6 93.57199 350.1718 370.3514      -168.0859         19.09454</code></pre>
+<pre><code>## 
+## ── Time (sec; fit$time): ──────────────────────────────────────────────────</code></pre>
+<pre><code>##   saem    setup optimize covariance table
+##  5.113 0.307689    2e-06      3e-06 0.007</code></pre>
+<pre><code>## 
+## ── Population Parameters (fit$parFixed or fit$parFixedDf): ────────────────</code></pre>
+<pre><code>##         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
+## tka        Log Ka 0.453  0.195 43.1       1.57 (1.07, 2.31)     71.4
+## tcl        Log Cl  1.01 0.0854 8.42       2.76 (2.33, 3.26)     27.7
+## tv          Log V  3.45 0.0455 1.32       31.5 (28.8, 34.5)     13.4
+## add.err           0.695                               0.695         
+##         Shrink(SD)%
+## tka        -0.233% 
+## tcl          4.36% 
+## tv           9.34% 
+## add.err             
+## 
+##   Covariance Type (fit$covMethod): linFim
+##   No correlations in between subject variability (BSV) matrix</code></pre>
+<pre><code>##   Full BSV covariance (fit$omega)</code></pre>
+<pre><code>##     or correlation (fit$omegaR; diagonals=SDs)</code></pre>
+<pre><code>##   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</code></pre>
+<pre><code>## 
+## ── Fit Data (object fit is a modified tibble): ────────────────────────────</code></pre>
+<pre><code>## # A tibble: 132 x 18
+##   ID     TIME    DV  EVID  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl
+##   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 1     0      0.74     0  0     0.74   0     0.74   1.06   0.105 -0.488
+## 2 1     0.25   2.84     0  3.26 -0.423  3.87 -1.03  -1.48   0.105 -0.488
+## 3 1     0.570  6.57     0  5.84  0.728  6.82 -0.247 -0.355  0.105 -0.488
+## # … with 129 more rows, and 7 more variables: eta.v &lt;dbl&gt;, ka &lt;dbl&gt;,
+## #   cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit<span class="op">$</span>eta</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">   ID      eta.ka       eta.cl       eta.v
-<span class="dv">1</span>   <span class="dv">1</span>  <span class="fl">0.12895240</span> <span class="op">-</span><span class="fl">0.629393083</span> <span class="op">-</span><span class="fl">0.20786978</span>
-<span class="dv">2</span>   <span class="dv">2</span>  <span class="fl">0.24202824</span>  <span class="fl">0.085230344</span> <span class="op">-</span><span class="fl">0.01555575</span>
-<span class="dv">3</span>   <span class="dv">3</span>  <span class="fl">0.39836641</span>  <span class="fl">0.005076775</span>  <span class="fl">0.04780371</span>
-<span class="dv">4</span>   <span class="dv">4</span> <span class="op">-</span><span class="fl">0.26316679</span> <span class="op">-</span><span class="fl">0.076702383</span> <span class="op">-</span><span class="fl">0.04668235</span>
-<span class="dv">5</span>   <span class="dv">5</span> <span class="op">-</span><span class="fl">0.07501618</span>  <span class="fl">0.076757369</span>  <span class="fl">0.06943232</span>
-<span class="dv">6</span>   <span class="dv">6</span> <span class="op">-</span><span class="fl">0.32677312</span>  <span class="fl">0.215018594</span>  <span class="fl">0.09234601</span>
-<span class="dv">7</span>   <span class="dv">7</span> <span class="op">-</span><span class="fl">0.83746008</span>  <span class="fl">0.236216832</span>  <span class="fl">0.08078046</span>
-<span class="dv">8</span>   <span class="dv">8</span> <span class="op">-</span><span class="fl">0.17361996</span>  <span class="fl">0.141848820</span>  <span class="fl">0.07864429</span>
-<span class="dv">9</span>   <span class="dv">9</span>  <span class="fl">1.49070753</span> <span class="op">-</span><span class="fl">0.181625209</span> <span class="op">-</span><span class="fl">0.18270360</span>
-<span class="dv">10</span> <span class="dv">10</span> <span class="op">-</span><span class="fl">0.79851904</span> <span class="op">-</span><span class="fl">0.207206272</span> <span class="op">-</span><span class="fl">0.03595335</span>
-<span class="dv">11</span> <span class="dv">11</span>  <span class="fl">0.75757178</span>  <span class="fl">0.338588793</span>  <span class="fl">0.19567123</span>
-<span class="dv">12</span> <span class="dv">12</span> <span class="op">-</span><span class="fl">0.56750540</span>  <span class="fl">0.012073101</span> <span class="op">-</span><span class="fl">0.09261596</span></code></pre></div>
+<pre><code>##    ID      eta.ka      eta.cl        eta.v
+## 1   1  0.10526670 -0.48796249 -0.081824932
+## 2   2  0.21679271  0.14055941  0.018376758
+## 3   3  0.36992522  0.03093773  0.058155105
+## 4   4 -0.27318227 -0.01613196 -0.005716384
+## 5   5 -0.04017666 -0.15233365 -0.140451267
+## 6   6 -0.39274353  0.37717920  0.194121922
+## 7   7 -0.79635616  0.16870625  0.043765451
+## 8   8 -0.18574253  0.16857680  0.091722703
+## 9   9  1.43460629  0.03730799  0.015417761
+## 10 10 -0.72239227 -0.40238432 -0.160589271
+## 11 11  0.77801005  0.28344846  0.141351696
+## 12 12 -0.51805436 -0.12775097 -0.191641208</code></pre>
 <p>Default trace plots can be generated using:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/traceplot.html">traceplot</a></span>(fit)</code></pre></div>
 <p>but with a little more work, we can get a nicer set of iteration trace plots (“wriggly worms”)…</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-iter &lt;-<span class="st"> </span>fit<span class="op">$</span>par.hist.stacked
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iter &lt;-<span class="st"> </span>fit<span class="op">$</span>par.hist.stacked
 iter<span class="op">$</span>Parameter[iter<span class="op">$</span>par<span class="op">==</span><span class="st">"add.err"</span>] &lt;-<span class="st"> "Additive error"</span>
 iter<span class="op">$</span>Parameter[iter<span class="op">$</span>par<span class="op">==</span><span class="st">"eta.cl"</span>]  &lt;-<span class="st"> "IIV CL/F"</span>
 iter<span class="op">$</span>Parameter[iter<span class="op">$</span>par<span class="op">==</span><span class="st">"eta.v"</span>]   &lt;-<span class="st"> "IIV V/F"</span>
@@ -430,12 +295,9 @@ iter<span class="op">$</span>Parameter &lt;-<span class="st"> </span><span class
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_y_continuous</a></span>(<span class="st">"Value"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/facet_wrap">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>Parameter, <span class="dt">scales=</span><span class="st">"free_y"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">"Theophylline single-dose"</span>, <span class="dt">subtitle=</span><span class="st">"Parameter estimation iterations"</span>)</code></pre></div>
-<div class="figure">
-<img src="iter.png" alt="Iterations"><p class="caption">Iterations</p>
-</div>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>… and some random-effects histograms…</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-etas &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">eta =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(fit<span class="op">$</span>eta<span class="op">$</span>eta.ka, fit<span class="op">$</span>eta<span class="op">$</span>eta.cl, fit<span class="op">$</span>eta<span class="op">$</span>eta.v),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">etas &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">eta =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(fit<span class="op">$</span>eta<span class="op">$</span>eta.ka, fit<span class="op">$</span>eta<span class="op">$</span>eta.cl, fit<span class="op">$</span>eta<span class="op">$</span>eta.v),
                    <span class="dt">lab =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"eta(ka)"</span>, <span class="st">"eta(CL/F)"</span>, <span class="st">"eta(V/F)"</span>), <span class="dt">each=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(fit<span class="op">$</span>eta)))
 etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/factor">ordered</a></span>(etas<span class="op">$</span>lab, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"eta(CL/F)"</span>,<span class="st">"eta(V/F)"</span>,<span class="st">"eta(ka)"</span>))
 
@@ -447,28 +309,27 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/facet_grid">facet_grid</a></span>(<span class="op">~</span><span class="st"> </span>lab) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/coord_cartesian">coord_cartesian</a></span>(<span class="dt">xlim=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="op">-</span><span class="fl">1.75</span>,<span class="fl">1.75</span>)) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">"Theophylline single-dose"</span>, <span class="dt">subtitle=</span><span class="st">"IIV distributions"</span>)</code></pre></div>
-<div class="figure">
-<img src="etas.png" alt="IIV distributions"><p class="caption">IIV distributions</p>
-</div>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <div id="xpose" class="section level2">
 <h2 class="hasAnchor">
 <a href="#xpose" class="anchor"></a>xpose</h2>
 <p>This is all very nice. But what we really want is a complete suite of model diagnostic tools, like those available in <a href="https://github.com/UUPharmacometrics/xpose">xpose</a>, right?</p>
-<p>First, save the nlmixr <code>fit</code> object you created (this example assumes in the same folder you’re working in…)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/save">save</a></span>(fit, <span class="dt">file=</span><span class="st">"nlmixrFit.RData"</span>)</code></pre></div>
 <p>Restart R, and install xpose from CRAN, if you haven’t already…</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"xpose"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## install.packages("xpose")
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(xpose)</code></pre></div>
+<pre><code>## 
+## Attaching package: 'xpose'</code></pre>
+<pre><code>## The following object is masked from 'package:nlmixr':
+## 
+##     vpc</code></pre>
+<pre><code>## The following object is masked from 'package:stats':
+## 
+##     filter</code></pre>
 <p>Now install the extension for nlmixr:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"nlmixrdevelopment/xpose.nlmixr"</span>)</code></pre></div>
-<p>Now restore your session…</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(nlmixr)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(xpose)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(xpose.nlmixr)
-
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/load">load</a></span>(<span class="st">"nlmixrFit.RData"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(xpose.nlmixr)</code></pre></div>
 <p>… and convert your nlmixr fit object into an xpose fit object.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xp &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose.nlmixr/topics/xpose_data_nlmixr">xpose_data_nlmixr</a></span>(fit)</code></pre></div>
-<p>Now let’s look at some diagnostic plots!</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose/topics/dv_vs_pred">dv_vs_pred</a></span>(xp)</code></pre></div>
 <div class="figure">
 <img src="dv_vs_pred.png" alt="DV vs PRED"><p class="caption">DV vs PRED</p>
@@ -482,10 +343,7 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 <img src="cwres_vs_pred.png" alt="CWRES vs PRED"><p class="caption">CWRES vs PRED</p>
 </div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose/topics/res_vs_pred">absval_res_vs_pred</a></span>(xp, <span class="dt">res=</span><span class="st">"IWRES"</span>)</code></pre></div>
-<div class="figure">
-<img src="iwres_vs_pred.png" alt="abs(IWRES) vs PRED"><p class="caption">abs(IWRES) vs PRED</p>
-</div>
-<p>We can also replicate some of nlmixr’s internal plots…</p>
+<p><img src="iwres_vs_pred.png" alt="abs(IWRES) vs PRED"> We can also replicate some of nlmixr’s internal plots…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose/topics/ind_plots">ind_plots</a></span>(xp, <span class="dt">res=</span><span class="st">"IWRES"</span>)</code></pre></div>
 <div class="figure">
 <img src="ind_plots.png" alt="Individual plots"><p class="caption">Individual plots</p>
@@ -642,13 +500,18 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 <h2 class="hasAnchor">
 <a href="#running-models" class="anchor"></a>Running models</h2>
 <p>Models can be fitted several ways, including via the [magrittr] forward-pipe operator.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment.model) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/saem.fit.html">saem.fit</a></span>(data)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment.model, dat, <span class="dt">est=</span><span class="st">"saem"</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span>one.compartment.model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/saem.fit.html">saem.fit</a></span>(data)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/saem.fit.html">saem.fit</a></span>(<span class="dt">data=</span>theo_sd)</code></pre></div>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-saem-4425fc1acffa4d2f0dc625e3f992ab10.rds)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, <span class="dt">data=</span>theo_sd, <span class="dt">est=</span><span class="st">"saem"</span>)</code></pre></div>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-4425fc1acffa4d2f0dc625e3f992ab10.rds)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit3 &lt;-<span class="st"> </span>one.compartment <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/saem.fit.html">saem.fit</a></span>(<span class="dt">data=</span>theo_sd)</code></pre></div>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-.-theo_sd-saem-4425fc1acffa4d2f0dc625e3f992ab10.rds)</code></pre>
 <p>Options to the estimation routines can be specified using nlmeControl for nlme estimation:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment.model,data,<span class="dt">est=</span><span class="st">"nlme"</span>,<span class="dt">control =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/nlme/topics/nlmeControl">nlmeControl</a></span>(<span class="dt">pnlsTol =</span> .<span class="dv">1</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit4 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd,<span class="dt">est=</span><span class="st">"nlme"</span>,<span class="dt">control =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/nlme/topics/nlmeControl">nlmeControl</a></span>(<span class="dt">pnlsTol =</span> .<span class="dv">5</span>))</code></pre></div>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-nlme-b7f656f2bbbb08c249f343a9c517d2ab.rds)</code></pre>
 <p>where options are specified in the <code>nlme</code> documentation. Options for saem can be specified using <code>saemControl</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment.model,data,<span class="dt">est=</span><span class="st">"saem"</span>,<span class="dt">control=</span><span class="kw"><a href="../reference/saemControl.html">saemControl</a></span>(<span class="dt">n.burn=</span><span class="dv">250</span>,<span class="dt">n.em=</span><span class="dv">350</span>,<span class="dt">print=</span><span class="dv">50</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit5 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment,theo_sd,<span class="dt">est=</span><span class="st">"saem"</span>,<span class="dt">control=</span><span class="kw"><a href="../reference/saemControl.html">saemControl</a></span>(<span class="dt">n.burn=</span><span class="dv">250</span>,<span class="dt">n.em=</span><span class="dv">350</span>,<span class="dt">print=</span><span class="dv">50</span>))</code></pre></div>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-292f2b3f75ac4db9e9d8b93272f5e4c6.rds)</code></pre>
 <p>this example specifies 250 burn-in iterations, 350 em iterations and a print progress every 50 runs.</p>
 </div>
 <div id="model-syntax-for-solved-pk-systems" class="section level2">
@@ -685,44 +548,32 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 <h2 class="hasAnchor">
 <a href="#checking-model-syntax" class="anchor"></a>Checking model syntax</h2>
 <p>After specifying the model syntax you can check that nlmixr is interpreting it correctly by using the nlmixr function on it. Using the above function we can get:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="op">&gt;</span><span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(f)
-## 1-compartment model with first-order absorption in terms of Cl
-## Initialization:
-################################################################################
-Fixed <span class="kw">Effects</span> (<span class="op">$</span>theta)<span class="op">:</span>
-<span class="st">    </span>lCl     lVc     lKA
-<span class="fl">1.60000</span> <span class="fl">4.49981</span> <span class="fl">0.10000</span>
-
-<span class="kw">Omega</span> (<span class="op">$</span>omega)<span class="op">:</span>
-<span class="st">     </span>[,<span class="dv">1</span>] [,<span class="dv">2</span>] [,<span class="dv">3</span>]
-[<span class="dv">1</span>,]  <span class="fl">0.1</span>  <span class="fl">0.0</span>  <span class="fl">0.0</span>
-[<span class="dv">2</span>,]  <span class="fl">0.0</span>  <span class="fl">0.1</span>  <span class="fl">0.0</span>
-[<span class="dv">3</span>,]  <span class="fl">0.0</span>  <span class="fl">0.0</span>  <span class="fl">0.1</span>
-
-## Model:
-################################################################################
-Cl &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(lCl <span class="op">+</span><span class="st"> </span>eta.Cl)
-Vc =<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(lVc <span class="op">+</span><span class="st"> </span>eta.Vc)
-KA &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(lKA <span class="op">+</span><span class="st"> </span>eta.KA)
-## Instead of specifying the ODEs, you can use
-## the linCmt() function to use the solved system.
-##
-## This function determines the type of PK solved system
-## to use by the parameters that are defined.  In this case
-## it knows that this is a one-compartment model with first-order
-## absorption.
-<span class="kw">linCmt</span>() <span class="op">~</span><span class="st"> </span><span class="kw">prop</span>(prop.err)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(f)</code></pre></div>
+<pre><code>## ▂▂ RxODE-based 1-compartment model with first-order absorption ▂▂▂▂▂▂▂▂▂▂▂▂</code></pre>
+<pre><code>## ── Initialization: ────────────────────────────────────────────────────────</code></pre>
+<pre><code>## Fixed Effects ($theta):</code></pre>
+<pre><code>##     lCl     lVc     lKA 
+## 1.60000 4.49981 0.10000</code></pre>
+<pre><code>## 
+## Omega ($omega):</code></pre>
+<pre><code>##        eta.Cl eta.Vc eta.KA
+## eta.Cl    0.1    0.0    0.0
+## eta.Vc    0.0    0.1    0.0
+## eta.KA    0.0    0.0    0.1</code></pre>
+<pre><code>## ── Model: ─────────────────────────────────────────────────────────────────</code></pre>
+<pre><code>##         Cl &lt;- exp(lCl + eta.Cl)
+##         Vc = exp(lVc + eta.Vc)
+##         KA &lt;- exp(lKA + eta.KA)
+##         ## Instead of specifying the ODEs, you can use
+##         ## the linCmt() function to use the solved system.
+##         ##
+##         ## This function determines the type of PK solved system
+##         ## to use by the parameters that are defined.  In this case
+##         ## it knows that this is a one-compartment model with first-order
+##         ## absorption.
+##         linCmt() ~ prop(prop.err)</code></pre>
+<pre><code>## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂</code></pre>
 <p>In general this gives you information about the model (what type of solved system/RxODE), initial estimates as well as the code for the model block.</p>
-</div>
-<div id="using-the-model-syntax-for-estimating-a-model" class="section level2">
-<h2 class="hasAnchor">
-<a href="#using-the-model-syntax-for-estimating-a-model" class="anchor"></a>Using the model syntax for estimating a model</h2>
-<p>Once the model function has been created, you can use it combined with a dataset to estimate the parameters for a model given a dataset. This dataset has to have RxODE compatible events IDs. Both Monolix and NONMEM use a different dataset description. You may convert these datasets to RxODE-compatible datasets with the nmDataConvert function. Note that steady state doses are not supported by RxODE, and therefore not supported by the conversion function.</p>
-<p>As an example, you can use a simulated rich 1-compartment dataset.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"> d &lt;-<span class="st"> </span>Oral_1CPT
- d &lt;-<span class="st"> </span>d[,<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(d) <span class="op">!=</span><span class="st"> "SS"</span>];
- d &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nmDataConvert.html">nmDataConvert</a></span>(d); </code></pre></div>
-<p>Once the data has been converted to the appropriate format, you can use the nlmixr function to run the appropriate code.</p>
 </div>
 </div>
   </div>
@@ -743,7 +594,6 @@ KA &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocument
       <li><a href="#running-models">Running models</a></li>
       <li><a href="#model-syntax-for-solved-pk-systems">Model Syntax for solved PK systems</a></li>
       <li><a href="#checking-model-syntax">Checking model syntax</a></li>
-      <li><a href="#using-the-model-syntax-for-estimating-a-model">Using the model syntax for estimating a model</a></li>
       </ul>
 </li>
       </ul>

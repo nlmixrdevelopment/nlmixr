@@ -88,7 +88,7 @@
     <li class="divider"></li>
     <li class="dropdown-header">Going further</li>
     <li>
-      <a href="../articles/modelPipng.html">Model Pipng</a>
+      <a href="../articles/modelPiping.html">Model Piping</a>
     </li>
   </ul>
 </li>
@@ -181,39 +181,39 @@
     <pre class="examples"><div class='input'><span class='no'>specs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>fixed</span><span class='kw'>=</span><span class='no'>lKA</span>+<span class='no'>lCL</span>+<span class='no'>lV</span>~<span class='fl'>1</span>, <span class='kw'>random</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/nlme/topics/pdDiag'>pdDiag</a></span>(<span class='no'>lKA</span>+<span class='no'>lCL</span>~<span class='fl'>1</span>), <span class='kw'>start</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>lKA</span><span class='kw'>=</span><span class='fl'>0.5</span>, <span class='kw'>lCL</span><span class='kw'>=</span>-<span class='fl'>3.2</span>, <span class='kw'>lV</span><span class='kw'>=</span>-<span class='fl'>1</span>))
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='nlme_lin_cmpt.html'>nlme_lin_cmpt</a></span>(<span class='no'>theo_md</span>, <span class='kw'>par_model</span><span class='kw'>=</span><span class='no'>specs</span>, <span class='kw'>ncmt</span><span class='kw'>=</span><span class='fl'>1</span>, <span class='kw'>verbose</span><span class='kw'>=</span><span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; 
 #&gt; **Iteration 1
-#&gt; LME step: Loglik: -422.4933, nlminb iterations: 1
+#&gt; LME step: Loglik: -420.4061, nlminb iterations: 1
 #&gt; reStruct  parameters:
-#&gt;       ID1       ID2 
-#&gt; 0.9708585 1.4195314 
+#&gt;      ID1      ID2 
+#&gt; 5.434250 5.693011 
 #&gt;  Beginning PNLS step: ..  completed fit_nlme() step.
-#&gt; PNLS step: RSS =  299.9608 
-#&gt;  fixed effects: 0.2616293  -3.183559  -0.825204  
+#&gt; PNLS step: RSS =  300.8155 
+#&gt;  fixed effects: 0.2384012  1.057595  3.395177  
 #&gt;  iterations: 7 
 #&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):
-#&gt;     fixed  reStruct 
-#&gt; 0.9111007 0.2049701 
+#&gt;    fixed reStruct 
+#&gt; 4.025732 4.507369 
 #&gt; 
 #&gt; **Iteration 2
-#&gt; LME step: Loglik: -423.7512, nlminb iterations: 4
+#&gt; LME step: Loglik: -422.6508, nlminb iterations: 5
 #&gt; reStruct  parameters:
 #&gt;       ID1       ID2 
-#&gt; 0.8058941 1.4564585 
+#&gt; 0.9829978 1.4302117 
 #&gt;  Beginning PNLS step: ..  completed fit_nlme() step.
-#&gt; PNLS step: RSS =  299.9622 
-#&gt;  fixed effects: 0.2614828  -3.18356  -0.8252407  
-#&gt;  iterations: 2 
+#&gt; PNLS step: RSS =  300.5795 
+#&gt;  fixed effects: 0.2352729  1.058965  3.393164  
+#&gt;  iterations: 3 
 #&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):
-#&gt;        fixed     reStruct 
-#&gt; 0.0005603542 0.0001345034 
+#&gt;       fixed    reStruct 
+#&gt; 0.013296624 0.004640796 
 #&gt; 
 #&gt; **Iteration 3
-#&gt; LME step: Loglik: -423.7518, nlminb iterations: 1
+#&gt; LME step: Loglik: -422.666, nlminb iterations: 1
 #&gt; reStruct  parameters:
 #&gt;       ID1       ID2 
-#&gt; 0.8058201 1.4564908 
+#&gt; 0.9821654 1.4298669 
 #&gt;  Beginning PNLS step: ..  completed fit_nlme() step.
-#&gt; PNLS step: RSS =  299.9622 
-#&gt;  fixed effects: 0.2614828  -3.18356  -0.8252407  
+#&gt; PNLS step: RSS =  300.5795 
+#&gt;  fixed effects: 0.2352729  1.058965  3.393164  
 #&gt;  iterations: 1 
 #&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):
 #&gt;    fixed reStruct 

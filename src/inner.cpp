@@ -227,6 +227,7 @@ typedef struct {
   double resetEtaSize;
   double resetThetaSize;
   double resetThetaFinalSize;
+  int doThetaReset;
   int checkTheta;
   int *muRef;
   int muRefN;
@@ -1456,7 +1457,8 @@ void innerOpt(){
     }
     // Reset ETA variances for next step
     op_focei.eta1SD = 1/sqrt(op_focei.etaS);
-    if (!op_focei.calcGrad && op_focei.maxOuterIterations > 0 && (!op_focei.initObj || op_focei.checkTheta==1) &&
+    if (!op_focei.calcGrad && op_focei.doThetaReset && op_focei.maxOuterIterations > 0 &&
+	(!op_focei.initObj || op_focei.checkTheta==1) &&
 	R_FINITE(op_focei.resetThetaSize)){
       thetaReset(op_focei.resetThetaSize);
     }
@@ -2445,6 +2447,11 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.cholAccept=as<double>(odeO["cholAccept"]);
   op_focei.resetEtaSize=as<double>(odeO["resetEtaSize"]);
   op_focei.resetThetaSize=as<double>(odeO["resetThetaSize"]);
+  if (odeO.containsElementNamed("doThetaReset")){
+    op_focei.doThetaReset = as<int>(odeO["doThetaReset"]);
+  } else {
+    op_focei.doThetaReset=1;
+  }
   op_focei.resetThetaFinalSize = as<double>(odeO["resetThetaFinalSize"]);
   
   IntegerVector muRef;
