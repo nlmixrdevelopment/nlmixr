@@ -1,0 +1,239 @@
+---
+title: "Using Broom with nlmixr"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using Broom with nlmixr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r, echo=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+![nlmixr](logo.png)
+
+## The broom and broom.mixed packages
+
+`broom` and `broom.mixed` are packages that attempt to put standard
+model outputs into data frames.  nlmixr supports the `tidy` and
+`glance` methods but does not support `augment` at this time.
+
+Using a model with a covariance term, the [Phenobarbital
+model](addingCovariances.html), we can explore the different types of
+output that is used in the tidy functions.
+
+To explore this, first we run the model:
+
+```{r}
+library(nlmixr)
+## To allow nlmixr to reload runs without large run times
+## To run the actual models on your system, take the save options off.
+options(nlmixr.save=TRUE,
+        nlmixr.save.dir=system.file(package="nlmixr"));
+
+pheno <- function() {
+  ini({
+    tcl <- log(0.008) # typical value of clearance
+    tv <-  log(0.6)   # typical value of volume
+    ## var(eta.cl)
+    eta.cl + eta.v ~ c(1, 
+                       0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
+                      # interindividual variability on clearance and volume
+    add.err <- 0.1    # residual variability
+  })
+  model({
+    cl <- exp(tcl + eta.cl) # individual value of clearance
+    v <- exp(tv + eta.v)    # individual value of volume
+    ke <- cl / v            # elimination rate constant
+    d/dt(A1) = - ke * A1    # model differential equation
+    cp = A1 / v             # concentration in plasma
+    cp ~ add(add.err)       # define error model
+  })
+}
+
+fit <- nlmixr(pheno, pheno_sd, "saem")
+```
+# Glancing at the goodness of fit metrics
+
+Often in fitting data, you would want to `glance` at the fit to see
+how well it fits.  In `broom`, `glance` will give a summary of the fit
+metrics of goodness of fit:
+
+```{r}
+glance(fit)
+```
+
+Note in nlmixr it is possible to have more than one fit metric (based
+on different quadratures, FOCEi approximation etc).  However, the
+`glance` only returns the fit metrics that are current.
+
+If you add conditional weighted residuals to the fit the objective
+function is changed to the `FOCEi` metric:
+
+```{r}
+fit <- fit %>% addCwres()
+```
+
+Now the glance gives the `FOCEi` values.
+
+```{r}
+glance(fit)
+```
+
+Of course you can always change the type of objective function that
+nlmixr uses:
+
+```{r}
+setOfv(fit,"gauss3_1.6") # Setting objective function to gauss3_1.6
+```
+
+By setting it back to the SAEM default objective function of
+`gauss3_1.6`, the `glance(fit)` has the same values again:
+
+```{r}
+glance(fit)
+```
+
+For convenience, you can do this while you `glance` at the objects:
+
+```{r}
+glance(fit, type="FOCEi")
+```
+
+# Tidying the model parameters
+## Tidying of overall fit parameters
+
+You can also tidy the model estimates into a data frame with broom for
+processing.  This can be useful when integrating into 3rd parting
+modeling packages.  With a consistent parameter format, tasks for
+multiple types of models can be automated and applied. 
+
+The default function for this is `tidy`, which when applied to the
+`fit` object provides the overall parameter information in a tidy
+dataset:
+
+```{r}
+tidy(fit)
+```
+
+nlmixr converts the log-transformed estimates to the normal scale for
+these tidy summaries, just like what was done for the `fit$parFixedDf`
+data frame.  Unlike that data-frame, the standard errors are also
+transformed by an approximation to the normal scale. 
+
+By default, this only applies to parameters that nlmixr has determined
+are on a log-scale (those that are not are not included in the
+transformation).  This behavior can be turned on or off with the
+`exponentiate` argument.
+
+```{r}
+tidy(fit, exponentiate=FALSE) ## No transformation applied
+```
+
+```{r}
+tidy(fit, exponentiate=TRUE) ## No transformation applied on every parameter
+```
+
+Note that the default is `exponentiate=NA` which is adaptive
+exponentiation.
+
+Also note, at the time of this writing the default separator between
+variables is `.`, which doesn't work well with this model giving
+`cor__eta.v.eta.cl`.  You can easily change this by:
+
+```{r}
+options(broom.mixed.sep2="..")
+tidy(fit)
+```
+
+This gives an easier way to parse value: `cor__eta.v..eta.cl`
+
+## Adding a confidence interval to the parameters
+
+The default R method `confint` works with nlmixr fit objects:
+
+```{r}
+confint(fit)
+```
+
+This transforms the variables as described above.  You can still use
+the `exponentiate` parameter to control the display of the confidence
+interval:
+
+```{r}
+confint(fit, exponentiate=FALSE)
+```
+
+However, broom has also implemented it own way to make these data a
+tidy dataset.  The easiest way to get these values in a nlmixr dataset
+is to use:
+
+```{r}
+tidy(fit, conf.level=0.9)
+```
+The confidence interval is on the scale specified by `exponentiate`, by default the adaptive scale. 
+
+# Extracting other model information with `tidy`
+The type of information that is extracted can be controlled by the `effects` argument.
+## Extracting only fixed effect parameters
+
+The fixed effect parameters can be extracted by `effects="fixed"`
+
+```{r}
+tidy(fit, effects="fixed")
+```
+## Extracting only random parameters
+
+The random standard deviations can be extracted by
+`effects="ran_pars"`:
+
+```{r}
+tidy(fit, effects="ran_pars")
+```
+## Extracting random values (also called ETAs)
+
+The random values, or in NONMEM the ETAs, can be extracted by
+`effects="ran_vals"` or `effects="random"`
+
+```{r}
+tidy(fit, effects="ran_vals")
+```
+
+This duplicate method of running `effects` is because the `broom`
+package supports `effects="random"` while the `broom.mixed` package
+supports `effects="ran_vals"`.
+
+## Extracting random coefficients
+
+Random coefficients are the population fixed effect parameter + the
+random effect parameter, possibly transformed to the correct scale.
+
+In this case we can extract this information from a nlmixr fit object by:
+
+```{r}
+tidy(fit, effects="ran_coef")
+```
+This can also be changed by the `exponentiate` argument
+
+```{r}
+tidy(fit, effects="ran_coef", exponentiate=FALSE)
+```
+# An example of using a tidy model estimates for other packages
+
+As explained above, this standard format makes it easier for tidyverse
+packages to interact with model information.  An example of this is
+piping the tidy information to dplyr to filter the effects and then to
+the `dotwhisker` package to plot the model parameter confidence
+intervals.
+
+```{r}
+library(ggplot2)
+library(dotwhisker)
+library(dplyr)
+fit %>%
+    tidy() %>%
+    filter(effect=="fixed") %>%
+    dwplot()
+```
+
+Happy tidying!

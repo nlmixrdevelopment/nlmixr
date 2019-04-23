@@ -1523,35 +1523,53 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   .covm <- object$Ha[1:.nth,1:.nth]
   .calcCov  <- calcCov;
   if (calcCov){
-    .covm <- calc.COV(object);
-    .tmp <- try(chol(.covm), silent=TRUE)
-    .addCov <- TRUE
-    .sqrtm <- FALSE
-    if (inherits(.tmp, "try-error")){
-      .tmp <- .covm
-      .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+    .covm <- try(calc.COV(object));
+    if (inherits(.covm, "try-error")){
+      .tmp <- try(chol(.covm), silent=TRUE)
+      .addCov <- TRUE
+      .sqrtm <- FALSE
       if (inherits(.tmp, "try-error")){
-        .calcCov <- FALSE
-        .covm <- object$Ha[1:.nth,1:.nth]
-        .tmp <- try(chol(.covm), silent=TRUE)
-        .addCov <- TRUE
-        .sqrtm <- FALSE
+        .tmp <- .covm
+        .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
         if (inherits(.tmp, "try-error")){
-          .tmp <- object$Ha[1:.nth,1:.nth]
-          .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+          .calcCov <- FALSE
+          .covm <- object$Ha[1:.nth,1:.nth]
+          .tmp <- try(chol(.covm), silent=TRUE)
+          .addCov <- TRUE
+          .sqrtm <- FALSE
           if (inherits(.tmp, "try-error")){
-            .addCov <- FALSE;
+            .tmp <- object$Ha[1:.nth,1:.nth]
+            .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+            if (inherits(.tmp, "try-error")){
+              .addCov <- FALSE;
+            } else {
+              .sqrtm <- TRUE
+            }
           } else {
-            .sqrtm <- TRUE
+            .tmp <- object$Ha[1:.nth,1:.nth]
           }
         } else {
-          .tmp <- object$Ha[1:.nth,1:.nth]
+          .sqrtm <- TRUE
         }
       } else {
-        .sqrtm <- TRUE
+        .tmp <- .covm
       }
     } else {
-      .tmp <- .covm
+      .tmp <- object$Ha[1:.nth,1:.nth]
+      .tmp <- try(chol(.covm), silent=TRUE)
+      .addCov <- TRUE
+      .sqrtm <- FALSE
+      if (inherits(.tmp, "try-error")){
+        .tmp <- object$Ha[1:.nth,1:.nth]
+        .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+        if (inherits(.tmp, "try-error")){
+          .addCov <- FALSE;
+        } else {
+          .sqrtm <- TRUE
+        }
+      } else {
+        .tmp <- object$Ha[1:.nth,1:.nth]
+      }
     }
   } else {
     .tmp <- try(chol(.covm), silent=TRUE)

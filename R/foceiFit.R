@@ -2888,6 +2888,7 @@ yeoJohnson <- function(x, lambda=1){
 ##'     $objective
 ##' @return Nothing
 ##' @author Matthew L. Fidler
+##' @export
 setOfv <- function(x, type){
     if (inherits(x, "nlmixrFitCore") || inherits(x, "nlmixrFitCoreSilent")){
         .objDf <- x$objDf
@@ -3169,6 +3170,10 @@ tidy.nlmixrFitCore <- function(x, ...){
 
 ##'@export
 glance.nlmixrFitCore <- function(x, ...){
+    .lst  <- list(...);
+    if (any(names(.lst)=="type")){
+        setOfv(x, type=.lst$type);
+    }
     .aic <- AIC(x); ## To calculate AIC if needed
     .df <- x$objDf[x$objDf$AIC == .aic, ];
     names(.df) <- gsub("Log-likelihood", "logLik", names(.df));

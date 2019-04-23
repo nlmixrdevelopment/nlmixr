@@ -112,12 +112,12 @@ armaVersion <- function(){
 ##' @inheritParams nlmixr_fit
 ##' @param ... Other parameters
 ##' @param save Boolean to save a nlmixr object in a rds file in the
-##'     working directory.
+##'     working directory.  If \code{NULL}, uses option "nlmixr.save"
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
 nlmixr <- function(object, data, est=NULL, control=list(),
-                   table=tableControl(), ...,save=getOption("nlmixr.save",FALSE)){
+                   table=tableControl(), ...,save=NULL){
     force(est)
     ## verbose?
     ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
@@ -127,7 +127,7 @@ nlmixr <- function(object, data, est=NULL, control=list(),
 ##' @rdname nlmixr
 ##' @export
 nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
-                            save=getOption("nlmixr.save", FALSE)){
+                            save=NULL){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .uif <- nlmixrUI(object);
     class(.uif) <- "list";
@@ -151,7 +151,7 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
 ##'@rdname nlmixr
 ##'@export
 nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
-                                 save=getOption("nlmixr.save", FALSE)){
+                                 save=NULL){
     .uif <- .getUif(object);
     if (missing(data)){
         data <- getData(object);
@@ -166,7 +166,7 @@ nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=t
 ##' @rdname nlmixr
 ##' @export
 nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
-                            save=getOption("nlmixr.save", FALSE)){
+                            save=NULL){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .uif <- object
     if (missing(data) && missing(est)){
@@ -690,7 +690,10 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 ##' @export
 nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
                         sum.prod=FALSE, table=tableControl(),
-                        save=getOption("nlmixr.save", FALSE)){
+                        save=NULL){
+    if (is.null(save)){
+        save <- getOption("nlmixr.save", FALSE);
+    }
     if (save){
         .modName  <- ifelse(is.null(uif$model.name),"",paste0(uif$model.name,"-"));
         if (.modName==".-") .modName <- ""
@@ -874,7 +877,7 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     if (!is.null(.saem)){
         assign("saem",NULL,fit$env)
         on.exit({assign("saem",.saem,fit$env)});
-        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=NA);
+        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=NA, calcCov=FALSE);
         .ob1 <- .newFit$objDf
         .ob2 <- fit$objDf
         if (any(names(.ob2) == "Condition Number")){

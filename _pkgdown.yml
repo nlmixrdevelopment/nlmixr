@@ -135,6 +135,8 @@ navbar:
         - text: "Going further"
         - text: "Model Piping"
           href: articles/modelPiping.html
+        - text: "Sweeping models to tidy datasets (broom)"
+          href: articles/broom.html
   - text: Example models
     icon: fas fa-chalkboard-teacher
     menu:

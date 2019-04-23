@@ -161,20 +161,19 @@ and pharmacokinetic-pharmacodynamic (PKPD) models.</p>
     </div>
 
     <pre class="usage"><span class='fu'>nlmixr</span>(<span class='no'>object</span>, <span class='no'>data</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
-  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"nlmixr.save"</span>, <span class='fl'>FALSE</span>))
+  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S3 method for function</span>
 <span class='fu'>nlmixr</span>(<span class='no'>object</span>, <span class='no'>data</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
-  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"nlmixr.save"</span>, <span class='fl'>FALSE</span>))
+  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S3 method for nlmixrFitCore</span>
 <span class='fu'>nlmixr</span>(<span class='no'>object</span>, <span class='no'>data</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>,
-  <span class='kw'>save</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"nlmixr.save"</span>, <span class='fl'>FALSE</span>))
+  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S3 method for nlmixrUI</span>
 <span class='fu'>nlmixr</span>(<span class='no'>object</span>, <span class='no'>data</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
-  <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"nlmixr.save"</span>, <span class='fl'>FALSE</span>))</pre>
+  <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,7 +209,7 @@ NPDE etc).  See <code><a href='tableControl.html'>tableControl</a></code>.</p></
     <tr>
       <th>save</th>
       <td><p>Boolean to save a nlmixr object in a rds file in the
-working directory.</p></td>
+working directory.  If <code>NULL</code>, uses option "nlmixr.save"</p></td>
     </tr>
     </table>
     
