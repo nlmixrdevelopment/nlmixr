@@ -1524,7 +1524,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   .calcCov  <- calcCov;
   if (calcCov){
     .covm <- try(calc.COV(object));
-    if (inherits(.covm, "try-error")){
+    if (!inherits(.covm, "try-error")){
       .tmp <- try(chol(.covm), silent=TRUE)
       .addCov <- TRUE
       .sqrtm <- FALSE
@@ -1557,6 +1557,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     } else {
       .tmp <- object$Ha[1:.nth,1:.nth]
       .tmp <- try(chol(.covm), silent=TRUE)
+      .calcCov <- FALSE
       .addCov <- TRUE
       .sqrtm <- FALSE
       if (inherits(.tmp, "try-error")){
@@ -1569,6 +1570,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         }
       } else {
         .tmp <- object$Ha[1:.nth,1:.nth]
+        .calcCov <- FALSE
       }
     }
   } else {
@@ -1585,6 +1587,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       }
     } else {
       .tmp <- object$Ha[1:.nth,1:.nth]
+      .calcCov <- FALSE
     }
   }
 
