@@ -388,9 +388,10 @@ model <- function(model, ..., .lines=NULL){
           .didCall <- TRUE
         }
       } else if (is.name(.x)){
-        .tmp <- eval(.x);
+        .cur  <- 1;
+        .tmp <- eval(.x, sys.parent(1))
         if (is(.tmp,"list") || is(.tmp,"numeric") || is(.tmp,"integer")){
-          .uif <- ini(.uif, .tmp)
+          .uif <- eval(bquote(ini(.(.uif), .(.tmp))))
         } else {
           .uif <- model(.uif, .lines=.deparse(.tmp))
         }
