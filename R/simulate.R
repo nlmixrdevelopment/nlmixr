@@ -373,10 +373,10 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
         }
     }
     r <- range(dat$TIME, na.rm=TRUE,finite=TRUE)
-    if (is.null(minimum)){
+    if (is.null(minimum) || is.infinite(minimum)){
         minimum <- r[1];
     }
-    if (is.null(maximum)){
+    if (is.null(maximum) || is.infinite(maximum)){
         maximum <- r[2];
     }
     new.time <- sort(unique(c(seq(minimum, maximum, length.out=length.out), dat$TIME)));
@@ -423,13 +423,13 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
 
 ##' @rdname nlmixrAugPred
 ##' @export
-augPred.nlmixrFitData <- memoise::memoise(function(object, primary = NULL, minimum = min(primary), maximum = max(primary),
-                              length.out = 51, ...){
-    lst <- as.list(match.call()[-1])
-    lst$object <- object
-    ret <- do.call("nlmixrAugPred", lst, envir=parent.frame(2))
-    class(ret) <- c("nlmixrAugPred", "data.frame")
-    return(ret)
+augPred.nlmixrFitData <- memoise::memoise(function(object, primary = NULL, minimum = NULL, maximum = NULL,
+                                                   length.out = 51, ...){
+   .ret  <- nlmixrAugPred(object=object, primary=primary,
+                          minimum=minimum, maximum=maximum,
+                          length.out=length.out,...)
+   class(.ret) <- c("nlmixrAugPred", "data.frame")
+   return(.ret)
 })
 
 ##' @export
