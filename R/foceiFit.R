@@ -2193,6 +2193,9 @@ VarCorr.nlmixrFitCore <- function(x, sigma=NULL, ...){
     }
 }
 
+##'@export
+VarCorr.nlmixrFitCoreSilent  <- VarCorr.nlmixrFitCore
+
 .sigma <- function(x){
     .ret <- x$nlme
     if (is.null(.ret)) {
@@ -2330,6 +2333,10 @@ plot.nlmixrFitData <- function(x, ...) {
 plot.nlmixrFitCore  <- function(x, ...){
     stop("This is not a nlmixr data frame and cannot be plotted");
 }
+
+##'@export
+plot.nlmixrFitCoreSilent  <- plot.nlmixrFitCore
+
 ##' Return the objective function
 ##'
 ##' @param x object to return objective function value
@@ -2430,6 +2437,23 @@ ranef.nlmixrFitCore <- function(object, ...){
 fixef.nlmixrFitCore <- function(object, ...){
     object$fixef;
 }
+##'@export
+fixef.nlmixrFitCoreSilent  <- fixef.nlmixrFitCore
+
+##'@export
+ranef.nlmixrFitCoreSilent  <- ranef.nlmixrFitCore
+
+##'@export
+getData.nlmixrFitCoreSilent  <- getData.nlmixrFitCore
+
+##'@export
+logLik.nlmixrFitCoreSilent  <- logLik.nlmixrFitCore
+
+##'@export
+nobs.nlmixrFitCoreSilent  <- nobs.nlmixrFitCore
+
+##'@export
+vcov.nlmixrFitCoreSilent  <- vcov.nlmixrFitCore
 
 .getR <- function(x,sd=FALSE){
     .rs <- x$omegaR
@@ -2654,6 +2678,9 @@ traceplot.nlmixrFitCore <- function(x, ...){
     }
 }
 
+##'@export
+traceplot.nlmixrFitCoreSilent  <-  traceplot.nlmixrFitCore
+
 ##' @export
 getVarCov.nlmixrFitCore <- function (obj, ...){
     .env <- obj;
@@ -2765,6 +2792,9 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     return(.env$cov);
 }
 
+##'@export
+getVarCov.nlmixrFitCoreSilent <- getVarCov.nlmixrFitCore
+
 focei.eta.nlmixrFitCore <- function(object, ...){
     .uif <- object$uif;
     ## Reorder based on translation
@@ -2798,6 +2828,9 @@ focei.eta.nlmixrFitCore <- function(object, ...){
     .ome <- eval(parse(text=sprintf("list(%s)", paste(.ome, collapse=","))))
     return(.ome)
 }
+
+##'@export
+focei.eta.nlmixrFitCoreSilent  <- focei.eta.nlmixrFitCore
 
 ##' Convert fit to FOCEi style fit
 ##'
@@ -2997,6 +3030,9 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
     .df
 }
 
+##'@export
+confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
+
 
 .nlmixrTidyFixed <- function(x, ..., .ranpar=FALSE){
     .extra <- list(...);
@@ -3169,6 +3205,9 @@ tidy.nlmixrFitCore <- function(x, ...){
 }
 
 ##'@export
+tidy.nlmixrFitCoreSilent  <- tidy.nlmixrFitCore
+
+##'@export
 glance.nlmixrFitCore <- function(x, ...){
     .lst  <- list(...);
     if (any(names(.lst)=="type")){
@@ -3182,8 +3221,14 @@ glance.nlmixrFitCore <- function(x, ...){
 }
 
 ##'@export
+glance.nlmixrFitCoreSilent  <- glance.nlmixrFitCore
+
+##'@export
 augment.nlmixrFitCore <- function(x, ...){
     stop("augment is not yet implemented for nlmixr models");
 }
+
+##'@export
+augment.nlmixrFitCoreSilent  <- augment.nlmixrFitCore
 
 ##  LocalWords:  covariance
