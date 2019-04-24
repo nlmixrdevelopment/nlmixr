@@ -12,7 +12,7 @@
 ##' @return Simulated dataset (invisibly)
 ##' @author Matthew L. Fidler
 ##' @export
-vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
+vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
                    n_bins = "auto", bin_mid = "mean",
                    show = NULL, stratify = NULL, pred_corr = FALSE,
                    pred_corr_lower_bnd = 0, pi = c(0.05, 0.95), ci = c(0.05, 0.95),
@@ -122,7 +122,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     print(p);
     sim$gg <- p;
     return(invisible(sim));
-}
+})
 
 ##'@export
 print.nlmixrVpc <- function(x, ...){

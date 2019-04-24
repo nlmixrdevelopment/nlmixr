@@ -9,7 +9,13 @@ vignette: >
 ---
 
 ```{r, echo=FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "100%"
+)
 ```
 
 ![nlmixr](logo.png)
@@ -27,10 +33,17 @@ An example of this is the Phenobarbital data:
 ## Load Phenobarb data
 library(nlmixr)
 
-## To allow nlmixr to reload runs without large run times
+## These options cache the models and the model simulations in R
 ## To run the actual models on your system, take the save options off.
 options(nlmixr.save=TRUE,
         nlmixr.save.dir=system.file(package="nlmixr"));
+
+invisible(memoise::cache_filesystem(file.path(system.file(package="nlmixr"),"memo")))
+
+```
+
+## Model Specification
+```{r}
 
 pheno <- function() {
   ini({
@@ -52,13 +65,30 @@ pheno <- function() {
   })
 }
 
+```
+## Fit with SAEM
+```{r}
 fit <- nlmixr(pheno, pheno_sd, "saem")
 
 fit
+```
+## Basic Goodness of Fit Plots
 
-suppressWarnings(plot(fit))
+```{r}
+plot(fit)
+```
 
-library(ggplot2)
+Those individual plots are not that great, it would be better to see
+the actual curves; You can with `augPred`
+
+```{r}
+plot(augPred(fit))
+```
+
+## Two types of VPCs
+
+```{r}
+## library(ggplot2)
 ## A traditional VPC
 vpc(fit, show=list(obs_dv=TRUE))
 

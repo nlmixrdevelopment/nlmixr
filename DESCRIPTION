@@ -2,7 +2,7 @@ Package: nlmixr
 Type: Package
 Title: Nonlinear Mixed Effects Models in Population Pharmacokinetics
         and Pharmacodynamics
-Depends: R (>= 3.3)
+Depends: R (>= 3.4)
 Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
         R.utils, n1qn1, fastGHQuad,
@@ -18,12 +18,15 @@ Authors@R: c(person("Matthew","Fidler",
    person("Yuan", "Xiong", 
       role = "aut", email = "yuan.xiong@gmail.com"),
    person("Rik", "Schoemaker", 
-      role = "aut", email = "rik.schoemaker@occams.com"),
+      role = "aut", email = "rik.schoemaker@occams.com",
+      comment=c(ORCID="0000-0002-7538-3005")),
    person("Justin", "Wilkins", 
       role = "aut", email = "justin.wilkins@occams.com",
       comment=c(ORCID="0000-0002-7099-9396")),
    person("Mirjam","Trame",
-      role = "aut", email = "mirjam.trame@gmail.com"),   
+      role = "aut", email = "mirjam.trame@gmail.com"),
+   person("Richard", "Hooijmaijers", email = "richardhooijmaijers@gmail.com",
+      role = "aut"),
    person("Teun","Post",
       role = "aut", email = "t.post@lapp.nl"),   
    person("Robert","Leary", role = "ctb"),

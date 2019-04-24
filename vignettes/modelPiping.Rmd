@@ -7,6 +7,11 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
 ![nlmixr](logo.png)
 
 # Changing models via piping
@@ -68,9 +73,9 @@ In these situations it can be come tedious to modify the models by hand.
 nlmixr provides the ability to:
 
 1. Change parameter estimates before or after running a model. (ie
-   `ini(tka=0.5)`)
+   `update(tka=0.5)`)
 2. Fix parameters to arbitrary values, or estimated values (ie
-   `ini(tka=fix(0.5))` or `ini(tka=fix)`)
+   `update(tka=fix(0.5))` or `update(tka=fix)`)
    
 The easiest way to illustrate this is by showing a few examples of
 piping changes to the model:
@@ -78,7 +83,7 @@ piping changes to the model:
 ```R
 ## Example 1 -- Set inital estimate to 0.5 (shown w/posthoc)
 one.ka.0.5 <- fit %>%
-    ini(tka=0.5) %>% 
+    update(tka=0.5) %>% 
     nlmixr(est="posthoc")
 
 one.ka.0.5
@@ -87,7 +92,7 @@ one.ka.0.5
 ```{r}
 ## Example 2 -- Fix tka to 0.5 and re-estimate.
 one.ka.0.5 <- fit %>%
-    ini(tka=fix(0.5)) %>%
+    update(tka=fix(0.5)) %>%
     nlmixr(est="focei")
 
 one.ka.0.5
@@ -96,7 +101,7 @@ one.ka.0.5
 ```{r}
 ## Example 3 -- Fix tka to model estimated value and re-estimate.
 one.ka.0.5 <- fit %>%
-    ini(tka=fix) %>%
+    update(tka=fix) %>%
     nlmixr(est="focei")
 
 one.ka.0.5
@@ -104,8 +109,8 @@ one.ka.0.5
 
 ```{r}
 ## Example 4 -- Change tka to 0.7 in orginal model function and then estimate
-one.ka.0.7 <- one.compartment %>%
-    ini(tka=0.7) %>% 
+one.ka.0.7 <- one.compartment %>% 
+    update(tka=0.7) %>% 
     nlmixr(data=theo_sd,est="focei")
 
 one.ka.0.7
@@ -131,7 +136,7 @@ then re-estimate by piping it to the `nlmixr` function again.
 ```{r}
 ## Remove eta.ka on ka
 noEta <- fit %>%
-    model(ka <- exp(tka)) %>%
+    update(ka <- exp(tka)) %>%
     nlmixr(est="focei")
 
 noEta
@@ -141,7 +146,7 @@ Of course you could also add an eta on a parameter in the same way;
 
 ```{r}
 addBackKa <- noEta %>%
-    model({ka <- exp(tka + bsv.ka)}) %>%
+    update({ka <- exp(tka + bsv.ka)}) %>%
     ini(bsv.ka=0.1) %>%
     nlmixr(est="focei")
 
@@ -174,8 +179,8 @@ parameters:
 ## Note currently cov is needed as a prefix so nlmixr knows this is an
 ## estimated parameter not a parameter
 wt70 <- fit %>% ## FIXME could be based on if it finds the covarite in the last used nlmixr data.
-    model({cl <- exp(tcl + eta.cl)*(WT/70)^covWtPow}) %>%
-    ini(covWtPow=fix(0.75)) %>%
+    update({cl <- exp(tcl + eta.cl)*(WT/70)^covWtPow}) %>%
+    update(covWtPow=fix(0.75)) %>%
     nlmixr(est="focei")
 
 wt70
@@ -191,8 +196,8 @@ d <- theo_sd
 d$DV[d$EVID == 0 & d$DV == 0] <- 0.0150
 
 addPropModel <- fit %>%
-    model({cp ~ add(add.err)+prop(prop.err)}) %>%
-    ini(prop.err=0.1) %>%
+    update({cp ~ add(add.err)+prop(prop.err)}) %>%
+    update(prop.err=0.1) %>%
     nlmixr(d,est="focei")
 
 addPropModel

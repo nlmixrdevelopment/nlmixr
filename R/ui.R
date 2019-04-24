@@ -1,24 +1,3 @@
-## TODO:
-## Lincmt infusion checks...
-## High Covariance in Omgea for nlme
-## Multiple endpoints check.
-## Initial conditions between methods -- OK
-## Dots in variable names (especially THETAs for SAEM)
-## Fixing components?
-
-## Unified UI observations
-## - nlme
-## - Initial conditions for residuls.
-## - Error structure
-## -
-## Check on unified SD for SAEM
-## Check on output for OMEGA (is is Var or SD)
-
-## Also need to add check for types of omega blocks
-
-## SAEM:
-## - Covariate part
-
 .deparse <- function(expr){
   deparse(expr,width=500, control = "useSource");
 }
