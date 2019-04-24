@@ -378,6 +378,9 @@ model <- function(model, ..., .lines=NULL){
   if (is.null(.callNames)){
     .callNames  <- rep("",length(.call));
   }
+  if (any(.callNames %in% c("data", "est", "control", "table", "save"))){
+    stop("Cannot update these arguments: 'data', 'est', 'control', 'table', or 'save'\nUse these options with nlmixr.");
+  }
   ## Any time the parameters are named, use ini call
   .iniArgs  <- which(.callNames %in% .iniNames);
   .iniNames2  <- .callNames[.iniArgs];
