@@ -255,6 +255,10 @@ typedef struct {
   double gradCalcCentralLarge;
   double etaNudge;
   int reducedTol;
+  int reducedTol2;
+  int repeatGill;
+  int repeatGillN;
+  int repeatGillMax;
   double badEtaPenalty;
   int printTop;
   double resetThetaCheckPer;
@@ -727,6 +731,7 @@ double likInner0(double *eta){
     j=0;
     while (op->badSolve && j < op_focei.maxOdeRecalc){
       op_focei.reducedTol=1;
+      op_focei.reducedTol2=1;
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
       op->badSolve=0;
       innerOde(id);
@@ -1823,7 +1828,10 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
 
 void numericGrad(double *theta, double *g){
   op_focei.mixDeriv=0;
-  if (op_focei.nF + op_focei.nF2 == 1 && op_focei.gillK > 0){
+  op_focei.reducedTol2=0;
+  if ((op_focei.repeatGill == 1 || op_focei.nF + op_focei.nF2 == 1) && op_focei.gillK > 0){
+    op_focei.repeatGill=0;
+    op_focei.reducedTol2=0;
     double hf, hphif, err;
     // op_focei.cur = 0;
     // op_focei.totTick = op_focei.npars;
@@ -1867,6 +1875,10 @@ void numericGrad(double *theta, double *g){
     // op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
     // Rprintf("\n");
     op_focei.didGill=1;
+    if (op_focei.reducedTol2 && op_focei.repeatGillN < op_focei.repeatGillMax){
+      op_focei.repeatGill=1;
+      op_focei.repeatGillN++;
+    }
   } else {
     op_focei.calcGrad=1;
     rx = getRx();
@@ -2202,6 +2214,9 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.objfRecalN=0;
   op_focei.odeRecalcFactor = as<double>(odeO["odeRecalcFactor"]);
   op_focei.reducedTol = 0;
+  op_focei.repeatGill=0;
+  op_focei.repeatGillN=0;
+  op_focei.repeatGillMax=as<int>(odeO["repeatGillMax"]);
   if (op_focei.maxOuterIterations <= 0){
     // No scaling.
     foceiSetupTheta_(mvi, theta, thetaFixed, 0.0, !RxODE::rxIs(obj, "NULL"));
@@ -2839,7 +2854,7 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
     } else {
       switch(op_focei.derivMethod){
       case 0:
-	if (op_focei.nF + op_focei.nF2 == 1 && op_focei.gillK > 0){
+	if ((op_focei.repeatGill == 1 || op_focei.nF + op_focei.nF2 == 1) && op_focei.gillK > 0){
 	  Rprintf("|    G|    Gill Diff. |");
 	} else if (op_focei.mixDeriv){
 	  Rprintf("|    M|   Mixed Diff. |");

@@ -520,6 +520,11 @@ is.latex <- function() {
 ##' @param odeRecalcFactor The factor to increase the rtol/atol with
 ##'     bad ODE solving.
 ##'
+##' @param repeatGillMax If the tolerances were reduced when
+##'     calculating the initial Gill differences, the Gill difference
+##'     is repeated up to a maximum number of times defined by this
+##'     parameter.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##'
@@ -642,7 +647,8 @@ foceiControl <- function(sigdig=3,...,
                          seed=42,
                          badEtaPenalty=0.05,
                          resetThetaCheckPer=0.1,
-                         etaMat=NULL){
+                         etaMat=NULL,
+                         repeatGillMax=7){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
@@ -913,6 +919,7 @@ foceiControl <- function(sigdig=3,...,
                  seed=seed,
                  resetThetaCheckPer=resetThetaCheckPer,
                  etaMat=etaMat,
+                 repeatGillMax=as.integer(repeatGillMax),
                  ...);
     if (!missing(etaMat) && missing(maxInnerIterations)){
         warning("By supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0");

@@ -39,13 +39,13 @@ We can try fitting a simple one-compartment PK model to this small dataset. We w
 ```{r}
 one.cmt <- function() {
     ini({
-        tka <- .5   # log Ka
-        tcl <- -3.2 # log Cl
-        tv <- -1    # log V
-        eta.ka ~ 1
-        eta.cl ~ 2
-        eta.v ~ 1
-        add.err <- 0.1
+        tka <- 0.45 # Log Ka
+        tcl <- 1 # Log Cl
+        tv <- 3.45    # Log V
+        eta.ka ~ 0.6
+        eta.cl ~ 0.3
+        eta.v ~ 0.1
+        add.err <- 0.7
     })
     model({
         ka <- exp(tka + eta.ka)
