@@ -3065,6 +3065,8 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     } else if (!.exponentiate){
         .df$estimate <- .df$model.est;
     }
+    .df$statistic  <- .df$estimate/.df$std.error
+    .df$p.value  <- pt(.df$statistic,nobs(x)-attr(logLik(x),"df"),lower.tail=FALSE)*2
     if (.conf.int){
         .ci <- confint.nlmixrFitCore(x, level=.conf.level, ciNames=FALSE, exponentiate=.exponentiate);
         .df$conf.low <- .ci$conf.low
@@ -3106,13 +3108,15 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 .nlmixrTidyRandomPar <- function(x,...){
     .pars  <- .getR(x,TRUE)
     .p1 <- data.frame(effect="ran_pars", group="ID", term=names(.pars),estimate=.pars, std.error=NA_real_,
-                      stringsAsFactors=FALSE) %>%
+                      statistic=NA_real_, p.value=NA_real_, stringsAsFactors=FALSE) %>%
         .reorderCols();
     .p2  <- data.frame(.nlmixrTidyFixed(x,.ranpar=TRUE), stringsAsFactors=FALSE)%>%
         .reorderCols();
     .df  <- rbind(.p1,.p2);
-    if (all(is.na(.df$std.error))){
-        .df  <- .df[,names(.df) != "std.error"];
+    for (.v in c("statistic", "p.value", "std.error")){
+        if (all(is.na(.df[,.v]))){
+            .df  <- .df[,names(.df) != .v];
+        }
     }
     return(dplyr::as.tbl(.df))
 ##   effect   group    term                  estimate std.error statistic
