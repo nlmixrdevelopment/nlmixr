@@ -1,0 +1,537 @@
+---
+title: "Running PK models with nlmixr"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Running PK models with nlmixr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+![nlmixr](logo.png)
+
+# Running PK models with nlmixr
+
+nlmixr uses a unified interface for specifying and running
+models. Let's start with a very simple PK example, using the
+single-dose theophylline dataset generously provided by Dr. Robert
+A. Upton of the University of California, San Francisco:
+
+```{r}
+## Load libraries
+library(ggplot2)
+library(nlmixr)
+
+## To allow nlmixr to reload runs without large run times
+## To run the actual models on your system, take the save options off.
+options(nlmixr.save=TRUE,
+        nlmixr.save.dir=system.file(package="nlmixr"));
+
+
+str(theo_sd)
+
+ggplot(theo_sd, aes(TIME, DV)) + geom_line(aes(group=ID), col="red") + scale_x_continuous("Time (h)") + scale_y_continuous("Concentration") + labs(title="Theophylline single-dose", subtitle="Concentration vs. time by individual")
+
+```
+
+We can try fitting a simple one-compartment PK model to this small dataset. We write the model as follows:
+
+```{r}
+one.cmt <- function() {
+    ini({
+        tka <- .5   # log Ka
+        tcl <- -3.2 # log Cl
+        tv <- -1    # log V
+        eta.ka ~ 1
+        eta.cl ~ 2
+        eta.v ~ 1
+        add.err <- 0.1
+    })
+    model({
+        ka <- exp(tka + eta.ka)
+        cl <- exp(tcl + eta.cl)
+        v <- exp(tv + eta.v)
+        linCmt() ~ add(add.err)
+    })
+}
+```
+
+We can now run the model...
+
+```{r}
+fit <- nlmixr(one.cmt, theo_sd, est="nlme")
+print(fit)
+```
+
+We can alternatively express the same model by ordinary differential equations (ODEs):
+
+```{r}
+one.compartment <- function() {
+    ini({
+        tka <- .5   # Log Ka
+        tcl <- -3.2 # Log Cl
+        tv <- -0.6    # Log V
+        eta.ka ~ 0.5
+        eta.cl ~ 0.5
+        eta.v ~ 0.5
+        add.err <- 0.1
+    })
+    model({
+        ka <- exp(tka + eta.ka)
+        cl <- exp(tcl + eta.cl)
+        v <- exp(tv + eta.v)
+        d/dt(depot) = -ka * depot
+        d/dt(center) = ka * depot - cl / v * center
+        cp = center / v 
+        cp ~ add(add.err)
+    })
+}
+```
+
+We can try the Stochastic Approximation EM (SAEM) method to this model:
+
+```{r}
+fit <- nlmixr(one.compartment, theo_sd, est="saem")
+```
+
+And if we wanted to, we could even apply the First-Order Conditional
+Estimation (FOCEi) method to this model:
+
+```{r}
+fitF <- nlmixr(one.compartment, theo_sd, est="focei")
+```
+
+
+This example delivers a complete model fit as the `fit`
+object, including parameter history, a set of fixed effect estimates,
+and random effects for all included subjects.
+
+Now back to the `saem` fit; Let's look at the fit using nlmixr's built-in diagnostics...
+
+```{r}
+plot(fit)
+```
+
+```{r}
+fit
+```
+
+```{r}
+fit$eta
+```
+
+Default trace plots can be generated using:
+```r
+traceplot(fit)
+```
+
+but with a little more work, we can get a nicer set of iteration trace
+plots ("wriggly worms")...
+
+
+```{r}
+
+iter <- fit$par.hist.stacked
+iter$Parameter[iter$par=="add.err"] <- "Additive error"
+iter$Parameter[iter$par=="eta.cl"]  <- "IIV CL/F"
+iter$Parameter[iter$par=="eta.v"]   <- "IIV V/F"
+iter$Parameter[iter$par=="eta.ka"]  <- "IIV ka"
+iter$Parameter[iter$par=="tcl"]     <- "log(CL/F)"
+iter$Parameter[iter$par=="tv"]      <- "log(V/F)"
+iter$Parameter[iter$par=="tka"]     <- "log(ka)"
+iter$Parameter <- ordered(iter$Parameter, c("log(CL/F)", "log(V/F)", "log(ka)",
+                                            "IIV CL/F", "IIV V/F", "IIV ka",
+                                            "Additive error"))
+
+ggplot(iter, aes(iter, val)) +
+  geom_line(col="red") + 
+  scale_x_continuous("Iteration") +
+  scale_y_continuous("Value") +
+  facet_wrap(~ Parameter, scales="free_y") +
+  labs(title="Theophylline single-dose", subtitle="Parameter estimation iterations")
+
+```
+
+... and some random-effects histograms...
+
+```{r}
+
+etas <- data.frame(eta = c(fit$eta$eta.ka, fit$eta$eta.cl, fit$eta$eta.v),
+                   lab = rep(c("eta(ka)", "eta(CL/F)", "eta(V/F)"), each=nrow(fit$eta)))
+etas$lab <- ordered(etas$lab, c("eta(CL/F)","eta(V/F)","eta(ka)"))
+
+ggplot(etas, aes(eta)) +
+  geom_histogram(fill="red", col="white") + 
+  geom_vline(xintercept=0) +
+  scale_x_continuous(expression(paste(eta))) +
+  scale_y_continuous("Count") +
+  facet_grid(~ lab) +
+  coord_cartesian(xlim=c(-1.75,1.75)) +
+  labs(title="Theophylline single-dose", subtitle="IIV distributions")
+
+```
+
+
+## xpose
+
+This is all very nice. But what we really want is a complete suite of model diagnostic
+tools, like those available in [xpose](https://github.com/UUPharmacometrics/xpose), right?
+
+Restart R, and install xpose from CRAN, if you haven't already...
+
+```{r}
+## install.packages("xpose")
+library(xpose)
+```
+
+Now install the extension for nlmixr:
+
+```r
+devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
+```
+
+```r
+library(xpose.nlmixr)
+```
+
+... and convert your nlmixr fit object into an xpose fit object.
+
+```r
+dv_vs_pred(xp)
+```
+![DV vs PRED](dv_vs_pred.png)
+```r
+dv_vs_ipred(xp)
+```
+![DV vs IPRED](dv_vs_ipred.png)
+```r
+pred_vs_pred(xp)
+```
+![CWRES vs PRED](cwres_vs_pred.png)
+```r
+absval_res_vs_pred(xp, res="IWRES")
+```
+![abs(IWRES) vs PRED](iwres_vs_pred.png)
+We can also replicate some of nlmixr's internal plots...
+```r
+ind_plots(xp, res="IWRES")
+```
+![Individual plots](ind_plots.png)
+
+
+For more information about using xpose, see the Uppsala pharmacometrics group's 
+comprehensive site [here](https://uupharmacometrics.github.io/xpose/).
+
+# The UI
+
+The nlmixr modeling dialect, inspired by R and NONMEM, can be used to
+fit models using all current and future estimation alogorithms within
+nlmixr. Using these widely-used tools as inspiration has the advantage
+of delivering a model specification syntax taht is instantly familira
+to the majority of analysts working in pharmacometrics and related
+fields.
+
+
+## Overall model structure
+
+Model specifications for nlmixr are written using functions containing
+`ini` and `model` blocks. These functions can be called anything, but
+must contain these two components. Let's look at a very simple
+one-compartment model with no covariates.
+
+```r
+f <- function() {
+    ini({   # Initial conditions/variables
+            # are specified here
+    })
+    model({ # The model is specified
+            # here
+    })
+}
+```
+
+### The ini block
+
+The `ini` block specifies initial conditions, including initial
+estimates and boundaries for those algorithms which support them
+(currently, the built-in `nlme` and `saem` methods do
+not). Nomenclature is similar to that used in NONMEM, Monolix and
+other similar packages. In the NONMEM world, the `ini` block is
+analogous to `$THETA`, `$OMEGA` and `$SIGMA` blocks.
+
+```r
+f <- function(){ # Note that arguments to the function are currently
+                 # ignored by nlmixr
+    ini({
+        # Initial conditions for population parameters (sometimes
+        # called THETA parameters) are defined by either '<-' or '='
+        lCl <- 1.6      # log Cl (L/hr)
+        
+        # Note that simple expressions that evaluate to a number are
+        # OK for defining initial conditions (like in R)
+        lVc = log(90)  # log V (L)
+        
+        ## Also, note that a comment on a parameter is captured as a parameter label
+        lKa <- 1       # log Ka (1/hr)
+        
+        # Bounds may be specified by c(lower, est, upper), like NONMEM:
+        # Residuals errors are assumed to be population parameters
+        prop.err <- c(0, 0.2, 1)
+        
+        # IIV terms will be discussed in the next example
+    })
+    
+    # The model block will be discussed later
+    model({})
+}
+
+```
+As shown in the above example: 
+
+* Simple parameter values are specified using an R-compatible
+  assignment
+* Boundaries my be specified by `c(lower, est, upper)`.
+* Like NONMEM, `c(lower,est)` is equivalent to `c(lower,est,Inf)`
+* Also like NONMEM, `c(est)` does not specify a lower bound, and is
+  equivalent to specifying the parameter without using R's `c()`
+  function.
+
+These parameters can be named using almost any R-compatible
+name. Please note that:
+
+* Residual error estimates should be coded as population estimates
+  (i.e. using `=` or `<-`, not `~`).
+* Variable names that start with `_` are not supported. Note that R
+  does not allow variable starting with `_` to be assigned without
+  quoting them.
+* Naming variables that start with `rx_` or `nlmixr_` is not allowed,
+  since RxODE and nlmixr use these prefixes internally for certain
+  estimation routines and for calculating residuals.
+* Variable names are case-sensitive, just like they are in R. `CL` is
+  not the same as `Cl`.
+
+In mixture models, multivariate normal individual deviations from the
+normal population and parameters are estimated (in NONMEM these are
+called "ETA" parameters). Additionally, the variance/covariance matrix
+of these deviations are is also estimated (in NONMEM this is the
+"OMEGA" matrix). These also take initial estimates. In nlmixr, these
+are specified by the `~` operator. This that is typically used in
+statistics R for "modeled by", and was chosen to distinguish these
+estimates from the population and residual error parameters.
+
+Continuing from the prior example, we can annotate the estimates for
+the between-subject error distribution...
+
+```r
+f <- function(){
+    ini({
+        lCl <- 1.6      # log Cl (L/hr)
+        lVc = log(90)   # log V (L)
+        lKa <- 1        # log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        
+        # Initial estimate for ka IIV variance
+        # Labels work for single parameters
+        eta.ka ~ 0.1    ## BSV Ka
+
+        # For correlated parameters, you specify the names of each
+        # correlated parameter separated by a addition operator `+`
+        # and the left handed side specifies the lower triangular
+        # matrix initial of the covariance matrix.
+        eta.cl + eta.vc ~ c(0.1,
+                            0.005, 0.1)
+                            
+        # Note that labels do not currently work for correlated
+        # parameters.  Also, do not put comments inside the lower
+        # triangular matrix as this will currently break the model.
+    })
+    
+    # The model block will be discussed later
+    model({})
+}
+```
+As shown in the above example: 
+
+* Simple variances are specified by the variable name and the estimate
+  separated by `~`.
+*	Correlated parameters are specified by the sum of the variable
+     labels and then the lower triangular matrix of the covariance is
+     specified on the left handed side of the equation. This is also
+     separated by `~`.
+*	The initial estimates are specified on the variance scale, and in
+     analogy with NONMEM, the square roots of the diagonal elements
+     correspond to coefficients of variation when used in the
+     exponential IIV implementation.
+
+Currently, comments inside the lower triangular matrix are not allowed. 
+
+
+### The model block
+
+The `model` block specifies the model, and is analogous to the `$PK`,
+`$PRED` and `$ERROR` blocks in NONMEM.
+
+Once the initialization block has been defined, you can define a model
+in terms of the variables defined in the `ini` block. You can also mix
+RxODE blocks into the model if needed.
+
+The current method of defining a nlmixr model is to specify the
+parameters, and then any required RxODE lines. Continuing the
+annotated example:
+
+
+```r
+f <- function(){
+    ini({
+        lCl <- 1.6       # log Cl (L/hr)
+        lVc <- log(90)   # log Vc (L)
+        lKA <- 0.1       # log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        
+        eta.Cl ~ 0.1     # BSV Cl
+        eta.Vc ~ 0.1     # BSV Vc
+        eta.KA ~ 0.1     # BSV Ka
+    })
+    model({
+        # Parameters are defined in terms of the previously-defined
+        # parameter names:
+        Cl <- exp(lCl + eta.Cl)
+        Vc =  exp(lVc + eta.Vc)
+        KA <- exp(lKA + eta.KA)
+        
+        # Next, the differential equations are defined:
+        kel <- Cl / Vc;
+        
+        d/dt(depot)  = -KA*depot;
+        d/dt(centr)  =  KA*depot-kel*centr;
+        
+        # And the concentration is then calculated
+        cp = centr / Vc;
+        # Finally, we specify that the plasma concentration follows
+        # a proportional error distribution (estimated by the parameter 
+        # prop.err)
+        cp ~ prop(prop.err)
+    })
+
+}
+
+```
+
+A few points to note: 
+
+* Parameters are defined before the differential equations. Currently
+  directly defining the differential equations in terms of the
+  population parameters is not supported.
+* The differential equations, parameters and error terms are in a
+  single block, instead of multiple sections.
+* Additionally state names, calculated variables, also cannot start
+  with either `rx_` or `nlmixr_` since these are used internally in
+  some estimation routines.
+* Errors are specified using the tilde, `~`. Currently you can use
+  either `add(parameter)` for additive error, `prop(parameter)` for
+  proportional error or `add(parameter1) + prop(parameter2)` for
+  combined additive and proportional error. You can also specify
+  `norm(parameter)` for additive error, since it follows a normal
+  distribution.
+* Some routines, like `saem`, require parameters expressed in terms of
+  `Pop.Parameter + Individual.Deviation.Parameter +
+  Covariate*Covariate.Parameter`. The order of these parameters does
+  not matter. This is similar to NONMEM's mu-referencing, though not
+  as restrictive. This means that for `saem`, a parameterization of
+  the form `Cl <- Cl*exp(eta.Cl)` is not allowed.
+* The type of parameter in the model is determined by the `ini` block;
+  covariates used in the model are not included in the `ini`
+  block. These variables need to be present in the modeling dataset
+  for the model to run.
+
+## Running models
+
+Models can be fitted several ways, including via
+the
+[magrittr] forward-pipe
+operator.
+
+```{r}
+fit <- nlmixr(one.compartment) %>% saem.fit(data=theo_sd)
+```
+```{r}
+fit2 <- nlmixr(one.compartment, data=theo_sd, est="saem")
+```
+```{r}
+fit3 <- one.compartment %>% saem.fit(data=theo_sd)
+```
+
+Options to the estimation routines can be specified using nlmeControl
+for nlme estimation:
+
+```{r}
+fit4 <- nlmixr(one.compartment, theo_sd,est="nlme",control = nlmeControl(pnlsTol = .5))
+```
+where options are specified in the `nlme` documentation.
+Options for saem can be specified using `saemControl`:
+```{r}
+fit5 <- nlmixr(one.compartment,theo_sd,est="saem",control=saemControl(n.burn=250,n.em=350,print=50))
+```
+
+this example specifies 250 burn-in iterations, 350 em iterations and a
+print progress every 50 runs.
+
+## Model Syntax for solved PK systems 
+
+Solved PK systems are also currently supported by nlmixr with the
+'linCmt()' pseudo-function. An annotated example of a solved system is
+below:
+
+```{r}
+f <- function(){
+    ini({
+        lCl <- 1.6      #log Cl (L/hr)
+        lVc <- log(90)  #log Vc (L)
+        lKA <- 0.1      #log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        eta.Cl ~ 0.1   # BSV Cl
+        eta.Vc ~ 0.1   # BSV Vc
+        eta.KA ~ 0.1   # BSV Ka
+    })
+    model({
+        Cl <- exp(lCl + eta.Cl)
+        Vc = exp(lVc + eta.Vc)
+        KA <- exp(lKA + eta.KA)
+        ## Instead of specifying the ODEs, you can use
+        ## the linCmt() function to use the solved system.
+        ##
+        ## This function determines the type of PK solved system
+        ## to use by the parameters that are defined.  In this case
+        ## it knows that this is a one-compartment model with first-order
+        ## absorption.
+        linCmt() ~ prop(prop.err)
+    })
+}
+```
+A few things to keep in mind: 
+*	Currently the solved systems support either oral dosing, IV dosing
+     or IV infusion dosing and does not allow mixing the dosing types.
+*	While RxODE allows mixing of solved systems and ODEs, this has not
+     been implemented in nlmixr yet.
+*	The solved systems implemented are the one, two and three
+     compartment models with or without first-order absorption. Each
+     of the models support a lag time with a tlag parameter.
+*	In general the linear compartment model figures out the model by
+     the parameter names. nlmixr currently knows about numbered
+     volumes, `Vc`/`Vp`, Clearances in terms of both `Cl` and
+     `Q`/`CLD`. Additionally nlmixr knows about elimination
+     micro-constants (ie `K12`). Mixing of these parameters for these
+     models is currently not supported.
+
+## Checking model syntax 
+
+After specifying the model syntax you can check that nlmixr is
+interpreting it correctly by using the nlmixr function on it.  Using
+the above function we can get:
+
+```{r}
+nlmixr(f)
+```
+
+In general this gives you information about the model (what type of
+solved system/RxODE), initial estimates as well as the code for the
+model block.
