@@ -683,7 +683,7 @@ anova.nlmixrNlme <- function(object, ...){
 
 ##' @rdname focei.eta
 focei.eta.nlmixrNlme <- function(object, ...){
-    mat <- as.matrix(VarCorr(object))
+    mat <- suppressWarnings(as.matrix(VarCorr(object)))
     dn <- dimnames(mat);
     d <- dim(mat);
     is.cov <- (d[2] >= 3);
@@ -691,8 +691,8 @@ focei.eta.nlmixrNlme <- function(object, ...){
     dimnames(mat) <- dn
     len <- length(mat[, 1, drop = FALSE]);
     mat <- mat[-len,, drop = FALSE]
+    etas <- sprintf("ETA[%d]", seq_along(row.names(mat)))
     est <- as.numeric(mat[, 1]);
-    etas <- sprintf("ETA[%d]", seq_along(row.names(est)))
     if (!is.cov)
         return(eval(parse(text=sprintf("list(%s)", paste(sprintf("ETA[%d] ~ %s", seq_along(est), est), collapse=", ")))));
     sd <- as.numeric(mat[-len, 2]);

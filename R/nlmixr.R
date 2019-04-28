@@ -445,9 +445,13 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             cfg$print <- as.integer(print)
         }
         .fit <- model$saem_mod(cfg);
-        .ret <- as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik,
-                                 nnodes.gq=.nnodes.gq, nsd.gq=.nsd.gq, adjObf=.adjObf,
-                                 addCov=.addCov);
+        .ret <- try(as.focei.saemFit(.fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik,
+                                     nnodes.gq=.nnodes.gq, nsd.gq=.nsd.gq, adjObf=.adjObf,
+                                     addCov=.addCov), silent=TRUE);
+        if (inherits(.ret, "try-error")){
+            warning("Error converting to nlmixr UI object, returning saem object");
+            return(.fit)
+        }
         if (inherits(.ret, "nlmixrFitData")){
             .ret <- fix.dat(.ret);
             .ret <- .addNpde(.ret);
@@ -524,7 +528,11 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                         rtol=.rtol,
                         ...);
         class(fit) <- c(est.type, class(fit));
-        .ret <- as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=calc.resid);
+        .ret <- try({as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=calc.resid)});
+        if (inherits(.ret, "try-error")){
+            warning("Error converting to nlmixr UI object, returning nlme object");
+            return(fit);
+        }
         if (inherits(.ret, "nlmixrFitData")){
             .ret <- fix.dat(.ret);
             .ret <- .addNpde(.ret);
