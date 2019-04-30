@@ -180,18 +180,19 @@ broadly extensible to all recent releases of macOS, however.
    - Install `pip` from the macOS terminal prompt: `sudo easy_install pip`.
      - If `easy_install` doesn't work, you can download by `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py` and then run `sudo python get-pip.py`
    - Install `sympy` using `pip`: `sudo -H pip install sympy`.
-w. Install build tools.
-   - Install Mac Rtools for clang and gfortran from [CRAN Rtools](http://cran.r-project.org/bin/macosx/tools/)
-   - Install Mac OSX command like tools by typing `xcode-select --install` and then choose `install`.  This allows you to compile the package without downloading the entire (large) Xcode package.
-   - If you are using Mojave you have to also type the following in the terminal to install the compiler hearders:
-   
+3. Install build tools.
+   - Install the clang and gfortran packages from [CRAN development tools website](http://cran.r-project.org/bin/macosx/tools/)
+   - Install Mac OSX command like tools by typing `xcode-select --install` and then choose `install`.  This allows you to compile the package without downloading the entire (large) Xcode package. Make sure to perform this step even if the Xcode package is already installed.
+   - If you are using macOS >= 10.14 you have to also type the following in the terminal to install the compiler headers:
+
 ```sh
 sudo installer -pkg \
 /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg \
 -target /
 ```
-   - Change `~/.Rprofile` to have the following line to adjust the paths in R to use the CRAN compilers:
+   - Change `~/.Rprofile` to have the following line to adjust the paths in R to use the CRAN compilers (if not present, create the .Rprofile file):
 ```R
+# make sure to adjust the version number of clang based on the downloaded version in step 3 (e.g. clang8/bin)
 Sys.setenv("PATH"=paste0("/usr/local/clang6/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
 
 ```
