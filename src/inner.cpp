@@ -1326,6 +1326,17 @@ void thetaReset(double size){
 	  thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
 	}
       }
+      arma::mat etaMat(rx->nsub, op_focei.neta);
+      for (int ii = rx->nsub; ii--;){
+	focei_ind *fInd = &(inds_focei[ii]);
+	for (int jj = op_focei.neta; jj--; ){
+	  if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < op_focei.thetan){
+	    etaMat(ii, jj) = fInd->eta[jj]-op_focei.etaM(jj,0);
+	  } else {
+	    etaMat(ii, jj) = fInd->eta[jj];
+	  }
+	}
+      }
       // Update omega estimates
       NumericVector omegaTheta(op_focei.omegan);
 	  
@@ -1335,6 +1346,9 @@ void thetaReset(double size){
       Function loadNamespace("loadNamespace", R_BaseNamespace);
       Environment nlmixr = loadNamespace("nlmixr");
       Environment thetaReset = nlmixr[".thetaReset"];
+      focei_options *fop = &op_focei;
+      thetaReset["maxInnerIterations"]=fop->maxInnerIterations;
+      thetaReset["etaMat"] = wrap(etaMat);
       thetaReset["thetaIni"]= thetaIni;
       thetaReset["omegaTheta"] = omegaTheta;
       thetaReset["nF"] = op_focei.nF+op_focei.nF2;

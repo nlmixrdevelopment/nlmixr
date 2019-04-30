@@ -1887,6 +1887,9 @@ foceiFit.data.frame0 <- function(data,
                 .ret$thetaIni <- setNames(.thetaReset$thetaIni + 0.0, .nm);
                 .ret$rxInv$theta <- .thetaReset$omegaTheta;
                 .ret$control$printTop <- FALSE
+                .ret$etaMat <- .thetaReset$etaMat;
+                .ret$control$etaMat <- .thetaReset$etaMat;
+                .ret$control$maxInnerIterations <- .thetaReset$maxInnerIterations;
                 .ret$control$nF <- .thetaReset$nF;
                 .ret$control$gillRetC <- .thetaReset$gillRetC
                 .ret$control$gillRet <- .thetaReset$gillRet
@@ -2277,7 +2280,7 @@ plot.nlmixrFitData <- function(x, ...) {
     if (!.doCmt){
         .dat$CMT <- factor(rep(1, length(.dat[, 1])), 1, "All Data");
     } else {
-        levels(.dat$CMT) <- paste("Compartment: ", levels(.dat$CMT))
+        levels(.dat$CMT) <- paste("Endpoint: ", levels(.dat$CMT))
     }
     for (.cmt in levels(.dat$CMT)){
         .dat0 <- .dat[.dat$CMT == .cmt, ];
