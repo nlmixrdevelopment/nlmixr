@@ -608,6 +608,8 @@ dists <- list("dpois"=0,
               "lnorm"=1,
               "dlnorm"=1)
 
+distsPositive  <- c("add","norm","dnorm", "prop","pow", "logn", "dlogn", "lnorm", "dlnorm")
+
 allVars <- function(x){
   defined <- character()
   this.env <- environment()
@@ -904,13 +906,22 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         stop("Distribution parameters cannot be numeric, but need to be estimated.")
       }
       .w <- which(bounds$name == distArgs[.i]);
-      .tmp <- bounds;
+      .tmp <- as.data.frame(bounds);
       .tmp$err[.w] <- ifelse(.i == 1, distName, paste0(distName, .i));
+      if (any(distName==distsPositive)){
+        if (is.na(.tmp$lower[.w]) || is.infinite(.tmp$lower[.w])){
+          .tmp$lower[.w]  <- 0;
+        }
+        if (.tmp$lower[.w] < 0 || .tmp$est[.w] < 0 || .tmp$upper[.w] < 0){
+          stop(sprintf("The distribution '%s' must have positive parameter estimates",distName));
+        }
+      }
       if (!is.null(curCond)){
         .tmp$condition[.w] <- sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond));
       } else {
         .tmp$condition[.w] <- "";
       }
+      class(.tmp) <- c("nlmixrBounds", "data.frame");
       assign("bounds", .tmp, this.env)
     }
     return(errn)
