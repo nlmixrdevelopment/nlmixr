@@ -36,8 +36,9 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         .xtra$returnType <- "rxSolve";
         .xtra$modelName <- "VPC"
         pt <- proc.time();
+        .si <- fit$simInfo;
         if (is.null(data)){
-            dat <- nlmixrData(getData(fit));
+            dat <- nlmixrData(getData(fit), .si$rx);
         } else {
             dat <- data
         }
@@ -53,7 +54,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         sim0 <- sim;
         sim <- sim[, c("id", "time", "sim")]
         names(sim)[3] <- "dv";
-        .si <- fit$simInfo;
+        ##
         if (pred_corr){
             .xtra.prd <- .xtra;
             .xtra.prd$modelName <- "Pred (for pcVpc)"
@@ -82,7 +83,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         }  else {
             cols <- c("dv");
         }
-
+        ##
         dat <- dat[dat$evid == 0, ];
         ## Assume this is in the observed dataset. Add it to the current dataset
         if(!all(names(sim) %in% cols)){

@@ -431,6 +431,12 @@ update.function  <- .nlmixrUpdate
     stop(sprintf("The following parameters initial estimates are NA: %s", paste(ns, collapse=", ")))
   }
   fun2$meta <- list2env(meta, parent=emptyenv());
+  .mv  <- RxODE::rxModelVars(fun2$rxode);
+  .tmp <- .mv$stateExtra[!(.mv$stateExtra %in% c(.mv$lhs))];
+  if (length(.tmp > 0)){
+    stop(sprintf("Modeled responses need to be defined in the model; Add definition for: %s",
+                 paste(.tmp, collapse=", ")))
+  }
   return(fun2)
 }
 
@@ -539,6 +545,29 @@ print.nlmixrUI <- function(x, ...){
   message(cli::rule(x$model.desc, line="bar2"))
   message(cli::rule(crayon::bold("Initialization:")))
   print(x$ini)
+  if (length(x$predDf$cond) > 1){
+    message(cli::rule(crayon::bold("Multiple Endpoint Model:")))
+    .info <- x$predDf
+    if (getOption("RxODE.combine.dvid", TRUE)){
+      .info  <- .info[order(.info$dvid),];
+    }
+    .info  <- with(.info, data.frame(variable=paste(var,"~",ifelse(use.utf(),"\u2026", "...")),
+                                     cmt=paste0("cmt='",cond, "' or cmt=", cmt),
+                                     "dvid*"=ifelse(is.na(dvid),"",
+                                                    paste0("dvid='",cond ,"' or dvid=",dvid)),
+                                     check.names=FALSE))
+    if (!getOption("RxODE.combine.dvid", TRUE)){
+      .info  <- .info[,names(info) != "dvid"];
+    }
+    huxtable::hux(.info) %>%
+      huxtable::add_colnames() %>%
+        huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+        huxtable::set_position("center") %>%
+        huxtable::set_all_borders(TRUE) %>%
+        huxtable::add_footnote("* If dvids are outside this range, all dvids are re-numered sequentially, ie 1,7, 10 becomes 1,2,3 etc") %>%
+        huxtable::print_screen(colnames=FALSE)
+    message("")
+  }
   if (length(x$all.covs) > 0){
     message("\n Covariates or Uninitialized Parameters ($all.covs)")
     print(x$all.covs);
@@ -888,6 +917,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   }
   .predDf <- NULL
   .doDist1 <- function(err1, err1.v, err1.args, x2, x3, curCond=NULL){
+    .bCond  <- is.null(curCond);
+    if (is.null(curCond)) curCond  <- x2;
     if (!is.na(suppressWarnings(as.numeric(err1.v)))){
       stop("Distribution parameters cannot be numeric, but need to be estimated.")
     }
@@ -896,17 +927,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       return(quote(nlmixrIgnore()));
     }
     else if (any(do.pred == c(1, 4, 5))){
-      if (is.null(curCond)){
-        assign(".predDf", rbind(.predDf,
-                                data.frame(cond="",
-                                           var=.deparse(x2))), this.env)
-        return(bquote(nlmixr_pred <- .(x2)));
-      } else {
-        assign(".predDf", rbind(.predDf,
-                                data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond)),
-                                           var=.deparse(x2))), this.env)
-        return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
-      }
+      assign(".predDf", rbind(.predDf,
+                              data.frame(cond=ifelse(.bCond,"",sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
+                                         var=.deparse(x2))), this.env)
+      return(bquote(if (CMT ==.(curCond)) {nlmixr_pred <- .(x2)}));
     } else if (do.pred == 3){
       .doDist(err1, err1.args, curCond)
       tmp <- bounds;
@@ -924,14 +948,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       }
       return(bquote(return(.(sprintf("Y%02d", errn)))));
     } else {
-      if (is.null(curCond)){
-        return(bquote(return(.(x3))));
-      } else {
-        return(bquote(if (.(curCond)){return(.(x3))}));
-      }
+      return(bquote(if (CMT==.(curCond)){return(.(x3))}));
     }
   }
   .doDist2 <- function(err1, err1.v, err1.args, err2, err2.v, err2.args, x2, x3, curCond=NULL){
+    .bCond  <- is.null(curCond);
+    if (is.null(curCond)) curCond  <- x2;
     if (!is.na(suppressWarnings(as.numeric(err1.v)))){
       stop("Distribution parameters cannot be numeric, but need to be estimated.")
     }
@@ -946,17 +968,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         return(quote(nlmixrIgnore()));
       }
       else if (any(do.pred == c(1, 4, 5))){
-        if (is.null(curCond)){
-          assign(".predDf", rbind(.predDf,
-                                  data.frame(cond="",
-                                             var=.deparse(x2))), this.env)
-          return(bquote(nlmixr_pred <- .(x2)));
-        } else {
-          assign(".predDf", rbind(.predDf,
-                                  data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond)),
-                                             var=.deparse(x2))), this.env)
-          return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
-        }
+        assign(".predDf", rbind(.predDf,
+                                data.frame(cond=ifelse(.bCond, "", sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
+                                           var=.deparse(x2))), this.env)
+        return(bquote(if (CMT==.(curCond)) {nlmixr_pred <- .(x2)}));
       } else if (do.pred == 3){
         .doDist(err1, err1.args, curCond)
         .doDist(err2, err2.args, curCond)
@@ -975,11 +990,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
         return(bquote(return(.(sprintf("Y%02d", errn)))));
       } else {
-        if (is.null(curCond)){
-          return(bquote(return(.(x3))));
-        } else {
-          return(bquote(if (.(curCond)){return(.(x3))}));
-        }
+        return(bquote(if (CMT==.(curCond)){return(.(x3))}));
       }
     } else {
       stop(sprintf("The %s and %s distributions cannot be combined\nCurrently can combine: %s",
@@ -988,6 +999,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
   }
   .doDist3 <- function(err1, err1.v, err1.args, err2, err2.v, err2.args, err3, err3.v, err3.args, x2, x3, curCond=NULL){
+    .bCond  <- is.null(curCond);
+    if (is.null(curCond)) curCond  <- x2;
     if (!is.na(suppressWarnings(as.numeric(err1.v)))){
       stop("Distribution parameters cannot be numeric, but need to be estimated.")
     }
@@ -1006,17 +1019,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         return(quote(nlmixrIgnore()));
       }
       else if (any(do.pred == c(1, 4, 5))){
-        if (is.null(curCond)){
-          assign(".predDf", rbind(.predDf,
-                                  data.frame(cond="",
-                                             var=.deparse(x2))), this.env)
-          return(bquote(nlmixr_pred <- .(x2)));
-        } else {
-          assign(".predDf", rbind(.predDf,
-                                  data.frame(cond=sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond)),
-                                             var=.deparse(x2))), this.env)
-          return(bquote(if (.(curCond)) {nlmixr_pred <- .(x2)}));
-        }
+        assign(".predDf", rbind(.predDf,
+                                data.frame(cond=ifelse(.bcond,"",sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
+                                           var=.deparse(x2))), this.env)
+        return(bquote(if (CMT==.(curCond)) {nlmixr_pred <- .(x2)}));
       } else if (do.pred == 3){
         .doDist(err1, err1.args, curCond)
         .doDist(err2, err2.args, curCond)
@@ -1036,11 +1042,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
         return(bquote(return(.(sprintf("Y%02d", errn)))));
       } else {
-        if (is.null(curCond)){
-          return(bquote(return(.(x3))));
-        } else {
-          return(bquote(if (.(curCond)){return(.(x3))}));
-        }
+        return(bquote(if (CMT==.(curCond)){return(.(x3))}));
       }
     } else {
       stop(sprintf("The %s, %s and %s distributions cannot be combined\nCurrently can combine: %s",
@@ -1059,7 +1061,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
           any(as.character(x[[3]][[2]][[1]]) == c(names(dists), unsupported.dists))){
         ch.dist <- as.character(x[[3]][[2]]);
         if (length(x[[3]][[3]]) == 1){
-          curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
+          curCond <- sprintf("%s", as.character(x[[3]][[3]]));
         } else {
           curCond <- .deparse(x[[3]][[3]]);
         }
@@ -1088,7 +1090,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         err2.v <- as.character(x[[3]][[2]][[3]][[2]]);
         err2.args <- as.character(x[[3]][[2]][[3]][-1]);
         if (length(x[[3]][[3]]) == 1){
-          curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
+          curCond <- sprintf("%s", as.character(x[[3]][[3]]));
         } else {
           curCond <- .deparse(x[[3]][[3]]);
         }
@@ -1109,7 +1111,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         err3.v <- as.character(x[[3]][[2]][[2]][[3]][[2]]);
         err3.args <- as.character(x[[3]][[2]][[2]][[3]][-1]);
         if (length(x[[3]][[3]]) == 1){
-          curCond <- sprintf("CMT == %s", as.character(x[[3]][[3]]));
+          curCond <- sprintf("%s", as.character(x[[3]][[3]]));
         } else {
           curCond <- .deparse(x[[3]][[3]]);
         }
@@ -1697,10 +1699,35 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                    "M_2_PI","M_2_SQRTPI","M_SQRT2","M_SQRT1_2","M_SQRT_3","M_SQRT_32","M_LOG10_2","M_2PI","M_SQRT_PI",
                                    "M_1_SQRT_2PI","M_SQRT_2dPI","M_LN_SQRT_PI","M_LN_SQRT_2PI","M_LN_SQRT_PId2","pi",
                                    nlmixrfindLhs(body(rest))))
-    .tmp <- RxODE::rxState(rxode);
-    .tmp <- data.frame(cmt=seq_along(.tmp), cond=.tmp)
-    .predDf <- merge(.predDf, .tmp, all.x=TRUE)
+    .mv  <- RxODE::rxModelVars(rxode);
+    .state <- c(.mv$state,.mv$stateExtra);
+    .tmp <- data.frame(cmt=seq_along(.state), cond=.state)
+    .predDf$dvid  <- seq_along(.predDf$var)
+    .predDf <- merge(.predDf, .tmp, all.x=TRUE, by="cond")
+    if (any(is.na(.predDf$cmt))){
+      .predDfNa  <- .predDf[is.na(.predDf$cmt), names(.predDf) != "cmt"];
+      .predDf <- .predDf[!is.na(.predDf$cmt),];
+      .tmp <- data.frame(cmt=seq_along(.state), var=.state)
+      .predDf <- rbind(.predDf,
+                       merge(.predDfNa, .tmp, all.x=TRUE, by="var")[names(.predDf)])
+    }
     .w <- which(is.na(.predDf$cmt))
+    .predDf$cond  <- paste(.predDf$cond);
+    .cmtEndpoints <- integer(0)
+    if (length(.w) > 0)
+      .cmtEndpoints <- paste(.predDf$cmt[-.w]);
+    .predDf$cmt[.w]  <- length(.state)+seq_along(.w)
+    .w  <- .predDf$cond == "";
+    .predDf$cond <- paste(.predDf$cond);
+    .predDf$cond[.w] <- paste(.predDf$var[.w])
+    .extra  <- paste(.predDf$cond[.w])
+    .extra  <- .extra[regexpr("[()+-]",.extra) == -1]
+    if (length(.extra) > 0){
+      rxode  <-  paste0(rxode,";\n",paste(c(paste0("cmt(", .extra,");\n")),collapse=""))
+    }
+    if (length(.predDf$cond) > 1){
+      rxode  <- paste0(rxode,";\ndvid(",paste(.predDf[order(.predDf$dvid),"cmt"],collapse=","),");\n");
+    }
     if (length(.predDf$cmt) > 1L){
       if (length(.w) > 0L){
         .nums <- suppressWarnings(as.numeric(paste(.predDf[.w, "cond"])))
@@ -1708,16 +1735,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         if (length(.w2) > 0L){
           .predDf[.w[.w2], "cmt"] <- .nums[.w2];
           .w <- which(is.na(.predDf$cmt))
-        }
-      }
-      if (length(.w) > 0L){
-        if (any(is.na(.predDf[.w,"cmt"]))){
-          stop(sprintf("In this multiple-endpoint model, You cannot mix unconditional errors (%s), with conditional errors (%s)",
-                       paste(.predDf[is.na(.predDf$cmt),"var"], collapse=", "),
-                       paste(.predDf[!is.na(.predDf$cmt),"cond"], collapse=", ")))
-        } else {
-          stop(sprintf("The conditional statements (%s) are not in terms of the RxODE states: %s", paste(.predDf[.w, "cond"], collapse=", "),
-                       paste(RxODE::rxState(rxode), collapse=", ")))
         }
       }
     }
@@ -1732,15 +1749,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   fun2 <- as.character(attr(fun2, "srcref"), useSource=TRUE);
   fun3 <- c(.bodyDewrap(as.character(attr(.fun000,"srcref"), useSource=TRUE)));
   fun3 <- paste0(fun3, collapse="\n");
-  if(length(.predDf$cond) != 1L){
-    if (any(.predDf$cond == "")){
-      stop("With multiple endpoints, all residual error predictions must be specified with the | syntax.")
-    }
-  } else {
-    if (any(.predDf$cond != "")){
-      warning("Multiple endpoint specified with | syntax, but only one endpoint specified.");
-    }
-  }
 
   misplaced.dists <- intersect(rest.funs, c(names(dists), unsupported.dists));
   if (length(misplaced.dists) == 1){
@@ -1830,13 +1838,29 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       return(x);
     }
   }
-  for (i in seq_along(.predDf$cond)){
-    if (.predDf$cond[i] != ""){
+  if (length(.predDf$cond) > 1){
+    for (i in seq_along(.predDf$cond)){
       .what <- (.predDf$cond[i]);
       .with <- paste(.predDf$cmt[i]);
       body(pred) <- .subs(body(pred))
       body(err) <- .subs(body(err))
     }
+  } else {
+    ## Strip if clauses out.
+    .strip <- function(x){
+      if (is.call(x)) {
+        if (identical(x[[1]], quote(`if`))){
+          return(x[[3]][[2]])
+        }
+        as.call(lapply(x, .strip))
+      } else if (is.pairlist(x)) {
+        as.pairlist(lapply(x, .strip))
+      } else {
+        return(x);
+      }
+    }
+    body(pred) <- .strip(body(pred))
+    body(err)<- .strip(body(err))
   }
   .predDf <- .predDf[order(.predDf$cmt), ];
   .w <- which(is.na(.predDf$cond))
@@ -1895,6 +1919,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   if (length(intersect(c("t","time"),allVars(body(rest)))) !=0){
     .saemErr  <- "Initial parameters defined based on ini({}) block variables cannot be defined in terms of time;\nTo fix:\n1. Define ini({}) variables/relationships first.\n2. Use the new variables in an time-based if/else clause later in the `model({})`";
   }
+  if (length(.predDf$cond)==1){
+    .w  <- which(bounds$condition=="")
+    bounds$condition[.w] <- paste(.predDf$cond)
+  }
   ret <- list(ini=bounds, model=bigmodel,
               nmodel=list(fun=fun2, fun.txt=fun3, pred=pred, error=err, rest=rest, rxode=rxode,
                           all.vars=all.vars, rest.vars=rest.vars, all.names=all.names,
@@ -1908,7 +1936,8 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                           log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
                           predDf=.predDf, predSaem =.predSaem, env=env, predSys=.pred,
                           noMuEtas=.no.mu.etas,
-                          saemErr=.saemErr))
+                          saemErr=.saemErr, cmtEndpoints=.cmtEndpoints,
+                          extra=.extra))
   if (.linCmt){
     ret$nmodel$lin.solved <- TRUE
   } else {
@@ -1916,6 +1945,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   }
   return(ret)
 }
+
 ##' Create the nlme specs list for nlmixr nlme solving
 ##' @inheritParams nlmixrUI.nlmefun
 ##' @param mu.type is the mu-referencing type of model hat nlme will be using.

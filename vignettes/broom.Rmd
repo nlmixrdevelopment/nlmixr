@@ -9,7 +9,7 @@ vignette: >
 ---
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-```
+``` 
 ![nlmixr](logo.png)
 
 ## The broom and broom.mixed packages
@@ -32,6 +32,7 @@ options(nlmixr.save=TRUE,
         nlmixr.save.dir=system.file(package="nlmixr"));
 
 pheno <- function() {
+    # Pheno with covariance
   ini({
     tcl <- log(0.008) # typical value of clearance
     tv <-  log(0.6)   # typical value of volume
@@ -218,7 +219,9 @@ This can also be changed by the `exponentiate` argument
 ```{r}
 tidy(fit, effects="ran_coef", exponentiate=FALSE)
 ```
-# An example of using a tidy model estimates for other packages
+# Example of using a tidy model estimates for other packages
+
+## Dotwhisker
 
 As explained above, this standard format makes it easier for tidyverse
 packages to interact with model information.  An example of this is
@@ -235,5 +238,37 @@ fit %>%
     filter(effect=="fixed") %>%
     dwplot()
 ```
+
+## Huxtable
+
+This allows easy creation of report ready tables in many formats including word.
+
+Huxtable relies on the `broom` implementation
+
+```{r}
+library(huxtable)
+## Since this is for a table output, you will probably want to adjust the separators
+## This gives sd: and cor: eta1, eta2
+options(broom.mixed.sep1=": ",
+        broom.mixed.sep2=", ")
+
+tbl <- huxreg('Phenobarbitol'=fit,
+              statistics=c(N = "nobs", "Objective Function" = "OBJF", "logLik", "AIC"))
+
+tbl
+```
+
+A word-based table can be easily created with the tool:
+```{r}
+library(officer)
+ft  <- tbl %>%
+    flextable::as_flextable;
+
+read_docx() %>%
+    flextable::body_add_flextable(ft)  %>%
+    print(target="pheno.docx")
+```
+
+Which produces the following [word document](pheno.docx).
 
 Happy tidying!

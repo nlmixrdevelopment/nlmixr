@@ -194,12 +194,12 @@ nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
 ##' @author Matthew L. Fidler
 ##' @keywords internal
 ##' @export
-nlmixrData <- function(data){
+nlmixrData <- function(data, ...){
     UseMethod("nlmixrData");
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.character <- function(data){
+nlmixrData.character <- function(data, ...){
     if (!file.exists(data)){
         stop(sprintf("%s does not exist.", data))
     }
@@ -211,12 +211,16 @@ nlmixrData.character <- function(data){
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.default <- function(data){
-    dat <- as.data.frame(data);
+nlmixrData.default <- function(data, model=NULL){
+    if (!is.null(model)){
+        dat  <- RxODE::etTrans(data, model,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
+    } else {
+        dat <- as.data.frame(data);
+    }
     return(dat);
 }
 nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
-                       sum.prod=FALSE, table=tableControl()){
+                        sum.prod=FALSE, table=tableControl()){
     .clearPipedData();
     .tmp <- deparse(body(uif$theta.pars))[-1];
     .tmp <- .tmp[-length(.tmp)];
