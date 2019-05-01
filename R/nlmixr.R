@@ -420,10 +420,11 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         if (is.null(uif$nlme.fun.mu)){
             stop("SAEM requires all ETAS to be mu-referenced")
         }
+        .err  <- uif$ini$err
         .low <- uif$ini$lower;
-        .low <- .low[!is.na(.low)]
+        .low <- .low[!is.na(.low) & is.na(.err)]
         .up <- uif$ini$upper;
-        .up <- .up[!is.na(.up)]
+        .up <- .up[!is.na(.up) & is.na(.err)]
         if (any(.low != -Inf) | any(.up != Inf)){
             warning("Bounds are ignored in SAEM")
         }

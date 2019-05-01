@@ -29,7 +29,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
     }
     .xtra <- list(...);
     if (inherits(fit, "nlmixrVpc")){
-        sim <- fit;
+        sim <- attr(class(fit), "nlmixrVpc");
     } else {
         .xtra$object <- fit;
         ## .xtra$returnType <- "data.frame";
@@ -105,6 +105,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
             }
         }
         sim <- list(rxsim=sim0, sim=sim, obs=dat)
+        class(sim)  <- "rxHidden"
         attr(sim, "nsim") <- .xtra$nsim;
         class(sim) <- "nlmixrVpc";
     }
@@ -116,28 +117,40 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
     }
     call <- as.list(match.call(expand.dots=TRUE))[-1];
     call <- call[names(call) %in% methods::formalArgs(getFromNamespace(vpcn,"vpc"))]
-    call$obs_cols = list(id="id", dv="dv", idv="time")
-    call$sim_cols = list(id="id", dv="dv", idv="time")
-    call$stratify = stratify
-    p = do.call(getFromNamespace(vpcn, "vpc"), c(sim, call), envir = parent.frame(1))
-    print(p);
-    sim$gg <- p;
-    return(invisible(sim));
+    call$obs_cols <- list(id="id", dv="dv", idv="time")
+    call$sim_cols <- list(id="id", dv="dv", idv="time")
+    call$stratify <- stratify
+    p  <-  do.call(getFromNamespace(vpcn, "vpc"), c(sim, call), envir = parent.frame(1))
+    cls <- c("nlmixrVpc", class(p));
+    attr(cls, "nlmixrVpc") <- sim
+    class(p) <- cls
+    return(invisible(p));
 })
 
 ##'@export
+`$.nlmixrVpc` <- function(obj, arg, exact = TRUE){
+    if (arg=="gg"){
+        .x <- obj;
+        class(.x)  <- class(.x)[class(.x) != "nlmixrVpc"]
+        return(.x);
+    } else if (any(arg==c("rxsim","sim", "obs"))) {
+        .info  <- attr(class(obj), "nlmixrVpc");
+        return(.info[[arg]])
+    }
+    NextMethod()
+}
+
+##'@export
 print.nlmixrVpc <- function(x, ...){
-    cat(sprintf("nlmixr vpc object of %d simulations.\n", attr(x, "nsim")))
+    cat(sprintf("nlmixr vpc object of %d simulations.\n",
+                attr(attr(class(x), "nlmixrVpc"), "nsim")))
     cat("  $rxsim = original simulated data\n")
     cat("  $sim = merge simulated data\n")
     cat("  $obs = observed data\n")
     cat("  $gg = vpc ggplot\n")
     cat("use vpc(...) to change plot options\n")
-}
-
-##'@export
-plot.nlmixrVpc <- function(x, ...){
-    return(x$gg)
+    cat("plotting the object now\n");
+    NextMethod()
 }
 
 ##' @rdname vpc_ui

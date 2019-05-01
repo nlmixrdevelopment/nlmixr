@@ -6,11 +6,11 @@
 \alias{nlmixrData.default}
 \title{Convert/Format the data appropriately for nlmixr}
 \usage{
-nlmixrData(data)
+nlmixrData(data, ...)
 
-\method{nlmixrData}{character}(data)
+\method{nlmixrData}{character}(data, ...)
 
-\method{nlmixrData}{default}(data)
+\method{nlmixrData}{default}(data, model = NULL)
 }
 \arguments{
 \item{data}{is the name of the data to convert.  Can be a csv file
