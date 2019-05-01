@@ -1855,7 +1855,14 @@ foceiFit.data.frame0 <- function(data,
     .ret$setupTime <- (proc.time() - .pt)["elapsed"];
     if (exists("uif", envir=.ret)){
         .uif <- .ret$uif
+        .ini <- as.data.frame(.uif$ini);
         .ret$logThetas <- as.integer(which(setNames(sapply(.uif$focei.names,function(x)any(x==.uif$log.theta)),NULL)))
+        .thetas  <- .ini[!is.na(.ini$ntheta),]
+        .muRefLog  <- setNames(unlist(.uif$mu.ref),NULL)
+        .muRefThetas <- .thetas[.thetas$name %in% .muRefLog,"ntheta"]
+        .ret$logThetasF <- intersect(.ret$logThetas, .muRefThetas)
+    } else {
+        .ret$logThetasF <- integer(0)
     }
     if (exists("noLik", envir=.ret)){
         if (!.ret$noLik){

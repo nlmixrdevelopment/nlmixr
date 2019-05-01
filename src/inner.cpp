@@ -3878,8 +3878,8 @@ void foceiFinalizeTables(Environment e){
   // Rf_pt(stat[7],(double)n1,1,0)
   // FIXME figure out log thetas outside of foceisetup.
   IntegerVector logTheta;
-  if (e.exists("logThetas")){
-    logTheta =  as<IntegerVector>(e["logThetas"]);
+  if (e.exists("logThetasF")){
+    logTheta =  as<IntegerVector>(e["logThetasF"]);
   } else if (e.exists("model")){
     List model = e["model"];
     logTheta =  as<IntegerVector>(model["log.thetas"]);
