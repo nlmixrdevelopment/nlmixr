@@ -90,6 +90,34 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
     do.call(asHux.nlmixrFitCore, .args)
 }
 
+.nmMuTable  <- function(x){
+    .mu  <- x$mu.ref
+    if (length(.mu) == 0) return(NULL)
+    .ret <- do.call(rbind, lapply(names(.mu),function(x){data.frame(theta=.mu[[x]], eta=x)}))
+    if (length(x$cov.ref) > 0){
+        .covRef  <- x$cov.ref;
+        .covRef  <- do.call(`c`,lapply(names(.covRef), function(x){
+            .ret <- .covRef[[x]];
+            setNames(.ret, paste0(x,"*",names(.ret)));
+            }))
+        .env  <- new.env(parent=emptyenv())
+        .env$ref  <- c();
+        lapply(names(.covRef), function(x){
+            .n  <- .covRef[x]
+            if (any(.n == names(.env$ref))){
+                .ref  <- .env$ref;
+                .ref[.n] <- paste0(.env$ref[.n], ", ", x);
+            } else {
+                .ref  <- .env$ref;
+                .ref[.n] <- x;
+            }
+            assign("ref",.ref,envir=.env);
+        })
+        .ret  <- merge(.ret,data.frame(theta=names(.env$ref),covariates=as.character(.env$ref)))
+    }
+    return(.ret)
+}
+
 .nmEstMethod  <- function(x){
     .cls1  <- class(x)[1];
     if (.cls1=="nlmixrNlmeUI") return("nlme");
@@ -337,6 +365,17 @@ nmDocx  <- function(x,
         .doc <- .doc %>%
             officer::body_add_par("Minimization Information:", style=headerStyle) %>%
             officer::body_add_par(paste0("$message: ",x$message), style=preformattedStyle)
+    }
+    .mu <- .nmMuTable(x);
+    if (length(.mu) !=0){
+        .mu  <- huxtable::hux(.mu) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
+        .doc <- .doc %>%
+            officer::body_add_par("Parsed Mu-referencing:", style=headerStyle) %>%
+            flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.mu)))
     }
     if (any(.nmEstMethod(x)==c("FOCEi", "FOCE","FO","FOi","posthoc"))){
         .doc <- .doc %>%
