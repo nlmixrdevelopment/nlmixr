@@ -837,7 +837,10 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   }
 
   find.theta <- function(x){
-    if (is.call(x) || is.pairlist(x)){
+    if (length(x)==0){
+    } else if (is.name(x) && length(x) == 1 && any.theta.names(as.character(x), theta.names)){
+      return(as.character(x));
+    } else if (is.call(x) || is.pairlist(x)){
       if (length(x)== 0){
       } else if (length(x) == 1 && any.theta.names(as.character(x), theta.names)){
         return(as.character(x));
