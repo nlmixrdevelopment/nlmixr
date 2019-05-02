@@ -1858,9 +1858,9 @@ foceiFit.data.frame0 <- function(data,
         .ini <- as.data.frame(.uif$ini);
         .ret$logThetas <- as.integer(which(setNames(sapply(.uif$focei.names,function(x)any(x==.uif$log.theta)),NULL)))
         .thetas  <- .ini[!is.na(.ini$ntheta),]
-        .muRefLog  <- setNames(unlist(.uif$mu.ref),NULL)
-        .muRefThetas <- .thetas[.thetas$name %in% .muRefLog,"ntheta"]
-        .ret$logThetasF <- intersect(.ret$logThetas, .muRefThetas)
+        .cov  <- .uif$cov.theta
+        .covThetas <- .thetas[.thetas$name %in% .cov,"ntheta"]
+        .ret$logThetasF <- setdiff(.ret$logThetas, .covThetas)
     } else {
         .ret$logThetasF <- integer(0)
     }

@@ -815,6 +815,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   eta.names <- c();
   .mu.ref <- list();
   cov.ref <- list();
+  cov.theta  <- c();
   log.theta <- c();
   log.eta <- c();
   this.env <- environment();
@@ -1210,7 +1211,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         }
         find.log(x[[2]])
         return(as.call(lapply(x, f)))
-      } else if (identical(x[[1]], quote(`+`))){
+      } else if (identical(x[[1]], quote(`+`)) ||
+                 identical(x[[1]], quote(`-`))){
+        isMinus  <- identical(x[[1]], quote(`-`));
         ## print(as.character(x))
         if (any(do.pred == c(4, 5))){
           if (length(x) >= 3){
@@ -1219,8 +1222,15 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             ## print(x[[2]]);
             ## print(x[[3]]);
             wm <- NULL
+            muRef  <- FALSE
             if (length(x[[3]]) == 3){
               if (identical(x[[3]][[1]], quote(`*`))){
+                wm <- 3;
+                wm0 <- 2;
+                muRef  <- TRUE
+              } else if (identical(x[[3]][[1]], quote(`/`)) ||
+                         identical(x[[3]][[1]], quote(`^`)) ||
+                         identical(x[[3]][[1]], quote(`**`))){
                 wm <- 3;
                 wm0 <- 2;
               }
@@ -1229,6 +1239,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
               if (identical(x[[2]][[1]], quote(`*`))){
                 wm <- 2;
                 wm0 <- 3;
+                muRef  <- TRUE
+              } else if (identical(x[[2]][[1]], quote(`/`)) ||
+                         identical(x[[2]][[1]], quote(`^`)) ||
+                         identical(x[[2]][[1]], quote(`**`))){
+                  wm <- 3;
+                  wm0 <- 2;
               }
             }
             if (!is.null(wm)){
@@ -1244,12 +1260,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                 cov <- all.covs[w];
                 th <- as.character(x[[wm]][[th]]);
                 th0 <- find.theta(x[[wm0]]);
-                if (length(th0) == 1 &&  do.pred == 4){
+                if (muRef && !isMinus && length(th0) == 1 &&  do.pred == 4){
                   tmp <- get("cov.ref", this.env)
                   tmp[[cov]] <- c(tmp[[cov]], structure(th0, .Names=th));
                   assign("cov.ref", tmp, this.env);
                   return(f(x[[wm0]]))
                 }
+                tmp <- get("cov.theta", this.env)
+                assign("cov.theta", unique(c(tmp, th)), this.env);
               }
             }
             if (any.theta.names(as.character(x[[2]]), eta.names) &&
@@ -1944,7 +1962,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                           all.covs=all.covs, saem.all.covs=saem.all.covs,
                           saem.inPars=saem.inPars,
                           errs.specified=errs.specified, add.prop.errs=add.prop.errs,
-                          grp.fn=grp.fn, mu.ref=.mu.ref, cov.ref=cov.ref,
+                          grp.fn=grp.fn, mu.ref=.mu.ref, cov.ref=cov.ref, cov.theta=cov.theta,
                           saem.pars=saem.pars, nlme.mu.fun=nlme.mu.fun, nlme.mu.fun2=nlme.mu.fun2,
                           log.theta=log.theta,
                           log.eta=log.eta, theta.ord=theta.ord, saem.theta.trans=saem.theta.trans,
