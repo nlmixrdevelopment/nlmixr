@@ -90,14 +90,33 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
     do.call(asHux.nlmixrFitCore, .args)
 }
 
+.nmEstMethod  <- function(x){
+    .cls1  <- class(x)[1];
+    if (.cls1=="nlmixrNlmeUI") return("nlme");
+    if (.cls1=="nlmixrPosthoc") return("posthoc");
+    if (.cls1=="nlmixrSaem") return("saem");
+    if (.cls1=="nlmixrFOCEi") return("FOCEi")
+    if (.cls1=="nlmixrFOCE") return("FOCE")
+    if (.cls1=="nlmixrFOi") return("FOi")
+    if (.cls1=="nlmixrFO") return("FO")
+    if (.cls1=="nlmixrPosthoc") return("posthoc");
+}
 
 .nmHuxHeader  <- function(x, bound){
+    .cor <- x$omega
+    diag(.cor) <- 0;
     huxtable::tribble_hux(
                   ~ Description, ~ Value,
                   "Full nlmixr Version:", .getFullNlmixrVersion(),
                   "R Model Function Name ($modelName):",  x$modelName,
-                  "R Fit Object", bound,
-                  "R Data Name ($dataName):", x$dataName
+                  "R Fit Object:", bound,
+                  "R Data Name ($dataName):", x$dataName,
+                  "Estimation Method:",.nmEstMethod(x),
+                  "All variables mu-referenced:", .mu <- dim(x$omega)[1] == length(x$mu.ref),
+                  "Covariance Method ($covMethod):", x$covMethod,
+                  "Modeled Correlations:", !all(.cor == 0),
+                  "CWRES:",ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="CWRES"),FALSE),
+                  "NPDE:",ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="NPDE"),FALSE),
               ) %>%
         huxtable::add_colnames() %>%
             huxtable::set_bold(row = huxtable::everywhere, col = 1, value = TRUE) %>%
@@ -127,11 +146,53 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
     .x <- tryCatch(utils::packageDescription("nlmixr", lib.loc = .libPaths()),
                    error = function(e) NA, warning = function(e) NA)
     .pv  <- packageVersion("nlmixr");
-    if (identical(.x, NA)) {
+    if (identical(.x, NA) || length(.x$RemoteSha)==0) {
         return(paste(.pv))
     } else {
         return(sprintf("%s %s", .pv, substr(paste(.x$RemoteSha),1,10)));
     }
+}
+
+.nmGetPrintLines  <- function(x){
+    .tempfile  <- tempfile();
+    .zz <- file(.tempfile, open = "wt")
+    .unsink  <- FALSE
+    sink(.zz, type="output");
+    sink(.zz, type="message");
+    on.exit({if(!.unsink){
+                 sink(type="output");
+                 sink(type="message")
+                 close(.zz);
+             }
+                 unlink(.tempfile)
+    });
+    print(x);
+    sink(type="output");
+    sink(type="message");
+    close(.zz);
+    .unsink <- TRUE
+    suppressWarnings(readLines(.tempfile));
+}
+
+.nmDocxPreformat <- function(x, doc, preformatStyle, width){
+    .cw  <- Sys.getenv("RSTUDIO_CONSOLE_WIDTH");
+    .width <- getOption("width");
+    options(width=width);
+    Sys.setenv("RSTUDIO_CONSOLE_WIDTH"=width);
+    on.exit({
+        options(width=.width)
+        if(.cw==""){
+            Sys.unsetenv("RSTUDIO_CONSOLE_WIDTH");
+        } else {
+            Sys.setenv("RSTUDIO_CONSOLE_WIDTH"=.cw);
+        }
+    })
+    .doc  <- doc
+    .lines  <- .nmGetPrintLines(x);
+    for (.i in seq_along(.lines)){
+        .doc  <- officer::body_add_par(.doc, .lines[.i], style=preformatStyle)
+    }
+    .doc
 }
 
 ##' Create a run summary word document
@@ -170,6 +231,10 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 ##' @param centeredStyle This is the word style for centered text
 ##'     which is used for the figures. Defaults to
 ##'     \code{option("nlmixr.docx.centered")} or \code{centered}
+##'
+##' @param preformattedStyle This is the preformatted text style for R
+##'     output lines.  Defaults to
+##'     \code{option("nlmixr.docx.preformatted")} or \code{HTML Preformatted}
 ##'
 ##' @return An officer docx object
 ##'
@@ -213,8 +278,9 @@ nmDocx  <- function(x,
                     subtitleStyle=getOption("nlmixr.docx.subtitle","Subtitle"),
                     normalStyle=getOption("nlmixr.docx.normal", "Normal"),
                     headerStyle=getOption("nlmixr.docx.heading1", "Heading 1"),
-                    centeredStyle=getOption("nlmixr.docx.centered","centered")
-                    ){
+                    centeredStyle=getOption("nlmixr.docx.centered", "centered"),
+                    preformattedStyle=getOption("nlmixr.docx.preformatted", "HTML Preformatted"),
+                    width=69){
     RxODE::rxReq("officer");
     RxODE::rxReq("flextable");
     if (!inherits(x, "nlmixrFitCore")){
@@ -246,6 +312,7 @@ nmDocx  <- function(x,
     if (!any(titleStyle==.style$style_name)) stop("Need to specify a valid titleStyle");
     if (!any(subtitleStyle==.style$style_name)) stop("Need to specify a valid subtitleStyle");
     if (!any(headerStyle==.style$style_name)) stop("Need to specify a valid headerStyle");
+    if (!any(preformattedStyle==.style$style_name)) stop("Need to specify a valid preformattedStyle");
     if (.bound !=""){
         .hreg  <- eval(parse(text=sprintf('nlmixr::as_hux("%s"=x)', .bound)));
     } else {
@@ -259,15 +326,57 @@ nmDocx  <- function(x,
                               style=subtitleStyle) %>%
         officer::body_add_par("",style=normalStyle) %>%
         flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.nmHuxHeader(x, .bound)))) %>%
-        officer::body_add_par("Run Time ($time)", style=headerStyle) %>%
+        officer::body_add_par("Timing ($time, in seconds)", style=headerStyle) %>%
         flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.nmHuxTime(x)))) %>%
         officer::body_add_par(sprintf("Parameter Information as_hux(%s)", .bound), style=headerStyle) %>%
         flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.hreg))) %>%
-        officer::body_add_par(sprintf("Basic Goodness of fit, ie plot(%s)",.bound), style=headerStyle)
+        officer::body_add_par("UI Model information ($uif):", style=headerStyle)
+    .doc  <- .nmDocxPreformat(x$uif, .doc, preformattedStyle, width)
+
+    if (x$message!=""){
+        .doc <- .doc %>%
+            officer::body_add_par("Minimization Information:", style=headerStyle) %>%
+            officer::body_add_par(paste0("$message: ",x$message), style=preformattedStyle)
+    }
+    if (any(.nmEstMethod(x)==c("FOCEi", "FOCE","FO","FOi","posthoc"))){
+        .doc <- .doc %>%
+            officer::body_add_par("Scaling and gradient information ($scaleInfo):", style=headerStyle)
+        .si  <- x$scaleInfo;
+        .t1 <- c("est","scaleC")
+        .t2  <- c("est","Initial Gradient", "Forward aEps", "Forward rEps", "Central aEps", "Central rEps");
+        .t3  <- c("est","Covariance Gradient","Covariance aEps", "Covariance rEps");
+        .t1  <- huxtable::hux(.si[,.t1]) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
+        .t2  <- huxtable::hux(.si[,.t2]) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
+        .t3  <- huxtable::hux(.si[,.t3]) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
+        .doc <- .doc %>%
+            officer::body_add_par("Scaling information (est/scaleC):",style=normalStyle) %>%
+            flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.t1))) %>%
+            officer::body_add_par("Gradient Information, used in estimation:",style=normalStyle) %>%
+            flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.t2))) %>%
+            officer::body_add_par("Gradient Information, used in covariance:",style=normalStyle) %>%
+            flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.t3)))
+    }
+    .doc <- .doc %>%
+        officer::body_add_par("Original arguments to control ($origControl):", style=headerStyle)
+    .doc  <- .nmDocxPreformat(x$origControl, .doc, preformattedStyle, width)
     if (inherits(x, "nlmixrFitData")){
+        .doc <- .doc %>%
+            officer::body_add_par(sprintf("Basic Goodness of fit, ie plot(%s)",.bound), style=headerStyle)
         .lst <- plot(x);
         for (.i in seq_along(.lst)){
-            .doc <- officer::body_add_gg(.doc, value = .lst[[.i]], style = "centered")
+            .doc <- officer::body_add_gg(.doc, value = .lst[[.i]], style = centeredStyle)
         }
     }
     if (!is.null(docxOut)){
