@@ -52,7 +52,9 @@ pheno <- function() {
   })
 }
 
-fit <- nlmixr(pheno, pheno_sd, "saem")
+## We will run it two ways to allow comparisons
+fit.s <- nlmixr(pheno, pheno_sd, "saem")
+fit.f <- nlmixr(pheno, pheno_sd, "focei")
 ```
 # Glancing at the goodness of fit metrics
 
@@ -61,7 +63,7 @@ how well it fits.  In `broom`, `glance` will give a summary of the fit
 metrics of goodness of fit:
 
 ```{r}
-glance(fit)
+glance(fit.s)
 ```
 
 Note in nlmixr it is possible to have more than one fit metric (based
@@ -72,33 +74,33 @@ If you add conditional weighted residuals to the fit the objective
 function is changed to the `FOCEi` metric:
 
 ```{r}
-fit <- fit %>% addCwres()
+fit.s <- fit.s %>% addCwres()
 ```
 
 Now the glance gives the `FOCEi` values.
 
 ```{r}
-glance(fit)
+glance(fit.s)
 ```
 
 Of course you can always change the type of objective function that
 nlmixr uses:
 
 ```{r}
-setOfv(fit,"gauss3_1.6") # Setting objective function to gauss3_1.6
+setOfv(fit.s,"gauss3_1.6") # Setting objective function to gauss3_1.6
 ```
 
 By setting it back to the SAEM default objective function of
-`gauss3_1.6`, the `glance(fit)` has the same values again:
+`gauss3_1.6`, the `glance(fit.s)` has the same values again:
 
 ```{r}
-glance(fit)
+glance(fit.s)
 ```
 
 For convenience, you can do this while you `glance` at the objects:
 
 ```{r}
-glance(fit, type="FOCEi")
+glance(fit.s, type="FOCEi")
 ```
 
 # Tidying the model parameters
@@ -114,7 +116,7 @@ The default function for this is `tidy`, which when applied to the
 dataset:
 
 ```{r}
-tidy(fit)
+tidy(fit.s)
 ```
 
 nlmixr converts the log-transformed estimates to the normal scale for
@@ -144,7 +146,7 @@ variables is `.`, which doesn't work well with this model giving
 
 ```{r}
 options(broom.mixed.sep2="..")
-tidy(fit)
+tidy(fit.s)
 ```
 
 This gives an easier way to parse value: `cor__eta.v..eta.cl`
@@ -154,7 +156,7 @@ This gives an easier way to parse value: `cor__eta.v..eta.cl`
 The default R method `confint` works with nlmixr fit objects:
 
 ```{r}
-confint(fit)
+confint(fit.s)
 ```
 
 This transforms the variables as described above.  You can still use
@@ -233,10 +235,16 @@ intervals.
 library(ggplot2)
 library(dotwhisker)
 library(dplyr)
-fit %>%
+fit.s %>%
     tidy() %>%
     filter(effect=="fixed") %>%
     dwplot()
+```
+
+You may also compare models easily by using the `dotwhisker` package
+
+```{r}
+dwplot(list("SAEM"=fit.s, "FOCEi"=fit.f))
 ```
 
 ## Huxtable
@@ -247,18 +255,26 @@ Huxtable relies on the `broom` implementation
 
 ```{r}
 library(huxtable)
-## Since this is for a table output, you will probably want to adjust the separators
-## This gives sd: and cor: eta1, eta2
-options(broom.mixed.sep1=": ",
-        broom.mixed.sep2=", ")
-
-tbl <- huxreg('Phenobarbitol'=fit,
-              statistics=c(N = "nobs", "Objective Function" = "OBJF", "logLik", "AIC"))
+tbl <- huxreg('Phenobarbitol'=fit.s)
 
 tbl
 ```
 
-A word-based table can be easily created with the tool:
+You may notice warnings and `(NA)` in the table.  `nlmixr` allows you
+to convert the tables to `huxtables` without these distracting
+elements by using `huxtable`'s generic `as_hux` or `as_huxtable`:
+
+```{r}
+as_hux('Phenobarbitol'=fit.s)
+```
+
+Like `dwplot`, you can also use `huxtable` to compare runs:
+
+```{r}
+as_hux('SAEM'=fit.s, 'FOCEi'=fit.f)
+```
+
+A word-based table can also be easily created with the tool:
 ```{r}
 library(officer)
 ft  <- tbl %>%

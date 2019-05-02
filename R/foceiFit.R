@@ -2274,9 +2274,11 @@ residuals.nlmixrFitData <- function(object, ..., type=c("ires", "res", "iwres", 
 #' @author Wenping Wang & Matthew Fidler
 #' @export
 plot.nlmixrFitData <- function(x, ...) {
+    .lst  <- list();
     object <- x
     IWRES <- NULL
-    traceplot(x);
+    .tp  <- traceplot(x)
+    if (!is.null(.tp)) .lst[[length(.lst)+1]] <- .tp;
     .dat <- as.data.frame(x);
     .doCmt <- FALSE;
     if (any(names(.dat) == "CMT")){
@@ -2298,31 +2300,32 @@ plot.nlmixrFitData <- function(x, ...) {
             ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
             ggplot2::geom_point() + xlab("Predictions") +
             ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
-        print(.p1);
+        .lst[[length(.lst)+1]] <- .p1
 
         .p2 <- ggplot2::ggplot(.dat0, aes(x=IPRED, y=IRES)) +
             ggplot2::geom_point() +
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IRES vs IPRED")
-        print(.p2)
+        .lst[[length(.lst)+1]] <- .p2
 
         .p2 <- ggplot2::ggplot(.dat0, aes(x=TIME, y=IRES)) +
             ggplot2::geom_point() +
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IRES vs TIME")
-        print(.p2)
+        .lst[[length(.lst)+1]] <- .p2
 
         .p2 <- ggplot2::ggplot(.dat0, aes(x=IPRED, y=IWRES)) +
             ggplot2::geom_point() +
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
-        print(.p2)
+        .lst[[length(.lst)+1]] <- .p2
 
         .p2 <- ggplot2::ggplot(.dat0, aes(x=TIME, y=IWRES)) +
             ggplot2::geom_point() +
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
-        print(.p2)
+        .lst[[length(.lst)+1]] <- .p2
+
         ## .idPlot <- try(plot.nlmixrAugPred(nlmixrAugPred(object)));
         ## if (inherits(.idPlot, "try-error")){
             .ids <- unique(.dat0$ID)
@@ -2340,9 +2343,29 @@ plot.nlmixrFitData <- function(x, ...) {
                     ggplot2::geom_line(aes(x=TIME, y=PRED), col="blue", size=1.2) +
                     ggplot2::facet_wrap(~ID) +
                     ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s)))
-                print(.p3)
+                .lst[[length(.lst)+1]] <- .p3
             }
         ## }
+    }
+    class(.lst)  <- "nlmixrPlotList"
+    return(.lst)
+}
+
+##'@export
+plot.nlmixrPlotList  <- function(x, y, ...){
+    .x  <- x
+    class(.x)  <- NULL
+    for (.i in seq_along(.x)){
+        plot(.x[[.i]])
+    }
+}
+
+##'@export
+print.nlmixrPlotList  <- function(x, ...){
+    .x  <- x
+    class(.x)  <- NULL
+    for (.i in seq_along(.x)){
+        print(.x[[.i]])
     }
 }
 
@@ -2691,7 +2714,9 @@ traceplot.nlmixrFitCore <- function(x, ...){
         if (!is.null(x$mcmc)){
             .p0 <- .p0 + ggplot2::geom_vline(xintercept=x$mcmc$niter[1], col="blue", size=1.2);
         }
-        print(.p0)
+        return(.p0)
+    } else {
+        return(invisible(NULL))
     }
 }
 
