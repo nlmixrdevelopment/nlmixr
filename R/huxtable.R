@@ -131,6 +131,28 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
     if (.cls1=="nlmixrPosthoc") return("posthoc");
 }
 
+.yamlHeader  <- function(x, bound="bound"){
+    .cor <- x$omega
+    diag(.cor) <- 0;
+    .lst <- list("Full nlmixr Version:"=.getFullNlmixrVersion(),
+                 "Full RxODE Version:"=.getFullNlmixrVersion("RxODE"),
+                 "R Model Function Name ($modelName):"=x$modelName,
+                 "R Fit Object:"=bound,
+                 "R Data Name ($dataName):"=x$dataName,
+                 "Estimation Method:"=.nmEstMethod(x),
+                 "All variables mu-referenced:"=dim(x$omega)[1] == length(x$mu.ref),
+                 "Covariance Method ($covMethod):"=x$covMethod,
+                 "Modeled Correlations:"=!all(.cor == 0),
+                 "CWRES:"=ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="CWRES"),FALSE),
+                 "NPDE:"=ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="NPDE"),FALSE),
+                 "Goodness Of Fit Metrics:"= as.list(x$objDf),
+                 "Timing Metrics"=as.list(x$time)
+                 )
+    return(yaml::as.yaml(.lst))
+}
+
+
+
 .nmHuxHeader  <- function(x, bound){
     .cor <- x$omega
     diag(.cor) <- 0;
@@ -527,6 +549,120 @@ nmDocx  <- function(x,
     } else {
         return(.doc)
     }
+}
+
+##' Create a large output based on a nlmixr fit
+##'
+##' @param x nlmixr fit object
+##'
+##' @param lst Listing file.  If not specified, it is determined by
+##'     the day and the model/R-object name.  If it is specified as
+##'     \code{NULL} the listing output is displayed on the screen.
+##'
+##' @return invisibly returns fit
+##'
+##' @author Matthew Fidler
+##' @export
+nmLst  <- function(x,
+                   lst=NULL){
+    RxODE::rxReq("data.table");
+    RxODE::rxReq("yaml");
+    if (!inherits(x, "nlmixrFitCore")){
+        stop("This only applies to nlmixr fit objects");
+    }
+    .parent <- globalenv();
+    .bound  <- "";
+    .bound2 <- do.call("c", lapply(ls(.parent), function(.cur){
+                                if (identical(.parent[[.cur]], x)){
+                                    return(.cur)
+                                }
+                                return(NULL);
+                            }))
+    if (length(.bound2) > 0){
+        .bound <- .bound2[order(sapply(.bound2, nchar))];
+        .bound <- .bound[1]
+    }
+    if (.bound !=""){
+        .hreg  <- eval(parse(text=sprintf('nlmixr::as_hux("%s"=x)', .bound)));
+    } else {
+        .hreg  <- nlmixr::as_hux(x);
+    }
+    .rule  <- function(msg){
+        message("")
+        message(cli::rule(msg));
+        message("")
+    }
+    if (missing(lst)){
+        lst  <- file.path(getwd(),paste0(ifelse(any(.bound==c("", ".")), "nlmixr", .bound),
+                                         "-", .nmEstMethod(x), "-", x$modelName,
+                                         format(Sys.time(), "-%Y-%m-%d.lst")));
+    }
+    if (!is.null(lst)){
+        .zz <- file(lst, open = "wt")
+        .unsink  <- FALSE
+        sink(.zz, type="output");
+        sink(.zz, type="message");
+        on.exit({if(!.unsink){
+                     sink(type="output");
+                     sink(type="message")
+                     close(.zz);
+                 }
+        });
+    }
+    message("---")
+    message(.yamlHeader(x, .bound));
+    message("---")
+    message("")
+    .rule(sprintf("Parameter Information as_hux(%s)", .bound));
+    .hreg %>% huxtable::print_screen(colnames=FALSE)
+    .rule(sprintf("Parsed model information %s$uif", .bound));
+    print(x$uif)
+    if (x$message!=""){
+        .rule("Minimization Information ($mesage):")
+        message(paste("$message: ",x$message,collapse=" "))
+
+    }
+    if (length(x$warnings) > 0){
+        .rule("Warning(s) ($warnings):")
+        for (.i in seq_along(x$warnings)){
+            message(x$warnings[.i]);
+        }
+    }
+    .mu <- .nmMuTable(x);
+    if (length(.mu) !=0){
+        .mu  <- huxtable::hux(.mu) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
+        .rule("Parsed Mu-referencing:");
+        .mu %>% huxtable::print_screen(colnames=FALSE)
+
+    }
+    .it  <- .nmIterHist(x)
+    if (length(.it) > 0){
+        .rule("Iteration History");
+        for (.i in seq_along(.it)){
+            message(paste0(names(.it)[.i],":"))
+            print(data.table::data.table(.it[[.i]]), nrows=11)
+        }
+    }
+    if (any(.nmEstMethod(x)==c("FOCEi", "FOCE","FO","FOi","posthoc"))){
+        .rule("Scaling and gradient information ($scaleInfo):")
+        print(x$scaleInfo)
+    }
+    if (!is.null(lst)){
+        .rule("Original arguments to control ($origControl):")
+        print(x$origControl)
+        .rule("sessionInfo():")
+        print(sessionInfo());
+        sink(type="output");
+        sink(type="message");
+        close(.zz);
+        .unsink <- TRUE
+        message(sprintf("Wrote listing to %s", lst))
+    }
+    invisible(x)
 }
 
 ##'@rdname nmDocx
