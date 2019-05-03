@@ -262,6 +262,7 @@ typedef struct {
   double badEtaPenalty;
   int printTop;
   double resetThetaCheckPer;
+
 } focei_options;
 
 focei_options op_focei;
@@ -382,6 +383,15 @@ typedef struct {
 focei_ind *inds_focei = NULL;
 int max_inds_focei = 0;
 
+// Parameter table
+std::vector<int> niter;
+std::vector<int> iterType;
+std::vector<double> vPar;
+std::vector<double> vGrad;
+std::vector<int> niterGrad;
+std::vector<int> gradType;
+
+
 extern "C" void rxOptionsFreeFocei(){
   if (op_focei.muRef != NULL) Free(op_focei.muRef);
   if (op_focei.thetaTrans != NULL) Free(op_focei.thetaTrans);
@@ -423,6 +433,12 @@ extern "C" void rxOptionsFreeFocei(){
   Free(op_focei.ga);
   Free(op_focei.gB);
   Free(op_focei.gc);
+  vGrad.clear();
+  vPar.clear();
+  iterType.clear();
+  gradType.clear();
+  niter.clear();
+  niterGrad.clear();
 }
 
 //[[Rcpp::export]]
@@ -2222,6 +2238,14 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.resetThetaCheckPer = as<double>(odeO["resetThetaCheckPer"]);
   op_focei.printTop = as<int>(odeO["printTop"]);
   op_focei.nF2 = as<int>(odeO["nF"]);
+  if (op_focei.nF2 == 0){
+    vGrad.clear();
+    vPar.clear();
+    iterType.clear();
+    gradType.clear();
+    niter.clear();
+    niterGrad.clear();
+  }
   op_focei.maxOuterIterations = as<int>(odeO["maxOuterIterations"]);
   op_focei.maxInnerIterations = as<int>(odeO["maxInnerIterations"]);
   op_focei.maxOdeRecalc = as<int>(odeO["maxOdeRecalc"]);
@@ -2734,9 +2758,41 @@ static inline void foceiPrintLine(int ncol){
 // Outer l-BFGS-b from R
 extern "C" double foceiOfvOptim(int n, double *x, void *ex){
   double ret = foceiOfv0(x);
-  op_focei.nF++;
+  niter.push_back(op_focei.nF2+(++op_focei.nF));
+  // Scaled
+  vPar.push_back(ret);
+  iterType.push_back(5);
+  int finalize = 0, i = 0;
+  for (i = 0; i < n; i++){
+    vPar.push_back(x[i]);
+  }
+  // Unscaled
+  iterType.push_back(6);
+  niter.push_back(niter.back());
+  if (op_focei.scaleObjective){
+    vPar.push_back(op_focei.initObjective * ret / op_focei.scaleObjectiveTo);
+  } else {
+    vPar.push_back(ret);
+  }
+  for (i = 0; i < n; i++){
+    vPar.push_back(unscalePar(x, i));
+  }
+  // Back-transformed (7)
+  iterType.push_back(7);
+  niter.push_back(niter.back());
+  if (op_focei.scaleObjective){
+    vPar.push_back(op_focei.initObjective * ret / op_focei.scaleObjectiveTo);
+  } else {
+    vPar.push_back(ret);
+  }
+  for (i = 0; i < n; i++){
+    if (op_focei.xPar[i] == 1){
+      vPar.push_back(exp(unscalePar(x, i)));
+    } else {
+      vPar.push_back(unscalePar(x, i));
+    }
+  }
   if (op_focei.printOuter != 0 && op_focei.nF % op_focei.printOuter == 0){
-    int finalize = 0, i = 0;
     if (op_focei.useColor && !isRstudio())
       Rprintf("|\033[1m%5d\033[0m|%#14.8g |", op_focei.nF+op_focei.nF2, ret);
     else 
@@ -2849,35 +2905,47 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
   numericGrad(par, gr);
   op_focei.nG++;
   int finalize=0, i = 0;
+  niterGrad.push_back(niter.back());
+  if (op_focei.derivMethod == 0){
+    if (op_focei.nF + op_focei.nF2 == 1 && op_focei.gillK > 0){
+      gradType.push_back(1);
+    } else if (op_focei.mixDeriv){
+      gradType.push_back(2);
+    } else{
+      gradType.push_back(3);
+    }
+  } else {
+    gradType.push_back(4);
+  }
   if (op_focei.printOuter != 0 && op_focei.nG % op_focei.printOuter == 0){
     if (op_focei.useColor && op_focei.printNcol >= n){
-      switch(op_focei.derivMethod){
-      case 0:
-	if (op_focei.nF + op_focei.nF2 == 1 && op_focei.gillK > 0){
-	  Rprintf("|\033[4m    G|    Gill Diff. |");
-	} else if (op_focei.mixDeriv){
-	  Rprintf("|\033[4m    M|   Mixed Diff. |");
-	} else {
-	  Rprintf("|\033[4m    G| Forward Diff. |");
-	}
-	break;
+      switch(gradType.back()){
       case 1:
-	Rprintf("|\033[4m    G| Central Diff. |");
+	Rprintf("|\033[4m    G|    Gill Diff. |");
+	break;
+      case 2:
+	Rprintf("|\033[4m    M|   Mixed Diff. |");
+	break;
+      case 3:
+	Rprintf("|\033[4m    F| Forward Diff. |");
+	break;
+      case 4:
+	Rprintf("|\033[4m    C| Central Diff. |");
 	break;
       }
     } else {
-      switch(op_focei.derivMethod){
-      case 0:
-	if ((op_focei.repeatGill == 1 || op_focei.nF + op_focei.nF2 == 1) && op_focei.gillK > 0){
-	  Rprintf("|    G|    Gill Diff. |");
-	} else if (op_focei.mixDeriv){
-	  Rprintf("|    M|   Mixed Diff. |");
-	} else {
-	  Rprintf("|    G| Forward Diff. |");
-	}
+      switch(gradType.back()){
+      case 1:
+	Rprintf("|    G|    Gill Diff. |");
 	break;
-      case 1:\
-	Rprintf("|    G| Central Diff. |");
+      case 2:
+	Rprintf("|    M|   Mixed Diff. |");
+	break;
+      case 3:
+	Rprintf("|    F| Forward Diff. |");
+	break;
+      case 4:
+	Rprintf("|    C| Central Diff. |");
 	break;
       }
     }
@@ -2913,7 +2981,8 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
       foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
     }
   }
-  for (i = n; i--;){
+  vGrad.push_back(NA_REAL); // Gradient doesn't record objf
+  for (i = 0; i < n; i++){
     if (gr[i] == 0){
       if (op_focei.nF+op_focei.nF2 == 1){
 	stop("On initial gradient evaluation, one or more parameters have a zero gradient\nChange model, try different initial estimates or use outerOpt=\"bobyqa\")");
@@ -2921,6 +2990,7 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
 	gr[i]=sqrt(DOUBLE_EPS);
       }
     }
+    vGrad.push_back(gr[i]);
   }
 }
 
@@ -3742,6 +3812,63 @@ NumericMatrix foceiCalcCov(Environment e){
   return ret;
 }
 
+List parHistData(Environment e){
+  CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
+  CharacterVector dfNames(3+op_focei.thetan + op_focei.omegan);
+  dfNames[0] = "iter";
+  dfNames[1] = "type";
+  dfNames[2] = "objf";
+  int i, j, k=1;
+  for (i = 0; i < op_focei.thetan + op_focei.omegan; i++){
+    j=op_focei.fixedTrans[i];
+    if (j < thetaNames.size()){
+      dfNames[i+3] = thetaNames[j];
+    } else {
+      dfNames[i+3] = "o" + std::to_string(k++);
+    } 
+  }
+  // iter type parameters
+  List ret(3+op_focei.thetan + op_focei.omegan);
+  int sz = niter.size()+niterGrad.size();
+  IntegerVector tmp;
+  std::vector<int> iter;
+  iter.reserve(sz);
+  iter.insert(iter.end(), niter.begin(), niter.end());
+  iter.insert(iter.end(), niterGrad.begin(), niterGrad.end());
+  ret[0] = iter;
+  tmp = IntegerVector(sz);
+  std::vector<int> typ;
+  typ.reserve(sz);
+  typ.insert(typ.end(), iterType.begin(), iterType.end());
+  typ.insert(typ.end(), gradType.begin(), gradType.end());
+  tmp = typ;
+  tmp.attr("levels") = CharacterVector::create("Gill83 Gradient", "Mixed Gradient",
+						"Forward Difference", "Central Difference",
+						"Scaled", "Unscaled", "Back-Transformed");
+  tmp.attr("class") = "factor";
+  ret[1] = tmp;
+  arma::mat cPar(vPar.size()/iterType.size(), iterType.size());
+  std::copy(vPar.begin(), vPar.end(), cPar.begin());
+  arma::mat cGrad(vGrad.size()/gradType.size(), gradType.size());
+  std::copy(vGrad.begin(), vGrad.end(), cGrad.begin());
+  cPar = cPar.t();
+  cGrad = cGrad.t();
+  arma::mat vals = arma::join_cols(cPar, cGrad);
+  for (i = 0; i < op_focei.thetan + op_focei.omegan+1; i++){
+    ret[i+2]= vals.col(i);
+  }
+  vGrad.clear();
+  vPar.clear();
+  iterType.clear();
+  gradType.clear();
+  niter.clear();
+  niterGrad.clear();
+  ret.attr("names")=dfNames;
+  ret.attr("class") = "data.frame";
+  ret.attr("row.names")=IntegerVector::create(NA_INTEGER, -sz);
+  return ret;
+}
+
 void foceiFinalizeTables(Environment e){
   CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
   arma::mat cov;
@@ -4080,6 +4207,7 @@ void foceiFinalizeTables(Environment e){
   objDf.attr("class") = "data.frame";
   e["objDf"]=objDf;
   if (!e.exists("method")){
+    e["parHistData"] = parHistData(e);
     if (op_focei.fo){
       e["method"] = "FO";
     } else {
@@ -4105,7 +4233,6 @@ void foceiFinalizeTables(Environment e){
   // RxODE::rxSolveFree();
   e.attr("class") = "nlmixrFitCore";
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // FOCEi fit
@@ -4216,14 +4343,16 @@ Environment foceiFitCpp_(Environment e){
     Rprintf("G: Gradient\n");
     foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
     Rprintf("|    #| Objective Fun |");
-    int j,  i=0, finalize=0;
+    int j,  i=0, finalize=0, k=1;
+    
     for (i = 0; i < op_focei.npars; i++){
       j=op_focei.fixedTrans[i];
       if (j < thetaNames.size()){
 	tmpS = thetaNames[j];
 	Rprintf("%#10s |", tmpS.c_str());
       } else {
-	Rprintf("           |");
+	tmpS = "o" +std::to_string(k++);
+	Rprintf("%#10s |", tmpS.c_str());
       } 
       if ((i + 1) != op_focei.npars && (i + 1) % op_focei.printNcol == 0){
 	if (op_focei.useColor && op_focei.printNcol + i  >= op_focei.npars){

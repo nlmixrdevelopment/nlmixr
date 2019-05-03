@@ -241,6 +241,9 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 ##'     \code{docxTemplate=NULL} it uses the \code{officer} blank
 ##'     document.
 ##'
+##' @param plot Boolean indicating if the default goodness of fit
+##'     plots are added to the document.  By default \code{TRUE}
+##'
 ##' @param titleStyle This is the word style name for the nlmixr
 ##'     title; Usually this is \code{nlmixr version (R
 ##'     object)}. Defaults to \code{option("nlmixr.docx.title")} or
@@ -263,6 +266,10 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 ##' @param preformattedStyle This is the preformatted text style for R
 ##'     output lines.  Defaults to
 ##'     \code{option("nlmixr.docx.preformatted")} or \code{HTML Preformatted}
+##'
+##' @param width Is an integer representing the number of characters
+##'     your preformatted style supports.  By default this is
+##'     \code{option("nlmixr.docx.width")} or \code{69}
 ##'
 ##' @return An officer docx object
 ##'
@@ -302,13 +309,14 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 nmDocx  <- function(x,
                     docxOut=NULL,
                     docxTemplate=NULL,
+                    plot=TRUE,
                     titleStyle=getOption("nlmixr.docx.title", "Title"),
                     subtitleStyle=getOption("nlmixr.docx.subtitle","Subtitle"),
                     normalStyle=getOption("nlmixr.docx.normal", "Normal"),
                     headerStyle=getOption("nlmixr.docx.heading1", "Heading 1"),
                     centeredStyle=getOption("nlmixr.docx.centered", "centered"),
                     preformattedStyle=getOption("nlmixr.docx.preformatted", "HTML Preformatted"),
-                    width=69){
+                    width=getOption("nlmixr.docx.width",69)){
     RxODE::rxReq("officer");
     RxODE::rxReq("flextable");
     if (!inherits(x, "nlmixrFitCore")){
@@ -332,7 +340,8 @@ nmDocx  <- function(x,
                                              "nlmixr-template.docx"))
     }
     if (missing(docxOut)){
-        docxOut  <- file.path(getwd(),paste0(ifelse(any(.bound==c("",".")),"nlmixr",.bound),
+        docxOut  <- file.path(getwd(),paste0(ifelse(any(.bound==c("", ".")), "nlmixr", .bound),
+                                             "-", .nmEstMethod(x), "-", x$modelName,
                                              format(Sys.time(), "-%Y-%m-%d.docx")))
     }
     .doc <- officer::read_docx(docxTemplate);
@@ -410,7 +419,7 @@ nmDocx  <- function(x,
     .doc <- .doc %>%
         officer::body_add_par("Original arguments to control ($origControl):", style=headerStyle)
     .doc  <- .nmDocxPreformat(x$origControl, .doc, preformattedStyle, width)
-    if (inherits(x, "nlmixrFitData")){
+    if (plot && inherits(x, "nlmixrFitData")){
         .doc <- .doc %>%
             officer::body_add_par(sprintf("Basic Goodness of fit, ie plot(%s)",.bound), style=headerStyle)
         .lst <- plot(x);

@@ -1947,6 +1947,15 @@ foceiFit.data.frame0 <- function(data,
     if (!control$calcTables){
         return(.ret);
     }
+    if (exists("parHistData",.ret)){
+        .tmp <- .ret$parHistData;
+        .tmp <- .tmp[.tmp$type == "Scaled", names(.tmp) != "type"];
+        .iter <- .tmp$iter
+        .tmp <- .tmp[,names(.tmp) != "iter"];
+        .ret$parHistStacked <- data.frame(stack(.tmp),iter=.iter)
+        names(.ret$parHistStacked) <- c("val","par","iter");
+        .ret$parHist <- data.frame(iter=.iter,.tmp);
+    }
     .solve <- function(...){
         .ret <- RxODE::rxSolve(...);
         if (names(.ret)[1] == "time"){
