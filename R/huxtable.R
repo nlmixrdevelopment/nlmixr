@@ -136,6 +136,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
     huxtable::tribble_hux(
                   ~ Description, ~ Value,
                   "Full nlmixr Version:", .getFullNlmixrVersion(),
+                  "Full RxODE Version:" .getFullNlmixrVersion("RxODE"),
                   "R Model Function Name ($modelName):",  x$modelName,
                   "R Fit Object:", bound,
                   "R Data Name ($dataName):", x$dataName,
@@ -170,10 +171,10 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
         huxtable::set_all_borders(TRUE)
 }
 
-.getFullNlmixrVersion  <- function(){
-    .x <- tryCatch(utils::packageDescription("nlmixr", lib.loc = .libPaths()),
+.getFullNlmixrVersion  <- function(pkg="nlmixr"){
+    .x <- tryCatch(utils::packageDescription(pkg, lib.loc = .libPaths()),
                    error = function(e) NA, warning = function(e) NA)
-    .pv  <- packageVersion("nlmixr");
+    .pv  <- packageVersion(pkg);
     if (identical(.x, NA) || length(.x$RemoteSha)==0) {
         return(paste(.pv))
     } else {
