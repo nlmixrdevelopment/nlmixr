@@ -124,7 +124,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
     cls <- c("nlmixrVpc", class(p));
     attr(cls, "nlmixrVpc") <- sim
     class(p) <- cls
-    return(invisible(p));
+    return(p);
 })
 
 ##'@export
