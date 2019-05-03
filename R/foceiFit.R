@@ -2471,6 +2471,20 @@ nobs.nlmixrFitCore <- function(object, ...){
 vcov.nlmixrFitCore <- function(object, ...){
     object$cov
 }
+##' This gets the parsed data in the lower-level manner that nlmixr expects.
+##'
+##' @param object nlmixr Object
+##'
+##' @export
+##'
+##' @author Matthew L. Fidler
+##' @keywords internal
+.nmGetData  <- function(object){
+    .uif <- object$uif
+    .tmp <- deparse(body(.uif$theta.pars))[-1];
+    .tmp <- .tmp[-length(.tmp)];
+    return(RxODE::etTrans(object$origData,paste(paste(.tmp,collapse="\n"),"\n",.uif$rxode),TRUE,TRUE, TRUE));
+}
 
 ##'@export
 getData.nlmixrFitCore <- function(object){
@@ -3016,8 +3030,18 @@ setOfv <- function(x, type){
                 } else {
                     stop(sprintf("Cannot switch objective function to '%s' type.", type))
                 }
+                .likTime <- proc.time();
                 .saemObf <- calc.2LL(x$saem,nnodes.gq = .nnode, nsd.gq = .nsd);
+                .likTime  <- proc.time()-.likTime;
+                .likTime  <- .likTime["elapsed"];
                 .env <- x$env;
+                .time  <- .env$time;
+                if (any(names(.time)=="logLik")){
+                    .time$logLik <- .time$logLik +.likTime;
+                } else {
+                    .time  <- data.frame(.time,logLik=.likTime,check.names=FALSE);
+                }
+                .env$time <- .time;
                 .llik <- -.saemObf / 2;
                 .nobs  <- .env$nobs;
                 attr(.llik, "df") <- attr(get("logLik", .env), "df");

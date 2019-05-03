@@ -12,6 +12,7 @@
 ##' @author Matthew L. Fidler
 ##' @export
 addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, cholSEtol=(.Machine$double.eps)^(1/3),...){
+    .pt  <- proc.time();
     .objName <- substitute(object);
     if (any(names(object) == "NPDE")){
         warning("Already contains NPDE")
@@ -25,7 +26,7 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, c
     .rx <- gsub(rex::rex("sim", or("=", "~"), "rxTBSi(", capture(except_any_of(",)")), ",", anything, any_of("\n;")),
                 "sim=\\1", .rx)
     .si$rx <- .rx
-    .dat <- nlmixrData(getData(object))
+    .dat <- nlmixrData(.nmGetData(object))
     .dat <- .dat[.dat$EVID == 0, ]
     .si$object <- object;
     .si$returnType <- "data.frame.TBS";
@@ -61,6 +62,8 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, c
             }
         }
     }
+    .env <- .new$env
+    .env$time <- data.frame(.env$time, npde=(proc.time() - .pt)["elapsed"], check.names=FALSE)
     return(.new)
 }
 ##' Output table/data.frame options

@@ -1522,6 +1522,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   .nth <- length(.tn)
   .covm <- object$Ha[1:.nth,1:.nth]
   .calcCov  <- calcCov;
+  .calcCovTime  <- proc.time();
   if (calcCov){
     .covm <- try(calc.COV(object));
     if (!inherits(.covm, "try-error")){
@@ -1590,7 +1591,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       .calcCov <- FALSE
     }
   }
-
   .ini <- as.data.frame(uif$ini)
   .ini <- .ini[is.na(.ini$err),]
   .ini <- .ini[!is.na(.ini$ntheta),]
@@ -1604,6 +1604,9 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     attr(.cov, "dimnames") <- list(.tn, .tn)
     .cov <- .cov[.ini, .ini, drop = FALSE];
   }
+  .calcCovTime  <- proc.time()-.calcCovTime;
+  .calcCovTime  <- .calcCovTime["elapsed"]
+
   .ini <- as.data.frame(uif$ini)
   .ini <- .ini[!is.na(.ini$ntheta),];
   .skipCov <- !is.na(.ini$err);
@@ -1625,10 +1628,14 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   dimnames(.m) <- list(NULL, .allThetaNames);
   .fixedNames <- paste(uif$ini$name[which(uif$ini$fix)]);
   .rn <- ""
+  .likTime <- 0;
   if (is.na(obf)){
     .saemObf <- NA
   } else if (is.null(obf)){
+    .likTime <- proc.time();
     .saemObf <- calc.2LL(object,nnodes.gq = nnodes.gq, nsd.gq = nsd.gq);
+    .likTime  <- proc.time()-.likTime;
+    .likTime  <- .likTime["elapsed"];
     if (nnodes.gq==1){
       .rn <- paste0("laplace",nsd.gq);
     } else {
@@ -1638,7 +1645,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (is.na(obf)){
       .saemObf <- NA;
     } else if (obf){
+      .likTime <- proc.time();
       .saemObf <- calc.2LL(object,nnodes.gq = nnodes.gq, nsd.gq = nsd.gq);
+      .likTime  <- proc.time()-.likTime;
+      .likTime  <- .likTime["elapsed"];
       if (nnodes.gq==1){
         .rn <- paste0("laplace",nsd.gq);
       } else {
@@ -1651,6 +1661,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .saemObf <- obf;
   }
   .notCalced <- TRUE;
+  .cwresTime  <- proc.time();
   while (.notCalced){
     .env <- new.env(parent=emptyenv());
     .env$nobs2  <- .saemCfg$nobs
@@ -1736,6 +1747,12 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       .notCalced <- FALSE;
     }
   }
+  .cwresTime  <-  proc.time() - .cwresTime;
+  if (is.na(calcResid)){
+    .cwresTime  <- 0;
+  } else if (!calcResid){
+    .cwresTime  <- 0;
+  }
   .env <- fit.f$env;
   if (.calcCov){
     .env$covMethod <- "linFim";
@@ -1758,7 +1775,20 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   if (is.null(.env$time)){
     .env$time <- data.frame(saem=.saemTime["elapsed"], check.names=FALSE, row.names=c(""));
   } else {
-    .env$time <- data.frame(saem=.saemTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
+    .time  <- .env$time
+    .time <- .time[,!(names(.time) %in% c("optimize", "covariance"))]
+    .saemTime  <-  .saemTime["elapsed"]
+    if (calcResid){
+      .saemTime  <- .saemTime - .cwresTime["elapsed"];
+      .time  <- data.frame(.time, cwres=.cwresTime["elapsed"], check.names=FALSE);
+    }
+    if (.likTime >0){
+      .time  <- data.frame(.time, logLik=.likTime, check.names=FALSE);
+      .saemTime  <- .saemTime - .likTime;
+    }
+    .saemTime  <- .saemTime - .calcCovTime;
+    .time <- data.frame(.time, covariance=.calcCovTime, check.names=FALSE)
+    .env$time <- data.frame(saem=.saemTime, .time, check.names=FALSE, row.names=c(""))
   }
   .env$message <- "";
   if (is.na(calcResid)){

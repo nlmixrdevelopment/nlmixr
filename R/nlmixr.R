@@ -98,6 +98,8 @@ armaVersion <- function(){
     nlmixrLogo(str="RcppArmadiilo", RcppArmadillo::armadillo_version())
 }
 
+.nlmixrTime <- NULL
+
 ##' nlmixr fits population PK and PKPD non-linear mixed effects models.
 ##'
 ##' nlmixr is an R package for fitting population pharmacokinetic (PK)
@@ -118,6 +120,7 @@ armaVersion <- function(){
 ##' @export
 nlmixr <- function(object, data, est=NULL, control=list(),
                    table=tableControl(), ...,save=NULL){
+    assignInMyNamespace(".nlmixrTime",proc.time());
     force(est)
     ## verbose?
     ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
@@ -704,6 +707,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
                         sum.prod=FALSE, table=tableControl(),
                         save=NULL){
+
     if (is.null(save)){
         save <- getOption("nlmixr.save", FALSE);
     }
@@ -743,7 +747,14 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
     }
     if (save){
         AIC(.ret); # Calculate SAEM AIC when saving...
+        .env <- .ret$env
+        .extra <- (proc.time() - .nlmixrTime)["elapsed"] - sum(.env$time)
+        .env$time <- data.frame(.env$time,"other"=.extra, check.names=FALSE)
         saveRDS(.ret,file=.saveFile)
+    } else {
+        .env <- .ret$env
+        .extra <- (proc.time() - .nlmixrTime)["elapsed"] - sum(.env$time)
+        .env$time <- data.frame(.env$time,"other"=.extra, check.names=FALSE)
     }
     return(.ret);
 }
@@ -889,6 +900,8 @@ saemControl <- function(seed=99,
 ##' @author Matthew L. Fidler
 ##' @export
 addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
+    .pt  <- proc.time();
+    .oTime <- fit$env$time;
     .objName <- substitute(fit);
     if(any(names(fit) == "CWRES")){
         ## warning("Already contains CWRES");
@@ -899,7 +912,7 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     if (!is.null(.saem)){
         assign("saem",NULL,fit$env)
         on.exit({assign("saem",.saem,fit$env)});
-        .newFit <- as.focei.saemFit(.saem, .uif, data=getData(fit), calcResid = TRUE, obf=NA, calcCov=FALSE);
+        .newFit <- as.focei.saemFit(.saem, .uif, data=.nmGetData(fit), calcResid = TRUE, obf=NA, calcCov=FALSE);
         .ob1 <- .newFit$objDf
         .ob2 <- fit$objDf
         if (any(names(.ob2) == "Condition Number")){
@@ -918,17 +931,12 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
         assign("saem",.saem,fit$env);
         assign("adjObj",fit$env$adjObj, .newFit$env)
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
+        ## Add CWRES timing to fit.
         .new <- cbind(fit, .df);
     }
     .nlme <- fit$nlme
     if (!is.null(.nlme)){
-        .newFit <- as.focei(.nlme, .uif, data=getData(fit), calcResid = TRUE);
-        .time <- fit$time
-        .time2  <- .newFit$time
-        for (.n in names(.time)){
-            .time[[.n]] <- .time[[.n]] + .time2[[.n]];
-        }
-        assign("time",.time,.newFit$env);
+        .newFit <- as.focei(.nlme, .uif, data=.nmGetData(fit), calcResid = TRUE);
         assign("adjObj",fit$env$adjObj, .newFit$env)
         .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")];
         .new <- cbind(fit, .df);
@@ -951,5 +959,7 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
             }
         }
     }
+    .env <- .new$env
+    .env$time <- data.frame(.oTime,cwres=(proc.time() - .pt)["elapsed"],check.names=FALSE);
     return(.new);
 }
