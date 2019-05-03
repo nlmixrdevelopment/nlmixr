@@ -730,8 +730,17 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
             return(.ret)
         }
     }
-    .ret  <- nlmixr_fit0(uif=uif, data=data, est=est, control=control, ...,
-                         sum.prod=sum.prod, table=table);
+    .ret  <- .collectWarnings(nlmixr_fit0(uif=uif, data=data, est=est, control=control, ...,
+                                          sum.prod=sum.prod, table=table), TRUE);
+    .ws  <- .ret[[2]];
+    .ret  <- .ret[[1]];
+    if (inherits(.ret, "nlmixrFitCore")){
+        .env <- .ret$env
+        .env$warnings <- .ws
+    }
+    for (.i in seq_along(.ws)){
+        warning(.ws[.i])
+    }
     if (save){
         AIC(.ret); # Calculate SAEM AIC when saving...
         saveRDS(.ret,file=.saveFile)
