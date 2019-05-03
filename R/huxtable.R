@@ -435,8 +435,15 @@ nmDocx  <- function(x,
 
     if (x$message!=""){
         .doc <- .doc %>%
-            officer::body_add_par("Minimization Information:", style=headerStyle) %>%
+            officer::body_add_par("Minimization Information ($mesage):", style=headerStyle) %>%
             officer::body_add_par(paste0("$message: ",x$message), style=preformattedStyle)
+    }
+    if (length(x$warnings) > 0){
+        .doc <- .doc %>%
+            officer::body_add_par("Warning(s) ($warnings):", style=headerStyle);
+        for (.i in seq_along(x$warnings)){
+            .doc  <- officer::body_add_par(.doc, x$warnings[.i], style=preformattedStyle)
+        }
     }
     .mu <- .nmMuTable(x);
     if (length(.mu) !=0){
