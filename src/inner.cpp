@@ -3849,14 +3849,20 @@ List parHistData(Environment e){
   ret[1] = tmp;
   arma::mat cPar(vPar.size()/iterType.size(), iterType.size());
   std::copy(vPar.begin(), vPar.end(), cPar.begin());
-  arma::mat cGrad(vGrad.size()/gradType.size(), gradType.size());
-  std::copy(vGrad.begin(), vGrad.end(), cGrad.begin());
-  cPar = cPar.t();
-  cGrad = cGrad.t();
-  arma::mat vals = arma::join_cols(cPar, cGrad);
+  arma::mat vals;
+  if (vGrad.size() > 0){
+    arma::mat cGrad(vGrad.size()/gradType.size(), gradType.size());
+    std::copy(vGrad.begin(), vGrad.end(), cGrad.begin());
+    cPar = cPar.t();
+    cGrad = cGrad.t();
+    vals = arma::join_cols(cPar, cGrad);
+  } else {
+    cPar = cPar.t();
+    vals = cPar;
+  }
   for (i = 0; i < op_focei.thetan + op_focei.omegan+1; i++){
     ret[i+2]= vals.col(i);
-  }
+  }    
   vGrad.clear();
   vPar.clear();
   iterType.clear();
