@@ -136,7 +136,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
     huxtable::tribble_hux(
                   ~ Description, ~ Value,
                   "Full nlmixr Version:", .getFullNlmixrVersion(),
-                  "Full RxODE Version:" .getFullNlmixrVersion("RxODE"),
+                  "Full RxODE Version:", .getFullNlmixrVersion("RxODE"),
                   "R Model Function Name ($modelName):",  x$modelName,
                   "R Fit Object:", bound,
                   "R Data Name ($dataName):", x$dataName,
