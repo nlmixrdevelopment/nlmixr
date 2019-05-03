@@ -2673,6 +2673,9 @@ print.nlmixrFitCore <- function(x, ...){
         if (x$message=="false convergence (8)"){
             message("  In an ODE system, false convergence may mean \"useless\" evaluations were performed.")
             message("  See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean")
+            message("  It could also mean the convergence is poor, check results before accepting fit")
+            message("  You may also try a good derivative free optimization:")
+            message("    nlmixr(...,control=list(outerOpt=\"bobyqa\"))")
         }
     }
     if (RxODE::rxIs(x, "nlmixrFitData")){
