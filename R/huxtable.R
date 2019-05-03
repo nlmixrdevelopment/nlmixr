@@ -194,12 +194,68 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
              }
                  unlink(.tempfile)
     });
-    print(x);
+    if (is.null(x)){
+        print(sessionInfo());
+    } else {
+        print(x);
+    }
     sink(type="output");
     sink(type="message");
     close(.zz);
     .unsink <- TRUE
     suppressWarnings(readLines(.tempfile));
+}
+
+.nmIterHist  <- function(x){
+    if (inherits(x, "nlmixrSaem")){
+        .tmp  <- x$parHist
+        .nit  <- x$mcmc$niter
+        return(list("SA iterations"=.tmp[seq(1,.nit[1]),],
+                    "EM iterations"=.tmp[-seq(1,.nit[1]),]))
+    } else if (inherits(x, "nlmixrNlmeUI") || inherits(x, "posthoc")){
+        return(NULL);
+    } else if (exists("parHistData", x$env)){
+        .tmp <- x$parHistData$type
+        class(.tmp) <- NULL
+        .w <- which(.tmp <= 4)
+        if (length(.w) > 0){
+            .grad  <- x$parHistData[.w,]
+            .grad  <- .grad[,names(.grad) != "objf"]
+            .est  <- x$parHistData[-.w,]
+        } else {
+            .grad <- NULL
+            .est  <- x$parHistData
+        }
+        .scale <- .est[.est$type == "Scaled",];
+        .scale <- .scale[,names(.scale) != "type"];
+        .unscale <- .est[.est$type == "Unscaled",];
+        .unscale <- .unscale[,names(.unscale) != "type"];
+        .back <- .est[.est$type == "Back-Transformed",];
+        .back <- .back[,names(.back) != "type"];
+        .ret  <- list("Scaled"=.scale, "Unscaled"=.unscale, "Back-Transformed"=.back);
+        if (!is.null(.grad)){
+            .ret <- c(.ret, list("Gradient"=.grad))
+        }
+        return(.ret);
+    }
+}
+
+.nmIterHistDoc  <- function(x, doc, headerStyle, normalStyle, preformatStyle, width){
+    .x <- .nmIterHist(x);
+    .doc  <- doc;
+    .nrows  <- getOption("datatable.print.nrows");
+    options(datatable.print.nrows=11)
+    on.exit(options(datatable.print.nrows=.nrows))
+    if (length(.x) > 0){
+        .doc <- .doc %>% officer::body_add_par("Iteration History", style=headerStyle);
+    }
+    for(.i in seq_along(.x)){
+        .doc  <- .doc %>%
+            officer::body_add_par(names(.x)[.i],style=normalStyle)
+        .doc <- .nmDocxPreformat(data.table::data.table(.x[[.i]]), doc,
+                                 preformatStyle, width);
+    }
+    return(.doc)
 }
 
 .nmDocxPreformat <- function(x, doc, preformatStyle, width){
@@ -271,6 +327,10 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 ##'     your preformatted style supports.  By default this is
 ##'     \code{option("nlmixr.docx.width")} or \code{69}
 ##'
+##' @param save Should the docx be saved in a zip file with the R rds
+##'     data object for the fit?  By default this is \code{FALSE} with
+##'     \code{nmDocx} and \code{TRUE} with \code{nmSave}
+##'
 ##' @return An officer docx object
 ##'
 ##' @author Matthew Fidler
@@ -316,9 +376,11 @@ nmDocx  <- function(x,
                     headerStyle=getOption("nlmixr.docx.heading1", "Heading 1"),
                     centeredStyle=getOption("nlmixr.docx.centered", "centered"),
                     preformattedStyle=getOption("nlmixr.docx.preformatted", "HTML Preformatted"),
-                    width=getOption("nlmixr.docx.width",69)){
+                    width=getOption("nlmixr.docx.width",69),
+                    save=FALSE){
     RxODE::rxReq("officer");
     RxODE::rxReq("flextable");
+    RxODE::rxReq("data.table");
     if (!inherits(x, "nlmixrFitCore")){
         stop("This only applies to nlmixr fit objects");
     }
@@ -362,6 +424,7 @@ nmDocx  <- function(x,
                                       format(Sys.time(), "%a %b %d %X %Y")),
                               style=subtitleStyle) %>%
         officer::body_add_par("",style=normalStyle) %>%
+        officer::body_add_toc() %>%
         flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.nmHuxHeader(x, .bound)))) %>%
         officer::body_add_par("Timing ($time, in seconds)", style=headerStyle) %>%
         flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.nmHuxTime(x)))) %>%
@@ -386,6 +449,7 @@ nmDocx  <- function(x,
             officer::body_add_par("Parsed Mu-referencing:", style=headerStyle) %>%
             flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.mu)))
     }
+    .doc <- .nmIterHistDoc(x, .doc, headerStyle, normalStyle, preformattedStyle, width);
     if (any(.nmEstMethod(x)==c("FOCEi", "FOCE","FO","FOi","posthoc"))){
         .doc <- .doc %>%
             officer::body_add_par("Scaling and gradient information ($scaleInfo):", style=headerStyle)
@@ -427,11 +491,37 @@ nmDocx  <- function(x,
             .doc <- officer::body_add_gg(.doc, value = .lst[[.i]], style = centeredStyle)
         }
     }
+    .doc <- .doc %>%
+        officer::body_add_par("sessionInfo():", style=headerStyle)
+    .doc  <- .nmDocxPreformat(NULL, .doc, preformattedStyle, width)
     if (!is.null(docxOut)){
         print(.doc, target=docxOut);
         message(sprintf("Printed document information to: %s", docxOut))
+        if (save){
+            .rdsOut <- sub("[.]docx",".rds", docxOut);
+            saveRDS(x,file=.rdsOut);
+            message(sprintf("Saved R object to: %s", .rdsOut))
+            .zipOut <- sub("[.]docx",".zip", docxOut);
+            if (file.exists(.zipOut)){
+                warning(sprintf("Overwriting %s", .zipOut))
+                unlink(.zipOut);
+            }
+            utils::zip(.zipOut,c(docxOut,.rdsOut),flags="-9Xj");
+            if (file.exists(.zipOut)){
+                message(sprintf("Zipped to: %s", .zipOut))
+                unlink(.rdsOut);
+                unlink(docxOut);
+                message("Removed rds/docx");
+            }
+        }
         return(invisible(.doc));
     } else {
         return(.doc)
     }
+}
+
+##'@rdname nmDocx
+##'@export
+nmSave  <- function(x,...,save=TRUE){
+    nmDocx(x, ..., save=save);
 }

@@ -2,14 +2,20 @@
 % Please edit documentation in R/huxtable.R
 \name{nmDocx}
 \alias{nmDocx}
+\alias{nmSave}
 \title{Create a run summary word document}
 \usage{
-nmDocx(x, docxOut = NULL, docxTemplate = NULL,
+nmDocx(x, docxOut = NULL, docxTemplate = NULL, plot = TRUE,
   titleStyle = getOption("nlmixr.docx.title", "Title"),
   subtitleStyle = getOption("nlmixr.docx.subtitle", "Subtitle"),
   normalStyle = getOption("nlmixr.docx.normal", "Normal"),
   headerStyle = getOption("nlmixr.docx.heading1", "Heading 1"),
-  centeredStyle = getOption("nlmixr.docx.centered", "centered"))
+  centeredStyle = getOption("nlmixr.docx.centered", "centered"),
+  preformattedStyle = getOption("nlmixr.docx.preformatted",
+  "HTML Preformatted"), width = getOption("nlmixr.docx.width", 69),
+  save = FALSE)
+
+nmSave(x, ..., save = TRUE)
 }
 \arguments{
 \item{x}{nlmixr fit object.}
@@ -27,6 +33,9 @@ specified it defaults to
 the included nlmixr document template.  When
 \code{docxTemplate=NULL} it uses the \code{officer} blank
 document.}
+
+\item{plot}{Boolean indicating if the default goodness of fit
+plots are added to the document.  By default \code{TRUE}}
 
 \item{titleStyle}{This is the word style name for the nlmixr
 title; Usually this is \code{nlmixr version (R
@@ -46,6 +55,18 @@ is \code{nlmixr model name and date}. Defaults to
 \item{centeredStyle}{This is the word style for centered text
 which is used for the figures. Defaults to
 \code{option("nlmixr.docx.centered")} or \code{centered}}
+
+\item{preformattedStyle}{This is the preformatted text style for R
+output lines.  Defaults to
+\code{option("nlmixr.docx.preformatted")} or \code{HTML Preformatted}}
+
+\item{width}{Is an integer representing the number of characters
+your preformatted style supports.  By default this is
+\code{option("nlmixr.docx.width")} or \code{69}}
+
+\item{save}{Should the docx be saved in a zip file with the R rds
+data object for the fit?  By default this is \code{FALSE} with
+\code{nmDocx} and \code{TRUE} with \code{nmSave}}
 }
 \value{
 An officer docx object
