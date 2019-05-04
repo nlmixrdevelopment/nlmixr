@@ -1,5 +1,6 @@
 context("Back-transform vs scaling checks (#161)")
 test_that("Log-scaled vs Back-transformed parameters", {
+
     run7.mod <- function() {
         ini({
             tcl <- log(0.008) # typical value of clearance
@@ -18,6 +19,8 @@ test_that("Log-scaled vs Back-transformed parameters", {
             cp ~ add(add.err)       # define error model
         })
     }
+
     f  <- nlmixr(run7.mod);
-    expect_equal(list(1:3, 1:2),f$logThetaList)
+
+    expect_equal(list(1:3, 1:2), f$logThetasList)
 })

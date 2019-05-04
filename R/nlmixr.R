@@ -229,6 +229,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     .tmp <- .tmp[-length(.tmp)];
     .origData <- data;
     data <- RxODE::etTrans(data,paste(paste(.tmp,collapse="\n"),"\n",uif$rxode),TRUE,TRUE, TRUE);
+    .nTv  <- attr(class(data),".RxODE.lst")$nTv;
     .lab  <- attr(class(data),".RxODE.lst")$idLvl;
     .modelId <- digest::digest(list(sessionInfo()$otherPkgs$nlmixr$Version,
                                     uif, data, est, control, sum.prod, table,...));
@@ -339,6 +340,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         }
     }
     if (est == "saem"){
+        if (.nTv != 0) stop("SAEM does not support time-varying covariates (yet)");
         pt <- proc.time()
         if (length(uif$noMuEtas) > 0){
             stop(sprintf("Cannot run SAEM since some of the parameters are not mu-referenced (%s)", paste(uif$noMuEtas, collapse=", ")))
@@ -477,6 +479,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         }
         return(.ret);
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
+        if (.nTv != 0) stop("nlme does not support time-varying covariates (yet)");
         data <- as.data.frame(data)
         if (length(uif$predDf$cond) > 1) stop("nlmixr nlme does not support multiple endpoints.")
         pt <- proc.time()
