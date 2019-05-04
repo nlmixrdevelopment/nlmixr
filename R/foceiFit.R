@@ -1854,7 +1854,7 @@ foceiFit.data.frame0 <- function(data,
     }
     .ret$setupTime <- (proc.time() - .pt)["elapsed"];
     if (exists("uif", envir=.ret)){
-        .tmp <- .ret$uiflogThetasList
+        .tmp <- .ret$uif$logThetasList
         .ret$logThetas <- .tmp[[1]]
         .ret$logThetasF <- .tmp[[2]]
     } else {
