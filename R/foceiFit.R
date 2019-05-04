@@ -1854,13 +1854,9 @@ foceiFit.data.frame0 <- function(data,
     }
     .ret$setupTime <- (proc.time() - .pt)["elapsed"];
     if (exists("uif", envir=.ret)){
-        .uif <- .ret$uif
-        .ini <- as.data.frame(.uif$ini);
-        .ret$logThetas <- as.integer(which(setNames(sapply(.uif$focei.names,function(x)any(x==.uif$log.theta)),NULL)))
-        .thetas  <- .ini[!is.na(.ini$ntheta),]
-        .cov  <- .uif$cov.theta
-        .covThetas <- .thetas[.thetas$name %in% .cov,"ntheta"]
-        .ret$logThetasF <- setdiff(.ret$logThetas, .covThetas)
+        .tmp <- .ret$uiflogThetasList
+        .ret$logThetas <- .tmp[[1]]
+        .ret$logThetasF <- .tmp[[2]]
     } else {
         .ret$logThetasF <- integer(0)
     }

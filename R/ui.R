@@ -2602,6 +2602,16 @@ nlmixrUI.poped.sigma <- function(obj){
   return(setNames(.tmp$est * .tmp$est, paste(.tmp$name)))
 }
 
+nlmixUI.logThetasList  <- function(obj){
+  .ini <- as.data.frame(obj$ini);
+  .logThetas <- as.integer(which(setNames(sapply(obj$focei.names,function(x)any(x==obj$log.theta)),NULL)));
+  .thetas  <- .ini[!is.na(.ini$ntheta),]
+  .cov  <- obj$cov.theta
+  .covThetas <- .thetas[.thetas$name %in% .cov,"ntheta"]
+  .logThetasF <- setdiff(.logThetas, .covThetas)
+  list(.logThetas, .logThetasF);
+}
+
 
 nlmixrUI.poped.ff_fun <- function(obj){
   if (!is.null(obj$lin.solved)){
@@ -2701,6 +2711,8 @@ nlmixrUI.poped.ff_fun <- function(obj){
     return(nlmixrUI.poped.d(obj));
   } else if (arg == "poped.sigma"){
     return(nlmixrUI.poped.sigma(obj));
+  } else if (arg=="logThetasList"){
+    return(nlmixUI.logThetasList(obj));
   } else if (arg == ".clean.dll"){
     if (exists(".clean.dll", envir=x$meta)){
       clean <- x$meta$.clean.dll;
@@ -2764,6 +2776,9 @@ str.nlmixrUI <- function(object, ...){
   cat(" $ saem.res.name : The SAEM omega names\n")
   cat(" $ saem.distribution: SAEM distribution\n");
   cat(" $ .clean.dll : boolean representing if dlls are cleaned after running.\n")
+  cat(" $ logThetasList: List of logThetas:\n")
+  cat("     first element are scaling log thetas;\n");
+  cat("     second element are back-transformed thetas;\n")
 }
 
 
