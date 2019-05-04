@@ -703,9 +703,16 @@ nlmixrfindLhs <- function(x) {
   if (is.atomic(x) || is.name(x)) {
     character()
   } else if (is.call(x)) {
-    if (identical(x[[1]], quote(`~`)) &&
-        is.name(x[[2]])) {
-      lhs <- as.character(x[[2]])
+    if (identical(x[[1]], quote(`~`))) {
+      if (is.name(x[[2]])){
+        lhs <- as.character(x[[2]])
+      } else {
+        if (is.call(x[[2]]) && identical(x[[2]][[1]], quote(`linCmt`))){
+          lhs <- "linCmt()"
+        } else {
+          lhs <- character()
+        }
+      }
     } else {
       lhs <- character()
     }
