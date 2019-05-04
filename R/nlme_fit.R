@@ -810,6 +810,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
         }
     }
     .notCalced <- TRUE;
+    .cwresTime  <- proc.time();
     while (.notCalced){
         env <- new.env(parent=emptyenv());
         env$covMethod <- "nlme";
@@ -879,6 +880,12 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
             .notCalced <- FALSE;
         }
     }
+    .cwresTime  <-  proc.time() - .cwresTime;
+    if (is.na(calcResid)){
+        .cwresTime  <- 0;
+    } else if (!calcResid){
+        .cwresTime  <- 0;
+    }
     if (is(object$apVar,"character")){
         env$message <- object$apVar;
     } else {
@@ -900,7 +907,14 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
         row.names(env$objDf) <- c("FOCEi", "nlme");
     }
     .env <- fit.f$env;
-    .env$time <- data.frame(nlme=.nlmeTime["elapsed"], .env$time, check.names=FALSE, row.names=c(""))
+    .time  <- .env$time;
+    .time <- .time[,!(names(.time) %in% c("optimize", "covariance"))]
+    .nlmeTime <- .nlmeTime["elapsed"]
+    if (calcResid){
+      .nlmeTime  <- .nlmeTime - .cwresTime["elapsed"];
+      .time  <- data.frame(.time, cwres=.cwresTime["elapsed"], check.names=FALSE);
+    }
+    .env$time <- data.frame(nlme=.nlmeTime, .time, check.names=FALSE, row.names=c(""))
     if (inherits(fit.f, "nlmixrFitData")){
         .cls <- class(fit.f);
         .env <- attr(.cls, ".foceiEnv");
