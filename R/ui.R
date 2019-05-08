@@ -535,6 +535,31 @@ nlmixrUI <- function(fun){
   ## }
   return(.finalizeUiModel(fun2,meta))
 }
+nlmixrUI.multipleEndpoint <- function(x){
+    if (length(x$nmodel$predDf$cond) > 1){
+        .info <- x$nmodel$predDf;
+        if (getOption("RxODE.combine.dvid", TRUE)){
+            .info  <- .info[order(.info$dvid),];
+        }
+        .info  <- with(.info, data.frame(variable=paste(var,"~",ifelse(use.utf(),"\u2026", "...")),
+                                         cmt=paste0("cmt='",cond, "' or cmt=", cmt),
+                                         "dvid*"=ifelse(is.na(dvid),"",
+                                                        paste0("dvid='",cond ,"' or dvid=",dvid)),
+                                         check.names=FALSE))
+        if (!getOption("RxODE.combine.dvid", TRUE)){
+            .info  <- .info[,names(info) != "dvid"];
+        }
+        .hux <- huxtable::hux(.info) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE) %>%
+            huxtable::add_footnote("* If dvids are outside this range, all dvids are re-numered sequentially, ie 1,7, 10 becomes 1,2,3 etc")
+        return(.hux);
+    } else {
+        return(NULL)
+    }
+}
 ##' Print UI function
 ##'
 ##' @param x  UI function
@@ -546,25 +571,8 @@ print.nlmixrUI <- function(x, ...){
   message(cli::rule(crayon::bold("Initialization:")))
   print(x$ini)
   if (length(x$predDf$cond) > 1){
-    message(cli::rule(crayon::bold("Multiple Endpoint Model:")))
-    .info <- x$predDf
-    if (getOption("RxODE.combine.dvid", TRUE)){
-      .info  <- .info[order(.info$dvid),];
-    }
-    .info  <- with(.info, data.frame(variable=paste(var,"~",ifelse(use.utf(),"\u2026", "...")),
-                                     cmt=paste0("cmt='",cond, "' or cmt=", cmt),
-                                     "dvid*"=ifelse(is.na(dvid),"",
-                                                    paste0("dvid='",cond ,"' or dvid=",dvid)),
-                                     check.names=FALSE))
-    if (!getOption("RxODE.combine.dvid", TRUE)){
-      .info  <- .info[,names(info) != "dvid"];
-    }
-    huxtable::hux(.info) %>%
-      huxtable::add_colnames() %>%
-        huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
-        huxtable::set_position("center") %>%
-        huxtable::set_all_borders(TRUE) %>%
-        huxtable::add_footnote("* If dvids are outside this range, all dvids are re-numered sequentially, ie 1,7, 10 becomes 1,2,3 etc") %>%
+      message(cli::rule(paste0(crayon::bold("Multiple Endpoint Model")," (", crayon::bold$blue("$multipleEndpoint"), "):")))
+    x$multipleEndpoint %>%
         huxtable::print_screen(colnames=FALSE)
     message("")
   }
@@ -2732,6 +2740,8 @@ nlmixrUI.poped.ff_fun <- function(obj){
     return(nlmixrBoundsOmega(x$ini,x$nmodel$mu.ref))
   } else if (arg == "bpop"){
     arg <- "theta";
+  } else if (arg == "multipleEndpoint"){
+      return(nlmixrUI.multipleEndpoint(x));
   }
   m <- x$ini;
   ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -2786,6 +2796,7 @@ str.nlmixrUI <- function(object, ...){
   cat(" $ logThetasList: List of logThetas:\n")
   cat("     first element are scaling log thetas;\n");
   cat("     second element are back-transformed thetas;\n")
+  cat(" $ multipleEndpoint: huxtable of multiple endpoint translations in nlmixr\n");
 }
 
 

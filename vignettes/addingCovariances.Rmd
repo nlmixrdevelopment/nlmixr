@@ -1,9 +1,9 @@
 ---
-title: "Example Model: Phenobarbatol with covariances"
+title: "Example Model: Phenobarbatol with correlations"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Example Model: Phenobarbatol with covariances}
+  %\VignetteIndexEntry{Example Model: Phenobarbatol with correlations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
