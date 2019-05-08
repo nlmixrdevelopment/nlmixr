@@ -2398,6 +2398,12 @@ plot.nlmixrFitData <- function(x, ...) {
             .lst[[length(.lst)+1]] <- .p3
         }
     }
+    if (dev.cur() != 1){
+        .x  <- .lst
+        for (.i in seq_along(.x)){
+            plot(.x[[.i]])
+        }
+    }
     class(.lst)  <- "nlmixrPlotList"
     return(.lst)
 }
