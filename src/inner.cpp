@@ -3813,66 +3813,68 @@ NumericMatrix foceiCalcCov(Environment e){
 }
 
 void parHistData(Environment e){
-  CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
-  CharacterVector dfNames(3+op_focei.thetan + op_focei.omegan);
-  dfNames[0] = "iter";
-  dfNames[1] = "type";
-  dfNames[2] = "objf";
-  int i, j, k=1;
-  for (i = 0; i < op_focei.npars; i++){
-    j=op_focei.fixedTrans[i];
-    if (j < thetaNames.size()){
-      dfNames[i+3] = thetaNames[j];
+  if (!e.exists("method")){
+    CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
+    CharacterVector dfNames(3+op_focei.thetan + op_focei.omegan);
+    dfNames[0] = "iter";
+    dfNames[1] = "type";
+    dfNames[2] = "objf";
+    int i, j, k=1;
+    for (i = 0; i < op_focei.npars; i++){
+      j=op_focei.fixedTrans[i];
+      if (j < thetaNames.size()){
+	dfNames[i+3] = thetaNames[j];
+      } else {
+	dfNames[i+3] = "o" + std::to_string(k++);
+      } 
+    }
+    // iter type parameters
+    List ret(3+op_focei.thetan + op_focei.omegan);
+    int sz = niter.size()+niterGrad.size();
+    IntegerVector tmp;
+    std::vector<int> iter;
+    iter.reserve(sz);
+    iter.insert(iter.end(), niter.begin(), niter.end());
+    iter.insert(iter.end(), niterGrad.begin(), niterGrad.end());
+    ret[0] = iter;
+    tmp = IntegerVector(sz);
+    std::vector<int> typ;
+    typ.reserve(sz);
+    typ.insert(typ.end(), iterType.begin(), iterType.end());
+    typ.insert(typ.end(), gradType.begin(), gradType.end());
+    tmp = typ;
+    tmp.attr("levels") = CharacterVector::create("Gill83 Gradient", "Mixed Gradient",
+						 "Forward Difference", "Central Difference",
+						 "Scaled", "Unscaled", "Back-Transformed");
+    tmp.attr("class") = "factor";
+    ret[1] = tmp;
+    arma::mat cPar(vPar.size()/iterType.size(), iterType.size());
+    std::copy(vPar.begin(), vPar.end(), cPar.begin());
+    arma::mat vals;
+    if (vGrad.size() > 0){
+      arma::mat cGrad(vGrad.size()/gradType.size(), gradType.size());
+      std::copy(vGrad.begin(), vGrad.end(), cGrad.begin());
+      cPar = cPar.t();
+      cGrad = cGrad.t();
+      vals = arma::join_cols(cPar, cGrad);
     } else {
-      dfNames[i+3] = "o" + std::to_string(k++);
-    } 
+      cPar = cPar.t();
+      vals = cPar;
+    }
+    for (i = 0; i < op_focei.thetan + op_focei.omegan+1; i++){
+      ret[i+2]= vals.col(i);
+    }    
+    vGrad.clear();
+    vPar.clear();
+    iterType.clear();
+    gradType.clear();
+    niter.clear();
+    niterGrad.clear();
+    ret.attr("names")=dfNames;
+    ret.attr("class") = "data.frame";
+    ret.attr("row.names")=IntegerVector::create(NA_INTEGER, -sz);
+    e["parHistData"] = ret;
   }
-  // iter type parameters
-  List ret(3+op_focei.thetan + op_focei.omegan);
-  int sz = niter.size()+niterGrad.size();
-  IntegerVector tmp;
-  std::vector<int> iter;
-  iter.reserve(sz);
-  iter.insert(iter.end(), niter.begin(), niter.end());
-  iter.insert(iter.end(), niterGrad.begin(), niterGrad.end());
-  ret[0] = iter;
-  tmp = IntegerVector(sz);
-  std::vector<int> typ;
-  typ.reserve(sz);
-  typ.insert(typ.end(), iterType.begin(), iterType.end());
-  typ.insert(typ.end(), gradType.begin(), gradType.end());
-  tmp = typ;
-  tmp.attr("levels") = CharacterVector::create("Gill83 Gradient", "Mixed Gradient",
-						"Forward Difference", "Central Difference",
-						"Scaled", "Unscaled", "Back-Transformed");
-  tmp.attr("class") = "factor";
-  ret[1] = tmp;
-  arma::mat cPar(vPar.size()/iterType.size(), iterType.size());
-  std::copy(vPar.begin(), vPar.end(), cPar.begin());
-  arma::mat vals;
-  if (vGrad.size() > 0){
-    arma::mat cGrad(vGrad.size()/gradType.size(), gradType.size());
-    std::copy(vGrad.begin(), vGrad.end(), cGrad.begin());
-    cPar = cPar.t();
-    cGrad = cGrad.t();
-    vals = arma::join_cols(cPar, cGrad);
-  } else {
-    cPar = cPar.t();
-    vals = cPar;
-  }
-  for (i = 0; i < op_focei.thetan + op_focei.omegan+1; i++){
-    ret[i+2]= vals.col(i);
-  }    
-  vGrad.clear();
-  vPar.clear();
-  iterType.clear();
-  gradType.clear();
-  niter.clear();
-  niterGrad.clear();
-  ret.attr("names")=dfNames;
-  ret.attr("class") = "data.frame";
-  ret.attr("row.names")=IntegerVector::create(NA_INTEGER, -sz);
-  e["parHistData"] = ret;
 }
 
 void foceiFinalizeTables(Environment e){

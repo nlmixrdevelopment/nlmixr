@@ -1,7 +1,9 @@
-orig.onAttach <- function(libname, pkgname){ ## nocov start
+orig.onAttach <- function(libname, pkgname){
+    ## nocov start
     ## Setup RxODE.prefer.tbl
     nlmixrSetupMemoize()
     options(keep.source=TRUE)
+    ## nocov end
 }
 
 ##' Convert data to RxODE format (depreciated)
