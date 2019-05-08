@@ -1945,7 +1945,7 @@ foceiFit.data.frame0 <- function(data,
     }
     if (exists("parHistData",.ret)){
         .tmp <- .ret$parHistData;
-        .tmp <- .tmp[.tmp$type == "Scaled", names(.tmp) != "type"];
+        .tmp <- .tmp[.tmp$type == "Unscaled", names(.tmp) != "type"];
         .iter <- .tmp$iter
         .tmp <- .tmp[,names(.tmp) != "iter"];
         .ret$parHistStacked <- data.frame(stack(.tmp),iter=.iter)

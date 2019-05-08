@@ -3812,14 +3812,14 @@ NumericMatrix foceiCalcCov(Environment e){
   return ret;
 }
 
-List parHistData(Environment e){
+void parHistData(Environment e){
   CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
   CharacterVector dfNames(3+op_focei.thetan + op_focei.omegan);
   dfNames[0] = "iter";
   dfNames[1] = "type";
   dfNames[2] = "objf";
   int i, j, k=1;
-  for (i = 0; i < op_focei.thetan + op_focei.omegan; i++){
+  for (i = 0; i < op_focei.npars; i++){
     j=op_focei.fixedTrans[i];
     if (j < thetaNames.size()){
       dfNames[i+3] = thetaNames[j];
@@ -3872,7 +3872,7 @@ List parHistData(Environment e){
   ret.attr("names")=dfNames;
   ret.attr("class") = "data.frame";
   ret.attr("row.names")=IntegerVector::create(NA_INTEGER, -sz);
-  return ret;
+  e["parHistData"] = ret;
 }
 
 void foceiFinalizeTables(Environment e){
@@ -4213,7 +4213,6 @@ void foceiFinalizeTables(Environment e){
   objDf.attr("class") = "data.frame";
   e["objDf"]=objDf;
   if (!e.exists("method")){
-    e["parHistData"] = parHistData(e);
     if (op_focei.fo){
       e["method"] = "FO";
     } else {
@@ -4417,6 +4416,7 @@ Environment foceiFitCpp_(Environment e){
     scaleSave[i] = getScaleC(i);
   }
   e["scaleC"] = scaleSave;
+  parHistData(e); // Need to calculate before the parameter translations are mangled
   IntegerVector gillRet(op_focei.ntheta+op_focei.omegan);
   NumericVector gillAEps(op_focei.ntheta+op_focei.omegan,NA_REAL);
   NumericVector gillREps(op_focei.ntheta+op_focei.omegan,NA_REAL);
