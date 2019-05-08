@@ -547,14 +547,17 @@ nlmixrUI.multipleEndpoint <- function(x){
                                                         paste0("dvid='",cond ,"' or dvid=",dvid)),
                                          check.names=FALSE))
         if (!getOption("RxODE.combine.dvid", TRUE)){
-            .info  <- .info[,names(info) != "dvid"];
+            .info  <- .info[,names(.info) != "dvid*"];
         }
         .hux <- huxtable::hux(.info) %>%
             huxtable::add_colnames() %>%
             huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
             huxtable::set_position("center") %>%
-            huxtable::set_all_borders(TRUE) %>%
+            huxtable::set_all_borders(TRUE);
+        if (getOption("RxODE.combine.dvid", TRUE)){
+            .hux <- .hux %>%
             huxtable::add_footnote("* If dvids are outside this range, all dvids are re-numered sequentially, ie 1,7, 10 becomes 1,2,3 etc")
+        }
         return(.hux);
     } else {
         return(NULL)
