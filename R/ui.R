@@ -1570,7 +1570,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   do.pred <- 3;
   grp.fn <- new.fn(.deparse(f(body(fun))));
   do.pred <- 4;
-  .deparse(f(body(fun)))
   saem.pars <- try(.deparse(f(body(fun))), silent=TRUE);
   nlme.mu.fun2 <- NULL
   if (inherits(saem.pars, "try-error")){
