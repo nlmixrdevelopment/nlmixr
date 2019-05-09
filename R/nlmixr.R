@@ -949,7 +949,7 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     }
     class(.new) <- class(.newFit)
     if (!is.null(.saem)){
-        setOfv(.new, "FOCEi")
+        setOfv(.new, "FOCEi");
     }
     if (updateObject){
         .parent <- envir;

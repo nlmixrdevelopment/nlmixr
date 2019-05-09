@@ -9,7 +9,13 @@
 nlmixrValidate <- function(full=FALSE){
     ## rxVersion(" Validation", TRUE);
     if (full=="site"){
-        devtools::build_vignettes(quiet=FALSE,install=FALSE)
+        message("Needs to be run on installed nlmixr");
+        if (!file.exists("DESCRIPTION")) stop("need to be in package root!")
+        sapply(list.files(system.file(package="nlmixr"), pattern="\\.rds$", full.names=TRUE),
+               function(x){unlink(x)})
+        devtools::build_vignettes(quiet=FALSE,install=FALSE);
+        sapply(list.files(system.file(package="nlmixr"), pattern="\\.rds$", full.names=TRUE),
+               function(x){message("\t", x);copy(x,file.path("inst", basename(x)))})
         pkgdown::build_site();
     } else{
         old.wd <- getwd();

@@ -119,26 +119,40 @@ dataset:
 tidy(fit.s)
 ```
 
-nlmixr converts the log-transformed estimates to the normal scale for
-these tidy summaries, just like what was done for the `fit$parFixedDf`
-data frame.  Unlike that data-frame, the standard errors are also
-transformed by an approximation to the normal scale. 
+Note by default these are the parameters that are *actually* estimated
+in nlmixr, not the back-transformed values in the table from the
+printout.  Of course, with mu-referenced models, you may want to
+exponentiate some of the terms. The broom package allows you to apply
+exponentiation on *all* the parameters, that is:
 
-By default, this only applies to parameters that nlmixr has determined
-are on a log-scale (those that are not are not included in the
-transformation).  This behavior can be turned on or off with the
-`exponentiate` argument.
+```{r}
+tidy(fit.s, exponentiate=TRUE) ## Transformation applied on every
+                               ## parameter
+```
+
+**Note:**, in accordance with the rest of the broom package, when the
+parameters with the exponentiated, the standard errors are transformed
+to an approximate standard error by the formula: $se(exp(x)) \approx
+exp(mu_x)\times se_x$.  This can be confusing because the confidence
+intervals (described later) are using the actual standard error and
+back-transforming to the exponiated scale.  This is the reason why the
+default for nlmixr's `broom` interface is `exponentiat=FALSE`, that
+is:
 
 ```{r}
 tidy(fit.s, exponentiate=FALSE) ## No transformation applied
 ```
 
-```{r}
-tidy(fit.s, exponentiate=TRUE) ## No transformation applied on every parameter
-```
+If you want, you can also use the parsed back-transformation that is
+used in nlmixr tables (ie `fit$parFixedDf`).  **Please note that this
+uses the approximate back-transformation for standard errors on the
+log-scaled back-transformed values**.
 
-Note that the default is `exponentiate=NA` which is adaptive
-exponentiation.
+This is done by:
+```{r}
+tidy(fit.s, exponentiate=NA) ## Transformation applied to log-scaled
+                             ## population parameters
+```
 
 Also note, at the time of this writing the default separator between
 variables is `.`, which doesn't work well with this model giving
@@ -174,10 +188,18 @@ is to use:
 ```{r}
 tidy(fit.s, conf.level=0.9)
 ```
-The confidence interval is on the scale specified by `exponentiate`, by default the adaptive scale. 
+The confidence interval is on the scale specified by `exponentiate`, by default the estimated scale.
+
+If you want to have the confidence on the adaptive back-transformed scale, you would simply use the following:
+
+```{r}
+tidy(fit.s, conf.level=0.9, exponentiate=NA)
+```
+
 
 # Extracting other model information with `tidy`
 The type of information that is extracted can be controlled by the `effects` argument.
+
 ## Extracting only fixed effect parameters
 
 The fixed effect parameters can be extracted by `effects="fixed"`
@@ -199,7 +221,7 @@ The random values, or in NONMEM the ETAs, can be extracted by
 `effects="ran_vals"` or `effects="random"`
 
 ```{r}
-tidy(fit.s, effects="ran_vals")
+head(tidy(fit.s, effects="ran_vals"))
 ```
 
 This duplicate method of running `effects` is because the `broom`
@@ -214,12 +236,13 @@ random effect parameter, possibly transformed to the correct scale.
 In this case we can extract this information from a nlmixr fit object by:
 
 ```{r}
-tidy(fit.s, effects="ran_coef")
+head(tidy(fit.s, effects="ran_coef"))
 ```
-This can also be changed by the `exponentiate` argument
+This can also be changed by the `exponentiate` argument:
 
 ```{r}
-tidy(fit.s, effects="ran_coef", exponentiate=FALSE)
+head(tidy(fit.s, effects="ran_coef", exponentiate=NA))
+head(tidy(fit.s, effects="ran_coef", exponentiate=TRUE))
 ```
 
 # Example of using a tidy model estimates for other packages
@@ -233,11 +256,12 @@ the `dotwhisker` package to plot the model parameter confidence
 intervals.
 
 ```{r}
+options(broom.mixed.sep2=": ", broom.mixed.sep2=", ")
 library(ggplot2)
 library(dotwhisker)
 library(dplyr)
 fit.s %>%
-    tidy() %>%
+    tidy(exponentiate=NA) %>%
     filter(effect=="fixed") %>%
     dwplot()
 ```
@@ -245,7 +269,7 @@ fit.s %>%
 You may also compare models easily by using the `dotwhisker` package
 
 ```{r}
-dwplot(list("SAEM"=fit.s, "FOCEi"=fit.f))
+dwplot(list("SAEM"=fit.s, "FOCEi"=fit.f), exponentiate=NA)
 ```
 
 ## Huxtable
