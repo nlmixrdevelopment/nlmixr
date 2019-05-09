@@ -1,7 +1,5 @@
-## ---- echo=FALSE---------------------------------------------------------
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-
 ## ------------------------------------------------------------------------
+
 ## Load libraries
 library(ggplot2)
 library(nlmixr)
@@ -20,13 +18,13 @@ ggplot(theo_sd, aes(TIME, DV)) + geom_line(aes(group=ID), col="red") + scale_x_c
 ## ------------------------------------------------------------------------
 one.cmt <- function() {
     ini({
-        tka <- .5   # log Ka
-        tcl <- -3.2 # log Cl
-        tv <- -1    # log V
-        eta.ka ~ 1
-        eta.cl ~ 2
-        eta.v ~ 1
-        add.err <- 0.1
+        tka <- 0.45 # Log Ka
+        tcl <- 1 # Log Cl
+        tv <- 3.45    # Log V
+        eta.ka ~ 0.6
+        eta.cl ~ 0.3
+        eta.v ~ 0.1
+        add.err <- 0.7
     })
     model({
         ka <- exp(tka + eta.ka)
@@ -62,6 +60,7 @@ one.compartment <- function() {
     })
 }
 
+
 ## ------------------------------------------------------------------------
 fit <- nlmixr(one.compartment, theo_sd, est="saem")
 
@@ -72,7 +71,7 @@ fitF <- nlmixr(one.compartment, theo_sd, est="focei")
 plot(fit)
 
 ## ------------------------------------------------------------------------
-fit
+print(fit)
 
 ## ------------------------------------------------------------------------
 fit$eta
@@ -120,46 +119,20 @@ ggplot(etas, aes(eta)) +
 library(xpose)
 
 ## ------------------------------------------------------------------------
-fit <- nlmixr(one.compartment) %>% saem.fit(data=theo_sd)
-
-## ------------------------------------------------------------------------
-fit2 <- nlmixr(one.compartment, data=theo_sd, est="saem")
-
-## ------------------------------------------------------------------------
-fit3 <- one.compartment %>% saem.fit(data=theo_sd)
-
-## ------------------------------------------------------------------------
-fit4 <- nlmixr(one.compartment, theo_sd,est="nlme",control = nlmeControl(pnlsTol = .5))
-
-## ------------------------------------------------------------------------
-fit5 <- nlmixr(one.compartment,theo_sd,est="saem",control=saemControl(n.burn=250,n.em=350,print=50))
-
-## ------------------------------------------------------------------------
-f <- function(){
-    ini({
-        lCl <- 1.6      #log Cl (L/hr)
-        lVc <- log(90)  #log Vc (L)
-        lKA <- 0.1      #log Ka (1/hr)
-        prop.err <- c(0, 0.2, 1)
-        eta.Cl ~ 0.1   # BSV Cl
-        eta.Vc ~ 0.1   # BSV Vc
-        eta.KA ~ 0.1   # BSV Ka
-    })
-    model({
-        Cl <- exp(lCl + eta.Cl)
-        Vc = exp(lVc + eta.Vc)
-        KA <- exp(lKA + eta.KA)
-        ## Instead of specifying the ODEs, you can use
-        ## the linCmt() function to use the solved system.
-        ##
-        ## This function determines the type of PK solved system
-        ## to use by the parameters that are defined.  In this case
-        ## it knows that this is a one-compartment model with first-order
-        ## absorption.
-        linCmt() ~ prop(prop.err)
-    })
+xpdbLoc <- file.path(system.file(package="nlmixr"), "xpdb.rds");
+if (file.exists(xpdbLoc)){
+    load(xpdbLoc);
+} else {
+    devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
+    library(xpose.nlmixr)
+    xp <- xpose_data_nlmixr(fit);
+    save(xp, file=xpdbLoc)
 }
 
+
 ## ------------------------------------------------------------------------
-nlmixr(f)
+dv_vs_pred(xp)
+
+## ------------------------------------------------------------------------
+dv_vs_ipred(xp)
 

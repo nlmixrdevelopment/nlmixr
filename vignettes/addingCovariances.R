@@ -45,5 +45,22 @@ pheno <- function() {
 ## ------------------------------------------------------------------------
 fit <- nlmixr(pheno, pheno_sd, "saem")
 
-fit
+print(fit)
+
+## ------------------------------------------------------------------------
+plot(fit)
+
+## ------------------------------------------------------------------------
+plot(augPred(fit))
+
+## ------------------------------------------------------------------------
+library(ggplot2)
+## A traditional VPC
+p1 <- vpc(fit, show=list(obs_dv=TRUE)) + ylab("Concentrations")
+
+## A prediction-corrected VPC
+p2 <- vpc(fit, pred_corr = TRUE, show=list(obs_dv=TRUE)) + ylab("Prediction-Corrected Concentrations")
+
+library(gridExtra)
+grid.arrange(p1,p2)
 

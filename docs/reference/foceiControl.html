@@ -65,7 +65,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.8</span>
       </span>
     </div>
 
@@ -84,6 +84,9 @@
     <li class="dropdown-header">Getting started</li>
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
+    </li>
+    <li>
+      <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider"></li>
     <li class="dropdown-header">Going further</li>
@@ -105,7 +108,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/addingCovariances.html">Phenobarbatol with covariances</a>
+      <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
   </ul>
 </li>
@@ -199,7 +202,8 @@
   <span class='kw'>maxOdeRecalc</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>odeRecalcFactor</span> <span class='kw'>=</span> <span class='fl'>10</span>^(<span class='fl'>0.5</span>),
   <span class='kw'>gradCalcCentralSmall</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>, <span class='kw'>gradCalcCentralLarge</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
   <span class='kw'>etaNudge</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='no'>stiff</span>, <span class='kw'>nRetries</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>,
-  <span class='kw'>badEtaPenalty</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>resetThetaCheckPer</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>etaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='kw'>badEtaPenalty</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>resetThetaCheckPer</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>etaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>repeatGillMax</span> <span class='kw'>=</span> <span class='fl'>7</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -908,6 +912,13 @@ generator should be initialized</p></td>
       <th>resetThetaCheckPer</th>
       <td><p>represents objective function
 % percentage below which resetThetaP is checked.</p></td>
+    </tr>
+    <tr>
+      <th>repeatGillMax</th>
+      <td><p>If the tolerances were reduced when
+calculating the initial Gill differences, the Gill difference
+is repeated up to a maximum number of times defined by this
+parameter.</p></td>
     </tr>
     </table>
     

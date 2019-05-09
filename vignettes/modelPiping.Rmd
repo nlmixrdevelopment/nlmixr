@@ -58,7 +58,7 @@ We can try the First-Order Conditional Estimation with Interaction
 ```{r}
 fit <- nlmixr(one.compartment, theo_sd, est="focei")
 
-fit
+print(fit)
 ```
 
 # Changing and fixing parameter values in models
@@ -86,7 +86,7 @@ one.ka.0.5 <- fit %>%
     update(tka=0.5) %>% 
     nlmixr(est="posthoc")
 
-one.ka.0.5
+print(one.ka.0.5)
 ```
 
 ```{r}
@@ -95,7 +95,7 @@ one.ka.0.5 <- fit %>%
     update(tka=fix(0.5)) %>%
     nlmixr(est="focei")
 
-one.ka.0.5
+print(one.ka.0.5)
 ```
 
 ```{r}
@@ -104,7 +104,7 @@ one.ka.0.5 <- fit %>%
     update(tka=fix) %>%
     nlmixr(est="focei")
 
-one.ka.0.5
+print(one.ka.0.5)
 ```
 
 ```{r}
@@ -113,7 +113,7 @@ one.ka.0.7 <- one.compartment %>%
     update(tka=0.7) %>% 
     nlmixr(data=theo_sd,est="focei")
 
-one.ka.0.7
+print(one.ka.0.7)
 ```
 
 # Changing model features
@@ -139,7 +139,7 @@ noEta <- fit %>%
     update(ka <- exp(tka)) %>%
     nlmixr(est="focei")
 
-noEta
+print(noEta)
 ```
 
 Of course you could also add an eta on a parameter in the same way;
@@ -150,7 +150,7 @@ addBackKa <- noEta %>%
     ini(bsv.ka=0.1) %>%
     nlmixr(est="focei")
 
-addBackKa
+print(addBackKa)
 ```
 
 You can see the name change by examining the `omega` matrix:
@@ -183,7 +183,7 @@ wt70 <- fit %>% ## FIXME could be based on if it finds the covarite in the last 
     update(covWtPow=fix(0.75)) %>%
     nlmixr(est="focei")
 
-wt70
+print(wt70)
 ```
 
 ## Changing residual errors
@@ -200,5 +200,5 @@ addPropModel <- fit %>%
     update(prop.err=0.1) %>%
     nlmixr(d,est="focei")
 
-addPropModel
+print(addPropModel)
 ```

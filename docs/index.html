@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.8</span>
       </span>
     </div>
 
@@ -57,6 +57,9 @@
     <li class="dropdown-header">Getting started</li>
     <li>
       <a href="articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
+    </li>
+    <li>
+      <a href="articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
     <li class="dropdown-header">Going further</li>
@@ -78,7 +81,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/addingCovariances.html">Phenobarbatol with covariances</a>
+      <a href="articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
   </ul>
 </li>
@@ -122,11 +125,11 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<p><img src="https://github.com/nlmixrdevelopment/nlmixr/blob/master/logo.png" alt="alt tag"></p>
 <div id="nlmixr-an-r-package-for-population-pkpd-modeling" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#nlmixr-an-r-package-for-population-pkpd-modeling" class="anchor"></a>nlmixr: an R package for population PKPD modeling</h1></div>
 <hr>
+<p><img src="logo.png" alt="nlmixr"></p>
 <div id="authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-mirjam-trame-teun-post-richard-hooijmaijers-wenping-wang" class="section level5">
 <h5 class="hasAnchor">
 <a href="#authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-mirjam-trame-teun-post-richard-hooijmaijers-wenping-wang" class="anchor"></a>Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Richard Hooijmaijers, Wenping Wang</h5>
@@ -303,18 +306,24 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 </li>
 <li>Install <code>sympy</code> using <code>pip</code>: <code>sudo -H pip install sympy</code>.</li>
 </ul>
-<p>w. Install build tools.</p>
+<ol>
+<li>Install build tools.</li>
+</ol>
 <ul>
-<li>Install Mac Rtools for clang and gfortran from <a href="http://cran.r-project.org/bin/macosx/tools/">CRAN Rtools</a>
+<li>Install the clang and gfortran packages from <a href="http://cran.r-project.org/bin/macosx/tools/">CRAN development tools website</a>
 </li>
-<li>Install Mac OSX command like tools by typing <code>xcode-select --install</code> and then choose <code>install</code>. This allows you to compile the package without downloading the entire (large) Xcode package.</li>
-<li>If you are using Mojave you have to also type the following in the terminal to install the compiler hearders:</li>
+<li>Install Mac OSX command like tools by typing <code>xcode-select --install</code> and then choose <code>install</code>. This allows you to compile the package without downloading the entire (large) Xcode package. Make sure to perform this step even if the Xcode package is already installed.</li>
+<li>If you are using macOS &gt;= 10.14 you have to also type the following in the terminal to install the compiler headers:</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="fu">sudo</span> installer -pkg \
 /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg \
 -target /</code></pre></div>
 <ul>
-<li>Change <code>~/.Rprofile</code> to have the following line to adjust the paths in R to use the CRAN compilers: ```R Sys.setenv(“PATH”=paste0(“/usr/local/clang6/bin:/usr/local/gfortran/bin:”, Sys.getenv(“PATH”)))</li>
+<li>
+<p>Change <code>~/.Rprofile</code> to have the following line to adjust the paths in R to use the CRAN compilers (if not present, create the .Rprofile file): ```R</p>
+<h1 id="make-sure-to-adjust-the-version-number-of-clang-based-on-the-downloaded-version-in-step-3-e.g.clang8bin">make sure to adjust the version number of clang based on the downloaded version in step 3 (e.g. clang8/bin)</h1>
+<p>Sys.setenv(“PATH”=paste0(“/usr/local/clang6/bin:/usr/local/gfortran/bin:”, Sys.getenv(“PATH”)))</p>
+</li>
 </ul>
 <p>``<code>4. Install</code>devtools<code>and dependencies.    - This package is required to install packages from Github, amongst other things.    - Install</code>devtools<code>from a clean R session by entering</code>install.packages(“devtools”)<code>. 5. In R, load</code>devtools<code>using</code>library(devtools)<code>. 6. Install</code>RxODE<code>.    - Currently the new version of</code>RxODE<code>is in the process of being      uploaded to CRAN.</code>nlmixr<code>needs this newer version of</code>RxODE<code>to      function correctly. To install this version, use the command:</code>install_github(“nlmixrdevelopment/RxODE”)<code>.    - Install</code>SnakeCharmR<code>using</code>install_github(“nlmixrdevelopment/SnakeCharmR”)<code>or install</code>reticulate<code>using</code>install.packages(“reticulate”)<code>.    - Restart your R session.    - As a quick test, you can make sure that R and Python can      communicate by typing the command</code>library(SnakeCharmR)<code>.    - To validate or test the installation of</code>RxODE<code>completely, you      can type the following</code>library(RxODE); rxTest();<code>and it will      run all of the unit tests in RxODE to make sure it is running      correctly on your system. (Note that the</code>testthat<code>package is required for this, and it will take a long time.) 7. Install</code>nlmixr<code>.    - This can be done by</code>install_github(“nlmixrdevelopment/nlmixr”)`</p>
 </div>

@@ -52,7 +52,6 @@ reference:
   - '`cholSE`'
   - '`configsaem`'
   - '`coxBox`'
-  - '`.collectWarnings`'
   - '`focei.eta`'
   - '`focei.theta`'
   - '`frwd_selection`'
@@ -131,6 +130,8 @@ navbar:
         - text: "Getting started"
         - text: "Introduction to Running Nlmixr"
           href: articles/running_nlmixr.html
+        - text: "Using Multiple Endpoints in Nlmixr"
+          href: articles/multiple-endpoints.html
         - text: "--------------------------"
         - text: "Going further"
         - text: "Model Piping"
@@ -140,7 +141,7 @@ navbar:
   - text: Example models
     icon: fas fa-chalkboard-teacher
     menu:
-        - text: "Phenobarbatol with covariances"
+        - text: "Phenobarbatol with correlations"
           href: articles/addingCovariances.html
   - text: "Cheat Sheet"
     icon: fas fa-scroll

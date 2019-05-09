@@ -6,4 +6,6 @@ articles:
   broom: broom.html
   installing_nlmixr: installing_nlmixr.html
   modelPiping: modelPiping.html
+  multiple-endpoints: multiple-endpoints.html
+  running_nlmixr: running_nlmixr.html
 

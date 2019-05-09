@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 )
 ```
 ![nlmixr](logo.png)
+
 # Multiple endpoints 
 
 Joint PK/PD models, or PK/PD models where you fix certain components
@@ -231,7 +232,7 @@ If you do not wish to use `dvid` items to define multiple endpoints in
 nlmixr, you can set the following option:
 
 ```{r}
-option(RxODE.combine.dvid=FALSE)
+options(RxODE.combine.dvid=FALSE)
 ui2$multipleEndpoint
 ```
 
@@ -239,7 +240,7 @@ Then only `cmt` items are used for the multiple endpoint models.  Of
 course you can turn it on or off for different models if you wish:
 
 ```{r}
-option(RxODE.combine.dvid=TRUE)
+options(RxODE.combine.dvid=TRUE)
 ui2$multipleEndpoint
 ```
 
@@ -331,7 +332,18 @@ print(fit.TOS);
 
 plot(fit.TOS);
 
-vpc(fit.TOS);
+library(ggplot2);
+library(gridExtra);
+
+v1 <- vpc(fit.TOS, show=list(obs_dv=T), scales="free_y") +
+    ylab("Warfarin Cp [mg/L] or PCA") +
+    xlab("Time [h]");
+
+v2 <- vpc(fit.TOS, show=list(obs_dv=T), pred_corr = TRUE) +
+    ylab("Prediction Corrected Warfarin Cp [mg/L] or PCA") +
+    xlab("Time [h]");
+
+grid.arrange(v1,v2);
 ```
 
 

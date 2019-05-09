@@ -70,7 +70,7 @@ pheno <- function() {
 ```{r}
 fit <- nlmixr(pheno, pheno_sd, "saem")
 
-fit
+print(fit)
 ```
 ## Basic Goodness of Fit Plots
 
@@ -88,10 +88,13 @@ plot(augPred(fit))
 ## Two types of VPCs
 
 ```{r}
-## library(ggplot2)
+library(ggplot2)
 ## A traditional VPC
-vpc(fit, show=list(obs_dv=TRUE))
+p1 <- vpc(fit, show=list(obs_dv=TRUE)) + ylab("Concentrations")
 
 ## A prediction-corrected VPC
-vpc(fit, pred_corr = TRUE, show=list(obs_dv=TRUE))
+p2 <- vpc(fit, pred_corr = TRUE, show=list(obs_dv=TRUE)) + ylab("Prediction-Corrected Concentrations")
+
+library(gridExtra)
+grid.arrange(p1,p2)
 ```

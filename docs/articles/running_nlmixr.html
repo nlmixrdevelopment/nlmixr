@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.8</span>
       </span>
     </div>
 
@@ -51,10 +51,16 @@
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
     </li>
+    <li>
+      <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
+    </li>
     <li class="divider">
     <li class="dropdown-header">Going further</li>
     <li>
       <a href="../articles/modelPiping.html">Model Piping</a>
+    </li>
+    <li>
+      <a href="../articles/broom.html">Sweeping models to tidy datasets (broom)</a>
     </li>
   </ul>
 </li>
@@ -68,7 +74,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/addingCovariances.html">Phenobarbatol with covariances</a>
+      <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
   </ul>
 </li>
@@ -114,7 +120,7 @@
     <div class="page-header toc-ignore">
       <h1>Running PK models with nlmixr</h1>
             
-            <h4 class="date">2019-04-23</h4>
+            <h4 class="date">2019-05-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd"><code>vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
@@ -154,13 +160,13 @@
 <p>We can try fitting a simple one-compartment PK model to this small dataset. We write the model as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">one.cmt &lt;-<span class="st"> </span><span class="cf">function</span>() {
     <span class="kw"><a href="../reference/ini.html">ini</a></span>({
-        tka &lt;-<span class="st"> </span>.<span class="dv">5</span>   <span class="co"># log Ka</span>
-        tcl &lt;-<span class="st"> </span><span class="op">-</span><span class="fl">3.2</span> <span class="co"># log Cl</span>
-        tv &lt;-<span class="st"> </span><span class="op">-</span><span class="dv">1</span>    <span class="co"># log V</span>
-        eta.ka <span class="op">~</span><span class="st"> </span><span class="dv">1</span>
-        eta.cl <span class="op">~</span><span class="st"> </span><span class="dv">2</span>
-        eta.v <span class="op">~</span><span class="st"> </span><span class="dv">1</span>
-        add.err &lt;-<span class="st"> </span><span class="fl">0.1</span>
+        tka &lt;-<span class="st"> </span><span class="fl">0.45</span> <span class="co"># Log Ka</span>
+        tcl &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># Log Cl</span>
+        tv &lt;-<span class="st"> </span><span class="fl">3.45</span>    <span class="co"># Log V</span>
+        eta.ka <span class="op">~</span><span class="st"> </span><span class="fl">0.6</span>
+        eta.cl <span class="op">~</span><span class="st"> </span><span class="fl">0.3</span>
+        eta.v <span class="op">~</span><span class="st"> </span><span class="fl">0.1</span>
+        add.err &lt;-<span class="st"> </span><span class="fl">0.7</span>
     })
     <span class="kw"><a href="../reference/model.html">model</a></span>({
         ka &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(tka <span class="op">+</span><span class="st"> </span>eta.ka)
@@ -171,24 +177,24 @@
 }</code></pre></div>
 <p>We can now run the model…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.cmt, theo_sd, <span class="dt">est=</span><span class="st">"nlme"</span>)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.cmt-theo_sd-nlme-7e4993e42dbddcbfd5130e441716d924.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.cmt-theo_sd-nlme-5a52a6e14c41d57f14800333b995589e.rds)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)</code></pre></div>
-<pre><code>## ── nlmixr nlme by [1m[33mmaximum likelihood[39m[22m ([3mSolved; μ-ref &amp; covs[23m) nlme OBF fit ──</code></pre>
+<pre><code>## ── nlmixr nlme by maximum likelihood (Solved; μ-ref &amp; covs) nlme OBF fit ──</code></pre>
 <pre><code>##          OBJF      AIC      BIC Log-likelihood Condition Number
-## nlme 116.8726 373.4723 393.6519      -179.7362         17.08703</code></pre>
+## nlme 116.8727 373.4725 393.6521      -179.7363         17.08747</code></pre>
 <pre><code>## 
 ## ── Time (sec; $time): ─────────────────────────────────────────────────────</code></pre>
-<pre><code>##    nlme    setup optimize covariance table
-##  16.476 4.927869    5e-06      6e-06 0.014</code></pre>
+<pre><code>##          nlme    setup table    other
+## elapsed 8.514 5.705841 0.012 0.374159</code></pre>
 <pre><code>## 
 ## ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</code></pre>
 <pre><code>##         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
-## tka        log Ka 0.447  0.192   43       1.56 (1.07, 2.28)     68.7
-## tcl        log Cl  1.02 0.0847 8.31       2.77 (2.35, 3.27)     26.9
-## tv          log V  3.45 0.0464 1.35       31.5 (28.7, 34.5)     13.6
+## tka        Log Ka 0.447  0.192   43       1.56 (1.07, 2.28)     68.7
+## tcl        Log Cl  1.02 0.0847 8.31       2.77 (2.35, 3.27)     26.9
+## tv          Log V  3.45 0.0464 1.35       31.5 (28.7, 34.5)     13.6
 ## add.err           0.697                               0.697         
 ##         Shrink(SD)%
-## tka         0.236% 
+## tka         0.241% 
 ## tcl          3.78% 
 ## tv           10.0% 
 ## add.err             
@@ -230,24 +236,24 @@
 }</code></pre></div>
 <p>We can try the Stochastic Approximation EM (SAEM) method to this model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"saem"</span>)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-1250c45e7f2b989f2dcbed06255cf167.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-fc93affe842124d57c37f8d5220fd1b9.rds)</code></pre>
 <p>And if we wanted to, we could even apply the First-Order Conditional Estimation (FOCEi) method to this model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fitF &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"focei"</span>)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-8d6c82315654d2336d9fe104889adc92.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-cdab62d4795084a5a33ff1bba675543c.rds)</code></pre>
 <p>This example delivers a complete model fit as the <code>fit</code> object, including parameter history, a set of fixed effect estimates, and random effects for all included subjects.</p>
 <p>Now back to the <code>saem</code> fit; Let’s look at the fit using nlmixr’s built-in diagnostics…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(fit)</code></pre></div>
-<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-1.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-2.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-3.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-4.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-5.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-6.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-7.png" width="700"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit</code></pre></div>
-<pre><code>## ── nlmixr SAEM([3mODE[23m); [2m[3mOBJF by Gaussian Quadrature (n.nodes=3, n.sd=1.6)[23m[22m fit</code></pre>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-1.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-2.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-3.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-4.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-5.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-6.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-7.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-8.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-9.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-10.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-11.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-12.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-13.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-14.png" width="700"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)</code></pre></div>
+<pre><code>## ── nlmixr SAEM(ODE); OBJF by Gaussian Quadrature (n.nodes=3, n.sd=1.6) fit</code></pre>
 <pre><code>##                OBJF      AIC      BIC Log-likelihood Condition Number
-## gauss3_1.6 122.9719 379.5717 399.7513      -182.7858         18.16213</code></pre>
+## gauss3_1.6 122.9719 379.5717 399.7513      -182.7858         18.16274</code></pre>
 <pre><code>## 
-## ── Time (sec; fit$time): ──────────────────────────────────────────────────</code></pre>
-<pre><code>##   saem   setup optimize covariance table
-##  4.755 0.85761  1.5e-05    1.7e-05 0.018</code></pre>
+## ── Time (sec; $time): ─────────────────────────────────────────────────────</code></pre>
+<pre><code>##           saem    setup table covariance logLik    other
+## elapsed 18.187 4.248864 0.021      0.009  0.029 0.360136</code></pre>
 <pre><code>## 
-## ── Population Parameters (fit$parFixed or fit$parFixedDf): ────────────────</code></pre>
+## ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</code></pre>
 <pre><code>##         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
 ## tka        Log Ka 0.451  0.196 43.5       1.57 (1.07, 2.31)     71.9
 ## tcl        Log Cl  1.02 0.0836 8.22       2.77 (2.35, 3.26)     27.0
@@ -259,13 +265,12 @@
 ## tv           10.0% 
 ## add.err             
 ## 
-##   Covariance Type (fit$covMethod): linFim
+##   Covariance Type ($covMethod): linFim
 ##   No correlations in between subject variability (BSV) matrix</code></pre>
-<pre><code>##   Full BSV covariance (fit$omega)</code></pre>
-<pre><code>##     or correlation (fit$omegaR; diagonals=SDs)</code></pre>
+<pre><code>##   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</code></pre>
 <pre><code>##   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</code></pre>
 <pre><code>## 
-## ── Fit Data (object fit is a modified tibble): ────────────────────────────</code></pre>
+## ── Fit Data (object is a modified tibble): ────────────────────────────────</code></pre>
 <pre><code>## # A tibble: 132 x 18
 ##   ID     TIME    DV  EVID  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl
 ##   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
@@ -275,19 +280,90 @@
 ## # … with 129 more rows, and 7 more variables: eta.v &lt;dbl&gt;, ka &lt;dbl&gt;,
 ## #   cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit<span class="op">$</span>eta</code></pre></div>
-<pre><code>##    ID      eta.ka      eta.cl        eta.v
-## 1   1  0.10452828 -0.48672270 -0.080039134
-## 2   2  0.22113608  0.14424813  0.020615245
-## 3   3  0.36834661  0.03113880  0.057953035
-## 4   4 -0.27706329 -0.01495799 -0.007228148
-## 5   5 -0.04575097 -0.15498484 -0.141863965
-## 6   6 -0.38224999  0.36699784  0.202578960
-## 7   7 -0.79123852  0.16021400  0.046593476
-## 8   8 -0.18055726  0.16803215  0.095775394
-## 9   9  1.42015833  0.04231817  0.012132127
-## 10 10 -0.73780585 -0.39067576 -0.169553540
-## 11 11  0.79018509  0.28141067  0.145748346
-## 12 12 -0.52731794 -0.12649060 -0.198041122</code></pre>
+<table class="table huxtable">
+<col>
+<col>
+<col>
+<col>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">ID</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">eta.ka</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">eta.cl</td>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">eta.v</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.105 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-0.487 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-0.08   </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">2</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.221 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.144 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.0206 </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">3</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.368 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0311</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.058  </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">4</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">-0.277 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">-0.015 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">-0.00723</td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">5</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-0.0458</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-0.155 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-0.142  </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">6</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">-0.382 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.367 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.203  </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">7</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-0.791 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.16  </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0466 </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">8</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">-0.181 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.168 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.0958 </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">9</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1.42  </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0423</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0121 </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">10</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">-0.738 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">-0.391 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">-0.17   </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">11</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.79  </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.281 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.146  </td>
+</tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">12</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">-0.527 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">-0.126 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">-0.198  </td>
+</tr>
+</table>
 <p>Default trace plots can be generated using:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/traceplot.html">traceplot</a></span>(fit)</code></pre></div>
 <p>but with a little more work, we can get a nicer set of iteration trace plots (“wriggly worms”)…</p>
@@ -515,17 +591,17 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 <a href="#running-models" class="anchor"></a>Running models</h2>
 <p>Models can be fitted several ways, including via the [magrittr] forward-pipe operator.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/saem.fit.html">saem.fit</a></span>(<span class="dt">data=</span>theo_sd)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-saem-1250c45e7f2b989f2dcbed06255cf167.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-saem-fc93affe842124d57c37f8d5220fd1b9.rds)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, <span class="dt">data=</span>theo_sd, <span class="dt">est=</span><span class="st">"saem"</span>)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-1250c45e7f2b989f2dcbed06255cf167.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-fc93affe842124d57c37f8d5220fd1b9.rds)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit3 &lt;-<span class="st"> </span>one.compartment <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/saem.fit.html">saem.fit</a></span>(<span class="dt">data=</span>theo_sd)</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-theo_sd-saem-1250c45e7f2b989f2dcbed06255cf167.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-theo_sd-saem-fc93affe842124d57c37f8d5220fd1b9.rds)</code></pre>
 <p>Options to the estimation routines can be specified using nlmeControl for nlme estimation:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit4 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd,<span class="dt">est=</span><span class="st">"nlme"</span>,<span class="dt">control =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/nlme/topics/nlmeControl">nlmeControl</a></span>(<span class="dt">pnlsTol =</span> .<span class="dv">5</span>))</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-nlme-072aa67f050d5536e56beba31bfc4766.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-nlme-68bc30e34affcf0621de04c4741fbeb7.rds)</code></pre>
 <p>where options are specified in the <code>nlme</code> documentation. Options for saem can be specified using <code>saemControl</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit5 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment,theo_sd,<span class="dt">est=</span><span class="st">"saem"</span>,<span class="dt">control=</span><span class="kw"><a href="../reference/saemControl.html">saemControl</a></span>(<span class="dt">n.burn=</span><span class="dv">250</span>,<span class="dt">n.em=</span><span class="dv">350</span>,<span class="dt">print=</span><span class="dv">50</span>))</code></pre></div>
-<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-f99f01a3bf15656466881f09d4346e52.rds)</code></pre>
+<pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-saem-23a5d7385d16552ed0ae2a4dae87bde0.rds)</code></pre>
 <p>this example specifies 250 burn-in iterations, 350 em iterations and a print progress every 50 runs.</p>
 </div>
 <div id="model-syntax-for-solved-pk-systems" class="section level2">
@@ -618,7 +694,7 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 
 
       <footer><div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

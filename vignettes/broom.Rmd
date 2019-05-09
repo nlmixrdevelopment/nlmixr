@@ -53,7 +53,7 @@ pheno <- function() {
 }
 
 ## We will run it two ways to allow comparisons
-fit.s <- nlmixr(pheno, pheno_sd, "saem")
+fit.s <- nlmixr(pheno, pheno_sd, "saem", control=list(logLik=TRUE), table=list(cwres=TRUE))
 fit.f <- nlmixr(pheno, pheno_sd, "focei")
 ```
 # Glancing at the goodness of fit metrics
@@ -70,11 +70,11 @@ Note in nlmixr it is possible to have more than one fit metric (based
 on different quadratures, FOCEi approximation etc).  However, the
 `glance` only returns the fit metrics that are current.
 
-If you add conditional weighted residuals to the fit the objective
-function is changed to the `FOCEi` metric:
+If you wish you can set the objective function to the focei objective
+function (which was already calculated with CWRES).
 
 ```{r}
-fit.s <- fit.s %>% addCwres()
+setOfv(fit.s,"FOCEi")
 ```
 
 Now the glance gives the `FOCEi` values.
@@ -130,11 +130,11 @@ transformation).  This behavior can be turned on or off with the
 `exponentiate` argument.
 
 ```{r}
-tidy(fit, exponentiate=FALSE) ## No transformation applied
+tidy(fit.s, exponentiate=FALSE) ## No transformation applied
 ```
 
 ```{r}
-tidy(fit, exponentiate=TRUE) ## No transformation applied on every parameter
+tidy(fit.s, exponentiate=TRUE) ## No transformation applied on every parameter
 ```
 
 Note that the default is `exponentiate=NA` which is adaptive
@@ -164,7 +164,7 @@ the `exponentiate` parameter to control the display of the confidence
 interval:
 
 ```{r}
-confint(fit, exponentiate=FALSE)
+confint(fit.s, exponentiate=FALSE)
 ```
 
 However, broom has also implemented it own way to make these data a
@@ -172,7 +172,7 @@ tidy dataset.  The easiest way to get these values in a nlmixr dataset
 is to use:
 
 ```{r}
-tidy(fit, conf.level=0.9)
+tidy(fit.s, conf.level=0.9)
 ```
 The confidence interval is on the scale specified by `exponentiate`, by default the adaptive scale. 
 
@@ -183,7 +183,7 @@ The type of information that is extracted can be controlled by the `effects` arg
 The fixed effect parameters can be extracted by `effects="fixed"`
 
 ```{r}
-tidy(fit, effects="fixed")
+tidy(fit.s, effects="fixed")
 ```
 ## Extracting only random parameters
 
@@ -191,7 +191,7 @@ The random standard deviations can be extracted by
 `effects="ran_pars"`:
 
 ```{r}
-tidy(fit, effects="ran_pars")
+tidy(fit.s, effects="ran_pars")
 ```
 ## Extracting random values (also called ETAs)
 
@@ -199,7 +199,7 @@ The random values, or in NONMEM the ETAs, can be extracted by
 `effects="ran_vals"` or `effects="random"`
 
 ```{r}
-tidy(fit, effects="ran_vals")
+tidy(fit.s, effects="ran_vals")
 ```
 
 This duplicate method of running `effects` is because the `broom`
@@ -214,13 +214,14 @@ random effect parameter, possibly transformed to the correct scale.
 In this case we can extract this information from a nlmixr fit object by:
 
 ```{r}
-tidy(fit, effects="ran_coef")
+tidy(fit.s, effects="ran_coef")
 ```
 This can also be changed by the `exponentiate` argument
 
 ```{r}
-tidy(fit, effects="ran_coef", exponentiate=FALSE)
+tidy(fit.s, effects="ran_coef", exponentiate=FALSE)
 ```
+
 # Example of using a tidy model estimates for other packages
 
 ## Dotwhisker
@@ -277,9 +278,10 @@ as_hux('SAEM'=fit.s, 'FOCEi'=fit.f)
 A word-based table can also be easily created with the tool:
 ```{r}
 library(officer)
-ft  <- tbl %>%
-    flextable::as_flextable;
+library(flextable)
 
+ft  <- huxtable::as_flextable(tbl);
+    
 read_docx() %>%
     flextable::body_add_flextable(ft)  %>%
     print(target="pheno.docx")

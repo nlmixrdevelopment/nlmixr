@@ -80,7 +80,15 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         if (!is.null(stratify)){
             cols <- c(tolower(stratify), "dv")
             stratify <- tolower(stratify);
-        }  else {
+        } else if (inherits(fit, "nlmixrFitCore")){
+            .uif <- fit$uif
+            if (length(.uif$predDf$cmt) > 1){
+                cols <- c("cmt", "dv")
+                stratify <- "cmt";
+            } else {
+                cols <- c("dv");
+            }
+        } else {
             cols <- c("dv");
         }
         ##

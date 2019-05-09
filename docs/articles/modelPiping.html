@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.8</span>
       </span>
     </div>
 
@@ -50,6 +50,9 @@
     <li class="dropdown-header">Getting started</li>
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
+    </li>
+    <li>
+      <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
     <li class="dropdown-header">Going further</li>
@@ -71,7 +74,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/addingCovariances.html">Phenobarbatol with covariances</a>
+      <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
   </ul>
 </li>
@@ -117,7 +120,7 @@
     <div class="page-header toc-ignore">
       <h1>Modifying nlmixr models by piping</h1>
             
-            <h4 class="date">2019-04-24</h4>
+            <h4 class="date">2019-05-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/modelPiping.Rmd"><code>vignettes/modelPiping.Rmd</code></a></small>
       <div class="hidden name"><code>modelPiping.Rmd</code></div>
@@ -163,46 +166,48 @@ one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>()
 }</code></pre></div>
 <p>We can try the First-Order Conditional Estimation with Interaction (FOCEi) method to find a good solution:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"focei"</span>)
-<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-8d6c82315654d2336d9fe104889adc92.rds)</span>
+<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-cdab62d4795084a5a33ff1bba675543c.rds)</span>
 
-fit
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ───────────────────────────────────────</span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8053 373.4051 393.5847      -179.7025         99.99962</span>
+<span class="co">#&gt; FOCEi 116.8045 373.4043 393.5839      -179.7022         29.32241</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; fit$time): ──────────────────────────────────────────────────</span>
-<span class="co">#&gt;           setup optimize covariance table</span>
-<span class="co">#&gt; elapsed 8.07996 0.983656   0.983658 0.011</span>
+<span class="co">#&gt; ── Time (sec; $time): ─────────────────────────────────────────────────────</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 9.351099 0.999064   0.999066  0.01 4.324771</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters (fit$parFixed or fit$parFixedDf): ────────────────</span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka        Log Ka 0.467  0.201 42.9        1.6 (1.08, 2.36)     70.1</span>
-<span class="co">#&gt; tcl        Log Cl  1.01 0.0818 8.09       2.75 (2.34, 3.23)     27.0</span>
-<span class="co">#&gt; tv          Log V  3.46 0.0401 1.16       31.8 (29.4, 34.4)     13.9</span>
-<span class="co">#&gt; add.err           0.694                               0.694         </span>
+<span class="co">#&gt; tka        Log Ka 0.469  0.203 43.3        1.6 (1.07, 2.38)     70.2</span>
+<span class="co">#&gt; tcl        Log Cl  1.01  0.316 31.2       2.75 (1.48, 5.11)     26.8</span>
+<span class="co">#&gt; tv          Log V  3.46 0.0728  2.1       31.8 (27.6, 36.7)     13.9</span>
+<span class="co">#&gt; add.err           0.695                               0.695         </span>
 <span class="co">#&gt;         Shrink(SD)%</span>
-<span class="co">#&gt; tka          1.47% </span>
-<span class="co">#&gt; tcl          4.43% </span>
-<span class="co">#&gt; tv           10.5% </span>
+<span class="co">#&gt; tka          1.57% </span>
+<span class="co">#&gt; tcl          4.03% </span>
+<span class="co">#&gt; tv           10.3% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (fit$covMethod): r,s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance (fit$omega)</span>
-<span class="co">#&gt;     or correlation (fit$omegaR; diagonals=SDs)</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</span>
-<span class="co">#&gt;   Minimization message (fit$message):</span>
+<span class="co">#&gt;   Minimization message ($message):</span>
 <span class="co">#&gt;     false convergence (8)</span>
 <span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
 <span class="co">#&gt;   See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object fit is a modified tibble): ────────────────────────────</span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 132 x 22</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.07   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.27 -0.430 -0.227  3.85 -1.01  -1.45   3.23</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.84  0.730  0.386  6.79 -0.215 -0.310  5.79</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.27 -0.433 -0.229  3.85 -1.01  -1.45   3.23</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.84  0.727  0.384  6.79 -0.215 -0.310  5.79</span>
 <span class="co">#&gt; # … with 129 more rows, and 11 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
@@ -222,51 +227,53 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(<span class="dt">tka=</span><span class="fl">0.5</span>) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"posthoc"</span>)
 
-one.ka.<span class="fl">0.5</span></code></pre></div>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(one.ka.<span class="fl">0.5</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Example 2 -- Fix tka to 0.5 and re-estimate.
 one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(<span class="dt">tka=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/fix">fix</a></span>(<span class="fl">0.5</span>)) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>)
-<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-be3f43188749471a151cd3c7286009c2.rds)</span>
+<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-d62efb1b96bf7ef6ded9f8d993886f01.rds)</span>
 
-one.ka.<span class="fl">0.5</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(one.ka.<span class="fl">0.5</span>)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ───────────────────────────────────────</span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8413 371.4411 388.7379      -179.7206         6.943677</span>
+<span class="co">#&gt; FOCEi 116.8398 371.4396 388.7364      -179.7198         7.394079</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; one.ka.0.5$time): ───────────────────────────────────────────</span>
-<span class="co">#&gt;            setup optimize covariance table</span>
-<span class="co">#&gt; elapsed 7.987877 0.597904   0.597906 0.009</span>
+<span class="co">#&gt; ── Time (sec; $time): ─────────────────────────────────────────────────────</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.376123 0.586071   0.586074 0.009 0.863732</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters (one.ka.0.5$parFixed or one.ka.0.5$parFixedDf): ──</span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</span>
 <span class="co">#&gt;         Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka        Log Ka   0.5  FIXED FIXED                    1.65     70.1</span>
-<span class="co">#&gt; tcl        Log Cl  1.01 0.0742  7.33       2.75 (2.38, 3.18)     27.0</span>
-<span class="co">#&gt; tv          Log V  3.46 0.0582  1.68       31.8 (28.4, 35.7)     13.9</span>
-<span class="co">#&gt; add.err           0.694                                0.694         </span>
+<span class="co">#&gt; tka        Log Ka   0.5  FIXED FIXED                    1.65     70.2</span>
+<span class="co">#&gt; tcl        Log Cl  1.01 0.0763  7.54        2.75 (2.37, 3.2)     26.8</span>
+<span class="co">#&gt; tv          Log V  3.46 0.0551  1.59       31.8 (28.6, 35.5)     13.9</span>
+<span class="co">#&gt; add.err           0.695                                0.695         </span>
 <span class="co">#&gt;         Shrink(SD)%</span>
-<span class="co">#&gt; tka          1.39% </span>
-<span class="co">#&gt; tcl          4.46% </span>
-<span class="co">#&gt; tv           10.4% </span>
+<span class="co">#&gt; tka          1.48% </span>
+<span class="co">#&gt; tcl          4.06% </span>
+<span class="co">#&gt; tv           10.3% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (one.ka.0.5$covMethod): r,s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance (one.ka.0.5$omega)</span>
-<span class="co">#&gt;     or correlation (one.ka.0.5$omegaR; diagonals=SDs)</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</span>
-<span class="co">#&gt;   Minimization message (one.ka.0.5$message):</span>
+<span class="co">#&gt;   Minimization message ($message):</span>
 <span class="co">#&gt;     false convergence (8)</span>
 <span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
 <span class="co">#&gt;   See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object one.ka.0.5 is a modified tibble): ─────────────────────</span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 132 x 22</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.07   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.36 -0.515 -0.272  3.85 -1.01  -1.45   3.32</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.95  0.619  0.327  6.79 -0.219 -0.316  5.91</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.36 -0.517 -0.273  3.85 -1.01  -1.45   3.33</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.95  0.616  0.325  6.79 -0.219 -0.315  5.91</span>
 <span class="co">#&gt; # … with 129 more rows, and 11 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
@@ -274,46 +281,48 @@ one.ka.<span class="fl">0.5</span>
 one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(<span class="dt">tka=</span>fix) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>)
-<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-5e132efb6a8675eb13854c70e1f2732f.rds)</span>
+<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.compartment-theo_sd-focei-8511f1da52ffb52a64046a9b12e4c314.rds)</span>
 
-one.ka.<span class="fl">0.5</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(one.ka.<span class="fl">0.5</span>)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ───────────────────────────────────────</span>
-<span class="co">#&gt;           OBJF     AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8052 371.405 388.7018      -179.7025         18.03789</span>
+<span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 116.8049 371.4046 388.7015      -179.7023         7.971318</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; one.ka.0.5$time): ───────────────────────────────────────────</span>
-<span class="co">#&gt;            setup optimize covariance table</span>
-<span class="co">#&gt; elapsed 0.335962 0.585052   0.585055 0.009</span>
+<span class="co">#&gt; ── Time (sec; $time): ─────────────────────────────────────────────────────</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.344831 0.622472   0.622474  0.01 0.521223</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters (one.ka.0.5$parFixed or one.ka.0.5$parFixedDf): ──</span>
-<span class="co">#&gt;         Parameter  Est.    SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka        Log Ka 0.467 FIXED FIXED                     1.6     70.1</span>
-<span class="co">#&gt; tcl        Log Cl  1.01 0.317  31.3       2.75 (1.48, 5.12)     27.0</span>
-<span class="co">#&gt; tv          Log V  3.46 0.174  5.04       31.8 (22.6, 44.8)     13.9</span>
-<span class="co">#&gt; add.err           0.694                               0.694         </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</span>
+<span class="co">#&gt;         Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
+<span class="co">#&gt; tka        Log Ka 0.469  FIXED FIXED                     1.6     70.2</span>
+<span class="co">#&gt; tcl        Log Cl  1.01 0.0812  8.02       2.75 (2.35, 3.23)     26.8</span>
+<span class="co">#&gt; tv          Log V  3.46 0.0611  1.77       31.8 (28.2, 35.9)     13.9</span>
+<span class="co">#&gt; add.err           0.695                                0.695         </span>
 <span class="co">#&gt;         Shrink(SD)%</span>
-<span class="co">#&gt; tka          1.47% </span>
-<span class="co">#&gt; tcl          4.40% </span>
-<span class="co">#&gt; tv           10.5% </span>
+<span class="co">#&gt; tka          1.58% </span>
+<span class="co">#&gt; tcl          4.03% </span>
+<span class="co">#&gt; tv           10.4% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (one.ka.0.5$covMethod): s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance (one.ka.0.5$omega)</span>
-<span class="co">#&gt;     or correlation (one.ka.0.5$omegaR; diagonals=SDs)</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</span>
-<span class="co">#&gt;   Minimization message (one.ka.0.5$message):</span>
+<span class="co">#&gt;   Minimization message ($message):</span>
 <span class="co">#&gt;     false convergence (8)</span>
 <span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
 <span class="co">#&gt;   See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object one.ka.0.5 is a modified tibble): ─────────────────────</span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 132 x 22</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.07   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.27 -0.429 -0.226  3.85 -1.01  -1.45   3.23</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.84  0.733  0.387  6.79 -0.215 -0.310  5.78</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.27 -0.433 -0.229  3.85 -1.01  -1.45   3.23</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.84  0.727  0.384  6.79 -0.216 -0.310  5.79</span>
 <span class="co">#&gt; # … with 129 more rows, and 11 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
@@ -321,44 +330,48 @@ one.ka.<span class="fl">0.5</span>
 one.ka.<span class="fl">0.7</span> &lt;-<span class="st"> </span>one.compartment <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(<span class="dt">tka=</span><span class="fl">0.7</span>) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">data=</span>theo_sd,<span class="dt">est=</span><span class="st">"focei"</span>)
-<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-0ebcb76f91b36d5d1e4f007fc9137677.rds)</span>
+<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-f22f76916ff54c7252a88764f14d8b80.rds)</span>
 
-one.ka.<span class="fl">0.7</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(one.ka.<span class="fl">0.7</span>)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ───────────────────────────────────────</span>
-<span class="co">#&gt;           OBJF     AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8042 373.404 393.5836       -179.702         66.56519</span>
+<span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 116.8071 373.4068 393.5865      -179.7034         47.02366</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; one.ka.0.7$time): ───────────────────────────────────────────</span>
-<span class="co">#&gt;            setup optimize covariance table</span>
-<span class="co">#&gt; elapsed 0.339859 1.034959    1.03496 0.009</span>
+<span class="co">#&gt; ── Time (sec; $time): ─────────────────────────────────────────────────────</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.359938 1.048131   1.048133 0.009 2.633798</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters (one.ka.0.7$parFixed or one.ka.0.7$parFixedDf): ──</span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka        Log Ka 0.464  0.208 44.8       1.59 (1.06, 2.39)     69.9</span>
-<span class="co">#&gt; tcl        Log Cl  1.01 0.0706 6.97        2.75 (2.4, 3.16)     26.7</span>
-<span class="co">#&gt; tv          Log V  3.46 0.0479 1.38         31.8 (29, 34.9)     13.9</span>
+<span class="co">#&gt; tka        Log Ka  0.46  0.198   43       1.58 (1.08, 2.33)     70.2</span>
+<span class="co">#&gt; tcl        Log Cl  1.01 0.0728 7.19       2.75 (2.39, 3.17)     26.5</span>
+<span class="co">#&gt; tv          Log V  3.46 0.0554  1.6       31.8 (28.5, 35.4)     14.1</span>
 <span class="co">#&gt; add.err           0.695                               0.695         </span>
 <span class="co">#&gt;         Shrink(SD)%</span>
-<span class="co">#&gt; tka          1.36% </span>
-<span class="co">#&gt; tcl          3.75% </span>
-<span class="co">#&gt; tv           10.3% </span>
+<span class="co">#&gt; tka          1.55% </span>
+<span class="co">#&gt; tcl          3.47% </span>
+<span class="co">#&gt; tv           10.7% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (one.ka.0.7$covMethod): r,s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance (one.ka.0.7$omega)</span>
-<span class="co">#&gt;     or correlation (one.ka.0.7$omegaR; diagonals=SDs)</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</span>
-<span class="co">#&gt;   Minimization message (one.ka.0.7$message):</span>
-<span class="co">#&gt;     relative convergence (4)</span>
+<span class="co">#&gt;   Minimization message ($message):</span>
+<span class="co">#&gt;     false convergence (8)</span>
+<span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
+<span class="co">#&gt;   See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object one.ka.0.7 is a modified tibble): ─────────────────────</span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 132 x 22</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.26 -0.423 -0.224  3.85 -1.01  -1.45   3.22</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.83  0.739  0.390  6.78 -0.215 -0.309  5.77</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.07   0   </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.25 -0.413 -0.218  3.84 -1.00  -1.45   3.21</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.82  0.752  0.397  6.78 -0.214 -0.308  5.76</span>
 <span class="co">#&gt; # … with 129 more rows, and 11 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
@@ -376,46 +389,48 @@ one.ka.<span class="fl">0.7</span>
 noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(ka &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(tka)) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>)
-<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-0032dabe7a02fbfc71992e358a75f1ff.rds)</span>
+<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-9d74c5deda3a8cdbadb4090d613a7e00.rds)</span>
 
-noEta
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(noEta)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ───────────────────────────────────────</span>
-<span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 176.5776 431.1774 448.4742      -209.5887         34.26018</span>
+<span class="co">#&gt;           OBJF      AIC     BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 176.5764 431.1762 448.473      -209.5881         33.66599</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; noEta$time): ────────────────────────────────────────────────</span>
-<span class="co">#&gt;            setup optimize covariance table</span>
-<span class="co">#&gt; elapsed 7.716876   0.5594   0.559401 0.009</span>
+<span class="co">#&gt; ── Time (sec; $time): ─────────────────────────────────────────────────────</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 8.588769 0.543587    0.54359 0.009 1.617054</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters (noEta$parFixed or noEta$parFixedDf): ────────────</span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka        Log Ka 0.432  0.168 38.9       1.54 (1.11, 2.14)         </span>
-<span class="co">#&gt; tcl        Log Cl  0.99 0.0745 7.53       2.69 (2.33, 3.11)     30.3</span>
-<span class="co">#&gt; tv          Log V  3.48  0.048 1.38       32.4 (29.5, 35.6)     15.3</span>
+<span class="co">#&gt; tka        Log Ka 0.433  0.168 38.8       1.54 (1.11, 2.14)         </span>
+<span class="co">#&gt; tcl        Log Cl  0.99 0.0743 7.51       2.69 (2.33, 3.11)     30.2</span>
+<span class="co">#&gt; tv          Log V  3.48 0.0479 1.38       32.5 (29.5, 35.6)     15.4</span>
 <span class="co">#&gt; add.err            1.02                                1.02         </span>
 <span class="co">#&gt;         Shrink(SD)%</span>
 <span class="co">#&gt; tka                </span>
-<span class="co">#&gt; tcl          7.71% </span>
-<span class="co">#&gt; tv           6.82% </span>
+<span class="co">#&gt; tcl          7.70% </span>
+<span class="co">#&gt; tv           7.12% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (noEta$covMethod): r,s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance (noEta$omega)</span>
-<span class="co">#&gt;     or correlation (noEta$omegaR; diagonals=SDs)</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</span>
-<span class="co">#&gt;   Minimization message (noEta$message):</span>
+<span class="co">#&gt;   Minimization message ($message):</span>
 <span class="co">#&gt;     false convergence (8)</span>
 <span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
 <span class="co">#&gt;   See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object noEta is a modified tibble): ──────────────────────────</span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 132 x 21</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.709  0     0.74   0.724  0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.12 -0.278 -0.266  3.57 -0.728 -0.712  3.09</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.61  0.959  0.919  6.44  0.125  0.123  5.56</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.709  0     0.74   0.725  0   </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.12 -0.280 -0.268  3.57 -0.732 -0.717  3.09</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.61  0.957  0.917  6.45  0.120  0.117  5.56</span>
 <span class="co">#&gt; # … with 129 more rows, and 10 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
@@ -424,55 +439,57 @@ noEta
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>({ka &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(tka <span class="op">+</span><span class="st"> </span>bsv.ka)}) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/ini.html">ini</a></span>(<span class="dt">bsv.ka=</span><span class="fl">0.1</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>)
-<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-f9d9f250dc46146e9553e553eb7bf2d4.rds)</span>
+<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-d3a4f368901f6feadc5f9cd775e92f11.rds)</span>
 
-addBackKa
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(addBackKa)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ───────────────────────────────────────</span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8165 373.4163 393.5959      -179.7081         66.40029</span>
+<span class="co">#&gt; FOCEi 116.8129 373.4127 393.5923      -179.7063         62.15095</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; addBackKa$time): ────────────────────────────────────────────</span>
-<span class="co">#&gt;            setup optimize covariance table</span>
-<span class="co">#&gt; elapsed 8.553877 0.972031   0.972034  0.01</span>
+<span class="co">#&gt; ── Time (sec; $time): ─────────────────────────────────────────────────────</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 9.230905 0.950333   0.950336 0.009 3.038426</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters (addBackKa$parFixed or addBackKa$parFixedDf): ────</span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka        Log Ka 0.485  0.194   40       1.62 (1.11, 2.38)     70.8</span>
-<span class="co">#&gt; tcl        Log Cl  1.01 0.0742 7.33       2.75 (2.38, 3.18)     26.9</span>
-<span class="co">#&gt; tv          Log V  3.46 0.0435 1.26       31.8 (29.2, 34.6)     13.9</span>
-<span class="co">#&gt; add.err           0.695                               0.695         </span>
+<span class="co">#&gt; tka        Log Ka 0.473  0.204 43.1        1.6 (1.08, 2.39)     70.5</span>
+<span class="co">#&gt; tcl        Log Cl  1.01 0.0725 7.14       2.76 (2.39, 3.18)     27.2</span>
+<span class="co">#&gt; tv          Log V  3.46 0.0419 1.21       31.8 (29.3, 34.5)     13.8</span>
+<span class="co">#&gt; add.err           0.693                               0.693         </span>
 <span class="co">#&gt;         Shrink(SD)%</span>
-<span class="co">#&gt; tka          2.13% </span>
-<span class="co">#&gt; tcl          4.16% </span>
+<span class="co">#&gt; tka          1.83% </span>
+<span class="co">#&gt; tcl          4.89% </span>
 <span class="co">#&gt; tv           10.3% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (addBackKa$covMethod): r,s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance (addBackKa$omega)</span>
-<span class="co">#&gt;     or correlation (addBackKa$omegaR; diagonals=SDs)</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</span>
-<span class="co">#&gt;   Minimization message (addBackKa$message):</span>
+<span class="co">#&gt;   Minimization message ($message):</span>
 <span class="co">#&gt;     false convergence (8)</span>
 <span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
 <span class="co">#&gt;   See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object addBackKa is a modified tibble): ──────────────────────</span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 132 x 22</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.375  0     0.74   1.07   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.32 -0.479 -0.243  3.85 -1.01  -1.45   3.28</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.91  0.665  0.337  6.79 -0.218 -0.313  5.86</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.29 -0.449 -0.227  3.85 -1.01  -1.45   3.25</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.705  0.357  6.79 -0.216 -0.312  5.81</span>
 <span class="co">#&gt; # … with 129 more rows, and 11 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, bsv.ka &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
 <p>You can see the name change by examining the <code>omega</code> matrix:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">addBackKa<span class="op">$</span>omega
-<span class="co">#&gt;            eta.cl      eta.v    bsv.ka</span>
-<span class="co">#&gt; eta.cl 0.06966343 0.00000000 0.0000000</span>
-<span class="co">#&gt; eta.v  0.00000000 0.01915664 0.0000000</span>
-<span class="co">#&gt; bsv.ka 0.00000000 0.00000000 0.4067497</span></code></pre></div>
+<span class="co">#&gt;            eta.cl      eta.v  bsv.ka</span>
+<span class="co">#&gt; eta.cl 0.07161515 0.00000000 0.00000</span>
+<span class="co">#&gt; eta.v  0.00000000 0.01889769 0.00000</span>
+<span class="co">#&gt; bsv.ka 0.00000000 0.00000000 0.40355</span></code></pre></div>
 <p>Note that new between subject variability parameters are distinguished from other types of parameters (ie population parameters, and individual covariates) by their name. Parameters starting or ending with the following names are assumed to be between subject variability parameters:</p>
 <ul>
 <li>eta (from NONMEM convention)</li>
@@ -492,48 +509,50 @@ wt70 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>({cl &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp</a></span>(tcl <span class="op">+</span><span class="st"> </span>eta.cl)<span class="op">*</span>(WT<span class="op">/</span><span class="dv">70</span>)<span class="op">^</span>covWtPow}) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(<span class="dt">covWtPow=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/fix">fix</a></span>(<span class="fl">0.75</span>)) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>)
-<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-634730226936bb22a77704a1142ba18d.rds)</span>
+<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-a0f9f608da09ddce9f6a5348fbbeadb8.rds)</span>
 
-wt70
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(wt70)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ───────────────────────────────────────</span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.1687 372.7685 392.9481      -179.3842         40.91139</span>
+<span class="co">#&gt; FOCEi 116.1449 372.7447 392.9243      -179.3723         53.97154</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; wt70$time): ─────────────────────────────────────────────────</span>
-<span class="co">#&gt;           setup optimize covariance table</span>
-<span class="co">#&gt; elapsed 8.91618 1.070857   1.070859  0.01</span>
+<span class="co">#&gt; ── Time (sec; $time): ─────────────────────────────────────────────────────</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 9.723973 1.095949   1.095951  0.01 2.197127</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters (wt70$parFixed or wt70$parFixedDf): ──────────────</span>
-<span class="co">#&gt;          Parameter  Est.    SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka         Log Ka 0.467  0.19  40.7        1.59 (1.1, 2.31)     69.2</span>
-<span class="co">#&gt; tcl         Log Cl  1.02 0.207  20.3       2.77 (1.85, 4.15)     26.8</span>
-<span class="co">#&gt; tv           Log V  3.46 0.041  1.19       31.7 (29.3, 34.4)     13.9</span>
-<span class="co">#&gt; add.err            0.698                               0.698         </span>
-<span class="co">#&gt; covWtPow            0.75 FIXED FIXED                    0.75         </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</span>
+<span class="co">#&gt;          Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
+<span class="co">#&gt; tka         Log Ka 0.469  0.174  37.1        1.6 (1.14, 2.25)     69.5</span>
+<span class="co">#&gt; tcl         Log Cl  1.03 0.0606   5.9       2.79 (2.48, 3.15)     26.4</span>
+<span class="co">#&gt; tv           Log V  3.46  0.035  1.01         31.7 (29.6, 34)     13.7</span>
+<span class="co">#&gt; add.err            0.696                                0.696         </span>
+<span class="co">#&gt; covWtPow            0.75  FIXED FIXED                    0.75         </span>
 <span class="co">#&gt;          Shrink(SD)%</span>
-<span class="co">#&gt; tka           1.23% </span>
-<span class="co">#&gt; tcl           6.58% </span>
-<span class="co">#&gt; tv            12.5% </span>
+<span class="co">#&gt; tka           1.49% </span>
+<span class="co">#&gt; tcl           5.51% </span>
+<span class="co">#&gt; tv            11.8% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; covWtPow             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (wt70$covMethod): r,s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance (wt70$omega)</span>
-<span class="co">#&gt;     or correlation (wt70$omegaR; diagonals=SDs)</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</span>
-<span class="co">#&gt;   Minimization message (wt70$message):</span>
+<span class="co">#&gt;   Minimization message ($message):</span>
 <span class="co">#&gt;     false convergence (8)</span>
 <span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
 <span class="co">#&gt;   See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object wt70 is a modified tibble): ───────────────────────────</span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 132 x 23</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID    WT  PRED    RES   WRES IPRED   IRES  IWRES</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  79.6  0     0.74   0.391  0     0.74   1.06 </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  79.6  3.28 -0.436 -0.230  3.84 -0.999 -1.43 </span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  79.6  5.84  0.731  0.386  6.78 -0.212 -0.304</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  79.6  3.28 -0.443 -0.234  3.84 -0.999 -1.44 </span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  79.6  5.85  0.722  0.381  6.78 -0.212 -0.305</span>
 <span class="co">#&gt; # … with 129 more rows, and 12 more variables: CPRED &lt;dbl&gt;, CRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
@@ -550,48 +569,50 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>({cp <span class="op">~</span><span class="st"> </span><span class="kw">add</span>(add.err)<span class="op">+</span><span class="kw">prop</span>(prop.err)}) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/update">update</a></span>(<span class="dt">prop.err=</span><span class="fl">0.1</span>) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(d,<span class="dt">est=</span><span class="st">"focei"</span>)
-<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-e7c88df8844858858507933f338b4f1f.rds)</span>
+<span class="co">#&gt; Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-focei-a009112ae5af2c031d874d07154bf324.rds)</span>
 
-addPropModel
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(addPropModel)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ───────────────────────────────────────</span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 104.3586 362.9584 386.0208      -173.4792         67.19398</span>
+<span class="co">#&gt; FOCEi 104.3524 362.9522 386.0146      -173.4761         71.93474</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; addPropModel$time): ─────────────────────────────────────────</span>
-<span class="co">#&gt;            setup optimize covariance table</span>
-<span class="co">#&gt; elapsed 9.218808 1.002433   1.002434  0.01</span>
+<span class="co">#&gt; ── Time (sec; $time): ─────────────────────────────────────────────────────</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 9.967874 0.958626   0.958629  0.01 6.273871</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters (addPropModel$parFixed or $parFixedDf): ──────────</span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</span>
 <span class="co">#&gt;          Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka         Log Ka 0.406  0.213 52.6       1.5 (0.988, 2.28)     68.4</span>
-<span class="co">#&gt; tcl         Log Cl  1.02 0.0809 7.89       2.79 (2.38, 3.26)     25.9</span>
-<span class="co">#&gt; tv           Log V  3.46 0.0468 1.35           32 (29.2, 35)     12.5</span>
-<span class="co">#&gt; add.err            0.276                               0.276         </span>
+<span class="co">#&gt; tka         Log Ka 0.389  0.243 62.5      1.47 (0.916, 2.37)     68.7</span>
+<span class="co">#&gt; tcl         Log Cl  1.02 0.0795 7.76       2.79 (2.38, 3.26)     25.9</span>
+<span class="co">#&gt; tv           Log V  3.46 0.0498 1.44         31.9 (29, 35.2)     12.5</span>
+<span class="co">#&gt; add.err            0.275                               0.275         </span>
 <span class="co">#&gt; prop.err           0.134                               0.134         </span>
 <span class="co">#&gt;          Shrink(SD)%</span>
-<span class="co">#&gt; tka           1.56% </span>
-<span class="co">#&gt; tcl           1.26% </span>
+<span class="co">#&gt; tka           1.81% </span>
+<span class="co">#&gt; tcl           1.51% </span>
 <span class="co">#&gt; tv            15.5% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; prop.err             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (addPropModel$covMethod): r,s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance (addPropModel$omega)</span>
-<span class="co">#&gt;     or correlation (addPropModel$omegaR; diagonals=SDs)</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs)</span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink</span>
-<span class="co">#&gt;   Minimization message (addPropModel$message):</span>
+<span class="co">#&gt;   Minimization message ($message):</span>
 <span class="co">#&gt;     false convergence (8)</span>
 <span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
 <span class="co">#&gt;   See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object addPropModel is a modified tibble): ───────────────────</span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 132 x 22</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.396  0     0.74   2.68   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.09 -0.255 -0.136  3.47 -0.627 -1.16   3.08</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.59  0.976  0.511  6.24  0.334  0.380  5.57</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.396  0     0.74   2.69   0   </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.05 -0.214 -0.114  3.46 -0.624 -1.16   3.03</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.54  1.03   0.541  6.23  0.337  0.383  5.51</span>
 <span class="co">#&gt; # … with 129 more rows, and 11 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>

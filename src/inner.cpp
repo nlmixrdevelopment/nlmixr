@@ -3813,9 +3813,9 @@ NumericMatrix foceiCalcCov(Environment e){
 }
 
 void parHistData(Environment e){
-  if (!e.exists("method")){
+  if (!e.exists("method") && iterType.size() > 0){
     CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
-    CharacterVector dfNames(3+op_focei.thetan + op_focei.omegan);
+    CharacterVector dfNames(3+op_focei.npars);
     dfNames[0] = "iter";
     dfNames[1] = "type";
     dfNames[2] = "objf";
@@ -3829,7 +3829,7 @@ void parHistData(Environment e){
       } 
     }
     // iter type parameters
-    List ret(3+op_focei.thetan + op_focei.omegan);
+    List ret(3+op_focei.npars);
     int sz = niter.size()+niterGrad.size();
     IntegerVector tmp;
     std::vector<int> iter;
@@ -3861,7 +3861,7 @@ void parHistData(Environment e){
       cPar = cPar.t();
       vals = cPar;
     }
-    for (i = 0; i < op_focei.thetan + op_focei.omegan+1; i++){
+    for (i = 0; i < op_focei.npars; i++){
       ret[i+2]= vals.col(i);
     }    
     vGrad.clear();

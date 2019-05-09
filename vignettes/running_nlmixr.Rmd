@@ -7,6 +7,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 ![nlmixr](logo.png)
 
 # Running PK models with nlmixr
@@ -114,7 +115,7 @@ plot(fit)
 ```
 
 ```{r}
-fit
+print(fit)
 ```
 
 ```{r}
@@ -187,38 +188,41 @@ library(xpose)
 
 Now install the extension for nlmixr:
 
-```r
-devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
-```
+```{r}
+xpdbLoc <- file.path(system.file(package="nlmixr"), "xpdb.rds");
+if (file.exists(xpdbLoc)){
+    load(xpdbLoc);
+} else {
+    ## devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
+    ## library(xpose.nlmixr)
+    ## xp <- xpose_data_nlmixr(fit);
+    ## save(xp, file=xpdbLoc)
+}
 
-```r
-library(xpose.nlmixr)
 ```
 
 ... and convert your nlmixr fit object into an xpose fit object.
 
-```r
+```{r}
 dv_vs_pred(xp)
 ```
-![DV vs PRED](dv_vs_pred.png)
-```r
+
+```{r}
 dv_vs_ipred(xp)
 ```
-![DV vs IPRED](dv_vs_ipred.png)
-```r
+
+```{r}
 pred_vs_pred(xp)
 ```
-![CWRES vs PRED](cwres_vs_pred.png)
-```r
+
+```{r}
 absval_res_vs_pred(xp, res="IWRES")
 ```
-![abs(IWRES) vs PRED](iwres_vs_pred.png)
 We can also replicate some of nlmixr's internal plots...
-```r
+
+```{r}
 ind_plots(xp, res="IWRES")
 ```
-![Individual plots](ind_plots.png)
-
 
 For more information about using xpose, see the Uppsala pharmacometrics group's 
 comprehensive site [here](https://uupharmacometrics.github.io/xpose/).

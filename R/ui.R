@@ -433,10 +433,10 @@ update.function  <- .nlmixrUpdate
   fun2$meta <- list2env(meta, parent=emptyenv());
   .mv  <- RxODE::rxModelVars(fun2$rxode);
   .tmp <- .mv$stateExtra[!(.mv$stateExtra %in% c(.mv$lhs))];
-  if (length(.tmp > 0)){
-    stop(sprintf("Modeled responses need to be defined in the model; Add definition for: %s",
-                 paste(.tmp, collapse=", ")))
-  }
+  ## if (length(.tmp > 0)){
+  ##   stop(sprintf("Modeled responses need to be defined in the model; Add definition for: %s",
+  ##                paste(.tmp, collapse=", ")))
+  ## }
   return(fun2)
 }
 
@@ -1755,11 +1755,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .predDf$dvid  <- seq_along(.predDf$var)
     .predDf <- merge(.predDf, .tmp, all.x=TRUE, by="cond")
     if (any(is.na(.predDf$cmt))){
-      .predDfNa  <- .predDf[is.na(.predDf$cmt), names(.predDf) != "cmt"];
-      .predDf <- .predDf[!is.na(.predDf$cmt),];
-      .tmp <- data.frame(cmt=seq_along(.state), var=.state)
-      .predDf <- rbind(.predDf,
-                       merge(.predDfNa, .tmp, all.x=TRUE, by="var")[names(.predDf)])
+        .predDfNa  <- .predDf[is.na(.predDf$cmt), names(.predDf) != "cmt"];
+        .predDf <- .predDf[!is.na(.predDf$cmt),];
+        .tmp <- data.frame(cmt=seq_along(.state), var=.state)
+        .predDf <- rbind(.predDf,
+                         merge(.predDfNa, .tmp, all.x=TRUE, by="var")[names(.predDf)])
     }
     .w <- which(is.na(.predDf$cmt))
     .predDf$cond  <- paste(.predDf$cond);
@@ -1767,13 +1767,23 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     if (length(.w) > 0)
       .cmtEndpoints <- paste(.predDf$cmt[-.w]);
     .predDf$cmt[.w]  <- length(.state)+seq_along(.w)
-    .w  <- .predDf$cond == "";
+    .w  <- .predDf$cond == "" | .predDf$cond != .predDf$var;
     .predDf$cond <- paste(.predDf$cond);
-    .predDf$cond[.w] <- paste(.predDf$var[.w])
+    .predDf$cond[.predDf$cond == ""] <- paste(.predDf$var[.predDf$cond == ""])
+    .predDf$cmt[.predDf$cond != .predDf$var] <- NA
     .extra  <- paste(.predDf$cond[.w])
     .extra  <- .extra[regexpr("[()+-]",.extra) == -1]
     if (length(.extra) > 0){
       rxode  <-  paste0(rxode,";\n",paste(c(paste0("cmt(", .extra,");\n")),collapse=""))
+    }
+    if (any(is.na(.predDf$cmt))){
+        .predDfNa  <- .predDf[is.na(.predDf$cmt), names(.predDf) != "cmt"];
+        .predDf <- .predDf[!is.na(.predDf$cmt),];
+        .mv <- RxODE::rxModelVars(rxode);
+        .state <- c(.mv$state,.mv$stateExtra)
+        .tmp <- data.frame(cmt=seq_along(.state), cond=.state)
+        .predDf <- rbind(.predDf,
+                         merge(.predDfNa, .tmp, all.x=TRUE, by="cond")[names(.predDf)])
     }
     if (length(.predDf$cond) > 1){
       rxode  <- paste0(rxode,";\ndvid(",paste(.predDf[order(.predDf$dvid),"cmt"],collapse=","),");\n");

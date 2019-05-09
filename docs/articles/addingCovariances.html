@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Example Model: Phenobarbatol with covariances • nlmixr</title>
+<title>Example Model: Phenobarbatol with correlations • nlmixr</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Example Model: Phenobarbatol with covariances">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Example Model: Phenobarbatol with correlations">
 <meta property="og:description" content="">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.8</span>
       </span>
     </div>
 
@@ -50,6 +50,9 @@
     <li class="dropdown-header">Getting started</li>
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
+    </li>
+    <li>
+      <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
     <li class="dropdown-header">Going further</li>
@@ -71,7 +74,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/addingCovariances.html">Phenobarbatol with covariances</a>
+      <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
   </ul>
 </li>
@@ -115,9 +118,9 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Example Model: Phenobarbatol with covariances</h1>
+      <h1>Example Model: Phenobarbatol with correlations</h1>
             
-            <h4 class="date">2019-04-24</h4>
+            <h4 class="date">2019-05-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/addingCovariances.Rmd"><code>vignettes/addingCovariances.Rmd</code></a></small>
       <div class="hidden name"><code>addingCovariances.Rmd</code></div>
@@ -172,11 +175,11 @@ pheno &lt;-<span class="st"> </span><span class="cf">function</span>() {
 <a href="#fit-with-saem" class="anchor"></a>Fit with SAEM</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pheno, pheno_sd, <span class="st">"saem"</span>)
 
-fit
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)
 <span class="co">#&gt;                OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; gauss3_1.6 721.8749 1018.746 1037.006      -503.3729         7.462652</span>
-<span class="co">#&gt;    saem    setup optimize covariance table</span>
-<span class="co">#&gt;  29.987 3.579099  1.6e-05    1.9e-05 0.013</span>
+<span class="co">#&gt;           saem   setup table covariance logLik   other</span>
+<span class="co">#&gt; elapsed 27.997 3.45407 0.013      0.016   0.06 0.51193</span>
 <span class="co">#&gt;                          Parameter  Est.     SE %RSE</span>
 <span class="co">#&gt; tcl     typical value of clearance    -5  0.075  1.5</span>
 <span class="co">#&gt; tv         typical value of volume 0.347 0.0536 15.4</span>
@@ -186,7 +189,7 @@ fit
 <span class="co">#&gt; tv              1.42 (1.27, 1.57)     40.8      1.18% </span>
 <span class="co">#&gt; add.err                      2.84                      </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type (fit$covMethod): linFim</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): linFim</span>
 <span class="co">#&gt;   Correlations in between subject variability (BSV) matrix:</span>
 <span class="co">#&gt;     cor__eta.v.eta.cl </span>
 <span class="co">#&gt;              0.986   </span>
@@ -204,7 +207,7 @@ fit
 <h2 class="hasAnchor">
 <a href="#basic-goodness-of-fit-plots" class="anchor"></a>Basic Goodness of Fit Plots</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(fit)</code></pre></div>
-<p><img src="addingCovariances_files/figure-html/unnamed-chunk-5-1.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-2.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-3.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-4.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-5.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-6.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-7.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-8.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-9.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-10.png" width="100%"></p>
+<p><img src="addingCovariances_files/figure-html/unnamed-chunk-5-1.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-2.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-3.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-4.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-5.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-6.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-7.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-8.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-9.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-10.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-11.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-12.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-13.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-14.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-15.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-16.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-17.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-18.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-19.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-20.png" width="100%"></p>
 <p>Those individual plots are not that great, it would be better to see the actual curves; You can with <code>augPred</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/nlme/topics/augPred">augPred</a></span>(fit))</code></pre></div>
 <p><img src="addingCovariances_files/figure-html/unnamed-chunk-6-1.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-6-2.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-6-3.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-6-4.png" width="100%"></p>
@@ -212,14 +215,16 @@ fit
 <div id="two-types-of-vpcs" class="section level2">
 <h2 class="hasAnchor">
 <a href="#two-types-of-vpcs" class="anchor"></a>Two types of VPCs</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## library(ggplot2)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)
 ## A traditional VPC
-<span class="kw"><a href="../reference/vpc.html">vpc</a></span>(fit, <span class="dt">show=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">obs_dv=</span><span class="ot">TRUE</span>))</code></pre></div>
-<p><img src="addingCovariances_files/figure-html/unnamed-chunk-7-1.png" width="100%"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+p1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/vpc.html">vpc</a></span>(fit, <span class="dt">show=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">obs_dv=</span><span class="ot">TRUE</span>)) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">ylab</a></span>(<span class="st">"Concentrations"</span>)
+
 ## A prediction-corrected VPC
-<span class="kw"><a href="../reference/vpc.html">vpc</a></span>(fit, <span class="dt">pred_corr =</span> <span class="ot">TRUE</span>, <span class="dt">show=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">obs_dv=</span><span class="ot">TRUE</span>))</code></pre></div>
-<p><img src="addingCovariances_files/figure-html/unnamed-chunk-7-2.png" width="100%"></p>
+p2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/vpc.html">vpc</a></span>(fit, <span class="dt">pred_corr =</span> <span class="ot">TRUE</span>, <span class="dt">show=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">obs_dv=</span><span class="ot">TRUE</span>)) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">ylab</a></span>(<span class="st">"Prediction-Corrected Concentrations"</span>)
+
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(gridExtra)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/gridExtra/topics/arrangeGrob">grid.arrange</a></span>(p1,p2)</code></pre></div>
+<p><img src="addingCovariances_files/figure-html/unnamed-chunk-7-1.png" width="100%"></p>
 </div>
 </div>
   </div>
