@@ -15,7 +15,7 @@ universal user interface (UUI), that provides universal model and
 parameter defintion syntax and results in a fit object that can be
 used as input into the `Xpose` package. Running nlmixr using the UUI
 is described in the vignette:
-https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
+ihttps://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
 
 Under the hood `nlmixr` has five main modules:  
 
@@ -181,16 +181,25 @@ broadly extensible to all recent releases of macOS, however.
      - If `easy_install` doesn't work, you can download by `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py` and then run `sudo python get-pip.py`
    - Install `sympy` using `pip`: `sudo -H pip install sympy`.
 3. Install build tools.
-   - Install the clang and gfortran packages from [CRAN development tools website](http://cran.r-project.org/bin/macosx/tools/)
-   - Install Mac OSX command like tools by typing `xcode-select --install` and then choose `install`.  This allows you to compile the package without downloading the entire (large) Xcode package. Make sure to perform this step even if the Xcode package is already installed.
-   - If you are using macOS >= 10.14 you have to also type the following in the terminal to install the compiler headers:
+   - Install the clang and gfortran packages from [CRAN development
+     tools website](http://cran.r-project.org/bin/macosx/tools/)
+   - Install Mac OSX command like tools by typing `xcode-select
+     --install` and then choose `install`.  This allows you to compile
+     the package without downloading the entire (large) Xcode
+     package. Make sure to perform this step even if the Xcode package
+     is already installed.
+   - If you are using macOS >= 10.14 you have to also type the
+     following in the terminal to install the compiler headers:
 
 ```sh
 sudo installer -pkg \
 /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg \
 -target /
 ```
-   - Change `~/.Rprofile` to have the following line to adjust the paths in R to use the CRAN compilers (if not present, create the .Rprofile file):
+   - Change `~/.Rprofile` to have the following line to adjust the
+     paths in R to use the CRAN compilers (if not present, create the
+     .Rprofile file):
+   
 ```R
 # make sure to adjust the version number of clang based on the downloaded version in step 3 (e.g. clang8/bin)
 Sys.setenv("PATH"=paste0("/usr/local/clang6/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
@@ -205,14 +214,19 @@ Sys.setenv("PATH"=paste0("/usr/local/clang6/bin:/usr/local/gfortran/bin:", Sys.g
      uploaded to CRAN.  `nlmixr` needs this newer version of `RxODE` to
      function correctly. To install this version, use the command:
      `install_github("nlmixrdevelopment/RxODE")`.
-   - Install `SnakeCharmR` using `install_github("nlmixrdevelopment/SnakeCharmR")` or install `reticulate` using `install.packages("reticulate")`.
+   - Install `SnakeCharmR` using
+     `install_github("nlmixrdevelopment/SnakeCharmR")` or install
+     `reticulate` using `install.packages("reticulate")`.
    - Restart your R session.
    - As a quick test, you can make sure that R and Python can
      communicate by typing the command `library(SnakeCharmR)`.
    - To validate or test the installation of `RxODE` completely, you
      can type the following `library(RxODE); rxTest();` and it will
      run all of the unit tests in RxODE to make sure it is running
-     correctly on your system. (Note that the `testthat` package is required for this, and it will take a long time.)
+     correctly on your system. (Note that the `testthat` package is
+     required for this, and it will take a long time.)
+	 - Note this requires a special install option to make sure the
+       tests are installed:  `remote:install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")`
 7. Install `nlmixr`.
    - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
    

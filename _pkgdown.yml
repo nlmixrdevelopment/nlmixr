@@ -147,10 +147,10 @@ navbar:
         - text: "Phenobarbatol with correlations"
           href: articles/addingCovariances.html
   - text: "Cheat Sheet"
-    icon: fas fa-scroll
+    icon: fa-scroll fa-lg
     href: https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf
   - text: "Functions"
-    icon: fa-file-code-o
+    icon: fa-file-code-o fa-lg
     href: reference/index.html
   right:
   - icon: fa-github fa-lg
