@@ -573,15 +573,23 @@ print.nlmixrUI <- function(x, ...){
   message(cli::rule(x$model.desc, line="bar2"))
   message(cli::rule(crayon::bold("Initialization:")))
   print(x$ini)
+  if (length(x$all.covs) > 0){
+    message("\n Covariates or Uninitialized Parameters ($all.covs)")
+    print(x$all.covs);
+  }
   if (length(x$predDf$cond) > 1){
       message(cli::rule(paste0(crayon::bold("Multiple Endpoint Model")," (", crayon::bold$blue("$multipleEndpoint"), "):")))
     x$multipleEndpoint %>%
         huxtable::print_screen(colnames=FALSE)
     message("")
   }
-  if (length(x$all.covs) > 0){
-    message("\n Covariates or Uninitialized Parameters ($all.covs)")
-    print(x$all.covs);
+  .mu <- x$muRefTable;
+  if (length(.mu) > 0){
+      message(cli::rule(paste0(crayon::bold(paste0(ifelse(use.utf(), "\u03bc", "mu"),"-referencing")),
+                           " (", crayon::bold$blue("$muRefTable"), "):")))
+      .mu %>%
+          huxtable::print_screen(colnames=FALSE)
+      message("")
   }
   message(cli::rule(crayon::bold(sprintf("Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))))
   message(x$fun.txt)
@@ -2761,6 +2769,8 @@ nlmixrUI.poped.ff_fun <- function(obj){
     arg <- "theta";
   } else if (arg == "multipleEndpoint"){
       return(nlmixrUI.multipleEndpoint(x));
+  } else if (arg=="muRefTable"){
+      return(.nmMuTable(x));
   }
   m <- x$ini;
   ret <- `$.nlmixrBounds`(m, arg, exact=exact)
@@ -2816,6 +2826,7 @@ str.nlmixrUI <- function(object, ...){
   cat("     first element are scaling log thetas;\n");
   cat("     second element are back-transformed thetas;\n")
   cat(" $ multipleEndpoint: huxtable of multiple endpoint translations in nlmixr\n");
+  cat(" $ muRefTable: huxtable of mu-referenced items in a model\n")
 }
 
 

@@ -190,3 +190,7 @@ generics::glance
 ##'@importFrom generics augment
 ##'@export
 generics::augment
+
+##' @importFrom huxtable number_format
+##' @export
+huxtable::number_format

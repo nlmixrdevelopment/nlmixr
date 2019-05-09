@@ -49,6 +49,7 @@
 \alias{tidy}
 \alias{glance}
 \alias{augment}
+\alias{number_format}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -59,6 +60,8 @@ below to see their documentation.
   \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{rxClean}}, \code{\link[RxODE]{rxCat}}, \code{\link[RxODE]{eventTable}}, \code{\link[RxODE]{add.dosing}}, \code{\link[RxODE]{add.sampling}}, \code{\link[RxODE]{rxPermissive}}, \code{\link[RxODE]{rxSymPySetupPred}}, \code{\link[RxODE]{et}}, \code{\link[RxODE]{rxSolve}}}
 
   \item{generics}{\code{\link[generics]{tidy}}, \code{\link[generics]{glance}}, \code{\link[generics]{glance}}, \code{\link[generics]{augment}}}
+
+  \item{huxtable}{\code{\link[huxtable]{number_format}}}
 
   \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
 

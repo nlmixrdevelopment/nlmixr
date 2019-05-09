@@ -91,10 +91,10 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 }
 
 .nmMuTable  <- function(x){
-    .mu  <- x$mu.ref
+    .mu  <- x$nmodel$mu.ref
     if (length(.mu) == 0) return(NULL)
     .ret <- do.call(rbind, lapply(names(.mu),function(x){data.frame(theta=.mu[[x]], eta=x)}))
-    if (length(x$cov.ref) > 0){
+    if (length(x$nmodel$cov.ref) > 0){
         .covRef  <- x$cov.ref;
         .covRef  <- do.call(`c`,lapply(names(.covRef), function(x){
             .ret <- .covRef[[x]];
@@ -116,6 +116,12 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
         .ret  <- merge(.ret,data.frame(theta=names(.env$ref),covariates=as.character(.env$ref)),
                        by="theta")
     }
+    .ret  <- huxtable::hux(.ret) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
+
     return(.ret)
 }
 
@@ -164,7 +170,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
                   "R Fit Object:", bound,
                   "R Data Name ($dataName):", x$dataName,
                   "Estimation Method:",.nmEstMethod(x),
-                  "All variables mu-referenced:", .mu <- dim(x$omega)[1] == length(x$mu.ref),
+                  "All variables mu-referenced:",dim(x$omega)[1] == length(x$mu.ref),
                   "Covariance Method ($covMethod):", x$covMethod,
                   "Modeled Correlations:", !all(.cor == 0),
                   "CWRES:",ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="CWRES"),FALSE),
@@ -449,11 +455,11 @@ nmDocx  <- function(x,
                               style=subtitleStyle) %>%
         officer::body_add_par("",style=normalStyle) %>%
         officer::body_add_toc() %>%
-        flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.nmHuxHeader(x, .bound)))) %>%
+        flextable::body_add_flextable(flextable::autofit(.asFlx(.nmHuxHeader(x, .bound)))) %>%
         officer::body_add_par("Timing ($time, in seconds)", style=headerStyle) %>%
-        flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.nmHuxTime(x)))) %>%
+        flextable::body_add_flextable(flextable::autofit(.asFlx(.nmHuxTime(x)))) %>%
         officer::body_add_par(sprintf("Parameter Information as_hux(%s)", .bound), style=headerStyle) %>%
-        flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.hreg))) %>%
+        flextable::body_add_flextable(flextable::autofit(.asFlx(.hreg))) %>%
         officer::body_add_par("UI Model information ($uif):", style=headerStyle)
     .doc  <- .nmDocxPreformat(x$uif, .doc, preformattedStyle, width)
 
@@ -470,15 +476,11 @@ nmDocx  <- function(x,
         }
     }
     .mu <- .nmMuTable(x);
+    print
     if (length(.mu) !=0){
-        .mu  <- huxtable::hux(.mu) %>%
-            huxtable::add_colnames() %>%
-            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
-            huxtable::set_position("center") %>%
-            huxtable::set_all_borders(TRUE)
         .doc <- .doc %>%
             officer::body_add_par("Parsed Mu-referencing:", style=headerStyle) %>%
-            flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.mu)))
+            flextable::body_add_flextable(flextable::autofit(.asFlx(.mu)))
     }
     .doc <- .nmIterHistDoc(x, .doc, headerStyle, normalStyle, preformattedStyle, width);
     if (any(.nmEstMethod(x)==c("FOCEi", "FOCE","FO","FOi","posthoc"))){
@@ -488,28 +490,28 @@ nmDocx  <- function(x,
         .t1 <- c("est","scaleC")
         .t2  <- c("est","Initial Gradient", "Forward aEps", "Forward rEps", "Central aEps", "Central rEps");
         .t3  <- c("est","Covariance Gradient","Covariance aEps", "Covariance rEps");
-        .t1  <- huxtable::hux(.si[,.t1]) %>%
-            huxtable::add_colnames() %>%
-            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
-            huxtable::set_position("center") %>%
-            huxtable::set_all_borders(TRUE)
-        .t2  <- huxtable::hux(.si[,.t2]) %>%
-            huxtable::add_colnames() %>%
-            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
-            huxtable::set_position("center") %>%
-            huxtable::set_all_borders(TRUE)
-        .t3  <- huxtable::hux(.si[,.t3]) %>%
-            huxtable::add_colnames() %>%
-            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
-            huxtable::set_position("center") %>%
-            huxtable::set_all_borders(TRUE)
+        .t1  <- flextable::hux(.si[,.t1]) %>%
+            flextable::add_colnames() %>%
+            flextable::set_bold(row = 1, col = flextable::everywhere, value = TRUE) %>%
+            flextable::set_position("center") %>%
+            flextable::set_all_borders(TRUE)
+        .t2  <- flextable::hux(.si[,.t2]) %>%
+            flextable::add_colnames() %>%
+            flextable::set_bold(row = 1, col = flextable::everywhere, value = TRUE) %>%
+            flextable::set_position("center") %>%
+            flextable::set_all_borders(TRUE)
+        .t3  <- flextable::hux(.si[,.t3]) %>%
+            flextable::add_colnames() %>%
+            flextable::set_bold(row = 1, col = flextable::everywhere, value = TRUE) %>%
+            flextable::set_position("center") %>%
+            flextable::set_all_borders(TRUE)
         .doc <- .doc %>%
             officer::body_add_par("Scaling information (est/scaleC):",style=normalStyle) %>%
-            flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.t1))) %>%
+            flextable::body_add_flextable(flextable::autofit(.asFlx(.t1))) %>%
             officer::body_add_par("Gradient Information, used in estimation:",style=normalStyle) %>%
-            flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.t2))) %>%
+            flextable::body_add_flextable(flextable::autofit(.asFlx(.t2))) %>%
             officer::body_add_par("Gradient Information, used in covariance:",style=normalStyle) %>%
-            flextable::body_add_flextable(flextable::autofit(huxtable::as_flextable(.t3)))
+            flextable::body_add_flextable(flextable::autofit(.asFlx(.t3)))
     }
     .doc <- .doc %>%
         officer::body_add_par("Original arguments to control ($origControl):", style=headerStyle)
@@ -614,7 +616,7 @@ nmLst  <- function(x,
     message("---")
     message("")
     .rule(sprintf("Parameter Information as_hux(%s)", .bound));
-    .hreg %>% huxtable::print_screen(colnames=FALSE)
+    .hreg %>% flextable::print_screen(colnames=FALSE)
     .rule(sprintf("Parsed model information %s$uif", .bound));
     print(x$uif)
     if (x$message!=""){
@@ -630,13 +632,8 @@ nmLst  <- function(x,
     }
     .mu <- .nmMuTable(x);
     if (length(.mu) !=0){
-        .mu  <- huxtable::hux(.mu) %>%
-            huxtable::add_colnames() %>%
-            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
-            huxtable::set_position("center") %>%
-            huxtable::set_all_borders(TRUE)
         .rule("Parsed Mu-referencing:");
-        .mu %>% huxtable::print_screen(colnames=FALSE)
+        .mu %>% flextable::print_screen(colnames=FALSE)
 
     }
     .it  <- .nmIterHist(x)
@@ -670,3 +667,17 @@ nmLst  <- function(x,
 nmSave  <- function(x,...,save=TRUE){
     nmDocx(x, ..., save=save);
 }
+
+## Ugly hacks to make word conversion work without loading flextable, officer, etc
+.huxNS <- NULL;
+.asFlx <- function(x, ...){
+    if (is.null(.huxNS)){
+        ## ugly hack
+        .huxNS <- loadNamespace("huxtable")
+        assignInMyNamespace(".huxNS", .huxNS);
+    }
+    .env <- new.env(parent=.huxNS);
+    .env$x <- x;
+    with(.env, as_flextable.huxtable(x));
+}
+
