@@ -1268,11 +1268,13 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             if (!is.null(wm)){
               cur <- 2;
               th <- 3;
-              w <- which(all.covs == as.character(x[[wm]][[2]])[1])
+              w <- try(which(all.covs == as.character(x[[wm]][[2]])[1]),silent=TRUE)
+              if (inherits(w, "try-error")) w <- integer(0)
               if (length(w) == 0){
                 cur <- 3;
                 th <- 2;
-                w <- which(all.covs == as.character(x[[wm]][[3]])[1])
+                w <- try(which(all.covs == as.character(x[[wm]][[3]])[1]),silent=TRUE)
+                if (inherits(w, "try-error")) w <- integer(0)
               }
               if (length(w) == 1){
                 cov <- all.covs[w];
@@ -1568,6 +1570,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   do.pred <- 3;
   grp.fn <- new.fn(.deparse(f(body(fun))));
   do.pred <- 4;
+  .deparse(f(body(fun)))
   saem.pars <- try(.deparse(f(body(fun))), silent=TRUE);
   nlme.mu.fun2 <- NULL
   if (inherits(saem.pars, "try-error")){
@@ -2404,26 +2407,30 @@ nlmixrUI.saem.log.eta <- function(obj){
 ##' @return saem user function
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.fit <- function(obj){
-  if (any(ls(envir=obj$env) == "saem.fit")){
-    return(obj$env$saem.fit)
-  } else if (!is.null(obj$rxode)) {
-    ## RxODE function
-    message("Compiling RxODE equations...", appendLF=FALSE)
-    if (obj$env$sum.prod){
-      ode <- RxODE::RxODE(RxODE::rxSumProdModel(obj$rxode));
-    } else {
-      ode <- RxODE::RxODE(obj$rxode);
+    if (any(ls(envir=obj$env) == "saem.fit")){
+        return(obj$env$saem.fit)
+    } else if (!is.null(obj$rxode)) {
+        ## RxODE function
+        if (is.null(obj$saem.pars)){
+            stop("SAEM requires mu-referenced parameters")
+        }
+        message("Compiling RxODE equations...", appendLF=FALSE)
+        if (obj$env$sum.prod){
+            ode <- RxODE::RxODE(RxODE::rxSumProdModel(obj$rxode));
+        } else {
+            ode <- RxODE::RxODE(obj$rxode);
+        }
+        RxODE::rxLoad(ode);
+        obj$env$saem.ode <- ode;
+        RxODE::rxLoad(ode);
+        message("done.")
+        inPars <- obj$saem.inPars;
+        if (length(inPars) == 0) inPars <- NULL
+
+        saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=obj$predSaem, inPars=inPars);
+        obj$env$saem.fit <- saem.fit;
+        return(obj$env$saem.fit);
     }
-    RxODE::rxLoad(ode);
-    obj$env$saem.ode <- ode;
-    RxODE::rxLoad(ode);
-    message("done.")
-    inPars <- obj$saem.inPars;
-    if (length(inPars) == 0) inPars <- NULL
-    saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=obj$predSaem, inPars=inPars);
-    obj$env$saem.fit <- saem.fit;
-    return(obj$env$saem.fit);
-  }
 }
 ##' Generate SAEM model list
 ##'
