@@ -14,7 +14,7 @@
 ##'@export
 confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
     .extra <- list(...);
-    .exponentiate <- ifelse(any(names(.extra) == "exponentiate"), .extra$exponentiate, NA)
+    .exponentiate <- ifelse(any(names(.extra) == "exponentiate"), .extra$exponentiate, FALSE)
     .ciNames <- ifelse(any(names(.extra) == "ciNames"), .extra$ciNames, TRUE)
     .df <- .fixNames(object$parFixedDf);
     if (!missing(parm)) .df <- .df[parm, ];
@@ -140,7 +140,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     return(x[,intersect(allCols, names(x))])
 }
 
-.coefPar  <- function(x, exponentiate=NA,...){
+.coefPar  <- function(x, exponentiate=FALSE,...){
     .muRef  <- x$mu.ref
     .theta  <- x$theta
     .df <- .fixNames(x$parFixedDf);

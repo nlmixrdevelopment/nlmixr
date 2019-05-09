@@ -126,18 +126,18 @@ exponentiate some of the terms. The broom package allows you to apply
 exponentiation on *all* the parameters, that is:
 
 ```{r}
-tidy(fit.s, exponentiate=TRUE) ## Transformation applied on every
-                               ## parameter
+## Transformation applied on every parameter
+tidy(fit.s, exponentiate=TRUE) 
 ```
 
 **Note:**, in accordance with the rest of the broom package, when the
 parameters with the exponentiated, the standard errors are transformed
-to an approximate standard error by the formula: $se(exp(x)) \approx
-exp(mu_x)\times se_x$.  This can be confusing because the confidence
-intervals (described later) are using the actual standard error and
-back-transforming to the exponiated scale.  This is the reason why the
-default for nlmixr's `broom` interface is `exponentiat=FALSE`, that
-is:
+to an approximate standard error by the formula: $\textrm{se}(\exp(x))
+\approx \exp(\textrm{model estimate}_x)\times \textrm{se}_x$.  This
+can be confusing because the confidence intervals (described later)
+are using the actual standard error and back-transforming to the
+exponentiated scale.  This is the reason why the default for nlmixr's
+`broom` interface is `exponentiate=FALSE`, that is:
 
 ```{r}
 tidy(fit.s, exponentiate=FALSE) ## No transformation applied
@@ -150,8 +150,8 @@ log-scaled back-transformed values**.
 
 This is done by:
 ```{r}
-tidy(fit.s, exponentiate=NA) ## Transformation applied to log-scaled
-                             ## population parameters
+## Transformation applied to log-scaled population parameters
+tidy(fit.s, exponentiate=NA) 
 ```
 
 Also note, at the time of this writing the default separator between
@@ -207,6 +207,7 @@ The fixed effect parameters can be extracted by `effects="fixed"`
 ```{r}
 tidy(fit.s, effects="fixed")
 ```
+
 ## Extracting only random parameters
 
 The random standard deviations can be extracted by
@@ -215,6 +216,7 @@ The random standard deviations can be extracted by
 ```{r}
 tidy(fit.s, effects="ran_pars")
 ```
+
 ## Extracting random values (also called ETAs)
 
 The random values, or in NONMEM the ETAs, can be extracted by

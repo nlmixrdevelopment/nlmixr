@@ -472,6 +472,7 @@ for nlme estimation:
 ```{r}
 fit4 <- nlmixr(one.compartment, theo_sd,est="nlme",control = nlmeControl(pnlsTol = .5))
 ```
+
 where options are specified in the `nlme` documentation.
 Options for saem can be specified using `saemControl`:
 ```{r}
