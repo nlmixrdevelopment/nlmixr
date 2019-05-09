@@ -13,6 +13,7 @@ reference:
 - title: Model diagnostics
   contents: 
   - '`vpc`'
+  - '`traceplot`'
 - title: Datasets
   contents:
   - '`Bolus_1CPTMM`'
@@ -26,10 +27,13 @@ reference:
   - '`rats`'
 - title: Options for fitting and output
   contents:
+  - '`nmSave`'
+  - '`nmDocx`'
   - '`saemControl`'
   - '`foceiControl`'
   - '`nlmeControl`'
   - '`tableControl`'
+
 - title: Low level estimation routines
   contents:
   - '`gnlmm`'
@@ -116,7 +120,6 @@ reference:
   - '`summary.saemFit`'
   - '`theo_md`'
   - '`theo_sd`'
-  - '`traceplot`'
   - '`vpc_nlmixr_nlme`'
   - '`vpc_saemFit`'
   - '`vpc_ui`'

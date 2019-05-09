@@ -179,13 +179,13 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.cmt, theo_sd, <span class="dt">est=</span><span class="st">"nlme"</span>)</code></pre></div>
 <pre><code>## Loading model already run (/home/matt/R/x86_64-pc-linux-gnu-library/3.5/nlmixr/nlmixr-one.cmt-theo_sd-nlme-5a52a6e14c41d57f14800333b995589e.rds)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)</code></pre></div>
-<pre><code>## ── nlmixr nlme by maximum likelihood (Solved; μ-ref &amp; covs) nlme OBF fit ──</code></pre>
+<pre><code>## ── nlmixr nlme by [1m[33mmaximum likelihood[39m[22m ([3mSolved; μ-ref &amp; covs[23m) nlme OBF fit ──</code></pre>
 <pre><code>##          OBJF      AIC      BIC Log-likelihood Condition Number
 ## nlme 116.8727 373.4725 393.6521      -179.7363         17.08747</code></pre>
 <pre><code>## 
 ## ── Time (sec; $time): ─────────────────────────────────────────────────────</code></pre>
-<pre><code>##          nlme    setup table    other
-## elapsed 8.514 5.705841 0.012 0.374159</code></pre>
+<pre><code>##           nlme    setup table    other
+## elapsed 13.364 5.545704 0.014 0.262296</code></pre>
 <pre><code>## 
 ## ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</code></pre>
 <pre><code>##         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
@@ -245,13 +245,13 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(fit)</code></pre></div>
 <p><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-1.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-2.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-3.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-4.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-5.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-6.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-7.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-8.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-9.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-10.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-11.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-12.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-13.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-7-14.png" width="700"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)</code></pre></div>
-<pre><code>## ── nlmixr SAEM(ODE); OBJF by Gaussian Quadrature (n.nodes=3, n.sd=1.6) fit</code></pre>
+<pre><code>## ── nlmixr SAEM([3mODE[23m); [2m[3mOBJF by Gaussian Quadrature (n.nodes=3, n.sd=1.6)[23m[22m fit</code></pre>
 <pre><code>##                OBJF      AIC      BIC Log-likelihood Condition Number
 ## gauss3_1.6 122.9719 379.5717 399.7513      -182.7858         18.16274</code></pre>
 <pre><code>## 
 ## ── Time (sec; $time): ─────────────────────────────────────────────────────</code></pre>
-<pre><code>##           saem    setup table covariance logLik    other
-## elapsed 18.187 4.248864 0.021      0.009  0.029 0.360136</code></pre>
+<pre><code>##          saem    setup table covariance logLik    other
+## elapsed 8.277 0.326083 0.007      0.007  0.032 0.308917</code></pre>
 <pre><code>## 
 ## ── Population Parameters ($parFixed or $parFixedDf): ──────────────────────</code></pre>
 <pre><code>##         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)
@@ -366,6 +366,7 @@
 </table>
 <p>Default trace plots can be generated using:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/traceplot.html">traceplot</a></span>(fit)</code></pre></div>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>but with a little more work, we can get a nicer set of iteration trace plots (“wriggly worms”)…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iter &lt;-<span class="st"> </span>fit<span class="op">$</span>par.hist.stacked
 iter<span class="op">$</span>Parameter[iter<span class="op">$</span>par<span class="op">==</span><span class="st">"add.err"</span>] &lt;-<span class="st"> "Additive error"</span>
@@ -385,7 +386,7 @@ iter<span class="op">$</span>Parameter &lt;-<span class="st"> </span><span class
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_y_continuous</a></span>(<span class="st">"Value"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/facet_wrap">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>Parameter, <span class="dt">scales=</span><span class="st">"free_y"</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">"Theophylline single-dose"</span>, <span class="dt">subtitle=</span><span class="st">"Parameter estimation iterations"</span>)</code></pre></div>
-<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <p>… and some random-effects histograms…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">etas &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">eta =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(fit<span class="op">$</span>eta<span class="op">$</span>eta.ka, fit<span class="op">$</span>eta<span class="op">$</span>eta.cl, fit<span class="op">$</span>eta<span class="op">$</span>eta.v),
                    <span class="dt">lab =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"eta(ka)"</span>, <span class="st">"eta(CL/F)"</span>, <span class="st">"eta(V/F)"</span>), <span class="dt">each=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(fit<span class="op">$</span>eta)))
@@ -400,7 +401,7 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/coord_cartesian">coord_cartesian</a></span>(<span class="dt">xlim=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="op">-</span><span class="fl">1.75</span>,<span class="fl">1.75</span>)) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">"Theophylline single-dose"</span>, <span class="dt">subtitle=</span><span class="st">"IIV distributions"</span>)</code></pre></div>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <div id="xpose" class="section level2">
 <h2 class="hasAnchor">
 <a href="#xpose" class="anchor"></a>xpose</h2>
@@ -417,27 +418,37 @@ etas<span class="op">$</span>lab &lt;-<span class="st"> </span><span class="kw">
 ## 
 ##     filter</code></pre>
 <p>Now install the extension for nlmixr:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"nlmixrdevelopment/xpose.nlmixr"</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(xpose.nlmixr)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xpdbLoc &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/file.path">file.path</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/system.file">system.file</a></span>(<span class="dt">package=</span><span class="st">"nlmixr"</span>), <span class="st">"xpdb.rds"</span>);
+<span class="cf">if</span> (<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/files">file.exists</a></span>(xpdbLoc)){
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/load">load</a></span>(xpdbLoc);
+} <span class="cf">else</span> {
+    ## devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(xpose.nlmixr)
+    xp &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose.nlmixr/topics/xpose_data_nlmixr">xpose_data_nlmixr</a></span>(fit);
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/save">save</a></span>(xp, <span class="dt">file=</span>xpdbLoc)
+}</code></pre></div>
 <p>… and convert your nlmixr fit object into an xpose fit object.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose/topics/dv_vs_pred">dv_vs_pred</a></span>(xp)</code></pre></div>
-<div class="figure">
-<img src="dv_vs_pred.png" alt="DV vs PRED"><p class="caption">DV vs PRED</p>
-</div>
+<pre><code>## Using data from $prob no.1</code></pre>
+<pre><code>## Filtering data by EVID == 0</code></pre>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose/topics/dv_vs_pred">dv_vs_ipred</a></span>(xp)</code></pre></div>
-<div class="figure">
-<img src="dv_vs_ipred.png" alt="DV vs IPRED"><p class="caption">DV vs IPRED</p>
-</div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pred_vs_pred</span>(xp)</code></pre></div>
-<div class="figure">
-<img src="cwres_vs_pred.png" alt="CWRES vs PRED"><p class="caption">CWRES vs PRED</p>
-</div>
+<pre><code>## Using data from $prob no.1</code></pre>
+<pre><code>## Filtering data by EVID == 0</code></pre>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose/topics/dv_vs_pred">dv_vs_pred</a></span>(xp)</code></pre></div>
+<pre><code>## Using data from $prob no.1</code></pre>
+<pre><code>## Filtering data by EVID == 0</code></pre>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose/topics/res_vs_pred">absval_res_vs_pred</a></span>(xp, <span class="dt">res=</span><span class="st">"IWRES"</span>)</code></pre></div>
-<p><img src="iwres_vs_pred.png" alt="abs(IWRES) vs PRED"> We can also replicate some of nlmixr’s internal plots…</p>
+<pre><code>## Using data from $prob no.1</code></pre>
+<pre><code>## Filtering data by EVID == 0</code></pre>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-18-1.png" width="700"> We can also replicate some of nlmixr’s internal plots…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/xpose/topics/ind_plots">ind_plots</a></span>(xp, <span class="dt">res=</span><span class="st">"IWRES"</span>)</code></pre></div>
-<div class="figure">
-<img src="ind_plots.png" alt="Individual plots"><p class="caption">Individual plots</p>
-</div>
+<pre><code>## Using data from $prob no.1</code></pre>
+<pre><code>## Filtering data by EVID == 0</code></pre>
+<pre><code>## Tidying data by ID, TIME, EVID, PRED, RES ... and 17 more variables</code></pre>
+<p><img src="running_nlmixr_files/figure-html/unnamed-chunk-19-1.png" width="700"><img src="running_nlmixr_files/figure-html/unnamed-chunk-19-2.png" width="700"></p>
 <p>For more information about using xpose, see the Uppsala pharmacometrics group’s comprehensive site <a href="https://uupharmacometrics.github.io/xpose/">here</a>.</p>
 </div>
 </div>

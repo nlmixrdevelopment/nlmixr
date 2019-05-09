@@ -123,7 +123,7 @@ fit$eta
 ```
 
 Default trace plots can be generated using:
-```r
+```{r}
 traceplot(fit)
 ```
 
@@ -194,9 +194,9 @@ if (file.exists(xpdbLoc)){
     load(xpdbLoc);
 } else {
     ## devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
-    ## library(xpose.nlmixr)
-    ## xp <- xpose_data_nlmixr(fit);
-    ## save(xp, file=xpdbLoc)
+    library(xpose.nlmixr)
+    xp <- xpose_data_nlmixr(fit);
+    save(xp, file=xpdbLoc)
 }
 
 ```
@@ -212,7 +212,7 @@ dv_vs_ipred(xp)
 ```
 
 ```{r}
-pred_vs_pred(xp)
+dv_vs_pred(xp)
 ```
 
 ```{r}
