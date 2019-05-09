@@ -432,11 +432,12 @@ update.function  <- .nlmixrUpdate
   }
   fun2$meta <- list2env(meta, parent=emptyenv());
   .mv  <- RxODE::rxModelVars(fun2$rxode);
-  .tmp <- .mv$stateExtra[!(.mv$stateExtra %in% c(.mv$lhs))];
-  ## if (length(.tmp > 0)){
-  ##   stop(sprintf("Modeled responses need to be defined in the model; Add definition for: %s",
-  ##                paste(.tmp, collapse=", ")))
-  ## }
+  .tmp <- paste(fun2$nmodel$predDf$var)
+  .tmp <- .tmp[!(.tmp %in% c(.mv$lhs,.mv$state))];
+  if (length(.tmp > 0)){
+    stop(sprintf("Modeled responses need to be defined in the model; Add definition for: %s",
+                 paste(.tmp, collapse=", ")))
+  }
   return(fun2)
 }
 
