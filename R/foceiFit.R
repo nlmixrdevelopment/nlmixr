@@ -2627,26 +2627,26 @@ print.nlmixrFitCore <- function(x, ...){
                                                       crayon::bold(" posthoc")),
                                                ""),
                                                crayon::bold(" posthoc")), " estimation"), " fit");
-    message(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
-                             x$extra, .posthoc)))
+    cat(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
+                         x$extra, .posthoc)), "\n")
     if (is.na(get("objective",x$env))){
-        message(sprintf(" Gaussian/Laplacian Likelihoods: AIC(%s) or %s etc.",
+        cat(sprintf(" Gaussian/Laplacian Likelihoods: AIC(%s) or %s etc.",
                         crayon::yellow(.bound),
-                        paste0(crayon::yellow(.bound),crayon::bold$blue("$objf"))))
-        message(sprintf(" FOCEi CWRES & Likelihoods: addCwres(%s)",
-                        crayon::yellow(.bound)))
+                        paste0(crayon::yellow(.bound),crayon::bold$blue("$objf"))), "\n")
+        cat(sprintf(" FOCEi CWRES & Likelihoods: addCwres(%s)",
+                        crayon::yellow(.bound)), "\n")
     } else {
         print(x$objDf)
     }
-    message(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))));
+    cat(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))),"\n");
     print(x$time)
     .boundChar <- nchar(.bound);
     if (2*.boundChar+54 < .width){
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))));
+        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))),"\n");
     } else if (.boundChar+54 < .width) {
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))));
+        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))),"\n");
     } else {
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))))
+        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))),"\n")
     }
     .pf <- R.utils::captureOutput(print(x$parFixed))
     if (crayon::has_color()){
@@ -2667,7 +2667,7 @@ print.nlmixrFitCore <- function(x, ...){
     cat(paste(.pf, collapse="\n"), "\n")
     .mu <- dim(x$omega)[1] == length(x$mu.ref)
     if (!.mu){
-        message(paste0("\n", cli::rule(paste0(crayon::bold("BSV Covariance"), " (", crayon::yellow(.bound), crayon::bold$blue("$omega"), "):"))));
+        cat(paste0("\n", cli::rule(paste0(crayon::bold("BSV Covariance"), " (", crayon::yellow(.bound), crayon::bold$blue("$omega"), "):"))),"\n");
         print(x$omega);
         cat(paste0("\n  Not all variables are ", ifelse(use.utf(), "\u03bc", "mu"), "-referenced.\n  Can also see BSV Correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n"))
     } else {
@@ -2709,44 +2709,44 @@ print.nlmixrFitCore <- function(x, ...){
             cat(paste(.lt, collapse="\n"), "\n\n")
         }
         if (.boundChar*2+70 < .width){
-            message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"));
+            cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"),"\n");
         } else {
             if (.boundChar+43 < .width){
-                message(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"));
-                message("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)");
+                cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"),"\n");
+                cat("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)","\n");
             } else {
-                message(paste0("  Full BSV covariance (", crayon::bold$blue("$omega"), ")"));
-                message("    or correlation (", crayon::bold$blue("$omegaR"), "; diagonals=SDs)");
+                cat(paste0("  Full BSV covariance (", crayon::bold$blue("$omega"), ")\n"));
+                cat("    or correlation (", crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n");
             }
         }
 
     }
     if (.boundChar+74 < .width){
-        message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
-                       crayon::yellow(.bound), crayon::bold$blue("$shrink")));
+        cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+                   crayon::yellow(.bound), crayon::bold$blue("$shrink")),"\n");
     } else {
-        message(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
-                       crayon::bold$blue("$shrink")));
+        cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+                       crayon::bold$blue("$shrink")),"\n");
     }
 
     if (x$message != ""){
-        message(paste0("  Minimization message (",crayon::yellow(.bound), crayon::bold$blue("$message"), "): "));
-        message(paste0("    ", x$message))
+        cat(paste0("  Minimization message (",crayon::yellow(.bound), crayon::bold$blue("$message"), "): "),"\n");
+        cat(paste0("    ", x$message),"\n")
         if (x$message=="false convergence (8)"){
-            message("  In an ODE system, false convergence may mean \"useless\" evaluations were performed.")
-            message("  See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean")
-            message("  It could also mean the convergence is poor, check results before accepting fit")
-            message("  You may also try a good derivative free optimization:")
-            message("    nlmixr(...,control=list(outerOpt=\"bobyqa\"))")
+            cat("  In an ODE system, false convergence may mean \"useless\" evaluations were performed.\n")
+            cat("  See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean\n")
+            cat("  It could also mean the convergence is poor, check results before accepting fit\n")
+            cat("  You may also try a good derivative free optimization:\n")
+            cat("    nlmixr(...,control=list(outerOpt=\"bobyqa\"))\n")
         }
     }
     if (RxODE::rxIs(x, "nlmixrFitData")){
         .dfName <- "data.frame";
         if (RxODE::rxIs(x, "tbl"))  .dfName <- "tibble"
         if (RxODE::rxIs(x, "data.table"))  .dfName <- "data.table"
-        message(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object", ifelse(.bound == "", "", " "),
+        cat(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object", ifelse(.bound == "", "", " "),
                                               crayon::yellow(.bound),
-                                              " is a modified ", crayon::blue(.dfName), "):"))))
+                                              " is a modified ", crayon::blue(.dfName), "):"))),"\n")
         if (RxODE::rxIs(x, "tbl") || RxODE::rxIs(x, "data.table")){
             .oldOpts <- options("tibble.print_max", "tibble.print_min");
             on.exit(options(tibble.print_max=.oldOpts$tibble.print_max,

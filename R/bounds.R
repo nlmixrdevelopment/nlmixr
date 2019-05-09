@@ -626,11 +626,11 @@ as.data.frame.nlmixrBounds <- function(x, row.names = NULL, optional = FALSE, ..
 
 ##' @export
 print.nlmixrBounds <- function(x, ...){
-    message(paste0(crayon::bold("Fixed Effects")," (", crayon::bold$blue("$theta"), "):"));
+    cat(paste0(crayon::bold("Fixed Effects")," (", crayon::bold$blue("$theta"), "):"),"\n");
     print(x$theta);
     omega <- x$omega;
     if (dim(omega)[1] > 0){
-        message(paste0("\n", crayon::bold("Omega")," (", crayon::bold$blue("$omega"), "):"))
+        cat(paste0("\n", crayon::bold("Omega")," (", crayon::bold$blue("$omega"), "):"),"\n")
         print(omega)
     }
 }

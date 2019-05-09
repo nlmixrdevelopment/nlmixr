@@ -571,30 +571,30 @@ nlmixrUI.multipleEndpoint <- function(x){
 ##' @author Matthew L. Fidler
 ##' @export
 print.nlmixrUI <- function(x, ...){
-  message(cli::rule(x$model.desc, line="bar2"))
-  message(cli::rule(crayon::bold("Initialization:")))
+  cat(cli::rule(x$model.desc, line="bar2"),"\n")
+  cat(cli::rule(crayon::bold("Initialization:")),"\n")
   print(x$ini)
   if (length(x$all.covs) > 0){
-    message("\n Covariates or Uninitialized Parameters ($all.covs)")
+    cat("\n Covariates or Uninitialized Parameters ($all.covs)\n")
     print(x$all.covs);
   }
   if (length(x$predDf$cond) > 1){
-      message(cli::rule(paste0(crayon::bold("Multiple Endpoint Model")," (", crayon::bold$blue("$multipleEndpoint"), "):")))
+      cat(cli::rule(paste0(crayon::bold("Multiple Endpoint Model")," (", crayon::bold$blue("$multipleEndpoint"), "):")),"\n")
     x$multipleEndpoint %>%
         huxtable::print_screen(colnames=FALSE)
-    message("")
+    cat("\n")
   }
   .mu <- x$muRefTable;
   if (length(.mu) > 0){
-      message(cli::rule(paste0(crayon::bold(paste0(ifelse(use.utf(), "\u03bc", "mu"),"-referencing")),
-                           " (", crayon::bold$blue("$muRefTable"), "):")))
+      cat(cli::rule(paste0(crayon::bold(paste0(ifelse(use.utf(), "\u03bc", "mu"),"-referencing")),
+                           " (", crayon::bold$blue("$muRefTable"), "):")),"\n")
       .mu %>%
           huxtable::print_screen(colnames=FALSE)
-      message("")
+      cat("\n")
   }
-  message(cli::rule(crayon::bold(sprintf("Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))))
-  message(x$fun.txt)
-  message(cli::rule(line="bar2"))
+  cat(cli::rule(crayon::bold(sprintf("Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))),"\n")
+  cat(x$fun.txt,"\n")
+  cat(cli::rule(line="bar2"),"\n")
 }
 
 ## This is a list of supported distributions with the number of arguments they currently support.
