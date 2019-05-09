@@ -914,6 +914,7 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     }
     .uif <- fit$uif;
     .saem <- fit$saem
+    .od <- fit$origData
     if (!is.null(.saem)){
         assign("saem",NULL,fit$env)
         on.exit({assign("saem",.saem,fit$env)});
@@ -966,5 +967,6 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     }
     .env <- .new$env
     .env$time <- data.frame(.oTime,cwres=(proc.time() - .pt)["elapsed"],check.names=FALSE);
+    assign("origData", .od, .env)
     return(.new);
 }

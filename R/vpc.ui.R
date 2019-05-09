@@ -36,9 +36,15 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         .xtra$returnType <- "rxSolve";
         .xtra$modelName <- "VPC"
         pt <- proc.time();
+        .dt <- fit$origData
         .si <- fit$simInfo;
         if (is.null(data)){
-            dat <- nlmixrData(getData(fit), .si$rx);
+            if (!is.null(stratify)){
+                .rx <- paste0(.si$rx,"\nrx_dummy_var~",paste(tolower(stratify),collapse="+"), "\n");
+            } else {
+                .rx <- .si$rx;
+            }
+            dat <- nlmixrData(.dt, .rx);
         } else {
             dat <- data
         }
@@ -141,7 +147,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         .x <- obj;
         class(.x)  <- class(.x)[class(.x) != "nlmixrVpc"]
         return(.x);
-    } else if (any(arg==c("rxsim","sim", "obs"))) {
+    } else if (any(arg==c("rxsim", "sim", "obs"))) {
         .info  <- attr(class(obj), "nlmixrVpc");
         return(.info[[arg]])
     }
