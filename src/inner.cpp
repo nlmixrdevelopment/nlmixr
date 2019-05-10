@@ -225,12 +225,14 @@ typedef struct {
   double hessEps;
   double cholAccept;
   double resetEtaSize;
+  int didEtaReset;
   double resetThetaSize;
   double resetThetaFinalSize;
   int checkTheta;
   int *muRef;
   int muRefN;
   int resetHessianAndEta;
+  int didHessianReset;
   int cholSEOpt;
   int cholSECov;
   int fo;
@@ -254,6 +256,7 @@ typedef struct {
   double gradCalcCentralSmall;
   double gradCalcCentralLarge;
   double etaNudge;
+  int didEtaNudge;
   int reducedTol;
   int reducedTol2;
   int repeatGill;
@@ -1204,8 +1207,10 @@ static inline void innerOpt1(int id, int likId){
       if (op_focei.resetHessianAndEta){
 	fInd->mode = 1;
 	fInd->uzm = 1;
+	op_focei.didHessianReset=1;
       }
       std::fill(&fInd->eta[0], &fInd->eta[0] + op_focei.neta, 0.0);
+      op_focei.didEtaReset=1;
     } else if (R_FINITE(op_focei.resetEtaSize)) {
       std::copy(&fInd->eta[0], &fInd->eta[0] + op_focei.neta, etaMat.begin());
       // Standardized ETAs
@@ -1217,8 +1222,10 @@ static inline void innerOpt1(int id, int likId){
 	  if (op_focei.resetHessianAndEta){
 	    fInd->mode = 1;
 	    fInd->uzm = 1;
+	    op_focei.didHessianReset=1;
 	  }
 	  std::fill(&fInd->eta[0], &fInd->eta[0] + op_focei.neta, 0.0);
+	  op_focei.didEtaReset=1;
 	  doBreak=true;
 	  break;
 	}
@@ -1230,8 +1237,10 @@ static inline void innerOpt1(int id, int likId){
 	    if (op_focei.resetHessianAndEta){
 	      fInd->mode = 1;
 	      fInd->uzm = 1;
+	      op_focei.didHessianReset=1;
 	    }
 	    std::fill(&fInd->eta[0], &fInd->eta[0] + op_focei.neta, 0.0);
+	    op_focei.didEtaReset=1;
 	    break;
 	  }
 	}
@@ -1263,6 +1272,7 @@ static inline void innerOpt1(int id, int likId){
 	 &izs, &rzs, &dzs);
   // If stays at zero try another point?
   if (fInd->doEtaNudge == 1 && op_focei.etaNudge != 0.0){
+    op_focei.didEtaNudge =1;
     bool tryAgain=true;
     for (int i = fop->neta; i--;){
       if (fInd->x[i] != 0){
@@ -1273,6 +1283,7 @@ static inline void innerOpt1(int id, int likId){
     if (tryAgain){
       fInd->mode = 1;
       fInd->uzm = 1;
+      op_focei.didHessianReset=1;
       std::fill_n(fInd->x, fop->neta, 0.01);
       fInd->x[fop->neta] = id;
       n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g, 
@@ -1290,6 +1301,7 @@ static inline void innerOpt1(int id, int likId){
       if (tryAgain){
 	fInd->mode = 1;
 	fInd->uzm = 1;
+	op_focei.didHessianReset=1;
 	std::fill_n(fInd->x, fop->neta, -0.01);
 	fInd->x[fop->neta] = id;
 	n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g, 
@@ -1398,6 +1410,9 @@ void thetaReset(double size){
       thetaReset["aEpsC"] = aEpsC;
       thetaReset["c1"] = op_focei.c1;
       thetaReset["c2"] = op_focei.c2;
+      if (op_focei.didEtaReset==1){
+	warning("mu-referenced Thetas were reset during optimization; (Can control by foceiControl(resetThetaP=.,resetThetaCheckPer=.,resetThetaFinalP=.))");
+      }
       stop("theta reset");
     }
   }
@@ -1446,6 +1461,7 @@ void innerOpt(){
       	  // Rprintf("Hessian Reset for ID: %d\n", id+1);
           indF->mode = 1;
           indF->uzm = 1;
+	  op_focei.didHessianReset=1;
           std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
       	  try {
             // Rprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
@@ -1453,6 +1469,7 @@ void innerOpt(){
           } catch (...){
             indF->mode = 1;
             indF->uzm = 1;
+	    op_focei.didHessianReset=1;
             std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
             if(!op_focei.noabort){
               stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
@@ -1460,6 +1477,7 @@ void innerOpt(){
       	      indF->doChol = 0; // Use generalized cholesky decomposition
               indF->mode = 1;
               indF->uzm = 1;
+	      op_focei.didHessianReset=1;
               std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
       	      try {
       		innerOpt1(id, 0);
@@ -4394,7 +4412,19 @@ Environment foceiFitCpp_(Environment e){
       stop("Not setup right.");
     }
   } else {
+    op_focei.didHessianReset=0;
+    op_focei.didEtaNudge =0;
+    op_focei.didEtaReset=0;
     foceiOuter(e);
+    if (op_focei.didHessianReset==1){
+      warning("Hessian reset during optimization; (Can control by foceiControl(resetHessianAndEta=.))");
+    }
+    if (op_focei.didEtaNudge==1){
+      warning("Initial ETAs were nudged; (Can control by foceiControl(etaNudge=.))");
+    }
+    if (op_focei.didEtaReset==1){
+      warning("ETAs were reset to zero during optimization; (Can control by foceiControl(resetEtaP=.))");
+    }
     if (op_focei.maxOuterIterations > 0  && R_FINITE(op_focei.resetThetaFinalSize)){
       focei_options *fop = &op_focei;
       std::fill(op_focei.etaM.begin(),op_focei.etaM.end(), 0.0);
