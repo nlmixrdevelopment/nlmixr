@@ -1532,7 +1532,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   if (calcCov){
     .covm <- try(calc.COV(object));
     .doIt <- !inherits(.covm, "try-error");
-    if (.doIt && dim(.covm)[1] !=length(.nth)) .doIt <- FALSE
+    if (.doIt && dim(.covm)[1] !=.nth) .doIt <- FALSE
     if (.doIt){
       .tmp <- try(chol(.covm), silent=TRUE)
       .addCov <- TRUE
@@ -1602,6 +1602,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   .ini <- as.data.frame(uif$ini)
   .ini <- .ini[is.na(.ini$err),]
   .ini <- .ini[!is.na(.ini$ntheta),]
+  .ini <- .ini[!.ini$fix,]
   .ini <- paste(.ini$name);
   if (.addCov){
     if (!.calcCov){
