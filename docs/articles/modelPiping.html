@@ -76,6 +76,14 @@
 <li>
       <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
+    <li class="divider">
+    <li class="dropdown-header">Page 2018</li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+    </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -120,7 +128,7 @@
     <div class="page-header toc-ignore">
       <h1>Modifying nlmixr models by piping</h1>
             
-            <h4 class="date">2019-05-09</h4>
+            <h4 class="date">2019-05-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/modelPiping.Rmd"><code>vignettes/modelPiping.Rmd</code></a></small>
       <div class="hidden name"><code>modelPiping.Rmd</code></div>
@@ -174,8 +182,8 @@ one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>()
 <span class="co">#&gt; FOCEi 116.8045 373.4043 393.5839      -179.7022         29.32241</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;           setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.31591 0.988532   0.988534  0.01 3.869024</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.334827  1.01048   1.010484 0.139 3.796209</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -241,7 +249,7 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.475864 0.583603   0.583606 0.014 0.869927</span>
+<span class="co">#&gt; elapsed 0.322812 0.613303   0.613306 0.017 0.931579</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -289,8 +297,8 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt; FOCEi 116.8049 371.4046 388.7015      -179.7023         7.971318</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 0.307827  0.57933   0.579333 0.009 0.59851</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.322806 0.584106   0.584109 0.146 0.556979</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -338,8 +346,8 @@ one.ka.<span class="fl">0.7</span> &lt;-<span class="st"> </span>one.compartment
 <span class="co">#&gt; FOCEi 116.8071 373.4068 393.5865      -179.7034         47.02366</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 0.305891 0.972098   0.972101 0.009 2.81691</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.305832 1.000212   1.000215 0.009 2.834741</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -398,7 +406,7 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.316856 0.525519   0.525522 0.009 1.567103</span>
+<span class="co">#&gt; elapsed 0.297826 0.544457    0.54446 0.009 1.610257</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -447,8 +455,8 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; FOCEi 116.8129 373.4127 393.5923      -179.7063         62.15095</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;           setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.30586 0.983262   0.983265 0.009 3.081613</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.308872  0.99269   0.992693 0.009 3.194745</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -518,7 +526,7 @@ wt70 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;           setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.30792  1.06909   1.069093  0.01 2.180897</span>
+<span class="co">#&gt; elapsed 0.31195 1.091749   1.091752  0.01 2.215549</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;          Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -578,7 +586,7 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.316836 0.970734   0.970737 0.013 6.315693</span>
+<span class="co">#&gt; elapsed 0.303858 0.998263   0.998267  0.01 6.539612</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;          Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>

@@ -76,6 +76,14 @@
 <li>
       <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
+    <li class="divider">
+    <li class="dropdown-header">Page 2018</li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+    </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -120,7 +128,7 @@
     <div class="page-header toc-ignore">
       <h1>Using Broom with nlmixr</h1>
             
-            <h4 class="date">2019-05-09</h4>
+            <h4 class="date">2019-05-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/broom.Rmd"><code>vignettes/broom.Rmd</code></a></small>
       <div class="hidden name"><code>broom.Rmd</code></div>
@@ -354,7 +362,8 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 </tr>
 </table>
 <p>Note by default these are the parameters that are <em>actually</em> estimated in nlmixr, not the back-transformed values in the table from the printout. Of course, with mu-referenced models, you may want to exponentiate some of the terms. The broom package allows you to apply exponentiation on <em>all</em> the parameters, that is:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">TRUE</span>) ## Transformation applied on every</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Transformation applied on every parameter
+<span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">TRUE</span>) </code></pre></div>
 <table class="table huxtable">
 <col>
 <col>
@@ -427,8 +436,7 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
 </tr>
 </table>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">                               ## parameter</code></pre></div>
-<p><strong>Note:</strong>, in accordance with the rest of the broom package, when the parameters with the exponentiated, the standard errors are transformed to an approximate standard error by the formula: <span class="math inline">\(se(exp(x)) \approx exp(mu_x)\times se_x\)</span>. This can be confusing because the confidence intervals (described later) are using the actual standard error and back-transforming to the exponiated scale. This is the reason why the default for nlmixr’s <code>broom</code> interface is <code>exponentiat=FALSE</code>, that is:</p>
+<p><strong>Note:</strong>, in accordance with the rest of the broom package, when the parameters with the exponentiated, the standard errors are transformed to an approximate standard error by the formula: <span class="math inline">\(\textrm{se}(\exp(x)) \approx \exp(\textrm{model estimate}_x)\times \textrm{se}_x\)</span>. This can be confusing because the confidence intervals (described later) are using the actual standard error and back-transforming to the exponentiated scale. This is the reason why the default for nlmixr’s <code>broom</code> interface is <code>exponentiate=FALSE</code>, that is:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">FALSE</span>) ## No transformation applied</code></pre></div>
 <table class="table huxtable">
 <col>
@@ -504,7 +512,8 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 </table>
 <p>If you want, you can also use the parsed back-transformation that is used in nlmixr tables (ie <code>fit$parFixedDf</code>). <strong>Please note that this uses the approximate back-transformation for standard errors on the log-scaled back-transformed values</strong>.</p>
 <p>This is done by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">NA</span>) ## Transformation applied to log-scaled</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Transformation applied to log-scaled population parameters
+<span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">NA</span>) </code></pre></div>
 <table class="table huxtable">
 <col>
 <col>
@@ -577,7 +586,6 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
 </tr>
 </table>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">                             ## population parameters</code></pre></div>
 <p>Also note, at the time of this writing the default separator between variables is <code>.</code>, which doesn’t work well with this model giving <code>cor__eta.v.eta.cl</code>. You can easily change this by:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="dt">broom.mixed.sep2=</span><span class="st">".."</span>)
 <span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s)</code></pre></div>
@@ -674,20 +682,20 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <tr>
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5    </td>
 <td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00674</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00582</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0078</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5.15 </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-4.85 </td>
 </tr>
 <tr>
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">0.347</td>
 <td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">1.42   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">1.27   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">1.57  </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.242</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.452</td>
 </tr>
 <tr>
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.84 </td>
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.84   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">      </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">    </td>
 </tr>
 </table>
 <p>This transforms the variables as described above. You can still use the <code>exponentiate</code> parameter to control the display of the confidence interval:</p>
@@ -916,7 +924,6 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <a href="#extracting-only-fixed-effect-parameters" class="anchor"></a>Extracting only fixed effect parameters</h2>
 <p>The fixed effect parameters can be extracted by <code>effects="fixed"</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"fixed"</span>)</code></pre></div>
-<p></p>
 <table class="table huxtable">
 <col>
 <col>
@@ -949,10 +956,12 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">6.37e-10</td>
 </tr>
 </table>
- ## Extracting only random parameters
+</div>
+<div id="extracting-only-random-parameters" class="section level2">
+<h2 class="hasAnchor">
+<a href="#extracting-only-random-parameters" class="anchor"></a>Extracting only random parameters</h2>
 <p>The random standard deviations can be extracted by <code>effects="ran_pars"</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"ran_pars"</span>)</code></pre></div>
-<p></p>
 <table class="table huxtable">
 <col>
 <col>
@@ -989,7 +998,10 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.84 </td>
 </tr>
 </table>
- ## Extracting random values (also called ETAs)
+</div>
+<div id="extracting-random-values-also-called-etas" class="section level2">
+<h2 class="hasAnchor">
+<a href="#extracting-random-values-also-called-etas" class="anchor"></a>Extracting random values (also called ETAs)</h2>
 <p>The random values, or in NONMEM the ETAs, can be extracted by <code>effects="ran_vals"</code> or <code>effects="random"</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"ran_vals"</span>))</code></pre></div>
 <table class="table huxtable">
@@ -1075,42 +1087,42 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
 <td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00626</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5.07</td>
 </tr>
 <tr>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
 <td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00543</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">-5.21</td>
 </tr>
 <tr>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
 <td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">3</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00872</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-4.74</td>
 </tr>
 <tr>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
 <td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00392</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">-5.54</td>
 </tr>
 <tr>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
 <td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">5</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00928</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-4.68</td>
 </tr>
 <tr>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">ID</td>
 <td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">6</td>
 <td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00596</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">-5.12</td>
 </tr>
 </table>
  This can also be changed by the <code>exponentiate</code> argument:
@@ -1495,6 +1507,8 @@ ft  &lt;-<span class="st"> </span>huxtable<span class="op">::</span><span class=
       <li>
 <a href="#extracting-other-model-information-with-tidy">Extracting other model information with <code>tidy</code></a><ul class="nav nav-pills nav-stacked">
 <li><a href="#extracting-only-fixed-effect-parameters">Extracting only fixed effect parameters</a></li>
+      <li><a href="#extracting-only-random-parameters">Extracting only random parameters</a></li>
+      <li><a href="#extracting-random-values-also-called-etas">Extracting random values (also called ETAs)</a></li>
       <li><a href="#extracting-random-coefficients">Extracting random coefficients</a></li>
       </ul>
 </li>

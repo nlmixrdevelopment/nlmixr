@@ -112,6 +112,14 @@ reasonable huxtables with nlmixr fit objects." />
     <li>
       <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Page 2018</li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+    </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -254,6 +262,10 @@ name the <code>coef</code> vector: <code><a href='https://www.rdocumentation.org
     <tr>
       <th>omit_coefs</th>
       <td><p>Omit these coefficients.</p></td>
+    </tr>
+    <tr>
+      <th>na_omit</th>
+      <td><p>Style of na_omit to use for the <code>error_format</code>;  If <code>na_omit = "all"</code>, then all items in the <code>error_format</code> have to be <code>NA</code> to replace the row with an empty string.  If <code>na_omit = "any"</code>, then any of the items in the <code>error_format</code> with a <code>NA</code> will be replaced with an empty string.</p></td>
     </tr>
     </table>
     
