@@ -454,12 +454,16 @@ nmDocx  <- function(x,
                                       format(Sys.time(), "%a %b %d %X %Y")),
                               style=subtitleStyle) %>%
         officer::body_add_par("",style=normalStyle) %>%
-        officer::body_add_toc() %>%
-        flextable::body_add_flextable(flextable::autofit(.asFlx(.nmHuxHeader(x, .bound)))) %>%
+        officer::body_add_toc();
+    .doc <- .doc %>%
+        flextable::body_add_flextable(flextable::autofit(.asFlx(.nmHuxHeader(x, .bound))));
+    .doc <- .doc %>%
         officer::body_add_par("Timing ($time, in seconds)", style=headerStyle) %>%
-        flextable::body_add_flextable(flextable::autofit(.asFlx(.nmHuxTime(x)))) %>%
+        flextable::body_add_flextable(flextable::autofit(.asFlx(.nmHuxTime(x))))
+    .doc <- .doc %>%
         officer::body_add_par(sprintf("Parameter Information as_hux(%s)", .bound), style=headerStyle) %>%
-        flextable::body_add_flextable(flextable::autofit(.asFlx(.hreg))) %>%
+        flextable::body_add_flextable(flextable::autofit(.asFlx(.hreg)));
+    doc <- .doc %>%
         officer::body_add_par("UI Model information ($uif):", style=headerStyle)
     .doc  <- .nmDocxPreformat(x$uif, .doc, preformattedStyle, width)
 

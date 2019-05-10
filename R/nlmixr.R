@@ -761,7 +761,6 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
             .env <- .ret$env
             .extra <- (proc.time() - .nlmixrTime)["elapsed"] - sum(.env$time)
             .env$time <- data.frame(.env$time,"other"=.extra, check.names=FALSE)
-            .env$time <- data.frame(.env$time,"other"=.extra, check.names=FALSE)
         }
     }
     return(.ret);
