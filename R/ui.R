@@ -433,11 +433,27 @@ update.function  <- .nlmixrUpdate
   fun2$meta <- list2env(meta, parent=emptyenv());
   .mv  <- RxODE::rxModelVars(fun2$rxode);
   .tmp <- paste(fun2$nmodel$predDf$var)
-  .tmp <- .tmp[!(.tmp %in% c(.mv$lhs,.mv$state))];
-
+  .testVars <- c(.mv$lhs,.mv$state)
+  .tmp <- .tmp[!(.tmp %in% .testVars)];
   if (length(.tmp > 0)){
-    stop(sprintf("Modeled responses need to be defined in the model; Add definition for: %s",
+    .predDf <- fun2$predDf
+    if (length(.predDf$var) > 0){
+      .predDf <- .predDf[.predDf$var %in% .tmp,];
+      .predDf <- .predDf[.predDf$var == .predDf$cond, , drop = FALSE]
+      if (length(.predDf$var) > 0){
+        stop(sprintf("Complex multiple compartment models need to be conditioned by `|`\n ie log(cp) ~ add(err) | cmt\n The following endpoints need to be corrected: %s", paste(.predDf$var, collapse=", ")))
+      }
+    }
+    .tmp <- lapply(.tmp,function(x){
+      .newPars <- RxODE::rxModelVars(paste0("nlmixr_tmp=",x))$params
+      if (all(.newPars %in% .testVars)) return(NA_character_)
+      return(.newPars);
+    })
+    .tmp <- na.omit(unlist(.tmp))
+    if (length(.tmp) > 0){
+      stop(sprintf("Modeled responses need to be defined in the model; Add definition for: %s",
                  paste(.tmp, collapse=", ")))
+    }
   }
   return(fun2)
 }
