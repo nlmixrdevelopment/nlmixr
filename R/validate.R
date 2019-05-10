@@ -16,7 +16,8 @@ nlmixrValidate <- function(full=FALSE){
         options(nlmixr.save=TRUE,
                 nlmixr.save.dir=system.file(package="nlmixr"));
 
-        sapply(list.files(system.file(package="nlmixr"), pattern="\\.rds$", full.names=TRUE),
+        sapply(c(list.files(system.file(package="nlmixr"), pattern="\\.rds$", full.names=TRUE),
+                 list.files(file.path("inst"),pattern="\\.rds$", full.names=TRUE)),
                function(x){unlink(x)})
         ## For some reason when tangling the nlme runs crash.
         ## run them here first.

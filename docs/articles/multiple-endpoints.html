@@ -80,14 +80,14 @@
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
-    <span class="fas fa fas fa-scroll"></span>
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
 </li>
 <li>
   <a href="../reference/index.html">
-    <span class="fa fa-file-code-o"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -120,7 +120,7 @@
     <div class="page-header toc-ignore">
       <h1>Working with multiple endpoints</h1>
             
-            <h4 class="date">2019-05-08</h4>
+            <h4 class="date">2019-05-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/multiple-endpoints.Rmd"><code>vignettes/multiple-endpoints.Rmd</code></a></small>
       <div class="hidden name"><code>multiple-endpoints.Rmd</code></div>
@@ -207,10 +207,15 @@
 <p>To see more about how nlmixr will handle the multiple compartment model, it is quite informative to parse the model and print the information about that model. In this case an initial parsing would give:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ui &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pk.turnover.emax)
 ui
+<span class="co">#&gt; ▂▂ RxODE-based ODE model ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂ </span>
+<span class="co">#&gt; ── Initialization: ──────────────────────────────────────────────────────── </span>
+<span class="co">#&gt; Fixed Effects ($theta): </span>
 <span class="co">#&gt;       tktr        tka        tcl         tv   poplogit      tec50 </span>
 <span class="co">#&gt;  0.0000000  0.0000000 -2.3025851  2.3025851  2.0000000 -0.6931472 </span>
 <span class="co">#&gt;      tkout        te0 </span>
 <span class="co">#&gt; -2.9957323  4.6051702 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Omega ($omega): </span>
 <span class="co">#&gt;          eta.ktr eta.ka eta.cl eta.v eta.emax eta.ec50 eta.kout eta.e0</span>
 <span class="co">#&gt; eta.ktr        1      0      0     0      0.0      0.0      0.0    0.0</span>
 <span class="co">#&gt; eta.ka         0      1      0     0      0.0      0.0      0.0    0.0</span>
@@ -220,6 +225,7 @@ ui
 <span class="co">#&gt; eta.ec50       0      0      0     0      0.0      0.5      0.0    0.0</span>
 <span class="co">#&gt; eta.kout       0      0      0     0      0.0      0.0      0.5    0.0</span>
 <span class="co">#&gt; eta.e0         0      0      0     0      0.0      0.0      0.0    0.5</span>
+<span class="co">#&gt; ── Multiple Endpoint Model ($multipleEndpoint): ─────────────────────────── </span>
 <span class="co">#&gt; ┌───────────────────────┬───────────────────────┬───────────────────────┐</span>
 <span class="co">#&gt; │ variable              │ cmt                   │ dvid*                 │</span>
 <span class="co">#&gt; ├───────────────────────┼───────────────────────┼───────────────────────┤</span>
@@ -229,7 +235,56 @@ ui
 <span class="co">#&gt; │                       │                       │ dvid=2                │</span>
 <span class="co">#&gt; └───────────────────────┴───────────────────────┴───────────────────────┘</span>
 <span class="co">#&gt;   * If dvids are outside this range, all dvids are re-numered            </span>
-<span class="co">#&gt;   sequentially, ie 1,7, 10 becomes 1,2,3 etc</span></code></pre></div>
+<span class="co">#&gt;   sequentially, ie 1,7, 10 becomes 1,2,3 etc                             </span>
+<span class="co">#&gt; ── μ-referencing ($muRefTable): ─────────────────────────────────────────── </span>
+<span class="co">#&gt; ┌──────────┬──────────┐</span>
+<span class="co">#&gt; │ theta    │ eta      │</span>
+<span class="co">#&gt; ├──────────┼──────────┤</span>
+<span class="co">#&gt; │ tktr     │ eta.ktr  │</span>
+<span class="co">#&gt; ├──────────┼──────────┤</span>
+<span class="co">#&gt; │ tka      │ eta.ka   │</span>
+<span class="co">#&gt; ├──────────┼──────────┤</span>
+<span class="co">#&gt; │ tcl      │ eta.cl   │</span>
+<span class="co">#&gt; ├──────────┼──────────┤</span>
+<span class="co">#&gt; │ tv       │ eta.v    │</span>
+<span class="co">#&gt; ├──────────┼──────────┤</span>
+<span class="co">#&gt; │ poplogit │ eta.emax │</span>
+<span class="co">#&gt; ├──────────┼──────────┤</span>
+<span class="co">#&gt; │ tec50    │ eta.ec50 │</span>
+<span class="co">#&gt; ├──────────┼──────────┤</span>
+<span class="co">#&gt; │ tkout    │ eta.kout │</span>
+<span class="co">#&gt; ├──────────┼──────────┤</span>
+<span class="co">#&gt; │ te0      │ eta.e0   │</span>
+<span class="co">#&gt; └──────────┴──────────┘</span>
+<span class="co">#&gt; ── Model: ───────────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;     ktr &lt;- exp(tktr + eta.ktr)</span>
+<span class="co">#&gt;     ka &lt;- exp(tka + eta.ka)</span>
+<span class="co">#&gt;     cl &lt;- exp(tcl + eta.cl)</span>
+<span class="co">#&gt;     v &lt;- exp(tv + eta.v)</span>
+<span class="co">#&gt;     ##</span>
+<span class="co">#&gt;     #poplogit = log(temax/(1-temax))</span>
+<span class="co">#&gt;     logit=exp(poplogit+eta.emax)</span>
+<span class="co">#&gt;     #logit=temax+eta.emax</span>
+<span class="co">#&gt;     emax = logit/(1+logit)</span>
+<span class="co">#&gt;     ec50 =  exp(tec50 + eta.ec50)</span>
+<span class="co">#&gt;     kout = exp(tkout + eta.kout)</span>
+<span class="co">#&gt;     e0 = exp(te0 + eta.e0)</span>
+<span class="co">#&gt;     ##</span>
+<span class="co">#&gt;     DCP = center/v</span>
+<span class="co">#&gt;     PD=1-emax*DCP/(ec50+DCP)</span>
+<span class="co">#&gt;     ##</span>
+<span class="co">#&gt;     effect(0) = e0</span>
+<span class="co">#&gt;     kin = e0*kout</span>
+<span class="co">#&gt;     ##</span>
+<span class="co">#&gt;     d/dt(depot) = -ktr * depot</span>
+<span class="co">#&gt;     d/dt(gut) =  ktr * depot -ka * gut</span>
+<span class="co">#&gt;     d/dt(center) =  ka * gut - cl / v * center</span>
+<span class="co">#&gt;     d/dt(effect) = kin*PD -kout*effect</span>
+<span class="co">#&gt;     ##</span>
+<span class="co">#&gt;     cp = center / v</span>
+<span class="co">#&gt;     cp ~ prop(prop.err) + add(pkadd.err)</span>
+<span class="co">#&gt;     effect ~ add(pdadd.err) </span>
+<span class="co">#&gt; ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂</span></code></pre></div>
 <p>In the middle of the printout, it shows how the data must be formatted (using the <code>cmt</code> and <code>dvid</code> data items) to allow nlmixr to model the multiple endpoint appropriately.</p>
 <p>Of course if you are interested you can directly access the information in <code>ui$multipleEndpoint</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ui<span class="op">$</span>multipleEndpoint</code></pre></div>
@@ -483,10 +538,15 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 fit.TOS &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pk.turnover.emax3, warfarin, <span class="st">"saem"</span>);
 
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit.TOS);
+<span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF by Gaussian Quadrature (n.nodes=3, n.sd=1.6) fit  </span>
 <span class="co">#&gt;               OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; gauss3_1.6 1381.64 2307.335 2386.755      -1134.667         1377.084</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            saem    setup table covariance logLik    other</span>
-<span class="co">#&gt; elapsed 106.899 0.376896 0.023      0.038 22.752 0.361104</span>
+<span class="co">#&gt; elapsed 106.873 0.343986 0.023      0.038 22.936 0.340014</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;              Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
 <span class="co">#&gt; tktr        0.265  0.338   127       1.3 (0.672, 2.53)     88.5</span>
 <span class="co">#&gt; tka        0.0416  0.267   641      1.04 (0.618, 1.76)     58.6</span>
@@ -514,6 +574,10 @@ fit.TOS &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlm
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): linFim</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
+<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 483 x 35</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID CMT    PRED   RES IPRED   IRES IWRES eta.ktr</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span>

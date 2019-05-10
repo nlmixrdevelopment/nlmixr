@@ -87,14 +87,14 @@
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
-    <span class="fas fa fas fa-scroll"></span>
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
 </li>
 <li>
   <a href="reference/index.html">
-    <span class="fa fa-file-code-o"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -134,7 +134,7 @@
 <h5 class="hasAnchor">
 <a href="#authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-mirjam-trame-teun-post-richard-hooijmaijers-wenping-wang" class="anchor"></a>Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Richard Hooijmaijers, Wenping Wang</h5>
 <hr>
-<p><code>nlmixr</code> is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter defintion syntax and results in a fit object that can be used as input into the <code>Xpose</code> package. Running nlmixr using the UUI is described in the vignette: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd" class="uri">https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd</a></p>
+<p><code>nlmixr</code> is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter defintion syntax and results in a fit object that can be used as input into the <code>Xpose</code> package. Running nlmixr using the UUI is described in the vignette: ihttps://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd</p>
 <p>Under the hood <code>nlmixr</code> has five main modules:</p>
 <ol>
 <li>
@@ -312,20 +312,47 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <ul>
 <li>Install the clang and gfortran packages from <a href="http://cran.r-project.org/bin/macosx/tools/">CRAN development tools website</a>
 </li>
-<li>Install Mac OSX command like tools by typing <code>xcode-select --install</code> and then choose <code>install</code>. This allows you to compile the package without downloading the entire (large) Xcode package. Make sure to perform this step even if the Xcode package is already installed.</li>
+<li>Install Mac OSX command like tools by typing <code>xcode-select  --install</code> and then choose <code>install</code>. This allows you to compile the package without downloading the entire (large) Xcode package. Make sure to perform this step even if the Xcode package is already installed.</li>
 <li>If you are using macOS &gt;= 10.14 you have to also type the following in the terminal to install the compiler headers:</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="fu">sudo</span> installer -pkg \
 /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg \
 -target /</code></pre></div>
 <ul>
-<li>
-<p>Change <code>~/.Rprofile</code> to have the following line to adjust the paths in R to use the CRAN compilers (if not present, create the .Rprofile file): ```R</p>
-<h1 id="make-sure-to-adjust-the-version-number-of-clang-based-on-the-downloaded-version-in-step-3-e.g.clang8bin">make sure to adjust the version number of clang based on the downloaded version in step 3 (e.g. clang8/bin)</h1>
-<p>Sys.setenv(“PATH”=paste0(“/usr/local/clang6/bin:/usr/local/gfortran/bin:”, Sys.getenv(“PATH”)))</p>
+<li>Change <code>~/.Rprofile</code> to have the following line to adjust the paths in R to use the CRAN compilers (if not present, create the .Rprofile file):</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># make sure to adjust the version number of clang based on the downloaded version in step 3 (e.g. clang8/bin)</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.setenv">Sys.setenv</a></span>(<span class="st">"PATH"</span>=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"/usr/local/clang6/bin:/usr/local/gfortran/bin:"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.getenv">Sys.getenv</a></span>(<span class="st">"PATH"</span>)))</code></pre></div>
+<ol>
+<li>Install <code>devtools</code> and dependencies.</li>
+</ol>
+<ul>
+<li>This package is required to install packages from Github, amongst other things.</li>
+<li>Install <code>devtools</code> from a clean R session by entering <code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("devtools")</a></code>.</li>
+</ul>
+<ol>
+<li>In R, load <code>devtools</code> using <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(devtools)</a></code>.</li>
+<li>Install <code>RxODE</code>.</li>
+</ol>
+<ul>
+<li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
+<li>Install <code>SnakeCharmR</code> using <code>install_github("nlmixrdevelopment/SnakeCharmR")</code> or install <code>reticulate</code> using <code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("reticulate")</a></code>.</li>
+<li>Restart your R session.</li>
+<li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(SnakeCharmR)</a></code>.</li>
+<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.)
+<ul>
+<li>Note this requires a special install option to make sure the tests are installed: <code>remote:install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")</code>
 </li>
 </ul>
-<p>``<code>4. Install</code>devtools<code>and dependencies.    - This package is required to install packages from Github, amongst other things.    - Install</code>devtools<code>from a clean R session by entering</code>install.packages(“devtools”)<code>. 5. In R, load</code>devtools<code>using</code>library(devtools)<code>. 6. Install</code>RxODE<code>.    - Currently the new version of</code>RxODE<code>is in the process of being      uploaded to CRAN.</code>nlmixr<code>needs this newer version of</code>RxODE<code>to      function correctly. To install this version, use the command:</code>install_github(“nlmixrdevelopment/RxODE”)<code>.    - Install</code>SnakeCharmR<code>using</code>install_github(“nlmixrdevelopment/SnakeCharmR”)<code>or install</code>reticulate<code>using</code>install.packages(“reticulate”)<code>.    - Restart your R session.    - As a quick test, you can make sure that R and Python can      communicate by typing the command</code>library(SnakeCharmR)<code>.    - To validate or test the installation of</code>RxODE<code>completely, you      can type the following</code>library(RxODE); rxTest();<code>and it will      run all of the unit tests in RxODE to make sure it is running      correctly on your system. (Note that the</code>testthat<code>package is required for this, and it will take a long time.) 7. Install</code>nlmixr<code>.    - This can be done by</code>install_github(“nlmixrdevelopment/nlmixr”)`</p>
+</li>
+</ul>
+<ol>
+<li>Install <code>nlmixr</code>.</li>
+</ol>
+<ul>
+<li>This can be done by <code>install_github("nlmixrdevelopment/nlmixr")</code>
+</li>
+</ul>
 </div>
 <div id="notes-on-python-configuration" class="section level1">
 <h1 class="hasAnchor">

@@ -80,14 +80,14 @@
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
-    <span class="fas fa fas fa-scroll"></span>
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
 </li>
 <li>
   <a href="../reference/index.html">
-    <span class="fa fa-file-code-o"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -120,7 +120,7 @@
     <div class="page-header toc-ignore">
       <h1>Example Model: Phenobarbatol with correlations</h1>
             
-            <h4 class="date">2019-05-08</h4>
+            <h4 class="date">2019-05-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/addingCovariances.Rmd"><code>vignettes/addingCovariances.Rmd</code></a></small>
       <div class="hidden name"><code>addingCovariances.Rmd</code></div>
@@ -176,10 +176,15 @@ pheno &lt;-<span class="st"> </span><span class="cf">function</span>() {
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pheno, pheno_sd, <span class="st">"saem"</span>)
 
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(fit)
+<span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF by Gaussian Quadrature (n.nodes=3, n.sd=1.6) fit  </span>
 <span class="co">#&gt;                OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; gauss3_1.6 721.8749 1018.746 1037.006      -503.3729         7.462652</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;           saem    setup table covariance logLik    other</span>
-<span class="co">#&gt; elapsed 18.555 0.177036 0.017      0.019  0.057 0.263964</span>
+<span class="co">#&gt; elapsed 20.172 0.190989 0.016       0.02  0.059 0.253011</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;                          Parameter  Est.     SE %RSE</span>
 <span class="co">#&gt; tcl     typical value of clearance    -5  0.075  1.5</span>
 <span class="co">#&gt; tv         typical value of volume 0.347 0.0536 15.4</span>
@@ -194,6 +199,10 @@ pheno &lt;-<span class="st"> </span><span class="cf">function</span>() {
 <span class="co">#&gt;     cor__eta.v.eta.cl </span>
 <span class="co">#&gt;              0.986   </span>
 <span class="co">#&gt; </span>
+<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
+<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 155 x 16</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES IPRED  IRES  IWRES  eta.cl   eta.v</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
