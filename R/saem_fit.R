@@ -1519,13 +1519,21 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     dat <- data;
   }
   .tn <-uif$saem.theta.name;
+  .ini <- as.data.frame(uif$ini)
+  .ini <- .ini[uif$ini$name %in% .tn,]
+  if (any(.ini$fix)){
+      .fixed <- paste(.ini$name[.ini$fix])
+      .tn <- .tn[!(.tn %in% .fixed)]
+  }
   .nth <- length(.tn)
   .covm <- object$Ha[1:.nth,1:.nth]
   .calcCov  <- calcCov;
   .calcCovTime  <- proc.time();
   if (calcCov){
     .covm <- try(calc.COV(object));
-    if (!inherits(.covm, "try-error")){
+    .doIt <- !inherits(.covm, "try-error");
+    if (.doIt && dim(.covm)[1] !=length(.nth)) .doIt <- FALSE
+    if (.doIt){
       .tmp <- try(chol(.covm), silent=TRUE)
       .addCov <- TRUE
       .sqrtm <- FALSE

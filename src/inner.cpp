@@ -165,6 +165,10 @@ typedef struct {
   double odeRecalcFactor;
   int maxOdeRecalc;
   int objfRecalN;
+  int stickyRecalcN1;
+  int stickyRecalcN2;
+  int stickyRecalcN;
+  int stickyTol;
 
   int nsim;
   int nzm;
@@ -745,10 +749,14 @@ double likInner0(double *eta){
     for (j = op_focei.neta; j--;){
       ind->par_ptr[op_focei.etaTrans[j]] = eta[j];
     }
+    if (op_focei.stickyRecalcN2 <= op_focei.stickyRecalcN){
+      op_focei.stickyRecalcN2=0;
+    }
     // Solve ODE
     innerOde(id);
     j=0;
-    while (op->badSolve && j < op_focei.maxOdeRecalc){
+    while (op_focei.stickyRecalcN2 <= op_focei.stickyRecalcN && op->badSolve && j < op_focei.maxOdeRecalc){
+      op_focei.stickyRecalcN2++;
       op_focei.reducedTol=1;
       op_focei.reducedTol2=1;
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
@@ -756,7 +764,13 @@ double likInner0(double *eta){
       innerOde(id);
       j++;
     }
-    if (j != 0) RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -j));
+    if (j != 0) {
+      if (op_focei.stickyRecalcN2 <= op_focei.stickyRecalcN){
+	RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -j));
+      } else {
+	op_focei.stickyTol=1;
+      }
+    }
     if (op->neq > 0 && ISNA(ind->solve[0])){
       return 1e300;
     } else {
@@ -1537,10 +1551,17 @@ static inline double foceiLik0(double *theta){
 
 static inline double foceiOfv0(double *theta){
   if (op_focei.objfRecalN != 0 && !op_focei.calcGrad) {
-    RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -op_focei.objfRecalN));
+    op_focei.stickyRecalcN1++;
+    if (op_focei.stickyRecalcN1 <= op_focei.stickyRecalcN){
+      RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -op_focei.objfRecalN));
+    } else {
+      op_focei.stickyTol=1;
+    }
   }
   double ret = -2*foceiLik0(theta);
-  while (!op_focei.calcGrad && (std::isnan(ret) || std::isinf(ret)) && op_focei.objfRecalN < op_focei.maxOdeRecalc){
+  while (!op_focei.calcGrad && op_focei.stickyRecalcN1 <= op_focei.stickyRecalcN &&
+	 (std::isnan(ret) || std::isinf(ret)) &&
+	 op_focei.objfRecalN < op_focei.maxOdeRecalc){
       op_focei.reducedTol=1;
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
       ret = -2*foceiLik0(theta);
@@ -1553,6 +1574,10 @@ static inline double foceiOfv0(double *theta){
       stop("Infinite/NaN while evaluating initial objective function");
     }
     if (op_focei.scaleObjective == 1) op_focei.scaleObjective=2;
+  } else {
+    if (std::isnan(ret) || std::isinf(ret)){
+      ret=5e100;
+    }
   }
   if (op_focei.scaleObjective == 2){
     ret = ret / op_focei.initObjective * op_focei.scaleObjectiveTo;
@@ -2273,6 +2298,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.repeatGill=0;
   op_focei.repeatGillN=0;
   op_focei.repeatGillMax=as<int>(odeO["repeatGillMax"]);
+  op_focei.stickyRecalcN=as<int>(odeO["stickyRecalcN"]);
   if (op_focei.maxOuterIterations <= 0){
     // No scaling.
     foceiSetupTheta_(mvi, theta, thetaFixed, 0.0, !RxODE::rxIs(obj, "NULL"));
@@ -4415,6 +4441,8 @@ Environment foceiFitCpp_(Environment e){
     op_focei.didHessianReset=0;
     op_focei.didEtaNudge =0;
     op_focei.didEtaReset=0;
+    op_focei.stickyRecalcN2=0;
+    op_focei.stickyRecalcN1=0;
     foceiOuter(e);
     if (op_focei.didHessianReset==1){
       warning("Hessian reset during optimization; (Can control by foceiControl(resetHessianAndEta=.))");
@@ -4523,7 +4551,11 @@ Environment foceiFitCpp_(Environment e){
     warning("Gradient problems with covariance; see $scaleInfo");
   }
   if (op_focei.reducedTol){
-    warning("Tolerances (atol/rtol) were temporarily reduced for some difficult ODE solving during the optimization.\nConsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model.");
+    if (op_focei.stickyTol){
+      warning("Tolerances (atol/rtol) were reduced (after %d bad solves) for some difficult ODE solving during the optimization.\nCan control with foceiControl(stickyRecalcN=)\nConsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model.", op_focei.stickyRecalcN);
+    } else {
+      warning("Tolerances (atol/rtol) were temporarily reduced for some difficult ODE solving during the optimization.\nConsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model.");
+    }
   }
   foceiFinalizeTables(e);
   // NumericVector scaleC(op_focei.ntheta+op_focei.omegan);

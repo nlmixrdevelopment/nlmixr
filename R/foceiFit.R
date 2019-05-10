@@ -525,6 +525,9 @@ is.latex <- function() {
 ##'     is repeated up to a maximum number of times defined by this
 ##'     parameter.
 ##'
+##' @param stickyRecalcN The number of bad ODE solves before reducing
+##'     the atol/rtol for the rest of the problem.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##'
@@ -648,7 +651,8 @@ foceiControl <- function(sigdig=3,...,
                          badEtaPenalty=0.05,
                          resetThetaCheckPer=0.1,
                          etaMat=NULL,
-                         repeatGillMax=7){
+                         repeatGillMax=7,
+                         stickyRecalcN=5){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
@@ -920,6 +924,7 @@ foceiControl <- function(sigdig=3,...,
                  resetThetaCheckPer=resetThetaCheckPer,
                  etaMat=etaMat,
                  repeatGillMax=as.integer(repeatGillMax),
+                 stickyRecalcN=as.integer(max(1,abs(stickyRecalcN))),
                  ...);
     if (!missing(etaMat) && missing(maxInnerIterations)){
         warning("By supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0");
