@@ -1612,6 +1612,9 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .pred <- TRUE
   }
   .linCmt <- FALSE;
+  if (any(regexpr(rex::rex("limCmt("), .deparse(body(fun))) != -1)) {
+    stop("You used `limCmt`, did you mean `linCmt`?")
+  }
   if (any(regexpr(rex::rex("linCmt("), .deparse(body(fun))) != -1)){
     .linCmt  <- TRUE;
     .hasLinCmt <- any(regexpr(rex::rex("linCmt("), .deparse(body(rest))) == -1);
