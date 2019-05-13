@@ -437,11 +437,11 @@ update.function  <- .nlmixrUpdate
   .tmp <- .tmp[!(.tmp %in% .testVars)];
   if (length(.tmp > 0)){
     .predDf <- fun2$predDf
-    if (length(.predDf$var) > 0){
+    if (length(.predDf$var) > 1){
       .predDf <- .predDf[.predDf$var %in% .tmp,];
       .predDf <- .predDf[.predDf$var == .predDf$cond, , drop = FALSE]
       if (length(.predDf$var) > 0){
-        stop(sprintf("Complex multiple compartment models need to be conditioned by `|`\n ie log(cp) ~ add(err) | cmt\n The following endpoints need to be corrected: %s", paste(.predDf$var, collapse=", ")))
+        stop(sprintf("Multiple compartment models with expressions need to be conditioned by `|`\n ie log(cp) ~ add(err) | cmt\n The following endpoints need to be corrected: %s", paste(.predDf$var, collapse=", ")))
       }
     }
     .tmp <- lapply(.tmp,function(x){
