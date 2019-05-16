@@ -55,15 +55,15 @@ rxPermissive({
 
     fitS <- nlmixr(one.compartment, theo_sd, est="saem")
     test_that("tidy works on nlmixr fit SAEM fits", {
-        td <- tidy(fitS)
-        check_tidy(td,7,5,c("effect", "group", "term", "estimate", "std.error"));
+        td <- tidy(fitS, exponentiate=NA)
+        check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
         expect_equal(
             td$term,
             c("tka", "tcl", "tv", "sd__eta.ka", "sd__eta.cl", "sd__eta.v",
               "add.err")
         )
-        td <- tidy(fitS, conf.level=0.9)
-        check_tidy(td, 7, 7, c("effect", "group", "term", "estimate", "std.error",
+        td <- tidy(fitS, conf.level=0.9, exponentiate=NA)
+        check_tidy(td, 7, 9, c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value",
                                "conf.low", "conf.high"))
         expect_equal(
             td$term,
@@ -87,7 +87,7 @@ rxPermissive({
                      tolerance=tol)
 
         for (ef in c("ran_vals", "random")){
-            td  <- tidy(fitS, effects=ef)
+            td  <- tidy(fitS, effects=ef, exponentiate=NA)
             td1  <- td$estimate
             check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
 
@@ -103,7 +103,7 @@ rxPermissive({
             expect_equal(td2, td3)
         }
 
-        td  <- tidy(fitS, effects="ran_coef")
+        td  <- tidy(fitS, effects="ran_coef", exponentiate=NA)
         td1  <- td$estimate
         check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
 
@@ -120,7 +120,7 @@ rxPermissive({
         expect_equal(log(td1),td2)
         expect_equal(td2,log(td3))
 
-        td  <- tidy(fitS, effects="ran_pars")
+        td  <- tidy(fitS, effects="ran_pars", exponentiate=NA)
         td1  <- td$estimate
         check_tidy(td, 4, 4, c("effect", "group", "term", "estimate"))
 
@@ -140,15 +140,15 @@ rxPermissive({
         context(sprintf("broom tidy nlmixr %s", f))
         fitF <- nlmixr(one.compartment, theo_sd, est=f)
         test_that(sprintf("tidy works on nlmixr fit %s fits",f), {
-            td <- tidy(fitF)
-            check_tidy(td,7,5,c("effect", "group", "term", "estimate", "std.error"));
+            td <- tidy(fitF, exponentiate=NA)
+            check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
             expect_equal(
                 td$term,
                 c("tka", "tcl", "tv", "sd__eta.ka", "sd__eta.cl", "sd__eta.v",
                   "add.err")
             )
-            td <- tidy(fitF, conf.level=0.9)
-            check_tidy(td, 7, 7, c("effect", "group", "term", "estimate", "std.error",
+            td <- tidy(fitF, conf.level=0.9, exponentiate=NA)
+            check_tidy(td, 7, 9, c("effect", "group", "term", "estimate", "std.error","statistic", "p.value",
                                    "conf.low", "conf.high"))
             expect_equal(
                 td$term,
@@ -171,7 +171,7 @@ rxPermissive({
                          tolerance=tol)
 
             for (ef in c("ran_vals", "random")){
-                td  <- tidy(fitF, effects=ef)
+                td  <- tidy(fitF, effects=ef, exponentiate=NA)
                 td1  <- td$estimate
                 check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
                 ##
@@ -187,7 +187,7 @@ rxPermissive({
                 expect_equal(td2, td3)
             }
             ##
-            td  <- tidy(fitF, effects="ran_coef")
+            td  <- tidy(fitF, effects="ran_coef", exponentiate=NA)
             td1  <- td$estimate
             check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
             ##
@@ -202,7 +202,7 @@ rxPermissive({
             expect_equal(log(td1),td2)
             expect_equal(td2,log(td3))
             ##
-            td  <- tidy(fitF, effects="ran_pars")
+            td  <- tidy(fitF, effects="ran_pars", exponentiate=NA)
             td1  <- td$estimate
             check_tidy(td, 4, 4, c("effect", "group", "term", "estimate"))
             ##
@@ -223,15 +223,15 @@ rxPermissive({
         context(sprintf("broom tidy nlmixr %s", f))
         fitF <- nlmixr(one.compartment, theo_sd, est=f)
         test_that(sprintf("tidy works on nlmixr fit %s fits",f), {
-            td <- tidy(fitF)
-            check_tidy(td,7,5,c("effect", "group", "term", "estimate", "std.error"));
+            td <- tidy(fitF, exponentiate=NA)
+            check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
             expect_equal(
                 td$term,
                 c("tka", "tcl", "tv", "sd__eta.ka", "sd__eta.cl", "sd__eta.v",
                   "add.err")
             )
-            td <- tidy(fitF, conf.level=0.9)
-            check_tidy(td, 7, 7, c("effect", "group", "term", "estimate", "std.error",
+            td <- tidy(fitF, conf.level=0.9, exponentiate=NA)
+            check_tidy(td, 7, 9, c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value",
                                    "conf.low", "conf.high"))
             expect_equal(
                 td$term,
@@ -254,7 +254,7 @@ rxPermissive({
             expect_equal(exp(td$conf.low), .confLow,
                          tolerance=tol)
             for (ef in c("ran_vals", "random")){
-                td  <- tidy(fitF, effects=ef)
+                td  <- tidy(fitF, effects=ef, exponentiate=NA)
                 td1  <- td$estimate
                 check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
                 ##
@@ -270,7 +270,7 @@ rxPermissive({
                 expect_equal(td2, td3, tolerance=tol)
             }
             ##
-            td  <- tidy(fitF, effects="ran_coef")
+            td  <- tidy(fitF, effects="ran_coef", exponentiate=NA)
             td1  <- td$estimate
             check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
             ##
@@ -285,7 +285,7 @@ rxPermissive({
             expect_equal(log(td1),td2, tolerance=tol)
             expect_equal(td2,log(td3), tolerance=tol)
             ##
-            td  <- tidy(fitF, effects="ran_pars")
+            td  <- tidy(fitF, effects="ran_pars", exponentiate=NA)
             td1  <- td$estimate
             check_tidy(td, 4, 4, c("effect", "group", "term", "estimate"))
             ##
@@ -306,15 +306,15 @@ rxPermissive({
     context("broom tidy nlmixr nlme")
     fitN <- nlmixr(one.compartment, theo_sd, est="nlme", control=nlmeControl(pnlsTol=0.6))
     test_that("tidy works on nlmixr fit nlme fits", {
-        td <- tidy(fitN)
-        check_tidy(td,7,5,c("effect", "group", "term", "estimate", "std.error"));
+        td <- tidy(fitN, exponentiate=NA)
+        check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
         expect_equal(
             td$term,
             c("tka", "tcl", "tv", "sd__eta.ka", "sd__eta.cl", "sd__eta.v",
               "add.err")
         )
-        td <- tidy(fitN, conf.level=0.9)
-        check_tidy(td, 7, 7, c("effect", "group", "term", "estimate", "std.error",
+        td <- tidy(fitN, conf.level=0.9, exponentiate=NA)
+        check_tidy(td, 7, 9, c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value",
                                "conf.low", "conf.high"))
         expect_equal(
             td$term,
@@ -338,7 +338,7 @@ rxPermissive({
                      tolerance=tol)
 
         for (ef in c("ran_vals", "random")){
-            td  <- tidy(fitN, effects=ef)
+            td  <- tidy(fitN, effects=ef, exponentiate=NA)
             td1  <- td$estimate
             check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
 
@@ -354,7 +354,7 @@ rxPermissive({
             expect_equal(td2, td3)
         }
 
-        td  <- tidy(fitN, effects="ran_coef")
+        td  <- tidy(fitN, effects="ran_coef", exponentiate=NA)
         td1  <- td$estimate
         check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
 
@@ -369,7 +369,7 @@ rxPermissive({
         expect_equal(log(td1),td2, tolerance=tol)
         expect_equal(td2,log(td3), tolerance=tol)
 
-        td  <- tidy(fitN, effects="ran_pars")
+        td  <- tidy(fitN, effects="ran_pars", exponentiate=NA)
         td1  <- td$estimate
         check_tidy(td, 4, 4, c("effect", "group", "term", "estimate"))
 
@@ -390,15 +390,15 @@ rxPermissive({
     fitP <- nlmixr(one.compartment, theo_sd, est="posthoc")
 
     test_that("tidy works on posthoc fit fits", {
-        td <- tidy(fitP)
-        check_tidy(td,7,5,c("effect", "group", "term", "estimate", "std.error"));
+        td <- tidy(fitP, exponentiate=NA)
+        check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
         expect_equal(
             td$term,
             c("tka", "tcl", "tv", "sd__eta.ka", "sd__eta.cl", "sd__eta.v",
               "add.err")
         )
-        td <- tidy(fitP, conf.level=0.9)
-        check_tidy(td, 7, 7, c("effect", "group", "term", "estimate", "std.error",
+        td <- tidy(fitP, conf.level=0.9, exponentiate=NA)
+        check_tidy(td, 7, 9, c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value",
                                "conf.low", "conf.high"))
         expect_equal(
             td$term,
@@ -426,7 +426,7 @@ rxPermissive({
                      tolerance=tol)
 
         for (ef in c("ran_vals", "random")){
-            td  <- tidy(fitP, effects=ef)
+            td  <- tidy(fitP, effects=ef, exponentiate=NA)
             td1  <- td$estimate
             check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
 
@@ -442,7 +442,7 @@ rxPermissive({
             expect_equal(td2, td3, tolerance=tol)
         }
 
-        td  <- tidy(fitP, effects="ran_coef")
+        td  <- tidy(fitP, effects="ran_coef", exponentiate=NA)
         td1  <- td$estimate
         check_tidy(td, 36, 5, c("effect", "group", "level", "term", "estimate"))
 
@@ -468,7 +468,7 @@ rxPermissive({
         expect_equal(log(td1),td2, tolerance=tol)
         expect_equal(td2,log(td3), tolerance=tol)
 
-        td  <- tidy(fitP, effects="ran_pars")
+        td  <- tidy(fitP, effects="ran_pars", exponentiate=NA)
         td1  <- td$estimate
         check_tidy(td, 4, 4, c("effect", "group", "term", "estimate"))
         expect_equal(td1, c(0.774596669241483, 0.547722557505166, 0.316227766016838, 0.7),
