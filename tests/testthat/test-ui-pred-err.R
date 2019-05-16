@@ -252,7 +252,7 @@ rxPermissive({
         expect_error(nlmixr:::nlmixrUIModel(fn29), "The dnorm distribution requires 1 argument.")
         expect_error(nlmixr:::nlmixrUIModel(fn30), "The dnorm distribution requires 1 argument.")
         expect_error(nlmixr:::nlmixrUIModel(fn31), "The nlmixrDist distribution is currently unsupported.")
-        expect_error(nlmixr(fn32), rex::rex("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): add"));
+        expect_error(nlmixr:::nlmixr(fn32), rex::rex("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): add"));
         expect_error(nlmixr:::nlmixrUIModel(fn33), rex::rex("The add and pois distributions cannot be combined\nCurrently can combine: add, prop"))
     })
 
@@ -302,7 +302,7 @@ rxPermissive({
     }
 
     test_that("Good Parsing of proper variance specifications", {
-        expect_equal(class(nlmixr:::nlmixr(fn1)), "nlmixrUI")
+        expect_equal(class(nlmixr:::nlmixr(fn1)),  "nlmixrUI")
         expect_equal(class(nlmixr:::nlmixr(fn34)), "nlmixrUI")
         expect_equal(class(nlmixr:::nlmixr(fn35)), "nlmixrUI")
     })

@@ -937,10 +937,12 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       .tmp1[, "err"] <- distName
       .tmp1[, "est"] <- -Inf
       if (!is.null(curCond)){
-        .tmp1[, "condition"] <- curCond;
+        .tmp1[, "condition"] <- .deparse(curCond);
       } else {
         .tmp1[, "condition"] <- "";
       }
+      assign(".tmp", .tmp, globalenv())
+      assign(".tmp1", .tmp1, globalenv())
       .tmp <- rbind(.tmp, .tmp1);
       class(.tmp) <- c("nlmixrBounds", "data.frame");
       assign("bounds", .tmp, this.env)
