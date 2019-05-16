@@ -658,6 +658,8 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         if (class(control) !="foceiControl") control <- do.call(nlmixr::foceiControl, control);
         control$covMethod <- 0L
         control$maxOuterIterations <- 0L;
+        .env <- new.env(parent=emptyenv());
+        .env$uif <- uif;
         fit <- foceiFit(dat,
                         inits=uif$focei.inits,
                         PKpars=uif$theta.pars,
@@ -670,6 +672,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                         thetaNames=uif$focei.names,
                         etaNames=uif$eta.names,
                         control=control,
+                        env=.env,
                         ...)
         if (inherits(fit, "nlmixrFitData")){
             .cls <- class(fit);
