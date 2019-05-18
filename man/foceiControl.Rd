@@ -43,7 +43,7 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
   etaNudge = 0.01, stiff, nRetries = 3, seed = 42,
   badEtaPenalty = 0.05, resetThetaCheckPer = 0.1, etaMat = NULL,
-  repeatGillMax = 7)
+  repeatGillMax = 7, stickyRecalcN = 5)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -632,6 +632,9 @@ generator should be initialized}
 calculating the initial Gill differences, the Gill difference
 is repeated up to a maximum number of times defined by this
 parameter.}
+
+\item{stickyRecalcN}{The number of bad ODE solves before reducing
+the atol/rtol for the rest of the problem.}
 }
 \description{
 Control Options for FOCEi

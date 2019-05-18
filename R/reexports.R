@@ -194,3 +194,17 @@ generics::augment
 ##' @importFrom huxtable number_format
 ##' @export
 huxtable::number_format
+
+##'@importFrom RxODE rxParams
+##'@export
+RxODE::rxParams
+
+##'@importFrom RxODE rxParam
+##'@export
+RxODE::rxParam
+
+
+##'@importFrom RxODE et
+##'@export
+RxODE::et
+

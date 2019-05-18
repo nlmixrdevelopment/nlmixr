@@ -7,7 +7,7 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
         R.utils, n1qn1, fastGHQuad,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
-	RxODE(>= 0.9.0-3), nlme, magrittr, tidyr, sys, generics,
+	RxODE(>= 0.9.0-6), nlme, magrittr, tidyr, sys, generics,
 	huxtable
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3c, testthat,
         madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf,
@@ -56,7 +56,7 @@ Description: Fit and compare nonlinear mixed-effects models in differential
     (Wang, Hallow, and James 2015 <doi:10.1002/psp4.12052>).
 License: GPL (>=2)
 NeedsCompilation: yes
-LinkingTo: dparser(>= 0.1.8), Rcpp (>= 1.0.1), RxODE,
+LinkingTo: dparser(>= 0.1.8), Rcpp (>= 1.0.1), RxODE(>= 0.9.0-6),
         RcppEigen (>= 0.3.3.3.0), StanHeaders(>= 2.17.0), BH, lbfgsb3c
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
