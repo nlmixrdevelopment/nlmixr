@@ -265,8 +265,8 @@ nlmeLinCmt <- nlme_lin_cmpt
                            dati <- subset(nlmixr::nlmeModList("dat.o"), id==as.integer(subj))
                            if (match("F1", names(theta), nomatch=0)) dati$amt <- theta["F1"]*dati$amt
                            if (match("RATE", names(theta), nomatch=0)) dati <- prepEv(dati, theta)
-                           ev <- eventTable()
-                           ev$import.EventTable(dati)
+                           ## ev <- eventTable()
+                           ## ev$import.EventTable(dati)
                            if (any(theta>1e38)) {
                                warning("large parameter values. may rewrite par_trans.")
                                print(theta)
@@ -276,7 +276,7 @@ nlmeLinCmt <- nlme_lin_cmpt
                                print(theta)
                            }
 
-                           m <- nlmixr::nlmeModList("m1")$run(theta, ev, inits, transitAbs=.(transitAbs), atol=.(atol), rtol=.(rtol),
+                           m <- nlmixr::nlmeModList("m1")$run(theta, dati, inits, transitAbs=.(transitAbs), atol=.(atol), rtol=.(rtol),
                                                               hmin=.(hmin), hmax=.(hmax), hini=.(hini), maxsteps = .(maxsteps),
                                                               maxordn=.(maxordn), maxords=.(maxords),
                                                               addDosing=NULL);
