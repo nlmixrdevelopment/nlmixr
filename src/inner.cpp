@@ -776,19 +776,20 @@ double likInner0(double *eta){
     } else {
       // Update eta.
       arma::mat lp(op_focei.neta, 1, fill::zeros);
-      arma::mat a(ind->n_all_times - ind->ndoses, op_focei.neta);
-      arma::mat B(ind->n_all_times - ind->ndoses, 1);
+      arma::mat a(ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta);
+      arma::mat B(ind->n_all_times - ind->ndoses - ind->nevid2, 1);
       arma::mat c;
       mat Vid;
       if (op_focei.fo == 1){
-	Vid = arma::mat(ind->n_all_times - ind->ndoses, ind->n_all_times - ind->ndoses, fill::zeros);
+	Vid = arma::mat(ind->n_all_times - ind->ndoses - ind->nevid2,
+			ind->n_all_times - ind->ndoses - ind->nevid2, fill::zeros);
       } else if (op_focei.interaction == 1){
-	c   = arma::mat(ind->n_all_times - ind->ndoses, op_focei.neta);
+	c   = arma::mat(ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta);
       }
     
       // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
       // Calculate matricies
-      int k = ind->n_all_times - ind->ndoses - 1;
+      int k = ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
       fInd->llik=0.0;
       fInd->tbsLik=0.0;
       double f, err, r, fpm, rp,lnr;
@@ -1119,14 +1120,14 @@ double LikInner2(double *eta, int likId){
     int k, l;
     mat tmp;
 
-    arma::mat a(ind->n_all_times - ind->ndoses, op_focei.neta);
+    arma::mat a(ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta);
     std::copy(&fInd->a[0], &fInd->a[0]+a.size(), a.begin());
-    arma::mat B(ind->n_all_times - ind->ndoses, 1);
+    arma::mat B(ind->n_all_times - ind->ndoses - ind->nevid2, 1);
     std::copy(&fInd->B[0], &fInd->B[0]+B.size(), B.begin());
 
     // This is actually -H
     if (op_focei.interaction){
-      arma::mat c(ind->n_all_times - ind->ndoses, op_focei.neta);
+      arma::mat c(ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta);
       std::copy(&fInd->c[0], &fInd->c[0]+c.size(), c.begin());
       for (k = op_focei.neta; k--;){
         for (l = k+1; l--;){
@@ -2219,10 +2220,10 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
 
     fInd->a = &op_focei.ga[iA];
     fInd->c = &op_focei.gc[iA];
-    iA += op_focei.neta * (ind->n_all_times - ind->ndoses);
+    iA += op_focei.neta * (ind->n_all_times - ind->ndoses - ind->nevid2);
 
     fInd->B = &op_focei.gB[iB];
-    iB += (ind->n_all_times - ind->ndoses);
+    iB += (ind->n_all_times - ind->ndoses - ind->nevid2);
 
     fInd->zm = &op_focei.gZm[ii];
     ii+=(op_focei.neta+1) * (op_focei.neta + 2) / 2 + 6*(op_focei.neta + 1)+1;
