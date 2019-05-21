@@ -118,6 +118,9 @@
     <li>
       <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -172,10 +175,10 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>nlmixrData</span>(<span class='no'>data</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>nlmixrData</span>(<span class='no'>data</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S3 method for character</span>
-<span class='fu'>nlmixrData</span>(<span class='no'>data</span>, <span class='no'>...</span>)
+<span class='fu'>nlmixrData</span>(<span class='no'>data</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S3 method for default</span>
 <span class='fu'>nlmixrData</span>(<span class='no'>data</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
@@ -187,6 +190,11 @@
       <th>data</th>
       <td><p>is the name of the data to convert.  Can be a csv file
 as well.</p></td>
+    </tr>
+    <tr>
+      <th>model</th>
+      <td><p>This is the RxODE model to use to translate against
+when parsing the data.</p></td>
     </tr>
     </table>
     

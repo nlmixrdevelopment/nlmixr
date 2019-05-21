@@ -84,6 +84,9 @@
     <li>
       <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -128,7 +131,7 @@
     <div class="page-header toc-ignore">
       <h1>Modifying nlmixr models by piping</h1>
             
-            <h4 class="date">2019-05-10</h4>
+            <h4 class="date">2019-05-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/modelPiping.Rmd"><code>vignettes/modelPiping.Rmd</code></a></small>
       <div class="hidden name"><code>modelPiping.Rmd</code></div>
@@ -183,7 +186,7 @@ one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>()
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.334827  1.01048   1.010484 0.139 3.796209</span>
+<span class="co">#&gt; elapsed 0.401569 1.118783   1.118785 0.046 4.494863</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -248,8 +251,8 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt; FOCEi 116.8398 371.4396 388.7364      -179.7198         7.394079</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.322812 0.613303   0.613306 0.017 0.931579</span>
+<span class="co">#&gt;            setup optimize covariance table   other</span>
+<span class="co">#&gt; elapsed 0.376321 0.647163   0.647166 0.078 0.97935</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -298,7 +301,7 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.322806 0.584106   0.584109 0.146 0.556979</span>
+<span class="co">#&gt; elapsed 0.356382   0.6514   0.651403 0.042 0.750815</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -347,7 +350,7 @@ one.ka.<span class="fl">0.7</span> &lt;-<span class="st"> </span>one.compartment
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.305832 1.000212   1.000215 0.009 2.834741</span>
+<span class="co">#&gt; elapsed 0.348489 1.155553   1.155557 0.027 3.131401</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -406,7 +409,7 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.297826 0.544457    0.54446 0.009 1.610257</span>
+<span class="co">#&gt; elapsed 0.349456 0.596201   0.596205 0.016 1.968138</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -456,7 +459,7 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.308872  0.99269   0.992693 0.009 3.194745</span>
+<span class="co">#&gt; elapsed 0.369516 1.109735   1.109738 0.069 3.513011</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;         Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -525,8 +528,8 @@ wt70 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class
 <span class="co">#&gt; FOCEi 116.1449 372.7447 392.9243      -179.3723         53.97154</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;           setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.31195 1.091749   1.091752  0.01 2.215549</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.378631 1.237841   1.237845 0.015 2.534683</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;          Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -586,7 +589,7 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.303858 0.998263   0.998267  0.01 6.539612</span>
+<span class="co">#&gt; elapsed 0.384517 1.105729   1.105732 0.025 7.278022</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;          Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -626,6 +629,49 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
 </div>
 </div>
+<div id="simulating-new-scenarios-with-nlmixr-and-rxode" class="section level1">
+<h1 class="hasAnchor">
+<a href="#simulating-new-scenarios-with-nlmixr-and-rxode" class="anchor"></a>Simulating new scenarios with nlmixr and RxODE</h1>
+<p>Once you have a fit, you can easily simulate different regimens by piping too.</p>
+<p>For example, you can simulate 100 subjects taking only the variability defined by the between subject variability matrix <code>omega</code> and the unexplained variability matrix <code>sigma</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RxODE/topics/et">et</a></span>(<span class="dt">amt=</span><span class="dv">300</span>,<span class="dt">ii=</span><span class="dv">12</span>,<span class="dt">until=</span><span class="dv">48</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Now use amt=300 BID for 48 hrs</span>
+<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RxODE/topics/rxSolve">rxSolve</a></span>(<span class="dt">nSub=</span><span class="dv">100</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Simulate with 50 subjects and 50 studies</span>
+<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/confint">confint</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Create intervals (not exactly confidence intervals)</span>
+<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>() <span class="co"># Plot the intervals</span>
+<span class="co">#&gt; Warning in rxSolve_(object, .ctl, .nms, .xtra, params, events, inits,</span>
+<span class="co">#&gt; setupOnly = .setupOnly): 'thetaMat' is ignored since nStud &lt;= 1.</span>
+<span class="co">#&gt; Warning in confint.rxSolve(.): In order to put confidence bands around the</span>
+<span class="co">#&gt; intervals, you need at least 2500 simulations.</span>
+<span class="co">#&gt; Summarizing data</span>
+<span class="co">#&gt; done.</span></code></pre></div>
+<p><img src="modelPiping_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p>You can also simulate by sampling from the uncertainty in the <code>omega</code>, <code>sigma</code> and <code>theta</code> matrices. The simulation needs:</p>
+<ul>
+<li>the population covariance matrix for the (truncated) multivariate normal distribution (<code>thetaMat</code>),</li>
+<li>the number of observations and the number of subjects in the model for the covariance re-sampling</li>
+</ul>
+<p>These are all stored in the nlmixr fit object.</p>
+<p>This means you may simply:</p>
+<ul>
+<li>Specify the number of “studies” you will be taking. Each study is a single parameter sample from the <code>theta</code> parameters as well as the <code>omega</code> and <code>sigma</code> matrices.</li>
+<li>Specify the number of subjects you are sampling for each of the “study” specified above, <code>nSub</code>.</li>
+</ul>
+<p>In the end, it is simply done by <code>nSub=x, nStud=y</code> as in the following example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/files">file.exists</a></span>(<span class="st">"modelPiping-sim0.rds"</span>)){
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/load">load</a></span>(<span class="st">"modelPiping-sim0.rds"</span>);
+} <span class="cf">else</span> {
+    sim0 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">        </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RxODE/topics/et">et</a></span>(<span class="dt">amt=</span><span class="dv">300</span>,<span class="dt">ii=</span><span class="dv">12</span>,<span class="dt">until=</span><span class="dv">48</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Now use amt=300 BID for 48 hrs</span>
+<span class="st">        </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RxODE/topics/rxSolve">rxSolve</a></span>(<span class="dt">nSub=</span><span class="dv">50</span>, <span class="dt">nStud=</span><span class="dv">50</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Simulate with 50 subjects and 50 studies</span>
+<span class="st">        </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/confint">confint</a></span>(<span class="st">"sim"</span>);
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/save">save</a></span>(sim0, <span class="dt">file=</span><span class="st">"modelPiping-sim0.rds"</span>)
+}
+
+sim0 <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Create intervals (not exactly confidence intervals)</span>
+<span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>() <span class="co"># Plot the intervals</span></code></pre></div>
+<p><img src="modelPiping_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -642,6 +688,7 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
       <li><a href="#changing-residual-errors">Changing residual errors</a></li>
       </ul>
 </li>
+      <li><a href="#simulating-new-scenarios-with-nlmixr-and-rxode">Simulating new scenarios with nlmixr and RxODE</a></li>
       </ul>
 </div>
       </div>
