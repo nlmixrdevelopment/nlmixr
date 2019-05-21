@@ -10,6 +10,9 @@ model(model, ..., .lines = NULL)
 \item{model}{Model specification}
 
 \item{...}{Other arguments to model object parsed by nlmixr}
+
+\item{.lines}{This is an interal argument when code{model} is
+being called recursively and should not be used.}
 }
 \value{
 Parsed UI object

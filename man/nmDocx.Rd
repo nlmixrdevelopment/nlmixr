@@ -67,6 +67,8 @@ your preformatted style supports.  By default this is
 \item{save}{Should the docx be saved in a zip file with the R rds
 data object for the fit?  By default this is \code{FALSE} with
 \code{nmDocx} and \code{TRUE} with \code{nmSave}}
+
+\item{...}{when using `nmSave` these arguments are passed to `nmDocx`}
 }
 \value{
 An officer docx object

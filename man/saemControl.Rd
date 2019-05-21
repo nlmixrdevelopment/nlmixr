@@ -107,6 +107,10 @@ calculation. By default this is turned on.}
 \item{maxsteps}{maximum number of (internally defined) steps allowed
 during one call to the solver. (5000 by default)}
 
+\item{adjObf}{is a boolean to indicate if the objective function
+should be adjusted to be closer to NONMEM's default objective
+function.  By default this is \code{TRUE}}
+
 \item{...}{Other arguments to control SAEM.}
 }
 \value{

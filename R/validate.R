@@ -21,6 +21,12 @@ nlmixrValidate <- function(full=FALSE){
                function(x){unlink(x)})
         ## For some reason when tangling the nlme runs crash.
         ## run them here first.
+        eta.ka <- eta.cl <- eta.v <- eta.ka <- eta.cl <- eta.v <- NULL
+        ## Cannot see this anywhere...
+        `/<-` <- NULL
+        dt <- function(...){}
+        depot <- dt <- center <- NULL
+
         one.cmt <- function() {
             ini({
                 tka <- 0.45 # Log Ka
@@ -60,8 +66,8 @@ nlmixrValidate <- function(full=FALSE){
             })
         }
         one.compartment <- one.compartment()
-        fit <- nlmixr(one.cmt, theo_sd, est="nlme")
-        fit4 <- nlmixr(one.compartment, theo_sd,est="nlme",control = nlmeControl(pnlsTol = .5))
+        fit <- nlmixr(one.cmt, nlmixr::theo_sd, est="nlme")
+        fit4 <- nlmixr(one.compartment, nlmixr::theo_sd,est="nlme",control = nlmeControl(pnlsTol = .5))
         devtools::build_vignettes(quiet=FALSE,install=FALSE);
         sapply(list.files(system.file(package="nlmixr"), pattern="\\.rds$", full.names=TRUE),
                function(x){message("\t", x);file.copy(x,file.path("inst", basename(x)))})

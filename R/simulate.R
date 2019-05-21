@@ -396,7 +396,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
                 return(fun(new.time))
             }))})
         names(new.cov) <- all.covs;
-        new.pts <- cbind(new.pts, new.covs);
+        new.pts <- cbind(new.pts, new.cov);
     }
     new.pts$EVID <- 0
     new.pts$AMT <- 0
@@ -451,18 +451,18 @@ plot.nlmixrAugPred <- function(x, y, ...){
 ##' @rdname nlmixrSim
 ##' @export
 rxSolve.nlmixrFitData <- function(object, params=NULL, events=NULL, inits = NULL, scale = NULL,
-                              covs = NULL, method = c("liblsoda", "lsoda", "dop853"),
-                              transitAbs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
-                              maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
-                              cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
-                              addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
-                              nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
-                              amountUnits = NA_character_, timeUnits = "hours", stiff,
-                              theta = NULL, eta = NULL, addDosing=FALSE, updateObject=FALSE, doSolve=TRUE,
-                              omega = NULL, omegaDf = NULL, omegaIsChol = FALSE,
-                              nSub = 1L, thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE,
-                              nStud = 1L, dfSub=0.0, dfObs=0.0, returnType=c("rxSolve", "matrix", "data.frame"),
-                              seed=NULL, nsim=NULL){
+                                  method = c("liblsoda", "lsoda", "dop853"),
+                                  transitAbs = NULL, atol = 1.0e-6, rtol = 1.0e-4,
+                                  maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L, maxordn = 12L, maxords = 5L, ...,
+                                  cores, covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+                                  addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
+                                  nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress=10000L,
+                                  amountUnits = NA_character_, timeUnits = "hours", stiff,
+                                  theta = NULL, eta = NULL, addDosing=FALSE, updateObject=FALSE,
+                                  omega = NULL, omegaDf = NULL, omegaIsChol = FALSE,
+                                  nSub = 1L, thetaMat = NULL, thetaDf = NULL, thetaIsChol = FALSE,
+                                  nStud = 1L, dfSub=0.0, dfObs=0.0, returnType=c("rxSolve", "matrix", "data.frame"),
+                                  seed=NULL, nsim=NULL){
     do.call("nlmixrSim", as.list(match.call()[-1]), envir=parent.frame(2));
 }
 

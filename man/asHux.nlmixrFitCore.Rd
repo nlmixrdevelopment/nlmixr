@@ -59,7 +59,7 @@ name the \code{coef} vector: \code{c("Displayed title" = "coefficient_name", ...
 }
 \description{
 This is a thin layer that differs from
-\code{\link[hustable]{huxreg}} to make it easier to produce
+\code{\link[huxtable]{huxreg}} to make it easier to produce
 reasonable huxtables with nlmixr fit objects.
 }
 \details{

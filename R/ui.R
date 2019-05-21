@@ -1,5 +1,5 @@
 .deparse <- function(expr){
-  deparse(expr,width=500, control = "useSource");
+  deparse(expr,width.cutoff=500, control = "useSource");
 }
 
 .bodyDewrap  <- function(ret){
@@ -18,7 +18,7 @@
 }
 
 .deparse1  <- function(expr){
-  return(.bodyDewrap(deparse(expr,width=500)));
+  return(.bodyDewrap(deparse(expr,width.cutoff=500)));
 }
 
 .pipedData  <- NULL;
@@ -177,6 +177,8 @@ ini <- function(ini, ...){
 ##'
 ##' @param model Model specification
 ##' @param ... Other arguments to model object parsed by nlmixr
+##' @param .lines This is an interal argument when code{model} is
+##'     being called recursively and should not be used.
 ##' @return Parsed UI object
 ##' @author Matthew L. Fidler
 ##' @export
@@ -449,7 +451,7 @@ update.function  <- .nlmixrUpdate
       if (all(.newPars %in% .testVars)) return(NA_character_)
       return(.newPars);
     })
-    .tmp <- na.omit(unlist(.tmp))
+    .tmp <- stats::na.omit(unlist(.tmp))
     if (length(.tmp) > 0){
       stop(sprintf("Modeled responses need to be defined in the model; Add definition for: %s",
                  paste(.tmp, collapse=", ")))
@@ -822,7 +824,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     .thisEnv$ws <- character(0);
     ret <- tryCatch(suppressWarnings(withCallingHandlers(.nlmixrUIModel(fun, ini, bigmodel),
                                                          warning=function(w){
-      assign("ws", unique(c(w$message, ws)), .thisEnv);
+      assign("ws", unique(c(w$message, .thisEnv$ws)), .thisEnv);
     })),error=function(e){assign("em",e$message,.thisEnv)});
     .lst <- list();
     if (exists("ws",envir=.thisEnv)){
@@ -941,8 +943,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       } else {
         .tmp1[, "condition"] <- "";
       }
-      assign(".tmp", .tmp, globalenv())
-      assign(".tmp1", .tmp1, globalenv())
       .tmp <- rbind(.tmp, .tmp1);
       class(.tmp) <- c("nlmixrBounds", "data.frame");
       assign("bounds", .tmp, this.env)
@@ -1081,7 +1081,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       }
       else if (any(do.pred == c(1, 4, 5))){
         assign(".predDf", rbind(.predDf,
-                                data.frame(cond=ifelse(.bcond,"",sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
+                                data.frame(cond=ifelse(.bCond,"",sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
                                            var=.deparse(x2))), this.env)
         return(bquote(if (CMT==.(curCond)) {nlmixr_pred <- .(x2)}));
       } else if (do.pred == 3){

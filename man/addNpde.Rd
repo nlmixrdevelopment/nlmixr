@@ -20,6 +20,9 @@ prevent ties.}
 
 \item{updateObject}{Boolean indicating if original object should be updated.  By default this is TRUE.}
 
+\item{cholSEtol}{tolerance for Generalized Cholesky
+Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)}
+
 \item{...}{Other ignored parameters.}
 }
 \value{

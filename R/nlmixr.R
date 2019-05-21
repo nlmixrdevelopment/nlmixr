@@ -69,7 +69,7 @@ nlmixrForget <- function(){
 ##' @importFrom Rcpp evalCpp
 ##' @importFrom dparser dparse
 ##' @importFrom vpc vpc
-##' @importFrom ggplot2 ggplot aes geom_point facet_wrap geom_line geom_abline xlab geom_smooth
+##' @importFrom ggplot2 ggplot aes geom_point facet_wrap geom_line geom_abline xlab geom_smooth aes_string
 ##' @importFrom RcppArmadillo armadillo_version
 ##' @useDynLib nlmixr, .registration=TRUE
 
@@ -195,16 +195,18 @@ nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
 ##'
 ##' @param data is the name of the data to convert.  Can be a csv file
 ##'     as well.
+##' @param model This is the RxODE model to use to translate against
+##'     when parsing the data.
 ##' @return Appropriately formatted data
 ##' @author Matthew L. Fidler
 ##' @keywords internal
 ##' @export
-nlmixrData <- function(data, ...){
+nlmixrData <- function(data, model=NULL){
     UseMethod("nlmixrData");
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.character <- function(data, ...){
+nlmixrData.character <- function(data, model=NULL){
     if (!file.exists(data)){
         stop(sprintf("%s does not exist.", data))
     }
@@ -709,6 +711,9 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 ##'     products/sums.  Increases solving accuracy and solving time.
 ##' @param table A list controlling the table options (i.e. CWRES,
 ##'     NPDE etc).  See \code{\link{tableControl}}.
+##' @param save This option determines if the fit will be saved to be
+##'     reloaded if already run.  If NULL, get the option from
+##'     \code{options("nlmixr.save")};
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
@@ -732,8 +737,8 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
                                        sum.prod,
                                        table,
                                        ...,
-                                       as.character(packageVersion("nlmixr")),
-                                       as.character(packageVersion("RxODE"))))
+                                       as.character(utils::packageVersion("nlmixr")),
+                                       as.character(utils::packageVersion("RxODE"))))
         .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
                                 paste0("nlmixr-",.modName,.dataName,est,"-",.digest,".rds"));
         if (file.exists(.saveFile)){
@@ -835,6 +840,10 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
 ##' @param nsd.gq span (in SD) over which to integrate when computing
 ##'     the likelihood by Gaussian quadrature. Defaults to 3 (eg 3
 ##'     times the SD)
+##'
+##' @param adjObf is a boolean to indicate if the objective function
+##'     should be adjusted to be closer to NONMEM's default objective
+##'     function.  By default this is \code{TRUE}
 ##'
 ##' @param ... Other arguments to control SAEM.
 ##'

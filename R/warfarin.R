@@ -8,8 +8,9 @@
 ##'   \item{amt}{Total drug administered [mg]}
 ##'   \item{dv}{Warfarin concentrations [mg/L] or PCA measurement}
 ##'   \item{dvid}{Dependent identifier Information (cp: Dose or PK, pca: PCA, factor)}
+##'   \item{evid}{Event identifier}
 ##'   \item{wt}{Weight [kg]}
-##'   \item{wt}{Age [yr]}
+##'   \item{age}{Age [yr]}
 ##'   \item{sex}{Gender (male or female, factor)}
 ##' }
 ##'

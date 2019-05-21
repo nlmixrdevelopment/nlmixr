@@ -528,8 +528,13 @@ is.latex <- function() {
 ##' @param stickyRecalcN The number of bad ODE solves before reducing
 ##'     the atol/rtol for the rest of the problem.
 ##'
+##' @param nRetries If FOCEi doesn't fit with the current parameter
+##'     estimates, randomly sample new parameter estimates and restart
+##'     the problem.  This is similar to 'PsN' resampling.
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
+##' @inheritParams foceiFit
 ##'
 ##' @details
 ##'
@@ -648,7 +653,6 @@ foceiControl <- function(sigdig=3,...,
                          etaNudge=0.01, stiff,
                          nRetries=3,
                          seed=42,
-                         badEtaPenalty=0.05,
                          resetThetaCheckPer=0.1,
                          etaMat=NULL,
                          repeatGillMax=7,
@@ -1926,7 +1930,7 @@ foceiFit.data.frame0 <- function(data,
         ## Maybe change scale?
         message(sprintf("Restart %s", .n));
         .ret$control$nF <- 0
-        .estNew <- .est0 + 0.2 * .n * abs(.est0) * runif(length(.est0)) - 0.1 * .n;
+        .estNew <- .est0 + 0.2 * .n * abs(.est0) * stats::runif(length(.est0)) - 0.1 * .n;
         .estNew <- sapply(seq_along(.est0),
                           function(.i){
             if (.ret$thetaFixed[.i]){
@@ -2306,7 +2310,7 @@ plot.nlmixrFitData <- function(x, ...) {
         .hasCwres <- any(names(.dat0) == "CWRES")
         .hasNpde <- any(names(.dat0) == "NPDE")
         .d1 <- data.frame(DV=.dat0$DV, stack(.dat0[, c("PRED", "IPRED")]))
-        .p1 <- ggplot2::ggplot(.d1, aes(values, DV)) + ggplot2::facet_wrap( ~ ind) +
+        .p1 <- ggplot2::ggplot(.d1, aes_string("values", "DV")) + ggplot2::facet_wrap( ~ ind) +
             ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
             ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
             ggplot2::geom_point() + xlab("Predictions") +
@@ -2315,7 +2319,7 @@ plot.nlmixrFitData <- function(x, ...) {
 
         if (.hasCwres){
             .d1 <- data.frame(DV=.dat0$DV, stack(.dat0[, c("CPRED", "IPRED")]))
-            .p1 <- ggplot2::ggplot(.d1, aes(values, DV)) + ggplot2::facet_wrap( ~ ind) +
+            .p1 <- ggplot2::ggplot(.d1, aes_string("values", "DV")) + ggplot2::facet_wrap( ~ ind) +
                 ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
                 ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
                 ggplot2::geom_point() + xlab("Predictions") +
@@ -2325,7 +2329,7 @@ plot.nlmixrFitData <- function(x, ...) {
 
         if (.hasNpde){
             .d1 <- data.frame(DV=.dat0$DV, stack(.dat0[, c("NPDE", "IPRED")]))
-            .p1 <- ggplot2::ggplot(.d1, aes(values, DV)) + ggplot2::facet_wrap( ~ ind) +
+            .p1 <- ggplot2::ggplot(.d1, aes_string("values", "DV")) + ggplot2::facet_wrap( ~ ind) +
                 ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
                 ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
                 ggplot2::geom_point() + xlab("Predictions") +
@@ -2333,51 +2337,51 @@ plot.nlmixrFitData <- function(x, ...) {
             .lst[[length(.lst)+1]] <- .p1
         }
 
-        .p2 <- ggplot2::ggplot(.dat0, aes(x=IPRED, y=IRES)) +
+        .p2 <- ggplot2::ggplot(.dat0, aes_string(x="IPRED", y="IRES")) +
             ggplot2::geom_point() +
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IRES vs IPRED")
         .lst[[length(.lst)+1]] <- .p2
 
-        .p2 <- ggplot2::ggplot(.dat0, aes(x=TIME, y=IRES)) +
+        .p2 <- ggplot2::ggplot(.dat0, aes_string(x="TIME", y="IRES")) +
             ggplot2::geom_point() +
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IRES vs TIME")
         .lst[[length(.lst)+1]] <- .p2
 
-        .p2 <- ggplot2::ggplot(.dat0, aes(x=IPRED, y=IWRES)) +
+        .p2 <- ggplot2::ggplot(.dat0, aes_string(x="IPRED", y="IWRES")) +
             ggplot2::geom_point() +
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
         .lst[[length(.lst)+1]] <- .p2
 
-        .p2 <- ggplot2::ggplot(.dat0, aes(x=TIME, y=IWRES)) +
+        .p2 <- ggplot2::ggplot(.dat0, aes_string(x="TIME", y="IWRES")) +
             ggplot2::geom_point() +
             ggplot2::geom_abline(slope=0, intercept=0, col="red") +
             ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
         .lst[[length(.lst)+1]] <- .p2
 
         if (.hasCwres){
-            .p2 <- ggplot2::ggplot(.dat0, aes(x=CPRED, y=CWRES)) +
+            .p2 <- ggplot2::ggplot(.dat0, aes_string(x="CPRED", y="CWRES")) +
                 ggplot2::geom_point() +
                 ggplot2::geom_abline(slope=0, intercept=0, col="red") +
                 ggplot2::ggtitle(.cmt, "CWRES vs CPRED")
             .lst[[length(.lst)+1]] <- .p2
 
-            .p2 <- ggplot2::ggplot(.dat0, aes(x=TIME, y=CWRES)) +
+            .p2 <- ggplot2::ggplot(.dat0, aes_string(x="TIME", y="CWRES")) +
                 ggplot2::geom_point() +
                 ggplot2::geom_abline(slope=0, intercept=0, col="red") +
                 ggplot2::ggtitle(.cmt, "CWRES vs CPRED")
             .lst[[length(.lst)+1]] <- .p2
         }
         if (.hasNpde){
-            .p2 <- ggplot2::ggplot(.dat0, aes(x=EPRED, y=NPDE)) +
+            .p2 <- ggplot2::ggplot(.dat0, aes_string(x="EPRED", y="NPDE")) +
                 ggplot2::geom_point() +
                 ggplot2::geom_abline(slope=0, intercept=0, col="red") +
                 ggplot2::ggtitle(.cmt, "NPDE vs EPRED")
             .lst[[length(.lst)+1]] <- .p2
 
-            .p2 <- ggplot2::ggplot(.dat0, aes(x=TIME, y=NPDE)) +
+            .p2 <- ggplot2::ggplot(.dat0, aes_string(x="TIME", y="NPDE")) +
                 ggplot2::geom_point() +
                 ggplot2::geom_abline(slope=0, intercept=0, col="red") +
                 ggplot2::ggtitle(.cmt, "NPDE vs EPRED")
@@ -2403,7 +2407,7 @@ plot.nlmixrFitData <- function(x, ...) {
             .lst[[length(.lst)+1]] <- .p3
         }
     }
-    if (dev.cur() != 1){
+    if (grDevices::dev.cur() != 1){
         .x  <- .lst
         for (.i in seq_along(.x)){
             plot(.x[[.i]])

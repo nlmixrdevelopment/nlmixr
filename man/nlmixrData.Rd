@@ -6,15 +6,18 @@
 \alias{nlmixrData.default}
 \title{Convert/Format the data appropriately for nlmixr}
 \usage{
-nlmixrData(data, ...)
+nlmixrData(data, model = NULL)
 
-\method{nlmixrData}{character}(data, ...)
+\method{nlmixrData}{character}(data, model = NULL)
 
 \method{nlmixrData}{default}(data, model = NULL)
 }
 \arguments{
 \item{data}{is the name of the data to convert.  Can be a csv file
 as well.}
+
+\item{model}{This is the RxODE model to use to translate against
+when parsing the data.}
 }
 \value{
 Appropriately formatted data

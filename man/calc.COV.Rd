@@ -7,7 +7,7 @@
 calc.COV(fit0)
 }
 \arguments{
-\item{fit}{saemFit fit}
+\item{fit0}{saemFit fit}
 }
 \value{
 standard error of fixed effects

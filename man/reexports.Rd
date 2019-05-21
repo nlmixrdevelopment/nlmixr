@@ -52,6 +52,8 @@
 \alias{number_format}
 \alias{rxParams}
 \alias{rxParam}
+\alias{as_hux}
+\alias{as_huxtable}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -63,7 +65,7 @@ below to see their documentation.
 
   \item{generics}{\code{\link[generics]{tidy}}, \code{\link[generics]{glance}}, \code{\link[generics]{glance}}, \code{\link[generics]{augment}}}
 
-  \item{huxtable}{\code{\link[huxtable]{number_format}}}
+  \item{huxtable}{\code{\link[huxtable]{number_format}}, \code{\link[huxtable]{as_hux}}, \code{\link[huxtable]{as_huxtable}}}
 
   \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
 
