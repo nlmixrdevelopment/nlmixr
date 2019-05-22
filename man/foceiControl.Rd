@@ -42,8 +42,8 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxOdeRecalc = 5, odeRecalcFactor = 10^(0.5),
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
   etaNudge = 0.01, stiff, nRetries = 3, seed = 42,
-  badEtaPenalty = 0.05, resetThetaCheckPer = 0.1, etaMat = NULL,
-  repeatGillMax = 7, stickyRecalcN = 5)
+  resetThetaCheckPer = 0.1, etaMat = NULL, repeatGillMax = 7,
+  stickyRecalcN = 5)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -622,11 +622,18 @@ done on the first ETA optimization.}
     Dormand and Prince as implemented in C by Hairer and Wanner
     (1993).}
 
+\item{nRetries}{If FOCEi doesn't fit with the current parameter
+estimates, randomly sample new parameter estimates and restart
+the problem.  This is similar to 'PsN' resampling.}
+
 \item{seed}{an object specifying if and how the random number
 generator should be initialized}
 
 \item{resetThetaCheckPer}{represents objective function
 \% percentage below which resetThetaP is checked.}
+
+\item{etaMat}{Eta matrix for initial estimates or final estimates
+of the ETAs.}
 
 \item{repeatGillMax}{If the tolerances were reduced when
 calculating the initial Gill differences, the Gill difference

@@ -1,7 +1,7 @@
 ##' Change a nlmixr fit object to a huxtable
 ##'
 ##' This is a thin layer that differs from
-##' \code{\link[hustable]{huxreg}} to make it easier to produce
+##' \code{\link[huxtable]{huxreg}} to make it easier to produce
 ##' reasonable huxtables with nlmixr fit objects.
 ##'
 ##' \itemize{
@@ -70,17 +70,7 @@ asHux.nlmixrFitCore  <- function(...,
     return(.ret[.w])
 }
 
-##'@importFrom huxtable as_hux
 ##'@export
-as_hux  <- huxtable::as_hux
-
-##'@importFrom huxtable as_huxtable
-##'@export
-as_huxtable  <- huxtable::as_huxtable
-
-# This shouldn't be necessary, but it is :(
-##'@S3method as_huxtable nlmixrFitCore
-##'@export as_huxtable.nlmixrFitCore
 as_huxtable.nlmixrFitCore  <- function(x,...){
     if (missing(x)){
         .args <- list(...)
@@ -203,7 +193,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 .getFullNlmixrVersion  <- function(pkg="nlmixr"){
     .x <- tryCatch(utils::packageDescription(pkg, lib.loc = .libPaths()),
                    error = function(e) NA, warning = function(e) NA)
-    .pv  <- packageVersion(pkg);
+    .pv  <- utils::packageVersion(pkg);
     if (identical(.x, NA) || length(.x$RemoteSha)==0) {
         return(paste(.pv))
     } else {
@@ -361,6 +351,8 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 ##'     data object for the fit?  By default this is \code{FALSE} with
 ##'     \code{nmDocx} and \code{TRUE} with \code{nmSave}
 ##'
+##' @param ... when using `nmSave` these arguments are passed to `nmDocx`
+##'
 ##' @return An officer docx object
 ##'
 ##' @author Matthew Fidler
@@ -448,7 +440,7 @@ nmDocx  <- function(x,
         .hreg  <- nlmixr::as_hux(x);
     }
     .doc <- .doc %>%
-        officer::body_add_par(sprintf("nlmixr %s (%s)", packageVersion("nlmixr"),
+        officer::body_add_par(sprintf("nlmixr %s (%s)", utils::packageVersion("nlmixr"),
                                       .bound), style=titleStyle) %>%
         officer::body_add_par(sprintf("function: %s; %s", x$modelName,
                                       format(Sys.time(), "%a %b %d %X %Y")),
@@ -494,21 +486,21 @@ nmDocx  <- function(x,
         .t1 <- c("est","scaleC")
         .t2  <- c("est","Initial Gradient", "Forward aEps", "Forward rEps", "Central aEps", "Central rEps");
         .t3  <- c("est","Covariance Gradient","Covariance aEps", "Covariance rEps");
-        .t1  <- flextable::hux(.si[,.t1]) %>%
-            flextable::add_colnames() %>%
-            flextable::set_bold(row = 1, col = flextable::everywhere, value = TRUE) %>%
-            flextable::set_position("center") %>%
-            flextable::set_all_borders(TRUE)
-        .t2  <- flextable::hux(.si[,.t2]) %>%
-            flextable::add_colnames() %>%
-            flextable::set_bold(row = 1, col = flextable::everywhere, value = TRUE) %>%
-            flextable::set_position("center") %>%
-            flextable::set_all_borders(TRUE)
-        .t3  <- flextable::hux(.si[,.t3]) %>%
-            flextable::add_colnames() %>%
-            flextable::set_bold(row = 1, col = flextable::everywhere, value = TRUE) %>%
-            flextable::set_position("center") %>%
-            flextable::set_all_borders(TRUE)
+        .t1  <- huxtable::hux(.si[,.t1]) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
+        .t2  <- huxtable::hux(.si[,.t2]) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
+        .t3  <- huxtable::hux(.si[,.t3]) %>%
+            huxtable::add_colnames() %>%
+            huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
+            huxtable::set_position("center") %>%
+            huxtable::set_all_borders(TRUE)
         .doc <- .doc %>%
             officer::body_add_par("Scaling information (est/scaleC):",style=normalStyle) %>%
             flextable::body_add_flextable(flextable::autofit(.asFlx(.t1))) %>%
@@ -620,7 +612,7 @@ nmLst  <- function(x,
     message("---")
     message("")
     .rule(sprintf("Parameter Information as_hux(%s)", .bound));
-    .hreg %>% flextable::print_screen(colnames=FALSE)
+    .hreg %>% huxtable::print_screen(colnames=FALSE)
     .rule(sprintf("Parsed model information %s$uif", .bound));
     print(x$uif)
     if (x$message!=""){
@@ -637,7 +629,7 @@ nmLst  <- function(x,
     .mu <- .nmMuTable(x);
     if (length(.mu) !=0){
         .rule("Parsed Mu-referencing:");
-        .mu %>% flextable::print_screen(colnames=FALSE)
+        .mu %>% huxtable::print_screen(colnames=FALSE)
 
     }
     .it  <- .nmIterHist(x)

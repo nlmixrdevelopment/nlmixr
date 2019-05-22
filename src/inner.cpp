@@ -266,7 +266,6 @@ typedef struct {
   int repeatGill;
   int repeatGillN;
   int repeatGillMax;
-  double badEtaPenalty;
   int printTop;
   double resetThetaCheckPer;
 

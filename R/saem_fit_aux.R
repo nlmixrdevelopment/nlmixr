@@ -300,7 +300,7 @@ cutoff = function (x, cut = .Machine$double.xmin) {
 ##'
 ##' Get the covariance matrix of fixed effect estimates via calculating Fisher Information Matrix by linearization
 ##'
-##' @param fit saemFit fit
+##' @param fit0 saemFit fit
 ##'
 ##' @return standard error of fixed effects
 ##'
@@ -352,7 +352,7 @@ calc.COV = function(fit0) {
   s = matrix(saem.cfg$inits$theta, ncol=nphi, byrow=T)
   cov.ix = !is.na(c(s))
   cov.est.ix = !fix.ix & cov.ix
-  
+
   phi = hat.phi = fit$mpost_phi
   omega = fit$Gamma2_phi1
   evt = saem.cfg$evt

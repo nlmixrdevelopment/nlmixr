@@ -208,3 +208,12 @@ RxODE::rxParam
 ##'@export
 RxODE::et
 
+
+
+##' @importFrom huxtable as_hux
+##' @export
+huxtable::as_hux
+
+##'@importFrom huxtable as_huxtable
+##'@export
+huxtable::as_huxtable

@@ -202,3 +202,54 @@ addPropModel <- fit %>%
 
 print(addPropModel)
 ```
+
+# Simulating new scenarios with nlmixr and RxODE
+
+Once you have a fit, you can easily simulate different regimens by piping too.
+
+For example, you can simulate 100 subjects taking only the variability
+defined by the between subject variability matrix `omega` and the
+unexplained variability matrix `sigma`.
+
+```{r}
+fit %>% 
+    et(amt=300,ii=12,until=48) %>% # Now use amt=300 BID for 48 hrs
+    rxSolve(nSub=100) %>% # Simulate with 50 subjects and 50 studies
+    confint() %>% # Create intervals (not exactly confidence intervals)
+    plot() # Plot the intervals
+```
+
+You can also simulate by sampling from the uncertainty in the `omega`,
+`sigma` and `theta` matrices.  The simulation needs:
+
+- the population covariance matrix for the (truncated) multivariate
+  normal distribution (`thetaMat`),
+- the number of observations and the number of subjects in the model
+  for the covariance re-sampling
+
+These are all stored in the nlmixr fit object.
+
+This means you may simply:
+
+- Specify the number of "studies" you will be taking.  Each study is a
+  single parameter sample from the `theta` parameters as well as the `omega` and `sigma`
+  matrices.
+- Specify the number of subjects you are sampling for each of the
+  "study" specified above, `nSub`.
+
+In the end, it is simply done by `nSub=x, nStud=y` as in the following example:
+
+```{r}
+if (file.exists("modelPiping-sim0.rds")){
+    load("modelPiping-sim0.rds");
+} else {
+    sim0 <- fit %>% 
+        et(amt=300,ii=12,until=48) %>% # Now use amt=300 BID for 48 hrs
+        rxSolve(nSub=50, nStud=50) %>% # Simulate with 50 subjects and 50 studies
+        confint("sim");
+    save(sim0, file="modelPiping-sim0.rds")
+}
+
+sim0 %>% # Create intervals (not exactly confidence intervals)
+    plot() # Plot the intervals
+```

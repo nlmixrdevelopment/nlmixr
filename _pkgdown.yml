@@ -152,7 +152,7 @@ navbar:
           href: https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html
         - text: "PBPK -- Mavoglurant"
           href: https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html
-	- text: "PKPD -- Myelosuppression model"
+        - text: "PKPD -- Myelosuppression model"
           href: https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html
   - text: "Cheat Sheet"
     icon: fa-scroll fa-lg

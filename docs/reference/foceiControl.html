@@ -118,6 +118,9 @@
     <li>
       <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -210,8 +213,8 @@
   <span class='kw'>maxOdeRecalc</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>odeRecalcFactor</span> <span class='kw'>=</span> <span class='fl'>10</span>^(<span class='fl'>0.5</span>),
   <span class='kw'>gradCalcCentralSmall</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>, <span class='kw'>gradCalcCentralLarge</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
   <span class='kw'>etaNudge</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='no'>stiff</span>, <span class='kw'>nRetries</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>,
-  <span class='kw'>badEtaPenalty</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>resetThetaCheckPer</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>etaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>repeatGillMax</span> <span class='kw'>=</span> <span class='fl'>7</span>)</pre>
+  <span class='kw'>resetThetaCheckPer</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>etaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>repeatGillMax</span> <span class='kw'>=</span> <span class='fl'>7</span>,
+  <span class='kw'>stickyRecalcN</span> <span class='kw'>=</span> <span class='fl'>5</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -912,6 +915,12 @@ done on the first ETA optimization.</p></td>
     (1993).</p></td>
     </tr>
     <tr>
+      <th>nRetries</th>
+      <td><p>If FOCEi doesn't fit with the current parameter
+estimates, randomly sample new parameter estimates and restart
+the problem.  This is similar to 'PsN' resampling.</p></td>
+    </tr>
+    <tr>
       <th>seed</th>
       <td><p>an object specifying if and how the random number
 generator should be initialized</p></td>
@@ -922,11 +931,21 @@ generator should be initialized</p></td>
 % percentage below which resetThetaP is checked.</p></td>
     </tr>
     <tr>
+      <th>etaMat</th>
+      <td><p>Eta matrix for initial estimates or final estimates
+of the ETAs.</p></td>
+    </tr>
+    <tr>
       <th>repeatGillMax</th>
       <td><p>If the tolerances were reduced when
 calculating the initial Gill differences, the Gill difference
 is repeated up to a maximum number of times defined by this
 parameter.</p></td>
+    </tr>
+    <tr>
+      <th>stickyRecalcN</th>
+      <td><p>The number of bad ODE solves before reducing
+the atol/rtol for the rest of the problem.</p></td>
     </tr>
     </table>
     

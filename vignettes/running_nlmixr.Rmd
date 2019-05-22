@@ -188,20 +188,29 @@ library(xpose)
 
 Now install the extension for nlmixr:
 
+```
+ devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
+```
+
+ ... and convert your nlmixr fit object into an xpose fit object.
+ 
+```
+library(xpose.nlmixr)
+xp <- xpose_data_nlmixr(fit);
+save(xp, file=xpdbLoc)
+```
+
+
+
 ```{r}
 xpdbLoc <- file.path(system.file(package="nlmixr"), "xpdb.rds");
 if (file.exists(xpdbLoc)){
     load(xpdbLoc);
 } else {
-    ## devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
-    library(xpose.nlmixr)
-    xp <- xpose_data_nlmixr(fit);
-    save(xp, file=xpdbLoc)
+    stop("Need to generate nlmixr.xpose example")
 }
-
 ```
 
-... and convert your nlmixr fit object into an xpose fit object.
 
 ```{r}
 dv_vs_pred(xp)

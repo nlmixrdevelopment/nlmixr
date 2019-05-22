@@ -63,7 +63,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
         .df$estimate <- .df$model.est;
     }
     .df$statistic  <- .df$estimate/.df$std.error
-    .df$p.value  <- pt(.df$statistic,nobs(x)-attr(logLik(x),"df"),lower.tail=FALSE)
+    .df$p.value  <- stats::pt(.df$statistic,nobs(x)-attr(logLik(x),"df"),lower.tail=FALSE)
     if (.conf.int){
         .ci <- confint.nlmixrFitCore(x, level=.conf.level, ciNames=FALSE, exponentiate=.exponentiate);
         .df$conf.low <- .ci$conf.low

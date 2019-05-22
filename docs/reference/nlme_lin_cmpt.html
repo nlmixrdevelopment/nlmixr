@@ -125,6 +125,9 @@ nlme notations." />
     <li>
       <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -250,7 +253,7 @@ nlme notations.</p>
 <span class='no'>specs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>fixed</span><span class='kw'>=</span><span class='no'>lKA</span>+<span class='no'>lCL</span>+<span class='no'>lV</span>~<span class='fl'>1</span>, <span class='kw'>random</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/nlme/topics/pdDiag'>pdDiag</a></span>(<span class='no'>lKA</span>+<span class='no'>lCL</span>~<span class='fl'>1</span>), <span class='kw'>start</span><span class='kw'>=</span><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='kw'>lKA</span><span class='kw'>=</span><span class='fl'>0.5</span>, <span class='kw'>lCL</span><span class='kw'>=</span>-<span class='fl'>3.2</span>, <span class='kw'>lV</span><span class='kw'>=</span>-<span class='fl'>1</span>))
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>nlme_lin_cmpt</span>(<span class='no'>theo_md</span>, <span class='kw'>par_model</span><span class='kw'>=</span><span class='no'>specs</span>, <span class='kw'>ncmt</span><span class='kw'>=</span><span class='fl'>1</span>, <span class='kw'>verbose</span><span class='kw'>=</span><span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; 
 #&gt; **Iteration 1
-#&gt; LME step: Loglik: -420.4061, nlminb iterations: 1
+#&gt; LME step: Loglik: -420.4062, nlminb iterations: 1
 #&gt; reStruct  parameters:
 #&gt;      ID1      ID2 
 #&gt; 5.434250 5.693011 
@@ -272,8 +275,8 @@ nlme notations.</p>
 #&gt;  fixed effects: 0.2352729  1.058965  3.393164  
 #&gt;  iterations: 3 
 #&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):
-#&gt;       fixed    reStruct 
-#&gt; 0.013296624 0.004640796 
+#&gt;      fixed   reStruct 
+#&gt; 0.01329674 0.00464086 
 #&gt; 
 #&gt; **Iteration 3
 #&gt; LME step: Loglik: -422.666, nlminb iterations: 1
@@ -285,8 +288,8 @@ nlme notations.</p>
 #&gt;  fixed effects: 0.2352729  1.058965  3.393164  
 #&gt;  iterations: 1 
 #&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):
-#&gt;    fixed reStruct 
-#&gt;        0        0 </div><div class='input'><span class='co'>#plot(augPred(fit,level=0:1))</span>
+#&gt;        fixed     reStruct 
+#&gt; 0.000000e+00 1.552904e-16 </div><div class='input'><span class='co'>#plot(augPred(fit,level=0:1))</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/summary'>summary</a></span>(<span class='no'>fit</span>)</div><div class='output co'>#&gt; Nonlinear mixed-effects model fit by maximum likelihood
 #&gt;   Model: DV ~ (nlmixr::nlmeModList("user_fn"))(lCL, lV, lKA, TIME, ID) 
 #&gt;        AIC      BIC   logLik
@@ -303,7 +306,7 @@ nlme notations.</p>
 #&gt;        Value  Std.Error  DF   t-value p-value
 #&gt; lKA 0.235273 0.12654742 250   1.85917  0.0642
 #&gt; lCL 1.058965 0.07713563 250  13.72861  0.0000
-#&gt; lV  3.393164 0.02575930 250 131.72576  0.0000
+#&gt; lV  3.393164 0.02575930 250 131.72577  0.0000
 #&gt;  Correlation: 
 #&gt;     lKA    lCL   
 #&gt; lCL -0.013       
@@ -311,7 +314,7 @@ nlme notations.</p>
 #&gt; 
 #&gt; Standardized Within-Group Residuals:
 #&gt;         Min          Q1         Med          Q3         Max 
-#&gt; -4.85501588 -0.40260330  0.06705229  0.43848336  3.43996210 
+#&gt; -4.85501587 -0.40260325  0.06705232  0.43848334  3.43996204 
 #&gt; 
 #&gt; Number of Observations: 264
 #&gt; Number of Groups: 12 </div><div class='input'>

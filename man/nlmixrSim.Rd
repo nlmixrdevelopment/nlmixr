@@ -10,8 +10,8 @@
 nlmixrSim(object, ...)
 
 \method{rxSolve}{nlmixrFitData}(object, params = NULL, events = NULL,
-  inits = NULL, scale = NULL, covs = NULL, method = c("liblsoda",
-  "lsoda", "dop853"), transitAbs = NULL, atol = 1e-06, rtol = 1e-04,
+  inits = NULL, scale = NULL, method = c("liblsoda", "lsoda",
+  "dop853"), transitAbs = NULL, atol = 1e-06, rtol = 1e-04,
   maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L,
   maxordn = 12L, maxords = 5L, ..., cores,
   covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
@@ -19,11 +19,11 @@ nlmixrSim(object, ...)
   nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress = 10000L,
   amountUnits = NA_character_, timeUnits = "hours", stiff,
   theta = NULL, eta = NULL, addDosing = FALSE,
-  updateObject = FALSE, doSolve = TRUE, omega = NULL,
-  omegaDf = NULL, omegaIsChol = FALSE, nSub = 1L, thetaMat = NULL,
-  thetaDf = NULL, thetaIsChol = FALSE, nStud = 1L, dfSub = 0,
-  dfObs = 0, returnType = c("rxSolve", "matrix", "data.frame"),
-  seed = NULL, nsim = NULL)
+  updateObject = FALSE, omega = NULL, omegaDf = NULL,
+  omegaIsChol = FALSE, nSub = 1L, thetaMat = NULL, thetaDf = NULL,
+  thetaIsChol = FALSE, nStud = 1L, dfSub = 0, dfObs = 0,
+  returnType = c("rxSolve", "matrix", "data.frame"), seed = NULL,
+  nsim = NULL)
 
 \method{simulate}{nlmixrFitData}(object, nsim = 1, seed = NULL, ...)
 

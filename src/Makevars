@@ -1,7 +1,7 @@
 ## The ARMA varaible is used instead of linking to because otherwise stanmath, armadillo, and eignen are included
 ARMA=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e 'cat(file.path(find.package("RcppArmadillo"),"include"))'`
 PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
-PKG_CXXFLAGS = -g -Id -I../inst/include -DBOOST_DISABLE_ASSERTS -I"$(ARMA)"
+PKG_CXXFLAGS = -Id -I../inst/include -DBOOST_DISABLE_ASSERTS -I"$(ARMA)"
 ##CXX_STD = C++14
 CXX_STD     = CXX11
 SOURCES_C = jj.c jj.g.d_parser.c init.c rprintf.c merge3.c lbfgsR.c

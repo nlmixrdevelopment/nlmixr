@@ -84,6 +84,9 @@
     <li>
       <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -128,7 +131,7 @@
     <div class="page-header toc-ignore">
       <h1>Using Broom with nlmixr</h1>
             
-            <h4 class="date">2019-05-10</h4>
+            <h4 class="date">2019-05-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/broom.Rmd"><code>vignettes/broom.Rmd</code></a></small>
       <div class="hidden name"><code>broom.Rmd</code></div>
@@ -1285,6 +1288,10 @@ fit.s <span class="op">%&gt;%</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     theme_grey</span>
 tbl &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/huxtable/topics/huxreg">huxreg</a></span>(<span class="st">'Phenobarbitol'</span>=fit.s)
+<span class="co">#&gt; Warning in checkMatrixPackageVersion(): Package version inconsistency detected.</span>
+<span class="co">#&gt; TMB was built with Matrix version 1.2.15</span>
+<span class="co">#&gt; Current Matrix version is 1.2.17</span>
+<span class="co">#&gt; Please re-install 'TMB' from source using install.packages('TMB', type = 'source') or ask CRAN for a binary version of 'TMB' matching CRAN's 'Matrix' package</span>
 <span class="co">#&gt; Warning in huxreg(Phenobarbitol = fit.s): Unrecognized statistics: r.squared</span>
 <span class="co">#&gt; Try setting `statistics` explicitly in the call to `huxreg()`</span>
 
@@ -1483,7 +1490,6 @@ ft  &lt;-<span class="st"> </span>huxtable<span class="op">::</span><span class=
 <span class="kw"><a href="https://www.rdocumentation.org/packages/officer/topics/read_docx">read_docx</a></span>() <span class="op">%&gt;%</span>
 <span class="st">    </span>flextable<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/flextable/topics/body_add_flextable">body_add_flextable</a></span>(ft)  <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="dt">target=</span><span class="st">"pheno.docx"</span>)
-<span class="co">#&gt; Note: zip::zip() is deprecated, please use zip::zipr() instead</span>
 <span class="co">#&gt; [1] "/home/matt/src/nlmixr/vignettes/pheno.docx"</span></code></pre></div>
 <p>Which produces the following <a href="pheno.docx">word document</a>.</p>
 <p>Happy tidying!</p>

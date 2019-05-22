@@ -22,5 +22,5 @@ rxParams.nlmixrFitData <- function(obj, ...){
                       omega=.si$omega,
                       dfSub=.si$dfSub,
                       sigma=.si$sigma);
-    do.call(RxODE::rxParams, list(...), envir=envir);
+    do.call(RxODE::rxParams, list(...));
 }

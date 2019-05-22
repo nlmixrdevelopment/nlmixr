@@ -990,6 +990,3 @@ VarCorr.nlmixrNlme <- function(x, sigma = NULL, ...){
     class(.vc2) <- "VarCorr.lme"
     return(.vc2)
 }
-
-##'@export
-varCorr <- nlme::VarCorr

@@ -118,6 +118,9 @@
     <li>
       <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
+    <li>
+      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -199,6 +202,11 @@ prevent ties.</p></td>
     <tr>
       <th>updateObject</th>
       <td><p>Boolean indicating if original object should be updated.  By default this is TRUE.</p></td>
+    </tr>
+    <tr>
+      <th>cholSEtol</th>
+      <td><p>tolerance for Generalized Cholesky
+Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)</p></td>
     </tr>
     <tr>
       <th>...</th>

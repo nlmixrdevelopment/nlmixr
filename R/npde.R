@@ -7,11 +7,13 @@
 ##'     prevent ties.
 ##' @param seed Seed for running nlmixr simulation.  By default 1009
 ##' @param updateObject Boolean indicating if original object should be updated.  By default this is TRUE.
+##' @inheritParams foceiControl
 ##' @param ... Other ignored parameters.
 ##' @return New nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, cholSEtol=(.Machine$double.eps)^(1/3),...){
+addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE,
+                    cholSEtol=(.Machine$double.eps)^(1/3), ...){
     .pt  <- proc.time();
     .objName <- substitute(object);
     if (any(names(object) == "NPDE")){
@@ -43,10 +45,8 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE, c
     .cls <- class(object)
     .evid <- rep(0L,.dvl);
     .evid[is.na(object$RES) & !is.na(object$PRED)] <- 2L;
-    assign(".sim",.sim,globalenv());
-    assign(".dv",.dv,globalenv());
-    assign(".evid",.evid,globalenv());
-    .new <- cbind(object, .Call(`_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj, ties, cholSEtol))
+    .new <- cbind(object, .Call(`_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj, ties,
+                                cholSEtol))
     class(.new) <- .cls;
     if (updateObject){
         .parent <- parent.frame(2);
