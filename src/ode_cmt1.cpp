@@ -3,6 +3,9 @@
 // [[Rcpp::depends(RcppEigen)]]
 using namespace Rcpp;
 
+#include <vector>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math.hpp>
 #include "PKPDLib_WW.h"
 

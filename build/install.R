@@ -21,15 +21,16 @@ install.packages(c("tidyverse", "data.table",
                    "stringi", "lbfgsb3",
                    "lbfgsb3c", "madness", "expm", "matrixcalc", "bookdown", "roxygen2", "xpose",
                    ## "reticulate",
-                   "nloptr", "ucminf", "vpc"))
+                   "nloptr", "ucminf", "vpc", "installr"))
 
 devtools::install_github("nlmixrdevelopment/RxODE")
 library(RxODE)
-devtools::install_github("nlmixrdevelopment/rxModels")
-devtools::install_github("nlmixrdevelopment/SnakeCharmR")
+devtools::install_github("nlmixrdevelopment/nlmixr")
+
+## devtools::install_github("nlmixrdevelopment/rxModels")
+## devtools::install_github("nlmixrdevelopment/SnakeCharmR")
 devtools::install_github("richardhooijmaijers/R3port")
 devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
-devtools::install_github("nlmixrdevelopment/nlmixr")
 
 devtools::install_github("AdeelK93/collapsibleTree")
 
