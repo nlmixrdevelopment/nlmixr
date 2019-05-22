@@ -54,8 +54,6 @@ statistics. To change display names, name the \code{statistics} vector:
 name the \code{coef} vector: \code{c("Displayed title" = "coefficient_name", ...)}}
 
 \item{omit_coefs}{Omit these coefficients.}
-
-\item{na_omit}{Style of na_omit to use for the \code{error_format};  If \code{na_omit = "all"}, then all items in the \code{error_format} have to be \code{NA} to replace the row with an empty string.  If \code{na_omit = "any"}, then any of the items in the \code{error_format} with a \code{NA} will be replaced with an empty string.}
 }
 \description{
 This is a thin layer that differs from

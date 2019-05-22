@@ -11,3 +11,14 @@ inst/doc
 .Rproj.user
 nlmixr.Rproj
 *.so
+/vignettes/addingCovariances.R
+vignettes/addingCovariances.html
+vignettes/broom.R
+vignettes/installing_nlmixr.R
+vignettes/installing_nlmixr.html
+vignettes/modelPiping.R
+vignettes/modelPiping.html
+vignettes/multiple-endpoints.R
+vignettes/multiple-endpoints.html
+vignettes/running_nlmixr.R
+vignettes/running_nlmixr.html

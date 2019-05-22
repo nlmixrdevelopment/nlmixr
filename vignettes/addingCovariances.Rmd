@@ -90,10 +90,25 @@ plot(augPred(fit))
 ```{r}
 library(ggplot2)
 ## A traditional VPC
-p1 <- vpc(fit, show=list(obs_dv=TRUE)) + ylab("Concentrations")
+if (file.exists(system.file("addCov-p1.rds",package="nlmixr"))){
+    load(system.file("addCov-p1.rds",package="nlmixr"))
+} else {
+    ## $gg will strip out all saved simulation information
+    ## This allows saving the vpc for speed
+    ## It is not typically needed
+    p1 <- vpc(fit, show=list(obs_dv=TRUE))$gg;
+    save(p1,file = file.path(system.file(package="nlmixr"),"addCov-p1.rds"),version = 2)
+}
+p1 <- p1+ ylab("Concentrations")
 
 ## A prediction-corrected VPC
-p2 <- vpc(fit, pred_corr = TRUE, show=list(obs_dv=TRUE)) + ylab("Prediction-Corrected Concentrations")
+if (file.exists(system.file("addCov-p2.rds",package="nlmixr"))){
+    load(system.file("addCov-p2.rds",package="nlmixr"))
+} else {
+    p2 <- vpc(fit, pred_corr = TRUE, show=list(obs_dv=TRUE))$gg
+    save(p2,file = file.path(system.file(package="nlmixr"), "addCov-p2.rds"), version = 2)
+}
+p2 <- p2+ ylab("Prediction-Corrected Concentrations")
 
 library(gridExtra)
 grid.arrange(p1,p2)

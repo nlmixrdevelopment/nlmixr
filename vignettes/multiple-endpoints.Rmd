@@ -335,11 +335,25 @@ plot(fit.TOS);
 library(ggplot2);
 library(gridExtra);
 
-v1 <- vpc(fit.TOS, show=list(obs_dv=T), scales="free_y") +
+if (file.exists(system.file("me-v1.rds",package="nlmixr"))){
+    load(system.file("me-v1.rds",package="nlmixr"))
+} else {
+    ## $gg returns the ggplot only, not typically needed
+    v1 <- vpc(fit.TOS, show=list(obs_dv=T), scales="free_y")$gg
+    save(v1,file = file.path(system.file(package="nlmixr"), "me-v1.rds"), version = 2)
+}
+v1 <- v1 +
     ylab("Warfarin Cp [mg/L] or PCA") +
     xlab("Time [h]");
 
-v2 <- vpc(fit.TOS, show=list(obs_dv=T), pred_corr = TRUE) +
+if (file.exists(system.file("me-v2.rds",package="nlmixr"))){
+    load(system.file("me-v2.rds",package="nlmixr"))
+} else {
+    ## $gg returns the ggplot only, not typically needed
+    v2 <- vpc(fit.TOS, show=list(obs_dv=T), pred_corr = TRUE)$gg
+    save(v2,file = file.path(system.file(package="nlmixr"), "me-v2.rds"), version = 2)
+}
+v2 <- v2 +
     ylab("Prediction Corrected Warfarin Cp [mg/L] or PCA") +
     xlab("Time [h]");
 

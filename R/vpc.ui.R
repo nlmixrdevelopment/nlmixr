@@ -145,7 +145,9 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
 `$.nlmixrVpc` <- function(obj, arg, exact = TRUE){
     if (arg=="gg"){
         .x <- obj;
-        class(.x)  <- class(.x)[class(.x) != "nlmixrVpc"]
+        .cls  <- class(.x)[class(.x) != "nlmixrVpc"]
+        attr(.cls, "nlmixrVpc") <- NULL
+        class(.x) <- .cls
         return(.x);
     } else if (any(arg==c("rxsim", "sim", "obs"))) {
         .info  <- attr(class(obj), "nlmixrVpc");

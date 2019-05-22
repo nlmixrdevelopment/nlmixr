@@ -258,20 +258,20 @@ the `dotwhisker` package to plot the model parameter confidence
 intervals.
 
 ```{r}
-options(broom.mixed.sep2=": ", broom.mixed.sep2=", ")
-library(ggplot2)
-library(dotwhisker)
-library(dplyr)
-fit.s %>%
-    tidy(exponentiate=NA) %>%
-    filter(effect=="fixed") %>%
-    dwplot()
+## options(broom.mixed.sep2=": ", broom.mixed.sep2=", ")
+## library(ggplot2)
+## library(dotwhisker)
+## library(dplyr)
+## fit.s %>%
+##     tidy(exponentiate=NA) %>%
+##     filter(effect=="fixed") %>%
+##     dwplot()
 ```
 
 You may also compare models easily by using the `dotwhisker` package
 
 ```{r}
-dwplot(list("SAEM"=fit.s, "FOCEi"=fit.f), exponentiate=NA)
+## dwplot(list("SAEM"=fit.s, "FOCEi"=fit.f), exponentiate=NA)
 ```
 
 ## Huxtable
