@@ -8,6 +8,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r,echo=FALSE}
+## To allow nlmixr to reload runs without large run times
+## To run the actual models on your system, take the save options off.
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+options(nlmixr.save=TRUE,
+        nlmixr.save.dir=system.file(package="nlmixr"));
+```
+
 ![nlmixr](logo.png)
 
 # Running PK models with nlmixr
@@ -22,13 +30,6 @@ A. Upton of the University of California, San Francisco:
 ## Load libraries
 library(ggplot2)
 library(nlmixr)
-
-## To allow nlmixr to reload runs without large run times
-## To run the actual models on your system, take the save options off.
-options(nlmixr.save=TRUE,
-        nlmixr.save.dir=system.file(package="nlmixr"));
-
-
 str(theo_sd)
 
 ggplot(theo_sd, aes(TIME, DV)) + geom_line(aes(group=ID), col="red") + scale_x_continuous("Time (h)") + scale_y_continuous("Concentration") + labs(title="Theophylline single-dose", subtitle="Concentration vs. time by individual")
@@ -87,7 +88,6 @@ one.compartment <- function() {
         cp ~ add(add.err)
     })
 }
-
 ```
 
 We can try the Stochastic Approximation EM (SAEM) method to this model:
@@ -465,26 +465,26 @@ the
 [magrittr] forward-pipe
 operator.
 
-```{r}
+```
 fit <- nlmixr(one.compartment) %>% saem.fit(data=theo_sd)
 ```
-```{r}
+```
 fit2 <- nlmixr(one.compartment, data=theo_sd, est="saem")
 ```
-```{r}
+```
 fit3 <- one.compartment %>% saem.fit(data=theo_sd)
 ```
 
 Options to the estimation routines can be specified using nlmeControl
 for nlme estimation:
 
-```{r}
+```
 fit4 <- nlmixr(one.compartment, theo_sd,est="nlme",control = nlmeControl(pnlsTol = .5))
 ```
 
 where options are specified in the `nlme` documentation.
 Options for saem can be specified using `saemControl`:
-```{r}
+```
 fit5 <- nlmixr(one.compartment,theo_sd,est="saem",control=saemControl(n.burn=250,n.em=350,print=50))
 ```
 
