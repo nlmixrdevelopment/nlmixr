@@ -19,6 +19,7 @@
 ##' }
 ##'
 ##' @inheritParams huxtable::huxreg
+##' @param na_omit How NAs are handled in converting to huxtable
 ##'@export
 asHux.nlmixrFitCore  <- function(...,
                                  error_format    = "({std.error})",

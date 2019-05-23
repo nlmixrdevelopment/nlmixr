@@ -54,6 +54,8 @@ statistics. To change display names, name the \code{statistics} vector:
 name the \code{coef} vector: \code{c("Displayed title" = "coefficient_name", ...)}}
 
 \item{omit_coefs}{Omit these coefficients.}
+
+\item{na_omit}{How NAs are handled in converting to huxtable}
 }
 \description{
 This is a thin layer that differs from

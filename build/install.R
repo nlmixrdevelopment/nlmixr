@@ -21,7 +21,8 @@ install.packages(c("tidyverse", "data.table",
                    "stringi", "lbfgsb3",
                    "lbfgsb3c", "madness", "expm", "matrixcalc", "bookdown", "roxygen2", "xpose",
                    ## "reticulate",
-                   "nloptr", "ucminf", "vpc", "installr", "DT", "dotwhisker"))
+                   "nloptr", "ucminf", "vpc", "installr", "DT", "dotwhisker", "broom", "broom.mixed",
+                   "Rvmmin", "pkgdown"))
 
 devtools::install_github("nlmixrdevelopment/RxODE")
 library(RxODE)
