@@ -635,7 +635,6 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                             env=env,
                             ...), silent = TRUE);
             if (inherits(fit0, "try-error")){
-                assign(".fit", fit, globalenv())
             } else {
                 fit <- fit0
                 assign("message2", fit$env$message, env);
