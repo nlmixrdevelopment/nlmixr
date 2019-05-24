@@ -48,7 +48,10 @@ r_github_packages:
   
 script: 
   - |
-    Rscript -e 'RxODE::rxC14();q("no");'
+    mkdir ~/.R
+    echo > ~/.R/Makevars
+    echo CXX14FLAGS=-O3 -march=native -mtune=native -fPIC >> ~/.R/Makevars
+    echo CXX14=g++ >> ~/.R/Makevars
     R CMD build .
     travis_wait 40 R CMD check nlmixr*tar.gz
     
