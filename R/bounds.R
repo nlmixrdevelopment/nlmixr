@@ -569,12 +569,12 @@ nlmixrBounds <- function(fun){
         stop(sprintf("The following parameters initial estimates are infinite: %s", paste(df$name[w], collapse=", ")))
     }
 
-    w <- which(df$lower == df$est && df$est == df$upper);
+    w <- which(df$lower == df$est & df$est == df$upper);
     if (length(w) > 0){
         stop(sprintf("The estimate, and upper and lower bounds are the same for the following parameters: %s\nTo fix parameters use %s=fix(%s) instead.",
                      paste(df$name[w], collapse=", "), df$name[w[1]], df$est[w[1]]))
     }
-    w <- which(df$lower == df$est || df$est == df$upper);
+    w <- which(df$lower == df$est | df$est == df$upper);
     if (length(w) > 0){
         tmp <- unique(sort(c(df$est[w[1]], df$lower[w[1]], df$upper[w[1]])));
         tmp <- tmp[!is.infinite(tmp)];
