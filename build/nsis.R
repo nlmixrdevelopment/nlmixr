@@ -114,15 +114,11 @@ WriteRegStr HKCU \"Software\\R-core\\R\" \"InstallPath\" \"$INSTDIR\\R\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\" \"Current Version\" \"<%=rtoolsver%>\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\" \"InstallPath\" \"$INSTDIR\\rtools\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"FullVersion\" \"<%=fullr%>\"
-WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"InstallPath\" \"$INSTDIR\\rtools\"
+WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"InstallPath\" \"$INSTDIR\\R\\Rtools\"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"MinRVersion\" \"<%=minr%>\"
 SetOutPath \"$INSTDIR\"
 File \"nlmixr.exe\"
 File \"shinyMixR.exe\"
-SetOutPath \"$INSTDIR\\python\"
-File /r <%=python%>\\*
-SetOutPath \"$INSTDIR\\rtools\"
-File /r <%=rtools%>\\*
 SetOutPath \"$INSTDIR\\R\"
 File /r <%=R%>\\*
 
