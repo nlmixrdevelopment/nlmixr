@@ -3,8 +3,7 @@
 language: r
 
 env:
- - CXX14FLAGS=-O3 -march=native -mtune=native -fPIC
- - CXX14=g++
+ - CXX14FLAGS=-O3 -march=native -mtune=native -fPIC CXX14=g++
 
 cache: packages
 
