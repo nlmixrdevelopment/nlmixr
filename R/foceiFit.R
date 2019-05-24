@@ -1520,6 +1520,7 @@ foceiFit.data.frame <- function(data, ...){
                     .v <- .shrink[7, .y];
                 }
                 if (length(.v) != 1) return(data.frame(ch=" ", v=NA_real_));
+                if (is.na(.v)) return(data.frame(ch=" ", v=NA_real_));
                 .t <- ">"
                 if (.v < 0){
                 } else  if (.v < 20){

@@ -619,7 +619,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             env$time2 <- time;
             env$uif <- .uif;
             env$method <- "FO";
-            fit <- foceiFit(dat,
+            fit0<- try(foceiFit(dat,
                             inits=.uif$focei.inits,
                             PKpars=.uif$theta.pars,
                             ## par_trans=fun,
@@ -633,22 +633,26 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                             etaNames=.uif$eta.names,
                             control=control,
                             env=env,
-                            ...);
-            assign("message2", fit$env$message, env);
-            assign("message", .message, env);
-            .tmp1 <- env$objDf;
-            if (any(names(.objDf) == "Condition Number")) .tmp1 <- data.frame(.tmp1, "Condition Number"=NA, check.names=FALSE);
-            if (any(names(.tmp1) == "Condition Number")) .objDf <- data.frame(.objDf, "Condition Number"=NA, check.names=FALSE);
-            env$objDf <- rbind(.tmp1, .objDf);
-            row.names(env$objDf) <- c(ifelse(est == "fo", "FOCE", "FOCEi"), "FO");
-            .tmp1 <- env$time;
-            .tmp1$optimize <- .time$optimize
-            .tmp1$covariance <- .time$covariance
-            assign("time", .tmp1, envir=env)
-            env$objDf <- env$objDf[, c("OBJF", "AIC", "BIC", "Log-likelihood", "Condition Number")]
-            setOfv(env, "fo")
+                            ...), silent = TRUE);
+            if (inherits(fit0, "try-error")){
+                assign(".fit", fit, globalenv())
+            } else {
+                fit <- fit0
+                assign("message2", fit$env$message, env);
+                assign("message", .message, env);
+                .tmp1 <- env$objDf;
+                if (any(names(.objDf) == "Condition Number")) .tmp1 <- data.frame(.tmp1, "Condition Number"=NA, check.names=FALSE);
+                if (any(names(.tmp1) == "Condition Number")) .objDf <- data.frame(.objDf, "Condition Number"=NA, check.names=FALSE);
+                env$objDf <- rbind(.tmp1, .objDf);
+                row.names(env$objDf) <- c(ifelse(est == "fo", "FOCE", "FOCEi"), "FO");
+                .tmp1 <- env$time;
+                .tmp1$optimize <- .time$optimize
+                .tmp1$covariance <- .time$covariance
+                assign("time", .tmp1, envir=env)
+                env$objDf <- env$objDf[, c("OBJF", "AIC", "BIC", "Log-likelihood", "Condition Number")]
+                setOfv(env, "fo")
+            }
         }
-        fit <- fix.dat(fit);
         fit <- .addNpde(fit);
         assign("start.time", start.time, env);
         assign("est", est, env);
