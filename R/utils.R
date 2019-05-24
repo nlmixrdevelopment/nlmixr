@@ -691,3 +691,7 @@ nlmixrPrint <- function(x, ...){
 cholSE <- function(matrix, tol=(.Machine$double.eps) ^ (1 / 3)){
     .Call(`_nlmixr_cholSE_`, matrix, tol);
 }
+
+.setRoot <- function(){
+    setwd("c:/");
+}

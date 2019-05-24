@@ -23,6 +23,29 @@ WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallP
 Exec \"$EXEDIR\\R\\bin\\<%=Rdir%>\\Rgui.exe\"
 SectionEnd"
 
+shiny.lauch.stub <- "
+CRCCheck On
+RequestExecutionLevel user
+; Best Compression
+SetCompress Auto
+SetCompressor /SOLID lzma
+SetCompressorDictSize 32
+SetDatablockOptimize On
+;SetCompress off
+Name \"<%=shiny.name%>\"
+Icon \"<%=icon%>\"
+OutFile \"<%=shiny.name%>.exe\"
+AutoCloseWindow true
+Caption \"Starting ShinyMixR\"
+Subcaption 3 \" \"
+ChangeUI all \"${NSISDIR}\\Contrib\\UIs\\LoadingBar_Icon.exe\"
+XPStyle on
+Section Main sec_main
+WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\" \"\" \"$EXEDIR\"
+WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallPath\" \"$EXEDIR\\R\"
+Exec '$EXEDIR\\R\\bin\\<%=Rdir%>\\R.exe -e library(shinyMixR);nlmixr:::.setRoot();run_shinymixr(launch.browser=TRUE)'
+SectionEnd"
+
 nsi.stub <- "
 CRCCheck On
 RequestExecutionLevel user
@@ -95,6 +118,7 @@ WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"InstallPath\" \"
 WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"MinRVersion\" \"<%=minr%>\"
 SetOutPath \"$INSTDIR\"
 File \"nlmixr.exe\"
+File \"shinyMixR.exe\"
 SetOutPath \"$INSTDIR\\python\"
 File /r <%=python%>\\*
 SetOutPath \"$INSTDIR\\rtools\"
@@ -162,6 +186,10 @@ buildInstaller <- function(name="nlmixr"){
     exe <- file.path(dr, "nlmixr.nsi");
     brew::brew(text=nsi.lauch.stub, output=file.path(dr, "nlmixr.nsi"));
     system(sprintf("makensis %s", file.path(dr, "nlmixr.nsi")));
+    shiny.name <- "shinyMixR"
+    brew::brew(text = shiny.lauch.stub, output=file.path(dr, "shinyMixR.nsi"))
+    system(sprintf("makensis %s", file.path(dr, "shinyMixR.nsi")));
+
     ## unlink(file.path(dr, "nlmixr.nsi"))
     dr <- normalizePath(file.path(dr, sprintf("%s%s.nsi", name, archext)))
     brew::brew(text=nsi.stub, output=dr)
