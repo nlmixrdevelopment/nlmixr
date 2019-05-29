@@ -56,6 +56,7 @@ SetCompressorDictSize 32
 SetDatablockOptimize On
 ;SetCompress off
 !include \"MUI2.nsh\"
+!include \"MUI_EXTRAPAGES.nsh\"
 ## For some reason, this doesn't work... :(
 ## !include LogicLib.nsh
 ## !include StrContains.nsh
@@ -99,6 +100,7 @@ BrandingText \"<%=name%> - Nonlinear Mixed Effects Models in R\"
 !insertmacro MUI_PAGE_LICENSE \"<%=lic%>\"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_README \"<%=readme>\"
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_WELCOME
@@ -155,6 +157,7 @@ buildInstaller <- function(name="nlmixr"){
     python <- gsub("/", "\\", RxODE:::.rxPythonBaseWin(), fixed=TRUE);
     R <- gsub("/", "\\", Sys.getenv("R_HOME"), fixed=TRUE);
     lic <- gsub("/", "\\", devtools::package_file("LICENSE"), fixed=TRUE);
+    readme <- gsub("/", "\\", devtools::package_file("build/installation-notes.rtf"), fixed=TRUE);
     header <- gsub("/", "\\", devtools::package_file("build/nlmixr-header.bmp"), fixed=TRUE)
     welcome <- gsub("/", "\\", devtools::package_file("build/nlmixr-welcome.bmp"), fixed=TRUE)
     icon <- gsub("/", "\\", devtools::package_file("build/icon_red.ico"), fixed=TRUE)
