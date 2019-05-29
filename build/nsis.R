@@ -100,7 +100,7 @@ BrandingText \"<%=name%> - Nonlinear Mixed Effects Models in R\"
 !insertmacro MUI_PAGE_LICENSE \"<%=lic%>\"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
-!insertmacro MUI_PAGE_README \"<%=readme>\"
+!define MUI_FINISHPAGE_SHOWREADME $INSTDIR\\installation-notes.rtf
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_WELCOME
@@ -121,6 +121,7 @@ WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"MinRVersion\" \"
 SetOutPath \"$INSTDIR\"
 File \"nlmixr.exe\"
 File \"shinyMixR.exe\"
+File \"installation-notes.rtf\"
 SetOutPath \"$INSTDIR\\R\"
 File /r <%=R%>\\*
 
@@ -140,6 +141,7 @@ RmDir /r \"$INSTDIR\\R\"
 Delete \"$SMPROGRAMS\\nlmixr\\*.lnk\"
 RmDir /r \"$SMPROGRAMS\\nlmixr\"
 
+Delete \"$INSTDIR\\Uninstall.exe\"
 Delete \"$INSTDIR\\Uninstall.exe\"
 RmDir /r \"$INSTDIR\"
 Delete \"$DESKTOP\\nlmixr R *.lnk\"
