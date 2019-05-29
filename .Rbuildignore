@@ -12,7 +12,8 @@
 ^\.gitignore$
 ^vignettes/examples/ACoP7poster/.*$
 ^vignettes/examples/LiveDemo/.*$
-^build/*.exe$
+^build/*.*$
+^*.exe$
 ^vignettes/figure/.*$
 ^appveyor\.yml$
 rx_.*\.(so|dll)$
