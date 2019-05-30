@@ -104,8 +104,11 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
             }
             assign("ref",.ref,envir=.env);
         })
-        .ret  <- merge(.ret,data.frame(theta=names(.env$ref),covariates=as.character(.env$ref)),
+        if(length(.env$ref) > 0){
+            .ret  <- merge(.ret,data.frame(theta=names(.env$ref),covariates=as.character(.env$ref)),
                        by="theta")
+        }
+
     }
     .ret  <- huxtable::hux(.ret) %>%
             huxtable::add_colnames() %>%
