@@ -327,10 +327,9 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 	if(inherits(fit$hessian,"try-error")){
 	  se = rep(NA, length(fit$par))
 	  warning("standard error of the Hessian has failed")
-	}
-  	else{
-  	se = sqrt(diag(solve(fit$hessian)))
-  	}
+	} else{
+	  se = sqrt(diag(solve(fit$hessian)))
+  }
 	res = cbind(fit$par, se, se/fit$par*100)
 	
 	dimnames(res) = list(names(inits), c("est", "se", "%cv"))
