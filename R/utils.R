@@ -323,9 +323,16 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 
 	if (squared) fit$par = fit$par^2
 	squared = F
-	fit$hessian = optimHess(fit$par, obj)
-	se = sqrt(diag(solve(fit$hessian)))
+	fit$hessian = try(optimHess(fit$par, obj), silent=TRUE)
+	if(inherits(fit$hessian,"try-error")){
+	  se = rep(NA, length(fit$par))
+	  warning("standard error of the Hessian has failed")
+	}
+  	else{
+  	se = sqrt(diag(solve(fit$hessian)))
+  	}
 	res = cbind(fit$par, se, se/fit$par*100)
+	
 	dimnames(res) = list(names(inits), c("est", "se", "%cv"))
 
 	nobs = 0
