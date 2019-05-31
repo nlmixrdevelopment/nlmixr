@@ -187,6 +187,7 @@ buildInstaller <- function(name="nlmixr"){
     exe <- file.path(dr, "nlmixr.nsi");
     brew::brew(text=nsi.lauch.stub, output=file.path(dr, "nlmixr.nsi"));
     system(sprintf("makensis %s", file.path(dr, "nlmixr.nsi")));
+    icon <- gsub("/", "\\", devtools::package_file("build/shinyMixR.ico"), fixed=TRUE)
     shiny.name <- "shinyMixR"
     brew::brew(text = shiny.lauch.stub, output=file.path(dr, "shinyMixR.nsi"))
     system(sprintf("makensis %s", file.path(dr, "shinyMixR.nsi")));
