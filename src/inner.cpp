@@ -1652,12 +1652,12 @@ extern "C" double outerLikOpim(int n, double *par, void *ex){
 
 // Gill 1983 Chat
 static inline double Chat(double phi, double h, double epsA){
-   if (phi == 0) return pow(10,300);
+   if (phi == 0) return 1e+300;
   return 2*epsA/(h*fabs(phi));
 }
 
 static inline double ChatP(double phi, double h, double epsA){
-  if (phi == 0) return pow(10,300);
+  if (phi == 0) return 1e+300;
   return 4*epsA/(h*h*fabs(phi));
 }
 
