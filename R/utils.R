@@ -208,8 +208,8 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #' (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
 #'
 #' @export
-dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
-	method=c("Nelder-Mead", "L-BFGS-B", "PORT"),
+dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -Inf, upper = Inf,
+	method=c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"),
 	control=list(ftol_rel=1e-6, maxeval=999), squared=T)
 {
 	if (class(model)=="formula") {
@@ -262,10 +262,19 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 	}
 
 	npar = length(pars) - length(fixPars)
-	have_zero = min(data$time) <= 0
+	have_zero = min(data$time) <= 0         # Error here, data$time, the data input may have a different name than time, could be TIME?
 	rows = if(have_zero) T else -1
 
-	if (squared) inits = sqrt(inits)
+	if (squared) {
+	  inits = sqrt(inits)
+	  if (any(lower == -Inf)) {
+	    lower[which(lower==-Inf)] <- -Inf
+	    lower[-which(lower==-Inf)] <- sqrt(lower[-which(lower==-Inf)])
+	  } else if (any(lower != -Inf)){
+	    lower = sqrt(lower)
+	    }
+	  upper = sqrt(upper)
+	}
 
 	obj = function(th)
 	{
@@ -303,11 +312,19 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 	}
 
 	method <- match.arg(method)
-	if (method=="Nelder-Mead") {
-		fit = mymin(as.vector(inits), obj, control=control)
-		fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
-	} else if (method=="L-BFGS-B") {
-		fit = lbfgs(as.vector(inits), obj, control=control)
+	if (method =="bobyqa") {
+	  fit = minqa::bobyqa(as.vector(inits), obj, lower, upper, control=control)
+	  fit$value <- fit$fval
+	} else if (method=="lbfgsb3c") {
+	  # remove any control elements nor required in lbfgsb3c()
+	  lbfgsb3c.control <- list(trace=NULL,factr=NULL,pgtol=NULL,abstol=NULL,reltol=NULL,lmm=NULL,maxit=NULL,iprint=NULL)
+	  if (any(names(lbfgsb3c.control) %in% names(control))) {
+	    control = control[match(names(lbfgsb3c.control),names(control))[!is.na(match(names(lbfgsb3c.control),names(control)))]]
+	  } else{control=NULL}
+		fit = lbfgsb3c::lbfgsb3c(par = as.vector(inits), fn=obj, lower=lower, upper=upper, control=control)
+	} else if (method=="Nelder-Mead") {
+	  fit = mymin(as.vector(inits), obj, control=control)
+	  fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
 	} else {
 		if ("ftol_rel" %in% names(control)) {
 			control$rel.tol = control$ftol_rel
@@ -323,13 +340,17 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 
 	if (squared) fit$par = fit$par^2
 	squared = F
+	
+
 	fit$hessian = try(optimHess(fit$par, obj), silent=TRUE)
+	
 	if(inherits(fit$hessian,"try-error")){
 	  se = rep(NA, length(fit$par))
 	  warning("standard error of the Hessian has failed")
-	} else{
+	} else {
 	  se = sqrt(diag(solve(fit$hessian)))
-  }
+	}
+	
 	res = cbind(fit$par, se, se/fit$par*100)
 	
 	dimnames(res) = list(names(inits), c("est", "se", "%cv"))
