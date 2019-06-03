@@ -43,7 +43,7 @@ XPStyle on
 Section Main sec_main
 WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\" \"\" \"$EXEDIR\"
 WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallPath\" \"$EXEDIR\\R\"
-Exec '$EXEDIR\\R\\bin\\<%=Rdir%>\\R.exe -e library(shinyMixR);nlmixr:::.setRoot();run_shinymixr(launch.browser=TRUE)'
+Exec '$EXEDIR\\R\\bin\\<%=Rdir%>\\R.exe -e options(keep.source=TRUE);library(shinyMixR);nlmixr:::.setRoot();run_shinymixr(launch.browser=TRUE)'
 SectionEnd"
 
 nsi.stub <- "
@@ -164,10 +164,11 @@ buildInstaller <- function(name="nlmixr"){
     welcome <- gsub("/", "\\", devtools::package_file("build/nlmixr-welcome.bmp"), fixed=TRUE)
     icon <- gsub("/", "\\", devtools::package_file("build/icon_red.ico"), fixed=TRUE)
     rver <- paste(R.version$major,R.version$minor,sep=".");
-    rtools.curr <- utils::readRegistry("SOFTWARE\\R-core\\Rtools", hive = "HLM", view = "32-bit", maxdepth = 2);
-    rtools.cur.ver <- rtools.curr$`Current Version`;
-    full.ver <- rtools.curr[[rtools.cur.ver]][["FullVersion"]];
-    min.rver <- rtools.curr[[rtools.cur.ver]][["MinRVersion"]];
+    ## rtools.curr <- utils::readRegistry("SOFTWARE\\R-core\\Rtools", hive = "HLM", view = "32-bit", maxdepth = 2);
+    full.ver <- gsub("Rtools version ", "", readLines(file.path(RxODE:::.rxRtoolsBaseWin(), "VERSION.txt")))
+    min.rver <- gsub("([0-9]+[.][0-9]+).*", "\\1", full.ver);
+    rtools.curr <- min.rver;
+    rtools.cur.ver <- rtools.curr
     arch <- R.version$arch;
     nlmixr.ver <- sessionInfo()$otherPkgs$nlmixr$Version;
     archext <- ifelse(.Platform$r_arch == "i386", "32", "")
@@ -191,7 +192,7 @@ buildInstaller <- function(name="nlmixr"){
     shiny.name <- "shinyMixR"
     brew::brew(text = shiny.lauch.stub, output=file.path(dr, "shinyMixR.nsi"))
     system(sprintf("makensis %s", file.path(dr, "shinyMixR.nsi")));
-
+    icon <- gsub("/", "\\", devtools::package_file("build/icon_red.ico"), fixed=TRUE)
     ## unlink(file.path(dr, "nlmixr.nsi"))
     dr <- normalizePath(file.path(dr, sprintf("%s%s.nsi", name, archext)))
     brew::brew(text=nsi.stub, output=dr)
