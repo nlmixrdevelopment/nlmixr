@@ -225,11 +225,14 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
   # warning messages for not specifying dynmodel input arguments, excluding control
   if(is.null(method)){warning("Estimation method not specified, method = \"bobyqa\" used.")}
 
-  
+
+# Error model Handling -------------------------------------------------------------
 	if (class(model)=="formula") {
 		model = list(model)
 	}
+  
 	inits.err = NULL
+	
 	model = lapply(model, function(f) {
 		s = unlist(lapply(attr(terms(f),"variables"), as.list))
 		s = sapply(s, deparse)
@@ -249,34 +252,46 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 		names(s) = c("dv", "pred", "err")
 		s
 	})
+	
 	names(inits.err) = rep("err", length(inits.err))
+	
 	inits = c(inits, inits.err)
+	
 	#print(model)
-
+	
 	vars = names(data)
+	
 	nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
+	
 	if (length(nodef)) {
 		msg = err.msg(nodef, pre="var(s) not found in data: ")
 		stop(msg)
 	}
 
 	modelVars = system$cmpMgr$get.modelVars()
+	
 	vars = c(modelVars$state, modelVars$lhs)
+	
 	nodef = setdiff(sapply(model, function(x) x["pred"]), vars)
+	
 	if (length(nodef)) {
 		msg = err.msg(nodef, pre="var(s) not found in model: ")
 		stop(msg)
 	}
 
 	pars = modelVars$params
+	
 	nodef = setdiff(pars, c(names(inits), names(fixPars)))
+	
 	if (length(nodef)) {
 		msg = err.msg(nodef, pre="par(s) not found: ")
 		stop(msg)
 	}
 
 	npar = length(pars) - length(fixPars)
-	have_zero = min(data$time) <= 0         
+	
+	have_zero = min(data$time) <= 0      
+	
 	rows = if(have_zero) T else -1
 
 	if (squared) {
@@ -290,18 +305,23 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	  upper = sqrt(upper)
 	}
 
-
-# - -----------------------------------------------------------------------#
+# Objective Function ------------------------------------------------------
 	obj = function(th)
 	{
+	  # unscale the parameters
+	  #scaled.inits <- sapply(th, unscalePar)
+	  
+	  
 		#squared = get("squared", envir=sys.parent(n = 1))
 		if (squared) th = th^2
 		
 		.ixpar = npar
+		
 		theta = th[1:npar]
 		
 		names(theta) = names(inits)[1:npar]
-    theta = c(theta, fixPars)
+    
+		theta = c(theta, fixPars)
     
     s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
 
@@ -338,16 +358,15 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 		do.call("sum", l)
 	}
 
-
-# - -----------------------------------------------------------------------#
+# Parameter Normalization and Scaling -----------------------------------------------------------------------
 	# normType assignment for scaling
 	normType <- match.arg(control$normType,c("constant","rescale2", "mean", "rescale", "std", "len"))
-  if (normType == "constant") {
-    C1 = 0
-    C2 = 1
-  } else if (normType == "rescale2") {
-    C1 = (max(inits) + min(inits))/2
-    C2 = (max(inits) - min(inits))/2
+	if (normType == "constant") {
+	  C1 = 0
+	  C2 = 1
+	} else if (normType == "rescale2") {
+	  C1 = (max(inits) + min(inits))/2
+	  C2 = (max(inits) - min(inits))/2
 	} else if (normType == "mean") {
 	  C1 = mean(inits)
 	  C2 = max(inits) - min(inits)
@@ -361,8 +380,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	  C1 = 0
 	  C2 = sqrt(sum(inits*inits))
 	} 
-
-# - -----------------------------------------------------------------------#
+	
 	# scaleC assignment for scaling (adopted from foceFIT.R)
 	scaleC <- double(length(inits));
 	if (is.null(control$scaleC)){
@@ -375,10 +393,9 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	    scaleC <- scaleC[seq(1, length(inits))];
 	    warning("scaleC control option has more options than estimated parameters, please check.")
 	  }
-	}
+	}	
 	
-# - -----------------------------------------------------------------------#
-# Function for scaling parameters based on scaleType
+  # Function for scaling parameters based on scaleType
 	  # Notes:
 	  # 1) are we scaling all parameters? if yes, does init contain all parameters including fixed params?
 
@@ -420,10 +437,9 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
   	}
 	}
 	
-# - -----------------------------------------------------------------------#
-# Function for unscaling parameters based on scaleType
-# Notes:
-# 1) are we scaling all parameters? if yes, does init contain all parameters including fixed params?
+  # Function for unscaling parameters based on scaleType
+  # Notes:
+  # 1) are we scaling all parameters? if yes, does init contain all parameters including fixed params?
 
 	unscalePar <- function(x, i){
 	  scaleType <- match.arg(control$scaleType, c("norm","nlmixr", "mult", "multAdd"))
@@ -462,14 +478,20 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	    }
 	  }
 	}
+# - -----------------------------------------------------------------------
 
-# - -----------------------------------------------------------------------#
-	#method assignment for optimization
+# Optimization Method -----------------------------------------------------------------------
 	method <- match.arg(method,c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"))
 	if (method =="bobyqa") {
 	  control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")]
-	  fit = minqa::bobyqa(as.vector(inits), obj, lower, upper, control=control)
+	  
+	  scaled.inits <- sapply(inits, scalePar)
+	  scaled.lower <- sapply(lower, scalePar)
+	  scaled.upper <- sapply(upper, scalePar)
+	  
+	  fit = minqa::bobyqa(scaled.inits, obj, scaled.lower, scaled.upper, control=control)
 	  fit$value <- fit$fval
+	  
 	} else if (method=="lbfgsb3c") {
 	  # remove any control elements nor required in lbfgsb3c()
 	  lbfgsb3c.control <- list(trace=NULL,factr=NULL,pgtol=NULL,abstol=NULL,reltol=NULL,lmm=NULL,maxit=NULL,iprint=NULL)
@@ -491,7 +513,8 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 		}
 		fit = nlminb(as.vector(inits), obj, lower, upper, control=control)
 	}
-
+# - -----------------------------------------------------------------------
+	
 	if (squared) fit$par = fit$par^2
 	squared = F
 	
@@ -592,8 +615,6 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL,
 	if (squared) inits = sqrt(inits)
 	s.save = NULL
 
-
-# - -----------------------------------------------------------------------
 	obj = function(th, do.ode.solving=T, negation=F)
 	{
 		#squared = get("squared", envir=sys.parent(n = 1))
