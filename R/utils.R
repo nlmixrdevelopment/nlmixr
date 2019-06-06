@@ -127,8 +127,8 @@ mymin = function(start, fr, rho=NULL, control=list())
     con <- list(maxeval=999, ftol_rel=1e-6, rcoeff=1., ecoeff=2., ccoeff=.5, trace=F)
     nmsC <- names(con)
     con[(namc <- names(control))] <- control
-    if (length(noNms <- namc[!namc %in% nmsC]))
-        warning("unknown names in control: ", paste(noNms, collapse = ", "))
+    #if (length(noNms <- namc[!namc %in% nmsC]))
+    #    warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
 	.Call(neldermead_wrap, fr, rho, length(start), start, step,
 		  as.integer(con$maxeval), con$ftol_rel, con$rcoeff, con$ecoeff, con$ccoeff,
@@ -209,9 +209,23 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #'
 #' @export
 dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -Inf, upper = Inf,
-	method=c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"),
-	control=list(ftol_rel=1e-6, maxeval=999), squared=T)
+ 	method=NULL,
+	control=list(ftol_rel=1e-6, maxeval=999,scaleTo=1.0,
+	             scaleTo=1.0,
+	             scaleObjective=0,
+	             normType=NULL,
+	             scaleType=NULL,
+	             scaleCmax=1e5,
+	             scaleCmin=1e-5,
+	             scaleC=1, #NULL,
+	             scaleC0=1e5), 
+	squared=T)
+  
 {
+  # warning messages for not specifying dynmodel input arguments, excluding control
+  if(is.null(method)){warning("Estimation method not specified, method = \"bobyqa\" used.")}
+
+  
 	if (class(model)=="formula") {
 		model = list(model)
 	}
@@ -262,7 +276,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	}
 
 	npar = length(pars) - length(fixPars)
-	have_zero = min(data$time) <= 0         # Error here, data$time, the data input may have a different name than time, could be TIME?
+	have_zero = min(data$time) <= 0         
 	rows = if(have_zero) T else -1
 
 	if (squared) {
@@ -276,22 +290,30 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	  upper = sqrt(upper)
 	}
 
+
+# - -----------------------------------------------------------------------#
 	obj = function(th)
 	{
 		#squared = get("squared", envir=sys.parent(n = 1))
 		if (squared) th = th^2
+		
 		.ixpar = npar
 		theta = th[1:npar]
+		
 		names(theta) = names(inits)[1:npar]
-            theta = c(theta, fixPars)
-
-            s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
+    theta = c(theta, fixPars)
+    
+    s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
 
 		l = lapply(model, function(x) {
-			err.combo = (x["err"]=="combo")+0
-			.ixpar <<- .ixpar+1
-			sig = th[.ixpar:(.ixpar+err.combo)]
-			sig = if (x["err"]=="add") {
+			
+		  err.combo = (x["err"]=="combo")+0
+			
+		  .ixpar <<- .ixpar+1
+			
+		  sig = th[.ixpar:(.ixpar+err.combo)]
+			
+		  sig = if (x["err"]=="add") {
 				c(sig, 0)
 			} else if (x["err"]=="prop") {
 				c(0, sig)
@@ -299,20 +321,153 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 				.ixpar <<- .ixpar+1
 				sig
 			}
-			#print(sig)
+			
+		  #print(sig)
 
 			yp = s[rows,x["pred"]]
+			
 			sgy = thresh(sig[1]+yp*sig[2])
+			
 			yo = data[, x["dv"]]
+			
 			ll = .5*((yo - yp)^2/sgy^2 + 2*log(sgy) + log(2*pi))
+			
 			sum(ll)
 		})
 
 		do.call("sum", l)
 	}
 
-	method <- match.arg(method)
+
+# - -----------------------------------------------------------------------#
+	# normType assignment for scaling
+	normType <- match.arg(control$normType,c("constant","rescale2", "mean", "rescale", "std", "len"))
+  if (normType == "constant") {
+    C1 = 0
+    C2 = 1
+  } else if (normType == "rescale2") {
+    C1 = (max(inits) + min(inits))/2
+    C2 = (max(inits) - min(inits))/2
+	} else if (normType == "mean") {
+	  C1 = mean(inits)
+	  C2 = max(inits) - min(inits)
+	} else if (normType == "rescale") {
+	  C1 = min(inits)
+	  C2 = max(inits) - min(inits)
+	} else if (normType == "std") {
+	  C1 = mean(inits)
+	  C2 = sd(inits)
+	} else if (normType == "len") {
+	  C1 = 0
+	  C2 = sqrt(sum(inits*inits))
+	} 
+
+# - -----------------------------------------------------------------------#
+	# scaleC assignment for scaling (adopted from foceFIT.R)
+	scaleC <- double(length(inits));
+	if (is.null(control$scaleC)){
+	  scaleC <- rep(1, length(inits))
+	} else {
+	  scaleC <- as.double(control$scaleC);
+	  if (length(inits) > length(scaleC)){
+	    scaleC <- c(scaleC, rep(1, length(inits) - length(scaleC)));
+	  } else if (length(inits) < length(scaleC)){
+	    scaleC <- scaleC[seq(1, length(inits))];
+	    warning("scaleC control option has more options than estimated parameters, please check.")
+	  }
+	}
+	
+# - -----------------------------------------------------------------------#
+# Function for scaling parameters based on scaleType
+	  # Notes:
+	  # 1) are we scaling all parameters? if yes, does init contain all parameters including fixed params?
+
+	scalePar <- function(x, i){
+  	scaleType <- match.arg(control$scaleType, c("norm","nlmixr", "mult", "multAdd"))
+  	# simple scaling
+  	if (scaleType == "norm") {
+  	  return((x[i]-C1)/C2) 
+  	}
+  	# nlmixr
+  	else if (scaleType == "nlmixr") {
+  	  scaleTo = (inits[i] - C1)/C2
+  	  return((x[i] - inits[i])/scaleC[i] + scaleTo)
+  	}
+  	# simple multiplicatice scaling
+  	else if (scaleType == "mult") {
+  	    if (scaleTo > 0) {
+  	      return(x[i]/inits[i]*scaleTo)
+  	    } else {
+  	      return(x[i])
+  	    }
+  	}
+  	# log non-log multiplicative scaling
+  	else if (scaleType == "multAdd") {
+  	  if(scaleTo > 0) {
+  	    return((x[i]-inits[i]) + scaleTo)
+  	  } else {
+  	    return(x[i]/inits[i]*scaleTo)
+  	  }
+  	}
+  	
+# When should this be used? "norm" scaling is essentially no scaling when normType specified.
+  	else {
+  	  if(scaleTo > 0) {
+  	    return((x[i] - inits[i]) + scaleTo)
+  	  } else {
+  	    return(x[i])
+  	  }
+  	}
+	}
+	
+# - -----------------------------------------------------------------------#
+# Function for unscaling parameters based on scaleType
+# Notes:
+# 1) are we scaling all parameters? if yes, does init contain all parameters including fixed params?
+
+	unscalePar <- function(x, i){
+	  scaleType <- match.arg(control$scaleType, c("norm","nlmixr", "mult", "multAdd"))
+	  # simple scaling
+	  if (scaleType == "norm") {
+	    return(x[i]*C2+C1);
+	  }
+	  # nlmixr
+	  else if (scaleType == "nlmixr") {
+	    scaleTo = (inits[i] - C1)/C2
+	    return((x[i] - scaleTo)*scaleC[i] + inits[i])
+	  }
+	  # simple multiplicatice scaling
+	  else if (scaleType == "mult") {
+	    if (scaleTo > 0) {
+	      return(x[i]*inits[i]/scaleTo)
+	    } else {
+	      return(x[i])
+	    }
+	  }
+	  # log non-log multiplicative scaling
+	  else if (scaleType == "multAdd") {
+	    if(scaleTo > 0) {
+	      return((x[i]- scaleTo) + inits[i])
+	    } else {
+	      return(x[i]*inits[i]/scaleTo)
+	    }
+	  }
+	  
+# When should this be used? "norm" scaling is essentially no scaling when normType specified.
+	  else {
+	    if(scaleTo > 0) {
+	      return((x[i]-scaleTo)*1 + inits[i])
+	    } else {
+	      return(x[i])
+	    }
+	  }
+	}
+
+# - -----------------------------------------------------------------------#
+	#method assignment for optimization
+	method <- match.arg(method,c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"))
 	if (method =="bobyqa") {
+	  control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")]
 	  fit = minqa::bobyqa(as.vector(inits), obj, lower, upper, control=control)
 	  fit$value <- fit$fval
 	} else if (method=="lbfgsb3c") {
@@ -334,8 +489,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 			control$eval.max = control$maxeval
 			control$maxeval = NULL
 		}
-
-		fit = nlminb(as.vector(inits), obj, control=control)
+		fit = nlminb(as.vector(inits), obj, lower, upper, control=control)
 	}
 
 	if (squared) fit$par = fit$par^2
@@ -369,13 +523,12 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	res
 }
 
-
-#---------------------
 uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
 {
 	if (is.null(rho)) rho = environment(fr)
 	.Call(slice_wrap, fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
 }
+
 
 genobj = function(system, model, evTable, inits, data, fixPars=NULL,
 	squared=T)
@@ -430,12 +583,17 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL,
 	}
 
 	npar = length(pars) - length(fixPars)
+	
+	## is this necessary ##
 	have_zero = min(data$time) <= 0
-	rows = if(have_zero) T else -1
+	rows = if(have_zero) T else -1 # used in line 304 in obj()
+	## ---------------- ##
 
 	if (squared) inits = sqrt(inits)
 	s.save = NULL
 
+
+# - -----------------------------------------------------------------------
 	obj = function(th, do.ode.solving=T, negation=F)
 	{
 		#squared = get("squared", envir=sys.parent(n = 1))
