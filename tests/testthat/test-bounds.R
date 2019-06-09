@@ -1077,6 +1077,9 @@ rxPermissive({
         lCl = c(5, 5) # A
     }
 
+    f7 <- function(){
+        lCl < 3
+    }
 
     test_that("Invalid bounds raise errors",{
         expect_error(nlmixrBounds(f1), rex::rex("The estimate, and upper and lower bounds are the same for the following parameters: lCl\nTo fix parameters use lCl=fix(5) instead."))
@@ -1085,5 +1088,7 @@ rxPermissive({
         expect_error(nlmixrBounds(f4), rex::rex("The estimate is the same as a boundary for the following parameters: lCl\nInstead use lCl=c(0, 5) # c(lower, est)"))
         expect_error(nlmixrBounds(f5), rex::rex("The estimate is the same as a boundary for the following parameters: lCl\nInstead use lCl=c(0, 5) # c(lower, est)"))
         expect_error(nlmixrBounds(f6), rex::rex("The estimate is the same as a boundary for the following parameter: lCl\nInstead use lCl=5 # est"))
+        expect_error(nlmixrBounds(f7), rex::rex("The '<' operator cannot be used in the ini block"))
     })
+
 }, cran=TRUE)
