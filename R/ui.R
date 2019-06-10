@@ -848,9 +848,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   rxode <- FALSE
   all.names <- allNames(body(fun));
   .diff <- setdiff(paste(ini$name), all.names)
-  .diff <- .diff[regexpr("[(]",.diff)==-1]
   if (length(.diff) > 0){
-    stop(sprintf("The following parameter(s) were in the ini block but not in the model block: %s", paste(.diff, collapse=", ")))
+    .diff <- .diff[regexpr("[(]",.diff)==-1]
+    if (length(.diff) > 0){
+      stop(sprintf("The following parameter(s) were in the ini block but not in the model block: %s", paste(.diff, collapse=", ")))
+    }
   }
   if (any(regexpr(rex::rex(start, or("rx_", "nlmixr_")), paste(all.names)) != -1)){
     stop("Parameters/States/Variables cannot start with `rx_` or `nlmixr_`");
