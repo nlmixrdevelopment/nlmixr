@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
 
-
 thresh = function(x, cut=.Machine$double.xmin)
 {
 	ifelse(x>cut, x, cut)
@@ -61,7 +60,6 @@ gof = function(x, ...)
 		abline(h=0, col="red", lty=2)
 	}
 }
-
 
 #' Plot of a non-population dynamic model fit
 #'
@@ -110,14 +108,11 @@ summary.dyn.ID = function(object, ...)
 	cat(object$message, "\n")
 }
 
-
-
 err.msg = function(x, pre="", post="")
 {
 	msg = paste0(x, collapse=", ")
 	paste0(pre, msg, post)
 }
-
 
 mymin = function(start, fr, rho=NULL, control=list())
 {
@@ -163,7 +158,6 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 		  PACKAGE = 'nlmixr')
 }
 
-
 #' Fit a non-population dynamic model
 #'
 #' Fit a non-population dynamic model
@@ -176,7 +170,6 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #' @param fixPars fixed system parameters
 #' @param method estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.
 #' @param control optional minimization control parameters
-#' @param squared if parameters be squared during estimation
 #' @return NULL
 #' @author Wenping Wang
 #' @examples
@@ -218,14 +211,12 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	             scaleCmax=1e5,
 	             scaleCmin=1e-5,
 	             scaleC=1, #NULL,
-	             scaleC0=1e5), 
-	squared=T)
+	             scaleC0=1e5),
+	rxControl=list(atol=1e-08,rtol=1e-06)
+	)
   
 {
-  # warning messages for not specifying dynmodel input arguments, excluding control
-  if(is.null(method)){warning("Estimation method not specified, method = \"bobyqa\" used.")}
-
-
+ 
 # Error model Handling -------------------------------------------------------------
 	if (class(model)=="formula") {
 		model = list(model)
@@ -294,37 +285,33 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	
 	rows = if(have_zero) T else -1
 
-	if (squared) {
-	  inits = sqrt(inits)
-	  if (any(lower == -Inf)) {
-	    lower[which(lower==-Inf)] <- -Inf
-	    lower[-which(lower==-Inf)] <- sqrt(lower[-which(lower==-Inf)])
-	  } else if (any(lower != -Inf)){
-	    lower = sqrt(lower)
-	    }
-	  upper = sqrt(upper)
-	}
-
 # Objective Function ------------------------------------------------------
 	obj = function(th)
 	{
-	  # unscale the parameters
-	  #scaled.inits <- sapply(th, unscalePar)
 	  
-	  
-		#squared = get("squared", envir=sys.parent(n = 1))
-		if (squared) th = th^2
-		
+	  # unscale ------------------- #
+	  unscaled.th <- numeric(length(th))
+	  for (i in 1:length(th)) {th[i] <- unscalePar(th,i)}
+
 		.ixpar = npar
 		
 		theta = th[1:npar]
 		
 		names(theta) = names(inits)[1:npar]
     
-		theta = c(theta, fixPars)
-    
-    s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
+		theta = c(theta, fixPars) 
 
+    s = system$solve(theta, evTable, rxControl) #atol=1e-06, rtol=1e-06
+    #do.call(RxODE :: rxSolve, c(list(system, theta, ev, rxControl)))
+    
+    
+    # solve(system) returns data.frame, look at RxODE code. Current matrix -> df -> matrix
+    #do.call(RxODE :: rxSolve, c(list(system, evTable),rxControl) # add rxControl
+    #returnType ="data.frame"
+    #rxNorm(system) # add error piece, use the error parameters as parameters
+    
+    #nlmixr_err=boxCox(add.err^2+prop.err^(2*pow)*pred, lambda) for the predictions not the errors
+    
 		l = lapply(model, function(x) {
 			
 		  err.combo = (x["err"]=="combo")+0
@@ -359,6 +346,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	}
 
 # Parameter Normalization and Scaling -----------------------------------------------------------------------
+	
 	# normType assignment for scaling
 	normType <- match.arg(control$normType,c("constant","rescale2", "mean", "rescale", "std", "len"))
 	if (normType == "constant") {
@@ -379,7 +367,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	} else if (normType == "len") {
 	  C1 = 0
 	  C2 = sqrt(sum(inits*inits))
-	} 
+	}
 	
 	# scaleC assignment for scaling (adopted from foceFIT.R)
 	scaleC <- double(length(inits));
@@ -396,10 +384,7 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	}	
 	
   # Function for scaling parameters based on scaleType
-	  # Notes:
-	  # 1) are we scaling all parameters? if yes, does init contain all parameters including fixed params?
-
-	scalePar <- function(x, i){
+		scalePar <- function(x, i){
   	scaleType <- match.arg(control$scaleType, c("norm","nlmixr", "mult", "multAdd"))
   	# simple scaling
   	if (scaleType == "norm") {
@@ -438,9 +423,6 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	}
 	
   # Function for unscaling parameters based on scaleType
-  # Notes:
-  # 1) are we scaling all parameters? if yes, does init contain all parameters including fixed params?
-
 	unscalePar <- function(x, i){
 	  scaleType <- match.arg(control$scaleType, c("norm","nlmixr", "mult", "multAdd"))
 	  # simple scaling
@@ -481,17 +463,51 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 # - -----------------------------------------------------------------------
 
 # Optimization Method -----------------------------------------------------------------------
-	method <- match.arg(method,c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"))
+	method <- match.arg(method,c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"))# match.arg(method)
 	if (method =="bobyqa") {
 	  control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")]
+
+	  # change control and see if it works better, default to these
+	  #npt = npar*2 + 1
+	  #rhobeg = 0.2
+	  #rhoend = 1E-04
 	  
-	  scaled.inits <- sapply(inits, scalePar)
-	  scaled.lower <- sapply(lower, scalePar)
-	  scaled.upper <- sapply(upper, scalePar)
+	  # scaled the initial conditions
+	  scaled.inits <- numeric(length(inits))
+	  for (i in 1:length(inits)) {scaled.inits[i] <- scalePar(inits,i)}
+
+	  # scaled lower boundary
+	  if (is.null(lower)==FALSE){
+  	  if (any(lower == -Inf)) {
+  	    lower[which(lower==-Inf)]=0
+  	    warning("Lower boundary of -Inf set to 0.")
+  	  } 
+  	  scaled.lower <-  numeric(length(lower))
+  	  for (i in 1:length(lower)) {scaled.lower[i] <- scalePar(lower,i)}
+	  } else {
+	    scaled.lower <- NULL
+	    scaled.upper <- NULL
+	  }
 	  
+	  # scaled upper boundary
+	  if (is.null(upper)==FALSE){
+  	  scaled.upper <- numeric(length(upper))
+  	  for (i in 1:length(upper)) {scaled.upper[i] <- scalePar(upper,i)}
+	  } else {scaled.upper <- NULL}
+
 	  fit = minqa::bobyqa(scaled.inits, obj, scaled.lower, scaled.upper, control=control)
 	  fit$value <- fit$fval
+    
+	  print(inits)
+	  print(fit$par)
 	  
+	  # unscale the output
+	  par.temp <- numeric(length(fit$par))
+	  for (i in 1:length(par.temp)) {par.temp[i] <- unscalePar(fit$par,i)}
+	  fit$par <- par.temp
+	  
+	  print(fit$par)
+
 	} else if (method=="lbfgsb3c") {
 	  # remove any control elements nor required in lbfgsb3c()
 	  lbfgsb3c.control <- list(trace=NULL,factr=NULL,pgtol=NULL,abstol=NULL,reltol=NULL,lmm=NULL,maxit=NULL,iprint=NULL)
@@ -513,13 +529,9 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 		}
 		fit = nlminb(as.vector(inits), obj, lower, upper, control=control)
 	}
-# - -----------------------------------------------------------------------
-	
-	if (squared) fit$par = fit$par^2
-	squared = F
-	
 
-	fit$hessian = try(optimHess(fit$par, obj), silent=TRUE)
+# Hessian Calculation -----------------------------------------------------------------------
+	fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
 	
 	if(inherits(fit$hessian,"try-error")){
 	  se = rep(NA, length(fit$par))
@@ -546,6 +558,8 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	res
 }
 
+####
+
 uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
 {
 	if (is.null(rho)) rho = environment(fr)
@@ -553,8 +567,8 @@ uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
 }
 
 
-genobj = function(system, model, evTable, inits, data, fixPars=NULL,
-	squared=T)
+genobj = function(system, model, evTable, inits, data, fixPars=NULL
+	)
 {
 	if (class(model)=="formula") {
 		model = list(model)
@@ -612,13 +626,9 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL,
 	rows = if(have_zero) T else -1 # used in line 304 in obj()
 	## ---------------- ##
 
-	if (squared) inits = sqrt(inits)
-	s.save = NULL
 
 	obj = function(th, do.ode.solving=T, negation=F)
 	{
-		#squared = get("squared", envir=sys.parent(n = 1))
-		if (squared) th = th^2
 		.ixpar = npar
 		theta = th[1:npar]
 		names(theta) = names(inits)[1:npar]
