@@ -40,10 +40,15 @@
     .etaN <- dimnames(.omega)[[1]]
     .params <- nlme::fixed.effects(object);
     .thetaN <- names(.params);
-    .newMod <- paste0(gsub(rex::rex(capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),any_of("\n;")), "",
-                           gsub(rex::rex(capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
-                                .repThetaEta(.mod, theta=.thetaN, eta=.etaN))),
-                      "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);");
+    .newMod <- .repThetaEta(.mod, theta=.thetaN, eta=.etaN);
+    .newMod <- .newMod %>%
+        gsub(rex::rex("rx_r", or("=", "~"), capture(except_any_of("\n;")),any_of("\n;")), "rx_r~\\1;\n", .);
+    .newMod <- .newMod %>%
+        gsub(rex::rex(start, capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),any_of("\n;")), "",.)
+    .newMod <- .newMod %>%
+        gsub(rex::rex("rx_pred_", or("=", "~"), capture(except_any_of("\n;")),any_of("\n;")),
+             "rx_pred_~\\1;\nipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);", .)
+    ## cat(print(.newMod))
     .sim <- "\nsim=rxTBSi(rx_pred_+rx_r_"
     .err <- object$uif$err;
     .w <- which(!is.na(object$uif$err))
@@ -73,7 +78,10 @@
     .mat <- .mat[.w, .w, drop = FALSE]
     .sigma <- .mat;
     .sigmaNames <- dimnames(.mat)[[1]]
-    .newMod <- paste0(.newMod, .sim, ", rx_lambda_, rx_yj_);\n");
+    .sim <- paste0(.sim, ", rx_lambda_, rx_yj_);\n");
+    .newMod <- .newMod %>%
+        gsub(rex::rex("rx_r_=", capture(except_any_of("\n;")),any_of("\n;")),
+             paste0("rx_r_=\\1;\n", .sim), .)
     .newMod <- strsplit(.newMod, "\n")[[1]];
     .w <- which(regexpr("rx_r_~", .newMod) != -1);
     .subs <- function(x, .what, .with){
