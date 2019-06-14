@@ -202,47 +202,46 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #'
 #' @export
 dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -Inf, upper = Inf,
- 	method=NULL,
-	control=list(ftol_rel=1e-6, maxeval=999,scaleTo=1.0,
+  method=c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"),
+	control=list(ftol_rel=1e-6, 
+	             maxeval=999,
 	             scaleTo=1.0,
 	             scaleObjective=0,
-	             normType=NULL,
-	             scaleType=NULL,
+	             normType=c("constant","rescale2", "mean", "rescale", "std", "len"),
+	             scaleType=c("norm","nlmixr", "mult", "multAdd"),
 	             scaleCmax=1e5,
 	             scaleCmin=1e-5,
 	             scaleC=1, #NULL,
-	             scaleC0=1e5),
+	             scaleC0=1e5,
+	             transformRUV=c("boxCox", "YeoJohnson")),
 	rxControl=list(atol=1e-08,rtol=1e-06)
 	)
-  
 {
- 
+# Control Argument Defaluts -----------------------------------------------
+if (is.null(control$scaleTo)) {control$scaleTo = 1.0}
+#if (is.null(control$transformRUV)) {control$transformRUV = 1.0}
+
 # Error model Handling -------------------------------------------------------------
 	if (class(model)=="formula") {
 		model = list(model)
 	}
   
 	inits.err = NULL
-	
+
 	model = lapply(model, function(f) {
-		s = unlist(lapply(attr(terms(f),"variables"), as.list))
-		s = sapply(s, deparse)
-
-		ix.add = match("add",  s, nomatch=0)
-		ix.pro = match("prop", s, nomatch=0)
-		err.type = c("add", "prop", "combo")[(ix.add>0)+2*(ix.pro>0)]
-
-		sig.add = if (ix.add>0) as.numeric(s[ix.add+1]) else NULL
-		sig.pro = if (ix.pro>0) as.numeric(s[ix.pro+1]) else NULL
-
-		inits.err <<- c(inits.err, sig.add, sig.pro)
-
-		if (any(is.na(inits.err) | inits.err<=0)) stop("error model misspecification")
-
-		s = c(s[2:3], err.type)
-		names(s) = c("dv", "pred", "err")
-		s
-	})
+	  s = unlist(lapply(attr(terms(f),"variables"), as.list))
+	  s = sapply(s, deparse)
+	  ix.add = match("add",  s, nomatch=0)
+	  ix.pro = match("prop", s, nomatch=0)
+	  err.type = c("add", "prop", "combo")[(ix.add>0)+2*(ix.pro>0)]
+	  sig.add = if (ix.add>0) as.numeric(s[ix.add+1]) else NULL
+	  sig.pro = if (ix.pro>0) as.numeric(s[ix.pro+1]) else NULL
+	  inits.err <<- c(inits.err, sig.add, sig.pro)
+	  if (any(is.na(inits.err) | inits.err<=0)) stop("error model misspecification")
+	  s = c(s[2:3], err.type)
+	  names(s) = c("dv", "pred", "err")
+	  s
+	}) 
 	
 	names(inits.err) = rep("err", length(inits.err))
 	
@@ -286,41 +285,32 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	rows = if(have_zero) T else -1
 
 # Objective Function ------------------------------------------------------
+	transformRUV <- 1
+	
 	obj = function(th)
 	{
-	  
 	  # unscale ------------------- #
 	  unscaled.th <- numeric(length(th))
 	  for (i in 1:length(th)) {th[i] <- unscalePar(th,i)}
 
+	   # define parameters used for simulation, all parameters except the error terms
 		.ixpar = npar
-		
-		theta = th[1:npar]
-		
+		theta = th[1:npar] 
 		names(theta) = names(inits)[1:npar]
+		theta = c(theta, fixPars)
     
-		theta = c(theta, fixPars) 
-
-    s = system$solve(theta, evTable, rxControl) #atol=1e-06, rtol=1e-06
-    #do.call(RxODE :: rxSolve, c(list(system, theta, ev, rxControl)))
-    
-    
-    # solve(system) returns data.frame, look at RxODE code. Current matrix -> df -> matrix
-    #do.call(RxODE :: rxSolve, c(list(system, evTable),rxControl) # add rxControl
-    #returnType ="data.frame"
+		s = do.call(RxODE :: rxSolve, c(list(system, theta, evTable, rxControl)))
     #rxNorm(system) # add error piece, use the error parameters as parameters
-    
     #nlmixr_err=boxCox(add.err^2+prop.err^(2*pow)*pred, lambda) for the predictions not the errors
+    #model.test <- unlist(model)
+    #print(model.test[3]=="prop")
     
 		l = lapply(model, function(x) {
-			
-		  err.combo = (x["err"]=="combo")+0
-			
-		  .ixpar <<- .ixpar+1
-			
-		  sig = th[.ixpar:(.ixpar+err.combo)]
-			
-		  sig = if (x["err"]=="add") {
+		  
+		  err.combo = (x["err"]=="combo")+0  # returns 1 for combintion (add + prop) or 0 for prop or add alone
+		  .ixpar <<- .ixpar+1 # create global parameter, that increaes the number of parameters (parameters being estimation, without err) by 1
+		  sig = th[.ixpar:(.ixpar+err.combo)] #if "combo" is used, it grabs both terms, or else it grabs just add or prop
+		  sig = if (x["err"]=="add") {   # changes sigma from a 1D vector into a 2D vector, with orientation sig[1] = add, sig[2] = prop
 				c(sig, 0)
 			} else if (x["err"]=="prop") {
 				c(0, sig)
@@ -328,43 +318,122 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 				.ixpar <<- .ixpar+1
 				sig
 			}
-			
-		  #print(sig)
-
 			yp = s[rows,x["pred"]]
-			
-			sgy = thresh(sig[1]+yp*sig[2])
-			
+			sgy = thresh(sig[1]+yp*sig[2]) # variance of Y for FOCEi, threshold used to prevent 0?
 			yo = data[, x["dv"]]
 			
-			ll = .5*((yo - yp)^2/sgy^2 + 2*log(sgy) + log(2*pi))
+
 			
-			sum(ll)
+			# assign sigma for the error model that are used in var[Y]
+			
+      # Transform both sides (used for non-normal residuals)
+			# may need to implement nlmixr::coxBox
+			boxCox = function (x, lambda) {
+			   if(lambda == 0) {
+			     .h.x <- log(x)
+			     }
+			   else {
+			     .h.x <- (x^lambda-1)/lambda
+			   }
+			   return(.h.x)
+			}
+			
+			# yeoJohnson = need function or figure out how to use nlmixr::yeoJohnson
+			yeoJohnson = function (x, lambda){
+			 options(warn=-1)
+			.h.x <- ifelse (x >= 0,
+        ifelse (lambda != 0 & x >= 0, 
+                ((x + 1)^lambda - 1)/lambda, 
+                log(x + 1)),
+			  ifelse (lambda != 2 & x < 0, 
+			          -((-x+1)^(2-lambda)-1)/(2-lambda), 
+			          -log(-x+1))
+			)
+			options(warn=0)
+			 return(.h.x)
+			}
+
+			# need to define power sigma coefficient
+
+      if (transformRUV == "boxCox") {
+			   .prop.sig = 1 # need to reassign above
+			   .add.sig = 0 # need to reassign above
+			   .power = 1 # need to reassign above
+			   
+			   .h.x <- boxCox(yo, lambda) # obs
+			   .h.y <- boxCox(yp, lambda) # pred
+			   .h.y.var <- yp^(2*.power)*.prop.sig^2 + .add.sig^2  # variance of pred
+
+			   # boxCox transformed -2 log-likelihood
+			   .boxCox.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
+			   
+			   # back-transformed  -2 log-likelihood function, with penalty added
+			   .n2ll = .boxCox.n2ll - 2*(lambda-1)*log(yo) -2*log(2*pi)
+			   
+			   # negative log-likelihood function for output
+			   ll = .5*(.n2ll)
+			   
+			 } else if(transformRUV == "yeoJohnson"){
+			   .prop.sig = 1 # need to reassign above
+			   .add.sig = 0 # need to reassign above
+			   .power.sig = 1 # need to reassign above
+			   
+			   .h.x <- yeoJohnson(yo, lambda) #obs
+			   .h.y <- yeoJohnson(yp, lambda) #pred
+			   .h.y.var <- yp^(2*.power)*.prop.sig^2 + .add.sig^2  # variance of pred
+			     
+			   # yeoJohnson transformed -2 log-likelihood
+			   .yeoJohnson.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
+			   
+			   # back-transformed  -2 log-likelihood function, with penalty added
+			   .n2ll <- ifelse(x >= 0, 
+			                   .yeoJohnson.n2ll -2*((lambda-1)*log(x+1) -2*log(2*pi)),
+			                   .yeoJohnson.n2ll -2*((1-lambda)*log(-x+1) -2*log(2*pi))
+			                   )
+			   
+			   # negative log-likelihood function for output
+			   ll = .5*(.n2ll)
+			   
+			 }
+			 else{
+			   ll = .5*((yo - yp)^2/sgy^2 + 2*log(sgy) + log(2*pi)) # negative log likelihood, as a vector
+			 }
+
+		sum(ll)
 		})
 
-		do.call("sum", l)
+		
+		do.call("sum", l)  # same as return(as.numeric(l))
+		
 	}
+
 
 # Parameter Normalization and Scaling -----------------------------------------------------------------------
 	
 	# normType assignment for scaling
-	normType <- match.arg(control$normType,c("constant","rescale2", "mean", "rescale", "std", "len"))
+ 	normType <- control$normType
 	if (normType == "constant") {
+	  print("constant used")
 	  C1 = 0
 	  C2 = 1
 	} else if (normType == "rescale2") {
+	  print("rescale2 used")
 	  C1 = (max(inits) + min(inits))/2
 	  C2 = (max(inits) - min(inits))/2
 	} else if (normType == "mean") {
+	  print("mean used")
 	  C1 = mean(inits)
 	  C2 = max(inits) - min(inits)
 	} else if (normType == "rescale") {
+	  print("rescale used")
 	  C1 = min(inits)
 	  C2 = max(inits) - min(inits)
 	} else if (normType == "std") {
+	  print("std used")
 	  C1 = mean(inits)
 	  C2 = sd(inits)
 	} else if (normType == "len") {
+	  print("len used")
 	  C1 = 0
 	  C2 = sqrt(sum(inits*inits))
 	}
@@ -384,30 +453,38 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	}	
 	
   # Function for scaling parameters based on scaleType
+	  scaleType <- control$scaleType
+	  scaleTo <- control$scaleTo
 		scalePar <- function(x, i){
-  	scaleType <- match.arg(control$scaleType, c("norm","nlmixr", "mult", "multAdd"))
   	# simple scaling
   	if (scaleType == "norm") {
-  	  return((x[i]-C1)/C2) 
+  	  print("norm used!")
+  	  return((x[i]-C1)/C2)
   	}
   	# nlmixr
   	else if (scaleType == "nlmixr") {
   	  scaleTo = (inits[i] - C1)/C2
+  	  print("nlmixr used!")
   	  return((x[i] - inits[i])/scaleC[i] + scaleTo)
   	}
   	# simple multiplicatice scaling
   	else if (scaleType == "mult") {
   	    if (scaleTo > 0) {
+  	      print("mult 1 used!")
   	      return(x[i]/inits[i]*scaleTo)
+  	      
   	    } else {
+  	      print("mult 2 used!")
   	      return(x[i])
   	    }
   	}
   	# log non-log multiplicative scaling
   	else if (scaleType == "multAdd") {
   	  if(scaleTo > 0) {
+  	    print("multAdd 1 used!")
   	    return((x[i]-inits[i]) + scaleTo)
   	  } else {
+  	    print("multAdd 2 used!")
   	    return(x[i]/inits[i]*scaleTo)
   	  }
   	}
@@ -415,8 +492,10 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 # When should this be used? "norm" scaling is essentially no scaling when normType specified.
   	else {
   	  if(scaleTo > 0) {
+  	    print("Other 1 used!")
   	    return((x[i] - inits[i]) + scaleTo)
   	  } else {
+  	    print("Other 2 used!")
   	    return(x[i])
   	  }
   	}
@@ -460,10 +539,9 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL, lower = -
 	    }
 	  }
 	}
-# - -----------------------------------------------------------------------
-
+	
 # Optimization Method -----------------------------------------------------------------------
-	method <- match.arg(method,c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"))# match.arg(method)
+	method <- match.arg(method)
 	if (method =="bobyqa") {
 	  control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")]
 
