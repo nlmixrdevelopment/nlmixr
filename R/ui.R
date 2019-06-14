@@ -1593,6 +1593,17 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   all.covs <- character();
   do.pred <- 1;
   pred.txt <- .deparse(f(body(fun)))
+  .reg <- rex::rex(or(group(any_spaces, "(", any_spaces, "{", any_spaces),
+                      group(any_spaces, "}", any_spaces, ")", any_spaces),
+                      group(any_spaces, "nlmixrIgnore()", any_spaces),
+                      group(any_spaces, "(", any_spaces, "{", any_spaces, "nlmixrIgnore()", any_spaces),
+                      group("nlmixrIgnore()", any_spaces, "}", any_spaces, ")")))
+  .pred <- sapply(pred.txt, function(x){
+    regexpr(.reg, x) != -1
+  })
+  if (all(.pred)){
+    stop("There must be at least one prediction in the model({}) block.  Use `~` for predictions")
+  }
   pred <- new.fn(pred.txt);
   do.pred <- 0;
   err <- new.fn(.deparse(f(body(fun))));
