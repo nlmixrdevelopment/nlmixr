@@ -4392,6 +4392,7 @@ Environment foceiFitCpp_(Environment e){
     Rprintf("U: Unscaled Parameters; ");
     Rprintf("X: Back-transformed parameters; ");
     Rprintf("G: Gradient\n");
+    Rprintf("Unscaled parameters for Omegas=chol(solve(omega));\nDiagonals are transformed, as specified by foceiControl(diagXform=)\n");
     foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
     Rprintf("|    #| Objective Fun |");
     int j,  i=0, finalize=0, k=1;
