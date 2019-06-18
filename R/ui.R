@@ -1,3 +1,68 @@
+.drakeTypeS <- NULL
+.drakeType <- function(){
+    if (is.null(.drakeTypeS)){
+        ns <- try(loadNamespace("drake"), silent=TRUE)
+        if (inherits(ns, "try-error")){
+            assignInMyNamespace(".drakeTypeS", 0L);
+        } else {
+            if (exists("no_deps", envir=ns)){
+                assignInMyNamespace(".drakeTypeS", 2L);
+            } else {
+                assignInMyNamespace(".drakeTypeS", 1L);
+            }
+        }
+    }
+    return(.drakeTypeS);
+}
+
+.drakeCompat0 <- function(x){
+    if (is.call(x)) {
+        .dt <- .drakeType();
+        .x1 <- as.character(x[[1]]);
+        if (any(.x1 == c("ignore", "no_deps")) && .dt != 0L){
+            return(x);
+        } else if (.x1 == "model" && .dt != 0L){
+            if (.dt == 1L){
+                return(as.call(c(list(quote(ignore)), x)));
+            } else {
+                return(as.call(c(list(quote(no_deps)), x)))
+            }
+        } else {
+            return(as.call(lapply(x, .drakeCompat0)));
+        }
+    } else {
+        return(x)
+    }
+}
+.drakeCompat <- function(x){
+  .f <- x;
+  .srcref <- attr(.f, "srcref");
+  body(.f) <- .drakeCompat0(body(.f))
+  attr(.f, "srcref") <- .srcref;
+  return(.f)
+}
+
+nlmixrfindLhs <- function(x) {
+  ## Modified from http://adv-r.had.co.nz/Expressions.html find_assign4
+  if (is.atomic(x) || is.name(x)) {
+    character()
+  } else if (is.call(x)) {
+    if ((identical(x[[1]], quote(`<-`)) ||
+         identical(x[[1]], quote(`=`))) &&
+        is.name(x[[2]])) {
+      lhs <- as.character(x[[2]])
+    } else {
+      lhs <- character()
+    }
+    unique(c(lhs, unlist(lapply(x, nlmixrfindLhs))))
+  } else if (is.pairlist(x)) {
+    unique(unlist(lapply(x, nlmixrfindLhs)))
+  } else {
+    stop("Don't know how to handle type ", typeof(x),
+         call. = FALSE)
+  }
+}
+
 .deparse <- function(expr){
   deparse(expr,width.cutoff=500, control = "useSource");
 }
@@ -469,6 +534,19 @@ update.function  <- .nlmixrUpdate
 ##' @export
 nlmixrUI <- function(fun){
   if (is(fun, "function")){
+    .funDrake <- .drakeCompat(fun);
+    if (!identical(.funDrake, fun)){
+      for (.f in seq(1, sys.nframe())){
+        .env <- parent.frame(.f);
+        for (.i in ls(.env)){
+          .t <- try(identical(get(.i, envir=.env), fun), silent=TRUE)
+          if (inherits(.t, "try-error")) .t <- FALSE
+          if (.t){
+            assign(.i, .funDrake, envir=.env);
+          }
+        }
+      }
+    }
     lhs0 <- nlmixrfindLhs(body(fun))
     dum.fun <- function(){return(TRUE)}
     env.here <- environment(dum.fun)
@@ -549,6 +627,7 @@ nlmixrUI <- function(fun){
   if (inherits(.ini, "try-error")){
     stop("Error parsing initial estimates.")
   }
+
   fun2 <- nlmixrUIModel(.model,ini,fun);
   ## if (inherits(fun2, "try-error")){
   ##     stop("Error parsing model.")
@@ -2872,6 +2951,6 @@ str.nlmixrUI <- function(object, ...){
 
 
 ## Local Variables:
-## ess-indent-level: 2
+## ess-indent-offset: 2
 ## indent-tabs-mode: nil
 ## End:
