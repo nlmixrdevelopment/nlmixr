@@ -228,6 +228,9 @@ nlmixrData.default <- function(data, model=NULL){
 }
 nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                         sum.prod=FALSE, table=tableControl()){
+    if (is.null(est)){
+        stop("Estimation type must be specified by est=''");
+    }
     .clearPipedData();
     .tmp <- deparse(body(uif$theta.pars))[-1];
     .tmp <- .tmp[-length(.tmp)];
