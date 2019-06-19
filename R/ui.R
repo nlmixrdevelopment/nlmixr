@@ -170,7 +170,23 @@ ini <- function(ini, ...){
             }
             .uif$ini$est[.w] <- .val;
           } else {
-            .val <- eval(.call[[.n]]);
+            .val <- try(eval(.call[[.n]]), silent=TRUE);
+            if (inherits(.val, "try-error")){
+              .val <- as.character(.call[[.n]]);
+              .val2 <- .val;
+              .frames <- seq(1, sys.nframe());
+              .frames <- .frames[.frames != 0];
+              for (.f in .frames){
+                .env <- parent.frame(.f);
+                if (exists(.val, envir=.env)){
+                  .val2 <- try(get(.val, envir=.env), silent=TRUE);
+                  if (!inherits(.val2, "try-error")){
+                    .val <- .val2;
+                    break;
+                  }
+                }
+              }
+            }
             if (length(.val) == 1){
               .uif$ini$est[.w] <- .val;
             } else if (length(.val) == 2){

@@ -119,5 +119,15 @@ rxPermissive({
         expect_true(inherits(.ui, "nlmixrUI"))
     })
 
+    context("piping looks through parent environments")
+
+    test_that("Looks through prior frames for the correct object", {
+        fit <- nlmixr(one.compartment)
+        fits <- lapply( seq( -1, -0.1, 0.1 ), function(kainit){
+            nlmixr( update( fit, tka = kainit ))})
+
+        expect_true(inherits(fits, "list"));
+    })
+
 }, cran=TRUE)
 
