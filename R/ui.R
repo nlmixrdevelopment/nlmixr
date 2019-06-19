@@ -171,7 +171,9 @@ ini <- function(ini, ...){
             .uif$ini$est[.w] <- .val;
           } else {
             .val <- try(eval(.call[[.n]]), silent=TRUE);
+            .found <- TRUE
             if (inherits(.val, "try-error")){
+              .found <- FALSE
               .val <- as.character(.call[[.n]]);
               .val2 <- .val;
               .frames <- seq(1, sys.nframe());
@@ -182,10 +184,14 @@ ini <- function(ini, ...){
                   .val2 <- try(get(.val, envir=.env), silent=TRUE);
                   if (!inherits(.val2, "try-error")){
                     .val <- .val2;
+                    .found <- TRUE
                     break;
                   }
                 }
               }
+            }
+            if (!.found){
+              stop(sprintf("object '%s' not found", .val))
             }
             if (length(.val) == 1){
               .uif$ini$est[.w] <- .val;

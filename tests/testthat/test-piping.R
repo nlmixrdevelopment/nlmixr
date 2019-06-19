@@ -127,6 +127,9 @@ rxPermissive({
             nlmixr( update( fit, tka = kainit ))})
 
         expect_true(inherits(fits, "list"));
+
+        expect_error(lapply( seq( -1, -0.1, 0.1 ), function(kainit){
+            nlmixr( update( fit, tka = matt ))}), "object 'matt' not found")
     })
 
 }, cran=TRUE)
