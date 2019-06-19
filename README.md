@@ -56,18 +56,28 @@ For those not interested in customized installation on Windows, we
  **recommend** you download a Windows installer for your platform from
  the following link:
  https://github.com/nlmixrdevelopment/nlmixr/releases/
+ 
+ 
+ **STOP AT THIS POINT IF YOU USED THE INSTALLER**
+ 
+ Sometimes trying to install yourself will corrupt the installation and nlmixr will not run.
 
 # Installation on Windows
-To replicate the environment that was used in Windows for `nlmixr` development, you will need administrator rights, and you should perform the following steps:
+To replicate the environment that was used in Windows for `nlmixr`
+development, you will need administrator rights, and you should
+perform the following steps:
 
-1. Install R 3.4.1 (or later) from the R website.
-   - For best results, we suggest you use `C:\R\R-3.4.1`, but
-     you can also use the default location (`C:\Program Files\R\R-3.4.1`) as well, if really needed.
-   - For 64-bit Windows, it is best practice to include *only* the 64-bit version. 
-     If you include 32-bit files, some packages may not
-     run correctly.  Additionally, both the 32- and
-     64-bit binaries have to be compiled for every package. Similarly, if on 32-bit Windows, install only the 32-bit version of R (and Python, and Rtools).
-2. Install the appropriate version of Rtools for Windows, currently version 3.4, from [here](https://cran.r-project.org/bin/windows/Rtools/).
+1. Install R 3.5.0 (or later) from the R website.
+   - For best results, we suggest you use `C:\R\R-3.5.0`, but
+     you can also use the default location (`C:\Program Files\R\R-3.5.0`) as well, if really needed.
+   - For 64-bit Windows, it is best practice to include *only* the
+     64-bit version.  If you include 32-bit files, some packages may
+     not run correctly.  Additionally, both the 32- and 64-bit
+     binaries have to be compiled for every package. Similarly, if on
+     32-bit Windows, install only the 32-bit version of R (and Python,
+     and Rtools).
+	 
+2. Install the appropriate version of Rtools for Windows, currently version 3.5, from [here](https://cran.r-project.org/bin/windows/Rtools/).
    - This is an absolute requirement, since it includes C++ and related compilers not usually available under Windows.
    - For best results, use the default location of `c:\Rtools`
      - `RxODE`, a required component of `nlmixr`, checks and sets up the path based on the following:
@@ -77,9 +87,12 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
 		c. `Rtools` is on a hard drive installed in either `Rtools` or `RBuildTools`
      - If you are on 64-bit windows, please *do not install* the R
        3.3.x 32-bit toolchain.  These files can interfere with some
-       packages that compile binaries, with unpredictable consequences.  Similarly, only install 32-bit
-       Rtools on 32-bit versions of Windows.
-   - Make sure the compilers have been added to the Windows `PATH` environment variable, or `RxODE` and `nlmixr` will not work (this should be done automatically during installation).
+       packages that compile binaries, with unpredictable
+       consequences.  Similarly, only install 32-bit Rtools on 32-bit
+       versions of Windows.
+   - Make sure the compilers have been added to the Windows `PATH`
+     environment variable, or `RxODE` and `nlmixr` will not work (this
+     should be done automatically during installation).
 3. Install a version of Python for Windows.
    - This is used for its symbolic algebra package [SymPy](http://sympy.org/).
    - If you already have a python installed, it is much easier to
@@ -103,9 +116,7 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
      for a few workarounds). Nonetheless, see
      [here](http://simpy.readthedocs.io/en/latest/simpy_intro/installation.html)
      for instructions for installation from source or using
-     `pip`. Note that if you approach us for support, we are going to
-     recommend that you use
-     [Anaconda](https://www.anaconda.com/download/).
+     `pip`. 
    - Regardless of the option you choose, please use like with like
      (64-bit Python for 64-bit Windows, for example).
    - Once again, make sure Python has been added to the Windows `PATH`
@@ -127,10 +138,33 @@ To replicate the environment that was used in Windows for `nlmixr` development, 
    - To validate or test the installation of `RxODE` completely, you
      can type the following `library(RxODE); rxTest();` and it will
      run all of the unit tests in RxODE to make sure it is running
-     correctly on your system. (Note that the `testthat` package is required for this, and it will take a long time.)
+     correctly on your system. (Note that the `testthat` package is
+     required for this, and it will take a long time.).  This also
+     requires installing `RxODE` with the tests.  Devtools changed so
+     that tests are no longer installed by default.  The correct
+     command to install the test suite is:
+	 
+```{r}
+devtools::install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")
+```
+	 
 6. Install `nlmixr`.
    - Load `devtools` again using `library(devtools)`
-   - Install `nlmixr` by running `install_github("nlmixrdevelopment/nlmixr")`
+   - Since `nlmixr` shares some stan headers, nlmixr now needs `C++14`
+     support.  To ease the setup you can run the command
+     `RxODE::rxC14()` which creates the following build file in
+     `~/.R/Makevars.win`.  If there are problems you may have to edit
+     the file manually to match your configuration.
+	 
+```{make}
+# Makvars.win
+CXX14=$(BINPREF)g++ $(M_ARCH)
+CXX14STD=-std=c++1y
+CXX14FLAGS=-O2 -Wall
+```
+
+   - Finally, install `nlmixr` by running
+     `devtools::install_github("nlmixrdevelopment/nlmixr")`
 
 # Installation on Linux
 Instructions for Ubuntu-alike distributions are given here
