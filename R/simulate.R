@@ -40,10 +40,12 @@
     .etaN <- dimnames(.omega)[[1]]
     .params <- nlme::fixed.effects(object);
     .thetaN <- names(.params);
-    .newMod <- paste0(gsub(rex::rex(start, any_spaces, capture(or(.lhs)), any_spaces, or("=", "~"), except_any_of("\n;"),any_of("\n;")), "",
-                           gsub(rex::rex(start, any_spaces, capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
-                                .repThetaEta(.mod, theta=.thetaN, eta=.etaN))),
-                      "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);");
+
+    .newMod <- gsub("\n[^=~\n]*\n", "\n",
+                    paste0(gsub("\n\n+", "\n", gsub(rex::rex(capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),one_of("\n;")), "",
+                                                    gsub(rex::rex(capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
+                                                         .repThetaEta(.mod, theta=.thetaN, eta=.etaN)))),
+                           "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);"));
     .sim <- "\nsim=rxTBSi(rx_pred_+rx_r_"
     .err <- object$uif$err;
     .w <- which(!is.na(object$uif$err))
