@@ -35,4 +35,4 @@ test_that("Error w/time-varying covariates",{
 
     expect_true(inherits(f, "nlmixrFOCEi"))
 
-})
+}, on.validate="NLMIXR_VALIDATION")
