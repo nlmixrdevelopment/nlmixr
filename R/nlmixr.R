@@ -134,9 +134,10 @@ nlmixr <- function(object, data, est=NULL, control=list(),
 nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
                             save=NULL){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
+    .modName <- deparse(substitute(object))
     .uif <- nlmixrUI(object);
     class(.uif) <- "list";
-    .uif$nmodel$model.name <- deparse(substitute(object))
+    .uif$nmodel$model.name <- .modName
     if (missing(data) && missing(est)){
         class(.uif) <- "nlmixrUI"
         return(.uif)
