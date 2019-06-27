@@ -131,7 +131,12 @@ perform the following steps:
      uploaded to CRAN.  `nlmixr` needs this newer version of `RxODE` to
      function correctly. To install this version, use the command:
      `install_github("nlmixrdevelopment/RxODE")`.
-   - Once installed, type `RxODE::rxWinPythonSetup()` to install the required package `SnakeCharmR`and to make sure Python and SymPy are working properly.
+   - Once installed, type `RxODE::rxWinPythonSetup()` to install the
+     required package `SnakeCharmR`and to make sure Python and SymPy
+     are working properly.  Since `SnakeCharmR` is orphaned, it may
+     not work without installing directly from github with the
+     following command:
+     `devtools::install_github("nlmixrdevelopment/SnakeCharmR")`
    - Restart your R session.
    - As a quick test, you can make sure that R and Python can
      communicate by typing the command `library(SnakeCharmR)`.
