@@ -202,6 +202,96 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 #'
 #' @export
 
+
+
+# nlmixrToDynmodel() -------------------------------------------------------
+
+nlmixrDynmodelConvert <- function(.nmf){
+  # Notes:
+  # Description - function used to convert nlmixr() object to initial conditions and model used for dynmodel
+  # input - nlmixr function (.nmf)
+  # output - .return
+  # TO DO:
+  # add lower and upper outputs for inits
+  
+  # iniitalize list for output
+  .return <- list()
+  
+  # convert nlmixr model to data.frame
+  .nmf.original <- .nmf
+  .nmf <- as.data.frame(.nmf$ini)
+  
+  # assign fixed terms
+  .fix.index <- if (length(which(.nmf$fix==TRUE))==0) {NULL} else {which(.nmf$fix==TRUE)} # obtain row location for fixed terms
+  .fixPars <- if (length(.nmf$est[.fix.index])==0) {NULL} else {exp(.nmf$est[.fix.index])}
+  names(.fixPars) <- substring(.nmf$name[.fix.index],2)
+  .return <- c(.return,fixPars=list(.fixPars))
+  
+  # assign theta terms(estimated terms excluding error terms)
+  .theta.index <- 
+    if (is.null(.fix.index)){
+      which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)
+    } else {
+      which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)[-which(.nmf$fix == TRUE)]
+    } # row location for theta values
+  
+  
+  .theta <- exp(.nmf$est[.theta.index]) # initial estimate for theta values, back-transformed
+  names(.theta) <- substring(.nmf$name[.theta.index],2)
+  
+  # assign sigma terms (estimated)
+  .sigma.index <- 
+    if (is.null(.fix.index)){
+      which(!is.na(.nmf$ntheta) & !is.na(.nmf$err),TRUE)
+    } else {
+      which(!is.na(.nmf$ntheta) & !is.na(.nmf$err),TRUE)[-which(.nmf$fix == TRUE)]
+    } # row location for theta values
+  
+  .sigma <- .nmf$est[.sigma.index] # initial estimate for theta values, back-transformed
+  
+  names(.sigma) <- .nmf$err[.sigma.index]
+  .return <- c(.return,sigma=list(.sigma))
+  
+  # assign "inits", vector of theta and sigma terms # (will be used when the likelihood function is changed)
+  .inits <- c(.theta)#,.sigma)
+  .return$inits <- .inits
+  
+  # assign boundaries
+  .lower <- exp(.nmf[,5][!is.na(.nmf["ntheta"]) & .nmf["fix"]==FALSE & is.na(.nmf["err"])]) # theta terms
+  .lower <- c(.lower, .nmf[,5][!is.na(.nmf["ntheta"]) & .nmf["fix"]==FALSE & !is.na(.nmf["err"])]) # error terms
+  
+  .upper <- exp(.nmf[,7][!is.na(.nmf["ntheta"]) & .nmf["fix"]==FALSE & is.na(.nmf["err"])]) # theta terms
+  .upper <- c(.upper, .nmf[,7][!is.na(.nmf["ntheta"]) & .nmf["fix"]==FALSE & !is.na(.nmf["err"])]) # error terms
+  
+  .return <- c(.return, lower = list(.lower), upper = list(.upper))
+  
+  # obtain system
+  .system <- RxODE(.nmf.original$rxode.pred) # (use nlmixr_prde)
+  .system$stateExtra <- NULL # remove extraState, the error model term shoudl not be inclcuded
+  .system$lhs <- .system$lhs[-length(.system$lhs)] # remove the error model term
+  .return <- c(.return,system=.system)
+  
+  # create error model
+  .DV <- .nmf$condition[!is.na(.nmf$condition) & .nmf$condition != "ID"]
+  .PRED <- "nlmixr_pred" # need to obtain from data? id dont know
+  
+  .formula <- list()
+  for(i in 1:length(.sigma.index)) {
+    if (i == 1) {
+      .temp <- paste(.nmf$err[.sigma.index[i]],"(", .nmf$est[.sigma.index[i]], ")",sep="")
+    } else {
+      .temp <- paste("+ ",.nmf$err[.sigma.index[i]],"(", .nmf$est[.sigma.index[i]], ")",sep="")
+    }
+    .formula <- paste(.formula,.temp)
+  }
+  
+  .model <- as.formula(paste(.DV,"~",.PRED,"+", .formula))
+  .return <- c(.return,model=.model)
+  
+  # Output
+  return(.return)
+}
+
 # dynmodel control -----------------------------------------------
 dynmodelControl <- function(...,
   fixPars=NULL,
