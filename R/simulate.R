@@ -1,5 +1,5 @@
 ## Add RxODE THETA/ETA replacement mini DSL
-.repThetaEta <- function(x, theta=c(), eta=c()){
+.repSim <- function(x, theta=c(), eta=c()){
     ret <- eval(parse(text=sprintf("quote({%s})", x)));
     f <- function(x){
         if (is.atomic(x)) {
@@ -17,6 +17,11 @@
                     return(eval(parse(text=sprintf("quote(%s)", eta[as.numeric(x[[3]])]))))
                 }
                 stop("Only theta/eta translation supported.");
+            } else if (length(x[[2]]) == 1 &&
+                       ((identical(x[[1]], quote(`=`))) ||
+                        (identical(x[[1]], quote(`~`))))) {
+                x[[1]] <- quote(`~`)
+                return(as.call(lapply(x, f)));
             } else {
                 return(as.call(lapply(x, f)))
             }
@@ -26,6 +31,7 @@
         }
     }
     ret <- deparse(f(ret))[-1];
+    ret <- ret[regexpr("^ *NULL$",ret) == -1];
     ret <- paste(ret[-length(ret)], collapse="\n");
     return(RxODE::rxNorm(RxODE::rxGetModel(ret)))
 }
@@ -40,12 +46,8 @@
     .etaN <- dimnames(.omega)[[1]]
     .params <- nlme::fixed.effects(object);
     .thetaN <- names(.params);
-
-    .newMod <- gsub("\n[^=~\n]*\n", "\n",
-                    paste0(gsub("\n\n+", "\n", gsub(rex::rex(capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),one_of("\n;")), "",
-                                                    gsub(rex::rex(capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
-                                                         .repThetaEta(.mod, theta=.thetaN, eta=.etaN)))),
-                           "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);"));
+    .newMod <- paste0(.repSim(.mod, theta=.thetaN, eta=.etaN),
+                      "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);");
     .sim <- "\nsim=rxTBSi(rx_pred_+rx_r_"
     .err <- object$uif$err;
     .w <- which(!is.na(object$uif$err))
