@@ -37,5 +37,7 @@ devtools::install_github("AdeelK93/collapsibleTree")
 
 devtools::install_github("richardhooijmaijers/shinyMixR")
 
+devtools::install_github("Novartis/xgxr")
+
 
 
