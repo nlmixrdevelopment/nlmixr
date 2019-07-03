@@ -17,50 +17,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with nlmixr.  If not, see <http:##www.gnu.org/licenses/>.
 
+# thresh() and err.msg() --------------------------------------------------
 thresh = function(x, cut=.Machine$double.xmin)
 {
+  x = abs(x)
 	ifelse(x>cut, x, cut)
 }
 
-gof = function(x, ...)
+err.msg = function(x, pre="", post="")
 {
-    gof_str = "
-{
-    theta = th[1:npar]
-    names(theta) = names(inits)[1:npar]
-    theta = c(theta, fixPars)
-    system$solve(theta, ev, atol = 1e-08, rtol = 1e-08)
+  msg = paste0(x, collapse=", ")
+  paste0(pre, msg, post)
 }
-"
-	f = x$obj
-	dat = x$data
-	body(f) = parse(text=gof_str)
-	x = f(x$par)
+# #########################################################################
 
-	rows = environment(f)$rows
-	m = environment(f)$model
-	for(s in m) {
-		time = x[,"time"]
-		yo = dat[, s["dv"]]		#FIXME
-		yp = x[, s["pred"]]
-
-		#dv vs pred
-		plot(time, yp, type="n", xlab="time", ylab=s["dv"])
-		points(dat[,"time"], yo, ...)
-		lines(time, yp)
-
-		#pred vs res
-		yp = yp[rows]
-		res = yo - yp
-		plot(yp, yp, xlab="pred", ylab=s["dv"], ...)
-		abline(0, 1, col="red", lty=2)
-
-		#pred vs res
-		plot(yp, res, xlab="pred", ylab="res", ...)
-		abline(h=0, col="red", lty=2)
-	}
-}
-
+# plot.dyn.ID() -----------------------------------------------------------
 #' Plot of a non-population dynamic model fit
 #'
 #' Plot of a non-population dynamic model fit
@@ -70,7 +41,47 @@ gof = function(x, ...)
 #' @return NULL
 #' @export
 plot.dyn.ID = gof
+gof = function(x, ...)
+{
+  gof_str = "
+  {
+  theta = th[1:npar]
+  names(theta) = names(inits)[1:npar]
+  theta = c(theta, fixPars)
+  system$solve(theta, ev, atol = 1e-08, rtol = 1e-08)
+  }
+  "
+  f = x$obj
+  dat = x$data
+  body(f) = parse(text=gof_str)
+  x = f(x$par)
+  
+  rows = environment(f)$rows
+  m = environment(f)$model
+  for(s in m) {
+    time = x[,"time"]
+    yo = dat[, s["dv"]]		#FIXME
+    yp = x[, s["pred"]]
+    
+    #dv vs pred
+    plot(time, yp, type="n", xlab="time", ylab=s["dv"])
+    points(dat[,"time"], yo, ...)
+    lines(time, yp)
+    
+    #pred vs res
+    yp = yp[rows]
+    res = yo - yp
+    plot(yp, yp, xlab="pred", ylab=s["dv"], ...)
+    abline(0, 1, col="red", lty=2)
+    
+    #pred vs res
+    plot(yp, res, xlab="pred", ylab="res", ...)
+    abline(h=0, col="red", lty=2)
+  }
+}
+# #########################################################################
 
+# print.dyn.ID() ----------------------------------------------------------
 #' Print a non-population dynamic model fit object
 #'
 #' Print a non-population dynamic model fit object
@@ -88,7 +99,9 @@ print.dyn.ID = function(x, ...)
 	print(c("-loglik"=x$value, "AIC"=aic, "BIC"=bic))
 	cat("\n")
 }
+# #########################################################################
 
+# summary.dyn.ID() --------------------------------------------------------
 #' Summary of a non-population dynamic model fit
 #'
 #' Summary of a non-population dynamic model fit
@@ -107,30 +120,9 @@ summary.dyn.ID = function(object, ...)
 	cat("\niter:", object$iter, "\n")
 	cat(object$message, "\n")
 }
+# #########################################################################
 
-err.msg = function(x, pre="", post="")
-{
-	msg = paste0(x, collapse=", ")
-	paste0(pre, msg, post)
-}
-
-mymin = function(start, fr, rho=NULL, control=list())
-{
-	if (is.null(rho)) rho = environment(fr)
-	step = -.2*start
-
-    con <- list(maxeval=999, ftol_rel=1e-6, rcoeff=1., ecoeff=2., ccoeff=.5, trace=F)
-    nmsC <- names(con)
-    con[(namc <- names(control))] <- control
-    #if (length(noNms <- namc[!namc %in% nmsC]))
-    #    warning("unknown names in control: ", paste(noNms, collapse = ", "))
-
-	.Call(neldermead_wrap, fr, rho, length(start), start, step,
-		  as.integer(con$maxeval), con$ftol_rel, con$rcoeff, con$ecoeff, con$ccoeff,
-		  as.integer(con$trace),
-		  PACKAGE = 'nlmixr')
-}
-
+# nmsimplex() and mymin() -------------------------------------------------
 #' Nelder-Mead of simplex search
 #'
 #' Nelder-Mead of simplex search
@@ -158,53 +150,43 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
 		  PACKAGE = 'nlmixr')
 }
 
-#' Fit a non-population dynamic model
-#'
-#' Fit a non-population dynamic model
-#'
-#' @param system an RxODE object
-#' @param model a list of statistical meaurement models
-#' @param evTable an Event Table object
-#' @param inits initial values of system parameters
-#' @param data input data
-#' @param fixPars fixed system parameters
-#' @param method estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.
-#' @param control optional minimization control parameters
-#' @return NULL
-#' @author Wenping Wang
-#' @examples
-#' ode <- "
-#'    dose=200;
-#'    pi = 3.1415926535897931;
-#'
-#'    if (t<=0) {
-#'       fI = 0;
-#'    } else {
-#'       fI = F*dose*sqrt(MIT/(2.0*pi*CVI2*t^3))*exp(-(t-MIT)^2/(2.0*CVI2*MIT*t));
-#'    }
-#'
-#'    C2 = centr/V2;
-#'    C3 = peri/V3;
-#'    d/dt(centr) = fI - CL*C2 - Q*C2 + Q*C3;
-#'    d/dt(peri)  =              Q*C2 - Q*C3;
-#' "
-#' sys1 <- RxODE(model = ode)
-#'
-#'
-#' ## ------------------------------------------------------------------------
-#' dat <- invgaussian
-#' mod <- cp ~ C2 + prop(.1)
-#' inits <- c(MIT=190, CVI2=.65, F=.92)
-#' fixPars <- c(CL=.0793, V2=.64, Q=.292, V3=9.63)
-#' ev <- eventTable()
-#' ev$add.sampling(c(0, dat$time))
-#' (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
-#'
+# Redundant function?
+mymin = function(start, fr, rho=NULL, control=list())
+{
+  if (is.null(rho)) rho = environment(fr)
+  step = -.2*start
+  
+  con <- list(maxeval=999, ftol_rel=1e-6, rcoeff=1., ecoeff=2., ccoeff=.5, trace=F)
+  nmsC <- names(con)
+  con[(namc <- names(control))] <- control
+  #if (length(noNms <- namc[!namc %in% nmsC]))
+  #    warning("unknown names in control: ", paste(noNms, collapse = ", "))
+  
+  .Call(neldermead_wrap, fr, rho, length(start), start, step,
+        as.integer(con$maxeval), con$ftol_rel, con$rcoeff, con$ecoeff, con$ccoeff,
+        as.integer(con$trace),
+        PACKAGE = 'nlmixr')
+}
+
+# #########################################################################
+
+# nlmixrDynmodelConvert ---------------------------------------------------
+#' Converting nlmixr Objects to dynmodel Objects
+#' 
+#' @param .nmf nlmixr object
+#' @return list containing inputs for the dynmodel()
+#' \itemize{
+#' \item \code{$fixPars} - fixed parameters defined as \code{fixed()} in the nlmixr object
+#' \item \code{$sigma} - error model parameters 
+#' \item \code{$inits} - initial estimates for parameters in the model
+#' \item \code{$lower} - lower boundaries for estimated parameters
+#' \item \code{$upper} - upper boundaries for estimated parameters
+#' \item \code{$system} - RxODE object that defines the structural model
+#' \item \code{$model} - error model
+#' }
+#' 
 #' @export
 
-
-
-# nlmixrToDynmodel() -------------------------------------------------------
 
 nlmixrDynmodelConvert <- function(.nmf){
   # Notes:
@@ -291,8 +273,20 @@ nlmixrDynmodelConvert <- function(.nmf){
   # Output
   return(.return)
 }
+# #########################################################################
 
-# dynmodel control -----------------------------------------------
+# dynmodelControl() -----------------------------------------------
+#' Control Options for dynmodel
+#' 
+#' @inheritParams RxODE::rxSolve
+#' @inheritParams foceiControl
+#' @param ... other arguments apply to dynmodelControl
+#' @export
+
+# run devtools::document() to update documentation
+# go through and make sure
+# devtools::check_man() used to identify missing and problems
+
 dynmodelControl <- function(...,
   fixPars=NULL,
   lower = -Inf,
@@ -308,7 +302,6 @@ dynmodelControl <- function(...,
   scaleCmin=1e-5,
   scaleC=NULL,
   scaleC0=1e5,
-  transformRUV=c("boxCox", "YeoJohnson"),
   # RxODE
   atol=1e-08,
   rtol=1e-06,
@@ -344,7 +337,6 @@ dynmodelControl <- function(...,
   if (missing(method)){method = "bobyqa"}
   if (missing(normType)){normType = "constant"}
   if (missing(scaleType)){scaleType = "norm"}
-  if (missing(transformRUV)){transformRUV = 1}
   
   .ret <- list(
     fixPars=fixPars,
@@ -361,7 +353,6 @@ dynmodelControl <- function(...,
     scaleCmin=scaleCmin,
     scaleC=scaleC, #NULL,
     scaleC0=scaleC0,
-    transformRUV=transformRUV,
     # RxODE
     atol=atol,
     rtol=rtol,
@@ -400,18 +391,63 @@ dynmodelControl <- function(...,
   
 }
 
-# dynmodel  ---------------------------------------------------------------
-dynmodel = function(system, model, evTable, inits, data, control=list(), ...)
-{
+# #########################################################################
+
+# dynmodel()  ---------------------------------------------------------------
+#' Fit a non-population dynamic model
+#'
+#' Fit a non-population dynamic model
+#'
+#' @param system an RxODE object
+#' @param model a list of statistical meaurement models
+#' @param evTable an Event Table object
+#' @param inits initial values of system parameters
+#' @param data input data
+#' @param fixPars fixed system parameters
+#' @param method estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.
+#' @param control optional minimization control parameters
+#' @return NULL
+#' @author Wenping Wang
+#' @examples
+#' ode <- "
+#'    dose=200;
+#'    pi = 3.1415926535897931;
+#'
+#'    if (t<=0) {
+#'       fI = 0;
+#'    } else {
+#'       fI = F*dose*sqrt(MIT/(2.0*pi*CVI2*t^3))*exp(-(t-MIT)^2/(2.0*CVI2*MIT*t));
+#'    }
+#'
+#'    C2 = centr/V2;
+#'    C3 = peri/V3;
+#'    d/dt(centr) = fI - CL*C2 - Q*C2 + Q*C3;
+#'    d/dt(peri)  =              Q*C2 - Q*C3;
+#' "
+#' sys1 <- RxODE(model = ode)
+#'
+#'
+#' ## ------------------------------------------------------------------------
+#' dat <- invgaussian
+#' mod <- cp ~ C2 + prop(.1)
+#' inits <- c(MIT=190, CVI2=.65, F=.92)
+#' fixPars <- c(CL=.0793, V2=.64, Q=.292, V3=9.63)
+#' ev <- eventTable()
+#' ev$add.sampling(c(0, dat$time))
+#' (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
+#'
+#' @export
+
+dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
   # dynmodelControl Handling ------------------------------------------------
-    if (!RxODE::rxIs(control, "dynmodelControl")){
-     control <- do.call(dynmodelControl, control)
-    }
+  if (!RxODE::rxIs(control, "dynmodelControl")){
+    control <- do.call(dynmodelControl, control)
+  }
   
-    # reassign contorl names
-    for (i in 1:length(control)){
-      assign(names(control[i]),control[[i]])
-    }
+  # reassign contorl names
+  for (i in 1:length(control)){
+    assign(names(control[i]),control[[i]])
+  }
   
   # Error model  -------------------------------------------------------------
   if (class(model)=="formula") {
@@ -483,379 +519,396 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...)
   })
   
   inits = c(inits, inits.err)
-
+  
   # Check dynmodel() inputs, Define vars, modelVars, pars,  ------------
-  	# Check to make sure all there is consistency between error model, data. inits, and ODE model
-    	
-  	  # Error "model" contains "data" variables?
-  	    # get column names of data (Time and Observation)
-    	  vars = names(data)
-    	  # check to see if there is a discrepency between error model names and data
-    	  nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
-        # print error message
-      	if (length(nodef)) {
-      		msg = err.msg(nodef, pre="var(s) not found in data: ")
-      		stop(msg)
-      	}
-      
-    	# "system" variables contain error "model" variables?
-    	  # obtain all variables from the system 
-      	modelVars = system$cmpMgr$get.modelVars()
-      	# reassign vars to combine state and lhs variables
-      	vars = c(modelVars$state, modelVars$lhs)
-      	# Check to see if the prediction term is in the error model
-      	nodef = setdiff(sapply(model, function(x) x["pred"]), vars)
-      	# print error message
-      	if (length(nodef)) {
-      		msg = err.msg(nodef, pre="modelVar(s) not found in model: ")
-      		stop(msg)
-      	}
-    
-      #  "system" variables contain estimated "init" variables and fixed "fixPars" variables?
-      	# obtain fixed and estimated parameters
-      	pars = modelVars$params
-        # Check to see if there are values in pars, that are not in the initial conditions and fixed parameters
-      	nodef = setdiff(pars, c(names(inits), names(fixPars)))
-      	# print error message
-      	if (length(nodef)) {
-      		msg = err.msg(nodef, pre="par(s) not found: ")
-      		stop(msg)
-      	}
-      	
+  # Check to make sure all there is consistency between error model, data. inits, and ODE model
+  
+  # Error "model" contains "data" variables?
+  # get column names of data (Time and Observation)
+  vars = names(data)
+  # check to see if there is a discrepency between error model names and data
+  nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
+  # print error message
+  if (length(nodef)) {
+    msg = err.msg(nodef, pre="var(s) not found in data: ")
+    stop(msg)
+  }
+  
+  # "system" variables contain error "model" variables?
+  # obtain all variables from the system 
+  modelVars = system$cmpMgr$get.modelVars()
+  # reassign vars to combine state and lhs variables
+  vars = c(modelVars$state, modelVars$lhs)
+  # Check to see if the prediction term is in the error model
+  nodef = setdiff(sapply(model, function(x) x["pred"]), vars)
+  # print error message
+  if (length(nodef)) {
+    msg = err.msg(nodef, pre="modelVar(s) not found in model: ")
+    stop(msg)
+  }
+  
+  #  "system" variables contain estimated "init" variables and fixed "fixPars" variables?
+  # obtain fixed and estimated parameters
+  pars = modelVars$params
+  # Check to see if there are values in pars, that are not in the initial conditions and fixed parameters
+  nodef = setdiff(pars, c(names(inits), names(fixPars)))
+  # print error message
+  if (length(nodef)) {
+    msg = err.msg(nodef, pre="par(s) not found: ")
+    stop(msg)
+  }
+  
   # Additional assignment ---------------------------------------------------
-    # number of estimated parameters, excluding the error terms
-  	npar = length(pars) - length(fixPars)
-  	
-  	# if the time of the observed "data" starts at zero, rows = T, else rows = -1 ??????
-  	have_zero = min(data$time) <= 0
-  	rows = if(have_zero) T else -1
+  # number of estimated parameters, excluding the error terms
+  npar = length(pars) - length(fixPars)
+  
+  # if the time of the observed "data" starts at zero, rows = T, else rows = -1 ??????
+  #have_zero = min(data$time) <= 0
+  #rows = if(have_zero) T else -1
+  
   
   # Objective Function ------------------------------------------------------
-  	obj = function(th)
-  	{
-  	  # unscale
-  	  unscaled.th <- numeric(length(th))
-  	  for (i in 1:length(th)) {th[i] <- unscalePar(th,i)}
-
-  	   # define parameters used for simulation, all parameters except the error terms
-  		.ixpar = npar
-  		theta = th[1:npar] 
-  		names(theta) = names(inits)[1:npar]
-  		theta = c(theta, fixPars)
-  
-  		# call rxODE for simulation
-  		rxControl <- c(atol=atol, rtol=rtol)
-  		s = do.call(RxODE :: rxSolve, c(list(object=system, params=theta, events=evTable), rxControl))
-  		
-  		# NOTES:
-  		#returnType="data.frame" - add to rxControl
-      #rxNorm(system) # add error piece, use the error parameters as parameters
-      #nlmixr_err=boxCox(add.err^2+prop.err^(2*pow)*pred, lambda) for the predictions not the errors
-  
-  		# sum of log-likelihood function:
-   		l = lapply(model, function(x) {
-   		  # name the inputs
-   		  names(th) <- names(inits)
-   		  
-   		  # initialize sigmas for objective function
-   		  add <- 0
-   		  prop <- 1
-   		  pow <- 1 # Why does pow() take two inputs in the nlmixr object?
-   		  norm <- NULL
-   		  dnorm <- NULL
-   		  logn <- NULL
-   		  dlnorm <- NULL
-   		  boxCox <- NULL
-   		  tbs <- NULL
-   		  yeoJohnson <- NULL
-   		  tbsYJ <- NULL
-
-   		  for(i in 1:sum((names(th) %in% names(model[[1]])))) 
-   		    assign(names(th[names(th) %in% names(model[[1]])])[i], as.numeric(th[names(th) %in% names(model[[1]])])[i])
-   		  
-   		  if (!is.null(norm)) add <- norm
-   		  if (!is.null(dnorm)) add <- dnorm
-   		  if (!is.null(logn) | !is.null(dlnorm)) lambda <- 0
-   		  if (!is.null(boxCox) | !is.null(tbs)) lambda <- boxCox
-   		  if (!is.null(yeoJohnson) | !is.null(tbsYJ)) lambda <- yeoJohnson
-
-   		  # predictted and observed values from RxODE
-   		  yp = s[rows,x["pred"]]
-   		  yo = data[, x["dv"]]
-   		  
-  		  # Transform both sides (used for non-normal residuals) ######### may need to implement nlmixr::coxBox and nlmixr::yeoJohnson
-  			boxCox = function (x, lambda) {
-  			   if(lambda == 0) {
-  			     .h.x <- log(x)
-  			     }
-  			   else {
-  			     .h.x <- (x^lambda-1)/lambda
-  			   }
-  			   return(.h.x)
-  			}
-  			yeoJohnson = function (x, lambda){
-  			 options(warn=-1)
-  			.h.x <- ifelse (x >= 0,
-          ifelse (lambda != 0 & x >= 0, 
-                  ((x + 1)^lambda - 1)/lambda, 
-                  log(x + 1)),
-  			  ifelse (lambda != 2 & x < 0, 
-  			          -((-x+1)^(2-lambda)-1)/(2-lambda), 
-  			          -log(-x+1))
-  			)
-  			options(warn=0)
-  			 return(.h.x)
-  			}
-  
-  			# boxCox Transform or log-normal transform
-        if ("boxCox" %in% names(model) | "tbs" %in% names(model) | "logn" %in% names(model) | "dlnorm" %in% names(model)) {
-  			   .h.x <- boxCox(yo, lambda) # obs
-  			   .h.y <- boxCox(yp, lambda) # pred
-  			   .h.y.var <- yp^(2*pow)*prop^2 + add^2  # variance of pred
-  
-  			   # boxCox transformed -2 log-likelihood
-  			   .boxCox.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
-  			   
-  			   # back-transformed  -2 log-likelihood function, with penalty added
-  			   .n2ll = .boxCox.n2ll - 2*(lambda-1)*log(yo) -2*log(2*pi)
-  			   
-  			   # negative log-likelihood function for output
-  			   ll = .5*(.n2ll)
-  			   
-  			 }
-  			# yeoJohnson Transform
-  			else if("yeoJohnson" %in% names(model) | "tbsYJ" %in% names(model)) {
-  			   .h.x <- yeoJohnson(yo, lambda) #obs
-  			   .h.y <- yeoJohnson(yp, lambda) #pred
-  			   .h.y.var <- yp^(2*pow)*prop^2 + add^2  # variance of pred
-  			     
-  			   # yeoJohnson transformed -2 log-likelihood
-  			   .yeoJohnson.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
-  			   
-  			   # back-transformed  -2 log-likelihood function, with penalty added
-  			   .n2ll <- ifelse(x >= 0, 
-  			                   .yeoJohnson.n2ll -2*((lambda-1)*log(x+1) -2*log(2*pi)),
-  			                   .yeoJohnson.n2ll -2*((1-lambda)*log(-x+1) -2*log(2*pi))
-  			                   )
-  			   
-  			   # negative log-likelihood function for output
-  			   ll = .5*(.n2ll)
-  			   
-  			 }
-  			# all other error models
-  			else{
-  			   sgy = thresh(add^2 + prop^2*yp^(2*pow))
-  			   ll = .5*((yo - yp)^2/sgy + 2*log(sqrt(sgy)) + log(2*pi)) 
-  			 }
-  		sum(ll)
-  		})
-  		do.call("sum", l)  # same as return(as.numeric(l)), l is a list for each value in the model?
-  	}
+  obj = function(th)
+  {
+    # unscale
+    unscaled.th <- numeric(length(th))
+    for (i in 1:length(th)) {th[i] <- unscalePar(th,i)}
+    
+    # define parameters used for simulation, all parameters except the error terms
+    .ixpar = npar
+    theta = th[1:npar] 
+    names(theta) = names(inits)[1:npar]
+    theta = c(theta, fixPars)
+    
+    # call rxODE for simulation
+    rxControl <- c(atol=atol, rtol=rtol)
+    s = do.call(RxODE :: rxSolve, c(list(object=system, params=theta, events=evTable), rxControl))
+    
+    # NOTES:
+    #returnType="data.frame" - add to rxControl
+    #rxNorm(system) # add error piece, use the error parameters as parameters
+    #nlmixr_err=boxCox(add.err^2+prop.err^(2*pow)*pred, lambda) for the predictions not the errors
+    
+    # sum of log-likelihood function:
+    l = lapply(model, function(x) {
+      # name the inputs
+      names(th) <- names(inits)
+      
+      # initialize sigmas for objective function
+      add <- 0
+      prop <- 0
+      pow <- 1
+      pow2 <- NULL
+      norm <- NULL
+      dnorm <- NULL
+      logn <- NULL
+      dlnorm <- NULL
+      boxCox <- NULL
+      tbs <- NULL
+      yeoJohnson <- NULL
+      tbsYJ <- NULL
+      for(i in 1:sum((names(th) %in% names(model[[1]])))) 
+        assign(names(th[names(th) %in% names(model[[1]])])[i], as.numeric(th[names(th) %in% names(model[[1]])])[i])
+      
+      
+      if (!is.null(pow2)) {prop <- pow; pow <- pow2}
+      if (!is.null(norm)) add <- norm
+      if (!is.null(dnorm)) add <- dnorm
+      if (!is.null(logn) | !is.null(dlnorm)) lambda <- 0
+      if (!is.null(boxCox) | !is.null(tbs)) lambda <- boxCox
+      if (!is.null(yeoJohnson) | !is.null(tbsYJ)) lambda <- yeoJohnson
+      
+      # predictted and observed values from RxODE
+      #yp = s[rows,x["pred"]]
+      yp = s[,x["pred"]]
+      yo = data[, x["dv"]]
+      
+      # Transform both sides (used for non-normal residuals) ######### may need to implement nlmixr::coxBox and nlmixr::yeoJohnson
+      boxCox = function (x, lambda) {
+        if(lambda == 0) {
+          .h.x <- log(x)
+        }
+        else {
+          .h.x <- (x^lambda-1)/lambda
+        }
+        return(.h.x)
+      }
+      yeoJohnson = function (x, lambda){
+        options(warn=-1)
+        .h.x <- ifelse (x >= 0,
+                        ifelse (lambda != 0 & x >= 0, 
+                                ((x + 1)^lambda - 1)/lambda, 
+                                log(x + 1)),
+                        ifelse (lambda != 2 & x < 0, 
+                                -((-x+1)^(2-lambda)-1)/(2-lambda), 
+                                -log(-x+1))
+        )
+        options(warn=0)
+        return(.h.x)
+      }
+      
+      # boxCox Transform or log-normal transform
+      if ("boxCox" %in% names(model[[1]]) | "tbs" %in% names(model[[1]]) | "logn" %in% names(model[[1]]) | "dlnorm" %in% names(model[[1]])) {
+        .h.x <- boxCox(yo, lambda) # obs
+        .h.y <- boxCox(yp, lambda) # pred
+        .h.y.var <- yp^(2*pow)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+        
+        # boxCox transformed -2 log-likelihood
+        .boxCox.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
+        
+        # back-transformed  -2 log-likelihood function, with penalty added
+        .n2ll = .boxCox.n2ll - 2*(lambda-1)*log(yo) -2*log(2*pi)
+        
+        # negative log-likelihood function for output
+        ll = .5*(.n2ll)
+      }
+      # yeoJohnson Transform
+      else if("yeoJohnson" %in% names(model[[1]]) | "tbsYJ" %in% names(model[[1]])) {
+        .h.x <- yeoJohnson(yo, lambda) #obs
+        .h.y <- yeoJohnson(yp, lambda) #pred
+        .h.y.var <- yp^(2*pow)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+        
+        # yeoJohnson transformed -2 log-likelihood
+        .yeoJohnson.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
+        
+        # back-transformed  -2 log-likelihood function, with penalty added
+        .n2ll <- ifelse(yo >= 0, 
+                        .yeoJohnson.n2ll -2*((lambda-1)*log(yo+1) -2*log(2*pi)),
+                        .yeoJohnson.n2ll -2*((1-lambda)*log(-yo+1) -2*log(2*pi))
+        )
+        
+        # negative log-likelihood function for output
+        ll = .5*(.n2ll)
+      }
+      # all other error models
+      else{
+        
+        sgy = thresh(add) + thresh(prop)*yp^(pow)
+        ll = .5*((yo - yp)^2/(sgy^2) + 2*log(sgy) + log(2*pi))
+      }
+      sum(ll)
+    })
+    do.call("sum", l)  # same as return(as.numeric(l)), l is a list for each value in the model?
+  }
   
   
   # Scaling functions -----------------------------------------------------------------------
-  	# normType assignment for scaling (normalization type)
-  	if (normType == "constant") {
-  	  C1 = 0
-  	  C2 = 1
-  	} else if (normType == "rescale2") {
-  	  C1 = (max(inits) + min(inits))/2
-  	  C2 = (max(inits) - min(inits))/2
-  	} else if (normType == "mean") {
-  	  C1 = mean(inits)
-  	  C2 = max(inits) - min(inits)
-  	} else if (normType == "rescale") {
-  	  C1 = min(inits)
-  	  C2 = max(inits) - min(inits)
-  	} else if (normType == "std") {
-  	  C1 = mean(inits)
-  	  C2 = sd(inits)
-  	} else if (normType == "len") {
-  	  C1 = 0
-  	  C2 = sqrt(sum(inits*inits))
-  	}
-  	
-  	# scaleC assignment for scaling (adopted from foceFIT.R)
-  	if (is.null(scaleC) | length(scaleC) < length(inits)){
-  	  scaleC <- rep(1, length(inits))
-  	} else {
-  	  scaleC <- as.double(scaleC);
-  	  if (length(inits) > length(scaleC)){
-  	    scaleC <- c(scaleC, rep(1, length(inits) - length(scaleC)));
-  	  } else if (length(inits) < length(scaleC)){
-  	    scaleC <- scaleC[seq(1, length(inits))];
-  	    warning("scaleC control option has more options than estimated parameters, please check.")
-  	  }
-  	}	
-  	
-    # Function for scaling parameters based on scaleType
-    scalePar <- function(x, i){
-    	if (scaleType == "norm") { # simple scaling
-    	  return((x[i]-C1)/C2)
-    	}	else if (scaleType == "nlmixr") { 	# nlmixr
-    	  scaleTo = (inits[i] - C1)/C2
-    	  return((x[i] - inits[i])/scaleC[i] + scaleTo)
-    	}	else if (scaleType == "mult") { # simple multiplicatice scaling
-    	    if (scaleTo > 0) {
-    	      return(x[i]/inits[i]*scaleTo)
-    	    } else {
-    	      return(x[i])
-    	    }
-    	} else if (scaleType == "multAdd") { # log non-log multiplicative scaling
-        if(scaleTo > 0) {
-          return((x[i]-inits[i]) + scaleTo)
-        } else {
-          return(x[i]/inits[i]*scaleTo)
-        }
-      } else { # When should this be used? "norm" scaling is essentially no scaling when normType specified.
-        if(scaleTo > 0) {
-          return((x[i] - inits[i]) + scaleTo)
-        } else {
-          return(x[i])
-        }
+  # normType assignment for scaling (normalization type)
+  if (normType == "constant") {
+    C1 = 0
+    C2 = 1
+  } else if (normType == "rescale2") {
+    C1 = (max(inits) + min(inits))/2
+    C2 = (max(inits) - min(inits))/2
+  } else if (normType == "mean") {
+    C1 = mean(inits)
+    C2 = max(inits) - min(inits)
+  } else if (normType == "rescale") {
+    C1 = min(inits)
+    C2 = max(inits) - min(inits)
+  } else if (normType == "std") {
+    C1 = mean(inits)
+    C2 = sd(inits)
+  } else if (normType == "len") {
+    C1 = 0
+    C2 = sqrt(sum(inits*inits))
+  }
+  
+  # scaleC assignment for scaling (adopted from foceFIT.R)
+  if (is.null(scaleC) | length(scaleC) < length(inits)){
+    scaleC <- rep(1, length(inits))
+  } else {
+    scaleC <- as.double(scaleC);
+    if (length(inits) > length(scaleC)){
+      scaleC <- c(scaleC, rep(1, length(inits) - length(scaleC)));
+    } else if (length(inits) < length(scaleC)){
+      scaleC <- scaleC[seq(1, length(inits))];
+      warning("scaleC control option has more options than estimated parameters, please check.")
+    }
+  }	
+  
+  # Function for scaling parameters based on scaleType
+  scalePar <- function(x, i){
+    if (scaleType == "norm") { # simple scaling
+      return((x[i]-C1)/C2)
+    }	else if (scaleType == "nlmixr") { 	# nlmixr
+      scaleTo = (inits[i] - C1)/C2
+      return((x[i] - inits[i])/scaleC[i] + scaleTo)
+    }	else if (scaleType == "mult") { # simple multiplicatice scaling
+      if (scaleTo > 0) {
+        return(x[i]/inits[i]*scaleTo)
+      } else {
+        return(x[i])
+      }
+    } else if (scaleType == "multAdd") { # log non-log multiplicative scaling
+      if(scaleTo > 0) {
+        return((x[i]-inits[i]) + scaleTo)
+      } else {
+        return(x[i]/inits[i]*scaleTo)
+      }
+    } else { # When should this be used? "norm" scaling is essentially no scaling when normType specified.
+      if(scaleTo > 0) {
+        return((x[i] - inits[i]) + scaleTo)
+      } else {
+        return(x[i])
       }
     }
-  	
-    # Function for unscaling parameters based on scaleType
-    unscalePar <- function(x, i){
-  	  if (scaleType == "norm") { # simple scaling
-  	    return(x[i]*C2+C1);
-  	  } else if (scaleType == "nlmixr") { 	  # nlmixr
-  	    scaleTo = (inits[i] - C1)/C2
-  	    return((x[i] - scaleTo)*scaleC[i] + inits[i])
-  	  } else if (scaleType == "mult") { 	  # simple multiplicatice scaling
-  	    if (scaleTo > 0) {
-  	      return(x[i]*inits[i]/scaleTo)
-  	    } else {
-  	      return(x[i])
-  	    }
-  	  } else if (scaleType == "multAdd") { # log non-log multiplicative scaling
-  	    if(scaleTo > 0) {
-  	      return((x[i]- scaleTo) + inits[i])
-  	    } else {
-  	      return(x[i]*inits[i]/scaleTo)
-  	    }
-  	  } else { # When should this be used? "norm" scaling is essentially no scaling when normType specified.
-  	    if(scaleTo > 0) {
-  	      return((x[i]-scaleTo)*1 + inits[i])
-  	    } else {
-  	      return(x[i])
-  	    }
-  	  }
-  	}
+  }
+  
+  # Function for unscaling parameters based on scaleType
+  unscalePar <- function(x, i){
+    if (scaleType == "norm") { # simple scaling
+      return(x[i]*C2+C1);
+    } else if (scaleType == "nlmixr") { 	  # nlmixr
+      scaleTo = (inits[i] - C1)/C2
+      return((x[i] - scaleTo)*scaleC[i] + inits[i])
+    } else if (scaleType == "mult") { 	  # simple multiplicatice scaling
+      if (scaleTo > 0) {
+        return(x[i]*inits[i]/scaleTo)
+      } else {
+        return(x[i])
+      }
+    } else if (scaleType == "multAdd") { # log non-log multiplicative scaling
+      if(scaleTo > 0) {
+        return((x[i]- scaleTo) + inits[i])
+      } else {
+        return(x[i]*inits[i]/scaleTo)
+      }
+    } else { # When should this be used? "norm" scaling is essentially no scaling when normType specified.
+      if(scaleTo > 0) {
+        return((x[i]-scaleTo)*1 + inits[i])
+      } else {
+        return(x[i])
+      }
+    }
+  }
   
   # Scale --------------
-  	if(normType != "constant" & scaleType != "norm"){
-  	    # scaled the initial conditions
-    	  inits.temp <- numeric(length(inits))
-    	  for(i in 1:length(inits)){inits.temp[i] <- scalePar(inits,i)}
-    	  .inits <- inits.temp
-      	# scaled lower boundary
-      	if (is.null(lower)==FALSE){
-      	  if (any(lower == -Inf)) {
-      	    lower[which(lower==-Inf)]=0
-      	    warning("Lower boundary of -Inf set to 0.")
-      	  } 
-      	  lower.temp <- numeric(length(lower))
-      	  for(i in 1:length(lower)){lower.temp[i] <- scalePar(lower,i)}
-      	  .lower <- lower.temp
-      	} else {.lower <- NULL}
-      	# scaled upper boundary
-      	if (is.null(upper)==FALSE){
-      	  upper.temp <- numeric(length(upper))
-      	  for(i in 1:length(upper)){upper.temp[i] <- scalePar(upper,i)}
-      	  .upper <- upper.temp
-      	} else {.upper <- NULL}
-  	} else {
-  	  .inits <- inits
-  	  .lower <- lower
-  	  .upper <- upper
-  	}
-      	
+  if(normType != "constant" & scaleType != "norm"){
+    # scaled the initial conditions
+    inits.temp <- numeric(length(inits))
+    for(i in 1:length(inits)){inits.temp[i] <- scalePar(inits,i)}
+    .inits <- inits.temp
+    # scaled lower boundary
+    if (is.null(lower)==FALSE){
+      if (any(lower == -Inf)) {
+        lower[which(lower==-Inf)]=0
+        warning("Lower boundary of -Inf set to 0.")
+      } 
+      lower.temp <- numeric(length(lower))
+      for(i in 1:length(lower)){lower.temp[i] <- scalePar(lower,i)}
+      .lower <- lower.temp
+    } else {.lower <- NULL}
+    # scaled upper boundary
+    if (is.null(upper)==FALSE){
+      upper.temp <- numeric(length(upper))
+      for(i in 1:length(upper)){upper.temp[i] <- scalePar(upper,i)}
+      .upper <- upper.temp
+    } else {.upper <- NULL}
+  } else {
+    .inits <- inits
+    .lower <- lower
+    .upper <- upper
+  }
+  
   # Optimization -----------------------------------------------------------------------
-  	if (method =="bobyqa") {
-  	  # remove any control elements not required in bobyqa()
-  	  if (is.null(control$npt)) control$npt <- c(npt = length(.inits)*2 + 1)  #Throws a warning
-  	  .control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint")] #"maxfun"
-  	  # Run bobyqa optimization
-  	  fit = minqa::bobyqa(par=.inits, fn=obj, lower=.lower, upper=.upper, control=.control)
-  	  fit$value <- fit$fval
-  	} else if (method=="lbfgsb3c") {
-  	  # remove any control elements not required in lbfgsb3c()
-  	  lbfgsb3c.control <- list(trace=NULL,factr=NULL,pgtol=NULL,abstol=NULL,reltol=NULL,lmm=NULL,maxit=NULL,iprint=NULL)
-  	  if (any(names(lbfgsb3c.control) %in% names(control))) {
-  	    .control = control[match(names(lbfgsb3c.control),names(control))[!is.na(match(names(lbfgsb3c.control),names(control)))]]
-  	  } else{.control=NULL}
-  	  # Run lbfbsb3c optimization
-  		fit = lbfgsb3c::lbfgsb3c(par = as.vector(.inits), fn=obj, lower=.lower, upper=.upper, control=.control)
-  	} else if (method=="Nelder-Mead") {
-  	  # Run Nelder-Mead optimization
-  	  fit = mymin(as.vector(.inits), obj, control=control)
-  	  fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
-  	} else {
-  		if ("ftol_rel" %in% names(control)) {
-  			control$rel.tol = control$ftol_rel
-  			control$ftol_rel = NULL
-  		}
-  		if ("maxeval" %in% names(control)) {
-  			control$eval.max = control$maxeval
-  			control$maxeval = NULL
-  		}
-  	  # Run nlminb (PORT) optimization
-  	  nlminb.control <- list(eval.max=NULL,iter.max=NULL,trace=NULL,abs.tol=NULL,rel.tol=NULL,x.tol=NULL,
-  	                         xf.tol=NULL,step.min=NULL, step.max=NULL,sing.tol=NULL,scale.init=NULL,diff.g=NULL)
-  	  if (any(names(nlminb.control) %in% names(control))) {
-  	    .control = control[match(names(nlminb.control),names(control))[!is.na(match(names(nlminb.control),names(control)))]]
-  	  } else{.control=NULL}
-  		fit = nlminb(start = as.vector(.inits), objective = obj, gradient = NULL, hessian = NULL, 
-  		             scale = 1, control=.control, lower = .lower, upper = .upper)
-  	}
+  if (method =="bobyqa") {
+    # remove any control elements not required in bobyqa()
+    if (is.null(control$npt)) control$npt <- c(npt = length(.inits)*2 + 1)
+    .control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint")] #"maxfun"
+    # Run bobyqa optimization
+    fit = minqa::bobyqa(par=.inits, fn=obj, lower=.lower, upper=.upper, control=.control)
+    fit$value <- fit$fval
+  } else if (method=="lbfgsb3c") {
+    # remove any control elements not required in lbfgsb3c()
+    #lbfgsb3c.control <- list(trace=-1,factr=1e7,pgtol=0,abstol=0,reltol=0,lmm=5,maxit=99999,iprint=-1)
+    #lbfgsb3c.control  <- c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")
+    #if (any(names(lbfgsb3c.control) %in% names(control))) {
+    #   .control = control[match(names(lbfgsb3c.control),names(control))[!is.na(match(names(lbfgsb3c.control),names(control)))]]
+    # } else{.control=NULL}
+    #.control <- control[names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")] #"maxfun"
+    
+    # Run lbfbsb3c optimization
+    fit = lbfgsb3c::lbfgsb3c(par = as.vector(.inits), fn=obj, lower=.lower, upper=.upper, gr=NULL)#, control=.control, gr=NULL)
+    
+  } else if (method=="Nelder-Mead") {
+    # Run Nelder-Mead optimization
+    fit = mymin(as.vector(.inits), obj, control=control)
+    fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
+  } else {
+    if ("ftol_rel" %in% names(control)) {
+      control$rel.tol = control$ftol_rel
+      control$ftol_rel = NULL
+    }
+    if ("maxeval" %in% names(control)) {
+      control$eval.max = control$maxeval
+      control$maxeval = NULL
+    }
+    # Run nlminb (PORT) optimization
+    nlminb.control <- list(eval.max=NULL,iter.max=NULL,trace=NULL,abs.tol=NULL,rel.tol=NULL,x.tol=NULL,
+                           xf.tol=NULL,step.min=NULL, step.max=NULL,sing.tol=NULL,scale.init=NULL,diff.g=NULL)
+    if (any(names(nlminb.control) %in% names(control))) {
+      .control = control[match(names(nlminb.control),names(control))[!is.na(match(names(nlminb.control),names(control)))]]
+    } else{.control=NULL}
+    fit = nlminb(start = as.vector(.inits), objective = obj, gradient = NULL, hessian = NULL, 
+                 scale = 1, control=.control, lower = .lower, upper = .upper)
+  }
   
   # Hessian -----------------------------------------------------------------------
-    fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
-  	
-  	if(inherits(fit$hessian,"try-error")){
-  	  se = rep(NA, length(fit$par))
-  	  warning("standard error of the Hessian has failed")
-  	} else {
-  	  se = sqrt(diag(solve(fit$hessian)))
-  	}
-  	
+  
+  # Change each add and prop to positive
+  fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
+  
+  if(inherits(fit$hessian,"try-error")){
+    se = rep(NA, length(fit$par))
+    warning("standard error of the Hessian has failed")
+  } else {
+    se = sqrt(diag(solve(fit$hessian)))
+  }
+  
   
   # dynmodel() Output -------------------------------------------------------
-    # unscale optmized parameters here if scaling was used:
-    if(normType != "constant" & scaleType != "norm"){
-      par.temp <- numeric(length(fit$par))
-      for (i in 1:length(par.temp)) {par.temp[i] <- unscalePar(fit$par,i)}
-      fit$par <- par.temp
-    }
-    
-    # create table for output
-    res = cbind(fit$par, se, se/fit$par*100)
-  	dimnames(res) = list(names(inits), c("est", "se", "%cv"))
-  	
-  	# ??
-  	nobs = 0
-  	l = lapply(model, function(x) {
-  		yo =  data[,model[[1]]["dv"][[1]]]#data[, x["dv"]]
-  		nobs <<- nobs + length(yo)
-  	})
-  	if (!is.null(fit$objective)) fit$value = fit$objective
-  	
-  	# Output
-  	res = c(list(res=res, obj=obj, npar=length(fit$par), nobs=nobs, data=data), fit)
-  	class(res) = "dyn.ID"
-  	res
+  # unscale optmized parameters here if scaling was used:
+  if(normType != "constant" & scaleType != "norm"){
+    par.temp <- numeric(length(fit$par))
+    for (i in 1:length(par.temp)) {par.temp[i] <- unscalePar(fit$par,i)}
+    fit$par <- par.temp
+  }
+  
+  # create table for output
+  res = cbind(fit$par, se, se/fit$par*100)
+  dimnames(res) = list(names(inits), c("est", "se", "%cv"))
+  
+  # ??
+  nobs = 0
+  l = lapply(model, function(x) {
+    yo =  data[,model[[1]]["dv"][[1]]]#data[, x["dv"]]
+    nobs <<- nobs + length(yo)
+  })
+  if (!is.null(fit$objective)) fit$value = fit$objective
+  
+  # Output
+  res = c(list(res=res, obj=obj, npar=length(fit$par), nobs=nobs, data=data), fit)
+  class(res) = "dyn.ID"
+  res
 }
 
-####----
+# #########################################################################
 
+
+
+
+
+# ####################################################################### #
+#
+## MCMC Section
+#
+# ####################################################################### #
 uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
 {
 	if (is.null(rho)) rho = environment(fr)
 	.Call(slice_wrap, fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
 }
-
 
 genobj = function(system, model, evTable, inits, data, fixPars=NULL
 	)
@@ -981,11 +1034,7 @@ do.slice = function(pars, fr0)
 	pars
 }
 
-
-
-
-
-
+# dynmodel.mcmc() ---------------------------------------------------------
 #' Fit a non-population dynamic model using mcmc
 #'
 #' Fit a non-population dynamic model using mcmc
@@ -1102,10 +1151,14 @@ plot.dyn.mcmc = function(x, ...)
 	fit = list(obj=attr(x, "obj"), par=apply(x, 2, mean))
 	gof(fit)
 }
+# #########################################################################
 
 
-
+# ####################################################################### #
+#
 ## Utilities for building nlmixr
+#
+# ####################################################################### #
 
 refresh <- function(){
     ## nocov start
@@ -1118,6 +1171,9 @@ nsis <- function(){ ## build installer...
     source(devtools::package_file("build/nsis.R"))
     ## nocov end
 }
+
+
+# .collectWarnings --------------------------------------------------------
 ##' Collect warnings and just warn once.
 ##'
 ##' @param expr R expression
@@ -1142,7 +1198,9 @@ nsis <- function(){ ## build installer...
         return(ret);
     }
 }
+# #########################################################################
 
+# nlmixrPrint() -----------------------------------------------------------
 ##' Print x using the message facility
 ##'
 ##' This allows the suppressMessages to work on print functions.  This
@@ -1161,6 +1219,7 @@ nlmixrPrint <- function(x, ...){
     message(invisible(paste(R.utils::captureOutput(assign("x", print(x, ...), this.env)), collapse="\n")), appendLF=TRUE);
     invisible(x)
 }
+# #########################################################################
 
 .dontRun <- function(...){
     ## This is for r checks, though they need to be loaded...
@@ -1168,6 +1227,7 @@ nlmixrPrint <- function(x, ...){
     dparser::dparse(...)
 }
 
+# cholSE() ----------------------------------------------------------------
 ##' Generalized Cholesky Matrix Decomposition
 ##'
 ##'  Performs a (modified) Cholesky factorization of the form
@@ -1202,6 +1262,7 @@ nlmixrPrint <- function(x, ...){
 cholSE <- function(matrix, tol=(.Machine$double.eps) ^ (1 / 3)){
     .Call(`_nlmixr_cholSE_`, matrix, tol);
 }
+# #########################################################################
 
 .setRoot <- function(){
     setwd("c:/");
