@@ -450,7 +450,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
   }
   
   # Error model  -------------------------------------------------------------
-  if (class(model)=="formula") {
+   if (class(model)=="formula") {
     model = list(model)
   }
   inits.err = NULL
@@ -458,6 +458,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     .model = unlist(lapply(attr(terms(.model),"variables"), as.list))
     .model = sapply(.model, deparse)
     
+
     # assign error terms    
     .sigma.add = if("add" %in% .model) {
       as.numeric(.model[which(.model=="add")+1])
@@ -471,7 +472,6 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       as.numeric(.model[which(.model=="pow")+1])
     } else{NULL}
     
-    # I don't think this is used
     .sigma.pow2 = if("pow2" %in% .model) {
       as.numeric(.model[which(.model=="pow2")+1])
     } else{NULL}
@@ -483,8 +483,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     .sigma.boxCox = if("boxCox" %in% .model) {
       as.numeric(.model[which(.model=="boxCox")+1])
     } else{NULL}
-    
-    # need to create objective functions for these
+
     .sigma.norm = if("norm" %in% .model) {
       as.numeric(.model[which(.model=="norm")+1])
     } else{NULL}
@@ -510,53 +509,58 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     } else{NULL}
     
     # keep error model terms
-    inits.err <- c(add=.sigma.add, prop=.sigma.prop, pow=.sigma.pow, yeoJohnson=.sigma.yeoJohnson, boxCox=.sigma.boxCox,
+    inits.err <- c(add=.sigma.add, prop=.sigma.prop, pow=.sigma.pow, pow2=.sigma.pow2, yeoJohnson=.sigma.yeoJohnson, boxCox=.sigma.boxCox,
                    norm=.sigma.norm, dnorm=.sigma.dnorm, logn=.sigma.logn, dlnorm=.sigma.dlnorm, tbs=.sigma.tbs, tbsYj=.sigma.tbs)
     
     inits.err <- inits.err[which(names(inits.err) %in% intersect(names(inits.err),.model))]
     inits.err <<- inits.err
     .model <- c("dv" = .model[2], "pred" = .model[3], inits.err)
+    
+    # error message for using power function
+   
   })
   
   inits = c(inits, inits.err)
-  
+  if("pow2" %in% names(inits) & !("pow" %in% names(inits))){stop("Error Model: pow must be defined when using pow2")}
+
+
   # Check dynmodel() inputs, Define vars, modelVars, pars,  ------------
-  # Check to make sure all there is consistency between error model, data. inits, and ODE model
-  
-  # Error "model" contains "data" variables?
-  # get column names of data (Time and Observation)
-  vars = names(data)
-  # check to see if there is a discrepency between error model names and data
-  nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
-  # print error message
-  if (length(nodef)) {
-    msg = err.msg(nodef, pre="var(s) not found in data: ")
-    stop(msg)
-  }
-  
-  # "system" variables contain error "model" variables?
-  # obtain all variables from the system 
-  modelVars = system$cmpMgr$get.modelVars()
-  # reassign vars to combine state and lhs variables
-  vars = c(modelVars$state, modelVars$lhs)
-  # Check to see if the prediction term is in the error model
-  nodef = setdiff(sapply(model, function(x) x["pred"]), vars)
-  # print error message
-  if (length(nodef)) {
-    msg = err.msg(nodef, pre="modelVar(s) not found in model: ")
-    stop(msg)
-  }
-  
-  #  "system" variables contain estimated "init" variables and fixed "fixPars" variables?
-  # obtain fixed and estimated parameters
-  pars = modelVars$params
-  # Check to see if there are values in pars, that are not in the initial conditions and fixed parameters
-  nodef = setdiff(pars, c(names(inits), names(fixPars)))
-  # print error message
-  if (length(nodef)) {
-    msg = err.msg(nodef, pre="par(s) not found: ")
-    stop(msg)
-  }
+    # Check to make sure all there is consistency between error model, data. inits, and ODE model
+    
+    # Error "model" contains "data" variables?
+    # get column names of data (Time and Observation)
+    vars = names(data)
+    # check to see if there is a discrepency between error model names and data
+    nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
+    # print error message
+    if (length(nodef)) {
+      msg = err.msg(nodef, pre="var(s) not found in data: ")
+      stop(msg)
+    }
+    
+    # "system" variables contain error "model" variables?
+    # obtain all variables from the system 
+    modelVars = system$cmpMgr$get.modelVars()
+    # reassign vars to combine state and lhs variables
+    vars = c(modelVars$state, modelVars$lhs)
+    # Check to see if the prediction term is in the error model
+    nodef = setdiff(sapply(model, function(x) x["pred"]), vars)
+    # print error message
+    if (length(nodef)) {
+      msg = err.msg(nodef, pre="modelVar(s) not found in model: ")
+      stop(msg)
+    }
+    
+    #  "system" variables contain estimated "init" variables and fixed "fixPars" variables?
+    # obtain fixed and estimated parameters
+    pars = modelVars$params
+    # Check to see if there are values in pars, that are not in the initial conditions and fixed parameters
+    nodef = setdiff(pars, c(names(inits), names(fixPars)))
+    # print error message
+    if (length(nodef)) {
+      msg = err.msg(nodef, pre="par(s) not found: ")
+      stop(msg)
+    }
   
   # Additional assignment ---------------------------------------------------
   # number of estimated parameters, excluding the error terms
@@ -598,7 +602,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       add <- 0
       prop <- 0
       pow <- 1
-      pow2 <- NULL
+      pow2 <- 1
       norm <- NULL
       dnorm <- NULL
       logn <- NULL
@@ -609,16 +613,16 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       tbsYJ <- NULL
       for(i in 1:sum((names(th) %in% names(model[[1]])))) 
         assign(names(th[names(th) %in% names(model[[1]])])[i], as.numeric(th[names(th) %in% names(model[[1]])])[i])
-      
-      
-      if (!is.null(pow2)) {prop <- pow; pow <- pow2}
+    
       if (!is.null(norm)) add <- norm
       if (!is.null(dnorm)) add <- dnorm
       if (!is.null(logn) | !is.null(dlnorm)) lambda <- 0
-      if (!is.null(boxCox) | !is.null(tbs)) lambda <- boxCox
-      if (!is.null(yeoJohnson) | !is.null(tbsYJ)) lambda <- yeoJohnson
+      if (!is.null(boxCox)) lambda <- boxCox
+      if (!is.null(tbs)) lambda <- tbs
+      if (!is.null(yeoJohnson)) lambda <- thresh(yeoJohnson)
+      if (!is.null(tbsYJ)) lambda <- thresh(tbsYJ)
       
-      # predictted and observed values from RxODE
+     # predictted and observed values from RxODE
       #yp = s[rows,x["pred"]]
       yp = s[,x["pred"]]
       yo = data[, x["dv"]]
@@ -649,10 +653,12 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       
       # boxCox Transform or log-normal transform
       if ("boxCox" %in% names(model[[1]]) | "tbs" %in% names(model[[1]]) | "logn" %in% names(model[[1]]) | "dlnorm" %in% names(model[[1]])) {
+
         .h.x <- boxCox(yo, lambda) # obs
         .h.y <- boxCox(yp, lambda) # pred
-        .h.y.var <- yp^(2*pow)*thresh(prop)^2 + thresh(add)^2  # variance of pred
         
+        .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+
         # boxCox transformed -2 log-likelihood
         .boxCox.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
         
@@ -664,33 +670,48 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       }
       # yeoJohnson Transform
       else if("yeoJohnson" %in% names(model[[1]]) | "tbsYJ" %in% names(model[[1]])) {
-        .h.x <- yeoJohnson(yo, lambda) #obs
-        .h.y <- yeoJohnson(yp, lambda) #pred
-        .h.y.var <- yp^(2*pow)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+        
+print(th)
+print(paste("add=",add))
+print(paste("prop=",prop))
+print(paste("pow=",pow))
+print(paste("pow2=",pow2))
+print(paste("lambda=",lambda))
+
+        .h.x <- yeo.johnson(yo, lambda) #obs
+        .h.y <- yeo.johnson(yp, lambda) #pred
+        
+        # used if prop is declared in error model
+        if(prop>0 & !("pow2" %in% names(model[[1]]))){coef <- prop} else (coef <- pow)
+        
+        .h.y.var <- yp^(2*pow2)*thresh(coef)^2 + thresh(add)^2  # variance of pred
         
         # yeoJohnson transformed -2 log-likelihood
         .yeoJohnson.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
         
         # back-transformed  -2 log-likelihood function, with penalty added
         .n2ll <- ifelse(yo >= 0, 
-                        .yeoJohnson.n2ll -2*((lambda-1)*log(yo+1) -2*log(2*pi)),
-                        .yeoJohnson.n2ll -2*((1-lambda)*log(-yo+1) -2*log(2*pi))
+                        .yeoJohnson.n2ll -2*(lambda-1)*log(yo+1) -2*log(2*pi),
+                        .yeoJohnson.n2ll -2*(1-lambda)*log(-yo+1) -2*log(2*pi)
         )
-        
+
         # negative log-likelihood function for output
         ll = .5*(.n2ll)
       }
       # all other error models
-      else{
-        
-        sgy = thresh(add) + thresh(prop)*yp^(pow)
-        ll = .5*((yo - yp)^2/(sgy^2) + 2*log(sgy) + log(2*pi))
+      else if ("pow2" %in% names(model[[1]])) {
+        sgy = thresh(add) + thresh(pow)*yp^(pow2)
+        ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
+      }
+      else {
+        sgy = thresh(add) + thresh(prop)*yp
+        ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
       }
       sum(ll)
     })
     do.call("sum", l)  # same as return(as.numeric(l)), l is a list for each value in the model?
   }
-  
+
   
   # Scaling functions -----------------------------------------------------------------------
   # normType assignment for scaling (normalization type)
@@ -855,17 +876,22 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
   }
   
   # Hessian -----------------------------------------------------------------------
-  
-  # Change each add and prop to positive
-  fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
-  
-  if(inherits(fit$hessian,"try-error")){
-    se = rep(NA, length(fit$par))
-    warning("standard error of the Hessian has failed")
-  } else {
-    se = sqrt(diag(solve(fit$hessian)))
-  }
-  
+assign("FIT",fit$par, envir = .GlobalEnv)
+    fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
+    
+    if(inherits(fit$hessian,"try-error")){
+      se = rep(NA, length(fit$par))
+      warning("standard error of the Hessian has failed")
+    } else {
+      se = sqrt(diag(solve(fit$hessian)))
+    }
+    
+  # reassign the negative values to positive for add, prop/pow since they are standard deviations
+    if (!is.na(match("add",names(inits)))) fit$par[match("add",names(inits))] = abs(fit$par[match("add",names(inits))])
+    if (!is.na(match("prop",names(inits)))) fit$par[match("prop",names(inits))] = abs(fit$par[match("prop",names(inits))])
+    if (!is.na(match("pow",names(inits)))) fit$par[match("pow",names(inits))] = abs(fit$par[match("pow",names(inits))])
+
+ 
   
   # dynmodel() Output -------------------------------------------------------
   # unscale optmized parameters here if scaling was used:
@@ -876,7 +902,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
   }
   
   # create table for output
-  res = cbind(fit$par, se, se/fit$par*100)
+  res = cbind(fit$par, abs(se), abs(se/fit$par*100))
   dimnames(res) = list(names(inits), c("est", "se", "%cv"))
   
   # ??
@@ -891,6 +917,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
   res = c(list(res=res, obj=obj, npar=length(fit$par), nobs=nobs, data=data), fit)
   class(res) = "dyn.ID"
   res
+
 }
 
 # #########################################################################
