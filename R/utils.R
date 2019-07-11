@@ -517,7 +517,6 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     .model <- c("dv" = .model[2], "pred" = .model[3], inits.err)
     
     # error message for using power function
-   
   })
   
   inits = c(inits, inits.err)
@@ -611,16 +610,22 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       tbs <- NULL
       yeoJohnson <- NULL
       tbsYJ <- NULL
-      for(i in 1:sum((names(th) %in% names(model[[1]])))) 
-        assign(names(th[names(th) %in% names(model[[1]])])[i], as.numeric(th[names(th) %in% names(model[[1]])])[i])
-    
+
+      # assign names sigma names
+
+      if(any(names(th) %in% names(model[[1]]))){
+        for(i in 1:sum((names(th) %in% names(model[[1]])))) {
+          assign(names(th[names(th) %in% names(model[[1]])])[i], as.numeric(th[names(th) %in% names(model[[1]])])[i])
+        } 
+      }
+      
       if (!is.null(norm)) add <- norm
       if (!is.null(dnorm)) add <- dnorm
       if (!is.null(logn) | !is.null(dlnorm)) lambda <- 0
       if (!is.null(boxCox)) lambda <- boxCox
       if (!is.null(tbs)) lambda <- tbs
-      if (!is.null(yeoJohnson)) lambda <- thresh(yeoJohnson)
-      if (!is.null(tbsYJ)) lambda <- thresh(tbsYJ)
+      if (!is.null(yeoJohnson)) lambda <- yeoJohnson
+      if (!is.null(tbsYJ)) lambda <- tbsYJ
       
      # predictted and observed values from RxODE
       #yp = s[rows,x["pred"]]
@@ -653,12 +658,16 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       
       # boxCox Transform or log-normal transform
       if ("boxCox" %in% names(model[[1]]) | "tbs" %in% names(model[[1]]) | "logn" %in% names(model[[1]]) | "dlnorm" %in% names(model[[1]])) {
-
+        
         .h.x <- boxCox(yo, lambda) # obs
         .h.y <- boxCox(yp, lambda) # pred
         
-        .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
-
+        if("pow" %in% names(model[[1]])) {
+          .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
+        } else {
+          .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+        }
+        
         # boxCox transformed -2 log-likelihood
         .boxCox.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
         
@@ -671,21 +680,22 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       # yeoJohnson Transform
       else if("yeoJohnson" %in% names(model[[1]]) | "tbsYJ" %in% names(model[[1]])) {
         
-print(th)
-print(paste("add=",add))
-print(paste("prop=",prop))
-print(paste("pow=",pow))
-print(paste("pow2=",pow2))
-print(paste("lambda=",lambda))
-
         .h.x <- yeo.johnson(yo, lambda) #obs
         .h.y <- yeo.johnson(yp, lambda) #pred
-        
+
         # used if prop is declared in error model
-        if(prop>0 & !("pow2" %in% names(model[[1]]))){coef <- prop} else (coef <- pow)
-        
-        .h.y.var <- yp^(2*pow2)*thresh(coef)^2 + thresh(add)^2  # variance of pred
-        
+        if(prop>0 & !("pow2" %in% names(model[[1]]))){
+          coef <- prop
+        } else if (("pow2" %in% names(model[[1]])))  {
+          coef <- pow
+        }
+
+        if (prop==0 & is.null(pow)) {
+          .h.y.var <- 1
+        } else {
+          .h.y.var <- yp^(2*pow2)*thresh(coef)^2 + thresh(add)^2  # variance of pred
+        }
+
         # yeoJohnson transformed -2 log-likelihood
         .yeoJohnson.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
         
@@ -698,13 +708,18 @@ print(paste("lambda=",lambda))
         # negative log-likelihood function for output
         ll = .5*(.n2ll)
       }
-      # all other error models
+      # power model
       else if ("pow2" %in% names(model[[1]])) {
         sgy = thresh(add) + thresh(pow)*yp^(pow2)
         ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
       }
+      # all other error models
       else {
-        sgy = thresh(add) + thresh(prop)*yp
+        if (!any("add" %in% names(model[[1]])) & !any("prop" %in% names(model[[1]]))){
+          sgy = 1  
+        }else{
+          sgy = thresh(add) + thresh(prop)*yp
+        }
         ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
       }
       sum(ll)
@@ -876,7 +891,6 @@ print(paste("lambda=",lambda))
   }
   
   # Hessian -----------------------------------------------------------------------
-assign("FIT",fit$par, envir = .GlobalEnv)
     fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
     
     if(inherits(fit$hessian,"try-error")){
