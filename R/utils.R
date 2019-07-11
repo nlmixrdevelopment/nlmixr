@@ -494,11 +494,15 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     
     .sigma.logn = if("logn" %in% .model) {
       as.numeric(.model[which(.model=="logn")+1])
-    } else{NULL}
+      .logn <<- T
+    } else{NULL
+      .logn <<- NULL}
     
     .sigma.dlnorm = if("dlnorm" %in% .model) {
       as.numeric(.model[which(.model=="dlnorm")+1])
-    } else{NULL}
+      .dlnorm <<- T
+    } else{NULL
+      .dlnorm <<- NULL}
     
     .sigma.tbs = if("tbs" %in% .model) {
       as.numeric(.model[which(.model=="tbs")+1])
@@ -510,7 +514,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     
     # keep error model terms
     inits.err <- c(add=.sigma.add, prop=.sigma.prop, pow=.sigma.pow, pow2=.sigma.pow2, yeoJohnson=.sigma.yeoJohnson, boxCox=.sigma.boxCox,
-                   norm=.sigma.norm, dnorm=.sigma.dnorm, logn=.sigma.logn, dlnorm=.sigma.dlnorm, tbs=.sigma.tbs, tbsYj=.sigma.tbs)
+                   norm=.sigma.norm, dnorm=.sigma.dnorm, tbs=.sigma.tbs, tbsYj=.sigma.tbs)
     
     inits.err <- inits.err[which(names(inits.err) %in% intersect(names(inits.err),.model))]
     inits.err <<- inits.err
@@ -604,15 +608,12 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       pow2 <- 1
       norm <- NULL
       dnorm <- NULL
-      logn <- NULL
-      dlnorm <- NULL
       boxCox <- NULL
       tbs <- NULL
       yeoJohnson <- NULL
       tbsYJ <- NULL
 
       # assign names sigma names
-
       if(any(names(th) %in% names(model[[1]]))){
         for(i in 1:sum((names(th) %in% names(model[[1]])))) {
           assign(names(th[names(th) %in% names(model[[1]])])[i], as.numeric(th[names(th) %in% names(model[[1]])])[i])
@@ -621,12 +622,19 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       
       if (!is.null(norm)) add <- norm
       if (!is.null(dnorm)) add <- dnorm
-      if (!is.null(logn) | !is.null(dlnorm)) lambda <- 0
+      if (!is.null(.logn)) {
+        lambda <- 0
+        th <- th[names(th)!="logn"]
+      }
+      if (!is.null(dlnorm)) {
+        lambda <- 0
+        th <- th[names(th)!="dlnorm"]
+      }
       if (!is.null(boxCox)) lambda <- boxCox
       if (!is.null(tbs)) lambda <- tbs
       if (!is.null(yeoJohnson)) lambda <- yeoJohnson
       if (!is.null(tbsYJ)) lambda <- tbsYJ
-      
+
      # predictted and observed values from RxODE
       #yp = s[rows,x["pred"]]
       yp = s[,x["pred"]]
@@ -656,8 +664,28 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
         return(.h.x)
       }
       
-      # boxCox Transform or log-normal transform
-      if ("boxCox" %in% names(model[[1]]) | "tbs" %in% names(model[[1]]) | "logn" %in% names(model[[1]]) | "dlnorm" %in% names(model[[1]])) {
+      # log normal transformation 
+      if (!is.null(.logn) | !is.null(.dlnorm)){
+        .h.x <- log(yo) #boxCox(yo, lambda) # obs
+        .h.y <- log(yp) #boxCox(yp, lambda) # pred
+        
+        if("pow" %in% names(model[[1]])) {
+          .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
+        } else {
+          .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+        }
+        
+        # boxCox transformed -2 log-likelihood
+        .logn.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
+        
+        # back-transformed  -2 log-likelihood function, with penalty added
+        .n2ll = .logn.n2ll - 2*(0-1)*log(yo) -2*log(2*pi) # lambda is zero here
+        
+        # negative log-likelihood function for output
+        ll = .5*(.n2ll)
+      }
+      # boxCox Transform
+      else if ("boxCox" %in% names(model[[1]]) | "tbs" %in% names(model[[1]])) {
         
         .h.x <- boxCox(yo, lambda) # obs
         .h.y <- boxCox(yp, lambda) # pred
@@ -683,17 +711,21 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
         .h.x <- yeo.johnson(yo, lambda) #obs
         .h.y <- yeo.johnson(yp, lambda) #pred
 
-        # used if prop is declared in error model
-        if(prop>0 & !("pow2" %in% names(model[[1]]))){
-          coef <- prop
-        } else if (("pow2" %in% names(model[[1]])))  {
-          coef <- pow
-        }
-
-        if (prop==0 & is.null(pow)) {
+        # assign correct variance according to defined error model
+        if (!any("prop" %in% names(model[[1]]))  & !any("pow" %in% names(model[[1]])) ) {
           .h.y.var <- 1
+print('Here1')
+        } else if (any("prop" %in% names(model[[1]]))  & !any("pow" %in% names(model[[1]])) ) {
+          .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+
+          
+          cat("pow2",pow2)
+print('Here2')
+
         } else {
-          .h.y.var <- yp^(2*pow2)*thresh(coef)^2 + thresh(add)^2  # variance of pred
+          .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
+print('Here3')
+
         }
 
         # yeoJohnson transformed -2 log-likelihood
@@ -703,7 +735,10 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
         .n2ll <- ifelse(yo >= 0, 
                         .yeoJohnson.n2ll -2*(lambda-1)*log(yo+1) -2*log(2*pi),
                         .yeoJohnson.n2ll -2*(1-lambda)*log(-yo+1) -2*log(2*pi)
+                        
+                        
         )
+        if (yo>=0) print("y0>=0") else (print("yo<0"))
 
         # negative log-likelihood function for output
         ll = .5*(.n2ll)
@@ -869,6 +904,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     
   } else if (method=="Nelder-Mead") {
     # Run Nelder-Mead optimization
+    if (.lower > 0 | .upper >0){warning("Optimization: Boundaries not used in Nelder-Mead")}
     fit = mymin(as.vector(.inits), obj, control=control)
     fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
   } else {
