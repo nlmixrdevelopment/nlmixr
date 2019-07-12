@@ -642,36 +642,11 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       #yp = s[rows,x["pred"]]
       yp = s[,x["pred"]]
       yo = data[, x["dv"]]
-      
-      # Transform both sides (used for non-normal residuals) ######### may need to implement nlmixr::coxBox and nlmixr::yeoJohnson
-      
-      #boxCox = function (x, lambda) {
-        if(lambda == 0) {
-          .h.x <- log(x)
-        }
-        else {
-          .h.x <- (x^lambda-1)/lambda
-        }
-        return(.h.x)
-      }
-      #yeoJohnson = function (x, lambda){
-        options(warn=-1)
-        .h.x <- ifelse (x >= 0,
-                        ifelse (lambda != 0 & x >= 0, 
-                                ((x + 1)^lambda - 1)/lambda, 
-                                log(x + 1)),
-                        ifelse (lambda != 2 & x < 0, 
-                                -((-x+1)^(2-lambda)-1)/(2-lambda), 
-                                -log(-x+1))
-        )
-        options(warn=0)
-        return(.h.x)
-      }
 
       # log normal transformation 
       if (!is.null(.logn) | !is.null(.dlnorm)){
-        .h.x <- coxBox(yo, lambda) #log(yo) # obs
-        .h.y <- coxBox(yp, lambda) #log(yp)  # pred
+        .h.x <- boxCox(yo, lambda) #log(yo) # obs
+        .h.y <- boxCox(yp, lambda) #log(yp)  # pred
         
         if("pow" %in% names(model[[1]])) {
           .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
@@ -879,54 +854,26 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
   
   # Optimization -----------------------------------------------------------------------
   if (method =="bobyqa") {
-    # remove any control elements not required in bobyqa()
-    if (is.null(control$npt)) control$npt <- c(npt = length(.inits)*2 + 1)
-    .control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint")] #"maxfun"
-    # Run bobyqa optimization
-    fit = minqa::bobyqa(par=.inits, fn=obj, lower=.lower, upper=.upper, control=.control)
-    fit$value <- fit$fval
+      if (is.null(control$npt)) control$npt <- c(npt = length(.inits)*2 + 1)
+      .control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint")]
+      .control[sapply(.control, is.null)] <- NULL
+      fit = minqa::bobyqa(par=.inits, fn=obj, lower=.lower, upper=.upper, control=.control)
+      fit$value <- fit$fval
   } else if (method=="lbfgsb3c") {
-    # remove any control elements not required in lbfgsb3c()
-    #lbfgsb3c.control <- list(trace=-1,factr=1e7,pgtol=0,abstol=0,reltol=0,lmm=5,maxit=99999,iprint=-1)
-    #lbfgsb3c.control  <- c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")
-    #if (any(names(lbfgsb3c.control) %in% names(control))) {
-    #   .control = control[match(names(lbfgsb3c.control),names(control))[!is.na(match(names(lbfgsb3c.control),names(control)))]]
-    # } else{.control=NULL}
-    #.control <- control[names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")] #"maxfun"
-    
-    # Run lbfbsb3c optimization
-    fit = lbfgsb3c::lbfgsb3c(par = as.vector(.inits), fn=obj, lower=.lower, upper=.upper, gr=NULL)#, control=.control, gr=NULL)
-
-print("bobyqa")
-
+      .control <- control[names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")]
+      .control[sapply(.control, is.null)] <- NULL
+      fit = lbfgsb3c::lbfgsb3c(par = as.vector(.inits), fn=obj, lower=.lower, upper=.upper, gr=NULL, control=.control)
   } else if (method=="Nelder-Mead") {
-    # Run Nelder-Mead optimization
     if (.lower != -Inf | .upper != Inf){warning("Optimization: Boundaries not used in Nelder-Mead")}
-    fit = mymin(as.vector(.inits), obj, control=control)
-    fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
-    
-print("Nelder-Mead")
-    
+      fit = mymin(as.vector(.inits), obj, control=control)
+      fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
   } else {
-    
-print("lbfgsb3c")
-  
-    if ("ftol_rel" %in% names(control)) {
-      control$rel.tol = control$ftol_rel
-      control$ftol_rel = NULL
-    }
-    if ("maxeval" %in% names(control)) {
-      control$eval.max = control$maxeval
-      control$maxeval = NULL
-    }
-    # Run nlminb (PORT) optimization
-    nlminb.control <- list(eval.max=NULL,iter.max=NULL,trace=NULL,abs.tol=NULL,rel.tol=NULL,x.tol=NULL,
-                           xf.tol=NULL,step.min=NULL, step.max=NULL,sing.tol=NULL,scale.init=NULL,diff.g=NULL)
-    if (any(names(nlminb.control) %in% names(control))) {
-      .control = control[match(names(nlminb.control),names(control))[!is.na(match(names(nlminb.control),names(control)))]]
-    } else{.control=NULL}
-    fit = nlminb(start = as.vector(.inits), objective = obj, gradient = NULL, hessian = NULL, 
-                 scale = 1, control=.control, lower = .lower, upper = .upper)
+      .control <- control[names(control) %in% c("eval.max", "iter.max", "trace", "abs.tol",
+                                                "rel.tol","x.tol","xf.tol","step.min", "step.max","sing.tol","scale.init","diff.g")]
+      .control[sapply(.control, is.null)] <- NULL
+      if (.lower == -Inf ) .lower = 1e-12
+      fit = nlminb(start = .inits, objective = obj, gradient = NULL, hessian = NULL, 
+                   scale = 1, control=.control, lower = .lower, upper = .upper)
   }
   
   # Hessian -----------------------------------------------------------------------
