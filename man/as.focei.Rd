@@ -8,7 +8,7 @@
 as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
 
 \method{as.focei}{nlmixrNlme}(object, uif, pt = proc.time(), ..., data,
-  calcResid = TRUE)
+  calcResid = TRUE, nobs2 = 0)
 }
 \arguments{
 \item{object}{Fit object to convert to FOCEi-style fit.}

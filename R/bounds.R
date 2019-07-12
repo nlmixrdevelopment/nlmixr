@@ -64,7 +64,13 @@ nlmixrBounds <- function(fun){
                 assign("do.fixed", TRUE, nenv)
                 return(x)
             }
-            if ((identical(x[[1]], quote(`<-`)) ||
+            if (identical(x[[1]], quote(`<`)) ||
+                identical(x[[1]], quote(`>`)) ||
+                identical(x[[1]], quote(`<=`)) ||
+                identical(x[[1]], quote(`>=`)) ||
+                identical(x[[1]], quote(`==`))){
+                stop(sprintf("The '%s' operator cannot be used in the ini block", as.character(x[[1]])));
+            } else if ((identical(x[[1]], quote(`<-`)) ||
                  identical(x[[1]], quote(`=`))) &&
                 is.name(x[[2]])) {
                 if (length(x[[3]]) > 5){

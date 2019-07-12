@@ -1,5 +1,7 @@
-context("Make sure SAEM/nlme throws an error with time varying covariates")
-test_that("Error w/time-varying covariates",{
+
+RxODE::rxPermissive({
+  context("Make sure SAEM/nlme throws an error with time varying covariates")
+  test_that("Error w/time-varying covariates",{
 
     hasSymPy  <- try(RxODE::rxSymPyVersion());
     skip_if(inherits(hasSymPy, "try-error"))
@@ -35,4 +37,4 @@ test_that("Error w/time-varying covariates",{
 
     expect_true(inherits(f, "nlmixrFOCEi"))
 
-})
+})} , on.validate="NLMIXR_VALIDATION")

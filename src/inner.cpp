@@ -1652,12 +1652,12 @@ extern "C" double outerLikOpim(int n, double *par, void *ex){
 
 // Gill 1983 Chat
 static inline double Chat(double phi, double h, double epsA){
-   if (phi == 0) return pow(10,300);
+   if (phi == 0) return 1e+300;
   return 2*epsA/(h*fabs(phi));
 }
 
 static inline double ChatP(double phi, double h, double epsA){
-  if (phi == 0) return pow(10,300);
+  if (phi == 0) return 1e+300;
   return 4*epsA/(h*h*fabs(phi));
 }
 
@@ -4392,6 +4392,7 @@ Environment foceiFitCpp_(Environment e){
     Rprintf("U: Unscaled Parameters; ");
     Rprintf("X: Back-transformed parameters; ");
     Rprintf("G: Gradient\n");
+    Rprintf("Unscaled parameters for Omegas=chol(solve(omega));\nDiagonals are transformed, as specified by foceiControl(diagXform=)\n");
     foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
     Rprintf("|    #| Objective Fun |");
     int j,  i=0, finalize=0, k=1;
@@ -4571,7 +4572,16 @@ Environment foceiFitCpp_(Environment e){
 NumericVector coxBox_(NumericVector x = 1, double lambda=1, int yj = 0){
   NumericVector ret(x.size());
   for (unsigned int i = x.size(); i--;){
-    ret[i] = powerD(x[i], lambda, yj);
+    ret[i] = _powerD(x[i], lambda, yj);
+  }
+  return ret;
+}
+
+//[[Rcpp::export]]
+NumericVector iCoxBox_(NumericVector x = 1, double lambda=1, int yj = 0){
+  NumericVector ret(x.size());
+  for (unsigned int i = x.size(); i--;){
+    ret[i] = _powerDi(x[i], lambda, yj);
   }
   return ret;
 }

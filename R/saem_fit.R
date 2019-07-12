@@ -1820,8 +1820,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
                            check.names=FALSE);
       .env$objDf  <- rbind(.env$objDf, .tmp)
       row.names(.env$objDf) <- c("FOCEi", .rn);
-      .setSaemExtra(.env, "FOCEi");
     }
+    .setSaemExtra(.env, "FOCEi")
   } else {
     row.names(.env$objDf) <- .rn;
   }

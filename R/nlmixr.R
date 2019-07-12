@@ -134,9 +134,10 @@ nlmixr <- function(object, data, est=NULL, control=list(),
 nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
                             save=NULL){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
+    .modName <- deparse(substitute(object))
     .uif <- nlmixrUI(object);
     class(.uif) <- "list";
-    .uif$nmodel$model.name <- deparse(substitute(object))
+    .uif$nmodel$model.name <- .modName
     if (missing(data) && missing(est)){
         class(.uif) <- "nlmixrUI"
         return(.uif)
@@ -228,6 +229,9 @@ nlmixrData.default <- function(data, model=NULL){
 }
 nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                         sum.prod=FALSE, table=tableControl()){
+    if (is.null(est)){
+        stop("Estimation type must be specified by est=''");
+    }
     .clearPipedData();
     .tmp <- deparse(body(uif$theta.pars))[-1];
     .tmp <- .tmp[-length(.tmp)];
@@ -268,6 +272,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         }
     }
     dat <- nlmixrData(data);
+    nobs2 <- sum(dat$EVID == 0)
     up.covs <- toupper(uif$all.covs);
     up.names <- toupper(names(dat))
     for (i in seq_along(up.covs)){
@@ -543,7 +548,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                         rtol=.rtol,
                         ...);
         class(fit) <- c(est.type, class(fit));
-        .ret <- try({as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=calc.resid)});
+        .ret <- try({as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=calc.resid, nobs2=nobs2)});
         if (inherits(.ret, "try-error")){
             warning("Error converting to nlmixr UI object, returning nlme object");
             return(fit);

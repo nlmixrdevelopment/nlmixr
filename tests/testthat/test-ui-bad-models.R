@@ -258,7 +258,30 @@ rxPermissive({
         }
         expect_error(nlmixr(two.cmt.pd),
                      rex::rex("The conditional statements (Cp, Ef) are not in terms of the RxODE states: depot, center, periph"))
+    })
 
+    test_that("Parameters cannot be missing or Infinite", {
+
+        uif <- function(){
+            ini({
+                tka <- NA
+                tcl <- exp(-3.2)
+                tv <- exp(1)
+                eta.ka ~ 0.1
+                eta.cl ~ 0.2
+                add.err = 1
+            })
+            model({
+                ka <- tka + eta.ka
+                cl <- tcl + eta.cl
+                v <- tv
+                d / dt(depot) = -ka * depot
+                d / dt(center) = ka * depot - cl / v * center
+                cp = center / v
+                cp = add(add.err)
+            })
+        }
+        expect_error(nlmixr(uif), "There must be at least one prediction")
     })
 
 }, on.validate="NLMIXR_VALIDATION")
