@@ -3001,14 +3001,14 @@ focei.theta <- function(object, uif, ...){
 ##' @author Matthew L. Fidler
 ##' @examples
 ##'
-##' coxBox(1:3,1) ## Normal
-##' iCoxBox(coxBox(1:3,1))
+##' boxCox(1:3,1) ## Normal
+##' iBoxCox(boxCox(1:3,1))
 ##'
-##' coxBox(1:3,0) ## Log-Normal
-##' iCoxBox(coxBox(1:3,0),0)
+##' boxCox(1:3,0) ## Log-Normal
+##' iBoxCox(boxCox(1:3,0),0)
 ##'
-##' coxBox(1:3,0.5) ## lambda=0.5
-##' iCoxBox(coxBox(1:3,0.5),0.5)
+##' boxCox(1:3,0.5) ## lambda=0.5
+##' iBoxCox(boxCox(1:3,0.5),0.5)
 ##'
 ##' yeoJohnson(seq(-3,3),1) ## Normal
 ##' iYeoJohnson(yeoJohnson(seq(-3,3),1))
@@ -3016,26 +3016,26 @@ focei.theta <- function(object, uif, ...){
 ##' yeoJohnson(seq(-3,3),0)
 ##' iYeoJohnson(yeoJohnson(seq(-3,3),0),0)
 ##' @export
-coxBox <- function(x, lambda=1){
-    .Call(`_nlmixr_coxBox_`, x, lambda, 0L)
+boxCox <- function(x, lambda=1){
+    .Call(`_nlmixr_boxCox_`, x, lambda, 0L)
 }
 
-##' @rdname coxBox
+##' @rdname boxCox
 ##' @export
-iCoxBox <- function(x, lambda=1){
-    .Call(`_nlmixr_iCoxBox_`, x, lambda, 0L)
+iBoxCox <- function(x, lambda=1){
+    .Call(`_nlmixr_iBoxCox_`, x, lambda, 0L)
 }
 
-##' @rdname coxBox
+##' @rdname boxCox
 ##' @export
 yeoJohnson <- function(x, lambda=1){
-    .Call(`_nlmixr_coxBox_`, x, lambda, 1L)
+    .Call(`_nlmixr_boxCox_`, x, lambda, 1L)
 }
 
-##' @rdname coxBox
+##' @rdname boxCox
 ##' @export
 iYeoJohnson <- function(x, lambda=1){
-    .Call(`_nlmixr_iCoxBox_`, x, lambda, 1L)
+    .Call(`_nlmixr_iBoxCox_`, x, lambda, 1L)
 }
 
 .setSaemExtra  <- function(.env,type){
