@@ -2993,26 +2993,49 @@ focei.theta <- function(object, uif, ...){
     UseMethod("focei.theta");
 }
 
-##' Cox Box transformation
+##' Cox Box, Yeo Johnson and inverse transformation
 ##'
 ##' @param x data to transform
 ##' @param lambda Cox-box lambda parameter
 ##' @return Cox-Box Transformed Data
 ##' @author Matthew L. Fidler
+##' @examples
+##'
+##' coxBox(1:3,1) ## Normal
+##' iCoxBox(coxBox(1:3,1))
+##'
+##' coxBox(1:3,0) ## Log-Normal
+##' iCoxBox(coxBox(1:3,0),0)
+##'
+##' coxBox(1:3,0.5) ## lambda=0.5
+##' iCoxBox(coxBox(1:3,0.5),0.5)
+##'
+##' yeoJohnson(seq(-3,3),1) ## Normal
+##' iYeoJohnson(yeoJohnson(seq(-3,3),1))
+##'
+##' yeoJohnson(seq(-3,3),0)
+##' iYeoJohnson(yeoJohnson(seq(-3,3),0),0)
 ##' @export
 coxBox <- function(x, lambda=1){
     .Call(`_nlmixr_coxBox_`, x, lambda, 0L)
 }
 
-##' Yeo-Johnson Transformation
-##'
-##' @param x data to transform
-##' @param lambda Cox-box lambda parameter
-##' @return Yeo-Johnson  Transformed Data
-##' @author Matthew L. Fidler
+##' @rdname coxBox
+##' @export
+iCoxBox <- function(x, lambda=1){
+    .Call(`_nlmixr_iCoxBox_`, x, lambda, 0L)
+}
+
+##' @rdname coxBox
 ##' @export
 yeoJohnson <- function(x, lambda=1){
     .Call(`_nlmixr_coxBox_`, x, lambda, 1L)
+}
+
+##' @rdname coxBox
+##' @export
+iYeoJohnson <- function(x, lambda=1){
+    .Call(`_nlmixr_iCoxBox_`, x, lambda, 1L)
 }
 
 .setSaemExtra  <- function(.env,type){

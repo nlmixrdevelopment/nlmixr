@@ -2,9 +2,18 @@
 % Please edit documentation in R/foceiFit.R
 \name{coxBox}
 \alias{coxBox}
-\title{Cox Box transformation}
+\alias{iCoxBox}
+\alias{yeoJohnson}
+\alias{iYeoJohnson}
+\title{Cox Box, Yeo Johnson and inverse transformation}
 \usage{
 coxBox(x, lambda = 1)
+
+iCoxBox(x, lambda = 1)
+
+yeoJohnson(x, lambda = 1)
+
+iYeoJohnson(x, lambda = 1)
 }
 \arguments{
 \item{x}{data to transform}
@@ -15,7 +24,24 @@ coxBox(x, lambda = 1)
 Cox-Box Transformed Data
 }
 \description{
-Cox Box transformation
+Cox Box, Yeo Johnson and inverse transformation
+}
+\examples{
+
+coxBox(1:3,1) ## Normal
+iCoxBox(coxBox(1:3,1))
+
+coxBox(1:3,0) ## Log-Normal
+iCoxBox(coxBox(1:3,0),0)
+
+coxBox(1:3,0.5) ## lambda=0.5
+iCoxBox(coxBox(1:3,0.5),0.5)
+
+yeoJohnson(seq(-3,3),1) ## Normal
+iYeoJohnson(yeoJohnson(seq(-3,3),1))
+
+yeoJohnson(seq(-3,3),0)
+iYeoJohnson(yeoJohnson(seq(-3,3),0),0)
 }
 \author{
 Matthew L. Fidler
