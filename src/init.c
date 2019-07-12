@@ -59,6 +59,7 @@ SEXP _nlmixr_sqrtm(SEXP);
 SEXP _nlmixr_foceiCalcCov(SEXP);
 SEXP _nlmixr_foceiFitCpp_(SEXP);
 SEXP _nlmixr_coxBox_(SEXP, SEXP, SEXP);
+SEXP _nlmixr_iCoxBox_(SEXP, SEXP, SEXP);
 SEXP _nlmixr_freeFocei();
 
 static const R_CMethodDef CEntries[] = {
@@ -101,6 +102,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_foceiCalcCov", (DL_FUNC) &_nlmixr_foceiCalcCov, 1},
   {"_nlmixr_foceiFitCpp_", (DL_FUNC) &_nlmixr_foceiFitCpp_, 1},
   {"_nlmixr_coxBox_", (DL_FUNC) &_nlmixr_coxBox_, 3},
+  {"_nlmixr_iCoxBox_", (DL_FUNC) &_nlmixr_iCoxBox_, 3},
   {NULL, NULL, 0}
 };
 

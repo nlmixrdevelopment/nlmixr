@@ -34,3 +34,4 @@ BinaryFiles$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^/?docs/*$
+^pkgdown$

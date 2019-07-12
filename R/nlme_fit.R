@@ -759,7 +759,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...){
 
 
 ##' @rdname as.focei
-as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE){
+as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, nobs2=0){
     RxODE::rxSolveFree();
     .nlmeTime <- proc.time() - pt;
     RxODE::rxSolveFree();
@@ -813,6 +813,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     .cwresTime  <- proc.time();
     while (.notCalced){
         env <- new.env(parent=emptyenv());
+        env$nobs2 <- nobs2
         env$covMethod <- "nlme";
         env$method <- "nlme"
         env$uif <- uif

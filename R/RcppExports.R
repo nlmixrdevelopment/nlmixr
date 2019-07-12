@@ -77,6 +77,10 @@ coxBox_ <- function(x = 1L, lambda = 1, yj = 0L) {
     .Call(`_nlmixr_coxBox_`, x, lambda, yj)
 }
 
+iCoxBox_ <- function(x = 1L, lambda = 1, yj = 0L) {
+    .Call(`_nlmixr_iCoxBox_`, x, lambda, yj)
+}
+
 lin_cmt_stan <- function(obs_time, dose_time, dose, Tinf, params, oralSEXP, infusionSEXP, ncmtSEXP, parameterizationSEXP) {
     .Call(`_nlmixr_lin_cmt_stan`, obs_time, dose_time, dose, Tinf, params, oralSEXP, infusionSEXP, ncmtSEXP, parameterizationSEXP)
 }

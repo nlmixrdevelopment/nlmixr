@@ -92,7 +92,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         message(sprintf("Calculating -2LL by Gaussian quadrature (nnodes=%s,nsd=%s)",nnodes.gq,nsd.gq))
     }
     RxODE::rxProgress(nx)
-    on.exit(RxODE::rxProgressAbort());
+    on.exit(RxODE::rxProgressAbort("Error calculating likelihood"));
     for (j in 1:nx) {
         phi[, i1] = a+b*matrix(rep(x[j, ], N), ncol=nphi1, byrow=TRUE)
         f = as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt))
@@ -338,7 +338,7 @@ calc.COV = function(fit0) {
   nphi = nphi0 + nphi1
   N = saem.cfg$N
   RxODE::rxProgress(N + nphi)
-  on.exit(RxODE::rxProgressAbort());
+  on.exit(RxODE::rxProgressAbort("Error calculating covariance via linearization"));
 
   ntotal = saem.cfg$ntotal
   ix_endpnt = saem.cfg$ix_endpnt[1:ntotal]+1

@@ -645,7 +645,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       
       # Transform both sides (used for non-normal residuals) ######### may need to implement nlmixr::coxBox and nlmixr::yeoJohnson
       
-      boxCox = function (x, lambda) {
+      #boxCox = function (x, lambda) {
         if(lambda == 0) {
           .h.x <- log(x)
         }
@@ -654,7 +654,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
         }
         return(.h.x)
       }
-      yeoJohnson = function (x, lambda){
+      #yeoJohnson = function (x, lambda){
         options(warn=-1)
         .h.x <- ifelse (x >= 0,
                         ifelse (lambda != 0 & x >= 0, 
@@ -670,8 +670,8 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
 
       # log normal transformation 
       if (!is.null(.logn) | !is.null(.dlnorm)){
-        .h.x <- boxCox(yo, lambda) #log(yo) # obs
-        .h.y <- boxCox(yp, lambda) #log(yp)  # pred
+        .h.x <- coxBox(yo, lambda) #log(yo) # obs
+        .h.y <- coxBox(yp, lambda) #log(yp)  # pred
         
         if("pow" %in% names(model[[1]])) {
           .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred

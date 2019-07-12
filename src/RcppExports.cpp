@@ -194,6 +194,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// iCoxBox_
+NumericVector iCoxBox_(NumericVector x, double lambda, int yj);
+RcppExport SEXP _nlmixr_iCoxBox_(SEXP xSEXP, SEXP lambdaSEXP, SEXP yjSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< int >::type yj(yjSEXP);
+    rcpp_result_gen = Rcpp::wrap(iCoxBox_(x, lambda, yj));
+    return rcpp_result_gen;
+END_RCPP
+}
 // lin_cmt_stan
 SEXP lin_cmt_stan(Eigen::Map<Eigen::VectorXd> obs_time, Eigen::Map<Eigen::VectorXd> dose_time, Eigen::Map<Eigen::VectorXd> dose, Eigen::Map<Eigen::VectorXd> Tinf, Eigen::Map<Eigen::VectorXd> params, SEXP oralSEXP, SEXP infusionSEXP, SEXP ncmtSEXP, SEXP parameterizationSEXP);
 RcppExport SEXP _nlmixr_lin_cmt_stan(SEXP obs_timeSEXP, SEXP dose_timeSEXP, SEXP doseSEXP, SEXP TinfSEXP, SEXP paramsSEXP, SEXP oralSEXPSEXP, SEXP infusionSEXPSEXP, SEXP ncmtSEXPSEXP, SEXP parameterizationSEXPSEXP) {
