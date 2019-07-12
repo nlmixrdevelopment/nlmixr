@@ -935,6 +935,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     if (!is.na(match("prop",names(inits)))) fit$par[match("prop",names(inits))] = abs(fit$par[match("prop",names(inits))])
     if (!is.na(match("pow",names(inits)))) fit$par[match("pow",names(inits))] = abs(fit$par[match("pow",names(inits))])
     if (!is.na(match("norm",names(inits)))) fit$par[match("norm",names(inits))] = abs(fit$par[match("norm",names(inits))])
+    if (!is.na(match("dnorm",names(inits)))) fit$par[match("dnorm",names(inits))] = abs(fit$par[match("dnorm",names(inits))])
 
  
   
