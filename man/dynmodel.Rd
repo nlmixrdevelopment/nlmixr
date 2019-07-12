@@ -4,9 +4,7 @@
 \alias{dynmodel}
 \title{Fit a non-population dynamic model}
 \usage{
-dynmodel(system, model, evTable, inits, data, fixPars = NULL,
-  method = c("Nelder-Mead", "L-BFGS-B", "PORT"),
-  control = list(ftol_rel = 1e-06, maxeval = 999), squared = T)
+dynmodel(system, model, evTable, inits, data, control = list(), ...)
 }
 \arguments{
 \item{system}{an RxODE object}
@@ -19,13 +17,11 @@ dynmodel(system, model, evTable, inits, data, fixPars = NULL,
 
 \item{data}{input data}
 
+\item{control}{optional minimization control parameters}
+
 \item{fixPars}{fixed system parameters}
 
 \item{method}{estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.}
-
-\item{control}{optional minimization control parameters}
-
-\item{squared}{if parameters be squared during estimation}
 }
 \description{
 Fit a non-population dynamic model

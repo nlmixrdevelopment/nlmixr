@@ -644,6 +644,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       yo = data[, x["dv"]]
       
       # Transform both sides (used for non-normal residuals) ######### may need to implement nlmixr::coxBox and nlmixr::yeoJohnson
+      
       boxCox = function (x, lambda) {
         if(lambda == 0) {
           .h.x <- log(x)
@@ -669,8 +670,8 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
 
       # log normal transformation 
       if (!is.null(.logn) | !is.null(.dlnorm)){
-        .h.x <- log(yo) #boxCox(yo, lambda) # obs
-        .h.y <- log(yp) #boxCox(yp, lambda) # pred
+        .h.x <- boxCox(yo, lambda) #log(yo) # obs
+        .h.y <- boxCox(yp, lambda) #log(yp)  # pred
         
         if("pow" %in% names(model[[1]])) {
           .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
@@ -895,13 +896,21 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     
     # Run lbfbsb3c optimization
     fit = lbfgsb3c::lbfgsb3c(par = as.vector(.inits), fn=obj, lower=.lower, upper=.upper, gr=NULL)#, control=.control, gr=NULL)
-    
+
+print("bobyqa")
+
   } else if (method=="Nelder-Mead") {
     # Run Nelder-Mead optimization
     if (.lower != -Inf | .upper != Inf){warning("Optimization: Boundaries not used in Nelder-Mead")}
     fit = mymin(as.vector(.inits), obj, control=control)
     fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
+    
+print("Nelder-Mead")
+    
   } else {
+    
+print("lbfgsb3c")
+  
     if ("ftol_rel" %in% names(control)) {
       control$rel.tol = control$ftol_rel
       control$ftol_rel = NULL
