@@ -458,7 +458,6 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     .model = unlist(lapply(attr(terms(.model),"variables"), as.list))
     .model = sapply(.model, deparse)
     
-
     # assign error terms    
     .sigma.add = if("add" %in% .model) {
       as.numeric(.model[which(.model=="add")+1])
@@ -486,11 +485,15 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
 
     .sigma.norm = if("norm" %in% .model) {
       as.numeric(.model[which(.model=="norm")+1])
-    } else{NULL}
+      .norm <<- T
+    } else{NULL
+      .norm <<- NULL}
     
     .sigma.dnorm = if("dnorm" %in% .model) {
       as.numeric(.model[which(.model=="dnorm")+1])
-    } else{NULL}
+      .dnorm <<- T
+    } else{NULL
+      .dnorm <<- NULL}
     
     .sigma.logn = if("logn" %in% .model) {
       as.numeric(.model[which(.model=="logn")+1])
@@ -620,8 +623,8 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
         } 
       }
       
-      if (!is.null(norm)) add <- norm
-      if (!is.null(dnorm)) add <- dnorm
+      if (!is.null(.norm)) add <- norm
+      if (!is.null(.dnorm)) add <- dnorm
       if (!is.null(.logn)) {
         lambda <- 0
         th <- th[names(th)!="logn"]
@@ -663,7 +666,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
         options(warn=0)
         return(.h.x)
       }
-      
+
       # log normal transformation 
       if (!is.null(.logn) | !is.null(.dlnorm)){
         .h.x <- log(yo) #boxCox(yo, lambda) # obs
@@ -714,18 +717,11 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
         # assign correct variance according to defined error model
         if (!any("prop" %in% names(model[[1]]))  & !any("pow" %in% names(model[[1]])) ) {
           .h.y.var <- 1
-print('Here1')
         } else if (any("prop" %in% names(model[[1]]))  & !any("pow" %in% names(model[[1]])) ) {
           .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
-
-          
           cat("pow2",pow2)
-print('Here2')
-
         } else {
           .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
-print('Here3')
-
         }
 
         # yeoJohnson transformed -2 log-likelihood
@@ -738,8 +734,6 @@ print('Here3')
                         
                         
         )
-        if (yo>=0) print("y0>=0") else (print("yo<0"))
-
         # negative log-likelihood function for output
         ll = .5*(.n2ll)
       }
@@ -750,7 +744,7 @@ print('Here3')
       }
       # all other error models
       else {
-        if (!any("add" %in% names(model[[1]])) & !any("prop" %in% names(model[[1]]))){
+        if (identical(c("dv","pred"),names(model[[1]]))){
           sgy = 1  
         }else{
           sgy = thresh(add) + thresh(prop)*yp
@@ -904,7 +898,7 @@ print('Here3')
     
   } else if (method=="Nelder-Mead") {
     # Run Nelder-Mead optimization
-    if (.lower > 0 | .upper >0){warning("Optimization: Boundaries not used in Nelder-Mead")}
+    if (.lower != -Inf | .upper != Inf){warning("Optimization: Boundaries not used in Nelder-Mead")}
     fit = mymin(as.vector(.inits), obj, control=control)
     fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
   } else {
@@ -940,6 +934,7 @@ print('Here3')
     if (!is.na(match("add",names(inits)))) fit$par[match("add",names(inits))] = abs(fit$par[match("add",names(inits))])
     if (!is.na(match("prop",names(inits)))) fit$par[match("prop",names(inits))] = abs(fit$par[match("prop",names(inits))])
     if (!is.na(match("pow",names(inits)))) fit$par[match("pow",names(inits))] = abs(fit$par[match("pow",names(inits))])
+    if (!is.na(match("norm",names(inits)))) fit$par[match("norm",names(inits))] = abs(fit$par[match("norm",names(inits))])
 
  
   
