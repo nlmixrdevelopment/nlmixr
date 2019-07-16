@@ -196,17 +196,39 @@ nlmixrDynmodelConvert <- function(.nmf){
   # TO DO:
   # add lower and upper outputs for inits
   
+ 
+  
   # iniitalize list for output
   .return <- list()
   
   # convert nlmixr model to data.frame
   .nmf.original <- .nmf
   .nmf <- as.data.frame(.nmf$ini)
+  .temp.model <- RxODE::rxSymPySetupPred(.nmf.original$rxode.pred,
+                                         function(){return(nlmixr_pred)},
+                                         .nmf.original$theta.pars,
+                                         .nmf.original$error,
+                                         grad=FALSE,
+                                         pred.minus.dv=TRUE, sum.prod=FALSE, #control$sumProd,
+                                         theta.derivs=FALSE, optExpression=TRUE, #control$optExpression,
+                                         run.internal=TRUE, only.numeric=TRUE)
+  
   
   # assign fixed terms
   .fix.index <- if (length(which(.nmf$fix==TRUE))==0) {NULL} else {which(.nmf$fix==TRUE)} # obtain row location for fixed terms
-  .fixPars <- if (length(.nmf$est[.fix.index])==0) {NULL} else {exp(.nmf$est[.fix.index])}
-  names(.fixPars) <- substring(.nmf$name[.fix.index],2)
+  .ref.fix <- substring(.nmf$name[.fix.index],2)
+
+  .temp.log.fixPars.index <- intersect(.fix.index,.temp.model$log.etas)
+  .temp.log.fixPars <- exp(.nmf$est[.temp.log.fixPars.index])
+  names(.temp.log.fixPars) <- substring(.nmf$name[.temp.log.fixPars.index],2)
+  
+  .temp.nonlog.fixPars.index <- setdiff(.fix.index,.temp.model$log.etas)
+  .temp.nonlog.fixPars <- .nmf$est[.temp.nonlog.fixPars.index]
+  names( .temp.nonlog.fixPars ) <- substring(.nmf$name[.temp.nonlog.fixPars.index],2)
+  
+  .fixPars <- c(.temp.log.fixPars,.temp.nonlog.fixPars)
+  .fixPars <- .fixPars[order(factor(names(.fixPars), levels=.ref.fix))]
+  
   .return <- c(.return,fixPars=list(.fixPars))
   
   # assign theta terms(estimated terms excluding error terms)
@@ -217,10 +239,19 @@ nlmixrDynmodelConvert <- function(.nmf){
       which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)[-which(.nmf$fix == TRUE)]
     } # row location for theta values
   
+  .ref.theta <- substring(.nmf$name[.theta.index],2)
   
-  .theta <- exp(.nmf$est[.theta.index]) # initial estimate for theta values, back-transformed
-  names(.theta) <- substring(.nmf$name[.theta.index],2)
+  .temp.log.theta.index <- intersect(.theta.index,.temp.model$log.etas)
+  .temp.log.theta <- exp(.nmf$est[.temp.log.theta.index])
+  names(.temp.log.theta) <- substring(.nmf$name[.temp.log.theta.index],2)
   
+  .temp.nonlog.theta.index <- setdiff(.theta.index,.temp.model$log.etas)
+  .temp.nonlog.theta <- .nmf$est[.temp.nonlog.theta.index]
+  names(.temp.nonlog.theta) <- substring(.nmf$name[.temp.nonlog.theta.index],2)
+  
+  .theta <- c(.temp.nonlog.theta,.temp.log.theta)
+  .theta <- .theta[order(factor(names(.theta), levels=.ref.theta))]
+
   # assign sigma terms (estimated)
   .sigma.index <- 
     if (is.null(.fix.index)){
@@ -517,13 +548,11 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     
     # keep error model terms
     inits.err <- c(add=.sigma.add, prop=.sigma.prop, pow=.sigma.pow, pow2=.sigma.pow2, yeoJohnson=.sigma.yeoJohnson, boxCox=.sigma.boxCox,
-                   norm=.sigma.norm, dnorm=.sigma.dnorm, tbs=.sigma.tbs, tbsYj=.sigma.tbs)
+                   norm=.sigma.norm, dnorm=.sigma.dnorm, tbs=.sigma.tbs, tbsYj=.sigma.tbsYj)
     
     inits.err <- inits.err[which(names(inits.err) %in% intersect(names(inits.err),.model))]
     inits.err <<- inits.err
     .model <- c("dv" = .model[2], "pred" = .model[3], inits.err)
-    
-    # error message for using power function
   })
   
   inits = c(inits, inits.err)
@@ -614,7 +643,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       boxCox <- NULL
       tbs <- NULL
       yeoJohnson <- NULL
-      tbsYJ <- NULL
+      tbsYj <- NULL
 
       # assign names sigma names
       if(any(names(th) %in% names(model[[1]]))){
@@ -636,7 +665,7 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       if (!is.null(boxCox)) lambda <- boxCox
       if (!is.null(tbs)) lambda <- tbs
       if (!is.null(yeoJohnson)) lambda <- yeoJohnson
-      if (!is.null(tbsYJ)) lambda <- tbsYJ
+      if (!is.null(tbsYj)) lambda <- tbsYj
 
      # predictted and observed values from RxODE
       #yp = s[rows,x["pred"]]
@@ -665,12 +694,11 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       }
       # boxCox Transform
       else if ("boxCox" %in% names(model[[1]]) | "tbs" %in% names(model[[1]])) {
-        
         .h.x <- boxCox(yo, lambda) # obs
         .h.y <- boxCox(yp, lambda) # pred
         
         if("pow" %in% names(model[[1]])) {
-          .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
+          .h.y.var <- (yp^(2*pow2))*thresh(pow)^2 + thresh(add)^2  # variance of pred
         } else {
           .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
         }
@@ -685,19 +713,19 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
         ll = .5*(.n2ll)
       }
       # yeoJohnson Transform
-      else if("yeoJohnson" %in% names(model[[1]]) | "tbsYJ" %in% names(model[[1]])) {
-        
-        .h.x <- yeo.johnson(yo, lambda) #obs
-        .h.y <- yeo.johnson(yp, lambda) #pred
+      else if("yeoJohnson" %in% names(model[[1]]) | "tbsYj" %in% names(model[[1]])) {
+        .h.x <- yeoJohnson(yo, lambda) #obs
+        .h.y <- yeoJohnson(yp, lambda) #pred
 
-        # assign correct variance according to defined error model
-        if (!any("prop" %in% names(model[[1]]))  & !any("pow" %in% names(model[[1]])) ) {
-          .h.y.var <- 1
-        } else if (any("prop" %in% names(model[[1]]))  & !any("pow" %in% names(model[[1]])) ) {
-          .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
-          cat("pow2",pow2)
+        if("pow" %in% names(model[[1]])) {
+          .h.y.var <- (yp^(2*pow2))*thresh(pow)^2 + thresh(add)^2  # variance of pred
+
+          
         } else {
-          .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
+          .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+
+
+          
         }
 
         # yeoJohnson transformed -2 log-likelihood
@@ -732,7 +760,6 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
     do.call("sum", l)  # same as return(as.numeric(l)), l is a list for each value in the model?
   }
 
-  
   # Scaling functions -----------------------------------------------------------------------
   # normType assignment for scaling (normalization type)
   if (normType == "constant") {
@@ -859,14 +886,26 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       .control[sapply(.control, is.null)] <- NULL
       fit = minqa::bobyqa(par=.inits, fn=obj, lower=.lower, upper=.upper, control=.control)
       fit$value <- fit$fval
+      
+print(.lower)
+print(.upper)
+
   } else if (method=="lbfgsb3c") {
       .control <- control[names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")]
       .control[sapply(.control, is.null)] <- NULL
       fit = lbfgsb3c::lbfgsb3c(par = as.vector(.inits), fn=obj, lower=.lower, upper=.upper, gr=NULL, control=.control)
+      
+print(.lower)
+print(.upper)
+      
   } else if (method=="Nelder-Mead") {
     if (.lower != -Inf | .upper != Inf){warning("Optimization: Boundaries not used in Nelder-Mead")}
       fit = mymin(as.vector(.inits), obj, control=control)
       fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
+      
+print(.lower)
+print(.upper)      
+      
   } else {
       .control <- control[names(control) %in% c("eval.max", "iter.max", "trace", "abs.tol",
                                                 "rel.tol","x.tol","xf.tol","step.min", "step.max","sing.tol","scale.init","diff.g")]
@@ -874,6 +913,10 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
       if (.lower == -Inf ) .lower = 1e-12
       fit = nlminb(start = .inits, objective = obj, gradient = NULL, hessian = NULL, 
                    scale = 1, control=.control, lower = .lower, upper = .upper)
+      
+print(.lower)
+print(.upper)      
+      
   }
   
   # Hessian -----------------------------------------------------------------------
@@ -923,9 +966,6 @@ dynmodel = function(system, model, evTable, inits, data, control=list(), ...){
 }
 
 # #########################################################################
-
-
-
 
 
 # ####################################################################### #
