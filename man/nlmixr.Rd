@@ -40,7 +40,7 @@ NPDE etc).  See \code{\link{tableControl}}.}
 \item{save}{Boolean to save a nlmixr object in a rds file in the
 working directory.  If \code{NULL}, uses option "nlmixr.save"}
 
-\item{envir}{Environment to use for argument access}
+\item{envir}{Environment that nlmixr is evaluated in.}
 }
 \value{
 Either a nlmixr model or a nlmixr fit object

@@ -117,7 +117,6 @@ armaVersion <- function(){
 ##' @param ... Other parameters
 ##' @param save Boolean to save a nlmixr object in a rds file in the
 ##'     working directory.  If \code{NULL}, uses option "nlmixr.save"
-##' @param envir Environment to use for argument access
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
@@ -725,6 +724,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 ##' @param save This option determines if the fit will be saved to be
 ##'     reloaded if already run.  If NULL, get the option from
 ##'     \code{options("nlmixr.save")};
+##' @param envir Environment that nlmixr is evaluated in.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export

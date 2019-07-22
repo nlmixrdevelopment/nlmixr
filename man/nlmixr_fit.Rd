@@ -31,6 +31,8 @@ NPDE etc).  See \code{\link{tableControl}}.}
 \item{save}{This option determines if the fit will be saved to be
 reloaded if already run.  If NULL, get the option from
 \code{options("nlmixr.save")};}
+
+\item{envir}{Environment that nlmixr is evaluated in.}
 }
 \value{
 nlmixr fit object
