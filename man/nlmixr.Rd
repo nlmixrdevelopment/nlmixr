@@ -8,16 +8,17 @@
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
 nlmixr(object, data, est = NULL, control = list(),
-  table = tableControl(), ..., save = NULL)
+  table = tableControl(), ..., save = NULL, envir = parent.frame())
 
 \method{nlmixr}{function}(object, data, est = NULL, control = list(),
-  table = tableControl(), ..., save = NULL)
+  table = tableControl(), ..., save = NULL, envir = parent.frame())
 
 \method{nlmixr}{nlmixrFitCore}(object, data, est = NULL,
-  control = list(), table = tableControl(), ..., save = NULL)
+  control = list(), table = tableControl(), ..., save = NULL,
+  envir = parent.frame())
 
 \method{nlmixr}{nlmixrUI}(object, data, est = NULL, control = list(),
-  ..., save = NULL)
+  ..., save = NULL, envir = parent.frame())
 }
 \arguments{
 \item{object}{Fitted object or function specifying the model.}
@@ -38,6 +39,8 @@ NPDE etc).  See \code{\link{tableControl}}.}
 
 \item{save}{Boolean to save a nlmixr object in a rds file in the
 working directory.  If \code{NULL}, uses option "nlmixr.save"}
+
+\item{envir}{Environment to use for argument access}
 }
 \value{
 Either a nlmixr model or a nlmixr fit object
