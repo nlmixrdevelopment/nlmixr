@@ -5,11 +5,7 @@
         if (inherits(ns, "try-error")){
             assignInMyNamespace(".drakeTypeS", 0L);
         } else {
-            if (exists("no_deps", envir=ns)){
-                assignInMyNamespace(".drakeTypeS", 2L);
-            } else {
-                assignInMyNamespace(".drakeTypeS", 1L);
-            }
+            assignInMyNamespace(".drakeTypeS", 2L);
         }
     }
     return(.drakeTypeS);
@@ -22,11 +18,7 @@
         if (any(.x1 == c("ignore", "no_deps")) && .dt != 0L){
             return(x);
         } else if (.x1 == "model" && .dt != 0L){
-            if (.dt == 1L){
-                return(as.call(c(list(quote(ignore)), x)));
-            } else {
-                return(as.call(c(list(quote(no_deps)), x)))
-            }
+            return(as.call(c(list(quote(ignore)), x)));
         } else {
             return(as.call(lapply(x, .drakeCompat0)));
         }
