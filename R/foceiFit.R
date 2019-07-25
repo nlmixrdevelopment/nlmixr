@@ -2651,12 +2651,17 @@ print.nlmixrFitCore <- function(x, ...){
     cat(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))),"\n");
     print(x$time)
     .boundChar <- nchar(.bound);
+    .tmp <- x$omega
+    .noEta <- (dim(.tmp)[1] == 0)
+    
+    populationParameters <- ifelse(.noEta, "Parameters", "Population Parameters")
+    
     if (2*.boundChar+54 < .width){
-        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))),"\n");
+        cat(paste0("\n", cli::rule(paste0(crayon::bold(populationParameters), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))),"\n");
     } else if (.boundChar+54 < .width) {
-        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))),"\n");
+        cat(paste0("\n", cli::rule(paste0(crayon::bold(populationParameters), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))),"\n");
     } else {
-        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))),"\n")
+        cat(paste0("\n", cli::rule(paste0(crayon::bold(populationParameters), " (", crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))),"\n")
     }
     .pf <- R.utils::captureOutput(print(x$parFixed))
     if (crayon::has_color()){
@@ -2688,7 +2693,8 @@ print.nlmixrFitCore <- function(x, ...){
     diag(.tmp) <- 0;
     cat(paste0("  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
                crayon::bold(x$covMethod), "\n"))
-    if (.mu){
+    
+    if (.mu & !.noEta){
         if (all(.tmp == 0)){
             cat("  No correlations in between subject variability (BSV) matrix\n")
         } else {
@@ -2718,9 +2724,9 @@ print.nlmixrFitCore <- function(x, ...){
             }
             cat(paste(.lt, collapse="\n"), "\n\n")
         }
-        if (.boundChar*2+70 < .width){
+        if (.boundChar*2+70 < .width & !.noEta){
             cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"),"\n");
-        } else {
+        } else if (!.noEta) {
             if (.boundChar+43 < .width){
                 cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"),"\n");
                 cat("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)","\n");
@@ -2731,10 +2737,10 @@ print.nlmixrFitCore <- function(x, ...){
         }
 
     }
-    if (.boundChar+74 < .width){
+    if (.boundChar+74 < .width & !.noEta){
         cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                    crayon::yellow(.bound), crayon::bold$blue("$shrink")),"\n");
-    } else {
+    } else if (!.noEta) {
         cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                        crayon::bold$blue("$shrink")),"\n");
     }
