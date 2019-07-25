@@ -41,9 +41,13 @@ We can try fitting a simple one-compartment PK model to this small dataset. We w
 ```{r}
 one.cmt <- function() {
     ini({
+        ## You may label each parameter with a comment
         tka <- 0.45 # Log Ka
         tcl <- 1 # Log Cl
-        tv <- 3.45    # Log V
+        ## This works with interactive models
+        ## You may also label the preceding line with label("label text")
+        tv <- 3.45; label("log V")
+        ## the label("Label name") works with all models
         eta.ka ~ 0.6
         eta.cl ~ 0.3
         eta.v ~ 0.1
