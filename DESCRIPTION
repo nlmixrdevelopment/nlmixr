@@ -63,5 +63,6 @@ URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
+Biarch: true
 Packaged: 2018-04-30 01:43:13 UTC; annie
 Maintainer: Wenping Wang <wwang8198@gmail.com>
