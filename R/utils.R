@@ -367,7 +367,11 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .fit
   # ####
   
   ## Additioanl output ----
+<<<<<<< HEAD
   #.data <- .dynmodelObject$data # might need to change name do to input
+=======
+  .data <- .dynmodelObject$data # might need to change name do to input
+>>>>>>> 2d1f495fed6a2525ac707afa5f069c8172dad8df
   
   .temp <- nlmixrDynmodelConvert(.nlmixrObject)
   .parameters <- c(.temp$inits, .temp$fixPars) #change parameters to final estimates. Should not be inits.
@@ -381,6 +385,10 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .fit
   .ID <- if (is.null(.nlmixr.sim$ID)) {rep(1, nrow(.data))} else {.nlmixr.sim$ID}
   .TIME <- .nlmixr.sim$time
   .DV = RxODE::etTrans(.data,.system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
+<<<<<<< HEAD
+=======
+  .DV = data$dv
+>>>>>>> 2d1f495fed6a2525ac707afa5f069c8172dad8df
   .EVID <- .nlmixr.sim$evid
   .PRED <- .nlmixr.sim$nlmixr_pred
   .RES <- .DV - .PRED
@@ -989,6 +997,10 @@ sgy<-c()
         .n2ll <- ifelse(yo >= 0, 
                         .yeoJohnson.n2ll -2*(lambda-1)*log(yo+1) -2*log(2*pi),
                         .yeoJohnson.n2ll -2*(1-lambda)*log(-yo+1) -2*log(2*pi)
+<<<<<<< HEAD
+=======
+                        
+>>>>>>> 2d1f495fed6a2525ac707afa5f069c8172dad8df
         )
         sgy <<- h.y.var
         # negative log-likelihood function for output
@@ -1013,7 +1025,11 @@ sgy<-c()
         }
         ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
       }
+<<<<<<< HEAD
       sgy <<- sgy
+=======
+      assign("sgy",sgy,envir = .dynmodel.env)
+>>>>>>> 2d1f495fed6a2525ac707afa5f069c8172dad8df
       sum(ll)
     })
       sgy <<- sgy
