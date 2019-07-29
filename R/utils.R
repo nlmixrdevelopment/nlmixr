@@ -170,7 +170,7 @@ mymin = function(start, fr, rho=NULL, control=list())
 
 # #########################################################################
 
-# as.focei.dynmodel () -----------------------------------------------------------
+# as.focei.dynmodel() -----------------------------------------------------------
 #' Output nlmixr format for dynmodel
 #' 
 #' @param .dynmodelObject return object from 
@@ -182,7 +182,7 @@ mymin = function(start, fr, rho=NULL, control=list())
 # devtools::check_man() used to identify missing and problems
 # Will outside of dynmodel, and called within dynmodel. If nlmixr input used, output nlmixr, if dynmodel input used, output dynmodel. 
 
-as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .fit, .message, .inits.err, .cov, .syg, .dynmodelControl, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl()){
+as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl()){
   
   # setup ----
   .env <- new.env(parent=emptyenv()); # store information for attaching to fit
@@ -302,8 +302,8 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .fit, .mess
   # ####
   
   ## $cov ----
-  .cov <- cov
-  dimnames(cov) <- list(names(.Estimates), names(.Estimates))
+  labels <- names(.Estimates)
+  dimnames(.cov) <- list(labels, labels)
   .env$cov <- .cov
   # ####
   
@@ -320,11 +320,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .fit, .mess
   ## $model ----
   .env$model <- .model
   # ####
-  
-  ## $time ----
-  .env$time <- .time
-  # ####
-  
+
   ## $objf ----
   .objf <-  .dynmodelObject$value-0.5*.dynmodelObject$nobs*log(2*pi)
   .env$objf <- .objf
@@ -371,7 +367,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .fit, .mess
   # ####
   
   ## Additioanl output ----
-  .data <- .dynmodelObject$data
+  .data <- .dynmodelObject$data # might need to change name do to input
   
   .temp <- nlmixrDynmodelConvert(.nlmixrObject)
   .parameters <- c(.temp$inits, .temp$fixPars) #change parameters to final estimates. Should not be inits.
@@ -379,11 +375,12 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .fit, .mess
   
   .rxControl$returnType <- "data.frame"
   .rxControl$addDosing=T
-  .nlmixr.sim = do.call(RxODE :: rxSolve, c(list(object=.system, params=.parameters, events=data), .rxControl))
+
+  .nlmixr.sim = do.call(RxODE :: rxSolve, c(list(object=.system, params=.parameters, events=.data), .rxControl))
   
   .ID <- if (is.null(.nlmixr.sim$ID)) {rep(1, nrow(.data))} else {.nlmixr.sim$ID}
   .TIME <- .nlmixr.sim$time
-  .DV = RxODE::etTrans(data,.system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
+  .DV = RxODE::etTrans(.data,.system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
   .DV = data$dv
   .EVID <- .nlmixr.sim$evid
   .PRED <- .nlmixr.sim$nlmixr_pred
@@ -397,6 +394,12 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .fit, .mess
   .nlmixr.pred.temp <- c("nlmixrDynmodel", "nlmixrFitData", "nlmixrFitCore", "tbl_df", "tbl", "data.frame")
   attr(.nlmixr.pred.temp,".foceiEnv") <- .env
   class(.nlmixr.pred) <- .nlmixr.pred.temp
+  
+  ## $time ----
+  .time$tableTime <- (proc.time() - .pt)["elapsed"]
+  names(.time) <- c("setup", "scaling", "optimization", "Hessian", "run total", "table")
+  .env$time <- .time
+  # ####
   
   
   return(.nlmixr.pred)
@@ -616,7 +619,9 @@ dynmodelControl <- function(...,
   step.max=NULL,
   sing.tol=NULL,
   scale.init=NULL,
-  diff.g=NULL
+  diff.g=NULL,
+  # rxControl
+  rxControl = RxODE::rxControl()
   ) {
   if (missing(method)){method = "bobyqa"}
   if (missing(normType)){normType = "constant"}
@@ -670,7 +675,8 @@ dynmodelControl <- function(...,
     step.max=step.max,
     sing.tol=sing.tol,
     scale.init=scale.init,
-    diff.g=diff.g
+    diff.g=diff.g,
+    rxControl = rxControl
   )
   
   class(.ret) <- "dynmodelControl"
@@ -680,7 +686,7 @@ dynmodelControl <- function(...,
 
 # #########################################################################
 
-# dynmodel()  ---------------------------------------------------------------
+# dynmodel()  -------------------------------------------------------------
 #' Fit a non-population dynamic model
 #'
 #' Fit a non-population dynamic model
@@ -882,9 +888,8 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
     theta = c(theta, fixPars)
     
     # call rxODE for simulation
-    rxControl <- list(atol=atol, rtol=rtol)
-    s = do.call(RxODE :: rxSolve, c(list(object=system, params=theta, events=data, addDosing=F), rxControl))
-    
+    s = do.call(RxODE :: rxSolve, c(list(object=system, params=theta, events=data), rxControl))
+   
     # NOTES:
     #returnType="data.frame" - add to rxControl
     #rxNorm(system) # add error piece, use the error parameters as parameters
@@ -985,9 +990,6 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
           
         } else {
           .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
-
-
-          
         }
 
         # yeoJohnson transformed -2 log-likelihood
@@ -997,7 +999,6 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
         .n2ll <- ifelse(yo >= 0, 
                         .yeoJohnson.n2ll -2*(lambda-1)*log(yo+1) -2*log(2*pi),
                         .yeoJohnson.n2ll -2*(1-lambda)*log(-yo+1) -2*log(2*pi)
-                        
                         
         )
         # negative log-likelihood function for output
@@ -1019,7 +1020,6 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
         ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
       }
       assign("sgy",sgy,envir = .dynmodel.env)
-assign("sgy",sgy,envir=.GlobalEnv)
       sum(ll)
     })
     do.call("sum", l)  # same as return(as.numeric(l)), l is a list for each value in the model?
@@ -1171,8 +1171,8 @@ assign("sgy",sgy,envir=.GlobalEnv)
     if (.lower != -Inf | .upper != Inf){warning("Optimization: Boundaries not used in Nelder-Mead")}
     fit = mymin(as.vector(.inits), obj, control=control)
     fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
-    .message <- fit$message
     assign("fit",fit,envir = .dynmodel.env)
+    .message <- if(is.na(fit$message)) "No messages" else fit$message
     .time$optimizationTime <- (proc.time() - .ot)["elapsed"]
   } else {
     .ot <- proc.time()
@@ -1195,7 +1195,7 @@ assign("sgy",sgy,envir=.GlobalEnv)
       se = rep(NA, length(fit$par))
       warning("standard error of the Hessian has failed")
     } else {
-      cov = solve(fit$hessian)
+      cov.matrix = solve(fit$hessian)
       se = sqrt(diag(solve(fit$hessian)))
     }
 
@@ -1207,8 +1207,7 @@ assign("sgy",sgy,envir=.GlobalEnv)
     if (!is.na(match("dnorm",names(inits)))) fit$par[match("dnorm",names(inits))] = abs(fit$par[match("dnorm",names(inits))])
   
   .time$hessianTime <- (proc.time() - .ht)["elapsed"]
-  .time$totalTime <- (proc.time() - .pt)["elapsed"]
-  .time <- as.data.frame(.time)
+
 
   # dynmodel Output -------------------------------------------------------
   # unscale optmized parameters here if scaling was used:
@@ -1233,22 +1232,20 @@ assign("sgy",sgy,envir=.GlobalEnv)
   # Output
   res = c(list(res=res, obj=obj, npar=length(fit$par), nobs=nobs, data=data), fit)
   class(res) = "dyn.ID"
-#res
   # Final Output ----------------------------------------------------------
-  if (!is.null(nlmixrObject) & control$nlmixrOutput){
+  .time$totalTime <- (proc.time() - .pt)["elapsed"]
+  .time <- as.data.frame(.time)
+  names(.time) <- c("setup", "scaling", "optimization", "Hessian", "total")
 
-    nlmixr.ouptut <- as.focei.dynmodel(.dynmodelObject = res, .nlmixrObject = nlmixrObject, .data = data, .fit = fit, .message = .message, .inits.err = inits.err, .cov = cov, .syg = sgy, 
+  if (!is.null(nlmixrObject) & control$nlmixrOutput){
+    nlmixr.ouptut <- as.focei.dynmodel(.dynmodelObject = res, .nlmixrObject = nlmixrObject, .data = data, .time = .time, .fit = fit, .message = .message, .inits.err = inits.err, .cov = cov.matrix, .sgy = sgy, 
                                   .dynmodelControl = control, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl())
-      
-      return(nlmixr.output)
+      return(nlmixr.ouptut)
     }
     else {
       return(res)
     }
-  
-  
- 
-}
+  }
 # #########################################################################
 
 
