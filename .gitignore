@@ -24,3 +24,4 @@ vignettes/running_nlmixr.R
 vignettes/running_nlmixr.html
 build/*.*$
 *.exe$
+/src/Makevars
