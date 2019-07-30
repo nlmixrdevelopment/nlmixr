@@ -4,22 +4,26 @@
 \alias{dynmodelControl}
 \title{Control Options for dynmodel}
 \usage{
-dynmodelControl(..., fixPars = NULL, lower = -Inf, upper = Inf,
-  method = c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"),
-  ftol_rel = 1e-06, maxeval = 999, scaleTo = 1, scaleObjective = 0,
-  normType = c("constant", "rescale2", "mean", "rescale", "std", "len"),
-  scaleType = c("norm", "nlmixr", "mult", "multAdd"),
-  scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
-  scaleC0 = 1e+05, atol = 1e-08, rtol = 1e-06, npt = NULL,
-  rhobeg = 0.2, rhoend = 1e-04, iprint = 0, maxfun = NULL,
-  trace = 0, factr = NULL, pgtol = NULL, abstol = NULL,
-  reltol = NULL, lmm = NULL, maxit = NULL, eval.max = NULL,
-  iter.max = NULL, abs.tol = NULL, rel.tol = NULL, x.tol = NULL,
-  xf.tol = NULL, step.min = NULL, step.max = NULL, sing.tol = NULL,
-  scale.init = NULL, diff.g = NULL)
+dynmodelControl(..., fixPars = NULL, ci = 0.95, nlmixrOutput = F,
+  digs = 3, lower = -Inf, upper = Inf, method = c("bobyqa",
+  "Nelder-Mead", "lbfgsb3c", "PORT"), ftol_rel = 1e-06, maxeval = 999,
+  scaleTo = 1, scaleObjective = 0, normType = c("constant",
+  "rescale2", "mean", "rescale", "std", "len"), scaleType = c("norm",
+  "nlmixr", "mult", "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05,
+  scaleC = NULL, scaleC0 = 1e+05, atol = 1e-08, rtol = 1e-06,
+  npt = NULL, rhobeg = 0.2, rhoend = 1e-04, iprint = 0,
+  maxfun = NULL, trace = 0, factr = NULL, pgtol = NULL,
+  abstol = NULL, reltol = NULL, lmm = NULL, maxit = NULL,
+  eval.max = NULL, iter.max = NULL, abs.tol = NULL, rel.tol = NULL,
+  x.tol = NULL, xf.tol = NULL, step.min = NULL, step.max = NULL,
+  sing.tol = NULL, scale.init = NULL, diff.g = NULL,
+  rxControl = RxODE::rxControl())
 }
 \arguments{
 \item{...}{other arguments apply to dynmodelControl}
+
+\item{ci}{Confidence level for some tables.  By default this is
+0.95 or 95\% confidence.}
 
 \item{method}{The method for solving ODEs.  Currently this supports:
 
@@ -229,6 +233,8 @@ is allowed. If not defined, then 10^(-sigdig-1) will be used.}
 \item{rel.tol}{Relative tolerance before nlminb stops.}
 
 \item{x.tol}{X tolerance for nlmixr optimizers}
+
+\item{CI}{Confidence interval range from 0-1, default is 0.95}
 }
 \description{
 Control Options for dynmodel

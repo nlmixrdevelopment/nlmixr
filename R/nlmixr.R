@@ -700,7 +700,40 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         assign("origControl",control,fit$env);
         assign("modelId",.modelId,fit$env);
         return(fit);
-    } else {
+    } 
+    
+    ################# dynmodel ############################################ #
+        else if (est == "dynmodel") {
+            if (class(control) !="dynmodelControl") control <- do.call(dynmodelControl, control);
+            env <- new.env(parent=emptyenv());
+            
+            env$uif <- NULL
+
+            # nlmixr Object ---
+            .nmf <- nlmixr(f)
+            # Conversion ---
+            .dynNlmixr <- nlmixrDynmodelConvert(.nmf)
+            # Model ---
+            .system <- .dynNlmixr$system
+            # Data ---
+            .data <- data
+            # Initial Estimates ---
+            .inits <- .dynNlmixr$inits
+            # Error Model ---
+            .model <- .dynNlmixr$model
+            # Optional Control ---
+            control$nlmixrOutput <- T
+            control$fixPars <- if(!is.null(.dynNlmixr$fixPars)) .dynNlmixr$fixPars else NULL
+            control$lower <- if(!is.null(.dynNlmixr$lower)) .dynNlmixr$lower else NULL
+            control$upper <- if(!is.null(.dynNlmixr$upper)) .dynNlmixr$upper else NULL
+
+            fit <- dynmodel(system = .system, model = .model, inits = .inits, data = .data, nlmixrObject = .nmf, control=control)
+
+            return(fit);
+            }
+    ####################################################################### #
+    
+    else {
         stop(sprintf("Unknown estimation method est=\"%s\"",est));
     }
 }

@@ -40,7 +40,6 @@ err.msg = function(x, pre="", post="")
 #' @param ... additional arguments
 #' @return NULL
 #' @export
-plot.dyn.ID = gof
 gof = function(x, ...)
 {
   gof_str = "
@@ -79,6 +78,10 @@ gof = function(x, ...)
     abline(h=0, col="red", lty=2)
   }
 }
+
+#' @export
+#' @rdname gof
+plot.dyn.ID = gof
 # #########################################################################
 
 # print.dyn.ID() ----------------------------------------------------------
@@ -174,7 +177,6 @@ mymin = function(start, fr, rho=NULL, control=list())
 #' Output nlmixr format for dynmodel
 #' 
 #' @param .dynmodelObject return object from 
-#' @param 
 #' @export
 
 # run devtools::document() to update documentation
@@ -400,6 +402,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .fit
   names(.time) <- c("setup", "scaling", "optimization", "Hessian", "run total", "table")
   .env$time <- .time
   # ####
+  
   
   
   return(.nlmixr.pred)
@@ -1233,6 +1236,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   class(res) = "dyn.ID"
   # Final Output ----------------------------------------------------------
   .time$totalTime <- (proc.time() - .pt)["elapsed"]
+  
   .time <- as.data.frame(.time)
   names(.time) <- c("setup", "scaling", "optimization", "Hessian", "total")
   

@@ -4,20 +4,21 @@
 \alias{dynmodel}
 \title{Fit a non-population dynamic model}
 \usage{
-dynmodel(system, model, evTable, inits, data, control = list(), ...)
+dynmodel(system, model, inits, data, nlmixrObject = NULL,
+  control = list(), ...)
 }
 \arguments{
 \item{system}{an RxODE object}
 
 \item{model}{a list of statistical meaurement models}
 
-\item{evTable}{an Event Table object}
-
 \item{inits}{initial values of system parameters}
 
 \item{data}{input data}
 
 \item{control}{optional minimization control parameters}
+
+\item{evTable}{an Event Table object}
 
 \item{fixPars}{fixed system parameters}
 
