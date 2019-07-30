@@ -23,6 +23,8 @@ as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
 
 \item{calcResid}{A boolean to indicate if the CWRES residuals
 should be calculated}
+
+\item{nobs2}{Number of observations without EVID=2}
 }
 \value{
 A FOCEi fit style object.

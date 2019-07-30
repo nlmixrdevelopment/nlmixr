@@ -121,7 +121,8 @@ armaVersion <- function(){
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
 nlmixr <- function(object, data, est=NULL, control=list(),
-                   table=tableControl(), ...,save=NULL){
+                   table=tableControl(), ...,save=NULL,
+                   envir=parent.frame()){
     assignInMyNamespace(".nlmixrTime",proc.time());
     force(est)
     ## verbose?
@@ -132,7 +133,7 @@ nlmixr <- function(object, data, est=NULL, control=list(),
 ##' @rdname nlmixr
 ##' @export
 nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
-                            save=NULL){
+                            save=NULL, envir=parent.frame()){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .modName <- deparse(substitute(object))
     .uif <- nlmixrUI(object);
@@ -150,14 +151,14 @@ nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableC
         if (is.null(est)){
             stop("Need to supply an estimation routine with est=.");
         }
-        return(do.call(nlmixr_fit, .args))
+        return(do.call(nlmixr_fit, .args, envir=envir))
     }
 }
 
 ##'@rdname nlmixr
 ##'@export
 nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
-                                 save=NULL){
+                                 save=NULL, envir=parent.frame()){
     .uif <- .getUif(object);
     if (missing(data)){
         data <- getData(object);
@@ -166,13 +167,13 @@ nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=t
     .args$data <- data;
     .args$est <- est;
     .args <- c(list(uif=.uif), .args[-1]);
-    return(do.call(nlmixr_fit, .args))
+    return(do.call(nlmixr_fit, .args, envir=envir))
 }
 
 ##' @rdname nlmixr
 ##' @export
 nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
-                            save=NULL){
+                            save=NULL, envir=parent.frame()){
     .args <- as.list(match.call(expand.dots=TRUE))[-1]
     .uif <- object
     if (missing(data) && missing(est)){
@@ -188,7 +189,7 @@ nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
             .args$data <- data;
             .args$est <- est;
         }
-        return(do.call(nlmixr_fit, .args));
+        return(do.call(nlmixr_fit, .args, envir=envir));
     }
 }
 
@@ -228,7 +229,8 @@ nlmixrData.default <- function(data, model=NULL){
     return(dat);
 }
 nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
-                        sum.prod=FALSE, table=tableControl()){
+                        sum.prod=FALSE, table=tableControl(),
+                        envir=parent.frame()){
     if (is.null(est)){
         stop("Estimation type must be specified by est=''");
     }
@@ -266,7 +268,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     start.time <- Sys.time();
     if (!is(table, "tableControl")){
         if (is(table, "list")){
-            table <- do.call(tableControl, table);
+            table <- do.call(tableControl, table, envir=envir);
         } else {
             table <- tableControl();
         }
@@ -755,12 +757,13 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 ##' @param save This option determines if the fit will be saved to be
 ##'     reloaded if already run.  If NULL, get the option from
 ##'     \code{options("nlmixr.save")};
+##' @param envir Environment that nlmixr is evaluated in.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
                         sum.prod=FALSE, table=tableControl(),
-                        save=NULL){
+                        save=NULL, envir=parent.frame()){
 
     if (is.null(save)){
         save <- getOption("nlmixr.save", FALSE);
@@ -789,7 +792,7 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
         }
     }
     .ret  <- .collectWarnings(nlmixr_fit0(uif=uif, data=data, est=est, control=control, ...,
-                                          sum.prod=sum.prod, table=table), TRUE);
+                                          sum.prod=sum.prod, table=table, envir=envir), TRUE);
     .ws  <- .ret[[2]];
     .ret  <- .ret[[1]];
     if (inherits(.ret, "nlmixrFitCore")){

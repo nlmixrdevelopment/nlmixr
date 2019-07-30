@@ -1,5 +1,5 @@
 ## Add RxODE THETA/ETA replacement mini DSL
-.repSim <- function(x, theta=c(), eta=c()){
+.repSim <- function(x, theta=c(), eta=c(), lhs=c()){
     ret <- eval(parse(text=sprintf("quote({%s})", x)));
     f <- function(x){
         if (is.atomic(x)) {
@@ -20,7 +20,14 @@
             } else if (length(x[[2]]) == 1 &&
                        ((identical(x[[1]], quote(`=`))) ||
                         (identical(x[[1]], quote(`~`))))) {
-                x[[1]] <- quote(`~`)
+                if (any(as.character(x[[2]]) == lhs)){
+                    if (any(as.character(x[[2]]) == c("rx_pred_", "rx_r_"))){
+                        x[[1]] <- quote(`~`)
+                        return(as.call(lapply(x, f)));
+                    } else {
+                        return(NULL)
+                    }
+                }
                 return(as.call(lapply(x, f)));
             } else {
                 return(as.call(lapply(x, f)))
@@ -38,7 +45,7 @@
 
 .simInfo <- function(object){
     .mod <- RxODE::rxNorm(object$model$pred.only)
-    .mod <- gsub(rex::rex("d/dt(", capture(except_any_of("\n;)")), ")", or("=", "~")), "d/dt(\\1)~", .mod);
+    ## .mod <- gsub(rex::rex("d/dt(", capture(except_any_of("\n;)")), ")", or("=", "~")), "d/dt(\\1)~", .mod);
     .lhs <- object$model$pred.only$lhs
     .lhs <- .lhs[.lhs != "rx_pred_"];
     .lhs <- .lhs[.lhs != "rx_r_"];
@@ -46,8 +53,12 @@
     .etaN <- dimnames(.omega)[[1]]
     .params <- nlme::fixed.effects(object);
     .thetaN <- names(.params);
-    .newMod <- paste0(.repSim(.mod, theta=.thetaN, eta=.etaN),
+    .newMod <- paste0(.repSim(.mod, theta=.thetaN, eta=.etaN, c(.lhs, "rx_pred_", "rx_r_")),
                       "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);");
+    ## paste0(gsub("\n\n+", "\n", gsub(rex::rex(capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),one_of("\n;")), "",
+    ##                                 gsub(rex::rex(capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
+    ##                                      .repThetaEta(.mod, theta=.thetaN, eta=.etaN)))),
+    ##        "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);"));
     .sim <- "\nsim=rxTBSi(rx_pred_+rx_r_"
     .err <- object$uif$err;
     .w <- which(!is.na(object$uif$err))

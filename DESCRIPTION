@@ -7,12 +7,12 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
         R.utils, n1qn1, fastGHQuad,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
-	RxODE(>= 0.9.0-6), nlme, magrittr, tidyr, sys, generics,
-	huxtable, digest, flextable, stringr, yaml
+	RxODE(>= 0.9.1-0), nlme, magrittr, tidyr, sys, generics,
+	huxtable, digest, flextable, stringr, yaml, BH, StanHeaders(>= 2.18.0)
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3c, testthat,
         madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf,
 	Rvmmin, broom.mixed, dotwhisker, officer, pkgdown, gridExtra,
-	xpose, drake
+	xpose, drake (>= 7.5.2)
 Version: 1.1.1-0
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",
@@ -57,11 +57,12 @@ Description: Fit and compare nonlinear mixed-effects models in differential
     (Wang, Hallow, and James 2015 <doi:10.1002/psp4.12052>).
 License: GPL (>=2)
 NeedsCompilation: yes
-LinkingTo: dparser(>= 0.1.8), Rcpp (>= 1.0.1), RxODE(>= 0.9.0-6),
-        RcppEigen (>= 0.3.3.3.0), StanHeaders(>= 2.18.0), BH, lbfgsb3c
+LinkingTo: dparser(>= 0.1.8), RxODE(>= 0.9.0-6), RcppEigen (>= 0.3.3.3.0),
+    lbfgsb3c
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
+Biarch: true
 Packaged: 2018-04-30 01:43:13 UTC; annie
 Maintainer: Wenping Wang <wwang8198@gmail.com>

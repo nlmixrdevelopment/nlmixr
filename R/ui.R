@@ -5,11 +5,7 @@
         if (inherits(ns, "try-error")){
             assignInMyNamespace(".drakeTypeS", 0L);
         } else {
-            if (exists("no_deps", envir=ns)){
-                assignInMyNamespace(".drakeTypeS", 2L);
-            } else {
-                assignInMyNamespace(".drakeTypeS", 1L);
-            }
+            assignInMyNamespace(".drakeTypeS", 2L);
         }
     }
     return(.drakeTypeS);
@@ -22,11 +18,7 @@
         if (any(.x1 == c("ignore", "no_deps")) && .dt != 0L){
             return(x);
         } else if (.x1 == "model" && .dt != 0L){
-            if (.dt == 1L){
-                return(as.call(c(list(quote(ignore)), x)));
-            } else {
-                return(as.call(c(list(quote(no_deps)), x)))
-            }
+            return(as.call(c(list(quote(ignore)), x)));
         } else {
             return(as.call(lapply(x, .drakeCompat0)));
         }
@@ -2249,6 +2241,21 @@ nlmixrUI.nlmefun <- function(object, mu.type=c("thetas", "covariates", "none")){
   }
   return(fn)
 }
+##' Return dynmodel variable translation function
+##'
+##' @param object nlmixr ui object
+##' @return nlmixr dynmodel translation
+##' @author Matthew Fidler
+nlmixrUI.dynmodelfun <- function(object){
+    .fn <- nlmixrUI.nlmefun(object, "none");
+    .fn <- deparse(body(.fn))
+    .fn[1] <- paste0("{\n.env <-environment();\nsapply(names(..par),function(x){assign(x,setNames(..par[x],NULL),envir=.env)})\n");
+    .fn[length(.fn)] <- paste("return(unlist(as.list(environment())))}");
+    .fn <- eval(parse(text=paste0("function(..par)", paste(.fn, collapse="\n"))))
+    return(.fn)
+}
+
+
 ##' Get the variance for the nlme fit process based on UI
 ##'
 ##' @param object UI object
@@ -2827,6 +2834,8 @@ nlmixrUI.poped.ff_fun <- function(obj){
     return(x$model);
   } else if (arg == "nlme.fun.mu"){
     return(nlmixrUI.nlmefun(obj, "thetas"))
+  } else if (arg == "dynmodel.fun"){
+    return(nlmixrUI.dynmodelfun(obj))
   } else if (arg == "nlme.fun"){
     return(nlmixrUI.nlmefun(obj, "none"))
   } else if (arg == "nlme.fun.mu.cov"){

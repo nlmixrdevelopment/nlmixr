@@ -450,11 +450,11 @@ void codegen_stanode(FILE *outpt, const char* template_file) {
 
 
 void inits() {
-  symtab.symb_str = (char *) malloc(64*MXSYM);
+  symtab.symb_str = (char *) malloc(64*MXSYM*sizeof(int));
   err_msg((intptr_t)symtab.symb_str, "error allocating vars", 1);
 
   symtab.offset[0]=0;
-  memset(symtab.is_lhs, 0, MXSYM);
+  memset(symtab.is_lhs, 0, MXSYM*sizeof(int));
   symtab.nvar=0;
   symtab.nder=0;
   symtab.is_fn=0;
