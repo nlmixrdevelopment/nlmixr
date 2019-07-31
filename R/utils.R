@@ -745,7 +745,7 @@ dynmodelControl <- function(...,
 #' @export
 
 dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(), ...){
-  
+
   # Timing and environment --------------------------------------------------
   .pt <- proc.time()
   .time <- c()
@@ -914,16 +914,10 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
     if (!is.null(nlmixrObject)) {
       theta <- nlmixrObject$dynmodel.fun(theta)
     }
-    
     # call rxODE for simulation
 
     s = do.call(RxODE :: rxSolve, c(list(object=system, params=theta, events=data), rxControl))
     
-#     if (!is.null(nlmixrObject)) {
-#       theta <- nmf$dynmodel.fun(original.theta)[names(nmf$dynmodel.fun(original.theta)) %in% names(original.theta)]
-# print(theta)
-#     }
-
     # NOTES:
     #returnType="data.frame" - add to rxControl
     #rxNorm(system) # add error piece, use the error parameters as parameters
@@ -1292,9 +1286,11 @@ uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
   .Call(slice_wrap, fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
 }
 
-genobj = function(system, model, evTable, inits, data, fixPars=NULL
-)
-{
+genobj = function(system, model, evTable, inits, data, fixPars=NULL,
+squared=T
+){
+  
+  # Error model  -------------------------------------------------------------
   if (class(model)=="formula") {
     model = list(model)
   }
@@ -1321,7 +1317,7 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL
   names(inits.err) = paste0("err", 1:length(inits.err))
   inits = c(inits, inits.err)
   
-  
+  # Check dynmodel() inputs, Define vars, modelVars, pars,  ------------
   vars = names(data)
   nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
   if (length(nodef)) {
@@ -1346,12 +1342,14 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL
   
   npar = length(pars) - length(fixPars)
   
+  
+  # Additional assignment ---------------------------------------------------
   ## is this necessary ##
   have_zero = min(data$time) <= 0
   rows = if(have_zero) T else -1 # used in line 304 in obj()
   ## ---------------- ##
   
-  
+  # Objective Function ------------------------------------------------------
   obj = function(th, do.ode.solving=T, negation=F)
   {
     .ixpar = npar
@@ -1359,6 +1357,8 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL
     names(theta) = names(inits)[1:npar]
     theta = c(theta, fixPars)
     if (do.ode.solving) {
+      
+      
       s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
       
       
@@ -1397,6 +1397,8 @@ genobj = function(system, model, evTable, inits, data, fixPars=NULL
 #-- mcmc
 error.terms = paste0("err", 1:40)
 
+
+# slice sampling  ---------------------------------------------------------
 do.slice = function(pars, fr0)
 {
   rho = environment()
@@ -1469,6 +1471,7 @@ dynmodel.mcmc = function(system, model, evTable, inits, data,
 {
   calls = match.call()
   
+  # Objective Function ------------------------------------------------------
   l = genobj(system, model, evTable, inits, data, fixPars, squared)
   rho = environment()
   pars = l$inits
@@ -1476,8 +1479,15 @@ dynmodel.mcmc = function(system, model, evTable, inits, data,
   
   if (is.null(seed)) seed=99
   set.seed(seed)
+  
+  # progress
+  on.exit(RxODE::rxProgressAbort("Aborted MCMC Calculation"))
+  RxODE::rxProgress(nsim)
+  
+  # slice sampling
   s = t(sapply(1:nsim, function(k,rho) {
     pars = do.slice(get("pars", rho), fr0)
+    RxODE::rxTick()
     assign("pars", pars, rho)
   }, rho=rho))
   
@@ -1485,6 +1495,7 @@ dynmodel.mcmc = function(system, model, evTable, inits, data,
   attr(s, "calls") <- calls
   attr(s, "obj") <- fr0
   attr(s, "class") <- "dyn.mcmc"
+  RxODE::rxProgressStop()
   s
 }
 
@@ -1536,6 +1547,9 @@ plot.dyn.mcmc = function(x, ...)
 # #########################################################################
 
 
+# Utilities for nlmixr ----------------------------------------------------
+
+
 # ####################################################################### #
 #
 ## Utilities for building nlmixr
@@ -1553,7 +1567,7 @@ nsis <- function(){ ## build installer...
   source(devtools::package_file("build/nsis.R"))
   ## nocov end
 }
-
+# ########################################################################
 
 # .collectWarnings --------------------------------------------------------
 ##' Collect warnings and just warn once.
@@ -1608,6 +1622,8 @@ nlmixrPrint <- function(x, ...){
   vpc::vpc(...)
   dparser::dparse(...)
 }
+
+
 
 # cholSE() ----------------------------------------------------------------
 ##' Generalized Cholesky Matrix Decomposition
