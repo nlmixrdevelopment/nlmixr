@@ -1702,6 +1702,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   err <- new.fn(.deparse(f(body(fun))));
   do.pred <- 2;
   rest.txt <- .deparse(f(body(fun)))
+  .w  <- which(regexpr(rex::rex(start, any_spaces, or(group(anything, "(0)"),
+                                                      group(or("rate", "dur", "F", "f", "lag", "alag"), "(", anything, ")")),
+                                any_spaces, or("=", "<-")),
+                       rest.txt, perl=TRUE) != -1);
+  rest.txt <- rest.txt[-.w];
   rest <- new.fn(rest.txt);
   rest.funs <- allCalls(body(rest));
   rest.vars <- allVars(body(rest));
