@@ -184,7 +184,7 @@ mymin = function(start, fr, rho=NULL, control=list())
 # devtools::check_man() used to identify missing and problems
 # Will outside of dynmodel, and called within dynmodel. If nlmixr input used, output nlmixr, if dynmodel input used, output dynmodel. 
 
-as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl()){
+as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .theta, .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl()){
   
   # setup ----
   .env <- new.env(parent=emptyenv()); # store information for attaching to fit
@@ -229,9 +229,10 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .fit
         which(!is.na(  .nlmixrObject.df$ntheta) & is.na(  .nlmixrObject.df$err),TRUE)[-which(  .nlmixrObject.df$fix == TRUE)]
       } # row location for theta values
     
-    .ref.theta <-   .nlmixrObject.df$name[.theta.index]
-    .temp.log.theta.index <- intersect(.theta.index,.temp.model$log.etas)
-    return(.temp.log.theta.index)
+    #.ref.theta <-   .nlmixrObject.df$name[.theta.index]
+    #.temp.log.theta.index <- intersect(.theta.index,.temp.model$log.etas)
+    
+    return(.theta.index)
   }
   
   .Back.Transformed.Y.N <- (names(.Estimates) %in% .Estimates[backTransformed(.model)])
@@ -261,10 +262,18 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .fit
     rep(")", length(.Back.Transformed))  
   )
   
+  # assign labels to parFixed
   .parameters.df <- .nlmixrObject.df$label[.theta.index]
+  if (any(is.na(.parameters.df))) {
+    .parameters.df[is.na(.parameters.df)] <- ""
+  } else {
+    .parameters.df <- .nlmixrObject.df$label[.theta.index]
+  }
   if (length(.parameters.df)<length(.Estimates)){
     .parameters.df <- c(.parameters.df, rep("", sum(!is.na(.nlmixrObject.df$err))))
-  }
+  } 
+  
+  
   
   .parFixed <- data.frame(
     .parameters.df,
@@ -372,7 +381,9 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .fit
   #.data <- .dynmodelObject$data # might need to change name do to input
   
   .temp <- nlmixrDynmodelConvert(.nlmixrObject)
-  .parameters <- c(.temp$inits, .temp$fixPars) #change parameters to final estimates. Should not be inits.
+  .temp.inits <- .nlmixrObject$dynmodel.fun(.temp$inits)
+  .parameters <- c(.temp.inits, .temp$fixPars) #change parameters to final estimates. Should not be inits.
+  #.parameters <- c(.temp$inits, .temp$fixPars) #change parameters to final estimates. Should not be inits.
   .system <- .temp$system
   
   .rxControl$returnType <- "data.frame"
@@ -500,10 +511,9 @@ nlmixrDynmodelConvert <- function(.nmf){
   .theta <- c(.temp.nonlog.theta,.temp.log.theta)
   .theta <- .theta[order(factor(names(.theta), levels=.ref.theta))]
   
-  .theta.name.index <-  .theta.index + 2 + length(.theta.index) + length(.fix.index)
+  # .theta.name.index <-  .theta.index + 2 + length(.theta.index) + length(.fix.index)
   
-  names(.theta) <- .temp.model$pred.only$lhs[.theta.name.index]
-  
+  # names(.theta) <- .temp.model$pred.only$lhs[.theta.name.index]
   
   # assign sigma terms (estimated)
   .sigma.index <- 
@@ -577,7 +587,7 @@ nlmixrDynmodelConvert <- function(.nmf){
 dynmodelControl <- function(...,
                             fixPars=NULL,
                             ci=0.95,
-                            nlmixrOutput=F,
+                            nlmixrOutput=FALSE,
                             digs=3,
                             lower = -Inf,
                             upper = Inf,
@@ -859,18 +869,24 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   
   #  "system" variables contain estimated "init" variables and fixed "fixPars" variables?
   # obtain fixed and estimated parameters
-  pars = modelVars$params
+  if (is.null(nlmixrObject)) {
+    pars = modelVars$params
+    } else {
+    .temp<-nlmixrDynmodelConvert(nlmixrObject)
+    pars = names(.temp$inits)}
+  
   # Check to see if there are values in pars, that are not in the initial conditions and fixed parameters
   nodef = setdiff(pars, c(names(inits), names(fixPars)))
   # print error message
   if (length(nodef)) {
-    msg = err.msg(nodef, pre="par(s) not found: ")
-    stop(msg)
+   msg = err.msg(nodef, pre="par(s) not found: ")
+   stop(msg)
   }
-  
+
   # Additional assignment ---------------------------------------------------
   # number of estimated parameters, excluding the error terms
   npar = length(pars) - length(fixPars)
+  
   # Objective Function ------------------------------------------------------
   
   yo = RxODE::etTrans(data,system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
@@ -891,9 +907,23 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
     names(theta) = names(inits)[1:npar]
     theta = c(theta, fixPars)
     
+# function that translates the nmf$dynmodel.fun() parameters if function is null, dont apply translation.
+    # RxODE(nmf$rxode.pred)
+    # write function outside so it is faster
+    
+    if (!is.null(nlmixrObject)) {
+      theta <- nlmixrObject$dynmodel.fun(theta)
+    }
+    
     # call rxODE for simulation
+
     s = do.call(RxODE :: rxSolve, c(list(object=system, params=theta, events=data), rxControl))
     
+#     if (!is.null(nlmixrObject)) {
+#       theta <- nmf$dynmodel.fun(original.theta)[names(nmf$dynmodel.fun(original.theta)) %in% names(original.theta)]
+# print(theta)
+#     }
+
     # NOTES:
     #returnType="data.frame" - add to rxControl
     #rxNorm(system) # add error piece, use the error parameters as parameters
