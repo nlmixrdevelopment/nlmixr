@@ -26,6 +26,10 @@ is accurate but takes more function evaluations to calculate the
 Hessian.  In addition, this procedures optimizes the forward
 difference interval by \code{\link{nlmixrGill83}}
 }
+\details{
+If you have an analytical gradient function, you should use
+`stats::optimHess`
+}
 \examples{
  func0 <- function(x){ sum(sin(x))  }
  x <- (0:10)*2*pi/10

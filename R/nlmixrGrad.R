@@ -157,6 +157,9 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
 ##' Hessian.  In addition, this procedures optimizes the forward
 ##' difference interval by \code{\link{nlmixrGill83}}
 ##'
+##' If you have an analytical gradient function, you should use
+##' `stats::optimHess`
+##'
 ##' @inheritParams stats::optimHess
 ##' @param ... Extra arguments sent to \code{\link{nlmixrGill83}}
 ##' @inheritParams base::do.call
