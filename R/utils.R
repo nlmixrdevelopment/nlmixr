@@ -1,6 +1,6 @@
 ## utils.R: population PK/PD modeling library
 ##
-## Copyright (C) 2014 - 2016  Wenping Wang
+## Copyright (C) 2014 - 2016  Wenping Wang 
 ##
 ## This file is part of nlmixr.
 ##
@@ -153,7 +153,7 @@ nmsimplex = function(start, fr, rho=NULL, control=list())
         PACKAGE = 'nlmixr')
 }
 
-# Redundant function?
+
 mymin = function(start, fr, rho=NULL, control=list())
 {
   if (is.null(rho)) rho = environment(fr)
@@ -387,13 +387,14 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   .system <- .temp$system
   
   .rxControl$returnType <- "data.frame"
-  .rxControl$addDosing=T
+  .rxControl$addDosing=TRUE
   
   .nlmixr.sim = do.call(RxODE :: rxSolve, c(list(object=.system, params=.parameters, events=.data), .rxControl))
   
   .ID <- if (is.null(.nlmixr.sim$ID)) {rep(1, nrow(.data))} else {.nlmixr.sim$ID}
   .TIME <- .nlmixr.sim$time
   .DV = RxODE::etTrans(.data,.system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
+  .DV <- .DV$DV
   .EVID <- .nlmixr.sim$evid
   .PRED <- .nlmixr.sim$nlmixr_pred
   .RES <- .DV - .PRED
@@ -401,7 +402,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   .WRES <- (1/sqrt(.sgy))*.RES
   
   .nlmixr.pred <- data.frame(ID = .ID, TIME = .TIME, DV = .DV, EVID = .EVID, PRED = .PRED, RES = .RES, WRES = .WRES)
-  .nlmixr.pred <- cbind(.nlmixr.pred, .nlmixr.sim[ , -which(names(.nlmixr.sim) %in% c("time","evid"))])
+  .nlmixr.pred <- cbind(.nlmixr.pred, .nlmixr.sim[ , -which(names(.nlmixr.sim) %in% c("time","evid","nlmixr_pred"))])
   
   class(.env) <- "nlmixrFitCoreSilent"
   .nlmixr.pred.temp <- c("nlmixrDynmodel", "nlmixrFitData", "nlmixrFitCore", "tbl_df", "tbl", "data.frame")
@@ -713,7 +714,7 @@ dynmodelControl <- function(...,
 #' @param method estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.
 #' @param control optional minimization control parameters
 #' @return NULL
-#' @author Wenping Wang
+#' @author Wenping Wang, Mason McComb and Matt Fidler
 #' @examples
 #' ode <- "
 #'    dose=200;
@@ -849,7 +850,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   # check to see if there is a discrepency between error model names and data
   nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
   # print error message
-  if (length(nodef)) {
+  if (length(nodef) & is.null(nlmixrObject)) {
     msg = err.msg(nodef, pre="var(s) not found in data: ")
     stop(msg)
   }
@@ -891,6 +892,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   
   yo = RxODE::etTrans(data,system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
   yo = yo$DV[yo$EVID==0]
+  nobs <- length(yo)
   
   .time$setupTime <- (proc.time() - .pt)["elapsed"]
   
@@ -1247,12 +1249,12 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   res = cbind(fit$par, abs(se), abs(se/fit$par*100))
   dimnames(res) = list(names(inits), c("est", "se", "%cv"))
   
-  # ??
-  nobs = 0
-  l = lapply(model, function(x) {
-    yo =  data[,model[[1]]["dv"][[1]]]#data[, x["dv"]]
-    nobs <<- nobs + length(yo)
-  })
+
+  # nobs = 0
+  # l = lapply(model, function(x) {
+  #   yo =  data[,model[[1]]["dv"][[1]]]#data[, x["dv"]]
+  #   nobs <<- nobs + length(yo)
+  # })
   if (!is.null(fit$objective)) fit$value = fit$objective
   
   # Output
@@ -1410,6 +1412,8 @@ do.slice = function(pars, fr0)
       pars.cp[wh] = x
       fr0(pars.cp, do.ode.solving=do.ode.solving, negation=T)
     }
+
+# pars.cp as a data frame, run in do all the ode solving at the end in parallel
     pars.cp[wh] = uni_slice(x0, fr, lower=0)
     assign("pars", pars.cp, rho)
     NULL
