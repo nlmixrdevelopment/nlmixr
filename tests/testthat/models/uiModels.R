@@ -108,7 +108,6 @@ one.compartment.IV.MM.model2 <- function(){
     })
 }
 
-
 one.compartment.oral.model <- function(){
     ini({ # Where initial conditions/variables are specified
           # '<-' or '=' defines population parameters
@@ -481,8 +480,6 @@ two.compartment.oral.model <- function(){
     })
 }
 
-
-
 two.compartment.oral.model.solve <- function(){
     ini({ # Where initial conditions/variables are specified
           # '<-' or '=' defines population parameters
@@ -661,7 +658,7 @@ mod2 <- matrix(c(1, 1,FALSE, FALSE, FALSE, "SD",
     mutate(data=paste0(ifelse(oral,"Oral",ifelse(infusion, "Infusion","Bolus")),"_",
                               cmt,"CPT",ifelse(mm,"MM","")))
 
-opts <- c("focei", "saem", "nlme", "fo", "foi", "foce")
+opts <- c("focei", "saem", "nlme", "fo", "foi", "foce", "dynmodel")
 env <- environment()
 
 ns <- loadNamespace("nlmixr")
