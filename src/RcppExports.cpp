@@ -148,6 +148,60 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrGill83_
+List nlmixrGill83_(Function what, NumericVector args, Environment envir, LogicalVector which, double gillRtol, int gillK, double gillStep, double gillFtol, bool optGillF);
+RcppExport SEXP _nlmixr_nlmixrGill83_(SEXP whatSEXP, SEXP argsSEXP, SEXP envirSEXP, SEXP whichSEXP, SEXP gillRtolSEXP, SEXP gillKSEXP, SEXP gillStepSEXP, SEXP gillFtolSEXP, SEXP optGillFSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Function >::type what(whatSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type args(argsSEXP);
+    Rcpp::traits::input_parameter< Environment >::type envir(envirSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type which(whichSEXP);
+    Rcpp::traits::input_parameter< double >::type gillRtol(gillRtolSEXP);
+    Rcpp::traits::input_parameter< int >::type gillK(gillKSEXP);
+    Rcpp::traits::input_parameter< double >::type gillStep(gillStepSEXP);
+    Rcpp::traits::input_parameter< double >::type gillFtol(gillFtolSEXP);
+    Rcpp::traits::input_parameter< bool >::type optGillF(optGillFSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrGill83_(what, args, envir, which, gillRtol, gillK, gillStep, gillFtol, optGillF));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nlmixrEval_
+double nlmixrEval_(NumericVector theta, std::string md5);
+RcppExport SEXP _nlmixr_nlmixrEval_(SEXP thetaSEXP, SEXP md5SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< std::string >::type md5(md5SEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrEval_(theta, md5));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nlmixrGrad_
+NumericVector nlmixrGrad_(NumericVector theta, std::string md5);
+RcppExport SEXP _nlmixr_nlmixrGrad_(SEXP thetaSEXP, SEXP md5SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< std::string >::type md5(md5SEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrGrad_(theta, md5));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nlmixrParHist_
+RObject nlmixrParHist_(std::string md5);
+RcppExport SEXP _nlmixr_nlmixrParHist_(SEXP md5SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type md5(md5SEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrParHist_(md5));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sqrtm
 NumericMatrix sqrtm(NumericMatrix m);
 RcppExport SEXP _nlmixr_sqrtm(SEXP mSEXP) {
