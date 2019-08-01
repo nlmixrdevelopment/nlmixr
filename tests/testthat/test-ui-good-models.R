@@ -72,5 +72,33 @@ rxPermissive({
     expect_equal("nlmixrUI", class(nlmixr(two.cmt.pd)));
 
 
+    one.compartment.IV.model <- function(){
+        ini({ # Where initial conditions/variables are specified
+                                        # '<-' or '=' defines population parameters
+                                        # Simple numeric expressions are supported
+            Cl <- 1.6      # Cl (L/hr)
+            Vc <- 4.5      # V (L)
+                                        # Bounds may be specified by c(lower, est, upper), like NONMEM:
+                                        # Residuals errors are assumed to be population parameters
+            prop.err <- c(0, 0.3, 1)
+                                        # Between subject variability estimates are specified by '~'
+                                        # Semicolons are optional
+                                        #eta.Vc ~ 0.1   #IIV V
+                                        #eta.Cl ~ 0.1   #IIV Cl
+        })
+        model({ # Where the model is specified
+                                        # The model uses the ini-defined variable names
+                                        #Vc <- exp(lVc + eta.Vc)
+                                        #Cl <- exp(lCl + eta.Cl)
+                                        # RxODE-style differential equations are supported
+            d / dt(centr) = -(Cl / Vc) * centr;
+            ## Concentration is calculated
+            cp = centr / Vc;
+                                        # And is assumed to follow proportional error estimated by prop.err
+            cp ~ prop(prop.err)
+        })
+    }
+
+    expect_equal("nlmixrUI", class(nlmixr(one.compartment.IV.model)));
 
 }, on.validate="NLMIXR_VALIDATION")
