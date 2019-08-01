@@ -89,6 +89,30 @@ nlmixrGill83 <- function(what, args, envir=parent.frame(),
 ##' @param thetaNames Names for the theta parameters
 ##' @inheritParams nlmixrGill83
 ##' @inheritParams foceiControl
+##' @param theta for the internal functions theta is the parameter
+##'     values
+##' @param md5 the md5 identifier for the internal gradient function
+##'     information.
+##' @examples
+##'
+##' func0 <- function(x){ sum(sin(x))  }
+##'
+##' ## This will printout every interation or when print=X
+##' gf <- nlmixrGradFun(func0)
+##'
+##' ## x
+##' x <- (0:10)*2*pi/10;
+##' gf$eval(x)
+##' gf$grad(x)
+##'
+##' ## x2
+##' x2 <- x+0.1
+##' gf$eval(x2)
+##' gf$grad(x2)
+##'
+##' ## Gives the parameter history as a data frame
+##' gf$hist()
+##'
 ##' @export
 nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
                           gillRtol=sqrt(.Machine$double.eps), gillK=10L, gillStep=2, gillFtol=0,
@@ -123,4 +147,53 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
         nlmixrParHist_(md5);
     }")))
     return(list(eval=.eval, grad=.grad, hist=.hist))
+}
+
+##' Calculate Hessian
+##'
+##' Unlike `stats::optimHess` which assumes the gradient is accurate,
+##' nlmixrHess does not make as strong an assumption that the gradient
+##' is accurate but takes more function evaluations to calculate the
+##' Hessian.  In addition, this procedures optimizes the forward
+##' difference interval by \code{\link{nlmixrGill83}}
+##'
+##' @inheritParams stats::optimHess
+##' @param ... Extra arguments sent to \code{\link{nlmixrGill83}}
+##' @inheritParams base::do.call
+##' @author Matthew Fidler
+##' @export
+##' @seealso \code{\link{nlmixrGill83}}, \code{\link{optimHess}}
+##' @references
+##'
+##' \url{https://pdfs.semanticscholar.org/presentation/e7d5/aff49eb17fd155e75725c295859d983cfda4.pdf}
+##'
+##' \url{https://v8doc.sas.com/sashtml/ormp/chap5/sect28.htm}
+##'
+##' @examples
+##'  func0 <- function(x){ sum(sin(x))  }
+##'  x <- (0:10)*2*pi/10
+##'  nlmixrHess(x, func0)
+##'
+##' fr <- function(x) {   ## Rosenbrock Banana function
+##'     x1 <- x[1]
+##'     x2 <- x[2]
+##'     100 * (x2 - x1 * x1)^2 + (1 - x1)^2
+##' }
+##' grr <- function(x) { ## Gradient of 'fr'
+##'     x1 <- x[1]
+##'     x2 <- x[2]
+##'     c(-400 * x1 * (x2 - x1 * x1) - 2 * (1 - x1),
+##'        200 *      (x2 - x1 * x1))
+##' }
+##'
+##' h1 <- optimHess(c(1.2,1.2), fr, grr)
+##'
+##' h2 <- optimHess(c(1.2,1.2), fr)
+##'
+##' ## in this case h3 is closer to h1 where the gradient is known
+##'
+##' h3 <- nlmixrHess(c(1.2,1.2), fr)
+nlmixrHess <- function (par, fn, ..., envir=parent.frame()){
+    .gill <- nlmixrGill83(fn, par, envir=envir,...);
+    return(nlmixrHess_(par, fn, envir, .gill))
 }
