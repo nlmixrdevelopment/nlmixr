@@ -3515,7 +3515,9 @@ void nlmixrGradPrint(NumericVector gr, int gradType, int cn, bool useColor,
     } else {
       Rprintf("\n");
     }
-    foceiPrintLine(min2(n, printNcol));
+    if (!useColor){
+      foceiPrintLine(min2(n, printNcol));
+    }
   }
 }
 
