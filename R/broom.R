@@ -97,25 +97,35 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 }
 
 .nlmixrTidyRandom <- function(x, ...){
-    .tmp <- stack(x$eta[,-1])
-    .df <- data.frame(group="ID", level=x$eta$ID, term=.tmp$ind, estimate=.tmp$values);
-    dplyr::as.tbl(.df)
+    .d <- dim(x$omegaR);
+    if (.d[1] > 0){
+        .tmp <- stack(x$eta[,-1])
+        .df <- data.frame(group="ID", level=x$eta$ID, term=.tmp$ind, estimate=.tmp$values);
+        return(dplyr::as.tbl(.df))
+    } else {
+        return(NULL)
+    }
 }
 
 .nlmixrTidyRandomPar <- function(x,...){
     .pars  <- .getR(x,TRUE)
-    .p1 <- data.frame(effect="ran_pars", group="ID", term=names(.pars),estimate=.pars, std.error=NA_real_,
-                      statistic=NA_real_, p.value=NA_real_, stringsAsFactors=FALSE) %>%
-        .reorderCols();
-    .p2  <- data.frame(.nlmixrTidyFixed(x,.ranpar=TRUE), stringsAsFactors=FALSE)%>%
-        .reorderCols();
-    .df  <- rbind(.p1,.p2);
-    for (.v in c("statistic", "p.value", "std.error")){
-        if (all(is.na(.df[,.v]))){
-            .df  <- .df[,names(.df) != .v];
+    if (length(.pars) > 0){
+        .p1 <- data.frame(effect="ran_pars", group="ID", term=names(.pars),estimate=.pars, std.error=NA_real_,
+                          statistic=NA_real_, p.value=NA_real_, stringsAsFactors=FALSE) %>%
+            .reorderCols();
+        .p2  <- data.frame(.nlmixrTidyFixed(x,.ranpar=TRUE), stringsAsFactors=FALSE)%>%
+            .reorderCols();
+        .df  <- rbind(.p1,.p2);
+        for (.v in c("statistic", "p.value", "std.error")){
+            if (all(is.na(.df[,.v]))){
+                .df  <- .df[,names(.df) != .v];
+            }
         }
+        return(dplyr::as.tbl(.df))
+    } else {
+        return(NULL)
     }
-    return(dplyr::as.tbl(.df))
+}
 ##   effect   group    term                  estimate std.error statistic
 ##   <chr>    <chr>    <chr>                    <dbl>     <dbl>     <dbl>
 ## 1 fixed    NA       (Intercept)           251.          6.82     36.8
@@ -124,7 +134,6 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 ## 4 ran_pars Subject  sd__Days                5.92       NA        NA
 ## 5 ran_pars Subject  cor__(Intercept).Days   0.0656     NA        NA
 ## 6 ran_pars Residual sd__Observation        25.6        NA        NA
-}
 
 ## Row names and order taken & adapted from
 ## https://github.com/bbolker/broom.mixed/blob/master/R/utilities.R#L238-L248
@@ -141,6 +150,10 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 }
 
 .coefPar  <- function(x, exponentiate=FALSE,...){
+    .d <- dim(x$omegaR);
+    if (.d[1] == 0){
+        return(NULL)
+    }
     .muRef  <- x$mu.ref
     .theta  <- x$theta
     .df <- .fixNames(x$parFixedDf);
@@ -206,6 +219,9 @@ tidy.nlmixrFitCore <- function(x, ...){
         .ret$ran_pars <- .nlmixrTidyRandomPar(x, ...);
     if (any(.effects == "ran_coef")){
         .ret$ran_coef <- .coefPar(x, ...);
+    }
+    if (all(unlist(lapply(seq_along(.ret), is.null)))){
+        return(NULL)
     }
     return(dplyr::bind_rows(.ret, .id="effect") %>%
            dplyr::as.tbl() %>%

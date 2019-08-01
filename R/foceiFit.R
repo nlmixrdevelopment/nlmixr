@@ -2627,7 +2627,10 @@ vcov.nlmixrFitCoreSilent  <- vcov.nlmixrFitCore
     .lt <- structure(.rs[.lt], .Names=.nms)
     .lt <- .lt[.lt != 0];
     if (sd){
-        .lt <- c(setNames(diag(x$omegaR),paste0("sd",getOption("broom.mixed.sep1","__"),.dn1)),.lt);
+        .d <- dim(x$omegaR);
+        if (.d[1] > 0){
+            .lt <- c(setNames(diag(x$omegaR),paste0("sd",getOption("broom.mixed.sep1","__"),.dn1)),.lt);
+        }
     }
     return(.lt)
 }

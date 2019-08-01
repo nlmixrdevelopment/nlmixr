@@ -318,10 +318,6 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   .env$cov <- .cov
   # ####
 
-  ## $logLik ----
-  attr(logLik, "df") = .dynmodelObject$npar
-  attr(logLik,"nobs") = .dynmodelObject$nobs
-  class(logLik) = "logLik"
   # ####
 
   ## $nobs ----
@@ -338,11 +334,21 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   .env$objective <- .objf
   # ####
 
-  ## $objDf ----
-  .aic <- 2*.dynmodelObject$value + 2*.dynmodelObject$npar
-  .bic <- 2*.dynmodelObject$value + log(.dynmodelObject$nobs)*.dynmodelObject$npar
 
-  .objDf <- data.frame(OBJF = .objf, AIC = .aic, BIC = .bic, "Log-likelihood"=.dynmodelObject$value)
+  ## $logLik ----
+  ## returns value = -ll
+  logLik <- -.dynmodelObject$value
+  attr(logLik, "df") = .dynmodelObject$npar
+  attr(logLik,"nobs") = .dynmodelObject$nobs
+  class(logLik) = "logLik"
+  .env$logLik <- logLik
+
+  ## $objDf ----
+  .aic <- AIC(logLik)
+  .bic <- BIC(logLik)
+
+  .objDf <- data.frame(OBJF = .objf, AIC = .aic, BIC = .bic, "Log-likelihood"=.dynmodelObject$value,
+                       check.names=FALSE)
   .env$objDf <- .objDf
   # ####
 
@@ -353,6 +359,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
 
   ## omega ----
   .env$omega <- matrix(numeric(0), 0, 0)
+  .env$omegaR <- matrix(numeric(0), 0, 0)
   # ####
 
   ## sigma ----
