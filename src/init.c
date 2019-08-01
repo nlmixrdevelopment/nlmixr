@@ -61,6 +61,8 @@ SEXP _nlmixr_foceiFitCpp_(SEXP);
 SEXP _nlmixr_boxCox_(SEXP, SEXP, SEXP);
 SEXP _nlmixr_iBoxCox_(SEXP, SEXP, SEXP);
 SEXP _nlmixr_freeFocei();
+SEXP _nlmixr_nlmixrGill83_(SEXP, SEXP, SEXP, SEXP, SEXP,
+			   SEXP, SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
@@ -103,6 +105,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_foceiFitCpp_", (DL_FUNC) &_nlmixr_foceiFitCpp_, 1},
   {"_nlmixr_boxCox_", (DL_FUNC) &_nlmixr_boxCox_, 3},
   {"_nlmixr_iBoxCox_", (DL_FUNC) &_nlmixr_iBoxCox_, 3},
+  {"_nlmixr_nlmixrGill83_", (DL_FUNC) &_nlmixr_nlmixrGill83_, 8},
   {NULL, NULL, 0}
 };
 

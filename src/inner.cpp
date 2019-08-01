@@ -1674,6 +1674,29 @@ static inline double phiB(double f, double fn, double h){
   return (f-fn)/h;
 }
 
+// Call R function for gill83
+bool foceiGill=true;
+double gillF=NA_REAL;
+int gillThetaN=0;
+Environment gillRfnE_;
+Environment baseEnv = Environment::base_env();
+Function doCall = baseEnv["do.call"];
+Function gillRfn_ = baseEnv["invisible"];
+int gillPar = 0;
+double gillLong = false;
+double gillRfn(double *theta){
+  List par(1);
+  NumericVector par0(gillThetaN);
+  std::copy(&theta[0], &theta[0]+gillThetaN,par0.begin());
+  par[0] = par0;
+  NumericVector ret = as<NumericVector>(doCall(_["what"] = gillRfn_, _["args"]=par, _["envir"]=gillRfnE_));
+  if (ret.size() == 1){
+    return(ret[0]);
+  } else {
+    return(ret[gillPar]);
+  }
+}
+
 // *hf is the forward difference final estimate
 // *hphif is central difference final estimate (when switching from forward to central differences)
 // *df is the derivative estimate
@@ -1691,8 +1714,8 @@ static inline double phiB(double f, double fn, double h){
 int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
 	   double *theta, int cpar, double epsR, int K, double gillStep,
 	   double fTol){
-  op_focei.calcGrad=1;
-  double f= op_focei.lastOfv , x, hbar, h0, fp, fn, phif, phib, phic, phicc = 0, phi, Chf, Chb, Ch, hs, hphi, hk, tmp, ehat,
+  if (foceiGill) op_focei.calcGrad=1;
+  double f= (foceiGill ? op_focei.lastOfv : gillF) , x, hbar, h0, fp, fn, phif, phib, phic, phicc = 0, phi, Chf, Chb, Ch, hs, hphi, hk, tmp, ehat,
     lasth, lastht=NA_REAL, lastfpt=NA_REAL, phict=NA_REAL;
   int k = 0;
   // Relative error should be given by the tolerances, I believe.
@@ -1703,11 +1726,19 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   h0 = gillStep*hbar;
   lasth=h0;
   theta[cpar] = x + h0;
-  updateTheta(theta);
-  fp = foceiOfv0(theta);
+  if (foceiGill){
+    updateTheta(theta);
+    fp = foceiOfv0(theta);
+  } else {
+    fp = gillRfn(theta);
+  }
   theta[cpar] = x-h0;
-  updateTheta(theta);
-  fn = foceiOfv0(theta);
+  if (foceiGill){
+    updateTheta(theta);
+    fn = foceiOfv0(theta);
+  } else {
+    fn = gillRfn(theta);
+  }
   phif = phiF(f, fp, h0);
   phib = phiB(f, fn, h0);
   phic = phiC(fp, fn, h0);
@@ -1747,11 +1778,19 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   // Compute the associated finite difference estimates and their
   // relative condition errors.
   theta[cpar] = x + hk;
-  updateTheta(theta);
-  fp = foceiOfv0(theta);
+  if (foceiGill) {
+    updateTheta(theta);
+    fp = foceiOfv0(theta);
+  } else {
+    fp = gillRfn(theta);
+  }
   theta[cpar] = x-hk;
-  updateTheta(theta);
-  fn = foceiOfv0(theta);
+  if (foceiGill){
+    updateTheta(theta);
+    fn = foceiOfv0(theta);
+  } else {
+    fn = gillRfn(theta);
+  }
   phif = phiF(f, fp, hk);
   phib = phiB(f, fn, hk);
   phic = phiC(fp, fn, hk);
@@ -1786,11 +1825,19 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   // Compute the associated finite difference estimates and their
   // relative condition errors.
   theta[cpar] = x + hk;
-  updateTheta(theta);
-  fp = foceiOfv0(theta);
+  if (foceiGill){
+    updateTheta(theta);
+    fp = foceiOfv0(theta);
+  } else {
+    fp = gillRfn(theta);
+  }
   theta[cpar] = x-hk;
-  updateTheta(theta);
-  fn = foceiOfv0(theta);
+  if (foceiGill){
+    updateTheta(theta);
+    fn = foceiOfv0(theta);
+  } else {
+    fn = gillRfn(theta);
+  }
   phif = phiF(f, fp, hk);
   phib = phiB(f, fn, hk);
   tmp=phic;
@@ -1832,11 +1879,15 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
   *df2 = phi;
   *hf = 2*_safe_sqrt(epsA/fabs(phi));
   theta[cpar] = x + *hf;
-  updateTheta(theta);
-  fp = foceiOfv0(theta);
+  if (foceiGill){
+    updateTheta(theta);
+    fp = foceiOfv0(theta);
+  } else {
+    fp = gillRfn(theta);
+  }
   // Restore theta
   theta[cpar] = x;
-  updateTheta(theta);
+  if (foceiGill) updateTheta(theta);
   *df = phiF(f, fp, *hf);
   *ef = (*hf)*fabs(phi)/2+2*epsA/(*hf);
   *hphif=hphi;
@@ -1870,8 +1921,12 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
     *hf = pow(DOUBLE_EPS, 0.25);//hbar;
     // *df=phic;
     theta[cpar] = x + *hf;
-    updateTheta(theta);
-    fp = foceiOfv0(theta);
+    if (foceiGill){
+      updateTheta(theta);
+      fp = foceiOfv0(theta);
+    } else {
+      fp = gillRfn(theta);
+    }
     *df = phiF(f, fp, *hf);
     *df2=0;
     // *df = 0.0; // Doesn't move.
@@ -3168,6 +3223,72 @@ Environment foceiOuter(Environment e){
     }
   }
   return e;
+}
+
+//[[Rcpp::export]]
+List nlmixrGill83_(Function what, NumericVector args, Environment envir,
+		   LogicalVector which,
+		   double gillRtol, int gillK=10, double gillStep=2, double gillFtol=0){
+  if (args.size()!=which.size()) stop("'args' must have same size as 'which'");
+  gillRfn_=what;
+  gillThetaN=args.size();  
+  gillRfnE_=envir;
+  double *theta;
+  theta = &args[0];
+  foceiGill=false;
+  NumericVector hfN(args.size());
+  NumericVector hphifN(args.size());
+  NumericVector gillDfN(args.size());
+  NumericVector gillDf2N(args.size());
+  NumericVector gillErrN(args.size());
+  IntegerVector retN(args.size());
+  gillLong=false;
+  for (int i = args.size(); i--;){
+    if (which[i]){
+      gillPar=i;
+      if (i == args.size()-1 || gillLong){
+	gillF = gillRfn(theta);
+      }
+      retN[i] = gill83(&hfN[i], &hphifN[i], &gillDfN[i], &gillDf2N[i], &gillErrN[i],
+		   theta, i, gillRtol, gillK, gillStep,
+		   gillFtol) + 1;
+    } else {
+      retN[i] = 1;
+      hfN[i] = NA_REAL;
+      hphifN[i] = NA_REAL;
+      gillDfN[i] = NA_REAL;
+      gillDf2N[i] = NA_REAL;
+      gillErrN[i] = NA_REAL;
+    }
+  }
+  foceiGill=true;
+  List df(6);
+  retN.attr("levels") = CharacterVector::create("Not Assessed","Good","High Grad Error",
+						"Constant Grad","Odd/Linear Grad",
+						"Grad changes quickly");
+  retN.attr("class") = "factor";
+  df[0] = retN;
+  df[1] = hfN;
+  df[2] = hphifN;
+  df[3] = gillDfN;
+  df[4] = gillDf2N;
+  df[5] = gillErrN;
+  df.attr("names") = CharacterVector::create("info","hf","hphi","df","df2","err");
+  if (args.hasAttribute("names")){
+    df.attr("row.names") = args.attr("names");
+  } else {
+    df.attr("row.names") = IntegerVector::create(NA_INTEGER, -args.size());
+  }
+  CharacterVector cls = CharacterVector::create("nlmixrGill83", "data.frame");
+  List info = List::create(_["which"]=which,
+			   _["gillRtol"]=gillRtol,
+			   _["gillK"]=gillK,
+			   _["gillStep"]=gillStep,
+			   _["gillFtol"]=gillFtol);
+  info.attr("class") = CharacterVector::create("nlmixrLstSilent");
+  cls.attr(".nlmixrGill") = info;
+  df.attr("class") = cls;
+  return df;
 }
 
 

@@ -148,6 +148,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrGill83_
+List nlmixrGill83_(Function what, NumericVector args, Environment envir, LogicalVector which, double gillRtol, int gillK, double gillStep, double gillFtol);
+RcppExport SEXP _nlmixr_nlmixrGill83_(SEXP whatSEXP, SEXP argsSEXP, SEXP envirSEXP, SEXP whichSEXP, SEXP gillRtolSEXP, SEXP gillKSEXP, SEXP gillStepSEXP, SEXP gillFtolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Function >::type what(whatSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type args(argsSEXP);
+    Rcpp::traits::input_parameter< Environment >::type envir(envirSEXP);
+    Rcpp::traits::input_parameter< LogicalVector >::type which(whichSEXP);
+    Rcpp::traits::input_parameter< double >::type gillRtol(gillRtolSEXP);
+    Rcpp::traits::input_parameter< int >::type gillK(gillKSEXP);
+    Rcpp::traits::input_parameter< double >::type gillStep(gillStepSEXP);
+    Rcpp::traits::input_parameter< double >::type gillFtol(gillFtolSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrGill83_(what, args, envir, which, gillRtol, gillK, gillStep, gillFtol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sqrtm
 NumericMatrix sqrtm(NumericMatrix m);
 RcppExport SEXP _nlmixr_sqrtm(SEXP mSEXP) {

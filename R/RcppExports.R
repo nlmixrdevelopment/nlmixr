@@ -49,6 +49,10 @@ foceiOuter <- function(e) {
     .Call(`_nlmixr_foceiOuter`, e)
 }
 
+nlmixrGill83_ <- function(what, args, envir, which, gillRtol, gillK = 10L, gillStep = 2, gillFtol = 0) {
+    .Call(`_nlmixr_nlmixrGill83_`, what, args, envir, which, gillRtol, gillK, gillStep, gillFtol)
+}
+
 #' Return the square root of general square matrix A
 #'
 #' @param m Matrix to take the square root of.
