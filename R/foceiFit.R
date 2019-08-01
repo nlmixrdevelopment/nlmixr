@@ -2599,6 +2599,29 @@ print.nlmixrFitCoreSilent  <- function(x, ...){
 }
 
 ##'@export
+print.nlmixrLstSilent <- function(x, ...){
+    return(invisible(x))
+}
+
+##'@export
+`$.nlmixrGill83` <-  function(obj, arg, exact = FALSE){
+    .ret <- obj[[arg]]
+    if (is.null(.ret)){
+        .cls <- class(obj);
+        .lst <- attr(.cls, ".nlmixrGill");
+        return(.lst[[arg]])
+    }
+    return(.ret)
+}
+
+##'@export
+print.nlmixrGill83 <- function(x, ...){
+    cat(sprintf("Gill83 Derivative/Forward Difference\n  (rtol=%s; K=%s, step=%s, ftol=%s)\n\n",
+                x$gillRtol, x$gillK, x$gillStep, x$gillFtol))
+    NextMethod(x);
+}
+
+##'@export
 print.nlmixrFitCore <- function(x, ...){
     .width <- getOption("width");
     .parent <- parent.frame(2);
