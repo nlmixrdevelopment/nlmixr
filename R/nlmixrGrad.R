@@ -137,14 +137,14 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
     .nlmixrGradInfo[[paste0(.md5, ".k")]] <- gillK
     .nlmixrGradInfo[[paste0(.md5, ".s")]] <- gillStep
     .nlmixrGradInfo[[paste0(.md5, ".ftol")]] <- gillFtol
-    .eval <- eval(parse(text=paste0("function(theta, md5=\"", .md5, "\"){
-        nlmixrEval_(theta, md5);
+    .eval <- eval(parse(text=paste0("function(theta){
+        nlmixrEval_(theta, \"", .md5, "\");
     }")))
-    .grad <- eval(parse(text=paste0("function(theta, md5=\"", .md5, "\"){
-        nlmixrGrad_(theta, md5);
+    .grad <- eval(parse(text=paste0("function(theta){
+        nlmixrGrad_(theta, \"", .md5, "\");
     }")))
-    .hist <- eval(parse(text=paste0("function(md5=\"", .md5, "\"){
-        nlmixrParHist_(md5);
+    .hist <- eval(parse(text=paste0("function(){
+        nlmixrParHist_(md5=\"", .md5, "\");
     }")))
     return(list(eval=.eval, grad=.grad, hist=.hist))
 }
