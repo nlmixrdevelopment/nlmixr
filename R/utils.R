@@ -370,7 +370,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
 
   ## extra ----
   .estimation.method <- .dynmodelControl$method
-  .env$extra <- paste0(" (Eestimation with " ,crayon::bold$yellow(.estimation.method),")")
+  .env$extra <- paste0(" (Estimation with " ,crayon::bold$yellow(.estimation.method),")")
   # ####
 
   ## fit ----
@@ -638,10 +638,49 @@ dynmodelControl <- function(...,
                             sing.tol=NULL,
                             scale.init=NULL,
                             diff.g=NULL,
+                            ## Sigdig
+                            boundTol=NULL,
+                            epsilon=NULL,
+                            derivSwitchTol=NULL,
+                            sigdig=4,
                             covMethod=c("nlmixrHess", "optimHess"),
                             # rxControl
                             rxControl = RxODE::rxControl()
-) {
+                            ) {
+  if (is.null(boundTol)){
+    boundTol <- 5 * 10 ^ (-sigdig + 1)
+  }
+  if (is.null(epsilon)){
+    epsilon <- 10 ^ (-sigdig - 1)
+  }
+  if (is.null(abstol)){
+    abstol <- 10 ^ (-sigdig - 1)
+  }
+  if (is.null(reltol)){
+    reltol <- 10 ^ (-sigdig - 1)
+  }
+  if (is.null(rhoend)){
+    rhoend <- 10 ^ (-sigdig - 1);
+  }
+  if (is.null(factr)){
+    factr <- 10 ^ (-sigdig - 1) / .Machine$double.eps;
+  }
+  if (is.null(atol)){
+    atol <- 0.5 * 10 ^ (-sigdig - 2);
+  }
+  if (is.null(rtol)){
+    rtol <- 0.5 * 10 ^ (-sigdig - 2);
+  }
+  if (is.null(rel.tol)){
+    rel.tol <- 10 ^ (-sigdig - 1);
+  }
+  if (is.null(x.tol)){
+    x.tol <- 10 ^ (-sigdig - 1);
+  }
+  if (is.null(derivSwitchTol)){
+    derivSwitchTol <- 2 * 10 ^ (-sigdig-1);
+  }
+
   if (missing(method)){method = "bobyqa"}
   if (missing(normType)){normType = "constant"}
   if (missing(scaleType)){scaleType = "norm"}

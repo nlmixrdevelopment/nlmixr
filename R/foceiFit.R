@@ -1042,8 +1042,10 @@ foceiControl <- function(sigdig=3,...,
     .ret <- nloptr::nloptr(x0=par, eval_f=fn, eval_grad_f=gr,
                            lb=lower, ub=upper,
                            opts=.ctl)
+    .ret$par <- .ret$solution;
     .ret$x <- .ret$solution;
     .ret$convergence <- .ret$status;
+    .ret$value <- .ret$objective
     return(.ret);
 }
 
@@ -1060,8 +1062,10 @@ foceiControl <- function(sigdig=3,...,
     .ret <- nloptr::nloptr(x0=par, eval_f=fn,
                            lb=lower, ub=upper,
                            opts=.ctl)
+    .ret$par <- .ret$solution;
     .ret$x <- .ret$solution;
     .ret$convergence <- .ret$status;
+    .ret$value <- .ret$objective
     return(.ret);
 }
 
@@ -1090,8 +1094,10 @@ foceiControl <- function(sigdig=3,...,
     .ret <- nloptr::nloptr(x0=par, eval_f=fn, eval_grad_f=gr,
                            lb=lower, ub=upper,
                            opts=.ctl)
+    .ret$par <- .ret$solution;
     .ret$x <- .ret$solution;
     .ret$convergence <- .ret$status;
+    .ret$value <- .ret$objective
     return(.ret);
 }
 
