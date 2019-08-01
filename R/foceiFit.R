@@ -965,6 +965,7 @@ foceiControl <- function(sigdig=3,...,
     .ret$x <- .ret$par;
     .ret$message <- .ret$msg;
     .ret$convergence <- .ret$ierr
+    .ret$value <- .ret$fval
     return(.ret);
 }
 
@@ -991,7 +992,7 @@ foceiControl <- function(sigdig=3,...,
     .control <- control[names(control) %in% c("eval.max", "iter.max", "trace", "abs.tol",
                                               "rel.tol","x.tol","xf.tol","step.min", "step.max","sing.tol","scale.init","diff.g")]
 
-    if (all(.lower != -Inf) | all(.upper != Inf)){
+    if (all(lower != -Inf) | all(upper != Inf)){
         warning("Optimization: Boundaries not used in Nelder-Mead")
     }
     fit = mymin(par, fn, control=.control);

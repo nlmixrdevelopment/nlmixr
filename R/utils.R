@@ -592,7 +592,10 @@ dynmodelControl <- function(...,
                             digs=3,
                             lower = -Inf,
                             upper = Inf,
-                            method=c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT",
+                            ## mma doesn't work
+                            ## lbfgsbLG
+                            ## slsqp
+                            method=c("bobyqa", "Nelder-Mead", "lbfgsb3c", "L-BFGS-B", "PORT",
                                      "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
                             ftol_rel=1e-6,
                             maxeval=999,
