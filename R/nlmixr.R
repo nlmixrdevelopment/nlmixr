@@ -239,7 +239,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     .tmp <- .tmp[-length(.tmp)];
     .origData <- data;
     data <- RxODE::etTrans(data,paste(paste(.tmp,collapse="\n"),"\n",uif$rxode),TRUE,TRUE, TRUE);
-   
+
     .nTv  <- attr(class(data),".RxODE.lst")$nTv;
     .lab  <- attr(class(data),".RxODE.lst")$idLvl;
     .modelId <- digest::digest(list(sessionInfo()$otherPkgs$nlmixr$Version,
@@ -706,11 +706,11 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     } else if (est == "dynmodel") {
             if (class(control) !="dynmodelControl") control <- do.call(dynmodelControl, control);
             env <- new.env(parent=emptyenv());
-            
+
             env$uif <- NULL
 
             # nlmixr Object ---
-            .nmf <- nlmixr(f)
+            .nmf <- uif
             # Conversion ---
             .dynNlmixr <- nlmixrDynmodelConvert(.nmf)
             # Model ---
