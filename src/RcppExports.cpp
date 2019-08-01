@@ -202,6 +202,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrHess_
+RObject nlmixrHess_(RObject thetaT, RObject fT, RObject e, RObject gillInfoT);
+RcppExport SEXP _nlmixr_nlmixrHess_(SEXP thetaTSEXP, SEXP fTSEXP, SEXP eSEXP, SEXP gillInfoTSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RObject >::type thetaT(thetaTSEXP);
+    Rcpp::traits::input_parameter< RObject >::type fT(fTSEXP);
+    Rcpp::traits::input_parameter< RObject >::type e(eSEXP);
+    Rcpp::traits::input_parameter< RObject >::type gillInfoT(gillInfoTSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrHess_(thetaT, fT, e, gillInfoT));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sqrtm
 NumericMatrix sqrtm(NumericMatrix m);
 RcppExport SEXP _nlmixr_sqrtm(SEXP mSEXP) {

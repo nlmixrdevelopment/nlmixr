@@ -71,6 +71,10 @@ nlmixrParHist_ <- function(md5) {
     .Call(`_nlmixr_nlmixrParHist_`, md5)
 }
 
+nlmixrHess_ <- function(thetaT, fT, e, gillInfoT) {
+    .Call(`_nlmixr_nlmixrHess_`, thetaT, fT, e, gillInfoT)
+}
+
 #' Return the square root of general square matrix A
 #'
 #' @param m Matrix to take the square root of.
