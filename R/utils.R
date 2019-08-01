@@ -592,7 +592,8 @@ dynmodelControl <- function(...,
                             digs=3,
                             lower = -Inf,
                             upper = Inf,
-                            method=c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT"),
+                            method=c("bobyqa", "Nelder-Mead", "lbfgsb3c", "PORT",
+                                     "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
                             ftol_rel=1e-6,
                             maxeval=999,
                             scaleTo=1.0,
@@ -619,7 +620,7 @@ dynmodelControl <- function(...,
                             abstol=NULL,
                             reltol=NULL,
                             lmm=NULL,
-                            maxit=NULL,
+                            maxit=100000L,
                             #,iprint=NULL repreated above
                             # nlminb (PORT)
                             eval.max=NULL,
@@ -694,7 +695,8 @@ dynmodelControl <- function(...,
     covMethod=match.arg(covMethod),
     rxControl = rxControl
   )
-
+  .w <- which(sapply(.ret, is.null))
+  .ret <- .ret[-.w];
   class(.ret) <- "dynmodelControl"
   return(.ret)
 
@@ -1078,6 +1080,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   }
 
   # scaleC assignment for scaling (adopted from foceFIT.R)
+  scaleC <- control$scaleC;
   if (is.null(scaleC) | length(scaleC) < length(inits)){
     scaleC <- rep(1, length(inits))
   } else {
@@ -1179,48 +1182,37 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   }
 
   # Optimization -----------------------------------------------------------------------
-  if (method =="bobyqa") {
-    .ot <- proc.time()
-    if (is.null(control$npt)) control$npt <- c(npt = length(.inits)*2 + 1)
-    .control <- control[names(control) %in% c("npt", "rhobeg", "rhoend", "iprint")]
-    .control[sapply(.control, is.null)] <- NULL
-    fit = minqa::bobyqa(par=.inits, fn=.funs$eval, lower=.lower, upper=.upper, control=.control)
-    fit$value <- fit$fval
-    assign("fit",fit,envir = .dynmodel.env)
-    .message <- fit$msg
-    .time$optimizationTime <- (proc.time() - .ot)["elapsed"]
-  } else if (method=="lbfgsb3c") {
-    .ot <- proc.time()
-    .control <- control[names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")]
-    .w <- sapply(.control, is.null)
-    .control <- .control[-.w]
-    fit = lbfgsb3c::lbfgsb3c(par = as.vector(.inits), fn=.funs$eval, gr=.funs$grad, lower=.lower, upper=.upper, control=.control)
-    assign("fit",fit,envir = .dynmodel.env)
-    .message <- fit$message
-    .time$optimizationTime <- (proc.time() - .ot)["elapsed"]
-  } else if (method=="Nelder-Mead") {
-    .ot <- proc.time()
-    if (.lower != -Inf | .upper != Inf){warning("Optimization: Boundaries not used in Nelder-Mead")}
-    fit = mymin(as.vector(.inits), .funs$eval, control=control)
-    fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
-    assign("fit",fit,envir = .dynmodel.env)
-    .message <- if(is.na(fit$message)) "No messages" else fit$message
-    .time$optimizationTime <- (proc.time() - .ot)["elapsed"]
+  if (method == "bobyqa"){
+    .optFun <- .bobyqa;
+  } else if (any(method == c("nlminb", "PORT"))){
+    .optFun <- .nlminb;
+  } else if (method == "mma"){
+    .optFun <- .nloptr;
+  } else if (method == "slsqp"){
+    .optFun <- .slsqp;
+  } else if (method == "lbfgsbLG"){
+    .optFun <- .lbfgsbLG;
+  } else if (method == "Rvmmin"){
+    .optFun <- .Rvmmin;
+  } else if (method=="Nelder-Mead"){
+    .optFun <- .mymin;
+  } else if (method == "lbfgsb3c"){
+    .optFun <- .lbfgsb3c
+  } else if (method == "L-BFGS-B"){
+    .optFun <- .lbfgsbO
   } else {
-    .ot <- proc.time()
-    .control <- control[names(control) %in% c("eval.max", "iter.max", "trace", "abs.tol",
-                                              "rel.tol","x.tol","xf.tol","step.min", "step.max","sing.tol","scale.init","diff.g")]
-    .control[sapply(.control, is.null)] <- NULL
-    if (.lower == -Inf ) .lower = 1e-12
-    fit = nlminb(start = .inits, objective = .funs$eval, gradient = .funs$grad, hessian = NULL,
-                 scale = 1, control=.control, lower = .lower, upper = .upper)
-    assign("fit",fit,envir = .dynmodel.env)
-    .message <- fit$message
-    .time$optimizationTime <- (proc.time() - .ot)["elapsed"]
+    stop("Optimization method unknown.");
   }
+  .ot <- proc.time()
+  fit <- .optFun(as.vector(.inits), fn=.funs$eval, gr=.funs$gr, lower=.lower, upper=.upper, control=control);
+  .message <- fit$message
+  ## fit$value
+  assign("fit",fit,envir = .dynmodel.env)
+  .time$optimizationTime <- (proc.time() - .ot)["elapsed"]
 
   # Hessian -----------------------------------------------------------------------
   .ht <- proc.time()
+
   if (control$covMethod == "optimHess"){
     fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
   } else {

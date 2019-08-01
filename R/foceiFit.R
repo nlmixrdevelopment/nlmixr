@@ -968,6 +968,38 @@ foceiControl <- function(sigdig=3,...,
     return(.ret);
 }
 
+.lbfgsb3c <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .w <- which(names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint"))
+    .control <- control[.w];
+    .ret <- lbfgsb3c::lbfgsb3c(par = as.vector(par), fn=fn, gr=gr, lower=lower, upper=upper, control=.control);
+    .ret$x <- .ret$par;
+    return(.ret);
+}
+
+.lbfgsbO <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .control <- control[names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")]
+    .w <- which(sapply(.control, is.null));
+    .control <- .control[-.w];
+    .ret <- optim(par=par, fn=fn, gr = gr, method = "L-BFGS-B",
+           lower = lower, upper = upper,
+           control = .control, hessian = FALSE);
+    .ret$x <- .ret$par;
+    return(.ret);
+}
+
+.mymin <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .control <- control[names(control) %in% c("eval.max", "iter.max", "trace", "abs.tol",
+                                              "rel.tol","x.tol","xf.tol","step.min", "step.max","sing.tol","scale.init","diff.g")]
+
+    if (all(.lower != -Inf) | all(.upper != Inf)){
+        warning("Optimization: Boundaries not used in Nelder-Mead")
+    }
+    fit = mymin(par, fn, control=.control);
+    fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
+    fit$x <- fit$par;
+    return(fit)
+}
+
 .nlminb <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
     .ctl <- control;
     .ctl <- .ctl[names(.ctl) %in% c("eval.max", "iter.max", "trace", "abs.tol", "rel.tol", "x.tol", "xf.tol", "step.min", "step.max", "sing.tol",
@@ -2676,9 +2708,9 @@ print.nlmixrFitCore <- function(x, ...){
     .boundChar <- nchar(.bound);
     .tmp <- x$omega
     .noEta <- (dim(.tmp)[1] == 0)
-    
+
     populationParameters <- ifelse(.noEta, "Parameters", "Population Parameters")
-    
+
     if (2*.boundChar+54 < .width){
         cat(paste0("\n", cli::rule(paste0(crayon::bold(populationParameters), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))),"\n");
     } else if (.boundChar+54 < .width) {
@@ -2716,7 +2748,7 @@ print.nlmixrFitCore <- function(x, ...){
     diag(.tmp) <- 0;
     cat(paste0("  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
                crayon::bold(x$covMethod), "\n"))
-    
+
     if (.mu & !.noEta){
         if (all(.tmp == 0)){
             cat("  No correlations in between subject variability (BSV) matrix\n")
