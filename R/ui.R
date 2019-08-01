@@ -1791,7 +1791,14 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                 "lag(", "alag(", "r(", "rate(",
                                 group("(0)", any_spaces, or("=", "<-")))),
                     rx.txt[1:w], perl=TRUE) != -1)){
-      stop("Mixed estimation types and ODEs.")
+        if (length(rx.txt) == w){
+            tmp <- RxODE::rxGetModel(paste(rx.txt, collapse="\n"))
+            tmp <- paste(tmp$params, "=", tmp$params)
+            w <- length(tmp);
+            rx.txt <- c(tmp, rx.txt);
+        } else {
+            stop("Mixed estimation types and ODEs.")
+        }
     }
     rx.ode <- rx.txt[-(1:w)];
     rx.pred <- try(eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n"))), silent=TRUE)
