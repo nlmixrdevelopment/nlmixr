@@ -3410,9 +3410,6 @@ double nlmixrEval_(NumericVector theta, std::string md5){
       } else {
 	Rprintf("\n");
       }
-      if (!useColor){
-	foceiPrintLine(min2(n, printNcol));
-      }
     }
   }
   niter.push_back(cn);
@@ -3451,7 +3448,6 @@ double nlmixrEval_(NumericVector theta, std::string md5){
     } else {
       Rprintf("\n");
     }
-    foceiPrintLine(min2(theta.size(), printNcol));
   }
   return f0;
 }
@@ -3519,9 +3515,7 @@ void nlmixrGradPrint(NumericVector gr, int gradType, int cn, bool useColor,
     } else {
       Rprintf("\n");
     }
-    if (!useColor){
-      foceiPrintLine(min2(n, printNcol));
-    }
+    foceiPrintLine(min2(n, printNcol));
   }
 }
 
