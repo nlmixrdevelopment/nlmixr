@@ -5,7 +5,9 @@
 ##'     and optimal forward difference interval
 ##' @inheritParams foceiControl
 ##' @author Matthew Fidler
+##'
 ##' @return
+##'
 ##' A data frame with the following columns:
 ##' \itemize{
 ##' \item{info}{Gradient evaluation/forward difference information}
@@ -13,6 +15,10 @@
 ##' \item{df}{Derivative estimate}
 ##' \item{df2}{2nd Derivative Estimate}
 ##' \item{err}{Error of the final estimate derivative}
+##' \item{aEps}{Absolute difference for forward numerical differences}
+##' \item{rEps}{Relative Difference for backward numerical differences}
+##' \item{aEpsC}{Absolute difference for central numerical differences}
+##' \item{rEpsC}{Relative difference for central numerical differences}
 ##' }
 ##'
 ##' The \code{info} returns one of the following:
@@ -74,4 +80,47 @@ nlmixrGill83 <- function(what, args, envir=parent.frame(),
     }
     return(nlmixrGill83_(what, args, envir, which,
                          gillRtol=sqrt(.Machine$double.eps), gillK=10L, gillStep=2, gillFtol=0))
+}
+
+.nlmixrGradInfo <- new.env(parent=emptyenv());
+
+##' Create a gradient function based on gill numerical differences
+##'
+##' @param thetaNames Names for the theta parameters
+##' @inheritParams nlmixrGill83
+##' @inheritParams foceiControl
+##' @export
+nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
+                          gillRtol=sqrt(.Machine$double.eps), gillK=10L, gillStep=2, gillFtol=0,
+                          useColor=crayon::has_color(),
+                          printNcol=floor((getOption("width") - 23)/12),
+                          print=1){
+    .md5 <- digest::digest(list(what, gillRtol, gillK, gillStep, gillFtol))
+    .nlmixrGradInfo[["printNcol"]] <- printNcol;
+    .nlmixrGradInfo[["useColor"]] <- useColor;
+    .nlmixrGradInfo[["isRstudio"]] <- (Sys.getenv("RSTUDIO")=="1");
+    .nlmixrGradInfo[["print"]] <- print;
+    if (!missing(which)){
+        .nlmixrGradInfo[[paste0(.md5, ".w")]] <- which;
+    }
+    if (!missing(which)){
+        .nlmixrGradInfo[["thetaNames"]] <- thetaNames;
+    }
+    .nlmixrGradInfo[[paste0(.md5, ".n")]] <- 0L
+    .nlmixrGradInfo[[paste0(.md5, ".f")]] <- what
+    .nlmixrGradInfo[[paste0(.md5, ".e")]] <- envir
+    .nlmixrGradInfo[[paste0(.md5, ".rtol")]] <- gillRtol
+    .nlmixrGradInfo[[paste0(.md5, ".k")]] <- gillK
+    .nlmixrGradInfo[[paste0(.md5, ".s")]] <- gillStep
+    .nlmixrGradInfo[[paste0(.md5, ".ftol")]] <- gillFtol
+    .eval <- eval(parse(text=paste0("function(theta, md5=\"", .md5, "\"){
+        nlmixrEval_(theta, md5);
+    }")))
+    .grad <- eval(parse(text=paste0("function(theta, md5=\"", .md5, "\"){
+        nlmixrGrad_(theta, md5);
+    }")))
+    .hist <- eval(parse(text=paste0("function(md5=\"", .md5, "\"){
+        nlmixrParHist_(md5);
+    }")))
+    return(list(eval=.eval, grad=.grad, hist=.hist))
 }

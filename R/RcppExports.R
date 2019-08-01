@@ -49,8 +49,26 @@ foceiOuter <- function(e) {
     .Call(`_nlmixr_foceiOuter`, e)
 }
 
-nlmixrGill83_ <- function(what, args, envir, which, gillRtol, gillK = 10L, gillStep = 2, gillFtol = 0) {
-    .Call(`_nlmixr_nlmixrGill83_`, what, args, envir, which, gillRtol, gillK, gillStep, gillFtol)
+nlmixrGill83_ <- function(what, args, envir, which, gillRtol, gillK = 10L, gillStep = 2, gillFtol = 0, optGillF = TRUE) {
+    .Call(`_nlmixr_nlmixrGill83_`, what, args, envir, which, gillRtol, gillK, gillStep, gillFtol, optGillF)
+}
+
+#' @rdname nlmixrGradFun
+#' @export
+nlmixrEval_ <- function(theta, md5) {
+    .Call(`_nlmixr_nlmixrEval_`, theta, md5)
+}
+
+#' @rdname nlmixrGradFun
+#' @export
+nlmixrGrad_ <- function(theta, md5) {
+    .Call(`_nlmixr_nlmixrGrad_`, theta, md5)
+}
+
+#' @rdname nlmixrGradFun
+#' @export
+nlmixrParHist_ <- function(md5) {
+    .Call(`_nlmixr_nlmixrParHist_`, md5)
 }
 
 #' Return the square root of general square matrix A

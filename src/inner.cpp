@@ -3228,7 +3228,7 @@ Environment foceiOuter(Environment e){
 //[[Rcpp::export]]
 List nlmixrGill83_(Function what, NumericVector args, Environment envir,
 		   LogicalVector which,
-		   double gillRtol, int gillK=10, double gillStep=2, double gillFtol=0){
+		   double gillRtol, int gillK=10, double gillStep=2, double gillFtol=0, bool optGillF=true){
   if (args.size()!=which.size()) stop("'args' must have same size as 'which'");
   gillRfn_=what;
   gillThetaN=args.size();  
@@ -3241,6 +3241,10 @@ List nlmixrGill83_(Function what, NumericVector args, Environment envir,
   NumericVector gillDfN(args.size());
   NumericVector gillDf2N(args.size());
   NumericVector gillErrN(args.size());
+  NumericVector aEps(args.size());
+  NumericVector rEps(args.size());
+  NumericVector aEpsC(args.size());
+  NumericVector rEpsC(args.size());
   IntegerVector retN(args.size());
   gillLong=false;
   for (int i = args.size(); i--;){
@@ -3252,6 +3256,16 @@ List nlmixrGill83_(Function what, NumericVector args, Environment envir,
       retN[i] = gill83(&hfN[i], &hphifN[i], &gillDfN[i], &gillDf2N[i], &gillErrN[i],
 		   theta, i, gillRtol, gillK, gillStep,
 		   gillFtol) + 1;
+      double err=1/(std::fabs(theta[i])+1);
+      aEps[i]  = hfN[i]*err;
+      rEps[i]  = hfN[i]*err;
+      if(optGillF){
+	aEpsC[i] = hfN[i]*err;
+	rEpsC[i] = hfN[i]*err;
+      } else {
+	aEpsC[i] = hphifN[i]*err;
+	rEpsC[i] = hphifN[i]*err;
+      }
     } else {
       retN[i] = 1;
       hfN[i] = NA_REAL;
@@ -3259,10 +3273,14 @@ List nlmixrGill83_(Function what, NumericVector args, Environment envir,
       gillDfN[i] = NA_REAL;
       gillDf2N[i] = NA_REAL;
       gillErrN[i] = NA_REAL;
+      aEps[i]  = NA_REAL;
+      rEps[i]  = NA_REAL;
+      aEpsC[i]  = NA_REAL;
+      rEpsC[i]  = NA_REAL;
     }
   }
   foceiGill=true;
-  List df(6);
+  List df(10);
   retN.attr("levels") = CharacterVector::create("Not Assessed","Good","High Grad Error",
 						"Constant Grad","Odd/Linear Grad",
 						"Grad changes quickly");
@@ -3273,7 +3291,11 @@ List nlmixrGill83_(Function what, NumericVector args, Environment envir,
   df[3] = gillDfN;
   df[4] = gillDf2N;
   df[5] = gillErrN;
-  df.attr("names") = CharacterVector::create("info","hf","hphi","df","df2","err");
+  df[6] = aEps;
+  df[7] = rEps;
+  df[8] = aEpsC;
+  df[9] = rEpsC;
+  df.attr("names") = CharacterVector::create("info","hf","hphi","df","df2","err","aEps","rEps","aEpsC","rEpsC");
   if (args.hasAttribute("names")){
     df.attr("row.names") = args.attr("names");
   } else {
@@ -3284,13 +3306,417 @@ List nlmixrGill83_(Function what, NumericVector args, Environment envir,
 			   _["gillRtol"]=gillRtol,
 			   _["gillK"]=gillK,
 			   _["gillStep"]=gillStep,
-			   _["gillFtol"]=gillFtol);
+			   _["gillFtol"]=gillFtol,
+			   _["optGillF"]=optGillF);
   info.attr("class") = CharacterVector::create("nlmixrLstSilent");
   cls.attr(".nlmixrGill") = info;
   df.attr("class") = cls;
   return df;
 }
+//' @rdname nlmixrGradFun
+//' @export
+//[[Rcpp::export]]
+double nlmixrEval_(NumericVector theta, std::string md5){
+  Function loadNamespace("loadNamespace", R_BaseNamespace);
+  Environment nlmixr = loadNamespace("nlmixr");
+  Environment gradInfo = nlmixr[".nlmixrGradInfo"];
+  std::string EF = md5 + ".f";
+  std::string EE = md5 + ".e";
+  std::string EW = md5 + ".w";
+  LogicalVector lEW;
+  if (!gradInfo.exists(EW)){
+    LogicalVector tmp(theta.size());
+    for (int i = theta.size(); i--;){
+      tmp[i] = true;
+    }
+    gradInfo[EW] = tmp;
+  }
+  lEW=gradInfo[EW];
+  if (lEW.size() != theta.size()) stop("invalid theta size");
+  Function cFun = as<Function>(gradInfo[EF]);
+  Environment cEnvir = as<Environment>(gradInfo[EE]);
+  double f0;
+  List par(1);
+  par[0] = theta;
+  f0 = as<double>(doCall(_["what"] = cFun, _["args"]=par, _["envir"]=cEnvir));
+  std::string f0s = md5 + ".fc";
+  std::string f0t = md5 + ".ft";
+  std::string cns = md5 + ".n";
+  f0 = as<double>(doCall(_["what"] = cFun, _["args"]=par, _["envir"]=cEnvir));
+  gradInfo[f0s] = f0;
+  gradInfo[f0t] = theta;
+  int cn = gradInfo[cns]; cn++;
+  gradInfo[cns] = cn;
+  bool useColor = as<bool>(gradInfo["useColor"]);
+  int printNcol=as<int>(gradInfo["printNcol"]);
+  int printN=as<int>(gradInfo["print"]);
+  int i, finalize=0, n=theta.size();
+  bool isRstudio=as<bool>(gradInfo["isRstudio"]);
+  if (cn == 1){
+    vGrad.clear();
+    vPar.clear();
+    iterType.clear();
+    gradType.clear();
+    niter.clear();
+    niterGrad.clear();
+    if (printN != 0){
+      foceiPrintLine(min2(n, printNcol));
+      if (gradInfo.exists("thetaNames")){
+	CharacterVector tn;
+	tn = gradInfo["thetaNames"];
+	if (tn.size()!=lEW.size()){
+	  CharacterVector tn2(lEW.size());
+	  for (int i = 0; i < lEW.size(); i++){
+	    tn2[i] = "t" + std::to_string(i+1);
+	  }
+	  gradInfo["thetaNames"]=tn2;
+	}
+      } else {
+	CharacterVector tn(lEW.size());
+	for (int i = 0; i < lEW.size(); i++){
+	  tn[i] = "t" + std::to_string(i+1);
+	}
+	gradInfo["thetaNames"]=tn;
+      }
+      CharacterVector thetaNames = gradInfo["thetaNames"];
+      Rprintf("|    #| Objective Fun |");
+      int i=0, finalize=0;
+      std::string tmpS;
+      for (i = 0; i < n; i++){
+	tmpS = thetaNames[i];
+	Rprintf("%#10s |", tmpS.c_str());
+	if ((i + 1) != n && (i + 1) % printNcol == 0){
+	  if (useColor && printNcol + i  >= n){
+	    Rprintf("\n\033[4m|.....................|");
+	  } else {
+	    Rprintf("\n|.....................|");
+	  }
+	  finalize=1;
+	}
+      }
+      if (finalize){
+	while(true){
+	  if ((i++) % op_focei.printNcol == 0){
+	    if (op_focei.useColor) Rprintf("\033[0m");
+	    Rprintf("\n");
+	    break;
+	  } else {
+	    Rprintf("...........|");
+	  }
+	}
+      } else {
+	Rprintf("\n");
+      }
+      if (!op_focei.useColor){
+	foceiPrintLine(min2(n, printNcol));
+      }
+    }
+  }
+  niter.push_back(cn);
+  // Scaled
+  vPar.push_back(f0);
+  iterType.push_back(5);
+  for (i = 0; i < n; i++){
+    vPar.push_back(theta[i]);
+  }  
+  if (printN != 0 && cn % printN == 0){
+    if (useColor && isRstudio)
+      Rprintf("|\033[1m%5d\033[0m|%#14.8g |", cn, f0);
+    else 
+      Rprintf("|%5d|%#14.8g |", cn, f0);
+    for (i = 0; i < n; i++){
+      Rprintf("%#10.4g |", theta[i]);
+      if ((i + 1) != n && (i + 1) % printNcol == 0){
+        if (useColor && printNcol + i  > n){
+          Rprintf("\n\033[4m|.....................|");
+        } else {
+          Rprintf("\n|.....................|");
+        }
+	finalize=1;
+      }
+    }
+    if (finalize){
+      while(true){
+        if ((i++) % printNcol == 0){
+          if (useColor) Rprintf("\033[0m");
+          Rprintf("\n");
+          break;
+        } else {
+          Rprintf("...........|");
+        }
+      }
+    } else {
+      Rprintf("\n");
+    }
+    foceiPrintLine(min2(theta.size(), printNcol));
+  }
+  return f0;
+}
 
+void nlmixrGradPrint(NumericVector gr, int gradType, int cn, bool useColor,
+		     int printNcol, int printN, bool isRstudio){
+  int n = gr.size(), finalize=0, i;
+  if (printN != 0 && cn % printN == 0){
+    if (useColor && printNcol >= n){
+      switch(gradType){
+      case 1:
+	Rprintf("|\033[4m    G|    Gill Diff. |");
+	break;
+      case 2:
+	Rprintf("|\033[4m    M|   Mixed Diff. |");
+	break;
+      case 3:
+	Rprintf("|\033[4m    F| Forward Diff. |");
+	break;
+      case 4:
+	Rprintf("|\033[4m    C| Central Diff. |");
+	break;
+      }
+    } else {
+      switch(gradType){
+      case 1:
+	Rprintf("|    G|    Gill Diff. |");
+	break;
+      case 2:
+	Rprintf("|    M|   Mixed Diff. |");
+	break;
+      case 3:
+	Rprintf("|    F| Forward Diff. |");
+	break;
+      case 4:
+	Rprintf("|    C| Central Diff. |");
+	break;
+      }
+    }
+    for (i = 0; i < n; i++){
+      Rprintf("%#10.4g ", gr[i]);
+      if (useColor && printNcol >= n && i == n-1){
+	Rprintf("\033[0m");
+      }
+      Rprintf("|");
+      if ((i + 1) != n && (i + 1) % printNcol == 0){
+        if (useColor && printNcol + i  >= n){
+          Rprintf("\n\033[4m|.....................|");
+        } else {
+          Rprintf("\n|.....................|");
+        }
+        finalize=1;
+      }
+    }
+    if (finalize){
+      while(true){
+        if ((i++) % op_focei.printNcol == 0){
+          if (op_focei.useColor) Rprintf("\033[0m");
+          Rprintf("\n");
+	  break;
+        } else {
+          Rprintf("...........|");
+	}
+      }
+    } else {
+      Rprintf("\n");
+    }
+    if (!op_focei.useColor){
+      foceiPrintLine(min2(n, printNcol));
+    }
+  }
+}
+
+//' @rdname nlmixrGradFun
+//' @export
+//[[Rcpp::export]]
+NumericVector nlmixrGrad_(NumericVector theta, std::string md5){
+  Function loadNamespace("loadNamespace", R_BaseNamespace);
+  Environment nlmixr = loadNamespace("nlmixr");
+  Environment gradInfo = nlmixr[".nlmixrGradInfo"];
+  
+  std::string Egill = md5 + ".g";
+  std::string EF = md5 + ".f";
+  std::string EE = md5 + ".e";
+
+  Function cFun = as<Function>(gradInfo[EF]);
+  Environment cEnvir = as<Environment>(gradInfo[EE]);
+  List Lgill;
+  std::string EW = md5 + ".w";
+  LogicalVector lEW;
+  bool useColor = as<bool>(gradInfo["useColor"]);
+  int printNcol=as<int>(gradInfo["printNcol"]);
+  int printN=as<int>(gradInfo["print"]);
+  bool isRstudio=as<bool>(gradInfo["isRstudio"]);
+  if (gradInfo.exists(Egill)){
+    lEW=gradInfo[EW];
+    if (lEW.size() != theta.size()){
+      stop("Invalid theta size");
+    }
+    Lgill = gradInfo[Egill];
+  } else {
+    if (!gradInfo.exists(EW)){
+      LogicalVector tmp(theta.size());
+      for (int i = theta.size(); i--;){
+	tmp[i] = true;
+      }
+      gradInfo[EW] = tmp;
+    }
+    lEW=gradInfo[EW];
+    if (lEW.size() != theta.size()){
+      stop("Invalid theta size (or which size)");
+    }
+    std::string Ertol = md5 + ".rtol";
+    std::string EK = md5 + ".k";
+    std::string Estep = md5 + ".s";
+    std::string EFtol = md5 + ".ftol";
+    Lgill = nlmixrGill83_(cFun, theta, gradInfo[EE],
+			  lEW, gradInfo[Ertol],
+			  gradInfo[EK], gradInfo[Estep],
+			  gradInfo[EFtol]);
+    gradInfo[Egill]=Lgill;
+    niterGrad.push_back(niter.back());
+    gradType.push_back(1);
+    vGrad.push_back(NA_REAL); // Gradient doesn't record objf
+    NumericVector gr = as<NumericVector>(Lgill["df"]);
+    for (int i = 0; i < gr.size(); i++){
+      if (gr[i] == 0){
+	stop("On initial gradient evaluation, one or more parameters have a zero gradient\nChange model, try different initial estimates or try derivative free optimization)");
+      }
+      vGrad.push_back(gr[i]);
+    }
+    nlmixrGradPrint(gr, gradType.back(), niter.back(), useColor,
+		    printNcol, printN, isRstudio);
+    return gr;
+  }
+  NumericVector aEps = as<NumericVector>(Lgill["aEps"]);
+  NumericVector rEps = as<NumericVector>(Lgill["rEps"]);
+  NumericVector aEpsC = as<NumericVector>(Lgill["aEpsC"]);
+  NumericVector rEpsC = as<NumericVector>(Lgill["rEpsC"]);
+  NumericVector g(theta.size());
+  double f0, delta, cur, tmp=0, tmp0;
+  bool doForward=true;
+  // FIXME
+  List par(1);
+  par[0] = theta;
+  std::string f0s = md5 + ".fc";
+  std::string f0t = md5 + ".ft";
+  bool reEval = true;
+  if (gradInfo.exists(f0s)){
+    NumericVector thetaL = gradInfo[f0t];
+    if (thetaL.size() == theta.size()){
+      reEval=false;
+      for (int i = theta.size(); i--;){
+	if (thetaL[i] != theta[i]){
+	  reEval=true;
+	  break;
+	}
+      }
+      if (!reEval)
+	f0 = gradInfo[f0s];
+    }
+  }
+  if (reEval){
+    f0 = as<double>(doCall(_["what"] = cFun, _["args"]=par, _["envir"]=cEnvir));
+  }
+  niterGrad.push_back(niter.back());
+  vGrad.push_back(NA_REAL); // Gradient doesn't record objf
+  bool isMixed=false;
+  for (int i = theta.size(); i--;){
+    cur = theta[i];
+    if (doForward){
+      delta = (std::fabs(theta[i])*rEps[i] + aEps[i]);
+      theta[i] = cur + delta;
+      par[0] = theta;
+      tmp = as<double>(doCall(_["what"] = cFun, _["args"]=par, _["envir"]=cEnvir));
+      g[i] = (tmp-f0)/delta;
+      theta[i] = cur;
+    } else {
+      delta = (std::fabs(theta[i])*rEpsC[i] + aEpsC[i]);
+      theta[i] = cur + delta;
+      par[0] = theta;
+      tmp0 = as<double>(doCall(_["what"] = cFun, _["args"]=par, _["envir"]=cEnvir));
+      theta[i] = cur - delta;
+      par[0] = theta;
+      tmp = as<double>(doCall(_["what"] = cFun, _["args"]=par, _["envir"]=cEnvir));
+      g[i] = (tmp0-tmp)/(2*delta);
+      theta[i] = cur;
+    }
+  
+    // Check for bad grad
+    if (std::isnan(g[i]) ||  ISNA(g[i]) || !R_FINITE(g[i])){
+      if (doForward){
+      	// Switch to Backward difference method
+      	// op_focei.mixDeriv=1;
+      	theta[i] = cur - delta;
+	par[0] = theta;
+	tmp0 = as<double>(doCall(_["what"] = cFun, _["args"]=par, _["envir"]=cEnvir));
+      	g[i] = (f0-tmp0)/(delta);
+	isMixed=true;
+      } else {
+      	// We are using the central difference AND there is an NA in one of the terms
+      	// g[cpar] = (tmp0-tmp)/(2*delta);
+      	// op_focei.mixDeriv=1;
+	isMixed=true;
+      	if (std::isnan(tmp0) || ISNA(tmp0) || !R_FINITE(tmp0)){
+      	  // Backward
+      	  g[i] = (f0-tmp)/delta;
+      	} else {
+      	  // Forward 
+      	  g[i] = (tmp0-f0)/delta;
+      	}
+      }
+    }
+  }
+  for (int i = 0; i < theta.size(); i++){
+    vGrad.push_back(g[i]);
+  }
+  if (isMixed){
+    gradType.push_back(2);
+  } else if (doForward) {
+    gradType.push_back(3);
+  } else {
+    gradType.push_back(4);
+  }
+  nlmixrGradPrint(g, gradType.back(), niter.back(), useColor,
+		  printNcol, printN, isRstudio);
+  return g;
+}
+void parHistData(Environment e, bool focei);
+//' @rdname nlmixrGradFun
+//' @export
+//[[Rcpp::export]]
+RObject nlmixrParHist_(std::string md5){
+  Function loadNamespace("loadNamespace", R_BaseNamespace);
+  Environment nlmixr = loadNamespace("nlmixr");
+  Environment gradInfo = nlmixr[".nlmixrGradInfo"];
+  std::string EW = md5 + ".w";
+  LogicalVector lEW;
+  if (!gradInfo.exists(EW)){
+    LogicalVector tmp(lEW.size());
+    for (int i = lEW.size(); i--;){
+      tmp[i] = true;
+    }
+    gradInfo[EW] = tmp;
+  }
+  lEW=gradInfo[EW];
+  if (gradInfo.exists("thetaNames")){
+    CharacterVector tn;
+    tn = gradInfo["thetaNames"];
+    if (tn.size()!=lEW.size()){
+      CharacterVector tn2(lEW.size());
+      for (int i = 0; i < lEW.size(); i++){
+	tn2[i] = "t" + std::to_string(i+1);
+      }
+      gradInfo["thetaNames"]=tn2;
+    }
+  } else {
+    CharacterVector tn(lEW.size());
+    for (int i = 0; i < lEW.size(); i++){
+      tn[i] = "t" + std::to_string(i+1);
+    }
+    gradInfo["thetaNames"]=tn;
+  }
+  std::string cns = md5 + ".n";
+  gradInfo[cns] = 0;
+  parHistData(gradInfo, false);
+  return gradInfo["parHistData"];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Covariance functions
@@ -3977,24 +4403,42 @@ NumericMatrix foceiCalcCov(Environment e){
   return ret;
 }
 
-void parHistData(Environment e){
+void parHistData(Environment e, bool focei){
   if (!e.exists("method") && iterType.size() > 0){
     CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
-    CharacterVector dfNames(3+op_focei.npars);
+    CharacterVector dfNames;
+    if (focei){
+      CharacterVector dfNames2(3+op_focei.npars);
+      dfNames = dfNames2;
+    } else {
+      CharacterVector dfNames2(3+thetaNames.size());
+      dfNames = dfNames2;
+    }
     dfNames[0] = "iter";
     dfNames[1] = "type";
     dfNames[2] = "objf";
     int i, j, k=1;
-    for (i = 0; i < op_focei.npars; i++){
-      j=op_focei.fixedTrans[i];
-      if (j < thetaNames.size()){
-	dfNames[i+3] = thetaNames[j];
-      } else {
-	dfNames[i+3] = "o" + std::to_string(k++);
-      } 
+    if (focei){
+      for (i = 0; i < op_focei.npars; i++){
+	j=op_focei.fixedTrans[i];
+	if (j < thetaNames.size()){
+	  dfNames[i+3] = thetaNames[j];
+	} else {
+	  dfNames[i+3] = "o" + std::to_string(k++);
+	} 
+      }
+    } else {
+      for (i = 0; i < thetaNames.size(); i++){
+	dfNames[i+3] = thetaNames[i];
+      }
     }
     // iter type parameters
-    List ret(3+op_focei.npars);
+    List ret;
+    if (focei){
+      ret = List(3+op_focei.npars);
+    } else {
+      ret = List(3+thetaNames.size());
+    }
     int sz = niter.size()+niterGrad.size();
     IntegerVector tmp;
     std::vector<int> iter;
@@ -4026,9 +4470,15 @@ void parHistData(Environment e){
       cPar = cPar.t();
       vals = cPar;
     }
-    for (i = 0; i < op_focei.npars; i++){
-      ret[i+2]= vals.col(i);
-    }    
+    if (focei){
+      for (i = 0; i < op_focei.npars; i++){
+	ret[i+2]= vals.col(i);
+      }
+    } else {
+      for (i = 0; i < thetaNames.size()+1; i++){
+	ret[i+2]= vals.col(i);
+      }
+    }
     vGrad.clear();
     vPar.clear();
     iterType.clear();
@@ -4598,7 +5048,7 @@ Environment foceiFitCpp_(Environment e){
     scaleSave[i] = getScaleC(i);
   }
   e["scaleC"] = scaleSave;
-  parHistData(e); // Need to calculate before the parameter translations are mangled
+  parHistData(e, true); // Need to calculate before the parameter translations are mangled
   IntegerVector gillRet(op_focei.ntheta+op_focei.omegan);
   NumericVector gillAEps(op_focei.ntheta+op_focei.omegan,NA_REAL);
   NumericVector gillREps(op_focei.ntheta+op_focei.omegan,NA_REAL);

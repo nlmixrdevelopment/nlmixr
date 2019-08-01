@@ -47,6 +47,10 @@ A data frame with the following columns:
 \item{df}{Derivative estimate}
 \item{df2}{2nd Derivative Estimate}
 \item{err}{Error of the final estimate derivative}
+\item{aEps}{Absolute difference for forward numerical differences}
+\item{rEps}{Relative Difference for backward numerical differences}
+\item{aEpsC}{Absolute difference for central numerical differences}
+\item{rEpsC}{Relative difference for central numerical differences}
 }
 
 The \code{info} returns one of the following:
@@ -95,7 +99,7 @@ sc2.f <- function(x){
 sc2.g <- function(x){
   n <- length(x)
   (1:n) * (exp(x) - 1) / n
-  }
+}
 
 x0 <- rnorm(100)
 exact <- sc2.g(x0)
