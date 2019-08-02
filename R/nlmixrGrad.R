@@ -127,7 +127,7 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
     if (!missing(which)){
         .nlmixrGradInfo[[paste0(.md5, ".w")]] <- which;
     }
-    if (!missing(which)){
+    if (!missing(thetaNames)){
         .nlmixrGradInfo[["thetaNames"]] <- thetaNames;
     }
     .nlmixrGradInfo[[paste0(.md5, ".n")]] <- 0L

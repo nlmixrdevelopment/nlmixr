@@ -621,6 +621,7 @@ dynmodelControl <- function(...,
                             rhobeg = 0.2,
                             rhoend = 1E-04,
                             iprint = 0,
+                            print=1,
                             maxfun = NULL,
                             # lbfgsb3c
                             trace=0,
@@ -651,6 +652,13 @@ dynmodelControl <- function(...,
                             sigdig=4,
                             covMethod=c("nlmixrHess", "optimHess"),
                             # rxControl
+                            gillK=10L,
+                            gillStep=4,
+                            gillFtol=0,
+                            gillRtol=sqrt(.Machine$double.eps),
+                            gillKcov=10L,
+                            gillStepCov=2,
+                            gillFtolCov=0,
                             rxControl = RxODE::rxControl()
                             ) {
   if (is.null(boundTol)){
@@ -717,6 +725,7 @@ dynmodelControl <- function(...,
     rhobeg = rhobeg,
     rhoend = rhoend,
     iprint = iprint, #also used in lbfgsb3c
+    print=print,
     maxfun = maxfun,
     # lbfgsb3c
     trace=trace,
@@ -741,7 +750,12 @@ dynmodelControl <- function(...,
     scale.init=scale.init,
     diff.g=diff.g,
     covMethod=match.arg(covMethod),
-    rxControl = rxControl
+    rxControl = rxControl,
+    gillK=as.integer(gillK),
+    gillKcov=as.integer(gillKcov),
+    gillRtol=as.double(gillRtol),
+    gillStep=as.double(gillStep),
+    gillStepCov=as.double(gillStepCov)
   )
   .w <- which(sapply(.ret, is.null))
   .ret <- .ret[-.w];
@@ -1102,7 +1116,12 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   }
 
   # FIXME: Put options from control here gillK etc
-  .funs <- nlmixrGradFun(obj)
+  .funs <- nlmixrGradFun(obj, print=control$print,
+                         gillRtol=control$gillRtol,
+                         gillK=control$gillK,
+                         gillStep=control$gillStep,
+                         gillFtol=control$gillFtol,
+                         thetaNames=names(inits))
 
 
   # Scaling functions -----------------------------------------------------------------------
@@ -1265,7 +1284,11 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
     fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
   } else {
     # FIXME: Put options from control here gillK etc
-    fit$hessian = try(nlmixrHess(fit$par, obj) , silent=TRUE)
+    fit$hessian = try(nlmixrHess(fit$par, obj,
+                                 gillRtol=control$gillRtol,
+                                 gillK=control$gillKcov,
+                                 gillStep=control$gillStepCov,
+                                 gillFtol=control$gillFtolCov) , silent=TRUE)
   }
 
 
