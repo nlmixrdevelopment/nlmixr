@@ -68,6 +68,7 @@ SEXP _nlmixr_nlmixrGrad_(SEXP, SEXP);
 SEXP _nlmixr_nlmixrEval_(SEXP, SEXP);
 SEXP _nlmixr_nlmixrParHist_(SEXP);
 SEXP _nlmixr_nlmixrHess_(SEXP, SEXP, SEXP, SEXP);
+SEXP _nlmixr_nlmixrUnscaled_(SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
@@ -115,6 +116,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_nlmixrEval_", (DL_FUNC) &_nlmixr_nlmixrEval_, 2},
   {"_nlmixr_nlmixrParHist_", (DL_FUNC) &_nlmixr_nlmixrParHist_, 1},
   {"_nlmixr_nlmixrHess_", (DL_FUNC) &_nlmixr_nlmixrHess_, 4},
+  {"_nlmixr_nlmixrUnscaled_", (DL_FUNC) &_nlmixr_nlmixrUnscaled_, 2},
   {NULL, NULL, 0}
 };
 

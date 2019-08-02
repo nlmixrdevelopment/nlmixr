@@ -8,18 +8,20 @@ dynmodelControl(..., fixPars = NULL, ci = 0.95, nlmixrOutput = FALSE,
   digs = 3, lower = -Inf, upper = Inf, method = c("bobyqa",
   "Nelder-Mead", "lbfgsb3c", "L-BFGS-B", "PORT", "mma", "lbfgsbLG",
   "slsqp", "Rvmmin"), ftol_rel = 1e-06, maxeval = 999, scaleTo = 1,
-  scaleObjective = 0, normType = c("constant", "rescale2", "mean",
-  "rescale", "std", "len"), scaleType = c("norm", "nlmixr", "mult",
+  scaleObjective = 0, normType = c("rescale2", "constant", "mean",
+  "rescale", "std", "len"), scaleType = c("nlmixr", "norm", "mult",
   "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
   scaleC0 = 1e+05, atol = 1e-08, rtol = 1e-06, npt = NULL,
-  rhobeg = 0.2, rhoend = 1e-04, iprint = 0, maxfun = NULL,
-  trace = 0, factr = NULL, pgtol = NULL, abstol = NULL,
-  reltol = NULL, lmm = NULL, maxit = 100000L, eval.max = NULL,
-  iter.max = NULL, abs.tol = NULL, rel.tol = NULL, x.tol = NULL,
-  xf.tol = NULL, step.min = NULL, step.max = NULL, sing.tol = NULL,
-  scale.init = NULL, diff.g = NULL, boundTol = NULL,
-  epsilon = NULL, derivSwitchTol = NULL, sigdig = 4,
-  covMethod = c("nlmixrHess", "optimHess"),
+  rhobeg = 0.2, rhoend = 1e-04, iprint = 0, print = 1,
+  maxfun = NULL, trace = 0, factr = NULL, pgtol = NULL,
+  abstol = NULL, reltol = NULL, lmm = NULL, maxit = 100000L,
+  eval.max = NULL, iter.max = NULL, abs.tol = NULL, rel.tol = NULL,
+  x.tol = NULL, xf.tol = NULL, step.min = NULL, step.max = NULL,
+  sing.tol = NULL, scale.init = NULL, diff.g = NULL,
+  boundTol = NULL, epsilon = NULL, derivSwitchTol = NULL,
+  sigdig = 4, covMethod = c("nlmixrHess", "optimHess"), gillK = 10L,
+  gillStep = 4, gillFtol = 0, gillRtol = sqrt(.Machine$double.eps),
+  gillKcov = 10L, gillStepCov = 2, gillFtolCov = 0,
   rxControl = RxODE::rxControl())
 }
 \arguments{
@@ -225,6 +227,11 @@ adjusted.}
 \item{rhoend}{The smallest value of the trust region radius that
 is allowed. If not defined, then 10^(-sigdig-1) will be used.}
 
+\item{print}{Integer representing when the outer step is
+printed. When this is 0 or do not print the iterations.  1 is
+print every function evaluation (default), 5 is print every 5
+evaluations.}
+
 \item{abstol}{Absolute tolerance for nlmixr optimizer}
 
 \item{reltol}{tolerance for nlmixr}
@@ -278,6 +285,38 @@ differences.}
 
  \item "" Does not calculate the covariance step.
 }}
+
+\item{gillK}{The total number of possible steps to determine the
+optimal forward/central difference step size per parameter (by
+the Gill 1983 method).  If 0, no optimal step size is
+determined.  Otherwise this is the optimal step size
+determined.}
+
+\item{gillStep}{When looking for the optimal forward difference
+step size, this is This is the step size to increase the
+initial estimate by.  So each iteration the new step size =
+(prior step size)*gillStep}
+
+\item{gillFtol}{The gillFtol is the gradient error tolerance that
+is accepable before issuing a warning/error about the gradient estimates.}
+
+\item{gillRtol}{The relative tolerance used for Gill 1983
+determination of optimal step size.}
+
+\item{gillKcov}{The total number of possible steps to determine
+the optimal forward/central difference step size per parameter
+(by the Gill 1983 method) during the covariance step.  If 0,
+no optimal step size is determined.  Otherwise this is the
+optimal step size determined.}
+
+\item{gillStepCov}{When looking for the optimal forward difference
+step size, this is This is the step size to increase the
+initial estimate by.  So each iteration during the covariance
+step is equalt new step size = (prior step size)*gillStepCov}
+
+\item{gillFtolCov}{The gillFtol is the gradient error tolerance
+that is acceptable before issuing a warning/error about the
+gradient estimates during the covariance step.}
 
 \item{CI}{Confidence interval range from 0-1, default is 0.95}
 }

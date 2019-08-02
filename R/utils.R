@@ -755,7 +755,9 @@ dynmodelControl <- function(...,
     gillKcov=as.integer(gillKcov),
     gillRtol=as.double(gillRtol),
     gillStep=as.double(gillStep),
-    gillStepCov=as.double(gillStepCov)
+    gillStepCov=as.double(gillStepCov),
+    gillFtol=as.double(gillFtol),
+    gillFtolCov=as.double(gillFtolCov)
   )
   .w <- which(sapply(.ret, is.null))
   .ret <- .ret[-.w];
@@ -962,12 +964,14 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
 
   .time$setupTime <- (proc.time() - .pt)["elapsed"]
 
+  .funs <- list()
   sgy<-c()
   obj = function(th)
   {
     # unscale
     unscaled.th <- numeric(length(th))
-    for (i in 1:length(th)) {th[i] <- unscalePar(th,i)}
+    th <- sapply(seq_along(th), function(x){unscalePar(th,x)});
+    .funs$unscaled(th)
 
     # define parameters used for simulation, all parameters except the error terms
     .ixpar = npar
@@ -1266,7 +1270,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   } else if (method == "lbfgsb3c"){
     .optFun <- .lbfgsb3c
   } else if (method == "L-BFGS-B"){
-    .optFun <- .lbfgsxbO
+    .optFun <- .lbfgsbO
   } else {
     stop("Optimization method unknown.");
   }
@@ -1344,6 +1348,14 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
                                        .dynmodelControl = control, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl())
     .hist <- .funs$hist();
     assign("parHistData", .hist, nlmixr.ouptut$env);
+    .tmp <- .hist;
+    .tmp <- .tmp[.tmp$type == "Unscaled", names(.tmp) != "type"];
+    .iter <- .tmp$iter
+    .tmp <- .tmp[,names(.tmp) != "iter"];
+    .ret <- nlmixr.ouptut$env
+    .ret$parHistStacked <- data.frame(stack(.tmp),iter=.iter)
+    names(.ret$parHistStacked) <- c("val","par","iter");
+    .ret$parHist <- data.frame(iter=.iter,.tmp);
     return(nlmixr.ouptut)
   }
   else {

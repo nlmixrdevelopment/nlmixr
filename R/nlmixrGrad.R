@@ -146,7 +146,10 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
     .hist <- eval(parse(text=paste0("function(){
         nlmixrParHist_(md5=\"", .md5, "\");
     }")))
-    return(list(eval=.eval, grad=.grad, hist=.hist))
+    .unscaled <- eval(parse(text=paste0("function(theta){
+        nlmixrUnscaled_(theta,md5=\"", .md5, "\");
+    }")))
+    return(list(eval=.eval, grad=.grad, hist=.hist, unscaled=.unscaled))
 }
 
 ##' Calculate Hessian
