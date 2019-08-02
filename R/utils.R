@@ -1770,3 +1770,16 @@ plot.nlmixrDynmodel <- function(x, y, ...){
     class(.lst)  <- "nlmixrPlotList"
     return(.lst)
 }
+
+##' Convert fit to classic dynmodel object
+##'
+##' @param x nlmixr object to convert to dynmodel object
+##' @return dynmodel
+##' @author Matthew Fidler
+##' @export
+as.dynmodel <- function(x){
+    .ret <- try(x$dynmodelObject, silent=TRUE)
+    if (inherits(.ret, "try-error") || is.null(.ret))
+        stop("Cannot convert to dynmodel object");
+    return(.ret)
+}
