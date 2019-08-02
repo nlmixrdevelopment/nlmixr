@@ -607,8 +607,8 @@ dynmodelControl <- function(...,
                             maxeval=999,
                             scaleTo=1.0,
                             scaleObjective=0,
-                            normType=c("constant","rescale2", "mean", "rescale", "std", "len"),
-                            scaleType=c("norm","nlmixr", "mult", "multAdd"),
+                            normType=c("rescale2", "constant", "mean", "rescale", "std", "len"),
+                            scaleType=c("nlmixr", "norm", "mult", "multAdd"),
                             scaleCmax=1e5,
                             scaleCmin=1e-5,
                             scaleC=NULL,
@@ -688,8 +688,8 @@ dynmodelControl <- function(...,
   }
 
   if (missing(method)){method = "bobyqa"}
-  if (missing(normType)){normType = "constant"}
-  if (missing(scaleType)){scaleType = "norm"}
+  if (missing(normType)){normType = "rescale2"}
+  if (missing(scaleType)){scaleType = "nlmixr"}
 
   .ret <- list(
     fixPars=fixPars,
