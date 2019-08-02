@@ -727,6 +727,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 
             fit <- dynmodel(system = .system, model = .model, inits = .inits, data = .origData, nlmixrObject = .nmf, control=control)
             assign("origData", .origData, fit$env)
+            fit <- fix.dat(fit);
             return(fit);
             }
     else {
