@@ -659,7 +659,7 @@ dynmodelControl <- function(...,
                             gillKcov=10L,
                             gillStepCov=2,
                             gillFtolCov=0,
-                            rxControl = RxODE::rxControl()
+                            rxControl = NULL
                             ) {
   if (is.null(boundTol)){
     boundTol <- 5 * 10 ^ (-sigdig + 1)
@@ -693,6 +693,19 @@ dynmodelControl <- function(...,
   }
   if (is.null(derivSwitchTol)){
     derivSwitchTol <- 2 * 10 ^ (-sigdig-1);
+  }
+  if (inherits(rxControl, "list")){
+    if (!any(names(rxControl) == "atol")){
+      rxControl$atol <- 0.5 * 10 ^ (-sigdig - 2);
+    }
+    if (!any(names(rxControl) == "rtol")){
+      rxControl$rtol <- 0.5 * 10 ^ (-sigdig - 2);
+    }
+    rxControl <- do.call(RxODE::rxControl, rxControl);
+  } else {
+    atol <- 0.5 * 10 ^ (-sigdig - 2);
+    rtol <- 0.5 * 10 ^ (-sigdig - 2);
+    rxControl = RxODE::rxControl(atol=atol, rtol=rtol);
   }
 
   if (missing(method)){method = "bobyqa"}
