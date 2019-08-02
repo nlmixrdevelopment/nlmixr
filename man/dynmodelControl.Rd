@@ -4,19 +4,22 @@
 \alias{dynmodelControl}
 \title{Control Options for dynmodel}
 \usage{
-dynmodelControl(..., fixPars = NULL, ci = 0.95, nlmixrOutput = F,
+dynmodelControl(..., fixPars = NULL, ci = 0.95, nlmixrOutput = FALSE,
   digs = 3, lower = -Inf, upper = Inf, method = c("bobyqa",
-  "Nelder-Mead", "lbfgsb3c", "PORT"), ftol_rel = 1e-06, maxeval = 999,
-  scaleTo = 1, scaleObjective = 0, normType = c("constant",
-  "rescale2", "mean", "rescale", "std", "len"), scaleType = c("norm",
-  "nlmixr", "mult", "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05,
-  scaleC = NULL, scaleC0 = 1e+05, atol = 1e-08, rtol = 1e-06,
-  npt = NULL, rhobeg = 0.2, rhoend = 1e-04, iprint = 0,
-  maxfun = NULL, trace = 0, factr = NULL, pgtol = NULL,
-  abstol = NULL, reltol = NULL, lmm = NULL, maxit = NULL,
-  eval.max = NULL, iter.max = NULL, abs.tol = NULL, rel.tol = NULL,
-  x.tol = NULL, xf.tol = NULL, step.min = NULL, step.max = NULL,
-  sing.tol = NULL, scale.init = NULL, diff.g = NULL,
+  "Nelder-Mead", "lbfgsb3c", "L-BFGS-B", "PORT", "mma", "lbfgsbLG",
+  "slsqp", "Rvmmin"), ftol_rel = 1e-06, maxeval = 999, scaleTo = 1,
+  scaleObjective = 0, normType = c("constant", "rescale2", "mean",
+  "rescale", "std", "len"), scaleType = c("norm", "nlmixr", "mult",
+  "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
+  scaleC0 = 1e+05, atol = 1e-08, rtol = 1e-06, npt = NULL,
+  rhobeg = 0.2, rhoend = 1e-04, iprint = 0, maxfun = NULL,
+  trace = 0, factr = NULL, pgtol = NULL, abstol = NULL,
+  reltol = NULL, lmm = NULL, maxit = 100000L, eval.max = NULL,
+  iter.max = NULL, abs.tol = NULL, rel.tol = NULL, x.tol = NULL,
+  xf.tol = NULL, step.min = NULL, step.max = NULL, sing.tol = NULL,
+  scale.init = NULL, diff.g = NULL, boundTol = NULL,
+  epsilon = NULL, derivSwitchTol = NULL, sigdig = 4,
+  covMethod = c("nlmixrHess", "optimHess"),
   rxControl = RxODE::rxControl())
 }
 \arguments{
@@ -233,6 +236,48 @@ is allowed. If not defined, then 10^(-sigdig-1) will be used.}
 \item{rel.tol}{Relative tolerance before nlminb stops.}
 
 \item{x.tol}{X tolerance for nlmixr optimizers}
+
+\item{boundTol}{Tolerance for boundary issues.}
+
+\item{epsilon}{Precision of estimate for n1qn1 optimization.}
+
+\item{derivSwitchTol}{The tolerance to switch forward to central
+differences.}
+
+\item{sigdig}{Optimization significant digits. This controls:
+
+\itemize{
+
+ \item The tolerance of the inner and outer optimization is \code{10^-sigdig}
+
+ \item The tolerance of the ODE solvers is
+ \code{0.5*10^(-sigdig-2)}; For the sensitivity equations the
+ default is \code{0.5*10^(-sigdig-1.5)} (only applicable for liblsoda)
+
+ \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
+
+ \item The significant figures that some tables are rounded to.
+}}
+
+\item{covMethod}{Method for calculating covariance.  In this
+    discussion, R is the Hessian matrix of the objective
+    function. The S matrix is the sum of individual
+    gradient cross-product (evaluated at the individual empirical
+    Bayes estimates).
+
+\itemize{
+
+ \item "\code{r,s}" Uses the sandwich matrix to calculate the
+ covariance, that is: \code{solve(R) \%*\% S \%*\% solve(R)}
+
+ \item "\code{r}" Uses the Hessian matrix to calculate the
+ covariance as \code{2 \%*\% solve(R)}
+
+ \item "\code{s}" Uses the cross-product matrix to calculate the
+ covariance as \code{4 \%*\% solve(S)}
+
+ \item "" Does not calculate the covariance step.
+}}
 
 \item{CI}{Confidence interval range from 0-1, default is 0.95}
 }

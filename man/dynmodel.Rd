@@ -57,5 +57,5 @@ ev$add.sampling(c(0, dat$time))
 
 }
 \author{
-Wenping Wang
+Wenping Wang, Mason McComb and Matt Fidler
 }

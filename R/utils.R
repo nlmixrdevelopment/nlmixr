@@ -397,8 +397,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   .rxControl$addDosing=TRUE
 
   .nlmixr.sim = do.call(RxODE :: rxSolve, c(list(object=.system, params=.parameters, events=.data), .rxControl))
-
-  .ID <- if (is.null(.nlmixr.sim$ID)) {rep(1, nrow(.data))} else {.nlmixr.sim$ID}
+  .ID <- if (is.null(.nlmixr.sim$id)) {rep(1, nrow(.data))} else {.nlmixr.sim$id}
   .TIME <- .nlmixr.sim$time
   .DV = RxODE::etTrans(.data,.system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
   .DV <- .DV$DV
@@ -1718,4 +1717,56 @@ cholSE <- function(matrix, tol=(.Machine$double.eps) ^ (1 / 3)){
 
 .setRoot <- function(){
   setwd("c:/");
+}
+
+##'@export
+plot.nlmixrDynmodel <- function(x, y, ...){
+    .lst  <- list();
+    .tp  <- traceplot(x)
+    if (!is.null(.tp)) .lst[[length(.lst)+1]] <- .tp;
+    .dat <- as.data.frame(x);
+    .p1 <- ggplot2::ggplot(.dat, ggplot2::aes_string("PRED", "DV")) +
+           ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
+            ggplot2::geom_point() + xlab("Predictions") +
+            ggplot2::ggtitle("DV vs PRED")
+    .lst[[length(.lst)+1]] <- .p1
+
+    .p0 <- ggplot2::ggplot(.dat, ggplot2::aes_string(x="PRED", y="RES")) +
+            ggplot2::geom_point() +
+            ggplot2::geom_abline(slope=0, intercept=0, col="red") +
+        ggplot2::ggtitle("PRED vs RES")
+    .lst[[length(.lst)+1]] <- .p0
+    .p0 <- ggplot2::ggplot(.dat, ggplot2::aes_string(x="PRED", y="WRES")) +
+            ggplot2::geom_point() +
+            ggplot2::geom_abline(slope=0, intercept=0, col="red") +
+            ggplot2::ggtitle("PRED vs WRES")
+    .lst[[length(.lst)+1]] <- .p0
+    .p0 <- ggplot2::ggplot(.dat, ggplot2::aes_string(x="TIME", y="RES")) +
+            ggplot2::geom_point() +
+            ggplot2::geom_abline(slope=0, intercept=0, col="red") +
+        ggplot2::ggtitle("TIME vs RES")
+    .lst[[length(.lst)+1]] <- .p0
+    .p0 <- ggplot2::ggplot(.dat, ggplot2::aes_string(x="TIME", y="WRES")) +
+            ggplot2::geom_point() +
+            ggplot2::geom_abline(slope=0, intercept=0, col="red") +
+            ggplot2::ggtitle("TIME vs WRES")
+    .lst[[length(.lst)+1]] <- .p0
+    .ids <- unique(.dat$ID)
+    .s <- seq(1, length(.ids), by=16)
+    .j <- 0;
+    for (i  in .s){
+        .j <- .j + 1
+        .tmp <- .ids[seq(i, i + 15)]
+        .tmp <- .tmp[!is.na(.tmp)];
+        .d1 <- .dat[.dat$ID %in% .tmp, ];
+
+        .p3 <- ggplot2::ggplot(.d1, aes(x=TIME, y=DV)) +
+            ggplot2::geom_point() +
+            ggplot2::geom_line(aes(x=TIME, y=PRED), col="red", size=1.2) +
+            ggplot2::facet_wrap(~ID) +
+            ggplot2::ggtitle(sprintf("Individual Plots (%s of %s)", .j, length(.s)))
+        .lst[[length(.lst)+1]] <- .p3
+    }
+    class(.lst)  <- "nlmixrPlotList"
+    return(.lst)
 }
