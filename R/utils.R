@@ -966,6 +966,9 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
 
   .funs <- list()
   sgy<-c()
+
+  rxControl <- control$rxControl
+
   obj = function(th)
   {
     # unscale
@@ -1345,7 +1348,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
 
   if (!is.null(nlmixrObject) & control$nlmixrOutput){
     nlmixr.ouptut <- as.focei.dynmodel(.dynmodelObject = res, .nlmixrObject = nlmixrObject, .data = data, .time = .time, .fit = fit, .message = .message, .inits.err = inits.err, .cov = cov.matrix, .sgy = sgy,
-                                       .dynmodelControl = control, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl())
+                                       .dynmodelControl = control, .nobs2=0, .pt=proc.time(), .rxControl = rxControl)
     .hist <- .funs$hist();
     assign("parHistData", .hist, nlmixr.ouptut$env);
     .tmp <- .hist;
