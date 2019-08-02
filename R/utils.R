@@ -1101,8 +1101,8 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
     do.call("sum", l)  # same as return(as.numeric(l)), l is a list for each value in the model?
   }
 
+  # FIXME: Put options from control here gillK etc
   .funs <- nlmixrGradFun(obj)
-
 
 
   # Scaling functions -----------------------------------------------------------------------
@@ -1247,7 +1247,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   } else if (method == "lbfgsb3c"){
     .optFun <- .lbfgsb3c
   } else if (method == "L-BFGS-B"){
-    .optFun <- .lbfgsbO
+    .optFun <- .lbfgsxbO
   } else {
     stop("Optimization method unknown.");
   }
@@ -1264,6 +1264,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   if (control$covMethod == "optimHess"){
     fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
   } else {
+    # FIXME: Put options from control here gillK etc
     fit$hessian = try(nlmixrHess(fit$par, obj) , silent=TRUE)
   }
 
@@ -1318,6 +1319,8 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   if (!is.null(nlmixrObject) & control$nlmixrOutput){
     nlmixr.ouptut <- as.focei.dynmodel(.dynmodelObject = res, .nlmixrObject = nlmixrObject, .data = data, .time = .time, .fit = fit, .message = .message, .inits.err = inits.err, .cov = cov.matrix, .sgy = sgy,
                                        .dynmodelControl = control, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl())
+    .hist <- .funs$hist();
+    assign("parHistData", .hist, nlmixr.ouptut$env);
     return(nlmixr.ouptut)
   }
   else {
