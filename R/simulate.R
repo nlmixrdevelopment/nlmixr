@@ -128,6 +128,10 @@
     .nlmixrData <- nlmixr::nlmixrData(nlme::getData(object))
     .dfSub <- length(unique(.nlmixrData$ID));
     .thetaMat <- nlme::getVarCov(object);
+    if (all(is.na(object$uif$ini$neta1))){
+        .omega <- NULL
+        .dfSub <- 0
+    }
     return(list(rx=.newMod, params=.params, events=.nlmixrData,
                 thetaMat=.thetaMat, omega=.omega, sigma=.sigma, dfObs=.dfObs, dfSub=.dfSub))
 }
@@ -212,6 +216,9 @@ nlmixrSim <- function(object, ...){
     .xtra$omega <- .si$omega;
     .xtra$dfSub <- .si$dfSub
     .xtra$sigma <- .si$sigma;
+    if (is.null(.xtra$omega)){
+        .xtra$omega <- matrix(1, 1, 1, dimnames=list("nlmixr_dum", "nlmixr_dum"))
+    }
     .ret <- do.call(getFromNamespace("rxSolve", "RxODE"), .xtra, envir=parent.frame(2))
     if (inherits(.ret, "rxSolve")){
         .rxEnv <- attr(class(.ret),".RxODE.env")
