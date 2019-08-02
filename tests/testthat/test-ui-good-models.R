@@ -101,4 +101,26 @@ rxPermissive({
 
     expect_equal("nlmixrUI", class(nlmixr(one.compartment.IV.model)));
 
+
+    model1 <- function(){
+        ini({
+            CL <- 2.2
+            V <- 65
+            add.err <- 0.01
+            prop.err <- 0.01
+        })
+        model({
+            kel = CL / V
+            X(0) = 0
+            d/dt(X) = -kel * X
+            cp = X / V
+            cp ~ add(add.err) + prop(prop.err)
+        })
+    }
+
+    f <- nlmixr(model1)
+
+    expect_true(regexpr(rex::rex("X(0)"), f$rxode.pred) != -1)
+    expect_true(regexpr(rex::rex("X(0)"), paste(deparse(f$dynmodel.fun), collapse="\n")) == -1)
+
 }, on.validate="NLMIXR_VALIDATION")
