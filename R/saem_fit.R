@@ -1064,8 +1064,9 @@ configsaem <- function(model, data, inits,
   phiM[,i1] = mprior_phi1
   phiM[,i0] = mprior_phi0
   phiM = phiM[rep(1:N, nmc),, drop = FALSE]
-  phiM = phiM + matrix(rnorm(phiM), dim(phiM)) %*% ifelse(model$N.eta == 1, matrix(sqrt(inits$omega)),
-                                                            diag(sqrt(inits$omega)))
+  .tmp <- diag(sqrt(inits$omega))
+  if (model$N.eta == 1) .tmp <- matrix(sqrt(inits$omega))
+  phiM = phiM + matrix(rnorm(phiM), dim(phiM)) %*% .tmp
 
 
   mc.idx = rep(1:N, nmc)
