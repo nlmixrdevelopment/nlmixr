@@ -1063,8 +1063,10 @@ configsaem <- function(model, data, inits,
   phiM = matrix(0, N, nphi)
   phiM[,i1] = mprior_phi1
   phiM[,i0] = mprior_phi0
-  phiM = phiM[rep(1:N, nmc),]
-  phiM = phiM + matrix(rnorm(phiM), dim(phiM)) %*% diag(sqrt(inits$omega))
+  phiM = phiM[rep(1:N, nmc),, drop = FALSE]
+  phiM = phiM + matrix(rnorm(phiM), dim(phiM)) %*% ifelse(model$N.eta == 1, matrix(sqrt(inits$omega)),
+                                                            diag(sqrt(inits$omega)))
+
 
   mc.idx = rep(1:N, nmc)
   statphi = sapply(1:nphi, function(x) tapply(phiM[,x], mc.idx, mean))
