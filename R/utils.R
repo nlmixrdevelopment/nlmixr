@@ -842,8 +842,19 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
   if("pow2" %in% names(inits) & !("pow" %in% names(inits))){stop("Error Model: pow must be defined when using pow2")}
   
   # Check dynmodel() inputs, Define vars, modelVars, pars,  ------------
-  # Check to make sure all there is consistency between error model, data. inits, and ODE model
+    # NOTES: Check to make sure all there is consistency between error model, data. inits, and ODE model
   
+  # convert data
+  data <- RxODE::etTrans(data,system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
+  
+  # add model variable to data
+  .dv.name <- unlist(model)["dv"][[1]]
+  if (any(names(data) %in% .dv.name) == FALSE){
+    .temp.names <- names(data)
+    data <- cbind(data, data$DV)
+    names(data) <- c(.temp.names,.dv.name)
+  }
+
   # Error "model" contains "data" variables?
   # get column names of data (Time and Observation)
   vars = names(data)
@@ -883,15 +894,18 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
    msg = err.msg(nodef, pre="par(s) not found: ")
    stop(msg)
   }
-
+  
   # Additional assignment ---------------------------------------------------
   # number of estimated parameters, excluding the error terms
   npar = length(pars) - length(fixPars)
   
   # Objective Function ------------------------------------------------------
+  if (data$TIME[1]==0 & data$EVID[1]==0 & data$DV[1]==0) {
+    rows = -1
+  } else {rows = TRUE}
   
-  yo = RxODE::etTrans(data,system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
-  yo = yo$DV[yo$EVID==0]
+  yo <- data$DV[data$EVID==0]
+  yo <- yo[rows]
   nobs <- length(yo)
   
   .time$setupTime <- (proc.time() - .pt)["elapsed"]
@@ -909,22 +923,14 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
     names(theta) = names(inits)[1:npar]
     theta = c(theta, fixPars)
     
-# function that translates the nmf$dynmodel.fun() parameters if function is null, dont apply translation.
-    # RxODE(nmf$rxode.pred)
-    # write function outside so it is faster
-    
+    # translates nlmixr parameters
     if (!is.null(nlmixrObject)) {
       theta <- nlmixrObject$dynmodel.fun(theta)
     }
+    
     # call rxODE for simulation
-
     s = do.call(RxODE :: rxSolve, c(list(object=system, params=theta, events=data), rxControl))
-    
-    # NOTES:
-    #returnType="data.frame" - add to rxControl
-    #rxNorm(system) # add error piece, use the error parameters as parameters
-    #nlmixr_err=boxCox(add.err^2+prop.err^(2*pow)*pred, lambda) for the predictions not the errors
-    
+ 
     # sum of log-likelihood function:
     l = lapply(model, function(x) {
       # name the inputs
@@ -965,10 +971,8 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
       if (!is.null(tbsYj)) lambda <- tbsYj
       
       # predictted and observed values from RxODE
-      #yp = s[rows,x["pred"]]
-      yp = s[,x["pred"]]
-      #yo = data[, x["dv"]]
-      
+      yp = s[rows,x["pred"]]
+
       # log normal transformation ----
       if (!is.null(.logn) | !is.null(.dlnorm)){
         .h.x <- boxCox(yo, lambda) #log(yo) # obs
@@ -1045,6 +1049,7 @@ dynmodel = function(system, model, inits, data, nlmixrObject=NULL, control=list(
       sgy <<- sgy
       sum(ll)
     })
+
     sgy <<- sgy
     do.call("sum", l)  # same as return(as.numeric(l)), l is a list for each value in the model?
   }
@@ -1288,11 +1293,9 @@ uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
   .Call(slice_wrap, fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
 }
 
-genobj = function(system, model, evTable, inits, data, fixPars=NULL,
-squared=T
-){
+genobj = function(system, model, evTable, inits, data, fixPars=NULL,squared=T){
   
-  # Error model  -------------------------------------------------------------
+# Error model  -------------------------------------------------------------
   if (class(model)=="formula") {
     model = list(model)
   }
@@ -1300,25 +1303,25 @@ squared=T
   model = lapply(model, function(f) {
     s = unlist(lapply(attr(terms(f),"variables"), as.list))
     s = sapply(s, deparse)
-    
+
     ix.add = match("add",  s, nomatch=0)
     ix.pro = match("prop", s, nomatch=0)
     err.type = c("add", "prop", "combo")[(ix.add>0)+2*(ix.pro>0)]
-    
+
     sig.add = if (ix.add>0) as.numeric(s[ix.add+1]) else NULL
     sig.pro = if (ix.pro>0) as.numeric(s[ix.pro+1]) else NULL
-    
+
     inits.err <<- c(inits.err, sig.add, sig.pro)
-    
+
     if (any(is.na(inits.err) | inits.err<=0)) stop("error model misspecification")
-    
+
     s = c(s[2:3], err.type)
     names(s) = c("dv", "pred", "err")
     s
   })
   names(inits.err) = paste0("err", 1:length(inits.err))
   inits = c(inits, inits.err)
-  
+
   # Check dynmodel() inputs, Define vars, modelVars, pars,  ------------
   vars = names(data)
   nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
@@ -1359,16 +1362,12 @@ squared=T
     names(theta) = names(inits)[1:npar]
     theta = c(theta, fixPars)
     if (do.ode.solving) {
-      
-      
       s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
-      
-      
       s.save <<- s
     } else {
       s = s.save
     }
-    
+
     l = lapply(model, function(x) {
       err.combo = (x["err"]=="combo")+0
       .ixpar <<- .ixpar+1
@@ -1381,7 +1380,7 @@ squared=T
         .ixpar <<- .ixpar+1
         sig
       }
-      
+
       yp = s[rows,x["pred"]]
       sgy = thresh(sig[1]+yp*sig[2])
       yo = data[, x["dv"]]
@@ -1394,7 +1393,6 @@ squared=T
   }
   list(obj=obj, inits=inits)
 }
-
 
 #-- mcmc
 error.terms = paste0("err", 1:40)

@@ -709,6 +709,10 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             
             env$uif <- NULL
 
+# update data to merge for origData and data. first add zeros or whatever is filled in for DV when there is no observations
+            # to match the lengths, then merge observed data for both origData and data, and send to RxODE.
+            
+            #.dynmodelData <- data
             # nlmixr Object ---
             .nmf <- nlmixr(f)
             # Conversion ---
