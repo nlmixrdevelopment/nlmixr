@@ -524,6 +524,12 @@ void parse_pars(char **model_file, char **result_file, int *nrhs, int *dosep, ch
   else {
     printf("\nfailure\n");
   }
+  if (pn){
+    free_D_ParseTreeBelow(p,pn);
+    free_D_ParseNode(p,pn);
+    pn=0;
+  }
+  free_D_Parser(p);
   return;
 }
 
