@@ -1550,7 +1550,6 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                     capture(any_spaces)),
                       reg00="",reg01="",repE="expr"){
       if (any(regexpr(.regRx, funTxt[1:w]) != -1)){
-
         .rxBegin <- funTxt[1:w];
         .re <- rex::rex(start, capture(any_spaces),reg0,
                         capture(any_spaces, or("=", "~", "<-")),
@@ -1631,9 +1630,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     w <- max(w);
 
     .finalFix <- function(){
-      if (any(regexpr(rex::rex(start,any_spaces,or("d/dt(", "f(", "F(", "dur(", "d(",
-                                  "lag(", "alag(", "r(", "rate(",
-                                  group("(0)", any_spaces, or("=", "~", "<-")))), funTxt[1:w],
+      if (any(regexpr(.regRx, funTxt[1:w],
                       perl=TRUE) != -1)){
         ## There are still mixed PK parameters and ODEs
         w <- which(regexpr(.regRx, funTxt, perl=TRUE) != -1);
@@ -1676,7 +1673,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   reg <- rex::rex(or("=","<-"),anything,boundary, or(ini$name), boundary);
   .regRx <- rex::rex(start,any_spaces, or("d/dt(", "f(", "F(", "dur(", "d(",
                         "lag(", "alag(", "r(", "rate(",
-                        group("(0)", any_spaces, or("=", "<-"))));
+                        group(anything, any_spaces, "(0)", any_spaces, or("=", "<-"))));
   .lhs <- nlmixrfindLhs(body(
     eval(parse(text=paste("function(){",
                           paste(.tmp,collapse="\n"),
@@ -1786,12 +1783,15 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
     w <- which(regexpr(reg, rx.txt, perl=TRUE) != -1);
     w <- max(w);
-    if (any(regexpr(rex::rex(start,any_spaces,
-                             or("d/dt(", "f(", "F(", "dur(", "d(",
-                                "lag(", "alag(", "r(", "rate(",
-                                group("(0)", any_spaces, or("=", "<-")))),
-                    rx.txt[1:w], perl=TRUE) != -1)){
-      stop("Mixed estimation types and ODEs.")
+    if (any(regexpr(.regRx, rx.txt[1:w], perl=TRUE) != -1)){
+        if (length(rx.txt) == w){
+            tmp <- RxODE::rxGetModel(paste(rx.txt, collapse="\n"))
+            tmp <- paste(tmp$params, "=", tmp$params)
+            w <- length(tmp);
+            rx.txt <- c(tmp, rx.txt);
+        } else {
+            stop("Mixed estimation types and ODEs.")
+        }
     }
     rx.ode <- rx.txt[-(1:w)];
     rx.pred <- try(eval(parse(text=paste(c("function() {", rx.txt[1:w], "}"), collapse="\n"))), silent=TRUE)
@@ -1812,11 +1812,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
             stop("else if are not supported in nlmixr");
           }
         }
-        if (any(regexpr(rex::rex(start,any_spaces,
-                             or("d/dt(", "f(", "F(", "dur(", "d(",
-                                "lag(", "alag(", "r(", "rate(",
-                                group("(0)", any_spaces, or("=", "<-")))),
-                        rx.pred, perl=TRUE) != -1)){
+        if (any(regexpr(.regRx, rx.pred, perl=TRUE) != -1)){
           stop("Mixed estimation types and ODEs #2.")
         }
       } else {

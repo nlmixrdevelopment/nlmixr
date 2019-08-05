@@ -239,7 +239,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     .tmp <- .tmp[-length(.tmp)];
     .origData <- data;
     data <- RxODE::etTrans(data,paste(paste(.tmp,collapse="\n"),"\n",uif$rxode),TRUE,TRUE, TRUE);
-   
+
     .nTv  <- attr(class(data),".RxODE.lst")$nTv;
     .lab  <- attr(class(data),".RxODE.lst")$idLvl;
     .modelId <- digest::digest(list(sessionInfo()$otherPkgs$nlmixr$Version,
@@ -706,7 +706,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     } else if (est == "dynmodel") {
             if (class(control) !="dynmodelControl") control <- do.call(dynmodelControl, control);
             env <- new.env(parent=emptyenv());
-            
+
             env$uif <- NULL
 
 # update data to merge for origData and data. first add zeros or whatever is filled in for DV when there is no observations
@@ -714,7 +714,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             
             #.dynmodelData <- data
             # nlmixr Object ---
-            .nmf <- nlmixr(f)
+            .nmf <- uif
             # Conversion ---
             .dynNlmixr <- nlmixrDynmodelConvert(.nmf)
             # Model ---
@@ -730,7 +730,8 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             control$upper <- if(!is.null(.dynNlmixr$upper)) .dynNlmixr$upper else NULL
 
             fit <- dynmodel(system = .system, model = .model, inits = .inits, data = .origData, nlmixrObject = .nmf, control=control)
-
+            assign("origData", .origData, fit$env)
+            fit <- fix.dat(fit);
             return(fit);
             }
     else {

@@ -61,6 +61,12 @@ nlmixrEval_ <- function(theta, md5) {
 
 #' @rdname nlmixrGradFun
 #' @export
+nlmixrUnscaled_ <- function(theta, md5) {
+    .Call(`_nlmixr_nlmixrUnscaled_`, theta, md5)
+}
+
+#' @rdname nlmixrGradFun
+#' @export
 nlmixrGrad_ <- function(theta, md5) {
     .Call(`_nlmixr_nlmixrGrad_`, theta, md5)
 }
@@ -69,6 +75,10 @@ nlmixrGrad_ <- function(theta, md5) {
 #' @export
 nlmixrParHist_ <- function(md5) {
     .Call(`_nlmixr_nlmixrParHist_`, md5)
+}
+
+nlmixrHess_ <- function(thetaT, fT, e, gillInfoT) {
+    .Call(`_nlmixr_nlmixrHess_`, thetaT, fT, e, gillInfoT)
 }
 
 #' Return the square root of general square matrix A

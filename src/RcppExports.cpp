@@ -179,6 +179,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrUnscaled_
+RObject nlmixrUnscaled_(NumericVector theta, std::string md5);
+RcppExport SEXP _nlmixr_nlmixrUnscaled_(SEXP thetaSEXP, SEXP md5SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< std::string >::type md5(md5SEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrUnscaled_(theta, md5));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nlmixrGrad_
 NumericVector nlmixrGrad_(NumericVector theta, std::string md5);
 RcppExport SEXP _nlmixr_nlmixrGrad_(SEXP thetaSEXP, SEXP md5SEXP) {
@@ -199,6 +211,20 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type md5(md5SEXP);
     rcpp_result_gen = Rcpp::wrap(nlmixrParHist_(md5));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nlmixrHess_
+RObject nlmixrHess_(RObject thetaT, RObject fT, RObject e, RObject gillInfoT);
+RcppExport SEXP _nlmixr_nlmixrHess_(SEXP thetaTSEXP, SEXP fTSEXP, SEXP eSEXP, SEXP gillInfoTSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RObject >::type thetaT(thetaTSEXP);
+    Rcpp::traits::input_parameter< RObject >::type fT(fTSEXP);
+    Rcpp::traits::input_parameter< RObject >::type e(eSEXP);
+    Rcpp::traits::input_parameter< RObject >::type gillInfoT(gillInfoTSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrHess_(thetaT, fT, e, gillInfoT));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -128,6 +128,10 @@
     .nlmixrData <- nlmixr::nlmixrData(nlme::getData(object))
     .dfSub <- length(unique(.nlmixrData$ID));
     .thetaMat <- nlme::getVarCov(object);
+    if (all(is.na(object$uif$ini$neta1))){
+        .omega <- NULL
+        .dfSub <- 0
+    }
     return(list(rx=.newMod, params=.params, events=.nlmixrData,
                 thetaMat=.thetaMat, omega=.omega, sigma=.sigma, dfObs=.dfObs, dfSub=.dfSub))
 }
@@ -212,6 +216,9 @@ nlmixrSim <- function(object, ...){
     .xtra$omega <- .si$omega;
     .xtra$dfSub <- .si$dfSub
     .xtra$sigma <- .si$sigma;
+    if (is.null(.xtra$omega)){
+        .xtra$omega <- matrix(1, 1, 1, dimnames=list("nlmixr_dum", "nlmixr_dum"))
+    }
     .ret <- do.call(getFromNamespace("rxSolve", "RxODE"), .xtra, envir=parent.frame(2))
     if (inherits(.ret, "rxSolve")){
         .rxEnv <- attr(class(.ret),".RxODE.env")
@@ -326,14 +333,28 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
         do.pred <- TRUE
     }
     if (do.ipred){
-        re <- random.effects(object)[,-1];
-        names(re) <- sprintf("ETA[%d]", seq_along(names(re)));
-        ipred.par <- data.frame(re,t(params),
-                                rx_err_=0, check.names=FALSE)
+        re <- random.effects(object);
+        if (is.null(re)){
+            .tmp <- lst$events
+            .w <- which(tolower(names(.tmp)) == "id");
+            .nid <- length(unique(.tmp[[.w]]));
+            ipred.par <- data.frame(t(params),
+                                    rx_err_=rep(0, .nid),
+                                    check.names=FALSE)
+        } else {
+            re <- re[,-1];
+            names(re) <- sprintf("ETA[%d]", seq_along(names(re)));
+            ipred.par <- data.frame(re,t(params),
+                                    rx_err_=0, check.names=FALSE)
+        }
     }
     if (do.pred){
         neta <- dim(object$omega)[1]
-        pred.par <- c(params, setNames(rep(0, neta + 1), c(sprintf("ETA[%d]", seq(1, neta)), "rx_err_")));
+        if (neta == 0){
+            pred.par <- c(params, rx_err_=0)
+        } else {
+            pred.par <- c(params, setNames(rep(0, neta + 1), c(sprintf("ETA[%d]", seq(1, neta)), "rx_err_")));
+        }
     }
     on.exit({RxODE::rxUnload(lst$object)});
     if (!is.na(ipred)){
@@ -370,7 +391,7 @@ predict.nlmixrFitData <- function(object, ...){
 ##' @return Stacked data.frame with observations, individual/population predictions.
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+nlmixrAugPred <- function(object, ..., covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
                           primary=NULL, minimum = NULL, maximum = NULL, length.out = 51L){
     force(object);
     if (!inherits(object, "nlmixrFitData")){
@@ -422,13 +443,20 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     lst <- as.list(match.call()[-1])
     lst <- lst[!(names(lst) %in% c("primary", "minimum", "maximum", "length.out"))]
     lst$object <- object
-    lst$ipred <- NA
+    if (all(is.na(uif$ini$neta1))){
+        lst$ipred <- FALSE
+    } else {
+        lst$ipred <- NA
+    }
     lst$events <- dat
     lst$params <- NULL;
     dat.new <- do.call("nlmixrPred", lst, envir=parent.frame(2))
+    .vars <- c("id", "time", "pred", "ipred")
+    .vars <- intersect(.vars, names(dat.new))
+    dat.new <- dat.new[, .vars]
     dat.new$id <- factor(dat.new$id)
     levels(dat.new$id) <- levels(object$ID)
-    dat.new <- data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2)]))
+    dat.new <- data.frame(dat.new[, 1:2, drop = FALSE], stack(dat.new[,-(1:2), drop = FALSE]))
     levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
     names(dat.old) <- tolower(names(dat.old))
     dat.old <- dat.old[dat.old$evid == 0, ];

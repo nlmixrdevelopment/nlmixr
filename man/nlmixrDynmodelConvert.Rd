@@ -13,7 +13,7 @@ nlmixrDynmodelConvert(.nmf)
 list containing inputs for the dynmodel()
 \itemize{
 \item \code{$fixPars} - fixed parameters defined as \code{fixed()} in the nlmixr object
-\item \code{$sigma} - error model parameters 
+\item \code{$sigma} - error model parameters
 \item \code{$inits} - initial estimates for parameters in the model
 \item \code{$lower} - lower boundaries for estimated parameters
 \item \code{$upper} - upper boundaries for estimated parameters

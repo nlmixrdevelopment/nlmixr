@@ -5,7 +5,7 @@
 \alias{augPred.nlmixrFitData}
 \title{Augmented Prediction for nlmixr fit}
 \usage{
-nlmixrAugPred(object, ..., covsInterpolation = c("linear", "locf",
+nlmixrAugPred(object, ..., covsInterpolation = c("locf", "linear",
   "nocb", "midpoint"), primary = NULL, minimum = NULL,
   maximum = NULL, length.out = 51L)
 

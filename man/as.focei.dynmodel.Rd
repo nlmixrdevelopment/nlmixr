@@ -5,8 +5,8 @@
 \title{Output nlmixr format for dynmodel}
 \usage{
 \method{as.focei}{dynmodel}(.dynmodelObject, .nlmixrObject, .data, .time,
-  .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl, .nobs2 = 0,
-  .pt = proc.time(), .rxControl = RxODE::rxControl())
+  .theta, .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl,
+  .nobs2 = 0, .pt = proc.time(), .rxControl = RxODE::rxControl())
 }
 \arguments{
 \item{.dynmodelObject}{return object from}
