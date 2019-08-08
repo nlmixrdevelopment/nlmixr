@@ -8,17 +8,18 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxInnerIterations = 1000, maxOuterIterations = 5000,
   n1qn1nsim = NULL, method = c("liblsoda", "lsoda", "dop853"),
   transitAbs = NULL, atol = NULL, rtol = NULL, atolSens = NULL,
-  rtolSens = NULL, maxstepsOde = 50000L, hmin = 0L,
-  hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
-  covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
-  print = 1L, printNcol = floor((getOption("width") - 23)/12),
-  scaleTo = 1, scaleObjective = 0, normType = c("rescale2", "mean",
-  "rescale", "std", "len", "constant"), scaleType = c("nlmixr", "norm",
-  "mult", "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05,
-  scaleC = NULL, scaleC0 = 1e+05, derivEps = rep(20 *
-  sqrt(.Machine$double.eps), 2), derivMethod = c("switch", "forward",
-  "central"), derivSwitchTol = NULL, covDerivMethod = c("central",
-  "forward"), covMethod = c("r,s", "r", "s", ""),
+  rtolSens = NULL, atolSS = NULL, rtolSS = NULL,
+  maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0,
+  maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
+  "linear", "nocb", "midpoint"), print = 1L,
+  printNcol = floor((getOption("width") - 23)/12), scaleTo = 1,
+  scaleObjective = 0, normType = c("rescale2", "mean", "rescale",
+  "std", "len", "constant"), scaleType = c("nlmixr", "norm", "mult",
+  "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
+  scaleC0 = 1e+05, derivEps = rep(20 * sqrt(.Machine$double.eps), 2),
+  derivMethod = c("switch", "forward", "central"),
+  derivSwitchTol = NULL, covDerivMethod = c("central", "forward"),
+  covMethod = c("r,s", "r", "s", ""),
   hessEps = (.Machine$double.eps)^(1/3), centralDerivEps = rep(20 *
   sqrt(.Machine$double.eps), 2), lbfgsLmm = 7L, lbfgsPgtol = 0,
   lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
@@ -53,8 +54,9 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
  \item The tolerance of the inner and outer optimization is \code{10^-sigdig}
 
  \item The tolerance of the ODE solvers is
- \code{0.5*10^(-sigdig-2)}; For the sensitivity equations the
- default is \code{0.5*10^(-sigdig-1.5)} (only applicable for liblsoda)
+ \code{0.5*10^(-sigdig-2)}; For the sensitivity equations and
+ steady-state solutions the default is \code{0.5*10^(-sigdig-1.5)}
+ (senstivity changes only applicable for liblsoda)
 
  \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
 
@@ -102,6 +104,12 @@ achieved. This is also used in the solved linear model to check
 liblsoda.  This allows a less accurate solve for gradients (if desired)}
 
 \item{rtolSens}{Sensitivity rtol, can be different than rtol with
+liblsoda.  This allows a less accurate solve for gradients (if desired)}
+
+\item{atolSS}{Steady-state atol, can be different than atol with
+liblsoda.  This allows a less accurate solve for gradients (if desired)}
+
+\item{rtolSS}{Steady-state rtol, can be different than rtol with
 liblsoda.  This allows a less accurate solve for gradients (if desired)}
 
 \item{maxstepsOde}{Maximum number of steps for ODE solver.}

@@ -781,9 +781,11 @@ double likInner0(double *eta){
       mat Vid;
       if (op_focei.fo == 1){
 	Vid = arma::mat(ind->n_all_times - ind->ndoses - ind->nevid2,
-			ind->n_all_times - ind->ndoses - ind->nevid2, fill::zeros);
+			ind->n_all_times - ind->ndoses - ind->nevid2,
+			fill::zeros);
       } else if (op_focei.interaction == 1){
-	c   = arma::mat(ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta);
+	c   = arma::mat(ind->n_all_times - ind->ndoses - ind->nevid2,
+			op_focei.neta);
       }
     
       // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
@@ -797,14 +799,18 @@ double likInner0(double *eta){
 	  ind->tlast = ind->all_times[j];
 	} else if (ind->evid[j] == 0) {
 	  ind->idx=j;
-	  inner_calc_lhs((int)id, ind->all_times[j], &ind->solve[j * op->neq], ind->lhs);
+	  inner_calc_lhs((int)id, ind->all_times[j],
+			 &ind->solve[j * op->neq],
+			 ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
-	  if (ISNA(f)) throw std::runtime_error("bad solve");
+	  if (ISNA(f))
+	    throw std::runtime_error("bad solve");
 	  // fInd->f(k, 0) = ind->lhs[0];
 	  err = f - tbs(ind->dv[j]);
 	  fInd->tbsLik+=tbsL(ind->dv[j]);
 	  // fInd->err(k, 0) = ind->lhs[0] - ind->dv[k]; // pred-dv
-	  if (ISNA(ind->lhs[op_focei.neta + 1])) throw std::runtime_error("bad solve");
+	  if (ISNA(ind->lhs[op_focei.neta + 1]))
+	    throw std::runtime_error("bad solve");
 	  r = _safe_zero(ind->lhs[op_focei.neta + 1]);
 	  if (op_focei.fo){
 	    // FO

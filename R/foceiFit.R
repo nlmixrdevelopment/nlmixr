@@ -28,8 +28,9 @@ is.latex <- function() {
 ##'  \item The tolerance of the inner and outer optimization is \code{10^-sigdig}
 ##'
 ##'  \item The tolerance of the ODE solvers is
-##'  \code{0.5*10^(-sigdig-2)}; For the sensitivity equations the
-##'  default is \code{0.5*10^(-sigdig-1.5)} (only applicable for liblsoda)
+##'  \code{0.5*10^(-sigdig-2)}; For the sensitivity equations and
+##'  steady-state solutions the default is \code{0.5*10^(-sigdig-1.5)}
+##'  (senstivity changes only applicable for liblsoda)
 ##'
 ##'  \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
 ##'
@@ -40,6 +41,12 @@ is.latex <- function() {
 ##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
 ##'
 ##' @param rtolSens Sensitivity rtol, can be different than rtol with
+##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
+##'
+##' @param atolSS Steady-state atol, can be different than atol with
+##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
+##'
+##' @param rtolSS Steady-state rtol, can be different than rtol with
 ##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
 ##'
 ##' @param epsilon Precision of estimate for n1qn1 optimization.
@@ -565,6 +572,7 @@ foceiControl <- function(sigdig=3,...,
                          method = c("liblsoda", "lsoda", "dop853"),
                          transitAbs = NULL, atol = NULL, rtol = NULL,
                          atolSens=NULL, rtolSens=NULL,
+                         atolSS=NULL, rtolSS=NULL,
                          maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
                          covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
                          print=1L,
@@ -686,6 +694,12 @@ foceiControl <- function(sigdig=3,...,
     }
     if (is.null(rtolSens)){
         rtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
+    }
+    if (is.null(atolSS)){
+        atolSS <- 0.5 * 10 ^ (-sigdig-1.5);
+    }
+    if (is.null(rtolSS)){
+        rtolSS <- 0.5 * 10 ^ (-sigdig-1.5);
     }
     if (is.null(rel.tol)){
         rel.tol <- 10 ^ (-sigdig - 1);
@@ -833,6 +847,8 @@ foceiControl <- function(sigdig=3,...,
                  rtol=rtol,
                  atolSens=atolSens,
                  rtolSens=rtolSens,
+                 atolSS=atolSS,
+                 rtolSS=rtolSS,
                  maxstepsOde=maxstepsOde,
                  hmin=hmin,
                  hmax=hmax,
