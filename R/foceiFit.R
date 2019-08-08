@@ -539,6 +539,12 @@ is.latex <- function() {
 ##'     estimates, randomly sample new parameter estimates and restart
 ##'     the problem.  This is similar to 'PsN' resampling.
 ##'
+##' @param eventFD Finite difference step for forward or central
+##'     difference estimation of event-based gradients
+##'
+##' @param eventCentral Use the central difference approximation when
+##'     estimating event-based gradients
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##' @inheritParams foceiFit
@@ -591,6 +597,8 @@ foceiControl <- function(sigdig=3,...,
                          covDerivMethod=c("central", "forward"),
                          covMethod=c("r,s", "r", "s", ""),
                          hessEps=(.Machine$double.eps) ^ (1 / 3),
+                         eventFD=sqrt(.Machine$double.eps),
+                         eventCentral=TRUE,
                          centralDerivEps=rep(20*sqrt(.Machine$double.eps), 2),
                          lbfgsLmm=7L,
                          lbfgsPgtol=0,
@@ -945,6 +953,8 @@ foceiControl <- function(sigdig=3,...,
                  etaMat=etaMat,
                  repeatGillMax=as.integer(repeatGillMax),
                  stickyRecalcN=as.integer(max(1,abs(stickyRecalcN))),
+                 eventFD=eventFD,
+                 eventCentral=as.integer(eventCentral),
                  ...);
     if (!missing(etaMat) && missing(maxInnerIterations)){
         warning("By supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0");
@@ -1897,6 +1907,12 @@ foceiFit.data.frame0 <- function(data,
     .ret$control$printTop <- TRUE
     .ret$control$nF <- 0
     .est0 <- .ret$thetaIni;
+    if (!is.null(.ret$model$pred.nolhs)){
+        message(sprintf("Assign .ret$contol$predNeq %s", length(.ret$model$pred.nolhs$state)))
+        .ret$control$predNeq = length(.ret$model$pred.nolhs$state)
+    } else {
+        .ret$control$predNeq = 0L
+    }
     .fitFun <- function(.ret){
         this.env <- environment()
         assign("err", "theta reset", this.env)

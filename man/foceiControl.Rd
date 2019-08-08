@@ -20,18 +20,20 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   derivMethod = c("switch", "forward", "central"),
   derivSwitchTol = NULL, covDerivMethod = c("central", "forward"),
   covMethod = c("r,s", "r", "s", ""),
-  hessEps = (.Machine$double.eps)^(1/3), centralDerivEps = rep(20 *
-  sqrt(.Machine$double.eps), 2), lbfgsLmm = 7L, lbfgsPgtol = 0,
-  lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
-  diagXform = c("sqrt", "log", "identity"), sumProd = FALSE,
-  optExpression = TRUE, ci = 0.95, useColor = crayon::has_color(),
-  boundTol = NULL, calcTables = TRUE, noAbort = TRUE,
-  interaction = TRUE, cholSEtol = (.Machine$double.eps)^(1/3),
-  cholAccept = 0.001, resetEtaP = 0.15, resetThetaP = 0.05,
-  resetThetaFinalP = 0.15, diagOmegaBoundUpper = 5,
-  diagOmegaBoundLower = 100, cholSEOpt = FALSE, cholSECov = FALSE,
-  fo = FALSE, covTryHarder = FALSE, outerOpt = c("nlminb", "bobyqa",
-  "lbfgsb3c", "L-BFGS-B", "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
+  hessEps = (.Machine$double.eps)^(1/3),
+  eventFD = sqrt(.Machine$double.eps), eventCentral = TRUE,
+  centralDerivEps = rep(20 * sqrt(.Machine$double.eps), 2),
+  lbfgsLmm = 7L, lbfgsPgtol = 0, lbfgsFactr = NULL, eigen = TRUE,
+  addPosthoc = TRUE, diagXform = c("sqrt", "log", "identity"),
+  sumProd = FALSE, optExpression = TRUE, ci = 0.95,
+  useColor = crayon::has_color(), boundTol = NULL, calcTables = TRUE,
+  noAbort = TRUE, interaction = TRUE,
+  cholSEtol = (.Machine$double.eps)^(1/3), cholAccept = 0.001,
+  resetEtaP = 0.15, resetThetaP = 0.05, resetThetaFinalP = 0.15,
+  diagOmegaBoundUpper = 5, diagOmegaBoundLower = 100,
+  cholSEOpt = FALSE, cholSECov = FALSE, fo = FALSE,
+  covTryHarder = FALSE, outerOpt = c("nlminb", "bobyqa", "lbfgsb3c",
+  "L-BFGS-B", "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
   innerOpt = c("n1qn1", "BFGS"), rhobeg = 0.2, rhoend = NULL,
   npt = NULL, rel.tol = NULL, x.tol = NULL, eval.max = 4000,
   iter.max = 2000, abstol = NULL, reltol = NULL,
@@ -361,6 +363,12 @@ derivatives while calculating the covariance components
 }}
 
 \item{hessEps}{is a double value representing the epsilon for the Hessian calculation.}
+
+\item{eventFD}{Finite difference step for forward or central
+difference estimation of event-based gradients}
+
+\item{eventCentral}{Use the central difference approximation when
+estimating event-based gradients}
 
 \item{centralDerivEps}{Central difference tolerances.  This is a
     numeric vector of relative difference and absolute difference.
