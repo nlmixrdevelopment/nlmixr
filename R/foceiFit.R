@@ -1908,7 +1908,6 @@ foceiFit.data.frame0 <- function(data,
     .ret$control$nF <- 0
     .est0 <- .ret$thetaIni;
     if (!is.null(.ret$model$pred.nolhs)){
-        message(sprintf("Assign .ret$contol$predNeq %s", length(.ret$model$pred.nolhs$state)))
         .ret$control$predNeq = length(.ret$model$pred.nolhs$state)
     } else {
         .ret$control$predNeq = 0L

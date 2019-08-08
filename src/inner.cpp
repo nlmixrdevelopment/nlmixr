@@ -5148,7 +5148,6 @@ Environment foceiFitCpp_(Environment e){
       // Now setup which ETAs need a finite difference
       if (model.containsElementNamed("eventEta")){
 	IntegerVector eventEta = model["eventEta"];
-	print(eventEta);
 	std::copy(eventEta.begin(), eventEta.end(),&op_focei.etaFD[0]);
       }
     } else if (model.containsElementNamed("pred.only")){
