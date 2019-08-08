@@ -12,7 +12,7 @@
 ##' @return Simulated dataset (invisibly)
 ##' @author Matthew L. Fidler
 ##' @export
-vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
+vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                    n_bins = "auto", bin_mid = "mean",
                    show = NULL, stratify = NULL, pred_corr = FALSE,
                    pred_corr_lower_bnd = 0, pi = c(0.05, 0.95), ci = c(0.05, 0.95),
@@ -40,7 +40,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         .si <- fit$simInfo;
         if (is.null(data)){
             if (!is.null(stratify)){
-                .rx <- paste0(.si$rx,"\nrx_dummy_var~",paste(tolower(stratify),collapse="+"), "\n");
+                .rx <- paste0(.si$rx,"\nrx_dummy_var~",paste(stratify,collapse="+"), "\n");
             } else {
                 .rx <- .si$rx;
             }
@@ -48,6 +48,32 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         } else {
             dat <- data
         }
+        ## Get stratify columns
+        if (!is.null(stratify)){
+            cols <- c(stratify, "dv")
+            stratify <- tolower(stratify);
+        } else if (inherits(fit, "nlmixrFitCore")){
+            .uif <- fit$uif
+            if (length(.uif$predDf$cmt) > 1){
+                cols <- c("cmt", "dv")
+                stratify <- "cmt";
+            } else {
+                cols <- c("dv");
+            }
+        } else {
+            cols <- c("dv");
+        }
+        .nd <- names(dat);
+        .xtra$rx <- paste(c(do.call("c", lapply(cols, function(x){
+            if (tolower(x) == "dv") return(NULL)
+            .w <- which(tolower(.nd) == tolower(x))
+            if (length(.w) == 1L){
+                names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]))
+                return(paste0(.nd[.w], "=0+nlmixr_", tolower(.nd[.w])));
+            }
+            return(NULL)
+        })), .si$rx), collapse="\n")
+
         .xtra$nStud <- n;
         if (!is.null(.xtra$nsim)){
             .xtra$nStud <- .xtra$nsim
@@ -56,10 +82,19 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         .xtra$dfObs <- 0
         .xtra$dfSub <- 0
         .xtra$thetaMat <- NA
+        .xtra$events <- dat
         sim <- do.call("nlmixrSim", .xtra);
         sim0 <- sim;
-        sim <- sim[, c("id", "time", "sim")]
-        names(sim)[3] <- "dv";
+        names(dat) <- gsub("nlmixr_", "", names(dat));
+        onames <- names(dat)
+        names(dat) <- tolower(onames)
+        w <- which(duplicated(names(dat)));
+        if (length(w) > 0){
+            warning(sprintf("Dropping duplicate columns (case insensitive): %s", paste(onames, collapse=", ")))
+            dat <- dat[, -w, drop = FALSE];
+        }
+        names(sim) <- gsub("^sim$", "dv", tolower(names(sim)))
+        sim0 <- sim
         ##
         if (pred_corr){
             .xtra.prd <- .xtra;
@@ -76,38 +111,10 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
         }
         diff <- proc.time() - pt;
         message(sprintf("done (%.2f sec)", diff["elapsed"]));
-        onames <- names(dat)
-        names(dat) <- tolower(onames)
-        w <- which(duplicated(names(dat)));
-        if (length(w) > 0){
-            warning(sprintf("Dropping duplicate columns (case insensitive): %s", paste(onames, collapse=", ")))
-            dat <- dat[, -w];
-        }
-        if (!is.null(stratify)){
-            cols <- c(tolower(stratify), "dv")
-            stratify <- tolower(stratify);
-        } else if (inherits(fit, "nlmixrFitCore")){
-            .uif <- fit$uif
-            if (length(.uif$predDf$cmt) > 1){
-                cols <- c("cmt", "dv")
-                stratify <- "cmt";
-            } else {
-                cols <- c("dv");
-            }
-        } else {
-            cols <- c("dv");
-        }
+
         ##
-        dat <- dat[dat$evid == 0, ];
         ## Assume this is in the observed dataset. Add it to the current dataset
-        if(!all(names(sim) %in% cols)){
-            w <- cols[!(cols %in% names(sim))]
-            if (length(w) >= 1){
-                n <- names(sim)
-                sim <- cbind(sim, dat[, w, drop = FALSE]);
-                names(sim) <- c(n, w);
-            }
-        }
+        dat <- dat[dat$evid == 0, ];
         if (any(names(sim)=="cmt") && any(names(fit)=="CMT")){
             if (is(fit$CMT, "factor")){
                 sim$cmt  <- factor(sim$cmt,sort(unique(sim$cmt)), labels=levels(fit$CMT))
@@ -118,7 +125,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
                 dat$cmt  <- factor(dat$cmt,sort(unique(dat$cmt)), labels=levels(fit$CMT))
             }
         }
-        sim <- list(rxsim=sim0, sim=sim, obs=dat)
+        sim <- list(rxsim=sim0, sim=as.data.frame(sim), obs=dat)
         class(sim)  <- "rxHidden"
         attr(sim, "nsim") <- .xtra$nsim;
         class(sim) <- "nlmixrVpc";
@@ -139,7 +146,7 @@ vpc_ui <- memoise::memoise(function(fit, data=NULL, n=100, bins = "jenks",
     attr(cls, "nlmixrVpc") <- sim
     class(p) <- cls
     return(p);
-})
+}
 
 ##'@export
 `$.nlmixrVpc` <- function(obj, arg, exact = TRUE){
