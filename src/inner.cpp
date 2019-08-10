@@ -73,6 +73,11 @@ extern "C"{
   typedef int (*isRstudio_t)();
   isRstudio_t isRstudio;
   getRxSolve_t getRx;
+
+  typedef int (*getCens_t) (rx_solving_options_ind* ind, int i);
+  typedef int (*getLimit_t) (rx_solving_options_ind* ind, int i);
+  getCens_t getCens;
+  getCens_t getLimit;
 }
 
 extern void lin_cmt_stanC(double *obs_timeD, const int nobs, double *dose_timeD, const int ndose, double *doseD, double *TinfD,
@@ -777,6 +782,88 @@ void updateTheta(double *theta){
 
 arma::mat cholSE__(arma::mat A, double tol);
 
+inline void foceiLpInner(int &cens, double &limit, double &dv,
+			 double& f, double& r, double& fpm, double &rp, double &err,
+			 arma::mat& a, arma::mat& B, arma::mat &c,
+			 arma::mat& lp, 
+			 int &k, int &i, 
+			 rx_solving_options_ind *ind){
+  double rxe[21];
+  fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
+  rp  = ind->lhs[i + op_focei.neta + 2];
+  if (cens==0){
+    // Not censored
+    c(k, i) = rp/_safe_zero(r);
+    // lp is eq 12 in Almquist 2015
+    // // .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
+    lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) - 0.5 * c(k, i) - 
+      0.5 * err * fpm * B(k, 0);
+    // Add d/likelihood from limit
+    // lp(i, 0)
+    if (!std::isinf(limit)){
+      // M2/M4 adjustment.
+      //
+      // Phi(x) = 1/2*(1+erf(x/sqrt(2)))
+      // M2/M4 extra log-lik = -log(1-phi((limit-f(x))/sqrt(r(x)))
+      // or -log(1-1/2*(1+erf(cens*(limit-f(x))/sqrt(r(x))/sqrt(2))))
+      // From symengine.R
+      // D(S("-log(1-1/2*(1+erf(cens*(limit-f(x))/sqrt(r(x))/M_SQRT2)))"),"x")
+      // (Mul)	exp(-cens^2*(limit - f(x))^2/(r(x)*M_SQRT2^2))*(-Derivative(f(x), x)*cens/(sqrt(r(x))*M_SQRT2) + (-1/2)*Derivative(r(x), x)*cens*(limit - f(x))/(r(x)^(3/2)*M_SQRT2))/(sqrt(pi)*(1 + (-1/2)*(1 + erf(cens*(limit - f(x))/(sqrt(r(x))*M_SQRT2)))))
+      // exp(-(limit - f)^2/(r*M_SQRT2^2))*(-fpm*cens/(sqrt(r)*M_SQRT2) + (-0.5)*rp*cens*(limit - f)/(r^(3/2)*M_SQRT2))/(sqrt(pi)*(1 + (-0.5)*(1 + erf(cens*(limit - f)/(sqrt(r)*M_SQRT2)))))
+      rxe[0] =limit-f;
+      rxe[1] =sqrt(r);
+      rxe[2] =rxe[1]*M_SQRT2;
+      lp(i,0)+=exp(-0.5*rxe[0]*rxe[0]/r)*(-fpm*(double)(cens)/(rxe[2])-0.5*rp*(double)(cens)*(rxe[0])/(R_pow(r,1.5)*M_SQRT2))/_safe_zero(M_SQRT_PI*(1-0.5*(1+erf((double)(cens)*(rxe[0])/((rxe[2]))))));
+    }
+  } else {
+    // Here dv = LLOQ when cens = 1 or dv=ULOQ when cens = -1
+    // limit is the lower limit like 0 for M4
+    // Assumption is dv > limit with cens=1 OR dv < limit with cens=-1
+    // Check fpm is df/dt instead of -df/dt
+    if (std::isinf(limit)){
+      // M3 method
+      // logLik = log(phi((QL-f(x)/sqrt(g(x)))))
+      // logLik = log(1/2*(1+erf((cens*(dv-f(x)))/sqrt(g(x))))/sqrt(2))
+      // > D(S("log(1/2*(1+erf((cens*(dv-f(x)))/sqrt(g(x))/M_SQRT2)))"),"x")
+      // (Mul) 2*exp(-(dv - f(x))^2*cens^2/(g(x)*M_SQRT2^2))*(-Derivative(f(x), x)*cens/(sqrt(g(x))*M_SQRT2) + (-1/2)*Derivative(g(x), x)*(dv - f(x))*cens/(g(x)^(3/2)*M_SQRT2))/(sqrt(pi)*(1 + erf((dv - f(x))*cens/(sqrt(g(x))*M_SQRT2))))
+      // 2*exp(-(dv - f)^2*cens^2/(r*M_SQRT2^2))*(-fpm*cens/(sqrt(r)*M_SQRT2) + (-0.5)*rp*(dv - f)*cens/(r^(1.5)*M_SQRT2))/(sqrt(pi)*(1 + erf((dv - f)*cens/(sqrt(r)*M_SQRT2))))
+      rxe[0] =dv-f;
+      rxe[1] =sqrt(r);
+      rxe[2] =rxe[1]*M_SQRT2;
+      lp(i,0)+=2*exp(-0.5* rxe[0]*rxe[0]/r)*(-fpm*(double)(cens)/rxe[2]-0.5*rp*(rxe[0])*(double)(cens)/(R_pow(r,1.5)*M_SQRT2))/_safe_zero((M_SQRT_PI*(1+erf((rxe[0])*(double)(cens)/rxe[2]))));
+    } else {
+      // M4 method
+      // dv = lloq
+      // logLik = log(phi((dv-f(x))/sqrt(g(x))))+log(phi((limit-f(x))/sqrt(g(x))))-log(1-phi((limit-f(x))/sqrt(g(x))))
+      // > D(S("log(0.5*(1+erf( (dv-f(x))/sqrt(g(x)) /M_SQRT2)))+log(0.5*(1+erf( (limit-f(x))/sqrt(g(x)) /M_SQRT2)))-log(1-0.5*(1+erf( (limit-f(x))/sqrt(g(x)) /M_SQRT2)))"),"x")
+      // (Add) 2.0*exp(-(dv - f(x))^2/(g(x)*M_SQRT2^2))*(-Derivative(f(x), x)/(sqrt(g(x))*M_SQRT2) + (-1/2)*Derivative(g(x), x)*(dv - f(x))/(g(x)^(3/2)*M_SQRT2))/(sqrt(pi)*(1 + erf((dv - f(x))/(sqrt(g(x))*M_SQRT2)))) + 1.0*exp(-(limit - f(x))^2/(g(x)*M_SQRT2^2))*(-Derivative(f(x), x)/(sqrt(g(x))*M_SQRT2) + (-1/2)*Derivative(g(x), x)*(limit - f(x))/(g(x)^(3/2)*M_SQRT2))/(sqrt(pi)*(1 - 0.5*(1 + erf((limit - f(x))/(sqrt(g(x))*M_SQRT2))))) + 2.0*exp(-(limit - f(x))^2/(g(x)*M_SQRT2^2))*(-Derivative(f(x), x)/(sqrt(g(x))*M_SQRT2) + (-1/2)*Derivative(g(x), x)*(limit - f(x))/(g(x)^(3/2)*M_SQRT2))/(sqrt(pi)*(1 + erf((limit - f(x))/(sqrt(g(x))*M_SQRT2))))
+      // 2.0*exp(-(dv - f)^2/(r*M_SQRT2^2))*(-fpm/(sqrt(r)*M_SQRT2) + (-0.5)*rp*(dv - f)/(r^(1.5)*M_SQRT2))/(M_SQRT_PI*(1 + erf((dv - f)/(sqrt(r)*M_SQRT2)))) + 1.0*exp(-(limit - f)^2/(r*M_SQRT2^2))*(-fpm/(sqrt(r)*M_SQRT2) + (-0.5)*rp*(limit - f)/(r^(1.5)*M_SQRT2))/(M_SQRT_PI*(1 - 0.5*(1 + erf((limit - f)/(sqrt(r)*M_SQRT2))))) + 2.0*exp(-(limit - f)^2/(r*M_SQRT2^2))*(-fpm/(sqrt(r)*M_SQRT2) + (-0.5)*rp*(limit - f)/(r^(1.5)*M_SQRT2))/(M_SQRT_PI*(1 + erf((limit - f)/(sqrt(r)*M_SQRT2))))
+      rxe[0] =dv-f;
+      rxe[1] =-fpm;
+      rxe[2] =sqrt(r);
+      rxe[3] = R_pow(r,1.5);
+      rxe[4] =limit-f;
+      rxe[5] = 2; //R_pow(M_SQRT2,2);
+      rxe[6] =-0.5*rp;
+      rxe[7] =r*rxe[5];
+      rxe[8] = rxe[4]*rxe[4];
+      rxe[9] =-rxe[8];
+      rxe[10] =rxe[2]*M_SQRT2;
+      rxe[11] =rxe[3]*M_SQRT2;
+      rxe[12] =rxe[6]*(rxe[4]);
+      rxe[13] =rxe[1]/_safe_zero(rxe[10]);
+      rxe[14] =rxe[9]/_safe_zero(rxe[7]);
+      rxe[15] =rxe[4]/_safe_zero(rxe[10]);
+      rxe[16] =exp(rxe[14]);
+      rxe[17] =erf(rxe[15]);
+      rxe[18] =1+rxe[17];
+      rxe[19] =rxe[12]/_safe_zero(rxe[11]);
+      rxe[20] =rxe[13]+rxe[19];
+      lp(i,0)+=2*exp(- rxe[0]*rxe[0]/_safe_zero((rxe[7])))*(rxe[13]+rxe[6]*(rxe[0])/_safe_zero((rxe[11])))/_safe_zero((M_SQRT_PI*(1+erf((rxe[0])/_safe_zero((rxe[10]))))))+rxe[16]*(rxe[20])/_safe_zero((M_SQRT_PI*(1-0.5*(rxe[18]))))+2*rxe[16]*(rxe[20])/_safe_zero((M_SQRT_PI*(rxe[18])));
+    }
+  }
+}
+
 double likInner0(double *eta){
   // id = eta[#neta]
   // eta = eta
@@ -849,9 +936,10 @@ double likInner0(double *eta){
       // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
       // Calculate matricies
       int k = ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
+      int cens;
       fInd->llik=0.0;
       fInd->tbsLik=0.0;
-      double f, err, r, fpm, rp,lnr;
+      double f, err, r, fpm, rp, lnr, limit, dv;
       int oldNeq = op->neq;
       for (j = ind->n_all_times; j--;){
 	if (isDose(ind->evid[j])){
@@ -865,7 +953,15 @@ double likInner0(double *eta){
 	  if (ISNA(f))
 	    throw std::runtime_error("bad solve");
 	  // fInd->f(k, 0) = ind->lhs[0];
-	  err = f - tbs(ind->dv[j]);
+	  dv = tbs(ind->dv[j]);
+	  err = f - dv;
+	  limit = getLimit(ind, j);
+	  cens = getCens(ind, j);
+	  if (!ISNA(limit) && !std::isinf(limit)){
+	    limit = tbs(limit);
+	  } else {
+	    limit = R_NegInf;
+	  }
 	  fInd->tbsLik+=tbsL(ind->dv[j]);
 	  // fInd->err(k, 0) = ind->lhs[0] - ind->dv[k]; // pred-dv
 	  if (ISNA(ind->lhs[op_focei.neta + 1]))
@@ -919,14 +1015,10 @@ double likInner0(double *eta){
 	    if (op_focei.interaction == 1){
 	      for (i = op_focei.neta; i--; ){
 		if (op_focei.etaFD[i]==0){
-		  fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
-		  rp  = ind->lhs[i + op_focei.neta + 2];
-		  c(k, i) = rp/_safe_zero(r);
-		  // lp is eq 12 in Almquist 2015
-		  // // .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
-		  lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) - 0.5 * c(k, i) - 
-		    0.5 * err * fpm * B(k, 0);
-		} 
+		  foceiLpInner(cens, limit, dv,
+			       f, r, fpm, rp, err,
+			       a, B, c, lp, k, i, ind);
+		}
 	      }
 	      for (i = op_focei.neta; i--; ){
 		if (op_focei.etaFD[i]==1){
@@ -953,17 +1045,26 @@ double likInner0(double *eta){
 		    rp = (rp - ind->lhs[1])/(2*op_focei.eventFD);
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  }
-		  a(k, i) = fpm;
-		  c(k, i) = rp/_safe_zero(r);
-		  lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) - 0.5 * c(k, i) - 
-		    0.5 * err * fpm * B(k, 0);
+		  foceiLpInner(cens, limit, dv, f, r, fpm, rp, err,
+			       a, B, c, lp, k, i, ind);
 		}
 	      }
 	      op->neq = oldNeq;
 	      // Eq #10
 	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
-	      fInd->llik += err * err/r + lnr;
+	      if (cens == 0){
+		fInd->llik += err * err/r + lnr;
+		if (!std::isinf(limit)){
+		  fInd->llik += -log(1-0.5*(1+erf((limit-f)/sqrt(r)/M_SQRT2)));
+		}
+	      } else if (cens != 0){
+		fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
+		if (!std::isinf(limit)){
+		  fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
+		}
+	      }
 	    } else if (op_focei.interaction == 0){
+	      // FOCE
 	      for (i = op_focei.neta; i--; ){
 		if (op_focei.etaFD[i]==0){
 		  fpm = a(k, i) = ind->lhs[i + 1];
@@ -994,13 +1095,23 @@ double likInner0(double *eta){
 		  }
 		  a(k, i) =  fpm;
 		  lp(i, 0) -= 0.5 * err * fpm * B(k, 0);
-
 		}
 	      }
 	      op->neq = oldNeq;
 	      // Eq #10
 	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
-	      fInd->llik += err * err/_safe_zero(r) + lnr;
+	      if (cens == 0){
+		r = _safe_zero(r);
+		fInd->llik += err * err/r + lnr;
+		if (!std::isinf(limit)){
+		  fInd->llik += -log(1-0.5*(1+erf((limit-f)/sqrt(r)/M_SQRT2)));
+		}
+	      } else if (cens != 0){
+		fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
+		if (!std::isinf(limit)){
+		  fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
+		}
+	      }
 	    }
 	  }
 	  k--;
@@ -1036,17 +1147,11 @@ double likInner0(double *eta){
 	fInd->llik = -trace(fInd->llik - 0.5*(etam.t() * op_focei.omegaInv * etam));
 	// print(wrap(fInd->llik));
 	std::copy(&eta[0], &eta[0] + op_focei.neta, &fInd->oldEta[0]);
-	// for (int ssi = op_focei.neta; ssi--;){
-	//   // Rprintf("ssi: %d :%d;\n",id, ssi);
-	//   // Rprintf("eta: %f\n", eta[ssi]);
-	//   fInd->oldEta[ssi] = eta[ssi];
-	// }
       }
       std::copy(lp.begin(), lp.end(), &fInd->lp[0]);
       std::copy(a.begin(), a.end(), &fInd->a[0]);
       std::copy(B.begin(), B.end(), &fInd->B[0]);
       std::copy(c.begin(), c.end(), &fInd->c[0]);    
-
     }
   }
   return fInd->llik;
@@ -5123,6 +5228,8 @@ Environment foceiFitCpp_(Environment e){
   par_progress = (par_progress_t) R_GetCCallable("RxODE", "par_progress");
   getRx = (getRxSolve_t) R_GetCCallable("RxODE", "getRxSolve_");
   isRstudio = (isRstudio_t) R_GetCCallable("RxODE", "isRstudio");
+  getCens = (getCens_t) R_GetCCallable("RxODE", "getCens");
+  getLimit = (getLimit_t) R_GetCCallable("RxODE", "getLimit");
   ind_solve=(ind_solve_t) R_GetCCallable("RxODE", "ind_solve");
   powerDD = (powerDD_t) R_GetCCallable("RxODE", "powerDD");
   powerDL = (powerDL_t) R_GetCCallable("RxODE", "powerDL");
