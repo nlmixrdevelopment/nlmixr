@@ -207,37 +207,35 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   # ####
 
   ## .parFixedDf ----
+  .temp.model <- .model
+  # assign fixed terms
+  .fix.index <- if (length(which(.nlmixrObject.df$fix==TRUE))==0) {NULL} else {which( .nlmixrObject.df$fix==TRUE)} # obtain row location for fixed terms
+  .ref.fix <- substring(.nlmixrObject.df$name[.fix.index],2)
+  
+  .temp.log.fixPars.index <- intersect(.fix.index,.temp.model$log.etas)
+  .temp.log.fixPars <-   .nlmixrObject.df $est[.temp.log.fixPars.index]
+  names(.temp.log.fixPars) <- substring(  .nlmixrObject.df$name[.temp.log.fixPars.index],2)
+  
+  .temp.nonlog.fixPars.index <- setdiff(.fix.index,.temp.model$log.etas)
+  .temp.nonlog.fixPars <-   .nlmixrObject.df$est[.temp.nonlog.fixPars.index]
+  names( .temp.nonlog.fixPars ) <- substring(  .nlmixrObject.df$name[.temp.nonlog.fixPars.index],2)
+  
+  .fixPars <- c(.temp.log.fixPars,.temp.nonlog.fixPars)
+  .fixPars <- .fixPars[order(factor(names(.fixPars), levels=.ref.fix))]
+  
+  # assign theta terms(estimated terms excluding error terms)
+  .theta.index <-
+    if (is.null(.fix.index)){
+      which(!is.na(  .nlmixrObject.df$ntheta) & is.na(  .nlmixrObject.df$err),TRUE)
+    } else {
+      which(!is.na(  .nlmixrObject.df$ntheta) & is.na(  .nlmixrObject.df$err),TRUE)[-which(  .nlmixrObject.df$fix == TRUE)]
+    }
+  
+  
   .ci <- .dynmodelControl$ci
   .Estimates <- .dynmodelObject$res[,1]
 
-  backTransformed <- function(.model){
-    .temp.model <- .model
-    # assign fixed terms
-    .fix.index <- if (length(which(.nlmixrObject.df$fix==TRUE))==0) {NULL} else {which( .nlmixrObject.df$fix==TRUE)} # obtain row location for fixed terms
-    .ref.fix <- substring(.nlmixrObject.df$name[.fix.index],2)
-
-    .temp.log.fixPars.index <- intersect(.fix.index,.temp.model$log.etas)
-    .temp.log.fixPars <-   .nlmixrObject.df $est[.temp.log.fixPars.index]
-    names(.temp.log.fixPars) <- substring(  .nlmixrObject.df$name[.temp.log.fixPars.index],2)
-
-    .temp.nonlog.fixPars.index <- setdiff(.fix.index,.temp.model$log.etas)
-    .temp.nonlog.fixPars <-   .nlmixrObject.df$est[.temp.nonlog.fixPars.index]
-    names( .temp.nonlog.fixPars ) <- substring(  .nlmixrObject.df$name[.temp.nonlog.fixPars.index],2)
-
-    .fixPars <- c(.temp.log.fixPars,.temp.nonlog.fixPars)
-    .fixPars <- .fixPars[order(factor(names(.fixPars), levels=.ref.fix))]
-
-    # assign theta terms(estimated terms excluding error terms)
-    .theta.index <<-
-      if (is.null(.fix.index)){
-        which(!is.na(  .nlmixrObject.df$ntheta) & is.na(  .nlmixrObject.df$err),TRUE)
-      } else {
-        which(!is.na(  .nlmixrObject.df$ntheta) & is.na(  .nlmixrObject.df$err),TRUE)[-which(  .nlmixrObject.df$fix == TRUE)]
-      } # row location for theta values
-    return(.theta.index)
-    }
-
-  .Back.Transformed.Y.N <- (names(.Estimates) %in% .Estimates[backTransformed(.model)])
+  .Back.Transformed.Y.N <- (names(.Estimates) %in% names(.Estimates[.model$log.thetas]))
   .Back.Transformed <- ifelse(.Back.Transformed.Y.N, exp(.Estimates), .Estimates)
   .SE <- .dynmodelObject$res[,2]
   .RSE <- .dynmodelObject$res[,3]
@@ -396,22 +394,19 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   .nlmixr.sim <- do.call(RxODE :: rxSolve, c(list(object=.system, params=.parameters, events=.data), .rxControl))
   
   names(.nlmixr.sim)<-sub("^time$","TIME",sub("^evid$","EVID",sub("^id$","ID",sub("^nlmixr_pred$","PRED",names(.nlmixr.sim)))))
-  
-assign(".nlmixr.sim",.nlmixr.sim,envir = .GlobalEnv)  
-assign(".data", .data, envir = .GlobalEnv)
 
   .nlmixr.sim$DV=NA
   .nlmixr.sim$DV[.nlmixr.sim$EVID==0]<-.data$DV[.data$EVID==0]
   
   #.sgy <- rep(.sgy[1],length(.nlmixr.sim$TIME))
   
-  .nlmixr.sim$W <- NA
-  .nlmixr.sim$W[.nlmixr.sim$EVID==0] <- .sgy
+  W <- NA
+  W[.nlmixr.sim$EVID==0] <- .sgy
   
   if(is.null(.nlmixr.sim$ID)) {.nlmixr.sim$ID <- 1L} 
   
   .nlmixr.sim$RES = .nlmixr.sim$DV - .nlmixr.sim$PRED
-  .nlmixr.sim$WRES = (1/sqrt(.nlmixr.sim$W))*.nlmixr.sim$RES
+  .nlmixr.sim$WRES = (1/sqrt(W))*.nlmixr.sim$RES
   
   .nlmixr.pred <- .nlmixr.sim
   class(.env) <- "nlmixrFitCoreSilent"
@@ -1130,10 +1125,11 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
         }else{
           sgy = thresh(add) + thresh(prop)*yp
           assign("sgy",sgy,envir = .dynmodel.env)
+          sgy <<- sgy
         }
         ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
       }
-      sgy <<- sgy
+      
       sum(ll)
     })
 
@@ -1172,9 +1168,9 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
     C2 = sqrt(sum(inits*inits))
   }
 
-  # scaleC assignment for scaling (adopted from foceFIT.R)
+  # produces vector of scaleC values if missing, handles incorrect length of scaleC values.
   scaleC <- control$scaleC;
-  if (is.null(scaleC) | length(scaleC) < length(inits)){
+  if (is.null(scaleC)){
     scaleC <- rep(1, length(inits))
   } else {
     scaleC <- as.double(scaleC);
@@ -1185,7 +1181,65 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
       warning("scaleC control option has more options than estimated parameters, please check.")
     }
   }
+
+  # assign value to scaleC. If log value, scaleC <- 1, else scalec <- 1/abs(inits[i])
+    # need to known when dynmodel has log values, and which ones, or else there will be a problem scaling
+  theta <- inits[1:(length(inits)-length(inits.err))]
+  names(scaleC) <- names(inits)
   
+  if (!is.null(nlmixrObject)){
+  
+    .model <- RxODE::rxSymPySetupPred(nlmixrObject$rxode.pred,
+                                      function(){return(nlmixr_pred)},
+                                      nlmixrObject$theta.pars,
+                                      nlmixrObject$error,
+                                      grad=FALSE,
+                                      pred.minus.dv=TRUE, sum.prod=FALSE, #control$sumProd,
+                                      theta.derivs=FALSE, optExpression=TRUE, #control$optExpression,
+                                      run.internal=TRUE, only.numeric=TRUE)
+    
+    scaleC[.model$log.thetas] <- 1
+    scaleC[setdiff(1:length(theta),.model$log.thetas)] <- 1/abs(theta[setdiff(1:length(theta),.model$log.thetas)])
+  }
+  
+  # assign value to scaleC based on the error model used
+  n.inits.err <- names(inits.err)
+  for (i in 1:length(n.inits.err)){
+    if (is.na(scaleC[n.inits.err[i]])){
+      if (any(n.inits.err[i] == c("boxCox", "yeoJohnson", "pow2", "tbs", "tbsYj"))){
+        scaleC[i] <-  1
+      } else if (any(n.inits.err[i] == c("prop", "add", "norm", "dnorm", "logn", "dlogn", "lnorm", "dlnorm"))){
+        scaleC[i] <- 0.5 * abs(inits.err[i]);
+      }
+    }
+  }
+  
+  # assign value to scaleC based on additional functions
+  for (i in .model$extraProps$powTheta){
+    if (is.na(scaleC[i])) scaleC[i] <- 1; ## Powers are log-scaled
+  }
+  .ini <- as.data.frame(nlmixrObject$ini)
+  for (i in .model$extraProps$factorial){
+    if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i] + 1));
+  }
+  for (i in .model$extraProps$gamma){
+    if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i]));
+  }
+  for (i in .model$extraProps$log){
+    if (is.na(scaleC[i])) scaleC[i] <- log(abs(.ini$est[i])) * abs(.ini$est[i]);
+  }
+  ## FIXME: needs to be based on actual initial values in sin because typically change to correct scale
+  ## Ctime is also usually used for circadian rhythm models
+  ## for (.i in .ini$model$extraProps$sin){
+  ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(tan(.ini$est[.i]));
+  ## }
+  ## for (.i in .ini$model$extraProps$cos){
+  ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(1 / tan(.ini$est[.i]));
+  ## }
+  ## for (.i in .ini$model$extraProps$tan){
+  ##     if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- fabs(2 * sin(2 * .ini$est[.i]));
+  ## }
+
   # Function for scaling parameters based on scaleType
   scalePar <- function(x, i){
     if (scaleType == "norm") { # simple scaling
@@ -1349,8 +1403,6 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
   if (!is.na(match("dnorm",names(inits)))) fit$par[match("dnorm",names(inits))] = abs(fit$par[match("dnorm",names(inits))])
 
   .time$hessianTime <- (proc.time() - .ht)["elapsed"]
-
-
   # dynmodel Output -------------------------------------------------------
   # unscale optmized parameters here if scaling was used:
   
@@ -1384,6 +1436,7 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
     .ret$parHistStacked <- data.frame(stack(.tmp),iter=.iter)
     names(.ret$parHistStacked) <- c("val","par","iter");
     .ret$parHist <- data.frame(iter=.iter,.tmp);
+  
     return(nlmixr.ouptut)
   }
   else {
