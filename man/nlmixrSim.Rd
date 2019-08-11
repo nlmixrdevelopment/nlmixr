@@ -12,18 +12,17 @@ nlmixrSim(object, ...)
 \method{rxSolve}{nlmixrFitData}(object, params = NULL, events = NULL,
   inits = NULL, scale = NULL, method = c("liblsoda", "lsoda",
   "dop853"), transitAbs = NULL, atol = 1e-06, rtol = 1e-04,
-  maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L,
-  maxordn = 12L, maxords = 5L, ..., cores,
-  covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
-  addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
-  nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress = 10000L,
-  amountUnits = NA_character_, timeUnits = "hours", stiff,
-  theta = NULL, eta = NULL, addDosing = FALSE,
-  updateObject = FALSE, omega = NULL, omegaDf = NULL,
-  omegaIsChol = FALSE, nSub = 1L, thetaMat = NULL, thetaDf = NULL,
-  thetaIsChol = FALSE, nStud = 1L, dfSub = 0, dfObs = 0,
-  returnType = c("rxSolve", "matrix", "data.frame"), seed = NULL,
-  nsim = NULL)
+  maxsteps = 5000, hmin = 0, hmax = NULL, hini = 0, maxordn = 12,
+  maxords = 5, ..., cores, covsInterpolation = c("linear", "locf",
+  "nocb", "midpoint"), addCov = FALSE, matrix = FALSE, sigma = NULL,
+  sigmaDf = NULL, nCoresRV = 1, sigmaIsChol = FALSE,
+  nDisplayProgress = 10000, amountUnits = NA_character_,
+  timeUnits = "hours", stiff, theta = NULL, eta = NULL,
+  addDosing = FALSE, updateObject = FALSE, omega = NULL,
+  omegaDf = NULL, omegaIsChol = FALSE, nSub = 1, thetaMat = NULL,
+  thetaDf = NULL, thetaIsChol = FALSE, nStud = 1, dfSub = 0,
+  dfObs = 0, returnType = c("rxSolve", "matrix", "data.frame"),
+  seed = NULL, nsim = NULL)
 
 \method{simulate}{nlmixrFitData}(object, nsim = 1, seed = NULL, ...)
 
