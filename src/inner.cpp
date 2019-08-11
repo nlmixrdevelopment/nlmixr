@@ -5031,7 +5031,11 @@ Environment foceiFitCpp_(Environment e){
     logTheta =  as<IntegerVector>(e["logThetas"]);
   } else if (e.exists("model")){
     List model = e["model"];
-    logTheta =  as<IntegerVector>(model["log.thetas"]);
+    if (model.containsElementNamed("log.thetas")){
+      if (RxODE::rxIs(model["log.thetas"], "integer") || RxODE::rxIs(model["log.thetas"], "numeric")){
+	logTheta =  as<IntegerVector>(model["log.thetas"]);
+      }
+    }
   } 
   int j;
   // Setup which parameters are transformed
