@@ -782,12 +782,11 @@ void updateTheta(double *theta){
 
 arma::mat cholSE__(arma::mat A, double tol);
 
-inline void foceiLpInner(int &cens, double &limit, double &dv,
-			 double& f, double& r, double& fpm, double &rp, double &err,
-			 arma::mat& a, arma::mat& B, arma::mat &c,
-			 arma::mat& lp, 
-			 int &k, int &i, 
-			 rx_solving_options_ind *ind){
+static inline void foceiLpInner(int &cens, double &limit, double &dv,
+				double& f, double& r, double& fpm, double &rp, double &err,
+				arma::mat& a, arma::mat& B, arma::mat &c,
+				arma::mat& lp, int &k, int &i,
+				rx_solving_options_ind *ind){
   double rxe[21];
   fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
   rp  = ind->lhs[i + op_focei.neta + 2];
@@ -830,7 +829,8 @@ inline void foceiLpInner(int &cens, double &limit, double &dv,
       rxe[0] =dv-f;
       rxe[1] =sqrt(r);
       rxe[2] =rxe[1]*M_SQRT2;
-      lp(i,0)+=2*exp(-0.5* rxe[0]*rxe[0]/r)*(-fpm*(double)(cens)/rxe[2]-0.5*rp*(rxe[0])*(double)(cens)/(R_pow(r,1.5)*M_SQRT2))/_safe_zero((M_SQRT_PI*(1+erf((rxe[0])*(double)(cens)/rxe[2]))));
+      rxe[3] = 2*exp(-0.5* rxe[0]*rxe[0]/r)*(-fpm*(double)(cens)/rxe[2]-0.5*rp*(rxe[0])*(double)(cens)/(R_pow(r,1.5)*M_SQRT2))/_safe_zero((M_SQRT_PI*(1+erf((rxe[0])*(double)(cens)/rxe[2]))));
+      lp(i,0)+= rxe[3];
     } else {
       // M4 method
       // dv = lloq
@@ -876,6 +876,63 @@ static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, 
   fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
   if (R_FINITE(limit)){
     fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
+  }
+}
+static inline void foceLpInner(int &cens, double &limit, double &dv,
+			       double& f, double& r, double& fpm,
+			       double &rp, double &err,
+			       arma::mat& a, arma::mat& B, arma::mat &c,
+			       arma::mat& lp, int &k, int &i,
+			       rx_solving_options_ind *ind){
+  double rxe[21];
+  a(k, i) =  fpm;
+  if (cens==0){
+    lp(i, 0) -= 0.5 * err * fpm * B(k, 0);
+    if (!std::isinf(limit)){
+      // M2/M4 adjustment.
+      //
+      // Phi(x) = 1/2*(1+erf(x/sqrt(2)))
+      // M2/M4 extra log-lik = -log(1-phi((limit-f(x))/sqrt(r(x)))
+      // or -log(1-1/2*(1+erf(cens*(limit-f(x))/sqrt(r(x))/sqrt(2))))
+      // From symengine.R
+      // D(S("-log(1-1/2*(1+erf(cens*(limit-f(x))/sqrt(r)/M_SQRT2)))"),"x")
+      // -exp(-cens^2*(limit - f(x))^2/(r*M_SQRT2^2))*Derivative(f(x), x)*cens/(sqrt(r)*sqrt(pi)*(1 + (-1/2)*(1 + erf(cens*(limit - f(x))/(sqrt(r)*M_SQRT2))))*M_SQRT2)
+      // -exp(-0.5*(limit - f)^2/r)*fpm*cens/(sqrt(r)*M_SQRT_PI*(1-0.5*(1 + erf(cens*(limit - f)/(sqrt(r)*M_SQRT2))))*M_SQRT2)
+      rxe[0] =limit-f;
+      rxe[1] =sqrt(r);
+      lp(i, 0)-= exp(-0.5* rxe[0]*rxe[0]/r)*fpm*(double)(cens)/_safe_zero(rxe[1]*M_SQRT_PI*(1-0.5*(1+erf((double)(cens)*rxe[0]/_safe_zero(rxe[1]*M_SQRT2))))*M_SQRT2);
+    }
+  } else {
+    if (std::isinf(limit)){
+      // M3 method
+      // logLik = log(phi((QL-f(x)/sqrt(g(x)))))
+      // logLik = log(1/2*(1+erf((cens*(dv-f(x)))/sqrt(g(x))))/sqrt(2))
+      // > D(S("log(1/2*(1+erf((cens*(dv-f(x)))/sqrt(g)/M_SQRT2)))"),"x")
+      // -2*exp(-0.5*(dv - f)^2/(g))*fpm*cens/(sqrt(g)*M_SQRT_PI*M_SQRT2*(1 + erf((dv - f)*cens/(sqrt(g)*M_SQRT2))))
+      rxe[0] =dv-f;
+      rxe[1] =sqrt(r);
+      lp(i, 0) -= 2*exp(-0.5* rxe[0]*rxe[0]/r)*fpm*(double)(cens)/_safe_zero(rxe[1]*M_SQRT_PI*M_SQRT2*(1+erf((rxe[0])*(double)(cens)/(rxe[1]*M_SQRT2))));
+    } else {
+      // M4
+      // > D(S("log(0.5*(1+erf((dv-f(x))/sqrt(r) /M_SQRT2)))+log(0.5*(1+erf( (limit-f(x))/sqrt(r)/M_SQRT2)))-log(1-0.5*(1+erf( (limit-f(x))/sqrt(r)/M_SQRT2)))"),"x")
+      // -2.0*exp(-0.5*(dv - f)^2/r)*fpm/(sqrt(r)*M_SQRT_PI*M_SQRT2*(1 + erf((dv - f)/(sqrt(r)*M_SQRT2)))) - 1.0*exp(-(limit - f)^2/(r*M_SQRT2^2))*fpm/(sqrt(r)*M_SQRT_PI*M_SQRT2*(1 - 0.5*(1 + erf((limit - f)/(sqrt(r)*M_SQRT2))))) - 2.0*exp(-(limit - f)^2/(r*M_SQRT2^2))*fpm/(sqrt(r)*M_SQRT_PI*M_SQRT2*(1 + erf((limit - f)/(sqrt(r)*M_SQRT2))))
+      rxe[0]   = dv-f;
+      rxe[1]   = sqrt(r);
+      rxe[2]   = limit-f;
+      rxe[3]   = 2;
+      rxe[4]   = rxe[2]*rxe[2];
+      rxe[5]   = r*rxe[3];
+      rxe[6]   = -rxe[4];
+      rxe[7]   = rxe[1]*M_SQRT2;
+      rxe[8]   = rxe[1]*M_SQRT_PI;
+      rxe[9]   = rxe[8]*M_SQRT2;
+      rxe[10]  = rxe[6]/_safe_zero(rxe[5]);
+      rxe[11]  = rxe[2]/_safe_zero(rxe[7]);
+      rxe[12]  = exp(rxe[10]);
+      rxe[13]  = erf(rxe[11]);
+      rxe[14]  = 1+rxe[13];
+      lp(i, 0) -= 2*exp(-0.5* rxe[0]*rxe[0]/r)*fpm/_safe_zero(rxe[9]*(1+erf((rxe[0])/_safe_zero(rxe[7]))))-1*rxe[12]*fpm/_safe_zero(rxe[9]*(1-0.5*(rxe[14])))-2*rxe[12]*fpm/_safe_zero(rxe[9]*(rxe[14]));
+    }
   }
 }
 
@@ -1077,8 +1134,10 @@ double likInner0(double *eta){
 	      // FOCE
 	      for (i = op_focei.neta; i--; ){
 		if (op_focei.etaFD[i]==0){
-		  fpm = a(k, i) = ind->lhs[i + 1];
-		  lp(i, 0) -= 0.5 * err * fpm * B(k, 0);
+		  fpm = ind->lhs[i + 1];
+		  foceLpInner(cens, limit, dv,
+			       f, r, fpm, rp, err,
+			       a, B, c, lp, k, i, ind);
 		}
 	      }
 	      for (i = op_focei.neta; i--; ){
@@ -1103,8 +1162,8 @@ double likInner0(double *eta){
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		    fpm  = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
 		  }
-		  a(k, i) =  fpm;
-		  lp(i, 0) -= 0.5 * err * fpm * B(k, 0);
+		  foceLpInner(cens, limit, dv, f, r, fpm, rp,
+			      err, a, B, c, lp, k, i, ind);
 		}
 	      }
 	      op->neq = oldNeq;

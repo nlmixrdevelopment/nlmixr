@@ -1,6 +1,7 @@
 library(nlmixr)
 library(testthat)
 source("helper-prep_fit.R")
+
 one.compartment.IV.model <- function(){
     ini({ # Where initial conditions/variables are specified
           # '<-' or '=' defines population parameters
@@ -49,6 +50,13 @@ one.compartment.IV.model.solve <- function(){
         linCmt() ~ prop(prop.err)
     })
 }
+
+## f <- nlmixr(one.compartment.IV.model.solve,Bolus_1CPT, "focei")
+
+
+## f <- nlmixr(one.compartment.IV.model.solve,Infusion_1CPT, "focei")
+
+
 
 one.compartment.IV.MM.model <- function(){
     ini({ # Where initial conditions/variables are specified
@@ -164,6 +172,8 @@ one.compartment.oral.model.solve <- function(){
         linCmt() ~ prop(prop.err)
     })
 }
+
+## f <- nlmixr(one.compartment.oral.model.solve, Bolus_1CPT, "focei")
 
 one.compartment.oral.model2 <- function(){
     ini({ # Where initial conditions/variables are specified
@@ -324,6 +334,10 @@ two.compartment.IV.model.solve <- function(){
     })
 }
 
+## dat <- read.csv("~/src/nlmixr/tests/testthat/Infusion_2CPT.csv")
+## f <- nlmixr(two.compartment.IV.model.solve, dat, "focei")
+## f <- nlmixr(two.compartment.IV.model.solve, Bolus_2CPT, "focei")
+
 two.compartment.IV.MM.model <- function(){
     ini({ # Where initial conditions/variables are specified
           # '<-' or '=' defines population parameters
@@ -481,8 +495,6 @@ two.compartment.oral.model <- function(){
     })
 }
 
-
-
 two.compartment.oral.model.solve <- function(){
     ini({ # Where initial conditions/variables are specified
           # '<-' or '=' defines population parameters
@@ -513,6 +525,9 @@ two.compartment.oral.model.solve <- function(){
         linCmt() ~ prop(prop.err)
     })
 }
+
+## dat <- read.csv("~/src/nlmixr/tests/testthat/Oral_2CPT.csv")
+## f <- nlmixr(two.compartment.oral.model.solve, dat, "focei")
 
 two.compartment.oral.MM.model <- function(){
     ini({ # Where initial conditions/variables are specified
