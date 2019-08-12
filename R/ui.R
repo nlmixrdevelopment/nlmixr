@@ -404,7 +404,8 @@ model <- function(model, ..., .lines=NULL){
           for (.new in .addVars){
             if (!any(.ini$name==.new)){
               if (regexpr(.etaModelReg,.new) !=-1){
-                .maxEta <- max(.ini$neta1,na.rm=TRUE);
+                .maxEta <- suppressWarnings(max(.ini$neta1,na.rm=TRUE));
+                if (is.infinite(.maxEta)) .maxEta <- 0
                 .ini <- rbind(.ini,
                               data.frame(ntheta=NA, neta1=.maxEta+1, neta2=.maxEta+1,
                                          name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,

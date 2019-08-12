@@ -4,13 +4,13 @@
 \alias{dynmodelControl}
 \title{Control Options for dynmodel}
 \usage{
-dynmodelControl(..., fixPars = NULL, ci = 0.95, nlmixrOutput = FALSE,
-  digs = 3, lower = -Inf, upper = Inf, method = c("bobyqa",
-  "Nelder-Mead", "lbfgsb3c", "L-BFGS-B", "PORT", "mma", "lbfgsbLG",
-  "slsqp", "Rvmmin"), ftol_rel = 1e-06, maxeval = 999, scaleTo = 1,
-  scaleObjective = 0, normType = c("rescale2", "constant", "mean",
-  "rescale", "std", "len"), scaleType = c("nlmixr", "norm", "mult",
-  "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
+dynmodelControl(..., ci = 0.95, nlmixrOutput = FALSE, digs = 3,
+  lower = -Inf, upper = Inf, method = c("bobyqa", "Nelder-Mead",
+  "lbfgsb3c", "L-BFGS-B", "PORT", "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
+  ftol_rel = 1e-06, maxeval = 999, scaleTo = 1, scaleObjective = 0,
+  normType = c("rescale2", "constant", "mean", "rescale", "std", "len"),
+  scaleType = c("nlmixr", "norm", "mult", "multAdd"),
+  scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
   scaleC0 = 1e+05, atol = 1e-08, rtol = 1e-06, npt = NULL,
   rhobeg = 0.2, rhoend = 1e-04, iprint = 0, print = 1,
   maxfun = NULL, trace = 0, factr = NULL, pgtol = NULL,
