@@ -608,8 +608,10 @@ dynmodelControl <- function(...,
                             scaleC=NULL,
                             scaleC0=1e5,
                             # RxODE
-                            atol=1e-08,
-                            rtol=1e-06,
+                            atol=NULL,
+                            rtol=NULL,
+                            atolSS=NULL,
+                            rtolSS=NULL,
                             # bobyqaControl
                             npt = NULL,
                             rhobeg = 0.2,
@@ -667,6 +669,7 @@ dynmodelControl <- function(...,
   if (is.null(reltol)){
     reltol <- 10 ^ (-sigdig - 1)
   }
+  
   if (is.null(rhoend)){
     rhoend <- 10 ^ (-sigdig - 1);
   }
@@ -678,6 +681,12 @@ dynmodelControl <- function(...,
   }
   if (is.null(rtol)){
     rtol <- 0.5 * 10 ^ (-sigdig - 2);
+  }
+  if (is.null(atolSS)){
+    atolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+  }
+  if (is.null(rtolSS)){
+    rtolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
   }
   if (is.null(rel.tol)){
     rel.tol <- 10 ^ (-sigdig - 1);
@@ -695,11 +704,19 @@ dynmodelControl <- function(...,
     if (!any(names(rxControl) == "rtol")){
       rxControl$rtol <- 0.5 * 10 ^ (-sigdig - 2);
     }
+    if (!any(names(rxControl) == "atolSS")){
+      rxControl$atolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+    }
+    if (!any(names(rxControl) == "rtolSS")){
+      rxControl$rtolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+    }
     rxControl <- do.call(RxODE::rxControl, rxControl);
   } else {
     atol <- 0.5 * 10 ^ (-sigdig - 2);
     rtol <- 0.5 * 10 ^ (-sigdig - 2);
-    rxControl = RxODE::rxControl(atol=atol, rtol=rtol);
+    atolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+    rtolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+    rxControl = RxODE::rxControl(atol=atol,rtol=rtol,atolSS=atolSS,rtolSS=rtolSS);
   }
 
   if (missing(method)){method = "bobyqa"}
