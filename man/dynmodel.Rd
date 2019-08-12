@@ -4,8 +4,8 @@
 \alias{dynmodel}
 \title{Fit a non-population dynamic model}
 \usage{
-dynmodel(system, model, inits, data, nlmixrObject = NULL,
-  control = list(), ...)
+dynmodel(system, model, inits, data, fixPars = NULL,
+  nlmixrObject = NULL, control = list(), ...)
 }
 \arguments{
 \item{system}{an RxODE object}
@@ -16,11 +16,11 @@ dynmodel(system, model, inits, data, nlmixrObject = NULL,
 
 \item{data}{input data}
 
+\item{fixPars}{fixed system parameters}
+
 \item{control}{optional minimization control parameters}
 
 \item{evTable}{an Event Table object}
-
-\item{fixPars}{fixed system parameters}
 
 \item{method}{estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.}
 }

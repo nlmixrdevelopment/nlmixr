@@ -1007,10 +1007,12 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
     if (!is.null(nlmixrObject)) {
       theta <- nlmixrObject$dynmodel.fun(theta)
     }
-    
+    .rxControl <- rxControl;
+    .rxControl$returnType <- "data.frame"
     # call rxODE for simulation
-    s = do.call(RxODE :: rxSolve, c(list(object=system, params=theta, events=data), rxControl))
-    
+    s = do.call(RxODE :: rxSolve,
+                c(list(object=system, params=theta, events=data),
+                  .rxControl))
     # sum of log-likelihood function:
     l = lapply(model, function(x) {
       # name the inputs
@@ -1050,7 +1052,7 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
       if (!is.null(yeoJohnson)) lambda <- yeoJohnson
       if (!is.null(tbsYj)) lambda <- tbsYj
 
-      # predictted and observed values from RxODE
+      # predicted and observed values from RxODE
       yo <- data[data$EVID==0,rows]$DV
       yp = s[rows,x["pred"]]
       nobs <<- length(yo)
