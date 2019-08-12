@@ -416,7 +416,8 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
 
   ## $time ----
   .time$tableTime <- (proc.time() - .pt)["elapsed"]
-  names(.time) <- c("setup", "scaling", "optimization", "Hessian", "run total", "table")
+  .time <- .time[-5]
+  names(.time) <- c("setup", "scaling", "optimization", "Hessian", "table")
   .env$time <- .time
   # ####
 
@@ -589,7 +590,7 @@ nlmixrDynmodelConvert <- function(.nmf){
 dynmodelControl <- function(...,
                             ci=0.95,
                             nlmixrOutput=FALSE,
-                            digs=3,
+                            digs=3, # check to make sure it is the same in the output
                             lower = -Inf,
                             upper = Inf,
                             ## mma doesn't work
@@ -615,7 +616,7 @@ dynmodelControl <- function(...,
                             # bobyqaControl
                             npt = NULL,
                             rhobeg = 0.2,
-                            rhoend = 1E-04,
+                            rhoend = NULL,
                             iprint = 0,
                             print=1,
                             maxfun = NULL,
