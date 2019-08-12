@@ -8,7 +8,7 @@ saemControl(seed = 99, nBurn = 200, nEm = 300, nmc = 3, nu = c(2,
   2, 2), atol = 1e-06, rtol = 1e-04, method = "lsoda",
   transitAbs = FALSE, print = 1, trace = 0, covMethod = c("linFim",
   "fim", "r,s", "r", "s"), logLik = FALSE, nnodes.gq = 3,
-  nsd.gq = 1.6, optExpression = TRUE, maxsteps = 100000,
+  nsd.gq = 1.6, optExpression = TRUE, maxsteps = 100000L,
   adjObf = TRUE, ...)
 }
 \arguments{

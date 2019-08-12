@@ -5,7 +5,7 @@
 \title{Get the optimal forward difference interval by Gill83 method}
 \usage{
 nlmixrGill83(what, args, envir = parent.frame(), which,
-  gillRtol = sqrt(.Machine$double.eps), gillK = 10, gillStep = 2,
+  gillRtol = sqrt(.Machine$double.eps), gillK = 10L, gillStep = 2,
   gillFtol = 0)
 }
 \arguments{

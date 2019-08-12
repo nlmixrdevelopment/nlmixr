@@ -168,8 +168,6 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
 ##' @seealso \code{\link{nlmixrGill83}}, \code{\link{optimHess}}
 ##' @references
 ##'
-##' \url{https://pdfs.semanticscholar.org/presentation/e7d5/aff49eb17fd155e75725c295859d983cfda4.pdf}
-##'
 ##' \url{https://v8doc.sas.com/sashtml/ormp/chap5/sect28.htm}
 ##'
 ##' @examples
