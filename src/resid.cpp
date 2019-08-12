@@ -103,9 +103,11 @@ List nlmixrShrink(NumericMatrix &omegaMat,DataFrame etasDf, List etaLst){
 }
 
 // [[Rcpp::export]]
-List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv,
+List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
 		 IntegerVector &evid, NumericVector &lambda, NumericVector &yj,
+		 IntegerVector &cens, NumericVector &limit,
 		 DataFrame etasDf, List etaLst){
+  NumericVector dv = clone(cdv);
   bool doCwres = (innerList.size() == 2);
   DataFrame pred = as<DataFrame>(innerList["pred"]);
   IntegerVector ID= as<IntegerVector>(pred[0]);
@@ -114,6 +116,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv,
   NumericVector prednv = as<NumericVector>(pred[0]);
   NumericVector prednvI(prednv.size());
   pred.erase(0);
+  // Individual predictions data frame.
   DataFrame ipred = as<DataFrame>(innerList["ipred"]);
   ipred.erase(0,2);
   NumericVector iprednv = as<NumericVector>(ipred[0]);
@@ -126,12 +129,6 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv,
   NumericMatrix rpp(iprednv.size(),neta);
   NumericMatrix rpi(iprednv.size(),neta);
   unsigned int i, j;
-  NumericVector dvTBS(dv.size());
-  for (i = dv.size(); i--;){
-    dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
-    prednvI[i] = powerDi(prednv[i], lambda[i], (int)yj[i]);
-    iprednvI[i]= powerDi(iprednv[i], lambda[i], (int)yj[i]);
-  }
   double om;
   unsigned int nid=etasDf.nrows();
   double tc = sqrt((double)nid);
@@ -162,6 +159,22 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv,
   NumericVector rp = pred[0];
   arma::vec rpv = as<arma::vec>(rp);
   NumericVector ri = ipred[0];
+  NumericVector dvTBS(dv.size());
+  for (i = dv.size(); i--;){
+    iprednvI[i]= powerDi(iprednv[i], lambda[i], (int)yj[i]);
+    switch (cens[i]){
+    case 1:
+      // (limit, dv) ; limit could be -inf
+      break;
+    case -1:
+      // (dv, limit); limit could be +inf
+      break;
+    case 0:
+      dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
+      prednvI[i] = powerDi(prednv[i], lambda[i], (int)yj[i]);
+      break;
+    }
+  }
   int warn1 = 0;
   int warn2 = 0;
   for (unsigned int j = ri.size(); j--;){
@@ -353,7 +366,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv,
   stat[6] = (1-stat[2])*100;
   stat[7] = M1*sqrt((double)n)/stat[2];
   stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
-  List ret(3);
+  List ret(4);
   // Now do inverse TBS to backtransform
   if (doCwres){
     NumericVector ires = dv-iprednvI;
@@ -390,6 +403,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &dv,
   }
   ret[1] = etaLst;
   ret[2] = etasDfFull;
+  ret[3] = dv;
   if (warn1){
     warning("Some variances were zero, replaced with 1.");
   }

@@ -147,8 +147,8 @@ nlmixrShrink <- function(omegaMat, etasDf, etaLst) {
     .Call(`_nlmixr_nlmixrShrink`, omegaMat, etasDf, etaLst)
 }
 
-nlmixrResid <- function(innerList, omegaMat, dv, evid, lambda, yj, etasDf, etaLst) {
-    .Call(`_nlmixr_nlmixrResid`, innerList, omegaMat, dv, evid, lambda, yj, etasDf, etaLst)
+nlmixrResid <- function(innerList, omegaMat, cdv, evid, lambda, yj, cens, limit, etasDf, etaLst) {
+    .Call(`_nlmixr_nlmixrResid`, innerList, omegaMat, cdv, evid, lambda, yj, cens, limit, etasDf, etaLst)
 }
 
 npde <- function(id, dv, evid, sim, lambda, yj, ties, tolChol) {

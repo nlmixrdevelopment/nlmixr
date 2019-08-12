@@ -800,7 +800,7 @@ inline void foceiLpInner(int &cens, double &limit, double &dv,
       0.5 * err * fpm * B(k, 0);
     // Add d/likelihood from limit
     // lp(i, 0)
-    if (!std::isinf(limit)){
+    if (R_FINITE(limit)){
       // M2/M4 adjustment.
       //
       // Phi(x) = 1/2*(1+erf(x/sqrt(2)))
@@ -820,7 +820,7 @@ inline void foceiLpInner(int &cens, double &limit, double &dv,
     // limit is the lower limit like 0 for M4
     // Assumption is dv > limit with cens=1 OR dv < limit with cens=-1
     // Check fpm is df/dt instead of -df/dt
-    if (std::isinf(limit)){
+    if (R_FINITE(limit)){
       // M3 method
       // logLik = log(phi((QL-f(x)/sqrt(g(x)))))
       // logLik = log(1/2*(1+erf((cens*(dv-f(x)))/sqrt(g(x))))/sqrt(2))
@@ -861,6 +861,21 @@ inline void foceiLpInner(int &cens, double &limit, double &dv,
       rxe[20] =rxe[13]+rxe[19];
       lp(i,0)+=2*exp(- rxe[0]*rxe[0]/_safe_zero((rxe[7])))*(rxe[13]+rxe[6]*(rxe[0])/_safe_zero((rxe[11])))/_safe_zero((M_SQRT_PI*(1+erf((rxe[0])/_safe_zero((rxe[10]))))))+rxe[16]*(rxe[20])/_safe_zero((M_SQRT_PI*(1-0.5*(rxe[18]))))+2*rxe[16]*(rxe[20])/_safe_zero((M_SQRT_PI*(rxe[18])));
     }
+  }
+}
+
+static inline void likM2(focei_ind *fInd, double& limit, double&f, double &r){
+  if (R_FINITE(limit)){
+    fInd->llik += -log(1-0.5*(1+erf((limit-f)/sqrt(r)/M_SQRT2)));
+  }
+}
+
+static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, double& dv, double &r){
+  double tmp = log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
+  Rprintf("tmp: %s\n", tmp);
+  fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
+  if (R_FINITE(limit)){
+    fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
   }
 }
 
@@ -957,7 +972,7 @@ double likInner0(double *eta){
 	  err = f - dv;
 	  limit = getLimit(ind, j);
 	  cens = getCens(ind, j);
-	  if (!ISNA(limit) && !std::isinf(limit)){
+	  if (!ISNA(limit) && R_FINITE(limit)){
 	    limit = tbs(limit);
 	  } else {
 	    limit = R_NegInf;
@@ -1054,14 +1069,9 @@ double likInner0(double *eta){
 	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
 	      if (cens == 0){
 		fInd->llik += err * err/r + lnr;
-		if (!std::isinf(limit)){
-		  fInd->llik += -log(1-0.5*(1+erf((limit-f)/sqrt(r)/M_SQRT2)));
-		}
+		likM2(fInd, limit, f, r);
 	      } else if (cens != 0){
-		fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
-		if (!std::isinf(limit)){
-		  fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
-		}
+		likCens(fInd, cens, limit, f, dv, r);
 	      }
 	    } else if (op_focei.interaction == 0){
 	      // FOCE
@@ -1103,14 +1113,9 @@ double likInner0(double *eta){
 	      if (cens == 0){
 		r = _safe_zero(r);
 		fInd->llik += err * err/r + lnr;
-		if (!std::isinf(limit)){
-		  fInd->llik += -log(1-0.5*(1+erf((limit-f)/sqrt(r)/M_SQRT2)));
-		}
+		likM2(fInd, limit, f, r);
 	      } else if (cens != 0){
-		fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
-		if (!std::isinf(limit)){
-		  fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
-		}
+		likCens(fInd, cens, limit, f, dv, r);
 	      }
 	    }
 	  }
@@ -1822,8 +1827,7 @@ static inline double foceiOfv0(double *theta){
   }
   double ret = -2*foceiLik0(theta);
   while (!op_focei.calcGrad && op_focei.stickyRecalcN1 <= op_focei.stickyRecalcN &&
-	 (std::isnan(ret) || std::isinf(ret)) &&
-	 op_focei.objfRecalN < op_focei.maxOdeRecalc){
+	 !R_FINITE(ret) && op_focei.objfRecalN < op_focei.maxOdeRecalc){
       op_focei.reducedTol=1;
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
       ret = -2*foceiLik0(theta);
@@ -1832,12 +1836,12 @@ static inline double foceiOfv0(double *theta){
   if (!op_focei.initObj){
     op_focei.initObj=1;
     op_focei.initObjective=std::fabs(ret);
-    if (std::isnan(ret) || std::isinf(ret)){
+    if (!R_FINITE(ret)){
       stop("Infinite/NaN while evaluating initial objective function");
     }
     if (op_focei.scaleObjective == 1) op_focei.scaleObjective=2;
   } else {
-    if (std::isnan(ret) || std::isinf(ret)){
+    if (!R_FINITE(ret)){
       ret=5e100;
     }
   }
@@ -2320,7 +2324,7 @@ void numericGrad(double *theta, double *g){
 	g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
 	op_focei.mixDeriv=1;
       }
-      if (std::isnan(g[cpar]) ||  ISNA(g[cpar]) || !R_FINITE(g[cpar])){
+      if (!R_FINITE(g[cpar])){
 	if (doForward){
 	  // Switch to Backward difference method
 	  op_focei.mixDeriv=1;
@@ -2337,7 +2341,7 @@ void numericGrad(double *theta, double *g){
 	  // We are using the central difference AND there is an NA in one of the terms
 	  // g[cpar] = (tmp0-tmp)/(2*delta);
 	  op_focei.mixDeriv=1;
-	  if (std::isnan(tmp0) || ISNA(tmp0) || !R_FINITE(tmp0)){
+	  if (!R_FINITE(tmp0)){
 	    // Backward
 	    g[cpar] = (f-tmp)/delta;
 	  } else {
@@ -2349,7 +2353,7 @@ void numericGrad(double *theta, double *g){
 	      g[cpar]=op_focei.gradTrim;
 	    } else if (g[cpar] < op_focei.gradTrim){
 	      g[cpar]=-op_focei.gradTrim;
-	    } else if (std::isnan(tmp0) || ISNA(g[cpar])) {
+	    } else if (!R_FINITE(tmp0)) {
 	      g[cpar]=op_focei.gradTrim;
 	    }
 	  }
@@ -3903,7 +3907,7 @@ NumericVector nlmixrGrad_(NumericVector theta, std::string md5){
     }
   
     // Check for bad grad
-    if (std::isnan(g[i]) ||  ISNA(g[i]) || !R_FINITE(g[i])){
+    if (!R_FINITE(g[i])){
       if (doForward){
       	// Switch to Backward difference method
       	// op_focei.mixDeriv=1;
@@ -3917,7 +3921,7 @@ NumericVector nlmixrGrad_(NumericVector theta, std::string md5){
       	// g[cpar] = (tmp0-tmp)/(2*delta);
       	// op_focei.mixDeriv=1;
 	isMixed=true;
-      	if (std::isnan(tmp0) || ISNA(tmp0) || !R_FINITE(tmp0)){
+      	if (!R_FINITE(tmp0)){
       	  // Backward
       	  g[i] = (f0-tmp)/delta;
       	} else {

@@ -1790,7 +1790,18 @@ foceiFit.data.frame0 <- function(data,
         data[[.v]] <- as.double(data[[.v]]);
     .ret$dataSav = data;
     .ds <- data[data$EVID != 0 & data$EVID != 2, c("ID", "TIME", "AMT", "EVID", .covNames)]
-    data <- data[data$EVID == 0 | data$EVID == 2 , c("ID", "TIME", "DV", "EVID", .covNames)]
+    .w <- which(tolower(names(data)) == "limit")
+    .limitName <- NULL
+    if (length(.w) == 1L){
+        .limitName <- names(data)[.w];
+    }
+    .censName <- NULL
+    .w <- which(tolower(names(data)) == "cens")
+    if (length(.w) == 1L){
+        .censName <- names(data[.w]);
+    }
+    data <- data[data$EVID == 0 | data$EVID == 2 ,
+                 c("ID", "TIME", "DV", "EVID", .covNames, .limitName, .censName)]
     ## keep the covariate names the same as in the model
     .w <- which(!(names(.ret$dataSav) %in% .covNames))
     names(.ret$dataSav)[.w] <- tolower(names(.ret$dataSav[.w]))         #needed in ev
@@ -2079,7 +2090,18 @@ foceiFit.data.frame0 <- function(data,
                                     method=.ret$control$method),
                        pred=.solvePred());
     }
-    .lst <- .Call(`_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, data$EVID, .preds$ipred$rxLambda, .preds$ipred$rxYj, .etas, .pars$eta.lst);
+    if (!is.null(.censName)){
+        .cens <- data[, .censName];
+    } else {
+        .cens <- rep(0L, length(data$DV));
+    }
+    if (!is.null(.limitName)){
+        .limit <- data[, .limitName];
+    } else {
+        .limit <- rep(-Inf, length(data$DV))
+    }
+    .lst <- .Call(`_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, data$EVID, .preds$ipred$rxLambda, .preds$ipred$rxYj,
+                  .cens, .limit, .etas, .pars$eta.lst);
     if (is.null(.preds$cwres)){
         .df <- RxODE::rxSolve(.ret$model$pred.only, .pars$ipred,.ret$dataSav,returnType="data.frame",
                               hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
