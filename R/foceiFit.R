@@ -2118,10 +2118,11 @@ foceiFit.data.frame0 <- function(data,
     if (any(names(.df) %in% names(.lst[[3]]))){
         .df <- .df[, !(names(.df) %in% names(.lst[[3]]))];
     }
-    .lst[[4]] <- .df;
+    .lst[[5]] <- .df;
     .ret$shrink <- .lst[[2]];
     .updateParFixed(.ret);
-    .df <- cbind(as.data.frame(data), .lst[[1]], .lst[[3]], .lst[[4]]);
+    .df <- cbind(as.data.frame(data), .lst[[1]], .lst[[3]], .lst[[5]]);
+    .df$DV <- .lst[[4]]
     .ret$tableTime <- (proc.time() - .pt)["elapsed"];
     .ret$time <- data.frame(.ret$time, table=.ret$tableTime);
     .isDplyr <- requireNamespace("dplyr", quietly = TRUE);

@@ -871,8 +871,6 @@ static inline void likM2(focei_ind *fInd, double& limit, double&f, double &r){
 }
 
 static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, double& dv, double &r){
-  double tmp = log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
-  Rprintf("tmp: %s\n", tmp);
   fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
   if (R_FINITE(limit)){
     fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
@@ -1173,7 +1171,7 @@ double likInner0(double *eta){
 		r = _safe_zero(r);
 		fInd->llik += err * err/r + lnr;
 		likM2(fInd, limit, f, r);
-	      } else if (cens != 0){
+	      } else {
 		likCens(fInd, cens, limit, f, dv, r);
 	      }
 	    }

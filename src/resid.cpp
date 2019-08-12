@@ -162,16 +162,78 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
   NumericVector dvTBS(dv.size());
   for (i = dv.size(); i--;){
     iprednvI[i]= powerDi(iprednv[i], lambda[i], (int)yj[i]);
+    prednvI[i] = powerDi(prednv[i], lambda[i], (int)yj[i]);
     switch (cens[i]){
     case 1:
       // (limit, dv) ; limit could be -inf
+      if (R_FINITE(limit[i])){
+	double lim0TBS = powerD(limit[i], lambda[i], (int)yj[i]);
+	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double sd = sqrt(ri[i]);
+	double cur;
+	dvTBS[i] = NA_REAL;
+	dv[i] = NA_REAL;
+	while (true){
+	  cur = iprednv[i]+R::norm_rand()*sd;
+	  if (lim0TBS < cur  &&  cur < lim1TBS){
+	    dvTBS[i] = cur;
+	    dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	    break;
+	  }
+	}
+      } else {
+	// (-Inf, dv)
+	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double sd = sqrt(ri[i]);
+	double cur;
+	dvTBS[i] = NA_REAL;
+	dv[i] = NA_REAL;
+	while (true){
+	  cur = iprednv[i]+R::norm_rand()*sd;
+	  if (cur < lim1TBS){
+	    dvTBS[i] = cur;
+	    dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	    break;
+	  }
+	}
+      }
       break;
     case -1:
       // (dv, limit); limit could be +inf
+      if (R_FINITE(limit[i])){
+	double lim1TBS = powerD(limit[i], lambda[i], (int)yj[i]);
+	double lim0TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double sd = sqrt(ri[i]);
+	double cur;
+	dvTBS[i] = NA_REAL;
+	dv[i] = NA_REAL;
+	while (true){
+	  cur = iprednv[i]+R::norm_rand()*sd;
+	  if (lim0TBS < cur  &&  cur < lim1TBS){
+	    dvTBS[i] = cur;
+	    dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	    break;
+	  }
+	}
+      } else {
+	// (dv, Inf)
+	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double sd = sqrt(ri[i]);
+	double cur;
+	dvTBS[i] = NA_REAL;
+	dv[i] = NA_REAL;
+	while (true){
+	  cur = iprednv[i]+R::norm_rand()*sd;
+	  if (cur > lim1TBS){
+	    dvTBS[i] = cur;
+	    dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	    break;
+	  }
+	}
+      }
       break;
     case 0:
       dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
-      prednvI[i] = powerDi(prednv[i], lambda[i], (int)yj[i]);
       break;
     }
   }
