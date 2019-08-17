@@ -173,6 +173,95 @@ mymin = function(start, fr, rho=NULL, control=list())
 
 # #########################################################################
 
+# sensitivity()  -------------------------------------------------------------
+#' Sensitivity Analysis based on the SOBOL method
+#'
+#' Applies the the SOBOL method for sensitivity analysis. A nlmixr object is required that contains no eta values. 
+#' The non-fixed theta parameters in a nlmixr object undergo sensitivity analysis.
+#'
+#' @param .nlmixrObjectmodel nlmixr object
+#' @param .data data for parameter estimation
+#' @param .method optimization method used for dynmodel
+#' @param .control control used for nlmixr and dynmodel
+#' @export
+# 
+# Method - simulate with fix parameters over a range, calculate objective function, and compare? 
+#
+# sensitivity = function(.nlmixrObject, .data, .method, .control = list()){
+#  
+#   # possible inputs
+#     # maybe have range and step size for evaluation of each parameter
+#   
+#     .nmfOriginal <- .nlmixrObject
+#     
+#     .nmf <- as.data.frame(.nlmixrObject$ini)
+#     
+#     .tempModel <- RxODE::rxSymPySetupPred(.nmfOriginal$rxode.pred,
+#                                            function(){return(nlmixr_pred)},
+#                                            .nmfOriginal$theta.pars,
+#                                            .nmfOriginal$error,
+#                                            grad=FALSE,
+#                                            pred.minus.dv=TRUE, sum.prod=FALSE, #control$sumProd,
+#                                            theta.derivs=FALSE, optExpression=TRUE, #control$optExpression,
+#                                            run.internal=TRUE, only.numeric=TRUE)
+#     
+#    
+#   # need to get fixed theta list
+#   fixParsFun <- function(.nmf, .tempModel){
+#    
+#     .fixIndex <- 
+#       if (length(which(.nmf$fix==TRUE))==0) {
+#         NULL} 
+#       else {
+#         which(.nmf$fix==TRUE)
+#       }
+#     
+#     .fixPars <- .nmf$est[.fixIndex]
+#     
+#     .fixParsName <- as.character(.nmf$name[.fixIndex])
+#     names(.fixPars) <- .fixParsName
+#     
+#     .ret <- list(fixIndex=.fixIndex, fixPars=.fixPars, fixParsName=.fixParsName)
+#     return(.ret)
+#   }
+#   
+#   # need to get non-fixed theta list
+#   thetaParsFun <- function(.nmf, .tempModel, .fixIndex){
+#     
+#     .thetaIndex <-
+#       if (is.null(.fixIndex)){
+#         which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)
+#       } else {
+#         which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)[-which(.nmf$fix == TRUE)]
+#       }
+#     
+#     .thetaPars <- .nmf$est[.thetaIndex]
+#     
+#     .thetaParsName <- as.character(.nmf$name[.thetaIndex])
+#     
+#     names(.thetaPars) <- .thetaParsName
+#     
+#     .ret <- list(thetaIndex=.thetaIndex,thetaPars=.thetaPars,thetaParsName=.thetaParsName)
+#     return(.ret) 
+#   }
+#   
+#   .fix <- fixParsFun(.nmf,.tempModel)
+#   .theta <- thetaParsFun(.nmf,.tempModel,.fix$fixIndex)
+#   
+#   #.i <- length(.theta$thetaIndex)
+#   .i <- 1
+#   # question, can I run it as a data frame?
+#   .nmfOriginal$ini$est[which(.nmfOriginal$ini$name==.theta$thetaParsName[.i])] <- 999 # replace 999 with new value
+#   
+#   # replace
+#   for(i in .ini.df){
+#     .tmp <- nlmixr(.tmpNlmixrObject, .data, est="dynmodel", control=dynmodelControl(method=.method))
+#   }
+#   
+#   
+# }
+# #########################################################################
+
 # as.focei.dynmodel() -----------------------------------------------------------
 #' Output nlmixr format for dynmodel
 #'
@@ -184,7 +273,8 @@ mymin = function(start, fr, rho=NULL, control=list())
 # devtools::check_man() used to identify missing and problems
 # Will outside of dynmodel, and called within dynmodel. If nlmixr input used, output nlmixr, if dynmodel input used, output dynmodel.
 
-as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .theta, .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl, .nobs2=0, .pt=proc.time(), .rxControl = RxODE::rxControl()){
+as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .theta, .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl, .nobs2=0, 
+                              .pt=proc.time(), .rxControl = RxODE::rxControl()){
 
   # setup ----
   .env <- new.env(parent=emptyenv()); # store information for attaching to fit
@@ -721,8 +811,8 @@ dynmodelControl <- function(...,
   }
 
   if (missing(method)){method = "bobyqa"}
-  if (missing(normType)){normType = "rescale2"} # normType=constant
-  if (missing(scaleType)){scaleType = "nlmixr"} # norm
+  if (missing(normType)){normType = "rescale2"} # normType= 'constant'
+  if (missing(scaleType)){scaleType = "nlmixr"} # sacleType= 'norm'
 
   .ret <- list(
     ci=ci,
@@ -859,6 +949,9 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
     model = list(model)
   }
   inits.err = NULL
+  
+
+
   model = lapply(model, function(.model) {
     .model = unlist(lapply(attr(terms(.model),"variables"), as.list))
     .model = sapply(.model, deparse)
@@ -932,6 +1025,7 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
   inits = c(inits, inits.err)
   if("pow2" %in% names(inits) & !("pow" %in% names(inits))){stop("Error Model: pow must be defined when using pow2")}
 
+ 
   # Check dynmodel() inputs, Define vars, modelVars, pars,  ------------
 
     # NOTES: Check to make sure all there is consistency between error model, data. inits, and ODE model
@@ -996,10 +1090,12 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
   #  stop(msg)
   # }
   
+   
   # Additional assignment ---------------------------------------------------
   # number of estimated parameters, excluding the error terms
   npar = length(pars) - length(fixPars)
 
+ 
   # Objective Function ------------------------------------------------------
   .time$setupTime <- (proc.time() - .pt)["elapsed"]
 
@@ -1009,6 +1105,8 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
 
   rxControl <- control$rxControl
 
+reducedTol <- FALSE  
+  
   obj = function(th)
   {
     # unscale
@@ -1031,6 +1129,20 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
     s = do.call(RxODE :: rxSolve,
                 c(list(object=system, params=theta, events=data),
                   .rxControl))
+    i<-1
+    i.max <- 10 
+    while(any(is.na(s$nlmixr_pred)) & i < i.max) {
+      .rxControl$atol <-  .rxControl$atol*100
+      .rxControl$rtol <-  .rxControl$rtol*100
+      
+      s = do.call(RxODE :: rxSolve,
+                  c(list(object=system, params=theta, events=data),
+                    .rxControl))
+      reducedTol <<- TRUE
+      i<- i+1
+      
+    }
+    
     # sum of log-likelihood function:
     l = lapply(model, function(x) {
       # name the inputs
@@ -1165,27 +1277,36 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
                          gillFtol=control$gillFtol,
                          thetaNames=names(inits))
 
-
+  
   # Scaling functions -----------------------------------------------------------------------
   # normType assignment for scaling (normalization type)
-  if (normType == "constant") {
+  
+  if (is.null(nlmixrObject)) {
+    normType= 'constant'
+    sacleType= 'norm'
     C1 = 0
     C2 = 1
-  } else if (normType == "rescale2") {
-    C1 = (max(inits) + min(inits))/2
-    C2 = (max(inits) - min(inits))/2
-  } else if (normType == "mean") {
-    C1 = mean(inits)
-    C2 = max(inits) - min(inits)
-  } else if (normType == "rescale") {
-    C1 = min(inits)
-    C2 = max(inits) - min(inits)
-  } else if (normType == "std") {
-    C1 = mean(inits)
-    C2 = sd(inits)
-  } else if (normType == "len") {
-    C1 = 0
-    C2 = sqrt(sum(inits*inits))
+  }
+  else {
+    if (normType == "constant") {
+      C1 = 0
+      C2 = 1
+    } else if (normType == "rescale2") {
+      C1 = (max(inits) + min(inits))/2
+      C2 = (max(inits) - min(inits))/2
+    } else if (normType == "mean") {
+      C1 = mean(inits)
+      C2 = max(inits) - min(inits)
+    } else if (normType == "rescale") {
+      C1 = min(inits)
+      C2 = max(inits) - min(inits)
+    } else if (normType == "std") {
+      C1 = mean(inits)
+      C2 = sd(inits)
+    } else if (normType == "len") {
+      C1 = 0
+      C2 = sqrt(sum(inits*inits))
+    }
   }
 
   # produces vector of scaleC values if missing, handles incorrect length of scaleC values.
@@ -1208,7 +1329,6 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
   names(scaleC) <- names(inits)
   
   if (!is.null(nlmixrObject)){
-  
     .model <- RxODE::rxSymPySetupPred(nlmixrObject$rxode.pred,
                                       function(){return(nlmixr_pred)},
                                       nlmixrObject$theta.pars,
@@ -1221,7 +1341,8 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
     scaleC[.model$log.thetas] <- 1
     scaleC[setdiff(1:length(theta),.model$log.thetas)] <- 1/abs(theta[setdiff(1:length(theta),.model$log.thetas)])
   }
-  
+
+
   # assign value to scaleC based on the error model used
   n.inits.err <- names(inits.err)
   for (i in 1:length(n.inits.err)){
@@ -1233,20 +1354,27 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
       }
     }
   }
+ 
   
   # assign value to scaleC based on additional functions
-  for (i in .model$extraProps$powTheta){
-    if (is.na(scaleC[i])) scaleC[i] <- 1; ## Powers are log-scaled
-  }
-  .ini <- as.data.frame(nlmixrObject$ini)
-  for (i in .model$extraProps$factorial){
-    if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i] + 1));
-  }
-  for (i in .model$extraProps$gamma){
-    if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i]));
-  }
-  for (i in .model$extraProps$log){
-    if (is.na(scaleC[i])) scaleC[i] <- log(abs(.ini$est[i])) * abs(.ini$est[i]);
+  if (!is.null(nlmixrObject)) {
+    for (i in .model$extraProps$powTheta){
+      if (is.na(scaleC[i])) scaleC[i] <- 1; ## Powers are log-scaled
+    }
+    
+    .ini <- as.data.frame(nlmixrObject$ini)
+
+    for (i in .model$extraProps$factorial){
+      if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i] + 1));
+    }
+    
+    for (i in .model$extraProps$gamma){
+      if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i]));
+    }
+    
+    for (i in .model$extraProps$log){
+      if (is.na(scaleC[i])) scaleC[i] <- log(abs(.ini$est[i])) * abs(.ini$est[i]);
+    }
   }
   ## FIXME: needs to be based on actual initial values in sin because typically change to correct scale
   ## Ctime is also usually used for circadian rhythm models
@@ -1423,7 +1551,7 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
   if (!is.na(match("dnorm",names(inits)))) fit$par[match("dnorm",names(inits))] = abs(fit$par[match("dnorm",names(inits))])
 
   .time$hessianTime <- (proc.time() - .ht)["elapsed"]
-  # dynmodel Output -------------------------------------------------------
+   # dynmodel Output -------------------------------------------------------
   # unscale optmized parameters here if scaling was used:
   
   # create table for output
@@ -1437,8 +1565,10 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
   res = c(list(res=res, obj=obj, npar=length(fit$par), nobs=nobs, data=data), fit)
   
   class(res) = "dyn.ID"
-  # Final Output ----------------------------------------------------------
+   # Final Output ----------------------------------------------------------
   .time$totalTime <- (proc.time() - .pt)["elapsed"]
+  
+  if (reducedTol) warning("atol and rtol reduced to complete optimization")
 
   .time <- as.data.frame(.time)
   names(.time) <- c("setup", "scaling", "optimization", "Hessian", "total")
@@ -1462,7 +1592,10 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
   else {
     return(res)
   }
-}
+
+  }
+
+
 # #########################################################################
 
 # ####################################################################### #
