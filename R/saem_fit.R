@@ -625,8 +625,8 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
   if(is.ode) RxODE::rxLoad(model)
   `.DLL` <- dyn.load(saem.dll);
-  fn.pred <- eval(bquote(function(a, b, c){dyn.load(saem.dll);.Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base))}))
-  fn1 <- eval(bquote(function(a){dyn.load(saem.dll);.Call(`_nlmixr_saemFit`, a, .(saem.base))}));
+  fn.pred <- eval(bquote(function(a, b, c){dyn.load(.(saem.dll)); if (.(is.ode)) {RxODE::rxLoad(.(model))};.Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base))}))
+  fn1 <- eval(bquote(function(a){dyn.load(.(saem.dll)); if (.(is.ode)){RxODE::rxLoad(.(model))};.Call(`_nlmixr_saemFit`, a, .(saem.base))}));
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
       RxODE::rxLoad(.(model))
