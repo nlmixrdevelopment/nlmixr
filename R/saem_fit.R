@@ -208,20 +208,17 @@ for (int _b=1; _b< <%=nendpnt%>; ++_b) {
 }
 
 // definition
-RcppExport SEXP dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
-BEGIN_RCPP
-    Rcpp::traits::input_parameter< mat& >::type phi(in_phi);
-    Rcpp::traits::input_parameter< mat& >::type evt(in_evt);
-    List opt(in_opt);
+SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
+    mat phi = as<mat>(in_phi);
+    mat evt = as<mat>(in_evt);
+    List opt= as<List>(in_opt);
     int distribution = as<int>(opt["distribution"]);
     vec g = user_function(phi, evt, opt);
     if (distribution == 4) g = log(g);
     return Rcpp::wrap(g);
-END_RCPP
 }
 
-RcppExport SEXP saem_fit(SEXP xSEXP) {
-BEGIN_RCPP
+SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
   List x(xSEXP);
 
   SAEM saem;
@@ -250,7 +247,15 @@ BEGIN_RCPP
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";
   return out;
-END_RCPP
+}
+extern "C" {
+void R_init_<%=saem.base%>(DllInfo *dll)
+{
+  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_saem_fit",(DL_FUNC) &_<%=saem.base%>_saem_fit);
+  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_dopred",(DL_FUNC) &_<%=saem.base%>_dopred);
+  R_registerRoutines(dll, NULL, NULL, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+}
 }
 '
 
@@ -352,8 +357,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 }
 
 // definition
-RcppExport SEXP dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
-BEGIN_RCPP
+extern "C"  SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
     Rcpp::traits::input_parameter< mat& >::type phi(in_phi);
     Rcpp::traits::input_parameter< mat& >::type evt(in_evt);
     List opt(in_opt);
@@ -361,11 +365,9 @@ BEGIN_RCPP
     vec g = user_function(phi, evt, opt);
     if (distribution == 4) g = log(g);
     return Rcpp::wrap(g);
-END_RCPP
 }
 
-RcppExport SEXP saem_fit(SEXP xSEXP) {
-BEGIN_RCPP
+extern "C" SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
   List x(xSEXP);
   SAEM saem;
   saem.inits(x);
@@ -393,7 +395,17 @@ BEGIN_RCPP
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";
   return out;
-END_RCPP
+}
+
+extern "C" {
+
+void R_init_<%=saem.base%>(DllInfo *dll)
+{
+  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_saem_fit",(DL_FUNC) &_<%=saem.base%>_saem_fit);
+R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_dopred",(DL_FUNC) &_<%=saem.base%>_dopred);
+  R_registerRoutines(dll, NULL, NULL, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+}
 }
 '
 
@@ -578,7 +590,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
       ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
-      make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
+      make_str = 'PKG_CXXFLAGS=-g %s\nPKG_LIBS=-g %s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
       make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
 
       cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
@@ -613,8 +625,8 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
   if(is.ode) RxODE::rxLoad(model)
   `.DLL` <- dyn.load(saem.dll);
-  fn.pred <- sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred')
-  fn1 <- sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
+  fn.pred <- eval(bquote(function(a, b, c){dyn.load(saem.dll);.Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base))}))
+  fn1 <- eval(bquote(function(a){dyn.load(saem.dll);.Call(`_nlmixr_saemFit`, a, .(saem.base))}));
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
       RxODE::rxLoad(.(model))

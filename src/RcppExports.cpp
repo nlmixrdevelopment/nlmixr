@@ -441,3 +441,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// saemDoPred
+RObject saemDoPred(RObject in_phi, RObject in_evt, RObject in_opt, CharacterVector cur);
+RcppExport SEXP _nlmixr_saemDoPred(SEXP in_phiSEXP, SEXP in_evtSEXP, SEXP in_optSEXP, SEXP curSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RObject >::type in_phi(in_phiSEXP);
+    Rcpp::traits::input_parameter< RObject >::type in_evt(in_evtSEXP);
+    Rcpp::traits::input_parameter< RObject >::type in_opt(in_optSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type cur(curSEXP);
+    rcpp_result_gen = Rcpp::wrap(saemDoPred(in_phi, in_evt, in_opt, cur));
+    return rcpp_result_gen;
+END_RCPP
+}
+// saemFit
+RObject saemFit(RObject xSEXP, CharacterVector cur);
+RcppExport SEXP _nlmixr_saemFit(SEXP xSEXPSEXP, SEXP curSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RObject >::type xSEXP(xSEXPSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type cur(curSEXP);
+    rcpp_result_gen = Rcpp::wrap(saemFit(xSEXP, cur));
+    return rcpp_result_gen;
+END_RCPP
+}

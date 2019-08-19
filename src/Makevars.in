@@ -13,7 +13,7 @@ PKG_CXXFLAGS = -Id -I../inst/include -DBOOST_DISABLE_ASSERTS -@ISYSTEM@"$(BH)" -
 SHLIB_LDFLAGS = $(SHLIB_CXXLDFLAGS) 
 SHLIB_LD = $(SHLIB_CXXLD)
 SOURCES_C = jj.c jj.g.d_parser.c init.c rprintf.c merge3.c lbfgsR.c
-SOURCES_CPP = neldermead.cpp slice.cpp RcppExportMod.cpp ode_cmt1.cpp RcppExports.cpp resid.cpp inner.cpp
+SOURCES_CPP = neldermead.cpp slice.cpp RcppExportMod.cpp ode_cmt1.cpp RcppExports.cpp resid.cpp inner.cpp saem.cpp
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o)
 
 all: $(SHLIB)
