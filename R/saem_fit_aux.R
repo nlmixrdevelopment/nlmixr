@@ -29,6 +29,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         ## .env$model$assignPtr()
         .evtM  <- saem.cfg$evtM
         .rx <- .env$model
+        RxODE::rxLoad(.env$model)
         .pars <- .rx$params
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
         suppressWarnings(do.call(RxODE:::rxSolve.default,
@@ -321,6 +322,7 @@ calc.COV = function(fit0) {
     ## .env$model$assignPtr()
     .evtM  <- saem.cfg$evtM
     .rx <- .env$model
+    RxODE::rxLoad(.rx)
     .pars <- .rx$params
     .pars <- setNames(rep(1.1,length(.pars)),.pars);
     suppressWarnings(do.call(RxODE:::rxSolve.default,

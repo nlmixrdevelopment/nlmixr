@@ -428,28 +428,28 @@ nmxInclude <- function(pkg="nlmixr"){
     }
 }
 
-..saemCountDll <- list();
-.saemCountDll <- function(dll, inc=NULL){
-    .what <- ..saemCountDll[[dll]];
-    if (is.null(.what)){
-        if (is.integer(inc)){
-            .lst <- ..saemCountDll;
-            .lst[[dll]] <- inc;
-            assignInMyNamespace("..saemCountDll", .lst);
-            return(inc);
-        } else {
-            return(0L);
-        }
-    } else if (is.null(inc)) {
-        return(.what);
-    } else {
-        .lst <- ..saemCountDll;
-        .what <- .what + inc;
-        .lst[[dll]] <- .what
-        assignInMyNamespace("..saemCountDll", .lst);
-        return(.what);
-    }
-}
+## ..saemCountDll <- list();
+## .saemCountDll <- function(dll, inc=NULL){
+##     .what <- ..saemCountDll[[dll]];
+##     if (is.null(.what)){
+##         if (is.integer(inc)){
+##             .lst <- ..saemCountDll;
+##             .lst[[dll]] <- inc;
+##             assignInMyNamespace("..saemCountDll", .lst);
+##             return(inc);
+##         } else {
+##             return(0L);
+##         }
+##     } else if (is.null(inc)) {
+##         return(.what);
+##     } else {
+##         .lst <- ..saemCountDll;
+##         .what <- .what + inc;
+##         .lst[[dll]] <- .what
+##         assignInMyNamespace("..saemCountDll", .lst);
+##         return(.what);
+##     }
+## }
 
 #' Generate an SAEM model
 #'
@@ -648,23 +648,25 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 
   if(is.ode) {
       RxODE::rxLoad(model)
-      .saemCountDll(RxODE::rxModelVars(model)$trans["lib.name"], 1L);
+      ## .saemCountDll(RxODE::rxModelVars(model)$trans["lib.name"], 1L);
   }
-  .saemCountDll(saem.dll, 1L);
+  ## .saemCountDll(saem.dll, 1L);
   `.DLL` <- dyn.load(saem.dll);
   fn.pred <- eval(bquote(function(a, b, c){
       if (!file.exists(.(saem.dll))) stop(sprintf("Stopping since '%s' does not exist", .(saem.dll)));
       dyn.load(.(saem.dll));
-      if (.(is.ode)) {
-          RxODE::rxLoad(.(model))
-      }
       .Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base))
   }))
   fn1 <- eval(bquote(function(a){
       dyn.load(.(saem.dll));
       if (.(is.ode)){
           RxODE::rxLoad(.(model))
-      };
+          suppressWarnings(do.call(RxODE:::rxSolve.default,
+                                   c(list(object=.(model), params=a$opt$.pars,
+                                          events=a$evtM,.setupOnly=2L),
+                                     a$optM)))
+          ## on.exit(RxODE::rxSolveFree())
+      }
       .Call(`_nlmixr_saemFit`, a, .(saem.base))
   }));
   if (is.ode){
@@ -715,18 +717,18 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 ##' @author Matthew L. Fidler
 ##' @export
 saem.cleanup <- function(env){
-    if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
-    if (is(env, "saemFit")) env <- attr(env, "env");
-    if (env$is.ode){
-        if (.saemCountDll(RxODE::rxModelVars(env$model)$trans["lib.name"], -1L) <= 0){
-            try({RxODE::rxUnload(env$model)}, silent=TRUE)
-        }
-    }
-    if (.saemCountDll(env$saem.dll, -1L) <= 0){
-        try({dyn.unload(env$saem.dll)}, silent=TRUE);
-        if (file.exists(env$saem.cpp))
-            unlink(env$saem.cpp);
-    }
+    ## if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
+    ## if (is(env, "saemFit")) env <- attr(env, "env");
+    ## if (env$is.ode){
+    ##     if (.saemCountDll(RxODE::rxModelVars(env$model)$trans["lib.name"], -1L) <= 0){
+    ##         try({RxODE::rxUnload(env$model)}, silent=TRUE)
+    ##     }
+    ## }
+    ## if (.saemCountDll(env$saem.dll, -1L) <= 0){
+    ##     try({dyn.unload(env$saem.dll)}, silent=TRUE);
+    ##     if (file.exists(env$saem.cpp))
+    ##         unlink(env$saem.cpp);
+    ## }
 }
 
 parfn.list = c(
@@ -975,7 +977,7 @@ configsaem <- function(model, data, inits,
   if (check) stop("saem classic UI needs sequential ID. check your data")
   ntotal = length(id)
   N = length(unique(id))
-  covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
+  covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars, drop = FALSE]), list(id), unique)[,-1, drop=FALSE])
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
   ncov = data$N.covar + 1
@@ -1010,9 +1012,9 @@ configsaem <- function(model, data, inits,
     .rx <- attr(model$saem_mod,"rx");
     .pars <- .rx$params
     .pars <- setNames(rep(1.1,length(.pars)),.pars);
-    do.call(RxODE:::rxSolve.default,
-            c(list(object=.rx, params=.pars,
-                   events=dat,.setupOnly=2L),ODEopt));
+    ## opt$.rx <- .rx;
+    opt$.pars <- .pars;
+    ## opt$.dat <- dat;
     dat <- as.data.frame(dat[,-6]);
     names(dat) <- toupper(names(dat));
     dat$ID <- as.integer(dat$ID);
@@ -1268,7 +1270,6 @@ configsaem <- function(model, data, inits,
 
   cfg$DEBUG = cfg$opt$DEBUG = cfg$optM$DEBUG = DEBUG
   cfg$phiMFile = tempfile()
-
   cfg
 }
 
