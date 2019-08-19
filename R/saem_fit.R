@@ -590,7 +590,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
       ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
-      make_str = 'PKG_CXXFLAGS=-g %s\nPKG_LIBS=-g %s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
+      make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
       make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
 
       cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
