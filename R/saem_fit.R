@@ -428,6 +428,29 @@ nmxInclude <- function(pkg="nlmixr"){
     }
 }
 
+..saemCountDll <- list();
+.saemCountDll <- function(dll, inc=NULL){
+    .what <- ..saemCountDll[[dll]];
+    if (is.null(.what)){
+        if (is.integer(inc)){
+            .lst <- ..saemCountDll;
+            .lst[[dll]] <- inc;
+            assignInMyNamespace("..saemCountDll", .lst);
+            return(inc);
+        } else {
+            return(0L);
+        }
+    } else if (is.null(inc)) {
+        return(.what);
+    } else {
+        .lst <- ..saemCountDll;
+        .what <- .what + inc;
+        .lst[[dll]] <- .what
+        assignInMyNamespace("..saemCountDll", .lst);
+        return(.what);
+    }
+}
+
 #' Generate an SAEM model
 #'
 #' Generate an SAEM model using either closed-form solutions or ODE-based model definitions
@@ -623,10 +646,27 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   ## setwd(lwd);
   saem.dll <- file.path(getwd(), saem.dll);
 
-  if(is.ode) RxODE::rxLoad(model)
+  if(is.ode) {
+      RxODE::rxLoad(model)
+      .saemCountDll(RxODE::rxModelVars(model)$trans["lib.name"], 1L);
+  }
+  .saemCountDll(saem.dll, 1L);
   `.DLL` <- dyn.load(saem.dll);
-  fn.pred <- eval(bquote(function(a, b, c){dyn.load(.(saem.dll)); if (.(is.ode)) {RxODE::rxLoad(.(model))};.Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base))}))
-  fn1 <- eval(bquote(function(a){dyn.load(.(saem.dll)); if (.(is.ode)){RxODE::rxLoad(.(model))};.Call(`_nlmixr_saemFit`, a, .(saem.base))}));
+  fn.pred <- eval(bquote(function(a, b, c){
+      if (!file.exists(.(saem.dll))) stop(sprintf("Stopping since '%s' does not exist", .(saem.dll)));
+      dyn.load(.(saem.dll));
+      if (.(is.ode)) {
+          RxODE::rxLoad(.(model))
+      }
+      .Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base))
+  }))
+  fn1 <- eval(bquote(function(a){
+      dyn.load(.(saem.dll));
+      if (.(is.ode)){
+          RxODE::rxLoad(.(model))
+      };
+      .Call(`_nlmixr_saemFit`, a, .(saem.base))
+  }));
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
       RxODE::rxLoad(.(model))
@@ -677,10 +717,16 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 saem.cleanup <- function(env){
     if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
     if (is(env, "saemFit")) env <- attr(env, "env");
-    if (env$is.ode) try({RxODE::rxUnload(env$model)}, silent=TRUE)
-    try({dyn.unload(env$saem.dll)}, silent=TRUE);
-    if (file.exists(env$saem.cpp))
-        unlink(env$saem.cpp);
+    if (env$is.ode){
+        if (.saemCountDll(RxODE::rxModelVars(env$model)$trans["lib.name"], -1L) <= 0){
+            try({RxODE::rxUnload(env$model)}, silent=TRUE)
+        }
+    }
+    if (.saemCountDll(env$saem.dll, -1L) <= 0){
+        try({dyn.unload(env$saem.dll)}, silent=TRUE);
+        if (file.exists(env$saem.cpp))
+            unlink(env$saem.cpp);
+    }
 }
 
 parfn.list = c(
