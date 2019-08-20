@@ -213,14 +213,14 @@ distributions are supported, in principle.
 Instructions for macOS 10.13 Mojave are provided here. They should be
 broadly extensible to all recent releases of macOS, however.
 
-1. Install R 3.5.2 (or later) from the R website.
-   - Download and install `R-3.5.2.pkg` (or later) from [CRAN](http://cran.r-project.org/bin/macosx/).
+1. Install R 3.6.1 from the R website.
+   - Download and install `R-3.6.1.pkg` (or later) from [CRAN](http://cran.r-project.org/bin/macosx/).
 2. Install Python dependencies.
    - Install `pip` from the macOS terminal prompt: `sudo easy_install pip`.
      - If `easy_install` doesn't work, you can download by `curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py` and then run `sudo python get-pip.py`
    - Install `sympy` using `pip`: `sudo -H pip install sympy`.
 3. Install build tools.
-   - Install the clang and gfortran packages from [CRAN development
+   - Install the clang 8.0+ and gfortran 6.1+ packages from [CRAN development
      tools website](http://cran.r-project.org/bin/macosx/tools/)
    - Install Mac OSX command like tools by typing `xcode-select
      --install` and then choose `install`.  This allows you to compile
@@ -241,9 +241,16 @@ sudo installer -pkg \
    
 ```R
 # make sure to adjust the version number of clang based on the downloaded version in step 3 (e.g. clang8/bin)
-Sys.setenv("PATH"=paste0("/usr/local/clang6/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
-
+Sys.setenv("PATH"=paste0("/usr/local/clang8/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
 ```
+
+You also need to create a directory `~/.R` and then put a file `Makevars` in it;  The context of the file should contain:
+
+```sh
+# ~/.R/Makevars
+CXX14FLAGS=-O2 -march=native -mtune=native -arch x86_64 -ftemplate-depth-256 -fPIC
+```
+
 4. Install `devtools` and dependencies.
    - This package is required to install packages from Github, amongst other things.
    - Install `devtools` from a clean R session by entering `install.packages("devtools")`.
@@ -253,12 +260,8 @@ Sys.setenv("PATH"=paste0("/usr/local/clang6/bin:/usr/local/gfortran/bin:", Sys.g
      uploaded to CRAN.  `nlmixr` needs this newer version of `RxODE` to
      function correctly. To install this version, use the command:
      `install_github("nlmixrdevelopment/RxODE")`.
-   - Install `SnakeCharmR` using
-     `install_github("nlmixrdevelopment/SnakeCharmR")` or install
-     `reticulate` using `install.packages("reticulate")`.
+   - Install `reticulate` using `install.packages("reticulate")`.
    - Restart your R session.
-   - As a quick test, you can make sure that R and Python can
-     communicate by typing the command `library(SnakeCharmR)`.
    - To validate or test the installation of `RxODE` completely, you
      can type the following `library(RxODE); rxTest();` and it will
      run all of the unit tests in RxODE to make sure it is running
