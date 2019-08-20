@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <R_ext/Rdynload.h>
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
+#include <RxODE.h>
 using namespace Rcpp;
 
 // This is a thin layer to the dll.  This is to try to avoid corruption
@@ -21,14 +22,22 @@ void setCur(std::string cur){
 }
 
 //[[Rcpp::export]]
-RObject saemDoPred(RObject in_phi, RObject in_evt, RObject in_opt, CharacterVector cur = ""){
+RObject saemDoPred(RObject in_phi, RObject in_evt, RObject in_opt,
+		   CharacterVector cur = "", RObject model = R_NilValue){
   setCur(as<std::string>(cur[0]));
+  if (!RxODE::rxIs(model, "NULL")){
+    RxODE::rxDynLoad(model);
+  }
   return dopred(in_phi, in_evt, in_opt);
 }
 
 //[[Rcpp::export]]
-RObject saemFit(RObject xSEXP, CharacterVector cur = ""){
+RObject saemFit(RObject xSEXP, CharacterVector cur = "",
+		RObject model = R_NilValue){
   setCur(as<std::string>(cur[0]));
+  if (!RxODE::rxIs(model, "NULL")){
+    RxODE::rxDynLoad(model);
+  }
   return saem_fit(xSEXP);
 }
 

@@ -49,6 +49,8 @@ rxOptionsIniEnsure0_t rxOptionsIniEnsure0 = (rxOptionsIniEnsure0_t) R_GetCCallab
 typedef rx_solve *(*getRxSolve_t)();
 getRxSolve_t getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
 
+rx_solve* _rx = NULL;
+
 }
 
 Function ff("sd");
@@ -71,7 +73,6 @@ vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
 
 
 vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
-  rx_solve* _rx = getRx();
   rx_solving_options* _op = _rx->op;
   vec _id = _evt.col(0);
   int _N=_id.max()+1;
@@ -208,7 +209,10 @@ for (int _b=1; _b< <%=nendpnt%>; ++_b) {
 }
 
 // definition
-SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
+SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt){
+    if (getRx == NULL) getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+    if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
+    _rx=getRx();
     mat phi = as<mat>(in_phi);
     mat evt = as<mat>(in_evt);
     List opt= as<List>(in_opt);
@@ -219,6 +223,9 @@ SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
 }
 
 SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
+  if (getRx == NULL) getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+  if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
+  if (_rx == NULL) _rx=getRx();
   List x(xSEXP);
 
   SAEM saem;
@@ -613,7 +620,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
       ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
-      make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
+      make_str = 'PKG_CXXFLAGS=-g %s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
       make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
 
       cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
@@ -652,22 +659,25 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   }
   ## .saemCountDll(saem.dll, 1L);
   `.DLL` <- dyn.load(saem.dll);
+  .mod <- model
+  if (!is.ode){.mod <- NULL}
   fn.pred <- eval(bquote(function(a, b, c){
       if (!file.exists(.(saem.dll))) stop(sprintf("Stopping since '%s' does not exist", .(saem.dll)));
       dyn.load(.(saem.dll));
-      .Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base))
+      .Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base),
+            .(.mod));
   }))
   fn1 <- eval(bquote(function(a){
       dyn.load(.(saem.dll));
       if (.(is.ode)){
-          RxODE::rxLoad(.(model))
           suppressWarnings(do.call(RxODE:::rxSolve.default,
                                    c(list(object=.(model), params=a$opt$.pars,
                                           events=a$evtM,.setupOnly=2L),
                                      a$optM)))
           ## on.exit(RxODE::rxSolveFree())
       }
-      .Call(`_nlmixr_saemFit`, a, .(saem.base))
+      .Call(`_nlmixr_saemFit`, a, .(saem.base),
+            .(.mod))
   }));
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
