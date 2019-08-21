@@ -225,7 +225,7 @@ SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt){
 SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
   if (getRx == NULL) getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
   if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
-  if (_rx == NULL) _rx=getRx();
+  _rx=getRx();
   List x(xSEXP);
 
   SAEM saem;
@@ -256,11 +256,18 @@ SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
   return out;
 }
 extern "C" {
+SEXP _<%=saem.base%>_call(){
+  return R_NilValue;
+}
 void R_init_<%=saem.base%>(DllInfo *dll)
 {
   R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_saem_fit",(DL_FUNC) &_<%=saem.base%>_saem_fit);
   R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_dopred",(DL_FUNC) &_<%=saem.base%>_dopred);
-  R_registerRoutines(dll, NULL, NULL, NULL, NULL);
+  static const R_CallMethodDef callMethods[]  = {
+    {"_<%=saem.base%>_call", (DL_FUNC) &_<%=saem.base%>_call, 0},
+    {NULL, NULL, 0}
+  };
+  R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }
 }
@@ -405,12 +412,18 @@ extern "C" SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
 }
 
 extern "C" {
-
+SEXP _<%=saem.base%>_call(){
+  return R_NilValue;
+}
 void R_init_<%=saem.base%>(DllInfo *dll)
 {
   R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_saem_fit",(DL_FUNC) &_<%=saem.base%>_saem_fit);
 R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_dopred",(DL_FUNC) &_<%=saem.base%>_dopred);
-  R_registerRoutines(dll, NULL, NULL, NULL, NULL);
+  static const R_CallMethodDef callMethods[]  = {
+    {"_<%=saem.base%>_call", (DL_FUNC) &_<%=saem.base%>_call, 0},
+    {NULL, NULL, 0}
+  };
+  R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 }
 }
@@ -435,28 +448,28 @@ nmxInclude <- function(pkg="nlmixr"){
     }
 }
 
-## ..saemCountDll <- list();
-## .saemCountDll <- function(dll, inc=NULL){
-##     .what <- ..saemCountDll[[dll]];
-##     if (is.null(.what)){
-##         if (is.integer(inc)){
-##             .lst <- ..saemCountDll;
-##             .lst[[dll]] <- inc;
-##             assignInMyNamespace("..saemCountDll", .lst);
-##             return(inc);
-##         } else {
-##             return(0L);
-##         }
-##     } else if (is.null(inc)) {
-##         return(.what);
-##     } else {
-##         .lst <- ..saemCountDll;
-##         .what <- .what + inc;
-##         .lst[[dll]] <- .what
-##         assignInMyNamespace("..saemCountDll", .lst);
-##         return(.what);
-##     }
-## }
+..saemCountDll <- list();
+.saemCountDll <- function(dll, inc=NULL){
+    .what <- ..saemCountDll[[dll]];
+    if (is.null(.what)){
+        if (is.integer(inc)){
+            .lst <- ..saemCountDll;
+            .lst[[dll]] <- inc;
+            assignInMyNamespace("..saemCountDll", .lst);
+            return(inc);
+        } else {
+            return(0L);
+        }
+    } else if (is.null(inc)) {
+        return(.what);
+    } else {
+        .lst <- ..saemCountDll;
+        .what <- .what + inc;
+        .lst[[dll]] <- .what
+        assignInMyNamespace("..saemCountDll", .lst);
+        return(.what);
+    }
+}
 
 #' Generate an SAEM model
 #'
@@ -665,19 +678,19 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       if (!file.exists(.(saem.dll))) stop(sprintf("Stopping since '%s' does not exist", .(saem.dll)));
       dyn.load(.(saem.dll));
       .Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base),
-            .(.mod));
+            .(.mod), .(saem.dll));
   }))
   fn1 <- eval(bquote(function(a){
       dyn.load(.(saem.dll));
       if (.(is.ode)){
           suppressWarnings(do.call(RxODE:::rxSolve.default,
                                    c(list(object=.(model), params=a$opt$.pars,
-                                          events=a$evtM,.setupOnly=2L),
+                                          events=a$evtM,.setupOnly=1L),
                                      a$optM)))
           ## on.exit(RxODE::rxSolveFree())
       }
       .Call(`_nlmixr_saemFit`, a, .(saem.base),
-            .(.mod))
+            .(.mod), .(saem.dll));
   }));
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
@@ -720,25 +733,24 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
 }
-
+.protectSaemDll <- "";
 ##' Cleanup saem_fit environment by removing dll after the object is no logner used by R.
 ##'
 ##' @param env Environment where cleanup needs to occur.
 ##' @author Matthew L. Fidler
 ##' @export
 saem.cleanup <- function(env){
-    ## if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
-    ## if (is(env, "saemFit")) env <- attr(env, "env");
-    ## if (env$is.ode){
-    ##     if (.saemCountDll(RxODE::rxModelVars(env$model)$trans["lib.name"], -1L) <= 0){
-    ##         try({RxODE::rxUnload(env$model)}, silent=TRUE)
-    ##     }
-    ## }
-    ## if (.saemCountDll(env$saem.dll, -1L) <= 0){
-    ##     try({dyn.unload(env$saem.dll)}, silent=TRUE);
-    ##     if (file.exists(env$saem.cpp))
-    ##         unlink(env$saem.cpp);
-    ## }
+    if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
+    if (is(env, "saemFit")) env <- attr(env, "env");
+    if (!any(.protectSaemDll== env$saem.dll)){
+        try({dyn.unload(env$saem.dll)}, silent=TRUE);
+        if (env$is.ode){
+            try({RxODE::rxUnload(env$model)}, silent=TRUE)
+        }
+        if (file.exists(env$saem.cpp))
+            unlink(env$saem.cpp);
+    }
+
 }
 
 parfn.list = c(
@@ -1555,7 +1567,7 @@ focei.eta.saemFit <- function(object, uif, ...){
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
                              nnodes.gq=1, nsd.gq=3, adjObf=TRUE,
                              calcCov=TRUE){
-  on.exit({RxODE::rxSolveFree()});
+  ## on.exit({RxODE::rxSolveFree()});
   .saemCfg  <-  attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt;
   if (class(uif) == "function"){

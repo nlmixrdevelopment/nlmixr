@@ -442,8 +442,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // saemDoPred
-RObject saemDoPred(RObject in_phi, RObject in_evt, RObject in_opt, CharacterVector cur, RObject model);
-RcppExport SEXP _nlmixr_saemDoPred(SEXP in_phiSEXP, SEXP in_evtSEXP, SEXP in_optSEXP, SEXP curSEXP, SEXP modelSEXP) {
+RObject saemDoPred(RObject in_phi, RObject in_evt, RObject in_opt, CharacterVector cur, RObject model, std::string dll);
+RcppExport SEXP _nlmixr_saemDoPred(SEXP in_phiSEXP, SEXP in_evtSEXP, SEXP in_optSEXP, SEXP curSEXP, SEXP modelSEXP, SEXP dllSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -452,20 +452,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< RObject >::type in_opt(in_optSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type cur(curSEXP);
     Rcpp::traits::input_parameter< RObject >::type model(modelSEXP);
-    rcpp_result_gen = Rcpp::wrap(saemDoPred(in_phi, in_evt, in_opt, cur, model));
+    Rcpp::traits::input_parameter< std::string >::type dll(dllSEXP);
+    rcpp_result_gen = Rcpp::wrap(saemDoPred(in_phi, in_evt, in_opt, cur, model, dll));
     return rcpp_result_gen;
 END_RCPP
 }
 // saemFit
-RObject saemFit(RObject xSEXP, CharacterVector cur, RObject model);
-RcppExport SEXP _nlmixr_saemFit(SEXP xSEXPSEXP, SEXP curSEXP, SEXP modelSEXP) {
+RObject saemFit(RObject xSEXP, CharacterVector cur, RObject model, std::string dll);
+RcppExport SEXP _nlmixr_saemFit(SEXP xSEXPSEXP, SEXP curSEXP, SEXP modelSEXP, SEXP dllSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type xSEXP(xSEXPSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type cur(curSEXP);
     Rcpp::traits::input_parameter< RObject >::type model(modelSEXP);
-    rcpp_result_gen = Rcpp::wrap(saemFit(xSEXP, cur, model));
+    Rcpp::traits::input_parameter< std::string >::type dll(dllSEXP);
+    rcpp_result_gen = Rcpp::wrap(saemFit(xSEXP, cur, model, dll));
     return rcpp_result_gen;
 END_RCPP
 }

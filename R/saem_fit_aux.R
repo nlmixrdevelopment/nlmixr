@@ -34,9 +34,14 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
         suppressWarnings(do.call(RxODE:::rxSolve.default,
                                 c(list(object=.rx, params=.pars,
-                                       events=.evtM,.setupOnly=2L),
+                                       events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
+        RxODE::rxLockFree(1L)
+        on.exit({RxODE::rxLockFree(0L)})
     }
+    dyn.load(.env$saem.dll);
+    assignInMyNamespace(".protectSaemDll", .env$saem.dll)
+    on.exit({assignInMyNamespace(".protectSaemDll", "")}, add=TRUE)
     dopred = attr(fit, "dopred")
     resMat = fit$resMat
     ares = resMat[,1]
@@ -134,7 +139,7 @@ plot.saemFit = function(x,...) {
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
         suppressWarnings(do.call(RxODE:::rxSolve.default,
                                 c(list(object=.rx, params=.pars,
-                                       events=.evtM,.setupOnly=2L),
+                                       events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
     }
     dat = as.data.frame(saem.cfg$evt)
@@ -327,9 +332,14 @@ calc.COV = function(fit0) {
     .pars <- setNames(rep(1.1,length(.pars)),.pars);
     suppressWarnings(do.call(RxODE:::rxSolve.default,
                              c(list(object=.rx, params=.pars,
-                                    events=.evtM,.setupOnly=2L),
-                                    saem.cfg$optM)));
+                                    events=.evtM,.setupOnly=1L),
+                               saem.cfg$optM)));
+      RxODE::rxLockFree(1L)
+      on.exit({RxODE::rxLockFree(0L)})
   }
+  dyn.load(.env$saem.dll);
+  assignInMyNamespace(".protectSaemDll", .env$saem.dll)
+  on.exit({assignInMyNamespace(".protectSaemDll", "")}, add=TRUE)
   dopred = attr(fit, "dopred")
   resMat = fit$resMat
   ares = resMat[,1]
