@@ -2262,7 +2262,6 @@ nlmixrUI.dynmodelfun2 <- function(object){
     .bfn <- body(.fn)
     .fn <- deparse(.bfn)
     .extra <- paste(deparse(nlmixrfindLhs(.bfn)), collapse=" ");
-    print(.extra)
     .fn[1] <- paste0("{\n.env <-environment();\nsapply(names(..par),function(x){assign(x,setNames(..par[[x]],NULL),envir=.env)})\n");
     .fn[length(.fn)] <- paste0(".names <- unique(c(names(..par),",
                                .extra, "));\nreturn(as.data.frame(setNames(lapply(.names,function(x){get(x,setNames(..par[x],NULL), envir=.env)}),.names)));\n}");
