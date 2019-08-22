@@ -184,82 +184,153 @@ mymin = function(start, fr, rho=NULL, control=list())
 #' @param .method optimization method used for dynmodel
 #' @param .control control used for nlmixr and dynmodel
 #' @export
-# 
-# Method - simulate with fix parameters over a range, calculate objective function, and compare? 
-#
-# sensitivity = function(.nlmixrObject, .data, .method, .control = list()){
-#  
-#   # possible inputs
-#     # maybe have range and step size for evaluation of each parameter
-#   
-#     .nmfOriginal <- .nlmixrObject
-#     
-#     .nmf <- as.data.frame(.nlmixrObject$ini)
-#     
-#     .tempModel <- RxODE::rxSymPySetupPred(.nmfOriginal$rxode.pred,
-#                                            function(){return(nlmixr_pred)},
-#                                            .nmfOriginal$theta.pars,
-#                                            .nmfOriginal$error,
-#                                            grad=FALSE,
-#                                            pred.minus.dv=TRUE, sum.prod=FALSE, #control$sumProd,
-#                                            theta.derivs=FALSE, optExpression=TRUE, #control$optExpression,
-#                                            run.internal=TRUE, only.numeric=TRUE)
-#     
-#    
-#   # need to get fixed theta list
-#   fixParsFun <- function(.nmf, .tempModel){
-#    
-#     .fixIndex <- 
-#       if (length(which(.nmf$fix==TRUE))==0) {
-#         NULL} 
-#       else {
-#         which(.nmf$fix==TRUE)
-#       }
-#     
-#     .fixPars <- .nmf$est[.fixIndex]
-#     
-#     .fixParsName <- as.character(.nmf$name[.fixIndex])
-#     names(.fixPars) <- .fixParsName
-#     
-#     .ret <- list(fixIndex=.fixIndex, fixPars=.fixPars, fixParsName=.fixParsName)
-#     return(.ret)
-#   }
-#   
-#   # need to get non-fixed theta list
-#   thetaParsFun <- function(.nmf, .tempModel, .fixIndex){
-#     
-#     .thetaIndex <-
-#       if (is.null(.fixIndex)){
-#         which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)
-#       } else {
-#         which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)[-which(.nmf$fix == TRUE)]
-#       }
-#     
-#     .thetaPars <- .nmf$est[.thetaIndex]
-#     
-#     .thetaParsName <- as.character(.nmf$name[.thetaIndex])
-#     
-#     names(.thetaPars) <- .thetaParsName
-#     
-#     .ret <- list(thetaIndex=.thetaIndex,thetaPars=.thetaPars,thetaParsName=.thetaParsName)
-#     return(.ret) 
-#   }
-#   
-#   .fix <- fixParsFun(.nmf,.tempModel)
-#   .theta <- thetaParsFun(.nmf,.tempModel,.fix$fixIndex)
-#   
-#   #.i <- length(.theta$thetaIndex)
-#   .i <- 1
-#   # question, can I run it as a data frame?
-#   .nmfOriginal$ini$est[which(.nmfOriginal$ini$name==.theta$thetaParsName[.i])] <- 999 # replace 999 with new value
-#   
-#   # replace
-#   for(i in .ini.df){
-#     .tmp <- nlmixr(.tmpNlmixrObject, .data, est="dynmodel", control=dynmodelControl(method=.method))
-#   }
-#   
-#   
-# }
+sensitivity <- function(.nmf, .data, .range=0.3, .simNumber=100, control=list(), ...){
+  # Inputs
+  # .nmf - nlmixr object
+  # .data - RxODE compatible dataset
+  # .range - 0 < range <= 1, fractional range of values to simulate;  
+  # .simNUmber - integer > 0, number of simulations to perform
+  
+  # Example
+  # # nlmixr model
+  # two.compartment.IV.model <- function(){
+  #   ini({
+  #     Cl <- 3      
+  #     Vc <- 70     
+  #     prop.err <- c(0, 0.3, 1)
+  #   })
+  #   model({ 
+  #     K10<- Cl/Vc
+  #     d/dt(centr)  = -K10*centr;
+  #     cp = centr / Vc;
+  #     cp ~ prop(prop.err)
+  #   })
+  # }
+  # 
+  # # data
+  # 
+  # .data <- eventTable()
+  # .dose = 250
+  # .data$add.dosing(
+  #   dose = .dose
+  # )
+  # .data$add.sampling(
+  #   time = 1:100
+  # )
+  # 
+  # # nlmixr object
+  # .nmf <- nlmixr(two.compartment.IV.model)
+  
+  # TODO
+  # expand support for etas in population model
+  # allow user to chose which compartment to use for sensitivity
+  # fix the output to have the first and second order sobol aggregates
+  # fix the output to only have plots
+  
+  # Library
+  #devtools::use_package('sensitivity')
+  
+  # Outputs
+  .return <- list()
+  
+  # Errors
+  # must have 'time' column in data
+  if(!any(names(.data) %in% 'time')){
+    stop(print('Data must contain column named time'))
+  }
+  # population models not currently supported
+  if(length(.nmf$omega)!=0){
+    stop(print('Models with eta not currently supported'))
+  }
+  
+  # rxControl
+  .rxControl = RxODE::rxControl()
+  .rxControl$returnType <- "data.frame"
+  
+  # convert nlmixr to dynmodel
+  .dmf <- nlmixrDynmodelConvert(.nmf)
+  .nmf.original <- .nmf
+  
+  # obtain model
+  .model <- .dmf$system
+  
+  # model parameters
+  .rxFun <- .nmf$dynmodel.fun.df
+  
+  # generate parameters to be simulated
+  .parametersN <- length(.dmf$inits)
+  .parametersNames <- names(.dmf$inits)
+  .parametersInit <- .dmf$inits
+  
+  .X1 <- matrix(0, .simNumber, .parametersN)
+  .X2 <- matrix(0, .simNumber, .parametersN)
+  for (i in 1:length(.parametersNames)){
+    .lower <- .parametersInit[i] - .parametersInit[i]*.range
+    .upper <- .parametersInit[i] + .parametersInit[i]*.range
+    .X1[,i]<-runif(.simNumber,.lower,.upper)
+    .X2[,i]<-runif(.simNumber,.lower,.upper)
+  }
+  rm(i)
+  .X1 <- as.data.frame(.X1)
+  .X2 <- as.data.frame(.X2)
+  names(.X1) <- .parametersNames
+  names(.X2) <- .parametersNames 
+  
+  # create a function that will be called by the sensitivity package
+  .rxFun2 <- function(.parameters){
+    .rxFunModel <<- .model
+    .rxFundata <<- .data
+    .parameters <- .rxFun(.parameters)
+    .sim <- rxSolve(.rxFunModel,.rxFundata,.parameters, control=.rxControl)
+    .ret <- matrix(.sim$nlmixr_pred,ncol=sum(is.na(.data$amt)))
+    return(.ret)
+  }
+  
+  .MCmethod = "soboljansen"
+  .sobolOut<-sensitivity::sobolMultOut(model=.rxFun2, q=sum(is.na(.data$amt)), .X1, .X2, MCmethod=.MCmethod, plotFct = TRUE)
+  graphics.off()
+  
+  # aggregated Sobol indices
+  firstOrderSobol <- .sobolOut$S # first-order indices
+  
+  .return <- c(.return, firstOrderSobol)
+  
+  secondOrderSobol <- .sobolOut$T # total sensitivity indices
+  
+  .return <- c(.return, secondOrderSobol)
+  
+  # functional Sobol indices
+  #plot(time,.sobolOut$Sfct[,1],type='l')
+  #plot(time,.sobolOut$Sfct[,2],type='l')
+  
+  # first order sobol indices
+  fo.sobol.df <- data.frame(.sobolOut$Sfct)
+  names(fo.sobol.df) <- .parametersNames
+  fo.sobol.df$time <- .data$time[is.na(.data$amt)]
+  fo.sobol.df <- cbind(fo.sobol.df$time, stack(fo.sobol.df[1:.parametersN]))
+  names(fo.sobol.df) <- c('time','fo','parameter')
+  
+  fo.plot <- ggplot(fo.sobol.df, aes(time, fo, col=as.factor(parameter))) + 
+    geom_line() +
+    labs(title = "First Order Sobol Indices", x = "Time", color = "Parameters")
+  
+  .return <- c(.return, plot(fo.plot))
+  
+  # secong order sobol indices
+  so.sobol.df <- data.frame(.sobolOut$Tfct)
+  names(so.sobol.df) <- .parametersNames
+  so.sobol.df$time <- .data$time[is.na(.data$amt)]
+  so.sobol.df <- cbind(so.sobol.df$time, stack(so.sobol.df[1:.parametersN]))
+  names(so.sobol.df) <- c('time','so','parameter')
+  
+  so.plot <- ggplot(so.sobol.df, aes(time, so, col=as.factor(parameter))) + 
+    geom_line() +
+    labs(title = "Second Order Sobol Indices", x = "Time", color = "Parameters")
+  
+  .return <- c(.return, plot(so.plot))
+  
+  return(.return)
+}
 # #########################################################################
 
 # as.focei.dynmodel() -----------------------------------------------------------
@@ -269,9 +340,7 @@ mymin = function(start, fr, rho=NULL, control=list())
 #' @export
 
 # run devtools::document() to update documentation
-# go through and make sure
 # devtools::check_man() used to identify missing and problems
-# Will outside of dynmodel, and called within dynmodel. If nlmixr input used, output nlmixr, if dynmodel input used, output dynmodel.
 
 as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .theta, .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl, .nobs2=0, 
                               .pt=proc.time(), .rxControl = RxODE::rxControl()){
@@ -636,7 +705,7 @@ nlmixrDynmodelConvert <- function(.nmf){
 
   # obtain system
   .system <- RxODE(.nmf.original$rxode.pred) # (use nlmixr_pred)
-  .system$stateExtra <- NULL # remove extraState, the error model term shoudl not be inclcuded
+  .system$stateExtra <- NULL # remove extraState, the error model term should not be inclcuded
   .system$lhs <- .system$lhs[-length(.system$lhs)] # remove the error model term
   .return <- c(.return,system=.system)
 
@@ -1129,6 +1198,7 @@ reducedTol <- FALSE
     s = do.call(RxODE :: rxSolve,
                 c(list(object=system, params=theta, events=data),
                   .rxControl))
+
     i<-1
     i.max <- 10 
     while(any(is.na(s$nlmixr_pred)) & i < i.max) {
@@ -1261,8 +1331,7 @@ reducedTol <- FALSE
         }
         ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
       }
-      
-      sum(ll)
+      sum(ll,na.rm=T)
     })
 
     sgy <<- sgy
@@ -1551,7 +1620,7 @@ reducedTol <- FALSE
   if (!is.na(match("dnorm",names(inits)))) fit$par[match("dnorm",names(inits))] = abs(fit$par[match("dnorm",names(inits))])
 
   .time$hessianTime <- (proc.time() - .ht)["elapsed"]
-   # dynmodel Output -------------------------------------------------------
+  # dynmodel Output -------------------------------------------------------
   # unscale optmized parameters here if scaling was used:
   
   # create table for output
@@ -1565,7 +1634,7 @@ reducedTol <- FALSE
   res = c(list(res=res, obj=obj, npar=length(fit$par), nobs=nobs, data=data), fit)
   
   class(res) = "dyn.ID"
-   # Final Output ----------------------------------------------------------
+  # Final Output ----------------------------------------------------------
   .time$totalTime <- (proc.time() - .pt)["elapsed"]
   
   if (reducedTol) warning("atol and rtol reduced to complete optimization")
