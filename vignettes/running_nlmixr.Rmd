@@ -12,8 +12,6 @@ vignette: >
 ## To allow nlmixr to reload runs without large run times
 ## To run the actual models on your system, take the save options off.
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-options(nlmixr.save=TRUE,
-        nlmixr.save.dir=system.file(package="nlmixr"));
 ```
 
 ![nlmixr](logo.png)
@@ -64,10 +62,18 @@ one.cmt <- function() {
 
 We can now run the model...
 
-```{r}
+```
 fit <- nlmixr(one.cmt, theo_sd, est="nlme")
+dir <- (system.file(package="nlmixr"))
+saveRDS(fit, file.path(dir,"fit.rds")); # This saves the rds file for running quickly
+```
+
+
+```{r}
+fit <- readRDS(file.path(dir,"fit.rds"))
 print(fit)
 ```
+
 
 We can alternatively express the same model by ordinary differential equations (ODEs):
 
@@ -96,15 +102,27 @@ one.compartment <- function() {
 
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
+```
+fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
+saveRDS(fit2, file.path(dir,"fit2.rds")); # This saves the rds file for running quickly
+```
+
 ```{r}
-fit <- nlmixr(one.compartment, theo_sd, est="saem")
+fit2 <- readRDS(file.path(dir,"fit2.rds")); # This saves the rds file for running quickly
+print(fit2)
 ```
 
 And if we wanted to, we could even apply the First-Order Conditional
 Estimation (FOCEi) method to this model:
 
-```{r}
+```
 fitF <- nlmixr(one.compartment, theo_sd, est="focei")
+saveRDS(fitF, file.path(dir,"fitF.rds")); # This saves the rds file for running quickly
+```
+
+```{r}
+fitF <- readRDS(file.path(dir,"fitF.rds")); # This saves the rds file for running quickly
+print(fitF)
 ```
 
 
@@ -112,7 +130,8 @@ This example delivers a complete model fit as the `fit`
 object, including parameter history, a set of fixed effect estimates,
 and random effects for all included subjects.
 
-Now back to the `saem` fit; Let's look at the fit using nlmixr's built-in diagnostics...
+Now back to the `saem` fit; Let's look at the fit using nlmixr's
+built-in diagnostics...
 
 ```{r}
 plot(fit)
