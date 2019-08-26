@@ -36,9 +36,8 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
                                 c(list(object=.rx, params=.pars,
                                        events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
-        RxODE::rxLockFree(1L)
         RxODE::rxDynProtect(RxODE::rxDll(.rx))
-        on.exit({RxODE::rxLockFree(0L); RxODE::rxDynProtect("")})
+        on.exit({RxODE::rxDynProtect("")})
     }
     dyn.load(.env$saem.dll);
     assignInMyNamespace(".protectSaemDll", .env$saem.dll)
@@ -142,9 +141,8 @@ plot.saemFit = function(x,...) {
                                 c(list(object=.rx, params=.pars,
                                        events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
-        RxODE::rxLockFree(1L)
         RxODE::rxDynProtect(RxODE::rxDll(.rx))
-        on.exit({RxODE::rxLockFree(0L); RxODE::rxDynProtect("")})
+        on.exit({RxODE::rxDynProtect("")})
     }
     dat = as.data.frame(saem.cfg$evt)
     dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
@@ -338,9 +336,8 @@ calc.COV = function(fit0) {
                                c(list(object=.rx, params=.pars,
                                       events=.evtM,.setupOnly=1L),
                                  saem.cfg$optM)));
-      RxODE::rxLockFree(1L)
       RxODE::rxDynProtect(RxODE::rxDll(.rx))
-      on.exit({RxODE::rxLockFree(0L); RxODE::rxDynProtect("")})
+      on.exit({RxODE::rxDynProtect("")})
   }
   dyn.load(.env$saem.dll);
   assignInMyNamespace(".protectSaemDll", .env$saem.dll)
