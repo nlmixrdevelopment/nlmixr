@@ -60,11 +60,16 @@ one.cmt <- function() {
 }
 ```
 
+Now setup the cache dir for running the vignette fast (a CRAN requirement)
+
+```{r}
+dir <- system.file(package="nlmixr");
+```
+
 We can now run the model...
 
 ```
-fit <- nlmixr(one.cmt, theo_sd, est="nlme")
-dir <- (system.file(package="nlmixr"))
+
 saveRDS(fit, file.path(dir,"fit.rds")); # This saves the rds file for running quickly
 ```
 
