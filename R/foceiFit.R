@@ -2821,7 +2821,7 @@ print.nlmixrFitCore <- function(x, ...){
         cat(paste0("    ", x$message),"\n")
         if (x$message=="false convergence (8)"){
             cat("  In an ODE system, false convergence may mean \"useless\" evaluations were performed.\n")
-            cat("  See https://stackoverflow.com/questions/40039114/r-nlminb-what-does-false-convergence-actually-mean\n")
+            cat("  See https://tinyurl.com/yyrrwkce\n")
             cat("  It could also mean the convergence is poor, check results before accepting fit\n")
             cat("  You may also try a good derivative free optimization:\n")
             cat("    nlmixr(...,control=list(outerOpt=\"bobyqa\"))\n")
