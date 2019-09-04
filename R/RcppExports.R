@@ -155,3 +155,11 @@ npde <- function(id, dv, evid, sim, lambda, yj, ties, tolChol) {
     .Call(`_nlmixr_npde`, id, dv, evid, sim, lambda, yj, ties, tolChol)
 }
 
+saemDoPred <- function(in_phi, in_evt, in_opt, cur, model, dll) {
+    .Call(`_nlmixr_saemDoPred`, in_phi, in_evt, in_opt, cur, model, dll)
+}
+
+saemFit <- function(xSEXP, cur, model, dll) {
+    .Call(`_nlmixr_saemFit`, xSEXP, cur, model, dll)
+}
+

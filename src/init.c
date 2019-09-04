@@ -69,6 +69,9 @@ SEXP _nlmixr_nlmixrEval_(SEXP, SEXP);
 SEXP _nlmixr_nlmixrParHist_(SEXP);
 SEXP _nlmixr_nlmixrHess_(SEXP, SEXP, SEXP, SEXP);
 
+SEXP _nlmixr_saemDoPred(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP _nlmixr_saemFit(SEXP, SEXP, SEXP, SEXP);
+
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
     {"parse_pars",              (DL_FUNC) &parse_pars,               7},
@@ -115,6 +118,8 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_nlmixrEval_", (DL_FUNC) &_nlmixr_nlmixrEval_, 2},
   {"_nlmixr_nlmixrParHist_", (DL_FUNC) &_nlmixr_nlmixrParHist_, 1},
   {"_nlmixr_nlmixrHess_", (DL_FUNC) &_nlmixr_nlmixrHess_, 4},
+  {"_nlmixr_saemDoPred", (DL_FUNC) &_nlmixr_saemDoPred, 6},
+  {"_nlmixr_saemFit", (DL_FUNC) &_nlmixr_saemFit, 4},
   {NULL, NULL, 0}
 };
 

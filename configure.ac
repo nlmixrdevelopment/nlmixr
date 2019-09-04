@@ -38,9 +38,11 @@ OPENMP_CXXFLAGS="${OPENMP_CFLAGS}"
 CXX14STD=""
 
 ISYSTEM="I"
-if test "${GCC}" = yes; then
-  ISYSTEM="isystem"
-fi
+dnl -- Uncomment when looking for "significant" warnings
+dnl if test "${GCC}" = yes; then
+dnl   ISYSTEM="isystem"
+dnl fi
+
 
 
 

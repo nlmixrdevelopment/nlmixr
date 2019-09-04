@@ -49,6 +49,8 @@ rxOptionsIniEnsure0_t rxOptionsIniEnsure0 = (rxOptionsIniEnsure0_t) R_GetCCallab
 typedef rx_solve *(*getRxSolve_t)();
 getRxSolve_t getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
 
+rx_solve* _rx = NULL;
+
 }
 
 Function ff("sd");
@@ -71,7 +73,6 @@ vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
 
 
 vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
-  rx_solve* _rx = getRx();
   rx_solving_options* _op = _rx->op;
   vec _id = _evt.col(0);
   int _N=_id.max()+1;
@@ -208,20 +209,23 @@ for (int _b=1; _b< <%=nendpnt%>; ++_b) {
 }
 
 // definition
-RcppExport SEXP dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
-BEGIN_RCPP
-    Rcpp::traits::input_parameter< mat& >::type phi(in_phi);
-    Rcpp::traits::input_parameter< mat& >::type evt(in_evt);
-    List opt(in_opt);
+SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt){
+    if (getRx == NULL) getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+    if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
+    _rx=getRx();
+    mat phi = as<mat>(in_phi);
+    mat evt = as<mat>(in_evt);
+    List opt= as<List>(in_opt);
     int distribution = as<int>(opt["distribution"]);
     vec g = user_function(phi, evt, opt);
     if (distribution == 4) g = log(g);
     return Rcpp::wrap(g);
-END_RCPP
 }
 
-RcppExport SEXP saem_fit(SEXP xSEXP) {
-BEGIN_RCPP
+SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
+  if (getRx == NULL) getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+  if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
+  _rx=getRx();
   List x(xSEXP);
 
   SAEM saem;
@@ -250,7 +254,22 @@ BEGIN_RCPP
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";
   return out;
-END_RCPP
+}
+extern "C" {
+SEXP _<%=saem.base%>_call(){
+  return R_NilValue;
+}
+void R_init_<%=saem.base%>(DllInfo *dll)
+{
+  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_saem_fit",(DL_FUNC) &_<%=saem.base%>_saem_fit);
+  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_dopred",(DL_FUNC) &_<%=saem.base%>_dopred);
+  static const R_CallMethodDef callMethods[]  = {
+    {"_<%=saem.base%>_call", (DL_FUNC) &_<%=saem.base%>_call, 0},
+    {NULL, NULL, 0}
+  };
+  R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+}
 }
 '
 
@@ -352,8 +371,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 }
 
 // definition
-RcppExport SEXP dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
-BEGIN_RCPP
+extern "C"  SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
     Rcpp::traits::input_parameter< mat& >::type phi(in_phi);
     Rcpp::traits::input_parameter< mat& >::type evt(in_evt);
     List opt(in_opt);
@@ -361,11 +379,9 @@ BEGIN_RCPP
     vec g = user_function(phi, evt, opt);
     if (distribution == 4) g = log(g);
     return Rcpp::wrap(g);
-END_RCPP
 }
 
-RcppExport SEXP saem_fit(SEXP xSEXP) {
-BEGIN_RCPP
+extern "C" SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
   List x(xSEXP);
   SAEM saem;
   saem.inits(x);
@@ -393,7 +409,23 @@ BEGIN_RCPP
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";
   return out;
-END_RCPP
+}
+
+extern "C" {
+SEXP _<%=saem.base%>_call(){
+  return R_NilValue;
+}
+void R_init_<%=saem.base%>(DllInfo *dll)
+{
+  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_saem_fit",(DL_FUNC) &_<%=saem.base%>_saem_fit);
+R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_dopred",(DL_FUNC) &_<%=saem.base%>_dopred);
+  static const R_CallMethodDef callMethods[]  = {
+    {"_<%=saem.base%>_call", (DL_FUNC) &_<%=saem.base%>_call, 0},
+    {NULL, NULL, 0}
+  };
+  R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+}
 }
 '
 
@@ -413,6 +445,29 @@ nmxInclude <- function(pkg="nlmixr"){
         return(x);
     } else {
         paste(sapply(pkg, nmxInclude), collapse=" ");
+    }
+}
+
+..saemCountDll <- list();
+.saemCountDll <- function(dll, inc=NULL){
+    .what <- ..saemCountDll[[dll]];
+    if (is.null(.what)){
+        if (is.integer(inc)){
+            .lst <- ..saemCountDll;
+            .lst[[dll]] <- inc;
+            assignInMyNamespace("..saemCountDll", .lst);
+            return(inc);
+        } else {
+            return(0L);
+        }
+    } else if (is.null(inc)) {
+        return(.what);
+    } else {
+        .lst <- ..saemCountDll;
+        .what <- .what + inc;
+        .lst[[dll]] <- .what
+        assignInMyNamespace("..saemCountDll", .lst);
+        return(.what);
     }
 }
 
@@ -578,7 +633,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
       ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
-      make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
+      make_str = 'PKG_CXXFLAGS=-g %s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
       make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
 
       cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
@@ -611,10 +666,32 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   ## setwd(lwd);
   saem.dll <- file.path(getwd(), saem.dll);
 
-  if(is.ode) RxODE::rxLoad(model)
+  if(is.ode) {
+      RxODE::rxLoad(model)
+      ## .saemCountDll(RxODE::rxModelVars(model)$trans["lib.name"], 1L);
+  }
+  ## .saemCountDll(saem.dll, 1L);
   `.DLL` <- dyn.load(saem.dll);
-  fn.pred <- sourceCppFunction(function(a,b,c) {}, FALSE, `.DLL`, 'dopred')
-  fn1 <- sourceCppFunction(function(a) {}, FALSE, `.DLL`, 'saem_fit')
+  .mod <- model
+  if (!is.ode){.mod <- NULL}
+  fn.pred <- eval(bquote(function(a, b, c){
+      if (!file.exists(.(saem.dll))) stop(sprintf("Stopping since '%s' does not exist", .(saem.dll)));
+      dyn.load(.(saem.dll));
+      .Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base),
+            .(.mod), .(saem.dll));
+  }))
+  fn1 <- eval(bquote(function(a){
+      dyn.load(.(saem.dll));
+      if (.(is.ode)){
+          suppressWarnings(do.call(RxODE:::rxSolve.default,
+                                   c(list(object=.(model), params=a$opt$.pars,
+                                          events=a$evtM,.setupOnly=1L),
+                                     a$optM)))
+          ## on.exit(RxODE::rxSolveFree())
+      }
+      .Call(`_nlmixr_saemFit`, a, .(saem.base),
+            .(.mod), .(saem.dll));
+  }));
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
       RxODE::rxLoad(.(model))
@@ -656,7 +733,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
 }
-
+.protectSaemDll <- "";
 ##' Cleanup saem_fit environment by removing dll after the object is no logner used by R.
 ##'
 ##' @param env Environment where cleanup needs to occur.
@@ -665,10 +742,15 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 saem.cleanup <- function(env){
     if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
     if (is(env, "saemFit")) env <- attr(env, "env");
-    if (env$is.ode) try({RxODE::rxUnload(env$model)}, silent=TRUE)
-    try({dyn.unload(env$saem.dll)}, silent=TRUE);
-    if (file.exists(env$saem.cpp))
-        unlink(env$saem.cpp);
+    if (!any(.protectSaemDll== env$saem.dll)){
+        try({dyn.unload(env$saem.dll)}, silent=TRUE);
+        if (env$is.ode){
+            try({RxODE::rxUnload(env$model)}, silent=TRUE)
+        }
+        if (file.exists(env$saem.cpp))
+            unlink(env$saem.cpp);
+    }
+
 }
 
 parfn.list = c(
@@ -917,7 +999,7 @@ configsaem <- function(model, data, inits,
   if (check) stop("saem classic UI needs sequential ID. check your data")
   ntotal = length(id)
   N = length(unique(id))
-  covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars]), list(id), unique)[,-1])
+  covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars, drop = FALSE]), list(id), unique)[,-1, drop=FALSE])
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
   ncov = data$N.covar + 1
@@ -952,9 +1034,9 @@ configsaem <- function(model, data, inits,
     .rx <- attr(model$saem_mod,"rx");
     .pars <- .rx$params
     .pars <- setNames(rep(1.1,length(.pars)),.pars);
-    do.call(RxODE:::rxSolve.default,
-            c(list(object=.rx, params=.pars,
-                   events=dat,.setupOnly=2L),ODEopt));
+    ## opt$.rx <- .rx;
+    opt$.pars <- .pars;
+    ## opt$.dat <- dat;
     dat <- as.data.frame(dat[,-6]);
     names(dat) <- toupper(names(dat));
     dat$ID <- as.integer(dat$ID);
@@ -1210,7 +1292,6 @@ configsaem <- function(model, data, inits,
 
   cfg$DEBUG = cfg$opt$DEBUG = cfg$optM$DEBUG = DEBUG
   cfg$phiMFile = tempfile()
-
   cfg
 }
 
@@ -1486,7 +1567,7 @@ focei.eta.saemFit <- function(object, uif, ...){
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
                              nnodes.gq=1, nsd.gq=3, adjObf=TRUE,
                              calcCov=TRUE){
-  on.exit({RxODE::rxSolveFree()});
+  ## on.exit({RxODE::rxSolveFree()});
   .saemCfg  <-  attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt;
   if (class(uif) == "function"){

@@ -12,8 +12,6 @@ vignette: >
 ## To allow nlmixr to reload runs without large run times
 ## To run the actual models on your system, take the save options off.
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-options(nlmixr.save=TRUE,
-        nlmixr.save.dir=system.file(package="nlmixr"));
 ```
 
 ![nlmixr](logo.png)
@@ -51,23 +49,36 @@ one.cmt <- function() {
         eta.ka ~ 0.6
         eta.cl ~ 0.3
         eta.v ~ 0.1
-        add.err <- 0.7
+        add.sd <- 0.7
     })
     model({
         ka <- exp(tka + eta.ka)
         cl <- exp(tcl + eta.cl)
         v <- exp(tv + eta.v)
-        linCmt() ~ add(add.err)
+        linCmt() ~ add(add.sd)
     })
 }
 ```
 
-We can now run the model...
+Now setup the cache dir for running the vignette fast (a CRAN requirement)
 
 ```{r}
-fit <- nlmixr(one.cmt, theo_sd, est="nlme")
+dir <- system.file(package="nlmixr");
+```
+
+We can now run the model...
+
+```
+
+saveRDS(fit, file.path(dir,"fit.rds")); # This saves the rds file for running quickly
+```
+
+
+```{r}
+fit <- readRDS(file.path(dir,"fit.rds"))
 print(fit)
 ```
+
 
 We can alternatively express the same model by ordinary differential equations (ODEs):
 
@@ -80,7 +91,7 @@ one.compartment <- function() {
         eta.ka ~ 0.6
         eta.cl ~ 0.3
         eta.v ~ 0.1
-        add.err <- 0.7
+        add.sd <- 0.7
     })
     model({
         ka <- exp(tka + eta.ka)
@@ -89,22 +100,34 @@ one.compartment <- function() {
         d/dt(depot) = -ka * depot
         d/dt(center) = ka * depot - cl / v * center
         cp = center / v
-        cp ~ add(add.err)
+        cp ~ add(add.sd)
     })
 }
 ```
 
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
+```
+fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
+saveRDS(fit2, file.path(dir,"fit2.rds")); # This saves the rds file for running quickly
+```
+
 ```{r}
-fit <- nlmixr(one.compartment, theo_sd, est="saem")
+fit2 <- readRDS(file.path(dir,"fit2.rds")); # This saves the rds file for running quickly
+print(fit2)
 ```
 
 And if we wanted to, we could even apply the First-Order Conditional
 Estimation (FOCEi) method to this model:
 
-```{r}
+```
 fitF <- nlmixr(one.compartment, theo_sd, est="focei")
+saveRDS(fitF, file.path(dir,"fitF.rds")); # This saves the rds file for running quickly
+```
+
+```{r}
+fitF <- readRDS(file.path(dir,"fitF.rds")); # This saves the rds file for running quickly
+print(fitF)
 ```
 
 
@@ -112,7 +135,8 @@ This example delivers a complete model fit as the `fit`
 object, including parameter history, a set of fixed effect estimates,
 and random effects for all included subjects.
 
-Now back to the `saem` fit; Let's look at the fit using nlmixr's built-in diagnostics...
+Now back to the `saem` fit; Let's look at the fit using nlmixr's
+built-in diagnostics...
 
 ```{r}
 plot(fit)
@@ -137,8 +161,8 @@ plots ("wriggly worms")...
 
 ```{r}
 
-iter <- fit$par.hist.stacked
-iter$Parameter[iter$par=="add.err"] <- "Additive error"
+iter <- fit2$par.hist.stacked
+iter$Parameter[iter$par=="add.sd"] <- "Additive error"
 iter$Parameter[iter$par=="eta.cl"]  <- "IIV CL/F"
 iter$Parameter[iter$par=="eta.v"]   <- "IIV V/F"
 iter$Parameter[iter$par=="eta.ka"]  <- "IIV ka"
@@ -162,8 +186,8 @@ ggplot(iter, aes(iter, val)) +
 
 ```{r}
 
-etas <- data.frame(eta = c(fit$eta$eta.ka, fit$eta$eta.cl, fit$eta$eta.v),
-                   lab = rep(c("eta(ka)", "eta(CL/F)", "eta(V/F)"), each=nrow(fit$eta)))
+etas <- data.frame(eta = c(fit2$eta$eta.ka, fit2$eta$eta.cl, fit2$eta$eta.v),
+                   lab = rep(c("eta(ka)", "eta(CL/F)", "eta(V/F)"), each=nrow(fit2$eta)))
 etas$lab <- ordered(etas$lab, c("eta(CL/F)","eta(V/F)","eta(ka)"))
 
 ggplot(etas, aes(eta)) +
@@ -200,7 +224,7 @@ Now install the extension for nlmixr:
  
 ```
 library(xpose.nlmixr)
-xp <- xpose_data_nlmixr(fit);
+xp <- xpose_data_nlmixr(fit2);
 save(xp, file=xpdbLoc)
 ```
 
