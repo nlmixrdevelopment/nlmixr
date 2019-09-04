@@ -1048,7 +1048,7 @@ double likInner0(double *eta){
 	    }
 	    for (i = op_focei.neta; i--; ){
 	      if (op_focei.etaFD[i]==1){
-		// Calculate derivatives by forward difference
+		// Calculate derivatives by finite difference
 		ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		op->neq = op_focei.predNeq;
 		predOde(id); // Assumes same order of parameters
