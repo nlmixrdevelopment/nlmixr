@@ -755,6 +755,9 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
         if (file.exists(.saveFile)){
             message(sprintf("Loading model already run (%s)",.saveFile))
             .ret  <- readRDS(.saveFile)
+            if (!is.null(.ret$warnings)){
+                sapply(.ret$warnings, warning)
+            }
             return(.ret)
         }
     }
