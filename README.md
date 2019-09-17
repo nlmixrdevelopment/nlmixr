@@ -244,6 +244,8 @@ sudo installer -pkg \
 Sys.setenv("PATH"=paste0("/usr/local/clang8/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
 ```
 
+**Make Sure you have an extra line at the end of this file; Otherwise R will not pick up the correct paths**.
+
 You also need to create a directory `~/.R` and then put a file `Makevars` in it;  The context of the file should contain:
 
 ```sh
