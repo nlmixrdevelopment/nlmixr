@@ -65,15 +65,22 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         }
         .nd <- names(dat);
         .xtra$rx <- paste(c(do.call("c", lapply(cols, function(x){
-            if (tolower(x) == "dv") return(NULL)
+            if (any(tolower(x) == c("dv"))) return(NULL)
             .w <- which(tolower(.nd) == tolower(x))
             if (length(.w) == 1L){
-                names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]))
-                return(paste0(.nd[.w], "=0+nlmixr_", tolower(.nd[.w])));
+                if (tolower(x) == "cmt"){
+                    names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]));
+                    return(paste0("cmt0=0+nlmixr_", tolower(.nd[.w])));
+                } else if (tolower(x) == "dvid"){
+                    names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]));
+                    return(paste0("dvid0=0+nlmixr_", tolower(.nd[.w])));
+                } else {
+                    names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]))
+                    return(paste0(.nd[.w], "=0+nlmixr_", tolower(.nd[.w])));
+                }
             }
             return(NULL)
-        })), .si$rx), collapse="\n")
-
+            })), .si$rx), collapse="\n")
         .xtra$nStud <- n;
         if (!is.null(.xtra$nsim)){
             .xtra$nStud <- .xtra$nsim
@@ -82,9 +89,25 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         .xtra$dfObs <- 0
         .xtra$dfSub <- 0
         .xtra$thetaMat <- NA
+        names(dat) <- sapply(names(dat), function(x){
+            if (any(tolower(x) == cols)) return(tolower(x))
+            return(x)
+        })
+        if (any(names(dat) == "nlmixr_cmt")) dat$cmt <- dat$nlmixr_cmt
+        if (any(names(dat) == "nlmixr_dvid")) dat$dvid <- dat$nlmixr_dvid
         .xtra$events <- dat
         sim <- do.call("nlmixrSim", .xtra);
+        max.resim <- 10;
+        while (any(is.na(sim$sim))){
+            sim <- sim[!is.na(sim$sim), ];
+            sim$id <- as.integer(factor(paste(sim$id)));
+            print(summary(sim))
+        }
+        if (any(names(sim) == "cmt0")) names(sim)[names(sim) == "cmt0"] <- "cmt";
+        if (any(names(sim) == "dvid0")) names(sim)[names(sim) == "dvid0"] <- "dvid";
         sim0 <- sim;
+        if (any(names(dat) == "nlmixr_cmt")) dat <- dat[, names(dat) != "nlmixr_cmt"];
+        if (any(names(dat) == "nlmixr_dvid")) dat <- dat[, names(dat) != "nlmixr_dvid"];
         names(dat) <- gsub("nlmixr_", "", names(dat));
         onames <- names(dat)
         names(dat) <- tolower(onames)
