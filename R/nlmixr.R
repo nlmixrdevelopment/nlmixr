@@ -660,6 +660,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             }
         }
         fit <- .addNpde(fit);
+        fit <- fix.dat(fit);
         assign("start.time", start.time, env);
         assign("est", est, env);
         assign("stop.time", Sys.time(), env);
@@ -699,6 +700,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         ## assign("start.time", start.time, env);
         ## assign("est", est, env);
         ## assign("stop.time", Sys.time(), env);
+        fit <- fix.dat(fit);
         assign("origControl",control,fit$env);
         assign("modelId",.modelId,fit$env);
         return(fit);
