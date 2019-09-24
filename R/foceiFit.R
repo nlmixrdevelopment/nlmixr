@@ -665,7 +665,8 @@ foceiControl <- function(sigdig=3,...,
                          resetThetaCheckPer=0.1,
                          etaMat=NULL,
                          repeatGillMax=7,
-                         stickyRecalcN=5){
+                         stickyRecalcN=5,
+                         gradProgressOfvTime=10){
     if (is.null(boundTol)){
         boundTol <- 5 * 10 ^ (-sigdig + 1)
     }
@@ -947,6 +948,7 @@ foceiControl <- function(sigdig=3,...,
                  etaMat=etaMat,
                  repeatGillMax=as.integer(repeatGillMax),
                  stickyRecalcN=as.integer(max(1,abs(stickyRecalcN))),
+                 gradProgressOfvTime=gradProgressOfvTime,
                  ...);
     if (!missing(etaMat) && missing(maxInnerIterations)){
         warning("By supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0");
