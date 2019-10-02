@@ -106,7 +106,6 @@ typedef struct {
   double *likSav;
   
   // Integer of ETAs
-  unsigned int etaTransN;
   unsigned int gEtaTransN;
   unsigned int gEtaGTransN;
   unsigned int gThetaGTransN;
@@ -144,8 +143,6 @@ typedef struct {
   NumericVector upperIn;
   double *upper;
   int *nbd;
-
-  unsigned int thetaTransN;
 
   int *fixedTrans;
   int *thetaTrans;
@@ -275,43 +272,14 @@ typedef struct {
 focei_options op_focei;
 
 extern "C" void rxOptionsIniFocei(){
-  op_focei.etaTransN = 0;
-  op_focei.thetaTransN = 0;
   op_focei.gEtaGTransN=0;
   op_focei.gZmN = 0;
 }
 
-void foceiThetaN(unsigned int n){
-  if (op_focei.thetaTransN < n){
-    unsigned int cur = n;
-    Free(op_focei.thetaTrans);
-    Free(op_focei.theta);
-    Free(op_focei.fullTheta);
-    Free(op_focei.initPar);
-    Free(op_focei.scaleC);
-    Free(op_focei.xPar);
-    Free(op_focei.fixedTrans);
-    op_focei.fullTheta   = Calloc(cur, double);
-    op_focei.thetaTrans  = Calloc(cur, int);
-    op_focei.fixedTrans  = Calloc(cur, int);
-    op_focei.theta       = Calloc(cur, double);
-    op_focei.initPar     = Calloc(cur, double);
-    op_focei.scaleC      = Calloc(cur, double);
-    op_focei.xPar        = Calloc(cur, int);
-    op_focei.thetaTransN = cur;
-  }
-}
 
-void foceiEtaN(unsigned int n){
-  if (op_focei.etaTransN < n){
-    unsigned int cur = n;
-    Free(op_focei.etaTrans);
-    op_focei.etaTrans = Calloc(cur, int);
-    op_focei.etaTransN=cur;
-  }
-}
 
 void foceiGThetaN(unsigned int n){
+  Rprintf("foceiGThetaN %d\n", n);
   if (op_focei.gThetaGTransN < n){
     unsigned int cur = n;
     Free(op_focei.gthetaGrad);
@@ -321,6 +289,7 @@ void foceiGThetaN(unsigned int n){
 }
 
 void foceiGEtaN(unsigned int n){
+  Rprintf("foceiGEtaN %d\n", n);
   if (op_focei.gEtaGTransN < n){
     unsigned int cur = n;
     Free(op_focei.geta);
@@ -343,6 +312,7 @@ void foceiGEtaN(unsigned int n){
 }
 
 void foceiGgZm(unsigned int n){
+  Rprintf("foceiGgZm %d\n", n);
   if (op_focei.gZmN < n){
     unsigned int cur = n;
     Free(op_focei.gZm);
@@ -400,12 +370,13 @@ std::vector<int> gradType;
 
 
 extern "C" void rxOptionsFreeFocei(){
+  Free(op_focei.etaTrans);
+  Free(op_focei.fullTheta);
+
+
   Free(inds_focei);
   Free(op_focei.aEps);
   Free(op_focei.aEpsC);
-  Free(op_focei.etaTrans);
-  Free(op_focei.fixedTrans);
-  Free(op_focei.fullTheta);
   Free(op_focei.gB);
   Free(op_focei.gG);
   Free(op_focei.gVar);
@@ -423,31 +394,21 @@ extern "C" void rxOptionsFreeFocei(){
   Free(op_focei.goldEta);
   Free(op_focei.gsaveEta);
   Free(op_focei.gthetaGrad);
-  Free(op_focei.initPar);
-  Free(op_focei.initPar);
   Free(op_focei.likSav);
   Free(op_focei.lower);
   Free(op_focei.muRef);
   Free(op_focei.nbd);
   Free(op_focei.rEps);
   Free(op_focei.rEpsC);
-  Free(op_focei.scaleC);
-  Free(op_focei.scaleC);
   Free(op_focei.skipCov);
-  Free(op_focei.theta);
-  Free(op_focei.theta);
-  Free(op_focei.thetaTrans);
   Free(op_focei.upper);
-  Free(op_focei.xPar);
   
   max_inds_focei=0;
-  op_focei.etaTransN=0;
   op_focei.gEtaGTransN=0;
   op_focei.gThetaGTransN=0;
   op_focei.gZmN = 0;
   op_focei.muRefN=0;
   op_focei.skipCovN = 0;
-  op_focei.thetaTransN=0;
   
   vGrad.clear();
   vPar.clear();
@@ -2180,8 +2141,17 @@ static inline void foceiSetupTrans_(CharacterVector pars){
   std::string thetaS;
   std::string etaS;
   std::string cur;
-  foceiEtaN(ps+1);
-  foceiThetaN(ps+1);
+
+  op_focei.etaTrans    = Calloc(ps*4, int);
+  op_focei.xPar        = op_focei.etaTrans +ps;
+  op_focei.thetaTrans  = op_focei.xPar + ps;
+  op_focei.fixedTrans  = op_focei.thetaTrans + ps;
+  
+  op_focei.fullTheta   = Calloc(ps*4, double);
+  op_focei.theta       = op_focei.fullTheta + ps;
+  op_focei.initPar     = op_focei.theta + ps;
+  op_focei.scaleC      = op_focei.initPar + ps;
+  
   op_focei.neta = 0;
   op_focei.ntheta = 0;
   for (;k--;){
@@ -2233,7 +2203,6 @@ static inline void foceiSetupTheta_(List mvi,
   if (alloc){
     rxUpdateInnerFuns(as<SEXP>(mvi["trans"]));
     foceiSetupTrans_(as<CharacterVector>(mvi["params"]));
-    foceiThetaN(thetan);
   }
   std::copy(theta.begin(), theta.end(), &op_focei.fullTheta[0]);  
   std::copy(omegaTheta.begin(), omegaTheta.end(), &op_focei.fullTheta[0]+thetan);
@@ -5024,7 +4993,6 @@ Environment foceiFitCpp_(Environment e){
     } else {
       doPredOnly=true;
       foceiSetupTrans_(as<CharacterVector>(e[".params"]));
-      foceiThetaN(as<unsigned int>(e[".thetan"]));
       foceiSetup_(R_NilValue, as<RObject>(e["dataSav"]), 
                   as<NumericVector>(e["thetaIni"]), e["thetaFixed"], e["skipCov"],
                   as<RObject>(e["rxInv"]), e["lower"], e["upper"], e["etaMat"],
@@ -5033,7 +5001,6 @@ Environment foceiFitCpp_(Environment e){
   } else {
     doPredOnly=true;
     foceiSetupTrans_(as<CharacterVector>(e[".params"]));
-    foceiThetaN(as<unsigned int>(e[".thetan"]));
     foceiSetup_(R_NilValue, as<RObject>(e["dataSav"]), 
                 as<NumericVector>(e["thetaIni"]), e["thetaFixed"], e["skipCov"],
                 as<RObject>(e["rxInv"]), e["lower"], e["upper"], e["etaMat"],
