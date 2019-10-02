@@ -2588,6 +2588,7 @@ NumericVector foceiSetup_(const RObject &obj,
   if (op_focei.likSav != NULL) Free(op_focei.likSav);
   if (op_focei.lower != NULL) Free(op_focei.lower);
   if (op_focei.upper != NULL) Free(op_focei.upper);
+  if (op_focei.nbd != NULL) Free(op_focei.nbd);
   op_focei.lower = Calloc(op_focei.npars, double);
   op_focei.upper = Calloc(op_focei.npars, double);
   op_focei.nbd   = Calloc(op_focei.npars, int);

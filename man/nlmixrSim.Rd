@@ -48,7 +48,7 @@ vector must be the same as the state variables (e.g., PK/PD
 compartments);}
 
 \item{scale}{a numeric named vector with scaling for ode
-parameters of the system.  The names must correstond to the
+parameters of the system.  The names must correspond to the
 parameter identifiers in the ODE specification. Each of the
 ODE variables will be divided by the scaling factor.  For
 example \code{scale=c(center=2)} will divide the center ODE
@@ -126,7 +126,7 @@ solving (ie thread-safe methods like "liblsoda").}
 to the output matrix or data frame. By default this is
 disabled.}
 
-\item{matrix}{A boolean inticating if a matrix should be returned
+\item{matrix}{A boolean indicating if a matrix should be returned
 instead of the RxODE's solved object.}
 
 \item{sigma}{Named sigma covariance or Cholesky decomposition of a
@@ -163,7 +163,7 @@ data as an RxODE event table.}
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
     the ODE system is stiff or not.
 
-    For stiff ODE sytems (\code{stiff = TRUE}), \code{RxODE} uses the
+    For stiff ODE systems (\code{stiff = TRUE}), \code{RxODE} uses the
     LSODA (Livermore Solver for Ordinary Differential Equations)
     Fortran package, which implements an automatic method switching
     for stiff and non-stiff problems along the integration
@@ -247,10 +247,10 @@ symmetric matrix.}
 \item{nStud}{Number virtual studies to characterize uncertainty in estimated 
 parameters.}
 
-\item{dfSub}{Degrees of freedom to sample the between subject variaiblity matrix from the 
+\item{dfSub}{Degrees of freedom to sample the between subject variability matrix from the 
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
 
-\item{dfObs}{Degrees of freedom to sample the unexplained variaiblity matrix from the 
+\item{dfObs}{Degrees of freedom to sample the unexplained variability matrix from the 
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
 
 \item{returnType}{This tells what type of object is returned.  The currently supported types are:

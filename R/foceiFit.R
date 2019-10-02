@@ -43,12 +43,6 @@ is.latex <- function() {
 ##' @param rtolSens Sensitivity rtol, can be different than rtol with
 ##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
 ##'
-##' @param atolSS Steady-state atol, can be different than atol with
-##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
-##'
-##' @param rtolSS Steady-state rtol, can be different than rtol with
-##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
-##'
 ##' @param epsilon Precision of estimate for n1qn1 optimization.
 ##'
 ##' @param maxstepsOde Maximum number of steps for ODE solver.
@@ -572,8 +566,7 @@ foceiControl <- function(sigdig=3,...,
                          method = c("liblsoda", "lsoda", "dop853"),
                          transitAbs = NULL, atol = NULL, rtol = NULL,
                          atolSens=NULL, rtolSens=NULL,
-                         atolSS=NULL, rtolSS=NULL,
-                         minSS=7, maxSS=1000L,
+                         minSS=4, maxSS=1000L,
                          maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
                          covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
                          print=1L,
@@ -696,12 +689,6 @@ foceiControl <- function(sigdig=3,...,
     }
     if (is.null(rtolSens)){
         rtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
-    }
-    if (is.null(atolSS)){
-        atolSS <- 0.5 * 10 ^ (-sigdig-1.5);
-    }
-    if (is.null(rtolSS)){
-        rtolSS <- 0.5 * 10 ^ (-sigdig-1.5);
     }
     if (is.null(rel.tol)){
         rel.tol <- 10 ^ (-sigdig - 1);
@@ -849,8 +836,6 @@ foceiControl <- function(sigdig=3,...,
                  rtol=rtol,
                  atolSens=atolSens,
                  rtolSens=rtolSens,
-                 atolSS=atolSS,
-                 rtolSS=rtolSS,
                  minSS=minSS, maxSS=maxSS,
                  maxstepsOde=maxstepsOde,
                  hmin=hmin,

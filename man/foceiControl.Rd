@@ -8,18 +8,18 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxInnerIterations = 1000, maxOuterIterations = 5000,
   n1qn1nsim = NULL, method = c("liblsoda", "lsoda", "dop853"),
   transitAbs = NULL, atol = NULL, rtol = NULL, atolSens = NULL,
-  rtolSens = NULL, atolSS = NULL, rtolSS = NULL,
-  maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0,
-  maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
-  "linear", "nocb", "midpoint"), print = 1L,
-  printNcol = floor((getOption("width") - 23)/12), scaleTo = 1,
-  scaleObjective = 0, normType = c("rescale2", "mean", "rescale",
-  "std", "len", "constant"), scaleType = c("nlmixr", "norm", "mult",
-  "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
-  scaleC0 = 1e+05, derivEps = rep(20 * sqrt(.Machine$double.eps), 2),
-  derivMethod = c("switch", "forward", "central"),
-  derivSwitchTol = NULL, covDerivMethod = c("central", "forward"),
-  covMethod = c("r,s", "r", "s", ""),
+  rtolSens = NULL, atolSS = NULL, rtolSS = NULL, minSS = 7,
+  maxSS = 1000L, maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_,
+  hini = 0, maxordn = 12L, maxords = 5L, cores,
+  covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
+  print = 1L, printNcol = floor((getOption("width") - 23)/12),
+  scaleTo = 1, scaleObjective = 0, normType = c("rescale2", "mean",
+  "rescale", "std", "len", "constant"), scaleType = c("nlmixr", "norm",
+  "mult", "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05,
+  scaleC = NULL, scaleC0 = 1e+05, derivEps = rep(20 *
+  sqrt(.Machine$double.eps), 2), derivMethod = c("switch", "forward",
+  "central"), derivSwitchTol = NULL, covDerivMethod = c("central",
+  "forward"), covMethod = c("r,s", "r", "s", ""),
   hessEps = (.Machine$double.eps)^(1/3), centralDerivEps = rep(20 *
   sqrt(.Machine$double.eps), 2), lbfgsLmm = 7L, lbfgsPgtol = 0,
   lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
@@ -44,7 +44,7 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
   etaNudge = 0.01, stiff, nRetries = 3, seed = 42,
   resetThetaCheckPer = 0.1, etaMat = NULL, repeatGillMax = 7,
-  stickyRecalcN = 5)
+  stickyRecalcN = 5, gradProgressOfvTime = 10)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -111,6 +111,10 @@ liblsoda.  This allows a less accurate solve for gradients (if desired)}
 
 \item{rtolSS}{Steady-state rtol, can be different than rtol with
 liblsoda.  This allows a less accurate solve for gradients (if desired)}
+
+\item{minSS}{Minimum number of iterations for a steady-state dose}
+
+\item{maxSS}{Maximum number of iterations for a steady-state dose}
 
 \item{maxstepsOde}{Maximum number of steps for ODE solver.}
 
@@ -619,7 +623,7 @@ done on the first ETA optimization.}
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
     the ODE system is stiff or not.
 
-    For stiff ODE sytems (\code{stiff = TRUE}), \code{RxODE} uses the
+    For stiff ODE systems (\code{stiff = TRUE}), \code{RxODE} uses the
     LSODA (Livermore Solver for Ordinary Differential Equations)
     Fortran package, which implements an automatic method switching
     for stiff and non-stiff problems along the integration
