@@ -677,7 +677,6 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   .mod <- model
   if (!is.ode){.mod <- NULL}
   fn.pred <- eval(bquote(function(a, b, c){
-      gc(FALSE);
       if (!file.exists(.(saem.dll))) stop(sprintf("Stopping since '%s' does not exist", .(saem.dll)));
       dyn.load(.(saem.dll));
       nlmixr::.protectSaem()
@@ -686,7 +685,6 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
             .(.mod), .(saem.dll));
   }))
   fn1 <- eval(bquote(function(a){
-      gc(FALSE);
       dyn.load(.(saem.dll));
       nlmixr::.protectSaem()
       on.exit({nlmixr::.unprotectSaem()}, add=TRUE)
@@ -705,7 +703,6 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   }));
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
-      gc(FALSE);
       RxODE::rxLoad(.(model))
       RxODE::rxDynProtect(RxODE::rxDll(.(model)))
       on.exit({RxODE::rxDynProtect("")})
@@ -722,7 +719,6 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
     }))
   } else {
     fn <- eval(bquote(function(a, b, c){
-      gc(FALSE);
       if (missing(b) && missing(c)){
         cur.fn <- .(fn1)
         ret <- cur.fn(a)
