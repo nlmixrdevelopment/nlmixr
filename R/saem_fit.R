@@ -672,15 +672,15 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   }
   ## .saemCountDll(saem.dll, 1L);
   `.DLL` <- dyn.load(saem.dll);
-  assignInMyNamespace(".protectSaemDll", saem.dll)
-  on.exit({assignInMyNamespace(".protectSaemDll", "")}, add=TRUE)
+  assignInMyNamespace(".protectSaemDll", TRUE)
+  on.exit({assignInMyNamespace(".protectSaemDll", FALSE)}, add=TRUE)
   .mod <- model
   if (!is.ode){.mod <- NULL}
   fn.pred <- eval(bquote(function(a, b, c){
       gc(FALSE);
       if (!file.exists(.(saem.dll))) stop(sprintf("Stopping since '%s' does not exist", .(saem.dll)));
       dyn.load(.(saem.dll));
-      nlmixr::.protectSaem(.(saem.dll))
+      nlmixr::.protectSaem()
       on.exit({nlmixr::.unprotectSaem()}, add=TRUE)
       .Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base),
             .(.mod), .(saem.dll));
@@ -688,7 +688,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   fn1 <- eval(bquote(function(a){
       gc(FALSE);
       dyn.load(.(saem.dll));
-      nlmixr::.protectSaem(.(saem.dll))
+      nlmixr::.protectSaem()
       on.exit({nlmixr::.unprotectSaem()}, add=TRUE)
       if (.(is.ode)){
           RxODE::rxLoad(.(model))
@@ -748,7 +748,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   reg.finalizer(env, saem.cleanup, onexit=TRUE); ## remove dlls on gc or proper exit of R.
   fn
 }
-.protectSaemDll <- "";
+.protectSaemDll <- FALSE;
 
 ##' SAEM dll prodection from garbage collection
 ##'
@@ -760,13 +760,13 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 ##' @return nothing
 ##'
 ##'@export
-.protectSaem <- function(dll){
-    assignInMyNamespace(".protectSaemDll", dll)
+.protectSaem <- function(protect=TRUE){
+    assignInMyNamespace(".protectSaemDll", protect)
 }
 ##'@rdname .protectSaem
 ##'@export
-.unprotectSaem <- function(dll){
-    assignInMyNamespace(".protectSaemDll", "")
+.unprotectSaem <- function(protect=FALSE){
+    assignInMyNamespace(".protectSaemDll", protect)
 }
 ##' Cleanup saem_fit environment by removing dll after the object is no logner used by R.
 ##'
@@ -776,15 +776,11 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 saem.cleanup <- function(env){
     if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
     if (is(env, "saemFit")) env <- attr(env, "env");
-    ## if (!any(.protectSaemDll== env$saem.dll)){
-    ##     try({dyn.unload(env$saem.dll)}, silent=TRUE);
-    ##     if (env$is.ode){
-    ##         try({RxODE::rxUnload(env$model)}, silent=TRUE)
-    ##     }
-    ##     if (file.exists(env$saem.cpp))
-    ##         unlink(env$saem.cpp);
-    ## }
-
+    if (!.protectSaemDll){
+        try({dyn.unload(env$saem.dll)}, silent=TRUE);
+        if (file.exists(env$saem.cpp))
+            unlink(env$saem.cpp);
+    }
 }
 
 parfn.list = c(
