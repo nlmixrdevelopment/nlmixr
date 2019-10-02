@@ -106,9 +106,7 @@ typedef struct {
   double *likSav;
   
   // Integer of ETAs
-  unsigned int gEtaTransN;
   unsigned int gEtaGTransN;
-  unsigned int gZmN;
   // Where likelihood is saved.
   
   int *etaTrans;
@@ -272,18 +270,9 @@ focei_options op_focei;
 
 extern "C" void rxOptionsIniFocei(){
   op_focei.gEtaGTransN=0;
-  op_focei.gZmN = 0;
 }
 
-void foceiGgZm(unsigned int n){
-  Rprintf("foceiGgZm %d\n", n);
-  if (op_focei.gZmN < n){
-    unsigned int cur = n;
-    Free(op_focei.gZm);
-    op_focei.gZm = Calloc(cur, double);
-    op_focei.gZmN = cur;
-  }
-}
+
 
 typedef struct {
   int nInnerF;
@@ -344,7 +333,6 @@ extern "C" void rxOptionsFreeFocei(){
   Free(op_focei.aEps);
   Free(op_focei.aEpsC);
   Free(op_focei.gB);
-  Free(op_focei.gZm);
   Free(op_focei.ga);
   Free(op_focei.gc);
   Free(op_focei.gillDf);
@@ -363,7 +351,6 @@ extern "C" void rxOptionsFreeFocei(){
   
   max_inds_focei=0;
   op_focei.gEtaGTransN=0;
-  op_focei.gZmN = 0;
   op_focei.muRefN=0;
   op_focei.skipCovN = 0;
   
@@ -2192,7 +2179,8 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   rxFoceiEnsure(rx->nsub);
   etaMat0 = transpose(etaMat0);
   op_focei.gEtaGTransN=(op_focei.neta+1)*rx->nsub;
-  op_focei.geta = Calloc(op_focei.gEtaGTransN*7+ op_focei.npars*(rx->nsub + 1), double);
+  int nz = ((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub;
+  op_focei.geta = Calloc(op_focei.gEtaGTransN*7+ op_focei.npars*(rx->nsub + 1)+nz, double);
   op_focei.goldEta = op_focei.geta + op_focei.gEtaGTransN;
   op_focei.gsaveEta = op_focei.goldEta + op_focei.gEtaGTransN;
   op_focei.gG = op_focei.gsaveEta + op_focei.gEtaGTransN;
@@ -2200,13 +2188,13 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   op_focei.gX = op_focei.gVar + op_focei.gEtaGTransN;
   op_focei.glp = op_focei.gX + op_focei.gEtaGTransN;
   op_focei.gthetaGrad = op_focei.glp + op_focei.gEtaGTransN;  // op_focei.npars*(rx->nsub + 1)
+  op_focei.gZm = op_focei.gthetaGrad + op_focei.npars*(rx->nsub + 1); // nz
 
 
   // Prefill to 0.1 or 10%
   std::fill_n(&op_focei.gVar[0], op_focei.gEtaGTransN, 0.1);
   std::fill_n(&op_focei.goldEta[0], op_focei.gEtaGTransN, -42.0); // All etas = -42;  Unlikely if normal    
   
-  foceiGgZm(((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub);
   op_focei.etaM = mat(op_focei.neta, 1, fill::zeros);
   op_focei.etaS = mat(op_focei.neta, 1, fill::zeros);
   op_focei.eta1SD = mat(op_focei.neta, 1, fill::zeros);
