@@ -332,9 +332,6 @@ extern "C" void rxOptionsFreeFocei(){
   Free(inds_focei);
   Free(op_focei.aEps);
   Free(op_focei.aEpsC);
-  Free(op_focei.gB);
-  Free(op_focei.ga);
-  Free(op_focei.gc);
   Free(op_focei.gillDf);
   Free(op_focei.gillDf2);
   Free(op_focei.gillErr);
@@ -2180,7 +2177,9 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   etaMat0 = transpose(etaMat0);
   op_focei.gEtaGTransN=(op_focei.neta+1)*rx->nsub;
   int nz = ((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub;
-  op_focei.geta = Calloc(op_focei.gEtaGTransN*7+ op_focei.npars*(rx->nsub + 1)+nz, double);
+  op_focei.geta = Calloc(op_focei.gEtaGTransN*7+ op_focei.npars*(rx->nsub + 1)+nz+
+			 2*op_focei.neta * rx->nall + rx->nall+
+			 op_focei.neta*3, double);
   op_focei.goldEta = op_focei.geta + op_focei.gEtaGTransN;
   op_focei.gsaveEta = op_focei.goldEta + op_focei.gEtaGTransN;
   op_focei.gG = op_focei.gsaveEta + op_focei.gEtaGTransN;
@@ -2189,18 +2188,22 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   op_focei.glp = op_focei.gX + op_focei.gEtaGTransN;
   op_focei.gthetaGrad = op_focei.glp + op_focei.gEtaGTransN;  // op_focei.npars*(rx->nsub + 1)
   op_focei.gZm = op_focei.gthetaGrad + op_focei.npars*(rx->nsub + 1); // nz
-
+  op_focei.ga  = op_focei.gZm + nz;//[op_focei.neta * rx->nall]
+  op_focei.gc  = op_focei.ga + op_focei.neta * rx->nall;//[op_focei.neta * rx->nall]
+  op_focei.gB  = op_focei.gc + op_focei.neta * rx->nall;//[rx->nall]
+  double *ptr = op_focei.gB + rx->nall;
+  // Could use .zeros() but since I used Calloc, they are already zero.
+  op_focei.etaM = mat(ptr, op_focei.neta, 1, false, true);
+  ptr += op_focei.neta;
+  op_focei.etaS = mat(ptr, op_focei.neta, 1, false, true);
+  ptr += op_focei.neta;
+  op_focei.eta1SD = mat(ptr, op_focei.neta, 1, false, true);
 
   // Prefill to 0.1 or 10%
   std::fill_n(&op_focei.gVar[0], op_focei.gEtaGTransN, 0.1);
   std::fill_n(&op_focei.goldEta[0], op_focei.gEtaGTransN, -42.0); // All etas = -42;  Unlikely if normal    
   
-  op_focei.etaM = mat(op_focei.neta, 1, fill::zeros);
-  op_focei.etaS = mat(op_focei.neta, 1, fill::zeros);
-  op_focei.eta1SD = mat(op_focei.neta, 1, fill::zeros);
-  op_focei.ga  = Calloc(op_focei.neta * rx->nall, double);
-  op_focei.gB  = Calloc(rx->nall, double);
-  op_focei.gc  = Calloc(op_focei.neta * rx->nall, double);
+  
   unsigned int i, j = 0, k = 0, ii=0, jj = 0, iA=0, iB=0;
   focei_ind *fInd;
   for (i = rx->nsub; i--;){
