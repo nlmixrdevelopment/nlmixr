@@ -400,46 +400,55 @@ std::vector<int> gradType;
 
 
 extern "C" void rxOptionsFreeFocei(){
-  if (op_focei.muRef != NULL) Free(op_focei.muRef);
-  if (op_focei.thetaTrans != NULL) Free(op_focei.thetaTrans);
-  if (op_focei.theta != NULL) Free(op_focei.theta);
-  if (op_focei.fullTheta != NULL) Free(op_focei.fullTheta);
-  if (op_focei.initPar != NULL) Free(op_focei.initPar);
-  if (op_focei.scaleC != NULL) Free(op_focei.scaleC);
-  if (op_focei.xPar != NULL) Free(op_focei.xPar);
-  if (op_focei.fixedTrans != NULL) Free(op_focei.fixedTrans);
-  op_focei.thetaTransN=0;
-  if (op_focei.etaTrans != NULL) Free(op_focei.etaTrans);
-  op_focei.etaTransN=0;
-  if (op_focei.geta != NULL) Free(op_focei.geta);
-  if (op_focei.goldEta != NULL) Free(op_focei.goldEta);
-  if (op_focei.gsaveEta != NULL) Free(op_focei.gsaveEta);
-  if (op_focei.gG != NULL) Free(op_focei.gG);
-  if (op_focei.gVar != NULL) Free(op_focei.gVar);
-  if (op_focei.gX != NULL) Free(op_focei.gX);
-  op_focei.gEtaGTransN=0;
-  if (op_focei.gthetaGrad != NULL) Free(op_focei.gthetaGrad);
-  op_focei.gThetaGTransN=0;
-  if (inds_focei != NULL) Free(inds_focei);
-  max_inds_focei=0;
-  if (op_focei.gZm != NULL) Free(op_focei.gZm);
-  op_focei.gZmN = 0;
-  if (op_focei.likSav != NULL) Free(op_focei.likSav);
-  if (op_focei.skipCovN && op_focei.skipCov != NULL) Free(op_focei.skipCov);
-  op_focei.skipCovN = 0;
-  if (op_focei.aEpsC != NULL)   Free(op_focei.aEpsC);
-  if (op_focei.rEpsC != NULL)   Free(op_focei.rEpsC);
-  if (op_focei.aEps != NULL)    Free(op_focei.aEps);
-  if (op_focei.rEps != NULL)    Free(op_focei.rEps);
-  if (op_focei.gillRetC != NULL) Free(op_focei.gillRetC);
-  if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
-  if (op_focei.gillDf != NULL)  Free(op_focei.gillDf);
-  if (op_focei.gillDf2 != NULL) Free(op_focei.gillDf2);
-  if (op_focei.gillErr != NULL) Free(op_focei.gillErr);
-  Free(op_focei.glp);
-  Free(op_focei.ga);
+  Free(inds_focei);
+  Free(op_focei.aEps);
+  Free(op_focei.aEpsC);
+  Free(op_focei.etaTrans);
+  Free(op_focei.fixedTrans);
+  Free(op_focei.fullTheta);
   Free(op_focei.gB);
+  Free(op_focei.gG);
+  Free(op_focei.gVar);
+  Free(op_focei.gX);
+  Free(op_focei.gZm);
+  Free(op_focei.ga);
   Free(op_focei.gc);
+  Free(op_focei.geta);
+  Free(op_focei.gillDf);
+  Free(op_focei.gillDf2);
+  Free(op_focei.gillErr);
+  Free(op_focei.gillRet);
+  Free(op_focei.gillRetC);
+  Free(op_focei.glp);
+  Free(op_focei.goldEta);
+  Free(op_focei.gsaveEta);
+  Free(op_focei.gthetaGrad);
+  Free(op_focei.initPar);
+  Free(op_focei.initPar);
+  Free(op_focei.likSav);
+  Free(op_focei.lower);
+  Free(op_focei.muRef);
+  Free(op_focei.nbd);
+  Free(op_focei.rEps);
+  Free(op_focei.rEpsC);
+  Free(op_focei.scaleC);
+  Free(op_focei.scaleC);
+  Free(op_focei.skipCov);
+  Free(op_focei.theta);
+  Free(op_focei.theta);
+  Free(op_focei.thetaTrans);
+  Free(op_focei.upper);
+  Free(op_focei.xPar);
+  
+  max_inds_focei=0;
+  op_focei.etaTransN=0;
+  op_focei.gEtaGTransN=0;
+  op_focei.gThetaGTransN=0;
+  op_focei.gZmN = 0;
+  op_focei.muRefN=0;
+  op_focei.skipCovN = 0;
+  op_focei.thetaTransN=0;
+  
   vGrad.clear();
   vPar.clear();
   iterType.clear();
@@ -456,8 +465,8 @@ void freeFocei(){
 focei_ind *rxFoceiEnsure(int mx){
   if (mx >= max_inds_focei){
     Free(inds_focei);
-    inds_focei =Calloc(mx+1024, focei_ind);
-    max_inds_focei = mx+1024;
+    inds_focei =Calloc(mx, focei_ind);
+    max_inds_focei = mx;
   }
   return inds_focei;
 }
