@@ -1,6 +1,9 @@
 // [[Rcpp::plugins(openmp)]]
 #define ARMA_DONT_PRINT_ERRORS
 #define ARMA_DONT_USE_OPENMP // Known to cause speed problems
+// #ifdef _OPENMP
+// #include <omp.h>
+// #endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -644,6 +647,7 @@ double likInner0(double *eta){
       op_focei.stickyRecalcN2++;
       op_focei.reducedTol=1;
       op_focei.reducedTol2=1;
+      // Not thread safe
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
       op->badSolve=0;
       innerOde(id);
@@ -651,6 +655,7 @@ double likInner0(double *eta){
     }
     if (j != 0) {
       if (op_focei.stickyRecalcN2 <= op_focei.stickyRecalcN){
+	// Not thread safe
 	RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -j));
       } else {
 	op_focei.stickyTol=1;
@@ -1334,7 +1339,6 @@ void innerOpt(){
 // #ifdef _OPENMP
 // #pragma omp parallel for num_threads(cores)
 // #endif
-    // Since we are evaluating the cholesky may be off
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
       indF->doChol = 1;
@@ -1343,6 +1347,7 @@ void innerOpt(){
       } catch(...) {
 	indF->doChol = 0; // Use generalized cholesky decomposition
         innerEval(id);
+	// Not thread safe
 	warning("Non-positive definite individual Hessian at solution(ID=%d); FOCEi objective functions may not be comparable.",id);
         indF->doChol = 1; // Cholesky again.
       }
@@ -1350,7 +1355,7 @@ void innerOpt(){
   } else {
 // #ifdef _OPENMP
 // #pragma omp parallel for num_threads(cores)
-// #endif    
+// #endif
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
       try {
@@ -1392,6 +1397,7 @@ void innerOpt(){
                 try{
                   innerEval(id);
                 } catch(...){
+		  // Not thread safe
       		  warning("Bad solve during optimization.");
       		  // ("Cannot correct.");
                 }
@@ -1402,6 +1408,7 @@ void innerOpt(){
               try{
                 innerEval(id);
               } catch(...){
+		// Not thread safe
                 warning("Bad solve during optimization.");
                 // ("Cannot correct.");
               }
@@ -1416,6 +1423,7 @@ void innerOpt(){
     if (!op_focei.calcGrad && op_focei.maxOuterIterations > 0 &&
 	(!op_focei.initObj || op_focei.checkTheta==1) &&
 	R_FINITE(op_focei.resetThetaSize)){
+      // Not thread safe...
       thetaReset(op_focei.resetThetaSize);
     }
     std::fill(op_focei.etaM.begin(),op_focei.etaM.end(), 0.0);
