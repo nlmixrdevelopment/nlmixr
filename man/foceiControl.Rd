@@ -8,18 +8,18 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxInnerIterations = 1000, maxOuterIterations = 5000,
   n1qn1nsim = NULL, method = c("liblsoda", "lsoda", "dop853"),
   transitAbs = NULL, atol = NULL, rtol = NULL, atolSens = NULL,
-  rtolSens = NULL, atolSS = NULL, rtolSS = NULL, minSS = 7,
-  maxSS = 1000L, maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_,
-  hini = 0, maxordn = 12L, maxords = 5L, cores,
-  covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
-  print = 1L, printNcol = floor((getOption("width") - 23)/12),
-  scaleTo = 1, scaleObjective = 0, normType = c("rescale2", "mean",
-  "rescale", "std", "len", "constant"), scaleType = c("nlmixr", "norm",
-  "mult", "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05,
-  scaleC = NULL, scaleC0 = 1e+05, derivEps = rep(20 *
-  sqrt(.Machine$double.eps), 2), derivMethod = c("switch", "forward",
-  "central"), derivSwitchTol = NULL, covDerivMethod = c("central",
-  "forward"), covMethod = c("r,s", "r", "s", ""),
+  rtolSens = NULL, minSS = 10L, maxSS = 1000L,
+  maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0,
+  maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
+  "linear", "nocb", "midpoint"), print = 1L,
+  printNcol = floor((getOption("width") - 23)/12), scaleTo = 1,
+  scaleObjective = 0, normType = c("rescale2", "mean", "rescale",
+  "std", "len", "constant"), scaleType = c("nlmixr", "norm", "mult",
+  "multAdd"), scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
+  scaleC0 = 1e+05, derivEps = rep(20 * sqrt(.Machine$double.eps), 2),
+  derivMethod = c("switch", "forward", "central"),
+  derivSwitchTol = NULL, covDerivMethod = c("central", "forward"),
+  covMethod = c("r,s", "r", "s", ""),
   hessEps = (.Machine$double.eps)^(1/3), centralDerivEps = rep(20 *
   sqrt(.Machine$double.eps), 2), lbfgsLmm = 7L, lbfgsPgtol = 0,
   lbfgsFactr = NULL, eigen = TRUE, addPosthoc = TRUE,
@@ -104,12 +104,6 @@ achieved. This is also used in the solved linear model to check
 liblsoda.  This allows a less accurate solve for gradients (if desired)}
 
 \item{rtolSens}{Sensitivity rtol, can be different than rtol with
-liblsoda.  This allows a less accurate solve for gradients (if desired)}
-
-\item{atolSS}{Steady-state atol, can be different than atol with
-liblsoda.  This allows a less accurate solve for gradients (if desired)}
-
-\item{rtolSS}{Steady-state rtol, can be different than rtol with
 liblsoda.  This allows a less accurate solve for gradients (if desired)}
 
 \item{minSS}{Minimum number of iterations for a steady-state dose}
