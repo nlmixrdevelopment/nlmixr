@@ -663,9 +663,10 @@ double likInner0(double *eta){
       return 1e300;
     } else {
       // Update eta.
-      arma::mat lp(op_focei.neta, 1, fill::zeros);
-      arma::mat a(ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta);
-      arma::mat B(ind->n_all_times - ind->ndoses - ind->nevid2, 1);
+      arma::mat lp(fInd->lp, op_focei.neta, 1, false, true);
+      lp.zeros();
+      arma::mat a(fInd->a, ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta, false, true);
+      arma::mat B(fInd->B, ind->n_all_times - ind->ndoses - ind->nevid2, 1, false, true);
       arma::mat c;
       mat Vid;
       if (op_focei.fo == 1){
@@ -673,8 +674,8 @@ double likInner0(double *eta){
 			ind->n_all_times - ind->ndoses - ind->nevid2,
 			fill::zeros);
       } else if (op_focei.interaction == 1){
-	c   = arma::mat(ind->n_all_times - ind->ndoses - ind->nevid2,
-			op_focei.neta);
+	c   = arma::mat(fInd->c, ind->n_all_times - ind->ndoses - ind->nevid2,
+			op_focei.neta, false, true);
       }
     
       // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
@@ -780,10 +781,6 @@ double likInner0(double *eta){
 	//   fInd->oldEta[ssi] = eta[ssi];
 	// }
       }
-      std::copy(lp.begin(), lp.end(), &fInd->lp[0]);
-      std::copy(a.begin(), a.end(), &fInd->a[0]);
-      std::copy(B.begin(), B.end(), &fInd->B[0]);
-      std::copy(c.begin(), c.end(), &fInd->c[0]);    
 
     }
   }
@@ -1015,15 +1012,15 @@ double LikInner2(double *eta, int likId){
     int k, l;
     mat tmp;
 
-    arma::mat a(ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta);
-    std::copy(&fInd->a[0], &fInd->a[0]+a.size(), a.begin());
-    arma::mat B(ind->n_all_times - ind->ndoses - ind->nevid2, 1);
-    std::copy(&fInd->B[0], &fInd->B[0]+B.size(), B.begin());
+    arma::mat a(fInd->a, ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta, false, true);
+    // std::copy(&fInd->a[0], &fInd->a[0]+a.size(), a.begin());
+    arma::mat B(fInd->B, ind->n_all_times - ind->ndoses - ind->nevid2, 1, false, true);
+    // std::copy(&fInd->B[0], &fInd->B[0]+B.size(), B.begin());
 
     // This is actually -H
     if (op_focei.interaction){
-      arma::mat c(ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta);
-      std::copy(&fInd->c[0], &fInd->c[0]+c.size(), c.begin());
+      arma::mat c(fInd->c, ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta, false, true);
+      // std::copy(&fInd->c[0], &fInd->c[0]+c.size(), c.begin());
       for (k = op_focei.neta; k--;){
         for (l = k+1; l--;){
           // tmp = fInd->a.col(l) %  fInd->B % fInd->a.col(k);
