@@ -74,6 +74,8 @@ extern "C"{
   getRxSolve_t getRx;
 }
 
+bool assignFn_ = false;
+
 extern void lin_cmt_stanC(double *obs_timeD, const int nobs, double *dose_timeD, const int ndose, double *doseD, double *TinfD,
 			  double *paramsD, const int oral, const int infusion, const int ncmt, const int parameterization,
 			  const int neta, double *fxD, double *dvdxD, double *fpD);
@@ -102,6 +104,8 @@ typedef struct {
   double *ga;
   double *gB;
   double *gc;
+  double *gH;
+  double *gH0;
 
   double *likSav;
   
@@ -264,6 +268,7 @@ typedef struct {
   double resetThetaCheckPer;
   int slow;
   double gradProgressOfvTime;
+  bool alloc=false;
 } focei_options;
 
 focei_options op_focei;
@@ -292,6 +297,8 @@ typedef struct {
   double *lp;// = mat(neta,1);
 
   double *g;
+  double *H;
+  double *H0;
 
   double tbsLik;
   
@@ -305,7 +312,6 @@ typedef struct {
 } focei_ind;
 
 focei_ind *inds_focei = NULL;
-int max_inds_focei = 0;
 
 // Parameter table
 std::vector<int> niter;
@@ -317,21 +323,18 @@ std::vector<int> gradType;
 
 
 extern "C" void rxOptionsFreeFocei(){
-  Free(op_focei.etaTrans);
-  Free(op_focei.fullTheta);
-  Free(op_focei.geta);
-
-  Free(op_focei.gillRet);
-  Free(op_focei.gillDf);
-
-
-
+  if (op_focei.alloc){
+    Free(op_focei.etaTrans);
+    Free(op_focei.fullTheta);
+    Free(op_focei.geta);
+    Free(op_focei.gillRet);
+    Free(op_focei.gillDf);  
+  }
   Free(inds_focei);
-  
-  max_inds_focei=0;
-  op_focei.gEtaGTransN=0;
-  op_focei.muRefN=0;
-  op_focei.skipCovN = 0;
+  inds_focei=NULL;
+
+  focei_options newf;
+  op_focei= newf;
   
   vGrad.clear();
   vPar.clear();
@@ -1005,9 +1008,10 @@ double LikInner2(double *eta, int likId){
     if (op->neq > 0 && ISNA(ind->solve[0])){
       return 1e300;
     }
-    // Calclaute lik first to calculate components for Hessian
+    // Calculate lik first to calculate components for Hessian
     // Hessian 
-    mat H(op_focei.neta, op_focei.neta, fill::zeros);
+    mat H(fInd->H, op_focei.neta, op_focei.neta, false, true);
+    H.zeros();
     int k, l;
     mat tmp;
 
@@ -1039,7 +1043,7 @@ double LikInner2(double *eta, int likId){
         }
       }
     }
-    arma::mat H0;
+    arma::mat H0(fInd->H0, op_focei.neta, op_focei.neta, false, true);
     k=0;
     if (fInd->doChol){
       H0=chol(H);
@@ -2153,7 +2157,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   int nz = ((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub;
   op_focei.geta = Calloc(op_focei.gEtaGTransN*7+ op_focei.npars*(rx->nsub + 1)+nz+
 			 2*op_focei.neta * rx->nall + rx->nall+
-			 op_focei.neta*3, double);
+			 op_focei.neta*3 + 2*op_focei.neta*op_focei.neta*rx->nsub, double);
   op_focei.goldEta = op_focei.geta + op_focei.gEtaGTransN;
   op_focei.gsaveEta = op_focei.goldEta + op_focei.gEtaGTransN;
   op_focei.gG = op_focei.gsaveEta + op_focei.gEtaGTransN;
@@ -2165,6 +2169,8 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   op_focei.ga  = op_focei.gZm + nz;//[op_focei.neta * rx->nall]
   op_focei.gc  = op_focei.ga + op_focei.neta * rx->nall;//[op_focei.neta * rx->nall]
   op_focei.gB  = op_focei.gc + op_focei.neta * rx->nall;//[rx->nall]
+  op_focei.gH  = op_focei.gB + rx->nall; //[op_focei.neta*op_focei.neta*rx->nsub]
+  op_focei.gH0  = op_focei.gB + op_focei.neta*op_focei.neta*rx->nsub; //[op_focei.neta*op_focei.neta*rx->nsub]
   double *ptr = op_focei.gB + rx->nall;
   // Could use .zeros() but since I used Calloc, they are already zero.
   op_focei.etaM = mat(ptr, op_focei.neta, 1, false, true);
@@ -2178,7 +2184,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   std::fill_n(&op_focei.goldEta[0], op_focei.gEtaGTransN, -42.0); // All etas = -42;  Unlikely if normal    
   
   
-  unsigned int i, j = 0, k = 0, ii=0, jj = 0, iA=0, iB=0;
+  unsigned int i, j = 0, k = 0, ii=0, jj = 0, iA=0, iB=0, iH=0;
   focei_ind *fInd;
   for (i = rx->nsub; i--;){
     fInd = &(inds_focei[i]);
@@ -2192,6 +2198,9 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
     fInd->x = &op_focei.gX[j];
     fInd->var = &op_focei.gVar[j];
     fInd->lp = &op_focei.glp[j];
+    fInd->H = &op_focei.gH[iH];
+    fInd->H0 = &op_focei.gH0[iH];
+    iH += op_focei.neta*op_focei.neta;
 
     // Copy in etaMat0 to the inital eta stored (0 if unspecified)
     // std::copy(&etaMat0[i*op_focei.neta], &etaMat0[(i+1)*op_focei.neta], &fInd->saveEta[0]);
@@ -2223,6 +2232,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
     fInd->doEtaNudge=1;
   }
   op_focei.thetaGrad = &op_focei.gthetaGrad[jj];
+  op_focei.alloc=true;
 }
 
 extern "C" double foceiOfvOptim(int n, double *x, void *ex);
@@ -4886,15 +4896,18 @@ void foceiFinalizeTables(Environment e){
 //' @export
 //[[Rcpp::export]]
 Environment foceiFitCpp_(Environment e){
-  n1qn1_ = (n1qn1_fp) R_GetCCallable("n1qn1","n1qn1F");
-  par_progress = (par_progress_t) R_GetCCallable("RxODE", "par_progress");
-  getRx = (getRxSolve_t) R_GetCCallable("RxODE", "getRxSolve_");
-  isRstudio = (isRstudio_t) R_GetCCallable("RxODE", "isRstudio");
-  ind_solve=(ind_solve_t) R_GetCCallable("RxODE", "ind_solve");
-  powerDD = (powerDD_t) R_GetCCallable("RxODE", "powerDD");
-  powerDL = (powerDL_t) R_GetCCallable("RxODE", "powerDL");
-  powerL = (powerL_t) R_GetCCallable("RxODE", "powerL");
-  powerD = (powerD_t) R_GetCCallable("RxODE", "powerD");  
+  if (!assignFn_){
+    n1qn1_ = (n1qn1_fp) R_GetCCallable("n1qn1","n1qn1F");
+    par_progress = (par_progress_t) R_GetCCallable("RxODE", "par_progress");
+    getRx = (getRxSolve_t) R_GetCCallable("RxODE", "getRxSolve_");
+    isRstudio = (isRstudio_t) R_GetCCallable("RxODE", "isRstudio");
+    ind_solve=(ind_solve_t) R_GetCCallable("RxODE", "ind_solve");
+    powerDD = (powerDD_t) R_GetCCallable("RxODE", "powerDD");
+    powerDL = (powerDL_t) R_GetCCallable("RxODE", "powerDL");
+    powerL = (powerL_t) R_GetCCallable("RxODE", "powerL");
+    powerD = (powerD_t) R_GetCCallable("RxODE", "powerD");
+    assignFn_=true;
+  }
   clock_t t0 = clock();
   List model = e["model"];
   bool doPredOnly = false;
