@@ -40,8 +40,8 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         on.exit({RxODE::rxDynProtect("")})
     }
     dyn.load(.env$saem.dll);
-    assignInMyNamespace(".protectSaemDll", TRUE)
-    on.exit({assignInMyNamespace(".protectSaemDll", FALSE)}, add=TRUE)
+    assignInMyNamespace(".protectSaemDll", .env$saem.dll)
+    on.exit({assignInMyNamespace(".protectSaemDll", "")}, add=TRUE)
     dopred = attr(fit, "dopred")
     resMat = fit$resMat
     ares = resMat[,1]
@@ -340,8 +340,8 @@ calc.COV = function(fit0) {
       on.exit({RxODE::rxDynProtect("")})
   }
   dyn.load(.env$saem.dll);
-  assignInMyNamespace(".protectSaemDll", TRUE)
-  on.exit({assignInMyNamespace(".protectSaemDll", FALSE)}, add=TRUE)
+  assignInMyNamespace(".protectSaemDll", .env$saem.dll)
+  on.exit({assignInMyNamespace(".protectSaemDll", "")}, add=TRUE)
   dopred = attr(fit, "dopred")
   resMat = fit$resMat
   ares = resMat[,1]
