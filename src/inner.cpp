@@ -321,7 +321,6 @@ std::vector<double> vGrad;
 std::vector<int> niterGrad;
 std::vector<int> gradType;
 
-
 extern "C" void rxOptionsFreeFocei(){
   if (op_focei.alloc){
     Free(op_focei.etaTrans);
@@ -342,8 +341,6 @@ extern "C" void rxOptionsFreeFocei(){
   gradType.clear();
   niter.clear();
   niterGrad.clear();
-
-  RxODE::rxSolveFree();
 }
 
 //[[Rcpp::export]]
@@ -2262,6 +2259,7 @@ NumericVector foceiSetup_(const RObject &obj,
     }
     mvi = RxODE::rxModelVars_(obj);
   }
+  rxOptionsFreeFocei();
   op_focei.mvi = mvi;
   
   op_focei.resetThetaCheckPer = as<double>(odeO["resetThetaCheckPer"]);

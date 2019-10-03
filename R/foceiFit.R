@@ -1582,8 +1582,6 @@ foceiFit.data.frame0 <- function(data,
                                 ...,
                                 env=NULL){
     set.seed(control$seed);
-    RxODE::rxSolveFree(); freeFocei();
-    on.exit({RxODE::rxSolveFree(); freeFocei();});
     .pt <- proc.time();
     loadNamespace("n1qn1");
     if (!RxODE::rxIs(control, "foceiControl")){
@@ -1891,7 +1889,6 @@ foceiFit.data.frame0 <- function(data,
         assign("err", "theta reset", this.env)
         while (this.env$err == "theta reset"){
             assign("err", "", this.env);
-            RxODE::rxSolveFree(); freeFocei();
             .ret0 <- tryCatch({foceiFitCpp_(.ret)},
                               error=function(e){
                 if (regexpr("theta reset", e$message) != -1){

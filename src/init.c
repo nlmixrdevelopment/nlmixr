@@ -130,3 +130,8 @@ void R_init_nlmixr(DllInfo *dll)
   R_useDynamicSymbols(dll, TRUE);
   R_forceSymbols(dll,FALSE);
 }
+
+void rxOptionsFreeFocei();
+void R_unload_nlmixr(DllInfo *info){
+  rxOptionsFreeFocei();
+}
