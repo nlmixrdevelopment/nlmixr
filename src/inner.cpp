@@ -268,12 +268,6 @@ typedef struct {
 
 focei_options op_focei;
 
-extern "C" void rxOptionsIniFocei(){
-  op_focei.gEtaGTransN=0;
-}
-
-
-
 typedef struct {
   int nInnerF;
   int nInnerG;
@@ -327,24 +321,12 @@ extern "C" void rxOptionsFreeFocei(){
   Free(op_focei.fullTheta);
   Free(op_focei.geta);
 
+  Free(op_focei.gillRet);
+  Free(op_focei.gillDf);
+
 
 
   Free(inds_focei);
-  Free(op_focei.aEps);
-  Free(op_focei.aEpsC);
-  Free(op_focei.gillDf);
-  Free(op_focei.gillDf2);
-  Free(op_focei.gillErr);
-  Free(op_focei.gillRet);
-  Free(op_focei.gillRetC);
-  Free(op_focei.likSav);
-  Free(op_focei.lower);
-  Free(op_focei.muRef);
-  Free(op_focei.nbd);
-  Free(op_focei.rEps);
-  Free(op_focei.rEpsC);
-  Free(op_focei.skipCov);
-  Free(op_focei.upper);
   
   max_inds_focei=0;
   op_focei.gEtaGTransN=0;
@@ -357,22 +339,14 @@ extern "C" void rxOptionsFreeFocei(){
   gradType.clear();
   niter.clear();
   niterGrad.clear();
+
+  RxODE::rxSolveFree();
 }
 
 //[[Rcpp::export]]
 void freeFocei(){
   rxOptionsFreeFocei();
 }
-
-focei_ind *rxFoceiEnsure(int mx){
-  if (mx >= max_inds_focei){
-    Free(inds_focei);
-    inds_focei =Calloc(mx, focei_ind);
-    max_inds_focei = mx;
-  }
-  return inds_focei;
-}
-
 
 t_dydt inner_dydt = NULL;
 
@@ -2173,7 +2147,7 @@ static inline void foceiSetupTheta_(List mvi,
 
 static inline void foceiSetupEta_(NumericMatrix etaMat0){
   rx = getRx();
-  rxFoceiEnsure(rx->nsub);
+  inds_focei =Calloc(rx->nsub, focei_ind);
   etaMat0 = transpose(etaMat0);
   op_focei.gEtaGTransN=(op_focei.neta+1)*rx->nsub;
   int nz = ((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub;
@@ -2283,15 +2257,6 @@ NumericVector foceiSetup_(const RObject &obj,
   }
   op_focei.mvi = mvi;
   
-  if (op_focei.skipCov != NULL) Free(op_focei.skipCov);
-  if (skipCov.isNull()){
-    op_focei.skipCovN = 0;
-  } else {
-    IntegerVector skipCov1 = as<IntegerVector>(skipCov);
-    op_focei.skipCovN = skipCov1.size();
-    op_focei.skipCov = Calloc(skipCov1.size(), int);
-    std::copy(skipCov1.begin(),skipCov1.end(),op_focei.skipCov);
-  }
   op_focei.resetThetaCheckPer = as<double>(odeO["resetThetaCheckPer"]);
   op_focei.printTop = as<int>(odeO["printTop"]);
   op_focei.nF2 = as<int>(odeO["nF"]);
@@ -2435,25 +2400,50 @@ NumericVector foceiSetup_(const RObject &obj,
     op_focei.derivMethodSwitch=1;
   }
 
-  if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
-  op_focei.gillRet=Calloc(totN, int);
-  if (op_focei.gillRetC != NULL) Free(op_focei.gillRetC);
-  op_focei.gillRetC=Calloc(totN, int);
-  if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
-  op_focei.gillDf=Calloc(totN, double);
-  if (op_focei.gillDf2 != NULL) Free(op_focei.gillDf2);
-  op_focei.gillDf2=Calloc(totN, double);
-  if (op_focei.gillErr != NULL) Free(op_focei.gillErr);
-  op_focei.gillErr=Calloc(totN, double);
+  IntegerVector muRef;
+  if (odeO.containsElementNamed("focei.mu.ref")){
+    try {
+      muRef = as<IntegerVector>(odeO["focei.mu.ref"]);
+    } catch (...){
+    }
+  }
+  if (muRef.size() == 0){
+    op_focei.resetThetaSize = R_PosInf;
+    op_focei.muRefN=0;
+  } else{
+    op_focei.muRefN=muRef.size();
+  }
+
+  IntegerVector skipCov1;
+  if (skipCov.isNull()){
+    op_focei.skipCovN = 0;
+  } else {
+    skipCov1 = as<IntegerVector>(skipCov);
+    op_focei.skipCovN = skipCov1.size();
+  }
+
+
+  op_focei.gillRet = Calloc(2*totN+op_focei.npars+
+			    op_focei.muRefN + op_focei.skipCovN, int);
+  op_focei.gillRetC= op_focei.gillRet + totN;
+  op_focei.nbd     = op_focei.gillRetC + totN;//[op_focei.npars]
+  op_focei.muRef   = op_focei.nbd + op_focei.npars; //[op_focei.muRefN]
+  if (op_focei.muRefN) std::copy(&op_focei.muRef[0], &op_focei.muRef[0]+op_focei.muRefN, muRef.begin());
+
+  op_focei.skipCov   = op_focei.muRef + op_focei.muRefN; //[op_focei.skipCovN]
+  if (op_focei.skipCovN) std::copy(skipCov1.begin(),skipCov1.end(),op_focei.skipCov); //
+
+  op_focei.gillDf = Calloc(7*totN + 2*op_focei.npars + rx->nsub, double);
+  op_focei.gillDf2 = op_focei.gillDf+totN;
+  op_focei.gillErr = op_focei.gillDf2+totN;
+  op_focei.rEps=op_focei.gillErr + totN;
+  op_focei.aEps = op_focei.rEps + totN;
+  op_focei.rEpsC = op_focei.aEps + totN;
+  op_focei.aEpsC = op_focei.rEpsC + totN;
+  op_focei.lower = op_focei.aEpsC + totN;
+  op_focei.upper = op_focei.lower +op_focei.npars;
+  op_focei.likSav = op_focei.upper + op_focei.npars;//[rx->nsub]
   
-  if (op_focei.rEps != NULL) Free(op_focei.rEps);
-  op_focei.rEps=Calloc(totN, double);
-  if (op_focei.aEps != NULL) Free(op_focei.aEps);
-  op_focei.aEps=Calloc(totN, double);
-  if (op_focei.rEpsC != NULL) Free(op_focei.rEpsC);
-  op_focei.rEpsC=Calloc(totN, double);
-  if (op_focei.aEpsC != NULL) Free(op_focei.aEpsC);
-  op_focei.aEpsC=Calloc(totN, double);
   if (op_focei.nF2 != 0){
     // Restore Gill information
     IntegerVector gillRetC =as<IntegerVector>(odeO["gillRetC"]);
@@ -2523,19 +2513,11 @@ NumericVector foceiSetup_(const RObject &obj,
   }
   op_focei.lowerIn =lowerIn;
   op_focei.upperIn =upperIn;
-  if (op_focei.likSav != NULL) Free(op_focei.likSav);
-  if (op_focei.lower != NULL) Free(op_focei.lower);
-  if (op_focei.upper != NULL) Free(op_focei.upper);
-  if (op_focei.nbd != NULL) Free(op_focei.nbd);
-  op_focei.lower = Calloc(op_focei.npars, double);
-  op_focei.upper = Calloc(op_focei.npars, double);
-  op_focei.nbd   = Calloc(op_focei.npars, int);
+
   std::fill_n(&op_focei.nbd[0], op_focei.npars, 0);
 
   NumericVector ret(op_focei.npars, op_focei.scaleTo);  
   op_focei.calcGrad=0;
-  if (op_focei.likSav != NULL) Free(op_focei.likSav);
-  if (!RxODE::rxIs(obj, "NULL")) op_focei.likSav = Calloc(rx->nsub, double);
   
   // Outer options
   op_focei.outerOpt	=as<int>(odeO["outerOpt"]);
@@ -2560,22 +2542,6 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.resetThetaSize=as<double>(odeO["resetThetaSize"]);
   op_focei.resetThetaFinalSize = as<double>(odeO["resetThetaFinalSize"]);
   
-  IntegerVector muRef;
-  if (odeO.containsElementNamed("focei.mu.ref")){
-    try {
-      muRef = as<IntegerVector>(odeO["focei.mu.ref"]);
-    } catch (...){
-    }
-  }
-  if (muRef.size() == 0){
-    op_focei.resetThetaSize = R_PosInf;
-    op_focei.muRefN=0;
-  } else{
-    op_focei.muRefN=muRef.size();
-    Free(op_focei.muRef);
-    op_focei.muRef=Calloc(op_focei.muRefN, int);
-    std::copy(&op_focei.muRef[0], &op_focei.muRef[0]+op_focei.muRefN, muRef.begin());
-  }
   op_focei.cholSEOpt=as<double>(odeO["cholSEOpt"]);
   op_focei.cholSECov=as<double>(odeO["cholSECov"]);
   op_focei.fo=as<int>(odeO["fo"]);
