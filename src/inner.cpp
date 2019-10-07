@@ -1853,8 +1853,8 @@ void numericGrad(double *theta, double *g){
       op_focei.cur = 0;
       op_focei.totTick = op_focei.npars * op_focei.gillK;
       op_focei.t0 = clock();
-      if (op_focei.repeatGill){
-	Rprintf("Repeat (#%d) Gill Diff/forward difference step size:\n",
+      if (op_focei.repeatGillN != 0){
+	Rprintf("Repeat %d Gill Diff/forward difference step size:\n",
 		op_focei.repeatGillN);
       } else {
 	Rprintf("Calculate Gill Difference and optimize forward difference step size:\n");
@@ -1902,6 +1902,7 @@ void numericGrad(double *theta, double *g){
     if (op_focei.reducedTol2 && op_focei.repeatGillN < op_focei.repeatGillMax){
       op_focei.repeatGill=1;
       op_focei.repeatGillN++;
+      op_focei.reducedTol2=0;
     }
     op_focei.curGill=1;
   } else {
@@ -5070,6 +5071,9 @@ Environment foceiFitCpp_(Environment e){
     }
     if (op_focei.didEtaReset==1){
       warning("ETAs were reset to zero during optimization; (Can control by foceiControl(resetEtaP=.))");
+    }
+    if (op_focei.repeatGillN > 0){
+      warning("Tolerances were reduced during Gill Gradient, so it was repeated %d/%d times\nYou can control this with foceiControl(repeatGillMax=.)", op_focei.repeatGillN, op_focei.repeatGillMax);
     }
     if (op_focei.maxOuterIterations > 0  && R_FINITE(op_focei.resetThetaFinalSize)){
       focei_options *fop = &op_focei;

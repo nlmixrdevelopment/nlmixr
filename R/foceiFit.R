@@ -657,7 +657,7 @@ foceiControl <- function(sigdig=3,...,
                          seed=42,
                          resetThetaCheckPer=0.1,
                          etaMat=NULL,
-                         repeatGillMax=7,
+                         repeatGillMax=3,
                          stickyRecalcN=5,
                          gradProgressOfvTime=10){
     if (is.null(boundTol)){
