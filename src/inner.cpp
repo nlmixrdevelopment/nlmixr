@@ -109,6 +109,7 @@ typedef struct {
   double *gc;
   double *gH;
   double *gH0;
+  double *gVid;
 
   double *likSav;
   
@@ -302,6 +303,7 @@ typedef struct {
   double *g;
   double *H;
   double *H0;
+  double *Vid;
 
   double tbsLik;
   
@@ -671,11 +673,10 @@ double likInner0(double *eta){
       arma::mat B(fInd->B, ind->n_all_times - ind->ndoses - ind->nevid2, 1, false, true);
       arma::mat c(fInd->c, ind->n_all_times - ind->ndoses - ind->nevid2,
 		  op_focei.neta, false, true);
-      mat Vid;
+      arma::mat Vid(fInd->Vid, ind->n_all_times - ind->ndoses - ind->nevid2,
+		    ind->n_all_times - ind->ndoses - ind->nevid2, false, true);
       if (op_focei.fo == 1){
-	Vid = arma::mat(ind->n_all_times - ind->ndoses - ind->nevid2,
-			ind->n_all_times - ind->ndoses - ind->nevid2,
-			fill::zeros);
+	Vid.zeros();
       }
     
       // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
@@ -2156,7 +2157,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   op_focei.gEtaGTransN=(op_focei.neta+1)*rx->nsub;
   int nz = ((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub;
   op_focei.geta = Calloc(op_focei.gEtaGTransN*7+ op_focei.npars*(rx->nsub + 1)+nz+
-			 2*op_focei.neta * rx->nall + rx->nall+
+			 2*op_focei.neta * rx->nall + rx->nall+ rx->nall*rx->nall +
 			 op_focei.neta*3 + 2*op_focei.neta*op_focei.neta*rx->nsub, double);
   op_focei.goldEta = op_focei.geta + op_focei.gEtaGTransN;
   op_focei.gsaveEta = op_focei.goldEta + op_focei.gEtaGTransN;
@@ -2171,6 +2172,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   op_focei.gB  = op_focei.gc + op_focei.neta * rx->nall;//[rx->nall]
   op_focei.gH  = op_focei.gB + rx->nall; //[op_focei.neta*op_focei.neta*rx->nsub]
   op_focei.gH0  = op_focei.gB + op_focei.neta*op_focei.neta*rx->nsub; //[op_focei.neta*op_focei.neta*rx->nsub]
+  op_focei.gVid = op_focei.gH0 + op_focei.neta*op_focei.neta*rx->nsub;
   double *ptr = op_focei.gB + rx->nall;
   // Could use .zeros() but since I used Calloc, they are already zero.
   op_focei.etaM = mat(ptr, op_focei.neta, 1, false, true);
@@ -2184,7 +2186,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   std::fill_n(&op_focei.goldEta[0], op_focei.gEtaGTransN, -42.0); // All etas = -42;  Unlikely if normal    
   
   
-  unsigned int i, j = 0, k = 0, ii=0, jj = 0, iA=0, iB=0, iH=0;
+  unsigned int i, j = 0, k = 0, ii=0, jj = 0, iA=0, iB=0, iH=0, iVid=0;
   focei_ind *fInd;
   for (i = rx->nsub; i--;){
     fInd = &(inds_focei[i]);
@@ -2200,7 +2202,9 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
     fInd->lp = &op_focei.glp[j];
     fInd->H = &op_focei.gH[iH];
     fInd->H0 = &op_focei.gH0[iH];
+    fInd->Vid = &op_focei.gVid[iVid];
     iH += op_focei.neta*op_focei.neta;
+    iVid += (ind->n_all_times - ind->ndoses - ind->nevid2)*(ind->n_all_times - ind->ndoses - ind->nevid2);
 
     // Copy in etaMat0 to the inital eta stored (0 if unspecified)
     // std::copy(&etaMat0[i*op_focei.neta], &etaMat0[(i+1)*op_focei.neta], &fInd->saveEta[0]);
