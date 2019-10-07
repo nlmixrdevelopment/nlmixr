@@ -281,6 +281,57 @@ plot.nlmixrSim <- function(x, y, ...){
     return(.ret);
 }
 
+## Mini DSL to fix pred-only models
+.predOnlyRx <- function(object){
+    .ret <- eval(parse(text=sprintf("quote({%s})", RxODE::rxNorm(object$model$pred.only))))
+    f <- function(x){
+        if (is.atomic(x)) {
+            return(x)
+        } else if (is.name(x)) {
+            return(x)
+        } else if (is.pairlist(x)){
+            return(x)
+        } else if (is.call(x)) {
+            if (length(x[[2]]) == 1 &&
+                ((identical(x[[1]], quote(`=`))) ||
+                 (identical(x[[1]], quote(`~`))))) {
+                x[[1]] <- quote(`~`)
+                return(as.call(lapply(x, f)));
+            } else {
+                if (((identical(x[[1]], quote(`=`))) ||
+                     (identical(x[[1]], quote(`~`)))) &&
+                    length(x[[2]] == 3)){
+                    if (identical(x[[2]][[1]], quote(`/`))){
+                        x[[1]] <- quote(`~`)
+                        return(as.call(lapply(x, f)));
+                    }
+                }
+                return(as.call(lapply(x, f)))
+            }
+        } else {
+            stop("Don't know how to handle type ", typeof(x),
+                 call. = FALSE)
+        }
+    }
+    .ret <- deparse(f(.ret))[-1];
+    .ret <- .ret[regexpr("^ *NULL$", .ret) == -1];
+    .ret <- .ret[-length(.ret)];
+    .w <- rev(which(regexpr("^ *cmt[(].*[)] *$", .ret) != -1));
+    if (length(.w) > 2){
+        while(.w[1] == .w[2] + 1){
+            .w <- .w[-1]
+            if (length(.w) <= 2) break;
+        }
+    }
+    if (length(.w) > 0){
+        .w <- .w[1];
+        .ret[.w] <- paste0("pred=rx_pred_\n", .ret[.w])
+    } else {
+        .ret <- c(.ret, "pred=rx_pred_");
+    }
+    .ret <- paste(.ret, collapse="\n");
+    return(RxODE::RxODE(.ret))
+}
 
 ##' Predict a nlmixr solved system
 ##'
@@ -309,9 +360,7 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
         lst$events <- nlmixrData(getData(object));
     }
     message("Compiling model...", appendLF=FALSE)
-    lst$object <- RxODE::RxODE(gsub(rex::rex("(0)~"), "(0)=",
-                                    paste0(gsub("=", "~", RxODE::rxNorm(object$model$pred.only), perl=TRUE),
-                                           "\npred=rx_pred_")));
+    lst$object <- .predOnlyRx(object);
     message("done")
     params <- fixed.effects(object);
     names(params) <- sprintf("THETA[%d]", seq_along(params))
