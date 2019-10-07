@@ -669,15 +669,13 @@ double likInner0(double *eta){
       lp.zeros();
       arma::mat a(fInd->a, ind->n_all_times - ind->ndoses - ind->nevid2, op_focei.neta, false, true);
       arma::mat B(fInd->B, ind->n_all_times - ind->ndoses - ind->nevid2, 1, false, true);
-      arma::mat c;
+      arma::mat c(fInd->c, ind->n_all_times - ind->ndoses - ind->nevid2,
+		  op_focei.neta, false, true);
       mat Vid;
       if (op_focei.fo == 1){
 	Vid = arma::mat(ind->n_all_times - ind->ndoses - ind->nevid2,
 			ind->n_all_times - ind->ndoses - ind->nevid2,
 			fill::zeros);
-      } else if (op_focei.interaction == 1){
-	c   = arma::mat(fInd->c, ind->n_all_times - ind->ndoses - ind->nevid2,
-			op_focei.neta, false, true);
       }
     
       // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
