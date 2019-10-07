@@ -268,6 +268,7 @@ typedef struct {
   int repeatGill;
   int repeatGillN;
   int repeatGillMax;
+  int curGill;
   int printTop;
   double resetThetaCheckPer;
   int slow;
@@ -1841,6 +1842,7 @@ int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
 void numericGrad(double *theta, double *g){
   op_focei.mixDeriv=0;
   op_focei.reducedTol2=0;
+  op_focei.curGill=0;
   if ((op_focei.repeatGill == 1 || op_focei.nF + op_focei.nF2 == 1) && op_focei.gillK > 0){
     clock_t t = clock() - op_focei.t0;
     op_focei.slow = op_focei.printOuter && ((double)t)/CLOCKS_PER_SEC >= op_focei.gradProgressOfvTime;
@@ -1851,7 +1853,12 @@ void numericGrad(double *theta, double *g){
       op_focei.cur = 0;
       op_focei.totTick = op_focei.npars * op_focei.gillK;
       op_focei.t0 = clock();
-      Rprintf("Calculate Gill Difference and optimize forward difference step size:\n");
+      if (op_focei.repeatGill){
+	Rprintf("Repeat (#%d) Gill Diff/forward difference step size:\n",
+		op_focei.repeatGillN);
+      } else {
+	Rprintf("Calculate Gill Difference and optimize forward difference step size:\n");
+      }
     }
     for (int cpar = op_focei.npars; cpar--;){
       op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
@@ -1896,6 +1903,7 @@ void numericGrad(double *theta, double *g){
       op_focei.repeatGill=1;
       op_focei.repeatGillN++;
     }
+    op_focei.curGill=1;
   } else {
     if(op_focei.slow){
       op_focei.t0 = clock();
@@ -2948,7 +2956,7 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
   int finalize=0, i = 0;
   niterGrad.push_back(niter.back());
   if (op_focei.derivMethod == 0){
-    if (op_focei.nF + op_focei.nF2 == 1 && op_focei.gillK > 0){
+    if (op_focei.curGill){
       gradType.push_back(1);
     } else if (op_focei.mixDeriv){
       gradType.push_back(2);
