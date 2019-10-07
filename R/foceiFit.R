@@ -1965,7 +1965,7 @@ foceiFit.data.frame0 <- function(data,
         .ret$parHist <- data.frame(iter=.iter,.tmp);
     }
     .solve <- function(...){
-        .ret <- RxODE::rxSolve(...);
+        .ret <- RxODE::rxSolve(..., warnIdSort=FALSE);
         if (names(.ret)[1] == "time"){
             ## For single subject ID is dropped.
             .ret <- data.frame(ID=1, .ret);
@@ -2055,7 +2055,8 @@ foceiFit.data.frame0 <- function(data,
         .df <- RxODE::rxSolve(.ret$model$pred.only, .pars$ipred,.ret$dataSav,returnType="data.frame",
                               hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
                               maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                              Method=.ret$control$method)[, -(1:4)];
+                              method=.ret$control$method,
+                              warnIdSort=FALSE)[, -(1:4)];
     } else {
         .df <- .preds$ipred[, -c(1:4, length(names(.preds$ipred)) - 0:1), drop = FALSE];
     }

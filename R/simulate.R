@@ -147,6 +147,8 @@
 ##' @inheritParams RxODE::rxSolve
 ##' @export
 nlmixrSim <- function(object, ...){
+    RxODE::.setWarnIdSort(TRUE);
+    on.exit({RxODE::.setWarnIdSort(FALSE)});
     .si <- .simInfo(object);
     .xtra <- list(...)
     if (any(names(.xtra) == "rx")){
@@ -345,6 +347,8 @@ plot.nlmixrSim <- function(x, y, ...){
 ##'
 ##' @export
 nlmixrPred <- function(object, ..., ipred=FALSE){
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     lst <- as.list(match.call()[-1]);
     if (RxODE::rxIs(lst$params, "rx.event")){
         if (!is.null(lst$events)){
@@ -361,6 +365,7 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
     }
     message("Compiling model...", appendLF=FALSE)
     lst$object <- .predOnlyRx(object);
+    print(summary(lst$object))
     message("done")
     params <- fixed.effects(object);
     names(params) <- sprintf("THETA[%d]", seq_along(params))
@@ -384,7 +389,7 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
         neta <- dim(object$omega)[1]
         pred.par <- c(params, setNames(rep(0, neta + 1), c(sprintf("ETA[%d]", seq(1, neta)), "rx_err_")));
     }
-    on.exit({RxODE::rxUnload(lst$object)});
+    on.exit({RxODE::rxUnload(lst$object)}, add=TRUE);
     if (!is.na(ipred)){
         if (do.pred){
             lst$params <- pred.par
@@ -428,6 +433,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     uif <- object$uif
     dat <- nlmixrData(getData(object))
     names(dat)  <- toupper(names(dat))
+    .isMulti <- (any(names(dat) == "DVID") || any(names(dat) == "CMT"))
     up.covs <- toupper(uif$all.covs);
     up.names <- toupper(names(dat))
     for (i in seq_along(up.covs)){
@@ -436,16 +442,41 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
             names(dat)[w] = uif$all.covs[i];
         }
     }
-    r <- range(dat$TIME, na.rm=TRUE,finite=TRUE)
-    if (is.null(minimum) || is.infinite(minimum)){
-        minimum <- r[1];
-    }
-    if (is.null(maximum) || is.infinite(maximum)){
-        maximum <- r[2];
-    }
-    new.time <- sort(unique(c(seq(minimum, maximum, length.out=length.out), dat$TIME)));
     ids <- unique(dat$ID)
-    new.pts <- expand.grid(TIME=new.time, ID=ids);
+    .multiType <- NULL
+    if (.isMulti){
+        if (any(names(dat) == "DVID")){
+            new.pts <- lapply(unique(dat$DVID), function(dvid) {
+                .dat <- dat[dat$DVID == dvid, ];
+                r <- range(.dat$TIME, na.rm=TRUE,finite=TRUE)
+                if (is.null(minimum) || is.infinite(minimum)){
+                    minimum <- r[1];
+                }
+                if (is.null(maximum) || is.infinite(maximum)){
+                    maximum <- r[2];
+                }
+                new.time <- sort(unique(c(seq(minimum, maximum, length.out=length.out), dat$TIME)));
+                new.pts <- expand.grid(TIME=new.time, ID=ids, DVID=dvid);
+            })
+            new.pts <- do.call("rbind", new.pts);
+            .multiType <- "DVID";
+        } else {
+            print(object$uif$nmodel$predDf)
+            stop("here")
+            new.pts <- expand.grid(TIME=new.time, ID=ids, CMT=object$uif$nmodel$predDf$cmt);
+            .multiType <- "CMT";
+        }
+    } else {
+        r <- range(dat$TIME, na.rm=TRUE,finite=TRUE)
+        if (is.null(minimum) || is.infinite(minimum)){
+            minimum <- r[1];
+        }
+        if (is.null(maximum) || is.infinite(maximum)){
+            maximum <- r[2];
+        }
+        new.time <- sort(unique(c(seq(minimum, maximum, length.out=length.out), dat$TIME)));
+        new.pts <- expand.grid(TIME=new.time, ID=ids);
+    }
     ## Add covariates in the augmented prediction
     covsi <- match.arg(covsInterpolation)
     all.covs <- uif$all.covs
@@ -474,14 +505,49 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     lst$ipred <- NA
     lst$events <- dat
     lst$params <- NULL;
+    if (.isMulti){
+        lst$keep <- .multiType
+    }
     dat.new <- do.call("nlmixrPred", lst, envir=parent.frame(2))
     dat.new$id <- factor(dat.new$id)
     levels(dat.new$id) <- levels(object$ID)
-    dat.new <- data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2)]))
-    levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
+    if (.isMulti){
+        if (.multiType == "DVID"){
+            .tmp <- object$uif$nmodel$predDf[, c("cond", "dvid")];
+            names(.tmp) <- c("Endpoint", "DVID")
+            dat.new <- merge(dat.new, .tmp, by="DVID")
+            dat.new <- dat.new[, names(dat.new) != "DVID"];
+            .endpoint <- dat.new[, "Endpoint"];
+            dat.new <- dat.new[, names(dat.new) != "Endpoint"];
+            dat.new <- data.frame(dat.new[, 1:2], Endpoint=.endpoint, stack(dat.new[,-(1:2)]))
+            levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
+            dat.new$Endpoint <- factor(dat.new$Endpoint)
+        } else {
+        }
+    } else {
+        dat.new <- data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2)]))
+        levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
+    }
     names(dat.old) <- tolower(names(dat.old))
     dat.old <- dat.old[dat.old$evid == 0, ];
-    dat.old <- data.frame(id=dat.old$id, time=dat.old$time, values=dat.old$dv, ind="Observed");
+    if (.isMulti){
+        if (.multiType == "DVID") {
+            ## FIXME
+            if (inherits(dat.old$dvid, "factor") || inherits(dat.old$dvid, "character")){
+                dat.old <- data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$dvid, values=dat.old$dv, ind="Observed");
+            } else {
+                .tmp <- object$uif$nmodel$predDf[, c("cond", "dvid")];
+                names(.tmp) <- c("Endpoint", "DVID")
+                dat.old <- merge(dat.old, .tmp, by="DVID")
+                dat.old <- data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$Endpoint,
+                                      values=dat.old$dv, ind="Observed");
+            }
+        } else {
+            stop("here")
+        }
+    } else {
+        dat.old <- data.frame(id=dat.old$id, time=dat.old$time, values=dat.old$dv, ind="Observed");
+    }
     return(rbind(dat.new, dat.old))
 }
 
@@ -498,17 +564,24 @@ augPred.nlmixrFitData <- memoise::memoise(function(object, primary = NULL, minim
 
 ##' @export
 plot.nlmixrAugPred <- function(x, y, ...){
-    ids <- unique(x$id)
-    time <- values <- ind <- id <- NULL;  # Rcheck fix
-    for (i  in seq(1, length(ids), by=16)){
-        tmp <- ids[seq(i, i + 15)]
-        tmp <- tmp[!is.na(tmp)];
-        d1 <- x[x$id %in% tmp, ];
-        dobs <- d1[d1$ind == "Observed", ];
-        dpred <- d1[d1$ind != "Observed", ];
-        p3 <- ggplot(d1,aes(time, values,col=ind)) + geom_line(data=dpred, size=1.2) +
-            geom_point(data=dobs) + facet_wrap(~id)
-        print(p3)
+    if (any(names(x) == "Endpoint")){
+        for (.tmp in unique(x$Endpoint)){
+            .x <- x[x$Endpoint == .tmp, names(x) != "Endpoint"];
+            plot.nlmixrAugPred(.x);
+        }
+    } else {
+        ids <- unique(x$id)
+        time <- values <- ind <- id <- NULL;  # Rcheck fix
+        for (i  in seq(1, length(ids), by=16)){
+            tmp <- ids[seq(i, i + 15)]
+            tmp <- tmp[!is.na(tmp)];
+            d1 <- x[x$id %in% tmp, ];
+            dobs <- d1[d1$ind == "Observed", ];
+            dpred <- d1[d1$ind != "Observed", ];
+            p3 <- ggplot(d1,aes(time, values,col=ind)) + geom_line(data=dpred, size=1.2) +
+                geom_point(data=dobs) + facet_wrap(~id)
+            print(p3)
+        }
     }
 }
 

@@ -124,6 +124,8 @@ nlmixr <- function(object, data, est=NULL, control=list(),
                    table=tableControl(), ...,save=NULL,
                    envir=parent.frame()){
     assignInMyNamespace(".nlmixrTime",proc.time());
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     force(est)
     ## verbose?
     ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
