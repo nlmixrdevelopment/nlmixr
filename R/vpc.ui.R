@@ -19,6 +19,8 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                    uloq = NULL, lloq = NULL, log_y = FALSE, log_y_min = 0.001,
                    xlab = NULL, ylab = NULL, title = NULL, smooth = TRUE, vpc_theme = NULL,
                    facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...){
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     if (is(data, "numeric") | is(data, "integer")){
         if (missing(n)){
             n <- data;
