@@ -30,8 +30,8 @@ rxPermissive({
     dat <- Wang2007
     dat$DV <- dat$Y
 
-    fit.prop <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.prop <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1))},
+                                          control=foceiControl(maxOuterIterations=0,covMethod="")))
 
 
     test_that("Matches NONMEM objective proportional function; (Based on Wang2007)", {
@@ -68,8 +68,8 @@ rxPermissive({
     dat2 <- rbind(dat2, data.frame(dat, EVID=0, AMT=0))
     dat2 <- dat2[(order(dat2$ID, -dat2$EVID, dat2$Time)), ]
 
-    fit.prop2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1))},
-                      control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.prop2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1))},
+                                           control=foceiControl(maxOuterIterations=0,covMethod="")))
 
 
     test_that("Matches NONMEM objective proportional function; ODE (Based on Wang2007)", {
@@ -77,8 +77,8 @@ rxPermissive({
     })
 
 
-    fit.prop <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.prop <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1))},
+                                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective proportional error FOCE (Based on Wang2007)", {
         expect_equal(round(fit.prop$objective, 3), 39.207);
@@ -86,23 +86,23 @@ rxPermissive({
 
     etaMat <- as.matrix(ranef(fit.prop)[, -1, drop = FALSE])
 
-    fit.prop2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.prop2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1))},
+                                           control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective proportional error FOCE; ODE (Based on Wang2007)", {
         expect_equal(round(fit.prop2$objective, 3), 39.279);
     })
 
 
-    fit.prop <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.prop <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1))},
+                                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective proportional error FO (Based on Wang2007)", {
         expect_equal(round(fit.prop$objective, 3), 39.213);
     })
 
-    fit.prop2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.prop2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1))},
+                                           control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective proportional error FO; ODE (Based on Wang2007)", {
         expect_equal(round(fit.prop2$objective, 3), 39.213); # Matches Table 2 Prop FOCEI for NONMEM
@@ -111,45 +111,45 @@ rxPermissive({
 
 #### Add
 
-    fit.add <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.add <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1))},
+                                         control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective additive error; (Based on Wang2007)", {
         expect_equal(round(fit.add$objective, 3), -2.059); # Matches Table 2 Add FOCEI for NONMEM
     })
 
-    fit.add2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1))},
-                      control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.add2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1))},
+                                          control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective additive error; ODE (Based on Wang2007)", {
         expect_equal(round(fit.add2$objective, 3), -2.059);
     })
 
-    fit.add <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.add <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1))},
+                                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective additive error FOCE (Based on Wang2007)", {
         expect_equal(round(fit.add$objective, 3), -2.059);
     })
 
 
-    fit.add2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.add2 <- supressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1))},
+                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective additive error FOCE; ODE (Based on Wang2007)", {
         expect_equal(round(fit.add2$objective, 3), -2.059);
     })
 
 
-    fit.add <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.add <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1))},
+                                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective additive error FO (Based on Wang2007)", {
         expect_equal(round(fit.add$objective, 3), 0.026);
     })
 
-    fit.add2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.add2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1))},
+                                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective additive error FO; ODE (Based on Wang2007)", {
         expect_equal(round(fit.add2$objective, 3), 0.026);
@@ -157,43 +157,43 @@ rxPermissive({
 
 ### Add+Prop
 
-    fit.addprop <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1)+prop(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.addprop <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1)+prop(.1))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective additive+proportional function; (Based on Wang2007)", {
         expect_equal(round(fit.addprop$objective, 3), 39.735);
     })
 
-    fit.addprop2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1)+prop(.1))},
-                      control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.addprop2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1)+prop(.1))},
+                                              control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective additive+proportional function; ODE (Based on Wang2007)", {
         expect_equal(round(fit.addprop2$objective, 3), 39.735);
     })
 
-    fit.addprop <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1)+prop(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.addprop <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1)+prop(.1))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective additive+proportional error FOCE (Based on Wang2007)", {
         expect_equal(round(fit.addprop$objective, 3), 39.499);
     })
 
-    fit.addprop2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1)+prop(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.addprop2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1)+prop(.1))},
+                                              control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective additive+proportional error FOCE; ODE (Based on Wang2007)", {
         expect_equal(round(fit.addprop2$objective, 3), 39.563);
     })
 
-    fit.addprop <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1)+prop(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.addprop <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(add(.1)+prop(.1))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective additive+proportional error FO (Based on Wang2007)", {
         expect_equal(round(fit.addprop$objective, 3), 39.505);
     })
 
-    fit.addprop2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1)+prop(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.addprop2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(add(.1)+prop(.1))},
+                                              control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective additive+proportional error FO; ODE (Based on Wang2007)", {
         expect_equal(round(fit.addprop2$objective, 3), 39.505);
@@ -207,15 +207,15 @@ rxPermissive({
     predl = function() log(ipre)
 
 
-    fit.lnorm <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(lnorm(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.lnorm <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(lnorm(.1))},
+                                           control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective lognormal function; (Based on Wang2007)", {
         expect_equal(round(fit.lnorm$objective, 3), 40.039);
     })
 
-    fit.lnorm0 <- foceiFit(datl, inits, mypar1,mod,predl,function(){return(add(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.lnorm0 <- suppressWarnings(foceiFit(datl, inits, mypar1,mod,predl,function(){return(add(.1))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective lognormal function; (Based on Wang2007)", {
         expect_equal(round(fit.lnorm$objective, 3), 40.039);
@@ -223,11 +223,11 @@ rxPermissive({
         expect_equal(round(fit.lnorm0$objective, 3), -42.106);
     })
 
-    fit.lnorm2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(lnorm(.1))},
-                           control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.lnorm2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(lnorm(.1))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="")))
 
-    fit.lnorm20 <- foceiFit(datl2, inits, mypar1, m1, predl,function(){return(add(.1))},
-                      control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.lnorm20 <- suppressWarnings(foceiFit(datl2, inits, mypar1, m1, predl,function(){return(add(.1))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective lognormal function; ODE (Based on Wang2007)", {
         expect_equal(round(fit.lnorm2$objective, 3), 40.039);
@@ -235,11 +235,11 @@ rxPermissive({
         expect_equal(round(fit.lnorm20$objective, 3), -42.106);
     })
 
-    fit.lnorm <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(lnorm(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.lnorm <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(lnorm(.1))},
+                                           control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
-    fit.lnorm0 <- foceiFit(datl, inits, mypar1,mod,predl,function(){return(add(.1))},
-                           control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.lnorm0 <- suppressWarnings(foceiFit(datl, inits, mypar1,mod,predl,function(){return(add(.1))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective lognormal error FOCE (Based on Wang2007)", {
         expect_equal(round(fit.lnorm$objective, 3), 40.039);
@@ -247,11 +247,11 @@ rxPermissive({
         expect_equal(round(fit.lnorm0$objective, 3), -42.106);
     })
 
-    fit.lnorm2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(lnorm(.1))},
-                           control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.lnorm2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(lnorm(.1))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
-    fit.lnorm20 <- foceiFit(datl2, inits, mypar1,m1,predl,function(){return(add(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.lnorm20 <- suppressWarnings(foceiFit(datl2, inits, mypar1,m1,predl,function(){return(add(.1))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective lognormal error FOCE; ODE (Based on Wang2007)", {
         expect_equal(round(fit.lnorm2$objective, 3), 40.039);
@@ -259,11 +259,11 @@ rxPermissive({
         expect_equal(round(fit.lnorm20$objective, 3), -42.106);
     })
 
-    fit.lnorm <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(lnorm(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.lnorm <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(lnorm(.1))},
+                                           control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
-    fit.lnorm0 <- foceiFit(datl, inits, mypar1,mod,predl,function(){return(add(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.lnorm0 <- suppressWarnings(foceiFit(datl, inits, mypar1,mod,predl,function(){return(add(.1))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective lognormal error FO (Based on Wang2007)", {
         expect_equal(round(fit.lnorm$objective, 3), 40.055);
@@ -271,11 +271,11 @@ rxPermissive({
         expect_equal(round(fit.lnorm0$objective, 3), -42.09);
     })
 
-    fit.lnorm2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(lnorm(.1))},
-                           control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.lnorm2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(lnorm(.1))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
-    fit.lnorm20 <- foceiFit(datl2, inits, mypar1,m1,predl,function(){return(add(.1))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.lnorm20 <- suppressWarnings(foceiFit(datl2, inits, mypar1,m1,predl,function(){return(add(.1))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective lognormal error FO; ODE (Based on Wang2007)", {
         expect_equal(round(fit.lnorm2$objective, 3), 40.055);
@@ -285,43 +285,43 @@ rxPermissive({
 
 ### Now try  TBS boxCox
 
-    fit.boxCox <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+boxCox(.5))},
-                         control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.boxCox <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+boxCox(.5))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective Box-Cox function; (Based on Wang2007)", {
         expect_equal(round(fit.boxCox$objective, 3), 61.473);
     })
 
-    fit.boxCox2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+boxCox(.5))},
-                      control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.boxCox2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+boxCox(.5))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective Box-Cox function; ODE (Based on Wang2007)", {
         expect_equal(round(fit.boxCox2$objective, 3), 61.473);
     })
 
-    fit.boxCox <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+boxCox(.5))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.boxCox <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+boxCox(.5))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective Box-Cox error FOCE (Based on Wang2007)", {
         expect_equal(round(fit.boxCox$objective, 3), 61.324);
     })
 
-    fit.boxCox2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+boxCox(.5))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.boxCox2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+boxCox(.5))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective Box-Cox error FOCE; ODE (Based on Wang2007)", {
         expect_equal(round(fit.boxCox2$objective, 3), 61.28);
     })
 
-    fit.boxCox <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+boxCox(.5))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.boxCox <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+boxCox(.5))},
+                                            control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective Box-Cox error FO (Based on Wang2007)", {
         expect_equal(round(fit.boxCox$objective, 3), 61.325);
     })
 
-    fit.boxCox2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+boxCox(.5))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.boxCox2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+boxCox(.5))},
+                                             control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective Box-Cox error FO; ODE (Based on Wang2007)", {
         expect_equal(round(fit.boxCox2$objective, 3), 61.325);
@@ -329,43 +329,43 @@ rxPermissive({
 
     ### Now try  TBS
 
-    fit.yeoJohnson <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+yeoJohnson(.5))},
-                         control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.yeoJohnson <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+yeoJohnson(.5))},
+                                                control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective Yeo-Johnson function; (Based on Wang2007)", {
         expect_equal(round(fit.yeoJohnson$objective, 3), 62.821);
     })
 
-    fit.yeoJohnson2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+yeoJohnson(.5))},
-                      control=foceiControl(maxOuterIterations=0,covMethod=""))
+    fit.yeoJohnson2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+yeoJohnson(.5))},
+                                                 control=foceiControl(maxOuterIterations=0,covMethod="")))
 
     test_that("Matches NONMEM objective Yeo-Johnson function; ODE (Based on Wang2007)", {
         expect_equal(round(fit.yeoJohnson2$objective, 3), 62.821);
     })
 
-    fit.yeoJohnson <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+yeoJohnson(.5))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.yeoJohnson <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+yeoJohnson(.5))},
+                                                control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective Yeo-Johnson error FOCE (Based on Wang2007)", {
         expect_equal(round(fit.yeoJohnson$objective, 3), 62.676);
     })
 
-    fit.yeoJohnson2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+yeoJohnson(.5))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE))
+    fit.yeoJohnson2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+yeoJohnson(.5))},
+                                                 control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE)))
 
     test_that("Matches NONMEM objective Yeo-Johnson error FOCE; ODE (Based on Wang2007)", {
         expect_equal(round(fit.yeoJohnson2$objective, 3), 62.627);
     })
 
-    fit.yeoJohnson <- foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+yeoJohnson(.5))},
-                         control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.yeoJohnson <- suppressWarnings(foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1)+yeoJohnson(.5))},
+                                                control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective Yeo-Johnson error FO (Based on Wang2007)", {
         expect_equal(round(fit.yeoJohnson$objective, 3), 62.677);
     })
 
-    fit.yeoJohnson2 <- foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+yeoJohnson(.5))},
-                          control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE))
+    fit.yeoJohnson2 <- suppressWarnings(foceiFit(dat2, inits, mypar1,m1,pred,function(){return(prop(.1)+yeoJohnson(.5))},
+                                                 control=foceiControl(maxOuterIterations=0,covMethod="", interaction=FALSE, fo=TRUE)))
 
     test_that("Matches NONMEM objective Yeo-Johnson error FO; ODE (Based on Wang2007)", {
         expect_equal(round(fit.yeoJohnson2$objective, 3), 62.677);
