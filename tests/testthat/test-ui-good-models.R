@@ -64,7 +64,7 @@ rxPermissive({
             Ef = Cp * Slope + Intercept                  ## add for PD estimation
 
             Cp ~ prop(prop.err1) | center
-            Ef ~ prop(prop.err2) | 4                    ## add for PD estimation
+            Ef ~ prop(prop.err2)                     ## add for PD estimation
 
         })
     }

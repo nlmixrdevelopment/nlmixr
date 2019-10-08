@@ -60,7 +60,7 @@ rxPermissive({
             })
         }
 
-        expect_error(nlmixr(uif.ode), rex::rex("Model error: initial estimates provided without variables being used: prop.err"))
+        expect_error(nlmixr(uif.ode), rex::rex("Model error: initial estimates provided without variables being used:r"))
 
         uif <- function(){
             ini({
@@ -83,7 +83,7 @@ rxPermissive({
             })
         }
 
-        expect_error(nlmixr(uif), rex::rex("Model error: initial estimates provided without variables being used: eta.v"))
+        expect_error(nlmixr(uif), rex::rex("The following parameter(s) were in the ini block but not in the model block: eta.v\nBad parsed model"))
 
     })
 

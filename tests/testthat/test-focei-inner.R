@@ -47,6 +47,4 @@ rxPermissive({
         expect_equal(418.9354, round(fitPi$objective, 4));
     })
 
-
-
 }, on.validate="NLMIXR_VALIDATION", silent=TRUE)
