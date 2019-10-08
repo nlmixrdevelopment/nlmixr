@@ -443,7 +443,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     }
     ids <- unique(dat$ID)
     .multiType <- NULL
-    if (isMulti){
+    if (.isMulti){
         stop("multiple endpoint augPred not supported yet.");
     }
     if (.isMulti){
