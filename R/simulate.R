@@ -365,7 +365,6 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
     }
     message("Compiling model...", appendLF=FALSE)
     lst$object <- .predOnlyRx(object);
-    print(summary(lst$object))
     message("done")
     params <- fixed.effects(object);
     names(params) <- sprintf("THETA[%d]", seq_along(params))
@@ -444,6 +443,9 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     }
     ids <- unique(dat$ID)
     .multiType <- NULL
+    if (isMulti){
+        stop("multiple endpoint augPred not supported yet.");
+    }
     if (.isMulti){
         if (any(names(dat) == "DVID")){
             new.pts <- lapply(unique(dat$DVID), function(dvid) {
@@ -461,8 +463,6 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
             new.pts <- do.call("rbind", new.pts);
             .multiType <- "DVID";
         } else {
-            print(object$uif$nmodel$predDf)
-            stop("here")
             new.pts <- expand.grid(TIME=new.time, ID=ids, CMT=object$uif$nmodel$predDf$cmt);
             .multiType <- "CMT";
         }
