@@ -430,9 +430,10 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
         stop("Need a nlmixr fit object")
     }
     uif <- object$uif
-    dat <- nlmixrData(getData(object))
+    ## Using the model will drop the subjects that were dropped by the fit
+    dat <- suppressWarnings(nlmixrData(getData(object), object$model$pred.only))
     names(dat)  <- toupper(names(dat))
-    .isMulti <- (any(names(dat) == "DVID") || any(names(dat) == "CMT"))
+    .isMulti <- (any(names(object) == "DVID") || any(names(object) == "CMT"))
     up.covs <- toupper(uif$all.covs);
     up.names <- toupper(names(dat))
     for (i in seq_along(up.covs)){
