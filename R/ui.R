@@ -1053,16 +1053,19 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       errn <- errn + 1;
       if (!is.na(.tmp)){
         ## FIXME: allow numeric estimates...?
-        stop("Distribution parameters cannot be numeric, but need to be estimated.")
+        stop("Distribution parameters cannot be numeric, but need to be estimated")
       }
       .w <- which(bounds$name == distArgs[.i]);
+      if (length(.w) == 0){
+          stop("Residual distribution parameter(s) estimates were not found in ini block");
+      }
       .tmp <- as.data.frame(bounds);
       .tmp$err[.w] <- ifelse(.i == 1, distName, paste0(distName, .i));
       if (any(distName==distsPositive)){
-        if (is.na(.tmp$lower[.w]) || is.infinite(.tmp$lower[.w])){
+        if (any(is.na(.tmp$lower[.w])) || any(is.infinite(.tmp$lower[.w]))){
           .tmp$lower[.w]  <- 0;
         }
-        if (.tmp$lower[.w] < 0 || .tmp$est[.w] < 0 || .tmp$upper[.w] < 0){
+        if ((.tmp$lower[.w] < 0) || .tmp$est[.w] < 0 || .tmp$upper[.w] < 0){
           stop(sprintf("The distribution '%s' must have positive parameter estimates",distName));
         }
       }
