@@ -8,7 +8,8 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxInnerIterations = 1000, maxOuterIterations = 5000,
   n1qn1nsim = NULL, method = c("liblsoda", "lsoda", "dop853"),
   transitAbs = NULL, atol = NULL, rtol = NULL, atolSens = NULL,
-  rtolSens = NULL, minSS = 10L, maxSS = 1000L,
+  rtolSens = NULL, ssAtol = NULL, ssRtol = NULL, ssAtolSens = NULL,
+  ssRtolSens = NULL, minSS = 10L, maxSS = 1000L,
   maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
   "linear", "nocb", "midpoint"), print = 1L,
@@ -43,7 +44,7 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxOdeRecalc = 5, odeRecalcFactor = 10^(0.5),
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
   etaNudge = 0.01, stiff, nRetries = 3, seed = 42,
-  resetThetaCheckPer = 0.1, etaMat = NULL, repeatGillMax = 7,
+  resetThetaCheckPer = 0.1, etaMat = NULL, repeatGillMax = 3,
   stickyRecalcN = 5, gradProgressOfvTime = 10)
 }
 \arguments{
@@ -105,6 +106,18 @@ liblsoda.  This allows a less accurate solve for gradients (if desired)}
 
 \item{rtolSens}{Sensitivity rtol, can be different than rtol with
 liblsoda.  This allows a less accurate solve for gradients (if desired)}
+
+\item{ssAtol}{Steady state absolute tolerance (atol) for calculating if steady-state
+has been archived.}
+
+\item{ssRtol}{Steady state relative tolerance (rtol) for
+calculating if steady-state has been achieved.}
+
+\item{ssAtolSens}{Sensitivity absolute tolerance (atol) for
+calculating if steady state has been achieved for sensitivity compartments.}
+
+\item{ssRtolSens}{Sensitivity relative tolerance (rtol) for
+calculating if steady state has been achieved for sensitivity compartments.}
 
 \item{minSS}{Minimum number of iterations for a steady-state dose}
 
@@ -648,6 +661,9 @@ parameter.}
 
 \item{stickyRecalcN}{The number of bad ODE solves before reducing
 the atol/rtol for the rest of the problem.}
+
+\item{gradProgressOfvTime}{This is the time for a single objective
+function evaluation (in seconds) to start progress bars on gradient evaluations}
 }
 \description{
 Control Options for FOCEi

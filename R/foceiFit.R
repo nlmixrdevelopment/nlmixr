@@ -43,6 +43,18 @@ is.latex <- function() {
 ##' @param rtolSens Sensitivity rtol, can be different than rtol with
 ##'     liblsoda.  This allows a less accurate solve for gradients (if desired)
 ##'
+##' @param ssAtol Steady state absolute tolerance (atol) for calculating if steady-state
+##'     has been archived.
+##'
+##' @param ssRtol Steady state relative tolerance (rtol) for
+##'     calculating if steady-state has been achieved.
+##'
+##' @param ssAtolSens Sensitivity absolute tolerance (atol) for
+##'     calculating if steady state has been achieved for sensitivity compartments.
+##'
+##' @param ssRtolSens Sensitivity relative tolerance (rtol) for
+##'     calculating if steady state has been achieved for sensitivity compartments.
+##'
 ##' @param epsilon Precision of estimate for n1qn1 optimization.
 ##'
 ##' @param maxstepsOde Maximum number of steps for ODE solver.
@@ -533,6 +545,9 @@ is.latex <- function() {
 ##'     estimates, randomly sample new parameter estimates and restart
 ##'     the problem.  This is similar to 'PsN' resampling.
 ##'
+##' @param gradProgressOfvTime This is the time for a single objective
+##'     function evaluation (in seconds) to start progress bars on gradient evaluations
+##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##' @inheritParams foceiFit
@@ -566,6 +581,7 @@ foceiControl <- function(sigdig=3,...,
                          method = c("liblsoda", "lsoda", "dop853"),
                          transitAbs = NULL, atol = NULL, rtol = NULL,
                          atolSens=NULL, rtolSens=NULL,
+                         ssAtol=NULL, ssRtol=NULL, ssAtolSens=NULL, ssRtolSens=NULL,
                          minSS=10L, maxSS=1000L,
                          maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
                          covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
@@ -689,6 +705,18 @@ foceiControl <- function(sigdig=3,...,
     }
     if (is.null(rtolSens)){
         rtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
+    }
+    if (is.null(ssAtol)){
+        ssAtol <- 0.5 * 10 ^ (-sigdig - 2);
+    }
+    if (is.null(ssRtol)){
+        ssRtol <- 0.5 * 10 ^ (-sigdig - 2);
+    }
+    if (is.null(ssAtolSens)){
+        ssAtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
+    }
+    if (is.null(ssRtolSens)){
+        ssRtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
     }
     if (is.null(rel.tol)){
         rel.tol <- 10 ^ (-sigdig - 1);
@@ -836,6 +864,10 @@ foceiControl <- function(sigdig=3,...,
                  rtol=rtol,
                  atolSens=atolSens,
                  rtolSens=rtolSens,
+                 ssAtol=ssAtol,
+                 ssRtol=ssRtol,
+                 ssAtolSens=ssAtolSens,
+                 ssRtolSens=ssRtolSens,
                  minSS=minSS, maxSS=maxSS,
                  maxstepsOde=maxstepsOde,
                  hmin=hmin,
@@ -1615,6 +1647,8 @@ foceiFit.data.frame0 <- function(data,
     if (!exists("noLik", envir=.ret)){
         .atol  <- rep(control$atol,length(RxODE::rxModelVars(model)$state))
         .rtol  <- rep(control$rtol,length(RxODE::rxModelVars(model)$state))
+        .ssAtol  <- rep(control$ssAtol,length(RxODE::rxModelVars(model)$state))
+        .ssRtol  <- rep(control$ssRtol,length(RxODE::rxModelVars(model)$state))
         .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err, grad=(control$derivMethod == 2L),
                                               pred.minus.dv=TRUE, sum.prod=control$sumProd,
                                               theta.derivs=FALSE, optExpression=control$optExpression,
@@ -1629,6 +1663,14 @@ foceiFit.data.frame0 <- function(data,
                                    length(.rtol)));
             .ret$control$rxControl$atol <- .atol
             .ret$control$rxControl$rtol <- .rtol
+            .ssAtol  <- c(.ssAtol,rep(control$ssAtolSens,
+                                  length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                                  length(.ssAtol)))
+            .ssRtol  <- c(.ssRtol, rep(control$ssRtolSens,
+                                   length(RxODE::rxModelVars(.ret$model$inner)$state)-
+                                   length(.ssRtol)));
+            .ret$control$rxControl$ssAtol <- .ssAtol
+            .ret$control$rxControl$ssRtol <- .ssRtol
         }
         .covNames <- .parNames <- RxODE::rxParams(.ret$model$pred.only);
         .covNames <- .covNames[regexpr(rex::rex(start, or("THETA", "ETA"), "[", numbers, "]", end), .covNames) == -1];

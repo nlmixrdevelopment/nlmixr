@@ -4,7 +4,7 @@
 \alias{.protectSaem}
 \title{SAEM dll prodection from garbage collection}
 \usage{
-.protectSaem(protect = TRUE)
+.protectSaem(dll)
 }
 \arguments{
 \item{dll}{dll to protect}
