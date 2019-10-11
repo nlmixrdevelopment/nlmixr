@@ -60,23 +60,44 @@ one.cmt <- function() {
 }
 ```
 
-Now setup the cache dir for running the vignette fast (a CRAN requirement)
-
-```{r}
-dir <- system.file(package="nlmixr");
-```
-
 We can now run the model...
 
 ```
-
-saveRDS(fit, file.path(dir,"fit.rds")); # This saves the rds file for running quickly
-```
-
-
-```{r}
-fit <- readRDS(file.path(dir,"fit.rds"))
+fit <- nlmixr(one.cmt, theo_sd, "nlme")
 print(fit)
+#> 
+#> ── nlmixr nlme by maximum likelihood (Solved; μ-ref & covs) nlme OBF fit ─────── 
+#>          OBJF      AIC      BIC Log-likelihood Condition Number
+#> nlme 116.8727 373.4725 393.6521      -179.7363         17.08747
+#> 
+#> ── Time (sec; fit$time): ─────────────────────────────────────────────────────── 
+#>          nlme   setup table    other
+#> elapsed 3.922 75.1171 0.053 1.105895
+#> 
+#> ── Population Parameters (fit$parFixed or fit$parFixedDf): ───────────────────── 
+#> Registered S3 method overwritten by 'R.oo':
+#>   method        from       
+#>   throw.default R.methodsS3
+#>        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%
+#> tka       Log Ka 0.447  0.192   43       1.56 (1.07, 2.28)     68.7     0.241% 
+#> tcl       Log Cl  1.02 0.0847 8.31       2.77 (2.35, 3.27)     26.9      3.78% 
+#> tv         log V  3.45 0.0464 1.35       31.5 (28.7, 34.5)     13.6      10.0% 
+#> add.sd           0.697                               0.697                      
+#> 
+#>   Covariance Type (fit$covMethod): nlme
+#>   No correlations in between subject variability (BSV) matrix
+#>   Full BSV covariance (fit$omega) or correlation (fit$omegaR; diagonals=SDs) 
+#>   Distribution stats (mean/skewness/kurtosis/p-value) available in fit$shrink 
+#> 
+#> ── Fit Data (object fit is a modified tibble): ───────────────────────────────── 
+#> # A tibble: 132 x 18
+#>   ID     TIME    DV  EVID  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl   eta.v
+#>   <fct> <dbl> <dbl> <int> <dbl>  <dbl> <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
+#> 1 1     0      0.74     0  0     0.74   0     0.74   1.06   0.101 -0.479 -0.0819
+#> 2 1     0.25   2.84     0  3.25 -0.410  3.84 -1.00  -1.44   0.101 -0.479 -0.0819
+#> 3 1     0.570  6.57     0  5.83  0.744  6.78 -0.212 -0.305  0.101 -0.479 -0.0819
+#> # … with 129 more rows, and 6 more variables: rx1c <dbl>, ka <dbl>, cl <dbl>,
+#> #   v <dbl>, depot <dbl>, central <dbl>
 ```
 
 
@@ -109,160 +130,96 @@ We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```
 fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
-saveRDS(fit2, file.path(dir,"fit2.rds")); # This saves the rds file for running quickly
+fit2
+#> ── nlmixr SAEM(ODE); OBJF not calculated fit ─────────────────────────────────── 
+#>  Gaussian/Laplacian Likelihoods: AIC(fit2) or fit2$objf etc. 
+#>  FOCEi CWRES & Likelihoods: addCwres(fit2) 
+#> 
+#> ── Time (sec; fit2$time): ────────────────────────────────────────────────────── 
+#>           saem    setup table covariance    other
+#> elapsed 18.142 31.54705 0.049      0.024 0.778949
+#> 
+#> ── Population Parameters (fit2$parFixed or fit2$parFixedDf): ─────────────────── 
+#>        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%
+#> tka       Log Ka 0.451  0.196 43.5       1.57 (1.07, 2.31)     71.9     0.411% 
+#> tcl       Log Cl  1.02 0.0836 8.22       2.77 (2.35, 3.26)     27.0      3.36% 
+#> tv         Log V  3.45 0.0469 1.36       31.5 (28.7, 34.5)     14.0      10.0% 
+#> add.sd           0.692                               0.692                      
+#> 
+#>   Covariance Type (fit2$covMethod): linFim
+#>   No correlations in between subject variability (BSV) matrix
+#>   Full BSV covariance (fit2$omega) or correlation (fit2$omegaR; diagonals=SDs) 
+#>   Distribution stats (mean/skewness/kurtosis/p-value) available in fit2$shrink 
+#> 
+#> ── Fit Data (object fit2 is a modified tibble): ──────────────────────────────── 
+#> # A tibble: 132 x 18
+#>   ID     TIME    DV  EVID  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl   eta.v
+#>   <fct> <dbl> <dbl> <int> <dbl>  <dbl> <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
+#> 1 1     0      0.74     0  0     0.74   0     0.74   1.07   0.105 -0.487 -0.0800
+#> 2 1     0.25   2.84     0  3.26 -0.423  3.86 -1.02  -1.48   0.105 -0.487 -0.0800
+#> 3 1     0.570  6.57     0  5.84  0.725  6.81 -0.235 -0.340  0.105 -0.487 -0.0800
+#> # … with 129 more rows, and 6 more variables: ka <dbl>, cl <dbl>, v <dbl>,
+#   cp <dbl>, depot <dbl>, center <dbl>#> 
 ```
 
-```{r}
-fit2 <- readRDS(file.path(dir,"fit2.rds")); # This saves the rds file for running quickly
-print(fit2)
-```
 
 And if we wanted to, we could even apply the First-Order Conditional
 Estimation (FOCEi) method to this model:
 
 ```
 fitF <- nlmixr(one.compartment, theo_sd, est="focei")
-saveRDS(fitF, file.path(dir,"fitF.rds")); # This saves the rds file for running quickly
+fitF
+#> ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── 
+#>           OBJF      AIC      BIC Log-likelihood Condition Number
+#> FOCEi 116.8064 373.4062 393.5858      -179.7031         161.0359
+#> 
+#> ── Time (sec; fitF$time): ────────────────────────────────────────────────────── 
+#>            setup optimize covariance table    other
+#> elapsed 71.86674 0.321867   0.321868 0.059 1.797528
+#> 
+#> ── Population Parameters (fitF$parFixed or fitF$parFixedDf): ─────────────────── 
+#>        Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)
+#> tka       Log Ka 0.469  0.229  48.8         1.6 (1.02, 2.5)     70.2
+#> tcl       Log Cl  1.01   0.11  10.9       2.75 (2.21, 3.41)     26.8
+#> tv         Log V  3.46 0.0248 0.716       31.8 (30.3, 33.4)     13.8
+#> add.sd           0.694                                0.694         
+#>        Shrink(SD)%
+#> tka         1.60% 
+#> tcl         3.94% 
+#> tv          9.95% 
+#> add.sd             
+#> 
+#>   Covariance Type (fitF$covMethod): r,s
+#>   No correlations in between subject variability (BSV) matrix
+#>   Full BSV covariance (fitF$omega) or correlation (fitF$omegaR; diagonals=SDs) 
+#>   Distribution stats (mean/skewness/kurtosis/p-value) available in fitF$shrink 
+#>   Minimization message (fitF$message):  
+#>     false convergence (8) 
+#>   In an ODE system, false convergence may mean "useless" evaluations were performed.
+#>   See https://tinyurl.com/yyrrwkce
+#>   It could also mean the convergence is poor, check results before accepting fit
+#>   You may also try a good derivative free optimization:
+#>     nlmixr(...,control=list(outerOpt="bobyqa"))
+#> 
+#> ── Fit Data (object fitF is a modified tibble): ──────────────────────────────── 
+#> # A tibble: 132 x 22
+#>   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES
+#>   <fct> <dbl> <dbl> <int> <dbl>  <dbl>  <dbl> <dbl>  <dbl>  <dbl> <dbl>  <dbl>
+#> 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.07   0     0.74 
+#> 2 1     0.25   2.84     0  3.28 -0.436 -0.230  3.85 -1.01  -1.45   3.23 -0.393
+#> 3 1     0.570  6.57     0  5.85  0.723  0.382  6.79 -0.216 -0.311  5.79  0.776
+#> # … with 129 more rows, and 10 more variables: CWRES <dbl>, eta.ka <dbl>,
+#> #   eta.cl <dbl>, eta.v <dbl>, ka <dbl>, cl <dbl>, v <dbl>, cp <dbl>,
+#   depot <dbl>, center <dbl>
 ```
-
-```{r}
-fitF <- readRDS(file.path(dir,"fitF.rds")); # This saves the rds file for running quickly
-print(fitF)
-```
-
 
 This example delivers a complete model fit as the `fit`
 object, including parameter history, a set of fixed effect estimates,
 and random effects for all included subjects.
 
-Now back to the `saem` fit; Let's look at the fit using nlmixr's
-built-in diagnostics...
-
-```{r}
-plot(fit)
-```
-
-```{r}
-print(fit)
-```
-
-```{r}
-fit$eta
-```
-
-Default trace plots can be generated using:
-```{r}
-traceplot(fit)
-```
-
-but with a little more work, we can get a nicer set of iteration trace
-plots ("wriggly worms")...
-
-
-```{r}
-
-iter <- fit2$par.hist.stacked
-iter$Parameter[iter$par=="add.sd"] <- "Additive error"
-iter$Parameter[iter$par=="eta.cl"]  <- "IIV CL/F"
-iter$Parameter[iter$par=="eta.v"]   <- "IIV V/F"
-iter$Parameter[iter$par=="eta.ka"]  <- "IIV ka"
-iter$Parameter[iter$par=="tcl"]     <- "log(CL/F)"
-iter$Parameter[iter$par=="tv"]      <- "log(V/F)"
-iter$Parameter[iter$par=="tka"]     <- "log(ka)"
-iter$Parameter <- ordered(iter$Parameter, c("log(CL/F)", "log(V/F)", "log(ka)",
-                                            "IIV CL/F", "IIV V/F", "IIV ka",
-                                            "Additive error"))
-
-ggplot(iter, aes(iter, val)) +
-  geom_line(col="red") + 
-  scale_x_continuous("Iteration") +
-  scale_y_continuous("Value") +
-  facet_wrap(~ Parameter, scales="free_y") +
-  labs(title="Theophylline single-dose", subtitle="Parameter estimation iterations")
-
-```
-
-... and some random-effects histograms...
-
-```{r}
-
-etas <- data.frame(eta = c(fit2$eta$eta.ka, fit2$eta$eta.cl, fit2$eta$eta.v),
-                   lab = rep(c("eta(ka)", "eta(CL/F)", "eta(V/F)"), each=nrow(fit2$eta)))
-etas$lab <- ordered(etas$lab, c("eta(CL/F)","eta(V/F)","eta(ka)"))
-
-ggplot(etas, aes(eta)) +
-  geom_histogram(fill="red", col="white") + 
-  geom_vline(xintercept=0) +
-  scale_x_continuous(expression(paste(eta))) +
-  scale_y_continuous("Count") +
-  facet_grid(~ lab) +
-  coord_cartesian(xlim=c(-1.75,1.75)) +
-  labs(title="Theophylline single-dose", subtitle="IIV distributions")
-
-```
-
-
-## xpose
-
-This is all very nice. But what we really want is a complete suite of model diagnostic
-tools, like those available in [xpose](https://github.com/UUPharmacometrics/xpose), right?
-
-Restart R, and install xpose from CRAN, if you haven't already...
-
-```{r}
-## install.packages("xpose")
-library(xpose)
-```
-
-Now install the extension for nlmixr:
-
-```
- devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
-```
-
- ... and convert your nlmixr fit object into an xpose fit object.
- 
-```
-library(xpose.nlmixr)
-xp <- xpose_data_nlmixr(fit2);
-save(xp, file=xpdbLoc)
-```
-
-
-
-```{r}
-xpdbLoc <- file.path(system.file(package="nlmixr"), "xpdb.rds");
-if (file.exists(xpdbLoc)){
-    load(xpdbLoc);
-} else {
-    stop("Need to generate nlmixr.xpose example")
-}
-```
-
-
-```{r}
-dv_vs_pred(xp)
-```
-
-```{r}
-dv_vs_ipred(xp)
-```
-
-```{r}
-dv_vs_pred(xp)
-```
-
-```{r}
-absval_res_vs_pred(xp, res="IWRES")
-```
-We can also replicate some of nlmixr's internal plots...
-
-```{r}
-ind_plots(xp, res="IWRES")
-```
-
-For more information about using xpose, see the Uppsala pharmacometrics group's 
-comprehensive site [here](https://uupharmacometrics.github.io/xpose/).
+For diagnosing the model further, you can look at various methods for
+retrieving model diagnostics including the included methods, xpose and
+ggPMX.
 
 # The UI
 
