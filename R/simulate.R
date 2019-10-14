@@ -450,7 +450,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     if (.isMulti){
         if (any(names(dat) == "DVID")){
             new.pts <- lapply(unique(dat$DVID), function(dvid) {
-                .dat <- dat[dat$DVID == dvid, ];
+                .dat <- dat[dat$DVID == dvid,, drop = FALSE];
                 r <- range(.dat$TIME, na.rm=TRUE,finite=TRUE)
                 if (is.null(minimum) || is.infinite(minimum)){
                     minimum <- r[1];
@@ -485,7 +485,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
         fs <- c(locf=0, nocb=1, midpoint=0.5, linear=0)
         new.cov<- lapply(all.covs, function(cov){
             unlist(lapply(ids, function(id){
-                dat.id <- dat[dat$ID == id, ];
+                dat.id <- dat[dat$ID == id,];
                 fun <- stats::approxfun(dat.id$TIME, dat.id[[cov]], method=ifelse(covsi == "linear", "linear", "constant"),
                                         rule=2,
                                         f=fs[covsi]);
@@ -497,9 +497,9 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     new.pts$EVID <- 0
     new.pts$AMT <- 0
     dat.old <- dat;
-    dat <- rbind(dat[, names(new.pts)], new.pts);
-    dat <- dat[order(dat$ID, dat$TIME), ];
-    dat <- dat[!duplicated(paste(dat$ID, dat$TIME)), ];
+    dat <- rbind(dat[, names(new.pts), drop = FALSE], new.pts);
+    dat <- dat[order(dat$ID, dat$TIME),];
+    dat <- dat[!duplicated(paste(dat$ID, dat$TIME)),];
     lst <- as.list(match.call()[-1])
     lst <- lst[!(names(lst) %in% c("primary", "minimum", "maximum", "length.out"))]
     lst$object <- object
@@ -517,16 +517,16 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
             .tmp <- object$uif$nmodel$predDf[, c("cond", "dvid")];
             names(.tmp) <- c("Endpoint", "DVID")
             dat.new <- merge(dat.new, .tmp, by="DVID")
-            dat.new <- dat.new[, names(dat.new) != "DVID"];
+            dat.new <- dat.new[, names(dat.new) != "DVID", drop = FALSE];
             .endpoint <- dat.new[, "Endpoint"];
-            dat.new <- dat.new[, names(dat.new) != "Endpoint"];
-            dat.new <- data.frame(dat.new[, 1:2], Endpoint=.endpoint, stack(dat.new[,-(1:2)]))
+            dat.new <- dat.new[, names(dat.new) != "Endpoint", drop = FALSE];
+            dat.new <- data.frame(dat.new[, 1:2], Endpoint=.endpoint, stack(dat.new[,-(1:2), drop = FALSE]))
             levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
             dat.new$Endpoint <- factor(dat.new$Endpoint)
         } else {
         }
     } else {
-        dat.new <- data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2)]))
+        dat.new <- data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2), drop = FALSE]))
         levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
     }
     names(dat.old) <- tolower(names(dat.old))

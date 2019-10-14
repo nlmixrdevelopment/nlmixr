@@ -34,8 +34,8 @@ vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
                                c(list(object=.rx, params=.pars,
                                       events=.evtM,.setupOnly=2L),
                                  saem.cfg$optM)));
-      RxODE::rxDynProtect(RxODE::rxDll(.rx))
-      on.exit({RxODE::rxDynProtect("")})
+      RxODE::rxLock(.rx)
+      on.exit({RxODE::rxUnlock(.rx)})
   }
   dyn.load(.env$saem.dll);
   assignInMyNamespace(".protectSaemDll", .env$saem.dll)

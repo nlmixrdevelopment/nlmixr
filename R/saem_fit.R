@@ -686,17 +686,17 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       on.exit({nlmixr::.unprotectSaem()}, add=TRUE)
       if (.(is.ode)){
           RxODE::rxLoad(.(model))
-          RxODE::rxDynProtect(RxODE::rxDll(.(model)))
-          on.exit({RxODE::rxDynProtect("")})
+          RxODE::rxLock(.(model))
+          on.exit({RxODE::rxUnlock(.(model))})
           .l1 <- length(unique(a$evt[, "ID"]));
           .l2 <- length(unique(a$evtM[, "ID"]))
           if (.l2 > .l1){
-              suppressWarnings(do.call(RxODE:::rxSolve.default,
+              suppressWarnings(do.call(RxODE::rxSolve.default,
                                        c(list(object=.(model), params=a$opt$.pars,
                                               events=a$evtM,.setupOnly=1L),
                                          a$optM)))
           } else {
-              suppressWarnings(do.call(RxODE:::rxSolve.default,
+              suppressWarnings(do.call(RxODE::rxSolve.default,
                                        c(list(object=.(model), params=a$opt$.pars,
                                               events=a$evt,.setupOnly=1L),
                                          a$optM)))
@@ -708,8 +708,8 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
       RxODE::rxLoad(.(model))
-      RxODE::rxDynProtect(RxODE::rxDll(.(model)))
-      on.exit({RxODE::rxDynProtect("")})
+      RxODE::rxLock(.(model))
+      on.exit({RxODE::rxUnlock(.(model))})
       if (missing(b) && missing(c)){
         cur.fn <- .(fn1)
         ret <- cur.fn(a)
