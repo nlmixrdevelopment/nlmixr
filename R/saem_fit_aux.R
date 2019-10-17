@@ -37,7 +37,8 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
                                        events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
         RxODE::rxLock(.rx)
-        on.exit({RxODE::rxUnlock(.rx)})
+        RxODE::rxAllowUnload(FALSE);
+        on.exit({RxODE::rxUnlock(.rx); RxODE::rxAllowUnload(TRUE)})
     }
     dyn.load(.env$saem.dll);
     assignInMyNamespace(".protectSaemDll", .env$saem.dll)
@@ -142,7 +143,8 @@ plot.saemFit = function(x,...) {
                                        events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
         RxODE::rxLock(.rx)
-        on.exit({RxODE::rxUnlock(.rx)})
+        RxODE::rxAllowUnload(FALSE);
+        on.exit({RxODE::rxUnlock(.rx); RxODE::rxAllowUnload(TRUE);})
     }
     dat = as.data.frame(saem.cfg$evt)
     dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
@@ -337,7 +339,8 @@ calc.COV = function(fit0) {
                                       events=.evtM,.setupOnly=1L),
                                  saem.cfg$optM)));
       RxODE::rxLock(.rx)
-      on.exit({RxODE::rxUnlock(.rx)})
+      RxODE::rxAllowUnload(FALSE);
+      on.exit({RxODE::rxUnlock(.rx);RxODE::rxAllowUnload(TRUE);})
   }
   dyn.load(.env$saem.dll);
   assignInMyNamespace(".protectSaemDll", .env$saem.dll)

@@ -687,6 +687,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       if (.(is.ode)){
           RxODE::rxLoad(.(model))
           RxODE::rxLock(.(model))
+          RxODE::rxAllowUnload(FALSE);
           on.exit({RxODE::rxUnlock(.(model))})
           .l1 <- length(unique(a$evt[, "ID"]));
           .l2 <- length(unique(a$evtM[, "ID"]))
@@ -709,7 +710,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
     fn <- eval(bquote(function(a, b, c){
       RxODE::rxLoad(.(model))
       RxODE::rxLock(.(model))
-      on.exit({RxODE::rxUnlock(.(model))})
+      on.exit({RxODE::rxUnlock(.(model)); RxODE::rxAllowUnload(TRUE);})
       if (missing(b) && missing(c)){
         cur.fn <- .(fn1)
         ret <- cur.fn(a)
