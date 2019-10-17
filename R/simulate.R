@@ -395,16 +395,16 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
         } else {
             lst$params <- ipred.par
         }
-        ret <- do.call(getFromNamespace("rxSolve","RxODE"), lst, envir=parent.frame(2));
+        ret <- suppressWarnings(do.call(getFromNamespace("rxSolve","RxODE"), lst, envir=parent.frame(2)));
         if (do.ipred){
             names(ret) <- sub("pred", "ipred", names(ret))
         }
         return(ret)
     } else {
         lst$params <- pred.par
-        ret.pred <- do.call(getFromNamespace("rxSolve","RxODE"), lst, envir=parent.frame(2));
+        ret.pred <- suppressWarnings(do.call(getFromNamespace("rxSolve","RxODE"), lst, envir=parent.frame(2)));
         lst$params <- ipred.par
-        ret.pred$ipred <- do.call(getFromNamespace("rxSolve","RxODE"), lst, envir=parent.frame(2))$pred
+        ret.pred$ipred <- suppressWarnings(do.call(getFromNamespace("rxSolve","RxODE"), lst, envir=parent.frame(2)))$pred
         return(ret.pred)
     }
 }
@@ -438,14 +438,14 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
         if (.modName==".-") .modName <- ""
         .dataName  <- ifelse(is.null(object$uif$data.name),"",paste0(object$uif$data.name,"-"));
         if (.dataName==".-") .dataName <- ""
-        .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",uif$fun.txt)),
+        .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",object$uif$fun.txt)),
                                        as.data.frame(object$uif$ini),
                                        covsInterpolation,
                                        primary, minimum, maximum, length.out,
                                        as.character(utils::packageVersion("nlmixr")),
                                        as.character(utils::packageVersion("RxODE"))))
         .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
-                                paste0("nlmixr-augPred-",.modName,.dataName,est,"-",.digest,".rds"));
+                                paste0("nlmixr-augPred-",.modName,.dataName,"-",.digest,".rds"));
         if (file.exists(.saveFile)){
             message(sprintf("Loading augPred already run (%s)",.saveFile))
             .ret  <- readRDS(.saveFile)
