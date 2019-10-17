@@ -296,9 +296,22 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     fix.dat <- function(x){
         .cls <- class(x);
         class(x) <- "data.frame";
+        x$ID <- as.integer(x$ID)
         attr(x$ID, "levels") <- .lab;
         class(x$ID) <- "factor";
         class(x) <- .cls;
+        .etaO <- x$etaObf
+        .etaO$ID <- as.integer(.etaO$ID)
+        attr(.etaO$ID, "levels") <- .lab;
+        class(.etaO$ID) <- "factor";
+        .eta <- x$eta
+        .eta$ID <- as.integer(.eta$ID)
+        attr(.eta$ID, "levels") <- .lab;
+        class(.eta$ID) <- "factor";
+        .ranef <- x$ranef
+        .ranef$ID <- as.integer(.ranef$ID)
+        attr(.ranef$ID, "levels") <- .lab;
+        class(.ranef$ID) <- "factor";
         .uif <- x$uif;
         .thetas <- x$theta;
         for (.n in names(.thetas)){
@@ -311,8 +324,11 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             }
         }
         .env <- x$env
+        .env$etaObf <- .etaO
+        .env$eta <- .eta
         .env$origData <- .origData;
         .env$uif <- .uif;
+        .env$ranef <- .ranef;
         .predDf <- .uif$predDf;
         if (any(.predDf$cond != "") & any(names(x) == "CMT")){
             .cls <- class(x);
