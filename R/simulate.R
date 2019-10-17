@@ -424,10 +424,33 @@ predict.nlmixrFitData <- function(object, ...){
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
-                          primary=NULL, minimum = NULL, maximum = NULL, length.out = 51L){
+                          primary=NULL, minimum = NULL, maximum = NULL, length.out = 51L,
+                          save=NULL){
     force(object);
     if (!inherits(object, "nlmixrFitData")){
         stop("Need a nlmixr fit object")
+    }
+    if (is.null(save)){
+        save <- getOption("nlmixr.save", FALSE);
+    }
+    if (save){
+        .modName  <- ifelse(is.null(object$uif$model.name),"",paste0(object$uif$model.name,"-"));
+        if (.modName==".-") .modName <- ""
+        .dataName  <- ifelse(is.null(object$uif$data.name),"",paste0(object$uif$data.name,"-"));
+        if (.dataName==".-") .dataName <- ""
+        .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",uif$fun.txt)),
+                                       as.data.frame(object$uif$ini),
+                                       covsInterpolation,
+                                       primary, minimum, maximum, length.out,
+                                       as.character(utils::packageVersion("nlmixr")),
+                                       as.character(utils::packageVersion("RxODE"))))
+        .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
+                                paste0("nlmixr-augPred-",.modName,.dataName,est,"-",.digest,".rds"));
+        if (file.exists(.saveFile)){
+            message(sprintf("Loading augPred already run (%s)",.saveFile))
+            .ret  <- readRDS(.saveFile)
+            return(.ret)
+        }
     }
     uif <- object$uif
     ## Using the model will drop the subjects that were dropped by the fit
@@ -549,7 +572,11 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     } else {
         dat.old <- data.frame(id=dat.old$id, time=dat.old$time, values=dat.old$dv, ind="Observed");
     }
-    return(rbind(dat.new, dat.old))
+    .ret <- rbind(dat.new, dat.old);
+    if (save){
+        saveRDS(.ret,file=.saveFile)
+    }
+    return(.ret)
 }
 
 ##' @rdname nlmixrAugPred

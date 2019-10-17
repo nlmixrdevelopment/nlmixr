@@ -18,7 +18,37 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                    pred_corr_lower_bnd = 0, pi = c(0.05, 0.95), ci = c(0.05, 0.95),
                    uloq = NULL, lloq = NULL, log_y = FALSE, log_y_min = 0.001,
                    xlab = NULL, ylab = NULL, title = NULL, smooth = TRUE, vpc_theme = NULL,
-                   facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...){
+                   facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...,
+                   save=NULL){
+    if (is.null(save)){
+        save <- getOption("nlmixr.save", FALSE);
+    }
+    if (save){
+        .modName  <- ifelse(is.null(fit$uif$model.name),"",paste0(fit$uif$model.name,"-"));
+        if (.modName==".-") .modName <- ""
+        .dataName  <- ifelse(is.null(fit$uif$data.name),"",paste0(fit$uif$data.name,"-"));
+        if (.dataName==".-") .dataName <- ""
+        .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",fit$uif$fun.txt)),
+                                       as.data.frame(fit$uif$ini),
+                                       data, n, bins,
+                                       n_bins,
+                                       bin_mid,
+                                       show, stratify, pred_corr,
+                                       pred_corr_lower_bnd,
+                                       pi, ci,
+                                       uloq, lloq, log_y, log_y_min,
+                                       xlab, ylab, title, smooth, vpc_theme,
+                                       facet, labeller, vpcdb, verbose,
+                                       as.character(utils::packageVersion("nlmixr")),
+                                       as.character(utils::packageVersion("RxODE"))))
+        .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
+                                paste0("nlmixr-vpc-",.modName,.dataName,"-",.digest,".rds"));
+        if (file.exists(.saveFile)){
+            message(sprintf("Loading vpc already run (%s)",.saveFile))
+            .ret  <- readRDS(.saveFile)
+            return(.ret)
+        }
+    }
     RxODE::.setWarnIdSort(FALSE);
     on.exit(RxODE::.setWarnIdSort(TRUE));
     if (is(data, "numeric") | is(data, "integer")){
@@ -170,6 +200,9 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     cls <- c("nlmixrVpc", class(p));
     attr(cls, "nlmixrVpc") <- sim
     class(p) <- cls
+    if (save){
+        saveRDS(p,file=.saveFile)
+    }
     return(p);
 }
 
