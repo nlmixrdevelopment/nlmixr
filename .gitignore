@@ -25,3 +25,8 @@ vignettes/running_nlmixr.html
 build/*.*$
 *.exe$
 /src/Makevars
+vignettes/*_files/
+vignettes/*.html
+vignettes/*.R
+config.log
+config.status

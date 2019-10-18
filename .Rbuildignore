@@ -35,3 +35,7 @@ BinaryFiles$
 ^\.Rproj\.user$
 ^/?docs/*$
 ^pkgdown$
+^vignettes/xgxr-nlmixr-ggpmx.Rmd$
+vignettes/*_files/
+vignettes/*.html
+vignettes/*.R
