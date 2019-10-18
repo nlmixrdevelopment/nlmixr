@@ -441,6 +441,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// augPredTrans
+RObject augPredTrans(NumericVector& pred, NumericVector& ipred, NumericVector& lambda, RObject& yjIn);
+RcppExport SEXP _nlmixr_augPredTrans(SEXP predSEXP, SEXP ipredSEXP, SEXP lambdaSEXP, SEXP yjInSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector& >::type pred(predSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type ipred(ipredSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< RObject& >::type yjIn(yjInSEXP);
+    rcpp_result_gen = Rcpp::wrap(augPredTrans(pred, ipred, lambda, yjIn));
+    return rcpp_result_gen;
+END_RCPP
+}
 // saemDoPred
 RObject saemDoPred(RObject in_phi, RObject in_evt, RObject in_opt, CharacterVector cur, RObject model, std::string dll);
 RcppExport SEXP _nlmixr_saemDoPred(SEXP in_phiSEXP, SEXP in_evtSEXP, SEXP in_optSEXP, SEXP curSEXP, SEXP modelSEXP, SEXP dllSEXP) {

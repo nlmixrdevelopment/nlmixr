@@ -155,6 +155,10 @@ npde <- function(id, dv, evid, sim, lambda, yj, ties, tolChol) {
     .Call(`_nlmixr_npde`, id, dv, evid, sim, lambda, yj, ties, tolChol)
 }
 
+augPredTrans <- function(pred, ipred, lambda, yjIn) {
+    .Call(`_nlmixr_augPredTrans`, pred, ipred, lambda, yjIn)
+}
+
 saemDoPred <- function(in_phi, in_evt, in_opt, cur, model, dll) {
     .Call(`_nlmixr_saemDoPred`, in_phi, in_evt, in_opt, cur, model, dll)
 }

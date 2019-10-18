@@ -535,7 +535,11 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     if (.isMulti){
         lst$keep <- .multiType
     }
+    lst$returnType <- "data.frame.TBS";
     dat.new <- do.call("nlmixrPred", lst, envir=parent.frame(2))
+    .Call(`_nlmixr_augPredTrans`, dat.new$pred, dat.new$ipred,
+          dat.new$rxLambda, dat.new$rxYj);
+    dat.new <- dat.new[, !(names(dat.new) %in% c("rxLambda", "rxYj"))]
     dat.new$id <- factor(dat.new$id)
     levels(dat.new$id) <- levels(object$ID)
     if (.isMulti){
