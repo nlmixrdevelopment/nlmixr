@@ -128,11 +128,12 @@ between actual individual profiles.  Using `ggplot` coupled with the
 as well:
 
 ```{r}
-ggplot(data = pk_data_cycle1, aes(x = NOMTIME, y = LIDV)) +
-  geom_line(aes(group = ID), color = rgb(0.5, 0.5, 0.5), size = 1, alpha = 0.3) +
+ggplot(data = pk_data_cycle1, aes(x = TIME, y = LIDV)) +
+  geom_line(aes(group = ID), color = "grey50", size = 1, alpha = 0.3) +
+  geom_point(aes(color = factor(CENS), shape = factor(CENS))) + 
   scale_shape_manual(values = c(1, 8)) +
   scale_color_manual(values = c("grey50", "red")) +
-  xgx_geom_ci(aes(x = NOMTIME, color = NULL, group = NULL), conf_level = 0.95) +
+  xgx_geom_ci(aes(x = NOMTIME, color = NULL, group = NULL, shape = NULL), conf_level = 0.95) +
   xgx_scale_y_log10() +
   xgx_scale_x_time_units(units_dataset = time_units_dataset, units_plot = time_units_plot) +
   labs(y = conc_label, color = trtact_label) +
