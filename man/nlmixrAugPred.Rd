@@ -7,7 +7,7 @@
 \usage{
 nlmixrAugPred(object, ..., covsInterpolation = c("linear", "locf",
   "nocb", "midpoint"), primary = NULL, minimum = NULL,
-  maximum = NULL, length.out = 51L)
+  maximum = NULL, length.out = 51L, save = NULL)
 
 \method{augPred}{nlmixrFitData}(object, primary = NULL, minimum = NULL,
   maximum = NULL, length.out = 51, ...)
