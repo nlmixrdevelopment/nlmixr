@@ -8,7 +8,10 @@ output:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "100%"
   )
 
 ## These options cache the models and the model simulations in R

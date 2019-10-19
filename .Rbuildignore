@@ -36,6 +36,7 @@ BinaryFiles$
 ^/?docs/*$
 ^pkgdown$
 ^vignettes/xgxr-nlmixr-ggpmx.Rmd$
+^vignettes/addingCovariances.Rmd$
 vignettes/*_files/
 vignettes/*_GOF/
 vignettes/*.html
