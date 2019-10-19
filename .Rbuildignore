@@ -37,5 +37,8 @@ BinaryFiles$
 ^pkgdown$
 ^vignettes/xgxr-nlmixr-ggpmx.Rmd$
 vignettes/*_files/
+vignettes/*_GOF/
 vignettes/*.html
 vignettes/*.R
+vignettes/*.docx
+vignettes/*.pdf

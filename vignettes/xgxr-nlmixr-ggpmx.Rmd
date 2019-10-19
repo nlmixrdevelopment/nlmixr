@@ -344,4 +344,4 @@ ctr %>% pmx_report("nlmixr_report",".")
 unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
 ```
 
-This creates 2 reports, both a [pdf](nlmixr_report.pdf) and [word](nlmixr_report.docx) document.
+This creates 2 reports, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document.
