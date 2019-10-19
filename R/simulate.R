@@ -146,8 +146,11 @@
 ##' @param ... Other arguments sent to \code{rxSolve}
 ##' @inheritParams RxODE::rxSolve
 ##' @export
-nlmixrSim <- function(object, ...){
+nlmixrSim <- function(object, ..., save=NULL){
     RxODE::.setWarnIdSort(TRUE);
+    if (is.null(save)){
+        save <- getOption("nlmixr.save", FALSE);
+    }
     on.exit({RxODE::.setWarnIdSort(FALSE)});
     .si <- .simInfo(object);
     .xtra <- list(...)
@@ -214,6 +217,24 @@ nlmixrSim <- function(object, ...){
     .xtra$omega <- .si$omega;
     .xtra$dfSub <- .si$dfSub
     .xtra$sigma <- .si$sigma;
+    if (save){
+        .modName  <- ifelse(is.null(object$uif$model.name),"",paste0(object$uif$model.name,"-"));
+        if (.modName==".-") .modName <- ""
+        .dataName  <- ifelse(is.null(object$uif$data.name),"",paste0(object$uif$data.name,"-"));
+        if (.dataName==".-") .dataName <- ""
+        .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",object$uif$fun.txt)),
+                                       as.data.frame(object$uif$ini),
+                                       .xtra
+                                       as.character(utils::packageVersion("nlmixr")),
+                                       as.character(utils::packageVersion("RxODE"))))
+        .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
+                                paste0("nlmixr-nlmixrSim-",.modName,.dataName,"-",.digest,".rds"));
+        if (file.exists(.saveFile)){
+            message(sprintf("Loading nlmixrSim already run (%s)",.saveFile))
+            .ret  <- readRDS(.saveFile)
+            return(.ret)
+        }
+    }
     .ret <- do.call(getFromNamespace("rxSolve", "RxODE"), .xtra, envir=parent.frame(2))
     if (inherits(.ret, "rxSolve")){
         .rxEnv <- attr(class(.ret),".RxODE.env")
@@ -237,6 +258,9 @@ nlmixrSim <- function(object, ...){
             }
         }
         class(.ret) <- .cls
+    }
+    if (save){
+        saveRDS(.ret,file=.saveFile)
     }
     return(.ret)
 }
