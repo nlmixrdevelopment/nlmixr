@@ -35,6 +35,9 @@ BinaryFiles$
 ^\.Rproj\.user$
 ^/?docs/*$
 ^pkgdown$
+^vignettes/running_nlmixr.Rmd$
+^vignettes/running_nlmixr.html$
+^vignettes/running_nlmixr_files$
 ^vignettes/xgxr-nlmixr-ggpmx.Rmd$
 ^vignettes/addingCovariances.Rmd$
 ^vignettes/broom.Rmd$

@@ -16,12 +16,22 @@ knitr::opts_chunk$set(
   out.width = "100%"
   )
 
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "100%"
+  )
+
 ## These options cache the models and the model simulations in R
 ## To run the actual models on your system, take the save options off.
 nlmixrVersion <- as.character(packageVersion("nlmixr"));
 options(nlmixr.save=TRUE,
-        nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion));
+        nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion),
+        huxtable.knit_print_df = FALSE);
 if (!dir.exists(getOption("nlmixr.save.dir")))
+    dir.create(getOption("nlmixr.save.dir"))
     dir.create(getOption("nlmixr.save.dir"))
 ```
 
