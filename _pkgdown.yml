@@ -141,6 +141,11 @@ navbar:
           href: articles/modelPiping.html
         - text: "Sweeping models to tidy datasets (broom)"
           href: articles/broom.html
+        - text: "--------------------------"
+	- text: "Goodness of fit graphics with xpose.nlmixr"
+	  href: articles/xpose-nlmixr.html
+	- text: "Integrated development with xgxr/nlmixr/ggPMX"
+	  href: articles/xgxr-nlmixr-ggpmx.html
   - text: Example models
     icon: fas fa-chalkboard-teacher
     menu:

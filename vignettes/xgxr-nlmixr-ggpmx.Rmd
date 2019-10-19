@@ -18,7 +18,6 @@ options(nlmixr.save=TRUE,
         nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion));
 if (!dir.exists(getOption("nlmixr.save.dir")))
     dir.create(getOption("nlmixr.save.dir"))
-warning(getOption("nlmixr.save.dir"))
 ```
 
 This shows an example of integrated workflow between `xgxr` `nlmixr`
@@ -35,8 +34,8 @@ library(ggPMX)
 
 ```
 
-
 # Load the data
+
 ```{r}
 pkpd_data <- case1_pkpd %>%
   arrange(DOSE) %>%
@@ -54,6 +53,7 @@ pk_data_cycle1 <- pk_data %>%
 ```
 
 # Exploratory analysis using ggplot and xgx helper functions
+
 ## Use xgxr for simplified concentration over time, colored by Dose, mean +/- 95% CI
 
 Often in exploring data it is worthwhile to plot by dose by each
@@ -120,7 +120,8 @@ stratified by dose
 Not only is it useful to look at the mean concentrations, it is often
 useful to look at the mean concentrations and their relationship
 between actual individual profiles.  Using `ggplot` coupled with the
-`xgxr` helper functions used above, we can easily create these plots as well:
+`xgxr` helper functions used above, we can easily create these plots
+as well:
 
 ```{r}
 ggplot(data = pk_data_cycle1, aes(x = NOMTIME, y = LIDV)) +
@@ -218,10 +219,10 @@ dat <- case1_pkpd %>%
     # Filter (for now) since CENS supprot in nlmixr is in development
     filter(CENS == 0) %>%
     filter(TRTACT != "Placebo")
-    
 ```
 
-Next create a 2 compartment model
+Next create a 2 compartment model:
+
 ```{r}
 
 ## Use 2 compartment model
@@ -347,3 +348,80 @@ if (file.exists("nlmixr_report.Rmd"))
 ```
 
 This creates 2 reports, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document.
+
+
+# Simulation of a new scenario with RxODE
+
+By creating events you can simply simulate a new scenario.  Perhaps
+your drug development team wants to explore the 100 mg dose 3 times a
+day dosing to see what happens with the PK.  You can simply simulate
+from the nlmixr model using a [new event
+table](https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html)
+created from RxODE.
+
+In this case we wish to simulate with some variability and see what
+happens at steady state:
+
+```{r}
+(ev <- et(amt=100, ii=8, ss=1))
+
+ev$add.sampling(seq(0, 8, length.out=100))
+ev
+```
+
+A nlmixr model already includes information about the parameter
+estimates and can simulate without uncertainty in the population
+parameters or covariances, like what is done for a VPC. 
+
+If you wish to simulate `100` patients repeated by `100` different
+theoretical studies where you simulate from the uncertainty in the
+fixed parameter estimates and covariances you can very easily with
+nlmixr/RxODE:
+
+```{r}
+set.seed(100)
+sim1 <- simulate(cmt2fit.logn, events=ev, nSub=100, nStud=100)
+
+sim1
+```
+
+You may examine the simulated study information easily, as show in the
+`RxODE` printout:
+
+```{r}
+head(sim1$thetaMat)
+```
+
+You can also see the covariance matricies that are simulated (note
+they come from an inverse Wishart distribution):
+
+```{r}
+head(sim1$omegaList)
+```
+
+```{r}
+head(sim1$sigmaList)
+```
+
+It is also easy enough to create a plot to see what is going on with
+the simulation:
+
+```{r}
+
+p1 <- plot(sim1) ## This returns a ggplot2 object
+
+## you can tweak the plot by the standard ggplot commands
+p1 + xlab("Time (hr)") + 
+    ylab("Simulated Concentrations of TID steady state")
+
+# And put the same plot on a semi-log plot
+p1 + xlab("Time (hr)") + 
+    ylab("Simulated Concentrations of TID steady state") +
+    xgx_scale_y_log10()
+```
+
+For more complex simulations with variability you can also [simulate
+dosing windows and sampling
+windows](https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html#add-doses-and-samples-within-a-sampling-window)
+and use any tool you want to summarize it in the way you wish.
+
