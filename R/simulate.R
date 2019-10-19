@@ -462,15 +462,12 @@ predict.nlmixrFitData <- function(object, ...){
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
-                          primary=NULL, minimum = NULL, maximum = NULL, length.out = 51L,
-                          save=NULL){
+                          primary=NULL, minimum = NULL, maximum = NULL, length.out = 51L){
     force(object);
     if (!inherits(object, "nlmixrFitData")){
         stop("Need a nlmixr fit object")
     }
-    if (is.null(save)){
-        save <- getOption("nlmixr.save", FALSE);
-    }
+    save <- getOption("nlmixr.save", FALSE);
     if (save){
         .modName  <- ifelse(is.null(object$uif$model.name),"",paste0(object$uif$model.name,"-"));
         if (.modName==".-") .modName <- ""

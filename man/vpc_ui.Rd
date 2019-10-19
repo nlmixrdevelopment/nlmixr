@@ -13,7 +13,7 @@ vpc_ui(fit, data = NULL, n = 100, bins = "jenks", n_bins = "auto",
   ci = c(0.05, 0.95), uloq = NULL, lloq = NULL, log_y = FALSE,
   log_y_min = 0.001, xlab = NULL, ylab = NULL, title = NULL,
   smooth = TRUE, vpc_theme = NULL, facet = "wrap", labeller = NULL,
-  vpcdb = FALSE, verbose = FALSE, ..., save = NULL)
+  vpcdb = FALSE, verbose = FALSE, ...)
 
 \method{vpc}{nlmixrFitData}(sim, ...)
 

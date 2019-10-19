@@ -18,11 +18,8 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                    pred_corr_lower_bnd = 0, pi = c(0.05, 0.95), ci = c(0.05, 0.95),
                    uloq = NULL, lloq = NULL, log_y = FALSE, log_y_min = 0.001,
                    xlab = NULL, ylab = NULL, title = NULL, smooth = TRUE, vpc_theme = NULL,
-                   facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...,
-                   save=NULL){
-    if (is.null(save)){
-        save <- getOption("nlmixr.save", FALSE);
-    }
+                   facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...){
+    save <- getOption("nlmixr.save", FALSE);
     if (save){
         .modName  <- ifelse(is.null(fit$uif$model.name),"",paste0(fit$uif$model.name,"-"));
         if (.modName==".-") .modName <- ""
