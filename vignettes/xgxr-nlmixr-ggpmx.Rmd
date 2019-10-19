@@ -339,9 +339,11 @@ ctr %>% pmx_plot_eta_hist
 ctr %>% pmx_plot_eta_matrix
 
 ## Create a report of all the plots you generated from the controller
-ctr %>% pmx_report("nlmixr_report",".")
-
-unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
+if (!file.exists("nlmixr_report.docx")){
+    ctr %>% pmx_report("nlmixr_report",".")
+}
+if (file.exists("nlmixr_report.Rmd"))
+    unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
 ```
 
 This creates 2 reports, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document.
