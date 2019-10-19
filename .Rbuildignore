@@ -67,6 +67,7 @@ BinaryFiles$
 ^vignettes/nimoData.rda$
 ^vignettes/Simulated_WBC_pacl_ddmore_samePK_nlmixr.csv$
 ^vignettes/pbpk.png$
+^vignettes/logo.png$
 ^vignettes/*_GOF/
 ^vignettes/*.R$
 ^vignettes/*.html$

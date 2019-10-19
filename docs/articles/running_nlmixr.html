@@ -151,7 +151,7 @@
             
             <h4 class="date">2019-10-19</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/vignettes/running_nlmixr.Rmd"><code>vignettes/vignettes/running_nlmixr.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/vignettes/running_nlmixr.Rmd"><code>inst/vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
 
     </div>
@@ -264,7 +264,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;          nlme    setup table    other</span>
-<span class="co">#&gt; elapsed 2.088 0.754332 0.061 0.211668</span>
+<span class="co">#&gt; elapsed 2.903 6.564018 0.133 0.870982</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -822,8 +822,8 @@
 <span class="co">#&gt;  FOCEi CWRES &amp; Likelihoods: addCwres() </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;          saem    setup table covariance    other</span>
-<span class="co">#&gt; elapsed 3.649 0.177003 0.007      0.006 0.151997</span>
+<span class="co">#&gt;           saem    setup table covariance    other</span>
+<span class="co">#&gt; elapsed 28.939 3.809114 0.009      0.009 0.427886</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -853,6 +853,10 @@
 <span class="co">#&gt; #   cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;</span></code></pre></div>
 <p>And if we wanted to, we could even apply the First-Order Conditional Estimation (FOCEi) method to this model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fitF &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"focei"</span>)
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====</span>
 <span class="co">#&gt; Key: U: Unscaled Parameters; X: Back-transformed parameters; G: Gradient</span>
 <span class="co">#&gt; Unscaled parameters for Omegas=chol(solve(omega));</span>
 <span class="co">#&gt; Diagonals are transformed, as specified by foceiControl(diagXform=)</span>
@@ -1202,7 +1206,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.243188 0.343473   0.343477 0.063 1.455862</span>
+<span class="co">#&gt; elapsed 10.94299 0.494011   0.494015 0.071 2.065984</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;        Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
@@ -1249,7 +1253,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;          nlme    setup table    other</span>
-<span class="co">#&gt; elapsed 2.088 0.754332 0.061 0.211668</span>
+<span class="co">#&gt; elapsed 2.903 6.564018 0.133 0.870982</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
