@@ -146,11 +146,9 @@
 ##' @param ... Other arguments sent to \code{rxSolve}
 ##' @inheritParams RxODE::rxSolve
 ##' @export
-nlmixrSim <- function(object, ..., save=NULL){
+nlmixrSim <- function(object, ...){
     RxODE::.setWarnIdSort(TRUE);
-    if (is.null(save)){
-        save <- getOption("nlmixr.save", FALSE);
-    }
+    save <- getOption("nlmixr.save", FALSE);
     on.exit({RxODE::.setWarnIdSort(FALSE)});
     .si <- .simInfo(object);
     .xtra <- list(...)
@@ -224,7 +222,7 @@ nlmixrSim <- function(object, ..., save=NULL){
         if (.dataName==".-") .dataName <- ""
         .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",object$uif$fun.txt)),
                                        as.data.frame(object$uif$ini),
-                                       .xtra
+                                       .xtra,
                                        as.character(utils::packageVersion("nlmixr")),
                                        as.character(utils::packageVersion("RxODE"))))
         .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
@@ -269,12 +267,25 @@ nlmixrSim <- function(object, ..., save=NULL){
 plot.nlmixrSim <- function(x, y, ...){
     p1 <-eff <-Percentile <-sim.id <-id <-p2 <-p50 <-p05 <- p95 <- . <- NULL
     .args <- list(...)
+    save <- getOption("nlmixr.save", FALSE);
     RxODE::rxReq("dplyr")
     RxODE::rxReq("tidyr")
     if (is.null(.args$p)){
         .p <- c(0.05, 0.5, 0.95)
     } else {
         .p <- .args$p;
+    }
+    if (save){
+        .digest <- digest::digest(list(.args,
+                                       as.character(utils::packageVersion("nlmixr")),
+                                       as.character(utils::packageVersion("RxODE"))))
+        .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
+                                paste0("nlmixrSimPlot-",.digest,".rds"));
+        if (file.exists(.saveFile)){
+            message(sprintf("Loading nlmixrSimPlot already summarized (%s)",.saveFile))
+            .ret  <- readRDS(.saveFile)
+            return(.ret)
+        }
     }
     if (x$env$nStud <= 1){
         if (x$env$nSub < 2500){
@@ -304,6 +315,9 @@ plot.nlmixrSim <- function(x, y, ...){
     .ret <- ggplot2::ggplot(.ret,aes(time,p50,col=Percentile,fill=Percentile)) +
         ggplot2::geom_ribbon(aes(ymin=p05,ymax=p95),alpha=0.5)+
         ggplot2::geom_line(size=1.2)
+    if (save){
+        saveRDS(.ret,file=.saveFile)
+    }
     return(.ret);
 }
 
