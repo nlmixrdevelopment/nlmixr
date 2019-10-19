@@ -1,0 +1,215 @@
+---
+title: "Modifying nlmixr models by piping"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: no
+---
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "100%"
+  )
+
+## These options cache the models and the model simulations in R
+## To run the actual models on your system, take the save options off.
+nlmixrVersion <- as.character(packageVersion("nlmixr"));
+options(nlmixr.save=TRUE,
+        nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion));
+if (!dir.exists(getOption("nlmixr.save.dir")))
+    dir.create(getOption("nlmixr.save.dir"))
+```
+
+![nlmixr](logo.png)
+
+# Changing models via piping
+
+As in the running nlmixr vignette, Let's start with a very simple PK
+example, using the single-dose theophylline dataset generously
+provided by Dr. Robert A. Upton of the University of California, San
+Francisco:
+
+```{r}
+
+library(nlmixr)
+
+one.compartment <- function() {
+    ini({
+        tka <- 0.45 # Log Ka
+        tcl <- 1 # Log Cl
+        ## This works with interactive models
+        ## You may also label the preceding line with label("label text")
+        tv <- 3.45; # log V
+        ## the label("Label name") works with all models
+        eta.ka ~ 0.6
+        eta.cl ~ 0.3
+        eta.v ~ 0.1
+        add.sd <- 0.7
+    })
+    model({
+        ka <- exp(tka + eta.ka)
+        cl <- exp(tcl + eta.cl)
+        v <- exp(tv + eta.v)
+        d/dt(depot) = -ka * depot
+        d/dt(center) = ka * depot - cl / v * center
+        cp = center / v 
+        cp ~ add(add.sd)
+    })
+}
+```
+
+We can try the First-Order Conditional Estimation with Interaction
+(FOCEi) method to find a good solution:
+
+```{r}
+fit <- nlmixr(one.compartment, theo_sd, est="focei",
+              table=list(npde=TRUE, cwres=TRUE))
+
+print(fit)
+```
+
+# Changing and fixing parameter values in models
+
+Something that you may want to do is change initial estimates with a
+model.  It is simple to modify the model definition and change them
+yourself, but you may also want to change them in a specific way; For
+example try a range of starting values to see how the system behaves
+(either by full estimation or by a posthoc estimation). 
+In these situations it can be come tedious to modify the models by hand.
+
+nlmixr provides the ability to:
+
+1. Change parameter estimates before or after running a model. (ie
+   `ini(tka=0.5)`)
+2. Fix parameters to arbitrary values, or estimated values (ie
+   `ini(tka=fix(0.5))` or `ini(tka=fix)`)
+   
+The easiest way to illustrate this is by showing a few examples of
+piping changes to the model:
+
+```R
+## Example 1 -- Set inital estimate to 0.5 (shown w/posthoc)
+one.ka.0.5 <- fit %>%
+    ini(tka=0.5) %>% 
+    nlmixr(est="posthoc", table=list(cwres=TRUE, npde=TRUE))
+
+print(one.ka.0.5)
+```
+
+```{r}
+## Example 2 -- Fix tka to 0.5 and re-estimate.
+one.ka.0.5 <- fit %>%
+    ini(tka=fix(0.5)) %>%
+    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+
+print(one.ka.0.5)
+```
+
+```{r}
+## Example 3 -- Fix tka to model estimated value and re-estimate.
+one.ka.0.5 <- fit %>%
+    ini(tka=fix) %>%
+    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+
+print(one.ka.0.5)
+```
+
+```{r}
+## Example 4 -- Change tka to 0.7 in orginal model function and then estimate
+one.ka.0.7 <- one.compartment %>%
+    ini(tka=0.7) %>% 
+    nlmixr(theo_sd, est="focei", table=list(cwres=TRUE, npde=TRUE))
+
+print(one.ka.0.7)
+```
+
+# Changing model features
+
+When developing models, often you add and remove between subject
+variability to parameters, add covariates to the effects, and/or
+change the residual errors.  You can change lines in the model by
+piping the fit or the nlmixr model specification function to a `model`
+
+## Adding or Removing between subject variability 
+
+Often in developing a model you add and remove between subject
+variability to certain model parameters.  For example, you could
+remove the between subject variability in the ka parameter by changing that line in the model;  
+
+For example to remove a eta from a prior fit or prior model
+specification function, simply pipe it to the model function.  You can
+then re-estimate by piping it to the `nlmixr` function again.
+
+```{r}
+## Remove eta.ka on ka
+noEta <- fit %>%
+    model(ka <- exp(tka)) %>%
+    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+
+print(noEta)
+```
+
+Of course you could also add an eta on a parameter in the same way;
+
+```{r}
+addBackKa <- noEta %>%
+    model({ka <- exp(tka + bsv.ka)}) %>%
+    ini(bsv.ka=0.1) %>%
+    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+
+print(addBackKa)
+```
+
+You can see the name change by examining the `omega` matrix:
+
+```{r}
+addBackKa$omega
+```
+
+Note that new between subject variability parameters are distinguished
+from other types of parameters (ie population parameters, and
+individual covariates) by their name. Parameters starting or ending
+with the following names are assumed to be between subject variability
+parameters:
+
+- eta (from NONMEM convention)
+- ppv (per patient variability)
+- psv (per subject variability)
+- iiv (inter-individual variability)
+- bsv (between subject variability)
+- bpv (between patient variability)
+
+
+## Adding Covariate effects
+
+```{r}
+## Note currently cov is needed as a prefix so nlmixr knows this is an
+## estimated parameter not a parameter
+wt70 <- fit %>% ## FIXME could be based on if it finds the covarite in the last used nlmixr data.
+    model({cl <- exp(tcl + eta.cl)*(WT/70)^covWtPow}) %>%
+    ini(covWtPow=fix(0.75)) %>%
+    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+
+print(wt70)
+```
+
+## Changing residual errors
+
+Changing the residual errors is also just as easy, by simply specifying the error you wish to change:
+
+```{r}
+## Since there are 0 predictions in the data, these are changed to
+## 0.0150 to show proportional error change.
+d <- theo_sd
+d$DV[d$EVID == 0 & d$DV == 0] <- 0.0150
+
+addPropModel <- fit %>%
+    model({cp ~ add(add.err)+prop(prop.err)}) %>%
+    ini(prop.err=0.1) %>%
+    nlmixr(d,est="focei", table=list(cwres=TRUE, npde=TRUE))
+
+print(addPropModel)
+```

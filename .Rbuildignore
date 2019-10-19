@@ -37,6 +37,17 @@ BinaryFiles$
 ^pkgdown$
 ^vignettes/xgxr-nlmixr-ggpmx.Rmd$
 ^vignettes/addingCovariances.Rmd$
+^vignettes/broom.Rmd$
+^vignettes/mavoglurant.Rmd$
+^vignettes/pbpk.png$
+^vignettes/Mavoglurant_A2121_nmpk.csv$
+^vignettes/modelPiping.Rmd$
+^vignettes/multiple-endpoints.Rmd$
+^vignettes/wbc.Rmd$
+^vignettes/nimo.Rmd$
+^vignettes/nimo_fig1.Rmd$
+^vignettes/nimoData.rda$
+^vignettes/Simulated_WBC_pacl_ddmore_samePK_nlmixr.csv$
 vignettes/*_files/
 vignettes/*_GOF/
 vignettes/*.html
