@@ -142,17 +142,14 @@ navbar:
         - text: "Sweeping models to tidy datasets (broom)"
           href: articles/broom.html
         - text: "--------------------------"
-	- text: "Goodness of fit graphics with xpose.nlmixr"
-	  href: articles/xpose-nlmixr.html
-	- text: "Integrated development with xgxr/nlmixr/ggPMX"
-	  href: articles/xgxr-nlmixr-ggpmx.html
+        - text: "Integrated development with xgxr/nlmixr/ggPMX"
+          href: articles/xgxr-nlmixr-ggpmx.html
   - text: Example models
     icon: fas fa-chalkboard-teacher
     menu:
         - text: "Phenobarbatol with correlations"
           href: articles/addingCovariances.html
         - text: "--------------------------"
-        - text: Page 2018
         - text: "Nonlinear PK/PD -- Nimotuzumab"
           href: https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html
         - text: "PBPK -- Mavoglurant"

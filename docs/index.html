@@ -7,16 +7,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nonlinear Mixed Effects Models in Population Pharmacokinetics
         and Pharmacodynamics • nlmixr</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Nonlinear Mixed Effects Models in Population Pharmacokinetics
         and Pharmacodynamics">
 <meta property="og:description" content="Fit and compare nonlinear mixed-effects models in differential
     equations with flexible dosing information commonly seen in pharmacokinetics
     and pharmacodynamics (Almquist, Leander, and Jirstrand 2015 
     &lt;doi:10.1007/s10928-015-9409-1&gt;). Differential equation solving is 
-    by compiled C code provided in the 'RxODE' package
+    by compiled C code provided in the RxODE package
     (Wang, Hallow, and James 2015 &lt;doi:10.1002/psp4.12052&gt;).">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
@@ -38,7 +45,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
       </span>
     </div>
 
@@ -69,6 +76,10 @@
     <li>
       <a href="articles/broom.html">Sweeping models to tidy datasets (broom)</a>
     </li>
+    <li class="divider">
+    <li>
+      <a href="articles/xgxr-nlmixr-ggpmx.html">Integrated development with xgxr/nlmixr/ggPMX</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -84,7 +95,6 @@
       <a href="articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Page 2018</li>
     <li>
       <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
@@ -133,6 +143,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="contents col-md-9">
 
@@ -176,20 +187,22 @@
 <h1 class="hasAnchor">
 <a href="#windows-installer" class="anchor"></a>Windows installer</h1>
 <p>For those not interested in customized installation on Windows, we <strong>recommend</strong> you download a Windows installer for your platform from the following link: <a href="https://github.com/nlmixrdevelopment/nlmixr/releases/" class="uri">https://github.com/nlmixrdevelopment/nlmixr/releases/</a></p>
+<p><strong>STOP AT THIS POINT IF YOU USED THE INSTALLER</strong></p>
+<p>Sometimes trying to install yourself will corrupt the installation and nlmixr will not run.</p>
 </div>
 <div id="installation-on-windows" class="section level1">
 <h1 class="hasAnchor">
 <a href="#installation-on-windows" class="anchor"></a>Installation on Windows</h1>
 <p>To replicate the environment that was used in Windows for <code>nlmixr</code> development, you will need administrator rights, and you should perform the following steps:</p>
 <ol>
-<li>Install R 3.4.1 (or later) from the R website.</li>
+<li>Install R 3.5.0 (or later) from the R website.</li>
 </ol>
 <ul>
-<li>For best results, we suggest you use <code>C:\R\R-3.4.1</code>, but you can also use the default location (<code>C:\Program Files\R\R-3.4.1</code>) as well, if really needed.</li>
+<li>For best results, we suggest you use <code>C:\R\R-3.5.0</code>, but you can also use the default location (<code>C:\Program Files\R\R-3.5.0</code>) as well, if really needed.</li>
 <li>For 64-bit Windows, it is best practice to include <em>only</em> the 64-bit version. If you include 32-bit files, some packages may not run correctly. Additionally, both the 32- and 64-bit binaries have to be compiled for every package. Similarly, if on 32-bit Windows, install only the 32-bit version of R (and Python, and Rtools).</li>
 </ul>
 <ol>
-<li>Install the appropriate version of Rtools for Windows, currently version 3.4, from <a href="https://cran.r-project.org/bin/windows/Rtools/">here</a>.</li>
+<li>Install the appropriate version of Rtools for Windows, currently version 3.5, from <a href="https://cran.r-project.org/bin/windows/Rtools/">here</a>.</li>
 </ol>
 <ul>
 <li>This is an absolute requirement, since it includes C++ and related compilers not usually available under Windows.</li>
@@ -213,7 +226,7 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <li>This is used for its symbolic algebra package <a href="http://sympy.org/">SymPy</a>.</li>
 <li>If you already have a python installed, it is much easier to piggy-back on that system than install two different python versions.</li>
 <li>If you are new to python, a very robust Python distribution that includes <a href="http://sympy.org/">SymPy</a> and many packages that may be useful to the data scientist and/or pharmacometrician is <a href="https://www.anaconda.com/download/">Anaconda</a>. Although very straightforward and easy to install, it is quite a large download and contains much more than you will need to run <code>nlmixr</code>. When installing, use the Python 3.6 version. During the installation, Anaconda provides the option of adding itself to the <code>PATH</code> environment variable, but advises against it; please do this anyway (despite the red warning).</li>
-<li>Another option is to use <a href="http://python.org">official Python</a>, although you will need to install <a href="http://sympy.org/">SymPy</a> separately if you go this route, which is sometimes not straightforward under Windows 10 owing to folder permissions (see <a href="https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows">here</a> for a few workarounds). Nonetheless, see <a href="http://simpy.readthedocs.io/en/latest/simpy_intro/installation.html">here</a> for instructions for installation from source or using <code>pip</code>. Note that if you approach us for support, we are going to recommend that you use <a href="https://www.anaconda.com/download/">Anaconda</a>.</li>
+<li>Another option is to use <a href="http://python.org">official Python</a>, although you will need to install <a href="http://sympy.org/">SymPy</a> separately if you go this route, which is sometimes not straightforward under Windows 10 owing to folder permissions (see <a href="https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows">here</a> for a few workarounds). Nonetheless, see <a href="http://simpy.readthedocs.io/en/latest/simpy_intro/installation.html">here</a> for instructions for installation from source or using <code>pip</code>.</li>
 <li>Regardless of the option you choose, please use like with like (64-bit Python for 64-bit Windows, for example).</li>
 <li>Once again, make sure Python has been added to the Windows <code>PATH</code> environment variable, or <code>RxODE</code> and <code>nlmixr</code> will not work, no matter what Anaconda might say.</li>
 </ul>
@@ -222,26 +235,35 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 </ol>
 <ul>
 <li>This package is required to install packages from Github, amongst other things.</li>
-<li>This can be done from a clean R session by <code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("devtools")</a></code>.</li>
+<li>This can be done from a clean R session by <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</li>
 </ul>
 <ol>
-<li>Load <code>devtools</code> using <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(devtools)</a></code>.</li>
+<li>Load <code>devtools</code> using <code><a href="https://rdrr.io/r/base/library.html">library(devtools)</a></code>.</li>
 <li>Install <code>RxODE</code>.</li>
 </ol>
 <ul>
 <li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
-<li>Once installed, type <code><a href="https://www.rdocumentation.org/packages/RxODE/topics/rxWinPythonSetup">RxODE::rxWinPythonSetup()</a></code> to install the required package <code>SnakeCharmR</code>and to make sure Python and SymPy are working properly.</li>
+<li>Once installed, type <code><a href="https://rdrr.io/pkg/RxODE/man/rxWinPythonSetup.html">RxODE::rxWinPythonSetup()</a></code> to install the required package <code>SnakeCharmR</code>and to make sure Python and SymPy are working properly. Since <code>SnakeCharmR</code> is orphaned, it may not work without installing directly from github with the following command: <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("nlmixrdevelopment/SnakeCharmR")</a></code>
+</li>
 <li>Restart your R session.</li>
-<li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(SnakeCharmR)</a></code>.</li>
-<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.)</li>
+<li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://rdrr.io/r/base/library.html">library(SnakeCharmR)</a></code>.</li>
+<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://rdrr.io/r/base/library.html">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.). This also requires installing <code>RxODE</code> with the tests. Devtools changed so that tests are no longer installed by default. The correct command to install the test suite is:</li>
 </ul>
+<pre class="{r}"><code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")</a></code></pre>
 <ol>
 <li>Install <code>nlmixr</code>.</li>
 </ol>
 <ul>
-<li>Load <code>devtools</code> again using <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(devtools)</a></code>
+<li>Load <code>devtools</code> again using <code><a href="https://rdrr.io/r/base/library.html">library(devtools)</a></code>
 </li>
-<li>Install <code>nlmixr</code> by running <code>install_github("nlmixrdevelopment/nlmixr")</code>
+<li>Since <code>nlmixr</code> shares some stan headers, nlmixr now needs <code>C++14</code> support. To ease the setup you can run the command <code><a href="https://rdrr.io/pkg/RxODE/man/rxC14.html">RxODE::rxC14()</a></code> which creates the following build file in <code>~/.R/Makevars.win</code>. If there are problems you may have to edit the file manually to match your configuration.</li>
+</ul>
+<pre class="{make}"><code># Makvars.win
+CXX14=$(BINPREF)g++ $(M_ARCH)
+CXX14STD=-std=c++1y
+CXX14FLAGS=-O2 -Wall</code></pre>
+<ul>
+<li>Finally, install <code>nlmixr</code> by running <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("nlmixrdevelopment/nlmixr")</a></code>
 </li>
 </ul>
 </div>
@@ -274,18 +296,18 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <li>This package is required to install packages from Github, amongst other things.</li>
 <li>Some Linux distributions don’t include build tools out of the box. To be safe, check this: <code>sudo apt-get install build-essential</code>
 </li>
-<li>Install <code>devtools</code> from a clean R session by entering <code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("devtools")</a></code>.</li>
+<li>Install <code>devtools</code> from a clean R session by entering <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</li>
 </ul>
 <ol>
-<li>In R, load <code>devtools</code> using <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(devtools)</a></code>.</li>
+<li>In R, load <code>devtools</code> using <code><a href="https://rdrr.io/r/base/library.html">library(devtools)</a></code>.</li>
 <li>Install <code>RxODE</code>.</li>
 </ol>
 <ul>
 <li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
 <li>Install <code>SnakeCharmR</code> using <code>install_github("nlmixrdevelopment/SnakeCharmR")</code>.</li>
 <li>Restart your R session.</li>
-<li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(SnakeCharmR)</a></code>.</li>
-<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.)</li>
+<li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://rdrr.io/r/base/library.html">library(SnakeCharmR)</a></code>.</li>
+<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://rdrr.io/r/base/library.html">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.)</li>
 </ul>
 <ol>
 <li>Install <code>nlmixr</code>.</li>
@@ -300,10 +322,10 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <a href="#installation-on-macos" class="anchor"></a>Installation on macOS</h1>
 <p>Instructions for macOS 10.13 Mojave are provided here. They should be broadly extensible to all recent releases of macOS, however.</p>
 <ol>
-<li>Install R 3.5.2 (or later) from the R website.</li>
+<li>Install R 3.6.1 from the R website.</li>
 </ol>
 <ul>
-<li>Download and install <code>R-3.5.2.pkg</code> (or later) from <a href="http://cran.r-project.org/bin/macosx/">CRAN</a>.</li>
+<li>Download and install <code>R-3.6.1.pkg</code> (or later) from <a href="http://cran.r-project.org/bin/macosx/">CRAN</a>.</li>
 </ul>
 <ol>
 <li>Install Python dependencies.</li>
@@ -321,7 +343,7 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <li>Install build tools.</li>
 </ol>
 <ul>
-<li>Install the clang and gfortran packages from <a href="http://cran.r-project.org/bin/macosx/tools/">CRAN development tools website</a>
+<li>Install the clang 8.0+ and gfortran 6.1+ packages from <a href="http://cran.r-project.org/bin/macosx/tools/">CRAN development tools website</a>
 </li>
 <li>Install Mac OSX command like tools by typing <code>xcode-select  --install</code> and then choose <code>install</code>. This allows you to compile the package without downloading the entire (large) Xcode package. Make sure to perform this step even if the Xcode package is already installed.</li>
 <li>If you are using macOS &gt;= 10.14 you have to also type the following in the terminal to install the compiler headers:</li>
@@ -333,24 +355,27 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <li>Change <code>~/.Rprofile</code> to have the following line to adjust the paths in R to use the CRAN compilers (if not present, create the .Rprofile file):</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># make sure to adjust the version number of clang based on the downloaded version in step 3 (e.g. clang8/bin)</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.setenv">Sys.setenv</a></span>(<span class="st">"PATH"</span>=<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"/usr/local/clang6/bin:/usr/local/gfortran/bin:"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.getenv">Sys.getenv</a></span>(<span class="st">"PATH"</span>)))</code></pre></div>
+<span class="kw"><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv</a></span>(<span class="st">"PATH"</span>=<span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"/usr/local/clang8/bin:/usr/local/gfortran/bin:"</span>, <span class="kw"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span>(<span class="st">"PATH"</span>)))</code></pre></div>
+<p><strong>Make Sure you have an extra line at the end of this file; Otherwise R will not pick up the correct paths</strong>.</p>
+<p>You also need to create a directory <code>~/.R</code> and then put a file <code>Makevars</code> in it; The context of the file should contain:</p>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="co"># ~/.R/Makevars</span>
+<span class="va">CXX14FLAGS=</span>-O2 <span class="ex">-march</span>=native -mtune=native -arch x86_64 -ftemplate-depth-256 -fPIC</code></pre></div>
 <ol>
 <li>Install <code>devtools</code> and dependencies.</li>
 </ol>
 <ul>
 <li>This package is required to install packages from Github, amongst other things.</li>
-<li>Install <code>devtools</code> from a clean R session by entering <code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("devtools")</a></code>.</li>
+<li>Install <code>devtools</code> from a clean R session by entering <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</li>
 </ul>
 <ol>
-<li>In R, load <code>devtools</code> using <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(devtools)</a></code>.</li>
+<li>In R, load <code>devtools</code> using <code><a href="https://rdrr.io/r/base/library.html">library(devtools)</a></code>.</li>
 <li>Install <code>RxODE</code>.</li>
 </ol>
 <ul>
 <li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
-<li>Install <code>SnakeCharmR</code> using <code>install_github("nlmixrdevelopment/SnakeCharmR")</code> or install <code>reticulate</code> using <code><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages("reticulate")</a></code>.</li>
+<li>Install <code>reticulate</code> using <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("reticulate")</a></code>.</li>
 <li>Restart your R session.</li>
-<li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(SnakeCharmR)</a></code>.</li>
-<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.)
+<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://rdrr.io/r/base/library.html">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.)
 <ul>
 <li>Note this requires a special install option to make sure the tests are installed: <code>remote:install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")</code>
 </li>
@@ -369,8 +394,8 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <h1 class="hasAnchor">
 <a href="#notes-on-python-configuration" class="anchor"></a>Notes on Python configuration</h1>
 <p>If you have multiple versions of python installed on your system, you may run into some more issues. To be more careful in your install, you can install SnakeCharmR as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Sys.setenv">Sys.setenv</a></span>(<span class="dt">SNAKECHARMR_PYTHON_VERSION=</span><span class="st">"/path/to/python/with/sympy/installed"</span>)
-devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"nlmixrdevelopment/SnakeCharmR"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv</a></span>(<span class="dt">SNAKECHARMR_PYTHON_VERSION=</span><span class="st">"/path/to/python/with/sympy/installed"</span>)
+devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"nlmixrdevelopment/SnakeCharmR"</span>)</code></pre></div>
 <p>You may also have to adjust the following python variables to match the version with sympy installed:</p>
 <table class="table">
 <colgroup>
@@ -412,11 +437,11 @@ devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumen
 </table>
 <p>I believe you could also unset some of these variables and python can figure them out. Please be warned if these variables are not setup correctly a call to python will abort python. The python abort does not respect R’s way of doing things and will also abort/crash R.</p>
 <p>To test without running a model you may wish to try</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(SnakeCharmR)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(SnakeCharmR)</code></pre></div>
 <p>If it doesn’t crash R, then python is likely setup correctly.</p>
 <p>After that point you can then type:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(RxODE)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/RxODE/topics/rxSymPyVersion">rxSymPyVersion</a></span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(RxODE)
+<span class="kw"><a href="https://rdrr.io/pkg/RxODE/man/rxSymPyVersion.html">rxSymPyVersion</a></span>()</code></pre></div>
 <p>It will show the version of sympy that you are using if SnakeCharmR is setup correctly.</p>
 </div>
 <div id="testing-the-install" class="section level1">
@@ -463,10 +488,10 @@ nlmixr run under saem: Yes
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Matthew Fidler <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8538-6691" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID" height="16"></a> </li>
+<li>Matthew Fidler <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8538-6691" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
 <li>Yuan Xiong <br><small class="roles"> Author </small>  </li>
-<li>Rik Schoemaker <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7538-3005" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID" height="16"></a> </li>
-<li>Justin Wilkins <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7099-9396" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID" height="16"></a> </li>
+<li>Rik Schoemaker <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7538-3005" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
+<li>Justin Wilkins <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7099-9396" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
 <li>Mirjam Trame <br><small class="roles"> Author </small>  </li>
 <li>Richard Hooijmaijers <br><small class="roles"> Author </small>  </li>
 <li>Teun Post <br><small class="roles"> Author </small>  </li>
@@ -478,17 +503,20 @@ nlmixr run under saem: Yes
   </div>
 </div>
 
+
       <footer><div class="copyright">
   <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

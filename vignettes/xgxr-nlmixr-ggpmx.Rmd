@@ -18,7 +18,8 @@ knitr::opts_chunk$set(
 ## To run the actual models on your system, take the save options off.
 nlmixrVersion <- as.character(packageVersion("nlmixr"));
 options(nlmixr.save=TRUE,
-        nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion));
+        nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion),
+        huxtable.knit_print_df = FALSE);
 if (!dir.exists(getOption("nlmixr.save.dir")))
     dir.create(getOption("nlmixr.save.dir"))
 ```
@@ -369,7 +370,7 @@ happens at steady state:
 (ev <- et(amt=100, ii=8, ss=1))
 
 ev$add.sampling(seq(0, 8, length.out=100))
-ev
+print(ev)
 ```
 
 A nlmixr model already includes information about the parameter
@@ -385,7 +386,7 @@ nlmixr/RxODE:
 set.seed(100)
 sim1 <- simulate(cmt2fit.logn, events=ev, nSub=100, nStud=100)
 
-sim1
+print(sim1)
 ```
 
 You may examine the simulated study information easily, as show in the

@@ -11,7 +11,14 @@ vignette: >
 ```{r,echo=FALSE}
 ## To allow nlmixr to reload runs without large run times
 ## To run the actual models on your system, take the save options off.
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "100%"
+  )
+options(huxtable.knit_print_df = FALSE)
 ```
 
 ![nlmixr](logo.png)
