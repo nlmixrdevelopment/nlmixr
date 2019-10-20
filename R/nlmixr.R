@@ -954,6 +954,8 @@ saemControl <- function(seed=99,
 ##' @author Matthew L. Fidler
 ##' @export
 addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     .pt  <- proc.time();
     .oTime <- fit$env$time;
     .objName <- substitute(fit);
