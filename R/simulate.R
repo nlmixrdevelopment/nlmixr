@@ -147,9 +147,9 @@
 ##' @inheritParams RxODE::rxSolve
 ##' @export
 nlmixrSim <- function(object, ...){
-    RxODE::.setWarnIdSort(TRUE);
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit({RxODE::.setWarnIdSort(TRUE)});
     save <- getOption("nlmixr.save", FALSE);
-    on.exit({RxODE::.setWarnIdSort(FALSE)});
     .si <- .simInfo(object);
     .xtra <- list(...)
     if (any(names(.xtra) == "rx")){
