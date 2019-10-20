@@ -1845,7 +1845,8 @@ void numericGrad(double *theta, double *g){
   op_focei.curGill=0;
   if ((op_focei.repeatGill == 1 || op_focei.nF + op_focei.nF2 == 1) && op_focei.gillK > 0){
     clock_t t = clock() - op_focei.t0;
-    op_focei.slow = op_focei.printOuter && ((double)t)/CLOCKS_PER_SEC >= op_focei.gradProgressOfvTime;
+    op_focei.slow = (op_focei.printOuter == 1) &&
+      ((double)t)/CLOCKS_PER_SEC >= op_focei.gradProgressOfvTime;
     op_focei.repeatGill=0;
     op_focei.reducedTol2=0;
     double hf, hphif, err;
