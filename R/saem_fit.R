@@ -638,6 +638,12 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       rexec = paste(R.home(component="bin"), .Platform$file.sep, "R", sep="")
 
       args  = c("CMD", "SHLIB", saem.cpp, "-o", saem.dll)
+      .rxBinpref <- Sys.getenv("rxBINPREF");
+      if (.rxBinpref != ""){
+        .oldBinpref <- Sys.getenv("BINPREF");
+        Sys.setenv("BINPREF"=.rxBinpref);
+        on.exit(Sys.setenv("BINPREF"=.oldBinpref), add=TRUE);
+      }
       ## do.call("system", list(shlib))
       .badBuild <- function(msg,stop=TRUE){
           message(msg);
