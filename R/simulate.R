@@ -467,6 +467,8 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     if (!inherits(object, "nlmixrFitData")){
         stop("Need a nlmixr fit object")
     }
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     save <- getOption("nlmixr.save", FALSE);
     if (save){
         .modName  <- ifelse(is.null(object$uif$model.name),"",paste0(object$uif$model.name,"-"));

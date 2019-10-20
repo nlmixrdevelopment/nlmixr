@@ -751,7 +751,8 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
                         sum.prod=FALSE, table=tableControl(),
                         save=NULL, envir=parent.frame()){
-
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     if (is.null(save)){
         save <- getOption("nlmixr.save", FALSE);
     }
