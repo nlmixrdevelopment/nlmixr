@@ -150,7 +150,7 @@
       <h1>xgxr nlmixr and ggPmx integration</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/vignettes/xgxr-nlmixr-ggpmx.Rmd"><code>vignettes/vignettes/xgxr-nlmixr-ggpmx.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/xgxr-nlmixr-ggpmx.Rmd"><code>vignettes/xgxr-nlmixr-ggpmx.Rmd</code></a></small>
       <div class="hidden name"><code>xgxr-nlmixr-ggpmx.Rmd</code></div>
 
     </div>
@@ -539,30 +539,32 @@ cmt2fit.add.prop &lt;-<span class="st"> </span>cmt2fit.prop <span class="op">%&g
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## The controller then can be piped into a specific plot
 ctr &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_nlmixr.html">pmx_nlmixr</a></span>(cmt2fit.logn, <span class="dt">conts =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"WEIGHTB"</span>), <span class="dt">cats=</span><span class="st">"TRTACT"</span>)
 
-ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_dv_ipred</code></pre></div>
+ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_npde_pred</code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_dv_pred</code></pre></div>
+## Modify graphical options and remove DRAFT label:
+ctr <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html">pmx_plot_npde_time</a></span>(<span class="dt">smooth =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">color=</span><span class="st">"blue"</span>), <span class="dt">point =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">shape=</span><span class="dv">4</span>), <span class="dt">is.draft=</span><span class="ot">FALSE</span>, 
+          <span class="dt">labels =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">x =</span> <span class="st">"Time after first dose (days)"</span>, <span class="dt">y =</span> <span class="st">"Normalized PDE"</span>))</code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-2.png" width="100%"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_abs_iwres_ipred</code></pre></div>
+ctr <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html">pmx_plot_dv_ipred</a></span>(<span class="dt">scale_x_log10=</span><span class="ot">TRUE</span>, <span class="dt">scale_y_log10=</span><span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-3.png" width="100%"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+ctr <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html">pmx_plot_dv_pred</a></span>(<span class="dt">scale_x_log10=</span><span class="ot">TRUE</span>, <span class="dt">scale_y_log10=</span><span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-4.png" width="100%"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_abs_iwres_ipred</code></pre></div>
+<p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-5.png" width="100%"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 ## For this display only show 1x1 individual plot for ID 110 for time &lt; 12
 ctr <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_plot_individual.html">pmx_plot_individual</a></span>(<span class="dv">1</span>, <span class="dt">filter=</span>ID <span class="op">==</span><span class="st"> </span><span class="dv">110</span> <span class="op">&amp;</span><span class="st"> </span>TIME <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>TIME <span class="op">&lt;</span><span class="st"> </span><span class="dv">12</span>, 
                             <span class="dt">facets =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">nrow =</span> <span class="dv">1</span>, <span class="dt">ncol =</span> <span class="dv">1</span>))</code></pre></div>
-<p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-4.png" width="100%"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_iwres_dens</code></pre></div>
-<p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-5.png" width="100%"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_npde_qq</code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-6.png" width="100%"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_npde_pred</code></pre></div>
+ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_iwres_dens</code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-7.png" width="100%"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_npde_time</code></pre></div>
+ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_npde_qq</code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-8.png" width="100%"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 ctr <span class="op">%&gt;%</span><span class="st"> </span>pmx_plot_eta_qq</code></pre></div>
@@ -638,7 +640,7 @@ ev<span class="op">$</span><span class="kw"><a href="https://rdrr.io/pkg/RxODE/m
 <p>If you wish to simulate <code>100</code> patients repeated by <code>100</code> different theoretical studies where you simulate from the uncertainty in the fixed parameter estimates and covariances you can very easily with nlmixr/RxODE:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="dv">100</span>)
 sim1 &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/simulate.html">simulate</a></span>(cmt2fit.logn, <span class="dt">events=</span>ev, <span class="dt">nSub=</span><span class="dv">100</span>, <span class="dt">nStud=</span><span class="dv">100</span>)
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:02:02</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(sim1)
 <span class="co">#&gt; ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂ Solved RxODE object ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂</span>
