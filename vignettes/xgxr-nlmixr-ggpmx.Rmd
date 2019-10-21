@@ -308,9 +308,15 @@ dwplot(list("lognormal"=cmt2fit.logn, "proportional"=cmt2fit.prop), exponentiate
 ## The controller then can be piped into a specific plot
 ctr <- pmx_nlmixr(cmt2fit.logn, conts = c("WEIGHTB"), cats="TRTACT")
 
-ctr %>% pmx_plot_dv_ipred
+ctr %>% pmx_plot_npde_pred
 
-ctr %>% pmx_plot_dv_pred
+## Modify graphical options and remove DRAFT label:
+ctr %>% pmx_plot_npde_time(smooth = list(color="blue"), point = list(shape=4), is.draft=FALSE, 
+          labels = list(x = "Time after first dose (days)", y = "Normalized PDE"))
+
+ctr %>% pmx_plot_dv_ipred(scale_x_log10=TRUE, scale_y_log10=TRUE)
+
+ctr %>% pmx_plot_dv_pred(scale_x_log10=TRUE, scale_y_log10=TRUE)
 
 ctr %>% pmx_plot_abs_iwres_ipred
 
@@ -321,10 +327,6 @@ ctr %>% pmx_plot_individual(1, filter=ID == 110 & TIME > 0 & TIME < 12,
 ctr %>% pmx_plot_iwres_dens
 
 ctr %>% pmx_plot_npde_qq
-
-ctr %>% pmx_plot_npde_pred
-
-ctr %>% pmx_plot_npde_time
 
 ctr %>% pmx_plot_eta_qq
 
