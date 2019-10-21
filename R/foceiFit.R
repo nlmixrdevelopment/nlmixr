@@ -30,7 +30,7 @@ is.latex <- function() {
 ##'  \item The tolerance of the ODE solvers is
 ##'  \code{0.5*10^(-sigdig-2)}; For the sensitivity equations and
 ##'  steady-state solutions the default is \code{0.5*10^(-sigdig-1.5)}
-##'  (senstivity changes only applicable for liblsoda)
+##'  (sensitivity changes only applicable for liblsoda)
 ##'
 ##'  \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
 ##'
@@ -470,7 +470,7 @@ is.latex <- function() {
 ##' @param gillStepCov When looking for the optimal forward difference
 ##'     step size, this is This is the step size to increase the
 ##'     initial estimate by.  So each iteration during the covariance
-##'     step is equalt new step size = (prior step size)*gillStepCov
+##'     step is equal to the new step size = (prior step size)*gillStepCov
 ##'
 ##' @param gillFtolCov The gillFtol is the gradient error tolerance
 ##'     that is acceptable before issuing a warning/error about the

@@ -24,7 +24,7 @@ lin_cmt(obs_time, dose_time, dose, Tinf, params, oral, infusion, ncmt,
 
 \item{ncmt}{number of compartments}
 
-\item{parameterization}{type of parameterization, 1=clearance/volumn, 2=micro-constants}
+\item{parameterization}{type of parameterization, 1=clearance/volume, 2=micro-constants}
 }
 \value{
 calculated concentrations

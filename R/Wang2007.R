@@ -7,7 +7,7 @@
 ##' @format A data frame with 20 rows and 3 columns
 ##'
 ##' \describe{
-##'   \item{ID}{Siumlated Subject ID}
+##'   \item{ID}{Simulated Subject ID}
 ##'   \item{Time}{Simulated Time}
 ##'   \item{Y}{Simulated Value}
 ##' }

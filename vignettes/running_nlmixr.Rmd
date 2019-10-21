@@ -239,7 +239,7 @@ comprehensive site [here](https://uupharmacometrics.github.io/xpose/).
 The nlmixr modeling dialect, inspired by R and NONMEM, can be used to
 fit models using all current and future estimation alogorithms within
 nlmixr. Using these widely-used tools as inspiration has the advantage
-of delivering a model specification syntax taht is instantly familira
+of delivering a model specification syntax that is instantly familira
 to the majority of analysts working in pharmacometrics and related
 fields.
 

@@ -1,4 +1,4 @@
-##' Multiple dose Theophiline PK data
+##' Multiple dose Theophilline PK data
 ##'
 ##' This datastart starts with the day 1 concentrations of the
 ##' Theophiline data that is included in the nlme/NONMEM. After day 7
