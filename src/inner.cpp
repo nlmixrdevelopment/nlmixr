@@ -2133,8 +2133,10 @@ static inline void foceiSetupTheta_(List mvi,
   if (alloc){
     rxUpdateInnerFuns(as<SEXP>(mvi["trans"]));
     foceiSetupTrans_(as<CharacterVector>(mvi["params"]));
+  } else if (!op_focei.alloc){
+    stop("FOCEi problem not allocated\nThis can happen when sympy<->nlmixr interaction is not working correctly.");
   }
-  std::copy(theta.begin(), theta.end(), &op_focei.fullTheta[0]);  
+  std::copy(theta.begin(), theta.end(), &op_focei.fullTheta[0]); 
   std::copy(omegaTheta.begin(), omegaTheta.end(), &op_focei.fullTheta[0]+thetan);
   op_focei.thetan = thetan;
   op_focei.omegan = omegan;
