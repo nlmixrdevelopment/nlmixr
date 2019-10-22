@@ -239,6 +239,18 @@ vpc.nlmixrFitData <- function(sim, ...){
     vpc_ui(fit=sim, ...);
 }
 
+##' @export
+vpc.nlmixrFOCEi <- vpc.nlmixrFitData
+
+##' @export
+vpc.nlmixrSaem <- vpc.nlmixrFitData
+
+##' @export
+vpc.nlmixrNlme <- vpc.nlmixrFitData
+
+##' @export
+vpc.nlmixrPosthoc <- vpc.nlmixrFitData
+
 ##' @rdname vpc_ui
 ##' @export
 vpc.nlmixrVpc <- function(sim, ...){
