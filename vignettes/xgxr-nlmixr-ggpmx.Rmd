@@ -314,9 +314,9 @@ ctr %>% pmx_plot_npde_pred
 ctr %>% pmx_plot_npde_time(smooth = list(color="blue"), point = list(shape=4), is.draft=FALSE, 
           labels = list(x = "Time after first dose (days)", y = "Normalized PDE"))
 
-ctr %>% pmx_plot_dv_ipred(scale_x_log10=TRUE, scale_y_log10=TRUE)
+ctr %>% pmx_plot_dv_ipred(scale_x_log10=TRUE, scale_y_log10=TRUE,filter=IPRED>0.001)
 
-ctr %>% pmx_plot_dv_pred(scale_x_log10=TRUE, scale_y_log10=TRUE)
+ctr %>% pmx_plot_dv_pred(scale_x_log10=TRUE, scale_y_log10=TRUE,filter=IPRED>0.001)
 
 ctr %>% pmx_plot_abs_iwres_ipred
 
@@ -325,8 +325,6 @@ ctr %>% pmx_plot_individual(1, filter=ID == 110 & TIME > 0 & TIME < 12,
                             facets = list(nrow = 1, ncol = 1))
 
 ctr %>% pmx_plot_iwres_dens
-
-ctr %>% pmx_plot_npde_qq
 
 ctr %>% pmx_plot_eta_qq
 
@@ -339,11 +337,15 @@ ctr %>% pmx_plot_vpc(filter=TIME > 0 & TIME < 12,
 ctr %>% pmx_plot_vpc(filter=TIME > 0 & TIME < 12,
                      scale_y_log10=FALSE, 
                      bin=pmx_vpc_bin("jenks",n=5))
-
+                     
 ctr %>% pmx_plot_eta_box
+```
 
+```{r, fig.width=4, fig.height=8}
 ctr %>% pmx_plot_eta_hist
+```
 
+```{r}
 ctr %>% pmx_plot_eta_matrix
 
 ## Create a report of all the plots you generated from the controller
@@ -354,7 +356,7 @@ if (file.exists("nlmixr_report.Rmd"))
     unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
 ```
 
-This creates 2 reports, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document.
+This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editting the default template to include project specificities (change labels, stratifications, filtering, etc.).
 
 
 # Simulation of a new scenario with RxODE
