@@ -218,10 +218,10 @@ typedef struct {
   double ci;
   double sigdig;
   //
-  clock_t t0;
-  int cur;
-  int curTick;
-  int totTick;
+  clock_t t0 = clock();
+  int cur = 0;
+  int curTick = 0;
+  int totTick = 100;
   int useColor;
   double boundTol;
   int printNcol;
@@ -1253,7 +1253,7 @@ static inline void innerOpt1(int id, int likId){
 void thetaReset(double size){
   mat etaRes =  op_focei.eta1SD % op_focei.etaM; //op_focei.cholOmegaInv * etaMat;    
   for (unsigned int j = etaRes.n_rows; j--;){
-    if (std::fabs(etaRes(j, 0)) >= size){
+    if (std::fabs(etaRes(j, 0)) >= size){ // Says reset
       NumericVector thetaIni(op_focei.thetan);
       for (int ii = op_focei.thetan; ii--;){
 	thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
@@ -2404,6 +2404,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.epsilon=as<double>(odeO["epsilon"]);
   op_focei.nsim=as<int>(odeO["n1qn1nsim"]);
   op_focei.imp=0;
+  op_focei.resetThetaSize = R_PosInf;
   // op_focei.printInner=as<int>(odeO["printInner"]);
   // if (op_focei.printInner < 0) op_focei.printInner = -op_focei.printInner;
   op_focei.printOuter=as<int>(odeO["print"]);
