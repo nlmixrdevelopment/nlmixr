@@ -4388,7 +4388,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	Dcov = inv_sympd(Dcov);
 	arma::mat cor2 = Dcov * cov * Dcov;
 	cor2.diag()= sd2;
-	e["cov"] = cor2;
+	e["cor"] = cor2;
       }
       if (op_focei.covMethod==0){
         warning("Covariance step failed");
