@@ -4805,6 +4805,11 @@ void foceiFinalizeTables(Environment e){
     List thetaDim = List::create(thetaCovN,thetaCovN);
     tmpNM.attr("dimnames") = thetaDim;
     e["cov"]=tmpNM;
+    if (e.exists("cor") && RxODE::rxIs(e["cor"], "matrix")){
+      tmpNM = as<NumericMatrix>(e["cor"]);
+      tmpNM.attr("dimnames") = thetaDim;
+      e["cor"]=tmpNM;
+    }
     if (e.exists("Rinv") && RxODE::rxIs(e["Rinv"], "matrix")){
       tmpNM = as<NumericMatrix>(e["Rinv"]);
       tmpNM.attr("dimnames") = thetaDim;
