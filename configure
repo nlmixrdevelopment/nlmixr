@@ -2688,9 +2688,9 @@ CXX14STD=""
 
 ISYSTEM="I"
 
-# if test "${GCC}" = yes; then
-#   ISYSTEM="isystem"
-# fi
+if test "${GCC}" = yes; then
+  ISYSTEM="isystem"
+fi
 
 
 
