@@ -2621,10 +2621,11 @@ nobs.nlmixrFitCoreSilent  <- nobs.nlmixrFitCore
 ##'@export
 vcov.nlmixrFitCoreSilent  <- vcov.nlmixrFitCore
 
+
 .getR <- function(x,sd=FALSE){
-    .rs <- x$omegaR
+    .rs <- x
     .lt <- lower.tri(.rs);
-    .dn1 <- dimnames(x$omegaR)[[2]]
+    .dn1 <- dimnames(x)[[2]]
     .nms <- apply(which(.lt,arr.ind=TRUE),1,
                   function(x){
         sprintf("cor%s%s",getOption("broom.mixed.sep1","__"),
@@ -2633,7 +2634,7 @@ vcov.nlmixrFitCoreSilent  <- vcov.nlmixrFitCore
     .lt <- structure(.rs[.lt], .Names=.nms)
     .lt <- .lt[.lt != 0];
     if (sd){
-        .lt <- c(setNames(diag(x$omegaR),paste0("sd",getOption("broom.mixed.sep1","__"),.dn1)),.lt);
+        .lt <- c(setNames(diag(x),paste0("sd",getOption("broom.mixed.sep1","__"),.dn1)),.lt);
     }
     return(.lt)
 }
@@ -2664,6 +2665,39 @@ print.nlmixrGill83 <- function(x, ...){
     cat(sprintf("Gill83 Derivative/Forward Difference\n  (rtol=%s; K=%s, step=%s, ftol=%s)\n\n",
                 x$gillRtol, x$gillK, x$gillStep, x$gillFtol))
     NextMethod(x);
+}
+
+.getCorPrint <- function(x){
+    .op <- options()
+    on.exit(options(.op))
+    options("broom.mixed.sep1"=":",
+            "broom.mixed.sep2"=",")
+    .strong <- getOption("nlmixr.strong.corr", 0.7);
+    .moderate <- getOption("nlmixr.moderate.corr", 0.3);
+    .lt <- .getR(x)
+    .digs <- 3;
+    .lts <- sapply(.lt, function(x){
+        .x <- abs(x);
+        .ret <- "<"
+        if (.x > .strong){
+            .ret <- ">" ## Strong
+        } else if (.x > .moderate){
+            .ret <- "=" ## Moderate
+        }
+        return(.ret)
+    })
+    .nms <- names(.lt);
+    .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), .lts)
+    names(.lt) <- .nms;
+    .lt <- gsub(rex::rex("\""), "", paste0("    ", R.utils::captureOutput(print(.lt))));
+    if (crayon::has_color()){
+        .lt <- gsub(rex::rex(capture(.regNum), ">"), "  \033[1m\033[31m\\1 \033[39m\033[22m", .lt, perl=TRUE)
+        .lt <- gsub(rex::rex(capture(.regNum), "="), "  \033[1m\033[32m\\1 \033[39m\033[22m", .lt, perl=TRUE)
+        .lt <- gsub(rex::rex(capture(.regNum), "<"), "  \\1  ", .lt, perl=TRUE)
+    } else {
+        .lt <- gsub(rex::rex(capture(.regNum), or(">", "=", "<")), "  \\1 ", .lt, perl=TRUE)
+    }
+    cat(paste(.lt, collapse="\n"), "\n\n")
 }
 
 ##'@export
@@ -2752,39 +2786,25 @@ print.nlmixrFitCore <- function(x, ...){
         cat("\n");
     }
     ## Correlations
-    .tmp <- x$omega
-    diag(.tmp) <- 0;
     cat(paste0("  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
                crayon::bold(x$covMethod), "\n"))
+    if (exists("cor", x$env)){
+        .tmp <- .getR(x$cor);
+        if (any(abs(.tmp) >= getOption("nlmixr.strong.corr", 0.7))){
+            cat(paste0("  Some strong fixed parameter correlations exist (", crayon::yellow(.bound), crayon::bold$blue("$cor"), ") :\n"));
+            .getCorPrint(x$cor);
+        } else {
+            cat(paste0("  Fixed parameter correlations in ", crayon::yellow(.bound), crayon::bold$blue("$cor"), "\n"));
+        }
+    }
+    .tmp <- x$omega
+    diag(.tmp) <- 0;
     if (.mu){
         if (all(.tmp == 0)){
             cat("  No correlations in between subject variability (BSV) matrix\n")
         } else {
             cat("  Correlations in between subject variability (BSV) matrix:\n")
-            .lt <- .getR(x)
-            .digs <- 3;
-            .lts <- sapply(.lt, function(x){
-                .x <- abs(.lt);
-                .ret <- "<"
-                if (.x > 0.7){
-                    .ret <- ">" ## Strong
-                } else if (.x > 0.3){
-                    .ret <- "=" ## Moderate
-                }
-                return(.ret)
-            })
-            .nms <- names(.lt);
-            .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), .lts)
-            names(.lt) <- .nms;
-            .lt <- gsub(rex::rex("\""), "", paste0("    ", R.utils::captureOutput(print(.lt))));
-            if (crayon::has_color()){
-                .lt <- gsub(rex::rex(capture(.regNum), ">"), "\033[1m\033[31m\\1 \033[39m\033[22m", .lt, perl=TRUE)
-                .lt <- gsub(rex::rex(capture(.regNum), "="), "\033[1m\033[32m\\1 \033[39m\033[22m", .lt, perl=TRUE)
-                .lt <- gsub(rex::rex(capture(.regNum), "<"), "\\1 ", .lt, perl=TRUE)
-            } else {
-                .lt <- gsub(rex::rex(capture(.regNum), or(">", "=", "<")), "\\1 ", .lt, perl=TRUE)
-            }
-            cat(paste(.lt, collapse="\n"), "\n\n")
+            .getCorPrint(x);
         }
         if (.boundChar*2+70 < .width){
             cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"),"\n");
@@ -2797,7 +2817,6 @@ print.nlmixrFitCore <- function(x, ...){
                 cat("    or correlation (", crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n");
             }
         }
-
     }
     if (.boundChar+74 < .width){
         cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",

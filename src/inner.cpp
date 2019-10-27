@@ -4300,7 +4300,7 @@ NumericMatrix foceiCalcCov(Environment e){
 		bool success;
 		success = inv(Sinv, trimatu(cholS));
 		if (!success){
-		  warning("Hessian (S) matrix seems singular; Using pseudo-inverse");
+		  warning("S matrix seems singular; Using pseudo-inverse");
 		  Sinv = pinv(trimatu(cholS));
 		}
 		Sinv = Sinv * Sinv.t();
@@ -4356,7 +4356,7 @@ NumericMatrix foceiCalcCov(Environment e){
               bool success;
               success = inv(Sinv, trimatu(cholS));
               if (!success){
-                warning("Hessian (S) matrix seems singular; Using pseudo-inverse.");
+                warning("S matrix seems singular; Using pseudo-inverse.");
                 Sinv = pinv(trimatu(cholS));
               }
               Sinv = Sinv * Sinv.t();
