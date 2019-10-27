@@ -274,6 +274,7 @@ typedef struct {
   int slow;
   double gradProgressOfvTime;
   bool alloc=false;
+  bool zeroGrad = false;
 } focei_options;
 
 focei_options op_focei;
@@ -2283,7 +2284,8 @@ NumericVector foceiSetup_(const RObject &obj,
   }
   rxOptionsFreeFocei();
   op_focei.mvi = mvi;
-  
+
+  op_focei.zeroGrad = false;
   op_focei.resetThetaCheckPer = as<double>(odeO["resetThetaCheckPer"]);
   op_focei.printTop = as<int>(odeO["printTop"]);
   op_focei.nF2 = as<int>(odeO["nF"]);
@@ -3041,6 +3043,7 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
       if (op_focei.nF+op_focei.nF2 == 1){
 	stop("On initial gradient evaluation, one or more parameters have a zero gradient\nChange model, try different initial estimates or use outerOpt=\"bobyqa\")");
       } else {
+	op_focei.zeroGrad=true;
 	gr[i]=sqrt(DOUBLE_EPS);
       }
     }
@@ -5197,6 +5200,9 @@ Environment foceiFitCpp_(Environment e){
     } else {
       warning("Tolerances (atol/rtol) were temporarily reduced for some difficult ODE solving during the optimization.\nConsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model.");
     }
+  }
+  if (op_focei.zeroGrad){
+    warning("Zero gradient replaced with small number (%f) during search", sqrt(DOUBLE_EPS));
   }
   foceiFinalizeTables(e);
   // NumericVector scaleC(op_focei.ntheta+op_focei.omegan);
