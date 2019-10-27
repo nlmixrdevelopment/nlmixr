@@ -4282,7 +4282,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	      e["cov"] = as<NumericMatrix>(e["covR"]);
               op_focei.covMethod = 2;
             } else {
-              Rprintf("Cannot calculate covariance.\n");
+              warning("Cannot calculate covariance");
             }
             op_focei.cur += op_focei.npars*2;
             op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
@@ -4376,6 +4376,7 @@ NumericMatrix foceiCalcCov(Environment e){
           } else {
             op_focei.covMethod=0;
             Rprintf("\rCould not calculate covariance matrix.\n");
+	    warning("Cannot calculate covariance");
             op_focei.cur++;
             op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
           }
@@ -5202,7 +5203,7 @@ Environment foceiFitCpp_(Environment e){
     }
   }
   if (op_focei.zeroGrad){
-    warning("Zero gradient replaced with small number (%f) during search", sqrt(DOUBLE_EPS));
+    warning("Zero gradient replaced with small number (%f)", sqrt(DOUBLE_EPS));
   }
   foceiFinalizeTables(e);
   // NumericVector scaleC(op_focei.ntheta+op_focei.omegan);
