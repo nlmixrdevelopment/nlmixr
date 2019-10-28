@@ -32,7 +32,7 @@
 #' @param ncmt number of compartments
 #' @param oral logical, whether oral absorption is true
 #' @param infusion logical, whether infusion is true
-#' @param parameterization type of parameterization, 1=clearance/volumn, 2=micro-constants
+#' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
 #' @return calculated concentrations
 #' @export lin_cmt
 lin_cmt <- function(obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization) {

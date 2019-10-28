@@ -716,3 +716,14 @@ List npde(IntegerVector id, NumericVector dv, IntegerVector evid,
   }
   return ret;
 }
+
+//[[Rcpp::export]]
+RObject augPredTrans(NumericVector& pred, NumericVector& ipred, NumericVector& lambda,
+		     RObject& yjIn){
+  IntegerVector yj = as<IntegerVector>(yjIn);
+  for (int i = pred.size(); i--;){
+    pred[i] = powerDi(pred[i], lambda[i], yj[i]);
+    ipred[i] = powerDi(ipred[i], lambda[i], yj[i]);
+  }
+  return R_NilValue;
+}

@@ -30,12 +30,13 @@ vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
       .rx <- .env$model
       .pars <- .rx$params
       .pars <- setNames(rep(1.1,length(.pars)),.pars);
-      suppressWarnings(do.call(RxODE:::rxSolve.default,
+      suppressWarnings(do.call(RxODE::rxSolve.default,
                                c(list(object=.rx, params=.pars,
                                       events=.evtM,.setupOnly=2L),
                                  saem.cfg$optM)));
-      RxODE::rxDynProtect(RxODE::rxDll(.rx))
-      on.exit({RxODE::rxDynProtect("")})
+      RxODE::rxLock(.rx)
+      RxODE::rxAllowUnload(FALSE);
+      on.exit({RxODE::rxUnlock(.rx); RxODE::rxAllowUnload(TRUE);})
   }
   dyn.load(.env$saem.dll);
   assignInMyNamespace(".protectSaemDll", .env$saem.dll)

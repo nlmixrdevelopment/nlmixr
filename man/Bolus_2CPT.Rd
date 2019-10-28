@@ -7,7 +7,7 @@
 \format{A data frame with 7,920 rows and 16 columns
 
 \describe{
-  \item{ID}{Siumlated Subject ID}
+  \item{ID}{Simulated Subject ID}
   \item{TIME}{Simulated Time}
   \item{DV}{Simulated Dependent Variable}
   \item{LNDV}{Simulated log(Dependent Variable)}

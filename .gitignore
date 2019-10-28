@@ -25,3 +25,10 @@ vignettes/running_nlmixr.html
 build/*.*$
 *.exe$
 /src/Makevars
+vignettes/*_files/
+vignettes/*.html
+vignettes/*.R
+config.log
+config.status
+inst/1.1.1.3/
+vignettes/ggpmx_GOF/

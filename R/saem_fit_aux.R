@@ -32,12 +32,13 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         RxODE::rxLoad(.env$model)
         .pars <- .rx$params
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
-        suppressWarnings(do.call(RxODE:::rxSolve.default,
+        suppressWarnings(do.call(RxODE::rxSolve.default,
                                 c(list(object=.rx, params=.pars,
                                        events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
-        RxODE::rxDynProtect(RxODE::rxDll(.rx))
-        on.exit({RxODE::rxDynProtect("")})
+        RxODE::rxLock(.rx)
+        RxODE::rxAllowUnload(FALSE);
+        on.exit({RxODE::rxUnlock(.rx); RxODE::rxAllowUnload(TRUE)})
     }
     dyn.load(.env$saem.dll);
     assignInMyNamespace(".protectSaemDll", .env$saem.dll)
@@ -137,12 +138,13 @@ plot.saemFit = function(x,...) {
         .rx <- .env$model
         .pars <- .rx$params
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
-        suppressWarnings(do.call(RxODE:::rxSolve.default,
+        suppressWarnings(do.call(RxODE::rxSolve.default,
                                 c(list(object=.rx, params=.pars,
                                        events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
-        RxODE::rxDynProtect(RxODE::rxDll(.rx))
-        on.exit({RxODE::rxDynProtect("")})
+        RxODE::rxLock(.rx)
+        RxODE::rxAllowUnload(FALSE);
+        on.exit({RxODE::rxUnlock(.rx); RxODE::rxAllowUnload(TRUE);})
     }
     dat = as.data.frame(saem.cfg$evt)
     dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
@@ -332,12 +334,13 @@ calc.COV = function(fit0) {
       RxODE::rxLoad(.rx)
       .pars <- .rx$params
       .pars <- setNames(rep(1.1,length(.pars)),.pars);
-      suppressWarnings(do.call(RxODE:::rxSolve.default,
+      suppressWarnings(do.call(RxODE::rxSolve.default,
                                c(list(object=.rx, params=.pars,
                                       events=.evtM,.setupOnly=1L),
                                  saem.cfg$optM)));
-      RxODE::rxDynProtect(RxODE::rxDll(.rx))
-      on.exit({RxODE::rxDynProtect("")})
+      RxODE::rxLock(.rx)
+      RxODE::rxAllowUnload(FALSE);
+      on.exit({RxODE::rxUnlock(.rx);RxODE::rxAllowUnload(TRUE);})
   }
   dyn.load(.env$saem.dll);
   assignInMyNamespace(".protectSaemDll", .env$saem.dll)

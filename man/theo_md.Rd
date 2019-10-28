@@ -3,7 +3,7 @@
 \docType{data}
 \name{theo_md}
 \alias{theo_md}
-\title{Multiple dose Theophiline PK data}
+\title{Multiple dose Theophilline PK data}
 \format{A data frame with 348 rows by 7 columns
 
 \describe{

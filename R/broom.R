@@ -103,7 +103,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 }
 
 .nlmixrTidyRandomPar <- function(x,...){
-    .pars  <- .getR(x,TRUE)
+    .pars  <- .getR(x$omegaR,TRUE)
     .p1 <- data.frame(effect="ran_pars", group="ID", term=names(.pars),estimate=.pars, std.error=NA_real_,
                       statistic=NA_real_, p.value=NA_real_, stringsAsFactors=FALSE) %>%
         .reorderCols();

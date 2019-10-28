@@ -3,6 +3,7 @@ rxPermissive({
     context("Bad UI models should raise errors")
 
     test_that("Duplicate parameters raise errors", {
+
         uif <- function(){
             ini({
                 lCL = 1.37
@@ -28,7 +29,9 @@ rxPermissive({
                 linCmt() ~ prop(prop.err)
             })
         }
+
         expect_error(nlmixr(uif), rex::rex("The following parameter names were duplicated: eta.Cl."))
+
     })
 
     test_that("Un-estimated paramteres raise errors", {
@@ -60,7 +63,7 @@ rxPermissive({
             })
         }
 
-        expect_error(nlmixr(uif.ode), rex::rex("Model error: initial estimates provided without variables being used: prop.err"))
+        expect_error(nlmixr(uif.ode), rex::rex("The following parameter(s) were in the ini block but not in the model block: prop.err"))
 
         uif <- function(){
             ini({
@@ -83,7 +86,7 @@ rxPermissive({
             })
         }
 
-        expect_error(nlmixr(uif), rex::rex("Model error: initial estimates provided without variables being used: eta.v"))
+        expect_error(nlmixr(uif), rex::rex("The following parameter(s) were in the ini block but not in the model block: eta.v"))
 
     })
 
@@ -176,8 +179,7 @@ rxPermissive({
                 tv <- exp(1)
                 eta.ka ~ 0.1
                 eta.cl ~ 0.2
-                ## Should be assign since it is a THETa, should I support it....?
-                add.err
+                add.err = 4
             })
             model({
                 ka <- tka + eta.ka
@@ -198,7 +200,29 @@ rxPermissive({
                 tv <- exp(1)
                 eta.ka ~ 0.1
                 eta.cl ~ 0.2
-                ## Should be assign since it is a THETa, should I support it....?
+                add.err = 4
+            })
+            model({
+                ka <- tka + eta.ka
+                cl <- tcl + eta.cl
+                v <- tv
+                d / dt(depot) = -ka * depot
+                d / dt(center) = ka * depot - cl / v * center
+                cp = center / v
+                cp ~ add(add.err)
+            })
+        }
+
+        expect_error(nlmixr(uif), rex::rex("The following parameters initial estimates are NA: tka"))
+
+
+        uif <- function(){
+            ini({
+                tka <- 3
+                tcl <- exp(-3.2)
+                tv <- exp(1)
+                eta.ka ~ 0.1
+                eta.cl ~ 0.2
                 add.err
             })
             model({
@@ -211,53 +235,9 @@ rxPermissive({
                 cp ~ add(add.err)
             })
         }
-        expect_error(nlmixr(uif), rex::rex("The following parameters initial estimates are NA: tka"))
 
-        two.cmt.pd <- function(){
-            ini({
-                tKa   <- log(0.64)
-                tCl   <- log(5.22)
-                tV2   <- log(41.3)
-                tV3   <- log(115)
-                tQ    <- log(11.96)
-                BWef  <- log(1.87)
-                tSlope     <- log(10) ## add for PD estimation
-                tIntercept <- log(1)  ## add for PD estimation
-                eta.Ka ~ 1.18
-                eta.Cl ~ 0.09
-                eta.V2 ~ 0.2
-                eta.V3 ~ 0.12
-                eta.Q  ~ 0.12
-                eta.Slope     ~ 0.1 ## add for PD estimation
-                eta.Intercept ~ 0.1 ## add for PD estimation
+        expect_error(nlmixr(uif), rex::rex("Residual distribution parameter(s) estimates were not found in ini block"))
 
-                prop.err1 <- 0.1  ## Cp
-                prop.err2 <- 0.3  ## Ef
-
-            })
-            model({
-                Ka <- exp(tKa + eta.Ka)
-                Cl <- exp(tCl + BWef * log.BW.70 + eta.Cl)
-                V2 <- exp(tV2 + eta.V2)
-                V3 <- exp(tV3 + eta.V3)
-                Q  <- exp(tQ + eta.Q)
-                Slope     <- exp(tSlope + eta.Slope)         ## add for PD estimation
-                Intercept <- exp(tIntercept + eta.Intercept) ## add for PD estimation
-
-                d/dt(depot)  = -Ka * depot
-                d/dt(center) = Ka * depot - Cl/V2 * center + Q/V3 * periph - Q/V2 * center
-                d/dt(periph) = Q/V2 * center - Q/V3 * periph
-
-                Cp = center / V2
-                Ef = Cp * Slope + Intercept                  ## add for PD estimation
-
-                Cp ~ prop(prop.err1) | Cp
-                Ef ~ prop(prop.err2) | Ef                    ## add for PD estimation
-
-            })
-        }
-        expect_error(nlmixr(two.cmt.pd),
-                     rex::rex("The conditional statements (Cp, Ef) are not in terms of the RxODE states: depot, center, periph"))
     })
 
     test_that("Parameters cannot be missing or Infinite", {

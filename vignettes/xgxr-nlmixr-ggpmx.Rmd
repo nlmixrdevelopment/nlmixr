@@ -1,0 +1,436 @@
+---
+title: "xgxr nlmixr and ggPmx integration"
+output:
+  html_document:
+    self_contained: no
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "100%"
+  )
+
+## These options cache the models and the model simulations in R
+## To run the actual models on your system, take the save options off.
+nlmixrVersion <- as.character(packageVersion("nlmixr"));
+options(nlmixr.save=TRUE,
+        nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion),
+        huxtable.knit_print_df = FALSE);
+if (!dir.exists(getOption("nlmixr.save.dir")))
+    dir.create(getOption("nlmixr.save.dir"))
+```
+
+This shows an example of integrated workflow between `xgxr` `nlmixr`
+and `ggPmx`
+
+```{r load}
+library(nlmixr)
+library(xgxr)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(ggPMX)
+
+```
+
+# Load the data
+
+```{r}
+pkpd_data <- case1_pkpd %>%
+  arrange(DOSE) %>%
+  select(-IPRED) %>%
+  mutate(TRTACT_low2high = factor(TRTACT, levels = unique(TRTACT)),
+         TRTACT_high2low = factor(TRTACT, levels = rev(unique(TRTACT))),
+         DAY_label = paste("Day", PROFDAY),
+         DAY_label = ifelse(DAY_label == "Day 0","Baseline",DAY_label))
+ 
+pk_data <- pkpd_data %>%
+  filter(CMT == 2)
+
+pk_data_cycle1 <- pk_data %>%
+    filter(CYCLE == 1)
+```
+
+# Exploratory analysis using ggplot and xgx helper functions
+
+## Use xgxr for simplified concentration over time, colored by Dose, mean +/- 95% CI
+
+Often in exploring data it is worthwhile to plot by dose by each
+nominal time and add the 95% confidence interval. This typical plot
+can be cumbersome and lack some nice features that `xgxr` can help
+with.  Note the following helper functions:
+
+- `xgx_theme_set()` this sets the theme to black and white color theme
+  and other best pratices in `xgxr`.
+  
+- `xgx_geom_ci()` which creates the Confidence Interval and mean plots
+  in a simple interface. 
+  
+- `xgx_scale_y_log10()` which creates a log-scale that includes the
+  minor grids that immediately show the viewer that the plot is a
+  semi-log plot without carefully examining the y axis.
+  
+- `xgx_scale_x_time_units()` which creates an appropriate scale based on
+  your times observed and the units you use. It also allows you to
+  convert units easily for the right display.
+  
+- `xgx_annote_status()` which adds a `DRAFT` annotation which is often
+  considered best practice when the data or plots are draft.
+
+```{r}
+xgx_theme_set() # This uses black and white theme based on xgxr best
+                # pratices
+
+# flag for labeling figures as draft
+status <- "DRAFT"
+
+time_units_dataset <- "hours"
+time_units_plot    <- "days"
+trtact_label       <- "Dose"
+dose_label         <- "Dose (mg)"
+conc_label         <- "Concentration (ng/ml)" 
+auc_label          <- "AUCtau (h.(ng/ml))"
+concnorm_label     <- "Normalized Concentration (ng/ml)/mg"
+sex_label          <- "Sex"
+w100_label         <- "WEIGHTB>100"
+pd_label           <- "FEV1 (mL)"
+cens_label         <- "Censored"
+
+
+ggplot(data = pk_data_cycle1, aes(x     = NOMTIME,
+                                  y     = LIDV,
+                                  group = DOSE,
+                                  color = TRTACT_high2low)) +
+    xgx_geom_ci(conf_level = 0.95) + # Easy CI with xgxr
+    xgx_scale_y_log10() + # semi-log plots with semi-log grid minor lines
+    xgx_scale_x_time_units(units_dataset = time_units_dataset,
+                           units_plot = time_units_plot) +
+    # The last line creates an appropriate x scale based on time-units
+    # and time unit scale
+    labs(y = conc_label, color = trtact_label) +
+    xgx_annotate_status(status) #  Adds draft status to plot
+```
+
+With this plot you see the mean concentrations confidence intervals
+stratified by dose
+
+## Concentration over time, faceted by Dose, mean +/- 95% CI, overlaid on gray spaghetti plots
+
+Not only is it useful to look at the mean concentrations, it is often
+useful to look at the mean concentrations and their relationship
+between actual individual profiles.  Using `ggplot` coupled with the
+`xgxr` helper functions used above, we can easily create these plots
+as well:
+
+```{r}
+ggplot(data = pk_data_cycle1, aes(x = TIME, y = LIDV)) +
+  geom_line(aes(group = ID), color = "grey50", size = 1, alpha = 0.3) +
+  geom_point(aes(color = factor(CENS), shape = factor(CENS))) + 
+  scale_shape_manual(values = c(1, 8)) +
+  scale_color_manual(values = c("grey50", "red")) +
+  xgx_geom_ci(aes(x = NOMTIME, color = NULL, group = NULL, shape = NULL), conf_level = 0.95) +
+  xgx_scale_y_log10() +
+  xgx_scale_x_time_units(units_dataset = time_units_dataset, units_plot = time_units_plot) +
+  labs(y = conc_label, color = trtact_label) +
+  theme(legend.position = "none") +
+  facet_grid(.~TRTACT_low2high) +
+  xgx_annotate_status(status)
+```
+
+To me it appears the variability seems to be higher with higher doses
+and higher with later times.
+
+
+## Exploring the dose linearity
+
+A common way to explore the dose linearity is to normalize by the
+dose.  If the confidence intervals overlap, often this is a dose
+linear example.
+
+```{r}
+ggplot(data = pk_data_cycle1,
+       aes(x = NOMTIME,
+           y = LIDV / as.numeric(as.character(DOSE)),
+           group = DOSE,
+           color = TRTACT_high2low)) +
+  xgx_geom_ci(conf_level = 0.95, alpha = 0.5, position = position_dodge(1)) +
+  xgx_scale_y_log10() +
+  xgx_scale_x_time_units(units_dataset = time_units_dataset, units_plot = time_units_plot) +
+  labs(y = concnorm_label, color = trtact_label) +
+    xgx_annotate_status(status)
+```
+
+This example seems to be dose-linear, with the exception of the
+censored data. This can be made even more clear by removing the censored data for this plot:
+
+```{r}
+ggplot(data = pk_data_cycle1 %>% filter(CENS == 0),
+       aes(x = NOMTIME,
+           y = LIDV / as.numeric(as.character(DOSE)),
+           group = DOSE,
+           color = TRTACT_high2low)) +
+  xgx_geom_ci(conf_level = 0.95, alpha = 0.5, position = position_dodge(1)) +
+  xgx_scale_y_log10() +
+  xgx_scale_x_time_units(units_dataset = time_units_dataset, units_plot = time_units_plot) +
+  labs(y = concnorm_label, color = trtact_label) +
+    xgx_annotate_status(status)
+```
+
+The lowest dose, with the most censoring, is the one that seems to be
+the outlier.  That is likely an artifact of censoring.
+
+Other ways to explore the data include by looking at normalized Cmax
+and AUC values (which we will skip in this vignette).
+
+# Exploring Covariates in the dataset
+
+Using the `xgx` helper functions to `ggplot` you can explore the
+effect of high baseline weight.  This particular plot is shown below:
+
+```{r}
+ggplot(data = pk_data_cycle1, aes(x = NOMTIME,
+                                  y = LIDV,
+                                  group = WEIGHTB > 100,
+                                  color = WEIGHTB > 100)) + 
+    xgx_geom_ci(conf_level = 0.95) +
+    xgx_scale_y_log10() +
+    xgx_scale_x_time_units(units_dataset = time_units_dataset, units_plot = time_units_plot) +
+    facet_grid(.~DOSE) +
+    labs(y = conc_label, color = w100_label) +
+    xgx_annotate_status(status)
+```
+It seems that the weight effect is not extreme for either dose group
+
+## Summary of exploratory analysis findings
+
+From the exploratory analysis we see:
+- The doses seem proportional
+- The PK seems to have a 2-compartment model
+- Censoring has a large effect on the PK data.
+
+# Fitting the data with nlmixr
+
+First we need to subset to the PK only data and rename `LIDV` to `DV`
+
+```{r}
+dat <- case1_pkpd %>%
+    rename(DV=LIDV) %>%
+    filter(CMT %in% 1:2) %>%
+    # Filter (for now) since CENS supprot in nlmixr is in development
+    filter(CENS == 0) %>%
+    filter(TRTACT != "Placebo")
+```
+
+Next create a 2 compartment model:
+
+```{r}
+
+## Use 2 compartment model
+cmt2 <- function(){
+    ini({
+        lka <- log(0.1) # log Ka
+        lv <- log(10) # Log Vc
+        lcl <- log(4) # Log Cl
+        lq <- log(10) # log Q
+        lvp <- log(20) # Log Vp
+
+        eta.ka ~ 0.01
+        eta.v ~ 0.1
+        eta.cl ~ 0.1
+        logn.sd = 10
+    })
+    model({
+        ka <- exp(lka + eta.ka)
+        cl <- exp(lcl + eta.cl)
+        v <- exp(lv + eta.v)
+        q <- exp(lq)
+        vp <- exp(lvp)
+        linCmt() ~ lnorm(logn.sd)
+    })
+}
+
+## Check parsing
+cmt2m <- nlmixr(cmt2)
+print(cmt2m)
+```
+
+```{r}
+## First try log-normal (since the variabilitiy seemed proportional to concentration)
+cmt2fit.logn <- nlmixr(cmt2m, dat, "saem", table=tableControl(npde=TRUE,cwres=TRUE))
+
+
+## Now try proportional
+cmt2fit.prop <- cmt2fit.logn %>%
+    update(linCmt() ~ prop(prop.sd)) %>%
+    nlmixr(est="saem", table=tableControl(npde=TRUE, cwres=TRUE))
+
+## now try add+prop
+cmt2fit.add.prop <- cmt2fit.prop %>%
+    update(linCmt() ~ prop(prop.sd) + add(add.sd)) %>%
+    nlmixr(est="saem", table=tableControl(npde=TRUE, cwres=TRUE))
+```
+
+Now that we have run 3 different estimation methods, we can compare the results side-by-side
+```{r}
+library(huxtable)
+
+as_hux("lognormal"=cmt2fit.logn, "proportional"=cmt2fit.prop, "add+prop"=cmt2fit.add.prop)
+```
+
+Note that the additive and proportional model has the additive
+component approach zero.  When comparing the objective functions of
+log-normal and proportional models, the proportional model has the
+lowest objective function value. (Since we modeled log-normal without
+data transformation it is appropriate to compare the AIC/Objective
+function values)
+
+You may wish to see a visual comparison of the parameters:
+
+```{r}
+library(dotwhisker)
+## exponentiate=NA causes the parameters to be back-transformed
+dwplot(list("lognormal"=cmt2fit.logn, "proportional"=cmt2fit.prop), exponentiate=NA) +
+    ## Notice we can use some xgx functions post analysis as well,
+    ## since they are ggplot helper functions
+    xgx_scale_x_log10() +
+    ggtitle("Comparison between lognormal and proportional models",
+            "On backtransformed scales")
+```
+
+# Model Diagnostics with ggPMX
+
+```{r}
+## The controller then can be piped into a specific plot
+ctr <- pmx_nlmixr(cmt2fit.logn, conts = c("WEIGHTB"), cats="TRTACT")
+
+ctr %>% pmx_plot_npde_pred
+
+## Modify graphical options and remove DRAFT label:
+ctr %>% pmx_plot_npde_time(smooth = list(color="blue"), point = list(shape=4), is.draft=FALSE, 
+          labels = list(x = "Time after first dose (days)", y = "Normalized PDE"))
+
+ctr %>% pmx_plot_dv_ipred(scale_x_log10=TRUE, scale_y_log10=TRUE,filter=IPRED>0.001)
+
+ctr %>% pmx_plot_dv_pred(scale_x_log10=TRUE, scale_y_log10=TRUE,filter=IPRED>0.001)
+
+ctr %>% pmx_plot_abs_iwres_ipred
+
+## For this display only show 1x1 individual plot for ID 110 for time < 12
+ctr %>% pmx_plot_individual(1, filter=ID == 110 & TIME > 0 & TIME < 12, 
+                            facets = list(nrow = 1, ncol = 1))
+
+ctr %>% pmx_plot_iwres_dens
+
+ctr %>% pmx_plot_eta_qq
+
+## 0-12 hour VPC on semi-log scale
+ctr %>% pmx_plot_vpc(filter=TIME > 0 & TIME < 12,
+                     scale_y_log10=TRUE, 
+                     bin=pmx_vpc_bin("jenks",n=5))
+
+## 0-12 hour VPC on linear scale
+ctr %>% pmx_plot_vpc(filter=TIME > 0 & TIME < 12,
+                     scale_y_log10=FALSE, 
+                     bin=pmx_vpc_bin("jenks",n=5))
+                     
+ctr %>% pmx_plot_eta_box
+```
+
+```{r, fig.width=4, fig.height=8}
+ctr %>% pmx_plot_eta_hist
+```
+
+```{r}
+ctr %>% pmx_plot_eta_matrix
+
+## Create a report of all the plots you generated from the controller
+if (!file.exists("nlmixr_report.docx")){
+    ctr %>% pmx_report("nlmixr_report",".")
+}
+if (file.exists("nlmixr_report.Rmd"))
+    unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
+```
+
+This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editting the default template to include project specificities (change labels, stratifications, filtering, etc.).
+
+
+# Simulation of a new scenario with RxODE
+
+By creating events you can simply simulate a new scenario.  Perhaps
+your drug development team wants to explore the 100 mg dose 3 times a
+day dosing to see what happens with the PK.  You can simply simulate
+from the nlmixr model using a [new event
+table](https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html)
+created from RxODE.
+
+In this case we wish to simulate with some variability and see what
+happens at steady state:
+
+```{r}
+(ev <- et(amt=100, ii=8, ss=1))
+
+ev$add.sampling(seq(0, 8, length.out=100))
+print(ev)
+```
+
+A nlmixr model already includes information about the parameter
+estimates and can simulate without uncertainty in the population
+parameters or covariances, like what is done for a VPC. 
+
+If you wish to simulate `100` patients repeated by `100` different
+theoretical studies where you simulate from the uncertainty in the
+fixed parameter estimates and covariances you can very easily with
+nlmixr/RxODE:
+
+```{r}
+set.seed(100)
+sim1 <- simulate(cmt2fit.logn, events=ev, nSub=100, nStud=100)
+
+print(sim1)
+```
+
+You may examine the simulated study information easily, as show in the
+`RxODE` printout:
+
+```{r}
+head(sim1$thetaMat)
+```
+
+You can also see the covariance matricies that are simulated (note
+they come from an inverse Wishart distribution):
+
+```{r}
+head(sim1$omegaList)
+```
+
+```{r}
+head(sim1$sigmaList)
+```
+
+It is also easy enough to create a plot to see what is going on with
+the simulation:
+
+```{r}
+
+p1 <- plot(sim1) ## This returns a ggplot2 object
+
+## you can tweak the plot by the standard ggplot commands
+p1 + xlab("Time (hr)") + 
+    ylab("Simulated Concentrations of TID steady state")
+
+# And put the same plot on a semi-log plot
+p1 + xlab("Time (hr)") + 
+    ylab("Simulated Concentrations of TID steady state") +
+    xgx_scale_y_log10()
+```
+
+For more complex simulations with variability you can also [simulate
+dosing windows and sampling
+windows](https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html#add-doses-and-samples-within-a-sampling-window)
+and use any tool you want to summarize it in the way you wish.
+

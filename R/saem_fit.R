@@ -43,9 +43,6 @@ typedef void (*rxSingleSolve_t)(int subid, double *_theta, double *timep,
 
 rxSingleSolve_t rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
 
-typedef void (*rxOptionsIniEnsure0_t)(int mx);
-rxOptionsIniEnsure0_t rxOptionsIniEnsure0 = (rxOptionsIniEnsure0_t) R_GetCCallable("RxODE","rxOptionsIniEnsure0");
-
 typedef rx_solve *(*getRxSolve_t)();
 getRxSolve_t getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
 
@@ -76,7 +73,6 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   rx_solving_options* _op = _rx->op;
   vec _id = _evt.col(0);
   int _N=_id.max()+1;
-  rxOptionsIniEnsure0(_N);
   int _cores = 1;//_op->cores;
   uvec _ix;
   _ix = find(_evt.col(2) == 0);
@@ -633,7 +629,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       ## .lib=  if(is.ode) model$cmpMgr$dllfile else ""
       ## if (is.ode && .Platform$OS.type=="windows") .lib <- gsub("\\\\", "/", utils::shortPathName(.lib));
 
-      make_str = 'PKG_CXXFLAGS=-g %s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
+      make_str = 'PKG_CXXFLAGS=%s\nPKG_LIBS=%s $(BLAS_LIBS) $(LAPACK_LIBS)\n'
       make_str = sprintf(make_str, nmxInclude(c("nlmixr","StanHeaders","Rcpp","RcppArmadillo","RcppEigen","BH","RxODE")), "")
 
       cat(paste0(make_str,"\n"), file=file.path(getwd(),"Makevars"))
@@ -642,6 +638,12 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
       rexec = paste(R.home(component="bin"), .Platform$file.sep, "R", sep="")
 
       args  = c("CMD", "SHLIB", saem.cpp, "-o", saem.dll)
+      .rxBinpref <- Sys.getenv("rxBINPREF");
+      if (.rxBinpref != ""){
+        .oldBinpref <- Sys.getenv("BINPREF");
+        Sys.setenv("BINPREF"=.rxBinpref);
+        on.exit(Sys.setenv("BINPREF"=.oldBinpref), add=TRUE);
+      }
       ## do.call("system", list(shlib))
       .badBuild <- function(msg,stop=TRUE){
           message(msg);
@@ -672,22 +674,40 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   }
   ## .saemCountDll(saem.dll, 1L);
   `.DLL` <- dyn.load(saem.dll);
+  assignInMyNamespace(".protectSaemDll", saem.dll)
+  on.exit({assignInMyNamespace(".protectSaemDll", "")}, add=TRUE)
   .mod <- model
   if (!is.ode){.mod <- NULL}
   fn.pred <- eval(bquote(function(a, b, c){
       if (!file.exists(.(saem.dll))) stop(sprintf("Stopping since '%s' does not exist", .(saem.dll)));
       dyn.load(.(saem.dll));
+      nlmixr::.protectSaem(.(saem.dll))
+      on.exit({nlmixr::.unprotectSaem()}, add=TRUE)
       .Call(`_nlmixr_saemDoPred`, a, b, c, .(saem.base),
             .(.mod), .(saem.dll));
   }))
   fn1 <- eval(bquote(function(a){
       dyn.load(.(saem.dll));
+      nlmixr::.protectSaem(.(saem.dll))
+      on.exit({nlmixr::.unprotectSaem()}, add=TRUE)
       if (.(is.ode)){
-          suppressWarnings(do.call(RxODE:::rxSolve.default,
-                                   c(list(object=.(model), params=a$opt$.pars,
-                                          events=a$evtM,.setupOnly=1L),
-                                     a$optM)))
-          ## on.exit(RxODE::rxSolveFree())
+          RxODE::rxLoad(.(model))
+          RxODE::rxLock(.(model))
+          RxODE::rxAllowUnload(FALSE);
+          on.exit({RxODE::rxUnlock(.(model))})
+          .l1 <- length(unique(a$evt[, "ID"]));
+          .l2 <- length(unique(a$evtM[, "ID"]))
+          if (.l2 > .l1){
+              suppressWarnings(do.call(RxODE::rxSolve.default,
+                                       c(list(object=.(model), params=a$opt$.pars,
+                                              events=a$evtM,.setupOnly=1L),
+                                         a$optM)))
+          } else {
+              suppressWarnings(do.call(RxODE::rxSolve.default,
+                                       c(list(object=.(model), params=a$opt$.pars,
+                                              events=a$evt,.setupOnly=1L),
+                                         a$optM)))
+          }
       }
       .Call(`_nlmixr_saemFit`, a, .(saem.base),
             .(.mod), .(saem.dll));
@@ -695,6 +715,8 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   if (is.ode){
     fn <- eval(bquote(function(a, b, c){
       RxODE::rxLoad(.(model))
+      RxODE::rxLock(.(model))
+      on.exit({RxODE::rxUnlock(.(model)); RxODE::rxAllowUnload(TRUE);})
       if (missing(b) && missing(c)){
         cur.fn <- .(fn1)
         ret <- cur.fn(a)
@@ -734,6 +756,25 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
   fn
 }
 .protectSaemDll <- "";
+
+##' SAEM dll prodection from garbage collection
+##'
+##' This protects the saem dll from being prematurely unloaded while
+##' running it due to garbage collection.
+##'
+##' @param dll dll to protect
+##'
+##' @return nothing
+##'
+##'@export
+.protectSaem <- function(dll){
+    assignInMyNamespace(".protectSaemDll", dll)
+}
+##'@rdname .protectSaem
+##'@export
+.unprotectSaem <- function(dll){
+    assignInMyNamespace(".protectSaemDll", "")
+}
 ##' Cleanup saem_fit environment by removing dll after the object is no logner used by R.
 ##'
 ##' @param env Environment where cleanup needs to occur.
@@ -742,14 +783,14 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 saem.cleanup <- function(env){
     if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
     if (is(env, "saemFit")) env <- attr(env, "env");
-    if (!any(.protectSaemDll== env$saem.dll)){
-        try({dyn.unload(env$saem.dll)}, silent=TRUE);
-        if (env$is.ode){
-            try({RxODE::rxUnload(env$model)}, silent=TRUE)
-        }
-        if (file.exists(env$saem.cpp))
-            unlink(env$saem.cpp);
-    }
+    ## if (!any(.protectSaemDll== env$saem.dll)){
+    ##     try({dyn.unload(env$saem.dll)}, silent=TRUE);
+    ##     if (env$is.ode){
+    ##         try({RxODE::rxUnload(env$model)}, silent=TRUE)
+    ##     }
+    ##     if (file.exists(env$saem.cpp))
+    ##         unlink(env$saem.cpp);
+    ## }
 
 }
 
@@ -1567,7 +1608,6 @@ focei.eta.saemFit <- function(object, uif, ...){
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
                              nnodes.gq=1, nsd.gq=3, adjObf=TRUE,
                              calcCov=TRUE){
-  ## on.exit({RxODE::rxSolveFree()});
   .saemCfg  <-  attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt;
   if (class(uif) == "function"){

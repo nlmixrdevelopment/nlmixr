@@ -71,6 +71,7 @@ SEXP _nlmixr_nlmixrHess_(SEXP, SEXP, SEXP, SEXP);
 
 SEXP _nlmixr_saemDoPred(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP _nlmixr_saemFit(SEXP, SEXP, SEXP, SEXP);
+SEXP _nlmixr_augPredTrans(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
@@ -120,6 +121,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_nlmixrHess_", (DL_FUNC) &_nlmixr_nlmixrHess_, 4},
   {"_nlmixr_saemDoPred", (DL_FUNC) &_nlmixr_saemDoPred, 6},
   {"_nlmixr_saemFit", (DL_FUNC) &_nlmixr_saemFit, 4},
+  {"_nlmixr_augPredTrans", (DL_FUNC) &_nlmixr_augPredTrans, 4},
   {NULL, NULL, 0}
 };
 
@@ -129,4 +131,9 @@ void R_init_nlmixr(DllInfo *dll)
   R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, TRUE);
   R_forceSymbols(dll,FALSE);
+}
+
+void rxOptionsFreeFocei();
+void R_unload_nlmixr(DllInfo *info){
+  rxOptionsFreeFocei();
 }

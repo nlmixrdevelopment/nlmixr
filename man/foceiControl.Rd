@@ -8,7 +8,8 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxInnerIterations = 1000, maxOuterIterations = 5000,
   n1qn1nsim = NULL, method = c("liblsoda", "lsoda", "dop853"),
   transitAbs = NULL, atol = NULL, rtol = NULL, atolSens = NULL,
-  rtolSens = NULL, atolSS = NULL, rtolSS = NULL,
+  rtolSens = NULL, ssAtol = NULL, ssRtol = NULL, ssAtolSens = NULL,
+  ssRtolSens = NULL, minSS = 10L, maxSS = 1000L,
   maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0,
   maxordn = 12L, maxords = 5L, cores, covsInterpolation = c("locf",
   "linear", "nocb", "midpoint"), print = 1L,
@@ -45,8 +46,8 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
   maxOdeRecalc = 5, odeRecalcFactor = 10^(0.5),
   gradCalcCentralSmall = 1e-04, gradCalcCentralLarge = 10000,
   etaNudge = 0.01, stiff, nRetries = 3, seed = 42,
-  resetThetaCheckPer = 0.1, etaMat = NULL, repeatGillMax = 7,
-  stickyRecalcN = 5)
+  resetThetaCheckPer = 0.1, etaMat = NULL, repeatGillMax = 3,
+  stickyRecalcN = 5, gradProgressOfvTime = 10)
 }
 \arguments{
 \item{sigdig}{Optimization significant digits. This controls:
@@ -58,7 +59,7 @@ foceiControl(sigdig = 3, ..., epsilon = NULL,
  \item The tolerance of the ODE solvers is
  \code{0.5*10^(-sigdig-2)}; For the sensitivity equations and
  steady-state solutions the default is \code{0.5*10^(-sigdig-1.5)}
- (senstivity changes only applicable for liblsoda)
+ (sensitivity changes only applicable for liblsoda)
 
  \item The tolerance of the boundary check is \code{5 * 10 ^ (-sigdig + 1)}
 
@@ -108,11 +109,21 @@ liblsoda.  This allows a less accurate solve for gradients (if desired)}
 \item{rtolSens}{Sensitivity rtol, can be different than rtol with
 liblsoda.  This allows a less accurate solve for gradients (if desired)}
 
-\item{atolSS}{Steady-state atol, can be different than atol with
-liblsoda.  This allows a less accurate solve for gradients (if desired)}
+\item{ssAtol}{Steady state absolute tolerance (atol) for calculating if steady-state
+has been archived.}
 
-\item{rtolSS}{Steady-state rtol, can be different than rtol with
-liblsoda.  This allows a less accurate solve for gradients (if desired)}
+\item{ssRtol}{Steady state relative tolerance (rtol) for
+calculating if steady-state has been achieved.}
+
+\item{ssAtolSens}{Sensitivity absolute tolerance (atol) for
+calculating if steady state has been achieved for sensitivity compartments.}
+
+\item{ssRtolSens}{Sensitivity relative tolerance (rtol) for
+calculating if steady state has been achieved for sensitivity compartments.}
+
+\item{minSS}{Minimum number of iterations for a steady-state dose}
+
+\item{maxSS}{Maximum number of iterations for a steady-state dose}
 
 \item{maxstepsOde}{Maximum number of steps for ODE solver.}
 
@@ -561,7 +572,7 @@ optimal step size determined.}
 \item{gillStepCov}{When looking for the optimal forward difference
 step size, this is This is the step size to increase the
 initial estimate by.  So each iteration during the covariance
-step is equalt new step size = (prior step size)*gillStepCov}
+step is equal to the new step size = (prior step size)*gillStepCov}
 
 \item{gillFtolCov}{The gillFtol is the gradient error tolerance
 that is acceptable before issuing a warning/error about the
@@ -627,7 +638,7 @@ done on the first ETA optimization.}
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
     the ODE system is stiff or not.
 
-    For stiff ODE sytems (\code{stiff = TRUE}), \code{RxODE} uses the
+    For stiff ODE systems (\code{stiff = TRUE}), \code{RxODE} uses the
     LSODA (Livermore Solver for Ordinary Differential Equations)
     Fortran package, which implements an automatic method switching
     for stiff and non-stiff problems along the integration
@@ -658,6 +669,9 @@ parameter.}
 
 \item{stickyRecalcN}{The number of bad ODE solves before reducing
 the atol/rtol for the rest of the problem.}
+
+\item{gradProgressOfvTime}{This is the time for a single objective
+function evaluation (in seconds) to start progress bars on gradient evaluations}
 }
 \description{
 Control Options for FOCEi

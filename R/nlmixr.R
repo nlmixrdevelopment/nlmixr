@@ -124,6 +124,8 @@ nlmixr <- function(object, data, est=NULL, control=list(),
                    table=tableControl(), ...,save=NULL,
                    envir=parent.frame()){
     assignInMyNamespace(".nlmixrTime",proc.time());
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     force(est)
     ## verbose?
     ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
@@ -294,9 +296,22 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     fix.dat <- function(x){
         .cls <- class(x);
         class(x) <- "data.frame";
+        x$ID <- as.integer(x$ID)
         attr(x$ID, "levels") <- .lab;
         class(x$ID) <- "factor";
         class(x) <- .cls;
+        .etaO <- x$etaObf
+        .etaO$ID <- as.integer(.etaO$ID)
+        attr(.etaO$ID, "levels") <- .lab;
+        class(.etaO$ID) <- "factor";
+        .eta <- x$eta
+        .eta$ID <- as.integer(.eta$ID)
+        attr(.eta$ID, "levels") <- .lab;
+        class(.eta$ID) <- "factor";
+        .ranef <- x$ranef
+        .ranef$ID <- as.integer(.ranef$ID)
+        attr(.ranef$ID, "levels") <- .lab;
+        class(.ranef$ID) <- "factor";
         .uif <- x$uif;
         .thetas <- x$theta;
         for (.n in names(.thetas)){
@@ -309,8 +324,11 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             }
         }
         .env <- x$env
+        .env$etaObf <- .etaO
+        .env$eta <- .eta
         .env$origData <- .origData;
         .env$uif <- .uif;
+        .env$ranef <- .ranef;
         .predDf <- .uif$predDf;
         if (any(.predDf$cond != "") & any(names(x) == "CMT")){
             .cls <- class(x);
@@ -660,6 +678,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
             }
         }
         fit <- .addNpde(fit);
+        fit <- fix.dat(fit);
         assign("start.time", start.time, env);
         assign("est", est, env);
         assign("stop.time", Sys.time(), env);
@@ -699,6 +718,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         ## assign("start.time", start.time, env);
         ## assign("est", est, env);
         ## assign("stop.time", Sys.time(), env);
+        fit <- fix.dat(fit);
         assign("origControl",control,fit$env);
         assign("modelId",.modelId,fit$env);
         return(fit);
@@ -731,7 +751,8 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
                         sum.prod=FALSE, table=tableControl(),
                         save=NULL, envir=parent.frame()){
-
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     if (is.null(save)){
         save <- getOption("nlmixr.save", FALSE);
     }
@@ -755,6 +776,9 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
         if (file.exists(.saveFile)){
             message(sprintf("Loading model already run (%s)",.saveFile))
             .ret  <- readRDS(.saveFile)
+            if (!is.null(.ret$warnings)){
+                sapply(.ret$warnings, warning)
+            }
             return(.ret)
         }
     }
@@ -930,6 +954,8 @@ saemControl <- function(seed=99,
 ##' @author Matthew L. Fidler
 ##' @export
 addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     .pt  <- proc.time();
     .oTime <- fit$env$time;
     .objName <- substitute(fit);

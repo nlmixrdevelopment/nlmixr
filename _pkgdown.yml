@@ -141,13 +141,15 @@ navbar:
           href: articles/modelPiping.html
         - text: "Sweeping models to tidy datasets (broom)"
           href: articles/broom.html
+        - text: "--------------------------"
+        - text: "Integrated development with xgxr/nlmixr/ggPMX"
+          href: articles/xgxr-nlmixr-ggpmx.html
   - text: Example models
     icon: fas fa-chalkboard-teacher
     menu:
         - text: "Phenobarbatol with correlations"
           href: articles/addingCovariances.html
         - text: "--------------------------"
-        - text: Page 2018
         - text: "Nonlinear PK/PD -- Nimotuzumab"
           href: https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html
         - text: "PBPK -- Mavoglurant"
@@ -157,6 +159,9 @@ navbar:
   - text: "Cheat Sheet"
     icon: fa-scroll fa-lg
     href: https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf
+  - text: "Tutorial"
+    icon: fas fa-life-ring
+    href: https://doi.org/10.1002/psp4.12445
   - text: "Functions"
     icon: fa-file-code-o fa-lg
     href: reference/index.html

@@ -29,5 +29,5 @@ Do visual predictive check (VPC) plots for nlme-based non-linear mixed effect mo
 \examples{
 specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
 fit <- nlme_lin_cmpt(theo_md, par_model=specs, ncmt=1, verbose=TRUE)
-vpc(fit, nsim = 100, condition = NULL)
+vpc_nlmixr_nlme(fit, nsim = 100, condition = NULL)
 }

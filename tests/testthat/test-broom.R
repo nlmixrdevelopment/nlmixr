@@ -8,6 +8,10 @@ rxPermissive({
         testthat::expect_equal(rownames(o), as.character(seq_len(nrow(o))))
     }
 
+    .nlmixr <- function(...){
+        suppressWarnings(nlmixr(...))
+    }
+
 
     #' check the output of a tidy function
     check_tidy <- function(o, exp.row = NULL, exp.col = NULL, exp.names = NULL) {
@@ -53,7 +57,7 @@ rxPermissive({
 
     context("broom tidy nlmixr SAEM")
 
-    fitS <- nlmixr(one.compartment, theo_sd, est="saem")
+    fitS <- .nlmixr(one.compartment, theo_sd, est="saem")
     test_that("tidy works on nlmixr fit SAEM fits", {
         td <- tidy(fitS, exponentiate=NA)
         check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
@@ -138,7 +142,7 @@ rxPermissive({
 
     for (f in c("focei", "foce")){
         context(sprintf("broom tidy nlmixr %s", f))
-        fitF <- nlmixr(one.compartment, theo_sd, est=f)
+        fitF <- .nlmixr(one.compartment, theo_sd, est=f)
         test_that(sprintf("tidy works on nlmixr fit %s fits",f), {
             td <- tidy(fitF, exponentiate=NA)
             check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
@@ -221,7 +225,7 @@ rxPermissive({
 
     for (f in c("foi", "fo")){
         context(sprintf("broom tidy nlmixr %s", f))
-        fitF <- nlmixr(one.compartment, theo_sd, est=f)
+        fitF <- .nlmixr(one.compartment, theo_sd, est=f)
         test_that(sprintf("tidy works on nlmixr fit %s fits",f), {
             td <- tidy(fitF, exponentiate=NA)
             check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
@@ -304,7 +308,7 @@ rxPermissive({
 
 
     context("broom tidy nlmixr nlme")
-    fitN <- nlmixr(one.compartment, theo_sd, est="nlme", control=nlmeControl(pnlsTol=0.6))
+    fitN <- .nlmixr(one.compartment, theo_sd, est="nlme", control=nlmeControl(pnlsTol=0.6))
     test_that("tidy works on nlmixr fit nlme fits", {
         td <- tidy(fitN, exponentiate=NA)
         check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
@@ -387,7 +391,7 @@ rxPermissive({
 
 
     context("broom tidy nlmixr posthoc")
-    fitP <- nlmixr(one.compartment, theo_sd, est="posthoc")
+    fitP <- .nlmixr(one.compartment, theo_sd, est="posthoc")
 
     test_that("tidy works on posthoc fit fits", {
         td <- tidy(fitP, exponentiate=NA)

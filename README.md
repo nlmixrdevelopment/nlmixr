@@ -244,6 +244,8 @@ sudo installer -pkg \
 Sys.setenv("PATH"=paste0("/usr/local/clang8/bin:/usr/local/gfortran/bin:", Sys.getenv("PATH")))
 ```
 
+**Make Sure you have an extra line at the end of this file; Otherwise R will not pick up the correct paths**.
+
 You also need to create a directory `~/.R` and then put a file `Makevars` in it;  The context of the file should contain:
 
 ```sh
@@ -292,7 +294,7 @@ Environmental Variable |  Correct value
 `PYTHONHOME` | Path where the python with sympy is installed
 `PYTHON_INCLUDE` | Path where the python libaries are installed; In windows this is `PYTHONHOME\include`
 `PYTHON_LIB` | Path where python libraries are installed; In windows this is `PYTHONHOME\libs`
-`PYTHONPATH` | Path where python searches.  In windows this is a path-style varible including `PYTHONHOME\DLLs`, `PYTHONHOME\Lib` and `PYTHONHOME\Lib\site-packages`.  
+`PYTHONPATH` | Path where python searches.  In windows this is a path-style variable including `PYTHONHOME\DLLs`, `PYTHONHOME\Lib` and `PYTHONHOME\Lib\site-packages`.  
 `PYTHONSTARTUP` | In windows, this value is unset if present
 
 I believe you could also unset some of these variables and python can

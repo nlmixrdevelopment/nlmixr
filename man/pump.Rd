@@ -20,7 +20,7 @@
 pump
 }
 \description{
-Thir records the number of failures and operation time for groups
+The records the number of failures and operation time for groups
 of 10 pumps.
 }
 \references{

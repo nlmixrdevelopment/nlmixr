@@ -44,9 +44,7 @@ rxPermissive({
                           control=foceiControl(maxOuterIterations=0,maxInnerIterations=0,
                                                covMethod=""))
 
-        expect_equal(418.9352, round(fitPi$objective, 4));
+        expect_equal(418.9354, round(fitPi$objective, 4));
     })
-
-
 
 }, on.validate="NLMIXR_VALIDATION", silent=TRUE)

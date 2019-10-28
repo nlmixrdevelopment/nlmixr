@@ -39,9 +39,9 @@ CXX14STD=""
 
 ISYSTEM="I"
 dnl -- Uncomment when looking for "significant" warnings
-dnl if test "${GCC}" = yes; then
-dnl   ISYSTEM="isystem"
-dnl fi
+if test "${GCC}" = yes; then
+  ISYSTEM="isystem"
+fi
 
 
 

@@ -14,6 +14,8 @@
 ##' @export
 addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE,
                     cholSEtol=(.Machine$double.eps)^(1/3), ...){
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     .pt  <- proc.time();
     .objName <- substitute(object);
     if (any(names(object) == "NPDE")){

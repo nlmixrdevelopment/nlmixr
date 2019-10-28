@@ -1,18 +1,24 @@
 ---
 title: "Running PK models with nlmixr"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Running PK models with nlmixr}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  html_document:
+    self_contained: no
 ---
 
 ```{r,echo=FALSE}
 ## To allow nlmixr to reload runs without large run times
 ## To run the actual models on your system, take the save options off.
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  out.width = "100%"
+  )
+options(huxtable.knit_print_df = FALSE)
 ```
+
 
 ![nlmixr](logo.png)
 
@@ -59,23 +65,10 @@ one.cmt <- function() {
     })
 }
 ```
-
-Now setup the cache dir for running the vignette fast (a CRAN requirement)
-
-```{r}
-dir <- system.file(package="nlmixr");
-```
-
 We can now run the model...
 
-```
-
-saveRDS(fit, file.path(dir,"fit.rds")); # This saves the rds file for running quickly
-```
-
-
 ```{r}
-fit <- readRDS(file.path(dir,"fit.rds"))
+fit <- nlmixr(one.cmt, theo_sd, est="nlme")
 print(fit)
 ```
 
@@ -107,26 +100,16 @@ one.compartment <- function() {
 
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
-```
-fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
-saveRDS(fit2, file.path(dir,"fit2.rds")); # This saves the rds file for running quickly
-```
-
 ```{r}
-fit2 <- readRDS(file.path(dir,"fit2.rds")); # This saves the rds file for running quickly
+fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
 print(fit2)
 ```
 
 And if we wanted to, we could even apply the First-Order Conditional
 Estimation (FOCEi) method to this model:
 
-```
-fitF <- nlmixr(one.compartment, theo_sd, est="focei")
-saveRDS(fitF, file.path(dir,"fitF.rds")); # This saves the rds file for running quickly
-```
-
 ```{r}
-fitF <- readRDS(file.path(dir,"fitF.rds")); # This saves the rds file for running quickly
+fitF <- nlmixr(one.compartment, theo_sd, est="focei")
 print(fitF)
 ```
 
@@ -222,23 +205,10 @@ Now install the extension for nlmixr:
 
  ... and convert your nlmixr fit object into an xpose fit object.
  
-```
+```{r}
 library(xpose.nlmixr)
 xp <- xpose_data_nlmixr(fit2);
-save(xp, file=xpdbLoc)
 ```
-
-
-
-```{r}
-xpdbLoc <- file.path(system.file(package="nlmixr"), "xpdb.rds");
-if (file.exists(xpdbLoc)){
-    load(xpdbLoc);
-} else {
-    stop("Need to generate nlmixr.xpose example")
-}
-```
-
 
 ```{r}
 dv_vs_pred(xp)
@@ -269,7 +239,7 @@ comprehensive site [here](https://uupharmacometrics.github.io/xpose/).
 The nlmixr modeling dialect, inspired by R and NONMEM, can be used to
 fit models using all current and future estimation alogorithms within
 nlmixr. Using these widely-used tools as inspiration has the advantage
-of delivering a model specification syntax taht is instantly familira
+of delivering a model specification syntax that is instantly familira
 to the majority of analysts working in pharmacometrics and related
 fields.
 
@@ -579,3 +549,4 @@ nlmixr(f)
 In general this gives you information about the model (what type of
 solved system/RxODE), initial estimates as well as the code for the
 model block.
+

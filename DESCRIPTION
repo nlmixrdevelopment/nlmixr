@@ -7,13 +7,13 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
         R.utils, n1qn1, fastGHQuad,
         crayon, cli, RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
-	RxODE(>= 0.9.1-0), nlme, magrittr, tidyr, sys, generics,
+	RxODE(>= 0.9.1-7), nlme, magrittr, tidyr, sys, generics,
 	huxtable, digest, flextable, stringr, yaml
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3c, testthat,
         madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf,
 	Rvmmin, broom.mixed, dotwhisker, officer, pkgdown, gridExtra,
 	xpose, drake (>= 7.5.2)
-Version: 1.1.1-2
+Version: 1.1.1-3
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",
       comment=c(ORCID="0000-0001-8538-6691")),
@@ -47,6 +47,7 @@ Authors@R: c(person("Matthew","Fidler",
    person("Bill", "Denney", role=c("ctb"),
       email="wdenney@humanpredictions.com",
       comment=c(ORCID="0000-0002-5759-428X")),
+   person("Daniel C.", "Dillon", role="ctb"),
    person("Katharine","Mullen",role = "cph")
    )
 Description: Fit and compare nonlinear mixed-effects models in differential

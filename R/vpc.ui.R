@@ -19,6 +19,37 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                    uloq = NULL, lloq = NULL, log_y = FALSE, log_y_min = 0.001,
                    xlab = NULL, ylab = NULL, title = NULL, smooth = TRUE, vpc_theme = NULL,
                    facet = "wrap", labeller = NULL, vpcdb = FALSE, verbose = FALSE, ...){
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
+    save <- getOption("nlmixr.save", FALSE);
+    if (save){
+        .modName  <- ifelse(is.null(fit$uif$model.name),"",paste0(fit$uif$model.name,"-"));
+        if (.modName==".-") .modName <- ""
+        .dataName  <- ifelse(is.null(fit$uif$data.name),"",paste0(fit$uif$data.name,"-"));
+        if (.dataName==".-") .dataName <- ""
+        .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",fit$uif$fun.txt)),
+                                       as.data.frame(fit$uif$ini),
+                                       data, n, bins,
+                                       n_bins,
+                                       bin_mid,
+                                       show, stratify, pred_corr,
+                                       pred_corr_lower_bnd,
+                                       pi, ci,
+                                       uloq, lloq, log_y, log_y_min,
+                                       xlab, ylab, title, smooth, vpc_theme,
+                                       facet, labeller, vpcdb, verbose,
+                                       as.character(utils::packageVersion("nlmixr")),
+                                       as.character(utils::packageVersion("RxODE"))))
+        .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
+                                paste0("nlmixr-vpc-",.modName,.dataName,"-",.digest,".rds"));
+        if (file.exists(.saveFile)){
+            message(sprintf("Loading vpc already run (%s)",.saveFile))
+            .ret  <- readRDS(.saveFile)
+            return(.ret)
+        }
+    }
+    RxODE::.setWarnIdSort(FALSE);
+    on.exit(RxODE::.setWarnIdSort(TRUE));
     if (is(data, "numeric") | is(data, "integer")){
         if (missing(n)){
             n <- data;
@@ -65,15 +96,22 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         }
         .nd <- names(dat);
         .xtra$rx <- paste(c(do.call("c", lapply(cols, function(x){
-            if (tolower(x) == "dv") return(NULL)
+            if (any(tolower(x) == c("dv"))) return(NULL)
             .w <- which(tolower(.nd) == tolower(x))
             if (length(.w) == 1L){
-                names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]))
-                return(paste0(.nd[.w], "=0+nlmixr_", tolower(.nd[.w])));
+                if (tolower(x) == "cmt"){
+                    names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]));
+                    return(paste0("cmt0=0+nlmixr_", tolower(.nd[.w])));
+                } else if (tolower(x) == "dvid"){
+                    names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]));
+                    return(paste0("dvid0=0+nlmixr_", tolower(.nd[.w])));
+                } else {
+                    names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]))
+                    return(paste0(.nd[.w], "=0+nlmixr_", tolower(.nd[.w])));
+                }
             }
             return(NULL)
-        })), .si$rx), collapse="\n")
-
+            })), .si$rx), collapse="\n")
         .xtra$nStud <- n;
         if (!is.null(.xtra$nsim)){
             .xtra$nStud <- .xtra$nsim
@@ -82,9 +120,25 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         .xtra$dfObs <- 0
         .xtra$dfSub <- 0
         .xtra$thetaMat <- NA
+        names(dat) <- sapply(names(dat), function(x){
+            if (any(tolower(x) == cols)) return(tolower(x))
+            return(x)
+        })
+        if (any(names(dat) == "nlmixr_cmt")) dat$cmt <- dat$nlmixr_cmt
+        if (any(names(dat) == "nlmixr_dvid")) dat$dvid <- dat$nlmixr_dvid
         .xtra$events <- dat
         sim <- do.call("nlmixrSim", .xtra);
+        max.resim <- 10;
+        while (any(is.na(sim$sim))){
+            sim <- sim[!is.na(sim$sim), ];
+            sim$id <- as.integer(factor(paste(sim$id)));
+            print(summary(sim))
+        }
+        if (any(names(sim) == "cmt0")) names(sim)[names(sim) == "cmt0"] <- "cmt";
+        if (any(names(sim) == "dvid0")) names(sim)[names(sim) == "dvid0"] <- "dvid";
         sim0 <- sim;
+        if (any(names(dat) == "nlmixr_cmt")) dat <- dat[, names(dat) != "nlmixr_cmt"];
+        if (any(names(dat) == "nlmixr_dvid")) dat <- dat[, names(dat) != "nlmixr_dvid"];
         names(dat) <- gsub("nlmixr_", "", names(dat));
         onames <- names(dat)
         names(dat) <- tolower(onames)
@@ -145,6 +199,9 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
     cls <- c("nlmixrVpc", class(p));
     attr(cls, "nlmixrVpc") <- sim
     class(p) <- cls
+    if (save){
+        saveRDS(p,file=.saveFile)
+    }
     return(p);
 }
 
@@ -181,6 +238,18 @@ print.nlmixrVpc <- function(x, ...){
 vpc.nlmixrFitData <- function(sim, ...){
     vpc_ui(fit=sim, ...);
 }
+
+##' @export
+vpc.nlmixrFOCEi <- vpc.nlmixrFitData
+
+##' @export
+vpc.nlmixrSaem <- vpc.nlmixrFitData
+
+##' @export
+vpc.nlmixrNlme <- vpc.nlmixrFitData
+
+##' @export
+vpc.nlmixrPosthoc <- vpc.nlmixrFitData
 
 ##' @rdname vpc_ui
 ##' @export
