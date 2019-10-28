@@ -357,6 +357,13 @@ plot.nlmixrSim <- function(x, y, ...){
     .ret <- .ret[regexpr("^ *NULL$", .ret) == -1];
     .ret <- .ret[-length(.ret)];
     .w <- rev(which(regexpr("^ *cmt[(].*[)] *$", .ret) != -1));
+    .cur <- 1
+    ## Remove cmt(#) at the beginning
+    while (any(.w == .cur)){
+        .w <- .w[.w != .cur];
+        .cur <- .cur + 1;
+    }
+    ## Put rx_pred_ at the end, but before cmt(name) statements
     if (length(.w) > 2){
         while(.w[1] == .w[2] + 1){
             .w <- .w[-1]
@@ -512,7 +519,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     }
     if (.isMulti){
         if (any(names(dat) == "DVID")){
-            new.pts <- lapply(unique(dat$DVID), function(dvid) {
+            new.pts <- lapply(unique(object$uif$predDf$dvid), function(dvid) {
                 .dat <- dat[dat$DVID == dvid,, drop = FALSE];
                 r <- range(.dat$TIME, na.rm=TRUE,finite=TRUE)
                 if (is.null(minimum) || is.infinite(minimum)){
@@ -521,13 +528,25 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
                 if (is.null(maximum) || is.infinite(maximum)){
                     maximum <- r[2];
                 }
-                new.time <- sort(unique(c(seq(minimum, maximum, length.out=length.out), dat$TIME)));
+                new.time <- seq(minimum, maximum, length.out=length.out);
                 new.pts <- expand.grid(TIME=new.time, ID=ids, DVID=dvid);
             })
             new.pts <- do.call("rbind", new.pts);
             .multiType <- "DVID";
         } else {
-            new.pts <- expand.grid(TIME=new.time, ID=ids, CMT=object$uif$nmodel$predDf$cmt);
+            new.pts <- lapply(unique(object$uif$predDf$cmt), function(cmt) {
+                .dat <- dat[dat$CMT == cmt,, drop = FALSE];
+                r <- range(.dat$TIME, na.rm=TRUE,finite=TRUE)
+                if (is.null(minimum) || is.infinite(minimum)){
+                    minimum <- r[1];
+                }
+                if (is.null(maximum) || is.infinite(maximum)){
+                    maximum <- r[2];
+                }
+                new.time <- seq(minimum, maximum, length.out=length.out);
+                new.pts <- expand.grid(TIME=new.time, ID=ids, CMT=cmt);
+            })
+            new.pts <- do.call("rbind", new.pts);
             .multiType <- "CMT";
         }
     } else {
@@ -591,7 +610,17 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
             levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
             dat.new$Endpoint <- factor(dat.new$Endpoint)
         } else {
+            .tmp <- object$uif$nmodel$predDf[, c("cond", "cmt")];
+            names(.tmp) <- c("Endpoint", "CMT")
+            dat.new <- merge(dat.new, .tmp, by="CMT")
+            dat.new <- dat.new[, names(dat.new) != "CMT", drop = FALSE];
+            .endpoint <- dat.new[, "Endpoint"];
+            dat.new <- dat.new[, names(dat.new) != "Endpoint", drop = FALSE];
+            dat.new <- data.frame(dat.new[, 1:2], Endpoint=.endpoint, stack(dat.new[,-(1:2), drop = FALSE]))
+            levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
+            dat.new$Endpoint <- factor(dat.new$Endpoint)
         }
+
     } else {
         dat.new <- data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2), drop = FALSE]))
         levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
@@ -611,7 +640,16 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
                                       values=dat.old$dv, ind="Observed");
             }
         } else {
-            stop("here")
+            .tmp <- object$uif$nmodel$predDf[, c("cond", "cmt")]
+            names(.tmp) <- c("Endpoint", "CMT");
+            .low <- tolower(names(dat.old))
+            .w <- which(.low == "cmt")
+            if (length(.w) == 1){
+                names(dat.old)[.w] <- "CMT"
+            }
+            dat.old <- merge(dat.old, .tmp, by="CMT")
+            dat.old <- data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$Endpoint,
+                                  values=dat.old$dv, ind="Observed");
         }
     } else {
         dat.old <- data.frame(id=dat.old$id, time=dat.old$time, values=dat.old$dv, ind="Observed");
