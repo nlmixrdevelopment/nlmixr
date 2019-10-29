@@ -1914,7 +1914,7 @@ static inline void gill83tickStep(int &k, int &K){
   if (foceiGill && op_focei.slow){
     if (k < K){
       op_focei.cur += (K-k);
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
     }
   }
 }
@@ -1923,7 +1923,7 @@ static inline void gill83fn(double *fp, double *theta){
   if (foceiGill){
     updateTheta(theta);
     *fp = foceiOfv0(theta);
-    if (op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+    if (op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
   } else {
     *fp = gillRfn(theta);
   }
@@ -2211,7 +2211,7 @@ void numericGrad(double *theta, double *g){
     }
     if(op_focei.slow){
       op_focei.cur=op_focei.totTick;
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       Rprintf("\n");
     }
     op_focei.didGill=1;
@@ -2251,7 +2251,7 @@ void numericGrad(double *theta, double *g){
       } else {
 	op_focei.calcGrad=0; // Save OBF and theta
 	f = foceiOfv0(theta);
-	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	op_focei.calcGrad=1;
 	doForward=true;
       }
@@ -2266,21 +2266,21 @@ void numericGrad(double *theta, double *g){
       theta[cpar] = cur + delta;
       if (doForward){
 	tmp = foceiOfv0(theta);
-	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	g[cpar] = (tmp-f)/delta;
       } else {
 	tmp0 = foceiOfv0(theta);
-	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	theta[cpar] = cur - delta;
 	tmp = foceiOfv0(theta);
-	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	g[cpar] = (tmp0-tmp)/(2*delta);
       }
       if (doForward && fabs(g[cpar]) > op_focei.gradCalcCentralLarge){
 	doForward = false;
 	theta[cpar] = cur - delta;
 	g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
-	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	op_focei.mixDeriv=1;
       }
       if (!R_FINITE(g[cpar])){
@@ -2289,7 +2289,7 @@ void numericGrad(double *theta, double *g){
 	  op_focei.mixDeriv=1;
 	  theta[cpar] = cur - delta;
 	  g[cpar] = (f-foceiOfv0(theta))/(delta);
-	  if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	  if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	  if (R_FINITE(op_focei.gradTrim)){
 	    if (g[cpar] > op_focei.gradTrim){
 	      g[cpar]=op_focei.gradTrim;
@@ -2324,7 +2324,7 @@ void numericGrad(double *theta, double *g){
 	  op_focei.mixDeriv=1;
 	  theta[cpar] = cur - delta;
 	  g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
-	  if(op_focei.slow)  op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	  if(op_focei.slow)  op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	  if (g[cpar] > op_focei.gradTrim){
 	    g[cpar]=op_focei.gradTrim;
 	  } else if (g[cpar] < op_focei.gradTrim){
@@ -2338,7 +2338,7 @@ void numericGrad(double *theta, double *g){
 	  op_focei.mixDeriv=1;
 	  theta[cpar] = cur - delta;
 	  g[cpar] = (tmp-foceiOfv0(theta))/(2*delta);
-	  if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	  if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	  if (g[cpar] > op_focei.gradTrim){
 	    g[cpar]=op_focei.gradTrim;
 	  } else if (g[cpar] < op_focei.gradTrim){
@@ -2352,16 +2352,16 @@ void numericGrad(double *theta, double *g){
 	theta[cpar]       = cur - delta;
 	tmp = g[cpar];
 	g[cpar]           = (tmp-foceiOfv0(theta))/(2*delta);
-	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	if (fabs(tmp) > fabs(g[cpar])) g[cpar] = tmp;
       } else if (doForward) {
-	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       }
       theta[cpar] = cur;
     }
     if(op_focei.slow) {
       op_focei.cur=op_focei.totTick;
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       Rprintf("\n");
     }
     op_focei.calcGrad=0;
@@ -4123,22 +4123,22 @@ void foceiCalcR(Environment e){
       updateTheta(theta.begin());
       f1 = foceiOfv0(theta.begin());
       op_focei.cur++;
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       theta[i] = ti + epsI;
       updateTheta(theta.begin());
       f2 = foceiOfv0(theta.begin());
       op_focei.cur++;
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       theta[i] = ti - epsI;
       updateTheta(theta.begin());
       f3 = foceiOfv0(theta.begin());
       op_focei.cur++;
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       theta[i] = ti - 2*epsI;
       updateTheta(theta.begin());
       f4 = foceiOfv0(theta.begin());
       op_focei.cur++;
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       theta[i] = ti;
       // Rprintf("-- i:%d, i: %d\n", i, i);
       // print(NumericVector::create(f1,f2,f3,f4,op_focei.lastOfv));
@@ -4154,25 +4154,25 @@ void foceiCalcR(Environment e){
 	updateTheta(theta.begin());
 	f1 = foceiOfv0(theta.begin());
 	op_focei.cur++;
-	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	theta[i] = ti + epsI;
 	theta[j] = tj - epsJ;
 	updateTheta(theta.begin());
 	f2 = foceiOfv0(theta.begin());
 	op_focei.cur++;
-	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	theta[i] = ti - epsI;
 	theta[j] = tj + epsJ;
 	updateTheta(theta.begin());
 	f3 = foceiOfv0(theta.begin());
 	op_focei.cur++;
-	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	theta[i] = ti - epsI;
 	theta[j] = tj - epsJ;
 	updateTheta(theta.begin());
 	f4 = foceiOfv0(theta.begin());
 	op_focei.cur++;
-	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	// Rprintf("-- i:%d, j: %d\n", i, j);
 	// print(NumericVector::create(f1,f2,f3,f4));
 	H(i,j)= fnscale*(f1-f2-f3+f4)/(4*epsI*epsJ*parScaleI*parScaleJ);
@@ -4282,7 +4282,7 @@ void foceiS(double *theta, Environment e){
     }
     theta[cpar] = cur;
     op_focei.cur++;
-    op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+    op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
   }
   op_focei.calcGrad=0;
   // Now calculate S matrix
@@ -4451,7 +4451,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	  op_focei.rEpsC[cpar] = hf*err;
 	}
 	op_focei.cur++;
-	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       }
       op_focei.didGill+=1; 
 
@@ -4466,7 +4466,7 @@ NumericMatrix foceiCalcCov(Environment e){
             foceiCalcR(e);
           } else {
             op_focei.cur += op_focei.npars*2;
-            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
           }
           isPd = as<bool>(e["R.pd"]);
           if (!isPd){
@@ -4504,13 +4504,13 @@ NumericMatrix foceiCalcCov(Environment e){
 	    }
 	  }
 	  op_focei.cur += op_focei.npars*2;
-	  op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+	  op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
           if (!isPd){
             warning("R matrix non-positive definite");
             e["R"] = wrap(e["R.0"]);
             op_focei.covMethod = 3;
             op_focei.cur += op_focei.npars*2;
-            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
           } else {
             cholR = as<arma::mat>(e["cholR"]);
             e["R"] = wrap(trans(cholR) * cholR);
@@ -4539,7 +4539,7 @@ NumericMatrix foceiCalcCov(Environment e){
           Rprintf("\rR matrix calculation failed; Switch to S-matrix covariance.\n");
           op_focei.covMethod = 3;
           op_focei.cur += op_focei.npars*2;
-          op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+          op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
         }
       }
       arma::mat cholS;
@@ -4557,7 +4557,7 @@ NumericMatrix foceiCalcCov(Environment e){
             foceiS(&theta[0], e);
           } else {
             op_focei.cur += op_focei.npars;
-            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
           }
           isPd = as<bool>(e["S.pd"]);
           if (!isPd){
@@ -4603,7 +4603,7 @@ NumericMatrix foceiCalcCov(Environment e){
               warning("Cannot calculate covariance");
             }
             op_focei.cur += op_focei.npars*2;
-            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
           } else {
             cholS = as<arma::mat>(e["cholS"]);
             arma::mat S;
@@ -4682,7 +4682,7 @@ NumericMatrix foceiCalcCov(Environment e){
               }
               Sinv = Sinv * Sinv.t();
               op_focei.cur++;
-              op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+              op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
               e["cov"]= 4 * Sinv;
             }
           }
@@ -4696,12 +4696,12 @@ NumericMatrix foceiCalcCov(Environment e){
             Rprintf("\rCould not calculate covariance matrix.\n");
 	    warning("Cannot calculate covariance");
             op_focei.cur++;
-            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+            op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
           }
         }
       }
       op_focei.cur=op_focei.totTick;
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       if (e.exists("cov")){
 	arma::mat cov = as<arma::mat>(e["cov"]);
 	arma::mat Dcov(cov.n_rows,cov.n_rows,fill::zeros);
@@ -4771,7 +4771,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	e["covMethod"] = "Boundary issue; Get SEs with getVarCov";
       }
       op_focei.cur=op_focei.totTick;
-      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, rx->op->cores, op_focei.t0, 0);
+      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       NumericMatrix ret;
       return ret;
     }
