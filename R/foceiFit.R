@@ -2841,7 +2841,7 @@ print.nlmixrFitCore <- function(x, ...){
             cat("  No correlations in between subject variability (BSV) matrix\n")
         } else {
             cat("  Correlations in between subject variability (BSV) matrix:\n")
-            .getCorPrint(x);
+            .getCorPrint(x$omega);
         }
         if (.boundChar*2+70 < .width){
             cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"),"\n");
