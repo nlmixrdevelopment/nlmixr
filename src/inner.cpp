@@ -76,11 +76,6 @@ extern "C"{
   typedef int (*isRstudio_t)();
   isRstudio_t isRstudio;
   getRxSolve_t getRx;
-
-  typedef int (*getCens_t) (rx_solving_options_ind* ind, int i);
-  typedef int (*getLimit_t) (rx_solving_options_ind* ind, int i);
-  getCens_t getCens;
-  getCens_t getLimit;
 }
 
 bool assignFn_ = false;
@@ -915,8 +910,8 @@ double likInner0(double *eta){
 	  // fInd->f(k, 0) = ind->lhs[0];
 	  dv = tbs(ind->dv[j]);
 	  err = f - dv;
-	  limit = getLimit(ind, j);
-	  cens = getCens(ind, j);
+	  limit = ind->limit[j];
+	  cens = ind->cens[j];
 	  if (!ISNA(limit) && R_FINITE(limit)){
 	    limit = tbs(limit);
 	  } else {
