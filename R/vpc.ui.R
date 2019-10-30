@@ -48,8 +48,6 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
             return(.ret)
         }
     }
-    RxODE::.setWarnIdSort(FALSE);
-    on.exit(RxODE::.setWarnIdSort(TRUE));
     if (is(data, "numeric") | is(data, "integer")){
         if (missing(n)){
             n <- data;
