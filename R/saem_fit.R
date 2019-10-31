@@ -1607,7 +1607,8 @@ focei.eta.saemFit <- function(object, uif, ...){
 
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
                              nnodes.gq=1, nsd.gq=3, adjObf=TRUE,
-                             calcCov=TRUE){
+                             calcCov=TRUE, covMethod=NULL,
+                             calcCovTime=NULL){
   .saemCfg  <-  attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt;
   if (class(uif) == "function"){
@@ -1649,48 +1650,75 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       .fixed <- paste(.ini$name[.ini$fix])
       .tn <- .tn[!(.tn %in% .fixed)]
   }
-  .nth <- length(.tn)
-  .covm <- object$Ha[1:.nth,1:.nth]
   .calcCov  <- calcCov;
-  .calcCovTime  <- proc.time();
-  if (calcCov){
-    .covm <- try(calc.COV(object));
-    .doIt <- !inherits(.covm, "try-error");
-    if (.doIt && dim(.covm)[1] !=.nth) .doIt <- FALSE
-    if (.doIt){
-      .tmp <- try(chol(.covm), silent=TRUE)
-      .addCov <- TRUE
-      .sqrtm <- FALSE
-      if (inherits(.tmp, "try-error")){
-        .tmp <- .covm
-        .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+  if (inherits(calcCov, "matrix")){
+    .cov <- calcCov;
+    .addCov <- TRUE
+  } else {
+    .nth <- length(.tn)
+
+    .ini <- as.data.frame(uif$ini)
+    .ini <- .ini[is.na(.ini$err),]
+    .ini <- .ini[!is.na(.ini$ntheta),]
+    .ini <- .ini[!.ini$fix,]
+    .ini <- paste(.ini$name);
+    if (calcCov){
+      .calcCovTime  <- proc.time();
+      .covm <- object$Ha[1:.nth,1:.nth]
+      .covm <- try(calc.COV(object));
+      .doIt <- !inherits(.covm, "try-error");
+      if (.doIt && dim(.covm)[1] !=.nth) .doIt <- FALSE
+      if (.doIt){
+        .tmp <- try(chol(.covm), silent=TRUE)
+        .addCov <- TRUE
+        .sqrtm <- FALSE
         if (inherits(.tmp, "try-error")){
-          .calcCov <- FALSE
-          .covm <- object$Ha[1:.nth,1:.nth]
-          .tmp <- try(chol(.covm), silent=TRUE)
-          .addCov <- TRUE
-          .sqrtm <- FALSE
+          .tmp <- .covm
+          .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
           if (inherits(.tmp, "try-error")){
-            .tmp <- object$Ha[1:.nth,1:.nth]
-            .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+            .calcCov <- FALSE
+            .covm <- object$Ha[1:.nth,1:.nth]
+            .tmp <- try(chol(.covm), silent=TRUE)
+            .addCov <- TRUE
+            .sqrtm <- FALSE
             if (inherits(.tmp, "try-error")){
-              .addCov <- FALSE;
+              .tmp <- object$Ha[1:.nth,1:.nth]
+              .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+              if (inherits(.tmp, "try-error")){
+                .addCov <- FALSE;
+              } else {
+                .sqrtm <- TRUE
+              }
             } else {
-              .sqrtm <- TRUE
+              .tmp <- object$Ha[1:.nth,1:.nth]
             }
           } else {
-            .tmp <- object$Ha[1:.nth,1:.nth]
+            .sqrtm <- TRUE
           }
         } else {
-          .sqrtm <- TRUE
+          .tmp <- .covm
         }
       } else {
-        .tmp <- .covm
+        .tmp <- object$Ha[1:.nth,1:.nth]
+        .tmp <- try(chol(.covm), silent=TRUE)
+        .calcCov <- FALSE
+        .addCov <- TRUE
+        .sqrtm <- FALSE
+        if (inherits(.tmp, "try-error")){
+          .tmp <- object$Ha[1:.nth,1:.nth]
+          .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
+          if (inherits(.tmp, "try-error")){
+            .addCov <- FALSE;
+          } else {
+            .sqrtm <- TRUE
+          }
+        } else {
+          .tmp <- object$Ha[1:.nth,1:.nth]
+          .calcCov <- FALSE
+        }
       }
     } else {
-      .tmp <- object$Ha[1:.nth,1:.nth]
       .tmp <- try(chol(.covm), silent=TRUE)
-      .calcCov <- FALSE
       .addCov <- TRUE
       .sqrtm <- FALSE
       if (inherits(.tmp, "try-error")){
@@ -1706,40 +1734,18 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
         .calcCov <- FALSE
       }
     }
-  } else {
-    .tmp <- try(chol(.covm), silent=TRUE)
-    .addCov <- TRUE
-    .sqrtm <- FALSE
-    if (inherits(.tmp, "try-error")){
-      .tmp <- object$Ha[1:.nth,1:.nth]
-      .tmp <- try(sqrtm(.tmp %*% t(.tmp)), silent=FALSE);
-      if (inherits(.tmp, "try-error")){
-        .addCov <- FALSE;
+    if (.addCov){
+      if (!.calcCov){
+        .cov <- RxODE::rxInv(.tmp)
       } else {
-        .sqrtm <- TRUE
+        .cov  <- .tmp
       }
-    } else {
-      .tmp <- object$Ha[1:.nth,1:.nth]
-      .calcCov <- FALSE
+      attr(.cov, "dimnames") <- list(.tn, .tn)
+      .cov <- .cov[.ini, .ini, drop = FALSE];
     }
+    .calcCovTime  <- proc.time()-.calcCovTime;
+    .calcCovTime  <- .calcCovTime["elapsed"]
   }
-  .ini <- as.data.frame(uif$ini)
-  .ini <- .ini[is.na(.ini$err),]
-  .ini <- .ini[!is.na(.ini$ntheta),]
-  .ini <- .ini[!.ini$fix,]
-  .ini <- paste(.ini$name);
-  if (.addCov){
-    if (!.calcCov){
-      .cov <- RxODE::rxInv(.tmp)
-    } else {
-      .cov  <- .tmp
-    }
-    attr(.cov, "dimnames") <- list(.tn, .tn)
-    .cov <- .cov[.ini, .ini, drop = FALSE];
-  }
-  .calcCovTime  <- proc.time()-.calcCovTime;
-  .calcCovTime  <- .calcCovTime["elapsed"]
-
   .ini <- as.data.frame(uif$ini)
   .ini <- .ini[!is.na(.ini$ntheta),];
   .skipCov <- !is.na(.ini$err);
@@ -1887,7 +1893,12 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .cwresTime  <- 0;
   }
   .env <- fit.f$env;
-  if (.calcCov){
+  if (inherits(.calcCov, "matrix")){
+    if (!is.null(covMethod)){
+      .env$covMethod <- covMethod;
+    }
+    .calcCovTime <- calcCovTime;
+  } else if (.calcCov){
     .env$covMethod <- "linFim";
     if (.addCov & .sqrtm){
       .env$covMethod <- "|linFim|";
