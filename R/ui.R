@@ -2824,6 +2824,7 @@ nlmixrUI.poped.ff_fun <- function(obj){
 ##' @export
 `$.nlmixrUI` <- function(obj, arg, exact = TRUE){
   x <- obj;
+  .cls <- class(x)
   class(x) <- "list"
   if (arg == "ini"){
     return(x$ini);
@@ -2920,6 +2921,7 @@ nlmixrUI.poped.ff_fun <- function(obj){
   } else if (arg == "multipleEndpoint"){
       return(nlmixrUI.multipleEndpoint(x));
   } else if (arg=="muRefTable"){
+      class(x) <- .cls
       return(.nmMuTable(x));
   }
   m <- x$ini;
