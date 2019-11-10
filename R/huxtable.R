@@ -106,16 +106,16 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
         })
         if(length(.env$ref) > 0){
             .ret  <- merge(.ret,data.frame(theta=names(.env$ref),covariates=as.character(.env$ref)),
-                       by="theta")
+                           by="theta", all.x=TRUE)
+            .ret$covariates <- paste(.ret$covariates)
+            .ret$covariates[.ret$covariates == "NA"] <- ""
         }
-
     }
     .ret  <- huxtable::hux(.ret) %>%
             huxtable::add_colnames() %>%
             huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
             huxtable::set_position("center") %>%
             huxtable::set_all_borders(TRUE)
-
     return(.ret)
 }
 

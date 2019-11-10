@@ -969,7 +969,9 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
     if (!is.null(.saem)){
         assign("saem",NULL,fit$env)
         on.exit({assign("saem",.saem,fit$env)});
-        .newFit <- as.focei.saemFit(.saem, .uif, data=.nmGetData(fit), calcResid = TRUE, obf=NA, calcCov=FALSE);
+        .newFit <- as.focei.saemFit(.saem, .uif, data=.nmGetData(fit), calcResid = TRUE, obf=NA,
+                                    calcCov=fit$cov, covMethod=fit$covMethod,
+                                    calcCovTime= as.vector(fit$time[["covariance"]]));
         .ob1 <- .newFit$objDf
         .ob2 <- fit$objDf
         if (any(names(.ob2) == "Condition Number")){
