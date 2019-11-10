@@ -48,7 +48,8 @@ Authors@R: c(person("Matthew","Fidler",
       email="wdenney@humanpredictions.com",
       comment=c(ORCID="0000-0002-5759-428X")),
    person("Daniel C.", "Dillon", role="ctb"),
-   person("Katharine","Mullen",role = "cph")
+   person("Katharine","Mullen",role = "cph"),
+   person("Ben", "Goodrich", role = "ctb")
    )
 Description: Fit and compare nonlinear mixed-effects models in differential
     equations with flexible dosing information commonly seen in pharmacokinetics
