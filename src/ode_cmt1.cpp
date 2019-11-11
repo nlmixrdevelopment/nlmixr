@@ -1,3 +1,4 @@
+#include <stan/math/prim/mat/fun/Eigen.hpp> // must come before #include <RcppEigen.h>
 #include "../inst/include/nlmixr_types.h"
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
@@ -5,7 +6,6 @@ using namespace Rcpp;
 
 #include <vector>
 #include <stan/math/rev/core.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math.hpp>
 #include "PKPDLib_WW.h"
 
