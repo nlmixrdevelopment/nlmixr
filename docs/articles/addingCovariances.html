@@ -149,9 +149,9 @@
     <div class="page-header toc-ignore">
       <h1>Example Model: Phenobarbatol with correlations</h1>
             
-            <h4 class="date">2019-10-19</h4>
+            <h4 class="date">2019-11-11</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/vignettes/addingCovariances.Rmd"><code>inst/vignettes/addingCovariances.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/addingCovariances.Rmd"><code>vignettes/addingCovariances.Rmd</code></a></small>
       <div class="hidden name"><code>addingCovariances.Rmd</code></div>
 
     </div>
@@ -203,8 +203,8 @@ pheno &lt;-<span class="st"> </span><span class="cf">function</span>() {
 <span class="co">#&gt; FOCEi 688.6326 985.5036 1003.764      -486.7518         7.536808</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;           saem    setup table cwres covariance npde    other</span>
-<span class="co">#&gt; elapsed 19.615 7.469974 0.034 7.526      0.032 1.14 0.333026</span>
+<span class="co">#&gt;           saem    setup table cwres covariance  npde    other</span>
+<span class="co">#&gt; elapsed 19.603 7.853898 0.122  7.97      0.015 0.464 0.498102</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;                          Parameter  Est.     SE %RSE</span>
@@ -218,8 +218,8 @@ pheno &lt;-<span class="st"> </span><span class="cf">function</span>() {
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): linFim</span>
 <span class="co">#&gt;   Correlations in between subject variability (BSV) matrix:</span>
-<span class="co">#&gt;     cor__eta.v.eta.cl </span>
-<span class="co">#&gt;              0.985   </span>
+<span class="co">#&gt;     cor:eta.v,eta.cl </span>
+<span class="co">#&gt;               0.193   </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>

@@ -250,7 +250,7 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 </ol>
 <ul>
 <li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
-<li>Once installed, type <code><a href="https://rdrr.io/pkg/RxODE/man/rxWinPythonSetup.html">RxODE::rxWinPythonSetup()</a></code> to install the required package <code>SnakeCharmR</code>and to make sure Python and SymPy are working properly. Since <code>SnakeCharmR</code> is orphaned, it may not work without installing directly from github with the following command: <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("nlmixrdevelopment/SnakeCharmR")</a></code>
+<li>Once installed, type <code>RxODE::rxWinPythonSetup()</code> to install the required package <code>SnakeCharmR</code>and to make sure Python and SymPy are working properly. Since <code>SnakeCharmR</code> is orphaned, it may not work without installing directly from github with the following command: <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("nlmixrdevelopment/SnakeCharmR")</a></code>
 </li>
 <li>Restart your R session.</li>
 <li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://rdrr.io/r/base/library.html">library(SnakeCharmR)</a></code>.</li>
@@ -263,7 +263,7 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <ul>
 <li>Load <code>devtools</code> again using <code><a href="https://rdrr.io/r/base/library.html">library(devtools)</a></code>
 </li>
-<li>Since <code>nlmixr</code> shares some stan headers, nlmixr now needs <code>C++14</code> support. To ease the setup you can run the command <code><a href="https://rdrr.io/pkg/RxODE/man/rxC14.html">RxODE::rxC14()</a></code> which creates the following build file in <code>~/.R/Makevars.win</code>. If there are problems you may have to edit the file manually to match your configuration.</li>
+<li>Since <code>nlmixr</code> shares some stan headers, nlmixr now needs <code>C++14</code> support. To ease the setup you can run the command <code>RxODE::rxC14()</code> which creates the following build file in <code>~/.R/Makevars.win</code>. If there are problems you may have to edit the file manually to match your configuration.</li>
 </ul>
 <pre class="{make}"><code># Makvars.win
 CXX14=$(BINPREF)g++ $(M_ARCH)
@@ -434,7 +434,7 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 </tr>
 <tr class="odd">
 <td><code>PYTHONPATH</code></td>
-<td>Path where python searches. In windows this is a path-style varible including <code>PYTHONHOME\DLLs</code>, <code>PYTHONHOME\Lib</code> and <code>PYTHONHOME\Lib\site-packages</code>.</td>
+<td>Path where python searches. In windows this is a path-style variable including <code>PYTHONHOME\DLLs</code>, <code>PYTHONHOME\Lib</code> and <code>PYTHONHOME\Lib\site-packages</code>.</td>
 </tr>
 <tr class="even">
 <td><code>PYTHONSTARTUP</code></td>
@@ -448,7 +448,7 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <p>If it doesn’t crash R, then python is likely setup correctly.</p>
 <p>After that point you can then type:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(RxODE)
-<span class="kw"><a href="https://rdrr.io/pkg/RxODE/man/rxSymPyVersion.html">rxSymPyVersion</a></span>()</code></pre></div>
+<span class="kw">rxSymPyVersion</span>()</code></pre></div>
 <p>It will show the version of sympy that you are using if SnakeCharmR is setup correctly.</p>
 </div>
 <div id="testing-the-install" class="section level1">
