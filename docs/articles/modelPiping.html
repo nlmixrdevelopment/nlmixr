@@ -149,9 +149,9 @@
     <div class="page-header toc-ignore">
       <h1>Modifying nlmixr models by piping</h1>
             
-            <h4 class="date">2019-10-19</h4>
+            <h4 class="date">2019-11-11</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/vignettes/modelPiping.Rmd"><code>inst/vignettes/modelPiping.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/modelPiping.Rmd"><code>vignettes/modelPiping.Rmd</code></a></small>
       <div class="hidden name"><code>modelPiping.Rmd</code></div>
 
     </div>
@@ -198,25 +198,26 @@ one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>()
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(fit)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8134 373.4132 393.5928      -179.7066         1602.168</span>
+<span class="co">#&gt; FOCEi 116.8072 373.4069 393.5865      -179.7035         9.591184</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table  npde   other</span>
-<span class="co">#&gt; elapsed 9.541923 0.368368   0.368369 0.012 0.501 2.17734</span>
+<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
+<span class="co">#&gt; elapsed 9.344272 0.927097   0.927099 0.029 0.412 2.370532</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;        Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka 0.478    0.2  41.8       1.61 (1.09, 2.39)     69.3</span>
-<span class="co">#&gt; tcl       Log Cl  1.01  0.806  79.6      2.75 (0.567, 13.4)     26.9</span>
-<span class="co">#&gt; tv         log V  3.46 0.0264 0.762       31.8 (30.2, 33.5)     13.9</span>
-<span class="co">#&gt; add.sd           0.695                                0.695         </span>
+<span class="co">#&gt;        Parameter  Est.    SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
+<span class="co">#&gt; tka       Log Ka 0.472 0.248 52.6       1.6 (0.985, 2.61)     69.7</span>
+<span class="co">#&gt; tcl       Log Cl  1.01 0.248 24.5       2.75 (1.69, 4.47)     26.8</span>
+<span class="co">#&gt; tv         log V  3.46 0.148 4.27       31.8 (23.8, 42.5)     13.9</span>
+<span class="co">#&gt; add.sd           0.695                              0.695         </span>
 <span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka        0.765% </span>
-<span class="co">#&gt; tcl         4.25% </span>
-<span class="co">#&gt; tv          10.5% </span>
+<span class="co">#&gt; tka         1.15% </span>
+<span class="co">#&gt; tcl         3.84% </span>
+<span class="co">#&gt; tv          10.2% </span>
 <span class="co">#&gt; add.sd             </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
+<span class="co">#&gt;   Fixed parameter correlations in $cor</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
@@ -233,8 +234,8 @@ one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>()
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.30 -0.459 -0.242  3.85 -1.01  -1.45   3.26</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.88  0.692  0.366  6.79 -0.216 -0.311  5.83</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.444 -0.234  3.85 -1.01  -1.45   3.24</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.711  0.375  6.79 -0.216 -0.310  5.81</span>
 <span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
@@ -264,25 +265,29 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(one.ka.<span class="fl">0.5</span>)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8456 371.4453 388.7422      -179.7227         17.80523</span>
+<span class="co">#&gt; FOCEi 116.8431 371.4429 388.7397      -179.7214         11.77467</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table npde    other</span>
-<span class="co">#&gt; elapsed 0.357751 0.230948    0.23095 0.011 0.21 0.402351</span>
+<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
+<span class="co">#&gt; elapsed 0.316092  0.53268   0.532683 0.022 0.251 0.423545</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;        Parameter  Est.    SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka   0.5 FIXED FIXED                    1.65     69.3</span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.314    31        2.75 (1.49, 5.1)     26.9</span>
-<span class="co">#&gt; tv         log V  3.46 0.174  5.02       31.8 (22.6, 44.8)     13.9</span>
-<span class="co">#&gt; add.sd           0.695                               0.695         </span>
+<span class="co">#&gt;        Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
+<span class="co">#&gt; tka       Log Ka   0.5  FIXED FIXED                    1.65     69.7</span>
+<span class="co">#&gt; tcl       Log Cl  1.01  0.081  8.01       2.75 (2.35, 3.22)     26.8</span>
+<span class="co">#&gt; tv         log V  3.46 0.0521  1.51       31.8 (28.7, 35.2)     13.9</span>
+<span class="co">#&gt; add.sd           0.695                                0.695         </span>
 <span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka        0.718% </span>
-<span class="co">#&gt; tcl         4.26% </span>
-<span class="co">#&gt; tv          10.4% </span>
+<span class="co">#&gt; tka         1.08% </span>
+<span class="co">#&gt; tcl         3.87% </span>
+<span class="co">#&gt; tv          10.1% </span>
 <span class="co">#&gt; add.sd             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type ($covMethod): s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
+<span class="co">#&gt;     cor:tv,tcl </span>
+<span class="co">#&gt;         0.807   </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
@@ -299,8 +304,8 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.36 -0.517 -0.273  3.85 -1.01  -1.45   3.33</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.95  0.616  0.325  6.79 -0.219 -0.315  5.91</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.36 -0.521 -0.275  3.85 -1.01  -1.45   3.33</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.96  0.609  0.322  6.79 -0.219 -0.315  5.92</span>
 <span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
@@ -313,25 +318,29 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(one.ka.<span class="fl">0.5</span>)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8138 371.4135 388.7104      -179.7068         23328.59</span>
+<span class="co">#&gt; FOCEi 116.8071 371.4069 388.7037      -179.7035         17.75535</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 0.377918 0.200872   0.200873 0.009 0.214 0.405337</span>
+<span class="co">#&gt; elapsed 0.291561 0.520657   0.520659 0.021 0.266 0.722123</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;        Parameter  Est.    SE  %RSE   Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka 0.478 FIXED FIXED                      1.61     69.3</span>
-<span class="co">#&gt; tcl       Log Cl  1.01  5.46   539 2.75 (6.21e-05, 1.22e+05)     26.9</span>
-<span class="co">#&gt; tv         log V  3.46 0.274  7.92         31.8 (18.6, 54.5)     13.9</span>
-<span class="co">#&gt; add.sd           0.695                                 0.695         </span>
+<span class="co">#&gt;        Parameter  Est.    SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
+<span class="co">#&gt; tka       Log Ka 0.472 FIXED FIXED                     1.6     69.7</span>
+<span class="co">#&gt; tcl       Log Cl  1.01 0.311  30.8       2.75 (1.49, 5.06)     26.8</span>
+<span class="co">#&gt; tv         log V  3.46 0.173  4.99       31.8 (22.7, 44.6)     13.9</span>
+<span class="co">#&gt; add.sd           0.695                               0.695         </span>
 <span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka        0.756% </span>
-<span class="co">#&gt; tcl         4.16% </span>
-<span class="co">#&gt; tv          10.4% </span>
+<span class="co">#&gt; tka         1.15% </span>
+<span class="co">#&gt; tcl         3.85% </span>
+<span class="co">#&gt; tv          10.2% </span>
 <span class="co">#&gt; add.sd             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): s</span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
+<span class="co">#&gt;     cor:tv,tcl </span>
+<span class="co">#&gt;        -0.848   </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
@@ -348,8 +357,8 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.30 -0.457 -0.241  3.85 -1.01  -1.45   3.26</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.87  0.696  0.367  6.79 -0.216 -0.311  5.82</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.444 -0.235  3.85 -1.01  -1.45   3.24</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.711  0.375  6.79 -0.216 -0.310  5.81</span>
 <span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
@@ -361,26 +370,30 @@ one.ka.<span class="fl">0.7</span> &lt;-<span class="st"> </span>one.compartment
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(one.ka.<span class="fl">0.7</span>)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
-<span class="co">#&gt;          OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.807 373.4067 393.5863      -179.7034         65.41897</span>
+<span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 116.8043 373.4041 393.5837       -179.702         37.39664</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 0.344043 0.330799     0.3308 0.021 0.239 1.333358</span>
+<span class="co">#&gt;            setup optimize covariance table npde    other</span>
+<span class="co">#&gt; elapsed 0.295878 0.921343   0.921345 0.039 0.24 4.396434</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka 0.471  0.201 42.6        1.6 (1.08, 2.37)     69.7</span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.0746 7.39       2.75 (2.37, 3.18)     26.7</span>
-<span class="co">#&gt; tv         log V  3.46 0.0467 1.35         31.8 (29, 34.9)     13.9</span>
-<span class="co">#&gt; add.sd           0.694                               0.694         </span>
+<span class="co">#&gt; tka       Log Ka 0.466  0.211 45.2       1.59 (1.05, 2.41)     70.6</span>
+<span class="co">#&gt; tcl       Log Cl  1.01 0.0836 8.25       2.75 (2.34, 3.25)     26.8</span>
+<span class="co">#&gt; tv         log V  3.46 0.0697 2.01       31.8 (27.7, 36.5)     13.9</span>
+<span class="co">#&gt; add.sd           0.695                               0.695         </span>
 <span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka         1.14% </span>
-<span class="co">#&gt; tcl         3.71% </span>
-<span class="co">#&gt; tv          10.1% </span>
+<span class="co">#&gt; tka         1.96% </span>
+<span class="co">#&gt; tcl         4.01% </span>
+<span class="co">#&gt; tv          10.4% </span>
 <span class="co">#&gt; add.sd             </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
+<span class="co">#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl </span>
+<span class="co">#&gt;          0.138       0.456       0.721   </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
@@ -396,9 +409,9 @@ one.ka.<span class="fl">0.7</span> &lt;-<span class="st"> </span>one.compartment
 <span class="co">#&gt; # A tibble: 132 x 25</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.07   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.440 -0.232  3.85 -1.01  -1.45   3.24</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.85  0.718  0.379  6.79 -0.216 -0.311  5.80</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.27 -0.429 -0.227  3.85 -1.01  -1.45   3.23</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.84  0.731  0.386  6.79 -0.215 -0.310  5.78</span>
 <span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
@@ -421,38 +434,44 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(noEta)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 176.5817 431.1815 448.4783      -209.5907         36.00378</span>
+<span class="co">#&gt; FOCEi 176.5824 431.1821 448.4789      -209.5911         35.68948</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 10.20914 0.268001   0.268003  0.01 0.514 0.766856</span>
+<span class="co">#&gt;            setup optimize covariance table  npde   other</span>
+<span class="co">#&gt; elapsed 8.819656 0.529436   0.529438 0.026 0.412 1.29647</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka  0.43  0.172 40.1        1.54 (1.1, 2.15)         </span>
-<span class="co">#&gt; tcl       Log Cl 0.991 0.0744 7.51       2.69 (2.33, 3.12)     30.3</span>
-<span class="co">#&gt; tv         log V  3.48 0.0486  1.4       32.3 (29.4, 35.6)     15.4</span>
+<span class="co">#&gt; tka       Log Ka  0.43  0.172 39.9        1.54 (1.1, 2.15)         </span>
+<span class="co">#&gt; tcl       Log Cl 0.991 0.0743  7.5       2.69 (2.33, 3.11)     30.3</span>
+<span class="co">#&gt; tv         log V  3.48 0.0484 1.39       32.4 (29.5, 35.6)     15.6</span>
 <span class="co">#&gt; add.sd            1.02                                1.02         </span>
 <span class="co">#&gt;        Shrink(SD)%</span>
 <span class="co">#&gt; tka               </span>
-<span class="co">#&gt; tcl         7.78% </span>
-<span class="co">#&gt; tv          7.34% </span>
+<span class="co">#&gt; tcl         7.68% </span>
+<span class="co">#&gt; tv          7.86% </span>
 <span class="co">#&gt; add.sd             </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
+<span class="co">#&gt;   Fixed parameter correlations in $cor</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
 <span class="co">#&gt;   Minimization message ($message):  </span>
-<span class="co">#&gt;     relative convergence (4) </span>
+<span class="co">#&gt;     false convergence (8) </span>
+<span class="co">#&gt;   In an ODE system, false convergence may mean "useless" evaluations were performed.</span>
+<span class="co">#&gt;   See https://tinyurl.com/yyrrwkce</span>
+<span class="co">#&gt;   It could also mean the convergence is poor, check results before accepting fit</span>
+<span class="co">#&gt;   You may also try a good derivative free optimization:</span>
+<span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 24</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.708  0     0.74   0.725  0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.12 -0.282 -0.270  3.57 -0.726 -0.712  3.09</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.62  0.950  0.910  6.44  0.125  0.123  5.57</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.709  0     0.74   0.726  0   </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.12 -0.277 -0.266  3.57 -0.728 -0.714  3.09</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.61  0.959  0.918  6.45  0.123  0.121  5.56</span>
 <span class="co">#&gt; # … with 129 more rows, and 13 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
@@ -464,26 +483,30 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(addBackKa)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
-<span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.8049 373.4047 393.5843      -179.7023         23.34314</span>
+<span class="co">#&gt;          OBJF      AIC      BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 116.813 373.4128 393.5924      -179.7064         107.8733</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 10.27198 0.362557   0.362559  0.01 0.507 1.784905</span>
+<span class="co">#&gt;            setup optimize covariance table npde    other</span>
+<span class="co">#&gt; elapsed 9.751309 0.932768    0.93277 0.034 0.44 2.730153</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;        Parameter  Est.    SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka 0.462 0.394 85.2      1.59 (0.734, 3.43)     69.9</span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.312 30.8        2.76 (1.5, 5.08)     26.8</span>
-<span class="co">#&gt; tv         log V  3.46 0.175 5.06       31.8 (22.6, 44.8)     13.8</span>
+<span class="co">#&gt; tka       Log Ka 0.471 0.976  207       1.6 (0.237, 10.9)     69.3</span>
+<span class="co">#&gt; tcl       Log Cl  1.01 0.227 22.4        2.76 (1.77, 4.3)     27.1</span>
+<span class="co">#&gt; tv         log V  3.46 0.194  5.6       31.8 (21.8, 46.5)     13.7</span>
 <span class="co">#&gt; add.sd           0.695                              0.695         </span>
 <span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka         1.38% </span>
-<span class="co">#&gt; tcl         3.87% </span>
-<span class="co">#&gt; tv          10.2% </span>
+<span class="co">#&gt; tka        0.800% </span>
+<span class="co">#&gt; tcl         4.43% </span>
+<span class="co">#&gt; tv          10.0% </span>
 <span class="co">#&gt; add.sd             </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Covariance Type ($covMethod): s</span>
+<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
+<span class="co">#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl </span>
+<span class="co">#&gt;         -0.608       0.855      -0.444   </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
@@ -500,8 +523,8 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.375  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.26 -0.419 -0.213  3.85 -1.01  -1.45   3.21</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.83  0.744  0.377  6.78 -0.215 -0.309  5.77</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.442 -0.224  3.85 -1.01  -1.45   3.24</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.715  0.363  6.79 -0.216 -0.310  5.80</span>
 <span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, bsv.ka &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
@@ -509,9 +532,9 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <p>You can see the name change by examining the <code>omega</code> matrix:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">addBackKa<span class="op">$</span>omega
 <span class="co">#&gt;            eta.cl      eta.v    bsv.ka</span>
-<span class="co">#&gt; eta.cl 0.06929604 0.00000000 0.0000000</span>
-<span class="co">#&gt; eta.v  0.00000000 0.01894748 0.0000000</span>
-<span class="co">#&gt; bsv.ka 0.00000000 0.00000000 0.3981419</span></code></pre></div>
+<span class="co">#&gt; eta.cl 0.07074149 0.00000000 0.0000000</span>
+<span class="co">#&gt; eta.v  0.00000000 0.01867839 0.0000000</span>
+<span class="co">#&gt; bsv.ka 0.00000000 0.00000000 0.3921465</span></code></pre></div>
 <p>Note that new between subject variability parameters are distinguished from other types of parameters (ie population parameters, and individual covariates) by their name. Parameters starting or ending with the following names are assumed to be between subject variability parameters:</p>
 <ul>
 <li>eta (from NONMEM convention)</li>
@@ -534,28 +557,29 @@ wt70 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(wt70)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
-<span class="co">#&gt;           OBJF      AIC    BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.1807 372.7804 392.96      -179.3902         53.73413</span>
+<span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 116.1543 372.7541 392.9337       -179.377         49.88943</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 10.19534 0.358575   0.358576 0.011 0.466 0.700513</span>
+<span class="co">#&gt; elapsed 10.29792 0.983131   0.983133 0.023 0.474 1.237821</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;          Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka         Log Ka 0.478  0.202  42.3        1.61 (1.08, 2.4)     69.3</span>
-<span class="co">#&gt; tcl         Log Cl  1.02 0.0767  7.56       2.76 (2.37, 3.21)     26.8</span>
-<span class="co">#&gt; tv           log V  3.46 0.0429  1.24       31.8 (29.2, 34.6)     13.9</span>
-<span class="co">#&gt; add.sd             0.695                                0.695         </span>
+<span class="co">#&gt; tka         Log Ka 0.472  0.199  42.1        1.6 (1.09, 2.36)     68.8</span>
+<span class="co">#&gt; tcl         Log Cl  1.02  0.074  7.25        2.77 (2.4, 3.21)     26.5</span>
+<span class="co">#&gt; tv           log V  3.46 0.0427  1.23       31.7 (29.2, 34.5)     13.8</span>
+<span class="co">#&gt; add.sd             0.697                                0.697         </span>
 <span class="co">#&gt; covWtPow            0.75  FIXED FIXED                    0.75         </span>
 <span class="co">#&gt;          Shrink(SD)%</span>
-<span class="co">#&gt; tka           1.27% </span>
-<span class="co">#&gt; tcl           6.73% </span>
-<span class="co">#&gt; tv            12.3% </span>
+<span class="co">#&gt; tka          0.886% </span>
+<span class="co">#&gt; tcl           5.79% </span>
+<span class="co">#&gt; tv            12.0% </span>
 <span class="co">#&gt; add.sd              </span>
 <span class="co">#&gt; covWtPow             </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
+<span class="co">#&gt;   Fixed parameter correlations in $cor</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
@@ -572,8 +596,8 @@ wt70 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class
 <span class="co">#&gt;   ID     TIME    DV  EVID    WT  PRED    RES   WRES IPRED   IRES  IWRES</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 1     0      0.74     0  79.6  0     0.74   0.391  0     0.74   1.06 </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  79.6  3.30 -0.458 -0.242  3.84 -1.00  -1.44 </span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  79.6  5.87  0.704  0.372  6.78 -0.214 -0.308</span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  79.6  3.29 -0.448 -0.236  3.84 -0.999 -1.43 </span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  79.6  5.85  0.716  0.378  6.78 -0.212 -0.305</span>
 <span class="co">#&gt; # … with 129 more rows, and 15 more variables: CPRED &lt;dbl&gt;, CRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;,</span>
@@ -595,28 +619,32 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(addPropModel)
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
-<span class="co">#&gt;          OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 104.367 362.9668 386.0292      -173.4834         55.33045</span>
+<span class="co">#&gt;           OBJF      AIC     BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 104.3518 362.9516 386.014      -173.4758         58.79822</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 9.644118 0.334027   0.334028  0.01 0.477 4.672827</span>
+<span class="co">#&gt;           setup optimize covariance table  npde    other</span>
+<span class="co">#&gt; elapsed 10.3147 0.935986   0.935988 0.029 0.421 8.842325</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
 <span class="co">#&gt;          Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka         Log Ka 0.397  0.199 50.2        1.49 (1.01, 2.2)     69.1</span>
-<span class="co">#&gt; tcl         Log Cl  1.02 0.0714 6.97        2.79 (2.42, 3.2)     25.9</span>
-<span class="co">#&gt; tv           log V  3.46  0.051 1.47         32 (28.9, 35.3)     12.7</span>
-<span class="co">#&gt; add.err            0.283                               0.283         </span>
-<span class="co">#&gt; prop.err           0.132                               0.132         </span>
+<span class="co">#&gt; tka         Log Ka 0.399  0.195 48.9       1.49 (1.02, 2.18)     68.9</span>
+<span class="co">#&gt; tcl         Log Cl  1.02 0.0735 7.18       2.78 (2.41, 3.21)     25.9</span>
+<span class="co">#&gt; tv           log V  3.46  0.046 1.33           32 (29.2, 35)     12.6</span>
+<span class="co">#&gt; add.err            0.276                               0.276         </span>
+<span class="co">#&gt; prop.err           0.134                               0.134         </span>
 <span class="co">#&gt;          Shrink(SD)%</span>
-<span class="co">#&gt; tka           2.01% </span>
-<span class="co">#&gt; tcl           1.33% </span>
-<span class="co">#&gt; tv            15.4% </span>
+<span class="co">#&gt; tka           1.93% </span>
+<span class="co">#&gt; tcl           1.27% </span>
+<span class="co">#&gt; tv            15.6% </span>
 <span class="co">#&gt; add.err             </span>
 <span class="co">#&gt; prop.err             </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
+<span class="co">#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl </span>
+<span class="co">#&gt;          0.174       0.461       0.715   </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
@@ -627,9 +655,9 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; # A tibble: 132 x 25</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.396  0     0.74   2.62   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.07 -0.233 -0.124  3.47 -0.631 -1.18   3.05</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.56  1.01   0.528  6.24  0.326  0.375  5.54</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.396  0     0.74   2.68   0   </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.08 -0.238 -0.127  3.47 -0.626 -1.16   3.06</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.57  1.000  0.524  6.24  0.334  0.381  5.55</span>
 <span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
