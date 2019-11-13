@@ -46,6 +46,31 @@ WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallP
 Exec '$EXEDIR\\R\\bin\\<%=Rdir%>\\R.exe -e options(keep.source=TRUE);library(shinyMixR);nlmixr:::.setRoot();run_shinymixr(launch.browser=TRUE)'
 SectionEnd"
 
+
+update.lauch.stub <- "
+CRCCheck On
+RequestExecutionLevel user
+; Best Compression
+SetCompress Auto
+SetCompressor /SOLID lzma
+SetCompressorDictSize 32
+SetDatablockOptimize On
+;SetCompress off
+Name \"Update\"
+Icon \"Oxygen-Icons.org-Oxygen-Apps-system-software-update.ico\"
+OutFile \"update.exe\"
+AutoCloseWindow true
+Caption \"Updating RxODE/nlmixr from github\"
+Subcaption 3 \" \"
+ChangeUI all \"${NSISDIR}\\Contrib\\UIs\\LoadingBar_Icon.exe\"
+XPStyle on
+Section Main sec_main
+WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\" \"\" \"$EXEDIR\"
+WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallPath\" \"$EXEDIR\\R\"
+System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"HOME\", \"$TEMP\").r0'
+Exec '$EXEDIR\\R\\bin\\<%=Rdir%>\\Rscript.exe \"$EXEDIR\\R\\update.R\"'
+SectionEnd"
+
 nsi.stub <- "
 CRCCheck On
 RequestExecutionLevel user
@@ -121,8 +146,10 @@ WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"MinRVersion\" \"
 SetOutPath \"$INSTDIR\"
 File \"nlmixr.exe\"
 File \"shinyMixR.exe\"
+File \"update.exe\"
 File \"installation-notes.rtf\"
 SetOutPath \"$INSTDIR\\R\"
+File \"update.R\"
 File /r <%=R%>\\*
 
 ##CreateDirectory \"c:\\R\\nlmixr<%=arch%>-<%=nlmixr.ver%>\"
@@ -185,6 +212,8 @@ buildInstaller <- function(name="nlmixr"){
     shortcuts <- shortcut;
     dr <- gsub("/", "\\", devtools::package_file("build"), fixed=TRUE)
     dir <- dr;
+    brew::brew(text=update.lauch.stub, output=file.path(dr,"update.nsi"));
+    system(sprintf("makensis %s", file.path(dr, "update.nsi")));
     exe <- file.path(dr, "nlmixr.nsi");
     brew::brew(text=nsi.lauch.stub, output=file.path(dr, "nlmixr.nsi"));
     system(sprintf("makensis %s", file.path(dr, "nlmixr.nsi")));
