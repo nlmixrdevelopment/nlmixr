@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This file was created by NSISDialogDesigner 1.4.4.0
+http://coolsoft.altervista.org/nsisdialogdesigner
+Do not edit manually!
+-->
+<Dialog Name="update" Title="Update nlmixr" Subtitle="Update nlmixr/RxODE to specific version(s)">
+  <Label Name="Label2" Location="16, 65" Size="421, 144" Text="The optimized compile uses the machine information to speed up some parts of nlmixr/RxODE on your system.  It is not portable to other windows versions and the distribution becomes system dependent." TabIndex="0" />
+  <Label Name="Label1" Location="12, 12" Size="411, 19" Text="Choose the version of nlmixr and RxODE to install" TabIndex="1" />
+  <DropList Name="DropList1" Location="12, 31" Size="287, 21" TabIndex="2">
+    <Items>
+      <value>development nlmixr / RxODE</value>
+      <value>nlmixr 1.1.1-3 / RxODE 0.9.1-8</value>
+    </Items>
+  </DropList>
+  <CheckBox Name="CheckBox1" Location="305, 28" Size="133, 24" Text="Optimized Compile" TabIndex="3" />
+</Dialog>
