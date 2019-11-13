@@ -7,9 +7,15 @@
 
 ; handle variables
 Var hCtl_update
+Var hCtl_update_Label6
+Var hCtl_update_Label5
+Var hCtl_update_CheckBox2
+Var hCtl_update_Label4
+Var hCtl_update_Label3
+Var hCtl_update_RxODE
+Var hCtl_update_nlmixr
 Var hCtl_update_Label2
 Var hCtl_update_Label1
-Var hCtl_update_DropList1
 Var hCtl_update_CheckBox1
 
 
@@ -24,22 +30,45 @@ Function fnc_update_Create
   ${EndIf}
   !insertmacro MUI_HEADER_TEXT "Update nlmixr" "Update nlmixr/RxODE to specific version(s)"
   
+  ; === Label6 (type: Label) ===
+  ${NSD_CreateLabel} 11u 68u 277u 15u "CRAN uses cran releases, otherwise use development github"
+  Pop $hCtl_update_Label6
+  
+  ; === Label5 (type: Label) ===
+  ${NSD_CreateLabel} 11u 52u 277u 15u "Unless specified, uses the latest version of nlmixr and RxODE.  "
+  Pop $hCtl_update_Label5
+  
+  ; === CheckBox2 (type: Checkbox) ===
+  ${NSD_CreateCheckbox} 200u 36u 88u 15u "CRAN"
+  Pop $hCtl_update_CheckBox2
+  ${NSD_Check} $hCtl_update_CheckBox2
+  
+  ; === Label4 (type: Label) ===
+  ${NSD_CreateLabel} 98u 20u 36u 14u "RxODE"
+  Pop $hCtl_update_Label4
+  
+  ; === Label3 (type: Label) ===
+  ${NSD_CreateLabel} 8u 21u 36u 14u "nlmixr"
+  Pop $hCtl_update_Label3
+  
+  ; === RxODE (type: Text) ===
+  ${NSD_CreateText} 136u 21u 49u 12u ""
+  Pop $hCtl_update_RxODE
+  
+  ; === nlmixr (type: Text) ===
+  ${NSD_CreateText} 45u 21u 49u 12u ""
+  Pop $hCtl_update_nlmixr
+  
   ; === Label2 (type: Label) ===
-  ${NSD_CreateLabel} 11u 40u 277u 89u "The optimized compile uses the machine information to speed up some parts of nlmixr/RxODE on your system.  It is not portable to other windows versions and the distribution becomes system dependent."
+  ${NSD_CreateLabel} 11u 83u 277u 36u "The optimized compile uses the machine information to speed up some parts of nlmixr/RxODE on your system.  It is not portable to other windows versions and the distribution becomes system dependent."
   Pop $hCtl_update_Label2
   
   ; === Label1 (type: Label) ===
   ${NSD_CreateLabel} 8u 7u 271u 12u "Choose the version of nlmixr and RxODE to install"
   Pop $hCtl_update_Label1
   
-  ; === DropList1 (type: DropList) ===
-  ${NSD_CreateDropList} 8u 19u 189u 13u ""
-  Pop $hCtl_update_DropList1
-  ${NSD_CB_AddString} $hCtl_update_DropList1 "development nlmixr / RxODE"
-  ${NSD_CB_AddString} $hCtl_update_DropList1 "nlmixr 1.1.1-3 / RxODE 0.9.1-8"
-  
   ; === CheckBox1 (type: Checkbox) ===
-  ${NSD_CreateCheckbox} 201u 17u 88u 15u "Optimized Compile"
+  ${NSD_CreateCheckbox} 200u 17u 88u 15u "Optimized Compile"
   Pop $hCtl_update_CheckBox1
   
 FunctionEnd

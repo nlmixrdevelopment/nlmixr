@@ -5,13 +5,14 @@ http://coolsoft.altervista.org/nsisdialogdesigner
 Do not edit manually!
 -->
 <Dialog Name="update" Title="Update nlmixr" Subtitle="Update nlmixr/RxODE to specific version(s)">
-  <Label Name="Label2" Location="16, 65" Size="421, 144" Text="The optimized compile uses the machine information to speed up some parts of nlmixr/RxODE on your system.  It is not portable to other windows versions and the distribution becomes system dependent." TabIndex="0" />
-  <Label Name="Label1" Location="12, 12" Size="411, 19" Text="Choose the version of nlmixr and RxODE to install" TabIndex="1" />
-  <DropList Name="DropList1" Location="12, 31" Size="287, 21" TabIndex="2">
-    <Items>
-      <value>development nlmixr / RxODE</value>
-      <value>nlmixr 1.1.1-3 / RxODE 0.9.1-8</value>
-    </Items>
-  </DropList>
-  <CheckBox Name="CheckBox1" Location="305, 28" Size="133, 24" Text="Optimized Compile" TabIndex="3" />
+  <Label Name="Label6" Location="16, 110" Size="421, 25" Text="CRAN uses cran releases, otherwise use development github" TabIndex="0" />
+  <Label Name="Label5" Location="17, 85" Size="421, 25" Text="Unless specified, uses the latest version of nlmixr and RxODE.  " TabIndex="1" />
+  <CheckBox Name="CheckBox2" Location="304, 58" Size="133, 24" Text="CRAN" Checked="True" TabIndex="2" />
+  <Label Name="Label4" Location="149, 33" Size="54, 23" Text="RxODE" TabIndex="3" />
+  <Label Name="Label3" Location="12, 34" Size="54, 23" Text="nlmixr" TabIndex="4" />
+  <TextBox Name="RxODE" Location="207, 34" Size="75, 20" TabIndex="5" />
+  <TextBox Name="nlmixr" Location="68, 34" Size="75, 20" TabIndex="6" />
+  <Label Name="Label2" Location="16, 135" Size="421, 59" Text="The optimized compile uses the machine information to speed up some parts of nlmixr/RxODE on your system.  It is not portable to other windows versions and the distribution becomes system dependent." TabIndex="7" />
+  <Label Name="Label1" Location="12, 12" Size="411, 19" Text="Choose the version of nlmixr and RxODE to install" TabIndex="8" />
+  <CheckBox Name="CheckBox1" Location="304, 28" Size="133, 24" Text="Optimized Compile" TabIndex="9" />
 </Dialog>
