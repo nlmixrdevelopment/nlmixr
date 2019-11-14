@@ -1,3 +1,4 @@
+Sys.setenv(PATH=paste0("c:/Rtools/bin;c:/Rtools/mingw_64/bin;", Sys.getenv("PATH")))
 install.packages(c("tidyverse", "data.table",
                    "devtools", "Rcpp", "brew",
                    "lattice","lbfgs",
@@ -22,21 +23,17 @@ install.packages(c("tidyverse", "data.table",
                    "lbfgsb3c", "madness", "expm", "matrixcalc", "bookdown", "roxygen2", "xpose",
                    ## "reticulate",
                    "nloptr", "ucminf", "vpc", "installr", "DT", "dotwhisker", "broom", "broom.mixed",
-                   "Rvmmin", "pkgdown", "xgxr"))
-
-devtools::install_github("nlmixrdevelopment/RxODE")
-library(RxODE)
-devtools::install_github("nlmixrdevelopment/nlmixr")
+                   "Rvmmin", "pkgdown", "xgxr", "RxODE", "nlmixr", "ggPMX"), type="source")
 
 ## devtools::install_github("nlmixrdevelopment/rxModels")
-## devtools::install_github("nlmixrdevelopment/SnakeCharmR")
+library(RxODE)
+devtools::install_github("nlmixrdevelopment/SnakeCharmR")
 devtools::install_github("richardhooijmaijers/R3port")
 devtools::install_github("nlmixrdevelopment/xpose.nlmixr")
 
 devtools::install_github("AdeelK93/collapsibleTree")
 
 devtools::install_github("richardhooijmaijers/shinyMixR")
-devtools::install_github("ggPMXdevelopment/ggPMX")
 
 
 

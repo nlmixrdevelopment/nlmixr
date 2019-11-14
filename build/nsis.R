@@ -46,6 +46,59 @@ WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallP
 Exec '$EXEDIR\\R\\bin\\<%=Rdir%>\\R.exe -e options(keep.source=TRUE);library(shinyMixR);nlmixr:::.setRoot();run_shinymixr(launch.browser=TRUE)'
 SectionEnd"
 
+
+update.lauch.stub <- "
+CRCCheck On
+RequestExecutionLevel user
+; Best Compression
+SetCompress Auto
+SetCompressor /SOLID lzma
+SetCompressorDictSize 32
+SetDatablockOptimize On
+!include \"MUI2.nsh\"
+!include \"MUI_EXTRAPAGES.nsh\"
+!include \"update.nsdinc\"
+!define MUI_HEADERIMAGE_BITMAP \"nlmixr-header.bmp\"
+!define MUI_HEADERIMAGE_BITMAP_NOSTRETCH
+!define MUI_HEADERIMAGE_UNBITMAP \"nlmixr-header.bmp\" ; 150x57 pixels
+!define MUI_PAGE_HEADER_TEXT \"nlmixr\"
+!define MUI_PAGE_HEADER_SUBTEXT \"Nonlinear Mixed Effects Models in R\"
+BrandingText \"nlmixr - Nonlinear Mixed Effects Models in R\"
+
+;SetCompress off
+Name \"Update\"
+Icon \"Oxygen-Icons.org-Oxygen-Apps-system-software-update.ico\"
+!define MUI_ICON \"Oxygen-Icons.org-Oxygen-Apps-system-software-update.ico\"
+OutFile \"update.exe\"
+AutoCloseWindow true
+Caption \"Updating RxODE/nlmixr\"
+Function fnc_update_Validate
+  ${NSD_GetState} $hCtl_update_CheckBox1 $R0
+  ${If} $R0 == ${BST_CHECKED}
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"binOpt\", \"true\").r0'
+  ${Else}
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"binOpt\", \"false\").r0'
+  ${EndIf}
+  ${NSD_GetText} $hCtl_update_nlmixr $R0
+  System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"nlmixrRef\", \"$R0\").r0'
+  ${NSD_GetText} $hCtl_update_RxODE $R0
+  System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"rxodeRef\", \"$R0\").r0'
+  ${NSD_GetState} $hCtl_update_CheckBox2 $R0
+  ${If} $R0 == ${BST_CHECKED}
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"useCRAN\", \"true\").r0'
+  ${Else}
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"useCRAN\", \"false\").r0'
+  ${EndIf}
+  WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\" \"\" \"$EXEDIR\"
+  WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallPath\" \"$EXEDIR\\R\"
+  System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"HOME\", \"$TEMP\").r0'
+  Exec '$EXEDIR\\R\\bin\\Rscript.exe \"$EXEDIR\\R\\update.R\"'
+FunctionEnd
+Page custom fnc_update_Show fnc_update_Validate
+Section Main sec_main
+SectionEnd
+"
+
 nsi.stub <- "
 CRCCheck On
 RequestExecutionLevel user
@@ -121,8 +174,10 @@ WriteRegStr HKCU \"Software\\R-core\\Rtools\\<%=rtoolsver%>\" \"MinRVersion\" \"
 SetOutPath \"$INSTDIR\"
 File \"nlmixr.exe\"
 File \"shinyMixR.exe\"
+File \"update.exe\"
 File \"installation-notes.rtf\"
 SetOutPath \"$INSTDIR\\R\"
+File \"update.R\"
 File /r <%=R%>\\*
 
 ##CreateDirectory \"c:\\R\\nlmixr<%=arch%>-<%=nlmixr.ver%>\"
@@ -185,6 +240,8 @@ buildInstaller <- function(name="nlmixr"){
     shortcuts <- shortcut;
     dr <- gsub("/", "\\", devtools::package_file("build"), fixed=TRUE)
     dir <- dr;
+    brew::brew(text=update.lauch.stub, output=file.path(dr,"update.nsi"));
+    system(sprintf("makensis %s", file.path(dr, "update.nsi")));
     exe <- file.path(dr, "nlmixr.nsi");
     brew::brew(text=nsi.lauch.stub, output=file.path(dr, "nlmixr.nsi"));
     system(sprintf("makensis %s", file.path(dr, "nlmixr.nsi")));
