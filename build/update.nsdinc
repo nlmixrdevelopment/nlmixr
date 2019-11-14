@@ -60,7 +60,7 @@ Function fnc_update_Create
   Pop $hCtl_update_nlmixr
   
   ; === Label2 (type: Label) ===
-  ${NSD_CreateLabel} 11u 83u 277u 36u "The optimized compile uses the machine information to speed up some parts of nlmixr/RxODE on your system.  It is not portable to other windows versions and the distribution becomes system dependent."
+  ${NSD_CreateLabel} 11u 83u 277u 36u "The optimized compile uses the machine information to speed up some parts of nlmixr/RxODE on your system.  It is not portable to other windows versions and the distribution becomes system dependent. It also requires installing from github".
   Pop $hCtl_update_Label2
   
   ; === Label1 (type: Label) ===
@@ -68,7 +68,7 @@ Function fnc_update_Create
   Pop $hCtl_update_Label1
   
   ; === CheckBox1 (type: Checkbox) ===
-  ${NSD_CreateCheckbox} 200u 17u 88u 15u "Optimized Compile"
+  ${NSD_CreateCheckbox} 200u 17u 88u 15u "Optimized"
   Pop $hCtl_update_CheckBox1
   
 FunctionEnd

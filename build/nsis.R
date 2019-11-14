@@ -55,21 +55,49 @@ SetCompress Auto
 SetCompressor /SOLID lzma
 SetCompressorDictSize 32
 SetDatablockOptimize On
+!include \"MUI2.nsh\"
+!include \"MUI_EXTRAPAGES.nsh\"
+!include \"update.nsdinc\"
+!define MUI_HEADERIMAGE_BITMAP \"nlmixr-header.bmp\"
+!define MUI_HEADERIMAGE_BITMAP_NOSTRETCH
+!define MUI_HEADERIMAGE_UNBITMAP \"nlmixr-header.bmp\" ; 150x57 pixels
+!define MUI_PAGE_HEADER_TEXT \"nlmixr\"
+!define MUI_PAGE_HEADER_SUBTEXT \"Nonlinear Mixed Effects Models in R\"
+BrandingText \"nlmixr - Nonlinear Mixed Effects Models in R\"
+
 ;SetCompress off
 Name \"Update\"
 Icon \"Oxygen-Icons.org-Oxygen-Apps-system-software-update.ico\"
+!define MUI_ICON \"Oxygen-Icons.org-Oxygen-Apps-system-software-update.ico\"
 OutFile \"update.exe\"
 AutoCloseWindow true
-Caption \"Updating RxODE/nlmixr from github\"
-Subcaption 3 \" \"
-ChangeUI all \"${NSISDIR}\\Contrib\\UIs\\LoadingBar_Icon.exe\"
-XPStyle on
+Caption \"Updating RxODE/nlmixr\"
+Function fnc_update_Validate
+  ${NSD_GetState} $hCtl_update_CheckBox1 $R0
+  ${If} $R0 == ${BST_CHECKED}
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"binOpt\", \"true\").r0'
+  ${Else}
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"binOpt\", \"false\").r0'
+  ${EndIf}
+  ${NSD_GetText} $hCtl_update_nlmixr $R0
+  System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"nlmixrRef\", \"$R0\").r0'
+  ${NSD_GetText} $hCtl_update_RxODE $R0
+  System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"rxodeRef\", \"$R0\").r0'
+  ${NSD_GetState} $hCtl_update_CheckBox2 $R0
+  ${If} $R0 == ${BST_CHECKED}
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"useCRAN\", \"true\").r0'
+  ${Else}
+    System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"useCRAN\", \"false\").r0'
+  ${EndIf}
+  WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\" \"\" \"$EXEDIR\"
+  WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallPath\" \"$EXEDIR\\R\"
+  System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"HOME\", \"$TEMP\").r0'
+  Exec '$EXEDIR\\R\\bin\\Rscript.exe \"$EXEDIR\\R\\update.R\"'
+FunctionEnd
+Page custom fnc_update_Show fnc_update_Validate
 Section Main sec_main
-WriteRegStr HKCU \"Software\\nlmixr<%=archext%>\" \"\" \"$EXEDIR\"
-WriteRegStr HKCU \"Software\\R-core\\R\\<%=rver%>nlmixr<%=archext%>\" \"InstallPath\" \"$EXEDIR\\R\"
-System::Call 'Kernel32::SetEnvironmentVariableA(t, t) i(\"HOME\", \"$TEMP\").r0'
-Exec '$EXEDIR\\R\\bin\\<%=Rdir%>\\Rscript.exe \"$EXEDIR\\R\\update.R\"'
-SectionEnd"
+SectionEnd
+"
 
 nsi.stub <- "
 CRCCheck On
