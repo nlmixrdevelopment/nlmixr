@@ -2073,7 +2073,6 @@ static inline void foceiSetupTrans_(CharacterVector pars){
   op_focei.xPar        = op_focei.etaTrans +op_focei.neta; // [ntheta+nomega]
   op_focei.thetaTrans  = op_focei.xPar + op_focei.thetan + op_focei.omegan; // [ntheta+nomega]
   op_focei.fixedTrans  = op_focei.thetaTrans + op_focei.thetan + op_focei.omegan; // [ntheta + nomega]
-  op_focei.etaFD       = op_focei.fixedTrans + op_focei.thetan + op_focei.omegan; // [neta]
   
   op_focei.fullTheta   = Calloc(4*(op_focei.ntheta+op_focei.omegan), double); // [ntheta+omegan]
   op_focei.theta       = op_focei.fullTheta+op_focei.ntheta+op_focei.omegan; // [ntheta + omegan]
