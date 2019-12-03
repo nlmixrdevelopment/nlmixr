@@ -3,7 +3,7 @@
 ***
 ![nlmixr](logo.png)
 
-##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Richard Hooijmaijers, Wenping Wang
+##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Teun Post, Richard Hooijmaijers, Wenping Wang
 
 ***
 

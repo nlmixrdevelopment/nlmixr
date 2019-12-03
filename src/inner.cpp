@@ -2378,7 +2378,6 @@ static inline void foceiSetupTrans_(CharacterVector pars){
   std::string thetaS;
   std::string etaS;
   std::string cur;
-  // Allocate size+1 for ID passthrough
   op_focei.etaTrans    = Calloc(op_focei.neta*2 + 3*(op_focei.thetan + op_focei.omegan), int); //[neta]
   op_focei.xPar        = op_focei.etaTrans +op_focei.neta; // [ntheta+nomega]
   op_focei.thetaTrans  = op_focei.xPar + op_focei.thetan + op_focei.omegan; // [ntheta+nomega]
