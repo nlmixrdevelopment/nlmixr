@@ -1842,6 +1842,10 @@ foceiFit.data.frame0 <- function(data,
     .omdf$upper <- with(.omdf, ifelse(a < b, b, a))
     .omdf$upper <- with(.omdf, ifelse(upper == m, Inf, upper));
     .omdf$upper <- with(.omdf, ifelse(!diag, Inf, upper));
+    .ret$control$ntheta <- length(lower)
+    .ret$control$nomega <- length(.omdf$lower)
+    .ret$control$neta <- sum(.omdf$diag)
+    .ret$control$nfixed <- sum(fixed);
     lower <- c(lower, .omdf$lower)
     upper <- c(upper, .omdf$upper)
 
