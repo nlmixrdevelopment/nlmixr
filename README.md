@@ -48,7 +48,7 @@ https://github.com/yxiong1/pmxstan.
 
 One of the easiest way to setup nlmixr is to docker image.  For more details see:
 
-https://github.com/nlmixrdevelopment/nlmixr/releases/download/v9.0.1-0/dockerInstall.pdf
+https://github.com/RichardHooijmaijers/nlmixr.docker
 
 
 # Windows installer
