@@ -5,15 +5,20 @@
 \alias{nmSave}
 \title{Create a run summary word document}
 \usage{
-nmDocx(x, docxOut = NULL, docxTemplate = NULL, plot = TRUE,
+nmDocx(
+  x,
+  docxOut = NULL,
+  docxTemplate = NULL,
+  plot = TRUE,
   titleStyle = getOption("nlmixr.docx.title", "Title"),
   subtitleStyle = getOption("nlmixr.docx.subtitle", "Subtitle"),
   normalStyle = getOption("nlmixr.docx.normal", "Normal"),
   headerStyle = getOption("nlmixr.docx.heading1", "Heading 1"),
   centeredStyle = getOption("nlmixr.docx.centered", "centered"),
-  preformattedStyle = getOption("nlmixr.docx.preformatted",
-  "HTML Preformatted"), width = getOption("nlmixr.docx.width", 69),
-  save = FALSE)
+  preformattedStyle = getOption("nlmixr.docx.preformatted", "HTML Preformatted"),
+  width = getOption("nlmixr.docx.width", 69),
+  save = FALSE
+)
 
 nmSave(x, ..., save = TRUE)
 }

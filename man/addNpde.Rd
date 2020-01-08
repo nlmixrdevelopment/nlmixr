@@ -4,8 +4,15 @@
 \alias{addNpde}
 \title{NPDE calculation for nlmixr}
 \usage{
-addNpde(object, nsim = 300, ties = TRUE, seed = 1009,
-  updateObject = TRUE, cholSEtol = (.Machine$double.eps)^(1/3), ...)
+addNpde(
+  object,
+  nsim = 300,
+  ties = TRUE,
+  seed = 1009,
+  updateObject = TRUE,
+  cholSEtol = (.Machine$double.eps)^(1/3),
+  ...
+)
 }
 \arguments{
 \item{object}{nlmixr fit object}

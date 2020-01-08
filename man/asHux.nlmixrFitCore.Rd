@@ -4,15 +4,26 @@
 \alias{asHux.nlmixrFitCore}
 \title{Change a nlmixr fit object to a huxtable}
 \usage{
-asHux.nlmixrFitCore(..., error_format = "({std.error})",
+asHux.nlmixrFitCore(
+  ...,
+  error_format = "({std.error})",
   error_style = c("stderr", "ci", "statistic", "pvalue"),
-  error_pos = c("below", "same", "right"), number_format = "\%.3f",
-  align = ".", pad_decimal = ".", ci_level = NULL,
-  tidy_args = NULL, stars = c(`***` = 0.001, `**` = 0.01, `*` = 0.05),
-  bold_signif = NULL, borders = 0.4, outer_borders = 0.8, note = if
-  (is.null(stars)) NULL else "{stars}.", statistics = c(N = "nobs",
-  `Objective Function` = "OBJF", "logLik", "AIC"), coefs = NULL,
-  omit_coefs = NULL, na_omit = c("all", "any", "none"))
+  error_pos = c("below", "same", "right"),
+  number_format = "\%.3f",
+  align = ".",
+  pad_decimal = ".",
+  ci_level = NULL,
+  tidy_args = NULL,
+  stars = c(`***` = 0.001, `**` = 0.01, `*` = 0.05),
+  bold_signif = NULL,
+  borders = 0.4,
+  outer_borders = 0.8,
+  note = if (is.null(stars)) NULL else "{stars}.",
+  statistics = c(N = "nobs", `Objective Function` = "OBJF", "logLik", "AIC"),
+  coefs = NULL,
+  omit_coefs = NULL,
+  na_omit = c("all", "any", "none")
+)
 }
 \arguments{
 \item{...}{Models, or a single list of models. Names will be used as column headings.}
@@ -23,7 +34,7 @@ asHux.nlmixrFitCore(..., error_format = "({std.error})",
 
 \item{error_pos}{Display uncertainty "below", to the "right" of, or in the "same" cell as estimates.}
 
-\item{number_format}{Format for numbering. See \code{\link[=number_format]{number_format()}} for details.}
+\item{number_format}{Format for numbering. See \code{\link[huxtable:number_format]{number_format()}} for details.}
 
 \item{align}{Alignment for table cells. Set to a single character to align on this character.}
 

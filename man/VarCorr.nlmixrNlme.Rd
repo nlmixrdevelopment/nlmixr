@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{x}{a fitted model object, usually an object inheriting from
-    class \code{"\link{lme}"}.}
+    class \code{"\link[nlme]{lme}"}.}
 
 \item{sigma}{an optional numeric value used as a multiplier for the
     standard deviations.  The default is \code{x$sigma} or \code{1}

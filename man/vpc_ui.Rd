@@ -7,13 +7,34 @@
 \alias{vpc.ui}
 \title{VPC based on ui model}
 \usage{
-vpc_ui(fit, data = NULL, n = 100, bins = "jenks", n_bins = "auto",
-  bin_mid = "mean", show = NULL, stratify = NULL,
-  pred_corr = FALSE, pred_corr_lower_bnd = 0, pi = c(0.05, 0.95),
-  ci = c(0.05, 0.95), uloq = NULL, lloq = NULL, log_y = FALSE,
-  log_y_min = 0.001, xlab = NULL, ylab = NULL, title = NULL,
-  smooth = TRUE, vpc_theme = NULL, facet = "wrap", labeller = NULL,
-  vpcdb = FALSE, verbose = FALSE, ...)
+vpc_ui(
+  fit,
+  data = NULL,
+  n = 100,
+  bins = "jenks",
+  n_bins = "auto",
+  bin_mid = "mean",
+  show = NULL,
+  stratify = NULL,
+  pred_corr = FALSE,
+  pred_corr_lower_bnd = 0,
+  pi = c(0.05, 0.95),
+  ci = c(0.05, 0.95),
+  uloq = NULL,
+  lloq = NULL,
+  log_y = FALSE,
+  log_y_min = 0.001,
+  xlab = NULL,
+  ylab = NULL,
+  title = NULL,
+  smooth = TRUE,
+  vpc_theme = NULL,
+  facet = "wrap",
+  labeller = NULL,
+  vpcdb = FALSE,
+  verbose = FALSE,
+  ...
+)
 
 \method{vpc}{nlmixrFitData}(sim, ...)
 
@@ -77,7 +98,7 @@ this argument.}
 
 \item{...}{Args sent to \code{\link[RxODE]{rxSolve}}}
 
-\item{sim}{this is usually a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link{read_table_nm}.  However it can also be an object like a nlmixr or xpose object}
+\item{sim}{this is usually a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link[vpc]{read_table_nm}.  However it can also be an object like a nlmixr or xpose object}
 }
 \value{
 Simulated dataset (invisibly)

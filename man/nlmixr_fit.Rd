@@ -4,9 +4,17 @@
 \alias{nlmixr_fit}
 \title{Fit a nlmixr model}
 \usage{
-nlmixr_fit(uif, data, est = NULL, control = list(), ...,
-  sum.prod = FALSE, table = tableControl(), save = NULL,
-  envir = parent.frame())
+nlmixr_fit(
+  uif,
+  data,
+  est = NULL,
+  control = list(),
+  ...,
+  sum.prod = FALSE,
+  table = tableControl(),
+  save = NULL,
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{uif}{Parsed nlmixr model (by \code{nlmixr(mod.fn)}).}

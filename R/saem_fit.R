@@ -698,12 +698,12 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
           .l1 <- length(unique(a$evt[, "ID"]));
           .l2 <- length(unique(a$evtM[, "ID"]))
           if (.l2 > .l1){
-              suppressWarnings(do.call(RxODE::rxSolve.default,
+              suppressWarnings(do.call(RxODE::rxSolve,
                                        c(list(object=.(model), params=a$opt$.pars,
                                               events=a$evtM,.setupOnly=1L),
                                          a$optM)))
           } else {
-              suppressWarnings(do.call(RxODE::rxSolve.default,
+              suppressWarnings(do.call(RxODE::rxSolve,
                                        c(list(object=.(model), params=a$opt$.pars,
                                               events=a$evt,.setupOnly=1L),
                                          a$optM)))

@@ -4,8 +4,12 @@
 \alias{gen_saem_user_fn}
 \title{Generate an SAEM model}
 \usage{
-gen_saem_user_fn(model, PKpars = attr(model, "default.pars"),
-  pred = NULL, inPars = NULL)
+gen_saem_user_fn(
+  model,
+  PKpars = attr(model, "default.pars"),
+  pred = NULL,
+  inPars = NULL
+)
 }
 \arguments{
 \item{model}{a compiled SAEM model by gen_saem_user_fn()}
