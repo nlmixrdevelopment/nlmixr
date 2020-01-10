@@ -30,7 +30,7 @@ vpc_saemFit = function(fit, dat, nsim = 100, by=NULL, ...) {
       .rx <- .env$model
       .pars <- .rx$params
       .pars <- setNames(rep(1.1,length(.pars)),.pars);
-      suppressWarnings(do.call(RxODE::rxSolve.default,
+      suppressWarnings(do.call(RxODE::rxSolve,
                                c(list(object=.rx, params=.pars,
                                       events=.evtM,.setupOnly=2L),
                                  saem.cfg$optM)));
