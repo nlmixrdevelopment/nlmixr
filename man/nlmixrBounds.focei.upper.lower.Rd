@@ -4,8 +4,7 @@
 \alias{nlmixrBounds.focei.upper.lower}
 \title{Get upper/lower/names for THETAs}
 \usage{
-nlmixrBounds.focei.upper.lower(obj, type = c("upper", "lower", "name",
-  "err"))
+nlmixrBounds.focei.upper.lower(obj, type = c("upper", "lower", "name", "err"))
 }
 \arguments{
 \item{obj}{Bounds object}

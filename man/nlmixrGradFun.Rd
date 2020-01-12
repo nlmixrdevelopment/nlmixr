@@ -13,10 +13,19 @@ nlmixrGrad_(theta, md5)
 
 nlmixrParHist_(md5)
 
-nlmixrGradFun(what, envir = parent.frame(), which, thetaNames,
-  gillRtol = sqrt(.Machine$double.eps), gillK = 10L, gillStep = 2,
-  gillFtol = 0, useColor = crayon::has_color(),
-  printNcol = floor((getOption("width") - 23)/12), print = 1)
+nlmixrGradFun(
+  what,
+  envir = parent.frame(),
+  which,
+  thetaNames,
+  gillRtol = sqrt(.Machine$double.eps),
+  gillK = 10L,
+  gillStep = 2,
+  gillFtol = 0,
+  useColor = crayon::has_color(),
+  printNcol = floor((getOption("width") - 23)/12),
+  print = 1
+)
 }
 \arguments{
 \item{theta}{for the internal functions theta is the parameter

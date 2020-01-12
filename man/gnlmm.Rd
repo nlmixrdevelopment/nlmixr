@@ -5,11 +5,27 @@
 \alias{gnlmm2}
 \title{Fit a generalized nonlinear mixed-effect model}
 \usage{
-gnlmm(llik, data, inits, syspar = NULL, system = NULL,
-  diag.xform = c("sqrt", "log", "identity"), ..., control = list())
+gnlmm(
+  llik,
+  data,
+  inits,
+  syspar = NULL,
+  system = NULL,
+  diag.xform = c("sqrt", "log", "identity"),
+  ...,
+  control = list()
+)
 
-gnlmm2(llik, data, inits, syspar = NULL, system = NULL,
-  diag.xform = c("sqrt", "log", "identity"), ..., control = list())
+gnlmm2(
+  llik,
+  data,
+  inits,
+  syspar = NULL,
+  system = NULL,
+  diag.xform = c("sqrt", "log", "identity"),
+  ...,
+  control = list()
+)
 }
 \arguments{
 \item{llik}{log-likelihood function}

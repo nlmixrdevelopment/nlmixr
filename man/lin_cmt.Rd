@@ -4,8 +4,17 @@
 \alias{lin_cmt}
 \title{concentrations from a linear compartment model}
 \usage{
-lin_cmt(obs_time, dose_time, dose, Tinf, params, oral, infusion, ncmt,
-  parameterization)
+lin_cmt(
+  obs_time,
+  dose_time,
+  dose,
+  Tinf,
+  params,
+  oral,
+  infusion,
+  ncmt,
+  parameterization
+)
 }
 \arguments{
 \item{obs_time}{times at which an observation is desired}

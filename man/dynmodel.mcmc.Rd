@@ -4,8 +4,17 @@
 \alias{dynmodel.mcmc}
 \title{Fit a non-population dynamic model using mcmc}
 \usage{
-dynmodel.mcmc(system, model, evTable, inits, data, fixPars = NULL,
-  nsim = 500, squared = T, seed = NULL)
+dynmodel.mcmc(
+  system,
+  model,
+  evTable,
+  inits,
+  data,
+  fixPars = NULL,
+  nsim = 500,
+  squared = T,
+  seed = NULL
+)
 }
 \arguments{
 \item{system}{an RxODE object}

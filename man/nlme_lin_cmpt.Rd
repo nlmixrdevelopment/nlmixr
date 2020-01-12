@@ -6,17 +6,44 @@
 \alias{nlmeLinCmt}
 \title{Fit nlme-based linear compartment mixed-effect model using closed form solution}
 \usage{
-nlme_lin_cmpt(dat, parModel, ncmt, oral = TRUE, infusion = FALSE,
-  tlag = FALSE, parameterization = 1, parTrans = .getParfn(oral,
-  ncmt, parameterization, tlag), mcCores = 1, ...)
+nlme_lin_cmpt(
+  dat,
+  parModel,
+  ncmt,
+  oral = TRUE,
+  infusion = FALSE,
+  tlag = FALSE,
+  parameterization = 1,
+  parTrans = .getParfn(oral, ncmt, parameterization, tlag),
+  mcCores = 1,
+  ...
+)
 
-nlmeLinCmpt(dat, parModel, ncmt, oral = TRUE, infusion = FALSE,
-  tlag = FALSE, parameterization = 1, parTrans = .getParfn(oral,
-  ncmt, parameterization, tlag), mcCores = 1, ...)
+nlmeLinCmpt(
+  dat,
+  parModel,
+  ncmt,
+  oral = TRUE,
+  infusion = FALSE,
+  tlag = FALSE,
+  parameterization = 1,
+  parTrans = .getParfn(oral, ncmt, parameterization, tlag),
+  mcCores = 1,
+  ...
+)
 
-nlmeLinCmt(dat, parModel, ncmt, oral = TRUE, infusion = FALSE,
-  tlag = FALSE, parameterization = 1, parTrans = .getParfn(oral,
-  ncmt, parameterization, tlag), mcCores = 1, ...)
+nlmeLinCmt(
+  dat,
+  parModel,
+  ncmt,
+  oral = TRUE,
+  infusion = FALSE,
+  tlag = FALSE,
+  parameterization = 1,
+  parTrans = .getParfn(oral, ncmt, parameterization, tlag),
+  mcCores = 1,
+  ...
+)
 }
 \arguments{
 \item{dat}{data to be fitted}

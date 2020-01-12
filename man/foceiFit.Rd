@@ -13,11 +13,24 @@ focei.fit(data, ...)
 
 \method{foceiFit}{data.frame}(data, ...)
 
-\method{foceiFit}{data.frame0}(data, inits, PKpars, model = NULL,
-  pred = NULL, err = NULL, lower = -Inf, upper = Inf,
-  fixed = NULL, skipCov = NULL, control = foceiControl(),
-  thetaNames = NULL, etaNames = NULL, etaMat = NULL, ...,
-  env = NULL)
+\method{foceiFit}{data.frame0}(
+  data,
+  inits,
+  PKpars,
+  model = NULL,
+  pred = NULL,
+  err = NULL,
+  lower = -Inf,
+  upper = Inf,
+  fixed = NULL,
+  skipCov = NULL,
+  control = foceiControl(),
+  thetaNames = NULL,
+  etaNames = NULL,
+  etaMat = NULL,
+  ...,
+  env = NULL
+)
 }
 \arguments{
 \item{data}{Data to fit; Needs to be RxODE compatible and have \code{DV},

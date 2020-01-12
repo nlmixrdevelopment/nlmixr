@@ -4,8 +4,7 @@
 \alias{lincmt}
 \title{Parameters for a linear compartment model for SAEM}
 \usage{
-lincmt(ncmt, oral = T, tlag = F, infusion = F,
-  parameterization = 1)
+lincmt(ncmt, oral = T, tlag = F, infusion = F, parameterization = 1)
 }
 \arguments{
 \item{ncmt}{number of compartments}

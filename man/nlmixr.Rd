@@ -7,18 +7,48 @@
 \alias{nlmixr.nlmixrUI}
 \title{nlmixr fits population PK and PKPD non-linear mixed effects models.}
 \usage{
-nlmixr(object, data, est = NULL, control = list(),
-  table = tableControl(), ..., save = NULL, envir = parent.frame())
+nlmixr(
+  object,
+  data,
+  est = NULL,
+  control = list(),
+  table = tableControl(),
+  ...,
+  save = NULL,
+  envir = parent.frame()
+)
 
-\method{nlmixr}{function}(object, data, est = NULL, control = list(),
-  table = tableControl(), ..., save = NULL, envir = parent.frame())
+\method{nlmixr}{`function`}(
+  object,
+  data,
+  est = NULL,
+  control = list(),
+  table = tableControl(),
+  ...,
+  save = NULL,
+  envir = parent.frame()
+)
 
-\method{nlmixr}{nlmixrFitCore}(object, data, est = NULL,
-  control = list(), table = tableControl(), ..., save = NULL,
-  envir = parent.frame())
+\method{nlmixr}{nlmixrFitCore}(
+  object,
+  data,
+  est = NULL,
+  control = list(),
+  table = tableControl(),
+  ...,
+  save = NULL,
+  envir = parent.frame()
+)
 
-\method{nlmixr}{nlmixrUI}(object, data, est = NULL, control = list(),
-  ..., save = NULL, envir = parent.frame())
+\method{nlmixr}{nlmixrUI}(
+  object,
+  data,
+  est = NULL,
+  control = list(),
+  ...,
+  save = NULL,
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{object}{Fitted object or function specifying the model.}

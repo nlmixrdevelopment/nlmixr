@@ -20,7 +20,7 @@ Bootstrap data by sampling the same number of subjects from the original dataset
 specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
 set.seed(99); nboot = 5;
 
-cat("generating", nboot, "bootstrap samples...\\n")
+cat("generating", nboot, "bootstrap samples...\n")
 cmat <- matrix(NA, nboot, 3)
 for (i in 1:nboot)
 {

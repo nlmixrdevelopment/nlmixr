@@ -9,21 +9,53 @@
 \usage{
 nlmixrSim(object, ...)
 
-\method{rxSolve}{nlmixrFitData}(object, params = NULL, events = NULL,
-  inits = NULL, scale = NULL, method = c("liblsoda", "lsoda",
-  "dop853"), transitAbs = NULL, atol = 1e-06, rtol = 1e-04,
-  maxsteps = 5000L, hmin = 0L, hmax = NULL, hini = 0L,
-  maxordn = 12L, maxords = 5L, ..., cores,
+\method{rxSolve}{nlmixrFitData}(
+  object,
+  params = NULL,
+  events = NULL,
+  inits = NULL,
+  scale = NULL,
+  method = c("liblsoda", "lsoda", "dop853"),
+  transitAbs = NULL,
+  atol = 1e-06,
+  rtol = 1e-04,
+  maxsteps = 5000L,
+  hmin = 0L,
+  hmax = NULL,
+  hini = 0L,
+  maxordn = 12L,
+  maxords = 5L,
+  ...,
+  cores,
   covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
-  addCov = FALSE, matrix = FALSE, sigma = NULL, sigmaDf = NULL,
-  nCoresRV = 1L, sigmaIsChol = FALSE, nDisplayProgress = 10000L,
-  amountUnits = NA_character_, timeUnits = "hours", stiff,
-  theta = NULL, eta = NULL, addDosing = FALSE,
-  updateObject = FALSE, omega = NULL, omegaDf = NULL,
-  omegaIsChol = FALSE, nSub = 1L, thetaMat = NULL, thetaDf = NULL,
-  thetaIsChol = FALSE, nStud = 1L, dfSub = 0, dfObs = 0,
-  returnType = c("rxSolve", "matrix", "data.frame"), seed = NULL,
-  nsim = NULL)
+  addCov = FALSE,
+  matrix = FALSE,
+  sigma = NULL,
+  sigmaDf = NULL,
+  nCoresRV = 1L,
+  sigmaIsChol = FALSE,
+  nDisplayProgress = 10000L,
+  amountUnits = NA_character_,
+  timeUnits = "hours",
+  stiff,
+  theta = NULL,
+  eta = NULL,
+  addDosing = FALSE,
+  updateObject = FALSE,
+  omega = NULL,
+  omegaDf = NULL,
+  omegaIsChol = FALSE,
+  nSub = 1L,
+  thetaMat = NULL,
+  thetaDf = NULL,
+  thetaIsChol = FALSE,
+  nStud = 1L,
+  dfSub = 0,
+  dfObs = 0,
+  returnType = c("rxSolve", "matrix", "data.frame"),
+  seed = NULL,
+  nsim = NULL
+)
 
 \method{simulate}{nlmixrFitData}(object, nsim = 1, seed = NULL, ...)
 
@@ -40,7 +72,7 @@ parameter identifiers used in the ODE specification;}
 
 \item{events}{an \code{eventTable} object describing the input
 (e.g., doses) to the dynamic system and observation sampling
-time points (see \code{\link{eventTable}});}
+time points (see \code{\link[RxODE]{eventTable}});}
 
 \item{inits}{a vector of initial values of the state variables
 (e.g., amounts in each compartment), and the order in this
@@ -102,7 +134,7 @@ method.  The default value is 5.  This can be between 1 and 5.}
 
 \item{cores}{Number of cores used in parallel ODE solving.  This
 defaults to the number or system cores determined by
-\code{\link{rxCores}} for methods that support parallel
+\code{\link[RxODE]{rxCores}} for methods that support parallel
 solving (ie thread-safe methods like "liblsoda").}
 
 \item{covsInterpolation}{specifies the interpolation method for
@@ -260,9 +292,12 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
      update the data frame.  This is the currently standard solving
      method in RxODE,  is used for \code{rxSolve(object, ...)}, \code{solve(object,...)},
 \item \code{"data.frame"} -- returns a plain, non-reactive data
-     frame; Currently very slightly Faster than \code{returnType="matrix"}
+     frame; Currently very slightly faster than \code{returnType="matrix"}
 \item \code{"matrix"} -- returns a plain matrix with column names attached
     to the solved object.  This is what is used \code{object$run} as well as \code{object$solve}
+\item \code{"data.table"} -- returns a \code{data.table}; The \code{data.table} is
+    created by reference (ie \code{setDt()}), which should be fast.
+\item \code{"tbl"} or \code{"tibble"} returns a tibble format.
 }}
 
 \item{seed}{an object specifying if and how the random number

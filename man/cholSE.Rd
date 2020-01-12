@@ -20,7 +20,7 @@ Performs a (modified) Cholesky factorization of the form
 \details{
 t(P) \%*\% A \%*\% P  + E = t(R) \%*\% R
 
-As detailed in Schnabel/Eskow (1990)
+ As detailed in Schnabel/Eskow (1990)
 }
 \note{
 This version does not pivot or return the E matrix

@@ -32,7 +32,7 @@ calc.2LL = function(fit, nnodes.gq=8, nsd.gq=4) {
         RxODE::rxLoad(.env$model)
         .pars <- .rx$params
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
-        suppressWarnings(do.call(RxODE::rxSolve.default,
+        suppressWarnings(do.call(RxODE::rxSolve,
                                 c(list(object=.rx, params=.pars,
                                        events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
@@ -138,7 +138,7 @@ plot.saemFit = function(x,...) {
         .rx <- .env$model
         .pars <- .rx$params
         .pars <- setNames(rep(1.1,length(.pars)),.pars);
-        suppressWarnings(do.call(RxODE::rxSolve.default,
+        suppressWarnings(do.call(RxODE::rxSolve,
                                 c(list(object=.rx, params=.pars,
                                        events=.evtM,.setupOnly=1L),
                                   saem.cfg$optM)));
@@ -334,7 +334,7 @@ calc.COV = function(fit0) {
       RxODE::rxLoad(.rx)
       .pars <- .rx$params
       .pars <- setNames(rep(1.1,length(.pars)),.pars);
-      suppressWarnings(do.call(RxODE::rxSolve.default,
+      suppressWarnings(do.call(RxODE::rxSolve,
                                c(list(object=.rx, params=.pars,
                                       events=.evtM,.setupOnly=1L),
                                  saem.cfg$optM)));

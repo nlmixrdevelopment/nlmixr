@@ -4,8 +4,11 @@
 \alias{residuals.nlmixrFitData}
 \title{Extract residuals from the FOCEI fit}
 \usage{
-\method{residuals}{nlmixrFitData}(object, ..., type = c("ires", "res",
-  "iwres", "wres", "cwres", "cpred", "cres"))
+\method{residuals}{nlmixrFitData}(
+  object,
+  ...,
+  type = c("ires", "res", "iwres", "wres", "cwres", "cpred", "cres")
+)
 }
 \arguments{
 \item{object}{focei.fit object}
