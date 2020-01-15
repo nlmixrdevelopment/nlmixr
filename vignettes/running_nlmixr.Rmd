@@ -40,7 +40,8 @@ ggplot(theo_sd, aes(TIME, DV)) + geom_line(aes(group=ID), col="red") + scale_x_c
 
 ```
 
-We can try fitting a simple one-compartment PK model to this small dataset. We write the model as follows:
+We can try fitting a simple one-compartment PK model to this small
+dataset. We write the model as follows:
 
 ```{r}
 one.cmt <- function() {
@@ -72,8 +73,8 @@ fit <- nlmixr(one.cmt, theo_sd, est="nlme")
 print(fit)
 ```
 
-
-We can alternatively express the same model by ordinary differential equations (ODEs):
+We can alternatively express the same model by ordinary differential
+equations (ODEs):
 
 ```{r}
 one.compartment <- function() {

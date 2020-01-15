@@ -2154,7 +2154,9 @@ print.nlmixrClass <- function(x, ...){
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
     .env <- obj;
-    if (any(arg == c("logLik", "value", "obf", "ofv", "objf", "OBJF", "objective", "AIC", "BIC"))){
+    if (any(arg == c("logLik", "value", "obf", "ofv",
+                     "objf", "OBJF", "objective", "AIC",
+                     "BIC"))) {
         if (!is.null(obj$saem)){
             .tmp <- obj$saem;
             .curObj <- get("objective",.env);
