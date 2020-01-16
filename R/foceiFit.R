@@ -2191,7 +2191,11 @@ print.nlmixrClass <- function(x, ...){
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE){
     .env <- obj;
-    if (any(arg == c("logLik", "value", "obf", "ofv",
+    if (arg == "posthoc"){
+        return(nlmixrPosthoc(obj));
+    } else if (arg == "notes"){
+        return(.notesFit(obj))
+    } else if (any(arg == c("logLik", "value", "obf", "ofv",
                      "objf", "OBJF", "objective", "AIC",
                      "BIC"))) {
         if (!is.null(obj$saem)){
@@ -2261,6 +2265,9 @@ print.nlmixrClass <- function(x, ...){
 `$.nlmixrFitData` <-  function(obj, arg, exact = FALSE){
     .ret <- obj[[arg]]
     if (is.null(.ret)){
+        if (arg == "posthoc"){
+            return(nlmixrPosthoc(obj));
+        }
         .cls <- class(obj);
         .env <- attr(.cls, ".foceiEnv");
         .ret <- `$.nlmixrFitCore`(.env, arg, exact);
@@ -2743,9 +2750,96 @@ print.nlmixrGill83 <- function(x, ...){
     cat(paste(.lt, collapse="\n"), "\n\n")
 }
 
+##' @export
+nlmixrPosthoc <- function(x, ...){
+    UseMethod("nlmixrPosthoc");
+}
+
+##'@export
+nlmixrPosthoc.default <- function(x, ...){
+    .posthoc <- (x$control$maxOuterIterations == 0L & x$control$maxInnerIterations > 0L)
+    .posthoc <- ifelse(.posthoc, paste0(ifelse(x$method == "FO",
+                                        ifelse(RxODE::rxIs(x, "nlmixrFitData"),
+                                               paste0(" estimation with ", crayon::bold$yellow("FOCE"),
+                                                      gsub(rex::rex(any_spaces, "(", anything, ")"), "", x$extra),
+                                                      crayon::bold(" posthoc")),
+                                               ""),
+                                        crayon::bold(" posthoc")), " estimation"), " fit");
+    return(.posthoc)
+}
+
+.fmt3 <- function(name, bound, access, extra="",
+                  on=c(TRUE, TRUE)){
+    if (length(access) == 1){
+        on <- on[1]
+    }
+    cat(cli::cli_format_method({
+             cli::cli_rule(paste0(crayon::bold(name), " (", extra,
+                    paste(crayon::bold$blue(paste0(ifelse(on, crayon::yellow(bound), ""), "$", access)), collapse=" or "), "):"))
+         }), sep="\n")
+}
+
+.pagedPrint <- function(x, name, bound){
+    access <- as.character(substitute(x))
+    if (length(access) == 3){
+        if (access[1] == "$"){
+            access <- paste0("$", access[3])
+        }
+    } else {
+        access <- ""
+    }
+    .df <- x;
+    if (inherits(.df, "matrix")) {
+        .df <- as.data.frame(.df);
+    } else if (inherits(.df, "character")) {
+        .df <- data.frame(Information=.df);
+    }
+    .cls <- c(paste0(gsub(" +", "\u00A0", name), ": ", bound, access),
+              "paged_df", "data.frame");
+    class(.df) <- .cls
+    print(.df)
+}
+
+.notesFit <- function(x){
+    .parent <- globalenv();
+    .bound2 <- do.call("c", lapply(ls(.parent), function(.cur) {
+                                if (identical(.parent[[.cur]], x)) {
+                                    return(.cur)
+                                }
+                                return(NULL);
+                            }))
+    if (length(.bound2) > 0) {
+        .bound <- .bound2[order(sapply(.bound2, nchar))];
+        .bound <- .bound[1]
+    } else {
+        .bound <- "";
+    }
+    .c <- c(paste0("  Covariance Type (", .bound, "$covMethod): ",
+                   x$covMethod));
+    if (is.na(get("objective",x$env))) {
+        .c <- c(.c,
+                "Missing Objective function; Can add by:",
+                sprintf(" Gaussian/Laplacian Likelihoods: AIC(%s) or %s etc.",
+                        .bound, .bound, "$objf"),
+                sprintf(" FOCEi CWRES & Likelihoods: addCwres(%s)",
+                        .bound));
+    }
+    if (x$message != ""){
+        .c <- c(.c, paste0("  Minimization message (",.bound, "$message): "),
+                paste0("    ", x$message));
+        if (x$message=="false convergence (8)"){f
+            .c <- c(.c, "  In an ODE system, false convergence may mean \"useless\" evaluations were performed.",
+                    "  See https://tinyurl.com/yyrrwkce",
+                    "  It could also mean the convergence is poor, check results before accepting fit",
+                    "  You may also try a good derivative free optimization:",
+                    "    nlmixr(...,control=list(outerOpt=\"bobyqa\"))");
+            }
+    }
+    .c
+}
+
 ##'@export
 print.nlmixrFitCore <- function(x, ...){
-    .width <- getOption("width");
     .parent <- parent.frame(2);
     .bound <- do.call("c", lapply(ls(.parent), function(.cur){
                                if (identical(.parent[[.cur]], x)){
@@ -2764,142 +2858,185 @@ print.nlmixrFitCore <- function(x, ...){
     } else if (.bound=="x"){
         .parent <- globalenv();
         .bound2 <- do.call("c", lapply(ls(.parent), function(.cur){
-                               if (identical(.parent[[.cur]], x)){
-                                   return(.cur)
-                               }
-                               return(NULL);
-                               }))
+                                    if (identical(.parent[[.cur]], x)){
+                                        return(.cur)
+                                    }
+                                    return(NULL);
+                                }))
         if (length(.bound2) > 0){
             .bound <- .bound2[order(sapply(.bound2, nchar))];
             .bound <- .bound[1]
         }
     }
-    .posthoc <- (x$control$maxOuterIterations == 0L & x$control$maxInnerIterations > 0L)
-    .posthoc <- ifelse(.posthoc, paste0(ifelse(x$method == "FO",
-                                        ifelse(RxODE::rxIs(x, "nlmixrFitData"),
-                                               paste0(" estimation with ", crayon::bold$yellow("FOCE"),
-                                                      gsub(rex::rex(any_spaces, "(", anything, ")"), "", x$extra),
-                                                      crayon::bold(" posthoc")),
-                                               ""),
-                                               crayon::bold(" posthoc")), " estimation"), " fit");
-    cat(cli::rule(paste0(crayon::bold$blue("nlmix"), crayon::bold$red("r"), " ", crayon::bold$yellow(x$method),
-                         x$extra, .posthoc)), "\n")
-    if (is.na(get("objective",x$env))){
-        cat(sprintf(" Gaussian/Laplacian Likelihoods: AIC(%s) or %s etc.",
+    if (RxODE::rxIsNotebook()){
+        if (!is.na(get("objective",x$env))) {
+            .pagedPrint(x$objDf, "Objective", .bound)
+        }
+        .pagedPrint(x$time, "Time (sec)", .bound)
+        .pagedPrint(x$parFixedDf, "Pop. Pars", .bound)
+        .pagedPrint(x$omega, "BSV Cov", .bound)
+        .pagedPrint(x$omegaR, "BSV Corr", .bound)
+        .pagedPrint(x$shrink, "Dist. Stats", .bound)
+        .pagedPrint(x$notes, "Fit notes", .bound)
+        .pagedPrint(x, "Fit Data", .bound)
+    } else {
+        .width <- getOption("width");
+        .parent <- parent.frame(2);
+
+        cat(cli::cli_format_method({
+                     cli::cli_rule(paste0(crayon::bold$blue("nlmix"),
+                                          crayon::bold$red("r"), " ",
+                                          crayon::bold$yellow(x$method),
+                                          x$extra, x$posthoc))
+                 }), sep="\n")
+        cat("\n")
+        if (length(.bound) == 0){
+            .bound <- ""
+        } else if (length(.bound) >= 2){
+            .bound <- .bound[order(sapply(.bound, nchar))];
+            if (.bound[1]=="x"){
+                .bound <- .bound[-1];
+            }
+            .bound <- .bound[1];
+        } else if (.bound=="x"){
+            .parent <- globalenv();
+            .bound2 <- do.call("c", lapply(ls(.parent), function(.cur){
+                                        if (identical(.parent[[.cur]], x)){
+                                            return(.cur)
+                                        }
+                                        return(NULL);
+                                    }))
+            if (length(.bound2) > 0){
+                .bound <- .bound2[order(sapply(.bound2, nchar))];
+                .bound <- .bound[1]
+            }
+        }
+        if (is.na(get("objective",x$env))) {
+            cat(sprintf(" Gaussian/Laplacian Likelihoods: AIC(%s) or %s etc.",
                         crayon::yellow(.bound),
                         paste0(crayon::yellow(.bound),crayon::bold$blue("$objf"))), "\n")
-        cat(sprintf(" FOCEi CWRES & Likelihoods: addCwres(%s)",
+            cat(sprintf(" FOCEi CWRES & Likelihoods: addCwres(%s)",
                         crayon::yellow(.bound)), "\n")
-    } else {
-        print(x$objDf)
-    }
-    cat(paste0("\n", cli::rule(paste0(crayon::bold("Time"), " (sec; ", crayon::yellow(.bound), crayon::bold$blue("$time"), "):"))),"\n");
-    print(x$time)
-    .boundChar <- nchar(.bound);
-    if (2*.boundChar+54 < .width){
-        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::yellow(.bound), crayon::bold$blue("$parFixedDf"), "):"))),"\n");
-    } else if (.boundChar+54 < .width) {
-        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::yellow(.bound), crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))),"\n");
-    } else {
-        cat(paste0("\n", cli::rule(paste0(crayon::bold("Population Parameters"), " (", crayon::bold$blue("$parFixed"), " or ", crayon::bold$blue("$parFixedDf"), "):"))),"\n")
-    }
-    .file <- raw(0L)
-    .pf <- .captureOutput(print(x$parFixed))
-    if (crayon::has_color()){
-        .pf <- gsub(rex::rex(capture(.regNum), "%>"), "\033[1;31m\\1%\033[0m ", .pf, perl=TRUE)
-        .pf <- gsub(rex::rex(capture(.regNum), "%="), "\033[1;32m\\1%\033[0m ", .pf, perl=TRUE)
-        .pf <- gsub(rex::rex(capture(.regNum), "="), "\033[1;32m\\1\033[0m ", .pf, perl=TRUE)
-        .pf <- gsub(rex::rex(capture(.regNum), "%<"), "\\1% ", .pf, perl=TRUE)
-        .tmp <- c(row.names(x$parFixed), names(x$parFixed))
-        .tmp <- .tmp[order(-sapply(.tmp, nchar))]
-        .pf <- gsub(rex::rex(boundary,capture(or(.tmp)), boundary), "\033[1m\\1\033[0m", .pf, perl=TRUE);
-        .pf <- gsub(rex::rex(capture(or(.tmp))), "\033[1m\\1\033[0m", .pf, perl=TRUE);
-        .pf <- gsub(rex::rex("FIXED"), "\033[1;32mFIXED\033[0m", .pf, perl=TRUE)
-        .pf <- gsub(rex::rex("fix(",capture(.regNum),")"), "\033[1;32mfix(\\1)\033[0m", .pf, perl=TRUE)
-    } else {
-        .pf <- gsub(rex::rex(capture(.regNum), "%", or(">", "=", "<")), "\\1% ", .pf, perl=TRUE)
-        .pf <- gsub(rex::rex(capture(.regNum), "="), "\\1 ", .pf, perl=TRUE)
-    }
-    cat(paste(.pf, collapse="\n"), "\n")
-    .mu <- dim(x$omega)[1] == length(x$mu.ref)
-    if (!.mu){
-        cat(paste0("\n", cli::rule(paste0(crayon::bold("BSV Covariance"), " (", crayon::yellow(.bound), crayon::bold$blue("$omega"), "):"))),"\n");
-        print(x$omega);
-        cat(paste0("\n  Not all variables are ", ifelse(use.utf(), "\u03bc", "mu"), "-referenced.\n  Can also see BSV Correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n"))
-    } else {
-        cat("\n");
-    }
-    ## Correlations
-    cat(paste0("  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
-               crayon::bold(x$covMethod), "\n"))
-    if (exists("cor", x$env)){
-        .tmp <- .getR(x$cor);
-        if (any(abs(.tmp) >= getOption("nlmixr.strong.corr", 0.7))){
-            cat(paste0("  Some strong fixed parameter correlations exist (", crayon::yellow(.bound), crayon::bold$blue("$cor"), ") :\n"));
-            .getCorPrint(x$cor);
         } else {
-            cat(paste0("  Fixed parameter correlations in ", crayon::yellow(.bound), crayon::bold$blue("$cor"), "\n"));
+            print(x$objDf)
         }
-    }
-    .tmp <- x$omega
-    diag(.tmp) <- 0;
-    if (.mu){
-        if (all(.tmp == 0)){
-            cat("  No correlations in between subject variability (BSV) matrix\n")
+        cat("\n")
+        .fmt3("Time", .bound, "time", "sec ")
+        cat("\n")
+        print(x$time)
+        cat("\n")
+        .boundChar <- nchar(.bound);
+        if (2*.boundChar+54 < .width){
+            .fmt3("Population Parameters", .bound, c("parFixed", "parFixedDf"))
+        } else if (.boundChar+54 < .width) {
+            .fmt3("Population Parameters", .bound, c("parFixed", "parFixedDf"),
+                  on=c(TRUE, FALSE))
         } else {
-            cat("  Correlations in between subject variability (BSV) matrix:\n")
-            .getCorPrint(x$omega);
+            .fmt3("Population Parameters", .bound, c("parFixed", "parFixedDf"),
+                  on=c(FALSE, FALSE))
         }
-        if (.boundChar*2+70 < .width){
-            cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"),"\n");
+        cat("\n")
+        .file <- raw(0L)
+        .pf <- .captureOutput(print(x$parFixed))
+        if (crayon::has_color()){
+            .pf <- gsub(rex::rex(capture(.regNum), "%>"), "\033[1;31m\\1%\033[0m ", .pf, perl=TRUE)
+            .pf <- gsub(rex::rex(capture(.regNum), "%="), "\033[1;32m\\1%\033[0m ", .pf, perl=TRUE)
+            .pf <- gsub(rex::rex(capture(.regNum), "="), "\033[1;32m\\1\033[0m ", .pf, perl=TRUE)
+            .pf <- gsub(rex::rex(capture(.regNum), "%<"), "\\1% ", .pf, perl=TRUE)
+            .tmp <- c(row.names(x$parFixed), names(x$parFixed))
+            .tmp <- .tmp[order(-sapply(.tmp, nchar))]
+            .pf <- gsub(rex::rex(boundary,capture(or(.tmp)), boundary), "\033[1m\\1\033[0m", .pf, perl=TRUE);
+            .pf <- gsub(rex::rex(capture(or(.tmp))), "\033[1m\\1\033[0m", .pf, perl=TRUE);
+            .pf <- gsub(rex::rex("FIXED"), "\033[1;32mFIXED\033[0m", .pf, perl=TRUE)
+            .pf <- gsub(rex::rex("fix(",capture(.regNum),")"), "\033[1;32mfix(\\1)\033[0m", .pf, perl=TRUE)
         } else {
-            if (.boundChar+43 < .width){
-                cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"),"\n");
-                cat("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)","\n");
+            .pf <- gsub(rex::rex(capture(.regNum), "%", or(">", "=", "<")), "\\1% ", .pf, perl=TRUE)
+            .pf <- gsub(rex::rex(capture(.regNum), "="), "\\1 ", .pf, perl=TRUE)
+        }
+        cat(paste(.pf, collapse="\n"), "\n")
+        .mu <- dim(x$omega)[1] == length(x$mu.ref)
+        if (!.mu){
+            .fmt3("BSV Covariance", .bound, "omega")
+            print(x$omega);
+            cat(paste0("\n  Not all variables are ", ifelse(use.utf(), "\u03bc", "mu"), "-referenced.\n  Can also see BSV Correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n"))
+        }
+        ## Correlations
+        cat(paste0("  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
+                   crayon::bold(x$covMethod), "\n"))
+        if (exists("cor", x$env)){
+            .tmp <- .getR(x$cor);
+            if (any(abs(.tmp) >= getOption("nlmixr.strong.corr", 0.7))){
+                cat(paste0("  Some strong fixed parameter correlations exist (", crayon::yellow(.bound), crayon::bold$blue("$cor"), ") :\n"));
+                .getCorPrint(x$cor);
             } else {
-                cat(paste0("  Full BSV covariance (", crayon::bold$blue("$omega"), ")\n"));
-                cat("    or correlation (", crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n");
+                cat(paste0("  Fixed parameter correlations in ", crayon::yellow(.bound), crayon::bold$blue("$cor"), "\n"));
+            }
+        }
+        .tmp <- x$omega
+        diag(.tmp) <- 0;
+        if (.mu){
+            if (all(.tmp == 0)){
+                cat("  No correlations in between subject variability (BSV) matrix\n")
+            } else {
+                cat("  Correlations in between subject variability (BSV) matrix:\n")
+                .getCorPrint(x$omega);
+            }
+            if (.boundChar*2+70 < .width){
+                cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"),"\n");
+            } else {
+                if (.boundChar+43 < .width){
+                    cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"),"\n");
+                    cat("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)","\n");
+                } else {
+                    cat(paste0("  Full BSV covariance (", crayon::bold$blue("$omega"), ")\n"));
+                    cat("    or correlation (", crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n");
+                }
+            }
+        }
+        if (.boundChar+74 < .width){
+            cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+                       crayon::yellow(.bound), crayon::bold$blue("$shrink")),"\n");
+        } else {
+            cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+                       crayon::bold$blue("$shrink")),"\n");
+        }
+
+        if (x$message != ""){
+            cat(paste0("  Minimization message (",crayon::yellow(.bound), crayon::bold$blue("$message"), "): "),"\n");
+            cat(paste0("    ", x$message),"\n")
+            if (x$message=="false convergence (8)"){
+                cat("  In an ODE system, false convergence may mean \"useless\" evaluations were performed.\n")
+                cat("  See https://tinyurl.com/yyrrwkce\n")
+                cat("  It could also mean the convergence is poor, check results before accepting fit\n")
+                cat("  You may also try a good derivative free optimization:\n")
+                cat("    nlmixr(...,control=list(outerOpt=\"bobyqa\"))\n")
+            }
+        }
+        if (RxODE::rxIs(x, "nlmixrFitData")){
+            .dfName <- "data.frame";
+            if (RxODE::rxIs(x, "tbl"))  .dfName <- "tibble"
+            if (RxODE::rxIs(x, "data.table"))  .dfName <- "data.table"
+            cat("\n")
+            cat(cli::cli_format_method({cli::cli_rule(paste0(crayon::bold("Fit Data"),
+                                                             " (object",
+                                                             ifelse(.bound == "", "", " "),
+                                                             crayon::yellow(.bound),
+                                                             " is a modified ",
+                                                             crayon::blue(.dfName), "):"))}), sep="\n")
+            if (RxODE::rxIs(x, "tbl") || RxODE::rxIs(x, "data.table")){
+                .oldOpts <- options("tibble.print_max", "tibble.print_min");
+                on.exit(options(tibble.print_max=.oldOpts$tibble.print_max,
+                                tibble.print_min=.oldOpts$tibble.print_min))
+                options(tibble.print_max = 3, tibble.print_min = 3)
+                NextMethod()
+                options(tibble.print_max=.oldOpts$tibble.print_max,
+                        tibble.print_min=.oldOpts$tibble.print_min)
+            } else{
+                print(head(x));
             }
         }
     }
-    if (.boundChar+74 < .width){
-        cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
-                   crayon::yellow(.bound), crayon::bold$blue("$shrink")),"\n");
-    } else {
-        cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
-                       crayon::bold$blue("$shrink")),"\n");
-    }
 
-    if (x$message != ""){
-        cat(paste0("  Minimization message (",crayon::yellow(.bound), crayon::bold$blue("$message"), "): "),"\n");
-        cat(paste0("    ", x$message),"\n")
-        if (x$message=="false convergence (8)"){
-            cat("  In an ODE system, false convergence may mean \"useless\" evaluations were performed.\n")
-            cat("  See https://tinyurl.com/yyrrwkce\n")
-            cat("  It could also mean the convergence is poor, check results before accepting fit\n")
-            cat("  You may also try a good derivative free optimization:\n")
-            cat("    nlmixr(...,control=list(outerOpt=\"bobyqa\"))\n")
-        }
-    }
-    if (RxODE::rxIs(x, "nlmixrFitData")){
-        .dfName <- "data.frame";
-        if (RxODE::rxIs(x, "tbl"))  .dfName <- "tibble"
-        if (RxODE::rxIs(x, "data.table"))  .dfName <- "data.table"
-        cat(paste0("\n", cli::rule(paste0(crayon::bold("Fit Data"), " (object", ifelse(.bound == "", "", " "),
-                                              crayon::yellow(.bound),
-                                              " is a modified ", crayon::blue(.dfName), "):"))),"\n")
-        if (RxODE::rxIs(x, "tbl") || RxODE::rxIs(x, "data.table")){
-            .oldOpts <- options("tibble.print_max", "tibble.print_min");
-            on.exit(options(tibble.print_max=.oldOpts$tibble.print_max,
-                            tibble.print_min=.oldOpts$tibble.print_min))
-            options(tibble.print_max = 3, tibble.print_min = 3)
-            NextMethod()
-            options(tibble.print_max=.oldOpts$tibble.print_max,
-                    tibble.print_min=.oldOpts$tibble.print_min)
-        } else{
-            print(head(x));
-        }
-    }
     return(invisible(x));
 }
 

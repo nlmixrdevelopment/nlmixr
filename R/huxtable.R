@@ -591,7 +591,7 @@ nmLst  <- function(x,
     }
     .rule  <- function(msg){
         message("")
-        message(cli::rule(msg));
+        cli::rule(msg);
         message("")
     }
     if (missing(lst)){

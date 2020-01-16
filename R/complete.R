@@ -30,6 +30,7 @@
 .DollarNames.nlmixrFitCore <- function(x, pattern) {
   .env <- x$env
   .cmp <- c(names(x),
+            "posthoc","notes",
             "logLik", "value", "obf", "ofv", "objf", "OBJF", "objective", "AIC", "BIC",
             "value","obf","ofv", "objf", "sigma", "coefficients", "parHist", "par.hist",
             "parHistStacked", "par.hist.stacked", "omegaR", "omega.R", "par.fixed", "eta",
