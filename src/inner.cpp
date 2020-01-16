@@ -315,7 +315,7 @@ typedef struct {
   double *var;
   double *x;
   unsigned int uzm;
-  int doChol;
+  int doChol=1;
   int doEtaNudge;
 } focei_ind;
 
@@ -592,8 +592,8 @@ void updateTheta(double *theta){
   }
   // Update setOmegaTheta
   NumericVector omegaTheta(op_focei.omegan);
-  std::copy(&op_focei.fullTheta[0] + op_focei.thetan, 
-	    &op_focei.fullTheta[0] + op_focei.thetan + op_focei.omegan, 
+  std::copy(&op_focei.fullTheta[0] + op_focei.ntheta, 
+	    &op_focei.fullTheta[0] + op_focei.ntheta + op_focei.omegan, 
 	    omegaTheta.begin());
   setOmegaTheta(omegaTheta);
   if (op_focei.fo){
@@ -1252,12 +1252,12 @@ void thetaReset(double size){
   mat etaRes =  op_focei.eta1SD % op_focei.etaM; //op_focei.cholOmegaInv * etaMat;    
   for (unsigned int j = etaRes.n_rows; j--;){
     if (std::fabs(etaRes(j, 0)) >= size){ // Says reset
-      NumericVector thetaIni(op_focei.thetan);
-      for (int ii = op_focei.thetan; ii--;){
+      NumericVector thetaIni(op_focei.ntheta);
+      for (int ii = op_focei.ntheta; ii--;){
 	thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
       }
       for (int ii = op_focei.muRefN; ii--;){
-	if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < op_focei.thetan){
+	if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < (int)op_focei.ntheta){
 	  thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
 	}
       }
@@ -1265,7 +1265,7 @@ void thetaReset(double size){
       for (int ii = rx->nsub; ii--;){
 	focei_ind *fInd = &(inds_focei[ii]);
 	for (int jj = op_focei.neta; jj--; ){
-	  if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < op_focei.thetan){
+	  if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < (int)op_focei.ntheta){
 	    etaMat(ii, jj) = fInd->eta[jj]-op_focei.etaM(jj,0);
 	  } else {
 	    etaMat(ii, jj) = fInd->eta[jj];
@@ -1275,8 +1275,8 @@ void thetaReset(double size){
       // Update omega estimates
       NumericVector omegaTheta(op_focei.omegan);
 	  
-      std::copy(&op_focei.fullTheta[0] + op_focei.thetan, 
-		&op_focei.fullTheta[0] + op_focei.thetan + op_focei.omegan, 
+      std::copy(&op_focei.fullTheta[0] + op_focei.ntheta, 
+		&op_focei.fullTheta[0] + op_focei.ntheta + op_focei.omegan, 
 		omegaTheta.begin());
       Function loadNamespace("loadNamespace", R_BaseNamespace);
       Environment nlmixr = loadNamespace("nlmixr");
@@ -2069,10 +2069,10 @@ static inline void foceiSetupTrans_(CharacterVector pars){
   std::string thetaS;
   std::string etaS;
   std::string cur;
-  op_focei.etaTrans    = Calloc(op_focei.neta + 3*(op_focei.thetan + op_focei.omegan), int); //[neta]
+  op_focei.etaTrans    = Calloc(op_focei.neta + 3*(op_focei.ntheta + op_focei.omegan), int); //[neta]
   op_focei.xPar        = op_focei.etaTrans +op_focei.neta; // [ntheta+nomega]
-  op_focei.thetaTrans  = op_focei.xPar + op_focei.thetan + op_focei.omegan; // [ntheta+nomega]
-  op_focei.fixedTrans  = op_focei.thetaTrans + op_focei.thetan + op_focei.omegan; // [ntheta + nomega]
+  op_focei.thetaTrans  = op_focei.xPar + op_focei.ntheta + op_focei.omegan; // [ntheta+nomega]
+  op_focei.fixedTrans  = op_focei.thetaTrans + op_focei.ntheta + op_focei.omegan; // [ntheta + nomega]
   
   op_focei.fullTheta   = Calloc(4*(op_focei.ntheta+op_focei.omegan), double); // [ntheta+omegan]
   op_focei.theta       = op_focei.fullTheta+op_focei.ntheta+op_focei.omegan; // [ntheta + omegan]
@@ -2141,7 +2141,11 @@ static inline void foceiSetupTheta_(List mvi,
   }
   std::copy(theta.begin(), theta.end(), &op_focei.fullTheta[0]); 
   std::copy(omegaTheta.begin(), omegaTheta.end(), &op_focei.fullTheta[0]+thetan);
-  op_focei.thetan = thetan;
+  if ((int)op_focei.ntheta != (int)thetan){
+    rxOptionsFreeFocei();
+    stop("op_focei.ntheta(%d) != thetan(%d)", op_focei.ntheta, thetan);
+  }
+  op_focei.ntheta = thetan;
   op_focei.omegan = omegan;
   int k = 0;
   for (j = 0; j < npars+fixedn; j++){
@@ -2312,6 +2316,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.neta = as<int>(odeO["neta"]);
   op_focei.omegan = as<int>(odeO["nomega"]);
   op_focei.ntheta = as<int>(odeO["ntheta"]);
+  // op_focei.ntheta = op_focei.ntheta;
   op_focei.nfixed = as<int>(odeO["nfixed"]);
   if (op_focei.maxOuterIterations <= 0){
     // No scaling.
@@ -2420,7 +2425,7 @@ NumericVector foceiSetup_(const RObject &obj,
   // if (op_focei.printInner > 0){
   //   rx->op->cores=1;
   // }
-  int totN=op_focei.thetan + op_focei.omegan;
+  int totN=op_focei.ntheta + op_focei.omegan;
   NumericVector cEps=odeO["derivEps"];
   if (cEps.size() != 2){
     stop("derivEps must be 2 elements for determining forward difference step size.");
@@ -2775,27 +2780,27 @@ LogicalVector nlmixrEnvSetup(Environment e, double fmin){
 void foceiOuterFinal(double *x, Environment e){
   double fmin = foceiOfv0(x);
   
-  NumericVector theta(op_focei.thetan);
-  std::copy(&op_focei.fullTheta[0],  &op_focei.fullTheta[0] + op_focei.thetan, 
+  NumericVector theta(op_focei.ntheta);
+  std::copy(&op_focei.fullTheta[0],  &op_focei.fullTheta[0] + op_focei.ntheta, 
             theta.begin());
 
-  NumericVector fullTheta(op_focei.thetan+op_focei.omegan);
-  std::copy(&op_focei.fullTheta[0],  &op_focei.fullTheta[0] + op_focei.thetan + op_focei.omegan, 
+  NumericVector fullTheta(op_focei.ntheta+op_focei.omegan);
+  std::copy(&op_focei.fullTheta[0],  &op_focei.fullTheta[0] + op_focei.ntheta + op_focei.omegan, 
             fullTheta.begin());
-  LogicalVector thetaFixed(op_focei.thetan);
-  std::fill_n(thetaFixed.begin(),op_focei.thetan, true);
+  LogicalVector thetaFixed(op_focei.ntheta);
+  std::fill_n(thetaFixed.begin(),op_focei.ntheta, true);
   int j;
   for (int k = op_focei.npars; k--;){
     j=op_focei.fixedTrans[k];
     if (j < thetaFixed.size()) thetaFixed[j]=false;
   }
-  // std::copy(&op_focei.thetaFixed[0],  &op_focei.thetaFixed[0] + op_focei.thetan, 
+  // std::copy(&op_focei.thetaFixed[0],  &op_focei.thetaFixed[0] + op_focei.ntheta, 
   //           thetaFixed.begin());
-  NumericVector lowerIn(op_focei.thetan);
-  NumericVector upperIn(op_focei.thetan);
-  std::copy(&op_focei.lowerIn[0],  &op_focei.lowerIn[0] + op_focei.thetan, 
+  NumericVector lowerIn(op_focei.ntheta);
+  NumericVector upperIn(op_focei.ntheta);
+  std::copy(&op_focei.lowerIn[0],  &op_focei.lowerIn[0] + op_focei.ntheta, 
             lowerIn.begin());
-  std::copy(&op_focei.upperIn[0],  &op_focei.upperIn[0] + op_focei.thetan, 
+  std::copy(&op_focei.upperIn[0],  &op_focei.upperIn[0] + op_focei.ntheta, 
             upperIn.begin());
   e["theta"] = DataFrame::create(_["lower"]=lowerIn, _["theta"]=theta, _["upper"]=upperIn,
 				 _["fixed"]=thetaFixed);
@@ -4062,12 +4067,12 @@ NumericMatrix foceiCalcCov(Environment e){
     op_focei.resetEtaSize = R_PosInf; // Dont reset ETAs
     op_focei.resetEtaSize=0; // Always reset ETAs.
     NumericVector fullT = e["fullTheta"];
-    NumericVector fullT2(op_focei.thetan);
+    NumericVector fullT2(op_focei.ntheta);
     std::copy(fullT.begin(), fullT.begin()+fullT2.size(), fullT2.begin());
-    LogicalVector skipCov(op_focei.thetan+op_focei.omegan);//skipCovN
+    LogicalVector skipCov(op_focei.ntheta+op_focei.omegan);//skipCovN
     if (op_focei.skipCovN == 0){
-      std::fill_n(skipCov.begin(), op_focei.thetan, false);
-      std::fill_n(skipCov.begin()+op_focei.thetan, skipCov.size() - op_focei.thetan, true);
+      std::fill_n(skipCov.begin(), op_focei.ntheta, false);
+      std::fill_n(skipCov.begin()+op_focei.ntheta, skipCov.size() - op_focei.ntheta, true);
     } else {
       std::copy(&op_focei.skipCov[0],&op_focei.skipCov[0]+op_focei.skipCovN,skipCov.begin());
       std::fill_n(skipCov.begin()+op_focei.skipCovN,skipCov.size()-op_focei.skipCovN,true);
