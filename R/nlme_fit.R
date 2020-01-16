@@ -232,7 +232,7 @@ nlme_lin_cmpt <- function(dat, parModel,
     if (Sys.getenv("nlmixr_silent") == "TRUE"){
         ret <- NULL;
         cur.env <- environment()
-        R.utils::captureOutput(assign("ret", .collectWarnings(do.call(nlme, mod.specs)), envir=cur.env));
+        .captureOutput(assign("ret", .collectWarnings(do.call(nlme, mod.specs)), envir=cur.env));
     } else {
         ret <- .collectWarnings(do.call(nlme, mod.specs));
     }
@@ -498,7 +498,7 @@ nlme_ode <- function(dat.o, model, parModel, parTrans,
     if (Sys.getenv("nlmixr_silent") == "TRUE"){
         ret <- NULL;
         cur.env <- environment()
-        R.utils::captureOutput(assign("ret", .collectWarnings(do.call(nlme, mod.specs)), envir=cur.env));
+        .captureOutput(assign("ret", .collectWarnings(do.call(nlme, mod.specs)), envir=cur.env));
     } else {
         ret <- .collectWarnings(do.call(nlme, mod.specs));
     }
