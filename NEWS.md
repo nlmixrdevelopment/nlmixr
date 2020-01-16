@@ -16,5 +16,8 @@
  - Added auto-completion of `nlmixr` object properties accessed by
    `$`. This works for major editors including `Rstudio`, `ESS`, and
    Base R itself.
+ 
+ - Changed the way that Rstudio notebooks display `nlmixr` objects; It
+   should be more legible in Rstudio.
 
 Note this includes all the RxODE changes *including* dropping python.
