@@ -5,17 +5,15 @@ rxPermissive({
     ## give quite different results.  However, FOCE doesn't work as
     ## well with prop models.
 
-    .foceiFit <- function(...){
+    .foceiFit <- function(...) {
         suppressWarnings(foceiFit(...));
     }
 
-    mypar1 = function ()
-    {
+    mypar1 = function () {
         ke = theta[1] * exp(eta[1]);
     }
 
-    mypar2 = function ()
-    {
+    mypar2 = function () {
         k = theta[1] * exp(eta[1]);
         v = 1
     }
