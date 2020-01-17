@@ -35,7 +35,10 @@ rxPermissive({
     dat$DV <- dat$Y
 
     fit.prop <- .foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1))},
-                         control=foceiControl(maxOuterIterations=0,covMethod=""))
+                          control=foceiControl(maxOuterIterations=0,covMethod=""))
+
+    fit.prop2 <- .foceiFit(dat, inits, mypar1,mod,pred,function(){return(prop(.1))},
+                           control=foceiControl(maxOuterIterations=0,covMethod="", optExpression = FALSE))
 
 
     test_that("Matches NONMEM objective proportional function; (Based on Wang2007)", {
@@ -59,6 +62,29 @@ rxPermissive({
         ## Note that E[x] for CPRED and CPREDI are equal
         expect_equal(round(fit.prop$CRES, 4), round(out.focei.prop$CRESI, 4)) # match NONMEM output
         expect_equal(round(fit.prop$CPRED, 4), round(out.focei.prop$CPREDI, 4)) # match NONMEM output
+    })
+    test_that("Matches NONMEM objective proportional function; (Based on Wang2007; unoptimized)", {
+        # Check unoptimized expression
+        expect_equal(round(fit.prop2$objective, 3), 39.458); # Matches Table 2 Prop FOCEI for NONMEM
+        expect_equal(round(fit.prop2$`ETA[1]`, 4), round(out.focei.prop$ETA1, 4)) # match NONMEM output
+        ## Individual properties
+        expect_equal(round(fit.prop2$IPRED, 4), round(out.focei.prop$IPRE, 4))
+        expect_equal(round(fit.prop2$IRES, 4), round(out.focei.prop$IRES, 4))
+        expect_equal(round(fit.prop2$IWRES, 4), round(out.focei.prop$IWRES, 4))
+        ## WRES variants
+        expect_equal(round(fit.prop2$PRED, 4), round(out.focei.prop$NPRED, 4)) # matches output of PRED from NONMEM
+        expect_equal(round(fit.prop2$PRED, 4), round(out.focei.prop$PRED, 4)) # matches output of PRED from NONMEM
+        expect_equal(round(fit.prop2$RES, 4), round(out.focei.prop$RES, 4)) # match NONMEM output
+        expect_equal(round(fit.prop2$RES, 4), round(out.focei.prop$NRES, 4)) # match NONMEM output
+        ## FOI equivalents
+        expect_equal(round(fit.prop2$PRED, 4), round(out.focei.prop$PREDI, 4)) # matches output of PRED from NONMEM
+        ## CWRES variants
+        expect_equal(round(fit.prop2$CRES, 4), round(out.focei.prop$CRES, 4)) # match NONMEM output
+        expect_equal(round(fit.prop2$CPRED, 4), round(out.focei.prop$CPRED, 4)) # match NONMEM output
+        expect_equal(round(fit.prop2$CWRES, 4), round(out.focei.prop$CWRES, 4)) # match NONMEM output
+        ## Note that E[x] for CPRED and CPREDI are equal
+        expect_equal(round(fit.prop2$CRES, 4), round(out.focei.prop$CRESI, 4)) # match NONMEM output
+        expect_equal(round(fit.prop2$CPRED, 4), round(out.focei.prop$CPREDI, 4)) # match NONMEM output
     })
 
     m1 <- RxODE({
