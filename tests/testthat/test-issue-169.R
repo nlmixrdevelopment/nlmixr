@@ -3,10 +3,6 @@ RxODE::rxPermissive({
   context("Make sure SAEM/nlme throws an error with time varying covariates")
   test_that("Error w/time-varying covariates",{
 
-    hasSymPy  <- try(RxODE::rxSymPyVersion());
-    skip_if(inherits(hasSymPy, "try-error"))
-    skip_if(hasSymPy < 1.0)
-
     d <- theo_sd
     ## Make this time-varying
     d$WT[d$TIME > 12]  <- d$WT[d$TIME > 12]+0.01;
