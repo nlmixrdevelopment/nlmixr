@@ -17,6 +17,7 @@
 #define min2( a , b )  ( (a) < (b) ? (a) : (b) )
 #define max2( a , b )  ( (a) > (b) ? (a) : (b) )
 #define innerOde(id) ind_solve(rx, id, rxInner.dydt_liblsoda, rxInner.dydt_lsoda_dum, rxInner.jdum_lsoda, rxInner.dydt, rxInner.update_inis, rxInner.global_jt)
+#define predOde(id) ind_solve(rx, id, rxPred.dydt_liblsoda, rxPred.dydt_lsoda_dum, rxPred.jdum_lsoda, rxPred.dydt, rxPred.update_inis, rxPred.global_jt)
 #define getCholOmegaInv() (as<arma::mat>(RxODE::rxSymInvCholEnvCalculate(_rxInv, "chol.omegaInv", R_NilValue)))
 #define getOmega() (as<NumericMatrix>(RxODE::rxSymInvCholEnvCalculate(_rxInv, "omega", R_NilValue)))
 #define getOmegaMat() (as<arma::mat>(RxODE::rxSymInvCholEnvCalculate(_rxInv, "omega", R_NilValue)))
@@ -120,6 +121,7 @@ typedef struct {
   int *etaTrans;
   int *etaFD;
   double eventFD;
+  int predNeq;
   int eventCentral;
 
   int neta;
@@ -377,6 +379,7 @@ typedef struct {
   int global_jt = 2;
   int global_mf = 22;  
   int global_debug = 0;
+  int neq = NA_INTEGER;
 } rxSolveF;
 
 rxSolveF rxInner;
@@ -688,6 +691,7 @@ double likInner0(double *eta){
       fInd->llik=0.0;
       fInd->tbsLik=0.0;
       double f, err, r, fpm, rp,lnr;
+      int oldNeq = op->neq;
       for (j = ind->n_all_times; j--;){
 	if (isDose(ind->evid[j])){
 	  ind->tlast = ind->all_times[j];
@@ -711,8 +715,38 @@ double likInner0(double *eta){
 	    B(k, 0) = err; // res
 	    Vid(k, k) = r;
 	    for (i = op_focei.neta; i--; ){
-	      a(k, i) = ind->lhs[i+1];
+	      if (op_focei.etaFD[i]==0){
+		a(k, i) = ind->lhs[i+1];
+	      }
 	    }
+	    op->neq = op_focei.predNeq;
+	    for (i = op_focei.neta; i--; ){
+	      if (op_focei.etaFD[i]==1){
+		// Calculate derivatives by finite difference
+		ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
+		predOde(id); // Assumes same order of parameters
+		rxPred.calc_lhs((int)id, ind->all_times[j],
+				&ind->solve[j * op->neq], // Solve space is smaller
+				ind->lhs);
+		ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
+		if (!op_focei.eventCentral) {
+		  // Forward difference
+		  // LHS #0 =  f
+		  a(k, i) = (ind->lhs[0]-f)/op_focei.eventFD;
+		} else {
+		  // Central Difference
+		  fpm = ind->lhs[0];
+		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
+		  predOde(id); // Assumes same order of parameters
+		  rxPred.calc_lhs((int)id, ind->all_times[j],
+				  &ind->solve[j * op->neq], // Solve space is smaller
+				  ind->lhs);
+		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
+		  a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
+		}
+	      }
+	    }
+	    op->neq = oldNeq;
 	    // Ci = fpm %*% omega %*% t(fpm) + Vi; Vi=diag(r)
 	  } else {
 	    lnr =_safe_log(ind->lhs[op_focei.neta + 1]);
@@ -720,27 +754,100 @@ double likInner0(double *eta){
 	    // B(k, 0) = 2.0/ind->lhs[op_focei.neta+1];
 	    // lhs 0 = F
 	    // lhs 1-eta = df/deta
-	    // FIXME faster initiliaitzation via copy or elim
+	    // FIXME faster initialization via copy or elm
 	    // Rprintf("id: %d k: %d j: %d\n", id, k, j);
 	    B(k, 0) = 2.0/_safe_zero(r);
-	    if (op_focei.interaction == 1){
-	      for (i = op_focei.neta; i--; ){
-		fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
-		rp  = ind->lhs[i + op_focei.neta + 2];
-		c(k, i) = rp/_safe_zero(r);
-		// lp is eq 12 in Almquist 2015
-		// // .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
-		lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) - 0.5 * c(k, i) - 
-		  0.5 * err * fpm * B(k, 0);
+	    if (op_focei.interaction == 1) {
+	      for (i = op_focei.neta; i--; ) {
+		if (op_focei.etaFD[i]==0){
+		  fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
+		  rp  = ind->lhs[i + op_focei.neta + 2];
+		  c(k, i) = rp/_safe_zero(r);
+		}
 	      }
+	      // Cannot combine for loop with for loop above because
+	      // calc_lhs overwrites the lhs memory.
+	      op->neq = op_focei.predNeq;
+	      for (i = op_focei.neta; i--; ) {
+		// Calculate finite difference derivatives if needed
+		if (op_focei.etaFD[i]==1){
+		  // Calculate derivatives by finite difference
+		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
+		  predOde(id); // Assumes same order of parameters
+		  rxPred.calc_lhs((int)id, ind->all_times[j],
+				&ind->solve[j * op->neq], // Solve space is smaller
+				ind->lhs);
+		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
+		  if (!op_focei.eventCentral) {
+		    // Forward difference
+		    // LHS #0 =  f
+		    a(k, i) = fpm = (ind->lhs[0]-f)/op_focei.eventFD;
+		    // LHS #1 =  r
+		    rp  = (ind->lhs[1]-r)/op_focei.eventFD;
+		    c(k, i) = rp/_safe_zero(r);
+		  } else {
+		    // Central difference
+		    fpm = ind->lhs[0];
+		    rp = ind->lhs[1];
+		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
+		    rxPred.calc_lhs((int)id, ind->all_times[j],
+				    &ind->solve[j * op->neq], // Solve space is smaller
+				    ind->lhs); // nlhs is smaller
+		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
+		    rp = (rp-ind->lhs[1])/(2*op_focei.eventFD);
+		    c(k, i) = rp/_safe_zero(r);
+		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
+		  }
+		} else {
+		  fpm = a(k, i);
+		}
+		// This is calculated at the end; That way it is
+		// correct for finite difference and sensitivity.
+
+		//lp is eq 12 in Almquist 2015
+		// .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
+		lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) -
+		  0.5 * c(k, i) - 0.5 * err * fpm * B(k, 0);
+	      }
+	      op->neq = oldNeq;
 	      // Eq #10
 	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
 	      fInd->llik += err * err/r + lnr;
 	    } else if (op_focei.interaction == 0){
 	      for (i = op_focei.neta; i--; ){
-		fpm = a(k, i) = ind->lhs[i + 1];
+		if (op_focei.etaFD[i]==0){
+		  a(k, i) = ind->lhs[i + 1];
+		}
+	      }
+	      op->neq = op_focei.predNeq;
+	      for (i = op_focei.neta; i--;){
+		if (op_focei.etaFD[i]==1){
+		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
+		  predOde(id); // Assumes same order of parameters
+		  rxPred.calc_lhs((int)id, ind->all_times[j],
+				&ind->solve[j * op->neq], // Solve space is smaller
+				ind->lhs);
+		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
+		  if (!op_focei.eventCentral) {
+		    // Forward difference
+		    fpm = a(k, i) = (ind->lhs[0]-f)/op_focei.eventFD;
+		  } else {
+		    // Central difference
+		    fpm = f;
+		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
+		    predOde(id); // Assumes same order of parameters
+		    rxPred.calc_lhs((int)id, ind->all_times[j],
+				&ind->solve[j * op->neq], // Solve space is smaller
+				ind->lhs);
+		    fpm = a(k, i) = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
+		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
+		  }
+		} else {
+		  fpm = a(k, i);
+		}
 		lp(i, 0) -= 0.5 * err * fpm * B(k, 0);
 	      }
+	      op->neq = oldNeq;
 	      // Eq #10
 	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
 	      fInd->llik += err * err/_safe_zero(r) + lnr;
@@ -2073,10 +2180,11 @@ static inline void foceiSetupTrans_(CharacterVector pars){
   std::string thetaS;
   std::string etaS;
   std::string cur;
-  op_focei.etaTrans    = Calloc(op_focei.neta + 3*(op_focei.ntheta + op_focei.omegan), int); //[neta]
+  op_focei.etaTrans    = Calloc(op_focei.neta*2 + 3*(op_focei.ntheta + op_focei.omegan), int); //[neta]
   op_focei.xPar        = op_focei.etaTrans +op_focei.neta; // [ntheta+nomega]
   op_focei.thetaTrans  = op_focei.xPar + op_focei.ntheta + op_focei.omegan; // [ntheta+nomega]
   op_focei.fixedTrans  = op_focei.thetaTrans + op_focei.ntheta + op_focei.omegan; // [ntheta + nomega]
+  op_focei.etaFD       = op_focei.fixedTrans + op_focei.ntheta + op_focei.omegan; // [neta]
   
   op_focei.fullTheta   = Calloc(4*(op_focei.ntheta+op_focei.omegan), double); // [ntheta+omegan]
   op_focei.theta       = op_focei.fullTheta+op_focei.ntheta+op_focei.omegan; // [ntheta + omegan]
@@ -2619,6 +2727,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.etaNudge = as<double>(odeO["etaNudge"]);
   op_focei.eventFD = as<double>(odeO["eventFD"]);
   op_focei.eventCentral = as<double>(odeO["eventCentral"]);
+  op_focei.predNeq = as<int>(odeO["predNeq"]);
   op_focei.gradProgressOfvTime = as<double>(odeO["gradProgressOfvTime"]);
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
@@ -4972,6 +5081,18 @@ Environment foceiFitCpp_(Environment e){
 		  as<NumericVector>(e["thetaIni"]), e["thetaFixed"], e["skipCov"],
 		  as<RObject>(e["rxInv"]), e["lower"], e["upper"], e["etaMat"],
 		  e["control"]);
+      if (model.containsElementNamed("pred.nolhs")){
+	RObject noLhs = model["pred.nolhs"];
+	if (RxODE::rxIs(noLhs, "RxODE")) {
+	  List mvp = RxODE::rxModelVars_(noLhs);
+	  rxUpdateFuns(as<SEXP>(mvp["trans"]), &rxPred);
+	}
+      }
+      // Now setup which ETAs need a finite difference
+      if (model.containsElementNamed("eventEta")) {
+	IntegerVector eventEta = model["eventEta"];
+	std::copy(eventEta.begin(), eventEta.end(),&op_focei.etaFD[0]);
+      }
     } else if (model.containsElementNamed("pred.only")){
       inner = model["pred.only"];
       if (RxODE::rxIs(inner, "RxODE")){
