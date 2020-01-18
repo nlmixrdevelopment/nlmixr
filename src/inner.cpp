@@ -16,7 +16,7 @@
 #define NSUBs 100
 #define min2( a , b )  ( (a) < (b) ? (a) : (b) )
 #define max2( a , b )  ( (a) > (b) ? (a) : (b) )
-#define innerOde(id) ind_solve(rx, id, inner_dydt_liblsoda, inner_dydt_lsoda_dum, inner_jdum_lsoda, inner_dydt, inner_update_inis, inner_global_jt)
+#define innerOde(id) ind_solve(rx, id, rxInner.dydt_liblsoda, rxInner.dydt_lsoda_dum, rxInner.jdum_lsoda, rxInner.dydt, rxInner.update_inis, rxInner.global_jt)
 #define getCholOmegaInv() (as<arma::mat>(RxODE::rxSymInvCholEnvCalculate(_rxInv, "chol.omegaInv", R_NilValue)))
 #define getOmega() (as<NumericMatrix>(RxODE::rxSymInvCholEnvCalculate(_rxInv, "omega", R_NilValue)))
 #define getOmegaMat() (as<arma::mat>(RxODE::rxSymInvCholEnvCalculate(_rxInv, "omega", R_NilValue)))
@@ -118,6 +118,9 @@ typedef struct {
   // Where likelihood is saved.
   
   int *etaTrans;
+  int *etaFD;
+  double eventFD;
+  int eventCentral;
 
   int neta;
   unsigned int ntheta;
@@ -356,29 +359,30 @@ void freeFocei(){
   rxOptionsFreeFocei();
 }
 
-t_dydt inner_dydt = NULL;
+typedef struct {
+  // 
+  // std::string estStr;
+  // std::string gradStr;
+  // std::string obfStr;
+  //
+  t_dydt dydt = NULL;
+  t_calc_jac calc_jac = NULL;
+  t_calc_lhs calc_lhs = NULL;
+  t_update_inis update_inis = NULL;
+  t_dydt_lsoda_dum dydt_lsoda_dum = NULL;
+  t_dydt_liblsoda dydt_liblsoda = NULL;
+  t_jdum_lsoda jdum_lsoda = NULL;
+  t_set_solve set_solve = NULL;
+  t_get_solve get_solve = NULL;
+  int global_jt = 2;
+  int global_mf = 22;  
+  int global_debug = 0;
+} rxSolveF;
 
-t_calc_jac inner_calc_jac = NULL;
+rxSolveF rxInner;
+rxSolveF rxPred;
 
-t_calc_lhs inner_calc_lhs = NULL;
-
-t_update_inis inner_update_inis = NULL;
-
-t_dydt_lsoda_dum inner_dydt_lsoda_dum = NULL;
-
-t_dydt_liblsoda inner_dydt_liblsoda = NULL;
-
-t_jdum_lsoda inner_jdum_lsoda = NULL;
-
-t_set_solve inner_set_solve = NULL;
-
-t_get_solve inner_get_solve = NULL;
-
-int inner_global_jt = 2;
-int inner_global_mf = 22;  
-int inner_global_debug = 0;
-
-void rxUpdateInnerFuns(SEXP trans){
+void rxUpdateFuns(SEXP trans, rxSolveF *inner){
   const char *lib, *s_dydt, *s_calc_jac, *s_calc_lhs, *s_inis, *s_dydt_lsoda_dum, *s_dydt_jdum_lsoda, 
     *s_ode_solver_solvedata, *s_ode_solver_get_solvedata, *s_dydt_liblsoda;
   lib = CHAR(STRING_ELT(trans, 0));
@@ -391,37 +395,37 @@ void rxUpdateInnerFuns(SEXP trans){
   s_ode_solver_solvedata = CHAR(STRING_ELT(trans, 11));
   s_ode_solver_get_solvedata = CHAR(STRING_ELT(trans, 12));
   s_dydt_liblsoda = CHAR(STRING_ELT(trans, 13));
-  inner_global_jt = 2;
-  inner_global_mf = 22;  
-  inner_global_debug = 0;
+  inner->global_jt = 2;
+  inner->global_mf = 22;  
+  inner->global_debug = 0;
   if (strcmp(CHAR(STRING_ELT(trans, 1)),"fulluser") == 0){
-    inner_global_jt = 1;
-    inner_global_mf = 21;
+    inner->global_jt = 1;
+    inner->global_mf = 21;
   } else {
-    inner_global_jt = 2;
-    inner_global_mf = 22;
+    inner->global_jt = 2;
+    inner->global_mf = 22;
   }
-  inner_calc_lhs =(t_calc_lhs) R_GetCCallable(lib, s_calc_lhs);
-  inner_dydt =(t_dydt) R_GetCCallable(lib, s_dydt);
-  inner_calc_jac =(t_calc_jac) R_GetCCallable(lib, s_calc_jac);
-  inner_update_inis =(t_update_inis) R_GetCCallable(lib, s_inis);
-  inner_dydt_lsoda_dum =(t_dydt_lsoda_dum) R_GetCCallable(lib, s_dydt_lsoda_dum);
-  inner_jdum_lsoda =(t_jdum_lsoda) R_GetCCallable(lib, s_dydt_jdum_lsoda);
-  inner_set_solve = (t_set_solve)R_GetCCallable(lib, s_ode_solver_solvedata);
-  inner_get_solve = (t_get_solve)R_GetCCallable(lib, s_ode_solver_get_solvedata);
-  inner_dydt_liblsoda = (t_dydt_liblsoda)R_GetCCallable(lib, s_dydt_liblsoda);
+  inner->calc_lhs =(t_calc_lhs) R_GetCCallable(lib, s_calc_lhs);
+  inner->dydt =(t_dydt) R_GetCCallable(lib, s_dydt);
+  inner->calc_jac =(t_calc_jac) R_GetCCallable(lib, s_calc_jac);
+  inner->update_inis =(t_update_inis) R_GetCCallable(lib, s_inis);
+  inner->dydt_lsoda_dum =(t_dydt_lsoda_dum) R_GetCCallable(lib, s_dydt_lsoda_dum);
+  inner->jdum_lsoda =(t_jdum_lsoda) R_GetCCallable(lib, s_dydt_jdum_lsoda);
+  inner->set_solve = (t_set_solve)R_GetCCallable(lib, s_ode_solver_solvedata);
+  inner->get_solve = (t_get_solve)R_GetCCallable(lib, s_ode_solver_get_solvedata);
+  inner->dydt_liblsoda = (t_dydt_liblsoda)R_GetCCallable(lib, s_dydt_liblsoda);
 }
 
-void rxClearInnerFuns(){
-  inner_calc_lhs              = NULL;
-  inner_dydt                  = NULL;
-  inner_calc_jac              = NULL;
-  inner_update_inis           = NULL;
-  inner_dydt_lsoda_dum        = NULL;
-  inner_jdum_lsoda            = NULL;
-  inner_set_solve             = NULL;
-  inner_get_solve             = NULL;
-  inner_dydt_liblsoda         = NULL;
+void rxClearFuns(rxSolveF *inner){
+  inner->calc_lhs              = NULL;
+  inner->dydt                  = NULL;
+  inner->calc_jac              = NULL;
+  inner->update_inis           = NULL;
+  inner->dydt_lsoda_dum        = NULL;
+  inner->jdum_lsoda            = NULL;
+  inner->set_solve             = NULL;
+  inner->get_solve             = NULL;
+  inner->dydt_liblsoda         = NULL;
 }
 
 rx_solve* rx;
@@ -689,7 +693,7 @@ double likInner0(double *eta){
 	  ind->tlast = ind->all_times[j];
 	} else if (ind->evid[j] == 0) {
 	  ind->idx=j;
-	  inner_calc_lhs((int)id, ind->all_times[j],
+	  rxInner.calc_lhs((int)id, ind->all_times[j],
 			 &ind->solve[j * op->neq],
 			 ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
@@ -2134,7 +2138,7 @@ static inline void foceiSetupTheta_(List mvi,
   }
   int npars = thetan+omegan-fixedn;
   if (alloc){
-    rxUpdateInnerFuns(as<SEXP>(mvi["trans"]));
+    rxUpdateFuns(as<SEXP>(mvi["trans"]), &rxInner);
     foceiSetupTrans_(as<CharacterVector>(mvi["params"]));
   } else if (!op_focei.alloc){
     stop("FOCEi problem not allocated\nThis can happen when sympy<->nlmixr interaction is not working correctly.");
@@ -2613,6 +2617,8 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.gradCalcCentralLarge = as<double>(odeO["gradCalcCentralLarge"]);
   op_focei.gradCalcCentralSmall = as<double>(odeO["gradCalcCentralSmall"]);
   op_focei.etaNudge = as<double>(odeO["etaNudge"]);
+  op_focei.eventFD = as<double>(odeO["eventFD"]);
+  op_focei.eventCentral = as<double>(odeO["eventCentral"]);
   op_focei.gradProgressOfvTime = as<double>(odeO["gradProgressOfvTime"]);
   op_focei.initObj=0;
   op_focei.lastOfv=std::numeric_limits<double>::max();
