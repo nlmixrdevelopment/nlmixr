@@ -2827,7 +2827,7 @@ nlmixrPosthoc.default <- function(x, ...){
     if (x$message != ""){
         .c <- c(.c, paste0("  Minimization message (",.bound, "$message): "),
                 paste0("    ", x$message));
-        if (x$message=="false convergence (8)"){f
+        if (x$message=="false convergence (8)"){
             .c <- c(.c, "  In an ODE system, false convergence may mean \"useless\" evaluations were performed.",
                     "  See https://tinyurl.com/yyrrwkce",
                     "  It could also mean the convergence is poor, check results before accepting fit",
