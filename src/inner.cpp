@@ -789,7 +789,9 @@ double likInner0(double *eta){
 		    // Central difference
 		    fpm = ind->lhs[0];
 		    rp = ind->lhs[1];
+		    // LHS #1 =  r
 		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
+		    predOde(id); // Assumes same order of parameters
 		    rxPred.calc_lhs((int)id, ind->all_times[j],
 				    &ind->solve[j * op->neq], // Solve space is smaller
 				    ind->lhs); // nlhs is smaller
