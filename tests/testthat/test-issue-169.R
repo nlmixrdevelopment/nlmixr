@@ -1,7 +1,7 @@
 
 RxODE::rxPermissive({
   context("Make sure SAEM/nlme throws an error with time varying covariates")
-  test_that("Error w/time-varying covariates",{
+  test_that("Error w/time-varying covariates", {
 
     d <- theo_sd
     ## Make this time-varying
