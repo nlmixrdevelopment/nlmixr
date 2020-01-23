@@ -13,8 +13,7 @@ nlmixrPrint(x, ...)
 }
 \description{
 This allows the suppressMessages to work on print functions.  This
-captures the output via R.Util's captureOutput function and then
-sends it through the message routine.
+captures the output function sends it through the message routine.
 }
 \details{
 catpureOutput was used since it is much faster than the internal

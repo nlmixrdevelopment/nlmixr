@@ -1,3 +1,4 @@
+##'@importFrom utils .DollarNames
 ##'@export
 .DollarNames.nlmixrBounds <- function(x, pattern){
   grep(pattern,

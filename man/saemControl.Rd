@@ -75,8 +75,6 @@ achieved. This is also used in the solved linear model to check
       solving, but allows user Jacobian specification.
 \item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
         solving nor user Jacobain specification
-\item \code{"indLin"} -- Solving through inductive linearization.  The RxODE dll
-        must be setup specially to use this solving routine.
 }}
 
 \item{transitAbs}{boolean indicating if this is a transit
