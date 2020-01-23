@@ -256,8 +256,8 @@ vpc.nlmixrVpc <- function(sim, ...){
 }
 
 ##' @rdname vpc_ui
-##' @S3method vpc ui
 ##' @export vpc.ui
+##' @rawNamespace S3method(vpc,ui)
 vpc.ui <- function(sim, ...){
     vpc_ui(fit=sim, ...);
 }

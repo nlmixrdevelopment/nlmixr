@@ -3425,7 +3425,7 @@ setOfv <- function(x, type){
     }
 }
 
-
+##' @importFrom utils capture.output
 .captureOutput <- function (expr, envir = parent.frame()) {
     eval({
         .file <- rawConnection(raw(0L), open = "w")
