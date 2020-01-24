@@ -621,7 +621,9 @@ arma::mat cholSE__(arma::mat A, double tol);
 
 static inline void likM2(focei_ind *fInd, double& limit, double&f, double &r) {
   if (R_FINITE(limit) && !ISNA(limit)) {
-    fInd->llik += -log(1-0.5*(1+erf((limit-f)/sqrt(r)/M_SQRT2)));
+    // When limit < f, this is M2
+    // When limit >=f, the limit is an upper limit (instead of lower limit)
+    fInd->llik += -log(1-0.5*(1+erf(((limit<f)*2-1)*(limit-f)/sqrt(r)/M_SQRT2)));    
   }
 }
 static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, double& dv, double &r) {
@@ -838,29 +840,7 @@ double likInner0(double *eta){
 		if (cens == 0) {
 		  lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) -
 		    0.5 * c(k, i) - 0.5 * err * fpm * B(k, 0);
-		  if (R_FINITE(limit) && !ISNA(limit)) {
-		    // M2/M4 adjustment.
-		    //
-		    // Phi(x) = 1/2*(1+erf(x/sqrt(2)))
-		    // M2/M4 extra log-lik = -log(1-phi((limit-f(x))/sqrt(r(x)))
-		    // or -log(1-1/2*(1+erf(cens*(limit-f(x))/sqrt(r(x))/sqrt(2))))
-		    // From symengine.R
-		    // D(S("-log(1-1/2*(1+erf(cens*(limit-f(x))/sqrt(r(x))/M_SQRT2)))"),"x")
-		    // (Mul)	exp(-cens^2*(limit - f(x))^2/(r(x)*M_SQRT2^2))*(-Derivative(f(x), x)*cens/(sqrt(r(x))*M_SQRT2) + (-1/2)*Derivative(r(x), x)*cens*(limit - f(x))/(r(x)^(3/2)*M_SQRT2))/(sqrt(pi)*(1 + (-1/2)*(1 + erf(cens*(limit - f(x))/(sqrt(r(x))*M_SQRT2)))))
-		    // exp(-(limit - f)^2/(r*M_SQRT2^2))*(-fpm*cens/(sqrt(r)*M_SQRT2) + (-0.5)*rp*cens*(limit - f)/(r^(3/2)*M_SQRT2))/(sqrt(pi)*(1 + (-0.5)*(1 + erf(cens*(limit - f)/(sqrt(r)*M_SQRT2)))))
-		    double rx_expr_0=limit-f;
-		    double rx_expr_1=sqrt(r);
-		    double rx_expr_2=rx_expr_1*M_SQRT2;
-		    // erf(0) = 0
-		    lp(i, 0) += exp(-(rx_expr_0*rx_expr_0)/(r*2))*
-		      (-fpm*cens/(rx_expr_2)-0.5*rp*cens*(rx_expr_0)/(R_pow(r,1.5)*M_SQRT2))/(M_SQRT_PI*0.5);
-		  }
 		} else {
-		  // Censoring
-		  // Here dv = LLOQ when cens = 1 or dv=ULOQ when cens = -1
-		  // limit is the lower limit like 0 for M4
-		  // Assumption is dv > limit with cens=1 OR dv < limit with cens=-1
-		  // Check fpm is df/dt instead of -df/dt
 		  if (R_FINITE(limit)){
 		    // M3 method
 		    // logLik = log(phi((QL-f(x)/sqrt(g(x)))))
@@ -943,18 +923,6 @@ double likInner0(double *eta){
 		}
 		if (cens == 0){
 		  lp(i, 0) -= 0.5 * err * fpm * B(k, 0);
-		  // if (!std::isinf(limit)){
-		    // M2/M4 adjustment.
-		    //
-		    // Phi(x) = 1/2*(1+erf(x/sqrt(2)))
-		    // M2/M4 extra log-lik = -log(1-phi((limit-f(x))/sqrt(r(x)))
-		    // or -log(1-1/2*(1+erf(cens*(limit-f(x))/sqrt(r(x))/sqrt(2))))
-		    // From symengine.R
-		    // D(S("-log(1-1/2*(1+erf(cens*(limit-f(x))/sqrt(r)/M_SQRT2)))"),"x")
-		    // -exp(-cens^2*(limit - f(x))^2/(r*M_SQRT2^2))*Derivative(f(x), x)*cens/(sqrt(r)*sqrt(pi)*(1 + (-1/2)*(1 + erf(cens*(limit - f(x))/(sqrt(r)*M_SQRT2))))*M_SQRT2)
-		    // -exp(-0.5*(limit - f)^2/r)*fpm*cens/(sqrt(r)*M_SQRT_PI*(1-0.5*(1 + erf(cens*(limit - f)/(sqrt(r)*M_SQRT2))))*M_SQRT2)
-		    // Since cens == 0, the above expression = 0
-		  // }
 		} else {
 		  if (std::isinf(limit)){
 		    // M3 method
