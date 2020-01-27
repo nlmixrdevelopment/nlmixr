@@ -1011,7 +1011,40 @@ foceiControl <- function(sigdig=3,...,
     .ret$x <- .ret$par;
     .ret$message <- .ret$msg;
     .ret$convergence <- .ret$ierr
+    .ret$value <- .ret$fval
     return(.ret);
+}
+
+.lbfgsb3c <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .w <- which(names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint"))
+    .control <- control[.w];
+    .ret <- lbfgsb3c::lbfgsb3c(par = as.vector(par), fn=fn, gr=gr, lower=lower, upper=upper, control=.control);
+    .ret$x <- .ret$par;
+    return(.ret);
+}
+
+.lbfgsbO <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .control <- control[names(control) %in% c("trace","factr","pgtol","abstol","reltol","lmm","maxit","iprint")]
+    .w <- which(sapply(.control, is.null));
+    .control <- .control[-.w];
+    .ret <- optim(par=par, fn=fn, gr = gr, method = "L-BFGS-B",
+           lower = lower, upper = upper,
+           control = .control, hessian = FALSE);
+    .ret$x <- .ret$par;
+    return(.ret);
+}
+
+.mymin <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
+    .control <- control[names(control) %in% c("eval.max", "iter.max", "trace", "abs.tol",
+                                              "rel.tol","x.tol","xf.tol","step.min", "step.max","sing.tol","scale.init","diff.g")]
+
+    if (all(lower != -Inf) | all(upper != Inf)){
+        warning("Optimization: Boundaries not used in Nelder-Mead")
+    }
+    fit = mymin(par, fn, control=.control);
+    fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
+    fit$x <- fit$par;
+    return(fit)
 }
 
 .nlminb <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
@@ -1055,8 +1088,10 @@ foceiControl <- function(sigdig=3,...,
     .ret <- nloptr::nloptr(x0=par, eval_f=fn, eval_grad_f=gr,
                            lb=lower, ub=upper,
                            opts=.ctl)
+    .ret$par <- .ret$solution;
     .ret$x <- .ret$solution;
     .ret$convergence <- .ret$status;
+    .ret$value <- .ret$objective
     return(.ret);
 }
 
@@ -1073,8 +1108,10 @@ foceiControl <- function(sigdig=3,...,
     .ret <- nloptr::nloptr(x0=par, eval_f=fn,
                            lb=lower, ub=upper,
                            opts=.ctl)
+    .ret$par <- .ret$solution;
     .ret$x <- .ret$solution;
     .ret$convergence <- .ret$status;
+    .ret$value <- .ret$objective
     return(.ret);
 }
 
@@ -1103,8 +1140,10 @@ foceiControl <- function(sigdig=3,...,
     .ret <- nloptr::nloptr(x0=par, eval_f=fn, eval_grad_f=gr,
                            lb=lower, ub=upper,
                            opts=.ctl)
+    .ret$par <- .ret$solution;
     .ret$x <- .ret$solution;
     .ret$convergence <- .ret$status;
+    .ret$value <- .ret$objective
     return(.ret);
 }
 
@@ -2673,9 +2712,9 @@ vcov.nlmixrFitCoreSilent  <- vcov.nlmixrFitCore
 
 
 .getR <- function(x,sd=FALSE){
-    .rs <- x
+    .rs <- x$omegaR
     .lt <- lower.tri(.rs);
-    .dn1 <- dimnames(x)[[2]]
+    .dn1 <- dimnames(x$omegaR)[[2]]
     .nms <- apply(which(.lt,arr.ind=TRUE),1,
                   function(x){
         sprintf("cor%s%s",getOption("broom.mixed.sep1","__"),
@@ -2684,7 +2723,10 @@ vcov.nlmixrFitCoreSilent  <- vcov.nlmixrFitCore
     .lt <- structure(.rs[.lt], .Names=.nms)
     .lt <- .lt[.lt != 0];
     if (sd){
-        .lt <- c(setNames(diag(x),paste0("sd",getOption("broom.mixed.sep1","__"),.dn1)),.lt);
+        .d <- dim(x$omegaR);
+        if (.d[1] > 0){
+            .lt <- c(setNames(diag(x$omegaR),paste0("sd",getOption("broom.mixed.sep1","__"),.dn1)),.lt);
+        }
     }
     return(.lt)
 }
@@ -2926,13 +2968,17 @@ print.nlmixrFitCore <- function(x, ...){
         print(x$time)
         cat("\n")
         .boundChar <- nchar(.bound);
+        .tmp <- x$omega
+        .noEta <- (dim(.tmp)[1] == 0)
+
+        .populationParameters <- ifelse(.noEta, "Parameters", "Population Parameters")
         if (2*.boundChar+54 < .width){
-            .fmt3("Population Parameters", .bound, c("parFixed", "parFixedDf"))
+            .fmt3(.populationParameters, .bound, c("parFixed", "parFixedDf"))
         } else if (.boundChar+54 < .width) {
-            .fmt3("Population Parameters", .bound, c("parFixed", "parFixedDf"),
+            .fmt3(.populationParameters, .bound, c("parFixed", "parFixedDf"),
                   on=c(TRUE, FALSE))
         } else {
-            .fmt3("Population Parameters", .bound, c("parFixed", "parFixedDf"),
+            .fmt3(.populationParameters, .bound, c("parFixed", "parFixedDf"),
                   on=c(FALSE, FALSE))
         }
         cat("\n")
@@ -2964,7 +3010,7 @@ print.nlmixrFitCore <- function(x, ...){
         cat(paste0("  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
                    crayon::bold(x$covMethod), "\n"))
         if (exists("cor", x$env)){
-            .tmp <- .getR(x$cor);
+            .tmp <- .getR(x);
             if (any(abs(.tmp) >= getOption("nlmixr.strong.corr", 0.7))){
                 cat(paste0("  Some strong fixed parameter correlations exist (", crayon::yellow(.bound), crayon::bold$blue("$cor"), ") :\n"));
                 .getCorPrint(x$cor);
@@ -2974,16 +3020,16 @@ print.nlmixrFitCore <- function(x, ...){
         }
         .tmp <- x$omega
         diag(.tmp) <- 0;
-        if (.mu){
+        if (.mu & !.noEta){
             if (all(.tmp == 0)){
                 cat("  No correlations in between subject variability (BSV) matrix\n")
             } else {
                 cat("  Correlations in between subject variability (BSV) matrix:\n")
                 .getCorPrint(x$omega);
             }
-            if (.boundChar*2+70 < .width){
+            if (.boundChar*2+70 < .width & !.noEta){
                 cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"),"\n");
-            } else {
+            } else if (!.noEta){
                 if (.boundChar+43 < .width){
                     cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"),"\n");
                     cat("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)","\n");
@@ -2993,10 +3039,10 @@ print.nlmixrFitCore <- function(x, ...){
                 }
             }
         }
-        if (.boundChar+74 < .width){
+        if (.boundChar+74 < .width & !.noEta){
             cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                        crayon::yellow(.bound), crayon::bold$blue("$shrink")),"\n");
-        } else {
+        } else if (!.noEta) {
             cat(paste0("  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
                        crayon::bold$blue("$shrink")),"\n");
         }

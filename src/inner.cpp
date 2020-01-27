@@ -3614,10 +3614,24 @@ double nlmixrEval_(NumericVector theta, std::string md5){
       }
     }
   }
+  bool doUnscaled = false;
+  std::string unscaledPar = md5 + ".uPar";
+  NumericVector thetaU;
   niter.push_back(cn);
   // Scaled
   vPar.push_back(f0);
-  iterType.push_back(5);
+  if (gradInfo.exists(unscaledPar)){
+    thetaU=as<NumericVector>(gradInfo[unscaledPar]);
+    if (thetaU.size() != theta.size()){
+      iterType.push_back(6);
+    } else {
+      doUnscaled=true;
+      iterType.push_back(5);    
+    }
+  } else {
+    // Actually unscaled
+    iterType.push_back(6);
+  }
   for (i = 0; i < n; i++){
     vPar.push_back(theta[i]);
   }
@@ -3650,6 +3664,46 @@ double nlmixrEval_(NumericVector theta, std::string md5){
     } else {
       Rprintf("\n");
     }
+  }
+  if (doUnscaled){
+    iterType.push_back(6);
+    niter.push_back(niter.back());
+    finalize=0;
+    // No obj scaling currently
+    vPar.push_back(f0);
+    for (i = 0; i < n; i++){
+      vPar.push_back(thetaU[i]);
+    }
+    if (printN != 0 && cn % printN == 0){
+      if (useColor && isRstudio)
+	Rprintf("|    U|%#14.8g |", f0);
+      else 
+	Rprintf("|    U|%#14.8g |", f0);
+      for (i = 0; i < n; i++){
+	Rprintf("%#10.4g |", thetaU[i]);
+	if ((i + 1) != n && (i + 1) % printNcol == 0){
+	  if (useColor && printNcol + i  > n){
+	    Rprintf("\n\033[4m|.....................|");
+	  } else {
+	    Rprintf("\n|.....................|");
+	  }
+	  finalize=1;
+	}
+      }
+      if (finalize){
+	while(true){
+	  if ((i++) % printNcol == 0){
+	    if (useColor) Rprintf("\033[0m");
+	    Rprintf("\n");
+	    break;
+	  } else {
+	    Rprintf("...........|");
+	  }
+	}
+      } else {
+	Rprintf("\n");
+      }
+    }  
   }
   return f0;
 }
@@ -3721,6 +3775,19 @@ void nlmixrGradPrint(NumericVector gr, int gradType, int cn, bool useColor,
       foceiPrintLine(min2(n, printNcol));
     }
   }
+}
+
+//' @rdname nlmixrGradFun
+//' @export
+//[[Rcpp::export]]
+RObject nlmixrUnscaled_(NumericVector theta, std::string md5){
+  // Unscaled
+  Function loadNamespace("loadNamespace", R_BaseNamespace);
+  Environment nlmixr = loadNamespace("nlmixr");
+  Environment gradInfo = nlmixr[".nlmixrGradInfo"];
+  std::string unscaledPar = md5 + ".uPar";
+  gradInfo[unscaledPar] = theta;
+  return R_NilValue;
 }
 
 //' @rdname nlmixrGradFun
@@ -3808,8 +3875,14 @@ NumericVector nlmixrGrad_(NumericVector theta, std::string md5){
 	  break;
 	}
       }
-      if (!reEval)
-	f0 = gradInfo[f0s];
+      if (!reEval){
+	NumericVector tmp  = gradInfo[f0s];
+	if (tmp.size() == 1){
+	  f0 = tmp[0];
+	} else {
+	  reEval=true;
+	}
+      }
     }
   }
   if (reEval){

@@ -127,7 +127,7 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
     if (!missing(which)){
         .nlmixrGradInfo[[paste0(.md5, ".w")]] <- which;
     }
-    if (!missing(which)){
+    if (!missing(thetaNames)){
         .nlmixrGradInfo[["thetaNames"]] <- thetaNames;
     }
     .nlmixrGradInfo[[paste0(.md5, ".n")]] <- 0L
@@ -146,7 +146,10 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
     .hist <- eval(parse(text=paste0("function(){
         nlmixrParHist_(md5=\"", .md5, "\");
     }")))
-    return(list(eval=.eval, grad=.grad, hist=.hist))
+    .unscaled <- eval(parse(text=paste0("function(theta){
+        nlmixrUnscaled_(theta,md5=\"", .md5, "\");
+    }")))
+    return(list(eval=.eval, grad=.grad, hist=.hist, unscaled=.unscaled))
 }
 
 ##' Calculate Hessian

@@ -2,12 +2,15 @@
 % Please edit documentation in R/RcppExports.R, R/nlmixrGrad.R
 \name{nlmixrEval_}
 \alias{nlmixrEval_}
+\alias{nlmixrUnscaled_}
 \alias{nlmixrGrad_}
 \alias{nlmixrParHist_}
 \alias{nlmixrGradFun}
 \title{Create a gradient function based on gill numerical differences}
 \usage{
 nlmixrEval_(theta, md5)
+
+nlmixrUnscaled_(theta, md5)
 
 nlmixrGrad_(theta, md5)
 

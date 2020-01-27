@@ -68,6 +68,7 @@ SEXP _nlmixr_nlmixrGrad_(SEXP, SEXP);
 SEXP _nlmixr_nlmixrEval_(SEXP, SEXP);
 SEXP _nlmixr_nlmixrParHist_(SEXP);
 SEXP _nlmixr_nlmixrHess_(SEXP, SEXP, SEXP, SEXP);
+SEXP _nlmixr_nlmixrUnscaled_(SEXP, SEXP);
 
 SEXP _nlmixr_saemDoPred(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP _nlmixr_saemFit(SEXP, SEXP, SEXP, SEXP);
@@ -122,6 +123,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_saemDoPred", (DL_FUNC) &_nlmixr_saemDoPred, 6},
   {"_nlmixr_saemFit", (DL_FUNC) &_nlmixr_saemFit, 4},
   {"_nlmixr_augPredTrans", (DL_FUNC) &_nlmixr_augPredTrans, 4},
+  {"_nlmixr_nlmixrUnscaled_", (DL_FUNC) &_nlmixr_nlmixrUnscaled_, 2},
   {NULL, NULL, 0}
 };
 

@@ -61,6 +61,12 @@ nlmixrEval_ <- function(theta, md5) {
 
 #' @rdname nlmixrGradFun
 #' @export
+nlmixrUnscaled_ <- function(theta, md5) {
+    .Call(`_nlmixr_nlmixrUnscaled_`, theta, md5)
+}
+
+#' @rdname nlmixrGradFun
+#' @export
 nlmixrGrad_ <- function(theta, md5) {
     .Call(`_nlmixr_nlmixrGrad_`, theta, md5)
 }

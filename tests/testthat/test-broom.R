@@ -1,4 +1,5 @@
 rxPermissive({
+
     tol  <- 1e-5
     ## From https://raw.githubusercontent.com/bbolker/broom.mixed/master/tests/testthat/helper-checkers.R
 

@@ -404,7 +404,8 @@ model <- function(model, ..., .lines=NULL){
           for (.new in .addVars){
             if (!any(.ini$name==.new)){
               if (regexpr(.etaModelReg,.new) !=-1){
-                .maxEta <- max(.ini$neta1,na.rm=TRUE);
+                .maxEta <- suppressWarnings(max(.ini$neta1,na.rm=TRUE));
+                if (is.infinite(.maxEta)) .maxEta <- 0
                 .ini <- rbind(.ini,
                               data.frame(ntheta=NA, neta1=.maxEta+1, neta2=.maxEta+1,
                                          name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
@@ -2267,6 +2268,23 @@ nlmixrUI.dynmodelfun <- function(object){
     return(.fn)
 }
 
+##' Return dynmodel variable translation function
+##'
+##' @param object nlmixr ui object
+##' @return nlmixr dynmodel translation
+##' @author Matthew Fidler
+nlmixrUI.dynmodelfun2 <- function(object){
+    .fn <- nlmixrUI.nlmefun(object, "none");
+    .bfn <- body(.fn)
+    .fn <- deparse(.bfn)
+    .extra <- paste(deparse(nlmixrfindLhs(.bfn)), collapse=" ");
+    .fn[1] <- paste0("{\n.env <-environment();\nsapply(names(..par),function(x){assign(x,setNames(..par[[x]],NULL),envir=.env)})\n");
+    .fn[length(.fn)] <- paste0(".names <- unique(c(names(..par),",
+                               .extra, "));\nreturn(as.data.frame(setNames(lapply(.names,function(x){get(x,setNames(..par[x],NULL), envir=.env)}),.names)));\n}");
+    .fn <- eval(parse(text=paste0("function(..par)", paste(.fn, collapse="\n"))))
+    return(.fn)
+}
+
 
 ##' Get the variance for the nlme fit process based on UI
 ##'
@@ -2848,7 +2866,9 @@ nlmixrUI.poped.ff_fun <- function(obj){
   } else if (arg == "nlme.fun.mu"){
     return(nlmixrUI.nlmefun(obj, "thetas"))
   } else if (arg == "dynmodel.fun"){
-    return(nlmixrUI.dynmodelfun(obj))
+      return(nlmixrUI.dynmodelfun(obj))
+  } else if (arg == "dynmodel.fun.df"){
+    return(nlmixrUI.dynmodelfun2(obj))
   } else if (arg == "nlme.fun"){
     return(nlmixrUI.nlmefun(obj, "none"))
   } else if (arg == "nlme.fun.mu.cov"){

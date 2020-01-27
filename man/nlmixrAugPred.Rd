@@ -8,7 +8,7 @@
 nlmixrAugPred(
   object,
   ...,
-  covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+  covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
   primary = NULL,
   minimum = NULL,
   maximum = NULL,

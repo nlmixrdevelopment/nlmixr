@@ -179,6 +179,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrUnscaled_
+RObject nlmixrUnscaled_(NumericVector theta, std::string md5);
+RcppExport SEXP _nlmixr_nlmixrUnscaled_(SEXP thetaSEXP, SEXP md5SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< std::string >::type md5(md5SEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrUnscaled_(theta, md5));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nlmixrGrad_
 NumericVector nlmixrGrad_(NumericVector theta, std::string md5);
 RcppExport SEXP _nlmixr_nlmixrGrad_(SEXP thetaSEXP, SEXP md5SEXP) {
