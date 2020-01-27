@@ -11,24 +11,34 @@ dynmodelControl(..., ci = 0.95, nlmixrOutput = FALSE, digs = 3,
   normType = c("rescale2", "constant", "mean", "rescale", "std", "len"),
   scaleType = c("nlmixr", "norm", "mult", "multAdd"),
   scaleCmax = 1e+05, scaleCmin = 1e-05, scaleC = NULL,
-  scaleC0 = 1e+05, atol = 1e-08, rtol = 1e-06, npt = NULL,
-  rhobeg = 0.2, rhoend = 1e-04, iprint = 0, print = 1,
-  maxfun = NULL, trace = 0, factr = NULL, pgtol = NULL,
-  abstol = NULL, reltol = NULL, lmm = NULL, maxit = 100000L,
-  eval.max = NULL, iter.max = NULL, abs.tol = NULL, rel.tol = NULL,
-  x.tol = NULL, xf.tol = NULL, step.min = NULL, step.max = NULL,
-  sing.tol = NULL, scale.init = NULL, diff.g = NULL,
-  boundTol = NULL, epsilon = NULL, derivSwitchTol = NULL,
-  sigdig = 4, covMethod = c("nlmixrHess", "optimHess"), gillK = 10L,
+  scaleC0 = 1e+05, atol = NULL, rtol = NULL, atolSS = NULL,
+  rtolSS = NULL, npt = NULL, rhobeg = 0.2, rhoend = NULL,
+  iprint = 0, print = 1, maxfun = NULL, trace = 0, factr = NULL,
+  pgtol = NULL, abstol = NULL, reltol = NULL, lmm = NULL,
+  maxit = 100000L, eval.max = NULL, iter.max = NULL,
+  abs.tol = NULL, rel.tol = NULL, x.tol = NULL, xf.tol = NULL,
+  step.min = NULL, step.max = NULL, sing.tol = NULL,
+  scale.init = NULL, diff.g = NULL, boundTol = NULL,
+  epsilon = NULL, derivSwitchTol = NULL, sigdig = 4,
+  covMethod = c("nlmixrHess", "optimHess"), gillK = 10L,
   gillStep = 4, gillFtol = 0, gillRtol = sqrt(.Machine$double.eps),
   gillKcov = 10L, gillStepCov = 2, gillFtolCov = 0,
   rxControl = NULL)
 }
 \arguments{
-\item{...}{other arguments apply to dynmodelControl}
+\item{...}{Other arguments including scaling factors for each
+compartment.  This includes S# = numeric will scale a compartment
+# by a dividing the compartment amount by the scale factor,
+like NONMEM.}
 
 \item{ci}{Confidence level for some tables.  By default this is
 0.95 or 95\% confidence.}
+
+\item{digs}{Option for the number of significant digits of the ouptut. By defalut this is 3.}
+
+\item{lower}{Lower bounds on the parameters used in optimization. By default this is -Inf.}
+
+\item{upper}{Upper bounds on the parameters used in optimization. By defalut this is Inf.}
 
 \item{method}{The method for solving ODEs.  Currently this supports:
 
@@ -40,6 +50,8 @@ dynmodelControl(..., ci = 0.95, nlmixrOutput = FALSE, digs = 3,
 \item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
         solving nor user Jacobain specification
 }}
+
+\item{maxeval}{Maximum number of iterations for Nelder-Mead of simplex search. By defalut this is 999.}
 
 \item{scaleTo}{Scale the initial parameter estimate to this value.
 By default this is 1.  When zero or below, no scaling is performed.}
@@ -207,6 +219,12 @@ by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
  if prior doses do not add anything to the solution.}
 
+\item{atolSS}{Absolute tolerance to check if a solution arrived at
+steady state.}
+
+\item{rtolSS}{Relative tolerance to check if a solution arrived at
+steady state.}
+
 \item{npt}{The number of points used to approximate the objective
 function via a quadratic approximation for bobyqa. The value
 of npt must be in the interval [n+2,(n+1)(n+2)/2] where n is
@@ -227,22 +245,72 @@ adjusted.}
 \item{rhoend}{The smallest value of the trust region radius that
 is allowed. If not defined, then 10^(-sigdig-1) will be used.}
 
+\item{iprint}{Print option for optimiaztion. See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}}, 
+and \code{\link[lbfgs]{lbfgs}} for more details. By defalut this is 0.}
+
 \item{print}{Integer representing when the outer step is
 printed. When this is 0 or do not print the iterations.  1 is
 print every function evaluation (default), 5 is print every 5
 evaluations.}
 
+\item{maxfun}{The maximum allowed number of function evaluations. If this is exceeded, 
+the method will terminate. See \code{\link[minqa]{bobyqa}} for more details. By default this value is NULL.}
+
+\item{trace}{Tracing information on the progress of the optimization is produced. 
+See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}}, and \code{\link[lbfgs]{lbfgs}} for more details. By defalut this is 0.}
+
+\item{factr}{Controls the convergence of the "L-BFGS-B"
+method.  Convergence occurs when the reduction in the
+objective is within this factor of the machine
+tolerance. Default is 1e10, which gives a tolerance of about
+\code{2e-6}, approximately 4 sigdigs.  You can check your
+exact tolerance by multiplying this value by
+\code{.Machine$double.eps}}
+
+\item{pgtol}{is a double precision variable.
+
+    On entry pgtol >= 0 is specified by the user.  The iteration
+    will stop when:
+
+       \code{max(\| proj g_i \| i = 1, ..., n) <= lbfgsPgtol}
+
+    where pg_i is the ith component of the projected gradient.
+
+    On exit pgtol is unchanged.  This defaults to zero, when the
+    check is suppressed.}
+
 \item{abstol}{Absolute tolerance for nlmixr optimizer}
 
 \item{reltol}{tolerance for nlmixr}
+
+\item{lmm}{An integer giving the number of BFGS updates
+retained in the "L-BFGS-B" method, It defaults to 7.}
+
+\item{maxit}{Maximum number of iterations for lbfgsb3c. See \code{\link[lbfgsb3c]{lbfgsb3c}} 
+for more details. By default this is 100000L.}
 
 \item{eval.max}{Number of maximum evaluations of the objective function}
 
 \item{iter.max}{Maximum number of iterations allowed.}
 
+\item{abs.tol}{Used in Nelder-Mead optimization and PORT optimization. Absolute tolerance. Defaults to 0 so the absolute convergence test is not used. 
+If the objective function is known to be non-negative, the previous default of 1e-20 would be more appropriate.}
+
 \item{rel.tol}{Relative tolerance before nlminb stops.}
 
 \item{x.tol}{X tolerance for nlmixr optimizers}
+
+\item{xf.tol}{Used in Nelder-Mead optimization and PORT optimization. false convergence tolerance. Defaults to 2.2e-14. See \code{\link[stats]{nlminb}} for more details.}
+
+\item{step.min}{Used in Nelder-Mead optimization and PORT optimization. Minimum step size. By defalut this is 1. See \code{\link[stats]{nlminb}} for more details.}
+
+\item{step.max}{Used in Nelder-Mead optimization and PORT optimization. Maximum step size. By defalut this is 1. See \code{\link[stats]{nlminb}} for more details.}
+
+\item{sing.tol}{Used in Nelder-Mead optimization and PORT optimization. Singular convergence tolerance; defaults to rel.tol. See \code{\link[stats]{nlminb}} for more details.}
+
+\item{scale.init}{Used in Nelder-Mead optimization and PORT optimization.  See \code{\link[stats]{nlminb}} for more details.}
+
+\item{diff.g}{Used in Nelder-Mead optimization and PORT optimization. An estimated bound on the relative error in the objective function value. See \code{\link[stats]{nlminb}} for more details.}
 
 \item{boundTol}{Tolerance for boundary issues.}
 
@@ -267,24 +335,10 @@ differences.}
 }}
 
 \item{covMethod}{Method for calculating covariance.  In this
-    discussion, R is the Hessian matrix of the objective
-    function. The S matrix is the sum of individual
-    gradient cross-product (evaluated at the individual empirical
-    Bayes estimates).
-
-\itemize{
-
- \item "\code{r,s}" Uses the sandwich matrix to calculate the
- covariance, that is: \code{solve(R) \%*\% S \%*\% solve(R)}
-
- \item "\code{r}" Uses the Hessian matrix to calculate the
- covariance as \code{2 \%*\% solve(R)}
-
- \item "\code{s}" Uses the cross-product matrix to calculate the
- covariance as \code{4 \%*\% solve(S)}
-
- \item "" Does not calculate the covariance step.
-}}
+discussion, R is the Hessian matrix of the objective
+function. The S matrix is the sum of individual
+gradient cross-product (evaluated at the individual empirical
+Bayes estimates).}
 
 \item{gillK}{The total number of possible steps to determine the
 optimal forward/central difference step size per parameter (by
@@ -318,8 +372,13 @@ step is equalt new step size = (prior step size)*gillStepCov}
 that is acceptable before issuing a warning/error about the
 gradient estimates during the covariance step.}
 
-\item{CI}{Confidence interval range from 0-1, default is 0.95}
+\item{rxControl}{This uses RxODE family of objects, file, or model specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for more details. By defalut this is NULL.}
+
+\item{nlmixrOuput}{Option to change output style to nlmixr output. By defalut this is FALSE.}
 }
 \description{
 Control Options for dynmodel
+}
+\author{
+Mason McComb and Matthew L. Fidler
 }

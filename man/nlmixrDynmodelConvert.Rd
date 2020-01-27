@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{nlmixrDynmodelConvert}
 \alias{nlmixrDynmodelConvert}
-\title{Converting nlmixr Objects to dynmodel Objects}
+\title{Converting nlmixr objects to dynmodel objects}
 \usage{
 nlmixrDynmodelConvert(.nmf)
 }
@@ -22,5 +22,8 @@ list containing inputs for the dynmodel()
 }
 }
 \description{
-Converting nlmixr Objects to dynmodel Objects
+Convert nlmixr Objects to dynmodel objects for use in fitting non-population dynamic models
+}
+\author{
+Mason McComb and Matt Fidler
 }

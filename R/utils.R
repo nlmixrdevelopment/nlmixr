@@ -173,174 +173,27 @@ mymin = function(start, fr, rho=NULL, control=list())
 
 # #########################################################################
 
-# sensitivity()  -------------------------------------------------------------
-#' Sensitivity Analysis based on the SOBOL method
-#'
-#' Applies the the SOBOL method for sensitivity analysis. A nlmixr object is required that contains no eta values. 
-#' The non-fixed theta parameters in a nlmixr object undergo sensitivity analysis.
-#'
-#' @param .nlmixrObjectmodel nlmixr object
-#' @param .data data for parameter estimation
-#' @param .method optimization method used for dynmodel
-#' @param .control control used for nlmixr and dynmodel
-#' @export
-sensitivity <- function(.nmf, .data, .range=0.3, .simNumber=100, control=list(), ...){
-  # Inputs
-  # .nmf - nlmixr object
-  # .data - RxODE compatible dataset
-  # .range - 0 < range <= 1, fractional range of values to simulate;  
-  # .simNUmber - integer > 0, number of simulations to perform
-  
-  # Example
-  # # nlmixr model
-  # two.compartment.IV.model <- function(){
-  #   ini({
-  #     Cl <- 3      
-  #     Vc <- 70     
-  #     prop.err <- c(0, 0.3, 1)
-  #   })
-  #   model({ 
-  #     K10<- Cl/Vc
-  #     d/dt(centr)  = -K10*centr;
-  #     cp = centr / Vc;
-  #     cp ~ prop(prop.err)
-  #   })
-  # }
-  # 
-  # # data
-  # 
-  # .data <- eventTable()
-  # .dose = 250
-  # .data$add.dosing(
-  #   dose = .dose
-  # )
-  # .data$add.sampling(
-  #   time = 1:100
-  # )
-  # 
-  # # nlmixr object
-  # .nmf <- nlmixr(two.compartment.IV.model)
-  
-  # TODO
-  # expand support for etas in population model
-  # allow user to chose which compartment to use for sensitivity
-  # fix the output to have the first and second order sobol aggregates
-  # fix the output to only have plots
-  
-  # Library
-  #devtools::use_package('sensitivity')
-  
-  # Outputs
-  .return <- list()
-  
-  # Errors
-  # must have 'time' column in data
-  if(!any(names(.data) %in% 'time')){
-    stop(print('Data must contain column named time'))
-  }
-  # population models not currently supported
-  if(length(.nmf$omega)!=0){
-    stop(print('Models with eta not currently supported'))
-  }
-  
-  # rxControl
-  .rxControl = RxODE::rxControl()
-  .rxControl$returnType <- "data.frame"
-  
-  # convert nlmixr to dynmodel
-  .dmf <- nlmixrDynmodelConvert(.nmf)
-  .nmf.original <- .nmf
-  
-  # obtain model
-  .model <- .dmf$system
-  
-  # model parameters
-  .rxFun <- .nmf$dynmodel.fun.df
-  
-  # generate parameters to be simulated
-  .parametersN <- length(.dmf$inits)
-  .parametersNames <- names(.dmf$inits)
-  .parametersInit <- .dmf$inits
-  
-  .X1 <- matrix(0, .simNumber, .parametersN)
-  .X2 <- matrix(0, .simNumber, .parametersN)
-  for (i in 1:length(.parametersNames)){
-    .lower <- .parametersInit[i] - .parametersInit[i]*.range
-    .upper <- .parametersInit[i] + .parametersInit[i]*.range
-    .X1[,i]<-runif(.simNumber,.lower,.upper)
-    .X2[,i]<-runif(.simNumber,.lower,.upper)
-  }
-  rm(i)
-  .X1 <- as.data.frame(.X1)
-  .X2 <- as.data.frame(.X2)
-  names(.X1) <- .parametersNames
-  names(.X2) <- .parametersNames 
-  
-  # create a function that will be called by the sensitivity package
-  .rxFun2 <- function(.parameters){
-    .rxFunModel <<- .model
-    .rxFundata <<- .data
-    .parameters <- .rxFun(.parameters)
-    .sim <- rxSolve(.rxFunModel,.rxFundata,.parameters, control=.rxControl)
-    .ret <- matrix(.sim$nlmixr_pred,ncol=sum(is.na(.data$amt)))
-    return(.ret)
-  }
-  
-  .MCmethod = "soboljansen"
-  .sobolOut<-sensitivity::sobolMultOut(model=.rxFun2, q=sum(is.na(.data$amt)), .X1, .X2, MCmethod=.MCmethod, plotFct = TRUE)
-  graphics.off()
-  
-  # aggregated Sobol indices
-  firstOrderSobol <- .sobolOut$S # first-order indices
-  
-  .return <- c(.return, firstOrderSobol)
-  
-  secondOrderSobol <- .sobolOut$T # total sensitivity indices
-  
-  .return <- c(.return, secondOrderSobol)
-  
-  # functional Sobol indices
-  #plot(time,.sobolOut$Sfct[,1],type='l')
-  #plot(time,.sobolOut$Sfct[,2],type='l')
-  
-  # first order sobol indices
-  fo.sobol.df <- data.frame(.sobolOut$Sfct)
-  names(fo.sobol.df) <- .parametersNames
-  fo.sobol.df$time <- .data$time[is.na(.data$amt)]
-  fo.sobol.df <- cbind(fo.sobol.df$time, stack(fo.sobol.df[1:.parametersN]))
-  names(fo.sobol.df) <- c('time','fo','parameter')
-  
-  fo.plot <- ggplot(fo.sobol.df, aes(time, fo, col=as.factor(parameter))) + 
-    geom_line() +
-    labs(title = "First Order Sobol Indices", x = "Time", color = "Parameters")
-  
-  .return <- c(.return, plot(fo.plot))
-  
-  # secong order sobol indices
-  so.sobol.df <- data.frame(.sobolOut$Tfct)
-  names(so.sobol.df) <- .parametersNames
-  so.sobol.df$time <- .data$time[is.na(.data$amt)]
-  so.sobol.df <- cbind(so.sobol.df$time, stack(so.sobol.df[1:.parametersN]))
-  names(so.sobol.df) <- c('time','so','parameter')
-  
-  so.plot <- ggplot(so.sobol.df, aes(time, so, col=as.factor(parameter))) + 
-    geom_line() +
-    labs(title = "Second Order Sobol Indices", x = "Time", color = "Parameters")
-  
-  .return <- c(.return, plot(so.plot))
-  
-  return(.return)
-}
-# #########################################################################
-
 # as.focei.dynmodel() -----------------------------------------------------------
 #' Output nlmixr format for dynmodel
+#' 
+#' Convert dynmodel output to nlmixr focei style output
 #'
-#' @param .dynmodelObject return object from
+#' @param .dynmodelObject dynmodel object
+#' @param .nlmixrObject nlmixr object
+#' @param .data RxOde data set
+#' @param .time proc.time object used in dynmodel timing
+#' @param .theta estimated terms excluding error terms
+#' @param .fit optimizied parameters
+#' @param .message optimization messages
+#' @param .inits.err initial estimates for error terms
+#' @param .cov covariance matrix from solved Hessian
+#' @param .sgy variance of Y given the model
+#' @param .dynmodelControl control options for dynmodel
+#' @param .nobs2 -
+#' @param .pt proc.time object used in dynmodel timing
+#' @param .rxControl control options for RxODE
+#' @author Mason McComb and Matt Fidler
 #' @export
-
-# run devtools::document() to update documentation
-# devtools::check_man() used to identify missing and problems
 
 as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .theta, .fit, .message, .inits.err, .cov, .sgy, .dynmodelControl, .nobs2=0, 
                               .pt=proc.time(), .rxControl = RxODE::rxControl()){
@@ -431,8 +284,6 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   if (length(.parameters.df)<length(.Estimates)){
     .parameters.df <- c(.parameters.df, rep("", sum(!is.na(.nlmixrObject.df$err))))
   }
-
-
 
   .parFixed <- data.frame(
     .parameters.df,
@@ -592,7 +443,9 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
 # #########################################################################
 
 # nlmixrDynmodelConvert() ---------------------------------------------------
-#' Converting nlmixr Objects to dynmodel Objects
+#' Converting nlmixr objects to dynmodel objects
+#' 
+#' Convert nlmixr Objects to dynmodel objects for use in fitting non-population dynamic models
 #'
 #' @param .nmf nlmixr object
 #' @return list containing inputs for the dynmodel()
@@ -606,12 +459,9 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
 #' \item \code{$model} - error model
 #' }
 #'
+#' @author Mason McComb and Matt Fidler
 #' @export
-#'
 
-# run devtools::document() to update documentation
-# go through and make sure
-# devtools::check_man() used to identify missing and problems
 
 nlmixrDynmodelConvert <- function(.nmf){
   # Notes:
@@ -736,20 +586,62 @@ nlmixrDynmodelConvert <- function(.nmf){
 #'
 #' @inheritParams RxODE::rxSolve
 #' @inheritParams foceiControl
-#' @param ... other arguments apply to dynmodelControl
-#' @param CI Confidence interval range from 0-1, default is 0.95
+#' 
+#' @param nlmixrOuput Option to change output style to nlmixr output. By defalut this is FALSE.
+#' @param digs Option for the number of significant digits of the ouptut. By defalut this is 3.
+#' @param lower Lower bounds on the parameters used in optimization. By default this is -Inf.
+#' @param upper Upper bounds on the parameters used in optimization. By defalut this is Inf. 
+#' @param maxeval Maximum number of iterations for Nelder-Mead of simplex search. By defalut this is 999. 
+#' @param maxit Maximum number of iterations for lbfgsb3c. See \code{\link[lbfgsb3c]{lbfgsb3c}} 
+#'      for more details. By default this is 100000L.
+#' @param maxfun The maximum allowed number of function evaluations. If this is exceeded, 
+#'      the method will terminate. See \code{\link[minqa]{bobyqa}} for more details. By default this value is NULL.
+#' @param iprint Print option for optimiaztion. See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}}, 
+#'      and \code{\link[lbfgs]{lbfgs}} for more details. By defalut this is 0.
+#' @param trace Tracing information on the progress of the optimization is produced. 
+#'      See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}}, and \code{\link[lbfgs]{lbfgs}} for more details. By defalut this is 0.
+#' @param factr Controls the convergence of the "L-BFGS-B"
+#'     method.  Convergence occurs when the reduction in the
+#'     objective is within this factor of the machine
+#'     tolerance. Default is 1e10, which gives a tolerance of about
+#'     \code{2e-6}, approximately 4 sigdigs.  You can check your
+#'     exact tolerance by multiplying this value by
+#'     \code{.Machine$double.eps}
+#' @param pgtol is a double precision variable.
+#'
+#'     On entry pgtol >= 0 is specified by the user.  The iteration
+#'     will stop when:
+#'
+#'        \code{max(\| proj g_i \| i = 1, ..., n) <= lbfgsPgtol}
+#'
+#'     where pg_i is the ith component of the projected gradient.
+#'
+#'     On exit pgtol is unchanged.  This defaults to zero, when the
+#'     check is suppressed.
+#' @param lmm An integer giving the number of BFGS updates
+#'     retained in the "L-BFGS-B" method, It defaults to 7.
+#' @param abs.tol Used in Nelder-Mead optimization and PORT optimization. Absolute tolerance. Defaults to 0 so the absolute convergence test is not used. 
+#'     If the objective function is known to be non-negative, the previous default of 1e-20 would be more appropriate. 
+#' @param xf.tol Used in Nelder-Mead optimization and PORT optimization. false convergence tolerance. Defaults to 2.2e-14. See \code{\link[stats]{nlminb}} for more details.
+#' @param step.min Used in Nelder-Mead optimization and PORT optimization. Minimum step size. By defalut this is 1. See \code{\link[stats]{nlminb}} for more details.
+#' @param step.max Used in Nelder-Mead optimization and PORT optimization. Maximum step size. By defalut this is 1. See \code{\link[stats]{nlminb}} for more details.
+#' @param sing.tol Used in Nelder-Mead optimization and PORT optimization. Singular convergence tolerance; defaults to rel.tol. See \code{\link[stats]{nlminb}} for more details.
+#' @param scale.init Used in Nelder-Mead optimization and PORT optimization.  See \code{\link[stats]{nlminb}} for more details.
+#' @param diff.g Used in Nelder-Mead optimization and PORT optimization. An estimated bound on the relative error in the objective function value. See \code{\link[stats]{nlminb}} for more details.
+#' @param covMethod Method for calculating covariance.  In this
+#'     discussion, R is the Hessian matrix of the objective
+#'     function. The S matrix is the sum of individual
+#'     gradient cross-product (evaluated at the individual empirical
+#'     Bayes estimates).
+#' @param rxControl This uses RxODE family of objects, file, or model specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for more details. By defalut this is NULL.
+#' 
+#' @author Mason McComb and Matthew L. Fidler
 #' @export
-
-# run devtools::document() to update documentation
-# go through and make sure
-# devtools::check_man() used to identify missing and problems
-
-# ADD RxODE::rxControl()
 
 dynmodelControl <- function(...,
                             ci=0.95,
                             nlmixrOutput=FALSE,
-                            digs=3, # check to make sure it is the same in the output
+                            digs=3, 
                             lower = -Inf,
                             upper = Inf,
                             ## mma doesn't work
@@ -956,45 +848,54 @@ dynmodelControl <- function(...,
 #'
 #' Fit a non-population dynamic model
 #'
-#' @param system an RxODE object
-#' @param model a list of statistical meaurement models
-#' @param evTable an Event Table object
-#' @param inits initial values of system parameters
-#' @param data input data
-#' @param fixPars fixed system parameters
-#' @param method estimation method: choice of Nelder-Mead, L-BFGS-B, and PORT.
-#' @param control optional minimization control parameters
+#' @param system RxODE object. See \code{\link[RxODE]{RxODE}} for more details.
+#' @param model Error model.
+#' @param inits Initial values of system parameters.
+#' @param data Dataset to estimate. Needs to be RxODE compatible in EVIDs. 
+#' @param fixPars Fixed system parameters. Default is NULL.
+#' @param nlmixrObject nlmixr object. See \code{\link[nlmixr]{nlmixr}} for more details. Default is NULL.
+#' @param control Control options for dynmodel \code{\link[nlmixr]{dynmodelControl}} .
 #' @return NULL
 #' @author Wenping Wang, Mason McComb and Matt Fidler
 #' @examples
+#' # dynmodel example --------------------------------------------------------
 #' ode <- "
-#'    dose=200;
-#'    pi = 3.1415926535897931;
-#'
-#'    if (t<=0) {
-#'       fI = 0;
-#'    } else {
-#'       fI = F*dose*sqrt(MIT/(2.0*pi*CVI2*t^3))*exp(-(t-MIT)^2/(2.0*CVI2*MIT*t));
-#'    }
-#'
-#'    C2 = centr/V2;
-#'    C3 = peri/V3;
-#'    d/dt(centr) = fI - CL*C2 - Q*C2 + Q*C3;
-#'    d/dt(peri)  =              Q*C2 - Q*C3;
-#' "
-#' sys1 <- RxODE(model = ode)
-#'
-#'
-#' ## ------------------------------------------------------------------------
-#' dat <- invgaussian
-#' mod <- cp ~ C2 + prop(.1)
-#' inits <- c(MIT=190, CVI2=.65, F=.92)
-#' fixPars <- c(CL=.0793, V2=.64, Q=.292, V3=9.63)
-#' ev <- eventTable()
-#' ev$add.sampling(c(0, dat$time))
-#' (fit <- dynmodel(sys1, mod, ev, inits, dat, fixPars))
-#'
+#'       kel = CL/V;
+#'       d/dt(X) = -kel*X;
+#'       C=X/V;
+#'       PRED = C
+#'       "
+#' system <- RxODE(model = ode)
+#' model <- cp ~ C + add(0.01) + prop(0.01)
+#' data("dynmodelExampleData")
+#' inits = c(CL=1, V=10)
+#' control =  dynmodelControl(method = "Nelder-Mead")
+#' (fit <- dynmodel(system=system, model=model, data=data, inits=inits, control=control))
+#' 
+#' # nlmixr example ----------------------------------------------------------
+#' model <- function(){
+#'   ini({
+#'     CL <- c(0,5,10) # Clearance (L/hr)
+#'     V <- c(0,50,100) # Volume of Distribution
+#'     prop.err <- c(0,0.01,1)
+#'   })
+#'   model({
+#'     kel = CL/V
+#'     d/dt(X) = -kel*X
+#'     cp = X/V
+#'     cp ~ prop(prop.err)
+#'   })
+#' }
+#' 
+#' data("dynmodelNlmixrExampleData")
+#' (fit <- nlmixr(object = model, data=data, est="dynmodel"))
 #' @export
+
+
+
+
+
+
 
 dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL, control=list(), ...){
   # Timing and environment --------------------------------------------------
@@ -1018,7 +919,6 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
     model = list(model)
   }
   inits.err = NULL
-  
 
 
   model = lapply(model, function(.model) {
