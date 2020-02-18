@@ -211,7 +211,7 @@ ini <- function(ini, ...){
       if (inherits(.lst, "list") && !is.null(.ns)){
         for (.n in .ns){
           .w <- which(.n == .ini$name)
-          if (length(.w) == 1){
+           if (length(.w) == 1){
             .val <- .lst[[.n]];
             if (length(.val) == 1){
               .uif$ini$est[.w] <- .val
@@ -236,7 +236,68 @@ ini <- function(ini, ...){
           }
         }
       } else {
-        stop("Arguments must be named")
+        ## If this is a+b~c(...) parse using lotri
+        ## FIXME handle conditional changes like a+b~c(...) | occ
+        .mat <- try(eval(parse(text=sprintf("lotri::lotri(%s)", paste(deparse(.lst), collapse=" ")))),
+                    silent=TRUE)
+        if (inherits(.mat, "matrix")){
+          .d <- dimnames(.mat)[[1]]
+          .ini2 <- as.data.frame(.uif$ini)
+          .m2 <- as.vector(.mat)
+          .l2 <- length(.d) * 2
+          .df <- data.frame(n1=rep(.d, each=length(.d)), n2=rep(.d, length(.d)), val=.m2)
+          .dfI <- as.data.frame(.uif$ini[, c("neta1", "neta2", "name")])
+          .dfI <- .dfI[!is.na(.dfI$neta1), ]
+          .dfI <- .dfI[which(.dfI$neta1 == .dfI$neta2), c("neta1", "name")]
+          .d2 <- paste(.dfI$name)
+          .diff <- setdiff(.d, .d2)
+          if (length(.diff) > 0){
+            stop(sprintf("trying to provide an estimate for non-existant eta: %s",
+                         paste(.diff, collapse=", ")))
+          }
+          names(.dfI)[2] <- "n1"
+          .df$n1 <- paste(.df$n1)
+          .dfI$n1 <- paste(.dfI$n1)
+          .df <- merge(.df, .dfI, all.x=TRUE)
+          names(.dfI) <- c("neta2", "n2")
+          .df <- merge(.df, .dfI, all.x=TRUE)
+          .df <- .df[order(.df$neta1, .df$neta2), ]
+          ## Name becomes (eta.cl,eta.ka)
+          .df$name <- ifelse(.df$neta1 == .df$neta2, .df$n1, paste0("(", .df$n1, ",", .df$n2, ")"))
+          .df$name2 <- ifelse(.df$neta1 == .df$neta2, .df$n1, paste0("(", .df$n2, ",", .df$n1, ")"))
+          .ini3 <- do.call("rbind", lapply(seq_along(.df$name), function(i) {
+                              .name1 <- .df$name[i]
+                              .name2 <- .df$name2[i]
+                              .w <- which(.ini2$name == .name1)
+                              if (length(.w) == 1){
+                                .ini2$est[.w] <<- .df$val[i]
+                                return(NULL)
+                              }
+                              .w <- which(.ini2$name == .name2)
+                              if (length(.w) == 1){
+                                .ini2$est[.w] <<- .df$val[i]
+                                return(NULL)
+                              }
+                              if (.df$neta1[i] < .df$neta2[i]){
+                                return(NULL)
+                              }
+                              return(data.frame(ntheta=NA_integer_,
+                                                neta1=.df$neta1[i], neta2=.df$neta2[i],
+                                                name=.df$name[i],
+                                                lower=-Inf,
+                                                est=.df$val[i],
+                                                upper=Inf,
+                                                fix=FALSE,
+                                                label="",
+                                                err=NA_real_,
+                                                condition="ID"))
+                              }))
+          .ini2 <- rbind(.ini2, .ini3)
+          class(.ini2) <- c("nlmixrBounds", "data.frame");
+          .uif$ini <- .ini2;
+        } else {
+          stop("")
+        }
       }
     } else {
       stop("Do not know what to do with the model's ini call.")
