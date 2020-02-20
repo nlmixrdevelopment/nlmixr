@@ -135,18 +135,40 @@ rxPermissive({
 
     })
 
-    context("piping works for correlations", {
+    f <- nlmixr(one.compartment)
 
-        f <- nlmixr(one.compartment)
+    test_that("piping works for correlations #1", {
 
         testUi(f %>% ini(eta.ka + eta.cl ~ c(0.2,
+                                             0.01, 0.2)),
+               has=c("tka", "tcl", "tv", "eta.ka", "eta.cl", "eta.v", "add.err", "(eta.cl,eta.ka)"),
+               exclude="matt",
+               values=c(tka = 0.45, tcl = 1, tv = 3.45, eta.ka = 0.2, eta.cl = 0.2,  eta.v = 0.1, add.err = 0.7,
+                        `(eta.cl,eta.ka)`=0.01))
+
+    })
+
+    test_that("piping works for correlations #2", {
+
+        expect_error(f %>% ini(eta.ka + eta.matt ~ c(0.2,
+                                                     0.01, 0.2)))
+
+    })
+
+
+    test_that("piping works for correlations #3", {
+
+        testUi(f %>% update(eta.ka + eta.cl ~ c(0.2,
                                              0.01, 0.2)),
                c("tka", "tcl", "tv", "eta.ka", "eta.cl", "eta.v", "add.err", "(eta.cl,eta.ka)"),
                "matt", c(tka = 0.45, tcl = 1, tv = 3.45, eta.ka = 0.2, eta.cl = 0.2,  eta.v = 0.1, add.err = 0.7,
                          `(eta.cl,eta.ka)`=0.01))
+    })
 
-        expect_error(f %>% ini(eta.ka + eta.matt ~ c(0.2,
-                                                     0.01, 0.2)))
+    test_that("piping works for correlations #4", {
+
+        expect_error(f %>% update(eta.ka + eta.matt ~ c(0.2,
+                                                        0.01, 0.2)))
 
     })
 
