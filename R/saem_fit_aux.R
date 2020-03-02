@@ -146,7 +146,7 @@ plot.saemFit = function(x,...) {
         RxODE::rxAllowUnload(FALSE);
         on.exit({RxODE::rxUnlock(.rx); RxODE::rxAllowUnload(TRUE);})
     }
-    dat = as.data.frame(saem.cfg$evt)
+    dat = .as.data.frame(saem.cfg$evt)
     dat = cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
     df = rbind(cbind(dat, grp = 1), cbind(dat, grp = 2), cbind(dat, grp = 3))
     dopred <- attr(fit, "dopred")
@@ -157,7 +157,7 @@ plot.saemFit = function(x,...) {
     df0 = df
 
     m = fit$par_hist
-    df = data.frame(val = as.vector(m), par = rep(1:ncol(m),
+    df = .data.frame(val = as.vector(m), par = rep(1:ncol(m),
         each = nrow(m)), iter = rep(1:nrow(m), ncol(m)))
     p1 = ggplot2::ggplot(df, aes(iter, val)) + ggplot2::geom_line() +
         ggplot2::facet_wrap(~par, scales = "free_y")

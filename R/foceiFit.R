@@ -1508,7 +1508,7 @@ foceiFit.data.frame <- function(data, ...){
         if (length(.muRef) > 0){
             .nMuRef <- names(.muRef)
             .ome <- .ret$omega
-            .omegaFix <- as.data.frame(.ret$uif$ini);
+            .omegaFix <- .as.data.frame(.ret$uif$ini);
             .omegaFix <- .omegaFix[is.na(.omegaFix$ntheta),];
             .omegaFix  <- setNames(.omegaFix$fix,paste(.omegaFix$name))
             .muRef <- structure(as.vector(.nMuRef), .Names=as.vector(.muRef));
@@ -1518,18 +1518,18 @@ foceiFit.data.frame <- function(data, ...){
             .sdOnly <- TRUE;
             .cvp <- lapply(row.names(.ret$popDfSig), function(x){
                 .y <- .muRef[x];
-                if (is.na(.y)) return(data.frame(ch=" ", v=NA_real_));
+                if (is.na(.y)) return(.data.frame(ch=" ", v=NA_real_));
                 .v <- .ome[.y, .y];
                 if (any(.y == .logEta)){
                     .sdOnly <<- FALSE;
-                    return(data.frame(ch=paste0(ifelse(.omegaFix[.y],"fix(",""),
+                    return(.data.frame(ch=paste0(ifelse(.omegaFix[.y],"fix(",""),
                                                 formatC(signif(sqrt(exp(.v) - 1) * 100, digits=.digs),
                                                         digits=.digs, format="fg", flag="#"),
                                                 ifelse(.omegaFix[.y],")","")),
                                       v=sqrt(exp(.v) - 1) * 100));
                 } else {
                     .cvOnly <<- FALSE;
-                    return(data.frame(ch=paste0(ifelse(.omegaFix[.y],"fix(",""),
+                    return(.data.frame(ch=paste0(ifelse(.omegaFix[.y],"fix(",""),
                                                 formatC(signif(sqrt(.v),digits=.digs),
                                                         digits=.digs, format="fg", flag="#"),
                                                  ifelse(.omegaFix[.y],")","")),
@@ -1538,17 +1538,17 @@ foceiFit.data.frame <- function(data, ...){
             })
             .cvp <- do.call("rbind", .cvp);
             .shrink <- .ret$shrink;
-            .errs <- as.data.frame(.uif$ini);
+            .errs <- .as.data.frame(.uif$ini);
             .errs <- paste(.errs[which(!is.na(.errs$err)), "name"]);
             .sh <- lapply(row.names(.ret$popDfSig), function(x){
                 .y <- .muRef[x];
                 if (is.na(.y)) {
                     if (any(x == .errs)){
                         .v <- .shrink[7, "IWRES"];
-                        if (length(.v) != 0) return(data.frame(ch=" ", v=NA_real_))
-                        if (is.null(.v)) return(data.frame(ch=" ", v=NA_real_))
+                        if (length(.v) != 0) return(.data.frame(ch=" ", v=NA_real_))
+                        if (is.null(.v)) return(.data.frame(ch=" ", v=NA_real_))
                         if (is.na(.v)){
-                            return(data.frame(ch=" ", v=NA_real_))
+                            return(.data.frame(ch=" ", v=NA_real_))
                         }
                     } else {
                         return(" ")
@@ -1556,8 +1556,8 @@ foceiFit.data.frame <- function(data, ...){
                 } else {
                     .v <- .shrink[7, .y];
                 }
-                if (length(.v) != 1) return(data.frame(ch=" ", v=NA_real_));
-                if (is.na(.v)) return(data.frame(ch=" ", v=NA_real_));
+                if (length(.v) != 1) return(.data.frame(ch=" ", v=NA_real_));
+                if (is.na(.v)) return(.data.frame(ch=" ", v=NA_real_));
                 .t <- ">"
                 if (.v < 0){
                 } else  if (.v < 20){
@@ -1565,13 +1565,13 @@ foceiFit.data.frame <- function(data, ...){
                 } else if (.v < 30){
                     .t <- "="
                 }
-                return(data.frame(ch=sprintf("%s%%%s", formatC(signif(.v, digits=.digs),
+                return(.data.frame(ch=sprintf("%s%%%s", formatC(signif(.v, digits=.digs),
                                                   digits=.digs, format="fg", flag="#"), .t),
                            v=.v));
             })
             .sh <- do.call("rbind", .sh);
-            .ret$parFixed <- data.frame(.ret$popDfSig, "BSD"=.cvp$ch, "Shrink(SD)%"=.sh$ch, check.names=FALSE);
-            .ret$parFixedDf <- data.frame(.ret$popDf, "BSD"=.cvp$v, "Shrink(SD)%"=.sh$v, check.names=FALSE);
+            .ret$parFixed <- .data.frame(.ret$popDfSig, "BSD"=.cvp$ch, "Shrink(SD)%"=.sh$ch, check.names=FALSE);
+            .ret$parFixedDf <- .data.frame(.ret$popDf, "BSD"=.cvp$v, "Shrink(SD)%"=.sh$v, check.names=FALSE);
             .w <- which(names(.ret$parFixed) == "BSD")
             if (length(.w) >= 1){
                 names(.ret$parFixed)[.w] <- ifelse(.sdOnly, "BSV(SD)", ifelse(.cvOnly, "BSV(CV%)", "BSV(CV% or SD)"))
@@ -1581,7 +1581,7 @@ foceiFit.data.frame <- function(data, ...){
                 names(.ret$parFixedDf)[.w] <- ifelse(.sdOnly, "BSV(SD)", ifelse(.cvOnly, "BSV(CV%)", "BSV(CV% or SD)"))
             }
             if (!all(.lab == "")){
-                .ret$parFixed <- data.frame(Parameter=.lab, .ret$parFixed, check.names=FALSE)
+                .ret$parFixed <- .data.frame(Parameter=.lab, .ret$parFixed, check.names=FALSE)
             }
         } else {
             .ret$parFixed <- .ret$popDfSig
@@ -1835,7 +1835,7 @@ foceiFit.data.frame0 <- function(data,
     .om0b <- .om0b * control$diagOmegaBoundUpper;
     .om0a <- RxODE::rxSymInvCholCreate(mat=.om0a, diag.xform=control$diagXform)
     .om0b <- RxODE::rxSymInvCholCreate(mat=.om0b, diag.xform=control$diagXform)
-    .omdf <- data.frame(a=.om0a$theta, m=.ret$rxInv$theta, b=.om0b$theta,diag=.om0a$theta.diag);
+    .omdf <- .data.frame(a=.om0a$theta, m=.ret$rxInv$theta, b=.om0b$theta,diag=.om0a$theta.diag);
     .omdf$lower <- with(.omdf, ifelse(a > b, b, a))
     .omdf$lower <- with(.omdf, ifelse(lower == m, -Inf, lower));
     .omdf$lower <- with(.omdf, ifelse(!diag, -Inf, lower));
@@ -1869,7 +1869,7 @@ foceiFit.data.frame0 <- function(data,
 
     .ret$scaleC <- .scaleC;
     if (exists("uif", envir=.ret)){
-        .ini <- as.data.frame(.ret$uif$ini)[!is.na(.ret$uif$ini$err), c("est", "err", "ntheta")]
+        .ini <- .as.data.frame(.ret$uif$ini)[!is.na(.ret$uif$ini$err), c("est", "err", "ntheta")]
         for (.i in seq_along(.ini$err)){
             if (is.na(.ret$scaleC[.ini$ntheta[.i]])){
                 if (any(.ini$err[.i] == c("boxCox", "yeoJohnson", "pow2", "tbs", "tbsYj"))){
@@ -1883,7 +1883,7 @@ foceiFit.data.frame0 <- function(data,
         for (.i in .ini$model$extraProps$powTheta){
             if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- 1; ## Powers are log-scaled
         }
-        .ini <- as.data.frame(.ret$uif$ini)
+        .ini <- .as.data.frame(.ret$uif$ini)
         for (.i in .ini$model$extraProps$factorial){
             if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- abs(1 / digamma(.ini$est[.i] + 1));
         }
@@ -2006,15 +2006,15 @@ foceiFit.data.frame0 <- function(data,
         .tmp <- .tmp[.tmp$type == "Unscaled", names(.tmp) != "type"];
         .iter <- .tmp$iter
         .tmp <- .tmp[,names(.tmp) != "iter"];
-        .ret$parHistStacked <- data.frame(stack(.tmp),iter=.iter)
+        .ret$parHistStacked <- .data.frame(stack(.tmp),iter=.iter)
         names(.ret$parHistStacked) <- c("val","par","iter");
-        .ret$parHist <- data.frame(iter=.iter,.tmp);
+        .ret$parHist <- .data.frame(iter=.iter,.tmp);
     }
     .solve <- function(...){
         .ret <- RxODE::rxSolve(..., warnIdSort=FALSE);
         if (names(.ret)[1] == "time"){
             ## For single subject ID is dropped.
-            .ret <- data.frame(ID=1, .ret);
+            .ret <- .data.frame(ID=1, .ret);
         }
         return(.ret)
     }
@@ -2117,9 +2117,9 @@ foceiFit.data.frame0 <- function(data,
     .lst[[4]] <- .df;
     .ret$shrink <- .lst[[2]];
     .updateParFixed(.ret);
-    .df <- cbind(as.data.frame(data), .lst[[1]], .lst[[3]], .lst[[4]]);
+    .df <- cbind(.as.data.frame(data), .lst[[1]], .lst[[3]], .lst[[4]]);
     .ret$tableTime <- (proc.time() - .pt)["elapsed"];
-    .ret$time <- data.frame(.ret$time, table=.ret$tableTime);
+    .ret$time <- .data.frame(.ret$time, table=.ret$tableTime);
     .isDplyr <- requireNamespace("dplyr", quietly = TRUE);
     if (!.isDplyr){
         .isDataTable <- requireNamespace("data.table", quietly = TRUE);
@@ -2267,7 +2267,7 @@ VarCorr.nlmixrFitCore <- function(x, sigma=NULL, ...){
     .ret <- x$nlme
     if (is.null(.ret)) {
         .var <- diag(x$omega);
-        .ret <- data.frame(Variance=.var, StdDev=sqrt(.var),
+        .ret <- .data.frame(Variance=.var, StdDev=sqrt(.var),
                            row.names=names(.var));
         .ret <- .ret[!is.na(.ret[, 1]), ]
         return(.ret);
@@ -2283,7 +2283,7 @@ VarCorr.nlmixrFitCoreSilent  <- VarCorr.nlmixrFitCore
     .ret <- x$nlme
     if (is.null(.ret)) {
         if (exists("uif", envir=x$env)){
-            .df <- as.data.frame(x$uif$ini)
+            .df <- .as.data.frame(x$uif$ini)
             .errs <- paste(.df[which(!is.na(.df$err)), "name"])
             return(fixef(x)[.errs]);
         }
@@ -2345,7 +2345,7 @@ plot.nlmixrFitData <- function(x, ...) {
     IWRES <- NULL
     .tp  <- traceplot(x)
     if (!is.null(.tp)) .lst[[length(.lst)+1]] <- .tp;
-    .dat <- as.data.frame(x);
+    .dat <- .as.data.frame(x);
     .doCmt <- FALSE;
     if (any(names(.dat) == "CMT")){
         if (length(levels(.dat$CMT)) > 1){
@@ -2361,7 +2361,7 @@ plot.nlmixrFitData <- function(x, ...) {
         .dat0 <- .dat[.dat$CMT == .cmt, ];
         .hasCwres <- any(names(.dat0) == "CWRES")
         .hasNpde <- any(names(.dat0) == "NPDE")
-        .d1 <- data.frame(DV=.dat0$DV, stack(.dat0[, c("PRED", "IPRED")]))
+        .d1 <- .data.frame(DV=.dat0$DV, stack(.dat0[, c("PRED", "IPRED")]))
         .p1 <- ggplot2::ggplot(.d1, ggplot2::aes_string("values", "DV")) + ggplot2::facet_wrap( ~ ind) +
             ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
             ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
@@ -2370,7 +2370,7 @@ plot.nlmixrFitData <- function(x, ...) {
         .lst[[length(.lst)+1]] <- .p1
 
         if (.hasCwres){
-            .d1 <- data.frame(DV=.dat0$DV, stack(.dat0[, c("CPRED", "IPRED")]))
+            .d1 <- .data.frame(DV=.dat0$DV, stack(.dat0[, c("CPRED", "IPRED")]))
             .p1 <- ggplot2::ggplot(.d1, ggplot2::aes_string("values", "DV")) + ggplot2::facet_wrap( ~ ind) +
                 ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
                 ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
@@ -2380,7 +2380,7 @@ plot.nlmixrFitData <- function(x, ...) {
         }
 
         if (.hasNpde){
-            .d1 <- data.frame(DV=.dat0$DV, stack(.dat0[, c("EPRED", "IPRED")]))
+            .d1 <- .data.frame(DV=.dat0$DV, stack(.dat0[, c("EPRED", "IPRED")]))
             .p1 <- ggplot2::ggplot(.d1, ggplot2::aes_string("values", "DV")) + ggplot2::facet_wrap( ~ ind) +
                 ggplot2::geom_abline(slope=1, intercept=0, col="red", size=1.2) +
                 ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
@@ -3020,7 +3020,7 @@ getVarCov.nlmixrFitCoreSilent <- getVarCov.nlmixrFitCore
 focei.eta.nlmixrFitCore <- function(object, ...){
     .uif <- object$uif;
     ## Reorder based on translation
-    .df <- as.data.frame(.uif$ini);
+    .df <- .as.data.frame(.uif$ini);
     .eta <- .df[!is.na(.df$neta1), ];
     .len <- length(.eta$name)
     .curOme <- object$omega;
@@ -3217,23 +3217,23 @@ setOfv <- function(x, type){
                 if (any(names(.time)=="logLik")){
                     .time$logLik <- .time$logLik +.likTime;
                 } else {
-                    .time  <- data.frame(.time,logLik=.likTime,check.names=FALSE);
+                    .time  <- .data.frame(.time,logLik=.likTime,check.names=FALSE);
                 }
                 .env$time <- .time;
                 .llik <- -.saemObf / 2;
                 .nobs  <- .env$nobs;
                 attr(.llik, "df") <- attr(get("logLik", .env), "df");
                 .objf <- ifelse(.env$adjObj,.saemObf - .nobs*log(2*pi),.saemObf);
-                .tmp <- data.frame(OBJF=.objf, AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
+                .tmp <- .data.frame(OBJF=.objf, AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
                                BIC=.saemObf + log(.env$nobs) * attr(get("logLik", .env), "df"),
                                "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
                 if (any(names(.env$objDf) == "Condition Number")){
                     .cn <- unique(.env$objDf[["Condition Number"]])
                     .cn <- .cn[!is.na(.cn)];
                     if (length(.cn)==1){
-                        .tmp <- data.frame(.tmp, "Condition Number"=.cn, check.names=FALSE);
+                        .tmp <- .data.frame(.tmp, "Condition Number"=.cn, check.names=FALSE);
                     } else {
-                        .tmp <- data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
+                        .tmp <- .data.frame(.tmp, "Condition Number"=NA, check.names=FALSE);
                     }
                 }
                 .rn  <- row.names(.env$objDf);

@@ -84,7 +84,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 .nmMuTable  <- function(x){
     .mu  <- x$nmodel$mu.ref
     if (length(.mu) == 0) return(NULL)
-    .ret <- do.call(rbind, lapply(names(.mu),function(x){data.frame(theta=.mu[[x]], eta=x)}))
+    .ret <- do.call(rbind, lapply(names(.mu),function(x){.data.frame(theta=.mu[[x]], eta=x)}))
     if (length(x$nmodel$cov.ref) > 0){
         .covRef  <- x$cov.ref;
         .covRef  <- do.call(`c`,lapply(names(.covRef), function(x){
@@ -105,7 +105,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
             assign("ref",.ref,envir=.env);
         })
         if(length(.env$ref) > 0){
-            .ret  <- merge(.ret,data.frame(theta=names(.env$ref),covariates=as.character(.env$ref)),
+            .ret  <- merge(.ret,.data.frame(theta=names(.env$ref),covariates=as.character(.env$ref)),
                            by="theta", all.x=TRUE)
             .ret$covariates <- paste(.ret$covariates)
             .ret$covariates[.ret$covariates == "NA"] <- ""
@@ -187,7 +187,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
 
 .nmHuxObjf  <-function(x){
     .tmp  <- x$objDf;
-    .tmp  <- data.frame(type=row.names(.tmp),.tmp, check.rows=FALSE,check.names=FALSE,stringsAsFactors=FALSE)
+    .tmp  <- .data.frame(type=row.names(.tmp),.tmp, check.rows=FALSE,check.names=FALSE,stringsAsFactors=FALSE)
     huxtable::as_hux(.tmp) %>%
         huxtable::add_colnames() %>%
         huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%

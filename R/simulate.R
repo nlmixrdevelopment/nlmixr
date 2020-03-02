@@ -221,7 +221,7 @@ nlmixrSim <- function(object, ...){
         .dataName  <- ifelse(is.null(object$uif$data.name),"",paste0(object$uif$data.name,"-"));
         if (.dataName==".-") .dataName <- ""
         .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",object$uif$fun.txt)),
-                                       as.data.frame(object$uif$ini),
+                                       as..data.frame(object$uif$ini),
                                        .xtra,
                                        as.character(utils::packageVersion("nlmixr")),
                                        as.character(utils::packageVersion("RxODE"))))
@@ -292,7 +292,7 @@ plot.nlmixrSim <- function(x, y, ...){
             warning("In order to put confidence bands around the intervals, you need at least 2500 simulations.")
             message("Summarizing data for plot")
             .ret <- x %>% dplyr::group_by(time) %>%
-                dplyr::do(data.frame(p1=.p, eff=quantile(.$sim, probs=.p))) %>%
+                dplyr::do(.data.frame(p1=.p, eff=quantile(.$sim, probs=.p))) %>%
                 dplyr::mutate(Percentile=factor(sprintf("%02d%%",round(p1*100))))
             message("done.")
             .ret <- ggplot2::ggplot(.ret,aes(time,eff,col=Percentile,fill=Percentile)) +
@@ -306,9 +306,9 @@ plot.nlmixrSim <- function(x, y, ...){
     }
     message("Summarizing data for plot")
     .ret <- x %>% dplyr::mutate(id=sim.id%%.n) %>% dplyr::group_by(id,time) %>%
-        dplyr::do(data.frame(p1=.p, eff=quantile(.$sim, probs=.p)))%>%
+        dplyr::do(.data.frame(p1=.p, eff=quantile(.$sim, probs=.p)))%>%
         dplyr::group_by(p1,time) %>%
-        dplyr::do(data.frame(p2=.p, eff=quantile(.$eff, probs=.p))) %>%
+        dplyr::do(.data.frame(p2=.p, eff=quantile(.$eff, probs=.p))) %>%
         dplyr::ungroup()  %>% dplyr::mutate(p2=sprintf("p%02d",(p2*100)))%>%
         tidyr::spread(p2,eff) %>% dplyr::mutate(Percentile=factor(sprintf("%02d%%",round(p1*100))));
     message("done.")
@@ -426,7 +426,7 @@ nlmixrPred <- function(object, ..., ipred=FALSE){
     if (do.ipred){
         re <- random.effects(object)[,-1];
         names(re) <- sprintf("ETA[%d]", seq_along(names(re)));
-        ipred.par <- data.frame(re,t(params),
+        ipred.par <- .data.frame(re,t(params),
                                 rx_err_=0, check.names=FALSE)
     }
     if (do.pred){
@@ -483,7 +483,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
         .dataName  <- ifelse(is.null(object$uif$data.name),"",paste0(object$uif$data.name,"-"));
         if (.dataName==".-") .dataName <- ""
         .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",object$uif$fun.txt)),
-                                       as.data.frame(object$uif$ini),
+                                       as..data.frame(object$uif$ini),
                                        covsInterpolation,
                                        primary, minimum, maximum, length.out,
                                        as.character(utils::packageVersion("nlmixr")),
@@ -499,7 +499,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
     uif <- object$uif
     ## Using the model will drop the subjects that were dropped by the fit
     dat <- suppressWarnings(nlmixrData(getData(object), object$model$pred.only))
-    dat <- as.data.frame(dat)
+    dat <- .as.data.frame(dat)
     names(dat)  <- toupper(names(dat))
     attr(dat$ID, "levels") <- attr(object$ID, "levels")
     attr(dat$ID, "class") <- "factor"
@@ -606,7 +606,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
             dat.new <- dat.new[, names(dat.new) != "DVID", drop = FALSE];
             .endpoint <- dat.new[, "Endpoint"];
             dat.new <- dat.new[, names(dat.new) != "Endpoint", drop = FALSE];
-            dat.new <- data.frame(dat.new[, 1:2], Endpoint=.endpoint, stack(dat.new[,-(1:2), drop = FALSE]))
+            dat.new <- .data.frame(dat.new[, 1:2], Endpoint=.endpoint, stack(dat.new[,-(1:2), drop = FALSE]))
             levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
             dat.new$Endpoint <- factor(dat.new$Endpoint)
         } else {
@@ -616,13 +616,13 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
             dat.new <- dat.new[, names(dat.new) != "CMT", drop = FALSE];
             .endpoint <- dat.new[, "Endpoint"];
             dat.new <- dat.new[, names(dat.new) != "Endpoint", drop = FALSE];
-            dat.new <- data.frame(dat.new[, 1:2], Endpoint=.endpoint, stack(dat.new[,-(1:2), drop = FALSE]))
+            dat.new <- .data.frame(dat.new[, 1:2], Endpoint=.endpoint, stack(dat.new[,-(1:2), drop = FALSE]))
             levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
             dat.new$Endpoint <- factor(dat.new$Endpoint)
         }
 
     } else {
-        dat.new <- data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2), drop = FALSE]))
+        dat.new <- .data.frame(dat.new[, 1:2], stack(dat.new[,-(1:2), drop = FALSE]))
         levels(dat.new$ind) <- gsub("pred", "Population", gsub("ipred", "Individual", levels(dat.new$ind)))
     }
     names(dat.old) <- tolower(names(dat.old))
@@ -631,12 +631,12 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
         if (.multiType == "DVID") {
             ## FIXME
             if (inherits(dat.old$dvid, "factor") || inherits(dat.old$dvid, "character")){
-                dat.old <- data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$dvid, values=dat.old$dv, ind="Observed");
+                dat.old <- .data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$dvid, values=dat.old$dv, ind="Observed");
             } else {
                 .tmp <- object$uif$nmodel$predDf[, c("cond", "dvid")];
                 names(.tmp) <- c("Endpoint", "DVID")
                 dat.old <- merge(dat.old, .tmp, by="DVID")
-                dat.old <- data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$Endpoint,
+                dat.old <- .data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$Endpoint,
                                       values=dat.old$dv, ind="Observed");
             }
         } else {
@@ -648,11 +648,11 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
                 names(dat.old)[.w] <- "CMT"
             }
             dat.old <- merge(dat.old, .tmp, by="CMT")
-            dat.old <- data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$Endpoint,
+            dat.old <- .data.frame(id=dat.old$id, time=dat.old$time, Endpoint=dat.old$Endpoint,
                                   values=dat.old$dv, ind="Observed");
         }
     } else {
-        dat.old <- data.frame(id=dat.old$id, time=dat.old$time, values=dat.old$dv, ind="Observed");
+        dat.old <- .data.frame(id=dat.old$id, time=dat.old$time, values=dat.old$dv, ind="Observed");
     }
     .ret <- rbind(dat.new, dat.old);
     if (save){

@@ -1040,7 +1040,7 @@ configsaem <- function(model, data, inits,
   if (check) stop("saem classic UI needs sequential ID. check your data")
   ntotal = length(id)
   N = length(unique(id))
-  covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(as.data.frame(data$data[, model$covars, drop = FALSE]), list(id), unique)[,-1, drop=FALSE])
+  covariables = if(is.null(model$covars)) NULL else unlist(stats::aggregate(.as.data.frame(data$data[, model$covars, drop = FALSE]), list(id), unique)[,-1, drop=FALSE])
   if (!is.null(covariables)) dim(covariables) = c(N, data$N.covar)
   nb_measures = table(id)
   ncov = data$N.covar + 1
@@ -1052,7 +1052,7 @@ configsaem <- function(model, data, inits,
   ix = rep(1:dim(io)[1], nmc)
   ioM = io[ix,]
   indioM = grep(1, t(ioM)) - 1
-  mPars = if(ninputpars==0) NULL else unlist(stats::aggregate(as.data.frame(data$data[, inPars]), list(id), unique)[,-1])
+  mPars = if(ninputpars==0) NULL else unlist(stats::aggregate(.as.data.frame(data$data[, inPars]), list(id), unique)[,-1])
   if (!is.null(mPars)) {
     dim(mPars) = c(N, ninputpars)
     opt$mPars = mPars
@@ -1078,7 +1078,7 @@ configsaem <- function(model, data, inits,
     ## opt$.rx <- .rx;
     opt$.pars <- .pars;
     ## opt$.dat <- dat;
-    dat <- as.data.frame(dat[,-6]);
+    dat <- .as.data.frame(dat[,-6]);
     names(dat) <- toupper(names(dat));
     dat$ID <- as.integer(dat$ID);
   } else {
@@ -1543,7 +1543,7 @@ focei.theta.saemFit <- function(object, uif, ...){
         thetas[n] <- sf[n];
     }
     .predDf <- uif$predDf;
-    .ini <- as.data.frame(uif$ini);
+    .ini <- .as.data.frame(uif$ini);
     .resMat <- object$resMat;
     sapply(seq_along(.predDf$cond), function(i){
         x <- paste(.predDf$cond[i]);
@@ -1574,7 +1574,7 @@ focei.eta.saemFit <- function(object, uif, ...){
         }
     }
     ## orig eta ->  new eta
-    df <- as.data.frame(uif$ini);
+    df <- .as.data.frame(uif$ini);
     eta <- df[!is.na(df$neta1), ];
     len <- length(eta$name)
     cur.lhs <- character()
@@ -1644,7 +1644,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     dat <- data;
   }
   .tn <-uif$saem.theta.name;
-  .ini <- as.data.frame(uif$ini)
+  .ini <- .as.data.frame(uif$ini)
   .ini <- .ini[uif$ini$name %in% .tn,]
   if (any(.ini$fix)){
       .fixed <- paste(.ini$name[.ini$fix])
@@ -1657,7 +1657,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   } else {
     .nth <- length(.tn)
 
-    .ini <- as.data.frame(uif$ini)
+    .ini <- .as.data.frame(uif$ini)
     .ini <- .ini[is.na(.ini$err),]
     .ini <- .ini[!is.na(.ini$ntheta),]
     .ini <- .ini[!.ini$fix,]
@@ -1746,7 +1746,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .calcCovTime  <- proc.time()-.calcCovTime;
     .calcCovTime  <- .calcCovTime["elapsed"]
   }
-  .ini <- as.data.frame(uif$ini)
+  .ini <- .as.data.frame(uif$ini)
   .ini <- .ini[!is.na(.ini$ntheta),];
   .skipCov <- !is.na(.ini$err);
   .fixed <- uif$focei.fixed
@@ -1813,36 +1813,36 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     if (.addCov){
       .env$cov <- .cov;
     }
-    .env$parHistStacked <- data.frame(val=as.vector(.m),
+    .env$parHistStacked <- .data.frame(val=as.vector(.m),
                                       par=rep(.allThetaNames, each=nrow(.m)),
                                       iter=rep(1:nrow(.m), ncol(.m)));
-    .env$parHist <- data.frame(iter=rep(1:nrow(.m)), as.data.frame(.m));
+    .env$parHist <- .data.frame(iter=rep(1:nrow(.m)), .as.data.frame(.m));
     if (length(.fixedNames) > 0){
       .env$parHistStacked <- .env$parHistStacked[!(.env$parHistStacked$par %in% .fixedNames),, drop = FALSE];
       .env$parHist <- .env$parHist[, !(names(.env$parHist) %in% .fixedNames), drop = FALSE];
     }
     if (is.na(calcResid)){
       .setSaemExtra(.env,.rn);
-      .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed[seq_along(init$THTA)],
+      .env$theta <- .data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed[seq_along(init$THTA)],
                                row.names=uif$focei.names);
       .env$fullTheta <- setNames(init$THTA, uif$focei.names)
       .om0 <- .genOM(.parseOM(init$OMGA));
       attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
       .env$omega <- .om0;
-      .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
+      .env$etaObf <- .data.frame(ID=seq_along(mat2[, 1]), setNames(.as.data.frame(mat2), uif$eta.names), OBJI=NA);
       .env$noLik <- FALSE;
       .env$objective <- .saemObf;
     } else if (calcResid){
       .setSaemExtra(.env,.rn);
     } else {
       .setSaemExtra(.env,.rn);
-      .env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed[seq_along(init$THTA)],
+      .env$theta <- .data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=.fixed[seq_along(init$THTA)],
                                row.names=uif$focei.names);
       .env$fullTheta <- setNames(init$THTA, uif$focei.names)
       .om0 <- .genOM(.parseOM(init$OMGA));
       attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
       .env$omega <- .om0;
-      .env$etaObf <- data.frame(ID=seq_along(mat2[, 1]), setNames(as.data.frame(mat2), uif$eta.names), OBJI=NA);
+      .env$etaObf <- .data.frame(ID=seq_along(mat2[, 1]), setNames(.as.data.frame(mat2), uif$eta.names), OBJI=NA);
       .env$noLik <- TRUE;
       .env$objective <- .saemObf;
     }
@@ -1917,22 +1917,22 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   }
 
   if (is.null(.env$time)){
-    .env$time <- data.frame(saem=.saemTime["elapsed"], check.names=FALSE, row.names=c(""));
+    .env$time <- .data.frame(saem=.saemTime["elapsed"], check.names=FALSE, row.names=c(""));
   } else {
     .time  <- .env$time
     .time <- .time[,!(names(.time) %in% c("optimize", "covariance"))]
     .saemTime  <-  .saemTime["elapsed"]
     if (calcResid){
       .saemTime  <- .saemTime - .cwresTime["elapsed"];
-      .time  <- data.frame(.time, cwres=.cwresTime["elapsed"], check.names=FALSE);
+      .time  <- .data.frame(.time, cwres=.cwresTime["elapsed"], check.names=FALSE);
     }
     if (.likTime >0){
-      .time  <- data.frame(.time, logLik=.likTime, check.names=FALSE);
+      .time  <- .data.frame(.time, logLik=.likTime, check.names=FALSE);
       .saemTime  <- .saemTime - .likTime;
     }
     .saemTime  <- .saemTime - .calcCovTime;
-    .time <- data.frame(.time, covariance=.calcCovTime, check.names=FALSE)
-    .env$time <- data.frame(saem=.saemTime, .time, check.names=FALSE, row.names=c(""))
+    .time <- .data.frame(.time, covariance=.calcCovTime, check.names=FALSE)
+    .env$time <- .data.frame(saem=.saemTime, .time, check.names=FALSE, row.names=c(""))
   }
   .env$message <- "";
   if (is.na(calcResid)){
@@ -1946,12 +1946,12 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       ## for (.t in c("OBJF","objective", "objf")){
       ##   assign(.t,.objf,.env);
       ## }
-      .tmp <- data.frame(OBJF=.objf,
+      .tmp <- .data.frame(OBJF=.objf,
                          AIC= .saemObf + 2 * attr(get("logLik", .env), "df"),
                          BIC=.saemObf + log(.env$nobs) * attr(get("logLik", .env), "df"),
                          "Log-likelihood"=as.numeric(.llik), check.names=FALSE);
       if (any(names(.env$objDf) == "Condition Number"))
-        .tmp <- data.frame(.tmp, "Condition Number"=.env$objDf[,"Condition Number"],
+        .tmp <- .data.frame(.tmp, "Condition Number"=.env$objDf[,"Condition Number"],
                            check.names=FALSE);
       .env$objDf  <- rbind(.env$objDf, .tmp)
       row.names(.env$objDf) <- c("FOCEi", .rn);

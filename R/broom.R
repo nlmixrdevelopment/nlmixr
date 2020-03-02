@@ -29,7 +29,7 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
         .hi <- exp(.hi);
         .low <- exp(.low);
     }
-    .df <- data.frame(model.est=.df$model.est, estimate=.df$estimate,  conf.low=.low, conf.high=.hi)
+    .df <- .data.frame(model.est=.df$model.est, estimate=.df$estimate,  conf.low=.low, conf.high=.hi)
     if (.ciNames) names(.df)[3:4] <- paste(c((1 - level) / 2, (1 - (1 - level) / 2)) * 100, "%")
     .df
 }
@@ -82,7 +82,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     }
     .ini  <- x$uif$ini$err[!is.na(x$uif$ini$ntheta)]
     ## effect   group   term            estimate std.error statistic
-    .df <- data.frame(effect="fixed",
+    .df <- .data.frame(effect="fixed",
                       term=row.names(.df), .df, stringsAsFactors=FALSE);
     if (!.ranpar) {
         .df  <- .df[is.na(x$uif$ini$err[!is.na(x$uif$ini$ntheta)]),];
@@ -98,16 +98,16 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 
 .nlmixrTidyRandom <- function(x, ...){
     .tmp <- stack(x$eta[,-1])
-    .df <- data.frame(group="ID", level=x$eta$ID, term=.tmp$ind, estimate=.tmp$values);
+    .df <- .data.frame(group="ID", level=x$eta$ID, term=.tmp$ind, estimate=.tmp$values);
     dplyr::as.tbl(.df)
 }
 
 .nlmixrTidyRandomPar <- function(x,...){
     .pars  <- .getR(x$omegaR,TRUE)
-    .p1 <- data.frame(effect="ran_pars", group="ID", term=names(.pars),estimate=.pars, std.error=NA_real_,
+    .p1 <- .data.frame(effect="ran_pars", group="ID", term=names(.pars),estimate=.pars, std.error=NA_real_,
                       statistic=NA_real_, p.value=NA_real_, stringsAsFactors=FALSE) %>%
         .reorderCols();
-    .p2  <- data.frame(.nlmixrTidyFixed(x,.ranpar=TRUE), stringsAsFactors=FALSE)%>%
+    .p2  <- .data.frame(.nlmixrTidyFixed(x,.ranpar=TRUE), stringsAsFactors=FALSE)%>%
         .reorderCols();
     .df  <- rbind(.p1,.p2);
     for (.v in c("statistic", "p.value", "std.error")){
@@ -154,7 +154,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     .eta <- x$eta
     .noMuRef <- c();
     .x <- setNames(
-        data.frame(lapply(names(.eta),function(n){
+        .data.frame(lapply(names(.eta),function(n){
             if (any(n==names(.muRef))){
                 .n <- .muRef[[n]];
                 .ret  <- .eta[[n]]+.theta[.n];
@@ -179,7 +179,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
                 return(n)
             }));
     .tmp <- stack(.x[,-1])
-    .df <- data.frame(group="ID", level=.x$ID, term=.tmp$ind, estimate=.tmp$values);
+    .df <- .data.frame(group="ID", level=.x$ID, term=.tmp$ind, estimate=.tmp$values);
     return(dplyr::as.tbl(.df))
 }
 

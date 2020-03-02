@@ -28,7 +28,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
         .dataName  <- ifelse(is.null(fit$uif$data.name),"",paste0(fit$uif$data.name,"-"));
         if (.dataName==".-") .dataName <- ""
         .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",fit$uif$fun.txt)),
-                                       as.data.frame(fit$uif$ini),
+                                       .as.data.frame(fit$uif$ini),
                                        data, n, bins,
                                        n_bins,
                                        bin_mid,
@@ -177,7 +177,7 @@ vpc_ui <- function(fit, data=NULL, n=100, bins = "jenks",
                 dat$cmt  <- factor(dat$cmt,sort(unique(dat$cmt)), labels=levels(fit$CMT))
             }
         }
-        sim <- list(rxsim=sim0, sim=as.data.frame(sim), obs=dat)
+        sim <- list(rxsim=sim0, sim=.as.data.frame(sim), obs=dat)
         class(sim)  <- "rxHidden"
         attr(sim, "nsim") <- .xtra$nsim;
         class(sim) <- "nlmixrVpc";

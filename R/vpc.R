@@ -35,7 +35,7 @@ sim.one = function(zz, x) {
 	r = as.integer(as.character(x$groups[[1]]))
 	m = m[r,]
 	m = cbind(m, TIME=..ModList$dat.g$TIME, ID=..ModList$dat.g$ID)
-	m = as.data.frame(m)
+	m = .as.data.frame(m)
     res = do.call(..ModList$user_fn, m)
 	res+rnorm(res, 0, x$sigma)
 }

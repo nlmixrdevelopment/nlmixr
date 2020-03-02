@@ -65,7 +65,7 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE,
         }
     }
     .env <- .new$env
-    .env$time <- data.frame(.env$time, npde=(proc.time() - .pt)["elapsed"], check.names=FALSE)
+    .env$time <- .data.frame(.env$time, npde=(proc.time() - .pt)["elapsed"], check.names=FALSE)
     return(.new)
 }
 ##' Output table/data.frame options
