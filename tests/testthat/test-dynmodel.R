@@ -9,13 +9,13 @@
 
 # Library -----------------------------------------------------------------
   #devtools::use_testthat() # deprecated
-  usethis::use_testthat()
+  ## usethis::use_testthat()
   library(RxODE)
   library(devtools)
   library(latticeExtra)
-  devtools::use_testthat()
+  ## devtools::use_testthat()
   #devtools::load_all("C:/Users/Mason/OneDrive/Novartis_2019_internship/dynmodel_github/nlmixr/")
-  devtools::install("C:/Users/Mason/OneDrive/Novartis_2019_internship/dynmodel_github/nlmixr", dependencies = FALSE, quick=TRUE)
+  ## devtools::install("C:/Users/Mason/OneDrive/Novartis_2019_internship/dynmodel_github/nlmixr", dependencies = FALSE, quick=TRUE)
   library(nlmixr)
 
   # Additive and Proportional Error Model Test ------------------------------
@@ -406,7 +406,7 @@
       if (!is.null(seed)) {set.seed(seed)}
 
       # load library for BoxCox transform and inverse
-      library(forecast)
+      ## library(forecast)
 
       # Error model ---
       .sim.output <- output
@@ -426,7 +426,7 @@
       sigma <- if (sigma.pow > 0) c(sigma, pow = sigma.pow, pow2 = pow2) else c(sigma)
 
       # transform observed data
-      h.y <- BoxCox(.sim.output$C1, 0)
+      h.y <- boxCox(.sim.output$C1, 0)
 
       # add error on transformed data
       if (sigma.pow > 0){
@@ -436,7 +436,7 @@
       }
 
       # inverse the transform
-      .output$PRED <- InvBoxCox(h.y.error, 0)
+      .output$PRED <- iBoxCox(h.y.error, 0)
 
       # resample instead of deleting (optional)
       if(any(.output$PRED < 0)) stop("negative observations not permitted with log normal testing")
@@ -599,7 +599,6 @@
       if (!is.null(seed)) {set.seed(seed)}
 
       # load library for BoxCox transform and inverse
-      library(forecast)
 
       # Error model ---
       .sim.output <- output
@@ -619,7 +618,7 @@
       sigma <- if (sigma.pow > 0) c(sigma, pow = sigma.pow, pow2 = pow2) else c(sigma)
 
       # transform observed data
-      h.y <- BoxCox(.sim.output$C1, 0)
+      h.y <- boxCox(.sim.output$C1, 0)
 
       # add error on transformed data
       if (sigma.pow > 0){
@@ -629,7 +628,7 @@
       }
 
       # inverse the transform
-      .output$PRED <- InvBoxCox(h.y.error, 0)
+      .output$PRED <- iBoxCox(h.y.error, 0)
 
       # resample instead of deleting (optional)
       if(any(.output$PRED < 0)) stop("negative observations not permitted with log normal testing")
