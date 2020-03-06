@@ -470,12 +470,12 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         model <- uif$saem.model
         inits = uif$saem.init
         if (length(uif$saem.fixed)>0) {
-			nphi = attr(model$saem_mod, "nrhs")
-			m = cumsum(!is.na(matrix(inits$theta, byrow=T, ncol=nphi)))
-			fixid = match(uif$saem.fixed, t(matrix(m,ncol=nphi)))
+            nphi = attr(model$saem_mod, "nrhs")
+            m = cumsum(!is.na(matrix(inits$theta, byrow=T, ncol=nphi)))
+            fixid = match(uif$saem.fixed, t(matrix(m,ncol=nphi)))
 
-			names(inits$theta) = rep("", length(inits$theta))
-			names(inits$theta)[fixid] = "FIXED"
+            names(inits$theta) = rep("", length(inits$theta))
+            names(inits$theta)[fixid] = "FIXED"
         }
         cfg <- configsaem(model=model, data=dat, inits=inits,
                           mcmc=mcmc, ODEopt=ODEopt, seed=seed,
