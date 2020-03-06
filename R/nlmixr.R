@@ -226,7 +226,7 @@ nlmixrData.default <- function(data, model=NULL){
     if (!is.null(model)){
         dat  <- RxODE::etTrans(data, model,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
     } else {
-        dat <- as.data.frame(data);
+        dat <- .as.data.frame(data);
     }
     return(dat);
 }
@@ -510,7 +510,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         return(.ret);
     } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
         if (.nTv != 0) stop("nlme does not support time-varying covariates (yet)");
-        data <- as.data.frame(data)
+        data <- .as.data.frame(data)
         if (length(uif$predDf$cond) > 1) stop("nlmixr nlme does not support multiple endpoints.")
         pt <- proc.time()
         est.type <- est;
@@ -666,8 +666,8 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
                 assign("message2", fit$env$message, env);
                 assign("message", .message, env);
                 .tmp1 <- env$objDf;
-                if (any(names(.objDf) == "Condition Number")) .tmp1 <- data.frame(.tmp1, "Condition Number"=NA, check.names=FALSE);
-                if (any(names(.tmp1) == "Condition Number")) .objDf <- data.frame(.objDf, "Condition Number"=NA, check.names=FALSE);
+                if (any(names(.objDf) == "Condition Number")) .tmp1 <- .data.frame(.tmp1, "Condition Number"=NA, check.names=FALSE);
+                if (any(names(.tmp1) == "Condition Number")) .objDf <- .data.frame(.objDf, "Condition Number"=NA, check.names=FALSE);
                 env$objDf <- rbind(.tmp1, .objDf);
                 row.names(env$objDf) <- c(ifelse(est == "fo", "FOCE", "FOCEi"), "FO");
                 .tmp1 <- env$time;
@@ -795,7 +795,7 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
         .dataName  <- ifelse(is.null(uif$data.name),"",paste0(uif$data.name,"-"));
         if (.dataName==".-") .dataName <- ""
         .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",uif$fun.txt)),
-                                       as.data.frame(uif$ini),
+                                       .as.data.frame(uif$ini),
                                        data,
                                        est,
                                        control,
@@ -831,12 +831,12 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
             AIC(.ret); # Calculate SAEM AIC when saving...
             .env <- .ret$env
             .extra <- (proc.time() - .nlmixrTime)["elapsed"] - sum(.env$time)
-            .env$time <- data.frame(.env$time,"other"=.extra, check.names=FALSE)
+            .env$time <- .data.frame(.env$time,"other"=.extra, check.names=FALSE)
             saveRDS(.ret,file=.saveFile)
         } else {
             .env <- .ret$env
             .extra <- (proc.time() - .nlmixrTime)["elapsed"] - sum(.env$time)
-            .env$time <- data.frame(.env$time,"other"=.extra, check.names=FALSE)
+            .env$time <- .data.frame(.env$time,"other"=.extra, check.names=FALSE)
         }
     }
     return(.ret);
@@ -1052,7 +1052,7 @@ addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
         }
     }
     .env <- .new$env
-    .env$time <- data.frame(.oTime,cwres=(proc.time() - .pt)["elapsed"],check.names=FALSE);
+    .env$time <- .data.frame(.oTime,cwres=(proc.time() - .pt)["elapsed"],check.names=FALSE);
     assign("origData", .od, .env)
     return(.new);
 }

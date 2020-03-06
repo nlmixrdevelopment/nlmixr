@@ -1,38 +1,3 @@
-.drakeTypeS <- NULL
-.drakeType <- function(){
-    if (is.null(.drakeTypeS)){
-        ns <- try(loadNamespace("drake"), silent=TRUE)
-        if (inherits(ns, "try-error")){
-            assignInMyNamespace(".drakeTypeS", 0L);
-        } else {
-            assignInMyNamespace(".drakeTypeS", 2L);
-        }
-    }
-    return(.drakeTypeS);
-}
-
-.drakeCompat0 <- function(x){
-    if (is.call(x)) {
-        .dt <- .drakeType();
-        .x1 <- as.character(x[[1]]);
-        if (any(.x1 == c("ignore", "no_deps")) && .dt != 0L){
-            return(x);
-        } else if (.x1 == "model" && .dt != 0L){
-            return(as.call(c(list(quote(ignore)), x)));
-        } else {
-            return(as.call(lapply(x, .drakeCompat0)));
-        }
-    } else {
-        return(x)
-    }
-}
-.drakeCompat <- function(x){
-  .f <- x;
-  .srcref <- attr(.f, "srcref");
-  body(.f) <- .drakeCompat0(body(.f))
-  attr(.f, "srcref") <- .srcref;
-  return(.f)
-}
 
 nlmixrfindLhs <- function(x) {
   ## Modified from http://adv-r.had.co.nz/Expressions.html find_assign4
@@ -100,6 +65,75 @@ nlmixrfindLhs <- function(x) {
     stop("Do not know how to handle object");
   }
   return(.uif);
+}
+
+.processLotri <- function(.code, .uif) {
+  .mat <- try(eval(parse(text=sprintf("lotri::lotri(%s)", .code))), silent=TRUE)
+  if (inherits(.mat, "matrix")){
+    .d <- dimnames(.mat)[[1]]
+    .ini2 <- .as.data.frame(.uif$ini)
+    .ini1 <- .ini2[is.na(.ini2$neta1), ]
+    .ini2 <- .ini2[!is.na(.ini2$neta1), ]
+    .ini4 <- .ini2[!is.na(.ini2$err), ]
+    .ini2 <- .ini2[is.na(.ini2$err), ]
+    .m2 <- as.vector(.mat)
+    .l2 <- length(.d) * 2
+    .df <- .data.frame(n1=rep(.d, each=length(.d)), n2=rep(.d, length(.d)), val=.m2)
+    .dfI <- .as.data.frame(.uif$ini[, c("neta1", "neta2", "name")])
+    .dfI <- .dfI[!is.na(.dfI$neta1), ]
+    .dfI <- .dfI[which(.dfI$neta1 == .dfI$neta2), c("neta1", "name")]
+    .d2 <- paste(.dfI$name)
+    .diff <- setdiff(.d, .d2)
+    if (length(.diff) > 0){
+      stop(sprintf("trying to provide an estimate for non-existant eta: %s",
+                   paste(.diff, collapse=", ")))
+    }
+    names(.dfI)[2] <- "n1"
+    .df$n1 <- paste(.df$n1)
+    .dfI$n1 <- paste(.dfI$n1)
+    .df <- merge(.df, .dfI, all.x=TRUE)
+    names(.dfI) <- c("neta2", "n2")
+    .df <- merge(.df, .dfI, all.x=TRUE)
+    .df <- .df[order(.df$neta1, .df$neta2), ]
+    ## Name becomes (eta.cl,eta.ka)
+    .df$name <- ifelse(.df$neta1 == .df$neta2, .df$n1, paste0("(", .df$n1, ",", .df$n2, ")"))
+    .df$name2 <- ifelse(.df$neta1 == .df$neta2, .df$n1, paste0("(", .df$n2, ",", .df$n1, ")"))
+    .ini3 <- do.call("rbind", lapply(seq_along(.df$name), function(i) {
+                                .name1 <- paste(.df$name[i])
+                                .name2 <- paste(.df$name2[i])
+                                .w <- which(.name1 ==  .ini2$name)
+                                if (length(.w) == 1){
+                                  .ini2$est[.w] <<- .df$val[i]
+                                  return(NULL)
+                                }
+                                .w <- which(.ini2$name == .name2)
+                                if (length(.w) == 1){
+                                  .ini2$est[.w] <<- .df$val[i]
+                                  return(NULL)
+                                }
+                                if (.df$neta1[i] < .df$neta2[i]){
+                                  return(NULL)
+                                }
+                                return(.data.frame(ntheta=NA_integer_,
+                                                  neta1=.df$neta1[i], neta2=.df$neta2[i],
+                                                  name=.df$name[i],
+                                                  lower=-Inf,
+                                                  est=.df$val[i],
+                                                  upper=Inf,
+                                                  fix=FALSE,
+                                                  label="",
+                                                  err=NA_real_,
+                                                  condition="ID"))
+                              }))
+    .ini2 <- rbind(.ini2, .ini3)
+    .ini2 <- .ini2[order(.ini2$neta1, .ini2$neta2), ]
+    .ini2 <- rbind(.ini1, .ini2, .ini4)
+    class(.ini2) <- c("nlmixrBounds", "data.frame");
+    .uif$ini <- .ini2;
+    return(.uif)
+  } else {
+    stop(sprintf('invalid syntax: %s', .code))
+  }
 }
 
 ##' nlmixr ini block handling
@@ -211,7 +245,7 @@ ini <- function(ini, ...){
       if (inherits(.lst, "list") && !is.null(.ns)){
         for (.n in .ns){
           .w <- which(.n == .ini$name)
-          if (length(.w) == 1){
+           if (length(.w) == 1){
             .val <- .lst[[.n]];
             if (length(.val) == 1){
               .uif$ini$est[.w] <- .val
@@ -236,7 +270,10 @@ ini <- function(ini, ...){
           }
         }
       } else {
-        stop("Arguments must be named")
+        ## If this is a+b~c(...) parse using lotri
+        ## FIXME handle conditional changes like a+b~c(...) | occ
+        .code <- paste(deparse(.lst), collapse=" ")
+        .uif <- .processLotri(.code, .uif)
       }
     } else {
       stop("Do not know what to do with the model's ini call.")
@@ -282,7 +319,7 @@ model <- function(model, ..., .lines=NULL){
     return(.f);
   } else {
     .uif  <- .getUif(model);
-    .ini <- as.data.frame(.uif$ini);
+    .ini <- .as.data.frame(.uif$ini);
     .call <- match.call(expand.dots=TRUE)[-(1:2)];
     if (is.null(.lines)){
           .lines <- .deparse(.call[[1]]);
@@ -299,8 +336,15 @@ model <- function(model, ..., .lines=NULL){
       .distOrig <- .findDist(body(.fOrig));
       .distNew <- .findDist(body(.f));
       .sharedDist <- intersect(.distNew,.distOrig);
-      if (length(.shared)==0 && length(.sharedDist)==0)
-        stop("Could not find a part of the model to modify.");
+      if (length(.shared)==0 && length(.sharedDist)==0) {
+        .code <- paste(.lines, collapse=" ")
+        .processLotri(.code, .uif)
+        .uif <- try(.processLotri(.code, .uif), silent=TRUE);
+        if(inherits(.uif, "try-error")) {
+          stop("Could not find a part of the model to modify.");
+        }
+        return(.uif)
+      }
       if (length(.sharedDist) > 0){
         for (.v in .sharedDist){
           .regShared <- rex::rex(start,any_spaces,.v,any_spaces,"~");
@@ -350,7 +394,7 @@ model <- function(model, ..., .lines=NULL){
             if (!any(.ini$name==.new)){
               .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
               .ini <- rbind(.ini,
-                            data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
+                            .data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
                                        name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
                                        err=NA,label=NA,condition=NA))
             }
@@ -407,14 +451,14 @@ model <- function(model, ..., .lines=NULL){
                 .maxEta <- suppressWarnings(max(.ini$neta1,na.rm=TRUE));
                 if (is.infinite(.maxEta)) .maxEta <- 0
                 .ini <- rbind(.ini,
-                              data.frame(ntheta=NA, neta1=.maxEta+1, neta2=.maxEta+1,
+                              .data.frame(ntheta=NA, neta1=.maxEta+1, neta2=.maxEta+1,
                                          name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
                                          err=NA,label=NA,condition="ID"))
 
               } else if (regexpr(.thetaModelReg, .new) !=-1) {
                 .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
                 .ini <- rbind(.ini,
-                              data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
+                              .data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
                                          name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
                                          err=NA,label=NA,condition=NA))
               }
@@ -549,19 +593,6 @@ update.function  <- .nlmixrUpdate
 ##' @export
 nlmixrUI <- function(fun){
   if (is(fun, "function")){
-    .funDrake <- .drakeCompat(fun);
-    if (!identical(.funDrake, fun)){
-      for (.f in seq(1, sys.nframe())){
-        .env <- parent.frame(.f);
-        for (.i in ls(.env)){
-          .t <- try(identical(get(.i, envir=.env), fun), silent=TRUE)
-          if (inherits(.t, "try-error")) .t <- FALSE
-          if (.t){
-            assign(.i, .funDrake, envir=.env);
-          }
-        }
-      }
-    }
     lhs0 <- nlmixrfindLhs(body(fun))
     dum.fun <- function(){return(TRUE)}
     env.here <- environment(dum.fun)
@@ -655,7 +686,7 @@ nlmixrUI.multipleEndpoint <- function(x){
         if (getOption("RxODE.combine.dvid", TRUE)){
             .info  <- .info[order(.info$dvid),];
         }
-        .info  <- with(.info, data.frame(variable=paste(var,"~",ifelse(use.utf(),"\u2026", "...")),
+        .info  <- with(.info, .data.frame(variable=paste(var,"~",ifelse(use.utf(),"\u2026", "...")),
                                          cmt=paste0("cmt='",cond, "' or cmt=", cmt),
                                          "dvid*"=ifelse(is.na(dvid),"",
                                                         paste0("dvid='",cond ,"' or dvid=",dvid)),
@@ -955,7 +986,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
   all.funs <- allCalls(body(fun));
   all.lhs <- nlmixrfindLhs(body(fun));
   errs.specified <- c()
-  add.prop.errs <- data.frame(y=character(), add=logical(), prop=logical());
+  add.prop.errs <- .data.frame(y=character(), add=logical(), prop=logical());
   bounds <- ini;
   theta.names <-  c()
   theta.ord <- c();
@@ -1035,7 +1066,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       }
     }
     if (length(distArgs) == 0L){
-      .tmp <- as.data.frame(bounds);
+      .tmp <- .as.data.frame(bounds);
       .tmp1 <- .tmp[1, ]
       .tmp1[1, ] <- NA;
       .tmp1[, "err"] <- distName
@@ -1061,7 +1092,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       if (length(.w) == 0){
           stop("Residual distribution parameter(s) estimates were not found in ini block");
       }
-      .tmp <- as.data.frame(bounds);
+      .tmp <- .as.data.frame(bounds);
       .tmp$err[.w] <- ifelse(.i == 1, distName, paste0(distName, .i));
       if (any(distName==distsPositive)){
         if (any(is.na(.tmp$lower[.w])) || any(is.infinite(.tmp$lower[.w]))){
@@ -1094,7 +1125,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
     }
     else if (any(do.pred == c(1, 4, 5))){
       assign(".predDf", rbind(.predDf,
-                              data.frame(cond=ifelse(.bCond,"",sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
+                              .data.frame(cond=ifelse(.bCond,"",sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
                                          var=.deparse(x2))), this.env)
       return(bquote(if (CMT ==.(curCond)) {nlmixr_pred <- .(x2)}));
     } else if (do.pred == 3){
@@ -1106,11 +1137,11 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
           any(paste(tmp$err) == "prop")){
         assign("errn", errn + 1, this.env);
         assign("add.prop.errs", rbind(add.prop.errs,
-                                      data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
+                                      .data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
       } else if (any(paste(tmp$err) == "prop")){
         assign("errn", errn + 1, this.env);
         assign("add.prop.errs", rbind(add.prop.errs,
-                                      data.frame(y=sprintf("Y%02d", errn), add=FALSE, prop=TRUE)), this.env);
+                                      .data.frame(y=sprintf("Y%02d", errn), add=FALSE, prop=TRUE)), this.env);
       }
       return(bquote(return(.(sprintf("Y%02d", errn)))));
     } else {
@@ -1135,7 +1166,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       }
       else if (any(do.pred == c(1, 4, 5))){
         assign(".predDf", rbind(.predDf,
-                                data.frame(cond=ifelse(.bCond, "", sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
+                                .data.frame(cond=ifelse(.bCond, "", sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
                                            var=.deparse(x2))), this.env)
         return(bquote(if (CMT==.(curCond)) {nlmixr_pred <- .(x2)}));
       } else if (do.pred == 3){
@@ -1152,7 +1183,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         ) && any(paste(tmp$err) == "prop")){
           assign("errn", errn + 1, this.env);
           assign("add.prop.errs", rbind(add.prop.errs,
-                                        data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
+                                        .data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
         }
         return(bquote(return(.(sprintf("Y%02d", errn)))));
       } else {
@@ -1186,7 +1217,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
       }
       else if (any(do.pred == c(1, 4, 5))){
         assign(".predDf", rbind(.predDf,
-                                data.frame(cond=ifelse(.bCond,"",sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
+                                .data.frame(cond=ifelse(.bCond,"",sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
                                            var=.deparse(x2))), this.env)
         return(bquote(if (CMT==.(curCond)) {nlmixr_pred <- .(x2)}));
       } else if (do.pred == 3){
@@ -1204,7 +1235,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         ) && any(paste(tmp$err) == "prop")){
           assign("errn", errn + 1, this.env);
           assign("add.prop.errs", rbind(add.prop.errs,
-                                        data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
+                                        .data.frame(y=sprintf("Y%02d", errn), add=TRUE, prop=TRUE)), this.env);
         }
         return(bquote(return(.(sprintf("Y%02d", errn)))));
       } else {
@@ -1908,13 +1939,13 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
                                    nlmixrfindLhs(body(rest))))
     .mv  <- RxODE::rxModelVars(rxode);
     .state <- c(.mv$state,.mv$stateExtra);
-    .tmp <- data.frame(cmt=seq_along(.state), cond=.state)
+    .tmp <- .data.frame(cmt=seq_along(.state), cond=.state)
     .predDf$dvid  <- seq_along(.predDf$var)
     .predDf <- merge(.predDf, .tmp, all.x=TRUE, by="cond")
     if (any(is.na(.predDf$cmt))){
         .predDfNa  <- .predDf[is.na(.predDf$cmt), names(.predDf) != "cmt"];
         .predDf <- .predDf[!is.na(.predDf$cmt),];
-        .tmp <- data.frame(cmt=seq_along(.state), var=.state)
+        .tmp <- .data.frame(cmt=seq_along(.state), var=.state)
         .predDf <- rbind(.predDf,
                          merge(.predDfNa, .tmp, all.x=TRUE, by="var")[names(.predDf)])
     }
@@ -1938,7 +1969,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
         .predDf <- .predDf[!is.na(.predDf$cmt),];
         .mv <- RxODE::rxModelVars(rxode);
         .state <- c(.mv$state,.mv$stateExtra)
-        .tmp <- data.frame(cmt=seq_along(.state), cond=.state)
+        .tmp <- .data.frame(cmt=seq_along(.state), cond=.state)
         .predDf <- rbind(.predDf,
                          merge(.predDfNa, .tmp, all.x=TRUE, by="cond")[names(.predDf)])
     }
@@ -2341,7 +2372,7 @@ nlmixrUI.rxode.pred <- function(object){
 ##' @return parameters function defined in THETA[#] and ETA[#]s.
 ##' @author Matthew L. Fidler
 nlmixrUI.theta.pars <- function(obj){
-  .df <- as.data.frame(obj$ini)
+  .df <- .as.data.frame(obj$ini)
   .dft <- .df[!is.na(.df$ntheta), ];
   .unfixed <- with(.dft, sprintf("%s=THETA[%d]", name, seq_along(.dft$name)))
   .eta <- .df[!is.na(.df$neta1), ];
@@ -2381,7 +2412,7 @@ nlmixrUI.saem.distribution <- function(obj){
 ##' @return logical vector of fixed THETA parameters
 ##' @author Matthew L. Fidler
 nlmixrUI.focei.fixed <- function(obj){
-  .df <- as.data.frame(obj$ini);
+  .df <- .as.data.frame(obj$ini);
   .dft <- .df[!is.na(.df$ntheta), ];
   .fix  <- .dft$fix;
   .dft <- .df[is.na(.df$ntheta), ];
@@ -2394,7 +2425,7 @@ nlmixrUI.focei.fixed <- function(obj){
 ##' @return List of parameters that are fixed.
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.fixed <- function(obj){
-  .df <- as.data.frame(obj$ini);
+  .df <- .as.data.frame(obj$ini);
   .dft <- .df[!is.na(.df$ntheta), ];
   .fixError <- .dft[!is.na(.dft$err), ];
   if (any(.fixError$fix)){
@@ -2412,7 +2443,7 @@ nlmixrUI.saem.fixed <- function(obj){
 ##' @return list with FOCEi style initializations
 ##' @author Matthew L. Fidler
 nlmixrUI.focei.inits <- function(obj){
-  df <- as.data.frame(obj$ini);
+  df <- .as.data.frame(obj$ini);
   dft <- df[!is.na(df$ntheta), ];
   eta <- df[!is.na(df$neta1), ];
   len <- length(eta$name)
@@ -2493,7 +2524,7 @@ nlmixrUI.saem.res.mod <- function(obj){
     return(1);
   }
   .predDf <- obj$predDf;
-  .ini <- as.data.frame(obj$ini);
+  .ini <- .as.data.frame(obj$ini);
   .ini <- .ini[!is.na(.ini$err), ];
   return(sapply(.predDf$cond, function(x){
     .tmp <- .ini[which(.ini$condition == x), ];
@@ -2531,7 +2562,7 @@ nlmixrUI.saem.res.name <- function(obj){
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.ares <- function(obj){
   .predDf <- obj$predDf;
-  .ini <- as.data.frame(obj$ini);
+  .ini <- .as.data.frame(obj$ini);
   .ini <- .ini[!is.na(.ini$err), ];
   return(sapply(.predDf$cond, function(x){
     .tmp <- .ini[which(.ini$condition == x), ];
@@ -2554,7 +2585,7 @@ nlmixrUI.saem.ares <- function(obj){
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.bres <- function(obj){
   .predDf <- obj$predDf;
-  .ini <- as.data.frame(obj$ini);
+  .ini <- .as.data.frame(obj$ini);
   .ini <- .ini[!is.na(.ini$err), ];
   return(sapply(.predDf$cond, function(x){
     .tmp <- .ini[which(.ini$condition == x), ];
@@ -2645,7 +2676,7 @@ nlmixrUI.saem.model <- function(obj){
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.theta.name <- function(uif){
   .trans <- uif$saem.theta.trans
-  .df <- as.data.frame(uif$ini);
+  .df <- .as.data.frame(uif$ini);
   .df <- .df[!is.na(.df$ntheta), ]
   .transName <- paste(.df$name[which(!is.na(.trans))]);
   .trans <- .trans[!is.na(.trans)]
@@ -2790,7 +2821,7 @@ nlmixrUI.model.desc <- function(obj){
 
 nlmixrUI.lincmt.dvdx <- function(obj){
   if (is.null(obj$rxode.pred)){
-    .df <- as.data.frame(obj$ini)
+    .df <- .as.data.frame(obj$ini)
     .dft <- .df[!is.na(.df$ntheta), ];
     .unfixed <- with(.dft, sprintf("%s=THETA[%d]", name, seq_along(.dft$name)))
     .eta <- .df[!is.na(.df$neta1), ];
@@ -2806,25 +2837,25 @@ nlmixrUI.lincmt.dvdx <- function(obj){
 }
 
 nlmixrUI.poped.notfixed_bpop <- function(obj){
-  .df <- as.data.frame(obj$ini);
+  .df <- .as.data.frame(obj$ini);
   .tmp <- .df[!is.na(.df$ntheta) & is.na(.df$err), ]
   return( setNames(1 - .tmp$fix* 1, paste(.tmp$name)))
 }
 
 nlmixrUI.poped.d <- function(obj){
-  .df <- as.data.frame(obj$ini);
+  .df <- .as.data.frame(obj$ini);
   .tmp <- .df[which(is.na(.df$ntheta) & .df$neta1 == .df$neta2), ]
   return(setNames(.tmp$est, paste(.tmp$name)))
 }
 
 nlmixrUI.poped.sigma <- function(obj){
-  .df <- as.data.frame(obj$ini);
+  .df <- .as.data.frame(obj$ini);
   .tmp <- .df[!which(is.na(.df$err) & .df$neta1 == .df$neta2), ]
   return(setNames(.tmp$est * .tmp$est, paste(.tmp$name)))
 }
 
 nlmixUI.logThetasList  <- function(obj){
-  .ini <- as.data.frame(obj$ini);
+  .ini <- .as.data.frame(obj$ini);
   .logThetas <- as.integer(which(setNames(sapply(obj$focei.names,function(x)any(x==obj$log.theta)),NULL)));
   .thetas  <- .ini[!is.na(.ini$ntheta),]
   .one <- obj$oneTheta
@@ -2838,7 +2869,7 @@ nlmixrUI.poped.ff_fun <- function(obj){
   if (!is.null(obj$lin.solved)){
     stop("Solved system not supported yet.")
   } else {
-    .df <- as.data.frame(obj$ini)
+    .df <- .as.data.frame(obj$ini)
     .dft <- .df[!is.na(.df$ntheta) & is.na(.df$err), ];
     .unfixed <- with(.dft, sprintf("%s=bpop[%d]", name, seq_along(.dft$name)))
     .eta <- .df[!is.na(.df$neta1), ];

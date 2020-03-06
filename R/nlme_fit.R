@@ -302,7 +302,7 @@ prepEv <- function(dati, theta)
     nar3 <- length(arr3)
     nevt <- nar1+nar2
     s <- .C("mergeArrays", arr1, arr2, arr3, integer(nar1), double(nevt), nar1, nar2, nar3)
-    datii <- data.frame(time=s[[5]], evid=0, amt=0)
+    datii <- .data.frame(time=s[[5]], evid=0, amt=0)
     wh <- s[[3]];
     datii$evid[wh] <- 10101;
     datii$amt[wh] <- theta["RATE"]
@@ -591,7 +591,7 @@ print.summaryNlmixrNlme <- function (x, verbose = FALSE, ..., print.data=FALSE)
         cat("  Subset:", deparse(asOneSidedFormula(x$call$subset)[[2L]]),
             "\n")
     }
-    print(data.frame(AIC = x$AIC, BIC = x$BIC, logLik = c(x$logLik),
+    print(.data.frame(AIC = x$AIC, BIC = x$BIC, logLik = c(x$logLik),
                      row.names = " "))
     if (verbose) {
         cat("Convergence at iteration:", x$numIter, "\n")
@@ -608,7 +608,7 @@ print.summaryNlmixrNlme <- function (x, verbose = FALSE, ..., print.data=FALSE)
         cat(deparse(lapply(fixF, function(el) as.name(deparse(el)))),
             "\n")
     }
-    xtTab <- as.data.frame(x$tTable)
+    xtTab <- .as.data.frame(x$tTable)
     wchPval <- match("p-value", names(xtTab))
     for (i in names(xtTab)[-wchPval]) {
         xtTab[, i] <- format(zapsmall(xtTab[, i]))
@@ -777,7 +777,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
                  OMGA=ome)
     nlme.time <- proc.time() - pt;
     if (missing(data)){
-        dat <- as.data.frame(getData(object));
+        dat <- .as.data.frame(getData(object));
     } else {
         dat <- data;
     }
@@ -788,7 +788,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     cov <- diag(length(var))
     diag(cov) <- var*var;
     attr(cov, "dimnames") <- list(names(var), names(var));
-    .ini <- as.data.frame(uif$ini)
+    .ini <- .as.data.frame(uif$ini)
     .ini <- .ini[!is.na(.ini$ntheta),];
     .skipCov <- !is.na(.ini$err);
     if (is(object, "nlme.free")){
@@ -821,24 +821,24 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
                             crayon::italic(paste0(ifelse(is.null(uif$nmodel$lin.solved), ifelse(uif$predSys, "PRED", "ODE"), "Solved"),
                                                   "; ", .text)), ")")
         if (is.na(calcResid)){
-            env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
+            env$theta <- .data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
             env$fullTheta <- setNames(init$THTA, uif$focei.names)
             .om0 <- .genOM(.parseOM(init$OMGA));
             attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
             env$omega <- .om0;
-            env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
+            env$etaObf <- .data.frame(ID=seq_along(mat[, 1]), setNames(.as.data.frame(mat), uif$eta.names), OBJI=NA);
             env$noLik <- FALSE;
             env$objective <- -2 * as.numeric(logLik(object));
             env$objectiveType <- "nlme";
             env$adjObf <- TRUE
             if (object$method == "REML") env$objectiveType <- "nlmeREML";
         } else if (!calcResid){
-            env$theta <- data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
+            env$theta <- .data.frame(lower= -Inf, theta=init$THTA, upper=Inf, fixed=FALSE, row.names=uif$focei.names);
             env$fullTheta <- setNames(init$THTA, uif$focei.names)
             .om0 <- .genOM(.parseOM(init$OMGA));
             attr(.om0, "dimnames") <- list(uif$eta.names, uif$eta.names)
             env$omega <- .om0;
-            env$etaObf <- data.frame(ID=seq_along(mat[, 1]), setNames(as.data.frame(mat), uif$eta.names), OBJI=NA);
+            env$etaObf <- .data.frame(ID=seq_along(mat[, 1]), setNames(.as.data.frame(mat), uif$eta.names), OBJI=NA);
             env$noLik <- TRUE;
             env$objective <- -2 * as.numeric(logLik(object));
             env$adjObf <- TRUE
@@ -896,12 +896,12 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
         row.names(env$objDf) <- "nlme";
     } else {
         env$adjObf <- TRUE
-        .tmp <- data.frame(OBJF=-2 * as.numeric(logLik(object))-
+        .tmp <- .data.frame(OBJF=-2 * as.numeric(logLik(object))-
                                ifelse(env$adjObf,nobs(object)*log(2*pi),0),
                            AIC=AIC(object), BIC=BIC(object),
                            "Log-likelihood"=as.numeric(logLik(object)), check.names=FALSE);
         if (any(names(env$objDf) == "Condition Number"))
-            .tmp <- data.frame(.tmp, "Condition Number"=env$objDf[,"Condition Number"], check.names=FALSE);
+            .tmp <- .data.frame(.tmp, "Condition Number"=env$objDf[,"Condition Number"], check.names=FALSE);
         env$objDf  <- rbind(env$objDf, .tmp)
         row.names(env$objDf) <- c("FOCEi", "nlme");
     }
@@ -911,9 +911,9 @@ as.focei.nlmixrNlme <- function(object, uif, pt=proc.time(), ..., data, calcResi
     .nlmeTime <- .nlmeTime["elapsed"]
     if (calcResid){
       .nlmeTime  <- .nlmeTime - .cwresTime["elapsed"];
-      .time  <- data.frame(.time, cwres=.cwresTime["elapsed"], check.names=FALSE);
+      .time  <- .data.frame(.time, cwres=.cwresTime["elapsed"], check.names=FALSE);
     }
-    .env$time <- data.frame(nlme=.nlmeTime, .time, check.names=FALSE, row.names=c(""))
+    .env$time <- .data.frame(nlme=.nlmeTime, .time, check.names=FALSE, row.names=c(""))
     if (inherits(fit.f, "nlmixrFitData")){
         .cls <- class(fit.f);
         .env <- attr(.cls, ".foceiEnv");
