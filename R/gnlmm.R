@@ -345,7 +345,8 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 	data.sav = data
 	names(data) <- tolower(names(data))		#needed in ev
 
-    #model
+    ##model
+    RxODE::rxReq("lbfgs")
     if (is.null(system)) {}
     else if (class(system) == "RxODE") {}
     else if (class(system) == "character") {
@@ -525,7 +526,7 @@ gnlmm <- function(llik, data, inits, syspar=NULL,
 			}
 
 			pvd = NULL; nfcall = 0
-			..fit.inner = lbfgs(f, g, starts[.wh,], invisible=T, epsilon=10000*con$reltol.inner)
+			..fit.inner = lbfgs::lbfgs(f, g, starts[.wh,], invisible=T, epsilon=10000*con$reltol.inner)
 			..fit.inner$hessian = optimHess(..fit.inner$par, f, g)
 			} else {
 			..fit.inner = optim(par=starts[.wh,], ..g.fn, method=con$optim.inner,

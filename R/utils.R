@@ -307,7 +307,8 @@ dynmodel = function(system, model, evTable, inits, data, fixPars=NULL,
 		fit = mymin(as.vector(inits), obj, control=control)
 		fit$message=c("NON-CONVERGENCE", "NELDER_FTOL_REACHED")[1+fit$convergence]
 	} else if (method=="L-BFGS-B") {
-		fit = lbfgs(as.vector(inits), obj, control=control)
+            RxODE::rxReq("lbfgs")
+            fit = lbfgs::lbfgs(as.vector(inits), obj, control=control)
 	} else {
 		if ("ftol_rel" %in% names(control)) {
 			control$rel.tol = control$ftol_rel

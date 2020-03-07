@@ -221,7 +221,7 @@ nlmixrSim <- function(object, ...){
         .dataName  <- ifelse(is.null(object$uif$data.name),"",paste0(object$uif$data.name,"-"));
         if (.dataName==".-") .dataName <- ""
         .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",object$uif$fun.txt)),
-                                       as..data.frame(object$uif$ini),
+                                       as.data.frame(object$uif$ini),
                                        .xtra,
                                        as.character(utils::packageVersion("nlmixr")),
                                        as.character(utils::packageVersion("RxODE"))))
@@ -483,7 +483,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("linear", "locf", "
         .dataName  <- ifelse(is.null(object$uif$data.name),"",paste0(object$uif$data.name,"-"));
         if (.dataName==".-") .dataName <- ""
         .digest <- digest::digest(list(gsub("<-","=",gsub(" +","",object$uif$fun.txt)),
-                                       as..data.frame(object$uif$ini),
+                                       as.data.frame(object$uif$ini),
                                        covsInterpolation,
                                        primary, minimum, maximum, length.out,
                                        as.character(utils::packageVersion("nlmixr")),

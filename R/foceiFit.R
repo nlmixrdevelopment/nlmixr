@@ -800,6 +800,7 @@ foceiControl <- function(sigdig=3,...,
         outerOpt <- match.arg(outerOpt);
         .outerOptTxt <- outerOpt;
         if (outerOpt == "bobyqa"){
+            RxODE::rxReq("minqa")
             outerOptFun <- .bobyqa;
             outerOpt <- -1L;
         } else if (outerOpt == "nlminb"){
