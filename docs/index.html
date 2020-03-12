@@ -45,7 +45,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -159,9 +159,9 @@
 <a href="#nlmixr-an-r-package-for-population-pkpd-modeling" class="anchor"></a>nlmixr: an R package for population PKPD modeling</h1></div>
 <hr>
 <p><img src="logo.png" alt="nlmixr"></p>
-<div id="authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-mirjam-trame-teun-post-richard-hooijmaijers-wenping-wang" class="section level5">
+<div id="authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-teun-post-richard-hooijmaijers-wenping-wang" class="section level5">
 <h5 class="hasAnchor">
-<a href="#authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-mirjam-trame-teun-post-richard-hooijmaijers-wenping-wang" class="anchor"></a>Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Teun Post, Richard Hooijmaijers, Wenping Wang</h5>
+<a href="#authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-teun-post-richard-hooijmaijers-wenping-wang" class="anchor"></a>Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Teun Post, Richard Hooijmaijers, Wenping Wang</h5>
 <hr>
 <p><code>nlmixr</code> is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter defintion syntax and results in a fit object that can be used as input into the <code>Xpose</code> package. Running nlmixr using the UUI is described in the vignette: ihttps://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd</p>
 <p>Under the hood <code>nlmixr</code> has five main modules:</p>
@@ -188,7 +188,7 @@
 <h1 class="hasAnchor">
 <a href="#using-a-docker-image-for-running-nlmixr" class="anchor"></a>Using a Docker Image for running nlmixr</h1>
 <p>One of the easiest way to setup nlmixr is to docker image. For more details see:</p>
-<p><a href="https://github.com/nlmixrdevelopment/nlmixr/releases/download/v9.0.1-0/dockerInstall.pdf" class="uri">https://github.com/nlmixrdevelopment/nlmixr/releases/download/v9.0.1-0/dockerInstall.pdf</a></p>
+<p><a href="https://github.com/RichardHooijmaijers/nlmixr.docker" class="uri">https://github.com/RichardHooijmaijers/nlmixr.docker</a></p>
 </div>
 <div id="windows-installer" class="section level1">
 <h1 class="hasAnchor">
@@ -250,7 +250,7 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 </ol>
 <ul>
 <li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
-<li>Once installed, type <code>RxODE::rxWinPythonSetup()</code> to install the required package <code>SnakeCharmR</code>and to make sure Python and SymPy are working properly. Since <code>SnakeCharmR</code> is orphaned, it may not work without installing directly from github with the following command: <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("nlmixrdevelopment/SnakeCharmR")</a></code>
+<li>Once installed, type <code><a href="https://nlmixrdevelopment.github.io/RxODE/reference/rxWinPythonSetup.html">RxODE::rxWinPythonSetup()</a></code> to install the required package <code>SnakeCharmR</code>and to make sure Python and SymPy are working properly. Since <code>SnakeCharmR</code> is orphaned, it may not work without installing directly from github with the following command: <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("nlmixrdevelopment/SnakeCharmR")</a></code>
 </li>
 <li>Restart your R session.</li>
 <li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://rdrr.io/r/base/library.html">library(SnakeCharmR)</a></code>.</li>
@@ -263,7 +263,7 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code
 <ul>
 <li>Load <code>devtools</code> again using <code><a href="https://rdrr.io/r/base/library.html">library(devtools)</a></code>
 </li>
-<li>Since <code>nlmixr</code> shares some stan headers, nlmixr now needs <code>C++14</code> support. To ease the setup you can run the command <code>RxODE::rxC14()</code> which creates the following build file in <code>~/.R/Makevars.win</code>. If there are problems you may have to edit the file manually to match your configuration.</li>
+<li>Since <code>nlmixr</code> shares some stan headers, nlmixr now needs <code>C++14</code> support. To ease the setup you can run the command <code><a href="https://nlmixrdevelopment.github.io/RxODE/reference/rxC14.html">RxODE::rxC14()</a></code> which creates the following build file in <code>~/.R/Makevars.win</code>. If there are problems you may have to edit the file manually to match your configuration.</li>
 </ul>
 <pre class="{make}"><code># Makvars.win
 CXX14=$(BINPREF)g++ $(M_ARCH)
@@ -448,7 +448,7 @@ devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/
 <p>If it doesn’t crash R, then python is likely setup correctly.</p>
 <p>After that point you can then type:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(RxODE)
-<span class="kw">rxSymPyVersion</span>()</code></pre></div>
+<span class="kw"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/rxSymPyVersion.html">rxSymPyVersion</a></span>()</code></pre></div>
 <p>It will show the version of sympy that you are using if SnakeCharmR is setup correctly.</p>
 </div>
 <div id="testing-the-install" class="section level1">
@@ -505,7 +505,6 @@ nlmixr run under saem: Yes
 <li>Yuan Xiong <br><small class="roles"> Author </small>  </li>
 <li>Rik Schoemaker <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7538-3005" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
 <li>Justin Wilkins <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7099-9396" target="orcid.widget"><img src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg" class="orcid" alt="ORCID"></a> </li>
-<li>Mirjam Trame <br><small class="roles"> Author </small>  </li>
 <li>Richard Hooijmaijers <br><small class="roles"> Author </small>  </li>
 <li>Teun Post <br><small class="roles"> Author </small>  </li>
 <li>Wenping Wang <br><small class="roles"> Author, maintainer </small>  </li>
@@ -518,7 +517,7 @@ nlmixr run under saem: Yes
 
 
       <footer><div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

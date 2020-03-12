@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -150,7 +150,7 @@
       <h1>mavoglurant – Physiologically-based PK</h1>
                         <h4 class="author">Wenping Wang</h4>
             
-            <h4 class="date">2019-11-11</h4>
+            <h4 class="date">2020-03-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/mavoglurant.Rmd"><code>vignettes/mavoglurant.Rmd</code></a></small>
       <div class="hidden name"><code>mavoglurant.Rmd</code></div>
@@ -342,7 +342,11 @@ gofs &lt;-<span class="st"> </span><span class="cf">function</span>(fit){
 <div id="fit-addprop-saem" class="section level2">
 <h2 class="hasAnchor">
 <a href="#fit-addprop-saem" class="anchor"></a>Fit add+prop SAEM</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit.addProp.S &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pbpk, dat, <span class="dt">est=</span><span class="st">"saem"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit.addProp.S &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pbpk, dat, <span class="dt">est=</span><span class="st">"saem"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>), 
+                        <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [1] "WT"</span>
 
 <span class="kw">gofs</span>(fit.addProp.S);</code></pre></div>
 <p><img src="mavoglurant_files/figure-html/unnamed-chunk-2-1.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-2.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-3.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-4.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-5.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-6.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-7.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-8.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-9.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-10.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-11.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-12.png" width="100%"></p>
@@ -353,7 +357,11 @@ gofs &lt;-<span class="st"> </span><span class="cf">function</span>(fit){
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit.lnorm.S &lt;-<span class="st"> </span>pbpk <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/model.html">model</a></span>({C15 <span class="op">~</span><span class="st"> </span><span class="kw">lnorm</span>(lnorm.err)}) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Change C15 to be log-normally distributed</span>
 <span class="st">    </span>## Requires data since piping from pbpk model
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(dat,<span class="dt">est=</span><span class="st">"saem"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))</code></pre></div>
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(dat,<span class="dt">est=</span><span class="st">"saem"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [1] "WT"</span></code></pre></div>
 <p><strong>NOTE:</strong> lognormal distribution AIC/loglik/etc is on normal scale. Therefore, you can compare the AICs between fit.lnorm and fit.addProp since they are calculated on the same scale.</p>
 <p>In this case you can see that the AIC for the log-normal model is better than the AIC for the addProp model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">gofs</span>(fit.lnorm.S);</code></pre></div>
@@ -368,7 +376,13 @@ gofs &lt;-<span class="st"> </span><span class="cf">function</span>(fit){
 <h2 class="hasAnchor">
 <a href="#additive-proportional" class="anchor"></a>Additive + Proportional</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit.addProp.F &lt;-<span class="st"> </span>fit.addProp.S <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>));
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>,
+           <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>), 
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>));
+<span class="co">#&gt; [1] "WT"</span>
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:49 </span>
+<span class="co">#&gt; done</span>
 ## Since this was a model pipline, the data
 ## remains the same as the last fit.
 
@@ -380,7 +394,13 @@ gofs &lt;-<span class="st"> </span><span class="cf">function</span>(fit){
 <a href="#lognoral" class="anchor"></a>Lognoral</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit.lnorm.F &lt;-<span class="st"> </span>fit.addProp.F <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/model.html">model</a></span>({C15 <span class="op">~</span><span class="st"> </span><span class="kw">lnorm</span>(lnorm.err)}) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>));
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>,
+           <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>), 
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>));
+<span class="co">#&gt; [1] "WT"</span>
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:51 </span>
+<span class="co">#&gt; done</span>
 ## In this model pipline we are changing the fit method to focei.
 
 <span class="kw">gofs</span>(fit.lnorm.F);</code></pre></div>
@@ -490,7 +510,20 @@ pbpkL &lt;-<span class="st"> </span><span class="cf">function</span>(){
 }
 
 fit.lnorm.trans &lt;-<span class="st"> </span>pbpkL <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(datL,<span class="dt">est=</span><span class="st">"saem"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">npde=</span><span class="ot">TRUE</span>, <span class="dt">cwres=</span><span class="ot">TRUE</span>))</code></pre></div>
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(datL,<span class="dt">est=</span><span class="st">"saem"</span>,
+           <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>), 
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">npde=</span><span class="ot">TRUE</span>, <span class="dt">cwres=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:04 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:06 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [1] "WT"</span></code></pre></div>
 <p><strong>NOTE:</strong> the estimates are the same but the AIC is different since it is calculated on the log scale.</p>
 </div>
 </div>
@@ -524,7 +557,7 @@ fit.lnorm.trans &lt;-<span class="st"> </span>pbpkL <span class="op">%&gt;%</spa
 
 
       <footer><div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

@@ -82,7 +82,7 @@ on the number of subjects and observations the model was based on." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -208,21 +208,53 @@ on the number of subjects and observations the model was based on.</p>
     <pre class="usage"><span class='fu'>nlmixrSim</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for nlmixrFitData</span>
-<span class='fu'><a href='https://rdrr.io/pkg/RxODE/man/rxSolve.html'>rxSolve</a></span>(<span class='no'>object</span>, <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>events</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>inits</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>scale</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"liblsoda"</span>, <span class='st'>"lsoda"</span>,
-  <span class='st'>"dop853"</span>), <span class='kw'>transitAbs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>atol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>, <span class='kw'>rtol</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
-  <span class='kw'>maxsteps</span> <span class='kw'>=</span> <span class='fl'>5000L</span>, <span class='kw'>hmin</span> <span class='kw'>=</span> <span class='fl'>0L</span>, <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hini</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
-  <span class='kw'>maxordn</span> <span class='kw'>=</span> <span class='fl'>12L</span>, <span class='kw'>maxords</span> <span class='kw'>=</span> <span class='fl'>5L</span>, <span class='no'>...</span>, <span class='no'>cores</span>,
+<span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html'>rxSolve</a></span>(
+  <span class='no'>object</span>,
+  <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>events</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>inits</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>scale</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"liblsoda"</span>, <span class='st'>"lsoda"</span>, <span class='st'>"dop853"</span>),
+  <span class='kw'>transitAbs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>atol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>,
+  <span class='kw'>rtol</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
+  <span class='kw'>maxsteps</span> <span class='kw'>=</span> <span class='fl'>5000L</span>,
+  <span class='kw'>hmin</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
+  <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>hini</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
+  <span class='kw'>maxordn</span> <span class='kw'>=</span> <span class='fl'>12L</span>,
+  <span class='kw'>maxords</span> <span class='kw'>=</span> <span class='fl'>5L</span>,
+  <span class='no'>...</span>,
+  <span class='no'>cores</span>,
   <span class='kw'>covsInterpolation</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"linear"</span>, <span class='st'>"locf"</span>, <span class='st'>"nocb"</span>, <span class='st'>"midpoint"</span>),
-  <span class='kw'>addCov</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>matrix</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>sigmaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>nCoresRV</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>sigmaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>nDisplayProgress</span> <span class='kw'>=</span> <span class='fl'>10000L</span>,
-  <span class='kw'>amountUnits</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>, <span class='kw'>timeUnits</span> <span class='kw'>=</span> <span class='st'>"hours"</span>, <span class='no'>stiff</span>,
-  <span class='kw'>theta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>addDosing</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>updateObject</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>omega</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>omegaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>omegaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>nSub</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>thetaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>thetaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>thetaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>nStud</span> <span class='kw'>=</span> <span class='fl'>1L</span>, <span class='kw'>dfSub</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>dfObs</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>returnType</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rxSolve"</span>, <span class='st'>"matrix"</span>, <span class='st'>"data.frame"</span>), <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+  <span class='kw'>addCov</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>matrix</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>sigmaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>nCoresRV</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
+  <span class='kw'>sigmaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>nDisplayProgress</span> <span class='kw'>=</span> <span class='fl'>10000L</span>,
+  <span class='kw'>amountUnits</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
+  <span class='kw'>timeUnits</span> <span class='kw'>=</span> <span class='st'>"hours"</span>,
+  <span class='no'>stiff</span>,
+  <span class='kw'>theta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>eta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>addDosing</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>updateObject</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>omega</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>omegaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>omegaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>nSub</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
+  <span class='kw'>thetaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>thetaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>thetaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>nStud</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
+  <span class='kw'>dfSub</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>dfObs</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>returnType</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rxSolve"</span>, <span class='st'>"matrix"</span>, <span class='st'>"data.frame"</span>),
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
 
 <span class='co'># S3 method for nlmixrFitData</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>object</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
@@ -251,7 +283,7 @@ parameter identifiers used in the ODE specification;</p></td>
       <th>events</th>
       <td><p>an <code>eventTable</code> object describing the input
 (e.g., doses) to the dynamic system and observation sampling
-time points (see <code><a href='https://rdrr.io/pkg/RxODE/man/eventTable.html'>eventTable</a></code>);</p></td>
+time points (see <code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/eventTable.html'>eventTable</a></code>);</p></td>
     </tr>
     <tr>
       <th>inits</th>
@@ -338,7 +370,7 @@ method.  The default value is 5.  This can be between 1 and 5.</p></td>
       <th>cores</th>
       <td><p>Number of cores used in parallel ODE solving.  This
 defaults to the number or system cores determined by
-<code>rxCores</code> for methods that support parallel
+<code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxCores.html'>rxCores</a></code> for methods that support parallel
 solving (ie thread-safe methods like "liblsoda").</p></td>
     </tr>
     <tr>
@@ -535,11 +567,14 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
 <li><p><code>"rxSolve"</code> (default) will return a reactive data frame
      that can change easily change different pieces of the solve and
      update the data frame.  This is the currently standard solving
-     method in RxODE,  is used for <code><a href='https://rdrr.io/pkg/RxODE/man/rxSolve.html'>rxSolve(object, ...)</a></code>, <code><a href='https://rdrr.io/r/base/solve.html'>solve(object,...)</a></code>,</p></li>
+     method in RxODE,  is used for <code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html'>rxSolve(object, ...)</a></code>, <code><a href='https://rdrr.io/r/base/solve.html'>solve(object,...)</a></code>,</p></li>
 <li><p><code>"data.frame"</code> -- returns a plain, non-reactive data
-     frame; Currently very slightly Faster than <code>returnType="matrix"</code></p></li>
+     frame; Currently very slightly faster than <code>returnType="matrix"</code></p></li>
 <li><p><code>"matrix"</code> -- returns a plain matrix with column names attached
     to the solved object.  This is what is used <code>object$run</code> as well as <code>object$solve</code></p></li>
+<li><p><code>"data.table"</code> -- returns a <code>data.table</code>; The <code>data.table</code> is
+    created by reference (ie <code>setDt()</code>), which should be fast.</p></li>
+<li><p><code>"tbl"</code> or <code>"tibble"</code> returns a tibble format.</p></li>
 </ul></td>
     </tr>
     <tr>
@@ -581,7 +616,7 @@ named argument, this overwrites the output</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

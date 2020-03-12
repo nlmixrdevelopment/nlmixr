@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -195,9 +195,16 @@
     <p>Get the optimal forward difference interval by Gill83 method</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nlmixrGill83</span>(<span class='no'>what</span>, <span class='no'>args</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(), <span class='no'>which</span>,
-  <span class='kw'>gillRtol</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='no'>.Machine</span>$<span class='no'>double.eps</span>), <span class='kw'>gillK</span> <span class='kw'>=</span> <span class='fl'>10L</span>, <span class='kw'>gillStep</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>gillFtol</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+    <pre class="usage"><span class='fu'>nlmixrGill83</span>(
+  <span class='no'>what</span>,
+  <span class='no'>args</span>,
+  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(),
+  <span class='no'>which</span>,
+  <span class='kw'>gillRtol</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='no'>.Machine</span>$<span class='no'>double.eps</span>),
+  <span class='kw'>gillK</span> <span class='kw'>=</span> <span class='fl'>10L</span>,
+  <span class='kw'>gillStep</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>gillFtol</span> <span class='kw'>=</span> <span class='fl'>0</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -419,7 +426,7 @@ is accepable before issuing a warning/error about the gradient estimates.</p></t
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

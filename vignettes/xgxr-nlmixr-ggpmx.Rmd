@@ -261,18 +261,22 @@ print(cmt2m)
 
 ```{r}
 ## First try log-normal (since the variabilitiy seemed proportional to concentration)
-cmt2fit.logn <- nlmixr(cmt2m, dat, "saem", table=tableControl(npde=TRUE,cwres=TRUE))
+cmt2fit.logn <- nlmixr(cmt2m, dat, "saem",
+                       control=list(print=0), 
+                       table=tableControl(npde=TRUE,cwres=TRUE))
 
 
 ## Now try proportional
 cmt2fit.prop <- cmt2fit.logn %>%
     update(linCmt() ~ prop(prop.sd)) %>%
-    nlmixr(est="saem", table=tableControl(npde=TRUE, cwres=TRUE))
+    nlmixr(est="saem", control=list(print=0),
+           table=tableControl(npde=TRUE, cwres=TRUE))
 
 ## now try add+prop
 cmt2fit.add.prop <- cmt2fit.prop %>%
     update(linCmt() ~ prop(prop.sd) + add(add.sd)) %>%
-    nlmixr(est="saem", table=tableControl(npde=TRUE, cwres=TRUE))
+    nlmixr(est="saem", control=list(print=0), 
+           table=tableControl(npde=TRUE, cwres=TRUE))
 ```
 
 Now that we have run 3 different estimation methods, we can compare the results side-by-side

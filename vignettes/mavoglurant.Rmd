@@ -219,7 +219,8 @@ gofs <- function(fit){
 ## Fit add+prop SAEM
 
 ```{r}
-fit.addProp.S <- nlmixr(pbpk, dat, est="saem", table=list(cwres=TRUE, npde=TRUE))
+fit.addProp.S <- nlmixr(pbpk, dat, est="saem", control=list(print=0), 
+                        table=list(cwres=TRUE, npde=TRUE))
 
 gofs(fit.addProp.S);
 ```
@@ -230,7 +231,8 @@ gofs(fit.addProp.S);
 fit.lnorm.S <- pbpk %>%
     model({C15 ~ lnorm(lnorm.err)}) %>% # Change C15 to be log-normally distributed
     ## Requires data since piping from pbpk model
-    nlmixr(dat,est="saem", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(dat,est="saem", control=list(print=0),
+           table=list(cwres=TRUE, npde=TRUE))
 ```
 **NOTE:** lognormal distribution AIC/loglik/etc is on normal scale.
 Therefore, you can compare the AICs between fit.lnorm and
@@ -251,7 +253,9 @@ estimation methods.
 ## Additive + Proportional
 ```{r}
 fit.addProp.F <- fit.addProp.S %>%
-    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE));
+    nlmixr(est="focei",
+           control=list(print=0), 
+           table=list(cwres=TRUE, npde=TRUE));
 ## Since this was a model pipline, the data
 ## remains the same as the last fit.
 
@@ -262,7 +266,9 @@ gofs(fit.addProp.F);
 ```{r}
 fit.lnorm.F <- fit.addProp.F %>%
     model({C15 ~ lnorm(lnorm.err)}) %>%
-    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE));
+    nlmixr(est="focei",
+           control=list(print=0), 
+           table=list(cwres=TRUE, npde=TRUE));
 ## In this model pipline we are changing the fit method to focei.
 
 gofs(fit.lnorm.F);
@@ -377,7 +383,9 @@ pbpkL <- function(){
 }
 
 fit.lnorm.trans <- pbpkL %>%
-    nlmixr(datL,est="saem", table=list(npde=TRUE, cwres=TRUE))
+    nlmixr(datL,est="saem",
+           control=list(print=0), 
+           table=list(npde=TRUE, cwres=TRUE))
 ```
 
 **NOTE:** the estimates are the same but the AIC is different since it

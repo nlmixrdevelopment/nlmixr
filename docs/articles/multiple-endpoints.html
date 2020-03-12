@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -149,7 +149,7 @@
     <div class="page-header toc-ignore">
       <h1>Working with multiple endpoints</h1>
             
-            <h4 class="date">2019-11-11</h4>
+            <h4 class="date">2020-03-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/multiple-endpoints.Rmd"><code>vignettes/multiple-endpoints.Rmd</code></a></small>
       <div class="hidden name"><code>multiple-endpoints.Rmd</code></div>
@@ -230,13 +230,13 @@
 <p>To see more about how nlmixr will handle the multiple compartment model, it is quite informative to parse the model and print the information about that model. In this case an initial parsing would give:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ui &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pk.turnover.emax)
 ui
-<span class="co">#&gt; ▂▂ RxODE-based ODE model ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂ </span>
-<span class="co">#&gt; ── Initialization: ──────────────────────────────────────────────────────── </span>
+<span class="co">#&gt; ▂▂ RxODE-based ODE model ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂ </span>
+<span class="co">#&gt; ── Initialization: ───────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt; Fixed Effects ($theta): </span>
-<span class="co">#&gt;       tktr        tka        tcl         tv   poplogit      tec50 </span>
-<span class="co">#&gt;  0.0000000  0.0000000 -2.3025851  2.3025851  2.0000000 -0.6931472 </span>
-<span class="co">#&gt;      tkout        te0 </span>
-<span class="co">#&gt; -2.9957323  4.6051702 </span>
+<span class="co">#&gt;       tktr        tka        tcl         tv   poplogit      tec50      tkout </span>
+<span class="co">#&gt;  0.0000000  0.0000000 -2.3025851  2.3025851  2.0000000 -0.6931472 -2.9957323 </span>
+<span class="co">#&gt;        te0 </span>
+<span class="co">#&gt;  4.6051702 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Omega ($omega): </span>
 <span class="co">#&gt;          eta.ktr eta.ka eta.cl eta.v eta.emax eta.ec50 eta.kout eta.e0</span>
@@ -248,18 +248,17 @@ ui
 <span class="co">#&gt; eta.ec50       0      0      0     0      0.0      0.5      0.0    0.0</span>
 <span class="co">#&gt; eta.kout       0      0      0     0      0.0      0.0      0.5    0.0</span>
 <span class="co">#&gt; eta.e0         0      0      0     0      0.0      0.0      0.0    0.5</span>
-<span class="co">#&gt; ── Multiple Endpoint Model ($multipleEndpoint): ─────────────────────────── </span>
-<span class="co">#&gt; ┌───────────────────────┬───────────────────────┬───────────────────────┐</span>
-<span class="co">#&gt; │ variable              │ cmt                   │ dvid*                 │</span>
-<span class="co">#&gt; ├───────────────────────┼───────────────────────┼───────────────────────┤</span>
-<span class="co">#&gt; │ cp ~ …                │ cmt='cp' or cmt=5     │ dvid='cp' or dvid=1   │</span>
-<span class="co">#&gt; ├───────────────────────┼───────────────────────┼───────────────────────┤</span>
-<span class="co">#&gt; │ effect ~ …            │ cmt='effect' or cmt=4 │ dvid='effect' or      │</span>
-<span class="co">#&gt; │                       │                       │ dvid=2                │</span>
-<span class="co">#&gt; └───────────────────────┴───────────────────────┴───────────────────────┘</span>
-<span class="co">#&gt;   * If dvids are outside this range, all dvids are re-numered            </span>
-<span class="co">#&gt;   sequentially, ie 1,7, 10 becomes 1,2,3 etc                             </span>
-<span class="co">#&gt; ── μ-referencing ($muRefTable): ─────────────────────────────────────────── </span>
+<span class="co">#&gt; ── Multiple Endpoint Model ($multipleEndpoint): ──────────────────────────────── </span>
+<span class="co">#&gt; ┌─────────────────────────┬─────────────────────────┬─────────────────────────┐</span>
+<span class="co">#&gt; │ variable                │ cmt                     │ dvid*                   │</span>
+<span class="co">#&gt; ├─────────────────────────┼─────────────────────────┼─────────────────────────┤</span>
+<span class="co">#&gt; │ cp ~ …                  │ cmt='cp' or cmt=5       │ dvid='cp' or dvid=1     │</span>
+<span class="co">#&gt; ├─────────────────────────┼─────────────────────────┼─────────────────────────┤</span>
+<span class="co">#&gt; │ effect ~ …              │ cmt='effect' or cmt=4   │ dvid='effect' or dvid=2 │</span>
+<span class="co">#&gt; └─────────────────────────┴─────────────────────────┴─────────────────────────┘</span>
+<span class="co">#&gt;   * If dvids are outside this range, all dvids are re-numered                  </span>
+<span class="co">#&gt;   sequentially, ie 1,7, 10 becomes 1,2,3 etc                                   </span>
+<span class="co">#&gt; ── μ-referencing ($muRefTable): ──────────────────────────────────────────────── </span>
 <span class="co">#&gt; ┌──────────┬──────────┐</span>
 <span class="co">#&gt; │ theta    │ eta      │</span>
 <span class="co">#&gt; ├──────────┼──────────┤</span>
@@ -279,7 +278,7 @@ ui
 <span class="co">#&gt; ├──────────┼──────────┤</span>
 <span class="co">#&gt; │ te0      │ eta.e0   │</span>
 <span class="co">#&gt; └──────────┴──────────┘</span>
-<span class="co">#&gt; ── Model: ───────────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt; ── Model: ────────────────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt;     ktr &lt;- exp(tktr + eta.ktr)</span>
 <span class="co">#&gt;     ka &lt;- exp(tka + eta.ka)</span>
 <span class="co">#&gt;     cl &lt;- exp(tcl + eta.cl)</span>
@@ -307,7 +306,7 @@ ui
 <span class="co">#&gt;     cp = center / v</span>
 <span class="co">#&gt;     cp ~ prop(prop.err) + add(pkadd.err)</span>
 <span class="co">#&gt;     effect ~ add(pdadd.err) </span>
-<span class="co">#&gt; ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂</span></code></pre></div>
+<span class="co">#&gt; ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂</span></code></pre></div>
 <p>In the middle of the printout, it shows how the data must be formatted (using the <code>cmt</code> and <code>dvid</code> data items) to allow nlmixr to model the multiple endpoint appropriately.</p>
 <p>Of course if you are interested you can directly access the information in <code>ui$multipleEndpoint</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ui<span class="op">$</span>multipleEndpoint</code></pre></div>
@@ -480,20 +479,20 @@ ui2<span class="op">$</span>multipleEndpoint</code></pre></div>
 <a href="#running-a-multiple-endpoint-model" class="anchor"></a>Running a multiple endpoint model</h2>
 <p>With this information, we can use the built-in warfarin dataset in nlmixr:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(warfarin)
-<span class="co">#&gt;        id             time             amt                dv        </span>
-<span class="co">#&gt;  Min.   : 1.00   Min.   :  0.00   Min.   :  0.000   Min.   :  0.00  </span>
-<span class="co">#&gt;  1st Qu.: 8.00   1st Qu.: 24.00   1st Qu.:  0.000   1st Qu.:  4.50  </span>
-<span class="co">#&gt;  Median :15.00   Median : 48.00   Median :  0.000   Median : 11.40  </span>
-<span class="co">#&gt;  Mean   :16.08   Mean   : 52.08   Mean   :  6.524   Mean   : 20.02  </span>
-<span class="co">#&gt;  3rd Qu.:24.00   3rd Qu.: 96.00   3rd Qu.:  0.000   3rd Qu.: 26.00  </span>
-<span class="co">#&gt;  Max.   :33.00   Max.   :144.00   Max.   :153.000   Max.   :100.00  </span>
-<span class="co">#&gt;   dvid          evid               wt              age            sex     </span>
-<span class="co">#&gt;  cp :283   Min.   :0.00000   Min.   : 40.00   Min.   :21.00   female:101  </span>
-<span class="co">#&gt;  pca:232   1st Qu.:0.00000   1st Qu.: 60.00   1st Qu.:23.00   male  :414  </span>
-<span class="co">#&gt;            Median :0.00000   Median : 70.00   Median :28.00               </span>
-<span class="co">#&gt;            Mean   :0.06214   Mean   : 69.27   Mean   :31.85               </span>
-<span class="co">#&gt;            3rd Qu.:0.00000   3rd Qu.: 78.00   3rd Qu.:36.00               </span>
-<span class="co">#&gt;            Max.   :1.00000   Max.   :102.00   Max.   :63.00</span></code></pre></div>
+<span class="co">#&gt;        id             time             amt                dv          dvid    </span>
+<span class="co">#&gt;  Min.   : 1.00   Min.   :  0.00   Min.   :  0.000   Min.   :  0.00   cp :283  </span>
+<span class="co">#&gt;  1st Qu.: 8.00   1st Qu.: 24.00   1st Qu.:  0.000   1st Qu.:  4.50   pca:232  </span>
+<span class="co">#&gt;  Median :15.00   Median : 48.00   Median :  0.000   Median : 11.40            </span>
+<span class="co">#&gt;  Mean   :16.08   Mean   : 52.08   Mean   :  6.524   Mean   : 20.02            </span>
+<span class="co">#&gt;  3rd Qu.:24.00   3rd Qu.: 96.00   3rd Qu.:  0.000   3rd Qu.: 26.00            </span>
+<span class="co">#&gt;  Max.   :33.00   Max.   :144.00   Max.   :153.000   Max.   :100.00            </span>
+<span class="co">#&gt;       evid               wt              age            sex     </span>
+<span class="co">#&gt;  Min.   :0.00000   Min.   : 40.00   Min.   :21.00   female:101  </span>
+<span class="co">#&gt;  1st Qu.:0.00000   1st Qu.: 60.00   1st Qu.:23.00   male  :414  </span>
+<span class="co">#&gt;  Median :0.00000   Median : 70.00   Median :28.00               </span>
+<span class="co">#&gt;  Mean   :0.06214   Mean   : 69.27   Mean   :31.85               </span>
+<span class="co">#&gt;  3rd Qu.:0.00000   3rd Qu.: 78.00   3rd Qu.:36.00               </span>
+<span class="co">#&gt;  Max.   :1.00000   Max.   :102.00   Max.   :63.00</span></code></pre></div>
 <p>Since dvid specifies <code>pca</code> as the effect endpoint, you can update the model to be more explicit making one last change:</p>
 <pre><code>cp ~ prop(prop.err) + add(pkadd.err)
 effect ~ add(pdadd.err) </code></pre>
@@ -563,47 +562,57 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <a href="#run-the-models-with-saem" class="anchor"></a>Run the models with SAEM</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit.TOS &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pk.turnover.emax3, warfarin, <span class="st">"saem"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
                   <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>));
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ===|====|====|====|====|====|====|====] 0:00:04 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ===|====|====|====|====|====|====|====] 0:00:04 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [1] "CMT"</span>
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(fit.TOS);
-<span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF by FOCEi approximation fit ────────────────────── </span>
+<span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF by FOCEi approximation fit ─────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 1397.183 2322.878 2402.298      -1142.439           1531.7</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;           saem    setup table  cwres covariance  npde    other</span>
-<span class="co">#&gt; elapsed 18.354 63.49316 0.056 63.575      0.071 1.343 0.735836</span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;          saem    setup table  cwres covariance  npde    other</span>
+<span class="co">#&gt; elapsed 27.18 49.56521 0.047 49.632      0.029 1.347 0.542794</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;              Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tktr        0.265  0.284   107       1.3 (0.747, 2.28)     88.2</span>
-<span class="co">#&gt; tka        0.0407  0.245   603      1.04 (0.644, 1.68)     58.4</span>
-<span class="co">#&gt; tcl         -2.01 0.0502  2.49    0.133 (0.121, 0.147)     27.9</span>
-<span class="co">#&gt; tv           2.05 0.0442  2.16       7.73 (7.09, 8.43)     22.5</span>
-<span class="co">#&gt; prop.err    0.116                                0.116         </span>
-<span class="co">#&gt; pkadd.err   0.239                                0.239         </span>
-<span class="co">#&gt; poplogit     2.95  0.443    15       19.2 (8.06, 45.7)     10.2</span>
-<span class="co">#&gt; tec50     -0.0756  0.148   196     0.927 (0.694, 1.24)     53.0</span>
-<span class="co">#&gt; tkout       -2.87 0.0426  1.48 0.0565 (0.0519, 0.0614)     6.62</span>
-<span class="co">#&gt; te0          4.57  0.012 0.262       96.6 (94.3, 98.9)     5.23</span>
-<span class="co">#&gt; pdadd.err    4.08                                 4.08         </span>
-<span class="co">#&gt;           Shrink(SD)%</span>
-<span class="co">#&gt; tktr           48.4% </span>
-<span class="co">#&gt; tka            52.1% </span>
-<span class="co">#&gt; tcl            1.48% </span>
-<span class="co">#&gt; tv             9.14% </span>
-<span class="co">#&gt; prop.err             </span>
-<span class="co">#&gt; pkadd.err            </span>
-<span class="co">#&gt; poplogit       84.2% </span>
-<span class="co">#&gt; tec50          6.17% </span>
-<span class="co">#&gt; tkout          43.8% </span>
-<span class="co">#&gt; te0            19.9% </span>
-<span class="co">#&gt; pdadd.err             </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
+<span class="co">#&gt;              Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
+<span class="co">#&gt; tktr        0.265  0.284   107       1.3 (0.747, 2.28)     88.2      48.4% </span>
+<span class="co">#&gt; tka        0.0407  0.245   603      1.04 (0.644, 1.68)     58.4      52.1% </span>
+<span class="co">#&gt; tcl         -2.01 0.0502  2.49    0.133 (0.121, 0.147)     27.9      1.48% </span>
+<span class="co">#&gt; tv           2.05 0.0442  2.16       7.73 (7.09, 8.43)     22.5      9.14% </span>
+<span class="co">#&gt; prop.err    0.116                                0.116                     </span>
+<span class="co">#&gt; pkadd.err   0.239                                0.239                     </span>
+<span class="co">#&gt; poplogit     2.95  0.443    15       19.2 (8.06, 45.7)     10.2      84.2% </span>
+<span class="co">#&gt; tec50     -0.0756  0.148   196     0.927 (0.694, 1.24)     53.0      6.17% </span>
+<span class="co">#&gt; tkout       -2.87 0.0426  1.48 0.0565 (0.0519, 0.0614)     6.62      43.8% </span>
+<span class="co">#&gt; te0          4.57  0.012 0.262       96.6 (94.3, 98.9)     5.23      19.9% </span>
+<span class="co">#&gt; pdadd.err    4.08                                 4.08                     </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): linFim</span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 483 x 42</span>
 <span class="co">#&gt;   ID     TIME    DV  EVID CMT    PRED   RES   WRES IPRED   IRES IWRES CPRED</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
@@ -611,12 +620,11 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; 2 1       1     1.9     0 cp     4.16 -2.26 -0.849 1.57   0.329  1.09  3.24</span>
 <span class="co">#&gt; 3 1       2     3.3     0 cp     8.57 -5.27 -1.91  4.21  -0.906 -1.67  7.80</span>
 <span class="co">#&gt; # … with 480 more rows, and 30 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.ktr &lt;dbl&gt;, eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.emax &lt;dbl&gt;, eta.ec50 &lt;dbl&gt;, eta.kout &lt;dbl&gt;, eta.e0 &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   ktr &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, logit &lt;dbl&gt;, emax &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   ec50 &lt;dbl&gt;, kout &lt;dbl&gt;, e0 &lt;dbl&gt;, DCP &lt;dbl&gt;, PD &lt;dbl&gt;, kin &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, gut &lt;dbl&gt;, center &lt;dbl&gt;, effect &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt; #   eta.ktr &lt;dbl&gt;, eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, eta.emax &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.ec50 &lt;dbl&gt;, eta.kout &lt;dbl&gt;, eta.e0 &lt;dbl&gt;, ktr &lt;dbl&gt;, ka &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cl &lt;dbl&gt;, v &lt;dbl&gt;, logit &lt;dbl&gt;, emax &lt;dbl&gt;, ec50 &lt;dbl&gt;, kout &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   e0 &lt;dbl&gt;, DCP &lt;dbl&gt;, PD &lt;dbl&gt;, kin &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, gut &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   center &lt;dbl&gt;, effect &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 <div id="saem-diagnostic-plots" class="section level3">
 <h3 class="hasAnchor">
 <a href="#saem-diagnostic-plots" class="anchor"></a>SAEM Diagnostic plots</h3>
@@ -641,86 +649,54 @@ gridExtra<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## FOCEi fit/vpcs
 fit.TOF &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pk.turnover.emax3, warfarin, <span class="st">"focei"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
                   <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>));
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
 <span class="co">#&gt; [1] "CMT"</span>
 <span class="co">#&gt; Calculating covariance matrix</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:02:39 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:03:14 </span>
 <span class="co">#&gt; done</span></code></pre></div>
 <div id="focei-diagnostic-plots" class="section level3">
 <h3 class="hasAnchor">
 <a href="#focei-diagnostic-plots" class="anchor"></a>FOCEi Diagnostic Plots</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(fit.TOF)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 1376.954 2302.649 2382.069      -1132.324         11849.62</span>
+<span class="co">#&gt; FOCEi 1345.072 2270.766 2350.187      -1116.383         5382.342</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 3.603914  159.677    159.677 0.121 1.354 381.5891</span>
+<span class="co">#&gt; elapsed 0.259946 194.9428   194.9428  0.05 1.138 468.2325</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;              Est.     SE     %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tktr      -0.0997   2.58 2.59e+03    0.905 (0.00572, 143)     112.</span>
-<span class="co">#&gt; tka         -0.45   2.53      562   0.638 (0.00448, 90.7)     123.</span>
-<span class="co">#&gt; tcl            -2  0.124     6.19    0.136 (0.107, 0.173)     28.6</span>
-<span class="co">#&gt; tv           2.07  0.118     5.69       7.93 (6.29, 9.99)     23.5</span>
-<span class="co">#&gt; prop.err    0.125                                   0.125         </span>
-<span class="co">#&gt; pkadd.err   0.256                                   0.256         </span>
-<span class="co">#&gt; poplogit     3.17    1.3     41.1        23.8 (1.86, 306)     28.1</span>
-<span class="co">#&gt; tec50     -0.0117  0.258 2.21e+03     0.988 (0.596, 1.64)     52.5</span>
-<span class="co">#&gt; tkout       -2.89    0.1     3.47 0.0556 (0.0457, 0.0677)     11.0</span>
-<span class="co">#&gt; te0          4.57 0.0411    0.901        96.2 (88.7, 104)     7.08</span>
-<span class="co">#&gt; pdadd.err    3.89                                    3.89         </span>
-<span class="co">#&gt;           Shrink(SD)%</span>
-<span class="co">#&gt; tktr           62.1% </span>
-<span class="co">#&gt; tka            58.0% </span>
-<span class="co">#&gt; tcl            1.91% </span>
-<span class="co">#&gt; tv             8.46% </span>
-<span class="co">#&gt; prop.err             </span>
-<span class="co">#&gt; pkadd.err            </span>
-<span class="co">#&gt; poplogit       87.6% </span>
-<span class="co">#&gt; tec50          6.70% </span>
-<span class="co">#&gt; tkout          33.8% </span>
-<span class="co">#&gt; te0            27.6% </span>
-<span class="co">#&gt; pdadd.err             </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
+<span class="co">#&gt;             Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
+<span class="co">#&gt; tktr       0.164   1.35   824     1.18 (0.0829, 16.8)     82.7      62.6% </span>
+<span class="co">#&gt; tka        0.352   2.13   605       1.42 (0.0218, 93)     183.      66.1% </span>
+<span class="co">#&gt; tcl        -2.03  0.139  6.84    0.132 (0.101, 0.173)     31.8      8.79% </span>
+<span class="co">#&gt; tv          2.07  0.124  5.98         7.9 (6.2, 10.1)     24.1      9.92% </span>
+<span class="co">#&gt; prop.err   0.101                                0.101                     </span>
+<span class="co">#&gt; pkadd.err  0.399                                0.399                     </span>
+<span class="co">#&gt; poplogit    3.66   2.06  56.4    38.7 (0.68, 2.2e+03)     95.9      81.8% </span>
+<span class="co">#&gt; tec50     0.0857  0.278   324      1.09 (0.632, 1.88)     53.6      12.6% </span>
+<span class="co">#&gt; tkout      -2.92  0.096  3.29 0.0542 (0.0449, 0.0654)     10.9      34.5% </span>
+<span class="co">#&gt; te0         4.57 0.0396 0.867        96.6 (89.4, 104)     7.08      28.3% </span>
+<span class="co">#&gt; pdadd.err   3.84                                 3.84                     </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): s</span>
 <span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
-<span class="co">#&gt;           cor:tka,tktr       cor:tcl,tktr        cor:tv,tktr </span>
-<span class="co">#&gt;                -0.956              0.373             -0.505  </span>
-<span class="co">#&gt;      cor:poplogit,tktr     cor:tec50,tktr     cor:tkout,tktr </span>
-<span class="co">#&gt;                 0.202            0.00817             -0.210  </span>
-<span class="co">#&gt;           cor:te0,tktr        cor:tcl,tka         cor:tv,tka </span>
-<span class="co">#&gt;                -0.586             -0.423              0.533  </span>
-<span class="co">#&gt;       cor:poplogit,tka      cor:tec50,tka      cor:tkout,tka </span>
-<span class="co">#&gt;                -0.399             -0.104              0.341  </span>
-<span class="co">#&gt;            cor:te0,tka         cor:tv,tcl   cor:poplogit,tcl </span>
-<span class="co">#&gt;                 0.569             -0.485              0.232  </span>
-<span class="co">#&gt;          cor:tec50,tcl      cor:tkout,tcl        cor:te0,tcl </span>
-<span class="co">#&gt;                 0.200             -0.288             -0.209  </span>
-<span class="co">#&gt;        cor:poplogit,tv       cor:tec50,tv       cor:tkout,tv </span>
-<span class="co">#&gt;                -0.124             0.0768              0.192  </span>
-<span class="co">#&gt;             cor:te0,tv cor:tec50,poplogit cor:tkout,poplogit </span>
-<span class="co">#&gt;                 0.234              0.547             -0.752  </span>
-<span class="co">#&gt;       cor:te0,poplogit    cor:tkout,tec50      cor:te0,tec50 </span>
-<span class="co">#&gt;                -0.130             -0.627            -0.0200  </span>
-<span class="co">#&gt;          cor:te0,tkout </span>
-<span class="co">#&gt;                 0.137   </span>
+<span class="co">#&gt;           cor:tka,tktr       cor:tcl,tktr        cor:tv,tktr  cor:poplogit,tktr </span>
+<span class="co">#&gt;            -0.896              0.180             -0.479              0.143  </span>
+<span class="co">#&gt;     cor:tec50,tktr     cor:tkout,tktr       cor:te0,tktr        cor:tcl,tka </span>
+<span class="co">#&gt;            -0.212            -0.0861             -0.284             -0.207  </span>
+<span class="co">#&gt;         cor:tv,tka   cor:poplogit,tka      cor:tec50,tka      cor:tkout,tka </span>
+<span class="co">#&gt;             0.541             -0.361              0.101              0.253  </span>
+<span class="co">#&gt;        cor:te0,tka         cor:tv,tcl   cor:poplogit,tcl      cor:tec50,tcl </span>
+<span class="co">#&gt;             0.178             -0.416              0.107              0.164  </span>
+<span class="co">#&gt;      cor:tkout,tcl        cor:te0,tcl    cor:poplogit,tv       cor:tec50,tv </span>
+<span class="co">#&gt;            -0.225             0.0532             -0.218             0.0736  </span>
+<span class="co">#&gt;       cor:tkout,tv         cor:te0,tv cor:tec50,poplogit cor:tkout,poplogit </span>
+<span class="co">#&gt;             0.287           -0.00203              0.485             -0.703  </span>
+<span class="co">#&gt;   cor:te0,poplogit    cor:tkout,tec50      cor:te0,tec50      cor:te0,tkout </span>
+<span class="co">#&gt;             0.195             -0.582              0.151             -0.100  </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
@@ -733,20 +709,19 @@ fit.TOF &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlm
 <span class="co">#&gt;   You may also try a good derivative free optimization:</span>
 <span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 483 x 42</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID CMT    PRED    RES   WRES IPRED   IRES IWRES</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;fct&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1       0.5   0       0 cp    0.705 -0.705 -0.900 0.442 -0.442 -1.68</span>
-<span class="co">#&gt; 2 1       1     1.9     0 cp    2.20  -0.303 -0.383 1.45   0.453  1.44</span>
-<span class="co">#&gt; 3 1       2     3.3     0 cp    5.53  -2.23  -2.42  3.95  -0.647 -1.16</span>
-<span class="co">#&gt; # … with 480 more rows, and 31 more variables: CPRED &lt;dbl&gt;, CRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   CWRES &lt;dbl&gt;, eta.ktr &lt;dbl&gt;, eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.emax &lt;dbl&gt;, eta.ec50 &lt;dbl&gt;, eta.kout &lt;dbl&gt;, eta.e0 &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   ktr &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, logit &lt;dbl&gt;, emax &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   ec50 &lt;dbl&gt;, kout &lt;dbl&gt;, e0 &lt;dbl&gt;, DCP &lt;dbl&gt;, PD &lt;dbl&gt;, kin &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, gut &lt;dbl&gt;, center &lt;dbl&gt;, effect &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span>
+<span class="co">#&gt;   ID     TIME    DV  EVID CMT    PRED   RES   WRES IPRED   IRES IWRES CPRED</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1       0.5   0       0 cp     1.74 -1.74 -0.522 0.444 -0.444 -1.11  1.09</span>
+<span class="co">#&gt; 2 1       1     1.9     0 cp     4.66 -2.76 -0.827 1.45   0.448  1.05  3.36</span>
+<span class="co">#&gt; 3 1       2     3.3     0 cp     9.08 -5.78 -1.70  3.95  -0.645 -1.14  8.18</span>
+<span class="co">#&gt; # … with 480 more rows, and 30 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.ktr &lt;dbl&gt;, eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, eta.emax &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.ec50 &lt;dbl&gt;, eta.kout &lt;dbl&gt;, eta.e0 &lt;dbl&gt;, ktr &lt;dbl&gt;, ka &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cl &lt;dbl&gt;, v &lt;dbl&gt;, logit &lt;dbl&gt;, emax &lt;dbl&gt;, ec50 &lt;dbl&gt;, kout &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   e0 &lt;dbl&gt;, DCP &lt;dbl&gt;, PD &lt;dbl&gt;, kin &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, gut &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   center &lt;dbl&gt;, effect &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span>
 <span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(fit.TOF)</code></pre></div>
 <p><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-1.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-2.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-3.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-4.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-5.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-6.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-7.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-8.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-9.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-10.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-11.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-12.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-13.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-14.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-15.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-16.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-17.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-18.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-19.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-20.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-21.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-22.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-23.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-24.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-25.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-26.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-27.png" width="100%"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
@@ -787,7 +762,7 @@ gridExtra<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg
 
 
       <footer><div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

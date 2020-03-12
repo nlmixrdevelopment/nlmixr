@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -195,48 +195,117 @@
     <p>Control Options for FOCEi</p>
     </div>
 
-    <pre class="usage"><span class='fu'>foceiControl</span>(<span class='kw'>sigdig</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='no'>...</span>, <span class='kw'>epsilon</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>maxInnerIterations</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>maxOuterIterations</span> <span class='kw'>=</span> <span class='fl'>5000</span>,
-  <span class='kw'>n1qn1nsim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"liblsoda"</span>, <span class='st'>"lsoda"</span>, <span class='st'>"dop853"</span>),
-  <span class='kw'>transitAbs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>atol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>rtol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>atolSens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>rtolSens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ssAtol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ssRtol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ssAtolSens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ssRtolSens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>minSS</span> <span class='kw'>=</span> <span class='fl'>10L</span>, <span class='kw'>maxSS</span> <span class='kw'>=</span> <span class='fl'>1000L</span>,
-  <span class='kw'>maxstepsOde</span> <span class='kw'>=</span> <span class='fl'>50000L</span>, <span class='kw'>hmin</span> <span class='kw'>=</span> <span class='fl'>0L</span>, <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='fl'>NA_real_</span>, <span class='kw'>hini</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>maxordn</span> <span class='kw'>=</span> <span class='fl'>12L</span>, <span class='kw'>maxords</span> <span class='kw'>=</span> <span class='fl'>5L</span>, <span class='no'>cores</span>, <span class='kw'>covsInterpolation</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"locf"</span>,
-  <span class='st'>"linear"</span>, <span class='st'>"nocb"</span>, <span class='st'>"midpoint"</span>), <span class='kw'>print</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
-  <span class='kw'>printNcol</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>((<span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"width"</span>) - <span class='fl'>23</span>)/<span class='fl'>12</span>), <span class='kw'>scaleTo</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>scaleObjective</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>normType</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rescale2"</span>, <span class='st'>"mean"</span>, <span class='st'>"rescale"</span>,
-  <span class='st'>"std"</span>, <span class='st'>"len"</span>, <span class='st'>"constant"</span>), <span class='kw'>scaleType</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"nlmixr"</span>, <span class='st'>"norm"</span>, <span class='st'>"mult"</span>,
-  <span class='st'>"multAdd"</span>), <span class='kw'>scaleCmax</span> <span class='kw'>=</span> <span class='fl'>1e+05</span>, <span class='kw'>scaleCmin</span> <span class='kw'>=</span> <span class='fl'>1e-05</span>, <span class='kw'>scaleC</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>scaleC0</span> <span class='kw'>=</span> <span class='fl'>1e+05</span>, <span class='kw'>derivEps</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>20</span> * <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='no'>.Machine</span>$<span class='no'>double.eps</span>), <span class='fl'>2</span>),
+    <pre class="usage"><span class='fu'>foceiControl</span>(
+  <span class='kw'>sigdig</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='no'>...</span>,
+  <span class='kw'>epsilon</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>maxInnerIterations</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
+  <span class='kw'>maxOuterIterations</span> <span class='kw'>=</span> <span class='fl'>5000</span>,
+  <span class='kw'>n1qn1nsim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"liblsoda"</span>, <span class='st'>"lsoda"</span>, <span class='st'>"dop853"</span>),
+  <span class='kw'>transitAbs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>atol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rtol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>atolSens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rtolSens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ssAtol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ssRtol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ssAtolSens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ssRtolSens</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>minSS</span> <span class='kw'>=</span> <span class='fl'>10L</span>,
+  <span class='kw'>maxSS</span> <span class='kw'>=</span> <span class='fl'>1000L</span>,
+  <span class='kw'>maxstepsOde</span> <span class='kw'>=</span> <span class='fl'>50000L</span>,
+  <span class='kw'>hmin</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
+  <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='fl'>NA_real_</span>,
+  <span class='kw'>hini</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>maxordn</span> <span class='kw'>=</span> <span class='fl'>12L</span>,
+  <span class='kw'>maxords</span> <span class='kw'>=</span> <span class='fl'>5L</span>,
+  <span class='no'>cores</span>,
+  <span class='kw'>covsInterpolation</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"locf"</span>, <span class='st'>"linear"</span>, <span class='st'>"nocb"</span>, <span class='st'>"midpoint"</span>),
+  <span class='kw'>print</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
+  <span class='kw'>printNcol</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span>((<span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"width"</span>) - <span class='fl'>23</span>)/<span class='fl'>12</span>),
+  <span class='kw'>scaleTo</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>scaleObjective</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>normType</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rescale2"</span>, <span class='st'>"mean"</span>, <span class='st'>"rescale"</span>, <span class='st'>"std"</span>, <span class='st'>"len"</span>, <span class='st'>"constant"</span>),
+  <span class='kw'>scaleType</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"nlmixr"</span>, <span class='st'>"norm"</span>, <span class='st'>"mult"</span>, <span class='st'>"multAdd"</span>),
+  <span class='kw'>scaleCmax</span> <span class='kw'>=</span> <span class='fl'>1e+05</span>,
+  <span class='kw'>scaleCmin</span> <span class='kw'>=</span> <span class='fl'>1e-05</span>,
+  <span class='kw'>scaleC</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>scaleC0</span> <span class='kw'>=</span> <span class='fl'>1e+05</span>,
+  <span class='kw'>derivEps</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>20</span> * <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='no'>.Machine</span>$<span class='no'>double.eps</span>), <span class='fl'>2</span>),
   <span class='kw'>derivMethod</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"switch"</span>, <span class='st'>"forward"</span>, <span class='st'>"central"</span>),
-  <span class='kw'>derivSwitchTol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>covDerivMethod</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"central"</span>, <span class='st'>"forward"</span>),
+  <span class='kw'>derivSwitchTol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>covDerivMethod</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"central"</span>, <span class='st'>"forward"</span>),
   <span class='kw'>covMethod</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"r,s"</span>, <span class='st'>"r"</span>, <span class='st'>"s"</span>, <span class='st'>""</span>),
-  <span class='kw'>hessEps</span> <span class='kw'>=</span> (<span class='no'>.Machine</span>$<span class='no'>double.eps</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>), <span class='kw'>centralDerivEps</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>20</span> *
-  <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='no'>.Machine</span>$<span class='no'>double.eps</span>), <span class='fl'>2</span>), <span class='kw'>lbfgsLmm</span> <span class='kw'>=</span> <span class='fl'>7L</span>, <span class='kw'>lbfgsPgtol</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>lbfgsFactr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>eigen</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>addPosthoc</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>diagXform</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sqrt"</span>, <span class='st'>"log"</span>, <span class='st'>"identity"</span>), <span class='kw'>sumProd</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>optExpression</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>ci</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='kw'>useColor</span> <span class='kw'>=</span> <span class='kw pkg'>crayon</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/crayon/man/has_color.html'>has_color</a></span>(),
-  <span class='kw'>boundTol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>calcTables</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>noAbort</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>interaction</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>cholSEtol</span> <span class='kw'>=</span> (<span class='no'>.Machine</span>$<span class='no'>double.eps</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>),
-  <span class='kw'>cholAccept</span> <span class='kw'>=</span> <span class='fl'>0.001</span>, <span class='kw'>resetEtaP</span> <span class='kw'>=</span> <span class='fl'>0.15</span>, <span class='kw'>resetThetaP</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>resetThetaFinalP</span> <span class='kw'>=</span> <span class='fl'>0.15</span>, <span class='kw'>diagOmegaBoundUpper</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>diagOmegaBoundLower</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>cholSEOpt</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>cholSECov</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>fo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>covTryHarder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>outerOpt</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"nlminb"</span>, <span class='st'>"bobyqa"</span>,
-  <span class='st'>"lbfgsb3c"</span>, <span class='st'>"L-BFGS-B"</span>, <span class='st'>"mma"</span>, <span class='st'>"lbfgsbLG"</span>, <span class='st'>"slsqp"</span>, <span class='st'>"Rvmmin"</span>),
-  <span class='kw'>innerOpt</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"n1qn1"</span>, <span class='st'>"BFGS"</span>), <span class='kw'>rhobeg</span> <span class='kw'>=</span> <span class='fl'>0.2</span>, <span class='kw'>rhoend</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>npt</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>rel.tol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>x.tol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>eval.max</span> <span class='kw'>=</span> <span class='fl'>4000</span>,
-  <span class='kw'>iter.max</span> <span class='kw'>=</span> <span class='fl'>2000</span>, <span class='kw'>abstol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reltol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>resetHessianAndEta</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>stateTrim</span> <span class='kw'>=</span> <span class='fl'>Inf</span>, <span class='kw'>gillK</span> <span class='kw'>=</span> <span class='fl'>10L</span>,
-  <span class='kw'>gillStep</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>gillFtol</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>gillRtol</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='no'>.Machine</span>$<span class='no'>double.eps</span>),
-  <span class='kw'>gillKcov</span> <span class='kw'>=</span> <span class='fl'>10L</span>, <span class='kw'>gillStepCov</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>gillFtolCov</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>rmatNorm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>smatNorm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>covGillF</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>optGillF</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>covSmall</span> <span class='kw'>=</span> <span class='fl'>1e-05</span>, <span class='kw'>adjLik</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>gradTrim</span> <span class='kw'>=</span> <span class='fl'>Inf</span>,
-  <span class='kw'>maxOdeRecalc</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>odeRecalcFactor</span> <span class='kw'>=</span> <span class='fl'>10</span>^(<span class='fl'>0.5</span>),
-  <span class='kw'>gradCalcCentralSmall</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>, <span class='kw'>gradCalcCentralLarge</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
-  <span class='kw'>etaNudge</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='no'>stiff</span>, <span class='kw'>nRetries</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>,
-  <span class='kw'>resetThetaCheckPer</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>etaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>repeatGillMax</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>stickyRecalcN</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>gradProgressOfvTime</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
+  <span class='kw'>hessEps</span> <span class='kw'>=</span> (<span class='no'>.Machine</span>$<span class='no'>double.eps</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>),
+  <span class='kw'>centralDerivEps</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>20</span> * <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='no'>.Machine</span>$<span class='no'>double.eps</span>), <span class='fl'>2</span>),
+  <span class='kw'>lbfgsLmm</span> <span class='kw'>=</span> <span class='fl'>7L</span>,
+  <span class='kw'>lbfgsPgtol</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>lbfgsFactr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>eigen</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>addPosthoc</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>diagXform</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sqrt"</span>, <span class='st'>"log"</span>, <span class='st'>"identity"</span>),
+  <span class='kw'>sumProd</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>optExpression</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>ci</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
+  <span class='kw'>useColor</span> <span class='kw'>=</span> <span class='kw pkg'>crayon</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/crayon/man/has_color.html'>has_color</a></span>(),
+  <span class='kw'>boundTol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>calcTables</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>noAbort</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>interaction</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>cholSEtol</span> <span class='kw'>=</span> (<span class='no'>.Machine</span>$<span class='no'>double.eps</span>)^(<span class='fl'>1</span>/<span class='fl'>3</span>),
+  <span class='kw'>cholAccept</span> <span class='kw'>=</span> <span class='fl'>0.001</span>,
+  <span class='kw'>resetEtaP</span> <span class='kw'>=</span> <span class='fl'>0.15</span>,
+  <span class='kw'>resetThetaP</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
+  <span class='kw'>resetThetaFinalP</span> <span class='kw'>=</span> <span class='fl'>0.15</span>,
+  <span class='kw'>diagOmegaBoundUpper</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>diagOmegaBoundLower</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>cholSEOpt</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>cholSECov</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>covTryHarder</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>outerOpt</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"nlminb"</span>, <span class='st'>"bobyqa"</span>, <span class='st'>"lbfgsb3c"</span>, <span class='st'>"L-BFGS-B"</span>, <span class='st'>"mma"</span>, <span class='st'>"lbfgsbLG"</span>, <span class='st'>"slsqp"</span>,
+    <span class='st'>"Rvmmin"</span>),
+  <span class='kw'>innerOpt</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"n1qn1"</span>, <span class='st'>"BFGS"</span>),
+  <span class='kw'>rhobeg</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
+  <span class='kw'>rhoend</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>npt</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rel.tol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>x.tol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>eval.max</span> <span class='kw'>=</span> <span class='fl'>4000</span>,
+  <span class='kw'>iter.max</span> <span class='kw'>=</span> <span class='fl'>2000</span>,
+  <span class='kw'>abstol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>reltol</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>resetHessianAndEta</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>stateTrim</span> <span class='kw'>=</span> <span class='fl'>Inf</span>,
+  <span class='kw'>gillK</span> <span class='kw'>=</span> <span class='fl'>10L</span>,
+  <span class='kw'>gillStep</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+  <span class='kw'>gillFtol</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>gillRtol</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span>(<span class='no'>.Machine</span>$<span class='no'>double.eps</span>),
+  <span class='kw'>gillKcov</span> <span class='kw'>=</span> <span class='fl'>10L</span>,
+  <span class='kw'>gillStepCov</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>gillFtolCov</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>rmatNorm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>smatNorm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>covGillF</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>optGillF</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>covSmall</span> <span class='kw'>=</span> <span class='fl'>1e-05</span>,
+  <span class='kw'>adjLik</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>gradTrim</span> <span class='kw'>=</span> <span class='fl'>Inf</span>,
+  <span class='kw'>maxOdeRecalc</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>odeRecalcFactor</span> <span class='kw'>=</span> <span class='fl'>10</span>^(<span class='fl'>0.5</span>),
+  <span class='kw'>gradCalcCentralSmall</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
+  <span class='kw'>gradCalcCentralLarge</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
+  <span class='kw'>etaNudge</span> <span class='kw'>=</span> <span class='fl'>0.01</span>,
+  <span class='no'>stiff</span>,
+  <span class='kw'>nRetries</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>42</span>,
+  <span class='kw'>resetThetaCheckPer</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>etaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>repeatGillMax</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>stickyRecalcN</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>gradProgressOfvTime</span> <span class='kw'>=</span> <span class='fl'>10</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -383,7 +452,7 @@ method.  The default value is 5.  This can be between 1 and 5.</p></td>
       <th>cores</th>
       <td><p>Number of cores used in parallel ODE solving.  This
 defaults to the number or system cores determined by
-<code>rxCores</code> for methods that support parallel
+<code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxCores.html'>rxCores</a></code> for methods that support parallel
 solving (ie thread-safe methods like "liblsoda").</p></td>
     </tr>
     <tr>
@@ -1021,7 +1090,7 @@ be reflective of the scaled problem's condition-number.</p>
 
     <div class='dont-index'><p><code><a href='https://rdrr.io/r/stats/optim.html'>optim</a></code></p>
 <p><code><a href='https://rdrr.io/pkg/n1qn1/man/n1qn1.html'>n1qn1</a></code></p>
-<p><code><a href='https://rdrr.io/pkg/RxODE/man/rxSolve.html'>rxSolve</a></code></p></div>
+<p><code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html'>rxSolve</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -1040,7 +1109,7 @@ be reflective of the scaled problem's condition-number.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

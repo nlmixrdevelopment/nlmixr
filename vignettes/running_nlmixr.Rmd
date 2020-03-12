@@ -102,7 +102,7 @@ one.compartment <- function() {
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```{r}
-fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
+fit2 <- nlmixr(one.compartment, theo_sd, est="saem", control=list(print=0))
 print(fit2)
 ```
 
@@ -110,7 +110,7 @@ And if we wanted to, we could even apply the First-Order Conditional
 Estimation (FOCEi) method to this model:
 
 ```{r}
-fitF <- nlmixr(one.compartment, theo_sd, est="focei")
+fitF <- nlmixr(one.compartment, theo_sd, est="focei", control=list(print=0))
 print(fitF)
 ```
 
