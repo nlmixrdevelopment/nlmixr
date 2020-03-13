@@ -2830,13 +2830,13 @@ nlmixrPosthoc.default <- function(x, ...){
 ## FIXME fitted?
 
 
-##' Produce trace-plot for fit if applicable
-##'
-##' @param x fit object
-##' @param ... other parameters
-##' @return Fit traceplot or nothing.
-##' @author Rik Schoemaker, Wenping Wang & Matthew L. Fidler
-##' @export
+#' @title Produce trace-plot for fit if applicable
+#'
+#' @param x fit object
+#' @param ... other parameters
+#' @return Fit traceplot or nothing.
+#' @author Rik Schoemaker, Wenping Wang & Matthew L. Fidler
+#' @export
 traceplot <- function(x, ...){
     UseMethod("traceplot");
 }

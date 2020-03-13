@@ -757,8 +757,9 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 }
 .protectSaemDll <- "";
 
-##' SAEM dll prodection from garbage collection
+##' @title SAEM dll prodection from garbage collection
 ##'
+##' @description
 ##' This protects the saem dll from being prematurely unloaded while
 ##' running it due to garbage collection.
 ##'
@@ -766,7 +767,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 ##'
 ##' @return nothing
 ##'
-##'@export
+##' @export
 .protectSaem <- function(dll){
     assignInMyNamespace(".protectSaemDll", dll)
 }

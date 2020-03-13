@@ -63,7 +63,7 @@ print.nlmixrGill83 <- function(x, ...){
     NextMethod(x);
 }
 
-
+##'@export
 print.nlmixrFitCore <- function(x, ...){
     .parent <- parent.frame(2);
     .bound <- do.call("c", lapply(ls(.parent), function(.cur){
