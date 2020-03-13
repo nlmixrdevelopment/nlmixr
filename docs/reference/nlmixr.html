@@ -78,7 +78,7 @@ and pharmacokinetic-pharmacodynamic (PKPD) models." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -197,21 +197,51 @@ and pharmacokinetic-pharmacodynamic (PKPD) models." />
 and pharmacokinetic-pharmacodynamic (PKPD) models.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nlmixr</span>(<span class='no'>object</span>, <span class='no'>data</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())
+    <pre class="usage"><span class='fu'>nlmixr</span>(
+  <span class='no'>object</span>,
+  <span class='no'>data</span>,
+  <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(),
+  <span class='no'>...</span>,
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>()
+)
 
-<span class='co'># S3 method for function</span>
-<span class='fu'>nlmixr</span>(<span class='no'>object</span>, <span class='no'>data</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())
+<span class='co'># S3 method for `function`</span>
+<span class='fu'>nlmixr</span>(
+  <span class='no'>object</span>,
+  <span class='no'>data</span>,
+  <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(),
+  <span class='no'>...</span>,
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>()
+)
 
 <span class='co'># S3 method for nlmixrFitCore</span>
-<span class='fu'>nlmixr</span>(<span class='no'>object</span>, <span class='no'>data</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(), <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())
+<span class='fu'>nlmixr</span>(
+  <span class='no'>object</span>,
+  <span class='no'>data</span>,
+  <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>table</span> <span class='kw'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span>(),
+  <span class='no'>...</span>,
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>()
+)
 
 <span class='co'># S3 method for nlmixrUI</span>
-<span class='fu'>nlmixr</span>(<span class='no'>object</span>, <span class='no'>data</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())</pre>
+<span class='fu'>nlmixr</span>(
+  <span class='no'>object</span>,
+  <span class='no'>data</span>,
+  <span class='kw'>est</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='no'>...</span>,
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>()
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -336,7 +366,7 @@ f &lt;- function(){ ## Note the arguments to the function are currently
 <li><p>Naming variables that start with "<code>_</code>" are not supported.  Note that R does not
     allow variable starting with "<code>_</code>" to be assigned without quoting them.</p></li>
 <li><p>Naming variables that start with "<code>rx_</code>" or "<code>nlmixr_</code>" is not supported since
-   <a href='https://rdrr.io/pkg/RxODE/man/RxODE.html'>RxODE</a> and nlmixr use these prefixes internally for certain estimation
+   <a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a> and nlmixr use these prefixes internally for certain estimation
    routines and calculating residuals.</p></li>
 <li><p>Variable names are case sensitive, just like they are in R. "<code>CL</code>" is not the
    same as "<code>Cl</code>".</p></li>
@@ -749,7 +779,7 @@ function.</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

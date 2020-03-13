@@ -53,8 +53,6 @@ nlmixrForget <- function(){
 ##' @importFrom stats predict logLik na.fail pchisq
 ##' @importFrom n1qn1 n1qn1
 ##' @importFrom brew brew
-##' @importFrom lattice xyplot
-##' @importFrom lattice trellis.par.get
 ##' @importFrom nlme nlme fixed.effects random.effects
 ##' @importFrom nlme groupedData
 ##' @importFrom nlme getData
@@ -64,10 +62,8 @@ nlmixrForget <- function(){
 ##' @importFrom stats as.formula nlminb optimHess rnorm terms predict anova optim sd var AIC BIC asOneSidedFormula coef end fitted resid setNames start simulate nobs qnorm quantile time
 ##' @importFrom utils assignInMyNamespace getFromNamespace head stack sessionInfo tail str
 ##' @importFrom parallel mclapply
-##' @importFrom lbfgs lbfgs
 ##' @importFrom methods is
 ##' @importFrom Rcpp evalCpp
-##' @importFrom dparser dparse
 ##' @importFrom vpc vpc
 ##' @importFrom ggplot2 ggplot aes geom_point facet_wrap geom_line geom_abline xlab geom_smooth aes_string
 ##' @importFrom RcppArmadillo armadillo_version
@@ -471,12 +467,12 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         model <- uif$saem.model
         inits = uif$saem.init
         if (length(uif$saem.fixed)>0) {
-			nphi = attr(model$saem_mod, "nrhs")
-			m = cumsum(!is.na(matrix(inits$theta, byrow=T, ncol=nphi)))
-			fixid = match(uif$saem.fixed, t(matrix(m,ncol=nphi)))
+            nphi = attr(model$saem_mod, "nrhs")
+            m = cumsum(!is.na(matrix(inits$theta, byrow=T, ncol=nphi)))
+            fixid = match(uif$saem.fixed, t(matrix(m,ncol=nphi)))
 
-			names(inits$theta) = rep("", length(inits$theta))
-			names(inits$theta)[fixid] = "FIXED"
+            names(inits$theta) = rep("", length(inits$theta))
+            names(inits$theta)[fixid] = "FIXED"
         }
         cfg <- configsaem(model=model, data=dat, inits=inits,
                           mcmc=mcmc, ODEopt=ODEopt, seed=seed,

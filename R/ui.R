@@ -2642,8 +2642,16 @@ nlmixrUI.saem.fit <- function(obj){
         RxODE::rxLoad(ode);
         message("done.")
         inPars <- obj$saem.inPars;
-        if (length(inPars) == 0) inPars <- NULL
-
+        if (length(inPars) == 0) {
+            inPars <- NULL
+        } else {
+            ## Check for inPars in Covariates in RxODE model
+            .extra <- RxODE::rxModelVars(obj$rxode)
+            .extra <- intersect(obj$saem.all.covs, .extra$params)
+            if (length(.extra) > 0){
+                inPars <- c(inPars, .extra)
+            }
+        }
         saem.fit <- gen_saem_user_fn(model=ode, obj$saem.pars, pred=obj$predSaem, inPars=inPars);
         obj$env$saem.fit <- saem.fit;
         return(obj$env$saem.fit);

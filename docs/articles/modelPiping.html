@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -149,7 +149,7 @@
     <div class="page-header toc-ignore">
       <h1>Modifying nlmixr models by piping</h1>
             
-            <h4 class="date">2019-11-11</h4>
+            <h4 class="date">2020-03-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/modelPiping.Rmd"><code>vignettes/modelPiping.Rmd</code></a></small>
       <div class="hidden name"><code>modelPiping.Rmd</code></div>
@@ -193,28 +193,36 @@ one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>()
 }</code></pre></div>
 <p>We can try the First-Order Conditional Estimation with Interaction (FOCEi) method to find a good solution:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(one.compartment, theo_sd, <span class="dt">est=</span><span class="st">"focei"</span>,
+              <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>), 
               <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">npde=</span><span class="ot">TRUE</span>, <span class="dt">cwres=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; done</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(fit)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 116.8072 373.4069 393.5865      -179.7035         9.591184</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 9.344272 0.927097   0.927099 0.029 0.412 2.370532</span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;           setup optimize covariance table  npde    other</span>
+<span class="co">#&gt; elapsed 9.15897 0.980185   0.980187 0.024 0.403 2.459658</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;        Parameter  Est.    SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka 0.472 0.248 52.6       1.6 (0.985, 2.61)     69.7</span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.248 24.5       2.75 (1.69, 4.47)     26.8</span>
-<span class="co">#&gt; tv         log V  3.46 0.148 4.27       31.8 (23.8, 42.5)     13.9</span>
-<span class="co">#&gt; add.sd           0.695                              0.695         </span>
-<span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka         1.15% </span>
-<span class="co">#&gt; tcl         3.84% </span>
-<span class="co">#&gt; tv          10.2% </span>
-<span class="co">#&gt; add.sd             </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
+<span class="co">#&gt;        Parameter  Est.    SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
+<span class="co">#&gt; tka       Log Ka 0.472 0.248 52.6       1.6 (0.985, 2.61)     69.7      1.15% </span>
+<span class="co">#&gt; tcl       Log Cl  1.01 0.248 24.5       2.75 (1.69, 4.47)     26.8      3.84% </span>
+<span class="co">#&gt; tv         log V  3.46 0.148 4.27       31.8 (23.8, 42.5)     13.9      10.2% </span>
+<span class="co">#&gt; add.sd           0.695                              0.695                     </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   Fixed parameter correlations in $cor</span>
@@ -229,17 +237,16 @@ one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>()
 <span class="co">#&gt;   You may also try a good derivative free optimization:</span>
 <span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 25</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.444 -0.234  3.85 -1.01  -1.45   3.24</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.711  0.375  6.79 -0.216 -0.310  5.81</span>
-<span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0     0.74 </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.444 -0.234  3.85 -1.01  -1.45   3.24 -0.403</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.711  0.375  6.79 -0.216 -0.310  5.81  0.763</span>
+<span class="co">#&gt; # … with 129 more rows, and 13 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="changing-and-fixing-parameter-values-in-models" class="section level1">
 <h1 class="hasAnchor">
@@ -254,24 +261,37 @@ one.compartment &lt;-<span class="st"> </span><span class="cf">function</span>()
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Example 1 -- Set inital estimate to 0.5 (shown w/posthoc)
 one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/ini.html">ini</a></span>(<span class="dt">tka=</span><span class="fl">0.5</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"posthoc"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"posthoc"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>), 
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(one.ka.<span class="fl">0.5</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Example 2 -- Fix tka to 0.5 and re-estimate.
 one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/ini.html">ini</a></span>(<span class="dt">tka=</span><span class="kw"><a href="https://rdrr.io/r/utils/fix.html">fix</a></span>(<span class="fl">0.5</span>)) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; done</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(one.ka.<span class="fl">0.5</span>)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 116.8431 371.4429 388.7397      -179.7214         11.77467</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 0.316092  0.53268   0.532683 0.022 0.251 0.423545</span>
+<span class="co">#&gt; elapsed 8.050913 0.563214   0.563216 0.018 0.231 0.413657</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
 <span class="co">#&gt;        Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
 <span class="co">#&gt; tka       Log Ka   0.5  FIXED FIXED                    1.65     69.7</span>
 <span class="co">#&gt; tcl       Log Cl  1.01  0.081  8.01       2.75 (2.35, 3.22)     26.8</span>
@@ -281,12 +301,14 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt; tka         1.08% </span>
 <span class="co">#&gt; tcl         3.87% </span>
 <span class="co">#&gt; tv          10.1% </span>
-<span class="co">#&gt; add.sd             </span>
+<span class="co">#&gt; add.sd            </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
 <span class="co">#&gt;     cor:tv,tcl </span>
-<span class="co">#&gt;         0.807   </span>
+<span class="co">#&gt;     0.807  </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
@@ -299,47 +321,47 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt;   You may also try a good derivative free optimization:</span>
 <span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 25</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.36 -0.521 -0.275  3.85 -1.01  -1.45   3.33</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.96  0.609  0.322  6.79 -0.219 -0.315  5.92</span>
-<span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0     0.74 </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.36 -0.521 -0.275  3.85 -1.01  -1.45   3.33 -0.490</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.96  0.609  0.322  6.79 -0.219 -0.315  5.92  0.651</span>
+<span class="co">#&gt; # … with 129 more rows, and 13 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Example 3 -- Fix tka to model estimated value and re-estimate.
 one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/ini.html">ini</a></span>(<span class="dt">tka=</span>fix) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; done</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(one.ka.<span class="fl">0.5</span>)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 116.8071 371.4069 388.7037      -179.7035         17.75535</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 0.291561 0.520657   0.520659 0.021 0.266 0.722123</span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;            setup optimize covariance table npde    other</span>
+<span class="co">#&gt; elapsed 0.233506 0.555763   0.555765 0.015 0.24 0.725966</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;        Parameter  Est.    SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka 0.472 FIXED FIXED                     1.6     69.7</span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.311  30.8       2.75 (1.49, 5.06)     26.8</span>
-<span class="co">#&gt; tv         log V  3.46 0.173  4.99       31.8 (22.7, 44.6)     13.9</span>
-<span class="co">#&gt; add.sd           0.695                               0.695         </span>
-<span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka         1.15% </span>
-<span class="co">#&gt; tcl         3.85% </span>
-<span class="co">#&gt; tv          10.2% </span>
-<span class="co">#&gt; add.sd             </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
+<span class="co">#&gt;        Parameter  Est.    SE  %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
+<span class="co">#&gt; tka       Log Ka 0.472 FIXED FIXED                     1.6     69.7      1.15% </span>
+<span class="co">#&gt; tcl       Log Cl  1.01 0.311  30.8       2.75 (1.49, 5.06)     26.8      3.85% </span>
+<span class="co">#&gt; tv         log V  3.46 0.173  4.99       31.8 (22.7, 44.6)     13.9      10.2% </span>
+<span class="co">#&gt; add.sd           0.695                               0.695                     </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): s</span>
 <span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
 <span class="co">#&gt;     cor:tv,tcl </span>
-<span class="co">#&gt;        -0.848   </span>
+<span class="co">#&gt;    -0.848  </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
@@ -352,47 +374,47 @@ one.ka.<span class="fl">0.5</span> &lt;-<span class="st"> </span>fit <span class
 <span class="co">#&gt;   You may also try a good derivative free optimization:</span>
 <span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 25</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.444 -0.235  3.85 -1.01  -1.45   3.24</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.711  0.375  6.79 -0.216 -0.310  5.81</span>
-<span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0     0.74 </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.444 -0.235  3.85 -1.01  -1.45   3.24 -0.403</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.711  0.375  6.79 -0.216 -0.310  5.81  0.763</span>
+<span class="co">#&gt; # … with 129 more rows, and 13 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Example 4 -- Change tka to 0.7 in orginal model function and then estimate
 one.ka.<span class="fl">0.7</span> &lt;-<span class="st"> </span>one.compartment <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/ini.html">ini</a></span>(<span class="dt">tka=</span><span class="fl">0.7</span>) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(theo_sd, <span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(theo_sd, <span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; done</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(one.ka.<span class="fl">0.7</span>)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 116.8043 373.4041 393.5837       -179.702         37.39664</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table npde    other</span>
-<span class="co">#&gt; elapsed 0.295878 0.921343   0.921345 0.039 0.24 4.396434</span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
+<span class="co">#&gt; elapsed 0.230525  0.98014   0.980141 0.019 0.362 4.589194</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka 0.466  0.211 45.2       1.59 (1.05, 2.41)     70.6</span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.0836 8.25       2.75 (2.34, 3.25)     26.8</span>
-<span class="co">#&gt; tv         log V  3.46 0.0697 2.01       31.8 (27.7, 36.5)     13.9</span>
-<span class="co">#&gt; add.sd           0.695                               0.695         </span>
-<span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka         1.96% </span>
-<span class="co">#&gt; tcl         4.01% </span>
-<span class="co">#&gt; tv          10.4% </span>
-<span class="co">#&gt; add.sd             </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
+<span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
+<span class="co">#&gt; tka       Log Ka 0.466  0.211 45.2       1.59 (1.05, 2.41)     70.6      1.96% </span>
+<span class="co">#&gt; tcl       Log Cl  1.01 0.0836 8.25       2.75 (2.34, 3.25)     26.8      4.01% </span>
+<span class="co">#&gt; tv         log V  3.46 0.0697 2.01       31.8 (27.7, 36.5)     13.9      10.4% </span>
+<span class="co">#&gt; add.sd           0.695                               0.695                     </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
 <span class="co">#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl </span>
-<span class="co">#&gt;          0.138       0.456       0.721   </span>
+<span class="co">#&gt;      0.138       0.456       0.721  </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
@@ -405,17 +427,16 @@ one.ka.<span class="fl">0.7</span> &lt;-<span class="st"> </span>one.compartment
 <span class="co">#&gt;   You may also try a good derivative free optimization:</span>
 <span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 25</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.27 -0.429 -0.227  3.85 -1.01  -1.45   3.23</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.84  0.731  0.386  6.79 -0.215 -0.310  5.78</span>
-<span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.391  0     0.74   1.06   0     0.74 </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.27 -0.429 -0.227  3.85 -1.01  -1.45   3.23 -0.386</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.84  0.731  0.386  6.79 -0.215 -0.310  5.78  0.786</span>
+<span class="co">#&gt; # … with 129 more rows, and 13 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="changing-model-features" class="section level1">
 <h1 class="hasAnchor">
@@ -429,28 +450,36 @@ one.ka.<span class="fl">0.7</span> &lt;-<span class="st"> </span>one.compartment
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Remove eta.ka on ka
 noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/model.html">model</a></span>(ka &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(tka)) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; done</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(noEta)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 176.5824 431.1821 448.4789      -209.5911         35.68948</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table  npde   other</span>
-<span class="co">#&gt; elapsed 8.819656 0.529436   0.529438 0.026 0.412 1.29647</span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
+<span class="co">#&gt; elapsed 7.222008 0.537576   0.537577 0.024 0.401 1.344839</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka  0.43  0.172 39.9        1.54 (1.1, 2.15)         </span>
-<span class="co">#&gt; tcl       Log Cl 0.991 0.0743  7.5       2.69 (2.33, 3.11)     30.3</span>
-<span class="co">#&gt; tv         log V  3.48 0.0484 1.39       32.4 (29.5, 35.6)     15.6</span>
-<span class="co">#&gt; add.sd            1.02                                1.02         </span>
-<span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka               </span>
-<span class="co">#&gt; tcl         7.68% </span>
-<span class="co">#&gt; tv          7.86% </span>
-<span class="co">#&gt; add.sd             </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
+<span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
+<span class="co">#&gt; tka       Log Ka  0.43  0.172 39.9        1.54 (1.1, 2.15)                     </span>
+<span class="co">#&gt; tcl       Log Cl 0.991 0.0743  7.5       2.69 (2.33, 3.11)     30.3      7.68% </span>
+<span class="co">#&gt; tv         log V  3.48 0.0484 1.39       32.4 (29.5, 35.6)     15.6      7.86% </span>
+<span class="co">#&gt; add.sd            1.02                                1.02                     </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   Fixed parameter correlations in $cor</span>
@@ -465,47 +494,56 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt;   You may also try a good derivative free optimization:</span>
 <span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 24</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.709  0     0.74   0.726  0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.12 -0.277 -0.266  3.57 -0.728 -0.714  3.09</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.61  0.959  0.918  6.45  0.123  0.121  5.56</span>
-<span class="co">#&gt; # … with 129 more rows, and 13 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.709  0     0.74   0.726  0     0.74 </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.12 -0.277 -0.266  3.57 -0.728 -0.714  3.09 -0.247</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.61  0.959  0.918  6.45  0.123  0.121  5.56  1.01 </span>
+<span class="co">#&gt; # … with 129 more rows, and 12 more variables: CWRES &lt;dbl&gt;, eta.cl &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 <p>Of course you could also add an eta on a parameter in the same way;</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">addBackKa &lt;-<span class="st"> </span>noEta <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/model.html">model</a></span>({ka &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(tka <span class="op">+</span><span class="st"> </span>bsv.ka)}) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/ini.html">ini</a></span>(<span class="dt">bsv.ka=</span><span class="fl">0.1</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
+<span class="co">#&gt; done</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(addBackKa)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;          OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 116.813 373.4128 393.5924      -179.7064         107.8733</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;            setup optimize covariance table npde    other</span>
-<span class="co">#&gt; elapsed 9.751309 0.932768    0.93277 0.034 0.44 2.730153</span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
+<span class="co">#&gt; elapsed 8.266774 1.010179    1.01018 0.033 0.402 2.846867</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;        Parameter  Est.    SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
-<span class="co">#&gt; tka       Log Ka 0.471 0.976  207       1.6 (0.237, 10.9)     69.3</span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.227 22.4        2.76 (1.77, 4.3)     27.1</span>
-<span class="co">#&gt; tv         log V  3.46 0.194  5.6       31.8 (21.8, 46.5)     13.7</span>
-<span class="co">#&gt; add.sd           0.695                              0.695         </span>
-<span class="co">#&gt;        Shrink(SD)%</span>
-<span class="co">#&gt; tka        0.800% </span>
-<span class="co">#&gt; tcl         4.43% </span>
-<span class="co">#&gt; tv          10.0% </span>
-<span class="co">#&gt; add.sd             </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
+<span class="co">#&gt;        Parameter  Est.    SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
+<span class="co">#&gt; tka       Log Ka 0.471 0.976  207       1.6 (0.237, 10.9)     69.3     0.800% </span>
+<span class="co">#&gt; tcl       Log Cl  1.01 0.227 22.4        2.76 (1.77, 4.3)     27.1      4.43% </span>
+<span class="co">#&gt; tv         log V  3.46 0.194  5.6       31.8 (21.8, 46.5)     13.7      10.0% </span>
+<span class="co">#&gt; add.sd           0.695                              0.695                     </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
 <span class="co">#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl </span>
-<span class="co">#&gt;         -0.608       0.855      -0.444   </span>
+<span class="co">#&gt;     -0.608       0.855      -0.444  </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
@@ -518,17 +556,16 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt;   You may also try a good derivative free optimization:</span>
 <span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 25</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.375  0     0.74   1.06   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.442 -0.224  3.85 -1.01  -1.45   3.24</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.715  0.363  6.79 -0.216 -0.310  5.80</span>
-<span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, bsv.ka &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.375  0     0.74   1.06   0     0.74 </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.28 -0.442 -0.224  3.85 -1.01  -1.45   3.24 -0.401</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.86  0.715  0.363  6.79 -0.216 -0.310  5.80  0.767</span>
+<span class="co">#&gt; # … with 129 more rows, and 13 more variables: CWRES &lt;dbl&gt;, eta.cl &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.v &lt;dbl&gt;, bsv.ka &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 <p>You can see the name change by examining the <code>omega</code> matrix:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">addBackKa<span class="op">$</span>omega
 <span class="co">#&gt;            eta.cl      eta.v    bsv.ka</span>
@@ -553,18 +590,31 @@ noEta &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 wt70 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class="st"> </span>## <span class="al">FIXME</span> could be based on if it finds the covarite in the last used nlmixr data.
 <span class="st">    </span><span class="kw"><a href="../reference/model.html">model</a></span>({cl &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(tcl <span class="op">+</span><span class="st"> </span>eta.cl)<span class="op">*</span>(WT<span class="op">/</span><span class="dv">70</span>)<span class="op">^</span>covWtPow}) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/ini.html">ini</a></span>(<span class="dt">covWtPow=</span><span class="kw"><a href="https://rdrr.io/r/utils/fix.html">fix</a></span>(<span class="fl">0.75</span>)) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [1] "WT"</span>
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
+<span class="co">#&gt; done</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(wt70)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 116.1543 372.7541 392.9337       -179.377         49.88943</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt;            setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 10.29792 0.983131   0.983133 0.023 0.474 1.237821</span>
+<span class="co">#&gt; elapsed 9.387925 1.128233   1.128235  0.03 0.479 1.275607</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
 <span class="co">#&gt;          Parameter  Est.     SE  %RSE Back-transformed(95%CI) BSV(CV%)</span>
 <span class="co">#&gt; tka         Log Ka 0.472  0.199  42.1        1.6 (1.09, 2.36)     68.8</span>
 <span class="co">#&gt; tcl         Log Cl  1.02  0.074  7.25        2.77 (2.4, 3.21)     26.5</span>
@@ -576,7 +626,8 @@ wt70 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class
 <span class="co">#&gt; tcl           5.79% </span>
 <span class="co">#&gt; tv            12.0% </span>
 <span class="co">#&gt; add.sd              </span>
-<span class="co">#&gt; covWtPow             </span>
+<span class="co">#&gt; covWtPow            </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   Fixed parameter correlations in $cor</span>
@@ -591,17 +642,16 @@ wt70 &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span><span class
 <span class="co">#&gt;   You may also try a good derivative free optimization:</span>
 <span class="co">#&gt;     nlmixr(...,control=list(outerOpt="bobyqa"))</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 26</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID    WT  PRED    RES   WRES IPRED   IRES  IWRES</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  79.6  0     0.74   0.391  0     0.74   1.06 </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  79.6  3.29 -0.448 -0.236  3.84 -0.999 -1.43 </span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  79.6  5.85  0.716  0.378  6.78 -0.212 -0.305</span>
-<span class="co">#&gt; # … with 129 more rows, and 15 more variables: CPRED &lt;dbl&gt;, CRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID    WT  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1     0      0.74     0  79.6  0     0.74   0.391  0     0.74   1.06   0   </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  79.6  3.29 -0.448 -0.236  3.84 -0.999 -1.43   3.25</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  79.6  5.85  0.716  0.378  6.78 -0.212 -0.305  5.81</span>
+<span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="changing-residual-errors" class="section level2">
 <h2 class="hasAnchor">
@@ -615,18 +665,31 @@ d<span class="op">$</span>DV[d<span class="op">$</span>EVID <span class="op">==<
 addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/model.html">model</a></span>({cp <span class="op">~</span><span class="st"> </span><span class="kw">add</span>(add.err)<span class="op">+</span><span class="kw">prop</span>(prop.err)}) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="../reference/ini.html">ini</a></span>(<span class="dt">prop.err=</span><span class="fl">0.1</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(d,<span class="dt">est=</span><span class="st">"focei"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="st">    </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(d,<span class="dt">est=</span><span class="st">"focei"</span>,
+           <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>),
+           <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; done</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(addPropModel)
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ─────────────────────────────────────── </span>
+<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ──────────────────────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC     BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 104.3518 362.9516 386.014      -173.4758         58.79822</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;           setup optimize covariance table  npde    other</span>
-<span class="co">#&gt; elapsed 10.3147 0.935986   0.935988 0.029 0.421 8.842325</span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;            setup optimize covariance table  npde    other</span>
+<span class="co">#&gt; elapsed 8.889745 0.982369    0.98237 0.021 0.422 9.312516</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
 <span class="co">#&gt;          Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%)</span>
 <span class="co">#&gt; tka         Log Ka 0.399  0.195 48.9       1.49 (1.02, 2.18)     68.9</span>
 <span class="co">#&gt; tcl         Log Cl  1.02 0.0735 7.18       2.78 (2.41, 3.21)     25.9</span>
@@ -638,12 +701,14 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt; tcl           1.27% </span>
 <span class="co">#&gt; tv            15.6% </span>
 <span class="co">#&gt; add.err             </span>
-<span class="co">#&gt; prop.err             </span>
+<span class="co">#&gt; prop.err            </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
 <span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
 <span class="co">#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl </span>
-<span class="co">#&gt;          0.174       0.461       0.715   </span>
+<span class="co">#&gt;      0.174       0.461       0.715  </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
@@ -651,17 +716,16 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 <span class="co">#&gt;   Minimization message ($message):  </span>
 <span class="co">#&gt;     relative convergence (4) </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 132 x 25</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.396  0     0.74   2.68   0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84     0  3.08 -0.238 -0.127  3.47 -0.626 -1.16   3.06</span>
-<span class="co">#&gt; 3 1     0.570  6.57     0  5.57  1.000  0.524  6.24  0.334  0.381  5.55</span>
-<span class="co">#&gt; # … with 129 more rows, and 14 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   cp &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1     0      0.74     0  0     0.74   0.396  0     0.74   2.68   0     0.74 </span>
+<span class="co">#&gt; 2 1     0.25   2.84     0  3.08 -0.238 -0.127  3.47 -0.626 -1.16   3.06 -0.218</span>
+<span class="co">#&gt; 3 1     0.570  6.57     0  5.57  1.00   0.524  6.24  0.334  0.381  5.55  1.02 </span>
+<span class="co">#&gt; # … with 129 more rows, and 13 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   depot &lt;dbl&gt;, center &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 </div>
 </div>
   </div>
@@ -690,7 +754,7 @@ addPropModel &lt;-<span class="st"> </span>fit <span class="op">%&gt;%</span>
 
 
       <footer><div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

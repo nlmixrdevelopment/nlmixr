@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -195,15 +195,20 @@
     <p>Create a run summary word document</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nmDocx</span>(<span class='no'>x</span>, <span class='kw'>docxOut</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>docxTemplate</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+    <pre class="usage"><span class='fu'>nmDocx</span>(
+  <span class='no'>x</span>,
+  <span class='kw'>docxOut</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>docxTemplate</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>titleStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.title"</span>, <span class='st'>"Title"</span>),
   <span class='kw'>subtitleStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.subtitle"</span>, <span class='st'>"Subtitle"</span>),
   <span class='kw'>normalStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.normal"</span>, <span class='st'>"Normal"</span>),
   <span class='kw'>headerStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.heading1"</span>, <span class='st'>"Heading 1"</span>),
   <span class='kw'>centeredStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.centered"</span>, <span class='st'>"centered"</span>),
-  <span class='kw'>preformattedStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.preformatted"</span>,
-  <span class='st'>"HTML Preformatted"</span>), <span class='kw'>width</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.width"</span>, <span class='fl'>69</span>),
-  <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>preformattedStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.preformatted"</span>, <span class='st'>"HTML Preformatted"</span>),
+  <span class='kw'>width</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.width"</span>, <span class='fl'>69</span>),
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
 <span class='fu'>nmSave</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
@@ -341,7 +346,7 @@ data object for the fit?  By default this is <code>FALSE</code> with
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

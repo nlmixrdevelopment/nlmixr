@@ -79,7 +79,7 @@ reasonable huxtables with nlmixr fit objects." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -199,15 +199,26 @@ reasonable huxtables with nlmixr fit objects." />
 reasonable huxtables with nlmixr fit objects.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>asHux.nlmixrFitCore</span>(<span class='no'>...</span>, <span class='kw'>error_format</span> <span class='kw'>=</span> <span class='st'>"({std.error})"</span>,
+    <pre class="usage"><span class='fu'>asHux.nlmixrFitCore</span>(
+  <span class='no'>...</span>,
+  <span class='kw'>error_format</span> <span class='kw'>=</span> <span class='st'>"({std.error})"</span>,
   <span class='kw'>error_style</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"stderr"</span>, <span class='st'>"ci"</span>, <span class='st'>"statistic"</span>, <span class='st'>"pvalue"</span>),
-  <span class='kw'>error_pos</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"below"</span>, <span class='st'>"same"</span>, <span class='st'>"right"</span>), <span class='kw'>number_format</span> <span class='kw'>=</span> <span class='st'>"%.3f"</span>,
-  <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"."</span>, <span class='kw'>pad_decimal</span> <span class='kw'>=</span> <span class='st'>"."</span>, <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tidy_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>stars</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>`***`</span> <span class='kw'>=</span> <span class='fl'>0.001</span>, <span class='kw'>`**`</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='kw'>`*`</span> <span class='kw'>=</span> <span class='fl'>0.05</span>),
-  <span class='kw'>bold_signif</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>borders</span> <span class='kw'>=</span> <span class='fl'>0.4</span>, <span class='kw'>outer_borders</span> <span class='kw'>=</span> <span class='fl'>0.8</span>, <span class='kw'>note</span> <span class='kw'>=</span> <span class='kw'>if</span>
-  (<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='no'>stars</span>)) <span class='kw'>NULL</span> <span class='kw'>else</span> <span class='st'>"{stars}."</span>, <span class='kw'>statistics</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>N</span> <span class='kw'>=</span> <span class='st'>"nobs"</span>,
-  <span class='kw'>`Objective Function`</span> <span class='kw'>=</span> <span class='st'>"OBJF"</span>, <span class='st'>"logLik"</span>, <span class='st'>"AIC"</span>), <span class='kw'>coefs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>omit_coefs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>na_omit</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"any"</span>, <span class='st'>"none"</span>))</pre>
+  <span class='kw'>error_pos</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"below"</span>, <span class='st'>"same"</span>, <span class='st'>"right"</span>),
+  <span class='kw'>number_format</span> <span class='kw'>=</span> <span class='st'>"%.3f"</span>,
+  <span class='kw'>align</span> <span class='kw'>=</span> <span class='st'>"."</span>,
+  <span class='kw'>pad_decimal</span> <span class='kw'>=</span> <span class='st'>"."</span>,
+  <span class='kw'>ci_level</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tidy_args</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>stars</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>`***`</span> <span class='kw'>=</span> <span class='fl'>0.001</span>, <span class='kw'>`**`</span> <span class='kw'>=</span> <span class='fl'>0.01</span>, <span class='kw'>`*`</span> <span class='kw'>=</span> <span class='fl'>0.05</span>),
+  <span class='kw'>bold_signif</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>borders</span> <span class='kw'>=</span> <span class='fl'>0.4</span>,
+  <span class='kw'>outer_borders</span> <span class='kw'>=</span> <span class='fl'>0.8</span>,
+  <span class='kw'>note</span> <span class='kw'>=</span> <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/NULL.html'>is.null</a></span>(<span class='no'>stars</span>)) <span class='kw'>NULL</span> <span class='kw'>else</span> <span class='st'>"{stars}."</span>,
+  <span class='kw'>statistics</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>N</span> <span class='kw'>=</span> <span class='st'>"nobs"</span>, <span class='kw'>`Objective Function`</span> <span class='kw'>=</span> <span class='st'>"OBJF"</span>, <span class='st'>"logLik"</span>, <span class='st'>"AIC"</span>),
+  <span class='kw'>coefs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>omit_coefs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>na_omit</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"all"</span>, <span class='st'>"any"</span>, <span class='st'>"none"</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -319,7 +330,7 @@ objective function value.</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

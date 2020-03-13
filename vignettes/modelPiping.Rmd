@@ -66,6 +66,7 @@ We can try the First-Order Conditional Estimation with Interaction
 
 ```{r}
 fit <- nlmixr(one.compartment, theo_sd, est="focei",
+              control=list(print=0), 
               table=list(npde=TRUE, cwres=TRUE))
 
 print(fit)
@@ -94,7 +95,8 @@ piping changes to the model:
 ## Example 1 -- Set inital estimate to 0.5 (shown w/posthoc)
 one.ka.0.5 <- fit %>%
     ini(tka=0.5) %>% 
-    nlmixr(est="posthoc", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(est="posthoc", control=list(print=0), 
+           table=list(cwres=TRUE, npde=TRUE))
 
 print(one.ka.0.5)
 ```
@@ -103,7 +105,8 @@ print(one.ka.0.5)
 ## Example 2 -- Fix tka to 0.5 and re-estimate.
 one.ka.0.5 <- fit %>%
     ini(tka=fix(0.5)) %>%
-    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(est="focei", control=list(print=0),
+           table=list(cwres=TRUE, npde=TRUE))
 
 print(one.ka.0.5)
 ```
@@ -112,7 +115,8 @@ print(one.ka.0.5)
 ## Example 3 -- Fix tka to model estimated value and re-estimate.
 one.ka.0.5 <- fit %>%
     ini(tka=fix) %>%
-    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(est="focei", control=list(print=0),
+           table=list(cwres=TRUE, npde=TRUE))
 
 print(one.ka.0.5)
 ```
@@ -121,7 +125,8 @@ print(one.ka.0.5)
 ## Example 4 -- Change tka to 0.7 in orginal model function and then estimate
 one.ka.0.7 <- one.compartment %>%
     ini(tka=0.7) %>% 
-    nlmixr(theo_sd, est="focei", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(theo_sd, est="focei", control=list(print=0),
+           table=list(cwres=TRUE, npde=TRUE))
 
 print(one.ka.0.7)
 ```
@@ -147,7 +152,8 @@ then re-estimate by piping it to the `nlmixr` function again.
 ## Remove eta.ka on ka
 noEta <- fit %>%
     model(ka <- exp(tka)) %>%
-    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(est="focei", control=list(print=0),
+           table=list(cwres=TRUE, npde=TRUE))
 
 print(noEta)
 ```
@@ -158,7 +164,8 @@ Of course you could also add an eta on a parameter in the same way;
 addBackKa <- noEta %>%
     model({ka <- exp(tka + bsv.ka)}) %>%
     ini(bsv.ka=0.1) %>%
-    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(est="focei", control=list(print=0),
+           table=list(cwres=TRUE, npde=TRUE))
 
 print(addBackKa)
 ```
@@ -191,7 +198,8 @@ parameters:
 wt70 <- fit %>% ## FIXME could be based on if it finds the covarite in the last used nlmixr data.
     model({cl <- exp(tcl + eta.cl)*(WT/70)^covWtPow}) %>%
     ini(covWtPow=fix(0.75)) %>%
-    nlmixr(est="focei", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(est="focei", control=list(print=0),
+           table=list(cwres=TRUE, npde=TRUE))
 
 print(wt70)
 ```
@@ -209,7 +217,9 @@ d$DV[d$EVID == 0 & d$DV == 0] <- 0.0150
 addPropModel <- fit %>%
     model({cp ~ add(add.err)+prop(prop.err)}) %>%
     ini(prop.err=0.1) %>%
-    nlmixr(d,est="focei", table=list(cwres=TRUE, npde=TRUE))
+    nlmixr(d,est="focei",
+           control=list(print=0),
+           table=list(cwres=TRUE, npde=TRUE))
 
 print(addPropModel)
 ```

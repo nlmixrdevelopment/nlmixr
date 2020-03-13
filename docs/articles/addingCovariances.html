@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
       </span>
     </div>
 
@@ -149,7 +149,7 @@
     <div class="page-header toc-ignore">
       <h1>Example Model: Phenobarbatol with correlations</h1>
             
-            <h4 class="date">2019-11-11</h4>
+            <h4 class="date">2020-03-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/addingCovariances.Rmd"><code>vignettes/addingCovariances.Rmd</code></a></small>
       <div class="hidden name"><code>addingCovariances.Rmd</code></div>
@@ -195,45 +195,52 @@ pheno &lt;-<span class="st"> </span><span class="cf">function</span>() {
 <div id="fit-with-saem" class="section level2">
 <h2 class="hasAnchor">
 <a href="#fit-with-saem" class="anchor"></a>Fit with SAEM</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pheno, pheno_sd, <span class="st">"saem"</span>, <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pheno, pheno_sd, <span class="st">"saem"</span>,
+              <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>), 
+              <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01</span>
 
 <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(fit)
-<span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF by FOCEi approximation fit ────────────────────── </span>
+<span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF by FOCEi approximation fit ─────────────────────────── </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
 <span class="co">#&gt; FOCEi 688.6326 985.5036 1003.764      -486.7518         7.536808</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec; $time): ───────────────────────────────────────────────────── </span>
-<span class="co">#&gt;           saem    setup table cwres covariance  npde    other</span>
-<span class="co">#&gt; elapsed 19.603 7.853898 0.122  7.97      0.015 0.464 0.498102</span>
+<span class="co">#&gt; ── Time (sec; $time): ────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt;           saem    setup table cwres covariance npde    other</span>
+<span class="co">#&gt; elapsed 19.061 0.192358 0.019 0.243      0.015 0.33 0.255642</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ────────────────────── </span>
-<span class="co">#&gt;                          Parameter  Est.     SE %RSE</span>
-<span class="co">#&gt; tcl     typical value of clearance    -5 0.0752  1.5</span>
-<span class="co">#&gt; tv         typical value of volume 0.346 0.0537 15.5</span>
-<span class="co">#&gt; add.err       residual variability  2.83            </span>
-<span class="co">#&gt;            Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
-<span class="co">#&gt; tcl     0.00677 (0.00584, 0.00784)     53.1      1.86% </span>
-<span class="co">#&gt; tv               1.41 (1.27, 1.57)     40.9      1.25% </span>
-<span class="co">#&gt; add.err                       2.83                      </span>
+<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ─────────────────────────── </span>
+<span class="co">#&gt;                          Parameter  Est.     SE %RSE    Back-transformed(95%CI)</span>
+<span class="co">#&gt; tcl     typical value of clearance    -5 0.0752  1.5 0.00677 (0.00584, 0.00784)</span>
+<span class="co">#&gt; tv         typical value of volume 0.346 0.0537 15.5          1.41 (1.27, 1.57)</span>
+<span class="co">#&gt; add.err       residual variability  2.83                                   2.83</span>
+<span class="co">#&gt;         BSV(CV%) Shrink(SD)%</span>
+<span class="co">#&gt; tcl         53.1      1.86% </span>
+<span class="co">#&gt; tv          40.9      1.25% </span>
+<span class="co">#&gt; add.err                     </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): linFim</span>
 <span class="co">#&gt;   Correlations in between subject variability (BSV) matrix:</span>
 <span class="co">#&gt;     cor:eta.v,eta.cl </span>
-<span class="co">#&gt;               0.193   </span>
+<span class="co">#&gt;           0.193  </span>
+<span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ──────────────────────────────── </span>
+<span class="co">#&gt; ── Fit Data (object is a modified tibble): ───────────────────────────────────── </span>
 <span class="co">#&gt; # A tibble: 155 x 23</span>
-<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED  IRES  IWRES CPRED</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1        2   17.3     0  17.5 -0.228 -0.105  18.5 -1.16 -0.410  17.5</span>
-<span class="co">#&gt; 2 1      112.  31       0  27.9  3.10   1.43   29.6  1.37  0.483  27.9</span>
-<span class="co">#&gt; 3 2        2    9.7     0  10.5 -0.817 -0.376  12.5 -2.80 -0.989  10.3</span>
-<span class="co">#&gt; # … with 152 more rows, and 12 more variables: CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, ke &lt;dbl&gt;, cp &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   A1 &lt;dbl&gt;, EPRED &lt;dbl&gt;, ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   ID     TIME    DV  EVID  PRED    RES   WRES IPRED  IRES  IWRES CPRED   CRES</span>
+<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 1        2   17.3     0  17.5 -0.228 -0.105  18.5 -1.16 -0.410  17.5 -0.203</span>
+<span class="co">#&gt; 2 1      112.  31       0  27.9  3.10   1.43   29.6  1.37  0.483  27.9  3.15 </span>
+<span class="co">#&gt; 3 2        2    9.7     0  10.5 -0.817 -0.376  12.5 -2.80 -0.989  10.3 -0.641</span>
+<span class="co">#&gt; # … with 152 more rows, and 11 more variables: CWRES &lt;dbl&gt;, eta.cl &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   eta.v &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, ke &lt;dbl&gt;, cp &lt;dbl&gt;, A1 &lt;dbl&gt;, EPRED &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   ERES &lt;dbl&gt;, NPDE &lt;dbl&gt;</span></code></pre></div>
 </div>
 <div id="basic-goodness-of-fit-plots" class="section level2">
 <h2 class="hasAnchor">
@@ -285,7 +292,7 @@ p2 &lt;-<span class="st"> </span>p2<span class="op">+</span><span class="st"> </
 
 
       <footer><div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Mirjam Trame, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
 </div>
 
 <div class="pkgdown">

@@ -65,7 +65,9 @@ pheno <- function() {
 ```
 ## Fit with SAEM
 ```{r}
-fit <- nlmixr(pheno, pheno_sd, "saem", table=list(cwres=TRUE, npde=TRUE))
+fit <- nlmixr(pheno, pheno_sd, "saem",
+              control=list(print=0), 
+              table=list(cwres=TRUE, npde=TRUE))
 
 print(fit)
 ```

@@ -61,8 +61,11 @@ pheno <- function() {
 }
 
 ## We will run it two ways to allow comparisons
-fit.s <- nlmixr(pheno, pheno_sd, "saem", control=list(logLik=TRUE), table=list(cwres=TRUE, npde=TRUE))
-fit.f <- nlmixr(pheno, pheno_sd, "focei", table=list(cwres=TRUE, npde=TRUE))
+fit.s <- nlmixr(pheno, pheno_sd, "saem", control=list(logLik=TRUE, print=0),
+                table=list(cwres=TRUE, npde=TRUE))
+fit.f <- nlmixr(pheno, pheno_sd, "focei",
+                control=list(print=0), 
+                table=list(cwres=TRUE, npde=TRUE))
 ```
 # Glancing at the goodness of fit metrics
 
