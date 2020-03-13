@@ -1327,4 +1327,4 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
         expect_error(nlmixrBounds(f7), rex::rex("The '<' operator cannot be used in the ini block"))
     })
 
-}, cran=TRUE)
+}, test="cran")

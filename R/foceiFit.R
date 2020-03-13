@@ -2693,27 +2693,6 @@ nobs.nlmixrFitCoreSilent  <- nobs.nlmixrFitCore
 ##'@export
 vcov.nlmixrFitCoreSilent  <- vcov.nlmixrFitCore
 
-
-.getR <- function(x,sd=FALSE){
-    .rs <- x$omegaR
-    .lt <- lower.tri(.rs);
-    .dn1 <- dimnames(x$omegaR)[[2]]
-    .nms <- apply(which(.lt,arr.ind=TRUE),1,
-                  function(x){
-        sprintf("cor%s%s",getOption("broom.mixed.sep1","__"),
-                paste(.dn1[x],collapse=getOption("broom.mixed.sep2",".")))
-    });
-    .lt <- structure(.rs[.lt], .Names=.nms)
-    .lt <- .lt[.lt != 0];
-    if (sd){
-        .d <- dim(x$omegaR);
-        if (.d[1] > 0){
-            .lt <- c(setNames(diag(x$omegaR),paste0("sd",getOption("broom.mixed.sep1","__"),.dn1)),.lt);
-        }
-    }
-    return(.lt)
-}
-
 ##'@export
 `$.nlmixrGill83` <-  function(obj, arg, exact = FALSE){
     .ret <- obj[[arg]]
@@ -2723,39 +2702,6 @@ vcov.nlmixrFitCoreSilent  <- vcov.nlmixrFitCore
         return(.lst[[arg]])
     }
     return(.ret)
-}
-
-.getCorPrint <- function(x){
-    .op <- options()
-    on.exit(options(.op))
-    options("broom.mixed.sep1"=":",
-            "broom.mixed.sep2"=",")
-    .strong <- getOption("nlmixr.strong.corr", 0.7);
-    .moderate <- getOption("nlmixr.moderate.corr", 0.3);
-    .lt <- .getR(x)
-    .digs <- 3;
-    .lts <- sapply(.lt, function(x){
-        .x <- abs(x);
-        .ret <- "<"
-        if (.x > .strong){
-            .ret <- ">" ## Strong
-        } else if (.x > .moderate){
-            .ret <- "=" ## Moderate
-        }
-        return(.ret)
-    })
-    .nms <- names(.lt);
-    .lt <- sprintf("%s%s", formatC(signif(.lt, digits=.digs),digits=.digs,format="fg", flag="#"), .lts)
-    names(.lt) <- .nms;
-    .lt <- gsub(rex::rex("\""), "", paste0("    ", .captureOutput(print(.lt))));
-    if (crayon::has_color()){
-        .lt <- gsub(rex::rex(capture(.regNum), ">"), "  \033[1m\033[31m\\1 \033[39m\033[22m", .lt, perl=TRUE)
-        .lt <- gsub(rex::rex(capture(.regNum), "="), "  \033[1m\033[32m\\1 \033[39m\033[22m", .lt, perl=TRUE)
-        .lt <- gsub(rex::rex(capture(.regNum), "<"), "  \\1  ", .lt, perl=TRUE)
-    } else {
-        .lt <- gsub(rex::rex(capture(.regNum), or(">", "=", "<")), "  \\1 ", .lt, perl=TRUE)
-    }
-    cat(paste(.lt, collapse="\n"), "\n\n")
 }
 
 ##' @export

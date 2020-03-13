@@ -47,4 +47,4 @@ rxPermissive({
 
     f <- nlmixr(One.SD.ODE, dat, "posthoc")
     expect_true(inherits(f, "nlmixrPosthoc"))
-}, cran=FALSE)
+})

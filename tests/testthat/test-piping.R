@@ -172,5 +172,5 @@ rxPermissive({
 
     })
 
-}, cran=TRUE)
+})
 

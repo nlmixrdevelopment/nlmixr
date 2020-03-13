@@ -490,4 +490,4 @@ rxPermissive({
         expect_equal(td1, td2, tolerance=tol)
         expect_equal(td2, td3, tolerance=tol)
     })
-}, cran=FALSE)
+})

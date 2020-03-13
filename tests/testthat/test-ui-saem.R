@@ -77,4 +77,4 @@ rxPermissive({
         expect_equal(c("lCl", "AllomCL", "lVc", "AllomV", "lKA"), m1$saem.theta.name)
     })
 
-}, cran=TRUE)
+})
