@@ -292,13 +292,22 @@ void prnt_aux_files(char *prefix) {
   int i, islhs;
   char buf[512];
   FILE *fp[3];
-
-  sprintf(buf, "%sODE_PARS.txt",   prefix); fp[0] = fopen(buf, "w");
-  sprintf(buf, "%sLHS_VARS.txt",   prefix); fp[1] = fopen(buf, "w");
-  sprintf(buf, "%sSTATE_VARS.txt", prefix); fp[2] = fopen(buf, "w");
-  i =  (intptr_t)fp[0] * (intptr_t)fp[1] *  (intptr_t) fp[2];
-  err_msg(i, "Coudln't open file to write.\n", -1);
-
+  FILE tmp;
+  sprintf(buf, "%sODE_PARS.txt",   prefix); tmp = fopen(buf, "w");
+  if (tmp == NULL) {
+    err_msg(1, "cannot open ODE_PARS.txt\n", -1);
+  }
+  fp[0] = tmp;
+  sprintf(buf, "%sLHS_VARS.txt",   prefix); tmp = fopen(buf, "w");
+  if (tmp == NULL) {
+    err_msg(1, "cannot open LHS_VARS.txt\n", -1);
+  }
+  fp[1] = tmp;
+  sprintf(buf, "%sSTATE_VARS.txt", prefix); tmp = fopen(buf, "w");
+  if (tmp == NULL) {
+    err_msg(1, "cannot open STATE_VARS.txt\n", -1);
+  }
+  fp[2] = tmp;
   for (i=0; i<symtab.nvar; i++) {
     islhs = symtab.is_lhs[i];
     if (islhs>1) continue;    /* is a state var */
