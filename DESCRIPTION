@@ -29,7 +29,7 @@ Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3c, testthat,
 	Rvmmin, broom.mixed, dotwhisker, officer, pkgdown, gridExtra,
 	xpose, lotri, rex, minqa, lattice, digest, sys, crayon,
 	lbfgs, dparser
-Version: 1.1.1-6
+Version: 1.1.1-7
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",
       comment=c(ORCID="0000-0001-8538-6691")),
