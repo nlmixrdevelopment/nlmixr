@@ -292,7 +292,7 @@ void prnt_aux_files(char *prefix) {
   int i, islhs;
   char buf[512];
   FILE *fp[3];
-  FILE tmp;
+  FILE *tmp;
   sprintf(buf, "%sODE_PARS.txt",   prefix); tmp = fopen(buf, "w");
   if (tmp == NULL) {
     err_msg(1, "cannot open ODE_PARS.txt\n", -1);
