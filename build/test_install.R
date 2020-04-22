@@ -118,20 +118,23 @@ test_install <- function(){
                                         # Test 11: nlme test for theophylline
     library(nlmixr)
     testmod <- function() {
-        ini({
-            tka <- .5
-            tcl <- -3.2
-            tv <- -1
-            eta.ka ~ 1
-            eta.cl ~ 2
-            eta.v ~ 1
-            add.err <- 0.1
-        })
+      ini({
+        tka <- 0.45 # Log Ka
+        tcl <- 1 # Log Cl
+        ## This works with interactive models
+        ## You may also label the preceding line with label("label text")
+        tv <- 3.45; label("log V")
+        ## the label("Label name") works with all models
+        eta.ka ~ 0.6
+        eta.cl ~ 0.3
+        eta.v ~ 0.1
+        add.sd <- 0.7
+      })
         model({
             ka <- exp(tka + eta.ka)
             cl <- exp(tcl + eta.cl)
             v <- exp(tv + eta.v)
-            linCmt() ~ add(add.err)
+            linCmt() ~ add(add.sd)
         })
     }
     if(Sys.info()['sysname']%in%c('Darwin','Linux')){
