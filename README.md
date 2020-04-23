@@ -204,7 +204,10 @@ distributions are supported, in principle.
    - To validate or test the installation of `RxODE` completely, you
      can type the following `library(RxODE); rxTest();` and it will
      run all of the unit tests in RxODE to make sure it is running
-     correctly on your system. (Note that the `testthat` package is required for this, and it will take a long time.)
+     correctly on your system. (Note that the `testthat` package is
+     required for this, and it will take a long time.)
+	 - Note this requires a special install option to make sure the
+       tests are installed:  `remotes::install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")`
 6. Install `nlmixr`.
    - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
  
@@ -270,7 +273,7 @@ CXX14FLAGS=-O2 -march=native -mtune=native -arch x86_64 -ftemplate-depth-256 -fP
      correctly on your system. (Note that the `testthat` package is
      required for this, and it will take a long time.)
 	 - Note this requires a special install option to make sure the
-       tests are installed:  `remote:install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")`
+       tests are installed:  `remotes::install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")`
 7. Install `nlmixr`.
    - This can be done by `install_github("nlmixrdevelopment/nlmixr")`
    
