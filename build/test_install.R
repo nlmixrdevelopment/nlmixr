@@ -130,12 +130,12 @@ test_install <- function(){
         eta.v ~ 0.1
         add.sd <- 0.7
       })
-        model({
-            ka <- exp(tka + eta.ka)
-            cl <- exp(tcl + eta.cl)
-            v <- exp(tv + eta.v)
-            linCmt() ~ add(add.sd)
-        })
+      model({
+        ka <- exp(tka + eta.ka)
+        cl <- exp(tcl + eta.cl)
+        v <- exp(tv + eta.v)
+        linCmt() ~ add(add.sd)
+      })
     }
     if(Sys.info()['sysname']%in%c('Darwin','Linux')){
         message("Running nlme")
