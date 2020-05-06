@@ -4,7 +4,8 @@
 \name{Bolus_1CPTMM}
 \alias{Bolus_1CPTMM}
 \title{1 Compartment Model w/ Michelis Menton Elimination}
-\format{A data frame with 7,920 rows and 14 columns
+\format{
+A data frame with 7,920 rows and 14 columns
 
 \describe{
   \item{ID}{Simulated Subject ID}
@@ -20,7 +21,8 @@
   \item{KM}{Individual Km constant}
   \item{SD}{Single Dose Flag}
   \item{CMT}{Compartment}
-}}
+}
+}
 \source{
 Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
     nlmixr: an open-source package for pharmacometric modelling in

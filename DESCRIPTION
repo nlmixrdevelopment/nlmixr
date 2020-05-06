@@ -6,14 +6,14 @@ Depends: R (>= 3.5)
 Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
  	n1qn1, fastGHQuad, crayon, cli (>= 2.0),
-	RcppArmadillo (>= 0.5.600.2.0), vpc (>= 1.0.0),
+	RcppArmadillo (>= 0.5.600.2.0),
 	RxODE(>= 0.9.1-9), nlme, magrittr, tidyr, sys, generics,
 	huxtable, digest, flextable, stringr, yaml
 Suggests: knitr, rmarkdown, dplyr, data.table, lbfgsb3c, testthat,
         madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf,
 	Rvmmin, broom.mixed, dotwhisker, officer, pkgdown, gridExtra,
 	xpose, lotri, rex, minqa, lattice, digest, sys, crayon,
-	lbfgs, dparser
+	lbfgs, dparser, vpc (>= 1.0.0)
 Version: 1.1.1-7
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",

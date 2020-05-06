@@ -54,15 +54,18 @@ vpc <- function (sim, ...)
 ##' @rdname vpc
 ##' @export
 vpc.default <- function(sim, ...){
-    ns <- loadNamespace("vpc");
-    if (exists("vpc_vpc",ns)){
-        vpcn <- "vpc_vpc"
-    } else {
-        vpcn <- "vpc"
-    }
-    call <- as.list(match.call(expand.dots=TRUE))[-1];
-    call <- call[names(call) %in% methods::formalArgs(getFromNamespace(vpcn,"vpc"))]
-    p = do.call(getFromNamespace(vpcn,"vpc"), call, envir = parent.frame(1))
+  if (!requireNamespace("vpc", quietly=TRUE)){
+    stop("'vpc' is required; Download from CRAN or github https://github.com/ronkeizer/vpc")
+  }
+  ns <- loadNamespace("vpc");
+  if (exists("vpc_vpc",ns)){
+    vpcn <- "vpc_vpc"
+  } else {
+    vpcn <- "vpc"
+  }
+  call <- as.list(match.call(expand.dots=TRUE))[-1];
+  call <- call[names(call) %in% methods::formalArgs(getFromNamespace(vpcn,"vpc"))]
+  p = do.call(getFromNamespace(vpcn,"vpc"), call, envir = parent.frame(1))
 }
 
 ##' Visual predictive check (VPC) for nlmixr nlme objects

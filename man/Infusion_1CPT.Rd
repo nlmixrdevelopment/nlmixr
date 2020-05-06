@@ -4,7 +4,8 @@
 \name{Infusion_1CPT}
 \alias{Infusion_1CPT}
 \title{Infusion_1CPT -- 1 Compartment Model Simulated Data from ACOP 2016}
-\format{A data frame with 7,920 rows and 14 columns
+\format{
+A data frame with 7,920 rows and 14 columns
 
 \describe{
   \item{ID}{Simulated Subject ID}
@@ -22,7 +23,8 @@
   \item{SD}{Single Dose Flag}
   \item{RATE}{NONMEM Rate}
   \item{CMT}{Compartment}
-}}
+}
+}
 \source{
 Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
     nlmixr: an open-source package for pharmacometric modelling in

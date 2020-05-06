@@ -4,7 +4,8 @@
 \name{theo_md}
 \alias{theo_md}
 \title{Multiple dose Theophilline PK data}
-\format{A data frame with 348 rows by 7 columns
+\format{
+A data frame with 348 rows by 7 columns
 
 \describe{
   \item{ID}{Subject ID}
@@ -14,7 +15,8 @@
   \item{EVID}{RxODE/nlmixr event ID (not NONMEM's)}
   \item{CMT}{Compartment number}
   \item{WT}{Weight (kg)}
-}}
+}
+}
 \source{
 NONMEM/nlme
 }

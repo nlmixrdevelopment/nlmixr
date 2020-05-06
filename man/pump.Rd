@@ -4,7 +4,8 @@
 \name{pump}
 \alias{pump}
 \title{Pump failure example dataset}
-\format{A data frame with 10 rows and 5 columns
+\format{
+A data frame with 10 rows and 5 columns
 
 \describe{
   \item{y}{Number of pump failures}
@@ -12,7 +13,8 @@
   \item{group}{Continuous Operation (=1) or Intermittent Operation(=2)}
   \item{ID}{ID for group of 10 pumps}
   \item{logtstd}{Centeredy operation times}
-}}
+}
+}
 \source{
 \url{https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.htm#statug_nlmixed_sect040.htm}
 }

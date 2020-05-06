@@ -4,7 +4,8 @@
 \name{pheno_sd}
 \alias{pheno_sd}
 \title{Single Dose Phenobarbitol PK/PD}
-\format{A data frame with 744 rows and 8 columns
+\format{
+A data frame with 744 rows and 8 columns
 
 \describe{
   \item{ID}{Infant ID}
@@ -15,7 +16,8 @@
   \item{DV}{The concentration of phenobarbitol in the serum (ug/mL)}
   \item{MDV}{If the dependent variable (DV) is missing;  0 for observations, 1 for doses}
   \item{EVID}{Event ID}
-}}
+}
+}
 \source{
 Pinheiro, J. C. and Bates, D. M. (2000), Mixed-Effects Models in S and S-PLUS, Springer, New York. (Appendix A.23)
 
