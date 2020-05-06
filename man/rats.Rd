@@ -4,7 +4,8 @@
 \name{rats}
 \alias{rats}
 \title{Pregnant Rat Diet Experiment}
-\format{A data frame with 32 rows and 6 columns
+\format{
+A data frame with 32 rows and 6 columns
 
 \describe{
   \item{trt}{Treatment; c= control diet; t=treated diet}
@@ -13,7 +14,8 @@
   \item{x1}{Indicator for trt=c}
   \item{x2}{Indicator for trt=t}
   \item{ID}{Rat ID}
-}}
+}
+}
 \source{
 \url{https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.htm#statug_nlmixed_sect040.htm}
 }

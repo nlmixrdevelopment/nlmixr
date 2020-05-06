@@ -30,6 +30,9 @@ vpc.nlme = function (fit, nsim = 100, by = NULL, ...)
     xs = do.call("cbind", s)
 
     df = cbind(xd[ord, c("ID", "TIME", "grp")], DV = as.vector(xs), SIM = sim)
+    if (!requireNamespace("vpc", quietly=TRUE)){
+      stop("'vpc' is required; Download from CRAN or github https://github.com/ronkeizer/vpc")
+    }
     ns <- loadNamespace("vpc");
     if (exists("vpc_vpc",ns)){
         vpcn <- "vpc_vpc"

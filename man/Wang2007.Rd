@@ -4,13 +4,15 @@
 \name{Wang2007}
 \alias{Wang2007}
 \title{Simulated Data Set for comparing objective functions}
-\format{A data frame with 20 rows and 3 columns
+\format{
+A data frame with 20 rows and 3 columns
 
 \describe{
   \item{ID}{Simulated Subject ID}
   \item{Time}{Simulated Time}
   \item{Y}{Simulated Value}
-}}
+}
+}
 \source{
 Table 1 from Wang, Y \emph{Derivation of Various NONMEM estimation methods}. J Pharmacokinet Pharmacodyn (2007) 34:575-593.
 }

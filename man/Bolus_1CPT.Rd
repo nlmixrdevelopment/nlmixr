@@ -4,7 +4,8 @@
 \name{Bolus_1CPT}
 \alias{Bolus_1CPT}
 \title{Bolus_1CPT -- 1 Compartment Model Simulated Data from ACOP 2016}
-\format{A data frame with 7,920 rows and 14 columns
+\format{
+A data frame with 7,920 rows and 14 columns
 
 \describe{
   \item{ID}{Simulated Subject ID}
@@ -21,7 +22,8 @@
   \item{II}{Interdose Interval}
   \item{SD}{Single Dose Flag}
   \item{CMT}{Compartment}
-}}
+}
+}
 \source{
 Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
     nlmixr: an open-source package for pharmacometric modelling in

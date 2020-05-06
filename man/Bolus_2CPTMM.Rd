@@ -4,7 +4,8 @@
 \name{Bolus_2CPTMM}
 \alias{Bolus_2CPTMM}
 \title{2 Compartment Model with Michelis Menton Clearance}
-\format{A data frame with 7,920 rows and 15 columns
+\format{
+A data frame with 7,920 rows and 15 columns
 
 \describe{
   \item{ID}{Simulated Subject ID}
@@ -22,7 +23,8 @@
   \item{V2}{Individual Peripheral Compartment Volume}
   \item{SD}{Single Dose Flag}
   \item{CMT}{Compartment Indicator}
-}}
+}
+}
 \source{
 Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
     nlmixr: an open-source package for pharmacometric modelling in

@@ -4,7 +4,8 @@
 \name{warfarin}
 \alias{warfarin}
 \title{Warfarin PK/PD data}
-\format{A data frame with 519 rows and 9 columns
+\format{
+A data frame with 519 rows and 9 columns
 
 \describe{
   \item{id}{Patient identifier (n=32)}
@@ -16,7 +17,8 @@
   \item{wt}{Weight [kg]}
   \item{age}{Age [yr]}
   \item{sex}{Gender (male or female, factor)}
-}}
+}
+}
 \source{
 Funaki T, Holford N, Fujita S (2018). Population PKPD
     analysis using nlmixr and NONMEM. PAGJA 2018

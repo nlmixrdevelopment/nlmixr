@@ -4,7 +4,8 @@
 \name{Bolus_2CPT}
 \alias{Bolus_2CPT}
 \title{2 Compartment Model}
-\format{A data frame with 7,920 rows and 16 columns
+\format{
+A data frame with 7,920 rows and 16 columns
 
 \describe{
   \item{ID}{Simulated Subject ID}
@@ -23,7 +24,8 @@
   \item{II}{Interdose interval}
   \item{SD}{Single Dose Flag}
   \item{CMT}{Compartment Indicator}
-}}
+}
+}
 \source{
 Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
     nlmixr: an open-source package for pharmacometric modelling in
