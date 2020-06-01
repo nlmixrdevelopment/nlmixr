@@ -20,14 +20,13 @@
 ##'
 ##' @inheritParams huxtable::huxreg
 ##' @param na_omit How NAs are handled in converting to huxtable
+##' @param x Object to convert to a huxtable
 ##'@export
 asHux.nlmixrFitCore  <- function(...,
                                  error_format    = "({std.error})",
-                                 error_style     = c("stderr", "ci", "statistic", "pvalue"),
                                  error_pos       = c("below", "same", "right"),
                                  number_format   = "%.3f",
                                  align           = ".",
-                                 pad_decimal     = ".",
                                  ci_level        = NULL,
                                  tidy_args       = NULL,
                                  stars           = c("***" = 0.001, "**" = 0.01, "*" = 0.05),
@@ -71,6 +70,7 @@ asHux.nlmixrFitCore  <- function(...,
     return(.ret[.w])
 }
 
+##'@rdname asHux.nlmixrFitCore
 ##'@export
 as_huxtable.nlmixrFitCore  <- function(x,...){
     if (missing(x)){
@@ -455,9 +455,9 @@ nmDocx  <- function(x,
     if (!any(headerStyle==.style$style_name)) stop("Need to specify a valid headerStyle");
     if (!any(preformattedStyle==.style$style_name)) stop("Need to specify a valid preformattedStyle");
     if (.bound !=""){
-        .hreg  <- eval(parse(text=sprintf('nlmixr::as_hux("%s"=x)', .bound)));
+        .hreg  <- eval(parse(text=sprintf('huxtable::as_hux("%s"=x)', .bound)));
     } else {
-        .hreg  <- nlmixr::as_hux(x);
+        .hreg  <- huxtable::as_hux(x);
     }
     .doc <- .doc %>%
         officer::body_add_par(sprintf("nlmixr %s (%s)", utils::packageVersion("nlmixr"),
@@ -605,9 +605,9 @@ nmLst  <- function(x,
         .bound <- .bound[1]
     }
     if (.bound !=""){
-        .hreg  <- eval(parse(text=sprintf('nlmixr::as_hux("%s"=x)', .bound)));
+        .hreg  <- eval(parse(text=sprintf('huxtable::as_hux("%s"=x)', .bound)));
     } else {
-        .hreg  <- nlmixr::as_hux(x);
+        .hreg  <- huxtable::as_hux(x);
     }
     .rule  <- function(msg){
         message("")
@@ -691,7 +691,7 @@ nmSave  <- function(x,...,save=TRUE){
 ## Ugly hacks to make word conversion work without loading flextable, officer, etc
 .huxNS <- NULL;
 .asFlx <- function(x, ...){
-  rxReq("huxtable")
+  RxODE::rxReq("huxtable")
   if (is.null(.huxNS)){
     ## ugly hack
     .huxNS <- loadNamespace("huxtable")

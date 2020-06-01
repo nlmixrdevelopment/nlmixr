@@ -21,7 +21,6 @@ Imports: Rcpp (>= 0.12.3),
 	 generics,
 	 flextable,
 	 stringr,
-	 tibble,
 	 yaml
 Suggests: knitr, rmarkdown, dplyr, tibble, data.table, lbfgsb3c, testthat,
         madness, devtools, expm, matrixcalc, reshape2, nloptr, ucminf,

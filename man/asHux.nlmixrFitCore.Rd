@@ -2,16 +2,15 @@
 % Please edit documentation in R/huxtable.R
 \name{asHux.nlmixrFitCore}
 \alias{asHux.nlmixrFitCore}
+\alias{as_huxtable.nlmixrFitCore}
 \title{Change a nlmixr fit object to a huxtable}
 \usage{
 asHux.nlmixrFitCore(
   ...,
   error_format = "({std.error})",
-  error_style = c("stderr", "ci", "statistic", "pvalue"),
   error_pos = c("below", "same", "right"),
   number_format = "\%.3f",
   align = ".",
-  pad_decimal = ".",
   ci_level = NULL,
   tidy_args = NULL,
   stars = c(`***` = 0.001, `**` = 0.01, `*` = 0.05),
@@ -24,9 +23,49 @@ asHux.nlmixrFitCore(
   omit_coefs = NULL,
   na_omit = c("all", "any", "none")
 )
+
+as_huxtable.nlmixrFitCore(x, ...)
 }
 \arguments{
+\item{...}{Models, or a single list of models. Names will be used as column headings.}
+
+\item{error_format}{How to display uncertainty in estimates. See below.}
+
+\item{error_pos}{Display uncertainty "below", to the "right" of, or in the "same" cell as estimates.}
+
+\item{number_format}{Format for numbering. See \code{\link[huxtable:number_format]{number_format()}} for details.}
+
+\item{align}{Alignment for table cells. Set to a single character to align on this character.}
+
+\item{ci_level}{Confidence level for intervals. Set to \code{NULL} to not calculate confidence intervals.}
+
+\item{tidy_args}{List of arguments to pass to \code{\link[broom:tidy]{broom::tidy()}}. You can also pass a list of lists;
+if so, the nth element will be used for the nth column.}
+
+\item{stars}{Levels for p value stars. Names of \code{stars} are symbols to use. Set to \code{NULL} to not show stars.}
+
+\item{bold_signif}{Where p values are below this number, cells will be displayed in bold. Use \code{NULL} to turn off
+this behaviour.}
+
+\item{borders}{Thickness of inner horizontal borders. Set to 0 for no borders.}
+
+\item{outer_borders}{Thickness of outer (top and bottom) horizontal borders. Set to 0 for no borders.}
+
+\item{note}{Footnote for bottom cell, which spans all columns. \code{{stars}} will be replaced by a note about
+significance stars. Set to \code{NULL} for no footnote.}
+
+\item{statistics}{A vector of summary statistics to display. Set to \code{NULL} to show all available
+statistics. To change display names, name the \code{statistics} vector:
+\code{c("Displayed title" = "statistic_name", ...)}}
+
+\item{coefs}{A vector of coefficients to display. Overrules \code{omit_coefs}. To change display names,
+name the \code{coef} vector: \code{c("Displayed title" = "coefficient_name", ...)}}
+
+\item{omit_coefs}{Omit these coefficients.}
+
 \item{na_omit}{How NAs are handled in converting to huxtable}
+
+\item{x}{Object to convert to a huxtable}
 }
 \description{
 This is a thin layer that differs from
