@@ -1938,7 +1938,7 @@ nlmixrUIModel <- function(fun, ini=NULL, bigmodel=NULL){
 
     rxode <- paste(rx.ode, collapse="\n")
     if (.linCmt){
-      rxode <- RxODE::rxNorm(RxODE::rxLinCmtTrans(rxode))
+      rxode <- RxODE::rxNorm(RxODE::rxGetLin(rxode))
     }
     rest <- rx.pred;
     all.vars <- all.vars[!(all.vars %in% RxODE::rxState(rxode))]

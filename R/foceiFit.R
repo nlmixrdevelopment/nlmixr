@@ -683,311 +683,311 @@ foceiControl <- function(sigdig=3,...,
                          repeatGillMax=3,
                          stickyRecalcN=5,
                          gradProgressOfvTime=10){
-    if (is.null(boundTol)){
-        boundTol <- 5 * 10 ^ (-sigdig + 1)
+  if (is.null(boundTol)){
+    boundTol <- 5 * 10 ^ (-sigdig + 1)
+  }
+  if (is.null(epsilon)){
+    epsilon <- 10 ^ (-sigdig - 1)
+  }
+  if (is.null(abstol)){
+    abstol <- 10 ^ (-sigdig - 1)
+  }
+  if (is.null(reltol)){
+    reltol <- 10 ^ (-sigdig - 1)
+  }
+  if (is.null(rhoend)){
+    rhoend <- 10 ^ (-sigdig - 1);
+  }
+  if (is.null(lbfgsFactr)){
+    lbfgsFactr <- 10 ^ (-sigdig - 1) / .Machine$double.eps;
+  }
+  if (is.null(atol)){
+    atol <- 0.5 * 10 ^ (-sigdig - 2);
+  }
+  if (is.null(rtol)){
+    rtol <- 0.5 * 10 ^ (-sigdig - 2);
+  }
+  if (is.null(atolSens)){
+    atolSens <- 0.5 * 10 ^ (-sigdig-1.5);
+  }
+  if (is.null(rtolSens)){
+    rtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
+  }
+  if (is.null(ssAtol)){
+    ssAtol <- 0.5 * 10 ^ (-sigdig - 2);
+  }
+  if (is.null(ssRtol)){
+    ssRtol <- 0.5 * 10 ^ (-sigdig - 2);
+  }
+  if (is.null(ssAtolSens)){
+    ssAtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
+  }
+  if (is.null(ssRtolSens)){
+    ssRtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
+  }
+  if (is.null(rel.tol)){
+    rel.tol <- 10 ^ (-sigdig - 1);
+  }
+  if (is.null(x.tol)){
+    x.tol <- 10 ^ (-sigdig - 1);
+  }
+  if (is.null(derivSwitchTol)){
+    derivSwitchTol <- 2 * 10 ^ (-sigdig-1);
+  }
+  ## if (is.null(gillRtol)){
+  ##     ## FIXME: there is a way to calculate this according to the
+  ##     ## Gill paper but it is buried in their optimization book.
+  ##     gillRtol <- 10 ^ (-sigdig - 1);
+  ## }
+  .xtra <- list(...);
+  if (is.null(transitAbs) && !is.null(.xtra$transit_abs)){  # nolint
+    transitAbs <- .xtra$transit_abs;  # nolint
+  }
+  if (missing(covsInterpolation) && !is.null(.xtra$covs_interpolation)){  # nolint
+    covsInterpolation <- .xtra$covs_interpolation; # nolint
+  }
+  if (missing(maxInnerIterations) && !is.null(.xtra$max_iterations)){  # nolint
+    maxInnerIterations <- .xtra$max_iterations; # nolint
+  }
+  if (!missing(stiff) && missing(method)){
+    if (RxODE::rxIs(stiff, "logical")){
+      if (stiff){
+        method <- "lsoda"
+        warning("stiff=TRUE has been replaced with method = \"lsoda\".")
+      } else {
+        method <- "dop853"
+        warning("stiff=FALSE has been replaced with method = \"dop853\".")
+      }
     }
-    if (is.null(epsilon)){
-        epsilon <- 10 ^ (-sigdig - 1)
+  }  else {
+    if (!RxODE::rxIs(method,"integer")){
+      method <- match.arg(method);
     }
-    if (is.null(abstol)){
-        abstol <- 10 ^ (-sigdig - 1)
-    }
-    if (is.null(reltol)){
-        reltol <- 10 ^ (-sigdig - 1)
-    }
-    if (is.null(rhoend)){
-        rhoend <- 10 ^ (-sigdig - 1);
-    }
-    if (is.null(lbfgsFactr)){
-        lbfgsFactr <- 10 ^ (-sigdig - 1) / .Machine$double.eps;
-    }
-    if (is.null(atol)){
-        atol <- 0.5 * 10 ^ (-sigdig - 2);
-    }
-    if (is.null(rtol)){
-        rtol <- 0.5 * 10 ^ (-sigdig - 2);
-    }
-    if (is.null(atolSens)){
-        atolSens <- 0.5 * 10 ^ (-sigdig-1.5);
-    }
-    if (is.null(rtolSens)){
-        rtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
-    }
-    if (is.null(ssAtol)){
-        ssAtol <- 0.5 * 10 ^ (-sigdig - 2);
-    }
-    if (is.null(ssRtol)){
-        ssRtol <- 0.5 * 10 ^ (-sigdig - 2);
-    }
-    if (is.null(ssAtolSens)){
-        ssAtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
-    }
-    if (is.null(ssRtolSens)){
-        ssRtolSens <- 0.5 * 10 ^ (-sigdig-1.5);
-    }
-    if (is.null(rel.tol)){
-        rel.tol <- 10 ^ (-sigdig - 1);
-    }
-    if (is.null(x.tol)){
-        x.tol <- 10 ^ (-sigdig - 1);
-    }
-    if (is.null(derivSwitchTol)){
-        derivSwitchTol <- 2 * 10 ^ (-sigdig-1);
-    }
-    ## if (is.null(gillRtol)){
-    ##     ## FIXME: there is a way to calculate this according to the
-    ##     ## Gill paper but it is buried in their optimization book.
-    ##     gillRtol <- 10 ^ (-sigdig - 1);
-    ## }
-    .xtra <- list(...);
-    if (is.null(transitAbs) && !is.null(.xtra$transit_abs)){  # nolint
-        transitAbs <- .xtra$transit_abs;  # nolint
-    }
-    if (missing(covsInterpolation) && !is.null(.xtra$covs_interpolation)){  # nolint
-        covsInterpolation <- .xtra$covs_interpolation; # nolint
-    }
-    if (missing(maxInnerIterations) && !is.null(.xtra$max_iterations)){  # nolint
-        maxInnerIterations <- .xtra$max_iterations; # nolint
-    }
-    if (!missing(stiff) && missing(method)){
-        if (RxODE::rxIs(stiff, "logical")){
-            if (stiff){
-                method <- "lsoda"
-                warning("stiff=TRUE has been replaced with method = \"lsoda\".")
-            } else {
-                method <- "dop853"
-                warning("stiff=FALSE has been replaced with method = \"dop853\".")
-            }
-        }
-    }  else {
-        if (!RxODE::rxIs(method,"integer")){
-            method <- match.arg(method);
-        }
-    }
-    ## .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
-    ## method <- as.integer(.methodIdx[method]);
-    if (RxODE::rxIs(scaleType, "character")){
-        .scaleTypeIdx <- c("norm"=1L, "nlmixr"=2L, "mult"=3L, "multAdd"=4L);
-        scaleType <- as.integer(.scaleTypeIdx[match.arg(scaleType)]);
-    }
-    if (RxODE::rxIs(normType, "character")){
-        .normTypeIdx <- c("rescale2"=1L, "rescale"=2L, "mean"=3L, "std"=4L, "len"=5L, "constant"=6);
-        normType <- as.integer(.normTypeIdx[match.arg(normType)]);
-    }
-    derivMethod <- match.arg(derivMethod);
-    .methodIdx <- c("forward"=0L, "central"=1L, "switch"=3L);
-    derivMethod <- as.integer(.methodIdx[derivMethod])
-    covDerivMethod <- .methodIdx[match.arg(covDerivMethod)];
-    if (length(covsInterpolation) > 1) covsInterpolation <- covsInterpolation[1];
-    if (!RxODE::rxIs(covsInterpolation, "integer")){
-        covsInterpolation <- tolower(match.arg(covsInterpolation,
-                                               c("linear", "locf", "LOCF", "constant", "nocb", "NOCB", "midpoint")))
-    }
+  }
+  ## .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
+  ## method <- as.integer(.methodIdx[method]);
+  if (RxODE::rxIs(scaleType, "character")){
+    .scaleTypeIdx <- c("norm"=1L, "nlmixr"=2L, "mult"=3L, "multAdd"=4L);
+    scaleType <- as.integer(.scaleTypeIdx[match.arg(scaleType)]);
+  }
+  if (RxODE::rxIs(normType, "character")){
+    .normTypeIdx <- c("rescale2"=1L, "rescale"=2L, "mean"=3L, "std"=4L, "len"=5L, "constant"=6);
+    normType <- as.integer(.normTypeIdx[match.arg(normType)]);
+  }
+  derivMethod <- match.arg(derivMethod);
+  .methodIdx <- c("forward"=0L, "central"=1L, "switch"=3L);
+  derivMethod <- as.integer(.methodIdx[derivMethod])
+  covDerivMethod <- .methodIdx[match.arg(covDerivMethod)];
+  if (length(covsInterpolation) > 1) covsInterpolation <- covsInterpolation[1];
+  if (!RxODE::rxIs(covsInterpolation, "integer")){
+    covsInterpolation <- tolower(match.arg(covsInterpolation,
+                                           c("linear", "locf", "LOCF", "constant", "nocb", "NOCB", "midpoint")))
+  }
 
-    ## if (covsInterpolation == "constant") covsInterpolation <- "locf";
-    ## covsInterpolation  <- as.integer(which(covsInterpolation == c("linear", "locf", "nocb", "midpoint")) - 1);
-    if (missing(cores)){
-        cores <- RxODE::rxCores();
+  ## if (covsInterpolation == "constant") covsInterpolation <- "locf";
+  ## covsInterpolation  <- as.integer(which(covsInterpolation == c("linear", "locf", "nocb", "midpoint")) - 1);
+  if (missing(cores)){
+    cores <- RxODE::rxCores();
+  }
+  if (missing(n1qn1nsim)){
+    n1qn1nsim <- 10 * maxInnerIterations + 1;
+  }
+  if (length(covMethod) == 1){
+    if (covMethod == ""){
+      covMethod <- 0L
     }
-    if (missing(n1qn1nsim)){
-        n1qn1nsim <- 10 * maxInnerIterations + 1;
+  }
+  if (RxODE::rxIs(covMethod, "character")){
+    covMethod <- match.arg(covMethod);
+    .covMethodIdx <- c("r,s" = 1L, "r"=2L, "s"=3L);
+    covMethod <- .covMethodIdx[match.arg(covMethod)];
+  }
+  .outerOptTxt <- "custom";
+  if (RxODE::rxIs(outerOpt, "character")){
+    outerOpt <- match.arg(outerOpt);
+    .outerOptTxt <- outerOpt;
+    if (outerOpt == "bobyqa"){
+      RxODE::rxReq("minqa")
+      outerOptFun <- .bobyqa;
+      outerOpt <- -1L;
+    } else if (outerOpt == "nlminb"){
+      outerOptFun <- .nlminb;
+      outerOpt <- -1L;
+    } else if (outerOpt == "mma"){
+      outerOptFun <- .nloptr;
+      outerOpt <- -1L;
+    } else if (outerOpt == "slsqp"){
+      outerOptFun <- .slsqp;
+      outerOpt <- -1L;
+    } else if (outerOpt == "lbfgsbLG"){
+      outerOptFun <- .lbfgsbLG;
+      outerOpt <- -1L;
+    } else if (outerOpt == "Rvmmin"){
+      outerOptFun <- .Rvmmin;
+      outerOpt <- -1L;
+    } else {
+      .outerOptIdx <- c("L-BFGS-B"=0L, "lbfgsb3c"=1L);
+      outerOpt <- .outerOptIdx[outerOpt]
+      if (outerOpt == 1L){
+        RxODE::rxReq("lbfgsb3c")
+      }
+      outerOptFun <- NULL
     }
-    if (length(covMethod) == 1){
-        if (covMethod == ""){
-            covMethod <- 0L
-        }
-    }
-    if (RxODE::rxIs(covMethod, "character")){
-        covMethod <- match.arg(covMethod);
-        .covMethodIdx <- c("r,s" = 1L, "r"=2L, "s"=3L);
-        covMethod <- .covMethodIdx[match.arg(covMethod)];
-    }
-    .outerOptTxt <- "custom";
-    if (RxODE::rxIs(outerOpt, "character")){
-        outerOpt <- match.arg(outerOpt);
-        .outerOptTxt <- outerOpt;
-        if (outerOpt == "bobyqa"){
-            RxODE::rxReq("minqa")
-            outerOptFun <- .bobyqa;
-            outerOpt <- -1L;
-        } else if (outerOpt == "nlminb"){
-            outerOptFun <- .nlminb;
-            outerOpt <- -1L;
-        } else if (outerOpt == "mma"){
-            outerOptFun <- .nloptr;
-            outerOpt <- -1L;
-        } else if (outerOpt == "slsqp"){
-            outerOptFun <- .slsqp;
-            outerOpt <- -1L;
-        } else if (outerOpt == "lbfgsbLG"){
-            outerOptFun <- .lbfgsbLG;
-            outerOpt <- -1L;
-        } else if (outerOpt == "Rvmmin"){
-            outerOptFun <- .Rvmmin;
-            outerOpt <- -1L;
-        } else {
-            .outerOptIdx <- c("L-BFGS-B"=0L, "lbfgsb3c"=1L);
-            outerOpt <- .outerOptIdx[outerOpt]
-            if (outerOpt == 1L){
-                RxODE::rxReq("lbfgsb3c")
-            }
-            outerOptFun <- NULL
-        }
-    } else if (is(outerOpt, "function")) {
-        outerOptFun <- outerOpt;
-        outerOpt <- -1L;
-    }
-    if (RxODE::rxIs(innerOpt, "character")){
-        .innerOptFun <- c("n1qn1"=1L, "BFGS"=2L);
-        innerOpt <- setNames(.innerOptFun[match.arg(innerOpt)], NULL);
-    }
+  } else if (is(outerOpt, "function")) {
+    outerOptFun <- outerOpt;
+    outerOpt <- -1L;
+  }
+  if (RxODE::rxIs(innerOpt, "character")){
+    .innerOptFun <- c("n1qn1"=1L, "BFGS"=2L);
+    innerOpt <- setNames(.innerOptFun[match.arg(innerOpt)], NULL);
+  }
 
-    if (resetEtaP > 0 & resetEtaP < 1){
-        .resetEtaSize <- qnorm(1 - (resetEtaP / 2));
-    } else if (resetEtaP <= 0){
-        .resetEtaSize <- Inf;
-    } else {
-        .resetEtaSize <- 0;
-    }
+  if (resetEtaP > 0 & resetEtaP < 1){
+    .resetEtaSize <- qnorm(1 - (resetEtaP / 2));
+  } else if (resetEtaP <= 0){
+    .resetEtaSize <- Inf;
+  } else {
+    .resetEtaSize <- 0;
+  }
 
-    if (resetThetaP > 0 & resetThetaP < 1){
-        .resetThetaSize <- qnorm(1 - (resetThetaP / 2));
-    } else if (resetThetaP <= 0){
-        .resetThetaSize <- Inf;
-    } else {
-        stop("Cannot always reset THETAs");
-    }
-    if (resetThetaFinalP > 0 & resetThetaFinalP < 1){
-        .resetThetaFinalSize <- qnorm(1 - (resetThetaFinalP / 2));
-    } else if (resetThetaP <= 0){
-        .resetThetaFinalSize <- Inf;
-    } else {
-        stop("Cannot always reset THETAs");
-    }
-    .ret <- list(maxOuterIterations=as.integer(maxOuterIterations),
-                 maxInnerIterations=as.integer(maxInnerIterations),
-                 method=method,
-                 transitAbs=transitAbs,
-                 atol=atol,
-                 rtol=rtol,
-                 atolSens=atolSens,
-                 rtolSens=rtolSens,
-                 ssAtol=ssAtol,
-                 ssRtol=ssRtol,
-                 ssAtolSens=ssAtolSens,
-                 ssRtolSens=ssRtolSens,
-                 minSS=minSS, maxSS=maxSS,
-                 maxstepsOde=maxstepsOde,
-                 hmin=hmin,
-                 hmax=hmax,
-                 hini=hini,
-                 maxordn=maxordn,
-                 maxords=maxords,
-                 cores=cores,
-                 covsInterpolation=covsInterpolation,
-                 n1qn1nsim=as.integer(n1qn1nsim),
-                 print=as.integer(print),
-                 lbfgsLmm=as.integer(lbfgsLmm),
-                 lbfgsPgtol=as.double(lbfgsPgtol),
-                 lbfgsFactr=as.double(lbfgsFactr),
-                 scaleTo=scaleTo,
-                 epsilon=epsilon,
-                 derivEps=derivEps,
-                 derivMethod=derivMethod,
-                 covDerivMethod=covDerivMethod,
-                 covMethod=covMethod,
-                 centralDerivEps=centralDerivEps,
-                 eigen=as.integer(eigen),
-                 addPosthoc=as.integer(addPosthoc),
-                 diagXform=match.arg(diagXform),
-                 sumProd=sumProd,
-                 optExpression=optExpression,
-                 outerOpt=as.integer(outerOpt),
-                 ci=as.double(ci),
-                 sigdig=as.double(sigdig),
-                 scaleObjective=as.double(scaleObjective),
-                 useColor=as.integer(useColor),
-                 boundTol=as.double(boundTol),
-                 calcTables=calcTables,
-                 printNcol=as.integer(printNcol),
-                 noAbort=as.integer(noAbort),
-                 interaction=as.integer(interaction),
-                 cholSEtol=as.double(cholSEtol),
-                 hessEps=as.double(hessEps),
-                 cholAccept=as.double(cholAccept),
-                 resetEtaSize=as.double(.resetEtaSize),
-                 resetThetaSize=as.double(.resetThetaSize),
-                 resetThetaFinalSize=as.double(.resetThetaFinalSize),
-                 diagOmegaBoundUpper=diagOmegaBoundUpper,
-                 diagOmegaBoundLower=diagOmegaBoundLower,
-                 cholSEOpt=as.integer(cholSEOpt),
-                 cholSECov=as.integer(cholSECov),
-                 fo=as.integer(fo),
-                 covTryHarder=as.integer(covTryHarder),
-                 outerOptFun=outerOptFun,
-                 ## bobyqa
-                 rhobeg=as.double(rhobeg),
-                 rhoend=as.double(rhoend),
-                 npt=npt,
-                 ## nlminb
-                 rel.tol=as.double(rel.tol),
-                 x.tol=as.double(x.tol),
-                 eval.max=eval.max,
-                 iter.max=iter.max,
-                 innerOpt=innerOpt,
-                 ## BFGS
-                 abstol=abstol,
-                 reltol=reltol,
-                 derivSwitchTol=derivSwitchTol,
-                 resetHessianAndEta=as.integer(resetHessianAndEta),
-                 stateTrim=as.double(stateTrim),
-                 gillK=as.integer(gillK),
-                 gillKcov=as.integer(gillKcov),
-                 gillRtol=as.double(gillRtol),
-                 gillStep=as.double(gillStep),
-                 gillStepCov=as.double(gillStepCov),
-                 scaleType=scaleType,
-                 normType=normType,
-                 scaleC=scaleC,
-                 scaleCmin=as.double(scaleCmin),
-                 scaleCmax=as.double(scaleCmax),
-                 scaleC0=as.double(scaleC0),
-                 outerOptTxt=.outerOptTxt,
-                 rmatNorm=as.integer(rmatNorm),
-                 smatNorm=as.integer(smatNorm),
-                 covGillF=as.integer(covGillF),
-                 optGillF=as.integer(optGillF),
-                 gillFtol=as.double(gillFtol),
-                 gillFtolCov=as.double(gillFtolCov),
-                 covSmall=as.double(covSmall),
-                 adjLik=adjLik,
-                 gradTrim=as.double(gradTrim),
-                 gradCalcCentralSmall=as.double(gradCalcCentralSmall),
-                 gradCalcCentralLarge=as.double(gradCalcCentralLarge),
-                 etaNudge=as.double(etaNudge),
-                 maxOdeRecalc=as.integer(maxOdeRecalc),
-                 odeRecalcFactor=as.double(odeRecalcFactor),
-                 nRetries=nRetries,
-                 seed=seed,
-                 resetThetaCheckPer=resetThetaCheckPer,
-                 etaMat=etaMat,
-                 repeatGillMax=as.integer(repeatGillMax),
-                 stickyRecalcN=as.integer(max(1,abs(stickyRecalcN))),
-                 eventFD=eventFD,
-                 eventCentral=as.integer(eventCentral),
-                 gradProgressOfvTime=gradProgressOfvTime,
-                 ...);
-    if (!missing(etaMat) && missing(maxInnerIterations)){
-        warning("By supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0");
-        .ret$maxInnerIterations <- 0L
-        .ret$etaMat;
-    }
-    .tmp <- .ret
-    .tmp$maxsteps <- maxstepsOde
-    .tmp <- do.call(RxODE::rxControl, .tmp);
-    .ret$rxControl <- .tmp;
-    class(.ret) <- "foceiControl"
-    return(.ret);
+  if (resetThetaP > 0 & resetThetaP < 1){
+    .resetThetaSize <- qnorm(1 - (resetThetaP / 2));
+  } else if (resetThetaP <= 0){
+    .resetThetaSize <- Inf;
+  } else {
+    stop("Cannot always reset THETAs");
+  }
+  if (resetThetaFinalP > 0 & resetThetaFinalP < 1){
+    .resetThetaFinalSize <- qnorm(1 - (resetThetaFinalP / 2));
+  } else if (resetThetaP <= 0){
+    .resetThetaFinalSize <- Inf;
+  } else {
+    stop("Cannot always reset THETAs");
+  }
+  .ret <- list(maxOuterIterations=as.integer(maxOuterIterations),
+               maxInnerIterations=as.integer(maxInnerIterations),
+               method=method,
+               transitAbs=transitAbs,
+               atol=atol,
+               rtol=rtol,
+               atolSens=atolSens,
+               rtolSens=rtolSens,
+               ssAtol=ssAtol,
+               ssRtol=ssRtol,
+               ssAtolSens=ssAtolSens,
+               ssRtolSens=ssRtolSens,
+               minSS=minSS, maxSS=maxSS,
+               maxstepsOde=maxstepsOde,
+               hmin=hmin,
+               hmax=hmax,
+               hini=hini,
+               maxordn=maxordn,
+               maxords=maxords,
+               cores=cores,
+               covsInterpolation=covsInterpolation,
+               n1qn1nsim=as.integer(n1qn1nsim),
+               print=as.integer(print),
+               lbfgsLmm=as.integer(lbfgsLmm),
+               lbfgsPgtol=as.double(lbfgsPgtol),
+               lbfgsFactr=as.double(lbfgsFactr),
+               scaleTo=scaleTo,
+               epsilon=epsilon,
+               derivEps=derivEps,
+               derivMethod=derivMethod,
+               covDerivMethod=covDerivMethod,
+               covMethod=covMethod,
+               centralDerivEps=centralDerivEps,
+               eigen=as.integer(eigen),
+               addPosthoc=as.integer(addPosthoc),
+               diagXform=match.arg(diagXform),
+               sumProd=sumProd,
+               optExpression=optExpression,
+               outerOpt=as.integer(outerOpt),
+               ci=as.double(ci),
+               sigdig=as.double(sigdig),
+               scaleObjective=as.double(scaleObjective),
+               useColor=as.integer(useColor),
+               boundTol=as.double(boundTol),
+               calcTables=calcTables,
+               printNcol=as.integer(printNcol),
+               noAbort=as.integer(noAbort),
+               interaction=as.integer(interaction),
+               cholSEtol=as.double(cholSEtol),
+               hessEps=as.double(hessEps),
+               cholAccept=as.double(cholAccept),
+               resetEtaSize=as.double(.resetEtaSize),
+               resetThetaSize=as.double(.resetThetaSize),
+               resetThetaFinalSize=as.double(.resetThetaFinalSize),
+               diagOmegaBoundUpper=diagOmegaBoundUpper,
+               diagOmegaBoundLower=diagOmegaBoundLower,
+               cholSEOpt=as.integer(cholSEOpt),
+               cholSECov=as.integer(cholSECov),
+               fo=as.integer(fo),
+               covTryHarder=as.integer(covTryHarder),
+               outerOptFun=outerOptFun,
+               ## bobyqa
+               rhobeg=as.double(rhobeg),
+               rhoend=as.double(rhoend),
+               npt=npt,
+               ## nlminb
+               rel.tol=as.double(rel.tol),
+               x.tol=as.double(x.tol),
+               eval.max=eval.max,
+               iter.max=iter.max,
+               innerOpt=innerOpt,
+               ## BFGS
+               abstol=abstol,
+               reltol=reltol,
+               derivSwitchTol=derivSwitchTol,
+               resetHessianAndEta=as.integer(resetHessianAndEta),
+               stateTrim=as.double(stateTrim),
+               gillK=as.integer(gillK),
+               gillKcov=as.integer(gillKcov),
+               gillRtol=as.double(gillRtol),
+               gillStep=as.double(gillStep),
+               gillStepCov=as.double(gillStepCov),
+               scaleType=scaleType,
+               normType=normType,
+               scaleC=scaleC,
+               scaleCmin=as.double(scaleCmin),
+               scaleCmax=as.double(scaleCmax),
+               scaleC0=as.double(scaleC0),
+               outerOptTxt=.outerOptTxt,
+               rmatNorm=as.integer(rmatNorm),
+               smatNorm=as.integer(smatNorm),
+               covGillF=as.integer(covGillF),
+               optGillF=as.integer(optGillF),
+               gillFtol=as.double(gillFtol),
+               gillFtolCov=as.double(gillFtolCov),
+               covSmall=as.double(covSmall),
+               adjLik=adjLik,
+               gradTrim=as.double(gradTrim),
+               gradCalcCentralSmall=as.double(gradCalcCentralSmall),
+               gradCalcCentralLarge=as.double(gradCalcCentralLarge),
+               etaNudge=as.double(etaNudge),
+               maxOdeRecalc=as.integer(maxOdeRecalc),
+               odeRecalcFactor=as.double(odeRecalcFactor),
+               nRetries=nRetries,
+               seed=seed,
+               resetThetaCheckPer=resetThetaCheckPer,
+               etaMat=etaMat,
+               repeatGillMax=as.integer(repeatGillMax),
+               stickyRecalcN=as.integer(max(1,abs(stickyRecalcN))),
+               eventFD=eventFD,
+               eventCentral=as.integer(eventCentral),
+               gradProgressOfvTime=gradProgressOfvTime,
+               ...);
+  if (!missing(etaMat) && missing(maxInnerIterations)){
+    warning("By supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0");
+    .ret$maxInnerIterations <- 0L
+    .ret$etaMat;
+  }
+  .tmp <- .ret
+  .tmp$maxsteps <- maxstepsOde
+  .tmp <- do.call(RxODE::rxControl, .tmp);
+  .ret$rxControl <- .tmp;
+  class(.ret) <- "foceiControl"
+  return(.ret);
 }
 
 .ucminf <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...){
@@ -1169,37 +1169,21 @@ foceiControl <- function(sigdig=3,...,
 
 .genOM <- function(s)
 {
-    .getNR = function(.a) round(sqrt(2 * length(.a) + 0.25) - 0.1)
-    .nr = sum(sapply(s, .getNR))
+    .getNR <- function(.a) round(sqrt(2 * length(.a) + 0.25) - 0.1)
+    .nr <- sum(sapply(s, .getNR))
     .mat <- matrix(0, .nr, .nr)
-    .offset = as.integer(0)
-    j = lapply(1:length(s), function(k) {
-        .a = s[[k]]
+    .offset <- as.integer(0)
+    j <- lapply(1:length(s), function(k) {
+        .a <- s[[k]]
         .p <- .getNR(.a)
-        .starts = row(.mat) > .offset  & col(.mat) > .offset
+        .starts <- row(.mat) > .offset  & col(.mat) > .offset
         .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset+.p & .starts] <<- .a
         .offset <<- .offset+.p
     })
-    .a = .mat[col(.mat) >= row(.mat)]
+    .a <- .mat[col(.mat) >= row(.mat)]
     .mat <- t(.mat)
     .mat[col(.mat) >= row(.mat)] <- .a
     .mat
-}
-##' Construct RxODE linCmt function
-##'
-##' @param fun function to convert to solveC syntax
-##' @return SolvedC RxODE object
-##' @author Matthew L. Fidler
-##' @keywords internal
-##' @export
-constructLinCmt <- function(fun){
-    pars <- nlmixrfindLhs(body(fun));
-    lines <- deparse(body(fun))[-1];
-    lines <- lines[-length(lines)];
-    ret <- RxODE::rxLinCmtTrans(sprintf("%s\nCentral=linCmt(%s);\n", paste(lines, collapse="\n"), paste(pars, collapse=", ")));
-    ret <- strsplit(RxODE::rxNorm(ret), "\n")[[1]];
-    ret <- paste(ret[-seq_along(lines)], collapse="\n");
-    return(ret)
 }
 ##' FOCEi fit
 ##'
@@ -1683,7 +1667,7 @@ foceiFit.data.frame0 <- function(data,
     } else {
         ## Fixme
         .ret$ODEmodel <- TRUE
-        model <- constructLinCmt(PKpars);
+        model <- RxODE::rxGetLin(PKpars);
         pred <- eval(parse(text="function(){return(Central);}"))
     }
     .square <- function(x) x*x
@@ -1996,47 +1980,47 @@ foceiFit.data.frame0 <- function(data,
         .ret$control$predNeq = 0L
     }
     .fitFun <- function(.ret){
-        this.env <- environment()
-        assign("err", "theta reset", this.env)
-        while (this.env$err == "theta reset"){
-            assign("err", "", this.env);
-            .ret0 <- tryCatch({foceiFitCpp_(.ret)},
-                              error=function(e){
-                if (regexpr("theta reset", e$message) != -1){
-                    assign("err", "theta reset", this.env);
-                } else {
-                    assign("err", e$message, this.env);
-                }
-            })
-            if (this.env$err == "theta reset"){
-                .nm <- names(.ret$thetaIni);
-                .ret$thetaIni <- setNames(.thetaReset$thetaIni + 0.0, .nm);
-                .ret$rxInv$theta <- .thetaReset$omegaTheta;
-                .ret$control$printTop <- FALSE
-                .ret$etaMat <- .thetaReset$etaMat;
-                .ret$control$etaMat <- .thetaReset$etaMat;
-                .ret$control$maxInnerIterations <- .thetaReset$maxInnerIterations;
-                .ret$control$nF <- .thetaReset$nF;
-                .ret$control$gillRetC <- .thetaReset$gillRetC
-                .ret$control$gillRet <- .thetaReset$gillRet
-                .ret$control$gillRet <- .thetaReset$gillRet
-                .ret$control$gillDf <- .thetaReset$gillDf
-                .ret$control$gillDf2 <- .thetaReset$gillDf2
-                .ret$control$gillErr <- .thetaReset$gillErr
-                .ret$control$rEps <- .thetaReset$rEps
-                .ret$control$aEps <- .thetaReset$aEps
-                .ret$control$rEpsC <- .thetaReset$rEpsC
-                .ret$control$aEpsC <- .thetaReset$aEpsC
-                .ret$control$c1 <- .thetaReset$c1
-                .ret$control$c2 <- .thetaReset$c2
-                message("Theta reset")
-            }
+      this.env <- environment()
+      assign("err", "theta reset", this.env)
+      while (this.env$err == "theta reset"){
+        assign("err", "", this.env);
+        .ret0 <- tryCatch({foceiFitCpp_(.ret)},
+                          error=function(e){
+                            if (regexpr("theta reset", e$message) != -1){
+                              assign("err", "theta reset", this.env);
+                            } else {
+                              assign("err", e$message, this.env);
+                            }
+                          })
+        if (this.env$err == "theta reset"){
+          .nm <- names(.ret$thetaIni);
+          .ret$thetaIni <- setNames(.thetaReset$thetaIni + 0.0, .nm);
+          .ret$rxInv$theta <- .thetaReset$omegaTheta;
+          .ret$control$printTop <- FALSE
+          .ret$etaMat <- .thetaReset$etaMat;
+          .ret$control$etaMat <- .thetaReset$etaMat;
+          .ret$control$maxInnerIterations <- .thetaReset$maxInnerIterations;
+          .ret$control$nF <- .thetaReset$nF;
+          .ret$control$gillRetC <- .thetaReset$gillRetC
+          .ret$control$gillRet <- .thetaReset$gillRet
+          .ret$control$gillRet <- .thetaReset$gillRet
+          .ret$control$gillDf <- .thetaReset$gillDf
+          .ret$control$gillDf2 <- .thetaReset$gillDf2
+          .ret$control$gillErr <- .thetaReset$gillErr
+          .ret$control$rEps <- .thetaReset$rEps
+          .ret$control$aEps <- .thetaReset$aEps
+          .ret$control$rEpsC <- .thetaReset$rEpsC
+          .ret$control$aEpsC <- .thetaReset$aEpsC
+          .ret$control$c1 <- .thetaReset$c1
+          .ret$control$c2 <- .thetaReset$c2
+          message("Theta reset")
         }
-        if (this.env$err != ""){
-            stop(this.env$err);
-        } else {
-            return(.ret0);
-        }
+      }
+      if (this.env$err != ""){
+        stop(this.env$err);
+      } else {
+        return(.ret0);
+      }
     }
     .ret0 <- try(.fitFun(.ret));
     .n <- 1;
