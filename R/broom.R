@@ -125,11 +125,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     } else {
         return(NULL)
     }
-<<<<<<< HEAD
 }
-=======
-    return(tibble::as_tibble(.df))
->>>>>>> master
 ##   effect   group    term                  estimate std.error statistic
 ##   <chr>    <chr>    <chr>                    <dbl>     <dbl>     <dbl>
 ## 1 fixed    NA       (Intercept)           251.          6.82     36.8
@@ -196,13 +192,8 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
                 return(n)
             }));
     .tmp <- stack(.x[,-1])
-<<<<<<< HEAD
     .df <- data.frame(group="ID", level=.x$ID, term=.tmp$ind, estimate=.tmp$values);
-    return(dplyr::as.tbl(.df))
-=======
-    .df <- .data.frame(group="ID", level=.x$ID, term=.tmp$ind, estimate=.tmp$values);
     return(tibble::as_tibble(.df))
->>>>>>> master
 }
 
 ##'@export
