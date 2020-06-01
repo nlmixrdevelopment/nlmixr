@@ -2204,7 +2204,7 @@ foceiFit.data.frame0 <- function(data,
             .df <- data.table::data.table(.df)
         }
     } else {
-        .df <- dplyr::as.tbl(.df);
+        .df <- tibble::as_tibble(.df);
     }
     .cls <- class(.df);
     if (control$interaction){

@@ -694,14 +694,18 @@ nlmixrUI.multipleEndpoint <- function(x){
         if (!getOption("RxODE.combine.dvid", TRUE)){
             .info  <- .info[,names(.info) != "dvid*"];
         }
-        .hux <- huxtable::hux(.info) %>%
+        if (requireNamespace("huxtable", quietly = TRUE)){
+          .hux <- huxtable::hux(.info) %>%
             huxtable::add_colnames() %>%
             huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
             huxtable::set_position("center") %>%
             huxtable::set_all_borders(TRUE);
-        if (getOption("RxODE.combine.dvid", TRUE)){
+          if (getOption("RxODE.combine.dvid", TRUE)){
             .hux <- .hux %>%
-            huxtable::add_footnote("* If dvids are outside this range, all dvids are re-numered sequentially, ie 1,7, 10 becomes 1,2,3 etc")
+              huxtable::add_footnote("* If dvids are outside this range, all dvids are re-numered sequentially, ie 1,7, 10 becomes 1,2,3 etc")
+          }
+        } else {
+          .hux <- .info
         }
         return(.hux);
     } else {
@@ -723,17 +727,26 @@ print.nlmixrUI <- function(x, ...){
     print(x$all.covs);
   }
   if (length(x$predDf$cond) > 1){
-      cat(cli::rule(paste0(crayon::bold("Multiple Endpoint Model")," (", crayon::bold$blue("$multipleEndpoint"), "):")),"\n")
-    x$multipleEndpoint %>%
+    cat(cli::rule(paste0(crayon::bold("Multiple Endpoint Model")," (", crayon::bold$blue("$multipleEndpoint"), "):")),"\n")
+
+    if (requireNamespace("huxtable", quietly = TRUE)){
+      x$multipleEndpoint %>%
         huxtable::print_screen(colnames=FALSE)
+    } else {
+      print(x$multipleEndpoint)
+    }
     cat("\n")
   }
   .mu <- x$muRefTable;
   if (length(.mu) > 0){
       cat(cli::rule(paste0(crayon::bold(paste0(ifelse(use.utf(), "\u03bc", "mu"),"-referencing")),
                            " (", crayon::bold$blue("$muRefTable"), "):")),"\n")
-      .mu %>%
+      if (requireNamespace("huxtable", quietly = TRUE)){
+        .mu %>%
           huxtable::print_screen(colnames=FALSE)
+      } else {
+        print(.mu)
+      }
       cat("\n")
   }
   cat(cli::rule(crayon::bold(sprintf("Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))),"\n")
@@ -3049,8 +3062,8 @@ str.nlmixrUI <- function(object, ...){
   cat(" $ logThetasList: List of logThetas:\n")
   cat("     first element are scaling log thetas;\n");
   cat("     second element are back-transformed thetas;\n")
-  cat(" $ multipleEndpoint: huxtable of multiple endpoint translations in nlmixr\n");
-  cat(" $ muRefTable: huxtable of mu-referenced items in a model\n")
+  cat(" $ multipleEndpoint: table/huxtable of multiple endpoint translations in nlmixr\n");
+  cat(" $ muRefTable: table/huxtable of mu-referenced items in a model\n")
 }
 
 

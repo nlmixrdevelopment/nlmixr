@@ -49,11 +49,8 @@
 \alias{tidy}
 \alias{glance}
 \alias{augment}
-\alias{number_format}
 \alias{rxParams}
 \alias{rxParam}
-\alias{as_hux}
-\alias{as_huxtable}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -62,8 +59,6 @@ below to see their documentation.
 
 \describe{
   \item{generics}{\code{\link[generics]{augment}}, \code{\link[generics]{glance}}, \code{\link[generics]{glance}}, \code{\link[generics]{tidy}}}
-
-  \item{huxtable}{\code{\link[huxtable]{as_hux}}, \code{\link[huxtable]{as_huxtable}}, \code{\link[huxtable]{number_format}}}
 
   \item{magrittr}{\code{\link[magrittr]{\%>\%}}}
 
