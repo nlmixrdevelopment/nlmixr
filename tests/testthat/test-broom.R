@@ -1,4 +1,5 @@
 rxPermissive({
+  
     tol  <- 1e-5
     ## From https://raw.githubusercontent.com/bbolker/broom.mixed/master/tests/testthat/helper-checkers.R
 
@@ -58,7 +59,9 @@ rxPermissive({
     context("broom tidy nlmixr SAEM")
 
     fitS <- .nlmixr(one.compartment, theo_sd, est="saem")
+    
     test_that("tidy works on nlmixr fit SAEM fits", {
+      
         td <- tidy(fitS, exponentiate=NA)
         check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
         expect_equal(
@@ -85,7 +88,8 @@ rxPermissive({
         expect_equal(td$estimate[-(1:3)], .est[-(1:3)],
                      tolerance=tol)
         ##exp(.df$model.est[.exp])*.df$std.error[.exp]
-        expect_equal(exp(td$estimate[1:3])*td$std.error[1:3], .stdErr[1:3],
+        expect_equal(setNames(exp(td$estimate[1:3])*td$std.error[1:3],NULL),
+                     .stdErr[1:3],
                      tolerance=tol)
         expect_equal(exp(td$conf.low), .confLow,
                      tolerance=tol)
@@ -169,7 +173,8 @@ rxPermissive({
                          tolerance=tol)
             expect_equal(td$estimate[-(1:3)], .est[-(1:3)],
                          tolerance=tol)
-            expect_equal(exp(td$estimate[1:3])*td$std.error[1:3], .stdErr[1:3],
+            expect_equal(setNames(exp(td$estimate[1:3])*td$std.error[1:3], NULL),
+                         .stdErr[1:3],
                          tolerance=tol)
             expect_equal(exp(td$conf.low), .confLow,
                          tolerance=tol)
@@ -253,7 +258,8 @@ rxPermissive({
             expect_equal(td$estimate[-(1:3)], .est[-(1:3)],
                          tolerance=tol)
             ##exp(.df$model.est[.exp])*.df$std.error[.exp]
-            expect_equal(exp(td$estimate[1:3])*td$std.error[1:3], .stdErr[1:3],
+            expect_equal(setNames(exp(td$estimate[1:3])*td$std.error[1:3],NULL),
+                         .stdErr[1:3],
                          tolerance=tol)
             expect_equal(exp(td$conf.low), .confLow,
                          tolerance=tol)
@@ -336,7 +342,8 @@ rxPermissive({
         expect_equal(td$estimate[-(1:3)], .est[-(1:3)],
                      tolerance=tol)
         ##exp(.df$model.est[.exp])*.df$std.error[.exp]
-        expect_equal(exp(td$estimate[1:3])*td$std.error[1:3], .stdErr[1:3],
+        expect_equal(setNames(exp(td$estimate[1:3])*td$std.error[1:3], NULL),
+                     .stdErr[1:3],
                      tolerance=tol)
         expect_equal(exp(td$conf.low), .confLow,
                      tolerance=tol)
@@ -394,6 +401,7 @@ rxPermissive({
     fitP <- .nlmixr(one.compartment, theo_sd, est="posthoc")
 
     test_that("tidy works on posthoc fit fits", {
+      
         td <- tidy(fitP, exponentiate=NA)
         check_tidy(td,7,7,c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"));
         expect_equal(
@@ -401,6 +409,7 @@ rxPermissive({
             c("tka", "tcl", "tv", "sd__eta.ka", "sd__eta.cl", "sd__eta.v",
               "add.err")
         )
+        
         td <- tidy(fitP, conf.level=0.9, exponentiate=NA)
         check_tidy(td, 7, 9, c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value",
                                "conf.low", "conf.high"))
@@ -409,6 +418,7 @@ rxPermissive({
             c("tka", "tcl", "tv", "sd__eta.ka", "sd__eta.cl", "sd__eta.v",
               "add.err")
         )
+        
         expect_equal(td$estimate, c(1.56831218549017, 2.71828182845905, 31.5003923087479, 0.774596669241483,
                                     0.547722557505166, 0.316227766016838, 0.7),
                      tolerance=tol)
@@ -419,10 +429,10 @@ rxPermissive({
 
         td <- tidy(fitP, conf.level=0.9,exponentiate=FALSE)
         check_tidy(td)
-        expect_equal(td$estimate,c(0.45, 1, 3.45, 0.774596669241483, 0.547722557505166, 0.316227766016838,
+        expect_equal(setNames(td$estimate, NULL),c(0.45, 1, 3.45, 0.774596669241483, 0.547722557505166, 0.316227766016838,
                                    0.7),
                      tolerance=tol)
-        expect_equal(td$std.error, c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
+        expect_equal(setNames(td$std.error, NULL), c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
                                      NA_real_),
                      tolerance=tol)
         expect_equal(td$conf.low, c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
