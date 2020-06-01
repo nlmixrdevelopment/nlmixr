@@ -93,13 +93,13 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
         .df$group <- paste0("Residual(",.tmp,")");
         .df$effect  <- "ran_pars"
     }
-    dplyr::as.tbl(.df)
+    tibble::as_tibble(.df)
 }
 
 .nlmixrTidyRandom <- function(x, ...){
     .tmp <- stack(x$eta[,-1])
     .df <- .data.frame(group="ID", level=x$eta$ID, term=.tmp$ind, estimate=.tmp$values);
-    dplyr::as.tbl(.df)
+    tibble::as_tibble(.df)
 }
 
 .nlmixrTidyRandomPar <- function(x,...){
@@ -115,7 +115,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
             .df  <- .df[,names(.df) != .v];
         }
     }
-    return(dplyr::as.tbl(.df))
+    return(tibble::as_tibble(.df))
 ##   effect   group    term                  estimate std.error statistic
 ##   <chr>    <chr>    <chr>                    <dbl>     <dbl>     <dbl>
 ## 1 fixed    NA       (Intercept)           251.          6.82     36.8
@@ -180,7 +180,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
             }));
     .tmp <- stack(.x[,-1])
     .df <- .data.frame(group="ID", level=.x$ID, term=.tmp$ind, estimate=.tmp$values);
-    return(dplyr::as.tbl(.df))
+    return(tibble::as_tibble(.df))
 }
 
 ##'@export
@@ -208,7 +208,7 @@ tidy.nlmixrFitCore <- function(x, ...){
         .ret$ran_coef <- .coefPar(x, ...);
     }
     return(dplyr::bind_rows(.ret, .id="effect") %>%
-           dplyr::as.tbl() %>%
+           tibble::as_tibble() %>%
            .reorderCols())
 }
 
@@ -225,7 +225,7 @@ glance.nlmixrFitCore <- function(x, ...){
     .df <- x$objDf[x$objDf$AIC == .aic, ];
     names(.df) <- gsub("Log-likelihood", "logLik", names(.df));
     names(.df) <- gsub("Condition Number", "conditionNumber", names(.df));
-    dplyr::as.tbl(.df)
+    tibble::as_tibble(.df)
 }
 
 ##'@export
