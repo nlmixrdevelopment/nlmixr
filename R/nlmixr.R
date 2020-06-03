@@ -1,7 +1,4 @@
 .onLoad <- function(libname, pkgname){
-  if (requireNamespace("huxtable", quietly = TRUE)){
-    .S3method("as_huxtable", "nlmixrFitCore", as_huxtable.nlmixrFitCore)
-  }
 }
 
 orig.onAttach <- function(libname, pkgname){
