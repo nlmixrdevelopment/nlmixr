@@ -1,86 +1,3 @@
-##' Change a nlmixr fit object to a huxtable
-##'
-##' This is a thin layer that differs from
-##' \code{\link[huxtable]{huxreg}} to make it easier to produce
-##' reasonable huxtables with nlmixr fit objects.
-##'
-##' \itemize{
-##'
-##' \item Drops \code{NA} values from tables, so (\code{NA}) is not
-##' shown for estimates without a standard error.
-##'
-##' \item Filters out any blank rows.
-##'
-##' \item Removes R.squared from the statistics and replaces with the
-##' objective function value.
-##'
-##' \item Adjust broom separators for an easier to read format.
-##'
-##' }
-##'
-##' @inheritParams huxtable::huxreg
-##' @param na_omit How NAs are handled in converting to huxtable
-##'@export
-asHux.nlmixrFitCore  <- function(...,
-                                 error_format    = "({std.error})",
-                                 error_style     = c("stderr", "ci", "statistic", "pvalue"),
-                                 error_pos       = c("below", "same", "right"),
-                                 number_format   = "%.3f",
-                                 align           = ".",
-                                 pad_decimal     = ".",
-                                 ci_level        = NULL,
-                                 tidy_args       = NULL,
-                                 stars           = c("***" = 0.001, "**" = 0.01, "*" = 0.05),
-                                 bold_signif     = NULL,
-                                 borders         = 0.4,
-                                 outer_borders   = 0.8,
-                                 note            = if (is.null(stars)) NULL else "{stars}.",
-                                 statistics      = c("N" = "nobs", "Objective Function" = "OBJF", "logLik", "AIC"),
-                                 coefs           = NULL,
-                                 omit_coefs      = NULL,
-                                 na_omit         = c("all", "any", "none")){
-    RxODE::rxReq("huxtable")
-    .opt  <- options()
-    on.exit(options(.opt));
-    options(broom.mixed.sep1=": ",
-            broom.mixed.sep2=", ")
-    .lst <- as.list(match.call(expand.dots=TRUE))[-1];
-    ## Extract all of the error format columns
-    .glueReg  <- "[{][^}]*[}]"
-    .isComplex  <- FALSE
-    .errCols <- sapply(unlist(stringr::str_extract_all(error_format, .glueReg)),
-                       function(x){
-        .err  <- substr(x, 2, nchar(x) - 1);
-        if (is.name(eval(parse(text=sprintf("quote(%s)", .err))))){
-            return(.err)
-        } else {
-            .isComplex <<- TRUE
-            return(NULL)
-        }
-    })
-    if (!.isComplex){
-        .lst$error_format <- paste0("{ifelse(!sapply(seq_along(",.errCols[1],"), function(x){any(is.na(c(",
-                                    paste(paste0(.errCols,"[x]"),collapse=","),
-                                    ")))}), paste0(\"",
-                                    gsub(rex::rex("{",capture(or(.errCols)),"}"), "\",\\1,\"",error_format),
-                                    "\"),\"\")}");
-    }
-    .lst$statistics  <- statistics
-    .ret <- do.call(huxtable::huxreg,.lst)
-    .w  <- which(sapply(seq_along(.ret$names),function(i){!all(as.character(.ret[i,])=="")}))
-    return(.ret[.w])
-}
-
-##'@export
-as_huxtable.nlmixrFitCore  <- function(x,...){
-    if (missing(x)){
-        .args <- list(...)
-    } else {
-        .args  <- list(x,...);
-    }
-    do.call(asHux.nlmixrFitCore, .args)
-}
-
 .nmMuTable  <- function(x){
     .mu  <- x$nmodel$mu.ref
     if (length(.mu) == 0) return(NULL)
@@ -113,7 +30,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
     }
     if (requireNamespace("huxtable", quietly = TRUE)){
       .ret  <- huxtable::hux(.ret) %>%
-        huxtable::add_colnames() %>%
+        ## huxtable::add_colnames() %>%
         huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
         huxtable::set_position("center") %>%
         huxtable::set_all_borders(TRUE)
@@ -166,15 +83,15 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
                       "R Fit Object:", bound,
                       "R Data Name ($dataName):", x$dataName,
                       "Estimation Method:",.nmEstMethod(x),
-                      "All variables mu-referenced:",dim(x$omega)[1] == length(x$mu.ref),
+                      "All variables mu-referenced:",paste(dim(x$omega)[1] == length(x$mu.ref)),
                       "Covariance Method ($covMethod):", x$covMethod,
-                      "Modeled Correlations:", !all(.cor == 0),
-                      "CWRES:",ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="CWRES"),FALSE),
-                      "NPDE:",ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="NPDE"),FALSE),
+                      "Modeled Correlations:", paste0(!all(.cor == 0)),
+                      "CWRES:",paste0(ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="CWRES"),FALSE)),
+                      "NPDE:",paste0(ifelse(inherits(x, "nlmixrFitData"), any(names(x)=="NPDE"),FALSE)),
                       )
     if (requireNamespace("huxtable", quietly = TRUE)){
       huxtable::as_hux(.tab) %>%
-        huxtable::add_colnames() %>%
+        ##huxtable::add_colnames() %>%
         huxtable::set_bold(row = huxtable::everywhere, col = 1, value = TRUE) %>%
         huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
         huxtable::set_all_borders(TRUE) ->
@@ -188,9 +105,9 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
   .tab <- x$time
   if (requireNamespace("huxtable", quietly = TRUE)){
       huxtable::as_hux(.tab) %>%
-        huxtable::add_colnames() %>%
+        ##huxtable::add_colnames() %>%
         huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
-        huxtable::set_all_borders(TRUE)
+        huxtable::set_all_borders(TRUE) -> .tab
   }
   return(.tab)
 }
@@ -201,7 +118,7 @@ as_huxtable.nlmixrFitCore  <- function(x,...){
     .tmp  <- .data.frame(type=row.names(.tmp),.tmp, check.rows=FALSE,check.names=FALSE,stringsAsFactors=FALSE)
     if (requireNamespace("huxtable", quietly = TRUE)){
       huxtable::as_hux(.tmp) %>%
-        huxtable::add_colnames() %>%
+        ##huxtable::add_colnames() %>%
         huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
         huxtable::set_all_borders(TRUE) ->
         .tmp
@@ -455,9 +372,9 @@ nmDocx  <- function(x,
     if (!any(headerStyle==.style$style_name)) stop("Need to specify a valid headerStyle");
     if (!any(preformattedStyle==.style$style_name)) stop("Need to specify a valid preformattedStyle");
     if (.bound !=""){
-        .hreg  <- eval(parse(text=sprintf('nlmixr::as_hux("%s"=x)', .bound)));
+        .hreg  <- eval(parse(text=sprintf('huxtable::huxreg("%s"=x)', .bound)));
     } else {
-        .hreg  <- nlmixr::as_hux(x);
+        .hreg  <- huxtable::huxreg(x);
     }
     .doc <- .doc %>%
         officer::body_add_par(sprintf("nlmixr %s (%s)", utils::packageVersion("nlmixr"),
@@ -473,7 +390,7 @@ nmDocx  <- function(x,
         officer::body_add_par("Timing ($time, in seconds)", style=headerStyle) %>%
         flextable::body_add_flextable(flextable::autofit(.asFlx(.nmHuxTime(x))))
     .doc <- .doc %>%
-        officer::body_add_par(sprintf("Parameter Information as_hux(%s)", .bound), style=headerStyle) %>%
+        officer::body_add_par(sprintf("Parameter Information huxreg(%s)", .bound), style=headerStyle) %>%
         flextable::body_add_flextable(flextable::autofit(.asFlx(.hreg)));
     doc <- .doc %>%
         officer::body_add_par("UI Model information ($uif):", style=headerStyle)
@@ -510,17 +427,17 @@ nmDocx  <- function(x,
         .t2 <- .si[,.t2]
         .t3 <- .si[,.t3]
         .t1  <- huxtable::hux(.t1) %>%
-          huxtable::add_colnames() %>%
+          ## huxtable::add_colnames() %>%
           huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
           huxtable::set_position("center") %>%
           huxtable::set_all_borders(TRUE) 
         .t2  <- huxtable::hux(.t2) %>%
-          huxtable::add_colnames() %>%
+          ## huxtable::add_colnames() %>%
           huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
           huxtable::set_position("center") %>%
           huxtable::set_all_borders(TRUE)
         .t3  <- huxtable::hux(.t3) %>%
-          huxtable::add_colnames() %>%
+          ## huxtable::add_colnames() %>%
           huxtable::set_bold(row = 1, col = huxtable::everywhere, value = TRUE) %>%
           huxtable::set_position("center") %>%
           huxtable::set_all_borders(TRUE)
@@ -605,9 +522,9 @@ nmLst  <- function(x,
         .bound <- .bound[1]
     }
     if (.bound !=""){
-        .hreg  <- eval(parse(text=sprintf('nlmixr::as_hux("%s"=x)', .bound)));
+        .hreg  <- eval(parse(text=sprintf('huxtable::huxreg("%s"=x)', .bound)));
     } else {
-        .hreg  <- nlmixr::as_hux(x);
+        .hreg  <- huxtable::huxreg(x);
     }
     .rule  <- function(msg){
         message("")
@@ -691,7 +608,7 @@ nmSave  <- function(x,...,save=TRUE){
 ## Ugly hacks to make word conversion work without loading flextable, officer, etc
 .huxNS <- NULL;
 .asFlx <- function(x, ...){
-  rxReq("huxtable")
+  RxODE::rxReq("huxtable")
   if (is.null(.huxNS)){
     ## ugly hack
     .huxNS <- loadNamespace("huxtable")

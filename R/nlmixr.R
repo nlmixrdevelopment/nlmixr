@@ -1,3 +1,6 @@
+.onLoad <- function(libname, pkgname){
+}
+
 orig.onAttach <- function(libname, pkgname){
     ## nocov start
     ## Setup RxODE.prefer.tbl
