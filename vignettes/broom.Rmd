@@ -298,18 +298,10 @@ tbl <- huxreg('Phenobarbitol'=fit.s)
 tbl
 ```
 
-You may notice warnings and `(NA)` in the table.  `nlmixr` allows you
-to convert the tables to `huxtables` without these distracting
-elements by using `huxtable`'s generic `as_hux` or `as_huxtable`:
-
-```{r}
-as_hux('Phenobarbitol'=fit.s)
-```
-
 Like `dwplot`, you can also use `huxtable` to compare runs:
 
 ```{r}
-as_hux('SAEM'=fit.s, 'FOCEi'=fit.f)
+huxreg('SAEM'=fit.s, 'FOCEi'=fit.f)
 ```
 
 A word-based table can also be easily created with the tool:
