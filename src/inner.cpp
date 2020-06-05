@@ -655,6 +655,8 @@ double likInner0(double *eta){
       }
     }
   }
+  ind->_newind = 1;
+  ind->solved = -1;
   if (recalc){
     for (j = op_focei.neta; j--;){
       ind->par_ptr[op_focei.etaTrans[j]] = eta[j];
@@ -701,13 +703,15 @@ double likInner0(double *eta){
 
       // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
       // Calculate matricies
-      int k = ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
+      int k = 0;//ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
       fInd->llik=0.0;
       fInd->tbsLik=0.0;
       double f, err, r, fpm, rp = 0,lnr, limit, dv;
       int cens;
       int oldNeq = op->neq;
-      for (j = ind->n_all_times; j--;){
+      ind->_newind = 1;
+      ind->solved = -1;
+      for (j = 0; j < ind->n_all_times; ++j){
 	if (isDose(ind->evid[j])){
 	  ind->tlast = ind->all_times[j];
 	} else if (ind->evid[j] == 0) {
@@ -965,7 +969,8 @@ double likInner0(double *eta){
 	      }
 	    }
 	  }
-	  k--;
+	  // k--;
+	  k++;
 	}
       }
       if (op_focei.fo){
