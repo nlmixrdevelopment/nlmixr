@@ -26,13 +26,13 @@
 
 \item{.nlmixrObject}{nlmixr object}
 
-\item{.data}{RxOde data set}
+\item{.data}{RxODE data set}
 
 \item{.time}{proc.time object used in dynmodel timing}
 
 \item{.theta}{estimated terms excluding error terms}
 
-\item{.fit}{optimizied parameters}
+\item{.fit}{optimized parameters}
 
 \item{.message}{optimization messages}
 

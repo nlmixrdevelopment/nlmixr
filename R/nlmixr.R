@@ -86,7 +86,7 @@ nlmixr.logo <- "         _             _             \n        | | %9s (_) %s\n 
 nlmixrLogo <- function(str="", version=sessionInfo()$otherPkgs$nlmixr$Version){
     message(sprintf(nlmixr.logo, str, version));
 }
-##' Dispaly nlmixr's version
+##' Display nlmixr's version
 ##'
 ##' @author Matthew L. Fidler
 ##' @export

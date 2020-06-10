@@ -180,10 +180,10 @@ mymin = function(start, fr, rho=NULL, control=list())
 #'
 #' @param .dynmodelObject dynmodel object
 #' @param .nlmixrObject nlmixr object
-#' @param .data RxOde data set
+#' @param .data RxODE data set
 #' @param .time proc.time object used in dynmodel timing
 #' @param .theta estimated terms excluding error terms
-#' @param .fit optimizied parameters
+#' @param .fit optimized parameters
 #' @param .message optimization messages
 #' @param .inits.err initial estimates for error terms
 #' @param .cov covariance matrix from solved Hessian
@@ -587,19 +587,19 @@ nlmixrDynmodelConvert <- function(.nmf){
 #' @inheritParams RxODE::rxSolve
 #' @inheritParams foceiControl
 #'
-#' @param nlmixrOuput Option to change output style to nlmixr output. By defalut this is FALSE.
-#' @param digs Option for the number of significant digits of the ouptut. By defalut this is 3.
+#' @param nlmixrOuput Option to change output style to nlmixr output. By default this is FALSE.
+#' @param digs Option for the number of significant digits of the output. By default this is 3.
 #' @param lower Lower bounds on the parameters used in optimization. By default this is -Inf.
-#' @param upper Upper bounds on the parameters used in optimization. By defalut this is Inf.
-#' @param maxeval Maximum number of iterations for Nelder-Mead of simplex search. By defalut this is 999.
+#' @param upper Upper bounds on the parameters used in optimization. By default this is Inf.
+#' @param maxeval Maximum number of iterations for Nelder-Mead of simplex search. By default this is 999.
 #' @param maxit Maximum number of iterations for lbfgsb3c. See \code{\link[lbfgsb3c]{lbfgsb3c}}
 #'      for more details. By default this is 100000L.
 #' @param maxfun The maximum allowed number of function evaluations. If this is exceeded,
 #'      the method will terminate. See \code{\link[minqa]{bobyqa}} for more details. By default this value is NULL.
-#' @param iprint Print option for optimiaztion. See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}},
-#'      and \code{\link[lbfgs]{lbfgs}} for more details. By defalut this is 0.
+#' @param iprint Print option for optimization. See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}},
+#'      and \code{\link[lbfgs]{lbfgs}} for more details. By default this is 0.
 #' @param trace Tracing information on the progress of the optimization is produced.
-#'      See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}}, and \code{\link[lbfgs]{lbfgs}} for more details. By defalut this is 0.
+#'      See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}}, and \code{\link[lbfgs]{lbfgs}} for more details. By default this is 0.
 #' @param factr Controls the convergence of the "L-BFGS-B"
 #'     method.  Convergence occurs when the reduction in the
 #'     objective is within this factor of the machine
@@ -623,8 +623,8 @@ nlmixrDynmodelConvert <- function(.nmf){
 #' @param abs.tol Used in Nelder-Mead optimization and PORT optimization. Absolute tolerance. Defaults to 0 so the absolute convergence test is not used.
 #'     If the objective function is known to be non-negative, the previous default of 1e-20 would be more appropriate.
 #' @param xf.tol Used in Nelder-Mead optimization and PORT optimization. false convergence tolerance. Defaults to 2.2e-14. See \code{\link[stats]{nlminb}} for more details.
-#' @param step.min Used in Nelder-Mead optimization and PORT optimization. Minimum step size. By defalut this is 1. See \code{\link[stats]{nlminb}} for more details.
-#' @param step.max Used in Nelder-Mead optimization and PORT optimization. Maximum step size. By defalut this is 1. See \code{\link[stats]{nlminb}} for more details.
+#' @param step.min Used in Nelder-Mead optimization and PORT optimization. Minimum step size. By default this is 1. See \code{\link[stats]{nlminb}} for more details.
+#' @param step.max Used in Nelder-Mead optimization and PORT optimization. Maximum step size. By default this is 1. See \code{\link[stats]{nlminb}} for more details.
 #' @param sing.tol Used in Nelder-Mead optimization and PORT optimization. Singular convergence tolerance; defaults to rel.tol. See \code{\link[stats]{nlminb}} for more details.
 #' @param scale.init Used in Nelder-Mead optimization and PORT optimization.  See \code{\link[stats]{nlminb}} for more details.
 #' @param diff.g Used in Nelder-Mead optimization and PORT optimization. An estimated bound on the relative error in the objective function value. See \code{\link[stats]{nlminb}} for more details.
@@ -633,7 +633,7 @@ nlmixrDynmodelConvert <- function(.nmf){
 #'     function. The S matrix is the sum of individual
 #'     gradient cross-product (evaluated at the individual empirical
 #'     Bayes estimates).
-#' @param rxControl This uses RxODE family of objects, file, or model specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for more details. By defalut this is NULL.
+#' @param rxControl This uses RxODE family of objects, file, or model specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for more details. By default this is NULL.
 #'
 #' @author Mason McComb and Matthew L. Fidler
 #' @export
@@ -1715,12 +1715,12 @@ do.slice = function(pars, fr0)
 #' Fit a non-population dynamic model using mcmc
 #'
 #' @param system an RxODE object
-#' @param model a list of statistical meaurement models
+#' @param model a list of statistical measurement models
 #' @param evTable an Event Table object
 #' @param inits initial values of system parameters
 #' @param data input data
-#' @param fixPars fixed system paraameters
-#' @param nsim number of mcmc iteractions
+#' @param fixPars fixed system parameters
+#' @param nsim number of mcmc iterations
 #' @param squared if parameters be squared during estimation
 #' @param seed random number seed
 #' @author Wenping Wang

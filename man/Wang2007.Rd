@@ -21,7 +21,7 @@ Wang2007
 }
 \description{
 This is a simulated dataset from Wang2007 where various NONMEM
-estimation methods (Lapclace FO, FOCE with and without
+estimation methods (Laplace FO, FOCE with and without
 interaction) are described.
 }
 \keyword{datasets}

@@ -3,14 +3,14 @@
 \docType{data}
 \name{theo_sd}
 \alias{theo_sd}
-\title{Multiple dose Theophilline PK data}
+\title{Multiple dose theophylline PK data}
 \format{
 A data frame with 144 rows by 7 columns
 
 \describe{
   \item{ID}{Subject ID}
   \item{TIME}{Time (hrs)}
-  \item{DV}{Dependant Variable, Theophiline Concentration}
+  \item{DV}{Dependent Variable, theophylline concentration}
   \item{AMT}{Dose Amount/kg}
   \item{EVID}{RxODE/nlmixr event ID (not NONMEM's)}
   \item{CMT}{Compartment Number}
@@ -24,7 +24,7 @@ NONMEM/nlme
 theo_sd
 }
 \description{
-This datastart is  the day 1 concentrations of the
-Theophiline data that is included in the nlme/NONMEM.
+This data set is  the day 1 concentrations of the
+theophylline data that is included in the nlme/NONMEM.
 }
 \keyword{datasets}

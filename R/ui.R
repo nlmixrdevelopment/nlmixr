@@ -293,7 +293,7 @@ ini <- function(ini, ...){
 ##'
 ##' @param model Model specification
 ##' @param ... Other arguments to model object parsed by nlmixr
-##' @param .lines This is an interal argument when code{model} is
+##' @param .lines This is an internal argument when code{model} is
 ##'     being called recursively and should not be used.
 ##' @return Parsed UI object
 ##' @author Matthew L. Fidler

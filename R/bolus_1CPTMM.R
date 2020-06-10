@@ -1,4 +1,4 @@
-##' 1 Compartment Model w/ Michelis Menton Elimination
+##' 1 Compartment Model w/ Michaelis-Menten Elimination
 ##'
 ##' This is a simulated dataset from the ACOP 2016 poster.  All
 ##' Datasets were simulated with the following methods.

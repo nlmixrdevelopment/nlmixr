@@ -2,18 +2,18 @@
 % Please edit documentation in R/gauss.quad.R
 \name{gauss.quad}
 \alias{gauss.quad}
-\title{Sets nodes and weigts of Gauss-Hermite quadrature}
+\title{Sets nodes and weights of Gauss-Hermite quadrature}
 \usage{
 gauss.quad(n)
 }
 \arguments{
-\item{n}{numbr of nodes}
+\item{n}{number of nodes}
 }
 \value{
-a list of nodes and weigts of Gauss-Hermite quadrature
+a list of nodes and weights of Gauss-Hermite quadrature
 }
 \description{
-Sets nodes and weigts of Gauss-Hermite quadrature
+Sets nodes and weights of Gauss-Hermite quadrature
 }
 \examples{
 gauss.quad(5)

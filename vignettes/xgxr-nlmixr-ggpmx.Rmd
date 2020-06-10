@@ -360,7 +360,7 @@ if (file.exists("nlmixr_report.Rmd"))
     unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
 ```
 
-This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editting the default template to include project specificities (change labels, stratifications, filtering, etc.).
+This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editing the default template to include project specificities (change labels, stratifications, filtering, etc.).
 
 
 # Simulation of a new scenario with RxODE

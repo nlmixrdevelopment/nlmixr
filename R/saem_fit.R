@@ -776,7 +776,7 @@ gen_saem_user_fn = function(model, PKpars=attr(model, "default.pars"), pred=NULL
 .unprotectSaem <- function(dll){
     assignInMyNamespace(".protectSaemDll", "")
 }
-##' Cleanup saem_fit environment by removing dll after the object is no logner used by R.
+##' Cleanup saem_fit environment by removing dll after the object is no longer used by R.
 ##'
 ##' @param env Environment where cleanup needs to occur.
 ##' @author Matthew L. Fidler

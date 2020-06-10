@@ -2,7 +2,7 @@
 % Please edit documentation in R/saem_fit.R
 \name{saem.cleanup}
 \alias{saem.cleanup}
-\title{Cleanup saem_fit environment by removing dll after the object is no logner used by R.}
+\title{Cleanup saem_fit environment by removing dll after the object is no longer used by R.}
 \usage{
 \method{saem}{cleanup}(env)
 }
@@ -10,7 +10,7 @@
 \item{env}{Environment where cleanup needs to occur.}
 }
 \description{
-Cleanup saem_fit environment by removing dll after the object is no logner used by R.
+Cleanup saem_fit environment by removing dll after the object is no longer used by R.
 }
 \author{
 Matthew L. Fidler

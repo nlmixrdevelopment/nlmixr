@@ -1,4 +1,4 @@
-##' 2 Compartment Model with Michelis Menton Clearance
+##' 2 Compartment Model with Michaelis-Menten Clearance
 ##'
 ##' This is a simulated dataset from the ACOP 2016 poster.  All
 ##' Datasets were simulated with the following methods.

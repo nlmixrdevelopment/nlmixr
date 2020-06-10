@@ -12,7 +12,7 @@ pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD)
 models in particular, with either individual data or population
 data. The nlme and SAEM estimation routines can be accessed using a
 universal user interface (UUI), that provides universal model and
-parameter defintion syntax and results in a fit object that can be
+parameter definition syntax and results in a fit object that can be
 used as input into the `Xpose` package. Running nlmixr using the UUI
 is described in the vignette:
 ihttps://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
@@ -295,7 +295,7 @@ Environmental Variable |  Correct value
 --------------------------|---------------------------
 `PYTHON_EXE`  | Path where the python with sympy is installed
 `PYTHONHOME` | Path where the python with sympy is installed
-`PYTHON_INCLUDE` | Path where the python libaries are installed; In windows this is `PYTHONHOME\include`
+`PYTHON_INCLUDE` | Path where the python libraries are installed; In windows this is `PYTHONHOME\include`
 `PYTHON_LIB` | Path where python libraries are installed; In windows this is `PYTHONHOME\libs`
 `PYTHONPATH` | Path where python searches.  In windows this is a path-style variable including `PYTHONHOME\DLLs`, `PYTHONHOME\Lib` and `PYTHONHOME\Lib\site-packages`.  
 `PYTHONSTARTUP` | In windows, this value is unset if present

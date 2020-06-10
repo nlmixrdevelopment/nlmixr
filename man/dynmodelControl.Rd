@@ -75,11 +75,11 @@ like NONMEM.}
 \item{ci}{Confidence level for some tables.  By default this is
 0.95 or 95\% confidence.}
 
-\item{digs}{Option for the number of significant digits of the ouptut. By defalut this is 3.}
+\item{digs}{Option for the number of significant digits of the output. By default this is 3.}
 
 \item{lower}{Lower bounds on the parameters used in optimization. By default this is -Inf.}
 
-\item{upper}{Upper bounds on the parameters used in optimization. By defalut this is Inf.}
+\item{upper}{Upper bounds on the parameters used in optimization. By default this is Inf.}
 
 \item{method}{The method for solving ODEs.  Currently this supports:
 
@@ -94,7 +94,7 @@ like NONMEM.}
         must be setup specially to use this solving routine.
 }}
 
-\item{maxeval}{Maximum number of iterations for Nelder-Mead of simplex search. By defalut this is 999.}
+\item{maxeval}{Maximum number of iterations for Nelder-Mead of simplex search. By default this is 999.}
 
 \item{scaleTo}{Scale the initial parameter estimate to this value.
 By default this is 1.  When zero or below, no scaling is performed.}
@@ -103,7 +103,7 @@ By default this is 1.  When zero or below, no scaling is performed.}
 value.  By default this is 1.}
 
 \item{normType}{This is the type of parameter
-    normalization/scaling used to get the scaled initial valuse
+    normalization/scaling used to get the scaled initial values
     for nlmixr.  These are used with \code{scaleType} of.
 
     With the exception of \code{rescale2}, these come
@@ -137,7 +137,7 @@ value.  By default this is 1.}
 
 
 \item \code{rescale} or min-max normalization. This rescales all
-    parmeters from (0 to 1).  As in the \code{rescale2} the
+    parameters from (0 to 1).  As in the \code{rescale2} the
     relative differences are preserved.  In this approach:
 
     C_{1} = min(all unscaled values)
@@ -192,7 +192,7 @@ and the scales are specified by \code{scaleC}.
 
 \item \code{mult} This approach does not use the data
 normalization provided by \code{normType}, but rather uses
-multiplicitve scaling to a constant provided by the \code{scaleTo}
+multiplicative scaling to a constant provided by the \code{scaleTo}
 argument.
 
   In this case:
@@ -201,7 +201,7 @@ argument.
 
 \item \code{multAdd} This approach changes the scaling based on
 the parameter being specified.  If a parameter is defined in an
-exponenital block (ie exp(theta)), then it is scaled on a
+exponential block (ie exp(theta)), then it is scaled on a
 linearly, that is:
 
   v_{scaled} = (v_{current}-v_{init}) + scaleTo
@@ -282,8 +282,8 @@ adjusted.}
 \item{rhoend}{The smallest value of the trust region radius that
 is allowed. If not defined, then 10^(-sigdig-1) will be used.}
 
-\item{iprint}{Print option for optimiaztion. See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}},
-and \code{\link[lbfgs]{lbfgs}} for more details. By defalut this is 0.}
+\item{iprint}{Print option for optimization. See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}},
+and \code{\link[lbfgs]{lbfgs}} for more details. By default this is 0.}
 
 \item{print}{Integer representing when the outer step is
 printed. When this is 0 or do not print the iterations.  1 is
@@ -294,7 +294,7 @@ evaluations.}
 the method will terminate. See \code{\link[minqa]{bobyqa}} for more details. By default this value is NULL.}
 
 \item{trace}{Tracing information on the progress of the optimization is produced.
-See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}}, and \code{\link[lbfgs]{lbfgs}} for more details. By defalut this is 0.}
+See \code{\link[minqa]{bobyqa}}, \code{\link[lbfgsb3c]{lbfgsb3c}}, and \code{\link[lbfgs]{lbfgs}} for more details. By default this is 0.}
 
 \item{factr}{Controls the convergence of the "L-BFGS-B"
 method.  Convergence occurs when the reduction in the
@@ -339,9 +339,9 @@ If the objective function is known to be non-negative, the previous default of 1
 
 \item{xf.tol}{Used in Nelder-Mead optimization and PORT optimization. false convergence tolerance. Defaults to 2.2e-14. See \code{\link[stats]{nlminb}} for more details.}
 
-\item{step.min}{Used in Nelder-Mead optimization and PORT optimization. Minimum step size. By defalut this is 1. See \code{\link[stats]{nlminb}} for more details.}
+\item{step.min}{Used in Nelder-Mead optimization and PORT optimization. Minimum step size. By default this is 1. See \code{\link[stats]{nlminb}} for more details.}
 
-\item{step.max}{Used in Nelder-Mead optimization and PORT optimization. Maximum step size. By defalut this is 1. See \code{\link[stats]{nlminb}} for more details.}
+\item{step.max}{Used in Nelder-Mead optimization and PORT optimization. Maximum step size. By default this is 1. See \code{\link[stats]{nlminb}} for more details.}
 
 \item{sing.tol}{Used in Nelder-Mead optimization and PORT optimization. Singular convergence tolerance; defaults to rel.tol. See \code{\link[stats]{nlminb}} for more details.}
 
@@ -390,7 +390,7 @@ initial estimate by.  So each iteration the new step size =
 (prior step size)*gillStep}
 
 \item{gillFtol}{The gillFtol is the gradient error tolerance that
-is accepable before issuing a warning/error about the gradient estimates.}
+is acceptable before issuing a warning/error about the gradient estimates.}
 
 \item{gillRtol}{The relative tolerance used for Gill 1983
 determination of optimal step size.}
@@ -410,9 +410,9 @@ step is equal to the new step size = (prior step size)*gillStepCov}
 that is acceptable before issuing a warning/error about the
 gradient estimates during the covariance step.}
 
-\item{rxControl}{This uses RxODE family of objects, file, or model specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for more details. By defalut this is NULL.}
+\item{rxControl}{This uses RxODE family of objects, file, or model specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for more details. By default this is NULL.}
 
-\item{nlmixrOuput}{Option to change output style to nlmixr output. By defalut this is FALSE.}
+\item{nlmixrOuput}{Option to change output style to nlmixr output. By default this is FALSE.}
 }
 \description{
 Control Options for dynmodel
