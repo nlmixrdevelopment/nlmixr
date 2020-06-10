@@ -1,4 +1,3 @@
-
 .fixNames <- function(.df){
     names(.df) <- gsub("Back-.*", "estimate", names(.df))
     names(.df) <- gsub("Estimate", "model.est", names(.df))
@@ -37,7 +36,7 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...){
 ##'@export
 confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 
-
+#' @importFrom tibble as_tibble
 .nlmixrTidyFixed <- function(x, ..., .ranpar=FALSE){
     .extra <- list(...);
     .conf.int <- ifelse(any(names(.extra) == "conf.int"), .extra$conf.int, ifelse(any(names(.extra) == "conf.level"), TRUE, FALSE));
@@ -96,6 +95,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     tibble::as_tibble(.df)
 }
 
+#' @importFrom tibble as_tibble
 .nlmixrTidyRandom <- function(x, ...){
     .d <- dim(x$omegaR);
     if (.d[1] > 0){
@@ -107,6 +107,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     }
 }
 
+#' @importFrom tibble as_tibble
 .nlmixrTidyRandomPar <- function(x,...){
     .pars  <- .getR(x$omegaR,TRUE)
     if (length(.pars) > 0){
@@ -121,7 +122,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
                 .df  <- .df[,names(.df) != .v];
             }
         }
-        return(dplyr::as.tbl(.df))
+        return(tibble::as_tibble(.df))
     } else {
         return(NULL)
     }
@@ -149,6 +150,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     return(x[,intersect(allCols, names(x))])
 }
 
+#' @importFrom tibble as_tibble
 .coefPar  <- function(x, exponentiate=FALSE,...){
     .d <- dim(x$omegaR);
     if (.d[1] == 0){
@@ -196,7 +198,8 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
     return(tibble::as_tibble(.df))
 }
 
-##'@export
+#' @export
+#' @importFrom tibble as_tibble
 tidy.nlmixrFitCore <- function(x, ...){
     .extra <- list(...);
     if (any(names(.extra)=="effects")){
@@ -231,7 +234,8 @@ tidy.nlmixrFitCore <- function(x, ...){
 ##'@export
 tidy.nlmixrFitCoreSilent  <- tidy.nlmixrFitCore
 
-##'@export
+#' @export
+#' @importFrom tibble as_tibble
 glance.nlmixrFitCore <- function(x, ...){
     .lst  <- list(...);
     if (any(names(.lst)=="type")){
