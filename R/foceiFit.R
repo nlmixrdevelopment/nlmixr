@@ -318,7 +318,7 @@ is.latex <- function() {
 ##'
 ##' \item \code{mult} This approach does not use the data
 ##' normalization provided by \code{normType}, but rather uses
-##' multiplicitve scaling to a constant provided by the \code{scaleTo}
+##' multiplicative scaling to a constant provided by the \code{scaleTo}
 ##' argument.
 ##'
 ##'   In this case:
@@ -327,7 +327,7 @@ is.latex <- function() {
 ##'
 ##' \item \code{multAdd} This approach changes the scaling based on
 ##' the parameter being specified.  If a parameter is defined in an
-##' exponenital block (ie exp(theta)), then it is scaled on a
+##' exponential block (ie exp(theta)), then it is scaled on a
 ##' linearly, that is:
 ##'
 ##'   v_{scaled} = (v_{current}-v_{init}) + scaleTo
@@ -379,7 +379,7 @@ is.latex <- function() {
 ##' @param scaleCmin Minimum value of the scaleC to prevent underflow.
 ##'
 ##' @param normType This is the type of parameter
-##'     normalization/scaling used to get the scaled initial valuse
+##'     normalization/scaling used to get the scaled initial values
 ##'     for nlmixr.  These are used with \code{scaleType} of.
 ##'
 ##'     With the exception of \code{rescale2}, these come
@@ -413,7 +413,7 @@ is.latex <- function() {
 ##'
 ##'
 ##' \item \code{rescale} or min-max normalization. This rescales all
-##'     parmeters from (0 to 1).  As in the \code{rescale2} the
+##'     parameters from (0 to 1).  As in the \code{rescale2} the
 ##'     relative differences are preserved.  In this approach:
 ##'
 ##'     C_{1} = min(all unscaled values)
@@ -459,7 +459,7 @@ is.latex <- function() {
 ##'     (prior step size)*gillStep
 ##'
 ##' @param gillFtol The gillFtol is the gradient error tolerance that
-##'     is accepable before issuing a warning/error about the gradient estimates.
+##'     is acceptable before issuing a warning/error about the gradient estimates.
 ##'
 ##' @param gillKcov The total number of possible steps to determine
 ##'     the optimal forward/central difference step size per parameter

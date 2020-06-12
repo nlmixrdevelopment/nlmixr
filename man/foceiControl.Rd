@@ -254,7 +254,7 @@ By default this is 1.  When zero or below, no scaling is performed.}
 value.  By default this is 1.}
 
 \item{normType}{This is the type of parameter
-    normalization/scaling used to get the scaled initial valuse
+    normalization/scaling used to get the scaled initial values
     for nlmixr.  These are used with \code{scaleType} of.
 
     With the exception of \code{rescale2}, these come
@@ -288,7 +288,7 @@ value.  By default this is 1.}
 
 
 \item \code{rescale} or min-max normalization. This rescales all
-    parmeters from (0 to 1).  As in the \code{rescale2} the
+    parameters from (0 to 1).  As in the \code{rescale2} the
     relative differences are preserved.  In this approach:
 
     C_{1} = min(all unscaled values)
@@ -343,7 +343,7 @@ and the scales are specified by \code{scaleC}.
 
 \item \code{mult} This approach does not use the data
 normalization provided by \code{normType}, but rather uses
-multiplicitve scaling to a constant provided by the \code{scaleTo}
+multiplicative scaling to a constant provided by the \code{scaleTo}
 argument.
 
   In this case:
@@ -352,7 +352,7 @@ argument.
 
 \item \code{multAdd} This approach changes the scaling based on
 the parameter being specified.  If a parameter is defined in an
-exponenital block (ie exp(theta)), then it is scaled on a
+exponential block (ie exp(theta)), then it is scaled on a
 linearly, that is:
 
   v_{scaled} = (v_{current}-v_{init}) + scaleTo
@@ -629,7 +629,7 @@ initial estimate by.  So each iteration the new step size =
 (prior step size)*gillStep}
 
 \item{gillFtol}{The gillFtol is the gradient error tolerance that
-is accepable before issuing a warning/error about the gradient estimates.}
+is acceptable before issuing a warning/error about the gradient estimates.}
 
 \item{gillRtol}{The relative tolerance used for Gill 1983
 determination of optimal step size.}

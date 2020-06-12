@@ -45,10 +45,10 @@ gnlmm2(
 \item{control}{additional optimization options}
 }
 \description{
-Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
+Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (AQD)
 }
 \details{
-Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AGQ)
+Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (AGQ)
 }
 \examples{
 llik <- function()

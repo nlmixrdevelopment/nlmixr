@@ -19,7 +19,7 @@ dynmodel.mcmc(
 \arguments{
 \item{system}{an RxODE object}
 
-\item{model}{a list of statistical meaurement models}
+\item{model}{a list of statistical measurement models}
 
 \item{evTable}{an Event Table object}
 
@@ -27,9 +27,9 @@ dynmodel.mcmc(
 
 \item{data}{input data}
 
-\item{fixPars}{fixed system paraameters}
+\item{fixPars}{fixed system parameters}
 
-\item{nsim}{number of mcmc iteractions}
+\item{nsim}{number of mcmc iterations}
 
 \item{squared}{if parameters be squared during estimation}
 

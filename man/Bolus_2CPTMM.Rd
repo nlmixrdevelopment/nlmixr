@@ -3,7 +3,7 @@
 \docType{data}
 \name{Bolus_2CPTMM}
 \alias{Bolus_2CPTMM}
-\title{2 Compartment Model with Michelis Menton Clearance}
+\title{2 Compartment Model with Michaelis-Menten Clearance}
 \format{
 A data frame with 7,920 rows and 15 columns
 

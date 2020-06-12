@@ -104,7 +104,7 @@ method.  The default value is 5.  This can be between 1 and 5.}
 \description{
 'nlme_ode' fits a mixed-effect model described using ordinary differential
 equation (ODEs). The ODE-definition follows RxODE syntax.
-Specification of fixed effects, random effects and intial values follows
+Specification of fixed effects, random effects and initial values follows
 the standard nlme notations.
 }
 \details{

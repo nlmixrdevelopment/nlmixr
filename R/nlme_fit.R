@@ -105,7 +105,7 @@ nlmeModList <- function(x, value){
 ##' administrations, and the model parameterization. `nlmixr` supports
 ##' the clearance/volume parameterization and the micro constant
 ##' parameterization, with the former as the default.  Specification of
-##' fixed effects, random effects and intial values follows the standard
+##' fixed effects, random effects and initial values follows the standard
 ##' nlme notations.
 ##'
 ##' @param dat data to be fitted
@@ -316,7 +316,7 @@ prepEv <- function(dati, theta)
 ##'
 ##' 'nlme_ode' fits a mixed-effect model described using ordinary differential
 ##' equation (ODEs). The ODE-definition follows RxODE syntax.
-##' Specification of fixed effects, random effects and intial values follows
+##' Specification of fixed effects, random effects and initial values follows
 ##' the standard nlme notations.
 ##'
 ##' @param dat.o data to be fitted

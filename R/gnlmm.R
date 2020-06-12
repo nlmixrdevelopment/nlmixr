@@ -245,7 +245,7 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 
 #' Fit a generalized nonlinear mixed-effect model
 #'
-#' Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AQD)
+#' Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (AQD)
 #'
 #' @param llik log-likelihood function
 #' @param data data to be fitted
@@ -257,7 +257,7 @@ prediction = function(fit, pred, data=NULL, mc.cores=1)
 #' @param control additional optimization options
 #' @return NULL
 #' @details
-#'    Fit a generalized nonlinear mixed-effect model by adapative Gaussian quadrature (AGQ)
+#'    Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (AGQ)
 #'
 #' @author Wenping Wang
 #' @examples

@@ -73,7 +73,7 @@ user specifies the number of compartments, route of drug
 administrations, and the model parameterization. `nlmixr` supports
 the clearance/volume parameterization and the micro constant
 parameterization, with the former as the default.  Specification of
-fixed effects, random effects and intial values follows the standard
+fixed effects, random effects and initial values follows the standard
 nlme notations.
 }
 \examples{

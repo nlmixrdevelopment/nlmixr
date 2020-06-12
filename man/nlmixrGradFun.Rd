@@ -64,7 +64,7 @@ initial estimate by.  So each iteration the new step size =
 (prior step size)*gillStep}
 
 \item{gillFtol}{The gillFtol is the gradient error tolerance that
-is accepable before issuing a warning/error about the gradient estimates.}
+is acceptable before issuing a warning/error about the gradient estimates.}
 
 \item{useColor}{Boolean indicating if focei can use ASCII color codes}
 
