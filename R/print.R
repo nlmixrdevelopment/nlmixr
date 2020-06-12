@@ -1,4 +1,5 @@
 .getR <- function(x,sd=FALSE){
+    if (is.null(x)) return(x)
     .rs <- x
     .lt <- lower.tri(.rs);
     .dn1 <- dimnames(x)[[2]]
@@ -262,7 +263,7 @@ print.nlmixrFitCore <- function(x, ...){
                 cat("  No correlations in between subject variability (BSV) matrix\n")
             } else {
                 cat("  Correlations in between subject variability (BSV) matrix:\n")
-                .getCorPrint(x$cor);
+                .getCorPrint(x$omegaR);
             }
             if (.boundChar*2+70 < .width & !.noEta){
                 cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"),"\n");
