@@ -1,12 +1,12 @@
 .onLoad <- function(libname, pkgname){
 }
 
-orig.onAttach <- function(libname, pkgname){
-    ## nocov start
-    ## Setup RxODE.prefer.tbl
-    nlmixrSetupMemoize()
-    options(keep.source=TRUE)
-    ## nocov end
+orig.onAttach <- function(libname, pkgname) {
+  ## nocov start
+  ## Setup RxODE.prefer.tbl
+  nlmixrSetupMemoize()
+  options(keep.source=TRUE)
+  ## nocov end
 }
 
 ##' Convert data to RxODE format (depreciated)
@@ -17,23 +17,23 @@ orig.onAttach <- function(libname, pkgname){
 ##'
 ##' @keywords internal
 ##' @export
-nmDataConvert <- function(data){
-    warning("nmDataConvert is depreciated and no longer needed.");
-    data
+nmDataConvert <- function(data) {
+  warning("nmDataConvert is depreciated and no longer needed.");
+  data
 }
 
-nlmixrSetupMemoize <- function(){
-    reSlow <- rex::rex(".slow", end)
-    f <- sys.function(-1)
-    ns <- environment(f)
-    .slow <- ls(pattern=reSlow,envir=ns);
-    for (slow in .slow){
-        fast <- sub(reSlow, "", slow);
-        if (!memoise::is.memoised(get(fast, envir=ns)) && is.null(get(slow, envir=ns))){
-            utils::assignInMyNamespace(slow, get(fast, envir=ns))
-            utils::assignInMyNamespace(fast, memoise::memoise(get(slow, envir=ns)))
-        }
+nlmixrSetupMemoize <- function() {
+  reSlow <- rex::rex(".slow", end)
+  f <- sys.function(-1)
+  ns <- environment(f)
+  .slow <- ls(pattern=reSlow,envir=ns);
+  for (slow in .slow){
+    fast <- sub(reSlow, "", slow);
+    if (!memoise::is.memoised(get(fast, envir=ns)) && is.null(get(slow, envir=ns))){
+      utils::assignInMyNamespace(slow, get(fast, envir=ns))
+      utils::assignInMyNamespace(fast, memoise::memoise(get(slow, envir=ns)))
     }
+  }
 }
 
 ##' Clear memoise cache for nlmixr
@@ -41,15 +41,15 @@ nlmixrSetupMemoize <- function(){
 ##' @author Matthew L. Fidler
 ##' @keywords internal
 ##' @export
-nlmixrForget <- function(){
-    reSlow <- rex::rex(".slow",end)
-    f <- sys.function(-1)
-    ns <- environment(f)
-    .slow <- ls(pattern=reSlow,envir=ns);
-    for (slow in .slow){
-        fast <- sub(reSlow, "", slow);
-        memoise::forget(get(fast, envir=ns));
-    }
+nlmixrForget <- function() {
+  reSlow <- rex::rex(".slow",end)
+  f <- sys.function(-1)
+  ns <- environment(f)
+  .slow <- ls(pattern=reSlow,envir=ns);
+  for (slow in .slow){
+    fast <- sub(reSlow, "", slow);
+    memoise::forget(get(fast, envir=ns));
+  }
 }
 
 
@@ -91,11 +91,11 @@ nlmixrLogo <- function(str="", version=sessionInfo()$otherPkgs$nlmixr$Version){
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixrVersion <- function(){
-    nlmixrLogo()
+  nlmixrLogo()
 }
 
 armaVersion <- function(){
-    nlmixrLogo(str="RcppArmadiilo", RcppArmadillo::armadillo_version())
+  nlmixrLogo(str="RcppArmadiilo", RcppArmadillo::armadillo_version())
 }
 
 .nlmixrTime <- NULL
@@ -121,53 +121,53 @@ armaVersion <- function(){
 nlmixr <- function(object, data, est=NULL, control=list(),
                    table=tableControl(), ...,save=NULL,
                    envir=parent.frame()){
-    assignInMyNamespace(".nlmixrTime",proc.time());
-    RxODE::.setWarnIdSort(FALSE);
-    on.exit(RxODE::.setWarnIdSort(TRUE));
-    force(est)
-    ## verbose?
-    ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
-    UseMethod("nlmixr")
+  assignInMyNamespace(".nlmixrTime",proc.time());
+  RxODE::.setWarnIdSort(FALSE);
+  on.exit(RxODE::.setWarnIdSort(TRUE));
+  force(est)
+  ## verbose?
+  ## https://tidymodels.github.io/model-implementation-principles/general-conventions.html
+  UseMethod("nlmixr")
 }
 
 ##' @rdname nlmixr
 ##' @export
 nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
                             save=NULL, envir=parent.frame()){
-    .args <- as.list(match.call(expand.dots=TRUE))[-1]
-    .modName <- deparse(substitute(object))
-    .uif <- nlmixrUI(object);
-    class(.uif) <- "list";
-    .uif$nmodel$model.name <- .modName
-    if (missing(data) && missing(est)){
-        class(.uif) <- "nlmixrUI"
-        return(.uif)
-    } else {
-        .uif$nmodel$data.name <- deparse(substitute(data))
-        class(.uif) <- "nlmixrUI"
-        .args$data <- data;
-        .args$est  <- est
-        .args <- c(list(uif=.uif), .args[-1]);
-        if (is.null(est)){
-            stop("Need to supply an estimation routine with est=.");
-        }
-        return(do.call(nlmixr_fit, .args, envir=envir))
+  .args <- as.list(match.call(expand.dots=TRUE))[-1]
+  .modName <- deparse(substitute(object))
+  .uif <- nlmixrUI(object);
+  class(.uif) <- "list";
+  .uif$nmodel$model.name <- .modName
+  if (missing(data) && missing(est)){
+    class(.uif) <- "nlmixrUI"
+    return(.uif)
+  } else {
+    .uif$nmodel$data.name <- deparse(substitute(data))
+    class(.uif) <- "nlmixrUI"
+    .args$data <- data;
+    .args$est  <- est
+    .args <- c(list(uif=.uif), .args[-1]);
+    if (is.null(est)){
+      stop("Need to supply an estimation routine with est=.");
     }
+    return(do.call(nlmixr_fit, .args, envir=envir))
+  }
 }
 
 ##'@rdname nlmixr
 ##'@export
 nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
                                  save=NULL, envir=parent.frame()){
-    .uif <- .getUif(object);
-    if (missing(data)){
-        data <- getData(object);
-    }
-    .args <- as.list(match.call(expand.dots=TRUE))[-1]
-    .args$data <- data;
-    .args$est <- est;
-    .args <- c(list(uif=.uif), .args[-1]);
-    return(do.call(nlmixr_fit, .args, envir=envir))
+  .uif <- .getUif(object);
+  if (missing(data)){
+    data <- getData(object);
+  }
+  .args <- as.list(match.call(expand.dots=TRUE))[-1]
+  .args$data <- data;
+  .args$est <- est;
+  .args <- c(list(uif=.uif), .args[-1]);
+  return(do.call(nlmixr_fit, .args, envir=envir))
 }
 
 ##' @rdname nlmixr
@@ -729,7 +729,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 
 # update data to merge for origData and data. first add zeros or whatever is filled in for DV when there is no observations
             # to match the lengths, then merge observed data for both origData and data, and send to RxODE.
-            
+
             #.dynmodelData <- data
             # nlmixr Object ---
             .nmf <- uif

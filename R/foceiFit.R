@@ -6,12 +6,12 @@
 .regNum <- rex::rex(maybe("-"), or(.regDecimalint, .regFloat1, .regFloat2))
 
 use.utf <- function() {
-    opt <- getOption("cli.unicode", NULL)
-    if (! is.null(opt)) {
-        isTRUE(opt)
-    } else {
-        l10n_info()$`UTF-8` && !is.latex()
-    }
+  opt <- getOption("cli.unicode", NULL)
+  if (! is.null(opt)) {
+    isTRUE(opt)
+  } else {
+    l10n_info()$`UTF-8` && !is.latex()
+  }
 }
 
 is.latex <- function() {
