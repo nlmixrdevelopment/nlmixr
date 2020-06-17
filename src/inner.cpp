@@ -1575,7 +1575,6 @@ void innerOpt(){
 // #pragma omp parallel for num_threads(cores)
 // #endif
     for (int id = 0; id < rx->nsub; id++){
-      if (id == 0) ind->_newind = 1;
       focei_ind *indF = &(inds_focei[id]);
       indF->doChol = 1;
       try{
