@@ -766,16 +766,16 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 ##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).
 ##' @param est Estimation method
 ##' @param control Estimation control options.  They could be
-##'     \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
-##'     \code{\link{foceiControl}}
+##'   \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
+##'   \code{\link{foceiControl}}
 ##' @param ... Parameters passed to estimation method.
-##' @param sum.prod Take the RxODE model and use more precise
-##'     products/sums.  Increases solving accuracy and solving time.
-##' @param table A list controlling the table options (i.e. CWRES,
-##'     NPDE etc).  See \code{\link{tableControl}}.
-##' @param save This option determines if the fit will be saved to be
-##'     reloaded if already run.  If NULL, get the option from
-##'     \code{options("nlmixr.save")};
+##' @param sum.prod Take the RxODE model and use more precise products/sums.
+##'   Increases solving accuracy and solving time.
+##' @param table A list controlling the table options (i.e. CWRES, NPDE etc).
+##'   See \code{\link{tableControl}}.
+##' @param save This option determines if the fit will be saved to be reloaded
+##'   if already run.  If NULL, get the option from
+##'   \code{options("nlmixr.save")};
 ##' @param envir Environment that nlmixr is evaluated in.
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
