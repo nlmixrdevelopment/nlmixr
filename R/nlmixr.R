@@ -760,8 +760,9 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 
 ##' Fit a nlmixr model
 ##'
-##' @param data Dataset to estimate.  Needs to be RxODE compatible in
-##'     EVIDs.
+##' @param data Dataset to estimate.  Needs to be RxODE compatible (see
+##'   \url{https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-types.html}
+##'   for detailed dataset requirements).
 ##' @param uif Parsed nlmixr model (by \code{nlmixr(mod.fn)}).
 ##' @param est Estimation method
 ##' @param control Estimation control options.  They could be
