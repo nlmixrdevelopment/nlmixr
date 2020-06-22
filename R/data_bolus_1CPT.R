@@ -1,4 +1,4 @@
-##' Infusion_1CPT -- 1 Compartment Model Simulated Data from ACOP 2016
+##' Bolus_1CPT -- 1 Compartment Model Simulated Data from ACOP 2016
 ##'
 ##' This is a simulated dataset from the ACOP 2016 poster.  All
 ##' Datasets were simulated with the following methods.
@@ -38,11 +38,11 @@
 ##'   \item{SS}{Steady State}
 ##'   \item{II}{Interdose Interval}
 ##'   \item{SD}{Single Dose Flag}
-##'   \item{RATE}{NONMEM Rate}
 ##'   \item{CMT}{Compartment}
 ##' }
 ##'
 ##' @source Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
 ##'     nlmixr: an open-source package for pharmacometric modelling in
 ##'     R. ACOP 2016
-"Infusion_1CPT"
+##' @family nlmixr datasets
+"Bolus_1CPT"

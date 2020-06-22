@@ -1,4 +1,4 @@
-##' 2 Compartment Model with Michaelis-Menten Clearance
+##' 1 Compartment Model w/ Michaelis-Menten Elimination
 ##'
 ##' This is a simulated dataset from the ACOP 2016 poster.  All
 ##' Datasets were simulated with the following methods.
@@ -22,7 +22,7 @@
 ##' samples in 24 hours per subject, using a first-order absorption,
 ##' 1-compartment disposition, linear elimination model.
 ##'
-##' @format A data frame with 7,920 rows and 15 columns
+##' @format A data frame with 7,920 rows and 14 columns
 ##'
 ##' \describe{
 ##'   \item{ID}{Simulated Subject ID}
@@ -33,16 +33,15 @@
 ##'   \item{AMT}{Dosing AMT}
 ##'   \item{EVID}{NONMEM Event ID}
 ##'   \item{DOSE}{Dose}
-##'   \item{V}{Individual Central Compartment Volume}
-##'   \item{VM}{Individual Vmax}
-##'   \item{KM}{Individual Km}
-##'   \item{Q}{Individual Q}
-##'   \item{V2}{Individual Peripheral Compartment Volume}
+##'   \item{V}{Individual Simulated Volume}
+##'   \item{VM}{Individual Vm constant}
+##'   \item{KM}{Individual Km constant}
 ##'   \item{SD}{Single Dose Flag}
-##'   \item{CMT}{Compartment Indicator}
+##'   \item{CMT}{Compartment}
 ##' }
 ##'
 ##' @source Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
 ##'     nlmixr: an open-source package for pharmacometric modelling in
 ##'     R. ACOP 2016
-"Bolus_2CPTMM"
+##' @family nlmixr datasets
+"Bolus_1CPTMM"

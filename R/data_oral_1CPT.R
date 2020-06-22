@@ -45,4 +45,5 @@
 ##' @source Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
 ##'     nlmixr: an open-source package for pharmacometric modelling in
 ##'     R. ACOP 2016
+##' @family nlmixr datasets
 "Oral_1CPT"

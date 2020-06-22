@@ -36,5 +36,5 @@
 ##'     "Likelihood Inference in a Correlated Probit Regression Model,"
 ##'     Biometrika, 71, 531-543.
 ##'
+##' @family nlmixr datasets
 "rats"
-

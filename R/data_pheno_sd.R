@@ -36,5 +36,5 @@
 ##' R. D. (1996), SAS System for Mixed Models, SAS Institute, Cary,
 ##' NC.
 ##'
+##' @family nlmixr datasets
 "pheno_sd"
-
