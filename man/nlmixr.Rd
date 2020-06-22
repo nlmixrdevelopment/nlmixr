@@ -53,8 +53,9 @@ nlmixr(
 \arguments{
 \item{object}{Fitted object or function specifying the model.}
 
-\item{data}{Dataset to estimate.  Needs to be RxODE compatible in
-EVIDs.}
+\item{data}{Dataset to estimate.  Needs to be RxODE compatible (see
+\url{https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-types.html}
+for detailed dataset requirements).}
 
 \item{est}{Estimation method}
 
@@ -62,8 +63,8 @@ EVIDs.}
 \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
 \code{\link{foceiControl}}}
 
-\item{table}{A list controlling the table options (i.e. CWRES,
-NPDE etc).  See \code{\link{tableControl}}.}
+\item{table}{A list controlling the table options (i.e. CWRES, NPDE etc).
+See \code{\link{tableControl}}.}
 
 \item{...}{Other parameters}
 

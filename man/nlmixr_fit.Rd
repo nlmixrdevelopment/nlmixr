@@ -19,8 +19,9 @@ nlmixr_fit(
 \arguments{
 \item{uif}{Parsed nlmixr model (by \code{nlmixr(mod.fn)}).}
 
-\item{data}{Dataset to estimate.  Needs to be RxODE compatible in
-EVIDs.}
+\item{data}{Dataset to estimate.  Needs to be RxODE compatible (see
+\url{https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-types.html}
+for detailed dataset requirements).}
 
 \item{est}{Estimation method}
 
@@ -30,14 +31,14 @@ EVIDs.}
 
 \item{...}{Parameters passed to estimation method.}
 
-\item{sum.prod}{Take the RxODE model and use more precise
-products/sums.  Increases solving accuracy and solving time.}
+\item{sum.prod}{Take the RxODE model and use more precise products/sums.
+Increases solving accuracy and solving time.}
 
-\item{table}{A list controlling the table options (i.e. CWRES,
-NPDE etc).  See \code{\link{tableControl}}.}
+\item{table}{A list controlling the table options (i.e. CWRES, NPDE etc).
+See \code{\link{tableControl}}.}
 
-\item{save}{This option determines if the fit will be saved to be
-reloaded if already run.  If NULL, get the option from
+\item{save}{This option determines if the fit will be saved to be reloaded
+if already run.  If NULL, get the option from
 \code{options("nlmixr.save")};}
 
 \item{envir}{Environment that nlmixr is evaluated in.}
