@@ -41,15 +41,21 @@ ode <- "
       C=X/V;
       PRED = C
       "
-system <- RxODE(model = ode)
-model <- cp ~ C + add(0.01) + prop(0.01)
-data("dynmodelExampleData")
+ode_system <- RxODE(model = ode)
+model_error_structure <- cp ~ C + add(0.01) + prop(0.01)
 inits = c(CL=1, V=10)
 control =  dynmodelControl(method = "Nelder-Mead")
-(fit <- dynmodel(system=system, model=model, data=data, inits=inits, control=control))
+fit <-
+  dynmodel(
+    system=ode_system,
+    model=model_error_structure,
+    data=Bolus_1CPT,
+    inits=inits,
+    control=control
+  )
 
 # nlmixr example ----------------------------------------------------------
-model <- function(){
+model_onecmt_bolus <- function() {
   ini({
     CL <- c(0,5,10) # Clearance (L/hr)
     V <- c(0,50,100) # Volume of Distribution
@@ -63,8 +69,7 @@ model <- function(){
   })
 }
 
-data("dynmodelNlmixrExampleData")
-(fit <- nlmixr(object = model, data=data, est="dynmodel"))
+fit <- nlmixr(object = model_onecmt_bolus, data=Bolus_1CPT, est="dynmodel")
 }
 \author{
 Wenping Wang, Mason McComb and Matt Fidler
