@@ -392,7 +392,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   .env$fit <- .fit
   # ####
 
-  ## Additioanl output ----
+  ## Additional output ----
   .temp <- nlmixrDynmodelConvert(.nlmixrObject)
   .temp.inits <- .nlmixrObject$dynmodel.fun(.temp$inits)
   .parameters <- c(.temp.inits, .temp$fixPars)
@@ -461,7 +461,6 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
 #'
 #' @author Mason McComb and Matt Fidler
 #' @export
-
 
 nlmixrDynmodelConvert <- function(.nmf){
   # Notes:
@@ -541,15 +540,22 @@ nlmixrDynmodelConvert <- function(.nmf){
   .return <- c(.return,sigma=list(.sigma))
 
   # assign "inits", vector of theta and sigma terms # (will be used when the likelihood function is changed)
-  .inits <- c(.theta)#,.sigma)
+  .inits <- .theta
   .return$inits <- .inits
 
   # assign boundaries
-  .lower <- exp(.nmf[,5][!is.na(.nmf["ntheta"]) & .nmf["fix"]==FALSE & is.na(.nmf["err"])]) # theta terms
-  .lower <- c(.lower, .nmf[,5][!is.na(.nmf["ntheta"]) & .nmf["fix"]==FALSE & !is.na(.nmf["err"])]) # error terms
-
-  .upper <- exp(.nmf[,7][!is.na(.nmf["ntheta"]) & .nmf["fix"]==FALSE & is.na(.nmf["err"])]) # theta terms
-  .upper <- c(.upper, .nmf[,7][!is.na(.nmf["ntheta"]) & .nmf["fix"]==FALSE & !is.na(.nmf["err"])]) # error terms
+  mask_theta_term <- !is.na(.nmf$ntheta) & !.nmf$fix & is.na(.nmf$err)
+  mask_error_term <- !is.na(.nmf$ntheta) & !.nmf$fix & !is.na(.nmf$err)
+  .lower <-
+    c(
+      .nmf$lower[mask_theta_term], # theta terms
+      .nmf$lower[mask_error_term] # error terms
+    )
+  .upper <-
+    c(
+      .nmf$upper[mask_theta_term], # theta terms
+      .nmf$upper[mask_error_term] # error terms
+    )
 
   .return <- c(.return, lower = list(.lower), upper = list(.upper))
 
