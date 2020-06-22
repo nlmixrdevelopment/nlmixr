@@ -1,4 +1,4 @@
-##' Bolus_1CPT -- 1 Compartment Model Simulated Data from ACOP 2016
+##' 2 Compartment Model
 ##'
 ##' This is a simulated dataset from the ACOP 2016 poster.  All
 ##' Datasets were simulated with the following methods.
@@ -22,7 +22,7 @@
 ##' samples in 24 hours per subject, using a first-order absorption,
 ##' 1-compartment disposition, linear elimination model.
 ##'
-##' @format A data frame with 7,920 rows and 14 columns
+##' @format A data frame with 7,920 rows and 16 columns
 ##'
 ##' \describe{
 ##'   \item{ID}{Simulated Subject ID}
@@ -33,15 +33,18 @@
 ##'   \item{AMT}{Dosing AMT}
 ##'   \item{EVID}{NONMEM Event ID}
 ##'   \item{DOSE}{Dose}
-##'   \item{V}{Individual Simulated Volume}
+##'   \item{V1}{Individual Central Compartment Volume}
 ##'   \item{CL}{Individual Clearance}
-##'   \item{SS}{Steady State}
-##'   \item{II}{Interdose Interval}
+##'   \item{Q}{Individual Between Compartment Clearance}
+##'   \item{V2}{Periperial Volume}
+##'   \item{SS}{Steady State Flag}
+##'   \item{II}{Interdose interval}
 ##'   \item{SD}{Single Dose Flag}
-##'   \item{CMT}{Compartment}
+##'   \item{CMT}{Compartment Indicator}
 ##' }
 ##'
 ##' @source Schoemaker R, Xiong Y, Wilkins J, Laveille C, Wang W.
 ##'     nlmixr: an open-source package for pharmacometric modelling in
 ##'     R. ACOP 2016
-"Bolus_1CPT"
+##' @family nlmixr datasets
+"Bolus_2CPT"

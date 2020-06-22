@@ -27,4 +27,5 @@
 ##'   Initiation of warfarin therapy without a loading dose. Circulation
 ##'   1968; 38: 169-177.
 ##'
+##' @family nlmixr datasets
 "warfarin"

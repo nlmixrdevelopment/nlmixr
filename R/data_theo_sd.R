@@ -16,4 +16,5 @@
 ##' }
 ##'
 ##' @source NONMEM/nlme
+##' @family nlmixr datasets
 "theo_sd"
