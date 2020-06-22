@@ -392,7 +392,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data, .time, .the
   .env$fit <- .fit
   # ####
 
-  ## Additioanl output ----
+  ## Additional output ----
   .temp <- nlmixrDynmodelConvert(.nlmixrObject)
   .temp.inits <- .nlmixrObject$dynmodel.fun(.temp$inits)
   .parameters <- c(.temp.inits, .temp$fixPars)
