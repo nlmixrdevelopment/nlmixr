@@ -765,7 +765,15 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     control$lower <- if(!is.null(.dynNlmixr$lower)) .dynNlmixr$lower else NULL
     control$upper <- if(!is.null(.dynNlmixr$upper)) .dynNlmixr$upper else NULL
 
-    fit <- dynmodel(system = .system, model = .model, inits = .inits, data = .origData, nlmixrObject = .nmf, control=control)
+    fit <-
+      dynmodel(
+        system = .system,
+        model = .model,
+        inits = .inits,
+        data = .origData,
+        nlmixrObject = .nmf,
+        control=control
+      )
     assign("origData", .origData, fit$env)
     assign(".fit", fit, envir = .GlobalEnv)
     fit <- fix.dat(fit)
