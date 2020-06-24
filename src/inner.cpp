@@ -5368,7 +5368,10 @@ Environment foceiFitCpp_(Environment e){
 
     Rprintf("U: Unscaled Parameters; ");
     Rprintf("X: Back-transformed parameters; ");
-    Rprintf("G: Gradient\n");
+    Rprintf("G: Gill difference gradient approximation\n");
+    Rprintf("F: Forward difference gradient approximation\n");
+    Rprintf("C: Central difference gradient approximation\n");
+    Rprintf("M: Mixed forward and central difference gradient approximation\n");
     Rprintf("Unscaled parameters for Omegas=chol(solve(omega));\nDiagonals are transformed, as specified by foceiControl(diagXform=)\n");
     op_focei.t0 = clock();
     foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
