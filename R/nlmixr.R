@@ -242,6 +242,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 
   .nTv  <- attr(class(data),".RxODE.lst")$nTv
   .lab  <- attr(class(data),".RxODE.lst")$idLvl
+  .nid  <- attr(class(data), ".RxODE.lst")$nid
   .modelId <-
     digest::digest(
       list(sessionInfo()$otherPkgs$nlmixr$Version,
@@ -371,6 +372,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     }
   }
   if (est == "saem"){
+    if (.nid <= 1) stop("SAEM is for mixed effects models, try 'dynmodel' (need more than 1 individual)")
     if (.nTv != 0) stop("SAEM does not support time-varying covariates (yet)")
     pt <- proc.time()
     if (length(uif$noMuEtas) > 0){
@@ -515,6 +517,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     }
     return(.ret)
   } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
+    if (.nid <= 1) stop("nlme is for mixed effects models, try 'dynmodel' (need more than 1 individual)")
     if (.nTv != 0) stop("nlme does not support time-varying covariates (yet)")
     data <- .as.data.frame(data)
     if (length(uif$predDf$cond) > 1) stop("nlmixr nlme does not support multiple endpoints.")
@@ -595,6 +598,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     }
     return(.ret)
   } else if (any(est == c("foce", "focei", "fo", "foi"))){
+    if (.nid <= 1) stop(sprintf("%s is for mixed effects models, try 'dynmodel' (need more than 1 individual)", est))
     if (any(est == c("foce", "fo"))){
       control$interaction <- FALSE
     }
@@ -703,6 +707,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     assign("modelId",.modelId, env)
     return(fit)
   } else if (est == "posthoc"){
+    if (.nid <= 1) stop("'posthoc' estimation is for mixed effects models, try 'dynmodel' (need more than 1 individual)")
     if (class(control) !="foceiControl") control <- do.call(nlmixr::foceiControl, control)
     control$covMethod <- 0L
     control$maxOuterIterations <- 0L
