@@ -878,9 +878,7 @@ dynmodelControl <- function(...,
   return(.ret)
 }
 
-# #########################################################################
-
-# dynmodel()  -------------------------------------------------------------
+# dynmodel()  #############################################################
 #' Fit a non-population dynamic model
 #'
 #' Fit a non-population dynamic model
@@ -890,8 +888,10 @@ dynmodelControl <- function(...,
 #' @param inits Initial values of system parameters.
 #' @param data Dataset to estimate. Needs to be RxODE compatible in EVIDs.
 #' @param fixPars Fixed system parameters. Default is NULL.
-#' @param nlmixrObject nlmixr object. See \code{\link[nlmixr]{nlmixr}} for more details. Default is NULL.
-#' @param control Control options for dynmodel \code{\link[nlmixr]{dynmodelControl}} .
+#' @param nlmixrObject nlmixr object. See \code{\link[nlmixr]{nlmixr}} for more
+#'   details. Default is NULL.
+#' @param control Control options for dynmodel
+#'   \code{\link[nlmixr]{dynmodelControl}} .
 #' @return NULL
 #' @author Wenping Wang, Mason McComb and Matt Fidler
 #' @examples
@@ -1229,7 +1229,10 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       # assign names sigma names
       if (any(names(th) %in% names(model[[1]]))) {
         for (i in 1:sum((names(th) %in% names(model[[1]])))) {
-          assign(names(th[names(th) %in% names(model[[1]])])[i], as.numeric(th[names(th) %in% names(model[[1]])])[i])
+          assign(
+            names(th[names(th) %in% names(model[[1]])])[i],
+            as.numeric(th[names(th) %in% names(model[[1]])])[i]
+          )
         }
       }
 
@@ -1627,15 +1630,20 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   }
 
   # reassign the negative values to positive for add, prop/pow since they are standard deviations
-  if (!is.na(match("add", names(inits)))) fit$par[match("add", names(inits))] <- abs(fit$par[match("add", names(inits))])
-  if (!is.na(match("prop", names(inits)))) fit$par[match("prop", names(inits))] <- abs(fit$par[match("prop", names(inits))])
-  if (!is.na(match("pow", names(inits)))) fit$par[match("pow", names(inits))] <- abs(fit$par[match("pow", names(inits))])
-  if (!is.na(match("norm", names(inits)))) fit$par[match("norm", names(inits))] <- abs(fit$par[match("norm", names(inits))])
-  if (!is.na(match("dnorm", names(inits)))) fit$par[match("dnorm", names(inits))] <- abs(fit$par[match("dnorm", names(inits))])
+  if (!is.na(match("add", names(inits))))
+    fit$par[match("add", names(inits))] <- abs(fit$par[match("add", names(inits))])
+  if (!is.na(match("prop", names(inits))))
+    fit$par[match("prop", names(inits))] <- abs(fit$par[match("prop", names(inits))])
+  if (!is.na(match("pow", names(inits))))
+    fit$par[match("pow", names(inits))] <- abs(fit$par[match("pow", names(inits))])
+  if (!is.na(match("norm", names(inits))))
+    fit$par[match("norm", names(inits))] <- abs(fit$par[match("norm", names(inits))])
+  if (!is.na(match("dnorm", names(inits))))
+    fit$par[match("dnorm", names(inits))] <- abs(fit$par[match("dnorm", names(inits))])
 
   .time$hessianTime <- (proc.time() - .ht)["elapsed"]
   # dynmodel Output -------------------------------------------------------
-  # unscale optmized parameters here if scaling was used:
+  # unscale optimized parameters here if scaling was used:
 
   # create table for output
   res <- cbind(fit$par, abs(se), abs(se / fit$par * 100))
@@ -1678,8 +1686,6 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     return(res)
   }
 }
-
-# #########################################################################
 
 # ####################################################################### #
 #
