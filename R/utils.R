@@ -468,36 +468,36 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
 #' @author Mason McComb and Matt Fidler
 #' @export
 nlmixrDynmodelConvert <- function(.nmf) {
-  # Notes:
-  # Description - function used to convert nlmixr() object to initial conditions and model used for dynmodel
-  # input - nlmixr function (.nmf)
-  # output - .return
-
-  # iniitalize list for output
+  # initialize list for output
   .return <- list()
 
   # convert nlmixr model to data.frame
   .nmf.original <- .nmf
   .nmf <- as.data.frame(.nmf$ini)
-  .temp.model <- RxODE::rxSymPySetupPred(.nmf.original$rxode.pred,
-    function() {
-      return(nlmixr_pred)
-    },
-    .nmf.original$theta.pars,
-    .nmf.original$error,
-    grad = FALSE,
-    pred.minus.dv = TRUE, sum.prod = FALSE, # control$sumProd,
-    theta.derivs = FALSE, optExpression = TRUE, # control$optExpression,
-    run.internal = TRUE, only.numeric = TRUE
-  )
-
+  .temp.model <-
+    RxODE::rxSymPySetupPred(
+      .nmf.original$rxode.pred,
+      function() {
+        return(nlmixr_pred)
+      },
+      .nmf.original$theta.pars,
+      .nmf.original$error,
+      grad = FALSE,
+      pred.minus.dv = TRUE,
+      sum.prod = FALSE, # control$sumProd,
+      theta.derivs = FALSE,
+      optExpression = TRUE, # control$optExpression,
+      run.internal = TRUE,
+      only.numeric = TRUE
+    )
 
   # assign fixed terms
-  .fix.index <- if (length(which(.nmf$fix == TRUE)) == 0) {
-    NULL
-  } else {
-    which(.nmf$fix == TRUE)
-  } # obtain row location for fixed terms
+  .fix.index <- # obtain row location for fixed terms
+    if (length(which(.nmf$fix == TRUE)) == 0) {
+      NULL
+    } else {
+      which(.nmf$fix == TRUE)
+    }
   .ref.fix <- substring(.nmf$name[.fix.index], 2)
 
   .temp.log.fixPars.index <- intersect(.fix.index, .temp.model$log.etas)
