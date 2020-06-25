@@ -950,7 +950,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   }
 
   # Error model  -------------------------------------------------------------
-  model_list <-
+  modelList <-
     if (class(model) == "formula") {
       list(model)
     } else {
@@ -958,8 +958,8 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     }
   inits.err <- NULL
 
-  model_parsed <-
-    lapply(model_list, function(.model) {
+  modelParsed <-
+    lapply(modelList, function(.model) {
       .model <- unlist(lapply(attr(terms(.model), "variables"), as.list))
       .model <- sapply(.model, deparse)
 
@@ -1087,7 +1087,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     rows <- TRUE
   }
   # add model variable to data
-  .dv.name <- unlist(model_parsed)["dv"][[1]]
+  .dv.name <- unlist(modelParsed)["dv"][[1]]
   if (any(names(data) %in% .dv.name) == FALSE) {
     data[[.dv.name]] <- data$DV
   }
@@ -1101,7 +1101,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
 
   # Error "model" contains "data" variables?
   # check to see if there is a discrepency between error model names and data
-  nodef <- setdiff(sapply(model_parsed, function(x) x["dv"]), names(data))
+  nodef <- setdiff(sapply(modelParsed, function(x) x["dv"]), names(data))
   # print error message
   if (length(nodef) & is.null(nlmixrObject)) {
     msg <- err.msg(nodef, pre = "var(s) not found in data: ")
@@ -1114,7 +1114,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   # reassign vars to combine state and lhs variables
   vars <- c(modelVars$state, modelVars$lhs)
   # Check to see if the prediction term is in the error model
-  nodef <- setdiff(sapply(model_parsed, function(x) x["pred"]), vars)
+  nodef <- setdiff(sapply(modelParsed, function(x) x["pred"]), vars)
   # print error message
   if (length(nodef)) {
     msg <- err.msg(nodef, pre = "modelVar(s) not found in model: ")
@@ -1203,7 +1203,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     }
 
     # sum of log-likelihood function:
-    l <- lapply(model_parsed, function(x) {
+    l <- lapply(modelParsed, function(x) {
       # name the inputs
       names(th) <- names(inits)
 
@@ -1220,11 +1220,11 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       tbsYj <- NULL
 
       # assign names sigma names
-      if (any(names(th) %in% names(model_parsed[[1]]))) {
-        for (i in 1:sum((names(th) %in% names(model_parsed[[1]])))) {
+      if (any(names(th) %in% names(modelParsed[[1]]))) {
+        for (i in 1:sum((names(th) %in% names(modelParsed[[1]])))) {
           assign(
-            names(th[names(th) %in% names(model_parsed[[1]])])[i],
-            as.numeric(th[names(th) %in% names(model_parsed[[1]])])[i]
+            names(th[names(th) %in% names(modelParsed[[1]])])[i],
+            as.numeric(th[names(th) %in% names(modelParsed[[1]])])[i]
           )
         }
       }
@@ -1253,7 +1253,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       if (!is.null(.logn) | !is.null(.dlnorm)) {
         .h.x <- boxCox(yo, lambda) # log(yo) # obs
         .h.y <- boxCox(yp, lambda) # log(yp)  # pred
-        if ("pow" %in% names(model_parsed[[1]])) {
+        if ("pow" %in% names(modelParsed[[1]])) {
           .h.y.var <- yp^(2 * pow2) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
           .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
@@ -1267,10 +1267,10 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         ll <- .5 * (.n2ll)
       }
       # boxCox Transform ----
-      else if ("boxCox" %in% names(model_parsed[[1]]) | "tbs" %in% names(model_parsed[[1]])) {
+      else if ("boxCox" %in% names(modelParsed[[1]]) | "tbs" %in% names(modelParsed[[1]])) {
         .h.x <- boxCox(yo, lambda) # obs
         .h.y <- boxCox(yp, lambda) # pred
-        if ("pow" %in% names(model_parsed[[1]])) {
+        if ("pow" %in% names(modelParsed[[1]])) {
           .h.y.var <- (yp^(2 * pow2)) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
           .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
@@ -1284,10 +1284,10 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         ll <- .5 * (.n2ll)
       }
       # yeoJohnson Transform ----
-      else if ("yeoJohnson" %in% names(model_parsed[[1]]) | "tbsYj" %in% names(model_parsed[[1]])) {
+      else if ("yeoJohnson" %in% names(modelParsed[[1]]) | "tbsYj" %in% names(modelParsed[[1]])) {
         .h.x <- yeoJohnson(yo, lambda) # obs
         .h.y <- yeoJohnson(yp, lambda) # pred
-        if ("pow" %in% names(model_parsed[[1]])) {
+        if ("pow" %in% names(modelParsed[[1]])) {
           .h.y.var <- (yp^(2 * pow2)) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
           .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
@@ -1306,7 +1306,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         ll <- .5 * (.n2ll)
       }
       # power model ----
-      else if ("pow2" %in% names(model_parsed[[1]])) {
+      else if ("pow2" %in% names(modelParsed[[1]])) {
         sgy <- thresh(add) + thresh(pow) * yp^(pow2)
         assign("sgy", sgy, envir = .dynmodel.env)
         sgy <<- sgy
@@ -1315,7 +1315,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       # all other error models ----
       else {
         #  if (identical(c("dv","pred"),names(model[[1]]))){
-        if (length(names(model_parsed[[1]])) == 2) {
+        if (length(names(modelParsed[[1]])) == 2) {
           sgy <- 1
           sgy <<- sgy
         } else {
