@@ -1562,7 +1562,6 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   }
   .ot <- proc.time()
 
-  browser()
   fit <- .optFun(as.vector(.inits), fn = .funs$eval, gr = .funs$gr, lower = .lower, upper = .upper, control = control)
   .message <- fit$message
   ## fit$value
