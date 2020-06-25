@@ -1800,27 +1800,29 @@ genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
 }
 
 #-- mcmc
-error.terms = paste0("err", 1:40)
-
+error.terms <- paste0("err", 1:40)
 
 # slice sampling  ---------------------------------------------------------
-do.slice = function(pars, fr0)
-{
-  rho = environment()
-  lapply(names(pars), function(wh, fr0) {
-    do.ode.solving = match(wh, error.terms, nomatch=0) == 0
-    pars.cp = get("pars", rho)
-    x0 = pars.cp[wh]
-    fr = function(x) {
-      pars.cp[wh] = x
-      fr0(pars.cp, do.ode.solving=do.ode.solving, negation=T)
-    }
+do.slice <- function(pars, fr0) {
+  rho <- environment()
+  lapply(
+    names(pars),
+    function(wh, fr0) {
+      do.ode.solving <- match(wh, error.terms, nomatch = 0) == 0
+      pars.cp <- get("pars", rho)
+      x0 <- pars.cp[wh]
+      fr <- function(x) {
+        pars.cp[wh] <- x
+        fr0(pars.cp, do.ode.solving = do.ode.solving, negation = T)
+      }
 
-# pars.cp as a data frame, run in do all the ode solving at the end in parallel
-    pars.cp[wh] = uni_slice(x0, fr, lower=0)
-    assign("pars", pars.cp, rho)
-    NULL
-  }, fr0=fr0)
+      # pars.cp as a data frame, run in do all the ode solving at the end in parallel
+      pars.cp[wh] <- uni_slice(x0, fr, lower = 0)
+      assign("pars", pars.cp, rho)
+      NULL
+    },
+    fr0 = fr0
+  )
 
   pars
 }
