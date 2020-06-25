@@ -31,8 +31,6 @@ err.msg <- function(x, pre = "", post = "") {
 # plot.dyn.ID() -----------------------------------------------------------
 #' Plot of a non-population dynamic model fit
 #'
-#' Plot of a non-population dynamic model fit
-#'
 #' @param x a dynamodel fit object
 #' @param ... additional arguments
 #' @return NULL
@@ -83,8 +81,6 @@ plot.dyn.ID <- gof
 # print.dyn.ID() ----------------------------------------------------------
 #' Print a non-population dynamic model fit object
 #'
-#' Print a non-population dynamic model fit object
-#'
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
@@ -100,8 +96,6 @@ print.dyn.ID <- function(x, ...) {
 # #########################################################################
 
 # summary.dyn.ID() --------------------------------------------------------
-#' Summary of a non-population dynamic model fit
-#'
 #' Summary of a non-population dynamic model fit
 #'
 #' @param object a dynmodel fit object
@@ -120,9 +114,7 @@ summary.dyn.ID <- function(object, ...) {
 # #########################################################################
 
 # nmsimplex() and mymin() -------------------------------------------------
-#' Nelder-Mead of simplex search
-#'
-#' Nelder-Mead of simplex search
+#' Nelder-Mead simplex search
 #'
 #' @param start initials
 #' @param fr objective function
@@ -879,8 +871,6 @@ dynmodelControl <- function(...,
 }
 
 # dynmodel()  #############################################################
-#' Fit a non-population dynamic model
-#'
 #' Fit a non-population dynamic model
 #'
 #' @param system RxODE object. See \code{\link[RxODE]{RxODE}} for more details.
@@ -1829,8 +1819,6 @@ do.slice <- function(pars, fr0) {
 }
 
 # dynmodel.mcmc() ---------------------------------------------------------
-#' Fit a non-population dynamic model using mcmc
-#'
 #' Fit a non-population dynamic model using mcmc
 #'
 #' @param system an RxODE object
