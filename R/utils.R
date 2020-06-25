@@ -1692,12 +1692,10 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
 ## MCMC Section
 #
 # ####################################################################### #
-uni_slice = function(x0, fr, rho=NULL, w=1, m=1000, lower=-1.0e20, upper=1.0e20)
-{
-  if (is.null(rho)) rho = environment(fr)
-  .Call(slice_wrap, fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = 'nlmixr')$x1
+uni_slice <- function(x0, fr, rho = NULL, w = 1, m = 1000, lower = -1.0e20, upper = 1.0e20) {
+  if (is.null(rho)) rho <- environment(fr)
+  .Call(slice_wrap, fr, rho, x0, w, as.integer(m), lower, upper, PACKAGE = "nlmixr")$x1
 }
-
 
 # Error model  -------------------------------------------------------------
 genobj = function(system, model, evTable, inits, data, fixPars=NULL,
