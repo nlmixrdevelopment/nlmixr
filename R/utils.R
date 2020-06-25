@@ -1948,16 +1948,12 @@ print.dyn.mcmc <- function(x, ...) {
 #' @param ... additional arguments
 #' @return NULL
 #' @export
-plot.dyn.mcmc = function(x, ...)
-{
-  fit = list(obj=attr(x, "obj"), par=apply(x, 2, mean))
+plot.dyn.mcmc <- function(x, ...) {
+  fit <- list(obj = attr(x, "obj"), par = apply(x, 2, mean))
   gof(fit)
 }
-# #########################################################################
 
-
-# Utilities for nlmixr ----------------------------------------------------
-
+# Utilities for nlmixr ####################################################
 
 # ####################################################################### #
 #
@@ -1990,17 +1986,23 @@ nsis <- function(){ ## build installer...
 ##'     the expression and a list of warning messages
 ##' @author Matthew L. Fidler
 ##' @noRd
-.collectWarnings <- function(expr,lst=FALSE){
-  ws <- c();
+.collectWarnings <- function(expr, lst = FALSE) {
+  ws <- c()
   this.env <- environment()
-  ret <- suppressWarnings(withCallingHandlers(expr,warning=function(w){assign("ws", unique(c(w$message, ws)), this.env)}))
-  if (lst){
-    return(list(ret, ws));
+  ret <-
+    suppressWarnings(withCallingHandlers(
+      expr,
+      warning = function(w) {
+        assign("ws", unique(c(w$message, ws)), this.env)
+      }
+    ))
+  if (lst) {
+    return(list(ret, ws))
   } else {
-    for (w in ws){
+    for (w in ws) {
       warning(w)
     }
-    return(ret);
+    return(ret)
   }
 }
 # #########################################################################
