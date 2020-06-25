@@ -1813,10 +1813,11 @@ do.slice <- function(pars, fr0) {
       x0 <- pars.cp[wh]
       fr <- function(x) {
         pars.cp[wh] <- x
-        fr0(pars.cp, do.ode.solving = do.ode.solving, negation = T)
+        fr0(pars.cp, do.ode.solving = do.ode.solving, negation = TRUE)
       }
 
-      # pars.cp as a data frame, run in do all the ode solving at the end in parallel
+      # pars.cp as a data frame, run in do all the ode solving at the end in
+      # parallel
       pars.cp[wh] <- uni_slice(x0, fr, lower = 0)
       assign("pars", pars.cp, rho)
       NULL
