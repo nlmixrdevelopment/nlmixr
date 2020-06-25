@@ -2020,10 +2020,13 @@ nsis <- function(){ ## build installer...
 ##' @author Matthew L. Fidler
 ##' @export
 ##' @keywords internal
-nlmixrPrint <- function(x, ...){
-    this.env <- environment();
-    message(invisible(paste(.captureOutput(assign("x", print(x, ...), this.env)), collapse="\n")), appendLF=TRUE);
-    invisible(x)
+nlmixrPrint <- function(x, ...) {
+  this.env <- environment()
+  message(invisible(paste(
+    .captureOutput(assign("x", print(x, ...), this.env)), collapse = "\n")),
+    appendLF = TRUE
+  )
+  invisible(x)
 }
 # #########################################################################
 
