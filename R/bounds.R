@@ -1,9 +1,3 @@
-.data.frame <- function(..., stringsAsFactors = FALSE) {
-  base::data.frame(..., stringsAsFactors = FALSE)
-}
-.as.data.frame <- function(..., stringsAsFactors = FALSE) {
-  base::as.data.frame(..., stringsAsFactors = FALSE)
-}
 ##' Extract the Nlmixr bound information from a function.
 ##'
 ##' @param fun Function to extract bound information from.
