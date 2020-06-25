@@ -2142,9 +2142,11 @@ plot.nlmixrDynmodel <- function(x, y, ...) {
 ##' @return dynmodel
 ##' @author Matthew Fidler
 ##' @export
-as.dynmodel <- function(x){
-    .ret <- try(x$dynmodelObject, silent=TRUE)
-    if (inherits(.ret, "try-error") || is.null(.ret))
-        stop("Cannot convert to dynmodel object");
-    return(.ret)
+as.dynmodel <- function(x) {
+  .ret <- try(x$dynmodelObject, silent = TRUE)
+  if (inherits(.ret, "try-error") || is.null(.ret)) {
+    stop("Cannot convert to dynmodel object")
+  }
+  return(.ret)
 }
+
