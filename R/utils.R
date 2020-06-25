@@ -901,166 +901,212 @@ dynmodelControl <- function(...,
 #'
 #' fit <- nlmixr(object = model_onecmt_bolus, data=Bolus_1CPT, est="dynmodel")
 #' @export
-
-
-
-
-
-
-
-dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL, control=list(), ...){
+dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = NULL, control = list(), ...) {
   # Timing and environment --------------------------------------------------
   .pt <- proc.time()
   .time <- c()
 
-  .dynmodel.env <- new.env(parent=emptyenv())
+  .dynmodel.env <- new.env(parent = emptyenv())
 
   # dynmodelControl Handling ------------------------------------------------
-  if (!RxODE::rxIs(control, "dynmodelControl")){
+  if (!RxODE::rxIs(control, "dynmodelControl")) {
     control <- do.call(dynmodelControl, control)
   }
 
   # reassign contorl names
-  for (i in 1:length(control)){
-    assign(names(control[i]),control[[i]])
+  for (i in 1:length(control)) {
+    assign(names(control[i]), control[[i]])
   }
 
   # Error model  -------------------------------------------------------------
-  if (class(model)=="formula") {
-    model = list(model)
+  if (class(model) == "formula") {
+    model <- list(model)
   }
-  inits.err = NULL
+  inits.err <- NULL
 
 
-  model = lapply(model, function(.model) {
-    .model = unlist(lapply(attr(terms(.model),"variables"), as.list))
-    .model = sapply(.model, deparse)
+  model <- lapply(model, function(.model) {
+    .model <- unlist(lapply(attr(terms(.model), "variables"), as.list))
+    .model <- sapply(.model, deparse)
 
     # assign error terms
-    .sigma.add = if("add" %in% .model) {
-      as.numeric(.model[which(.model=="add")+1])
-    } else{NULL}
+    .sigma.add <-
+      if ("add" %in% .model) {
+        as.numeric(.model[which(.model == "add") + 1])
+      } else {
+        NULL
+      }
 
-    .sigma.prop = if("prop" %in% .model) {
-      as.numeric(.model[which(.model=="prop")+1])
-    } else{NULL}
+    .sigma.prop <-
+      if ("prop" %in% .model) {
+        as.numeric(.model[which(.model == "prop") + 1])
+      } else {
+        NULL
+      }
 
-    .sigma.pow = if("pow" %in% .model) {
-      as.numeric(.model[which(.model=="pow")+1])
-    } else{NULL}
+    .sigma.pow <-
+      if ("pow" %in% .model) {
+        as.numeric(.model[which(.model == "pow") + 1])
+      } else {
+        NULL
+      }
 
-    .sigma.pow2 = if("pow2" %in% .model) {
-      as.numeric(.model[which(.model=="pow2")+1])
-    } else{NULL}
+    .sigma.pow2 <-
+      if ("pow2" %in% .model) {
+        as.numeric(.model[which(.model == "pow2") + 1])
+      } else {
+        NULL
+      }
 
-    .sigma.yeoJohnson = if("yeoJohnson" %in% .model) {
-      as.numeric(.model[which(.model=="yeoJohnson")+1])
-    } else{NULL}
+    .sigma.yeoJohnson <-
+      if ("yeoJohnson" %in% .model) {
+        as.numeric(.model[which(.model == "yeoJohnson") + 1])
+      } else {
+        NULL
+      }
 
-    .sigma.boxCox = if("boxCox" %in% .model) {
-      as.numeric(.model[which(.model=="boxCox")+1])
-    } else{NULL}
+    .sigma.boxCox <-
+      if ("boxCox" %in% .model) {
+        as.numeric(.model[which(.model == "boxCox") + 1])
+      } else {
+        NULL
+      }
 
-    .sigma.norm = if("norm" %in% .model) {
-      as.numeric(.model[which(.model=="norm")+1])
-      .norm <<- T
-    } else{NULL
-      .norm <<- NULL}
+    .sigma.norm <-
+      if ("norm" %in% .model) {
+        as.numeric(.model[which(.model == "norm") + 1])
+        .norm <<- TRUE
+      } else {
+        NULL
+        .norm <<- NULL
+      }
 
-    .sigma.dnorm = if("dnorm" %in% .model) {
-      as.numeric(.model[which(.model=="dnorm")+1])
-      .dnorm <<- T
-    } else{NULL
-      .dnorm <<- NULL}
+    .sigma.dnorm <-
+      if ("dnorm" %in% .model) {
+        as.numeric(.model[which(.model == "dnorm") + 1])
+        .dnorm <<- TRUE
+      } else {
+        NULL
+        .dnorm <<- NULL
+      }
 
-    .sigma.logn = if("logn" %in% .model) {
-      as.numeric(.model[which(.model=="logn")+1])
-      .logn <<- T
-    } else{NULL
-      .logn <<- NULL}
+    .sigma.logn <-
+      if ("logn" %in% .model) {
+        as.numeric(.model[which(.model == "logn") + 1])
+        .logn <<- TRUE
+      } else {
+        NULL
+        .logn <<- NULL
+      }
 
-    .sigma.dlnorm = if("dlnorm" %in% .model) {
-      as.numeric(.model[which(.model=="dlnorm")+1])
-      .dlnorm <<- T
-    } else{NULL
-      .dlnorm <<- NULL}
+    .sigma.dlnorm <-
+      if ("dlnorm" %in% .model) {
+        as.numeric(.model[which(.model == "dlnorm") + 1])
+        .dlnorm <<- TRUE
+      } else {
+        NULL
+        .dlnorm <<- NULL
+      }
 
-    .sigma.tbs = if("tbs" %in% .model) {
-      as.numeric(.model[which(.model=="tbs")+1])
-    } else{NULL}
+    .sigma.tbs <-
+      if ("tbs" %in% .model) {
+        as.numeric(.model[which(.model == "tbs") + 1])
+      } else {
+        NULL
+      }
 
-    .sigma.tbsYj = if("tbsYj" %in% .model) {
-      as.numeric(.model[which(.model=="tbsYj")+1])
-    } else{NULL}
+    .sigma.tbsYj <-
+      if ("tbsYj" %in% .model) {
+        as.numeric(.model[which(.model == "tbsYj") + 1])
+      } else {
+        NULL
+      }
 
     # keep error model terms
-    inits.err <- c(add=.sigma.add, prop=.sigma.prop, pow=.sigma.pow, pow2=.sigma.pow2, yeoJohnson=.sigma.yeoJohnson, boxCox=.sigma.boxCox,
-                   norm=.sigma.norm, dnorm=.sigma.dnorm, tbs=.sigma.tbs, tbsYj=.sigma.tbsYj)
+    inits.err <-
+      c(
+        add = .sigma.add,
+        prop = .sigma.prop,
+        pow = .sigma.pow,
+        pow2 = .sigma.pow2,
+        yeoJohnson = .sigma.yeoJohnson,
+        boxCox = .sigma.boxCox,
+        norm = .sigma.norm,
+        dnorm = .sigma.dnorm,
+        tbs = .sigma.tbs,
+        tbsYj = .sigma.tbsYj
+      )
 
-    inits.err <- inits.err[which(names(inits.err) %in% intersect(names(inits.err),.model))]
+    inits.err <- inits.err[which(names(inits.err) %in% intersect(names(inits.err), .model))]
     inits.err <<- inits.err
     .model <- c("dv" = .model[2], "pred" = .model[3], inits.err)
   })
 
-  inits = c(inits, inits.err)
-  if("pow2" %in% names(inits) & !("pow" %in% names(inits))){stop("Error Model: pow must be defined when using pow2")}
-
+  inits <- c(inits, inits.err)
+  if ("pow2" %in% names(inits) & !("pow" %in% names(inits))) {
+    stop("Error Model: pow must be defined when using pow2")
+  }
 
   # Check dynmodel() inputs, Define vars, modelVars, pars,  ------------
 
-    # NOTES: Check to make sure all there is consistency between error model, data. inits, and ODE model
+  # NOTES: Check to make sure all there is consistency between error model, data. inits, and ODE model
 
   # data handling
-    data <- RxODE::etTrans(data,system,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
-    .original.data <- data
+  data <- RxODE::etTrans(data, system, addCmt = TRUE, dropUnits = TRUE, allTimeVar = TRUE)
+  .original.data <- data
 
-    # warn DV must be in data
-    if (!any(names(data)=="DV")) stop("data must contain column named DV")
-    # remove row that has time zero with zero observation, and no event
-    if (data$TIME[1]==0 & data$EVID[1]==0 & data$DV[1]==0) {
-      rows = -1
-    } else {rows = TRUE}
-    # add model variable to data
-    .dv.name <- unlist(model)["dv"][[1]]
-    if (any(names(data) %in% .dv.name) == FALSE){
-      .tmp.names <- names(data)
-      data <- cbind(data, data$DV)
-      names(data) <- c(.tmp.names,.dv.name)
-    }
-    # remove EVID==2
-    data <- data[data$EVID!=2,]
+  # warn DV must be in data
+  if (!any(names(data) == "DV")) {
+    stop("data must contain column named DV")
+  }
+  # remove row that has time zero with zero observation, and no event
+  if (data$TIME[1] == 0 & data$EVID[1] == 0 & data$DV[1] == 0) {
+    rows <- -1
+  } else {
+    rows <- TRUE
+  }
+  # add model variable to data
+  .dv.name <- unlist(model)["dv"][[1]]
+  if (any(names(data) %in% .dv.name) == FALSE) {
+    .tmp.names <- names(data)
+    data <- cbind(data, data$DV)
+    names(data) <- c(.tmp.names, .dv.name)
+  }
+  # remove EVID==2
+  data <- data[data$EVID != 2, ]
 
   # Error "model" contains "data" variables?
   # get column names of data (Time and Observation)
-  vars = names(data)
+  vars <- names(data)
   # check to see if there is a discrepency between error model names and data
-  nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
+  nodef <- setdiff(sapply(model, function(x) x["dv"]), vars)
   # print error message
   if (length(nodef) & is.null(nlmixrObject)) {
-    msg = err.msg(nodef, pre="var(s) not found in data: ")
+    msg <- err.msg(nodef, pre = "var(s) not found in data: ")
     stop(msg)
   }
 
   # "system" variables contain error "model" variables?
   # obtain all variables from the system
-  modelVars = system$cmpMgr$get.modelVars()
+  modelVars <- system$cmpMgr$get.modelVars()
   # reassign vars to combine state and lhs variables
-  vars = c(modelVars$state, modelVars$lhs)
+  vars <- c(modelVars$state, modelVars$lhs)
   # Check to see if the prediction term is in the error model
-  nodef = setdiff(sapply(model, function(x) x["pred"]), vars)
+  nodef <- setdiff(sapply(model, function(x) x["pred"]), vars)
   # print error message
   if (length(nodef)) {
-    msg = err.msg(nodef, pre="modelVar(s) not found in model: ")
+    msg <- err.msg(nodef, pre = "modelVar(s) not found in model: ")
     stop(msg)
   }
 
   #  "system" variables contain estimated "init" variables and fixed "fixPars" variables?
   # obtain fixed and estimated parameters
   if (is.null(nlmixrObject)) {
-    pars = modelVars$params
-    } else {
-    .temp<-nlmixrDynmodelConvert(nlmixrObject)
-    pars = names(.temp$inits)}
+    pars <- modelVars$params
+  } else {
+    .temp <- nlmixrDynmodelConvert(nlmixrObject)
+    pars <- names(.temp$inits)
+  }
 
   # Check to see if there are values in pars, that are not in the initial conditions and fixed parameters
   # nodef = setdiff(pars, c(names(inits), names(fixPars)))
@@ -1070,62 +1116,70 @@ dynmodel = function(system, model, inits, data, fixPars=NULL, nlmixrObject=NULL,
   #  stop(msg)
   # }
 
-
   # Additional assignment ---------------------------------------------------
   # number of estimated parameters, excluding the error terms
-  npar = length(pars) - length(fixPars)
-
+  npar <- length(pars) - length(fixPars)
 
   # Objective Function ------------------------------------------------------
   .time$setupTime <- (proc.time() - .pt)["elapsed"]
 
   .funs <- list()
-  sgy<-c()
-  nobs<-c()
+  sgy <- c()
+  nobs <- c()
 
   rxControl <- control$rxControl
 
-reducedTol <- FALSE
+  reducedTol <- FALSE
 
-  obj = function(th)
-  {
+  obj <- function(th) {
     # unscale
     unscaled.th <- numeric(length(th))
-    th <- sapply(seq_along(th), function(x){unscalePar(th,x)});
+    th <- sapply(seq_along(th), function(x) {
+      unscalePar(th, x)
+    })
     .funs$unscaled(th)
 
     # define parameters used for simulation, all parameters except the error terms
-    .ixpar = npar
-    theta = th[1:npar]
-    names(theta) = names(inits)[1:npar]
-    theta = c(theta, fixPars)
+    .ixpar <- npar
+    theta <- th[1:npar]
+    names(theta) <- names(inits)[1:npar]
+    theta <- c(theta, fixPars)
 
     if (!is.null(nlmixrObject)) {
       theta <- nlmixrObject$dynmodel.fun(theta)
     }
-    .rxControl <- rxControl;
+    .rxControl <- rxControl
     .rxControl$returnType <- "data.frame"
     # call rxODE for simulation
-    s = do.call(RxODE :: rxSolve,
-                c(list(object=system, params=theta, events=data),
-                  .rxControl))
+    s <-
+      do.call(
+        RxODE::rxSolve,
+        c(
+          list(object = system, params = theta, events = data),
+          .rxControl
+        )
+      )
 
-    i<-1
+    i <- 1
     i.max <- 10
-    while(any(is.na(s$nlmixr_pred)) & i < i.max) {
-      .rxControl$atol <-  .rxControl$atol*100
-      .rxControl$rtol <-  .rxControl$rtol*100
+    while (any(is.na(s$nlmixr_pred)) & i < i.max) {
+      .rxControl$atol <- .rxControl$atol * 100
+      .rxControl$rtol <- .rxControl$rtol * 100
 
-      s = do.call(RxODE :: rxSolve,
-                  c(list(object=system, params=theta, events=data),
-                    .rxControl))
+      s <-
+        do.call(
+          RxODE::rxSolve,
+          c(
+            list(object = system, params = theta, events = data),
+            .rxControl
+          )
+        )
       reducedTol <<- TRUE
-      i<- i+1
-
+      i <- i + 1
     }
 
     # sum of log-likelihood function:
-    l = lapply(model, function(x) {
+    l <- lapply(model, function(x) {
       # name the inputs
       names(th) <- names(inits)
 
@@ -1142,8 +1196,8 @@ reducedTol <- FALSE
       tbsYj <- NULL
 
       # assign names sigma names
-      if(any(names(th) %in% names(model[[1]]))){
-        for(i in 1:sum((names(th) %in% names(model[[1]])))) {
+      if (any(names(th) %in% names(model[[1]]))) {
+        for (i in 1:sum((names(th) %in% names(model[[1]])))) {
           assign(names(th[names(th) %in% names(model[[1]])])[i], as.numeric(th[names(th) %in% names(model[[1]])])[i])
         }
       }
@@ -1152,11 +1206,11 @@ reducedTol <- FALSE
       if (!is.null(.dnorm)) add <- dnorm
       if (!is.null(.logn)) {
         lambda <- 0
-        th <- th[names(th)!="logn"]
+        th <- th[names(th) != "logn"]
       }
       if (!is.null(dlnorm)) {
         lambda <- 0
-        th <- th[names(th)!="dlnorm"]
+        th <- th[names(th) != "dlnorm"]
       }
       if (!is.null(boxCox)) lambda <- boxCox
       if (!is.null(tbs)) lambda <- tbs
@@ -1164,173 +1218,179 @@ reducedTol <- FALSE
       if (!is.null(tbsYj)) lambda <- tbsYj
 
       # predicted and observed values from RxODE
-      yo <- data[data$EVID==0,rows]$DV
-      yp = s[rows,x["pred"]]
+      yo <- data[data$EVID == 0, rows]$DV
+      yp <- s[rows, x["pred"]]
       nobs <<- length(yo)
 
       # log normal transformation ----
-      if (!is.null(.logn) | !is.null(.dlnorm)){
-        .h.x <- boxCox(yo, lambda) #log(yo) # obs
-        .h.y <- boxCox(yp, lambda) #log(yp)  # pred
-        if("pow" %in% names(model[[1]])) {
-          .h.y.var <- yp^(2*pow2)*thresh(pow)^2 + thresh(add)^2  # variance of pred
+      if (!is.null(.logn) | !is.null(.dlnorm)) {
+        .h.x <- boxCox(yo, lambda) # log(yo) # obs
+        .h.y <- boxCox(yp, lambda) # log(yp)  # pred
+        if ("pow" %in% names(model[[1]])) {
+          .h.y.var <- yp^(2 * pow2) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
-          .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+          .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
         }
         # boxCox transformed -2 log-likelihood
-        .logn.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
+        .logn.n2ll <- log(.h.y.var) + ((.h.x - .h.y)^2) / .h.y.var
         # back-transformed  -2 log-likelihood function, with penalty added
-        .n2ll = .logn.n2ll - 2*(0-1)*log(yo) -2*log(2*pi) # lambda is zero here
+        .n2ll <- .logn.n2ll - 2 * (0 - 1) * log(yo) - 2 * log(2 * pi) # lambda is zero here
         sgy <<- .h.y.var
         # negative log-likelihood function for output
-        ll = .5*(.n2ll)
+        ll <- .5 * (.n2ll)
       }
       # boxCox Transform ----
       else if ("boxCox" %in% names(model[[1]]) | "tbs" %in% names(model[[1]])) {
         .h.x <- boxCox(yo, lambda) # obs
         .h.y <- boxCox(yp, lambda) # pred
-        if("pow" %in% names(model[[1]])) {
-          .h.y.var <- (yp^(2*pow2))*thresh(pow)^2 + thresh(add)^2  # variance of pred
+        if ("pow" %in% names(model[[1]])) {
+          .h.y.var <- (yp^(2 * pow2)) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
-          .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+          .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
         }
         # boxCox transformed -2 log-likelihood
-        .boxCox.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
+        .boxCox.n2ll <- log(.h.y.var) + ((.h.x - .h.y)^2) / .h.y.var
         # back-transformed  -2 log-likelihood function, with penalty added
-        .n2ll = .boxCox.n2ll - 2*(lambda-1)*log(yo) -2*log(2*pi)
+        .n2ll <- .boxCox.n2ll - 2 * (lambda - 1) * log(yo) - 2 * log(2 * pi)
         sgy <<- .h.y.var
         # negative log-likelihood function for output
-        ll = .5*(.n2ll)
+        ll <- .5 * (.n2ll)
       }
       # yeoJohnson Transform ----
-      else if("yeoJohnson" %in% names(model[[1]]) | "tbsYj" %in% names(model[[1]])) {
-        .h.x <- yeoJohnson(yo, lambda) #obs
-        .h.y <- yeoJohnson(yp, lambda) #pred
-        if("pow" %in% names(model[[1]])) {
-          .h.y.var <- (yp^(2*pow2))*thresh(pow)^2 + thresh(add)^2  # variance of pred
+      else if ("yeoJohnson" %in% names(model[[1]]) | "tbsYj" %in% names(model[[1]])) {
+        .h.x <- yeoJohnson(yo, lambda) # obs
+        .h.y <- yeoJohnson(yp, lambda) # pred
+        if ("pow" %in% names(model[[1]])) {
+          .h.y.var <- (yp^(2 * pow2)) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
-          .h.y.var <- yp^(2*pow2)*thresh(prop)^2 + thresh(add)^2  # variance of pred
+          .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
         }
         # yeoJohnson transformed -2 log-likelihood
-        .yeoJohnson.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
+        .yeoJohnson.n2ll <- log(.h.y.var) + ((.h.x - .h.y)^2) / .h.y.var
         # back-transformed  -2 log-likelihood function, with penalty added
-        .n2ll <- ifelse(yo >= 0,
-                        .yeoJohnson.n2ll -2*(lambda-1)*log(yo+1) -2*log(2*pi),
-                        .yeoJohnson.n2ll -2*(1-lambda)*log(-yo+1) -2*log(2*pi)
-        )
+        .n2ll <-
+          ifelse(
+            yo >= 0,
+            .yeoJohnson.n2ll - 2 * (lambda - 1) * log(yo + 1) - 2 * log(2 * pi),
+            .yeoJohnson.n2ll - 2 * (1 - lambda) * log(-yo + 1) - 2 * log(2 * pi)
+          )
         sgy <<- .h.y.var
         # negative log-likelihood function for output
-        ll = .5*(.n2ll)
+        ll <- .5 * (.n2ll)
       }
       # power model ----
       else if ("pow2" %in% names(model[[1]])) {
-        sgy = thresh(add) + thresh(pow)*yp^(pow2)
-        assign("sgy",sgy,envir = .dynmodel.env)
+        sgy <- thresh(add) + thresh(pow) * yp^(pow2)
+        assign("sgy", sgy, envir = .dynmodel.env)
         sgy <<- sgy
-        ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
+        ll <- .5 * ((yo - yp)^2 / (sgy^2) + log(sgy^2) + log(2 * pi))
       }
       # all other error models ----
       else {
         #  if (identical(c("dv","pred"),names(model[[1]]))){
-        if (length(names(model[[1]]))==2){
-          sgy = 1
+        if (length(names(model[[1]])) == 2) {
+          sgy <- 1
           sgy <<- sgy
-        }else{
-          sgy = thresh(add) + thresh(prop)*yp
-          assign("sgy",sgy,envir = .dynmodel.env)
+        } else {
+          sgy <- thresh(add) + thresh(prop) * yp
+          assign("sgy", sgy, envir = .dynmodel.env)
           sgy <<- sgy
         }
-        ll = .5*((yo - yp)^2/(sgy^2) + log(sgy^2) + log(2*pi))
+        ll <- .5 * ((yo - yp)^2 / (sgy^2) + log(sgy^2) + log(2 * pi))
       }
-      sum(ll,na.rm=T)
+      sum(ll, na.rm = TRUE)
     })
 
     sgy <<- sgy
-    do.call("sum", l)  # same as return(as.numeric(l)), l is a list for each value in the model?
+    do.call("sum", l) # same as return(as.numeric(l)), l is a list for each value in the model?
   }
 
   # FIXME: Put options from control here gillK etc
-  .funs <- nlmixrGradFun(obj, print=control$print,
-                         gillRtol=control$gillRtol,
-                         gillK=control$gillK,
-                         gillStep=control$gillStep,
-                         gillFtol=control$gillFtol,
-                         thetaNames=names(inits))
-
+  .funs <- nlmixrGradFun(obj,
+    print = control$print,
+    gillRtol = control$gillRtol,
+    gillK = control$gillK,
+    gillStep = control$gillStep,
+    gillFtol = control$gillFtol,
+    thetaNames = names(inits)
+  )
 
   # Scaling functions -----------------------------------------------------------------------
   # normType assignment for scaling (normalization type)
 
   if (is.null(nlmixrObject)) {
-    normType= 'constant'
-    sacleType= 'norm'
-    C1 = 0
-    C2 = 1
+    normType <- "constant"
+    sacleType <- "norm"
+    C1 <- 0
+    C2 <- 1
   }
   else {
     if (normType == "constant") {
-      C1 = 0
-      C2 = 1
+      C1 <- 0
+      C2 <- 1
     } else if (normType == "rescale2") {
-      C1 = (max(inits) + min(inits))/2
-      C2 = (max(inits) - min(inits))/2
+      C1 <- (max(inits) + min(inits)) / 2
+      C2 <- (max(inits) - min(inits)) / 2
     } else if (normType == "mean") {
-      C1 = mean(inits)
-      C2 = max(inits) - min(inits)
+      C1 <- mean(inits)
+      C2 <- max(inits) - min(inits)
     } else if (normType == "rescale") {
-      C1 = min(inits)
-      C2 = max(inits) - min(inits)
+      C1 <- min(inits)
+      C2 <- max(inits) - min(inits)
     } else if (normType == "std") {
-      C1 = mean(inits)
-      C2 = sd(inits)
+      C1 <- mean(inits)
+      C2 <- sd(inits)
     } else if (normType == "len") {
-      C1 = 0
-      C2 = sqrt(sum(inits*inits))
+      C1 <- 0
+      C2 <- sqrt(sum(inits * inits))
     }
   }
 
   # produces vector of scaleC values if missing, handles incorrect length of scaleC values.
-  scaleC <- control$scaleC;
-  if (is.null(scaleC)){
+  scaleC <- control$scaleC
+  if (is.null(scaleC)) {
     scaleC <- rep(1, length(inits))
   } else {
-    scaleC <- as.double(scaleC);
-    if (length(inits) > length(scaleC)){
-      scaleC <- c(scaleC, rep(1, length(inits) - length(scaleC)));
-    } else if (length(inits) < length(scaleC)){
-      scaleC <- scaleC[seq(1, length(inits))];
+    scaleC <- as.double(scaleC)
+    if (length(inits) > length(scaleC)) {
+      scaleC <- c(scaleC, rep(1, length(inits) - length(scaleC)))
+    } else if (length(inits) < length(scaleC)) {
+      scaleC <- scaleC[seq(1, length(inits))]
       warning("scaleC control option has more options than estimated parameters, please check.")
     }
   }
 
   # assign value to scaleC. If log value, scaleC <- 1, else scalec <- 1/abs(inits[i])
-    # need to known when dynmodel has log values, and which ones, or else there will be a problem scaling
-  theta <- inits[1:(length(inits)-length(inits.err))]
+  # need to known when dynmodel has log values, and which ones, or else there will be a problem scaling
+  theta <- inits[1:(length(inits) - length(inits.err))]
   names(scaleC) <- names(inits)
 
-  if (!is.null(nlmixrObject)){
+  if (!is.null(nlmixrObject)) {
     .model <- RxODE::rxSymPySetupPred(nlmixrObject$rxode.pred,
-                                      function(){return(nlmixr_pred)},
-                                      nlmixrObject$theta.pars,
-                                      nlmixrObject$error,
-                                      grad=FALSE,
-                                      pred.minus.dv=TRUE, sum.prod=FALSE, #control$sumProd,
-                                      theta.derivs=FALSE, optExpression=TRUE, #control$optExpression,
-                                      run.internal=TRUE, only.numeric=TRUE)
+      function() {
+        return(nlmixr_pred)
+      },
+      nlmixrObject$theta.pars,
+      nlmixrObject$error,
+      grad = FALSE,
+      pred.minus.dv = TRUE, sum.prod = FALSE, # control$sumProd,
+      theta.derivs = FALSE, optExpression = TRUE, # control$optExpression,
+      run.internal = TRUE, only.numeric = TRUE
+    )
 
     scaleC[.model$log.thetas] <- 1
-    scaleC[setdiff(1:length(theta),.model$log.thetas)] <- 1/abs(theta[setdiff(1:length(theta),.model$log.thetas)])
+    scaleC[setdiff(1:length(theta), .model$log.thetas)] <- 1 / abs(theta[setdiff(1:length(theta), .model$log.thetas)])
   }
 
 
   # assign value to scaleC based on the error model used
   n.inits.err <- names(inits.err)
-  for (i in seq_along(n.inits.err)){
-    if (is.na(scaleC[n.inits.err[i]])){
-      if (any(n.inits.err[i] == c("boxCox", "yeoJohnson", "pow2", "tbs", "tbsYj"))){
-        scaleC[i] <-  1
-      } else if (any(n.inits.err[i] == c("prop", "add", "norm", "dnorm", "logn", "dlogn", "lnorm", "dlnorm"))){
-        scaleC[i] <- 0.5 * abs(inits.err[i]);
+  for (i in seq_along(n.inits.err)) {
+    if (is.na(scaleC[n.inits.err[i]])) {
+      if (any(n.inits.err[i] == c("boxCox", "yeoJohnson", "pow2", "tbs", "tbsYj"))) {
+        scaleC[i] <- 1
+      } else if (any(n.inits.err[i] == c("prop", "add", "norm", "dnorm", "logn", "dlogn", "lnorm", "dlnorm"))) {
+        scaleC[i] <- 0.5 * abs(inits.err[i])
       }
     }
   }
@@ -1338,22 +1398,22 @@ reducedTol <- FALSE
 
   # assign value to scaleC based on additional functions
   if (!is.null(nlmixrObject)) {
-    for (i in .model$extraProps$powTheta){
-      if (is.na(scaleC[i])) scaleC[i] <- 1; ## Powers are log-scaled
+    for (i in .model$extraProps$powTheta) {
+      if (is.na(scaleC[i])) scaleC[i] <- 1 ## Powers are log-scaled
     }
 
     .ini <- as.data.frame(nlmixrObject$ini)
 
-    for (i in .model$extraProps$factorial){
-      if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i] + 1));
+    for (i in .model$extraProps$factorial) {
+      if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i] + 1))
     }
 
-    for (i in .model$extraProps$gamma){
-      if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i]));
+    for (i in .model$extraProps$gamma) {
+      if (is.na(scaleC[i])) scaleC[i] <- abs(1 / digamma(.ini$est[i]))
     }
 
-    for (i in .model$extraProps$log){
-      if (is.na(scaleC[i])) scaleC[i] <- log(abs(.ini$est[i])) * abs(.ini$est[i]);
+    for (i in .model$extraProps$log) {
+      if (is.na(scaleC[i])) scaleC[i] <- log(abs(.ini$est[i])) * abs(.ini$est[i])
     }
   }
   ## FIXME: needs to be based on actual initial values in sin because typically change to correct scale
@@ -1369,26 +1429,26 @@ reducedTol <- FALSE
   ## }
 
   # Function for scaling parameters based on scaleType
-  scalePar <- function(x, i){
+  scalePar <- function(x, i) {
     if (scaleType == "norm") { # simple scaling
-      return((x[i]-C1)/C2)
-    }	else if (scaleType == "nlmixr") { 	# nlmixr
-      scaleTo = (inits[i] - C1)/C2
-      return((x[i] - inits[i])/scaleC[i] + scaleTo)
-    }	else if (scaleType == "mult") { # simple multiplicatice scaling
+      return((x[i] - C1) / C2)
+    } else if (scaleType == "nlmixr") { # nlmixr
+      scaleTo <- (inits[i] - C1) / C2
+      return((x[i] - inits[i]) / scaleC[i] + scaleTo)
+    } else if (scaleType == "mult") { # simple multiplicatice scaling
       if (scaleTo > 0) {
-        return(x[i]/inits[i]*scaleTo)
+        return(x[i] / inits[i] * scaleTo)
       } else {
         return(x[i])
       }
     } else if (scaleType == "multAdd") { # log non-log multiplicative scaling
-      if(scaleTo > 0) {
-        return((x[i]-inits[i]) + scaleTo)
+      if (scaleTo > 0) {
+        return((x[i] - inits[i]) + scaleTo)
       } else {
-        return(x[i]/inits[i]*scaleTo)
+        return(x[i] / inits[i] * scaleTo)
       }
     } else { # When should this be used? "norm" scaling is essentially no scaling when normType specified.
-      if(scaleTo > 0) {
+      if (scaleTo > 0) {
         return((x[i] - inits[i]) + scaleTo)
       } else {
         return(x[i])
@@ -1397,27 +1457,27 @@ reducedTol <- FALSE
   }
 
   # Function for unscaling parameters based on scaleType
-  unscalePar <- function(x, i){
+  unscalePar <- function(x, i) {
     if (scaleType == "norm") { # simple scaling
-      return(x[i]*C2+C1);
-    } else if (scaleType == "nlmixr") { 	  # nlmixr
-      scaleTo = (inits[i] - C1)/C2
-      return((x[i] - scaleTo)*scaleC[i] + inits[i])
-    } else if (scaleType == "mult") { 	  # simple multiplicatice scaling
+      return(x[i] * C2 + C1)
+    } else if (scaleType == "nlmixr") { # nlmixr
+      scaleTo <- (inits[i] - C1) / C2
+      return((x[i] - scaleTo) * scaleC[i] + inits[i])
+    } else if (scaleType == "mult") { # simple multiplicatice scaling
       if (scaleTo > 0) {
-        return(x[i]*inits[i]/scaleTo)
+        return(x[i] * inits[i] / scaleTo)
       } else {
         return(x[i])
       }
     } else if (scaleType == "multAdd") { # log non-log multiplicative scaling
-      if(scaleTo > 0) {
-        return((x[i]- scaleTo) + inits[i])
+      if (scaleTo > 0) {
+        return((x[i] - scaleTo) + inits[i])
       } else {
-        return(x[i]*inits[i]/scaleTo)
+        return(x[i] * inits[i] / scaleTo)
       }
     } else { # When should this be used? "norm" scaling is essentially no scaling when normType specified.
-      if(scaleTo > 0) {
-        return((x[i]-scaleTo)*1 + inits[i])
+      if (scaleTo > 0) {
+        return((x[i] - scaleTo) * 1 + inits[i])
       } else {
         return(x[i])
       }
@@ -1425,67 +1485,77 @@ reducedTol <- FALSE
   }
 
   # Scale --------------
-  if(normType != "constant" & scaleType != "norm"){
+  if (normType != "constant" & scaleType != "norm") {
     .st <- proc.time()
     # scaled the initial conditions
     inits.temp <- numeric(length(inits))
-    for(i in 1:length(inits)){inits.temp[i] <- scalePar(inits,i)}
+    for (i in 1:length(inits)) {
+      inits.temp[i] <- scalePar(inits, i)
+    }
     .inits <- inits.temp
     # scaled lower boundary
-    if (is.null(lower)==FALSE){
-     if (any(lower == -Inf)) {
-       lower[which(lower==-Inf)]=0
-       warning("Lower boundary of -Inf set to 0.")
-     }
-          lower.temp <- numeric(length(lower))
-          for(i in 1:length(lower)){lower.temp[i] <- scalePar(lower,i)}
-          .lower <- lower.temp
-    } else {.lower <- NULL}
-
+    if (is.null(lower) == FALSE) {
+      if (any(lower == -Inf)) {
+        lower[which(lower == -Inf)] <- 0
+        warning("Lower boundary of -Inf set to 0.")
+      }
+      lower.temp <- numeric(length(lower))
+      for (i in 1:length(lower)) {
+        lower.temp[i] <- scalePar(lower, i)
+      }
+      .lower <- lower.temp
+    } else {
+      .lower <- NULL
+    }
 
     # scaled upper boundary
-    if (is.null(upper)==FALSE){
+    if (is.null(upper) == FALSE) {
       upper.temp <- numeric(length(upper))
-      for(i in 1:length(upper)){upper.temp[i] <- scalePar(upper,i)}
+      for (i in 1:length(upper)) {
+        upper.temp[i] <- scalePar(upper, i)
+      }
       .upper <- upper.temp
-    } else {.upper <- NULL}
-    .time$scalingTime<- (proc.time() - .st)["elapsed"]
+    } else {
+      .upper <- NULL
+    }
+    .time$scalingTime <- (proc.time() - .st)["elapsed"]
   } else {
     .st <- proc.time()
     .inits <- inits
     .lower <- lower
     .upper <- upper
-    .time$scalingTime<-(proc.time() - .st)["elapsed"]
+    .time$scalingTime <- (proc.time() - .st)["elapsed"]
   }
 
   # Optimization -----------------------------------------------------------------------
-  if (method == "bobyqa"){
-    .optFun <- .bobyqa;
-  } else if (any(method == c("nlminb", "PORT"))){
-    .optFun <- .nlminb;
-  } else if (method == "mma"){
-    .optFun <- .nloptr;
-  } else if (method == "slsqp"){
-    .optFun <- .slsqp;
-  } else if (method == "lbfgsbLG"){
-    .optFun <- .lbfgsbLG;
-  } else if (method == "Rvmmin"){
-    .optFun <- .Rvmmin;
-  } else if (method=="Nelder-Mead"){
-    .optFun <- .mymin;
-  } else if (method == "lbfgsb3c"){
+  if (method == "bobyqa") {
+    .optFun <- .bobyqa
+  } else if (any(method == c("nlminb", "PORT"))) {
+    .optFun <- .nlminb
+  } else if (method == "mma") {
+    .optFun <- .nloptr
+  } else if (method == "slsqp") {
+    .optFun <- .slsqp
+  } else if (method == "lbfgsbLG") {
+    .optFun <- .lbfgsbLG
+  } else if (method == "Rvmmin") {
+    .optFun <- .Rvmmin
+  } else if (method == "Nelder-Mead") {
+    .optFun <- .mymin
+  } else if (method == "lbfgsb3c") {
     .optFun <- .lbfgsb3c
-  } else if (method == "L-BFGS-B"){
+  } else if (method == "L-BFGS-B") {
     .optFun <- .lbfgsbO
   } else {
-    stop("Optimization method unknown.");
+    stop("Optimization method unknown.")
   }
   .ot <- proc.time()
 
-  fit <- .optFun(as.vector(.inits), fn=.funs$eval, gr=.funs$gr, lower=.lower, upper=.upper, control=control);
+  browser()
+  fit <- .optFun(as.vector(.inits), fn = .funs$eval, gr = .funs$gr, lower = .lower, upper = .upper, control = control)
   .message <- fit$message
   ## fit$value
-  assign("fit",fit,envir = .dynmodel.env)
+  assign("fit", fit, envir = .dynmodel.env)
 
   .time$optimizationTime <- (proc.time() - .ot)["elapsed"]
 
@@ -1493,58 +1563,61 @@ reducedTol <- FALSE
   .ht <- proc.time()
 
   fit$unscaledPar <- fit$par
-  fit$par <- sapply(seq_along(fit$par), function(x){unscalePar(fit$par,x)});
+  fit$par <- sapply(seq_along(fit$par), function(x) {
+    unscalePar(fit$par, x)
+  })
 
   fit$normType <- normType
   fit$scaleType <- scaleType
 
-  normType="constant"
-  C1 = 0
-  C2 = 1
-  scaleType="norm"
+  normType <- "constant"
+  C1 <- 0
+  C2 <- 1
+  scaleType <- "norm"
 
-  if (control$covMethod == "optimHess"){
-    fit$hessian = try(optimHess(fit$par, obj, control=control) , silent=TRUE)
+  if (control$covMethod == "optimHess") {
+    fit$hessian <- try(optimHess(fit$par, obj, control = control), silent = TRUE)
   } else {
     # FIXME: Put options from control here gillK etc
-    fit$hessian = try(nlmixrHess(fit$par, obj,
-                                 gillRtol=control$gillRtol,
-                                 gillK=control$gillKcov,
-                                 gillStep=control$gillStepCov,
-                                 gillFtol=control$gillFtolCov) , silent=TRUE)
+    fit$hessian <- try(nlmixrHess(fit$par, obj,
+      gillRtol = control$gillRtol,
+      gillK = control$gillKcov,
+      gillStep = control$gillStepCov,
+      gillFtol = control$gillFtolCov
+    ), silent = TRUE)
   }
 
 
-  if(inherits(fit$hessian,"try-error")){
-    se = rep(NA, length(fit$par))
+  if (inherits(fit$hessian, "try-error")) {
+    se <- rep(NA, length(fit$par))
     warning("standard error of the Hessian has failed")
   } else {
-    cov.matrix = solve(fit$hessian)
-    se = sqrt(diag(solve(fit$hessian)))
+    cov.matrix <- solve(fit$hessian)
+    se <- sqrt(diag(solve(fit$hessian)))
   }
 
   # reassign the negative values to positive for add, prop/pow since they are standard deviations
-  if (!is.na(match("add",names(inits)))) fit$par[match("add",names(inits))] = abs(fit$par[match("add",names(inits))])
-  if (!is.na(match("prop",names(inits)))) fit$par[match("prop",names(inits))] = abs(fit$par[match("prop",names(inits))])
-  if (!is.na(match("pow",names(inits)))) fit$par[match("pow",names(inits))] = abs(fit$par[match("pow",names(inits))])
-  if (!is.na(match("norm",names(inits)))) fit$par[match("norm",names(inits))] = abs(fit$par[match("norm",names(inits))])
-  if (!is.na(match("dnorm",names(inits)))) fit$par[match("dnorm",names(inits))] = abs(fit$par[match("dnorm",names(inits))])
+  if (!is.na(match("add", names(inits)))) fit$par[match("add", names(inits))] <- abs(fit$par[match("add", names(inits))])
+  if (!is.na(match("prop", names(inits)))) fit$par[match("prop", names(inits))] <- abs(fit$par[match("prop", names(inits))])
+  if (!is.na(match("pow", names(inits)))) fit$par[match("pow", names(inits))] <- abs(fit$par[match("pow", names(inits))])
+  if (!is.na(match("norm", names(inits)))) fit$par[match("norm", names(inits))] <- abs(fit$par[match("norm", names(inits))])
+  if (!is.na(match("dnorm", names(inits)))) fit$par[match("dnorm", names(inits))] <- abs(fit$par[match("dnorm", names(inits))])
 
   .time$hessianTime <- (proc.time() - .ht)["elapsed"]
   # dynmodel Output -------------------------------------------------------
   # unscale optmized parameters here if scaling was used:
 
   # create table for output
-  res = cbind(fit$par, abs(se), abs(se/fit$par*100))
+  res <- cbind(fit$par, abs(se), abs(se / fit$par * 100))
 
-  dimnames(res) = list(names(inits), c("est", "se", "%cv"))
+  dimnames(res) <- list(names(inits), c("est", "se", "%cv"))
 
-  if (!is.null(fit$objective)) fit$value = fit$objective
+  if (!is.null(fit$objective)) fit$value <- fit$objective
 
   # Output
-  res = c(list(res=res, obj=obj, npar=length(fit$par), nobs=nobs, data=data), fit)
+  res <- c(list(res = res, obj = obj, npar = length(fit$par), nobs = nobs, data = data), fit)
 
-  class(res) = "dyn.ID"
+  class(res) <- "dyn.ID"
   # Final Output ----------------------------------------------------------
   .time$totalTime <- (proc.time() - .pt)["elapsed"]
 
@@ -1553,28 +1626,28 @@ reducedTol <- FALSE
   .time <- as.data.frame(.time)
   names(.time) <- c("setup", "scaling", "optimization", "Hessian", "total")
 
-  if (!is.null(nlmixrObject) & control$nlmixrOutput){
-    nlmixr.ouptut <- as.focei.dynmodel(.dynmodelObject = res, .nlmixrObject = nlmixrObject, .data = .original.data, .time = .time, .fit = fit, .message = .message, .inits.err = inits.err, .cov = cov.matrix, .sgy = sgy,
-                                       .dynmodelControl = control, .nobs2=0, .pt=proc.time(), .rxControl = rxControl)
-    .hist <- .funs$hist();
-    assign("parHistData", .hist, nlmixr.ouptut$env);
-    .tmp <- .hist;
-    .tmp <- .tmp[.tmp$type == "Unscaled", names(.tmp) != "type"];
+  if (!is.null(nlmixrObject) & control$nlmixrOutput) {
+    nlmixr.ouptut <- as.focei.dynmodel(
+      .dynmodelObject = res, .nlmixrObject = nlmixrObject, .data = .original.data, .time = .time, .fit = fit, .message = .message, .inits.err = inits.err, .cov = cov.matrix, .sgy = sgy,
+      .dynmodelControl = control, .nobs2 = 0, .pt = proc.time(), .rxControl = rxControl
+    )
+    .hist <- .funs$hist()
+    assign("parHistData", .hist, nlmixr.ouptut$env)
+    .tmp <- .hist
+    .tmp <- .tmp[.tmp$type == "Unscaled", names(.tmp) != "type"]
     .iter <- .tmp$iter
-    .tmp <- .tmp[,names(.tmp) != "iter"];
+    .tmp <- .tmp[, names(.tmp) != "iter"]
     .ret <- nlmixr.ouptut$env
-    .ret$parHistStacked <- data.frame(stack(.tmp),iter=.iter)
-    names(.ret$parHistStacked) <- c("val","par","iter");
-    .ret$parHist <- data.frame(iter=.iter,.tmp);
+    .ret$parHistStacked <- data.frame(stack(.tmp), iter = .iter)
+    names(.ret$parHistStacked) <- c("val", "par", "iter")
+    .ret$parHist <- data.frame(iter = .iter, .tmp)
 
     return(nlmixr.ouptut)
   }
   else {
     return(res)
   }
-
-  }
-
+}
 
 # #########################################################################
 
