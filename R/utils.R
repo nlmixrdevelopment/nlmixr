@@ -1698,107 +1698,105 @@ uni_slice <- function(x0, fr, rho = NULL, w = 1, m = 1000, lower = -1.0e20, uppe
 }
 
 # Error model  -------------------------------------------------------------
-genobj = function(system, model, evTable, inits, data, fixPars=NULL,
-squared=T
-){
+genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
+                   squared = TRUE) {
 
   # Error model  -------------------------------------------------------------
-  if (class(model)=="formula") {
-    model = list(model)
+  if (class(model) == "formula") {
+    model <- list(model)
   }
-  inits.err = NULL
-  model = lapply(model, function(f) {
-    s = unlist(lapply(attr(terms(f),"variables"), as.list))
-    s = sapply(s, deparse)
+  inits.err <- NULL
+  model <- lapply(model, function(f) {
+    s <- unlist(lapply(attr(terms(f), "variables"), as.list))
+    s <- sapply(s, deparse)
 
-    ix.add = match("add",  s, nomatch=0)
-    ix.pro = match("prop", s, nomatch=0)
-    err.type = c("add", "prop", "combo")[(ix.add>0)+2*(ix.pro>0)]
+    ix.add <- match("add", s, nomatch = 0)
+    ix.pro <- match("prop", s, nomatch = 0)
+    err.type <- c("add", "prop", "combo")[(ix.add > 0) + 2 * (ix.pro > 0)]
 
-    sig.add = if (ix.add>0) as.numeric(s[ix.add+1]) else NULL
-    sig.pro = if (ix.pro>0) as.numeric(s[ix.pro+1]) else NULL
+    sig.add <- if (ix.add > 0) as.numeric(s[ix.add + 1]) else NULL
+    sig.pro <- if (ix.pro > 0) as.numeric(s[ix.pro + 1]) else NULL
 
     inits.err <<- c(inits.err, sig.add, sig.pro)
 
-    if (any(is.na(inits.err) | inits.err<=0)) stop("error model misspecification")
+    if (any(is.na(inits.err) | inits.err <= 0))
+      stop("error model misspecification")
 
-    s = c(s[2:3], err.type)
-    names(s) = c("dv", "pred", "err")
+    s <- c(s[2:3], err.type)
+    names(s) <- c("dv", "pred", "err")
     s
   })
-  names(inits.err) = paste0("err", 1:length(inits.err))
-  inits = c(inits, inits.err)
+  names(inits.err) <- paste0("err", 1:length(inits.err))
+  inits <- c(inits, inits.err)
 
   # Check dynmodel() inputs, Define vars, modelVars, pars,  ------------
-  vars = names(data)
-  nodef = setdiff(sapply(model, function(x) x["dv"]), vars)
+  vars <- names(data)
+  nodef <- setdiff(sapply(model, function(x) x["dv"]), vars)
   if (length(nodef)) {
-    msg = err.msg(nodef, pre="var(s) not found in data: ")
+    msg <- err.msg(nodef, pre = "var(s) not found in data: ")
     stop(msg)
   }
 
-  modelVars = system$cmpMgr$get.modelVars()
-  vars = c(modelVars$state, modelVars$lhs)
-  nodef = setdiff(sapply(model, function(x) x["pred"]), vars)
+  modelVars <- system$cmpMgr$get.modelVars()
+  vars <- c(modelVars$state, modelVars$lhs)
+  nodef <- setdiff(sapply(model, function(x) x["pred"]), vars)
   if (length(nodef)) {
-    msg = err.msg(nodef, pre="var(s) not found in model: ")
+    msg <- err.msg(nodef, pre = "var(s) not found in model: ")
     stop(msg)
   }
 
-  pars = modelVars$params
-  nodef = setdiff(pars, c(names(inits), names(fixPars)))
+  pars <- modelVars$params
+  nodef <- setdiff(pars, c(names(inits), names(fixPars)))
   if (length(nodef)) {
-    msg = err.msg(nodef, pre="par(s) not found: ")
+    msg <- err.msg(nodef, pre = "par(s) not found: ")
     stop(msg)
   }
 
-  npar = length(pars) - length(fixPars)
-
+  npar <- length(pars) - length(fixPars)
 
   # Additional assignment ---------------------------------------------------
   ## is this necessary ##
-  have_zero = min(data$time) <= 0
-  rows = if(have_zero) T else -1 # used in line 304 in obj()
+  have_zero <- min(data$time) <= 0
+  rows <- if (have_zero) TRUE else -1 # used in line 304 in obj()
   ## ---------------- ##
 
   # Objective Function ------------------------------------------------------
-  obj = function(th, do.ode.solving=T, negation=F)
-  {
-    .ixpar = npar
-    theta = th[1:npar]
-    names(theta) = names(inits)[1:npar]
-    theta = c(theta, fixPars)
+  obj <- function(th, do.ode.solving = T, negation = F) {
+    .ixpar <- npar
+    theta <- th[1:npar]
+    names(theta) <- names(inits)[1:npar]
+    theta <- c(theta, fixPars)
     if (do.ode.solving) {
-      s = system$solve(theta, evTable, atol=1e-06, rtol=1e-06)
+      s <- system$solve(theta, evTable, atol = 1e-06, rtol = 1e-06)
       s.save <<- s
     } else {
-      s = s.save
+      s <- s.save
     }
 
-    l = lapply(model, function(x) {
-      err.combo = (x["err"]=="combo")+0
-      .ixpar <<- .ixpar+1
-      sig = th[.ixpar:(.ixpar+err.combo)]
-      sig = if (x["err"]=="add") {
+    l <- lapply(model, function(x) {
+      err.combo <- (x["err"] == "combo") + 0
+      .ixpar <<- .ixpar + 1
+      sig <- th[.ixpar:(.ixpar + err.combo)]
+      sig <- if (x["err"] == "add") {
         c(sig, 0)
-      } else if (x["err"]=="prop") {
+      } else if (x["err"] == "prop") {
         c(0, sig)
       } else {
-        .ixpar <<- .ixpar+1
+        .ixpar <<- .ixpar + 1
         sig
       }
 
-      yp = s[rows,x["pred"]]
-      sgy = thresh(sig[1]+yp*sig[2])
-      yo = data[, x["dv"]]
-      ll = .5*((yo - yp)^2/sgy^2 + 2*log(sgy) + log(2*pi))
+      yp <- s[rows, x["pred"]]
+      sgy <- thresh(sig[1] + yp * sig[2])
+      yo <- data[, x["dv"]]
+      ll <- .5 * ((yo - yp)^2 / sgy^2 + 2 * log(sgy) + log(2 * pi))
       sum(ll)
     })
 
-    res = do.call("sum", l)
+    res <- do.call("sum", l)
     if (negation) -res else res
   }
-  list(obj=obj, inits=inits)
+  list(obj = obj, inits = inits)
 }
 
 #-- mcmc
