@@ -2073,10 +2073,6 @@ cholSE <- function(matrix, tol = (.Machine$double.eps)^(1 / 3)) {
 }
 # #########################################################################
 
-.setRoot <- function() {
-  setwd("c:/")
-}
-
 ##'@export
 plot.nlmixrDynmodel <- function(x, y, ...) {
   .lst <- list()
