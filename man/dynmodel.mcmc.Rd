@@ -12,7 +12,7 @@ dynmodel.mcmc(
   data,
   fixPars = NULL,
   nsim = 500,
-  squared = T,
+  squared = TRUE,
   seed = NULL
 )
 }

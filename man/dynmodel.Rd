@@ -26,9 +26,11 @@ dynmodel(
 
 \item{fixPars}{Fixed system parameters. Default is NULL.}
 
-\item{nlmixrObject}{nlmixr object. See \code{\link[nlmixr]{nlmixr}} for more details. Default is NULL.}
+\item{nlmixrObject}{nlmixr object. See \code{\link[nlmixr]{nlmixr}} for more
+details. Default is NULL.}
 
-\item{control}{Control options for dynmodel \code{\link[nlmixr]{dynmodelControl}} .}
+\item{control}{Control options for dynmodel
+\code{\link[nlmixr]{dynmodelControl}} .}
 }
 \description{
 Fit a non-population dynamic model

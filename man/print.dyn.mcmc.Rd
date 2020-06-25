@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{print.dyn.mcmc}
 \alias{print.dyn.mcmc}
-\title{Summary of a non-population dynamic model fit using mcmc}
+\title{Print summary of a non-population dynamic model fit using mcmc}
 \usage{
 \method{print}{dyn.mcmc}(x, ...)
 }
@@ -12,5 +12,5 @@
 \item{...}{additional arguments}
 }
 \description{
-Summary of a non-population dynamic model fit using mcmc
+Print summary of a non-population dynamic model fit using mcmc
 }
