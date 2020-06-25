@@ -2030,13 +2030,11 @@ nlmixrPrint <- function(x, ...) {
 }
 # #########################################################################
 
-.dontRun <- function(...){
+.dontRun <- function(...) {
   ## This is for r checks, though they need to be loaded...
   vpc::vpc(...)
   dparser::dparse(...)
 }
-
-
 
 # cholSE() ----------------------------------------------------------------
 ##' Generalized Cholesky Matrix Decomposition
@@ -2070,8 +2068,8 @@ nlmixrPrint <- function(x, ...) {
 ##' This version does not pivot or return the E matrix
 ##'
 ##' @export
-cholSE <- function(matrix, tol=(.Machine$double.eps) ^ (1 / 3)){
-  .Call(`_nlmixr_cholSE_`, matrix, tol);
+cholSE <- function(matrix, tol = (.Machine$double.eps)^(1 / 3)) {
+  .Call(`_nlmixr_cholSE_`, matrix, tol)
 }
 # #########################################################################
 
