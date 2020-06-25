@@ -1876,18 +1876,18 @@ do.slice <- function(pars, fr0) {
 #'
 #' }
 #' @export
-dynmodel.mcmc = function(system, model, evTable, inits, data,
-                         fixPars=NULL, nsim = 500, squared=T, seed=NULL)
-{
-  calls = match.call()
+dynmodel.mcmc <- function(system, model, evTable, inits, data,
+                          fixPars = NULL, nsim = 500, squared = TRUE,
+                          seed = NULL) {
+  calls <- match.call()
 
   # Objective Function ------------------------------------------------------
-  l = genobj(system, model, evTable, inits, data, fixPars, squared)
-  rho = environment()
-  pars = l$inits
-  fr0 = l$obj
+  l <- genobj(system, model, evTable, inits, data, fixPars, squared)
+  rho <- environment()
+  pars <- l$inits
+  fr0 <- l$obj
 
-  if (is.null(seed)) seed=99
+  if (is.null(seed)) seed <- 99
   set.seed(seed)
 
   # progress
@@ -1895,13 +1895,18 @@ dynmodel.mcmc = function(system, model, evTable, inits, data,
   RxODE::rxProgress(nsim)
 
   # slice sampling
-  s = t(sapply(1:nsim, function(k,rho) {
-    pars = do.slice(get("pars", rho), fr0)
-    RxODE::rxTick()
-    assign("pars", pars, rho)
-  }, rho=rho))
+  s <-
+    t(sapply(
+      1:nsim,
+      function(k, rho) {
+        pars <- do.slice(get("pars", rho), fr0)
+        RxODE::rxTick()
+        assign("pars", pars, rho)
+      },
+      rho = rho
+    ))
 
-  if (squared) s = s*s
+  if (squared) s <- s * s
   attr(s, "calls") <- calls
   attr(s, "obj") <- fr0
   attr(s, "class") <- "dyn.mcmc"
