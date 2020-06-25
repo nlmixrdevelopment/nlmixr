@@ -447,9 +447,8 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
   ## $parHist
   ## $parHistStacked
 }
-# #########################################################################
 
-# nlmixrDynmodelConvert() ---------------------------------------------------
+# nlmixrDynmodelConvert() #################################################
 #' Converting nlmixr objects to dynmodel objects
 #'
 #' Convert nlmixr Objects to dynmodel objects for use in fitting non-population dynamic models
@@ -468,8 +467,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
 #'
 #' @author Mason McComb and Matt Fidler
 #' @export
-
-nlmixrDynmodelConvert <- function(.nmf){
+nlmixrDynmodelConvert <- function(.nmf) {
   # Notes:
   # Description - function used to convert nlmixr() object to initial conditions and model used for dynmodel
   # input - nlmixr function (.nmf)
@@ -482,52 +480,59 @@ nlmixrDynmodelConvert <- function(.nmf){
   .nmf.original <- .nmf
   .nmf <- as.data.frame(.nmf$ini)
   .temp.model <- RxODE::rxSymPySetupPred(.nmf.original$rxode.pred,
-                                         function(){return(nlmixr_pred)},
-                                         .nmf.original$theta.pars,
-                                         .nmf.original$error,
-                                         grad=FALSE,
-                                         pred.minus.dv=TRUE, sum.prod=FALSE, #control$sumProd,
-                                         theta.derivs=FALSE, optExpression=TRUE, #control$optExpression,
-                                         run.internal=TRUE, only.numeric=TRUE)
+    function() {
+      return(nlmixr_pred)
+    },
+    .nmf.original$theta.pars,
+    .nmf.original$error,
+    grad = FALSE,
+    pred.minus.dv = TRUE, sum.prod = FALSE, # control$sumProd,
+    theta.derivs = FALSE, optExpression = TRUE, # control$optExpression,
+    run.internal = TRUE, only.numeric = TRUE
+  )
 
 
   # assign fixed terms
-  .fix.index <- if (length(which(.nmf$fix==TRUE))==0) {NULL} else {which(.nmf$fix==TRUE)} # obtain row location for fixed terms
-  .ref.fix <- substring(.nmf$name[.fix.index],2)
+  .fix.index <- if (length(which(.nmf$fix == TRUE)) == 0) {
+    NULL
+  } else {
+    which(.nmf$fix == TRUE)
+  } # obtain row location for fixed terms
+  .ref.fix <- substring(.nmf$name[.fix.index], 2)
 
-  .temp.log.fixPars.index <- intersect(.fix.index,.temp.model$log.etas)
+  .temp.log.fixPars.index <- intersect(.fix.index, .temp.model$log.etas)
   .temp.log.fixPars <- .nmf$est[.temp.log.fixPars.index]
-  names(.temp.log.fixPars) <- substring(.nmf$name[.temp.log.fixPars.index],2)
+  names(.temp.log.fixPars) <- substring(.nmf$name[.temp.log.fixPars.index], 2)
 
-  .temp.nonlog.fixPars.index <- setdiff(.fix.index,.temp.model$log.etas)
+  .temp.nonlog.fixPars.index <- setdiff(.fix.index, .temp.model$log.etas)
   .temp.nonlog.fixPars <- .nmf$est[.temp.nonlog.fixPars.index]
-  names( .temp.nonlog.fixPars ) <- substring(.nmf$name[.temp.nonlog.fixPars.index],2)
+  names(.temp.nonlog.fixPars) <- substring(.nmf$name[.temp.nonlog.fixPars.index], 2)
 
-  .fixPars <- c(.temp.log.fixPars,.temp.nonlog.fixPars)
-  .fixPars <- .fixPars[order(factor(names(.fixPars), levels=.ref.fix))]
+  .fixPars <- c(.temp.log.fixPars, .temp.nonlog.fixPars)
+  .fixPars <- .fixPars[order(factor(names(.fixPars), levels = .ref.fix))]
 
-  .return <- c(.return,fixPars=list(.fixPars))
+  .return <- c(.return, fixPars = list(.fixPars))
 
   # assign theta terms(estimated terms excluding error terms)
   .theta.index <-
-    if (is.null(.fix.index)){
-      which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)
+    if (is.null(.fix.index)) {
+      which(!is.na(.nmf$ntheta) & is.na(.nmf$err), TRUE)
     } else {
-      which(!is.na(.nmf$ntheta) & is.na(.nmf$err),TRUE)[-which(.nmf$fix == TRUE)]
+      which(!is.na(.nmf$ntheta) & is.na(.nmf$err), TRUE)[-which(.nmf$fix == TRUE)]
     } # row location for theta values
 
   .ref.theta <- .nmf$name[.theta.index]
 
-  .temp.log.theta.index <- intersect(.theta.index,.temp.model$log.etas)
+  .temp.log.theta.index <- intersect(.theta.index, .temp.model$log.etas)
   .temp.log.theta <- .nmf$est[.temp.log.theta.index]
   names(.temp.log.theta) <- .nmf$name[.temp.log.theta.index]
 
-  .temp.nonlog.theta.index <- setdiff(.theta.index,.temp.model$log.etas)
+  .temp.nonlog.theta.index <- setdiff(.theta.index, .temp.model$log.etas)
   .temp.nonlog.theta <- .nmf$est[.temp.nonlog.theta.index]
   names(.temp.nonlog.theta) <- .nmf$name[.temp.nonlog.theta.index]
 
-  .theta <- c(.temp.nonlog.theta,.temp.log.theta)
-  .theta <- .theta[order(factor(names(.theta), levels=.ref.theta))]
+  .theta <- c(.temp.nonlog.theta, .temp.log.theta)
+  .theta <- .theta[order(factor(names(.theta), levels = .ref.theta))]
 
   # .theta.name.index <-  .theta.index + 2 + length(.theta.index) + length(.fix.index)
 
@@ -535,16 +540,16 @@ nlmixrDynmodelConvert <- function(.nmf){
 
   # assign sigma terms (estimated)
   .sigma.index <-
-    if (is.null(.fix.index)){
-      which(!is.na(.nmf$ntheta) & !is.na(.nmf$err),TRUE)
+    if (is.null(.fix.index)) {
+      which(!is.na(.nmf$ntheta) & !is.na(.nmf$err), TRUE)
     } else {
-      which(!is.na(.nmf$ntheta) & !is.na(.nmf$err),TRUE)[-which(.nmf$fix == TRUE)]
+      which(!is.na(.nmf$ntheta) & !is.na(.nmf$err), TRUE)[-which(.nmf$fix == TRUE)]
     } # row location for theta values
 
   .sigma <- .nmf$est[.sigma.index] # initial estimate for theta values, back-transformed
 
   names(.sigma) <- .nmf$err[.sigma.index]
-  .return <- c(.return,sigma=list(.sigma))
+  .return <- c(.return, sigma = list(.sigma))
 
   # assign "inits", vector of theta and sigma terms # (will be used when the likelihood function is changed)
   .inits <- .theta
@@ -570,31 +575,30 @@ nlmixrDynmodelConvert <- function(.nmf){
   .system <- RxODE(.nmf.original$rxode.pred) # (use nlmixr_pred)
   .system$stateExtra <- NULL # remove extraState, the error model term should not be inclcuded
   .system$lhs <- .system$lhs[-length(.system$lhs)] # remove the error model term
-  .return <- c(.return,system=.system)
+  .return <- c(.return, system = .system)
 
   # create error model
   .DV <- .nmf$condition[!is.na(.nmf$condition) & .nmf$condition != "ID"]
   .PRED <- "nlmixr_pred" # need to obtain from data? id dont know
 
   .formula <- list()
-  for(i in 1:length(.sigma.index)) {
+  for (i in 1:length(.sigma.index)) {
     if (i == 1) {
-      .temp <- paste(.nmf$err[.sigma.index[i]],"(", .nmf$est[.sigma.index[i]], ")",sep="")
+      .temp <- paste(.nmf$err[.sigma.index[i]], "(", .nmf$est[.sigma.index[i]], ")", sep = "")
     } else {
-      .temp <- paste("+ ",.nmf$err[.sigma.index[i]],"(", .nmf$est[.sigma.index[i]], ")",sep="")
+      .temp <- paste("+ ", .nmf$err[.sigma.index[i]], "(", .nmf$est[.sigma.index[i]], ")", sep = "")
     }
-    .formula <- paste(.formula,.temp)
+    .formula <- paste(.formula, .temp)
   }
 
-  .model <- as.formula(paste(.DV,"~",.PRED,"+", .formula))
-  .return <- c(.return,model=.model)
+  .model <- as.formula(paste(.DV, "~", .PRED, "+", .formula))
+  .return <- c(.return, model = .model)
 
   # Output
   return(.return)
 }
-# #########################################################################
 
-# dynmodelControl() -----------------------------------------------
+# dynmodelControl() #######################################################
 #' Control Options for dynmodel
 #'
 #' @inheritParams RxODE::rxSolve
