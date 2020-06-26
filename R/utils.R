@@ -1914,22 +1914,15 @@ dynmodel.mcmc <- function(system, model, evTable, inits, data,
   s
 }
 
-#' Summary of a non-population dynamic model fit using mcmc
-#'
-#' @param object a dynmodel fit object
-#' @param ... additional arguments
-#' @return NULL
+#' @rdname print.dyn.mcmc
 #' @export
 summary.dyn.mcmc <- function(object, ...) {
-  s <- t(apply(object, 2, function(x) c(mean(x), sd(x), sd(x) / mean(x) * 100)))
-  dimnames(s)[[2]] <- c("mean", "sd", "cv%")
-  print(s)
-  cat("\n# samples:", dim(object)[1], "\n")
+  print.dyn.mcmc(x=object, ...)
 }
 
 #' Print summary of a non-population dynamic model fit using mcmc
 #'
-#' @param x a dynmodel fit object
+#' @param x,object a dynmodel fit object
 #' @param ... additional arguments
 #' @return NULL
 #' @export
