@@ -811,7 +811,7 @@ dynmodelControl <- function(...,
 
   if (missing(method)){method = "bobyqa"}
   if (missing(normType)){normType = "rescale2"} # normType= 'constant'
-  if (missing(scaleType)){scaleType = "nlmixr"} # sacleType= 'norm'
+  if (missing(scaleType)){scaleType = "nlmixr"} # scaleType= 'norm'
 
   .ret <- list(
     ci=ci,
@@ -944,134 +944,124 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     control <- do.call(dynmodelControl, control)
   }
 
-  # reassign contorl names
+  # reassign control names
   for (i in 1:length(control)) {
     assign(names(control[i]), control[[i]])
   }
 
   # Error model  -------------------------------------------------------------
-  if (class(model) == "formula") {
-    model <- list(model)
-  }
+  modelList <-
+    if (class(model) == "formula") {
+      list(model)
+    } else {
+      model
+    }
   inits.err <- NULL
 
+  modelParsed <-
+    lapply(modelList, function(.model) {
+      .model <- unlist(lapply(attr(terms(.model), "variables"), as.list))
+      .model <- sapply(.model, deparse)
 
-  model <- lapply(model, function(.model) {
-    .model <- unlist(lapply(attr(terms(.model), "variables"), as.list))
-    .model <- sapply(.model, deparse)
-
-    # assign error terms
-    .sigma.add <-
-      if ("add" %in% .model) {
-        as.numeric(.model[which(.model == "add") + 1])
-      } else {
-        NULL
-      }
-
-    .sigma.prop <-
-      if ("prop" %in% .model) {
-        as.numeric(.model[which(.model == "prop") + 1])
-      } else {
-        NULL
-      }
-
-    .sigma.pow <-
-      if ("pow" %in% .model) {
-        as.numeric(.model[which(.model == "pow") + 1])
-      } else {
-        NULL
-      }
-
-    .sigma.pow2 <-
-      if ("pow2" %in% .model) {
-        as.numeric(.model[which(.model == "pow2") + 1])
-      } else {
-        NULL
-      }
-
-    .sigma.yeoJohnson <-
-      if ("yeoJohnson" %in% .model) {
-        as.numeric(.model[which(.model == "yeoJohnson") + 1])
-      } else {
-        NULL
-      }
-
-    .sigma.boxCox <-
-      if ("boxCox" %in% .model) {
-        as.numeric(.model[which(.model == "boxCox") + 1])
-      } else {
-        NULL
-      }
-
-    .sigma.norm <-
-      if ("norm" %in% .model) {
-        as.numeric(.model[which(.model == "norm") + 1])
-        .norm <<- TRUE
-      } else {
-        NULL
-        .norm <<- NULL
-      }
-
-    .sigma.dnorm <-
-      if ("dnorm" %in% .model) {
-        as.numeric(.model[which(.model == "dnorm") + 1])
-        .dnorm <<- TRUE
-      } else {
-        NULL
-        .dnorm <<- NULL
-      }
-
-    .sigma.logn <-
-      if ("logn" %in% .model) {
-        as.numeric(.model[which(.model == "logn") + 1])
-        .logn <<- TRUE
-      } else {
-        NULL
-        .logn <<- NULL
-      }
-
-    .sigma.dlnorm <-
-      if ("dlnorm" %in% .model) {
-        as.numeric(.model[which(.model == "dlnorm") + 1])
-        .dlnorm <<- TRUE
-      } else {
-        NULL
-        .dlnorm <<- NULL
-      }
-
-    .sigma.tbs <-
-      if ("tbs" %in% .model) {
-        as.numeric(.model[which(.model == "tbs") + 1])
-      } else {
-        NULL
-      }
-
-    .sigma.tbsYj <-
-      if ("tbsYj" %in% .model) {
-        as.numeric(.model[which(.model == "tbsYj") + 1])
-      } else {
-        NULL
-      }
-
-    # keep error model terms
-    inits.err <-
-      c(
-        add = .sigma.add,
-        prop = .sigma.prop,
-        pow = .sigma.pow,
-        pow2 = .sigma.pow2,
-        yeoJohnson = .sigma.yeoJohnson,
-        boxCox = .sigma.boxCox,
-        norm = .sigma.norm,
-        dnorm = .sigma.dnorm,
-        tbs = .sigma.tbs,
-        tbsYj = .sigma.tbsYj
-      )
-
-    inits.err <- inits.err[which(names(inits.err) %in% intersect(names(inits.err), .model))]
-    inits.err <<- inits.err
-    .model <- c("dv" = .model[2], "pred" = .model[3], inits.err)
-  })
+      # assign error terms
+      .sigma.add <-
+        if ("add" %in% .model) {
+          as.numeric(.model[which(.model == "add") + 1])
+        } else {
+          NULL
+        }
+      .sigma.prop <-
+        if ("prop" %in% .model) {
+          as.numeric(.model[which(.model == "prop") + 1])
+        } else {
+          NULL
+        }
+      .sigma.pow <-
+        if ("pow" %in% .model) {
+          as.numeric(.model[which(.model == "pow") + 1])
+        } else {
+          NULL
+        }
+      .sigma.pow2 <-
+        if ("pow2" %in% .model) {
+          as.numeric(.model[which(.model == "pow2") + 1])
+        } else {
+          NULL
+        }
+      .sigma.yeoJohnson <-
+        if ("yeoJohnson" %in% .model) {
+          as.numeric(.model[which(.model == "yeoJohnson") + 1])
+        } else {
+          NULL
+        }
+      .sigma.boxCox <-
+        if ("boxCox" %in% .model) {
+          as.numeric(.model[which(.model == "boxCox") + 1])
+        } else {
+          NULL
+        }
+      .sigma.norm <-
+        if ("norm" %in% .model) {
+          as.numeric(.model[which(.model == "norm") + 1])
+          .norm <<- TRUE
+        } else {
+          NULL
+          .norm <<- NULL
+        }
+      .sigma.dnorm <-
+        if ("dnorm" %in% .model) {
+          as.numeric(.model[which(.model == "dnorm") + 1])
+          .dnorm <<- TRUE
+        } else {
+          NULL
+          .dnorm <<- NULL
+        }
+      .sigma.logn <-
+        if ("logn" %in% .model) {
+          as.numeric(.model[which(.model == "logn") + 1])
+          .logn <<- TRUE
+        } else {
+          NULL
+          .logn <<- NULL
+        }
+      .sigma.dlnorm <-
+        if ("dlnorm" %in% .model) {
+          as.numeric(.model[which(.model == "dlnorm") + 1])
+          .dlnorm <<- TRUE
+        } else {
+          NULL
+          .dlnorm <<- NULL
+        }
+      .sigma.tbs <-
+        if ("tbs" %in% .model) {
+          as.numeric(.model[which(.model == "tbs") + 1])
+        } else {
+          NULL
+        }
+      .sigma.tbsYj <-
+        if ("tbsYj" %in% .model) {
+          as.numeric(.model[which(.model == "tbsYj") + 1])
+        } else {
+          NULL
+        }
+      # keep error model terms
+      inits.err <-
+        c(
+          add = .sigma.add,
+          prop = .sigma.prop,
+          pow = .sigma.pow,
+          pow2 = .sigma.pow2,
+          yeoJohnson = .sigma.yeoJohnson,
+          boxCox = .sigma.boxCox,
+          norm = .sigma.norm,
+          dnorm = .sigma.dnorm,
+          tbs = .sigma.tbs,
+          tbsYj = .sigma.tbsYj
+        )
+      inits.err <- inits.err[which(names(inits.err) %in% intersect(names(inits.err), .model))]
+      inits.err <<- inits.err
+      .model <- c("dv" = .model[2], "pred" = .model[3], inits.err)
+    })
 
   inits <- c(inits, inits.err)
   if ("pow2" %in% names(inits) & !("pow" %in% names(inits))) {
@@ -1087,7 +1077,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   .original.data <- data
 
   # warn DV must be in data
-  if (!any(names(data) == "DV")) {
+  if (!("DV" %in% names(data))) {
     stop("data must contain column named DV")
   }
   # remove row that has time zero with zero observation, and no event
@@ -1097,20 +1087,21 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     rows <- TRUE
   }
   # add model variable to data
-  .dv.name <- unlist(model)["dv"][[1]]
+  .dv.name <- unlist(modelParsed)["dv"][[1]]
   if (any(names(data) %in% .dv.name) == FALSE) {
-    .tmp.names <- names(data)
-    data <- cbind(data, data$DV)
-    names(data) <- c(.tmp.names, .dv.name)
+    data[[.dv.name]] <- data$DV
   }
-  # remove EVID==2
-  data <- data[data$EVID != 2, ]
+  if (any(data$EVID %in% 2)) {
+    warning("Removing EVID==2 rows from the data; they are not supported in dynmodel.")
+    data <- data[data$EVID != 2, ]
+    if (nrow(data) == 0) {
+      stop("Zero rows of data remain after removing EVID == 2.")
+    }
+  }
 
   # Error "model" contains "data" variables?
-  # get column names of data (Time and Observation)
-  vars <- names(data)
   # check to see if there is a discrepency between error model names and data
-  nodef <- setdiff(sapply(model, function(x) x["dv"]), vars)
+  nodef <- setdiff(sapply(modelParsed, function(x) x["dv"]), names(data))
   # print error message
   if (length(nodef) & is.null(nlmixrObject)) {
     msg <- err.msg(nodef, pre = "var(s) not found in data: ")
@@ -1123,7 +1114,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   # reassign vars to combine state and lhs variables
   vars <- c(modelVars$state, modelVars$lhs)
   # Check to see if the prediction term is in the error model
-  nodef <- setdiff(sapply(model, function(x) x["pred"]), vars)
+  nodef <- setdiff(sapply(modelParsed, function(x) x["pred"]), vars)
   # print error message
   if (length(nodef)) {
     msg <- err.msg(nodef, pre = "modelVar(s) not found in model: ")
@@ -1132,12 +1123,14 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
 
   #  "system" variables contain estimated "init" variables and fixed "fixPars" variables?
   # obtain fixed and estimated parameters
-  if (is.null(nlmixrObject)) {
-    pars <- modelVars$params
-  } else {
-    .temp <- nlmixrDynmodelConvert(nlmixrObject)
-    pars <- names(.temp$inits)
-  }
+  pars <-
+    if (is.null(nlmixrObject)) {
+      modelVars$params
+    } else {
+      names(
+        nlmixrDynmodelConvert(nlmixrObject)$inits
+      )
+    }
 
   # Check to see if there are values in pars, that are not in the initial conditions and fixed parameters
   # nodef = setdiff(pars, c(names(inits), names(fixPars)))
@@ -1210,7 +1203,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     }
 
     # sum of log-likelihood function:
-    l <- lapply(model, function(x) {
+    l <- lapply(modelParsed, function(x) {
       # name the inputs
       names(th) <- names(inits)
 
@@ -1227,11 +1220,11 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       tbsYj <- NULL
 
       # assign names sigma names
-      if (any(names(th) %in% names(model[[1]]))) {
-        for (i in 1:sum((names(th) %in% names(model[[1]])))) {
+      if (any(names(th) %in% names(modelParsed[[1]]))) {
+        for (i in 1:sum((names(th) %in% names(modelParsed[[1]])))) {
           assign(
-            names(th[names(th) %in% names(model[[1]])])[i],
-            as.numeric(th[names(th) %in% names(model[[1]])])[i]
+            names(th[names(th) %in% names(modelParsed[[1]])])[i],
+            as.numeric(th[names(th) %in% names(modelParsed[[1]])])[i]
           )
         }
       }
@@ -1260,7 +1253,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       if (!is.null(.logn) | !is.null(.dlnorm)) {
         .h.x <- boxCox(yo, lambda) # log(yo) # obs
         .h.y <- boxCox(yp, lambda) # log(yp)  # pred
-        if ("pow" %in% names(model[[1]])) {
+        if ("pow" %in% names(modelParsed[[1]])) {
           .h.y.var <- yp^(2 * pow2) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
           .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
@@ -1274,10 +1267,10 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         ll <- .5 * (.n2ll)
       }
       # boxCox Transform ----
-      else if ("boxCox" %in% names(model[[1]]) | "tbs" %in% names(model[[1]])) {
+      else if ("boxCox" %in% names(modelParsed[[1]]) | "tbs" %in% names(modelParsed[[1]])) {
         .h.x <- boxCox(yo, lambda) # obs
         .h.y <- boxCox(yp, lambda) # pred
-        if ("pow" %in% names(model[[1]])) {
+        if ("pow" %in% names(modelParsed[[1]])) {
           .h.y.var <- (yp^(2 * pow2)) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
           .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
@@ -1291,10 +1284,10 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         ll <- .5 * (.n2ll)
       }
       # yeoJohnson Transform ----
-      else if ("yeoJohnson" %in% names(model[[1]]) | "tbsYj" %in% names(model[[1]])) {
+      else if ("yeoJohnson" %in% names(modelParsed[[1]]) | "tbsYj" %in% names(modelParsed[[1]])) {
         .h.x <- yeoJohnson(yo, lambda) # obs
         .h.y <- yeoJohnson(yp, lambda) # pred
-        if ("pow" %in% names(model[[1]])) {
+        if ("pow" %in% names(modelParsed[[1]])) {
           .h.y.var <- (yp^(2 * pow2)) * thresh(pow)^2 + thresh(add)^2 # variance of pred
         } else {
           .h.y.var <- yp^(2 * pow2) * thresh(prop)^2 + thresh(add)^2 # variance of pred
@@ -1313,7 +1306,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         ll <- .5 * (.n2ll)
       }
       # power model ----
-      else if ("pow2" %in% names(model[[1]])) {
+      else if ("pow2" %in% names(modelParsed[[1]])) {
         sgy <- thresh(add) + thresh(pow) * yp^(pow2)
         assign("sgy", sgy, envir = .dynmodel.env)
         sgy <<- sgy
@@ -1322,7 +1315,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       # all other error models ----
       else {
         #  if (identical(c("dv","pred"),names(model[[1]]))){
-        if (length(names(model[[1]])) == 2) {
+        if (length(names(modelParsed[[1]])) == 2) {
           sgy <- 1
           sgy <<- sgy
         } else {
@@ -1340,44 +1333,42 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   }
 
   # FIXME: Put options from control here gillK etc
-  .funs <- nlmixrGradFun(obj,
-    print = control$print,
-    gillRtol = control$gillRtol,
-    gillK = control$gillK,
-    gillStep = control$gillStep,
-    gillFtol = control$gillFtol,
-    thetaNames = names(inits)
-  )
+  .funs <-
+    nlmixrGradFun(
+      obj,
+      print = control$print,
+      gillRtol = control$gillRtol,
+      gillK = control$gillK,
+      gillStep = control$gillStep,
+      gillFtol = control$gillFtol,
+      thetaNames = names(inits)
+    )
 
   # Scaling functions -----------------------------------------------------------------------
   # normType assignment for scaling (normalization type)
-
+  normType <- control$normType
   if (is.null(nlmixrObject)) {
     normType <- "constant"
-    sacleType <- "norm"
+    scaleType <- "norm"
+  }
+  if (normType == "constant") {
     C1 <- 0
     C2 <- 1
-  }
-  else {
-    if (normType == "constant") {
-      C1 <- 0
-      C2 <- 1
-    } else if (normType == "rescale2") {
-      C1 <- (max(inits) + min(inits)) / 2
-      C2 <- (max(inits) - min(inits)) / 2
-    } else if (normType == "mean") {
-      C1 <- mean(inits)
-      C2 <- max(inits) - min(inits)
-    } else if (normType == "rescale") {
-      C1 <- min(inits)
-      C2 <- max(inits) - min(inits)
-    } else if (normType == "std") {
-      C1 <- mean(inits)
-      C2 <- sd(inits)
-    } else if (normType == "len") {
-      C1 <- 0
-      C2 <- sqrt(sum(inits * inits))
-    }
+  } else if (normType == "rescale2") {
+    C1 <- (max(inits) + min(inits)) / 2
+    C2 <- (max(inits) - min(inits)) / 2
+  } else if (normType == "mean") {
+    C1 <- mean(inits)
+    C2 <- max(inits) - min(inits)
+  } else if (normType == "rescale") {
+    C1 <- min(inits)
+    C2 <- max(inits) - min(inits)
+  } else if (normType == "std") {
+    C1 <- mean(inits)
+    C2 <- sd(inits)
+  } else if (normType == "len") {
+    C1 <- 0
+    C2 <- sqrt(sum(inits * inits))
   }
 
   # produces vector of scaleC values if missing, handles incorrect length of scaleC values.
@@ -1395,40 +1386,45 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   }
 
   # assign value to scaleC. If log value, scaleC <- 1, else scalec <- 1/abs(inits[i])
-  # need to known when dynmodel has log values, and which ones, or else there will be a problem scaling
-  theta <- inits[1:(length(inits) - length(inits.err))]
+  # need to known when dynmodel has log values, and which ones, or else there
+  # will be a problem scaling.
+  theta <- inits[seq_len(length(inits) - length(inits.err))]
   names(scaleC) <- names(inits)
 
   if (!is.null(nlmixrObject)) {
-    .model <- RxODE::rxSymPySetupPred(nlmixrObject$rxode.pred,
-      function() {
-        return(nlmixr_pred)
-      },
-      nlmixrObject$theta.pars,
-      nlmixrObject$error,
-      grad = FALSE,
-      pred.minus.dv = TRUE, sum.prod = FALSE, # control$sumProd,
-      theta.derivs = FALSE, optExpression = TRUE, # control$optExpression,
-      run.internal = TRUE, only.numeric = TRUE
-    )
+    .model <-
+      RxODE::rxSymPySetupPred(
+        nlmixrObject$rxode.pred,
+        function() {
+          return(nlmixr_pred)
+        },
+        nlmixrObject$theta.pars,
+        nlmixrObject$error,
+        grad = FALSE,
+        pred.minus.dv = TRUE,
+        sum.prod = FALSE, # control$sumProd,
+        theta.derivs = FALSE,
+        optExpression = TRUE, # control$optExpression,
+        run.internal = TRUE,
+        only.numeric = TRUE
+      )
 
     scaleC[.model$log.thetas] <- 1
-    scaleC[setdiff(1:length(theta), .model$log.thetas)] <- 1 / abs(theta[setdiff(1:length(theta), .model$log.thetas)])
+    scaleC[setdiff(1:length(theta), .model$log.thetas)] <-
+      1 / abs(theta[setdiff(1:length(theta), .model$log.thetas)])
   }
-
 
   # assign value to scaleC based on the error model used
   n.inits.err <- names(inits.err)
   for (i in seq_along(n.inits.err)) {
     if (is.na(scaleC[n.inits.err[i]])) {
-      if (any(n.inits.err[i] == c("boxCox", "yeoJohnson", "pow2", "tbs", "tbsYj"))) {
-        scaleC[i] <- 1
-      } else if (any(n.inits.err[i] == c("prop", "add", "norm", "dnorm", "logn", "dlogn", "lnorm", "dlnorm"))) {
-        scaleC[i] <- 0.5 * abs(inits.err[i])
+      if (n.inits.err[i] %in% c("boxCox", "yeoJohnson", "pow2", "tbs", "tbsYj")) {
+        scaleC[n.inits.err[i]] <- 1
+      } else if (n.inits.err[i] %in% c("prop", "add", "norm", "dnorm", "logn", "dlogn", "lnorm", "dlnorm")) {
+        scaleC[n.inits.err[i]] <- 0.5 * abs(inits.err[i])
       }
     }
   }
-
 
   # assign value to scaleC based on additional functions
   if (!is.null(nlmixrObject)) {
@@ -1519,6 +1515,9 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   }
 
   # Scale --------------
+  scaleType <- control$scaleType
+  lower <- control$lower
+  upper <- control$upper
   if (normType != "constant" & scaleType != "norm") {
     .st <- proc.time()
     # scaled the initial conditions
@@ -1528,7 +1527,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     }
     .inits <- inits.temp
     # scaled lower boundary
-    if (is.null(lower) == FALSE) {
+    if (!is.null(lower)) {
       if (any(lower == -Inf)) {
         lower[which(lower == -Inf)] <- 0
         warning("Lower boundary of -Inf set to 0.")
@@ -1543,7 +1542,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     }
 
     # scaled upper boundary
-    if (is.null(upper) == FALSE) {
+    if (!is.null(upper)) {
       upper.temp <- numeric(length(upper))
       for (i in 1:length(upper)) {
         upper.temp[i] <- scalePar(upper, i)
