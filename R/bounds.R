@@ -21,9 +21,9 @@ nlmixrBounds <- function(fun){
     if (length(w) > 0){
         fun2 <- fun2[-w];
     }
-    w <- which(regexpr("#+.*", fun2) != -1);
+    w <- which(regexpr("^ *[^\n\"]+ *#+.*", fun2) != -1);
     if (length(w) > 0){
-        labels <- gsub(".*#+ *(.*) *$", "\\1", fun2[w]);
+        labels <- gsub("^ *[^\n\"]+ *#+ *(.*) *$", "\\1", fun2[w]);
                            labels <- sapply(labels,
                                             function(x){
                                return(sprintf("label(%s)", paste0(deparse(x))))});
