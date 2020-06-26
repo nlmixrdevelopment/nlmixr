@@ -5,745 +5,746 @@
 ##' @author Matthew L. Fidler
 ##' @export
 ##' @keywords internal
+##' @family nlmixrBounds
 nlmixrBounds <- function(fun) {
+  # Prepare the data.frame
+  df <- nlmixrBounds_df(fun)
+  # Check the data.frame, adjust values as required, and set its class
+  as.nlmixrBounds(df)
+}
+
+#' This is defines the columns and classes for the nlmixrBounds data.frame.
+#' (Done here to make testing easier and ensure consistency across functions.)
+nlmixrBoundsTemplate <-
+  data.frame(
+    ntheta = NA_real_,
+    neta1 = NA_real_,
+    neta2 = NA_real_,
+    name = NA_character_,
+    lower = NA_real_,
+    est = NA_real_,
+    upper = NA_real_,
+    fix = NA,
+    err = NA_character_,
+    label = NA_character_,
+    condition = NA_character_,
+    stringsAsFactors = FALSE
+  )
+
+# Generate the data.frame form of nlmixrBounds from a function or call
+nlmixrBounds_df <- function(fun) {
+  df <- nlmixrBoundsTemplate[-1,]
+  funPrepared <- nlmixrBoundsPrepareFun(fun)
+  funParsed <- nlmixrBoundsParser(funPrepared)
+  currentParse <- 0
+  if (!("assign" %in% funParsed[[1]]$operation)) {
+    stop("The item in an initialization block other than comments must be an assignment to theta, omega, or sigma.")
+  }
+  for (currentParse in seq_along(funParsed)) {
+    if ("assign" %in% funParsed[[currentParse]]$operation) {
+      if (funParsed[[currentParse]]$operation[2] == "theta") {
+        newRows <-
+          nlmixrBoundsParserTheta(x=funParsed[[currentParse]], currentData=nlmixrBoundsTemplate)
+        newRows$ntheta <-
+          if (nrow(df) == 0) {
+            1
+          } else if (all(is.na(df$ntheta))) {
+            1
+          } else {
+            max(df$ntheta, na.rm=TRUE) + 1
+          }
+      } else if (funParsed[[currentParse]]$operation[2] == "omega") {
+        newRows <-
+          nlmixrBoundsParserOmega(x=funParsed[[currentParse]], currentData=nlmixrBoundsTemplate)
+        maxPreviousEta <-
+          if (nrow(df) == 0) {
+            0
+          } else if (all(is.na(df$neta1))) {
+            0
+          } else {
+            max(df$neta1, na.rm=TRUE)
+          }
+        newRows$neta1 <- maxPreviousEta + newRows$neta1
+        newRows$neta2 <- maxPreviousEta + newRows$neta2
+      } else {
+        stop("Please report this as a bug.  Unknown assigment method for ", funParsed[[currentParse]]$operation[2]) # nocov
+      }
+      currentRows <- nrow(df) + seq_len(nrow(newRows))
+      df <- rbind(df, newRows)
+    } else if (funParsed[[currentParse]]$operation %in% "attribute") {
+      df[currentRows, ] <-
+        nlmixrBoundsParserAttribute(
+          x=funParsed[[currentParse]],
+          currentData=df[currentRows, ]
+        )
+    } else {
+      stop("Please report this as a bug.  Unknown nlmixrBounds operation: ", funParsed[[currentParse]]$operation) # nocov
+    }
+  }
+  df
+}
+
+nlmixrBoundsPrepareFun <- function(fun) {
+  ret <- fun
   if (!is.null(attr(fun, "srcref"))) {
-    fun2 <- as.character(attr(fun, "srcref"), useSource = TRUE)
-  } else {
-    return(eval(fun(), parent.frame(1)))
+    # Check for comments, and if comments exist, try to convert them to
+    # `label(%s)`.
+    hasComments <-
+      any(getParseData(
+        parse(text=as.character(attr(fun, "srcref")), keep.source=TRUE),
+      )$token == "COMMENT")
+    if (hasComments) {
+      message("Detection of parameter labels from comments will be replaced by `label()`")
+      ret <- nlmixrBoundsPrepareFunComments(as.character(attr(fun, "srcref")))
+    }
   }
-  w <- which(regexpr("^ *#+.*", fun2) == 1)
+  ret
+}
+
+#' Prepare an bounds function with comments by extracting the comments and
+#' converting them to label()
+#' 
+#' @param fun_char The function as a vector of character strings
+#' @return A function body with comments converted to \code{label()} and pipes
+#'   converted to \code{condition()} calls.
+#' @noRd
+nlmixrBoundsPrepareFunComments <- function(fun_char) {
+  # drop comment-only lines
+  w <- which(regexpr("^ *#+.*", fun_char) == 1)
   if (length(w) > 0) {
-    fun2 <- fun2[-w]
+    fun_char <- fun_char[-w]
   }
-  w <- which(regexpr("#+.*", fun2) != -1)
+  # convert comments to `label()` values
+  w <- which(regexpr("#+.*", fun_char) != -1)
   if (length(w) > 0) {
-    labels <- gsub(".*#+ *(.*) *$", "\\1", fun2[w])
+    labels <- gsub(x=fun_char[w], pattern=".*#+ *(.*) *$", replacement="\\1")
     labels <- sapply(
       labels,
       function(x) {
+        # Ensure that quotes and other special characters are correctly escaped.
         return(sprintf("label(%s)", paste0(deparse(x))))
       }
     )
-    fun2[w] <- paste0(fun2[w], "\n", labels)
+    # Remove the comment and then insert the labels as new lines.
+    fun_char[w] <- gsub(x=fun_char[w], pattern="#.*$", replacement="")
+    fun_char <- c(fun_char, labels)[order(c(seq_along(fun_char), w))]
   }
-  w <- which(regexpr("^ *[|].*", fun2) != -1)
+  # Find impossible condition rows (and give an error for them)
+  w <- which(regexpr("^ *[|].*", fun_char) != -1)
   if (length(w) > 0) {
-    stop("A conditional statement cannot be on a line by itself.")
+    # This does not have code coverage because it is not valid R, and a function
+    # will not parse this way.
+    stop("A conditional statement cannot be on a line by itself.") # nocov
   }
-  w <- which(regexpr("^.*[|]", fun2) != -1)
-  if (length(w) > 0) {
-    condition <- gsub(".*[|] *(.*) *$", "\\1", fun2[w])
-    condition <- sapply(
-      condition,
-      function(x) {
-        return(sprintf("condition(%s)", paste0(deparse(x))))
-      }
+  # To be removed later: condition capture has been moved to the function
+  # parsing part.
+  # Capture condition values and convert them to `condition()`
+  # w <- which(regexpr("^.*[|]", fun_char) != -1)
+  # if (length(w) > 0) {
+  #   condition <- gsub(".*[|] *(.*) *$", "\\1", fun_char[w])
+  #   condition <- sapply(
+  #     condition,
+  #     function(x) {
+  #       return(sprintf("condition(%s)", paste0(deparse(x))))
+  #     }
+  #   )
+  #   fun_char[w] <- paste0(gsub("[|].*", "", fun_char[w]), "\n", condition)
+  # }
+  # Perform final parsing of the modified function
+  fun_parsed <-
+    try(
+      eval(parse(text = paste0(fun_char, collapse = "\n"))),
+      silent = TRUE
     )
-    fun2[w] <- paste0(gsub("[|].*", "", fun2[w]), "\n", condition)
-  }
-  fun2 <- try(eval(parse(text = paste0(fun2, collapse = "\n"))), silent = TRUE)
-  if (inherits(fun2, "try-error")) {
+  if (inherits(fun_parsed, "try-error")) {
     stop("Error parsing bounds; Perhaps there is an (unsupported) comment/condition inside the bounds themselves.")
   }
-  theta <- 0
-  eta1 <- 0
-  df <-
-      data.frame(
-          ntheta = numeric(),
-          neta1 = numeric(),
-          neta2 = numeric(),
-          name = character(),
-          lower = numeric(),
-          est = numeric(),
-          upper = numeric(),
-          fix = logical(),
-          err = character(),
-          label = character(),
-          condition = character(),
-          stringsAsFactors = FALSE
+  # The current environment is not valid for the function as parsed here.
+  environment(fun_parsed) <- emptyenv()
+  fun_parsed
+}
+
+nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
+  varnameC <- na.omit(varname)
+  maskDupVarname <- duplicated(varnameC)
+  if (any(maskDupVarname)) {
+    stop(
+      "The following parameter names are duplicated: ",
+      paste(unique(varnameC[maskDupVarname]), collapse=", ")
+    )
+  }
+  maskNAEst <- is.na(est)
+  maskNALower <- is.na(lower)
+  maskNAUpper <- is.na(upper)
+  if (any(maskNAEst | maskNALower | maskNAUpper)) {
+    stop(
+      "NA values found for the following\n",
+      if (any(maskNAEst)) {
+        paste0("  Parameter estimates: ", paste(varname[maskNAEst], collapse=", "), "\n")
+      },
+      if (any(maskNALower)) {
+        paste0("  Lower bounds: ", paste(varname[maskNALower], collapse=", "), "\n")
+      },
+      if (any(maskNAUpper)) {
+        paste0("  Upper bounds: ", paste(varname[maskNAUpper], collapse=", "), "\n")
+      }
+    )
+  }
+  maskGood <-
+    !is.infinite(est) &
+    lower < est &
+    est < upper
+  maskInfEst <-
+    is.infinite(est)
+  maskSuggestFixed <-
+    !maskInfEst &
+    (lower == upper |
+       lower == est |
+       upper == est)
+  maskSuggestReorder <-
+    !(maskInfEst | maskSuggestFixed) &
+    (lower > est |
+       est > upper |
+       lower > upper)
+  maskUnknown <-
+    !(maskGood |
+        maskInfEst |
+        maskSuggestFixed |
+        maskSuggestReorder)
+  # Generate the messages
+  messageInfEst <- NULL
+  messageFixed <- NULL
+  messageReorder <- NULL
+  messageUnknown <- NULL
+  if (any(maskInfEst)) {
+    messageInfEst <-
+      paste(
+        "  The following have infinite estimates:",
+        paste(varname[maskInfEst], collapse=", ")
       )
-  netas <- 0
-  nerr <- 0
-  f <- function(x, env) {
-    if (is.name(x)) {
-      character()
-    } else if (is.call(x)) {
-      nenv <- new.env(parent = emptyenv())
-      nenv$do.fixed <- FALSE
-      fix <- FIX <- fixed <- FIXED <- function(x) {
-        assign("do.fixed", TRUE, nenv)
-        return(x)
-      }
-      if (identical(x[[1]], quote(`<`)) ||
-        identical(x[[1]], quote(`>`)) ||
-        identical(x[[1]], quote(`<=`)) ||
-        identical(x[[1]], quote(`>=`)) ||
-        identical(x[[1]], quote(`==`))) {
-        stop(sprintf("The '%s' operator cannot be used in the ini block", as.character(x[[1]])))
-      } else if ((identical(x[[1]], quote(`<-`)) ||
-        identical(x[[1]], quote(`=`))) &&
-        is.name(x[[2]])) {
-        if (length(x[[3]]) > 5) {
-          stop(sprintf(
-            "%s %s c(%s) syntax is not supported for thetas",
-            as.character(x[[2]]), as.character(x[[1]]), paste(sapply(x[[3]][-1], as.character), collapse = ", ")
-          ))
-        } else if (length(x[[3]]) == 5) {
-          if (as.character(x[[3]][[1]]) == "c" &&
-            any(tolower(as.character(x[[3]][[5]])) == c("fix", "fixed")) &&
-            length(x[[3]][[5]]) == 1) {
-            ## a = c(1,2,3,fixed)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = as.character(x[[2]]),
-                lower = as.numeric(eval(x[[3]][[2]])),
-                est = as.numeric(eval(x[[3]][[3]])),
-                upper = as.numeric(eval(x[[3]][[4]])),
-                fix = TRUE,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          } else {
-            stop(sprintf(
-              "%s %s c(%s) syntax is not supported for thetas", as.character(x[[2]]),
-              as.character(x[[1]]), paste(sapply(x[[3]][-1], as.character), collapse = ", ")
-            ))
-          }
-        } else if (length(x[[3]]) == 4 &&
-          any(tolower(as.character(x[[3]][[1]])) == c("c", "fix", "fixed"))) {
-          nenv$do.fixed <- any(tolower(as.character(x[[3]][[1]])) == c("fix", "fixed"))
-          if (any(tolower(as.character(x[[3]][[4]])) == c("fix", "fixed")) &&
-            length(x[[3]][[4]]) == 1) {
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = as.character(x[[2]]),
-                lower = as.numeric(eval(x[[3]][[2]])),
-                est = as.numeric(eval(x[[3]][[3]])),
-                upper = Inf,
-                fix = TRUE,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          } else {
-            ## a = c(1,2,3)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = as.character(x[[2]]),
-                lower = as.numeric(eval(x[[3]][[2]])),
-                est = as.numeric(eval(x[[3]][[3]])),
-                upper = as.numeric(eval(x[[3]][[4]])),
-                fix = nenv$do.fixed,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          }
-        } else if (length(x[[3]]) == 3 &&
-          any(tolower(as.character(x[[3]][[1]])) == c("c", "fix", "fixed"))) {
-          nenv$do.fixed <- any(tolower(as.character(x[[3]][[1]])) == c("fix", "fixed"))
-          if (any(tolower(as.character(x[[3]][[3]])) == c("fix", "fixed"))
-          && length(x[[3]][[3]]) == 1) {
-            ## a = c(1,fixed)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = as.character(x[[2]]),
-                lower = -Inf,
-                est = as.numeric(eval(x[[3]][[2]])),
-                upper = Inf,
-                fix = TRUE,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          } else {
-            ## a = c(1,2)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = as.character(x[[2]]),
-                lower = as.numeric(eval(x[[3]][[2]])),
-                est = as.numeric(eval(x[[3]][[3]])),
-                upper = Inf,
-                fix = nenv$do.fixed,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          }
-        } else if (length(x[[3]]) == 2 &&
-          any(tolower(as.character(x[[3]][[1]])) == c("c", "fix", "fixed"))) {
-          ## a = c(1)
-          nenv$do.fixed <- any(tolower(as.character(x[[3]][[1]])) == c("fix", "fixed"))
-          env$theta <- env$theta + 1
-          env$df <- rbind(
-            env$df,
-            data.frame(
-              ntheta = env$theta,
-              neta1 = NA,
-              neta2 = NA,
-              name = as.character(x[[2]]),
-              lower = -Inf,
-              est = as.numeric(eval(x[[3]][[2]])),
-              upper = Inf,
-              fix = nenv$do.fixed,
-              err = NA,
-              label = NA,
-              condition = NA,
-              stringsAsFactors = FALSE
-            )
-          )
-        } else if (length(x[[3]]) == 1) {
-          ## a = 1
-          env$theta <- env$theta + 1
-          env$df <- rbind(
-            env$df,
-            data.frame(
-              ntheta = env$theta,
-              neta1 = NA,
-              neta2 = NA,
-              name = as.character(x[[2]]),
-              lower = -Inf,
-              est = as.numeric(eval(x[[3]][[1]])),
-              upper = Inf,
-              fix = nenv$do.fixed,
-              err = NA,
-              label = NA,
-              condition = NA,
-              stringsAsFactors = FALSE
-            )
-          )
-        } else {
-          num <- try(eval(x[[3]]), silent = TRUE)
-          if (is.numeric(num)) {
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = as.character(x[[2]]),
-                lower = -Inf,
-                est = num,
-                upper = Inf,
-                fix = nenv$do.fixed,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          }
-        }
-      } else if (any(tolower(as.character(x[[1]])) == c("c", "fix", "fixed"))) {
-        nenv$do.fixed <- any(tolower(as.character(x[[1]])) == c("fix", "fixed"))
-        if (length(x) > 5) {
-          stop(sprintf("c(%s) syntax is not supported for thetas", paste(sapply(x[-1], as.character), collapse = ", ")))
-        } else if (length(x) == 5) {
-          if (any(tolower(as.character(x[[5]])) == c("fix", "fixed")) &&
-            length(x[[5]]) == 1) {
-            ## c(1,2,3,fixed)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = NA,
-                lower = as.numeric(eval(x[[2]])),
-                est = as.numeric(eval(x[[3]])),
-                upper = as.numeric(eval(x[[4]])),
-                fix = TRUE,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          } else {
-            stop(sprintf("c(%s) syntax is not supported for thetas", paste(sapply(x[-1], as.character), collapse = ", ")))
-          }
-        } else if (length(x) == 4) {
-          ## No assignment...
-          if (any(tolower(as.character(x[[4]])) == c("fix", "fixed")) &&
-            length(x[[4]]) == 1) {
-            ## c(1,2,fixed)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = NA,
-                lower = as.numeric(eval(x[[2]])),
-                est = as.numeric(eval(x[[3]])),
-                upper = Inf,
-                fix = TRUE,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          } else {
-            ## c(1,2,3)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = NA,
-                lower = as.numeric(eval(x[[2]])),
-                est = as.numeric(eval(x[[3]])),
-                upper = as.numeric(eval(x[[4]])),
-                fix = nenv$do.fixed,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          }
-        } else if (length(x) == 3) {
-          if (any(tolower(as.character(x[[3]])) == c("fix", "fixed")) &&
-            length(x[[3]]) == 1) {
-            ## c(1, fixed)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = NA,
-                lower = -Inf,
-                est = as.numeric(eval(x[[2]])),
-                upper = Inf,
-                fix = TRUE,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          } else {
-            ## c(1,2)
-            env$theta <- env$theta + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = env$theta,
-                neta1 = NA,
-                neta2 = NA,
-                name = NA,
-                lower = as.numeric(eval(x[[2]])),
-                est = as.numeric(eval(x[[3]])),
-                upper = Inf,
-                fix = nenv$do.fixed,
-                err = NA,
-                label = NA,
-                condition = NA,
-                stringsAsFactors = FALSE
-              )
-            )
-          }
-        } else if (length(x) == 2) {
-          ## c(1)
-          env$theta <- env$theta + 1
-          env$df <- rbind(
-            env$df,
-            data.frame(
-              ntheta = env$theta,
-              neta1 = NA,
-              neta2 = NA,
-              name = NA,
-              lower = -Inf,
-              est = as.numeric(eval(x[[2]])),
-              upper = Inf,
-              fix = FALSE,
-              err = NA,
-              label = NA,
-              condition = NA,
-              stringsAsFactors = FALSE
-            )
-          )
-        }
-      } else if (identical(x[[1]], quote(`~`))) {
-        if (length(x) == 3) {
-          if (length(x[[3]]) == 1) {
-            ## et1 ~ 0.2
-            env$netas <- 1
-            env$eta1 <- env$eta1 + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = NA,
-                neta1 = env$eta1,
-                neta2 = env$eta1,
-                name = as.character(x[[2]]),
-                lower = -Inf,
-                est = as.numeric(eval(x[[3]])),
-                upper = Inf,
-                fix = FALSE,
-                err = NA,
-                label = NA,
-                condition = "ID",
-                stringsAsFactors = FALSE
-              )
-            )
-          } else {
-            ## et1+et2+et3~c() lower triangular matrix
-            if (any(tolower(as.character(x[[3]][[1]])) == c("c", "fix", "fixed"))) {
-              full.fixed <- any(tolower(as.character(x[[3]][[1]])) == c("fix", "fixed"))
-              env$netas <- length(x[[3]]) - 1
-              num <- sqrt(1 + env$netas * 8) / 2 - 1 / 2
-              if (round(num) == num) {
-                n <- unlist(strsplit(as.character(x[[2]]), " +[+] +"))
-                n <- n[n != "+"]
-                if (length(n) == num) {
-                  r <- x[[3]][-1]
-                  r <- t(sapply(r, function(x) {
-                    nenv$do.fixed <- FALSE
-                    ret <- as.numeric(eval(x))
-                    return(c(v = ret, do.fixed = nenv$do.fixed))
-                  }))
-                  r <- data.frame(r, stringsAsFactors = FALSE)
-                  r$do.fixed <- as.logical(r$do.fixed)
-                  i <- 0
-                  j <- 1
-                  for (k in seq_along(r$do.fixed)) {
-                    v <- r$v[k]
-                    do.fixed <- r$do.fixed[k]
-                    i <- i + 1
-                    if (i == j) {
-                      nm <- n[i]
-                    } else {
-                      nm <- sprintf("(%s,%s)", n[j], n[i])
-                    }
-                    env$df <- rbind(
-                      env$df,
-                      data.frame(
-                        ntheta = NA,
-                        neta1 = env$eta1 + j,
-                        neta2 = env$eta1 + i,
-                        name = nm,
-                        lower = -Inf,
-                        est = v,
-                        upper = Inf,
-                        fix = full.fixed | do.fixed,
-                        err = NA,
-                        label = NA,
-                        condition = "ID",
-                        stringsAsFactors = FALSE
-                      )
-                    )
-                    if (i == j) {
-                      j <- j + 1
-                      i <- 0
-                    }
-                  }
-                  env$eta1 <- env$eta1 + num
-                } else {
-                  stop("The left handed side of the expression must match the number of ETAs in the lower triangular matrix.")
-                }
-              } else {
-                n <- unlist(strsplit(as.character(x[[2]]), " +[+] +"))
-                n <- n[n != "+"]
-                stop(sprintf("%s ~ c(%s) does not have the right dimensions for a lower triangular matrix.", paste(n, collapse = " + "), paste(sapply(x[[3]][-1], as.character), collapse = ", ")))
-              }
-            } else if (any(as.character(x[[3]][[1]]) == c("add", "norm", "dnorm", "prop"))) {
-              env$theta <- env$theta + 1
-              env$nerr <- 1
-              env$df <- rbind(
-                env$df,
-                data.frame(
-                  ntheta = env$theta,
-                  neta1 = NA,
-                  neta2 = NA,
-                  name = as.character(x[[2]]),
-                  lower = 0,
-                  est = as.numeric(eval(x[[3]][[2]])),
-                  upper = Inf,
-                  fix = TRUE,
-                  err = as.character(x[[3]][[1]]),
-                  label = NA,
-                  condition = NA,
-                  stringsAsFactors = FALSE
-                )
-              )
-            } else if (as.character(x[[3]][[1]]) == "+" && length(x[[3]]) == 3) {
-              env$nerr <- 2
-              env$theta <- env$theta + 1
-              env$df <- rbind(
-                env$df,
-                data.frame(
-                  ntheta = env$theta,
-                  neta1 = NA,
-                  neta2 = NA,
-                  name = as.character(x[[2]]),
-                  lower = 0,
-                  est = as.numeric(eval(x[[3]][[2]][[2]])),
-                  upper = Inf,
-                  fix = TRUE,
-                  err = as.character(x[[3]][[2]][[1]]),
-                  label = NA,
-                  condition = NA,
-                  stringsAsFactors = FALSE
-                )
-              )
-              env$theta <- env$theta + 1
-              env$df <- rbind(
-                env$df,
-                data.frame(
-                  ntheta = env$theta,
-                  neta1 = NA,
-                  neta2 = NA,
-                  name = as.character(x[[2]]),
-                  lower = 0,
-                  est = as.numeric(eval(x[[3]][[3]][[2]])),
-                  upper = Inf,
-                  fix = TRUE,
-                  err = as.character(x[[3]][[3]][[1]]),
-                  label = NA,
-                  condition = NA,
-                  stringsAsFactors = FALSE
-                )
-              )
-            }
-          }
-        } else if (length(x) == 2) {
-          if (length(x[[2]]) == 1) {
-            ## ~ 0.1
-            env$netas <- 1
-            env$eta1 <- env$eta1 + 1
-            env$df <- rbind(
-              env$df,
-              data.frame(
-                ntheta = NA,
-                neta1 = env$eta1,
-                neta2 = env$eta1,
-                name = NA,
-                lower = -Inf,
-                est = as.numeric(eval(x[[2]])),
-                upper = Inf,
-                fix = FALSE,
-                err = NA,
-                label = NA,
-                condition = "ID",
-                stringsAsFactors = FALSE
-              )
-            )
-          } else {
-            ## ~c() lower triangular matrix
-            if (any(tolower(as.character(x[[2]][[1]])) == c("c", "fix", "fixed"))) {
-              full.fixed <- any(tolower(as.character(x[[2]][[1]])) == c("fix", "fixed"))
-              env$netas <- length(x[[2]]) - 1
-              num <- sqrt(1 + env$netas * 8) / 2 - 1 / 2
-              if (round(num) == num) {
-                r <- x[[2]][-1]
-                r <- t(sapply(r, function(x) {
-                  nenv$do.fixed <- FALSE
-                  ret <- as.numeric(eval(x))
-                  return(c(v = ret, do.fixed = nenv$do.fixed))
-                }))
-                r <- data.frame(r, stringsAsFactors = FALSE)
-                r$do.fixed <- as.logical(r$do.fixed)
-                i <- 0
-                j <- 1
-                for (k in seq_along(r$do.fixed)) {
-                  v <- r$v[k]
-                  do.fixed <- r$do.fixed[k]
-                  i <- i + 1
-                  env$df <- rbind(
-                    env$df,
-                    data.frame(
-                      ntheta = NA,
-                      neta1 = eta1 + j,
-                      neta2 = eta1 + i,
-                      name = NA,
-                      lower = -Inf,
-                      est = v,
-                      upper = Inf,
-                      fix = full.fixed | do.fixed,
-                      err = NA,
-                      label = NA,
-                      condition = "ID",
-                      stringsAsFactors = FALSE
-                    )
-                  )
-                  if (i == j) {
-                    j <- j + 1
-                    i <- 0
-                  }
-                }
-                env$eta1 <- env$eta1 + num
-              } else {
-                stop(sprintf("~c(%s) does not have the right dimensions for a lower triangular matrix.", paste(sapply(x[[2]][-1], as.character), collapse = ", ")))
-              }
-            }
-          }
-        }
-      } else if (identical(x[[1]], quote(`label`))) {
-        lab <- as.character(x[[2]])
-        lab <- gsub(";+", "", lab)
-        len <- length(env$df$ntheta)
-        if (len > 0) {
-          if (!is.na(env$df$ntheta[len])) {
-            tmp <- as.character(env$df$label)
-            tmp[len] <- lab
-            env$df$label <- tmp
-          } else {
-            ## stop("Currently only thetas can be labeled");
-            ## warning("Currently only thetas can be labeled")
-          }
-        }
-      } else if (identical(x[[1]], quote(`condition`))) {
-        lab <- as.character(x[[2]])
-        lab <- gsub(";+", "", lab)
-        len <- length(env$df$ntheta)
-        if (!is.na(env$df$ntheta[len]) && is.na(env$df$err[len])) {
-          stop("Currently only etas/errs can be conditioned on...")
-        } else if (is.na(env$df$ntheta[len])) {
-          cnd <- as.character(env$df$condition)
-          cnd[seq(len - env$netas + 1, len)] <- lab
-          env$df$condition <- cnd
-        } else {
-          cnd <- as.character(env$df$condition)
-          cnd[seq(len - env$nerr + 1, len)] <- lab
-          env$df$condition <- cnd
-        }
-      } else {
-        lapply(x, f, env = env)
-      }
-    } else if (is.pairlist(x)) {
-      unique(unlist(lapply(x, f, env = env)))
-    } else if (is.atomic(x)) {
-      ## a simple number
-      ## 1
-      env$theta <- env$theta + 1
-      env$df <- rbind(
-        env$df,
-        data.frame(
-          ntheta = env$theta,
-          neta1 = NA,
-          neta2 = NA,
-          name = NA,
-          lower = -Inf,
-          est = as.numeric(eval(x)),
-          upper = Inf,
-          fix = FALSE,
-          err = NA,
-          label = NA,
-          condition = NA,
-          stringsAsFactors = FALSE
+  }
+  if (any(maskSuggestFixed)) {
+    messageFixed <-
+      paste(
+        "  Consider fixing the following parameters:\n",
+        paste(
+          sprintf("    %s = fixed(%g)", varname[maskSuggestFixed], est[maskSuggestFixed]),
+          collapse="\n"
         )
       )
+  }
+  if (any(maskSuggestReorder)) {
+    hasLower <- is.finite(lower[maskSuggestReorder])
+    hasUpper <- is.finite(upper[maskSuggestReorder])
+    bestOrder <-
+      # matrix is necessary if there is a single item that needs to be reordered
+      # to prevent it from returning as a vector.
+      matrix(
+        apply(
+          cbind(
+            lower[maskSuggestReorder],
+            est[maskSuggestReorder],
+            upper[maskSuggestReorder]
+          ),
+          MARGIN=1,
+          FUN=sort
+        ),
+        nrow=sum(maskSuggestReorder)
+      )
+    messageReorderLower <-
+      ifelse(
+        hasLower | hasUpper,
+        paste0(format(bestOrder[,1]), ", "),
+        ""
+      )
+    messageReorderUpper <-
+      ifelse(
+        hasUpper,
+        paste0(", ", format(bestOrder[,3])),
+        ""
+      )
+    messageReorderConcatStart <-
+      ifelse(
+        fixed[maskSuggestReorder],
+        "fixed(",
+        ifelse(
+          hasLower | hasUpper,
+          "c(",
+          ""
+        )
+      )
+    messageReorderConcatEnd <-
+      ifelse(
+        messageReorderConcatStart == "",
+        "",
+        ")"
+      )
+    messageReorder <-
+      paste(
+        "  Consider reordering the following parameters:\n",
+        paste0(
+          "    ",
+          varname[maskSuggestReorder],
+          " = ",
+          messageReorderConcatStart,
+          messageReorderLower,
+          format(bestOrder[,2]),
+          messageReorderUpper,
+          messageReorderConcatEnd,
+          collapse="\n"
+        )
+      )
+  }
+  if (any(maskUnknown)) {
+    messageUnknown <-
+      paste(
+        "  Unknown issue with the following parameters:",
+        paste(varname[maskUnknown], collapse=", ")
+      )
+  }
+  if (any(!is.null(messageFixed), !is.null(messageReorder), !is.null(messageUnknown))) {
+    stop(
+      "Parameter error with the following initial conditions:\n",
+      messageInfEst, messageFixed, messageReorder, messageUnknown
+    )
+  }
+  NULL
+}
+
+#' Verify the accuracy of a nlmixrBounds object and update initial conditions,
+#' as required.
+as.nlmixrBounds <- function(df) {
+  # Ensure that the format is data.frame (instead of data.table, tibble, etc.)
+  df <- as.data.frame(df)
+  if (nrow(df) == 0) {
+    stop("Could not find any parameter information.")
+  }
+  extraColumns <- setdiff(names(df), names(nlmixrBoundsTemplate))
+  if (length(extraColumns)) {
+    stop("The following extra columns are found: ", paste(extraColumns, collapse=", "))
+  }
+  missingColumns <- setdiff(names(nlmixrBoundsTemplate), names(df))
+  if (length(missingColumns)) {
+    stop("The following columns are missing: ", paste(missingColumns, collapse=", "))
+  }
+  nlmixrBoundsSuggest(
+    varname=df$name, lower=df$lower, est=df$est, upper=df$upper, fixed=df$fix
+  )
+  w <- which(df$lower == 0)
+  if (length(w) > 0) df$lower[w] <- sqrt(.Machine$double.eps)
+  w <- which(df$upper == 0)
+  if (length(w) > 0) df$upper[w] <- -sqrt(.Machine$double.eps)
+  class(df) <- c("nlmixrBounds", "data.frame")
+  df
+}
+
+# nlmixrBoundsParser #####
+
+#' Functions to assist with setting initial conditions and boundaries
+#' 
+#' These functions are not intended to be called by a user.  They are intended
+#' to be internal to nlmixr.
+#' 
+#' @param x the object to attempt extraction from
+#' @return A list with how the object will be used
+#' @keywords internal
+#' @family nlmixrBounds
+#' @export
+nlmixrBoundsParser <- function(x) {
+  UseMethod("nlmixrBoundsParser")
+}
+#' @export
+nlmixrBoundsParser.default <- function(x) {
+  stop(
+    "Cannot handle initial condition parsing for `", deparse(x),
+    "`, class: ", class(x)
+  )
+}
+#' @describeIn nlmixrBoundsParser For functions, apply to the function body
+#' @export
+nlmixrBoundsParser.function <- function(x) {
+  nlmixrBoundsParser(body(x))
+}
+#' @describeIn nlmixrBoundsParser For function bodies and similar.
+#' @export
+`nlmixrBoundsParser.{` <- function(x) {
+  # Recurse; there is nothing more to do
+  lapply(x[-1], nlmixrBoundsParser)
+}
+#' @describeIn nlmixrBoundsParser Assignments to thetas with names
+#' @export
+`nlmixrBoundsParser.<-` <- function(x) {
+  list(
+    operation=c("assign", "theta"),
+    varname=as.character(x[[2]]),
+    value=x[[3]]
+  )
+}
+#' @describeIn nlmixrBoundsParser Assignments to thetas with names
+#' @export
+`nlmixrBoundsParser.=` <- function(x) {
+  `nlmixrBoundsParser.<-`(x)
+}
+#' @describeIn nlmixrBoundsParser Assignments to thetas without names,
+#'   assignment to omegas with or without names, or setting of attributes.
+#' @export
+nlmixrBoundsParser.call <- function(x) {
+  if (as.character(x[[1]]) == "c" |
+      grepl(x=as.character(x[[1]]), pattern="^fix(ed)?$", ignore.case=TRUE)) {
+    # unnamed assignment can happen either with `c()`, with `fix()`, or with
+    # `fixed()` (where fix and fixed are case insensitive).
+      list(
+        operation=c("assign", "theta"),
+        varname=NA_character_,
+        value=x
+      )
+  } else if (as.character(x[[1]]) %in% "~") {
+    if (length(x) == 2) {
+      # one-sided formula
+      list(
+        operation=c("assign", "omega"),
+        varname=NA_character_,
+        value=x
+      )
+    } else if (length(x) == 3) {
+      list(
+        operation=c("assign", "omega"),
+        varname=x[[2]],
+        value=x[c(1, 3)]
+      )
     } else {
-      stop("Don't know how to handle type ", typeof(x),
-        call. = FALSE
+      # This should never be possible because formula only parse with length=2
+      # or 3.
+      stop("Invalid assignment to omega (please report this as a bug): ", deparse(x)) # nocov
+    }
+  } else if (as.character(x[[1]]) %in% c("label", "condition")) {
+    list(
+      operation="attribute",
+      varname=as.character(x[[1]]),
+      value=x
+    )
+  } else {
+    # This may be a valid R expression that could be evaluated
+    stop(
+      "Cannot handle the following call when setting initial conditions: ",
+      deparse(x)
+    )
+  }
+}
+#' @describeIn nlmixrBoundsParser Assignments of numbers to thetas without names
+#' @export
+nlmixrBoundsParser.numeric <- function(x) {
+  list(
+    operation=c("assign", "theta"),
+    varname=NA_character_,
+    value=x
+  )
+}
+#' @describeIn nlmixrBoundsParser Assignments of numbers to thetas without names
+#' @export
+nlmixrBoundsParser.integer <- function(x) {
+  nlmixrBoundsParser.numeric(x)
+}
+
+# Convert a parsed theta assignment to data.frame form.
+#' Forms of fixed that are allowed are:
+#' 
+#' * `fixed(1)`
+#' * `fixed(1, 2)`
+#' * `fixed(1, 2, 3)`
+#' * `c(1, fixed)`
+#' * `c(1, 2, fixed)`
+#' * `c(1, 2, 3, fixed)`
+#' * `c(1, fixed(2))`
+#' * `c(1, fixed(2), 3)`
+#' 
+#' Where "fixed" can be "FIX", "FIXED", "fix", or "fixed".
+nlmixrBoundsParserTheta <- function(x, currentData) {
+  currentData$name <- x$varname
+  valueFix <- nlmixrBoundsValueFixed(x$value)
+  # Set the lower bound, estimate, and upper bound for theta
+  value <- valueFix$value
+  if (length(value) == 1) {
+    currentData$lower <- -Inf
+    currentData$est <- value
+    currentData$upper <- Inf
+  } else if (length(value) == 2) {
+    currentData$lower <- value[1]
+    currentData$est <- value[2]
+    currentData$upper <- Inf
+  } else if (length(value) == 3) {
+    currentData$lower <- value[1]
+    currentData$est <- value[2]
+    currentData$upper <- value[3]
+  } else {
+    stop("Syntax is not supported for thetas: ", deparse(x$value))
+  }
+  if (all(valueFix$fixed)) {
+    currentData$fix <- TRUE
+  } else if (!any(valueFix$fixed)) {
+    currentData$fix <- FALSE
+  } else {
+    currentData$fix <- valueFix$fixed[2]
+    if (length(valueFix$fixed) == 2 && valueFix$fixed[1]) {
+      stop(
+        "Cannot declare the lower bound as fixed for theta without declaring the estimate fixed: ",
+        deparse(x)
+      )
+    } else if (length(valueFix$fixed) == 3 &&
+               (valueFix$fixed[1] | valueFix$fixed[3])) {
+      stop(
+        "Cannot declare the lower or upper bounds as fixed for theta without declaring the estimate fixed: ",
+        deparse(x)
       )
     }
   }
-  env <- environment(f)
-  f(body(fun2), env)
-  if (length(df$ntheta) == 0) {
-    stop(sprintf("Could not find any parameter information."))
-  }
-  n <- df$name
-  n <- n[!is.na(n)]
-  if (any(duplicated(n))) {
-    dups <- unique(n[duplicated(n)])
-    stop(sprintf("The following parameter names were duplicated: %s.", paste(dups, collapse = ", ")))
-  }
-  w <- which(is.infinite(df$est))
-  if (length(w) > 0) {
-    stop(sprintf("The following parameters initial estimates are infinite: %s", paste(df$name[w], collapse = ", ")))
-  }
+  currentData
+}
 
-  w <- which(df$lower == df$est & df$est == df$upper)
-  if (length(w) > 0) {
-    stop(sprintf(
-      "The estimate, and upper and lower bounds are the same for the following parameters: %s\nTo fix parameters use %s=fix(%s) instead.",
-      paste(df$name[w], collapse = ", "), df$name[w[1]], df$est[w[1]]
-    ))
+# Convert a parsed omega assignment to data.frame form.
+nlmixrBoundsParserOmega <- function(x, currentData) {
+  if (x$value[[2]][[1]] == as.name("|")) {
+    # The formula is conditional (i.e. ~a|b)
+    conditionValue <- all.vars(x$value[[2]][[3]])
+    if (length(conditionValue) != 1) {
+      stop("Invalid conditional expression, cannot parse: ", deparse(x$value))
+    }
+    valueFix <- nlmixrBoundsValueFixed(x$value[[2]][[2]])
+  } else {
+    # The condition is not specified, set to "ID"
+    conditionValue <- "ID"
+    valueFix <- nlmixrBoundsValueFixed(x$value[[2]])
   }
-  w <- which(df$lower == df$est | df$est == df$upper)
-  if (length(w) > 0) {
-    tmp <- unique(sort(c(df$est[w[1]], df$lower[w[1]], df$upper[w[1]])))
-    tmp <- tmp[!is.infinite(tmp)]
-    if (length(tmp) == 1) {
-      stop(sprintf(
-        "The estimate is the same as a boundary for the following parameter: %s\nInstead use %s=%s # est",
-        paste(df$name[w], collapse = ", "), df$name[w[1]], tmp
-      ))
+  currentDiagIdx <- 0
+  est <- numeric()
+  fix <- logical()
+  neta1 <- numeric()
+  neta2 <- numeric()
+  while (length(valueFix$value)) {
+    currentDiagIdx <- currentDiagIdx + 1
+    if (length(valueFix$value) < currentDiagIdx) {
+      stop(deparse(x$value), " does not have the right dimensions for a lower triangular matrix.")
+    }
+    nextValues <- seq_len(currentDiagIdx)
+    est <- c(est, valueFix$value[nextValues])
+    fix <- c(fix, valueFix$fixed[nextValues])
+    neta1 <- c(neta1, rep(currentDiagIdx, currentDiagIdx))
+    neta2 <- c(neta2, nextValues)
+    valueFix$value <- valueFix$value[-nextValues]
+    valueFix$fixed <- valueFix$fixed[-nextValues]
+  }
+  if (class(x$varname) != "character") {
+    # It has a name
+    nameVec <- all.vars(x$varname)
+    if (length(nameVec) != currentDiagIdx) {
+      stop("The left handed side of the expression must match the number of ETAs in the lower triangular matrix.")
+    }
+    name1 <- nameVec[neta1]
+    name2 <- nameVec[neta2]
+  } else {
+    name1 <- name2 <- NA_character_
+  }
+  finalData <- currentData[seq_along(neta1), ]
+  rownames(finalData) <- NULL
+  finalData$lower <- -Inf
+  finalData$est <- est
+  finalData$upper <- Inf
+  finalData$fix <- fix
+  finalData$neta1 <- neta1
+  finalData$neta2 <- neta2
+  finalData$name <-
+    ifelse(
+      is.na(name1) | name1 == name2,
+      name1,
+      sprintf("(%s,%s)", name1, name2)
+    )
+  finalData$condition <- conditionValue
+  finalData
+}
+
+# Add a parsed attribute to the existing theta or omega data.frame.
+nlmixrBoundsParserAttribute <- function(x, currentData) {
+  if (x$varname == "label") {
+    if (!length(x$value) == 2) {
+      stop("Only a single label can be applied: ", deparse(x$value))
+    } else if (!is.character(x$value[[2]])) {
+      # We could try to coerce it to a character string, but that will
+      # be more likely to yield a bug at some point.
+      stop("A label must be a character string: ", deparse(x$value))
+    } else if (!all(is.na(currentData$label))) {
+      warning("Applying multiple labels to the same initial condition will use the last label: ", deparse(x$value))
+    }
+    currentData$label <- x$value[[2]]
+  } else {
+    # We could ignore this, but it is likely to indicate some form of accidental
+    # misspecification.
+    stop("Cannot handle attribute: ", x$varname)
+  }
+  currentData
+}
+
+#' Determine the values and what is fixed
+#' 
+#' @param x A call that may have fixed values
+#' @return A list with elements of:
+#' * value: the numeric value of evaluating the expression
+#' * all_fixed: Are all values from the expression fixed ?
+#' * fixed: Which value(s) from `x` are fixed?
+#' @seealso \code{\link{nlmixrBoundsReplaceFixed}}
+#' @noRd
+nlmixrBoundsValueFixed <- function(x) {
+  valueFixed <- nlmixrBoundsReplaceFixed(x, replacementName=NULL)
+  # determine the numeric value after removing `fixed` names and using `fixed()`
+  # like `c()`
+  value <- try(eval(valueFixed$call, list(fixed=c)))
+  if (inherits(value, "try-error")) {
+    stop("Error parsing initial condition `", deparse(x), "`: ", attr(value, "condition")$message)
+  } else if (!is.numeric(value)) {
+    stop("Values are not numeric when evaluating initial condition bounds: ", deparse(x))
+  } else if (any(is.nan(value))) {
+    stop("Some values evaluated to NaN when evaluating initial condition bounds: ", deparse(x))
+  }
+  isFixed <- valueFixed$fixed
+  if (length(isFixed) != 1) {
+    stop( # nocov
+      "Please report this as a bug.  length(isFixed) > 1 in nlmixrBoundsValueFixed: ", # nocov
+      length(isFixed), ", `", deparse(x), "`" # nocov
+    ) # nocov
+  }
+  if (!isFixed) {
+    # Determine which specific values are fixed by assigning them to NaN
+    fixedVec <-
+      is.nan(
+        eval(
+          valueFixed$call,
+          envir=
+            list(
+              fixed=function(...) {
+                rep(NaN, length(sapply(list(...), FUN=eval)))
+              }
+            )
+        )
+      )
+  } else {
+    fixedVec <- rep(FALSE, length(value))
+  }
+  list(
+    value=value,
+    fixed=fixedVec | any(isFixed)
+  )
+}
+
+#' Find all `fixed` names and calls in a call or other language object and
+#' detect the fixed status and replace them for later evaluation.
+#' 
+#' @details Note that fixed calls, like \code{fixed(1)} do not make the return
+#'   list element of \code{fixed=TRUE}.  When the call form of fixed (e.g.
+#'   \code{fixed(1)}) is used, then fixed may only apply to a subset of
+#'   elements, and that is accounted for by \code{eval(ret$call)} outside of
+#'   this function.
+#'
+#'   `replacementName` can either be numeric (often NaN) which is usable in a
+#'   call, or it can be NULL which will remove `fixed` from the call arguments,
+#'   or it can be something that will be converted to a name.  If an actual
+#'   character string replacement is desired, make that into a name, first.
+#'
+#' @param x The object to search
+#' @param replacementFun The function name (coerced using \code{as.name()}, if
+#'   necessary) to use to replace \code{fixed()}
+#' @param replacementName \code{NULL}, a number (including \code{NaN}) or the
+#'   name (coerced using \code{as.name()}) to replace bare uses of \code{fixed},
+#'   such as `c(1, fixed)`.
+#' @return A list with names of \code{call} which is the modified call version
+#'   of \code{x} and \code{fixed} indicating if a \code{replacementName} was
+#'   used within.
+#' @seealso \code{\link{nlmixrBoundsValueFixed}}
+#' @noRd
+nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=NULL) {
+  fixedNames <- sapply(c("fix", "FIX", "fixed", "FIXED"), as.name)
+  if (!is.name(replacementFun)) {
+    if (length(replacementFun) != 1) {
+      stop("`replacementFun` must be a scalar.")
+    }
+    replacementFun <- as.name(replacementFun)
+  }
+  if (!is.numeric(replacementName) & !is.null(replacementName) & !is.name(replacementName)) {
+    if (length(replacementName) != 1) {
+      stop("`replacementName` must be a scalar or NULL.")
+    }
+    replacementName <- as.name(replacementName)
+  }
+  ret <- x
+  fixed <- FALSE
+  if (is.call(x)) {
+    if (identical(x[[1]], as.name("{")) |
+        identical(x[[1]], as.name("("))) {
+      # Note that while these types of calls are allowed, the function is only
+      # intended to be called on a single initial condition assignment at a time
+      # and not to be called on the entire initial condition assignment block.
+      retPrep <- lapply(X=x[-1], nlmixrBoundsReplaceFixed)
+      x[-1] <- retPrep$call
+      ret <- x
+      # Potential fragile code: Are there any cases where some but not all of
+      # the entries may be fixed?  (Those cases should all be caught by
+      # `fixed()` used as a function which happens elsewhere. When it is used as
+      # a name, it should likely always be all fixed.)
+      fixed <- any(retPrep$fixed)
+    } else if (any(sapply(fixedNames, identical, x[[1]]))) {
+      # Replace fixed used as a function, like `fixed(1)`, to the
+      # `replacementFun`
+      x[[1]] <- replacementFun
+      ret <- x
+      # `fixed` is not set to TRUE here as the setting to TRUE will be based on
+      # the evaluation of the function.  (Evaluation happens outside of this
+      # function.)
     } else {
-      stop(sprintf(
-        "The estimate is the same as a boundary for the following parameters: %s\nInstead use %s=c(%s) # c(lower, est)",
-        paste(df$name[w], collapse = ", "), df$name[w[1]], paste(tmp, collapse = ", ")
-      ))
+      # Find fixed used as a name, like `c(1, fixed)`.  `fixed` is only valid at
+      # the end when used as a name, `c(1, fixed)` is valid while `c(fixed, 1)`
+      # is invalid.
+      fixedPrep <-
+        lapply(
+          x,
+          FUN=nlmixrBoundsReplaceFixed,
+          replacementFun=replacementFun,
+          replacementName=replacementName
+        )
+      fixed <- sapply(fixedPrep, "[[", "fixed")
+      if (any(fixed)) {
+        if (length(fixed) == 1) {
+          # This should not be possible because this should either be a call
+          # (like `fixed()`) and caught above (x[[1]] %in% fixedNames) or a name
+          # (which would not be here because of the outer if block here as
+          # is.call(x)).
+          stop("Please report this as a bug.  Invalid detection of scalar `fixed` within a call: ", deparse(x))
+        }
+        if (any(fixed[-length(fixed)])) {
+          stop("`fixed` may only be used as the last item in a list of values: ", deparse(x))
+        }
+        # When `fixed` is at the end of a vector, it applies to the entire
+        # vector, and it should be dropped (or modified by replacementName) for
+        # later evaluation.
+        fixed <- TRUE
+      } else {
+        fixed <- FALSE
+      }
+      for (idx in rev(seq_along(fixedPrep))) {
+        # Reversing the assignment is needed to ensure that if a $call is NULL,
+        # it doesn't mess up the subsequent assignments.
+        ret[[idx]] <- fixedPrep[[idx]]$call
+      }
+    }
+  } else if (is.name(x)) {
+    fixed <- any(sapply(fixedNames, FUN=identical, x))
+    if (fixed) {
+      ret <- replacementName
     }
   }
-  w <- which(df$est >= df$upper)
-  if (length(w) > 0) {
-    stop(sprintf(
-      "The bounds make no sense for these parameters: %s.\nThey should be ordered as follows: %s=c(%s) # c(lower, est, upper)",
-      paste(df$name[w], collapse = ", "), df$name[w[1]], paste(sort(c(df$est[w[1]], df$lower[w[1]], df$upper[w[1]])), collapse = ", ")
-    ))
-  }
-  w <- which(df$lower >= df$est)
-  if (length(w) > 0) {
-    stop(sprintf(
-      "The lower bound is higher than the estimate for these parameters: %s.\nYou can adjust by %s=c(%s, %s) # c(lower, est)",
-      paste(df$name[w], collapse = ", "), df$name[w[1]], df$est[w[1]], df$lower[w[1]]
-    ))
-  }
-  .w <- which(df$lower == 0)
-  if (length(.w) > 0) df$lower[.w] <- sqrt(.Machine$double.eps)
-  .w <- which(df$upper == 0)
-  if (length(.w) > 0) df$upper[.w] <- -sqrt(.Machine$double.eps)
-  class(df) <- c("nlmixrBounds", "data.frame")
-  return(df)
+  # No `else` is required.  Other classes including name, numeric, character,
+  # and logical that are likely valid within a call but not fixed.
+  list(call=ret, fixed=fixed)
 }
+
+# nlmixrBounds helpers ####
 
 is.nlmixrBounds <- function(x) {
   should <- c("ntheta", "neta1", "neta2", "name", "lower", "est", "upper", "fix", "err", "label", "condition")

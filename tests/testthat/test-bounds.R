@@ -22,10 +22,10 @@ Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, 13,
 Inf, Inf, 13), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
 FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
 FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE), err = c(NA,
+FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE), err = as.character(c(NA,
 NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
 NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA
-), label = c("A", NA, NA, NA, "e", NA, NA, NA, NA, NA, NA, NA,
+)), label = c("A", NA, NA, NA, "e", NA, NA, NA, NA, NA, NA, NA,
 NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
 NA, "labels", NA, NA, NA), condition = c(NA, NA, NA, NA, NA,
 NA, NA, NA, "ID", "ID", "ID", "ID", "STUD", "STUD", "STUD", "ID",
@@ -81,9 +81,9 @@ NA, NA, NA, NA, NA, NA)), row.names = c(NA, -33L), class = c("nlmixrBounds",
     }
 
     test_that("Theta Bounds above 5 don't work", {
-        expect_error(nlmixrBounds(bnd), rex::rex("c(1, 2, 3, 4, 5) syntax is not supported for thetas") )
-        expect_error(nlmixrBounds(bnda), rex::rex("a = c(1, 2, 3, 4, 5) syntax is not supported for thetas"))
-        expect_error(nlmixrBounds(bndb), rex::rex("a <- c(1, 2, 3, 4, 5) syntax is not supported for thetas"))
+        expect_error(nlmixrBounds(bnd), regexp="Syntax is not supported for thetas: c(1, 2, 3, 4, 5)", fixed=TRUE)
+        expect_error(nlmixrBounds(bnda), regexp="Syntax is not supported for thetas: c(1, 2, 3, 4, 5)", fixed=TRUE)
+        expect_error(nlmixrBounds(bndb), regexp="Syntax is not supported for thetas: c(1, 2, 3, 4, 5)", fixed=TRUE)
     })
 
     bnd <- function(){
@@ -96,17 +96,17 @@ NA, NA, NA, NA, NA, NA)), row.names = c(NA, -33L), class = c("nlmixrBounds",
         a <- c(1, 2, 3, 4)
     }
     test_that("Theta Bounds above 4 don't work", {
-        expect_error(nlmixrBounds(bnd), rex::rex("c(1, 2, 3, 4) syntax is not supported for thetas") )
-        expect_error(nlmixrBounds(bnda), rex::rex("a = c(1, 2, 3, 4) syntax is not supported for thetas"))
-        expect_error(nlmixrBounds(bndb), rex::rex("a <- c(1, 2, 3, 4) syntax is not supported for thetas"))
+        expect_error(nlmixrBounds(bnd), regexp="Syntax is not supported for thetas: c(1, 2, 3, 4)", fixed=TRUE)
+        expect_error(nlmixrBounds(bnda), regexp="Syntax is not supported for thetas: c(1, 2, 3, 4)", fixed=TRUE)
+        expect_error(nlmixrBounds(bndb), regexp="Syntax is not supported for thetas: c(1, 2, 3, 4)", fixed=TRUE)
     })
 
     bnd1 <- function(){
         ~ c(1)
     }
-    ref1 <- structure(list(ntheta = NA, neta1 = 1, neta2 = 1, name = NA,
-    lower = -Inf, est = 1, upper = Inf, fix = FALSE, err = NA,
-    label = NA, condition = "ID"), row.names = c(NA, -1L), class = c("nlmixrBounds",
+    ref1 <- structure(list(ntheta = NA_real_, neta1 = 1, neta2 = 1, name = NA_character_,
+    lower = -Inf, est = 1, upper = Inf, fix = FALSE, err = NA_character_,
+    label = NA_character_, condition = "ID"), row.names = c(NA, -1L), class = c("nlmixrBounds",
 "data.frame"))
 
     bnd2 <- function(){
@@ -118,10 +118,10 @@ NA, NA, NA, NA, NA, NA)), row.names = c(NA, -33L), class = c("nlmixrBounds",
             2, 3)
     }
 
-    ref3 <- structure(list(ntheta = c(NA, NA, NA), neta1 = c(1, 2, 2), neta2 = c(1,
-1, 2), name = c(NA, NA, NA), lower = c(-Inf, -Inf, -Inf), est = c(1,
+    ref3 <- structure(list(ntheta = as.numeric(c(NA, NA, NA)), neta1 = c(1, 2, 2), neta2 = c(1,
+1, 2), name = as.character(c(NA, NA, NA)), lower = c(-Inf, -Inf, -Inf), est = c(1,
 2, 3), upper = c(Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE),
-    err = c(NA, NA, NA), label = c(NA, NA, NA), condition = c("ID",
+    err = as.character(c(NA, NA, NA)), label = as.character(c(NA, NA, NA)), condition = c("ID",
     "ID", "ID")), row.names = c(NA, -3L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -143,12 +143,12 @@ NA, NA, NA, NA, NA, NA)), row.names = c(NA, -33L), class = c("nlmixrBounds",
             4, 5, 6)
     }
 
-    ref6 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref6 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(1, 2, 3, 4, 5, 6), upper = c(Inf, Inf, Inf, Inf, Inf,
-Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), err = c(NA,
-NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), err = as.character(c(NA,
+NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
 "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -178,15 +178,15 @@ NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
             7, 8, 9, 10)
     }
 
-    ref10 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA, NA, NA, NA,
-NA), neta1 = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4), neta2 = c(1, 1,
-2, 1, 2, 3, 1, 2, 3, 4), name = c(NA, NA, NA, NA, NA, NA, NA,
-NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf,
+    ref10 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA, NA, NA, NA,
+NA)), neta1 = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4), neta2 = c(1, 1,
+2, 1, 2, 3, 1, 2, 3, 4), name = as.character(c(NA, NA, NA, NA, NA, NA, NA,
+NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf, -Inf,
 -Inf, -Inf, -Inf), est = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), upper = c(Inf,
 Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf), fix = c(FALSE,
 FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), label = c(NA,
-NA, NA, NA, NA, NA, NA, NA, NA, NA), condition = c("ID", "ID",
+), err = as.character(c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)), label = as.character(c(NA,
+NA, NA, NA, NA, NA, NA, NA, NA, NA)), condition = c("ID", "ID",
 "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -10L), class = c("nlmixrBounds", "data.frame"))
 
@@ -209,9 +209,9 @@ NA, NA, NA, NA, NA, NA, NA, NA, NA), condition = c("ID", "ID",
         eta1 ~ c(1)
     }
 
-    ref1 <- structure(list(ntheta = NA, neta1 = 1, neta2 = 1, name = "eta1",
-    lower = -Inf, est = 1, upper = Inf, fix = FALSE, err = NA,
-    label = NA, condition = "ID"), row.names = c(NA, -1L), class = c("nlmixrBounds",
+    ref1 <- structure(list(ntheta = NA_real_, neta1 = 1, neta2 = 1, name = "eta1",
+    lower = -Inf, est = 1, upper = Inf, fix = FALSE, err = NA_character_,
+    label = NA_character_, condition = "ID"), row.names = c(NA, -1L), class = c("nlmixrBounds",
 "data.frame"))
 
     bnd2 <- function(){
@@ -223,10 +223,10 @@ NA, NA, NA, NA, NA, NA, NA, NA, NA), condition = c("ID", "ID",
                        2, 3)
     }
 
-    ref3 <- structure(list(ntheta = c(NA, NA, NA), neta1 = c(1, 2, 2), neta2 = c(1,
+    ref3 <- structure(list(ntheta = as.numeric(c(NA, NA, NA)), neta1 = c(1, 2, 2), neta2 = c(1,
 1, 2), name = c("eta1", "(eta2,eta1)", "eta2"), lower = c(-Inf,
 -Inf, -Inf), est = c(1, 2, 3), upper = c(Inf, Inf, Inf), fix = c(FALSE,
-FALSE, FALSE), err = c(NA, NA, NA), label = c(NA, NA, NA), condition = c("ID",
+FALSE, FALSE), err = as.character(c(NA, NA, NA)), label = as.character(c(NA, NA, NA)), condition = c("ID",
 "ID", "ID")), row.names = c(NA, -3L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -248,13 +248,13 @@ FALSE, FALSE), err = c(NA, NA, NA), label = c(NA, NA, NA), condition = c("ID",
                                4, 5, 6)
     }
 
-    ref6 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref6 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(1,
     2, 3, 4, 5, 6), upper = c(Inf, Inf, Inf, Inf, Inf, Inf),
-    fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), err = c(NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+    fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), err = as.character(c(NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
     "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -283,30 +283,30 @@ FALSE, FALSE), err = c(NA, NA, NA), label = c(NA, NA, NA), condition = c("ID",
                                       7, 8, 9, 10)
     }
 
-    ref10 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA, NA, NA, NA,
-NA), neta1 = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4), neta2 = c(1, 1,
+    ref10 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA, NA, NA, NA,
+NA)), neta1 = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4), neta2 = c(1, 1,
 2, 1, 2, 3, 1, 2, 3, 4), name = c("eta1", "(eta2,eta1)", "eta2",
 "(eta3,eta1)", "(eta3,eta2)", "eta3", "(eta4,eta1)", "(eta4,eta2)",
 "(eta4,eta3)", "eta4"), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf,
 -Inf, -Inf, -Inf, -Inf, -Inf), est = c(1, 2, 3, 4, 5, 6, 7, 8,
 9, 10), upper = c(Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf, Inf,
 Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-FALSE, FALSE, FALSE), err = c(NA, NA, NA, NA, NA, NA, NA, NA,
-NA, NA), label = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), condition = c("ID",
+FALSE, FALSE, FALSE), err = as.character(c(NA, NA, NA, NA, NA, NA, NA, NA,
+NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)), condition = c("ID",
 "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -10L), class = c("nlmixrBounds", "data.frame"))
 
 
     test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
         expect_equal(nlmixrBounds(bnd1), ref1);
-        expect_error(nlmixrBounds(bnd2), rex::rex("eta1 ~ c(1, 2) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd2), rex::rex("~c(1, 2) does not have the right dimensions for a lower triangular matrix."))
         expect_equal(nlmixrBounds(bnd3), ref3);
-        expect_error(nlmixrBounds(bnd4), rex::rex("eta1 + eta2 ~ c(1, 2, 3, 4) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd5), rex::rex("eta1 + eta2 ~ c(1, 2, 3, 4, 5) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd4), rex::rex("~c(1, 2, 3, 4) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd5), rex::rex("~c(1, 2, 3, 4, 5) does not have the right dimensions for a lower triangular matrix."))
         expect_equal(nlmixrBounds(bnd6), ref6);
-        expect_error(nlmixrBounds(bnd7), rex::rex("eta1 + eta2 + eta3 ~ c(1, 2, 3, 4, 5, 6, 7) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd8), rex::rex("eta1 + eta2 + eta3 ~ c(1, 2, 3, 4, 5, 6, 7, 8) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd9), rex::rex("eta1 + eta2 + eta3 ~ c(1, 2, 3, 4, 5, 6, 7, 8, 9) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd7), rex::rex("~c(1, 2, 3, 4, 5, 6, 7) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd8), rex::rex("~c(1, 2, 3, 4, 5, 6, 7, 8) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd9), rex::rex("~c(1, 2, 3, 4, 5, 6, 7, 8, 9) does not have the right dimensions for a lower triangular matrix."))
         expect_equal(nlmixrBounds(bnd10), ref10)
     })
 
@@ -346,14 +346,14 @@ NA, NA), label = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), condition = c("ID",
             2, 3)
     }
 
-    ref <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 3, 3, 4, 5, 5), neta2 = c(1, 2, 2, 3, 4, 4, 5), name = c("eta0",
 "eta1", "(eta2,eta1)", "eta2", NA, NA, NA), lower = c(-Inf, -Inf,
 -Inf, -Inf, -Inf, -Inf, -Inf), est = c(0.3, 1, 2, 3, 1, 2, 3),
     upper = c(Inf, Inf, Inf, Inf, Inf, Inf, Inf), fix = c(FALSE,
-    FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), err = c(NA, NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA, NA
-    ), condition = c("ID", "STUD", "STUD", "STUD", "ID", "ID",
+    FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), err = as.character(c(NA, NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA, NA
+    )), condition = c("ID", "STUD", "STUD", "STUD", "ID", "ID",
     "ID")), row.names = c(NA, -7L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -390,12 +390,12 @@ NA, NA), label = c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), condition = c("ID",
 
     ## Now try a fixed parameter block
 
-    ref1 <- structure(list(ntheta = c(1, 2, 3, 4), neta1 = c(NA, NA, NA,
-NA), neta2 = c(NA, NA, NA, NA), name = c("a", "b", "c", "d"),
+    ref1 <- structure(list(ntheta = c(1, 2, 3, 4), neta1 = as.numeric(c(NA, NA, NA,
+NA)), neta2 = as.numeric(c(NA, NA, NA, NA)), name = c("a", "b", "c", "d"),
     lower = c(1.49011611938477e-08, 1.49011611938477e-08, -Inf,
     -Inf), est = c(1, 3, 4, 4), upper = c(2, Inf, Inf, Inf),
-    fix = c(TRUE, TRUE, FALSE, TRUE), err = c(NA, NA, NA, NA),
-    label = c("A", NA, NA, NA), condition = c(NA, NA, NA, NA)), row.names = c(NA,
+    fix = c(TRUE, TRUE, FALSE, TRUE), err = as.character(c(NA, NA, NA, NA)),
+    label = c("A", NA, NA, NA), condition = as.character(c(NA, NA, NA, NA))), row.names = c(NA,
 -4L), class = c("nlmixrBounds", "data.frame"))
 
     bnd1 <- function(){
@@ -464,13 +464,13 @@ NA), neta2 = c(NA, NA, NA, NA), name = c("a", "b", "c", "d"),
         expect_equal(nlmixrBounds(bnd8), ref1)
     })
 
-    ref1 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref1 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd1 <- function(){
@@ -479,13 +479,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, 0.1, 30)
     }
 
-    ref2 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref2 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE),
-    err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-    NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID"
+    err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+    NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID"
     )), row.names = c(NA, -6L), class = c("nlmixrBounds", "data.frame"
 ))
 
@@ -521,13 +521,13 @@ Inf, Inf, Inf), fix = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE),
         expect_equal(nlmixrBounds(bnd5), ref2)
     })
 
-    ref6 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref6 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd6 <- function(){
@@ -536,13 +536,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, 0.1, 30)
     }
 
-    ref7 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref7 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd7 <- function(){
@@ -551,13 +551,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, 0.1, 30)
     }
 
-    ref8 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref8 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd8 <- function(){
@@ -566,13 +566,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, 0.1, 30)
     }
 
-    ref9 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref9 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd9 <- function(){
@@ -581,13 +581,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             fix(0.1), 0.1, 30)
     }
 
-    ref10 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref10 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd10 <- function(){
@@ -596,13 +596,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, fix(0.1), 30)
     }
 
-    ref11 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref11 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd11 <- function(){
@@ -618,13 +618,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, 0.1, 30)
     }
 
-    ref7 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref7 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd7 <- function(){
@@ -633,13 +633,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, 0.1, 30)
     }
 
-    ref8 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref8 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd8 <- function(){
@@ -648,13 +648,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, 0.1, 30)
     }
 
-    ref9 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref9 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd9 <- function(){
@@ -663,13 +663,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             fix(0.1), 0.1, 30)
     }
 
-    ref10 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref10 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd10 <- function(){
@@ -678,13 +678,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
             0.1, fix(0.1), 30)
     }
 
-    ref11 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
-2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c(NA, NA,
-NA, NA, NA, NA), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
+    ref11 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
+2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = as.character(c(NA, NA,
+NA, NA, NA, NA)), lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf
 ), est = c(40, 0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf,
 Inf, Inf, Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE
-), err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
+), err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
 -6L), class = c("nlmixrBounds", "data.frame"))
 
     bnd11 <- function(){
@@ -948,14 +948,14 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
         expect_equal(nlmixrBounds(bnd11c), ref11)
     })
 
-    ref12 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref12 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(40,
     0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf, Inf, Inf,
     Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
-    err = c(NA, NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA,
-    NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID"
+    err = as.character(c(NA, NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA,
+    NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID"
     )), row.names = c(NA, -6L), class = c("nlmixrBounds", "data.frame"
 ))
 
@@ -965,13 +965,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
                                0.1, 0.1, 30)
     }
 
-    ref13 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref13 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(40,
     0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf, Inf, Inf,
-    Inf), fix = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE), err = c(NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+    Inf), fix = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE), err = as.character(c(NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
     "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -1008,13 +1008,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
         expect_equal(nlmixrBounds(bnd16), ref13)
     })
 
-    ref17 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref17 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(40,
     0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf, Inf, Inf,
-    Inf), fix = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE), err = c(NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+    Inf), fix = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE), err = as.character(c(NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
     "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -1025,13 +1025,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
     }
 
 
-    ref18 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref18 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(40,
     0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf, Inf, Inf,
-    Inf), fix = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE), err = c(NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+    Inf), fix = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE), err = as.character(c(NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
     "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -1041,13 +1041,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
                                0.1, 0.1, 30)
     }
 
-    ref19 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref19 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(40,
     0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf, Inf, Inf,
-    Inf), fix = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE), err = c(NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+    Inf), fix = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE), err = as.character(c(NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
     "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -1057,13 +1057,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
                                0.1, 0.1, 30)
     }
 
-    ref20 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref20 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(40,
     0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf, Inf, Inf,
-    Inf), fix = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE), err = c(NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+    Inf), fix = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE), err = as.character(c(NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
     "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -1073,13 +1073,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
                                fix(0.1), 0.1, 30)
     }
 
-    ref21 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref21 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(40,
     0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf, Inf, Inf,
-    Inf), fix = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE), err = c(NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+    Inf), fix = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE), err = as.character(c(NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
     "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -1089,13 +1089,13 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
                                0.1, fix(0.1), 30)
     }
 
-    ref22 <- structure(list(ntheta = c(NA, NA, NA, NA, NA, NA), neta1 = c(1,
+    ref22 <- structure(list(ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA)), neta1 = c(1,
 2, 2, 3, 3, 3), neta2 = c(1, 1, 2, 1, 2, 3), name = c("eta1",
 "(eta2,eta1)", "eta2", "(eta3,eta1)", "(eta3,eta2)", "eta3"),
     lower = c(-Inf, -Inf, -Inf, -Inf, -Inf, -Inf), est = c(40,
     0.1, 20, 0.1, 0.1, 30), upper = c(Inf, Inf, Inf, Inf, Inf,
-    Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE), err = c(NA,
-    NA, NA, NA, NA, NA), label = c(NA, NA, NA, NA, NA, NA), condition = c("ID",
+    Inf), fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE), err = as.character(c(NA,
+    NA, NA, NA, NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA)), condition = c("ID",
     "ID", "ID", "ID", "ID", "ID")), row.names = c(NA, -6L), class = c("nlmixrBounds",
 "data.frame"))
 
@@ -1318,13 +1318,308 @@ NA, NA), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
     }
 
     test_that("Invalid bounds raise errors",{
-        expect_error(nlmixrBounds(f1), rex::rex("The estimate, and upper and lower bounds are the same for the following parameters: lCl\nTo fix parameters use lCl=fix(5) instead."))
-        expect_error(nlmixrBounds(f2), rex::rex("The lower bound is higher than the estimate for these parameters: lCl.\nYou can adjust by lCl=c(-1.3, 0) # c(lower, est)"))
-        expect_error(nlmixrBounds(f3), rex::rex("The bounds make no sense for these parameters: lCl.\nThey should be ordered as follows: lCl=c(-10, -1.3, 0) # c(lower, est, upper)"))
-        expect_error(nlmixrBounds(f4), rex::rex("The estimate is the same as a boundary for the following parameters: lCl\nInstead use lCl=c(0, 5) # c(lower, est)"))
-        expect_error(nlmixrBounds(f5), rex::rex("The estimate is the same as a boundary for the following parameters: lCl\nInstead use lCl=c(0, 5) # c(lower, est)"))
-        expect_error(nlmixrBounds(f6), rex::rex("The estimate is the same as a boundary for the following parameter: lCl\nInstead use lCl=5 # est"))
-        expect_error(nlmixrBounds(f7), rex::rex("The '<' operator cannot be used in the ini block"))
+        expect_error(nlmixrBounds(f1), regexp="Consider fixing the following parameters:\n     lCl = fixed(5)", fixed=TRUE)
+        expect_error(nlmixrBounds(f2), regexp="Consider reordering the following parameters:\n     lCl = c(-1.3, 0)", fixed=TRUE)
+        expect_error(nlmixrBounds(f3), regexp="Consider reordering the following parameters:\n     lCl = c(-10, -1.3, 0)", fixed=TRUE)
+        expect_error(nlmixrBounds(f4), regexp="Consider fixing the following parameters:\n     lCl = fixed(5)", fixed=TRUE)
+        expect_error(nlmixrBounds(f5), regexp="Consider fixing the following parameters:\n     lCl = fixed(0)", fixed=TRUE)
+        expect_error(nlmixrBounds(f6), regexp="Consider fixing the following parameters:\n     lCl = fixed(5)", fixed=TRUE)
+        expect_error(nlmixrBounds(f7), regexp="Cannot handle the following call when setting initial conditions: lCl < 3", fixed=TRUE)
     })
 
 }, test="cran")
+
+# nlmixrBoundsValueFixed ####
+
+test_that("nlmixrBoundsValueFixed", {
+  expect_equal(
+    nlmixrBoundsValueFixed((~1)[[2]]),
+    list(value=1, fixed=FALSE)
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(1))[[2]]),
+    list(value=1, fixed=FALSE)
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(1, 2))[[2]]),
+    list(value=c(1, 2), fixed=rep(FALSE, 2))
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(1, 2, 3))[[2]]),
+    list(value=c(1, 2, 3), fixed=rep(FALSE, 3))
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(1, fixed))[[2]]),
+    list(value=1, fixed=TRUE)
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(1, 2, fixed))[[2]]),
+    list(value=c(1, 2), fixed=rep(TRUE, 2))
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(1, 2, 3, fixed))[[2]]),
+    list(value=c(1, 2, 3), fixed=rep(TRUE, 3))
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(1, fixed(2), 3, fixed))[[2]]),
+    list(value=c(1, 2, 3), fixed=rep(TRUE, 3)),
+    info="Fixed is specified two ways, but they are not in conflict"
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(1, fixed(2), 3))[[2]]),
+    list(value=c(1, 2, 3), fixed=c(FALSE, TRUE, FALSE))
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(fixed(1), 2, 3))[[2]]),
+    list(value=c(1, 2, 3), fixed=c(TRUE, FALSE, FALSE))
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(fixed(1), 2, 3))[[2]]),
+    list(value=c(1, 2, 3), fixed=c(TRUE, FALSE, FALSE))
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(fixed(1), log(2), 3))[[2]]),
+    list(value=c(1, log(2), 3), fixed=c(TRUE, FALSE, FALSE)),
+    info="Function evaluation works (though it may have issues related to environment precedence). (Fix #253)"
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(log(0), log(1.5), log(20)))[[2]]),
+    list(value=log(c(0, 1.5, 20)), fixed=rep(FALSE, 3)),
+    info="Function evaluation works (though it may have issues related to environment precedence). (Fix #253)"
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~FIX(log(0), log(1.5), log(20)))[[2]]),
+    list(value=log(c(0, 1.5, 20)), fixed=rep(TRUE, 3)),
+    info="Function evaluation works (though it may have issues related to environment precedence). (Fix #253)"
+  )
+  expect_equal(
+    nlmixrBoundsValueFixed((~c(FIX(log(0), 1/log(1.5)), 1/log(20)))[[2]]),
+    list(value=c(log(0), 1/log(1.5), 1/log(20)), fixed=c(TRUE, TRUE, FALSE)),
+    info="Function evaluation works and arbitrary complexity may be within the fixed() call (or outside of it). (Fix #253)"
+  )
+  expect_error(
+    expect_warning(
+      nlmixrBoundsValueFixed((~FIX(sqrt(-1)))[[2]]),
+      regexp="NaNs produced"
+    ),
+    regexp="Some values evaluated to NaN when evaluating initial condition bounds: FIX(sqrt(-1))",
+    fixed=TRUE,
+    info="Invalid math stops execution"
+  )
+  expect_error(
+    nlmixrBoundsValueFixed((~FIX("A"))[[2]]),
+    regexp='Values are not numeric when evaluating initial condition bounds: FIX("A")',
+    fixed=TRUE,
+    info="Values must be numbers"
+  )
+  expect_error(
+    nlmixrBoundsValueFixed((~a)[[2]]),
+    regexp="Error parsing initial condition `a`: object 'a' not found",
+    fixed=TRUE,
+    info="No variable substitutions are performed for parsing."
+  )
+})
+
+# nlmixrBoundsReplaceFixed ####
+
+test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed names within calls", {
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~a)[[2]]),
+    list(
+      call=(~a)[[2]],
+      fixed=FALSE
+    )
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~c(1, fixed))[[2]]),
+    list(
+      call=(~c(1))[[2]],
+      fixed=TRUE
+    )
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~c(1, c(1, fixed)))[[2]]),
+    list(
+      call=(~c(1, c(1)))[[2]],
+      fixed=TRUE
+    )
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~1)[[2]]),
+    list(
+      call=1,
+      fixed=FALSE
+    )
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~fixed(1))[[2]], replacementFun="c"),
+    list(
+      call=(~c(1))[[2]],
+      fixed=FALSE
+    )
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~fixed(1))[[2]], replacementFun="c"),
+    list(
+      call=(~c(1))[[2]],
+      fixed=FALSE
+    )
+  )
+  # This is weird syntax to use, but it is logically okay
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~c(1, 1, c(fixed)))[[2]]),
+    list(
+      call=(~c(1, 1, c()))[[2]],
+      fixed=TRUE
+    ),
+    info="Fixed can only be at the end of a vector of values, and detection of that works even when it is in a sub-expression."
+  )
+  expect_error(
+    nlmixrBoundsReplaceFixed((~c(fixed, 1))[[2]]),
+    regexp="`fixed` may only be used as the last item in a list of values: c(fixed, 1)",
+    fixed=TRUE,
+    info="Fixed can only be at the end of a vector of values"
+  )
+  expect_error(
+    nlmixrBoundsReplaceFixed((~c(1, c(fixed), 1))[[2]]),
+    regexp="`fixed` may only be used as the last item in a list of values: c(1, c(fixed), 1)",
+    fixed=TRUE,
+    info="Fixed can only be at the end of a vector of values, and detection of that works even when it is at the end of its sub-expression, but it is not at the overall-end of the expression."
+  )
+})
+
+test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls within calls", {
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~fixed(a))[[2]]),
+    list(
+      call=(~fixed(a))[[2]],
+      fixed=FALSE
+    ),
+    info="`fixed()` is returned unchanged"
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~fix(a))[[2]]),
+    list(
+      call=(~fixed(a))[[2]],
+      fixed=FALSE
+    ),
+    info="`fix()` is changed to `fixed()`"
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~FIX(a))[[2]]),
+    list(
+      call=(~fixed(a))[[2]],
+      fixed=FALSE
+    ),
+    info="`FIX()` is changed to `fixed()`"
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~FIXED(a))[[2]]),
+    list(
+      call=(~fixed(a))[[2]],
+      fixed=FALSE
+    ),
+    info="`FIXED()` is changed to `fixed()`"
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~1/FIX(a))[[2]]),
+    list(
+      call=(~1/fixed(a))[[2]],
+      fixed=FALSE
+    ),
+    info="`FIX()` is changed to `fixed()` inside another expression"
+  )
+  expect_equal(
+    nlmixrBoundsReplaceFixed((~1/FIX(a))[[2]], replacementFun="c"),
+    list(
+      call=(~1/c(a))[[2]],
+      fixed=FALSE
+    ),
+    info="`FIX()` is changed to `c()` inside another expression to allow for arbitrary calculations as part of initial conditions."
+  )
+})
+
+# nlmixrBoundsPrepareFun ####
+
+test_that("preparation of the function for bound extraction", {
+  expect_equal(
+    nlmixrBoundsPrepareFun(function() {1}),
+    function() {1}
+  )
+  expect_equal(
+    expect_message(
+      nlmixrBoundsPrepareFun(
+        function() {
+          1 # foo
+        }
+      ),
+      regexp="Detection of parameter labels from comments will be replaced by `label()`",
+      fixed=TRUE
+    ),
+    function() {
+      1
+      label("foo")
+    },
+    # Env and srcref attributes will not be equal
+    check.attributes=FALSE,
+    info="comment lines are converted to labels"
+  )
+})
+
+# nlmixrBoundsPrepareFunComments ####
+
+test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments", {
+  nlmixrTestFunToChar <- function(x) {
+    as.character(attr(x, "srcref"), useSource = TRUE)
+  }
+  expect_equal(
+    nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+      function() {
+        # hello
+      }
+    )),
+    function() {},
+    # Env and srcref attributes will not be equal
+    check.attributes=FALSE,
+    info="comment lines without other information are dropped"
+  )
+  expect_equal(
+    nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+      function() {
+        1 # hello
+      }
+    )),
+    function() {
+      1
+      label("hello")
+    },
+    # Env and srcref attributes will not be equal
+    check.attributes=FALSE,
+    info="comment lines with other information are converted to label()"
+  )
+  expect_equal(
+    nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+      function() {
+        1|STUDY # hello
+      }
+    )),
+    function() {
+      1|STUDY
+      label("hello")
+    },
+    # Env and srcref attributes will not be equal
+    check.attributes=FALSE,
+    info="comment lines with other information are converted to label() (even if they are on a line with a condition)"
+  )
+  expect_error(
+    nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+      function() {
+        1
+        label("# hash in a quote will try to be detected as a label, but that is wrong")
+      }
+    )),
+    regexp="Error parsing bounds; Perhaps there is an (unsupported) comment/condition inside the bounds themselves.",
+    fixed=TRUE,
+    info="This is a bug that represents one reason that trying to parse the text will always be difficult."
+  )
+})
