@@ -115,9 +115,9 @@ nlmixrBoundsPrepareFunComments <- function(fun_char) {
     fun_char <- fun_char[-w]
   }
   # convert comments to `label()` values
-  w <- which(regexpr("#+.*", fun_char) != -1)
+  w <- which(regexpr("^ *[^\n\"]+ *#+.*", fun_char) != -1)
   if (length(w) > 0) {
-    labels <- gsub(x=fun_char[w], pattern=".*#+ *(.*) *$", replacement="\\1")
+    labels <- gsub(x=fun_char[w], pattern="^ *[^\n\"]+ *#+ *(.*) *$", replacement="\\1")
     labels <- sapply(
       labels,
       function(x) {

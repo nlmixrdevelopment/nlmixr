@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{nmsimplex}
 \alias{nmsimplex}
-\title{Nelder-Mead of simplex search}
+\title{Nelder-Mead simplex search}
 \usage{
 nmsimplex(start, fr, rho = NULL, control = list())
 }
@@ -19,5 +19,5 @@ nmsimplex(start, fr, rho = NULL, control = list())
 a list of ...
 }
 \description{
-Nelder-Mead of simplex search
+Nelder-Mead simplex search
 }
