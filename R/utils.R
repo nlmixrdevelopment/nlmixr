@@ -2077,7 +2077,8 @@ cholSE <- function(matrix, tol = (.Machine$double.eps)^(1 / 3)) {
   setwd("c:/")
 }
 
-##'@export
+#' @export
+#' @importFrom ggplot2 aes_string facet_wrap geom_abline geom_line geom_point ggplot ggtitle
 plot.nlmixrDynmodel <- function(x, y, ...) {
   .lst <- list()
   .tp <- traceplot(x)
