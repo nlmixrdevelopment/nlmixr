@@ -193,14 +193,14 @@ NA, NA, NA, NA, NA, NA, NA, NA, NA)), condition = c("ID", "ID",
 
     test_that("Bad Lower trianglar matrices throw errors.", {
         expect_equal(nlmixrBounds(bnd1), ref1);
-        expect_error(nlmixrBounds(bnd2), rex::rex("~c(1, 2) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd2), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2)", fixed=TRUE)
         expect_equal(nlmixrBounds(bnd3), ref3);
-        expect_error(nlmixrBounds(bnd4), rex::rex("~c(1, 2, 3, 4) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd5), rex::rex("~c(1, 2, 3, 4, 5) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd4), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4)", fixed=TRUE)
+        expect_error(nlmixrBounds(bnd5), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4, 5)", fixed=TRUE)
         expect_equal(nlmixrBounds(bnd6), ref6);
-        expect_error(nlmixrBounds(bnd7), rex::rex("~c(1, 2, 3, 4, 5, 6, 7) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd8), rex::rex("~c(1, 2, 3, 4, 5, 6, 7, 8) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd9), rex::rex("~c(1, 2, 3, 4, 5, 6, 7, 8, 9) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd7), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4, 5, 6, 7)", fixed=TRUE)
+        expect_error(nlmixrBounds(bnd8), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4, 5, 6, 7, 8)", fixed=TRUE)
+        expect_error(nlmixrBounds(bnd9), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4, 5, 6, 7, 8, 9)", fixed=TRUE)
         expect_equal(nlmixrBounds(bnd10), ref10)
     })
 
@@ -299,14 +299,14 @@ NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)), condi
 
     test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
         expect_equal(nlmixrBounds(bnd1), ref1);
-        expect_error(nlmixrBounds(bnd2), rex::rex("~c(1, 2) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd2), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2)", fixed=TRUE)
         expect_equal(nlmixrBounds(bnd3), ref3);
-        expect_error(nlmixrBounds(bnd4), rex::rex("~c(1, 2, 3, 4) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd5), rex::rex("~c(1, 2, 3, 4, 5) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd4), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4)", fixed=TRUE)
+        expect_error(nlmixrBounds(bnd5), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4, 5)", fixed=TRUE)
         expect_equal(nlmixrBounds(bnd6), ref6);
-        expect_error(nlmixrBounds(bnd7), rex::rex("~c(1, 2, 3, 4, 5, 6, 7) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd8), rex::rex("~c(1, 2, 3, 4, 5, 6, 7, 8) does not have the right dimensions for a lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd9), rex::rex("~c(1, 2, 3, 4, 5, 6, 7, 8, 9) does not have the right dimensions for a lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd7), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4, 5, 6, 7)", fixed=TRUE)
+        expect_error(nlmixrBounds(bnd8), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4, 5, 6, 7, 8)", fixed=TRUE)
+        expect_error(nlmixrBounds(bnd9), regexp="incorrect lower triangular matrix dimensions: ~c(1, 2, 3, 4, 5, 6, 7, 8, 9)", fixed=TRUE)
         expect_equal(nlmixrBounds(bnd10), ref10)
     })
 
@@ -325,8 +325,8 @@ NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)), condi
     }
 
     test_that("Number of eta variables must match", {
-        expect_error(nlmixrBounds(bnd10.a), rex::rex("The left handed side of the expression must match the number of ETAs in the lower triangular matrix."))
-        expect_error(nlmixrBounds(bnd10.b), rex::rex("The left handed side of the expression must match the number of ETAs in the lower triangular matrix."))
+        expect_error(nlmixrBounds(bnd10.a), regexp="omega assignment left handed side must match lower triangular matrix size", fixed=TRUE)
+        expect_error(nlmixrBounds(bnd10.b), regexp="omega assignment left handed side must match lower triangular matrix size", fixed=TRUE)
     })
 
     bnd3 <- function(){
@@ -335,7 +335,7 @@ NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)), condi
     }
 
     test_that("Comments inside bounds are not supported!", {
-        expect_error(nlmixrBounds(bnd3), rex::rex("Error parsing bounds; Perhaps there is an (unsupported) comment/condition inside the bounds themselves."))
+        expect_error(nlmixrBounds(bnd3), regexp="error parsing bounds; possible (unsupported) comment/condition inside bounds", fixed=TRUE)
     })
 
     bnd1 <- function(){
@@ -1318,13 +1318,13 @@ NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
     }
 
     test_that("Invalid bounds raise errors",{
-        expect_error(nlmixrBounds(f1), regexp="Consider fixing the following parameters:\n     lCl = fixed(5)", fixed=TRUE)
-        expect_error(nlmixrBounds(f2), regexp="Consider reordering the following parameters:\n     lCl = c(-1.3, 0)", fixed=TRUE)
-        expect_error(nlmixrBounds(f3), regexp="Consider reordering the following parameters:\n     lCl = c(-10, -1.3, 0)", fixed=TRUE)
-        expect_error(nlmixrBounds(f4), regexp="Consider fixing the following parameters:\n     lCl = fixed(5)", fixed=TRUE)
-        expect_error(nlmixrBounds(f5), regexp="Consider fixing the following parameters:\n     lCl = fixed(0)", fixed=TRUE)
-        expect_error(nlmixrBounds(f6), regexp="Consider fixing the following parameters:\n     lCl = fixed(5)", fixed=TRUE)
-        expect_error(nlmixrBounds(f7), regexp="Cannot handle the following call when setting initial conditions: lCl < 3", fixed=TRUE)
+        expect_error(nlmixrBounds(f1), regexp="consider fixing these:\n     lCl = fixed(5)", fixed=TRUE)
+        expect_error(nlmixrBounds(f2), regexp="reorder bounds:\n     lCl = c(-1.3, 0)", fixed=TRUE)
+        expect_error(nlmixrBounds(f3), regexp="reorder bounds:\n     lCl = c(-10, -1.3, 0)", fixed=TRUE)
+        expect_error(nlmixrBounds(f4), regexp="consider fixing these:\n     lCl = fixed(5)", fixed=TRUE)
+        expect_error(nlmixrBounds(f5), regexp="consider fixing these:\n     lCl = fixed(0)", fixed=TRUE)
+        expect_error(nlmixrBounds(f6), regexp="consider fixing these:\n     lCl = fixed(5)", fixed=TRUE)
+        expect_error(nlmixrBounds(f7), regexp="invalid call in initial conditions: lCl < 3", fixed=TRUE)
     })
 
 }, test="cran")
@@ -1402,19 +1402,19 @@ test_that("nlmixrBoundsValueFixed", {
       nlmixrBoundsValueFixed((~FIX(sqrt(-1)))[[2]]),
       regexp="NaNs produced"
     ),
-    regexp="Some values evaluated to NaN when evaluating initial condition bounds: FIX(sqrt(-1))",
+    regexp="NaN values in initial condition: FIX(sqrt(-1))",
     fixed=TRUE,
     info="Invalid math stops execution"
   )
   expect_error(
     nlmixrBoundsValueFixed((~FIX("A"))[[2]]),
-    regexp='Values are not numeric when evaluating initial condition bounds: FIX("A")',
+    regexp='non-numeric values in initial condition: FIX("A")',
     fixed=TRUE,
     info="Values must be numbers"
   )
   expect_error(
     nlmixrBoundsValueFixed((~a)[[2]]),
-    regexp="Error parsing initial condition `a`: object 'a' not found",
+    regexp="error parsing initial condition 'a': object 'a' not found",
     fixed=TRUE,
     info="No variable substitutions are performed for parsing."
   )
@@ -1476,13 +1476,13 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed names within c
   )
   expect_error(
     nlmixrBoundsReplaceFixed((~c(fixed, 1))[[2]]),
-    regexp="`fixed` may only be used as the last item in a list of values: c(fixed, 1)",
+    regexp="'fixed' may only be the last item in a list: c(fixed, 1)",
     fixed=TRUE,
     info="Fixed can only be at the end of a vector of values"
   )
   expect_error(
     nlmixrBoundsReplaceFixed((~c(1, c(fixed), 1))[[2]]),
-    regexp="`fixed` may only be used as the last item in a list of values: c(1, c(fixed), 1)",
+    regexp="'fixed' may only be the last item in a list: c(1, c(fixed), 1)",
     fixed=TRUE,
     info="Fixed can only be at the end of a vector of values, and detection of that works even when it is at the end of its sub-expression, but it is not at the overall-end of the expression."
   )
@@ -1553,7 +1553,7 @@ test_that("preparation of the function for bound extraction", {
           1 # foo
         }
       ),
-      regexp="Detection of parameter labels from comments will be replaced by `label()`",
+      regexp="parameter labels from comments will be replaced by 'label()'",
       fixed=TRUE
     ),
     function() {
@@ -1611,15 +1611,20 @@ test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments"
     check.attributes=FALSE,
     info="comment lines with other information are converted to label() (even if they are on a line with a condition)"
   )
-  expect_error(
+  expect_equal(
     nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
       function() {
-        1
-        label("# hash in a quote will try to be detected as a label, but that is wrong")
+        1 # label 1
+        label("# hash in a quote may try to be detected as a label, but that is wrong")
       }
     )),
-    regexp="Error parsing bounds; Perhaps there is an (unsupported) comment/condition inside the bounds themselves.",
-    fixed=TRUE,
-    info="This is a bug that represents one reason that trying to parse the text will always be difficult."
+    function() {
+      1
+      label("label 1")
+      label("# hash in a quote may try to be detected as a label, but that is wrong")
+    },
+    # Env and srcref attributes will not be equal
+    check.attributes=FALSE,
+    info="This is challenging to parse, and it was formerly a bug.  It is the reason that we are moving to parsing and not string extraction."
   )
 })

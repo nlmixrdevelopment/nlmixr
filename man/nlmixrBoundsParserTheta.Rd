@@ -7,15 +7,15 @@
 nlmixrBoundsParserTheta(x, currentData)
 }
 \description{
-* `fixed(1)`
-* `fixed(1, 2)`
-* `fixed(1, 2, 3)`
-* `c(1, fixed)`
-* `c(1, 2, fixed)`
-* `c(1, 2, 3, fixed)`
-* `c(1, fixed(2))`
-* `c(1, fixed(2), 3)`
+* \code{fixed(1)}
+* \code{fixed(1, 2)}
+* \code{fixed(1, 2, 3)}
+* \code{c(1, fixed)}
+* \code{c(1, 2, fixed)}
+* \code{c(1, 2, 3, fixed)}
+* \code{c(1, fixed(2))}
+* \code{c(1, fixed(2), 3)}
 }
 \details{
-Where "fixed" can be "FIX", "FIXED", "fix", or "fixed".
+Where 'fixed' can be 'FIX', 'FIXED', 'fix', or 'fixed'.
 }

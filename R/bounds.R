@@ -38,7 +38,7 @@ nlmixrBounds_df <- function(fun) {
   funParsed <- nlmixrBoundsParser(funPrepared)
   currentParse <- 0
   if (!("assign" %in% funParsed[[1]]$operation)) {
-    stop("The item in an initialization block other than comments must be an assignment to theta, omega, or sigma.")
+    stop("first initialization item must be theta, omega, or sigma", call. = FALSE)
   }
   for (currentParse in seq_along(funParsed)) {
     if ("assign" %in% funParsed[[currentParse]]$operation) {
@@ -67,7 +67,7 @@ nlmixrBounds_df <- function(fun) {
         newRows$neta1 <- maxPreviousEta + newRows$neta1
         newRows$neta2 <- maxPreviousEta + newRows$neta2
       } else {
-        stop("Please report this as a bug.  Unknown assigment method for ", funParsed[[currentParse]]$operation[2]) # nocov
+        stop("report a bug.  unknown assigment for ", funParsed[[currentParse]]$operation[2], call. = FALSE) # nocov
       }
       currentRows <- nrow(df) + seq_len(nrow(newRows))
       df <- rbind(df, newRows)
@@ -78,7 +78,7 @@ nlmixrBounds_df <- function(fun) {
           currentData=df[currentRows, ]
         )
     } else {
-      stop("Please report this as a bug.  Unknown nlmixrBounds operation: ", funParsed[[currentParse]]$operation) # nocov
+      stop("report a bug.  unknown nlmixrBounds operation: ", funParsed[[currentParse]]$operation, call. = FALSE) # nocov
     }
   }
   df
@@ -88,13 +88,13 @@ nlmixrBoundsPrepareFun <- function(fun) {
   ret <- fun
   if (!is.null(attr(fun, "srcref"))) {
     # Check for comments, and if comments exist, try to convert them to
-    # `label(%s)`.
+    # 'label(%s)'.
     hasComments <-
       any(getParseData(
         parse(text=as.character(attr(fun, "srcref")), keep.source=TRUE),
       )$token == "COMMENT")
     if (hasComments) {
-      message("Detection of parameter labels from comments will be replaced by `label()`")
+      message("parameter labels from comments will be replaced by 'label()'")
       ret <- nlmixrBoundsPrepareFunComments(as.character(attr(fun, "srcref")))
     }
   }
@@ -114,7 +114,7 @@ nlmixrBoundsPrepareFunComments <- function(fun_char) {
   if (length(w) > 0) {
     fun_char <- fun_char[-w]
   }
-  # convert comments to `label()` values
+  # convert comments to 'label()' values
   w <- which(regexpr("^ *[^\n\"]+ *#+.*", fun_char) != -1)
   if (length(w) > 0) {
     labels <- gsub(x=fun_char[w], pattern="^ *[^\n\"]+ *#+ *(.*) *$", replacement="\\1")
@@ -136,7 +136,7 @@ nlmixrBoundsPrepareFunComments <- function(fun_char) {
       silent = TRUE
     )
   if (inherits(fun_parsed, "try-error")) {
-    stop("Error parsing bounds; Perhaps there is an (unsupported) comment/condition inside the bounds themselves.")
+    stop("error parsing bounds; possible (unsupported) comment/condition inside bounds", call. = FALSE)
   }
   # The current environment is not valid for the function as parsed here.
   environment(fun_parsed) <- emptyenv()
@@ -148,8 +148,9 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
   maskDupVarname <- duplicated(varnameC)
   if (any(maskDupVarname)) {
     stop(
-      "The following parameter names are duplicated: ",
-      paste(unique(varnameC[maskDupVarname]), collapse=", ")
+      "duplicated parameter names: ",
+      paste(unique(varnameC[maskDupVarname]), collapse=", "),
+      call. = FALSE
     )
   }
   maskNAEst <- is.na(est)
@@ -157,16 +158,17 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
   maskNAUpper <- is.na(upper)
   if (any(maskNAEst | maskNALower | maskNAUpper)) {
     stop(
-      "NA values found for the following\n",
+      "NA values\n",
       if (any(maskNAEst)) {
-        paste0("  Parameter estimates: ", paste(varname[maskNAEst], collapse=", "), "\n")
+        paste0("  estimates: ", paste(varname[maskNAEst], collapse=", "), "\n")
       },
       if (any(maskNALower)) {
-        paste0("  Lower bounds: ", paste(varname[maskNALower], collapse=", "), "\n")
+        paste0("  lower bounds: ", paste(varname[maskNALower], collapse=", "), "\n")
       },
       if (any(maskNAUpper)) {
-        paste0("  Upper bounds: ", paste(varname[maskNAUpper], collapse=", "), "\n")
-      }
+        paste0("  upper bounds: ", paste(varname[maskNAUpper], collapse=", "), "\n")
+      },
+      call. = FALSE
     )
   }
   maskGood <-
@@ -198,14 +200,14 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
   if (any(maskInfEst)) {
     messageInfEst <-
       paste(
-        "  The following have infinite estimates:",
+        "  infinite estimates:",
         paste(varname[maskInfEst], collapse=", ")
       )
   }
   if (any(maskSuggestFixed)) {
     messageFixed <-
       paste(
-        "  Consider fixing the following parameters:\n",
+        "  consider fixing these:\n",
         paste(
           sprintf("    %s = fixed(%g)", varname[maskSuggestFixed], est[maskSuggestFixed]),
           collapse="\n"
@@ -260,7 +262,7 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
       )
     messageReorder <-
       paste(
-        "  Consider reordering the following parameters:\n",
+        "  reorder bounds:\n",
         paste0(
           "    ",
           varname[maskSuggestReorder],
@@ -277,14 +279,15 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
   if (any(maskUnknown)) {
     messageUnknown <-
       paste(
-        "  Unknown issue with the following parameters:",
+        "  unknown issue with parameters:",
         paste(varname[maskUnknown], collapse=", ")
       )
   }
   if (any(!is.null(messageFixed), !is.null(messageReorder), !is.null(messageUnknown))) {
     stop(
-      "Parameter error with the following initial conditions:\n",
-      messageInfEst, messageFixed, messageReorder, messageUnknown
+      "initial conditions error:\n",
+      messageInfEst, messageFixed, messageReorder, messageUnknown,
+      call. = FALSE
     )
   }
   NULL
@@ -296,15 +299,15 @@ as.nlmixrBounds <- function(df) {
   # Ensure that the format is data.frame (instead of data.table, tibble, etc.)
   df <- as.data.frame(df)
   if (nrow(df) == 0) {
-    stop("Could not find any parameter information.")
+    stop("no parameter information", call. = FALSE)
   }
   extraColumns <- setdiff(names(df), names(nlmixrBoundsTemplate))
   if (length(extraColumns)) {
-    stop("The following extra columns are found: ", paste(extraColumns, collapse=", "))
+    stop("extra columns found: ", paste(extraColumns, collapse=", "), call. = FALSE)
   }
   missingColumns <- setdiff(names(nlmixrBoundsTemplate), names(df))
   if (length(missingColumns)) {
-    stop("The following columns are missing: ", paste(missingColumns, collapse=", "))
+    stop("columns missing: ", paste(missingColumns, collapse=", "), call. = FALSE)
   }
   nlmixrBoundsSuggest(
     varname=df$name, lower=df$lower, est=df$est, upper=df$upper, fixed=df$fix
@@ -335,8 +338,8 @@ nlmixrBoundsParser <- function(x) {
 #' @export
 nlmixrBoundsParser.default <- function(x) {
   stop(
-    "Cannot handle initial condition parsing for `", deparse(x),
-    "`, class: ", class(x)
+    "cannot parse initial condition: '", deparse(x), "', class: ", class(x),
+    call. = FALSE
   )
 }
 #' @describeIn nlmixrBoundsParser For functions, apply to the function body
@@ -370,8 +373,8 @@ nlmixrBoundsParser.function <- function(x) {
 nlmixrBoundsParser.call <- function(x) {
   if (as.character(x[[1]]) == "c" |
       grepl(x=as.character(x[[1]]), pattern="^fix(ed)?$", ignore.case=TRUE)) {
-    # unnamed assignment can happen either with `c()`, with `fix()`, or with
-    # `fixed()` (where fix and fixed are case insensitive).
+    # unnamed assignment can happen either with 'c()', with 'fix()', or with
+    # 'fixed()' (where fix and fixed are case insensitive).
       list(
         operation=c("assign", "theta"),
         varname=NA_character_,
@@ -394,7 +397,7 @@ nlmixrBoundsParser.call <- function(x) {
     } else {
       # This should never be possible because formula only parse with length=2
       # or 3.
-      stop("Invalid assignment to omega (please report this as a bug): ", deparse(x)) # nocov
+      stop("report a bug.  invalid omega assignment: ", deparse(x), call. = FALSE) # nocov
     }
   } else if (as.character(x[[1]]) %in% c("label", "condition")) {
     list(
@@ -404,10 +407,7 @@ nlmixrBoundsParser.call <- function(x) {
     )
   } else {
     # This may be a valid R expression that could be evaluated
-    stop(
-      "Cannot handle the following call when setting initial conditions: ",
-      deparse(x)
-    )
+    stop("invalid call in initial conditions: ", deparse(x), call. = FALSE)
   }
 }
 #' @describeIn nlmixrBoundsParser Assignments of numbers to thetas without names
@@ -428,16 +428,16 @@ nlmixrBoundsParser.integer <- function(x) {
 # Convert a parsed theta assignment to data.frame form.
 #' Forms of fixed that are allowed are:
 #' 
-#' * `fixed(1)`
-#' * `fixed(1, 2)`
-#' * `fixed(1, 2, 3)`
-#' * `c(1, fixed)`
-#' * `c(1, 2, fixed)`
-#' * `c(1, 2, 3, fixed)`
-#' * `c(1, fixed(2))`
-#' * `c(1, fixed(2), 3)`
+#' * \code{fixed(1)}
+#' * \code{fixed(1, 2)}
+#' * \code{fixed(1, 2, 3)}
+#' * \code{c(1, fixed)}
+#' * \code{c(1, 2, fixed)}
+#' * \code{c(1, 2, 3, fixed)}
+#' * \code{c(1, fixed(2))}
+#' * \code{c(1, fixed(2), 3)}
 #' 
-#' Where "fixed" can be "FIX", "FIXED", "fix", or "fixed".
+#' Where 'fixed' can be 'FIX', 'FIXED', 'fix', or 'fixed'.
 nlmixrBoundsParserTheta <- function(x, currentData) {
   currentData$name <- x$varname
   valueFix <- nlmixrBoundsValueFixed(x$value)
@@ -456,7 +456,7 @@ nlmixrBoundsParserTheta <- function(x, currentData) {
     currentData$est <- value[2]
     currentData$upper <- value[3]
   } else {
-    stop("Syntax is not supported for thetas: ", deparse(x$value))
+    stop("Syntax is not supported for thetas: ", deparse(x$value), call. = FALSE)
   }
   if (all(valueFix$fixed)) {
     currentData$fix <- TRUE
@@ -466,14 +466,16 @@ nlmixrBoundsParserTheta <- function(x, currentData) {
     currentData$fix <- valueFix$fixed[2]
     if (length(valueFix$fixed) == 2 && valueFix$fixed[1]) {
       stop(
-        "Cannot declare the lower bound as fixed for theta without declaring the estimate fixed: ",
-        deparse(x)
+        "cannot fix theta lower bound without fixed estimate: ",
+        deparse(x),
+        call. = FALSE
       )
     } else if (length(valueFix$fixed) == 3 &&
                (valueFix$fixed[1] | valueFix$fixed[3])) {
       stop(
-        "Cannot declare the lower or upper bounds as fixed for theta without declaring the estimate fixed: ",
-        deparse(x)
+        "cannot fix lower or upper bounds without fixing estimate: ",
+        deparse(x),
+        call. = FALSE
       )
     }
   }
@@ -486,7 +488,10 @@ nlmixrBoundsParserOmega <- function(x, currentData) {
     # The formula is conditional (i.e. ~a|b)
     conditionValue <- all.vars(x$value[[2]][[3]])
     if (length(conditionValue) != 1) {
-      stop("Invalid conditional expression, cannot parse: ", deparse(x$value))
+      stop(
+        "invalid conditional expression, cannot parse: ", deparse(x$value),
+        call. = FALSE
+      )
     }
     valueFix <- nlmixrBoundsValueFixed(x$value[[2]][[2]])
   } else {
@@ -502,7 +507,10 @@ nlmixrBoundsParserOmega <- function(x, currentData) {
   while (length(valueFix$value)) {
     currentDiagIdx <- currentDiagIdx + 1
     if (length(valueFix$value) < currentDiagIdx) {
-      stop(deparse(x$value), " does not have the right dimensions for a lower triangular matrix.")
+      stop(
+        "incorrect lower triangular matrix dimensions: ", deparse(x$value),
+        call. = FALSE
+      )
     }
     nextValues <- seq_len(currentDiagIdx)
     est <- c(est, valueFix$value[nextValues])
@@ -516,7 +524,10 @@ nlmixrBoundsParserOmega <- function(x, currentData) {
     # It has a name
     nameVec <- all.vars(x$varname)
     if (length(nameVec) != currentDiagIdx) {
-      stop("The left handed side of the expression must match the number of ETAs in the lower triangular matrix.")
+      stop(
+        "omega assignment left handed side must match lower triangular matrix size",
+        call. = FALSE
+      )
     }
     name1 <- nameVec[neta1]
     name2 <- nameVec[neta2]
@@ -545,19 +556,19 @@ nlmixrBoundsParserOmega <- function(x, currentData) {
 nlmixrBoundsParserAttribute <- function(x, currentData) {
   if (x$varname == "label") {
     if (!length(x$value) == 2) {
-      stop("Only a single label can be applied: ", deparse(x$value))
+      stop("only apply a single label: ", deparse(x$value), call. = FALSE)
     } else if (!is.character(x$value[[2]])) {
       # We could try to coerce it to a character string, but that will
       # be more likely to yield a bug at some point.
-      stop("A label must be a character string: ", deparse(x$value))
+      stop("label must be a character string: ", deparse(x$value), call. = FALSE)
     } else if (!all(is.na(currentData$label))) {
-      warning("Applying multiple labels to the same initial condition will use the last label: ", deparse(x$value))
+      warning("only last label used: ", deparse(x$value))
     }
     currentData$label <- x$value[[2]]
   } else {
     # We could ignore this, but it is likely to indicate some form of accidental
     # misspecification.
-    stop("Cannot handle attribute: ", x$varname)
+    stop("cannot handle attribute: ", x$varname, call. = FALSE)
   }
   currentData
 }
@@ -568,26 +579,33 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
 #' @return A list with elements of:
 #' * value: the numeric value of evaluating the expression
 #' * all_fixed: Are all values from the expression fixed ?
-#' * fixed: Which value(s) from `x` are fixed?
+#' * fixed: Which value(s) from \code{x} are fixed?
 #' @seealso \code{\link{nlmixrBoundsReplaceFixed}}
 #' @noRd
 nlmixrBoundsValueFixed <- function(x) {
   valueFixed <- nlmixrBoundsReplaceFixed(x, replacementName=NULL)
-  # determine the numeric value after removing `fixed` names and using `fixed()`
-  # like `c()`
+  # determine the numeric value after removing 'fixed' names and using 'fixed()'
+  # like 'c()'
   value <- try(eval(valueFixed$call, list(fixed=c)))
   if (inherits(value, "try-error")) {
-    stop("Error parsing initial condition `", deparse(x), "`: ", attr(value, "condition")$message)
+    stop(
+      "error parsing initial condition '", deparse(x), "': ", attr(value, "condition")$message,
+      call. = FALSE
+    )
   } else if (!is.numeric(value)) {
-    stop("Values are not numeric when evaluating initial condition bounds: ", deparse(x))
+    stop(
+      "non-numeric values in initial condition: ", deparse(x),
+      call. = FALSE
+    )
   } else if (any(is.nan(value))) {
-    stop("Some values evaluated to NaN when evaluating initial condition bounds: ", deparse(x))
+    stop("NaN values in initial condition: ", deparse(x), call. = FALSE)
   }
   isFixed <- valueFixed$fixed
   if (length(isFixed) != 1) {
     stop( # nocov
-      "Please report this as a bug.  length(isFixed) > 1 in nlmixrBoundsValueFixed: ", # nocov
-      length(isFixed), ", `", deparse(x), "`" # nocov
+      "report as a bug.  length(isFixed) > 1 in nlmixrBoundsValueFixed: ", # nocov
+      length(isFixed), ", '", deparse(x), "'", # nocov
+      call. = FALSE # nocov
     ) # nocov
   }
   if (!isFixed) {
@@ -613,7 +631,7 @@ nlmixrBoundsValueFixed <- function(x) {
   )
 }
 
-#' Find all `fixed` names and calls in a call or other language object and
+#' Find all \code{fixed} names and calls in a call or other language object and
 #' detect the fixed status and replace them for later evaluation.
 #' 
 #' @details Note that fixed calls, like \code{fixed(1)} do not make the return
@@ -622,17 +640,18 @@ nlmixrBoundsValueFixed <- function(x) {
 #'   elements, and that is accounted for by \code{eval(ret$call)} outside of
 #'   this function.
 #'
-#'   `replacementName` can either be numeric (often NaN) which is usable in a
-#'   call, or it can be NULL which will remove `fixed` from the call arguments,
-#'   or it can be something that will be converted to a name.  If an actual
-#'   character string replacement is desired, make that into a name, first.
+#'   \code{replacementName} can either be numeric (often NaN) which is usable in
+#'   a call, or it can be NULL which will remove \code{fixed} from the call
+#'   arguments, or it can be something that will be converted to a name.  If an
+#'   actual character string replacement is desired, make that into a name,
+#'   first.
 #'
 #' @param x The object to search
 #' @param replacementFun The function name (coerced using \code{as.name()}, if
 #'   necessary) to use to replace \code{fixed()}
 #' @param replacementName \code{NULL}, a number (including \code{NaN}) or the
 #'   name (coerced using \code{as.name()}) to replace bare uses of \code{fixed},
-#'   such as `c(1, fixed)`.
+#'   such as \code{c(1, fixed)}.
 #' @return A list with names of \code{call} which is the modified call version
 #'   of \code{x} and \code{fixed} indicating if a \code{replacementName} was
 #'   used within.
@@ -642,13 +661,13 @@ nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=
   fixedNames <- sapply(c("fix", "FIX", "fixed", "FIXED"), as.name)
   if (!is.name(replacementFun)) {
     if (length(replacementFun) != 1) {
-      stop("`replacementFun` must be a scalar.")
+      stop("'replacementFun' must be scalar", call. = FALSE)
     }
     replacementFun <- as.name(replacementFun)
   }
   if (!is.numeric(replacementName) & !is.null(replacementName) & !is.name(replacementName)) {
     if (length(replacementName) != 1) {
-      stop("`replacementName` must be a scalar or NULL.")
+      stop("'replacementName' must be scalar or NULL", call. = FALSE)
     }
     replacementName <- as.name(replacementName)
   }
@@ -665,20 +684,20 @@ nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=
       ret <- x
       # Potential fragile code: Are there any cases where some but not all of
       # the entries may be fixed?  (Those cases should all be caught by
-      # `fixed()` used as a function which happens elsewhere. When it is used as
+      # 'fixed()' used as a function which happens elsewhere. When it is used as
       # a name, it should likely always be all fixed.)
       fixed <- any(retPrep$fixed)
     } else if (any(sapply(fixedNames, identical, x[[1]]))) {
-      # Replace fixed used as a function, like `fixed(1)`, to the
-      # `replacementFun`
+      # Replace fixed used as a function, like 'fixed(1)', to the
+      # 'replacementFun'
       x[[1]] <- replacementFun
       ret <- x
-      # `fixed` is not set to TRUE here as the setting to TRUE will be based on
+      # 'fixed' is not set to TRUE here as the setting to TRUE will be based on
       # the evaluation of the function.  (Evaluation happens outside of this
       # function.)
     } else {
-      # Find fixed used as a name, like `c(1, fixed)`.  `fixed` is only valid at
-      # the end when used as a name, `c(1, fixed)` is valid while `c(fixed, 1)`
+      # Find fixed used as a name, like 'c(1, fixed)'.  'fixed' is only valid at
+      # the end when used as a name, 'c(1, fixed)' is valid while 'c(fixed, 1)'
       # is invalid.
       fixedPrep <-
         lapply(
@@ -691,15 +710,21 @@ nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=
       if (any(fixed)) {
         if (length(fixed) == 1) {
           # This should not be possible because this should either be a call
-          # (like `fixed()`) and caught above (x[[1]] %in% fixedNames) or a name
+          # (like 'fixed()') and caught above (x[[1]] %in% fixedNames) or a name
           # (which would not be here because of the outer if block here as
           # is.call(x)).
-          stop("Please report this as a bug.  Invalid detection of scalar `fixed` within a call: ", deparse(x))
+          stop(
+            "report a bug.  Invalid detection of scalar 'fixed' within a call: ", deparse(x),
+            call. = FALSE
+          )
         }
         if (any(fixed[-length(fixed)])) {
-          stop("`fixed` may only be used as the last item in a list of values: ", deparse(x))
+          stop(
+            "'fixed' may only be the last item in a list: ", deparse(x),
+            call. = FALSE
+          )
         }
-        # When `fixed` is at the end of a vector, it applies to the entire
+        # When 'fixed' is at the end of a vector, it applies to the entire
         # vector, and it should be dropped (or modified by replacementName) for
         # later evaluation.
         fixed <- TRUE
@@ -718,7 +743,7 @@ nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=
       ret <- replacementName
     }
   }
-  # No `else` is required.  Other classes including name, numeric, character,
+  # No 'else' is required.  Other classes including name, numeric, character,
   # and logical that are likely valid within a call but not fixed.
   list(call=ret, fixed=fixed)
 }
@@ -854,7 +879,7 @@ nlmixrBoundsTheta <- function(x, full = TRUE, formula = FALSE) {
     }
     if (formula) {
       if (any(duplicated(nm))) {
-        stop("Duplicated names for thetas; Cannot figure out formula")
+        stop("duplicated theta names", call. = FALSE)
       } else {
         return(as.formula(sprintf("%s ~ 1", paste(nm, collapse = " + "))))
       }
