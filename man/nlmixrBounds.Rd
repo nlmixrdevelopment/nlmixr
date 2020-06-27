@@ -2,7 +2,7 @@
 % Please edit documentation in R/bounds.R
 \name{nlmixrBounds}
 \alias{nlmixrBounds}
-\title{Extract the Nlmixr bound information from a function.}
+\title{Extract the nlmixr bound information from a function.}
 \usage{
 nlmixrBounds(fun)
 }
@@ -13,14 +13,13 @@ nlmixrBounds(fun)
 a data.frame with bound information.
 }
 \description{
-Extract the Nlmixr bound information from a function.
+Extract the nlmixr bound information from a function.
 }
 \seealso{
 Other nlmixrBounds: 
 \code{\link{nlmixrBoundsParser}()}
 }
 \author{
-Bill Denny & Matthew L. Fidler
+Bill Denney and Matthew L. Fidler
 }
 \concept{nlmixrBounds}
-\keyword{internal}
