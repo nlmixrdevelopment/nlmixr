@@ -2131,3 +2131,17 @@ as.dynmodel <- function(x) {
   return(.ret)
 }
 
+#' Generate a data.frame using the R4.0 convention
+#' 
+#' @param ... Passed to \code{base::data.frame()} or
+#'   \code{base::as.data.frame()}
+#' @param stringsAsFactors Captured so that it can be ignored and always set to
+#'   \code{FALSE}
+#' @return A data.frame with strings not converted to factors
+#' @noRd
+.data.frame <- function(..., stringsAsFactors = FALSE) {
+  base::data.frame(..., stringsAsFactors = FALSE)
+}
+.as.data.frame <- function(..., stringsAsFactors = FALSE) {
+  base::as.data.frame(..., stringsAsFactors = FALSE)
+}

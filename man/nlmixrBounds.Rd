@@ -15,7 +15,12 @@ a dataframe with bound information.
 \description{
 Extract the Nlmixr bound information from a function.
 }
+\seealso{
+Other nlmixrBounds: 
+\code{\link{nlmixrBoundsParser}()}
+}
 \author{
 Matthew L. Fidler
 }
+\concept{nlmixrBounds}
 \keyword{internal}
