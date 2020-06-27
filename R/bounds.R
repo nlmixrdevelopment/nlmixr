@@ -1,8 +1,8 @@
 ##' Extract the Nlmixr bound information from a function.
 ##'
 ##' @param fun Function to extract bound information from.
-##' @return a dataframe with bound information.
-##' @author Matthew L. Fidler
+##' @return a data.frame with bound information.
+##' @author Bill Denny & Matthew L. Fidler
 ##' @export
 ##' @keywords internal
 ##' @family nlmixrBounds
@@ -38,7 +38,7 @@ nlmixrBounds_df <- function(fun) {
   funParsed <- nlmixrBoundsParser(funPrepared)
   currentParse <- 0
   if (!("assign" %in% funParsed[[1]]$operation)) {
-    stop("first initialization item must be theta, omega, or sigma", call. = FALSE)
+    stop("first initialization item must be 'theta', 'omega', or 'sigma'", call. = FALSE)
   }
   for (currentParse in seq_along(funParsed)) {
     if ("assign" %in% funParsed[[currentParse]]$operation) {
@@ -67,7 +67,7 @@ nlmixrBounds_df <- function(fun) {
         newRows$neta1 <- maxPreviousEta + newRows$neta1
         newRows$neta2 <- maxPreviousEta + newRows$neta2
       } else {
-        stop("report a bug.  unknown assigment for ", funParsed[[currentParse]]$operation[2], call. = FALSE) # nocov
+        stop(paste0("report a bug.  unknown assignment for '", funParsed[[currentParse]]$operation[2], "'"), call. = FALSE) # nocov
       }
       currentRows <- nrow(df) + seq_len(nrow(newRows))
       df <- rbind(df, newRows)
@@ -78,7 +78,7 @@ nlmixrBounds_df <- function(fun) {
           currentData=df[currentRows, ]
         )
     } else {
-      stop("report a bug.  unknown nlmixrBounds operation: ", funParsed[[currentParse]]$operation, call. = FALSE) # nocov
+      stop(paste0("report a bug.  unknown nlmixrBounds operation: '", funParsed[[currentParse]]$operation, "'"), call. = FALSE) # nocov
     }
   }
   df
@@ -103,7 +103,7 @@ nlmixrBoundsPrepareFun <- function(fun) {
 
 #' Prepare an bounds function with comments by extracting the comments and
 #' converting them to label()
-#' 
+#'
 #' @param fun_char The function as a vector of character strings
 #' @return A function body with comments converted to \code{label()} and pipes
 #'   converted to \code{condition()} calls.
@@ -136,7 +136,7 @@ nlmixrBoundsPrepareFunComments <- function(fun_char) {
       silent = TRUE
     )
   if (inherits(fun_parsed, "try-error")) {
-    stop("error parsing bounds; possible (unsupported) comment/condition inside bounds", call. = FALSE)
+    stop("error parsing bounds: possible (unsupported) comment/condition inside bounds", call. = FALSE)
   }
   # The current environment is not valid for the function as parsed here.
   environment(fun_parsed) <- emptyenv()
@@ -148,8 +148,9 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
   maskDupVarname <- duplicated(varnameC)
   if (any(maskDupVarname)) {
     stop(
-      "duplicated parameter names: ",
-      paste(unique(varnameC[maskDupVarname]), collapse=", "),
+      paste0("duplicated parameter names: '",
+             paste(unique(varnameC[maskDupVarname]), collapse="', '"),
+             "'"),
       call. = FALSE
     )
   }
@@ -160,13 +161,13 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
     stop(
       "NA values\n",
       if (any(maskNAEst)) {
-        paste0("  estimates: ", paste(varname[maskNAEst], collapse=", "), "\n")
+        paste0("  estimates: '", paste(varname[maskNAEst], collapse="', '"), "'\n")
       },
       if (any(maskNALower)) {
-        paste0("  lower bounds: ", paste(varname[maskNALower], collapse=", "), "\n")
+        paste0("  lower bounds: '", paste(varname[maskNALower], collapse="', '"), "'\n")
       },
       if (any(maskNAUpper)) {
-        paste0("  upper bounds: ", paste(varname[maskNAUpper], collapse=", "), "\n")
+        paste0("  upper bounds: '", paste(varname[maskNAUpper], collapse="', '"), "'\n")
       },
       call. = FALSE
     )
@@ -278,10 +279,10 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
   }
   if (any(maskUnknown)) {
     messageUnknown <-
-      paste(
-        "  unknown issue with parameters:",
-        paste(varname[maskUnknown], collapse=", ")
-      )
+      paste0(paste(
+        "  unknown issue with parameters: '",
+        paste(varname[maskUnknown], collapse="', '")
+      ), "'")
   }
   if (any(!is.null(messageFixed), !is.null(messageReorder), !is.null(messageUnknown))) {
     stop(
@@ -303,11 +304,11 @@ as.nlmixrBounds <- function(df) {
   }
   extraColumns <- setdiff(names(df), names(nlmixrBoundsTemplate))
   if (length(extraColumns)) {
-    stop("extra columns found: ", paste(extraColumns, collapse=", "), call. = FALSE)
+    stop(paste0("extra columns found: '", paste(extraColumns, collapse="', '"), "'"), call. = FALSE)
   }
   missingColumns <- setdiff(names(nlmixrBoundsTemplate), names(df))
   if (length(missingColumns)) {
-    stop("columns missing: ", paste(missingColumns, collapse=", "), call. = FALSE)
+    stop(paste0("columns missing: '", paste(missingColumns, collapse="', '"), "'"), call. = FALSE)
   }
   nlmixrBoundsSuggest(
     varname=df$name, lower=df$lower, est=df$est, upper=df$upper, fixed=df$fix
@@ -323,10 +324,10 @@ as.nlmixrBounds <- function(df) {
 # nlmixrBoundsParser #####
 
 #' Functions to assist with setting initial conditions and boundaries
-#' 
+#'
 #' These functions are not intended to be called by a user.  They are intended
 #' to be internal to nlmixr.
-#' 
+#'
 #' @param x the object to attempt extraction from
 #' @return A list with how the object will be used
 #' @keywords internal
@@ -397,7 +398,7 @@ nlmixrBoundsParser.call <- function(x) {
     } else {
       # This should never be possible because formula only parse with length=2
       # or 3.
-      stop("report a bug.  invalid omega assignment: ", deparse(x), call. = FALSE) # nocov
+      stop("report a bug.  invalid 'omega' assignment: ", deparse(x), call. = FALSE) # nocov
     }
   } else if (as.character(x[[1]]) %in% c("label", "condition")) {
     list(
@@ -427,7 +428,7 @@ nlmixrBoundsParser.integer <- function(x) {
 
 # Convert a parsed theta assignment to data.frame form.
 #' Forms of fixed that are allowed are:
-#' 
+#'
 #' * \code{fixed(1)}
 #' * \code{fixed(1, 2)}
 #' * \code{fixed(1, 2, 3)}
@@ -436,7 +437,7 @@ nlmixrBoundsParser.integer <- function(x) {
 #' * \code{c(1, 2, 3, fixed)}
 #' * \code{c(1, fixed(2))}
 #' * \code{c(1, fixed(2), 3)}
-#' 
+#'
 #' Where 'fixed' can be 'FIX', 'FIXED', 'fix', or 'fixed'.
 nlmixrBoundsParserTheta <- function(x, currentData) {
   currentData$name <- x$varname
@@ -574,13 +575,14 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
 }
 
 #' Determine the values and what is fixed
-#' 
+#'
 #' @param x A call that may have fixed values
 #' @return A list with elements of:
 #' * value: the numeric value of evaluating the expression
 #' * all_fixed: Are all values from the expression fixed ?
 #' * fixed: Which value(s) from \code{x} are fixed?
 #' @seealso \code{\link{nlmixrBoundsReplaceFixed}}
+#' @author Bill Denny
 #' @noRd
 nlmixrBoundsValueFixed <- function(x) {
   valueFixed <- nlmixrBoundsReplaceFixed(x, replacementName=NULL)
@@ -603,7 +605,7 @@ nlmixrBoundsValueFixed <- function(x) {
   isFixed <- valueFixed$fixed
   if (length(isFixed) != 1) {
     stop( # nocov
-      "report as a bug.  length(isFixed) > 1 in nlmixrBoundsValueFixed: ", # nocov
+      "report as a bug.  'length(isFixed)' > 1 in nlmixrBoundsValueFixed: ", # nocov
       length(isFixed), ", '", deparse(x), "'", # nocov
       call. = FALSE # nocov
     ) # nocov
@@ -633,7 +635,7 @@ nlmixrBoundsValueFixed <- function(x) {
 
 #' Find all \code{fixed} names and calls in a call or other language object and
 #' detect the fixed status and replace them for later evaluation.
-#' 
+#'
 #' @details Note that fixed calls, like \code{fixed(1)} do not make the return
 #'   list element of \code{fixed=TRUE}.  When the call form of fixed (e.g.
 #'   \code{fixed(1)}) is used, then fixed may only apply to a subset of
@@ -656,6 +658,7 @@ nlmixrBoundsValueFixed <- function(x) {
 #'   of \code{x} and \code{fixed} indicating if a \code{replacementName} was
 #'   used within.
 #' @seealso \code{\link{nlmixrBoundsValueFixed}}
+#' @author Bill Denny
 #' @noRd
 nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=NULL) {
   fixedNames <- sapply(c("fix", "FIX", "fixed", "FIXED"), as.name)
