@@ -1,11 +1,10 @@
-##' Extract the Nlmixr bound information from a function.
-##'
-##' @param fun Function to extract bound information from.
-##' @return a data.frame with bound information.
-##' @author Bill Denney & Matthew L. Fidler
-##' @export
-##' @keywords internal
-##' @family nlmixrBounds
+#' Extract the nlmixr bound information from a function.
+#'
+#' @param fun Function to extract bound information from.
+#' @return a data.frame with bound information.
+#' @author Bill Denney and Matthew L. Fidler
+#' @family nlmixrBounds
+#' @export
 nlmixrBounds <- function(fun) {
   # Prepare the data.frame
   df <- nlmixrBounds_df(fun)
@@ -330,7 +329,6 @@ as.nlmixrBounds <- function(df) {
 #'
 #' @param x the object to attempt extraction from
 #' @return A list with how the object will be used
-#' @keywords internal
 #' @family nlmixrBounds
 #' @export
 nlmixrBoundsParser <- function(x) {
@@ -343,18 +341,18 @@ nlmixrBoundsParser.default <- function(x) {
     call. = FALSE
   )
 }
-#' @describeIn nlmixrBoundsParser For functions, apply to the function body
+# @describeIn nlmixrBoundsParser For functions, apply to the function body
 #' @export
 nlmixrBoundsParser.function <- function(x) {
   nlmixrBoundsParser(body(x))
 }
-#' @describeIn nlmixrBoundsParser For function bodies and similar.
+# @describeIn nlmixrBoundsParser For function bodies and similar.
 #' @export
 `nlmixrBoundsParser.{` <- function(x) {
   # Recurse; there is nothing more to do
   lapply(x[-1], nlmixrBoundsParser)
 }
-#' @describeIn nlmixrBoundsParser Assignments to thetas with names
+# @describeIn nlmixrBoundsParser Assignments to thetas with names
 #' @export
 `nlmixrBoundsParser.<-` <- function(x) {
   list(
@@ -363,13 +361,13 @@ nlmixrBoundsParser.function <- function(x) {
     value=x[[3]]
   )
 }
-#' @describeIn nlmixrBoundsParser Assignments to thetas with names
+# @describeIn nlmixrBoundsParser Assignments to thetas with names
 #' @export
 `nlmixrBoundsParser.=` <- function(x) {
   `nlmixrBoundsParser.<-`(x)
 }
-#' @describeIn nlmixrBoundsParser Assignments to thetas without names,
-#'   assignment to omegas with or without names, or setting of attributes.
+# @describeIn nlmixrBoundsParser Assignments to thetas without names,
+#   assignment to omegas with or without names, or setting of attributes.
 #' @export
 nlmixrBoundsParser.call <- function(x) {
   if (as.character(x[[1]]) == "c" |
@@ -411,7 +409,7 @@ nlmixrBoundsParser.call <- function(x) {
     stop("invalid call in initial conditions: ", deparse(x), call. = FALSE)
   }
 }
-#' @describeIn nlmixrBoundsParser Assignments of numbers to thetas without names
+# @describeIn nlmixrBoundsParser Assignments of numbers to thetas without names
 #' @export
 nlmixrBoundsParser.numeric <- function(x) {
   list(
@@ -420,7 +418,7 @@ nlmixrBoundsParser.numeric <- function(x) {
     value=x
   )
 }
-#' @describeIn nlmixrBoundsParser Assignments of numbers to thetas without names
+# @describeIn nlmixrBoundsParser Assignments of numbers to thetas without names
 #' @export
 nlmixrBoundsParser.integer <- function(x) {
   nlmixrBoundsParser.numeric(x)

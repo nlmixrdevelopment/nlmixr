@@ -264,7 +264,7 @@ distribution instead of a t-distribution.}
 Cholesky decomposed matrix instead of the traditional
 symmetric matrix.}
 
-\item{nSub}{Number between subject variabilities (ETAs) simulated for every
+\item{nSub}{Number between subject variabilities (ETAs) simulated for every 
 realization of the parameters.}
 
 \item{thetaMat}{Named theta matrix.}
@@ -278,13 +278,13 @@ distribution instead of a t-distribution.}
 Cholesky decomposed matrix instead of the traditional
 symmetric matrix.}
 
-\item{nStud}{Number virtual studies to characterize uncertainty in estimated
+\item{nStud}{Number virtual studies to characterize uncertainty in estimated 
 parameters.}
 
-\item{dfSub}{Degrees of freedom to sample the between subject variability matrix from the
+\item{dfSub}{Degrees of freedom to sample the between subject variability matrix from the 
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
 
-\item{dfObs}{Degrees of freedom to sample the unexplained variability matrix from the
+\item{dfObs}{Degrees of freedom to sample the unexplained variability matrix from the 
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
 
 \item{returnType}{This tells what type of object is returned.  The currently supported types are:
