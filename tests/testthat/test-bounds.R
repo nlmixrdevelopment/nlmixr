@@ -1326,8 +1326,44 @@ NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
         expect_error(nlmixrBounds(f6), regexp="consider fixing these:\n     lCl = fixed(5)", fixed=TRUE)
         expect_error(nlmixrBounds(f7), regexp="invalid call in initial conditions: lCl < 3", fixed=TRUE)
     })
-
 }, test="cran")
+
+# nlmixrBounds ####
+
+test_that("nlmixrBounds", {
+  expect_equal(
+    nlmixrBoundsParser(
+      function() {
+        ({({a = 1;b=2})})
+        {c = 3}
+        d <- 4
+      }
+    ),
+    list(
+      list(
+        operation=c("assign", "theta"),
+        varname="a",
+        value=1
+      ),
+      list(
+        operation=c("assign", "theta"),
+        varname="b",
+        value=2
+      ),
+      list(
+        operation=c("assign", "theta"),
+        varname="c",
+        value=3
+      ),
+      list(
+        operation=c("assign", "theta"),
+        varname="d",
+        value=4
+      )
+    ),
+    info="Nested assignments are unnested"
+  )
+})
 
 # nlmixrBoundsValueFixed ####
 

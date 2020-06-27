@@ -10,7 +10,7 @@ nlmixrBounds(fun)
 \item{fun}{Function to extract bound information from.}
 }
 \value{
-a dataframe with bound information.
+a data.frame with bound information.
 }
 \description{
 Extract the Nlmixr bound information from a function.
@@ -20,7 +20,7 @@ Other nlmixrBounds:
 \code{\link{nlmixrBoundsParser}()}
 }
 \author{
-Matthew L. Fidler
+Bill Denny & Matthew L. Fidler
 }
 \concept{nlmixrBounds}
 \keyword{internal}

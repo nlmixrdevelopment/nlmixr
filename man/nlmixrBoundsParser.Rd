@@ -4,6 +4,7 @@
 \alias{nlmixrBoundsParser}
 \alias{nlmixrBoundsParser.function}
 \alias{nlmixrBoundsParser.{}
+\alias{nlmixrBoundsParser.(}
 \alias{nlmixrBoundsParser.<-}
 \alias{nlmixrBoundsParser.=}
 \alias{nlmixrBoundsParser.call}
@@ -16,6 +17,8 @@ nlmixrBoundsParser(x)
 \method{nlmixrBoundsParser}{`function`}(x)
 
 \method{nlmixrBoundsParser}{`{`}(x)
+
+\method{nlmixrBoundsParser}{`(`}(x)
 
 \method{nlmixrBoundsParser}{`<-`}(x)
 
@@ -42,6 +45,8 @@ to be internal to nlmixr.
 \item \code{function}: For functions, apply to the function body
 
 \item \code{{}: For function bodies and similar.
+
+\item \code{(}: For function bodies and similar.
 
 \item \code{<-}: Assignments to thetas with names
 

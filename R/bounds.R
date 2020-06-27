@@ -336,6 +336,21 @@ as.nlmixrBounds <- function(df) {
 nlmixrBoundsParser <- function(x) {
   UseMethod("nlmixrBoundsParser")
 }
+# When nested assignments occur (like '({({a = 1})})'), unnest assignments so that
+# the result is a flat list.
+nlmixrBoundsParserUnnest <- function(x) {
+  if ("operation" %in% names(x)) {
+    list(x)
+  } else if (length(x) == 1) {
+    nlmixrBoundsParserUnnest(x[[1]])
+  } else {
+    ret <- list()
+    for (idx in seq_along(x)) {
+      ret <- append(ret, nlmixrBoundsParserUnnest(x[idx]))
+    }
+    ret
+  }
+}
 #' @export
 nlmixrBoundsParser.default <- function(x) {
   stop(
@@ -352,7 +367,14 @@ nlmixrBoundsParser.function <- function(x) {
 #' @export
 `nlmixrBoundsParser.{` <- function(x) {
   # Recurse; there is nothing more to do
-  lapply(x[-1], nlmixrBoundsParser)
+  nlmixrBoundsParserUnnest(
+    lapply(x[-1], nlmixrBoundsParser)
+  )
+}
+#' @describeIn nlmixrBoundsParser For function bodies and similar.
+#' @export
+`nlmixrBoundsParser.(` <- function(x) {
+  `nlmixrBoundsParser.{`(x)
 }
 #' @describeIn nlmixrBoundsParser Assignments to thetas with names
 #' @export
