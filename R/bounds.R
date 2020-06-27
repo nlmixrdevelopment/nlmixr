@@ -2,7 +2,7 @@
 ##'
 ##' @param fun Function to extract bound information from.
 ##' @return a data.frame with bound information.
-##' @author Bill Denny & Matthew L. Fidler
+##' @author Bill Denney & Matthew L. Fidler
 ##' @export
 ##' @keywords internal
 ##' @family nlmixrBounds
@@ -582,7 +582,7 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
 #' * all_fixed: Are all values from the expression fixed ?
 #' * fixed: Which value(s) from \code{x} are fixed?
 #' @seealso \code{\link{nlmixrBoundsReplaceFixed}}
-#' @author Bill Denny
+#' @author Bill Denney
 #' @noRd
 nlmixrBoundsValueFixed <- function(x) {
   valueFixed <- nlmixrBoundsReplaceFixed(x, replacementName=NULL)
@@ -658,7 +658,7 @@ nlmixrBoundsValueFixed <- function(x) {
 #'   of \code{x} and \code{fixed} indicating if a \code{replacementName} was
 #'   used within.
 #' @seealso \code{\link{nlmixrBoundsValueFixed}}
-#' @author Bill Denny
+#' @author Bill Denney
 #' @noRd
 nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=NULL) {
   fixedNames <- sapply(c("fix", "FIX", "fixed", "FIXED"), as.name)
