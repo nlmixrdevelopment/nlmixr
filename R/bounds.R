@@ -326,7 +326,7 @@ as.nlmixrBounds <- function(df) {
 #' Functions to assist with setting initial conditions and boundaries
 #'
 #' These functions are not intended to be called by a user.  They are intended
-#' to be internal to nlmixr.
+#' to be internal to nlmixr
 #'
 #' @param x the object to attempt extraction from
 #' @return A list with how the object will be used

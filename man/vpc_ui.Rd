@@ -52,53 +52,7 @@ this argument.}
 
 \item{n}{Number of VPC simulations.  By default 100}
 
-\item{bins}{either "density", "time", or "data", "none", or one of the approaches available in classInterval() such as "jenks" (default) or "pretty", or a numeric vector specifying the bin separators.}
-
-\item{n_bins}{when using the "auto" binning method, what number of bins to aim for}
-
-\item{bin_mid}{either "mean" for the mean of all timepoints (default) or "middle" to use the average of the bin boundaries.}
-
-\item{show}{what to show in VPC (obs_dv, obs_ci, pi, pi_as_area, pi_ci, obs_median, sim_median, sim_median_ci)}
-
-\item{stratify}{character vector of stratification variables. Only 1 or 2 stratification variables can be supplied.}
-
-\item{pred_corr}{perform prediction-correction?}
-
-\item{pred_corr_lower_bnd}{lower bound for the prediction-correction}
-
-\item{pi}{simulated prediction interval to plot. Default is c(0.05, 0.95),}
-
-\item{ci}{confidence interval to plot. Default is (0.05, 0.95)}
-
-\item{uloq}{Number or NULL indicating upper limit of quantification. Default is NULL.}
-
-\item{lloq}{Number or NULL indicating lower limit of quantification. Default is NULL.}
-
-\item{log_y}{Boolean indicting whether y-axis should be shown as logarithmic. Default is FALSE.}
-
-\item{log_y_min}{minimal value when using log_y argument. Default is 1e-3.}
-
-\item{xlab}{label for x axis}
-
-\item{ylab}{label for y axis}
-
-\item{title}{title}
-
-\item{smooth}{"smooth" the VPC (connect bin midpoints) or show bins as rectangular boxes. Default is TRUE.}
-
-\item{vpc_theme}{theme to be used in VPC. Expects list of class vpc_theme created with function vpc_theme()}
-
-\item{facet}{either "wrap", "columns", or "rows"}
-
-\item{labeller}{ggplot2 labeller function to be passed to underlying ggplot object}
-
-\item{vpcdb}{Boolean whether to return the underlying vpcdb rather than the plot}
-
-\item{verbose}{show debugging information (TRUE or FALSE)}
-
 \item{...}{Args sent to \code{\link[RxODE]{rxSolve}}}
-
-\item{sim}{this is usually a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link[vpc]{read_table_nm}.  However it can also be an object like a nlmixr or xpose object}
 }
 \value{
 Simulated dataset (invisibly)
