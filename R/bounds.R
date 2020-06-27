@@ -93,7 +93,7 @@ nlmixrBoundsPrepareFun <- function(fun) {
         parse(text=as.character(attr(fun, "srcref")), keep.source=TRUE),
       )$token == "COMMENT")
     if (hasComments) {
-      message("parameter labels from comments will be replaced by 'label()'")
+      cli::cli_alert_info("parameter labels from comments will be replaced by 'label()'")
       ret <- nlmixrBoundsPrepareFunComments(as.character(attr(fun, "srcref")))
     }
   }
