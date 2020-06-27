@@ -129,27 +129,6 @@ nlmixrBoundsPrepareFunComments <- function(fun_char) {
     fun_char[w] <- gsub(x=fun_char[w], pattern="#.*$", replacement="")
     fun_char <- c(fun_char, labels)[order(c(seq_along(fun_char), w))]
   }
-  # Find impossible condition rows (and give an error for them)
-  w <- which(regexpr("^ *[|].*", fun_char) != -1)
-  if (length(w) > 0) {
-    # This does not have code coverage because it is not valid R, and a function
-    # will not parse this way.
-    stop("A conditional statement cannot be on a line by itself.") # nocov
-  }
-  # To be removed later: condition capture has been moved to the function
-  # parsing part.
-  # Capture condition values and convert them to `condition()`
-  # w <- which(regexpr("^.*[|]", fun_char) != -1)
-  # if (length(w) > 0) {
-  #   condition <- gsub(".*[|] *(.*) *$", "\\1", fun_char[w])
-  #   condition <- sapply(
-  #     condition,
-  #     function(x) {
-  #       return(sprintf("condition(%s)", paste0(deparse(x))))
-  #     }
-  #   )
-  #   fun_char[w] <- paste0(gsub("[|].*", "", fun_char[w]), "\n", condition)
-  # }
   # Perform final parsing of the modified function
   fun_parsed <-
     try(
