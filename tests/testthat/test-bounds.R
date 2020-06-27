@@ -335,7 +335,7 @@ NA, NA)), label = as.character(c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)), condi
     }
 
     test_that("Comments inside bounds are not supported!", {
-        expect_error(nlmixrBounds(bnd3), regexp="error parsing bounds; possible (unsupported) comment/condition inside bounds", fixed=TRUE)
+        expect_error(nlmixrBounds(bnd3), regexp="error parsing bounds: possible (unsupported) comment/condition inside bounds", fixed=TRUE)
     })
 
     bnd1 <- function(){
@@ -1369,73 +1369,73 @@ test_that("nlmixrBounds", {
 
 test_that("nlmixrBoundsValueFixed", {
   expect_equal(
-    nlmixrBoundsValueFixed((~1)[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~1)[[2]]),
     list(value=1, fixed=FALSE)
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(1))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(1))[[2]]),
     list(value=1, fixed=FALSE)
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(1, 2))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(1, 2))[[2]]),
     list(value=c(1, 2), fixed=rep(FALSE, 2))
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(1, 2, 3))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(1, 2, 3))[[2]]),
     list(value=c(1, 2, 3), fixed=rep(FALSE, 3))
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(1, fixed))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(1, fixed))[[2]]),
     list(value=1, fixed=TRUE)
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(1, 2, fixed))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(1, 2, fixed))[[2]]),
     list(value=c(1, 2), fixed=rep(TRUE, 2))
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(1, 2, 3, fixed))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(1, 2, 3, fixed))[[2]]),
     list(value=c(1, 2, 3), fixed=rep(TRUE, 3))
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(1, fixed(2), 3, fixed))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(1, fixed(2), 3, fixed))[[2]]),
     list(value=c(1, 2, 3), fixed=rep(TRUE, 3)),
     info="Fixed is specified two ways, but they are not in conflict"
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(1, fixed(2), 3))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(1, fixed(2), 3))[[2]]),
     list(value=c(1, 2, 3), fixed=c(FALSE, TRUE, FALSE))
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(fixed(1), 2, 3))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(fixed(1), 2, 3))[[2]]),
     list(value=c(1, 2, 3), fixed=c(TRUE, FALSE, FALSE))
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(fixed(1), 2, 3))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(fixed(1), 2, 3))[[2]]),
     list(value=c(1, 2, 3), fixed=c(TRUE, FALSE, FALSE))
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(fixed(1), log(2), 3))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(fixed(1), log(2), 3))[[2]]),
     list(value=c(1, log(2), 3), fixed=c(TRUE, FALSE, FALSE)),
     info="Function evaluation works (though it may have issues related to environment precedence). (Fix #253)"
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(log(0), log(1.5), log(20)))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(log(0), log(1.5), log(20)))[[2]]),
     list(value=log(c(0, 1.5, 20)), fixed=rep(FALSE, 3)),
     info="Function evaluation works (though it may have issues related to environment precedence). (Fix #253)"
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~FIX(log(0), log(1.5), log(20)))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~FIX(log(0), log(1.5), log(20)))[[2]]),
     list(value=log(c(0, 1.5, 20)), fixed=rep(TRUE, 3)),
     info="Function evaluation works (though it may have issues related to environment precedence). (Fix #253)"
   )
   expect_equal(
-    nlmixrBoundsValueFixed((~c(FIX(log(0), 1/log(1.5)), 1/log(20)))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~c(FIX(log(0), 1/log(1.5)), 1/log(20)))[[2]]),
     list(value=c(log(0), 1/log(1.5), 1/log(20)), fixed=c(TRUE, TRUE, FALSE)),
     info="Function evaluation works and arbitrary complexity may be within the fixed() call (or outside of it). (Fix #253)"
   )
   expect_error(
     expect_warning(
-      nlmixrBoundsValueFixed((~FIX(sqrt(-1)))[[2]]),
+      nlmixr:::nlmixrBoundsValueFixed((~FIX(sqrt(-1)))[[2]]),
       regexp="NaNs produced"
     ),
     regexp="NaN values in initial condition: FIX(sqrt(-1))",
@@ -1443,13 +1443,13 @@ test_that("nlmixrBoundsValueFixed", {
     info="Invalid math stops execution"
   )
   expect_error(
-    nlmixrBoundsValueFixed((~FIX("A"))[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~FIX("A"))[[2]]),
     regexp='non-numeric values in initial condition: FIX("A")',
     fixed=TRUE,
     info="Values must be numbers"
   )
   expect_error(
-    nlmixrBoundsValueFixed((~a)[[2]]),
+    nlmixr:::nlmixrBoundsValueFixed((~a)[[2]]),
     regexp="error parsing initial condition 'a': object 'a' not found",
     fixed=TRUE,
     info="No variable substitutions are performed for parsing."
@@ -1460,42 +1460,42 @@ test_that("nlmixrBoundsValueFixed", {
 
 test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed names within calls", {
   expect_equal(
-    nlmixrBoundsReplaceFixed((~a)[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~a)[[2]]),
     list(
       call=(~a)[[2]],
       fixed=FALSE
     )
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~c(1, fixed))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~c(1, fixed))[[2]]),
     list(
       call=(~c(1))[[2]],
       fixed=TRUE
     )
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~c(1, c(1, fixed)))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~c(1, c(1, fixed)))[[2]]),
     list(
       call=(~c(1, c(1)))[[2]],
       fixed=TRUE
     )
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~1)[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~1)[[2]]),
     list(
       call=1,
       fixed=FALSE
     )
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~fixed(1))[[2]], replacementFun="c"),
+    nlmixr:::nlmixrBoundsReplaceFixed((~fixed(1))[[2]], replacementFun="c"),
     list(
       call=(~c(1))[[2]],
       fixed=FALSE
     )
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~fixed(1))[[2]], replacementFun="c"),
+    nlmixr:::nlmixrBoundsReplaceFixed((~fixed(1))[[2]], replacementFun="c"),
     list(
       call=(~c(1))[[2]],
       fixed=FALSE
@@ -1503,7 +1503,7 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed names within c
   )
   # This is weird syntax to use, but it is logically okay
   expect_equal(
-    nlmixrBoundsReplaceFixed((~c(1, 1, c(fixed)))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~c(1, 1, c(fixed)))[[2]]),
     list(
       call=(~c(1, 1, c()))[[2]],
       fixed=TRUE
@@ -1511,13 +1511,13 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed names within c
     info="Fixed can only be at the end of a vector of values, and detection of that works even when it is in a sub-expression."
   )
   expect_error(
-    nlmixrBoundsReplaceFixed((~c(fixed, 1))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~c(fixed, 1))[[2]]),
     regexp="'fixed' may only be the last item in a list: c(fixed, 1)",
     fixed=TRUE,
     info="Fixed can only be at the end of a vector of values"
   )
   expect_error(
-    nlmixrBoundsReplaceFixed((~c(1, c(fixed), 1))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~c(1, c(fixed), 1))[[2]]),
     regexp="'fixed' may only be the last item in a list: c(1, c(fixed), 1)",
     fixed=TRUE,
     info="Fixed can only be at the end of a vector of values, and detection of that works even when it is at the end of its sub-expression, but it is not at the overall-end of the expression."
@@ -1526,7 +1526,7 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed names within c
 
 test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls within calls", {
   expect_equal(
-    nlmixrBoundsReplaceFixed((~fixed(a))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~fixed(a))[[2]]),
     list(
       call=(~fixed(a))[[2]],
       fixed=FALSE
@@ -1534,7 +1534,7 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
     info="`fixed()` is returned unchanged"
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~fix(a))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~fix(a))[[2]]),
     list(
       call=(~fixed(a))[[2]],
       fixed=FALSE
@@ -1542,7 +1542,7 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
     info="`fix()` is changed to `fixed()`"
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~FIX(a))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~FIX(a))[[2]]),
     list(
       call=(~fixed(a))[[2]],
       fixed=FALSE
@@ -1550,7 +1550,7 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
     info="`FIX()` is changed to `fixed()`"
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~FIXED(a))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~FIXED(a))[[2]]),
     list(
       call=(~fixed(a))[[2]],
       fixed=FALSE
@@ -1558,7 +1558,7 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
     info="`FIXED()` is changed to `fixed()`"
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~1/FIX(a))[[2]]),
+    nlmixr:::nlmixrBoundsReplaceFixed((~1/FIX(a))[[2]]),
     list(
       call=(~1/fixed(a))[[2]],
       fixed=FALSE
@@ -1566,7 +1566,7 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
     info="`FIX()` is changed to `fixed()` inside another expression"
   )
   expect_equal(
-    nlmixrBoundsReplaceFixed((~1/FIX(a))[[2]], replacementFun="c"),
+    nlmixr:::nlmixrBoundsReplaceFixed((~1/FIX(a))[[2]], replacementFun="c"),
     list(
       call=(~1/c(a))[[2]],
       fixed=FALSE
@@ -1579,12 +1579,12 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
 
 test_that("preparation of the function for bound extraction", {
   expect_equal(
-    nlmixrBoundsPrepareFun(function() {1}),
+    nlmixr:::nlmixrBoundsPrepareFun(function() {1}),
     function() {1}
   )
   expect_equal(
     expect_message(
-      nlmixrBoundsPrepareFun(
+      nlmixr:::nlmixrBoundsPrepareFun(
         function() {
           1 # foo
         }
@@ -1609,7 +1609,7 @@ test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments"
     as.character(attr(x, "srcref"), useSource = TRUE)
   }
   expect_equal(
-    nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+    nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
       function() {
         # hello
       }
@@ -1620,7 +1620,7 @@ test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments"
     info="comment lines without other information are dropped"
   )
   expect_equal(
-    nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+    nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
       function() {
         1 # hello
       }
@@ -1634,7 +1634,7 @@ test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments"
     info="comment lines with other information are converted to label()"
   )
   expect_equal(
-    nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+    nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
       function() {
         1|STUDY # hello
       }
@@ -1648,7 +1648,7 @@ test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments"
     info="comment lines with other information are converted to label() (even if they are on a line with a condition)"
   )
   expect_equal(
-    nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+    nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
       function() {
         1 # label 1
         label("# hash in a quote may try to be detected as a label, but that is wrong")
