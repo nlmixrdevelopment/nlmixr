@@ -2,7 +2,7 @@
 ##'
 ##' @param fun Function to extract bound information from.
 ##' @return a data.frame with bound information.
-##' @author Bill Denny & Matthew L. Fidler
+##' @author Bill Denney & Matthew L. Fidler
 ##' @export
 ##' @keywords internal
 ##' @family nlmixrBounds
@@ -326,7 +326,7 @@ as.nlmixrBounds <- function(df) {
 #' Functions to assist with setting initial conditions and boundaries
 #'
 #' These functions are not intended to be called by a user.  They are intended
-#' to be internal to nlmixr.
+#' to be internal to nlmixr
 #'
 #' @param x the object to attempt extraction from
 #' @return A list with how the object will be used
@@ -604,7 +604,7 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
 #' * all_fixed: Are all values from the expression fixed ?
 #' * fixed: Which value(s) from \code{x} are fixed?
 #' @seealso \code{\link{nlmixrBoundsReplaceFixed}}
-#' @author Bill Denny
+#' @author Bill Denney
 #' @noRd
 nlmixrBoundsValueFixed <- function(x) {
   valueFixed <- nlmixrBoundsReplaceFixed(x, replacementName=NULL)
@@ -680,7 +680,7 @@ nlmixrBoundsValueFixed <- function(x) {
 #'   of \code{x} and \code{fixed} indicating if a \code{replacementName} was
 #'   used within.
 #' @seealso \code{\link{nlmixrBoundsValueFixed}}
-#' @author Bill Denny
+#' @author Bill Denney
 #' @noRd
 nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=NULL) {
   fixedNames <- sapply(c("fix", "FIX", "fixed", "FIXED"), as.name)
