@@ -393,47 +393,6 @@ addCovVar <- function(fitobject,
               covNameMod,
               names(fitobject$theta),
               isLog)
-    
-    # if (is.null(categorical)) {
-    #   # non-categorical variable
-    #   covNames <- list(paste0("cov_", covariate))
-    #   
-    #   res = performNorm(data=data,
-    #                      funstring=funstringSplit[[idx]],
-    #                      covariate=covariate,
-    #                      varName=varName,
-    #                      normValVec=normValVec,
-    #                      normOp=normOp,
-    #                      isLog=isLog,
-    #                      isCat = categorical)
-    #   
-    #   data = res[[1]]
-    #   covNameMod = res[[2]]
-    # 
-    #   funstringSplit[[idx]] <-
-    #     addCov3(funstringSplit[[idx]],
-    #             varName,
-    #             covNameMod,
-    #             names(fitobject$theta))
-    # }
-    # else {
-    #   # categorical variable
-    #   datColName <- paste0("categorical_", covariate)
-    #   res <- makeDummies(data, covariate = covariate)
-    #   data <- res[[1]]
-    #   covModExpr <- res[[2]]
-    #   covNames <- res[[3]]
-    #   
-    #   covNameMod <- paste(covModExpr, collapse = "+")
-    #   
-    #   funstringSplit[[idx]] <-
-    #     addCov3(funstringSplit[[idx]],
-    #             varName,
-    #             covNameMod,
-    #             names(fitobject$theta))
-    # }
-    # cli::cli_alert_success("computed {datColName} performing normalization with {norm}")
-    # cli::cli_alert_success(cli::col_blue("added '{cli::style_bold(datColName)}' to data"))
   }
   
   cli::cli_alert_success("added {covNameMod} to {varName}'s equation in the model")
@@ -557,6 +516,26 @@ makeDummies <- function(data, covariate) {
   list(newdat, covModExpr, covNames, colnames(d))
 }
 
+removCov = function(funstring, varName, covariate, isLog){ 
+  # if log: expression -> varName = exp(g(x) + covariate) -->  exp(g(x)) | covariate = a*b
+  
+  # elif not log: expression -> varName = (g(x))*(covariate) --> g(x) | covariate = a*b
+  
+  expr = strsplit(covariate, '\\*')[[1]]
+  
+  if (isLog){
+    fstringRmv = gsub(paste0('\\+', expr[[1]], '\\*', expr[[2]]), '', funstring,  perl = TRUE)
+  }
+  
+  else{
+    fstringRmv= gsub(paste0('\\*\\(', expr[[1]], '\\*', expr[[2]], '\\)'), '', funstring, perl=TRUE)
+    fstringRmv = gsub(" ", "", fstringRmv, perl=TRUE)      # remove white spaces
+  }
+  
+}
+
+
+
 addCovMultiple <- function(covInfo, fitobject, parallel = TRUE) {
   # create directory to store 'fit' objects for the covariate search
   
@@ -632,3 +611,28 @@ addCovMultiple <- function(covInfo, fitobject, parallel = TRUE) {
     }
   }
 }
+
+covarSearchSCM = function(fit, varsVec, covarsVec, relationsVarCovar=NULL, testAll=TRUE){
+  if (testAll){
+    possiblePerms = expand.grid(varsVec, covarsVec)
+    possiblePerms = list(as.character(possiblePerms[[1]]), as.character(possiblePerms[[2]]))
+    names(possiblePerms) = c('vars', 'covars')
+  }
+  else{
+    # relationsVarCovar in the form list(var1=covar1, var2=covar2, ...)  # list of lists of list
+    possiblePerms = list(names(relationsVarCovar), unlist(unname(relationsVarCovar)))
+    names(possiblePerms) = c('vars', 'covars')
+  }
+  
+  # create covInfo list --> list of lists with information on each covar
+  covInfo = list()
+  for (item in Map(list, possiblePerms$vars, possiblePerms$covars)){
+    # covInfo = list(list(varName=item[[1]], covariate=item[[2]])) # list of lists since covInfo is ideally a list of covinfos
+    covInfo[[length(covInfo)+1]] = list(varName=item[[1]], covariate=item[[2]])
+  }
+  
+  addCovMultiple(covInfo, fit, parallel = TRUE)
+  # Select best model, remove covar from possible Perms | metric: delta AIC, chi-square test | for now delta objf (without chi-square)
+  
+}
+
