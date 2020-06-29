@@ -1,6 +1,37 @@
 context("Test bounds extraction")
-rxPermissive({
 
+test_that("as.nlmixrBounds, data.frame to bounds creation works", {
+  expect_error(
+    as.nlmixrBounds(data.frame()),
+    regexp="no parameter information"
+  )
+  expect_error(
+    as.nlmixrBounds(data.frame(ntheta=1)),
+    regexp=
+      paste(
+        "columns missing:",
+        paste0("'", setdiff(names(nlmixr:::nlmixrBoundsTemplate), "ntheta"), "'", collapse=", ")
+      )
+  )
+  {
+    zero_bound <- nlmixrBoundsTemplate[1:2,]
+    zero_bound$ntheta <- 1:2
+    zero_bound$lower <- c(-Inf, 0)
+    zero_bound$est <- c(-5, 5)
+    zero_bound$upper <- c(0, Inf)
+    expect_equal(
+      as.data.frame(as.nlmixrBounds(zero_bound)[, c("lower", "upper")]),
+      data.frame(
+        lower=c(-Inf, sqrt(.Machine$double.eps)),
+        upper=c(-sqrt(.Machine$double.eps), Inf)
+      ),
+      # row.names will not be equal
+      check.attributes=FALSE
+    )
+  }
+})
+
+rxPermissive({
     ref <- structure(list(ntheta = c(1, 2, 3, 4, 5, 6, 7, 8, NA, NA, NA,
 NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
 9, 10, 11, 12, 13, 14), neta1 = c(NA, NA, NA, NA, NA, NA, NA,
@@ -1327,6 +1358,7 @@ NA, NA)), condition = c("ID", "ID", "ID", "ID", "ID", "ID")), row.names = c(NA,
         expect_error(nlmixrBounds(f7), regexp="invalid call in initial conditions: lCl < 3", fixed=TRUE)
     })
 }, test="cran")
+
 
 # nlmixrBounds ####
 
