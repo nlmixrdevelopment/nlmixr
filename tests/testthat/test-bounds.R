@@ -588,6 +588,32 @@ test_that("Theta fix fixed are reasonable", {
   expect_equal(nlmixrBounds(bnd6), ref1)
   expect_equal(nlmixrBounds(bnd7), ref1)
   expect_equal(nlmixrBounds(bnd8), ref1)
+  
+  ref2 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = 1,
+        neta1 = NA_real_,
+        neta2 = NA_real_,
+        name = "a",
+        lower = 1.49011611938477e-08,
+        est = 2,
+        upper = 3,
+        fix = TRUE,
+        err = NA_character_,
+        label = NA_character_,
+        condition = NA_character_,
+        stringsAsFactors=FALSE
+      )
+    )
+  bnd1 <- function() {
+    a <- fixed(0, 2, 3)
+  }
+  bnd2 <- function() {
+    a <- c(0, fixed(2), 3)
+  }
+  expect_equal(nlmixrBounds(bnd1), ref2)
+  expect_equal(nlmixrBounds(bnd2), ref2)
 })
 
 
@@ -754,7 +780,7 @@ test_that("Total ETA fixed (unnamed)", {
         stringsAsFactors=FALSE
       )
     )
-  
+
   bnd9 <- function(){
     ~ c(40,
         0.1, 20,
@@ -929,7 +955,7 @@ test_that("Total ETA fixed (unnamed)", {
         stringsAsFactors=FALSE
       )
     )
-  
+
   bnd11 <- function(){
     ~ c(40,
         0.1, 20,
@@ -945,6 +971,109 @@ test_that("Total ETA fixed (unnamed)", {
 })
 
 test_that("Total ETA fixed (unnamed) #a", {
+  ref6 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower =-Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref7 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref8 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref9 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref10 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref11 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+
   bnd6a <- function(){
     ~ c(fixed(40),
         0.1, 20,
@@ -1025,6 +1154,109 @@ test_that("Total ETA fixed (unnamed) #a", {
 })
 
 test_that("Total ETA fixed (unnamed) #b", {
+  ref6 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower =-Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref7 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref8 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref9 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref10 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref11 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  
   bnd6b <- function(){
     ~ c(FIX(40),
         0.1, 20,
@@ -1105,6 +1337,109 @@ test_that("Total ETA fixed (unnamed) #b", {
 })
 
 test_that("Total ETA fixed (unnamed) #c", {
+  ref6 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower =-Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref7 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref8 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref9 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref10 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+  ref11 <-
+    as.nlmixrBounds(
+      data.frame(
+        ntheta = NA_real_,
+        neta1 = c(1, 2, 2, 3, 3, 3),
+        neta2 = c(1, 1, 2, 1, 2, 3),
+        name = NA_character_,
+        lower = -Inf,
+        est = c(40, 0.1, 20, 0.1, 0.1, 30),
+        upper = Inf,
+        fix = c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE),
+        err = NA_character_,
+        label = NA_character_,
+        condition = "ID",
+        stringsAsFactors=FALSE
+      )
+    )
+
   bnd6c <- function(){
     ~ c(FIXED(40),
         0.1, 20,
