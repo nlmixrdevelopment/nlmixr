@@ -521,14 +521,21 @@ removCov = function(funstring, varName, covariate, isLog){
   
   # elif not log: expression -> varName = (g(x))*(covariate) --> g(x) | covariate = a*b
   
-  expr = strsplit(covariate, '\\*')[[1]]
+  expr = strsplit(covariate, '\\*|\\+')[[1]]
+  fstringRmv = list()
+  i=1
+  while (i %in% 1:(length(expr)-1)){
+    fstringRmv = paste0(fstringRmv, expr[[i]], '\\*', expr[[i+1]], '\\+')
+    i = i+2
+  }
   
   if (isLog){
-    fstringRmv = gsub(paste0('\\+', expr[[1]], '\\*', expr[[2]]), '', funstring,  perl = TRUE)
+    fstringRmv = gsub(fstringRmv, '', funstring,  perl = TRUE)
   }
   
   else{
-    fstringRmv= gsub(paste0('\\*\\(', expr[[1]], '\\*', expr[[2]], '\\)'), '', funstring, perl=TRUE)
+    fstringRmv = gsub('\\\\\\+$', '', fstringRmv)  # remove additional \\+ at the end
+    fstringRmv = gsub(paste0('\\*\\(', fstringRmv, '\\)'), '', funstring, perl=TRUE)
     fstringRmv = gsub(" ", "", fstringRmv, perl=TRUE)      # remove white spaces
   }
   
