@@ -32,11 +32,9 @@ preconditionFit <- function(fit, estType=c("full", "posthoc", "none")){
   } else if (estType == "posthoc") {
     .ctl$maxOuterIterations <- 0
     .ctl$boundTol <- 0
-    .ctl$etaMat <- as.matrix(fit$eta[,-1]) # Could speed up solution
     .ctl$calcTables <- FALSE
   } else if (estType == "full"){
     .ctl$boundTol <- 0
-    .ctl$etaMat <- as.matrix(fit$eta[,-1]) # Could speed up solution
     .ctl$calcTables <- FALSE
   }
   ## FIXME use vipul's get estimate routine
