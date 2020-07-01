@@ -16,7 +16,8 @@ saemControl(
   transitAbs = FALSE,
   print = 1,
   trace = 0,
-  covMethod = c("linFim", "fim", "r,s", "r", "s"),
+  covMethod = c("linFim", "fim", "r,s", "r", "s", ""),
+  calcTables = TRUE,
   logLik = FALSE,
   nnodes.gq = 3,
   nsd.gq = 1.6,
@@ -106,6 +107,9 @@ typical fitting.}
  "\code{s}" Uses the crossproduct matrix to calculate the covariance as \eqn{4\times S^-1}
 
  "" Does not calculate the covariance step.}
+
+\item{calcTables}{This boolean is to determine if the foceiFit
+will calculate tables. By default this is \code{TRUE}}
 
 \item{logLik}{boolean indicating that log-likelihood should be
 calculate by Gaussian quadrature.}

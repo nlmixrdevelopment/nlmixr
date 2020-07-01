@@ -69,7 +69,7 @@ one.cmt <- function() {
 We can now run the model...
 
 ```{r}
-fit <- nlmixr(one.cmt, theo_sd, est="nlme")
+fit <- nlmixr(one.cmt, theo_sd, est="focei")
 print(fit)
 ```
 

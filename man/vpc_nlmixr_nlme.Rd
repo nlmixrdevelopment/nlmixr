@@ -20,6 +20,8 @@ vpcNlmixrNlme(fit, nsim = 100, condition = NULL, ...)
 \item{condition}{conditional variable}
 
 \item{...}{Additional arguments}
+
+\item{sim}{this is usually a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using \link[vpc]{read_table_nm}.  However it can also be an object like a nlmixr or xpose object}
 }
 \description{
 Do visual predictive check (VPC) plots for nlme-based non-linear mixed effect models

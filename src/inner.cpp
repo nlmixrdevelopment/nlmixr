@@ -361,6 +361,30 @@ void freeFocei(){
   rxOptionsFreeFocei();
 }
 
+//' Calculate the inverse preconditioning matrix
+//'
+//' @param Rin The R matrix input
+//'
+//[[Rcpp::export]]
+SEXP preCondInv(SEXP Rin){
+  // Assumes Rin is symmetric
+  arma::vec eigval;
+  arma::mat eigvec;
+  arma::mat R = as<arma::mat>(Rin);
+  bool success = eig_sym(eigval, eigvec, R);
+  if (success){
+    // Now calculate the norm
+    arma::mat eignorm = normalise(eigvec);
+    arma::mat v12 = diagmat(1/sqrt(abs(eigval)));
+    R = eignorm*v12;
+    SEXP out = wrap(R);
+    Rf_setAttrib(out, R_DimNamesSymbol, Rf_getAttrib(Rin, R_DimNamesSymbol));
+    return out;
+  }
+  Rcpp::stop("cannot calculate the eigenvectors/eigenvalues required for preconditioning");
+  return R_NilValue;
+}
+
 typedef struct {
   //
   // std::string estStr;

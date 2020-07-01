@@ -73,6 +73,7 @@ SEXP _nlmixr_nlmixrUnscaled_(SEXP, SEXP);
 SEXP _nlmixr_saemDoPred(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP _nlmixr_saemFit(SEXP, SEXP, SEXP, SEXP);
 SEXP _nlmixr_augPredTrans(SEXP, SEXP, SEXP, SEXP);
+SEXP _nlmixr_preCondInv(SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"parse_ode",               (DL_FUNC) &parse_ode,                4},
@@ -124,6 +125,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_saemFit", (DL_FUNC) &_nlmixr_saemFit, 4},
   {"_nlmixr_augPredTrans", (DL_FUNC) &_nlmixr_augPredTrans, 4},
   {"_nlmixr_nlmixrUnscaled_", (DL_FUNC) &_nlmixr_nlmixrUnscaled_, 2},
+  {"_nlmixr_preCondInv", (DL_FUNC) _nlmixr_preCondInv, 1},
   {NULL, NULL, 0}
 };
 

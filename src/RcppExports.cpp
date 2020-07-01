@@ -16,6 +16,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// preCondInv
+SEXP preCondInv(SEXP Rin);
+RcppExport SEXP _nlmixr_preCondInv(SEXP RinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type Rin(RinSEXP);
+    rcpp_result_gen = Rcpp::wrap(preCondInv(Rin));
+    return rcpp_result_gen;
+END_RCPP
+}
 // foceiInnerLp
 NumericVector foceiInnerLp(NumericVector eta, int id);
 RcppExport SEXP _nlmixr_foceiInnerLp(SEXP etaSEXP, SEXP idSEXP) {
