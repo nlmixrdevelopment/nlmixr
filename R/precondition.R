@@ -1,4 +1,4 @@
-preconditionFit <- function(fit, estType=c("none", "posthoc", "full")){
+preconditionFit <- function(fit, estType=c("full", "posthoc", "none")){
   pre <- preCondInv(fit$R)
   P <- symengine::Matrix(pre)
   d0 <- dimnames(fit$R)[[1]]
