@@ -1531,7 +1531,7 @@ foceiFit.data.frame <- function(data, ...){
     return(.collectWarnings(do.call(foceiFit.data.frame0, call, envir=parent.frame(1))))
 }
 
-.updateParFixed <- function(.ret){
+.updateParFixed <- function(.ret) {
     if (exists("uif", envir=.ret) & exists("shrink", envir=.ret)){
         .uif <- .ret$uif;
         .lab <- paste(.uif$ini$label[!is.na(.uif$ini$ntheta)]);
@@ -2048,7 +2048,12 @@ foceiFit.data.frame0 <- function(data,
     if (inherits(.ret0, "try-error")) stop("Could not fit data.");
     .ret <- .ret0
     if (!control$calcTables){
-        return(.ret);
+      .etas <- .ret$ranef
+      .thetas <- .ret$fixef
+      .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas);
+      .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)]);
+      .updateParFixed(.ret);
+      return(.ret);
     }
     if (exists("parHistData",.ret)){
         .tmp <- .ret$parHistData;
