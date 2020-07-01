@@ -1609,7 +1609,7 @@ focei.eta.saemFit <- function(object, uif, ...){
 as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=TRUE, obf=NULL,
                              nnodes.gq=1, nsd.gq=3, adjObf=TRUE,
                              calcCov=TRUE, covMethod=NULL,
-                             calcCovTime=NULL){
+                             calcCovTime=NULL, calcTables=TRUE){
   .saemCfg  <-  attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt;
   if (class(uif) == "function"){
@@ -1853,9 +1853,11 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .ctl$maxOuterIterations <- 0;
     .ctl$maxInnerIterations  <- 0;
     .ctl$covMethod <- .covMethod;
+    .ctl
     .ctl$sumProd <- uif$env$sum.prod;
     .ctl$optExpression  <- uif$env$optExpression
     .ctl$scaleTo <- 0;
+    .ctl$calcTables <- calcTables
     .ctl <- do.call(foceiControl, .ctl)
     fit.f <- try(foceiFit.data.frame(data=dat,
                                      inits=init,

@@ -422,6 +422,13 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     } else {
       covMethod <- default$covMethod
     }
+    if (any(names(args) == "calcTables")){
+      calcTables <- args$calcTables
+    } else if (any(names(control) == "calcTables")) {
+      calcTables <- control$calcTables
+    } else {
+      calcTables <- default$calcTables
+    }
     if (any(names(control) == "logLik")){
       .logLik <- control$logLik
     } else {
@@ -493,7 +500,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         as.focei.saemFit(
           .fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik,
           nnodes.gq=.nnodes.gq, nsd.gq=.nsd.gq, adjObf=.adjObf,
-          addCov=.addCov),
+          addCov=.addCov, calcTables=calcTables),
         silent=TRUE
       )
     if (inherits(.ret, "try-error")){
@@ -970,7 +977,8 @@ saemControl <- function(seed=99,
                         transitAbs = FALSE,
                         print=1,
                         trace=0,
-                        covMethod=c("linFim", "fim", "r,s", "r", "s"),
+                        covMethod=c("linFim", "fim", "r,s", "r", "s", ""),
+                        calcTables=TRUE,
                         logLik=FALSE,
                         nnodes.gq=3,
                         nsd.gq=1.6,
@@ -1008,6 +1016,7 @@ saemControl <- function(seed=99,
   }
   .ret[["covMethod"]] <- match.arg(covMethod)
   .ret[["logLik"]] <- logLik
+  .ret[["calcTables"]] <- calcTables
   class(.ret) <- "saemControl"
   .ret
 }
