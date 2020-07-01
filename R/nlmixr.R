@@ -380,85 +380,25 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     }
     args <- as.list(match.call(expand.dots=TRUE))[-1]
     default <- saemControl()
-    if (any(names(args) == "mcmc")){
-      mcmc <- args$mcmc
-    } else if (any(names(control) == "mcmc")){
-      mcmc <- control$mcmc
-    } else {
-      mcmc <- default$mcmc
+    .getOpt <- function(arg, envir=parent.frame(1)){
+      if (arg %in% names(args)){
+        assign(paste0(".", arg), args[[arg]], envir=envir)
+      } else if (arg %in% names(control)){
+        assign(paste0(".", arg), control[[arg]], envir=envir)
+      } else if (arg %in% names(default)){
+        assign(paste0(".", arg), default[[arg]], envir=envir)
+      }
     }
-    if (any(names(args) == "ODEopt")){
-      ODEopt <- args$ODEopt
-    } else if (any(names(control) == "ODEopt")){
-      ODEopt <- control$ODEopt
-    } else {
-      ODEopt <- default$ODEopt
+    for (a in c("mcmc", "ODEopt", "seed", "print",
+                "DEBUG", "covMethod", "calcTables",
+                "logLik", "nnodes.gq",
+                "nsd.gq", "nsd.gq", "adjObf",
+                "optExpression")){
+      .getOpt(a)
     }
-    if (any(names(args) == "seed")){
-      seed <- args$seed
-    } else if (any(names(control) == "seed")){
-      seed <- control$seed
-    } else {
-      seed <- default$seed
-    }
-    if (any(names(args) == "print")){
-      print <- args$print
-    } else if (any(names(control) == "print")){
-      print <- control$print
-    } else {
-      print <- default$print
-    }
-    if (any(names(args) == "DEBUG")){
-      DEBUG <- args$DEBUG
-    } else if (any(names(control) == "DEBUG")){
-      DEBUG <- control$DEBUG
-    } else {
-      DEBUG <- default$DEBUG
-    }
-    if (any(names(args) == "covMethod")){
-      covMethod <- args$covMethod
-    } else if (any(names(control) == "covMethod")){
-      covMethod <- control$covMethod
-    } else {
-      covMethod <- default$covMethod
-    }
-    if (any(names(args) == "calcTables")){
-      calcTables <- args$calcTables
-    } else if (any(names(control) == "calcTables")) {
-      calcTables <- control$calcTables
-    } else {
-      calcTables <- default$calcTables
-    }
-    if (any(names(control) == "logLik")){
-      .logLik <- control$logLik
-    } else {
-      .logLik <- default$logLik
-    }
-    if (any(names(control) == "nnodes.gq")){
-      .nnodes.gq <- control$nnodes.gq
-    } else {
-      .nnodes.gq <- default$nnodes.gq
-    }
-    if (any(names(control) == "nsd.gq")){
-      .nsd.gq <- control$nsd.gq
-    } else {
-      .nsd.gq <- default$nsd.gq
-    }
-    if (any(names(control) == "adjObf")){
-      .adjObf <- control$adjObf
-    } else {
-      .adjObf <- default$adjObf
-    }
-    if (any(names(control) == "optExpression")){
-      uif$env$optExpression <- control$optExpression
-    } else {
-      uif$env$optExpression <- default$optExpression
-    }
-    if (any(names(control) == "covMethod")){
-      .addCov <- control$covMethod == "linFim"
-    } else {
-      .addCov <- default$covMethod == "linFim"
-    }
+    uif$env$optExpression <- .optExpression
+    .addCov <- .covMethod == "linFim"
+
     if (uif$saemErr!=""){
       stop(paste0("For SAEM:\n",uif$saemErr))
     }
@@ -473,34 +413,34 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     if (any(.low != -Inf) | any(.up != Inf)){
       warning("Bounds are ignored in SAEM")
     }
-    uif$env$mcmc <- mcmc
-    uif$env$ODEopt <- ODEopt
+    uif$env$mcmc <- .mcmc
+    uif$env$ODEopt <- .ODEopt
     uif$env$sum.prod <- sum.prod
-    uif$env$covMethod <- covMethod
+    uif$env$covMethod <- .covMethod
     .dist <- uif$saem.distribution
     model <- uif$saem.model
-    inits = uif$saem.init
+    inits <- uif$saem.init
     if (length(uif$saem.fixed)>0) {
       nphi = attr(model$saem_mod, "nrhs")
-      m = cumsum(!is.na(matrix(inits$theta, byrow=T, ncol=nphi)))
+      m = cumsum(!is.na(matrix(inits$theta, byrow=TRUE, ncol=nphi)))
       fixid = match(uif$saem.fixed, t(matrix(m,ncol=nphi)))
 
       names(inits$theta) = rep("", length(inits$theta))
       names(inits$theta)[fixid] = "FIXED"
     }
-    cfg <- configsaem(model=model, data=dat, inits=inits,
-                      mcmc=mcmc, ODEopt=ODEopt, seed=seed,
-                      distribution=.dist, DEBUG=DEBUG)
-    if (is(print, "numeric")){
-      cfg$print <- as.integer(print)
+    .cfg <- configsaem(model=model, data=dat, inits=inits,
+                      mcmc=.mcmc, ODEopt=.ODEopt, seed=.seed,
+                      distribution=.dist, DEBUG=.DEBUG)
+    if (is(.print, "numeric")){
+      .cfg$print <- as.integer(.print)
     }
-    .fit <- model$saem_mod(cfg)
+    .fit <- model$saem_mod(.cfg)
     .ret <-
       try(
         as.focei.saemFit(
           .fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik,
           nnodes.gq=.nnodes.gq, nsd.gq=.nsd.gq, adjObf=.adjObf,
-          addCov=.addCov, calcTables=calcTables),
+          calcCov=.addCov, calcTables=.calcTables),
         silent=TRUE
       )
     if (inherits(.ret, "try-error")){

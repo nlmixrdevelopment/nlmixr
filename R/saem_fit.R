@@ -1652,7 +1652,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       .tn <- .tn[!(.tn %in% .fixed)]
   }
   .calcCov  <- calcCov;
-  if (inherits(calcCov, "matrix")){
+  if (uif$env$covMethod == ""){
+    .cov <- NULL
+    .addCov <- FALSE
+  } else if (inherits(calcCov, "matrix")){
     .cov <- calcCov;
     .addCov <- TRUE
   } else {
@@ -1663,8 +1666,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .ini <- .ini[!is.na(.ini$ntheta),]
     .ini <- .ini[!.ini$fix,]
     .ini <- paste(.ini$name);
+    .calcCovTime  <- proc.time()
     if (calcCov){
-      .calcCovTime  <- proc.time();
       .covm <- object$Ha[1:.nth,1:.nth]
       .covm <- try(calc.COV(object));
       .doIt <- !inherits(.covm, "try-error");
@@ -1753,7 +1756,7 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
   .fixed <- uif$focei.fixed
   .skipCov <- .skipCov | .fixed[seq_along(.skipCov)]
   .covMethod <- uif$env$covMethod
-  if (!any(.covMethod == c("r", "s", "r,s"))){
+  if (!any(.covMethod == c("", "r", "s", "r,s"))){
     .covMethod <- "";
   }
   if (is.na(calcResid)) .covMethod <- "";
@@ -1853,7 +1856,6 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .ctl$maxOuterIterations <- 0;
     .ctl$maxInnerIterations  <- 0;
     .ctl$covMethod <- .covMethod;
-    .ctl
     .ctl$sumProd <- uif$env$sum.prod;
     .ctl$optExpression  <- uif$env$optExpression
     .ctl$scaleTo <- 0;
@@ -1896,7 +1898,8 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
     .cwresTime  <- 0;
   }
   .env <- fit.f$env;
-  if (inherits(.calcCov, "matrix")){
+  if (uif$env$covMethod == ""){
+  } else if (inherits(.calcCov, "matrix")){
     if (!is.null(covMethod)){
       .env$covMethod <- covMethod;
     }
@@ -1933,8 +1936,10 @@ as.focei.saemFit <- function(object, uif, pt=proc.time(), ..., data, calcResid=T
       .time  <- .data.frame(.time, logLik=.likTime, check.names=FALSE);
       .saemTime  <- .saemTime - .likTime;
     }
-    .saemTime  <- .saemTime - .calcCovTime;
-    .time <- .data.frame(.time, covariance=.calcCovTime, check.names=FALSE)
+    if (uif$env$covMethod != ""){
+      .saemTime  <- .saemTime - .calcCovTime;
+      .time <- .data.frame(.time, covariance=.calcCovTime, check.names=FALSE)
+    }
     .env$time <- .data.frame(saem=.saemTime, .time, check.names=FALSE, row.names=c(""))
   }
   .env$message <- "";
