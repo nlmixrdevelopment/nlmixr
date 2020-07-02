@@ -18,7 +18,6 @@ addConfboundsToVar <-
         ")"
       )
     })
-
     unlist(res)
   }
 
@@ -69,8 +68,10 @@ bootstrapFit <- function(fit,
                          nSampIndiv,
                          pvalues = NULL,
                          resume = TRUE) {
+  fitName <- as.character(substitute(fit))
+
   modelsList <-
-    modelBootstrap(fit, nboot, nSampIndiv, pvalues, resume) # multiple models
+    modelBootstrap(fit, nboot, nSampIndiv, pvalues, resume, fitName) # multiple models
   bootSummary <-
     getBootstrapSummary(modelsList) # aggregate values/summary
 
@@ -221,8 +222,8 @@ modelBootstrap <- function(fit,
                            nboot = 100,
                            nSampIndiv,
                            pvalues = NULL,
-                           resume = FALSE) {
-  fitName <- as.character(substitute(fit))
+                           resume = FALSE,
+                           fitName="fit") {
 
   if (!inherits(fit, "nlmixrFitCore")) {
     stop("'fit' needs to be a nlmixr fit", call. = FALSE)
