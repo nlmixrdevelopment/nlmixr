@@ -2,36 +2,28 @@
 % Please edit documentation in R/bootstrap.R
 \name{bootstrapFit}
 \alias{bootstrapFit}
-\title{Main bootstrap function that performs bootstrap sampling, fitting, and aggregation}
+\title{Bootstrap nlmixr fit}
 \usage{
-bootstrapFit(
-  fit,
-  numModels = 3,
-  nSampIndiv,
-  uidCol,
-  pvalues = NULL,
-  resume = TRUE
-)
+bootstrapFit(fit, nboot = 500, nSampIndiv, pvalues = NULL, resume = TRUE)
 }
 \arguments{
-\item{numModels}{an integer giving the number of bootstrapped models to be fit; default value is 3}
+\item{fit}{the nlmixr fit object}
+
+\item{nboot}{an integer giving the number of bootstrapped models to be fit; default value is 100}
 
 \item{nSampIndiv}{an integer specifying the number of samples in each bootstrapped sample; default is the number of unique subjects in the original dataset}
 
-\item{uidCol}{a string representing the unique ID of each subject in the data; default values is 'ID'}
-
-\item{pvalues}{a vector of pvalues indicating the probability of each subject to get selected; default value is NULL}
+\item{pvalues}{a vector of pvalues indicating the probability of each subject to get selected; default value is NULL implying that probability of each subject is the same}
 
 \item{resume}{a boolean that indicates if a previous session has to be resumed; default value is TRUE}
 }
 \description{
-Main bootstrap function that performs bootstrap sampling, fitting, and aggregation
+Bootstrap input dataset and rerun the model to get confidence bounds and aggregated parameters
 }
 \examples{
 bootstrapFit(fit)
-bootstrapFit(fit, numModels=5, resume=FALSE)  # overwrites any of the existing data or model files
-bootstrapFit(fit, numModels=7)  # resumes fitting using the stored data and model files
-
+bootstrapFit(fit, nboot = 5, resume = FALSE) # overwrites any of the existing data or model files
+bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
 }
 \author{
 Vipul Mann, Matthew Fidler

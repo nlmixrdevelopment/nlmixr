@@ -37,11 +37,35 @@ addConfboundsToVar <-
 #' @export
 #'
 #' @examples
+#' one.cmt <- function() {
+#'   ini({
+#'     ## You may label each parameter with a comment
+#'     tka <- 0.45 # Log Ka
+#'     tcl <- 1 # Log Cl
+#'     ## This works with interactive models
+#'     ## You may also label the preceding line with label("label text")
+#'     tv <- 3.45; label("log V")
+#'     ## the label("Label name") works with all models
+#'     eta.ka ~ 0.6
+#'     eta.cl ~ 0.3
+#'     eta.v ~ 0.1
+#'     add.sd <- 0.7
+#'   })
+#'   model({
+#'     ka <- exp(tka + eta.ka)
+#'     cl <- exp(tcl + eta.cl)
+#'     v <- exp(tv + eta.v)
+#'     linCmt() ~ add(add.sd)
+#'   })
+#' }
+#'
+#' fit <- nlmixr(one.cmt, theo_sd, "focei")
+#'
 #' bootstrapFit(fit)
 #' bootstrapFit(fit, nboot = 5, resume = FALSE) # overwrites any of the existing data or model files
 #' bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
 bootstrapFit <- function(fit,
-                         nboot = 100,
+                         nboot = 500,
                          nSampIndiv,
                          pvalues = NULL,
                          resume = TRUE) {
@@ -157,7 +181,7 @@ sampling <- function(data,
   )
 
   sampled_df <-
-    data.frame(samp_dat)[0, ] # initialize an empty dataframe with the same col names
+    data.frame(data)[0, ] # initialize an empty dataframe with the same col names
 
   # populate dataframe based on sampled uids
   # new_id = 1
@@ -204,13 +228,17 @@ modelBootstrap <- function(fit,
     stop("'fit' needs to be a nlmixr fit", call. = FALSE)
   }
 
+  data <- getData(fit)
+
+  .w <- tolower(names(data)) == "id"
+  uidCol <- names(data)[.w]
+
   checkmate::assert_integerish(nboot,
     len = 1,
     any.missing = FALSE,
     lower = 1
   )
 
-  data <- getData(fit)
 
   if (missing(nSampIndiv)) {
     nSampIndiv <- length(unique(data[, uidCol]))
@@ -225,9 +253,9 @@ modelBootstrap <- function(fit,
   }
 
   # infer the ID column from data
-  colNames <- colnames(data)
+  colNames <- names(data)
   colNamesLower <- tolower(colNames)
-  if ("id" %in% colNames) {
+  if ("id" %in% colNamesLower) {
     uid_colname <- colNames[which("id" %in% colNamesLower)]
   }
   else {
@@ -266,7 +294,11 @@ modelBootstrap <- function(fit,
     as.character(substitute(boot_data)),
     ".RData",
     sep = ""
-  )
+    )
+
+  if (!file.exists(fnameBootData)){
+    resume <- FALSE
+  }
 
   if (resume) {
     if (file.exists(fnameBootData)) {
@@ -290,7 +322,7 @@ modelBootstrap <- function(fit,
     }
     else {
       cli::cli_alert_danger(cli::col_red(
-        "need the file at {paste0(getwd(), '/', fnameBootData)} to resume"
+        "need the file at {.file {paste0(getwd(), '/', fnameBootData)}} to resume"
       ))
       stop("aborting...resume file missing", call. = FALSE)
     }
@@ -620,23 +652,20 @@ getBootstrapSummary <- function(fitList, ci = 0.95) {
   })
 
   names(summaryList) <- varIds
-  summaryList
 
   class(summaryList) <- "nlmixrBoostrapSummary"
+  summaryList
 }
 
-#' Print a well-formatted summary for the bootstrap models
-#'
-#' @param x the summary object returned by the getBootstrapSummary() function
-#'
-#' @author Vipul Mann, Matthew Fidler
-#'
-#' @noRd
-print.nlmixrBootstrapSummary <- function(x, fitObj) {
-  if (!inherits(fitObj, "nlmixrFitCore")) {
-    stop("'fit' needs to be a nlmixr fit", call. = FALSE)
+#' @export
+print.nlmixrBootstrapSummary <- function(x, ..., sigdig=NULL) {
+  if (is.null(sigdig)) {
+    if (any(names(x) == "sigdig")){
+      sigdig <- x$sigdig
+    } else {
+      sigdig <- 3
+    }
   }
-  sigdig <- fitObj$control$sigdig
 
   objf <- x$objf
   aic <- x$aic
@@ -704,6 +733,7 @@ print.nlmixrBootstrapSummary <- function(x, fitObj) {
   print(warnings)
 
   cli::cli_h1("end")
+  invsibile(x)
 }
 
 
