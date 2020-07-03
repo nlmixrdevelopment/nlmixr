@@ -295,7 +295,14 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
 
 #' Verify the accuracy of a nlmixrBounds object and update initial conditions,
 #' as required.
-as.nlmixrBounds <- function(df) {
+#' 
+#' @param df The data.frame to check and convert to an nlmixrBounds object.
+#' @param addMissingCols Should missing columns be added to the object?  (Should
+#'   typically be FALSE except for testing.)
+#' @return An nlmixrBounds object with data confirmed to be consistent.
+#' 
+#' @noRd
+as.nlmixrBounds <- function(df, addMissingCols=FALSE) {
   # Ensure that the format is data.frame (instead of data.table, tibble, etc.)
   df <- as.data.frame(df)
   if (nrow(df) == 0) {
@@ -307,8 +314,19 @@ as.nlmixrBounds <- function(df) {
   }
   missingColumns <- setdiff(names(nlmixrBoundsTemplate), names(df))
   if (length(missingColumns)) {
-    stop(paste0("columns missing: '", paste(missingColumns, collapse="', '"), "'"), call. = FALSE)
+    if (!addMissingCols) {
+      stop(paste0("columns missing: '", paste(missingColumns, collapse="', '"), "'"), call. = FALSE)
+    } else {
+      # Add in the missing columns, if requested.  This is mostly for ensuring
+      # that testing works even when new columns are added.
+      for (nm in missingColumns) {
+        df[[nm]] <- nlmixrBoundsTemplate[[nm]]
+      }
+    }
   }
+  # Ensure that the columns are in the expected order (mainly for simplification
+  # of testing)
+  df <- df[, names(nlmixrBoundsTemplate)]
   nlmixrBoundsSuggest(
     varname=df$name, lower=df$lower, est=df$est, upper=df$upper, fixed=df$fix
   )
