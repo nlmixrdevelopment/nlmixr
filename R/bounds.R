@@ -789,6 +789,99 @@ nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=
   list(call=ret, fixed=fixed)
 }
 
+#' Find all calls (i.e. function calls) and replace them
+#' 
+#' This does not apply to names that are not calls.
+#' 
+#' @param x A call to replace calls within
+#' @param replacementFun The name (or character string) to use as a replacement
+#' @param sourceNames The scalar or vector of names (or character strings) to
+#'   replace.
+#' @return \code{x} with calls to \code{sourceNames} replaced with
+#'   \code{replacementFun}
+#' @seealso \code{\link{replaceNameName}}
+#' @examples
+#' replaceCallName(x=a~b(), replacementFun="c", sourceNames="b")
+#' # names that are not calls are not replaced
+#' replaceCallName(x=a~b(b), replacementFun="c", sourceNames="b")
+#' @noRd
+replaceCallName <- function(x, replacementFun, sourceNames) {
+  if (length(replacementFun) != 1) {
+    stop("'replacementFun' must be a scalar")
+  } else if (!is.name(replacementFun)) {
+    replacementFun <- as.name(replacementFun)
+  }
+  if (!all(sapply(sourceNames, is.name))) {
+    sourceNames <- sapply(X=sourceNames, FUN=as.name)
+  }
+  if (is.call(x)) {
+    ret <- x
+    if (any(sapply(X=sourceNames, FUN=identical, y=x[[1]]))) {
+      # If one of the source names is the name of the call, replace it.
+      ret[[1]] <- replacementFun
+    }
+    for (idx in rev(seq_len(length(ret) - 1) + 1)) {
+      # Recurse through all the parts of the call, if there are more than one.
+      ret[[idx]] <-
+        replaceCallName(
+          ret[[idx]],
+          replacementFun=replacementFun,
+          sourceNames=sourceNames
+        )
+    }
+  } else {
+    # Almost any other class can be part of a call, so just return anything
+    # other than a call as-is.
+    ret <- x
+  }
+  ret
+}
+
+#' Replace a name that is not used as a function call with a new name.
+#' 
+#' This does not apply to names that are the function name of calls.
+#' 
+#' @inheritParams replaceCallName
+#' @param replacementName The name (or character string) to use as a replacement
+#' @return \code{x} with calls to \code{sourceNames} replaced with
+#'   \code{replacementFun}
+#' @seealso \code{\link{replaceCallName}}
+#' @noRd
+replaceNameName <- function(x, replacementName, sourceNames) {
+  if (length(replacementName) != 1) {
+    stop("'replacementName' must be a scalar")
+  } else if (!is.name(replacementName)) {
+    replacementName <- as.name(replacementName)
+  }
+  if (!all(sapply(sourceNames, is.name))) {
+    sourceNames <- sapply(X=sourceNames, FUN=as.name)
+  }
+  if (is.call(x)) {
+    ret <- x
+    # Recurse through all the parts of the call after the first (i.e. do not
+    # replace function calls), if there are more than one.
+    for (idx in rev(seq_len(length(ret) - 1) + 1)) {
+      ret[[idx]] <-
+        replaceNameName(
+          ret[[idx]],
+          replacementName=replacementName,
+          sourceNames=sourceNames
+        )
+    }
+  } else if (is.name(x)) {
+    if (any(sapply(X=sourceNames, FUN=identical, y=x))) {
+      ret <- replacementName
+    } else {
+      ret <- x
+    }
+  } else {
+    # Almost any other class can be part of a call, so just return anything
+    # other than a call or a name as-is.
+    ret <- x
+  }
+  ret
+}
+
 # nlmixrBounds helpers ####
 
 is.nlmixrBounds <- function(x) {

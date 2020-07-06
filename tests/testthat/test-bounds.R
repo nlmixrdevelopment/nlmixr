@@ -2354,3 +2354,70 @@ test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments"
     info="This is challenging to parse, and it was formerly a bug.  It is the reason that we are moving to parsing and not string extraction."
   )
 })
+
+# Test call and name replacement ####
+test_that("call replacement", {
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b(), replacementFun="c", sourceNames="b"),
+    a~c(),
+    check.attributes=FALSE,
+    info="Simple replacement works"
+  )
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b(c+d*b(e)), replacementFun="c", sourceNames="b"),
+    a~c(c+d*c(e)),
+    check.attributes=FALSE,
+    info="Nested replacement works"
+  )
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b, replacementFun="c", sourceNames="b"),
+    a~b,
+    check.attributes=FALSE,
+    info="Names that are not calls are not replaced"
+  )
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b(b), replacementFun="c", sourceNames="b"),
+    a~c(b),
+    check.attributes=FALSE,
+    info="Nested names that are not calls are not replaced"
+  )
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b(1+"A"), replacementFun="c", sourceNames="b"),
+    a~c(1+"A"),
+    check.attributes=FALSE,
+    info="Non-name values are permitted"
+  )
+})
+
+test_that("name replacement", {
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b, replacementName="c", sourceNames="b"),
+    a~c,
+    check.attributes=FALSE,
+    info="Names that are not calls are replaced"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(), replacementName="c", sourceNames="b"),
+    a~b(),
+    check.attributes=FALSE,
+    info="Function calls are skipped"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(c+d*b(e)), replacementName="c", sourceNames="b"),
+    a~b(c+d*b(e)),
+    check.attributes=FALSE,
+    info="Nested replacement still ignores function calls"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(b), replacementName="c", sourceNames="b"),
+    a~b(c),
+    check.attributes=FALSE,
+    info="Nested names that are not calls are replaced"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(1+"A"), replacementName="c", sourceNames="b"),
+    a~b(1+"A"),
+    check.attributes=FALSE,
+    info="Non-name values are permitted"
+  )
+})
