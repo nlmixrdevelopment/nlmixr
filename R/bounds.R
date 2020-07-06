@@ -842,13 +842,17 @@ replaceCallName <- function(x, replacementFun, sourceNames) {
 #' This does not apply to names that are the function name of calls.
 #' 
 #' @inheritParams replaceCallName
-#' @param replacementName The name (or character string) to use as a replacement
+#' @param replacementName The name (or character string) to use as a
+#'   replacement; if \code{NULL}, the name is removed (which can make an invalid
+#'   call).
 #' @return \code{x} with calls to \code{sourceNames} replaced with
 #'   \code{replacementFun}
 #' @seealso \code{\link{replaceCallName}}
 #' @noRd
 replaceNameName <- function(x, replacementName, sourceNames) {
-  if (length(replacementName) != 1) {
+  if (is.null(replacementName)) {
+    # do nothing, NULL is allowed and it removes a name
+  } else if (length(replacementName) != 1) {
     stop("'replacementName' must be a scalar")
   } else if (!is.name(replacementName)) {
     replacementName <- as.name(replacementName)

@@ -2420,4 +2420,20 @@ test_that("name replacement", {
     check.attributes=FALSE,
     info="Non-name values are permitted"
   )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(b), replacementName=NULL, sourceNames="b"),
+    a~b(),
+    check.attributes=FALSE,
+    info="Null removes the name"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b*c, replacementName=NULL, sourceNames="b"),
+    {
+      comparison <- a~b*c
+      comparison[[3]][[2]] <- NULL
+      comparison
+    },
+    check.attributes=FALSE,
+    info="This is weird but consistent (and no longer a valid formula), you can remove anything"
+  )
 })
