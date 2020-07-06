@@ -2265,6 +2265,54 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
   )
 })
 
+# nlmixrBoundsReplaceCor ####
+
+test_that("", {
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~cor(1, 2, 3))[[2]]),
+    list(
+      value=1:3,
+      fixed=rep(FALSE, 3),
+      cor=rep(TRUE, 3)
+    )
+  )
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~cor(1, fixed(2), 3))[[2]]),
+    list(
+      value=1:3,
+      fixed=c(FALSE, TRUE, FALSE),
+      cor=rep(TRUE, 3)
+    )
+  )
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~fixed(cor(1, fixed(2), 3)))[[2]]),
+    list(
+      value=1:3,
+      fixed=rep(TRUE, 3),
+      cor=rep(TRUE, 3)
+    ),
+    info="Unusual syntax works"
+  )
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~c(1, fixed(2), cor(3)))[[2]]),
+    list(
+      value=1:3,
+      fixed=c(FALSE, TRUE, FALSE),
+      cor=c(FALSE, FALSE, TRUE)
+    ),
+    info="Legitimacy of syntax checking will be confirmed elsewhere"
+  )
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~c(1, 2, cor(3), fixed))[[2]]),
+    list(
+      value=1:3,
+      fixed=c(TRUE, TRUE, TRUE),
+      cor=c(FALSE, FALSE, TRUE)
+    ),
+    info="Trailing 'fixed' is handled correctly"
+  )
+})
+
 # nlmixrBoundsPrepareFun ####
 
 test_that("preparation of the function for bound extraction", {

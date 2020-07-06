@@ -619,7 +619,8 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
 #' * value: the numeric value of evaluating the expression
 #' * all_fixed: Are all values from the expression fixed ?
 #' * fixed: Which value(s) from \code{x} are fixed?
-#' @seealso \code{\link{nlmixrBoundsReplaceFixed}}
+#' @seealso \code{\link{nlmixrBoundsReplaceFixed}},
+#'   \code{\link{nlmixrBoundsValueCor}}
 #' @author Bill Denney
 #' @noRd
 nlmixrBoundsValueFixed <- function(x) {
@@ -787,6 +788,43 @@ nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=
   # No 'else' is required.  Other classes including name, numeric, character,
   # and logical that are likely valid within a call but not fixed.
   list(call=ret, fixed=fixed)
+}
+
+#' Detect \code{cor()} in omega blocks
+#' 
+#' @param x A call to check for correlation
+#' @return A list with elements for 'value', 'fixed', and 'cor'
+#' @seealso \code{\link{nlmixrBoundsValueFixed}}
+#' @noRd
+nlmixrBoundsValueCor <- function(x) {
+  x_nofixed_call <-
+    replaceCallName(
+      x=x,
+      replacementFun="c",
+      sourceNames=c("fix", "fixed", "FIX", "FIXED")
+    )
+  x_nofixed <-
+    replaceNameName(
+      x_nofixed_call,
+      replacementName=NULL,
+      sourceNames=c("fix", "fixed", "FIX", "FIXED")
+    )
+  # Handle both correlation and 
+  ret <-
+    nlmixrBoundsValueFixed(
+      replaceCallName(x, replacementFun="c", sourceNames="cor")
+    )
+  isCor <-
+    is.nan(eval(
+      x_nofixed,
+      envir=
+        list(
+          cor=function(...)
+            rep(NaN, length(sapply(list(...), FUN=eval)))
+        )
+    ))
+  ret$cor <- isCor
+  ret
 }
 
 #' Find all calls (i.e. function calls) and replace them
