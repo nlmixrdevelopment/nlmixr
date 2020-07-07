@@ -1,0 +1,633 @@
+#' Add covariate expression to a function string
+#'
+#' @param funstring a string giving the expression that needs to be modified
+#' @param varName the variable to which the given string corresponds to in the model expression
+#' @param covariate the covariate expression that needs to be added (at the appropriate place)
+#' @param theta a list of names of the 'theta' parameters in the 'fit' object
+#' @param isLog a boolean signifying the presence of log-transformation in the funstring
+#' @return returns the modified string with the covariate added to function string
+#' @author Vipul Mann, Matthew Fidler
+#' @export
+#' @noRd
+addCovariate <- function(funstring, varName, covariate, theta, isLog) {
+  f <- function(x, isCov = FALSE) {
+    if (is.atomic(x)) {
+      return(x)
+    }
+    else if (is.name(x)) {
+      if (isCov) {
+        if (any(as.character(x) == theta)) {
+          return(eval(parse(
+            text = paste0("quote(", x, "+", covariate, ")")
+          )))
+        }
+      }
+      return(x)
+    } else if (is.pairlist(x)) {
+      return(x)
+    } else if (is.call(x)) {
+      if (identical(x[[1]], quote(`{`))) {
+        return(paste(unlist(lapply(x[-1], function(x) {
+          gsub(" +", "", paste(deparse1(f(x, isCov)), collapse = ""))
+        })), collapse = "\n"))
+      }
+      else if (identical(x[[1]], quote(`~`)) ||
+        identical(x[[1]], quote(`=`)) ||
+        identical(x[[1]], quote(`<-`))) {
+        if (length(x[[2]]) == 1) {
+          if (as.character(x[[2]]) == varName) {
+            isCov <- TRUE
+          }
+        }
+        return(as.call(lapply(x, f, isCov = isCov)))
+      }
+      else {
+        return(as.call(lapply(x, f, isCov = isCov)))
+      }
+    }
+  }
+
+  f(eval(parse(text = paste0(
+    "quote({", funstring, "})"
+  ))))
+
+  f2 <- function(varName) {
+    funstringLhsRhs <- strsplit(funstring, "(<-|=)")[[1]]
+    funstringRhs <- funstringLhsRhs[2]
+    funstringLhs <- funstringLhsRhs[1]
+
+    expr <- paste0("(", funstringRhs, ")", "*", "(", covariate, ")")
+    expr <- gsub(" ", "", expr, perl = TRUE) # remove white spaces from the above string
+    return(paste0(funstringLhs, "<-", expr))
+  }
+
+  if (!isLog) {
+    f2(varName)
+  }
+  else {
+    f(eval(parse(text = paste0(
+      "quote({", funstring, "})"
+    ))))
+  }
+}
+
+
+#' Remove covariate expression from a function string
+#'
+#' @param funstring a string giving the expression that needs to be modified
+#' @param varName the variable to which the given string corresponds to in the model expression
+#' @param covariate the covariate expression that needs to be removed (from the appropriate place)
+#' @param theta a list of names of the 'theta' parameters in the 'fit' object
+#' @param isLog a boolean signifying the presence of log-transformation in the funstring
+#'
+#' @return returns the modified string with the covariate removed from the function string
+#'
+#' @author Vipul Mann, Matthew Fidler
+#' @export
+#' @noRd
+#'
+removeCovariate <- function(funstring, varName, covariate, theta, isLog) {
+  covariateSplit <- strsplit(covariate, "\\*|\\+")[[1]]
+
+  f <- function(x, isCov = FALSE) {
+    if (is.atomic(x)) {
+      return(x)
+    } else if (is.name(x)) { # x is a name recognized by R eg. in-built functions, etc.
+      # if (isCov) {  # the equaitons corresponds to the varName's equation where the covariate is added
+      #   # if (any(as.character(x) == theta)) {
+      #     if (any(as.character(x) == covariateSplit)){
+      #         return(eval(parse(
+      #         # text = paste0("quote(", 0,")")
+      #           text = ""
+      #       )))
+      #
+      #     }
+      #
+      #   # }
+      # }
+      return(x)
+    } else if (is.pairlist(x)) {
+      return(x)
+    } else if (is.call(x)) {
+      if (identical(x[[1]], quote(`{`))) {
+        return(paste(unlist(lapply(x[-1], function(x) {
+          gsub(" +", "", paste(deparse1(f(x, isCov)), collapse = ""))
+        })), collapse = "\n"))
+      }
+      else if (identical(x[[1]], quote(`~`)) ||
+        identical(x[[1]], quote(`=`)) ||
+        identical(x[[1]], quote(`<-`))) {
+        if (length(x[[2]]) == 1) {
+          if (as.character(x[[2]]) == varName) {
+            isCov <- TRUE
+          }
+        }
+        return(as.call(lapply(x, f, isCov = isCov)))
+      }
+      else if (isCov && identical(x[[1]], quote(`+`))) {
+        # Case 1: + centered_factor*cov_factor
+        if (length(x[[3]]) > 1 && identical(quote(`*`), x[[3]][[1]])) {
+          if (as.character(x[[3]][[2]]) %in% covariateSplit && as.character(x[[3]][[3]]) %in% covariateSplit) {
+            return(x[[2]])
+          }
+        }
+
+        return(as.call(lapply(x, f, isCov = isCov)))
+      }
+
+      else if (isCov && identical(x[[1]], quote(`*`))) {
+        # Case 2: *(centered_factor*cov_factor)
+
+        if (length(x[[3]]) > 1 && identical(x[[3]][[1]], quote(`(`))) {
+          covExpr <- x[[3]][[2]]
+
+          if (length(covExpr) > 1 && identical(quote(`*`), covExpr[[1]])) {
+            if (as.character(covExpr[[2]]) %in% covariateSplit && as.character(covExpr[[3]]) %in% covariateSplit) {
+              return(x[[2]])
+            }
+          }
+        }
+
+        return(as.call(lapply(x, f, isCov = isCov)))
+      }
+
+
+      else {
+        return(as.call(lapply(x, f, isCov = isCov)))
+      }
+    }
+  }
+
+  f(eval(parse(text = paste0(
+    "quote({", funstring, "})"
+  ))))
+
+  f2 <- function(varName) {
+    funstringLhsRhs <- strsplit(funstring, "(<-|=)")[[1]]
+    funstringRhs <- funstringLhsRhs[2]
+    funstringLhs <- funstringLhsRhs[1]
+
+    expr <- paste0("(", funstringRhs, ")", "*", "(", covariate, ")")
+    expr <- gsub(" ", "", expr, perl = TRUE) # remove white spaces from the above string
+    return(paste0(funstringLhs, "<-", expr))
+  }
+
+  if (!isLog) {
+    f2(varName)
+  }
+  else {
+    f(eval(parse(text = paste0(
+      "quote({", funstring, "})"
+    ))))
+  }
+}
+
+#' Adding covariate to a given variable in an nlmixr model expression
+#'
+#' @param fitobject an nlmixr 'fit' object
+#' @param varName a string giving the variable name to which covariate needs to be added
+#' @param covariate a string giving the covariate name; must be present in the data used for 'fit'
+#' @param norm the kind of normalization to be used while normalizing covariates; must be either 'mean' or 'median'
+#' @param norm_type a string defining operator to be used for transforming covariates using 'norm'; must be one among 'mul', 'div', 'sub', 'add'
+#' @param categorical a boolean indicating if the 'covariate' is categorical
+#' @param isHS a boolean indicating if 'covariate' is of Hockey-stick kind
+#' @param initialEst the initial estimate for the covariate parameters to be estimated; default is 0
+#' @param initialEstLB a lower bound for the covariate parameters to be estimated; default is -Inf
+#' @param initialEstUB an upper bound for the covariate parameters to be estimated; default is Inf
+#'
+#' @return a list with the updated model expression and data with columns corresponding to normalized covaraite(s) appended
+#' @author Vipul Mann, Matthew Fidler
+#' @export
+#' @noRd
+#'
+addCovVar <- function(fitobject,
+                      varName,
+                      covariate,
+                      norm = c("median", "mean"),
+                      norm_type = c("mul", "div", "sub", "add"),
+                      categorical = FALSE,
+                      isHS = FALSE,
+                      initialEst = 0,
+                      initialEstLB = -Inf,
+                      initialEstUB = Inf) {
+  if (!inherits(fitobject, "nlmixrFitCore")) {
+    stop("'fit' needs to be a nlmixr fit")
+  }
+
+  if (inherits(norm, "numeric")) {
+    checkmate::assert_numeric(
+      norm,
+      len = 1,
+      lower = .Machine$double.eps,
+      null.ok = FALSE,
+      any.missing = FALSE
+    )
+  }
+  else {
+    norm <- match.arg(norm)
+  }
+
+  norm_type <- match.arg(norm_type)
+
+  if (missing(norm_type)) {
+    norm_type <- "sub"
+  }
+  norm_ops <-
+    list(
+      "div" = `/`,
+      "mul" = `*`,
+      "sub" = `-`,
+      "add" = `+`
+    )
+  normOp <- norm_ops[[norm_type]]
+
+  funstring <- fitobject$uif$fun.txt
+  funstringSplit <-
+    unlist(strsplit(funstring, split = "\\\n")) # split the string at \n
+
+  # # look for the string that needs to be modified
+  idx <- grep(varName, funstringSplit)
+  if (length(idx) >= 2) {
+    stop("cannot update more than one variable at a time")
+  }
+
+  # Get the normalization value from data
+  data <- getData(fitobject)
+
+  # search the dataframe for a column name of 'ID'
+  colNames <- colnames(data)
+  colNamesLower <- tolower(colNames)
+  if ("id" %in% colNamesLower) {
+    uidCol <- colNames[which("id" %in% colNamesLower)]
+  }
+  else {
+    uidCol <- "ID"
+  }
+
+  if (covariate %in% colnames(data)) {
+    if (inherits(norm, "numeric")) {
+      normValVec <- norm
+    }
+    else {
+      if (norm %in% "mean") {
+        # mean of the mean values
+        uids <- unlist(unname(data[uidCol]))
+        normValVec <- lapply(uids, function(x) {
+          datSlice <- data[data[uidCol] == x, ]
+          normVal <- mean(unlist(datSlice[covariate]))
+        })
+
+        normValVec <- mean(unlist(normValVec))
+      }
+      else {
+        # mean of the median values
+        uids <- unlist(unname(data[uidCol]))
+        normValVec <- lapply(uids, function(x) {
+          datSlice <- data[data[uidCol] == x, ]
+          normVal <- median(unlist(datSlice[covariate]))
+        })
+        normValVec <- mean(unlist(normValVec))
+      }
+    }
+
+    # check if log transform required
+
+    isLog <- grepl("\\bexp *\\(", funstringSplit[[idx]], perl = TRUE)
+
+    res <- performNorm(
+      data = data,
+      funstring = funstringSplit[[idx]],
+      covariate = covariate,
+      normOp = normOp,
+      normValVec = normValVec,
+      isLog = isLog,
+      isCat = categorical,
+      isHS = isHS
+    )
+
+    data <- res[[1]]
+    covNameMod <- res[[2]]
+    covNames <- res[[3]]
+
+    funstringSplit[[idx]] <-
+      addCovariate(
+        funstringSplit[[idx]],
+        varName,
+        covNameMod,
+        names(fitobject$theta),
+        isLog
+      )
+  }
+
+  cli::cli_alert_success("added {covNameMod} to {varName}'s equation in the model")
+  cli::cli_alert_success("updated value: {funstringSplit[[idx]]}")
+
+  updatedMod <- initializeCovars(
+    fitobject,
+    funstringSplit[[idx]],
+    covNames,
+    initialEst,
+    initialEstLB,
+    initialEstUB
+  )
+
+  list(updatedMod, data) # return updated model and updated data
+}
+
+
+#' Perform normalization of the covariate
+#'
+#' @param data a dataframe consisting the covariates added
+#' @param funstring a string giving the expression that needs to be modified
+#' @param covariate a string giving the covariate name; must be present in the data used for 'fit'
+#' @param normOp an operator indicating the kind transformation to be done on the covariate
+#' @param normValVec a numeric value to be used for normalization of the covariate
+#' @param isLog a boolean indicating the presence of log-transformation in the funstring; default is FALSE
+#' @param isCat a boolean indicating if the covariate is categorical; default is FALSE
+#' @param isHS a boolean indicating if the covariate is of Hockey-stick kind; default is FALSE
+#'
+#' @return a list comprising the update dataframe, the modified expression for funstring, and a list of covariate names
+#' @export
+#' @author Vipul Mann, Matthew Fidler
+#' @noRd
+performNorm <- function(data,
+                        funstring,
+                        covariate,
+                        normOp,
+                        normValVec,
+                        isLog = FALSE,
+                        isCat = FALSE,
+                        isHS = FALSE) {
+  if (!(isCat)) { # not categorical variable
+    if (!(isHS)) { # not hockey stick
+      datColNames <- paste0("centered_", covariate)
+      data[, datColNames] <-
+        normOp(unname(unlist(data[, covariate])), normValVec)
+
+      covNameMod1 <- datColNames
+      covNameParam1 <- paste0("cov_", covariate)
+      covNameMod <- paste0(covNameMod1, "*", covNameParam1)
+      covNames <- covNameParam1
+    }
+
+    else {
+      res <- makeHockeyStick(data, covariate = covariate)
+
+      data <- res[[1]]
+      covModExpr <- res[[2]]
+      covNames <- res[[3]]
+      datColNames <- res[[4]]
+      covNameMod <- paste(covModExpr, collapse = "+")
+      return(list(data, covNameMod, covNames))
+    }
+  }
+
+  else { # categorical variable
+    # datColNames <- paste0("categorical_", covariate)
+    res <- makeDummies(data, covariate = covariate)
+    data <- res[[1]]
+    covModExpr <- res[[2]]
+    covNames <- res[[3]]
+    datColNames <- res[[4]]
+
+    covNameMod <- paste(covModExpr, collapse = "+")
+
+    return(list(data, covNameMod, covNames))
+  }
+
+  if (isLog) {
+    if (varName %in% c("cl")) { # with 0.75 prefactor
+      for (datColName in datColNames) { # for loop to handle both non-categorical and categorical vars
+        data[, datColName] <- 0.75 * log(data[, datColName])
+      }
+    }
+    else {
+      for (datColName in datColNames) {
+        data[, datColName] <- log(data[, datColName])
+      }
+    }
+  }
+
+  list(data, covNameMod, covNames)
+}
+
+#' Initializing covariates before estimation
+#'
+#' @param fitobject an nlmixr 'fit' object
+#' @param fstring a string giving the entire expression for the model function string
+#' @param covNames  a list of covariate names (parameters) that need to be estimates
+#' @param initialEst the initial estimate for the covariate parameters to be estimated; default is 0
+#' @param initialEstLB a lower bound for the covariate parameters to be estimated; default is -Inf
+#' @param initialEstUB an upper bound for the covariate parameters to be estimated; default is Inf
+#'
+#' @return updated model object with the modified initial values
+#' @export
+#' @author Vipul Mann, Matthew Fidler
+#' @noRd
+#'
+initializeCovars <- function(fitobject,
+                             fstring,
+                             covNames,
+                             initialEst,
+                             initialEstLB,
+                             initialEstUB) {
+  updatedMod <- paste0("model(fitobject,{", fstring, "})")
+  updatedMod <- eval(parse(text = updatedMod))
+
+  ini2 <- as.data.frame(updatedMod$ini)
+  for (covName in covNames) {
+    ini2[ini2$name == covName, "est"] <- initialEst
+    ini2[ini2$name == covName, "lower"] <- initialEstLB
+    ini2[ini2$name == covName, "upper"] <- initialEstUB
+  }
+
+  class(ini2) <- c("nlmixrBounds", "data.frame")
+  updatedMod$ini <- ini2
+
+  updatedMod
+}
+
+#' Creating Hockey-stick covariates
+#'
+#' @param data a dataframe containing the dataset that needs to be used
+#' @param covariate the covariate that needs to be converted to hockey-stick; must be present in the data
+#'
+#' @return a list of updated data with covariates added, an expression that needs to be added to the model expression, the list of covariate names, and the column names corresponding to the hockey-stick covariates
+#' @export
+#' @author Vipul Mann, Matthew Fidler
+#' @noRd
+makeHockeyStick <- function(data, covariate) {
+  v <- unlist(data[, covariate])
+
+  prefix <- paste0("centered_", covariate, "_")
+  s <- c("lower", "upper")
+
+  # create two columns for below and above the median
+  med <- median(v)
+  d <- list(1L * (v < med), 1L * (v >= med))
+
+  names(d) <- paste0(prefix, s)
+  newdat <- cbind(data, d)
+
+  prefix2 <- paste0("cov_", covariate, "_")
+  covNames <- paste0(prefix2, s)
+
+  covModExpr <- paste0(names(d), "*", covNames)
+  list(newdat, covModExpr, covNames, colnames(d))
+}
+
+
+#' Create categorical covariates
+#'
+#' @param data a dataframe containing the dataset that needs to be used
+#' @param covariate the covariate that needs to be converted to categorical; must be present in the data
+#'
+#' @return a list of updated data with covariates added, an expression that needs to be added to the model expression, the list of covariate names, and the column names corresponding to the categorical covariates
+#' @export
+#' @author Vipul Mann, Matthew Fidler
+#'
+#' @noRd
+makeDummies <- function(data, covariate) {
+  v <- unlist(data[, covariate])
+
+  prefix <- paste0("categorical_", covariate, "_")
+  s <- head(sort(unique(v)), -1) # remove the last column
+
+  d <- outer(v, s, function(v, s) {
+    1L * (v == s)
+  })
+  colnames(d) <- paste0(prefix, s)
+  newdat <- cbind(data, d)
+
+  prefix2 <- paste0("cov_", covariate, "_")
+  covNames <- paste0(prefix2, s)
+
+  covModExpr <- paste0(colnames(d), "*", covNames)
+  list(newdat, covModExpr, covNames, colnames(d))
+}
+
+#' Add multiple covariates to a given model, sequentially or all at once
+#'
+#' @param covInfo a list of lists containing information on the covariates that need to be tested
+#' @param fitobject an nlmixr 'fit' object
+#' @param indep a boolean indicating if the covariates should be added independently (one after the other), or sequentially to the previous model; default is TRUE
+#'
+#' @export
+#' @author Vipul Mann, Matthew Fidler
+#' @noRd
+#'
+addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
+  # create directory to store 'fit' objects for the covariate search
+  outputDir <-
+    paste0("nlmixrCovariateSearchCache_", as.character(substitute(fitobject)))
+  if (!dir.exists(outputDir)) {
+    print(outputDir)
+    dir.create(outputDir)
+  }
+
+  # adding covariates independent of each other
+  if (!indep) {
+    mets <- lapply(covInfo, function(x) {
+      res <- do.call(addCovVar, c(list(fitobject), x))
+      updatedMod <- res[[1]]
+      data <- res[[2]]
+
+      fit2 <- suppressWarnings(
+        nlmixr(updatedMod, data, est = getFitMethod(fitobject))
+      )
+
+      fnamefit2 <-
+        paste0(
+          outputDir,
+          "/",
+          as.character(substitute(fitobject)),
+          "_",
+          as.character(x$varName),
+          "_",
+          as.character(x$covariate),
+          ".RData",
+          sep = ""
+        )
+      saveRDS(fit2, fnamefit2)
+      cli::cli_h1("Metrics for CovFit: AIC: {fit2$AIC}, BIC: {fit2$BIC}, OBJF: {fit2$OBJF}")
+    })
+  }
+
+  # adding covariates one after the other, appending to the previous model
+  else {
+    covsAdded <-
+      list() # to keep track of covariates added and store in a file
+    covsAddedIdx <- 1
+    for (x in covInfo) {
+      res <- do.call(addCovVar, c(list(fitobject), x))
+      updatedMod <- res[[1]]
+      data <- res[[2]]
+
+      if (length(covsAdded) == 0) {
+        covsAdded[[covsAddedIdx]] <- paste0(x$varName, "_", x$covariate)
+        covsAddedIdx <- covsAddedIdx + 1
+      }
+      else {
+        covsAdded[[covsAddedIdx]] <-
+          paste0(covsAdded[[covsAddedIdx - 1]], "_", x$varName, "_", x$covariate)
+        covsAddedIdx <- covsAddedIdx + 1
+      }
+
+      fit2 <- suppressWarnings(
+        nlmixr(updatedMod, data, est = getFitMethod(fitobject))
+      )
+
+      print(fit2$fun.txt)
+      cli::cli_h1("Metrics for CovFit: AIC: {fit2$AIC}, BIC: {fit2$BIC}, OBJF: {fit2$OBJF}")
+
+      fnamefit2 <-
+        paste0(outputDir, "/", covsAdded[[covsAddedIdx - 1]],
+          ".RData",
+          sep = ""
+        )
+      print(fnamefit2)
+      saveRDS(fit2, fnamefit2)
+
+
+      fitobject <- fit2
+    }
+  }
+}
+
+#' Stepwise Covariate Model-selection (SCM) method
+#'
+#' @param fit an nlmixr 'fit' object
+#' @param varsVec a list of candidate variables to which the covariates could be added
+#' @param covarsVec a list of candidate covariates that need to be tested
+#' @param covInformation a list containing information on the variables-covariates pairs
+#' @param testAll a boolean indicating if all possible permutations between varsVec and covarsVec need to be tested
+#'
+#' @export
+#' @author Vipul Mann, Matthew Fidler
+#'
+#' @examples
+covarSearchSCM <- function(fit, varsVec, covarsVec, covInformation = NULL, testAll = TRUE) {
+  if (testAll) {
+    possiblePerms <- expand.grid(varsVec, covarsVec)
+    possiblePerms <- list(as.character(possiblePerms[[1]]), as.character(possiblePerms[[2]]))
+    names(possiblePerms) <- c("vars", "covars")
+  }
+  else {
+    possiblePerms <- list(names(relationsVarCovar), unlist(unname(relationsVarCovar)))
+    names(possiblePerms) <- c("vars", "covars")
+  }
+
+  covInfo <- list()
+  for (item in Map(list, possiblePerms$vars, possiblePerms$covars)) {
+    listVarName <- paste0(item[[2]], "_", item[[1]])
+    if (listVarName %in% names(covInformation)) { # search for name of var_covar in the list covInformation
+      covInfo[[length(covInfo) + 1]] <- c(list(varName = item[[1]], covariate = item[[2]]), covInformation[[listVarName]])
+    }
+    else {
+      covInfo[[length(covInfo) + 1]] <- list(varName = item[[1]], covariate = item[[2]])
+    }
+  }
+
+  addCovMultiple(covInfo, fit, indep = TRUE)
+  # Select best model, remove covar from possible Perms | metric: delta AIC, chi-square test | for now delta objf (without chi-square)
+}
