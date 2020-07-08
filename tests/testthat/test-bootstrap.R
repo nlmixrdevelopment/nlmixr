@@ -8,7 +8,7 @@ testthat::test_that("sampling should return different datasets at each call", {
 })
 
 
-testthat::test_that("resuming the fit should return not return the same datasets as before",
+testthat::test_that("resuming the fit should not return the same datasets as before",
                     {
                       one.cmt <- function() {
                         ini({
@@ -32,32 +32,32 @@ testthat::test_that("resuming the fit should return not return the same datasets
                           linCmt() ~ add(add.sd)
                         })
                       }
-                      
+
                       fit <- suppressWarnings(nlmixr(
                         one.cmt,
                         samp_dat,
-                        est = "saem",
+                        est = "focei",
                         control = list(print = 0),
                         table = list(npde = TRUE, cwres = TRUE)
                       ))
-                      
-                      fit1 <- nlmixr:::bootstrapFit(fit, numModels = 2, resume = FALSE)
-                      fit2 <- nlmixr:::bootstrapFit(fit, numModels = 4, resume = TRUE)
-                      
+
+                      fit1 <- nlmixr:::bootstrapFit(fit, nboot = 2, resume = FALSE)
+                      fit2 <- nlmixr:::bootstrapFit(fit, nboot = 4, resume = TRUE)
+
                       fnamebootdata <- paste0(getwd(),
                                               "/",
                                               "nlmixrBootstrapCache_fit/",
                                               "boot_data.Rdata")
                       fitdata <- readRDS(fnamebootdata)
-                      
+
                       a <- digest::digest(fitdata[[1]])
                       b <- digest::digest(fitdata[[3]])
                       testthat::expect_false(isTRUE(all.equal(a, b)))
-                      
+
                       a <- digest::digest(fitdata[[2]])
                       b <- digest::digest(fitdata[[4]])
                       testthat::expect_false(isTRUE(all.equal(a, b)))
-                      
+
                       unlink(paste0(getwd(),
                              "/",
                              "nlmixrBootstrapCache_fit/"), recursive = TRUE, force=TRUE)
@@ -86,7 +86,7 @@ testthat::test_that("different confidence levels should result in different band
       linCmt() ~ add(add.sd)
     })
   }
-  
+
   fit <- suppressWarnings(nlmixr(
     one.cmt,
     samp_dat,
@@ -94,15 +94,15 @@ testthat::test_that("different confidence levels should result in different band
     control = list(print = 0),
     table = list(npde = TRUE, cwres = TRUE)
   ))
-  
-  fitlist <- modelBootstrap(fit, numModels = 4, resume = FALSE)
+
+  fitlist <- modelBootstrap(fit, nboot = 4, resume = FALSE)
   bootSummary1 <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.95)
   bootSummary2 <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.75)
-  
+
   a <- digest::digest(bootSummary1$parFixedDf$confLower)
   b <- digest::digest(bootSummary2$parFixedDf$confLower)
   testthat::expect_false(isTRUE(all.equal(a, b)))
-  
+
   a <- digest::digest(bootSummary1$parFixedDf$confUpper)
   b <- digest::digest(bootSummary2$parFixedDf$confUpper)
   testthat::expect_false(isTRUE(all.equal(a, b)))
@@ -131,7 +131,7 @@ testthat::test_that("expected columns in fit$parFixedDf object should match", {
       linCmt() ~ add(add.sd)
     })
   }
-  
+
   fit <- suppressWarnings(nlmixr(
     one.cmt,
     samp_dat,
@@ -139,18 +139,13 @@ testthat::test_that("expected columns in fit$parFixedDf object should match", {
     control = list(print = 0),
     table = list(npde = TRUE, cwres = TRUE)
   ))
-  
-  modelBootstrap(fit, numModels = 4, resume = FALSE)
-  
-  
-  bootSummary1 <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.95)
-  bootSummary2 <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.75)
-  
-  a <- digest::digest(bootSummary1$parFixedDf$confLower)
-  b <- digest::digest(bootSummary2$parFixedDf$confLower)
-  testthat::expect_false(isTRUE(all.equal(a, b)))
-  
-  a <- digest::digest(bootSummary1$parFixedDf$confUpper)
-  b <- digest::digest(bootSummary2$parFixedDf$confUpper)
-  testthat::expect_false(isTRUE(all.equal(a, b)))
+
+  colsBefore = colnames(fit$parFixedDf)
+  fitlist = modelBootstrap(fit, nboot = 4, resume = FALSE)
+
+  bootSummary <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.95)
+
+  colsAfter = colnames(fit$parFixedDf)
+
+  testthat::expect_equal(colsAfter, colsBefore)
 })
