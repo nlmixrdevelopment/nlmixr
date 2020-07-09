@@ -371,8 +371,8 @@ testthat::test_that("creating hockey stick variables", {
   colNames <- res1[[4]]
 
 
-  dat2a <- 1L * (data[, covariate] < med)
-  dat2b <- 1L * (data[, covariate] >= med)
+  dat2a <- 1L * (data[, covariate] < med) * data[, covariate]
+  dat2b <- 1L * (data[, covariate] >= med) * data[, covariate]
 
   covModExpr2 <- c("centered_WT_lower*cov_WT_lower", "centered_WT_upper*cov_WT_upper")
   covNames2 <- c("cov_WT_lower", "cov_WT_upper")

@@ -474,7 +474,7 @@ makeHockeyStick <- function(data, covariate) {
 
   # create two columns for below and above the median
   med <- median(v)
-  d <- list(1L * (v < med), 1L * (v >= med))
+  d <- list(v*1L * (v < med), v*1L * (v >= med))
 
   names(d) <- paste0(prefix, s)
   newdat <- cbind(data, d)
