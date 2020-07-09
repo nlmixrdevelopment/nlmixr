@@ -58,6 +58,7 @@ addCovariate <- function(funstring, varName, covariate, theta, isLog) {
 
     expr <- paste0("(", funstringRhs, ")", "*", "(", covariate, ")")
     expr <- gsub(" ", "", expr, perl = TRUE) # remove white spaces from the above string
+    funstringLhs <- gsub(" ", "", funstringLhs, perl = TRUE) # remove white spaces from the above string
     return(paste0(funstringLhs, "<-", expr))
   }
 
@@ -86,7 +87,8 @@ addCovariate <- function(funstring, varName, covariate, theta, isLog) {
 #' @export
 #' @noRd
 #'
-removeCovariate <- function(funstring, varName, covariate, theta, isLog) {
+removeCovariate <- function(funstring, varName, covariate, theta) {
+  covariate <- gsub(" ", "", covariate, perl = TRUE) # remove white spaces from the above string
   covariateSplit <- strsplit(covariate, "\\*|\\+")[[1]]
 
   f <- function(x, isCov = FALSE) {
@@ -125,25 +127,38 @@ removeCovariate <- function(funstring, varName, covariate, theta, isLog) {
         return(as.call(lapply(x, f, isCov = isCov)))
       }
       else if (isCov && identical(x[[1]], quote(`+`))) {
+
         # Case 1: + centered_factor*cov_factor
         if (length(x[[3]]) > 1 && identical(quote(`*`), x[[3]][[1]])) {
           if (as.character(x[[3]][[2]]) %in% covariateSplit && as.character(x[[3]][[3]]) %in% covariateSplit) {
-            return(x[[2]])
+            # return(x[[2]])
+            if (length(x[[2]]) == 1) {
+              return(x[[2]])
+            }
+            return(as.call(lapply(x[[2]], f, isCov = isCov)))
           }
         }
-
         return(as.call(lapply(x, f, isCov = isCov)))
       }
 
       else if (isCov && identical(x[[1]], quote(`*`))) {
         # Case 2: *(centered_factor*cov_factor)
-
         if (length(x[[3]]) > 1 && identical(x[[3]][[1]], quote(`(`))) {
           covExpr <- x[[3]][[2]]
 
           if (length(covExpr) > 1 && identical(quote(`*`), covExpr[[1]])) {
             if (as.character(covExpr[[2]]) %in% covariateSplit && as.character(covExpr[[3]]) %in% covariateSplit) {
-              return(x[[2]])
+              # return(x[[2]])
+              return(as.call(lapply(x[[2]], f, isCov = isCov)))
+            }
+          }
+
+          else if (length(covExpr) > 1 && identical(quote(`+`), covExpr[[1]])) {
+            if (length(covExpr[[3]]) > 1 && identical(quote(`*`), covExpr[[3]][[1]])) {
+              if (as.character(covExpr[[3]][[2]]) %in% covariateSplit && as.character(covExpr[[3]][[3]]) %in% covariateSplit) {
+                # return(x[[2]])
+                return(as.call(lapply(x[[2]], f, isCov = isCov)))
+              }
             }
           }
         }
@@ -158,29 +173,24 @@ removeCovariate <- function(funstring, varName, covariate, theta, isLog) {
     }
   }
 
-  f(eval(parse(text = paste0(
-    "quote({", funstring, "})"
-  ))))
+  nch <- 0
+  ret <- funstring
 
-  f2 <- function(varName) {
-    funstringLhsRhs <- strsplit(funstring, "(<-|=)")[[1]]
-    funstringRhs <- funstringLhsRhs[2]
-    funstringLhs <- funstringLhsRhs[1]
+  while (nch != nchar(ret)) {
+    nch <- nchar(ret)
 
-    expr <- paste0("(", funstringRhs, ")", "*", "(", covariate, ")")
-    expr <- gsub(" ", "", expr, perl = TRUE) # remove white spaces from the above string
-    return(paste0(funstringLhs, "<-", expr))
-  }
-
-  if (!isLog) {
-    f2(varName)
-  }
-  else {
-    f(eval(parse(text = paste0(
-      "quote({", funstring, "})"
+    ret <- f(eval(parse(text = paste0(
+      "quote({", ret, "})"
     ))))
   }
+
+  return(ret)
 }
+
+
+
+
+
 
 #' Adding covariate to a given variable in an nlmixr model expression
 #'
@@ -296,8 +306,8 @@ addCovVar <- function(fitobject,
 
     res <- performNorm(
       data = data,
-      funstring = funstringSplit[[idx]],
       covariate = covariate,
+      varName = varName,
       normOp = normOp,
       normValVec = normValVec,
       isLog = isLog,
@@ -338,21 +348,21 @@ addCovVar <- function(fitobject,
 #' Perform normalization of the covariate
 #'
 #' @param data a dataframe consisting the covariates added
-#' @param funstring a string giving the expression that needs to be modified
 #' @param covariate a string giving the covariate name; must be present in the data used for 'fit'
+#' @param varName the variable name to which the covariate is being added
 #' @param normOp an operator indicating the kind transformation to be done on the covariate
 #' @param normValVec a numeric value to be used for normalization of the covariate
 #' @param isLog a boolean indicating the presence of log-transformation in the funstring; default is FALSE
 #' @param isCat a boolean indicating if the covariate is categorical; default is FALSE
 #' @param isHS a boolean indicating if the covariate is of Hockey-stick kind; default is FALSE
 #'
-#' @return a list comprising the update dataframe, the modified expression for funstring, and a list of covariate names
+#' @return a list comprising the update dataframe, the expression for covariate, and a list of covariate names
 #' @export
 #' @author Vipul Mann, Matthew Fidler
 #' @noRd
 performNorm <- function(data,
-                        funstring,
                         covariate,
+                        varName,
                         normOp,
                         normValVec,
                         isLog = FALSE,
