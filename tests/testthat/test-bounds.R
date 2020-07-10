@@ -2055,6 +2055,163 @@ test_that("nlmixrBounds", {
   )
 })
 
+# nlmixrBoundsParserOmega ####
+
+test_that("Implicitly test nlmixrBoundsParserOmega", {
+  expect_equal(
+    nlmixrBounds(function(){
+      ~1
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=1,
+        neta2=1,
+        name=NA_character_,
+        lower=-Inf,
+        est=1,
+        upper=Inf,
+        fix=FALSE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Unnamed omega scalar assignment"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a~1
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=1,
+        neta2=1,
+        name="a",
+        lower=-Inf,
+        est=1,
+        upper=Inf,
+        fix=FALSE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named omega scalar assignment"
+  )
+  expect_equal(
+    expect_warning(
+      nlmixrBounds(function(){
+        a~cor(1)
+      }),
+      regexp="'cor(...)' with a single value is ignored: ~cor(1)",
+      fixed=TRUE
+    ),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=1,
+        neta2=1,
+        name="a",
+        lower=-Inf,
+        est=1,
+        upper=Inf,
+        fix=FALSE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named scalar omega assignment with correlation"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a+b~cor(2, -0.5, 3)
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=c(1, 2, 2),
+        neta2=c(1, 1, 2),
+        name=c("a", "(b,a)", "b"),
+        lower=-Inf,
+        est=c(4, -3, 9),
+        upper=Inf,
+        fix=FALSE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named vector omega assignment with correlation"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a+b~fixed(cor(2, -0.5, 3))
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=c(1, 2, 2),
+        neta2=c(1, 1, 2),
+        name=c("a", "(b,a)", "b"),
+        lower=-Inf,
+        est=c(4, -3, 9),
+        upper=Inf,
+        fix=TRUE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named vector omega assignment with correlation, all fixed with an outer function"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a+b~cor(fixed(2, -0.5, 3))
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=c(1, 2, 2),
+        neta2=c(1, 1, 2),
+        name=c("a", "(b,a)", "b"),
+        lower=-Inf,
+        est=c(4, -3, 9),
+        upper=Inf,
+        fix=TRUE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named vector omega assignment with correlation, all fixed with an inner function"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a+b~cor(fixed(2), fixed(-0.5), fixed(3))
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=c(1, 2, 2),
+        neta2=c(1, 1, 2),
+        name=c("a", "(b,a)", "b"),
+        lower=-Inf,
+        est=c(4, -3, 9),
+        upper=Inf,
+        fix=TRUE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named vector omega assignment with correlation, all fixed with individual functions (unusual, but acceptable)"
+  )
+  expect_error(
+    nlmixrBounds(function(){
+      a+b~cor(2, fixed(-0.5), fixed(3))
+    }),
+    regexp="either all or none of the elements may be fixed with cor(...): ~cor(2, fixed(-0.5), fixed(3))",
+    fixed=TRUE,
+    info="Named vector omega assignment with correlation, some fixed"
+  )
+})
+    
 # nlmixrBoundsValueFixed ####
 
 test_that("nlmixrBoundsValueFixed", {
