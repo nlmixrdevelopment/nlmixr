@@ -6,6 +6,7 @@
    such as tvCL <- log(3) (#253).
  - The function as.nlmixrBounds() now supports adding the columns that are
    missing into the input data.frame.
+ - omega definitions can be correlation matrices (#338)
 
 # Before nlmixr 1.1.1-9
 
