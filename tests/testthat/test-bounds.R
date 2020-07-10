@@ -2211,7 +2211,48 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
     info="Named vector omega assignment with correlation, some fixed"
   )
 })
-    
+
+# nlmixrBoundsParserAttribute ####
+
+test_that("nlmixrBoundsParserAttribute backTransform", {
+  expect_equal(
+    nlmixrBounds(function() {
+      0.1; backTransform(exp)
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        ntheta=1,
+        lower=-Inf,
+        est=0.1,
+        upper=Inf,
+        fix=FALSE,
+        backTransform="exp",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Simple back-transform"
+  )
+  expect_equal(
+    nlmixrBounds(function() {
+      0.1; backTransform(exp())
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        ntheta=1,
+        lower=-Inf,
+        est=0.1,
+        upper=Inf,
+        fix=FALSE,
+        backTransform="exp",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Simple back-transform with zero arguments is replaced by the function name alone."
+  )
+})
+
 # nlmixrBoundsValueFixed ####
 
 test_that("nlmixrBoundsValueFixed", {
