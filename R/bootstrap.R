@@ -29,7 +29,7 @@ addConfboundsToVar <-
 #' @param nboot an integer giving the number of bootstrapped models to be fit; default value is 100
 #' @param nSampIndiv an integer specifying the number of samples in each bootstrapped sample; default is the number of unique subjects in the original dataset
 #' @param pvalues a vector of pvalues indicating the probability of each subject to get selected; default value is NULL implying that probability of each subject is the same
-#' @param resume a boolean that indicates if a previous session has to be resumed; default value is TRUE
+#' @param restart a boolean that indicates if a previous session has to be restarted; default value is FALSE
 #'
 #'
 #' @author Vipul Mann, Matthew Fidler
@@ -43,8 +43,9 @@ addConfboundsToVar <-
 #'     tcl <- 1 # Log Cl
 #'     ## This works with interactive models
 #'     ## You may also label the preceding line with label("label text")
-#'    tv <- 3.45; label("log V")
-#'    ## the label("Label name") works with all models
+#'     tv <- 3.45
+#'     label("log V")
+#'     ## the label("Label name") works with all models
 #'     eta.ka ~ 0.6
 #'     eta.cl ~ 0.3
 #'     eta.v ~ 0.1
@@ -57,21 +58,27 @@ addConfboundsToVar <-
 #'     linCmt() ~ add(add.sd)
 #'   })
 #' }
-#' 
+#'
 #' fit <- nlmixr(one.cmt, theo_sd, "focei")
 #'
 #' bootstrapFit(fit)
-#' bootstrapFit(fit, nboot = 5, resume = FALSE) # overwrites any of the existing data or model files
+#' bootstrapFit(fit, nboot = 5, restart = TRUE) # overwrites any of the existing data or model files
 #' bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
 bootstrapFit <- function(fit,
                          nboot = 500,
                          nSampIndiv,
                          pvalues = NULL,
-                         resume = TRUE) {
+                         restart = FALSE) {
   fitName <- as.character(substitute(fit))
 
+  if (is.null(fit$bootstrapMd5)){
+    bootstrapMd5 = digest::digest(fit)
+    assign('bootstrapMd5', bootstrapMd5, envir = fit$env)
+  }
+
+  
   modelsList <-
-    modelBootstrap(fit, nboot, nSampIndiv, pvalues, resume, fitName) # multiple models
+    modelBootstrap(fit, nboot, nSampIndiv, pvalues, restart, fitName) # multiple models
   bootSummary <-
     getBootstrapSummary(modelsList) # aggregate values/summary
 
@@ -209,7 +216,7 @@ sampling <- function(data,
 #' @param nboot an integer giving the number of bootstrapped models to be fit; default value is 100
 #' @param nSampIndiv an integer specifying the number of samples in each bootstrapped sample; default is the number of unique subjects in the original dataset
 #' @param pvalues a vector of pvalues indicating the probability of each subject to get selected; default value is NULL implying that probability of each subject is the same
-#' @param resume a boolean that indicates if a previous session has to be resumed; default value is TRUE
+#' @param restart a boolean that indicates if a previous session has to be restarted; default value is FALSE
 #'
 #' @return a list of lists containing the different attributed of the fit object for each of the bootstrapped models
 #' @author Vipul Mann, Matthew Fidler
@@ -222,9 +229,8 @@ modelBootstrap <- function(fit,
                            nboot = 100,
                            nSampIndiv,
                            pvalues = NULL,
-                           resume = FALSE,
-                           fitName="fit") {
-
+                           restart = FALSE,
+                           fitName = "fit") {
   if (!inherits(fit, "nlmixrFitCore")) {
     stop("'fit' needs to be a nlmixr fit", call. = FALSE)
   }
@@ -268,57 +274,58 @@ modelBootstrap <- function(fit,
 
   bootData <- vector(mode = "list", length = nboot)
 
+  if (is.null(fit$bootstrapMd5)){
+    bootstrapMd5 = digest::digest(fit)
+    assign('bootstrapMd5', bootstrapMd5, envir = fit$env)
+  }
+  
   output_dir <-
-    paste0("nlmixrBootstrapCache_", fitName) # a new directory with this name will be created
+    paste0("nlmixrBootstrapCache_", fitName, '_' ,fit$bootstrapMd5) # a new directory with this name will be created
   if (!dir.exists(output_dir)) {
     dir.create(output_dir)
   }
-
-  # fnameBootData <- paste0(output_dir, "/",
-  #   as.character(substitute(boot_data)),
-  #   ".RData",
-  #   sep = ""
-  #   )
-  # if (!file.exists(fnameBootData)){
-  #   resume <- FALSE
-  # }
-  
-  fnameBootDataPattern <- paste0(as.character(substitute(boot_data)),
-                                      '_', '[0-9]+', '.RData',
-                                      sep = ""
-                                      )
-  fileExists = list.files(paste0('./', output_dir), pattern=fnameBootDataPattern)
-  
-  if (length(fileExists)==0){
-    resume <- FALSE
+  else if (dir.exists(output_dir) && restart == TRUE) {
+    unlink(output_dir, recursive = TRUE, force = TRUE) # unlink any of the previous directories
+    dir.create(output_dir) # create a fresh directory
   }
-  
 
-  if (resume) {
-    if (length(fileExists)>0) {
+  fnameBootDataPattern <- paste0(as.character(substitute(boot_data)),
+    "_", "[0-9]+", ".RData",
+    sep = ""
+  )
+  fileExists <- list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
+
+  if (length(fileExists) == 0) {
+    restart <- TRUE
+  }
+
+  if (!restart) { # read saved bootData from boot_data files on disk
+    if (length(fileExists) > 0) {
       cli::cli_alert_success("resuming bootstrap data sampling using data at {paste0('./', output_dir)}")
-      
 
-      bootData = lapply(fileExists, function(x){readRDS(paste0('./', output_dir, '/',x, sep=""))})
-      
+
+      bootData <- lapply(fileExists, function(x) {
+        readRDS(paste0("./", output_dir, "/", x, sep = ""))
+      })
+
       # bootData <- readRDS(fnameBootData)
       # assign('.Random.seed', attr(bootData, 'randomSeed'), envir = .GlobalEnv)
 
       # startCtr <- sum(!sapply(bootData, is.null)) + 1
-      
-      startCtr <- length(bootData)+1
 
-      if (startCtr > nboot) {
-        cli::cli_alert_danger(
-          cli::col_red(
-            "the data file already has {startCtr-1} datasets when max datasets is {nboot}"
-          )
-        )
-        stop(
-          "aborting ... the number of models in resume file exceeds the number of models to be estimated",
-          call. = FALSE
-        )
-      }
+      startCtr <- length(bootData) + 1
+
+      # if (startCtr > nboot) {
+      #   cli::cli_alert_danger(
+      #     cli::col_red(
+      #       "the data file already has {startCtr-1} datasets when max datasets is {nboot}"
+      #     )
+      #   )
+      #   stop(
+      #     "aborting ... the number of models in resume file exceeds the number of models to be estimated",
+      #     call. = FALSE
+      #   )
+      # }
     }
     else {
       cli::cli_alert_danger(cli::col_red(
@@ -332,46 +339,49 @@ modelBootstrap <- function(fit,
     startCtr <- 1
   }
 
-  for (mod_idx in startCtr:nboot) {
-    bootData[[mod_idx]] <- sampling(data,
-      nsamp = nSampIndiv,
-      uid_colname = uidCol,
-      pvalues = pvalues
-    )
+  # Generate additional samples (if nboot>startCtr)
+  if (nboot >= startCtr) {
+    for (mod_idx in startCtr:nboot) {
+      bootData[[mod_idx]] <- sampling(data,
+        nsamp = nSampIndiv,
+        uid_colname = uidCol,
+        pvalues = pvalues
+      )
 
-    # save bootData in curr directory: read the file using readRDS()
-    attr(bootData, "randomSeed") <- .Random.seed
-    saveRDS(bootData[[mod_idx]], file = paste0('./', output_dir, '/',as.character(substitute(boot_data)),'_',mod_idx,'.RData'))
+      # save bootData in curr directory: read the file using readRDS()
+      attr(bootData, "randomSeed") <- .Random.seed
+      saveRDS(bootData[[mod_idx]], file = paste0("./", output_dir, "/", as.character(substitute(boot_data)), "_", mod_idx, ".RData"))
+    }
   }
-  
-  
 
-  # check if number of samples in stored file is the same as required number of samples
+  # check if number of samples in stored file is the same as the required number of samples
   # bootData <- readRDS(fnameBootData)
-  
-  fileExists = list.files(paste0('./', output_dir), pattern=fnameBootDataPattern)
-  bootData = lapply(fileExists, function(x){readRDS(paste0('./', output_dir, '/',x, sep=""))})
-  
-  if (length(bootData) == nboot) {
-  # if (mod_idx == nboot){
-    cli::cli_alert_success(
-      cli::col_silver(
-        "sampling complete! saved data is at {paste0(getwd(),'/', output_dir)}"
-      )
-    )
-  }
-  else {
-    cli::cli_alert_danger(
-      cli::col_red(
-        "could not save all data. resume bootstrapping using saved data at {paste0(getwd(), '/', output_dir)}"
-      )
-    )
-    stop(
-      "aborting... could not save all the data; resume using data saved at {paste0(getwd(), '/', output_dir)}",
-      call. = FALSE
-    )
-  }
 
+  fileExists <- list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
+  bootData <- lapply(fileExists, function(x) {
+    readRDS(paste0("./", output_dir, "/", x, sep = ""))
+  })
+
+  currBootData <- length(bootData)
+
+  # if (currBootData == nboot) {
+  #   cli::cli_alert_success(
+  #     cli::col_silver(
+  #       "sampling complete! saved data is at {paste0(getwd(),'/', output_dir)}"
+  #     )
+  #   )
+  # }
+  # else {
+  #   cli::cli_alert_danger(
+  #     cli::col_red(
+  #       "could not save all data. resume bootstrapping using saved data at {paste0(getwd(), '/', output_dir)}"
+  #     )
+  #   )
+  #   stop(
+  #     "aborting... could not save all the data; resume using data saved at {paste0(getwd(), '/', output_dir)}",
+  #     call. = FALSE
+  #   )
+  # }
 
   # Fitting models to bootData now
   .env <- environment()
@@ -380,38 +390,56 @@ modelBootstrap <- function(fit,
   #   ".RData",
   #   sep = ""
   # )
-  fnameModelsEnsemblePattern <- paste0(as.character(substitute(modelsEnsemble)),'_', '[0-9]+',
-                                ".RData",
-                                sep = "")
+  fnameModelsEnsemblePattern <- paste0(as.character(substitute(modelsEnsemble)), "_", "[0-9]+",
+    ".RData",
+    sep = ""
+  )
 
-  modFileExists = list.files(paste0('./', output_dir), pattern=fnameModelsEnsemblePattern)
-  
-  if (resume) {
-    if (length(modFileExists)>0 &&
-      (length(fileExists)>0)) {
+  modFileExists <- list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
+
+  if (!restart) {
+    if (length(modFileExists) > 0 &&
+      (length(fileExists) > 0)) { # read bootData and modelsEnsemble files from disk
       cli::cli_alert_success(
         "resuming bootstrap model fitting using data and models stored at {paste0(getwd(), '/', output_dir)}"
       )
-      # bootData <- readRDS(fnameBootData)
-      # modelsEnsembleLoaded <- readRDS(fnameModelsEnsemble)
-      
-      bootData = lapply(fileExists, function(x){readRDS(paste0('./', output_dir, '/',x, sep=""))})
-      modelsEnsembleLoaded = lapply(modFileExists, function(x){readRDS(paste0('./', output_dir, '/',x, sep=""))})
+
+
+      bootData <- lapply(fileExists, function(x) {
+        readRDS(paste0("./", output_dir, "/", x, sep = ""))
+      })
+      modelsEnsembleLoaded <- lapply(modFileExists, function(x) {
+        readRDS(paste0("./", output_dir, "/", x, sep = ""))
+      })
 
       .env$mod_idx <- length(modelsEnsembleLoaded) + 1
 
-      if (.env$mod_idx > nboot) {
+      currNumModels <- .env$mod_idx - 1
+
+      if (currNumModels > nboot) {
         cli::cli_alert_danger(
           cli::col_red(
-            "the model file already has {.env$mod_idx-1} models when max models is {nboot}"
+            "the model file already has {.env$mod_idx-1} models when max models is {nboot}; using only the first {nboot} model(s)"
           )
         )
-        stop(
-          "aborting...the number of models in resume file exceeds the number of models to be estimated",
-          call. = FALSE
+        return(modelsEnsembleLoaded[1:nboot])
+        # .env$mod_idx <- 1
+      }
+
+      else if (currNumModels == nboot) {
+        cli::col_red(
+          "the model file already has {.env$mod_idx-1} models when max models is {nboot}; loading from {nboot} models already saved on disk"
+        )
+        return(modelsEnsembleLoaded)
+      }
+
+      else if (currNumModels < nboot) {
+        cli::col_red(
+          "estimating the additional models ... "
         )
       }
     }
+
     else {
       cli::cli_alert_danger(
         cli::col_red(
@@ -428,7 +456,6 @@ modelBootstrap <- function(fit,
   else {
     .env$mod_idx <- 1
   }
-
 
   # get control settings for the 'fit' object and save computation effort by not computing the tables
   .ctl <- fit$origControl
@@ -456,36 +483,38 @@ modelBootstrap <- function(fit,
         message = fit$message,
         warnings = fit$warnings
       )
-      
-      saveRDS(.env$multipleFits, file = paste0('./', output_dir, '/',as.character(substitute(modelsEnsemble)), '_',.env$mod_idx,'.RData'))
+
+      saveRDS(.env$multipleFits, file = paste0("./", output_dir, "/", as.character(substitute(modelsEnsemble)), "_", .env$mod_idx, ".RData"))
       assign("mod_idx", .env$mod_idx + 1, .env)
     })
-  
-  if (resume) {
+
+  if (!restart) {
     modelsEnsemble <- c(modelsEnsembleLoaded, modelsEnsemble)
   }
 
-  modFileExists = list.files(paste0('./', output_dir), pattern=fnameModelsEnsemblePattern)
-  modelsEnsemble = lapply(modFileExists, function(x){readRDS(paste0('./', output_dir, '/',x, sep=""))})
-  
-  if (length(modelsEnsemble) == nboot) {
-    cli::cli_alert_success(
-      cli::col_silver(
-        "fitting complete! saved models at {paste0(getwd(), '/', output_dir)}"
-      )
-    )
-  }
-  else {
-    cli::cli_alert_danger(
-      cli::col_red(
-        "all models not saved. resume bootstrapping using saved models at {paste0(getwd(),'/', output_dir)}"
-      )
-    )
-    stop(
-      "aborting...could not save all the models; resume bootstrapping useing models saved at {paste0(getwd(),'/', output_dir)}",
-      call. = FALSE
-    )
-  }
+  modFileExists <- list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
+  modelsEnsemble <- lapply(modFileExists, function(x) {
+    readRDS(paste0("./", output_dir, "/", x, sep = ""))
+  })
+
+  # if (length(modelsEnsemble) == nboot) {
+  #   cli::cli_alert_success(
+  #     cli::col_silver(
+  #       "fitting complete! saved models at {paste0(getwd(), '/', output_dir)}"
+  #     )
+  #   )
+  # }
+  # else {
+  #   cli::cli_alert_danger(
+  #     cli::col_red(
+  #       "all models not saved. resume bootstrapping using saved models at {paste0(getwd(),'/', output_dir)}"
+  #     )
+  #   )
+  #   stop(
+  #     "aborting...could not save all the models; resume bootstrapping useing models saved at {paste0(getwd(),'/', output_dir)}",
+  #     call. = FALSE
+  #   )
+  # }
 
   modelsEnsemble
 }
@@ -672,9 +701,9 @@ getBootstrapSummary <- function(fitList, ci = 0.95) {
 }
 
 #' @export
-print.nlmixrBootstrapSummary <- function(x, ..., sigdig=NULL) {
+print.nlmixrBootstrapSummary <- function(x, ..., sigdig = NULL) {
   if (is.null(sigdig)) {
-    if (any(names(x) == "sigdig")){
+    if (any(names(x) == "sigdig")) {
       sigdig <- x$sigdig
     } else {
       sigdig <- 3
