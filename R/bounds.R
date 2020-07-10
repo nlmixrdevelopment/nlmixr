@@ -532,32 +532,66 @@ nlmixrBoundsParserOmega <- function(x, currentData) {
         call. = FALSE
       )
     }
-    valueFix <- nlmixrBoundsValueFixed(x$value[[2]][[2]])
+    valueCor <- nlmixrBoundsValueCor(x$value[[2]][[2]])
   } else {
     # The condition is not specified, set to "ID"
     conditionValue <- "ID"
-    valueFix <- nlmixrBoundsValueFixed(x$value[[2]])
+    valueCor <- nlmixrBoundsValueCor(x$value[[2]])
+  }
+  if (length(valueCor$value) == 1 & all(valueCor$cor)) {
+    warning("'cor(...)' with a single value is ignored: ", deparse(x$value))
+  } else if (any(valueCor$cor) & !all(valueCor$cor)) {
+    stop("'cor(...)' must enclose all or none of the block: ", deparse(x$value))
+  }
+  # Make it a matrix so that decorrelation can occur, if necessary.
+  tmpValue <- valueCor$value
+  valueMatrix <- matrix(numeric(), nrow=0, ncol=0)
+  currentDiagIdx <- 0
+  while (length(tmpValue)) {
+    currentDiagIdx <- currentDiagIdx + 1
+    if (length(tmpValue) < currentDiagIdx) {
+      stop(
+        "incorrect lower triangular matrix dimensions: ", deparse(x$value),
+        call. = FALSE
+      )
+    }
+    valueMatrix <-
+      rbind(
+        cbind(
+          valueMatrix,
+          tmpValue[seq_len(currentDiagIdx - 1)]
+        ),
+        tmpValue[seq_len(currentDiagIdx)]
+      )
+    tmpValue <- tmpValue[-seq_len(currentDiagIdx)]
+  }
+  if (all(valueCor$cor)) {
+    # Confirm that all or none are fixed
+    if (!(all(valueCor$fixed) | all(!valueCor$fixed))) {
+      stop(
+        "either all or none of the elements may be fixed with cor(...): ",
+        deparse(x$value)
+      )
+    }
+    # Decorrelate the matrix
+    sdValues <- diag(valueMatrix)
+    diag(valueMatrix) <- 1
+    # Convert to variance-covariance matrix
+    valueMatrix <- sweep(sweep(valueMatrix, 1, sdValues, "*"), 2, sdValues, "*")
   }
   currentDiagIdx <- 0
   est <- numeric()
   fix <- logical()
   neta1 <- numeric()
   neta2 <- numeric()
-  while (length(valueFix$value)) {
-    currentDiagIdx <- currentDiagIdx + 1
-    if (length(valueFix$value) < currentDiagIdx) {
-      stop(
-        "incorrect lower triangular matrix dimensions: ", deparse(x$value),
-        call. = FALSE
-      )
-    }
+  for (currentDiagIdx in seq_len(nrow(valueMatrix))) {
     nextValues <- seq_len(currentDiagIdx)
-    est <- c(est, valueFix$value[nextValues])
-    fix <- c(fix, valueFix$fixed[nextValues])
+    est <- c(est, valueMatrix[currentDiagIdx, nextValues])
+    fix <- c(fix, valueCor$fixed[nextValues])
     neta1 <- c(neta1, rep(currentDiagIdx, currentDiagIdx))
     neta2 <- c(neta2, nextValues)
-    valueFix$value <- valueFix$value[-nextValues]
-    valueFix$fixed <- valueFix$fixed[-nextValues]
+    # Drop the values of 'fixed' that had just been used
+    valueCor$fixed <- valueCor$fixed[-nextValues]
   }
   if (class(x$varname) != "character") {
     # It has a name
