@@ -2803,8 +2803,6 @@ getVarCov.nlmixrFitCore <- function (obj, ...){
     .env <- obj;
     if (RxODE::rxIs(obj, "nlmixrFitData")){
         .env <- obj$env;
-    } else {
-        class(.env) <- NULL
     }
     .force <- FALSE;
     .args <- list(...);
