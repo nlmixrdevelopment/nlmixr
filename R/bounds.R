@@ -608,7 +608,8 @@ nlmixrBoundsParserOmega <- function(x, currentData) {
   } else {
     name1 <- name2 <- NA_character_
   }
-  finalData <- currentData[seq_along(neta1), ]
+  # rep() ensures that the default values are set for each row
+  finalData <- currentData[rep(1, length(neta1)), ]
   rownames(finalData) <- NULL
   finalData$lower <- -Inf
   finalData$est <- est
