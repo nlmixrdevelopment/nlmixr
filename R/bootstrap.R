@@ -67,6 +67,7 @@ addConfboundsToVar <-
 bootstrapFit <- function(fit,
                          nboot = 500,
                          nSampIndiv,
+                         stratVar,
                          stdErrType = c('perc', 'se'),
                          ci=0.95,
                          pvalues = NULL,
@@ -80,6 +81,17 @@ bootstrapFit <- function(fit,
     stop("'ci' needs to be between 0 and 1", call. = FALSE)
   }
   
+  if (missing(stratVar)){
+    performStrat = FALSE
+  }
+  else{
+    if (!(stratVar %in% colnames(getData(fit)))){
+      cli::cli_alert_danger('{stratVar} not in data')
+      stop('aborting ...stratifying variable not in data', call. = FALSE)
+    }
+    performStrat = TRUE
+  }
+  
   fitName <- as.character(substitute(fit))
 
   if (is.null(fit$bootstrapMd5)){
@@ -87,8 +99,15 @@ bootstrapFit <- function(fit,
     assign('bootstrapMd5', bootstrapMd5, envir = fit$env)
   }
 
-  modelsList <-
-    modelBootstrap(fit, nboot, nSampIndiv, pvalues, restart, fitName) # multiple models
+  if (performStrat){
+    modelsList <-
+      modelBootstrap(fit, nboot, nSampIndiv, stratVar, pvalues, restart, fitName) # multiple models    
+  }
+  else{
+    modelsList <-
+      modelBootstrap(fit, nboot, nSampIndiv, pvalues, restart, fitName) # multiple models
+  }
+
   
   bootSummary <-
     getBootstrapSummary(modelsList, ci, stdErrType) # aggregate values/summary
@@ -174,7 +193,9 @@ bootstrapFit <- function(fit,
 sampling <- function(data,
                      nsamp,
                      uid_colname,
-                     pvalues = NULL) {
+                     pvalues = NULL,
+                     performStrat=FALSE,
+                     stratVar) {
   checkmate::assert_data_frame(data)
   if (missing(nsamp)) {
     nsamp <- length(unique(data[, uid_colname]))
@@ -185,6 +206,11 @@ sampling <- function(data,
       any.missing = FALSE,
       lower = 2
     )
+  }
+  
+  if (performStrat && missing(stratVar)){
+    print('stratVar is required for stratifying')
+    stop('aborting... stratVar not specified', call. = FALSE)
   }
 
   checkmate::assert_integerish(nsamp,
@@ -208,32 +234,86 @@ sampling <- function(data,
     checkmate::assert_character(uid_colname)
   }
 
-  uids <- unique(data[, uid_colname])
-  uids_samp <- sample(uids,
-    size = nsamp,
-    replace = TRUE,
-    prob = pvalues
-  )
+  
+  if (performStrat){
+    stratLevels = as.character(unique(data[,stratVar])) # char to access freq. values
+    
+    dataSubsets = lapply(stratLevels, function(x){
+      data[data[,stratVar]==x,]
+    })
+    
+    names(dataSubsets) = stratLevels
+    
+    tab = table(theo_sd[stratVar])
+    nTab = sum(tab)
+    
+    sampledDataSubsets = lapply(names(dataSubsets), function(x){
+      dat = dataSubsets[[x]]
+      
+      uids <- unique(dat[, uid_colname])
+      print(uids)
+      uids_samp <- sample(list(uids),
+                          size = ceiling(nsamp*unname(tab[x])/nTab),
+                          replace = TRUE,
+                          prob = pvalues
+    )
+    
+    sampled_df <-
+      data.frame(dat)[0, ] # initialize an empty dataframe with the same col names
+    
+    # populate dataframe based on sampled uids
+    # new_id = 1
+    .env <- environment()
+    .env$new_id <- 1
+    # print(uids_samp)
+    do.call(rbind, lapply(uids_samp, function(u) {
+      # print(dat)
+      # print(u)
+      # print('============')
+      data_slice <- dat[dat[, uid_colname] == u, ]
+      start <- NROW(sampled_df) + 1
+      end <- start + NROW(data_slice) - 1
+      
+      data_slice[uid_colname] <-
+        .env$new_id # assign a new ID to the sliced dataframe
+      .env$new_id <- .env$new_id + 1
+      data_slice
+    }))
+      
+      
+  })
+    
+  do.call('rbind', sampledDataSubsets)
+  }
+  
+  else{
+    uids <- unique(data[, uid_colname])
+    uids_samp <- sample(uids,
+                        size = nsamp,
+                        replace = TRUE,
+                        prob = pvalues
+    )
+    
+    sampled_df <-
+      data.frame(data)[0, ] # initialize an empty dataframe with the same col names
+    
+    # populate dataframe based on sampled uids
+    # new_id = 1
+    .env <- environment()
+    .env$new_id <- 1
+    
+    do.call(rbind, lapply(uids_samp, function(u) {
+      data_slice <- data[data[, uid_colname] == u, ]
+      start <- NROW(sampled_df) + 1
+      end <- start + NROW(data_slice) - 1
+      
+      data_slice[uid_colname] <-
+        .env$new_id # assign a new ID to the sliced dataframe
+      .env$new_id <- .env$new_id + 1
+      data_slice
+    }))
+  }
 
-  sampled_df <-
-    data.frame(data)[0, ] # initialize an empty dataframe with the same col names
-
-  # populate dataframe based on sampled uids
-  # new_id = 1
-  .env <- environment()
-  .env$new_id <- 1
-
-  do.call(rbind, lapply(uids_samp, function(u) {
-    data_slice <- data[data[, uid_colname] == u, ]
-    start <- NROW(sampled_df) + 1
-    end <- start + NROW(data_slice) - 1
-
-    data_slice[uid_colname] <-
-      .env$new_id # assign a new ID to the sliced dataframe
-    .env$new_id <- .env$new_id + 1
-    # assign("new_id", .env$new_id+1, .env)
-    data_slice
-  }))
 }
 
 
@@ -255,11 +335,19 @@ sampling <- function(data,
 modelBootstrap <- function(fit,
                            nboot = 100,
                            nSampIndiv,
+                           stratVar, 
                            pvalues = NULL,
                            restart = FALSE,
                            fitName = "fit") {
   if (!inherits(fit, "nlmixrFitCore")) {
     stop("'fit' needs to be a nlmixr fit", call. = FALSE)
+  }
+  
+  if (missing(stratVar)){
+    performStrat = FALSE
+  }
+  else{
+    performStrat=TRUE
   }
 
   data <- getData(fit)
@@ -272,7 +360,6 @@ modelBootstrap <- function(fit,
     any.missing = FALSE,
     lower = 1
   )
-
 
   if (missing(nSampIndiv)) {
     nSampIndiv <- length(unique(data[, uidCol]))
@@ -355,7 +442,9 @@ modelBootstrap <- function(fit,
       bootData[[mod_idx]] <- sampling(data,
         nsamp = nSampIndiv,
         uid_colname = uidCol,
-        pvalues = pvalues
+        pvalues = pvalues,
+        performStrat = performStrat,
+        startVar = stratVar
       )
 
       # save bootData in curr directory: read the file using readRDS()
