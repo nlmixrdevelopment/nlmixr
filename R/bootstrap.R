@@ -67,8 +67,19 @@ addConfboundsToVar <-
 bootstrapFit <- function(fit,
                          nboot = 500,
                          nSampIndiv,
+                         stdErrType = c('perc', 'se'),
+                         ci=0.95,
                          pvalues = NULL,
                          restart = FALSE) {
+  stdErrType = match.arg(stdErrType)
+  if (missing(stdErrType)){
+    stdErrType = 'perc'
+  }
+  
+  if (!(ci < 1 && ci > 0)) {
+    stop("'ci' needs to be between 0 and 1", call. = FALSE)
+  }
+  
   fitName <- as.character(substitute(fit))
 
   if (is.null(fit$bootstrapMd5)){
@@ -76,11 +87,11 @@ bootstrapFit <- function(fit,
     assign('bootstrapMd5', bootstrapMd5, envir = fit$env)
   }
 
-  
   modelsList <-
     modelBootstrap(fit, nboot, nSampIndiv, pvalues, restart, fitName) # multiple models
+  
   bootSummary <-
-    getBootstrapSummary(modelsList) # aggregate values/summary
+    getBootstrapSummary(modelsList, ci, stdErrType) # aggregate values/summary
 
   # modify the fit object
   nrws <- nrow(bootSummary$parFixedDf$mean)
@@ -122,10 +133,26 @@ bootstrapFit <- function(fit,
     signif(seBoot / estEst * 100, sigdig)
   newParFixed["Bootstrap Back-transformed(95%CI)"] <-
     backTransformed
-
+  
+  # compute delta objf values for each of the models
+  deltOBJF = lapply(modelsList, function(x){
+    x$objf - fit$objf 
+  })
+  
+  # compute bias
+  bootstrapBias = bootSummary$objf[[1]] -fit$objf  # 1 corresponds to the mean value, 2 corresponds to the median
+  
+  # compute covariance matrix
+  covMatrix = cov(getData(fit), getData(fit))
+  corMatrix = cor(getData(fit), getData(fit))
+  
+  
+  assign('deltOBJF', deltOBJF, envir = fit$env)
+  assign('bootstrapBias', bootstrapBias, envir = fit$env)
+  assign('covMatrix', covMatrix, envir=fit$env)
+  assign('corMatrix', corMatrix, envir=fit$env)
   assign("parFixedDf", newParFixedDf, envir = fit$env)
   assign("parFixed", newParFixed, envir = fit$env)
-
   assign("omegaSummary", bootSummary$omega, envir = fit$env)
 }
 
@@ -308,24 +335,7 @@ modelBootstrap <- function(fit,
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
 
-      # bootData <- readRDS(fnameBootData)
-      # assign('.Random.seed', attr(bootData, 'randomSeed'), envir = .GlobalEnv)
-
-      # startCtr <- sum(!sapply(bootData, is.null)) + 1
-
       startCtr <- length(bootData) + 1
-
-      # if (startCtr > nboot) {
-      #   cli::cli_alert_danger(
-      #     cli::col_red(
-      #       "the data file already has {startCtr-1} datasets when max datasets is {nboot}"
-      #     )
-      #   )
-      #   stop(
-      #     "aborting ... the number of models in resume file exceeds the number of models to be estimated",
-      #     call. = FALSE
-      #   )
-      # }
     }
     else {
       cli::cli_alert_danger(cli::col_red(
@@ -355,8 +365,6 @@ modelBootstrap <- function(fit,
   }
 
   # check if number of samples in stored file is the same as the required number of samples
-  # bootData <- readRDS(fnameBootData)
-
   fileExists <- list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
   bootData <- lapply(fileExists, function(x) {
     readRDS(paste0("./", output_dir, "/", x, sep = ""))
@@ -364,32 +372,8 @@ modelBootstrap <- function(fit,
 
   currBootData <- length(bootData)
 
-  # if (currBootData == nboot) {
-  #   cli::cli_alert_success(
-  #     cli::col_silver(
-  #       "sampling complete! saved data is at {paste0(getwd(),'/', output_dir)}"
-  #     )
-  #   )
-  # }
-  # else {
-  #   cli::cli_alert_danger(
-  #     cli::col_red(
-  #       "could not save all data. resume bootstrapping using saved data at {paste0(getwd(), '/', output_dir)}"
-  #     )
-  #   )
-  #   stop(
-  #     "aborting... could not save all the data; resume using data saved at {paste0(getwd(), '/', output_dir)}",
-  #     call. = FALSE
-  #   )
-  # }
-
   # Fitting models to bootData now
   .env <- environment()
-  # fnameModelsEnsemble <- paste0(output_dir, "/",
-  #   as.character(substitute(modelsEnsemble)),
-  #   ".RData",
-  #   sep = ""
-  # )
   fnameModelsEnsemblePattern <- paste0(as.character(substitute(modelsEnsemble)), "_", "[0-9]+",
     ".RData",
     sep = ""
@@ -466,23 +450,32 @@ modelBootstrap <- function(fit,
   modelsEnsemble <-
     lapply(bootData[.env$mod_idx:nboot], function(boot_data) {
       cli::cli_h1("Running nlmixr for model index: {.env$mod_idx}")
-
-      fit <- suppressWarnings(nlmixr(
-        uif,
-        boot_data,
-        est = fitMeth,
-        control = .ctl
-      ))
-
-      .env$multipleFits <- list(
-        objf = fit$OBJF,
-        aic = fit$AIC,
-        omega = fit$omega,
-        parFixedDf = fit$parFixedDf,
-        method = fit$method,
-        message = fit$message,
-        warnings = fit$warnings
-      )
+      
+      fit = tryCatch({
+        fit = suppressWarnings(nlmixr(
+          uif,
+          boot_data,
+          est = fitMeth,
+          control = .ctl
+        ))
+        
+        .env$multipleFits <- list(
+          objf = fit$OBJF,
+          aic = fit$AIC,
+          omega = fit$omega,
+          parFixedDf = fit$parFixedDf,
+          method = fit$method,
+          message = fit$message,
+          warnings = fit$warnings)
+        
+        fit  # to return 'fit'
+      },
+      error=function(error_message){
+        print('error fitting the model')
+        print(error_message)
+        print('storing the models as NA ...')
+        return(NA)  # return NA otherwise (instead of NULL)
+      })
 
       saveRDS(.env$multipleFits, file = paste0("./", output_dir, "/", as.character(substitute(modelsEnsemble)), "_", .env$mod_idx, ".RData"))
       assign("mod_idx", .env$mod_idx + 1, .env)
@@ -496,25 +489,6 @@ modelBootstrap <- function(fit,
   modelsEnsemble <- lapply(modFileExists, function(x) {
     readRDS(paste0("./", output_dir, "/", x, sep = ""))
   })
-
-  # if (length(modelsEnsemble) == nboot) {
-  #   cli::cli_alert_success(
-  #     cli::col_silver(
-  #       "fitting complete! saved models at {paste0(getwd(), '/', output_dir)}"
-  #     )
-  #   )
-  # }
-  # else {
-  #   cli::cli_alert_danger(
-  #     cli::col_red(
-  #       "all models not saved. resume bootstrapping using saved models at {paste0(getwd(),'/', output_dir)}"
-  #     )
-  #   )
-  #   stop(
-  #     "aborting...could not save all the models; resume bootstrapping useing models saved at {paste0(getwd(),'/', output_dir)}",
-  #     call. = FALSE
-  #   )
-  # }
 
   modelsEnsemble
 }
@@ -617,10 +591,11 @@ extractVars <- function(fitlist, id = "objf") {
 #' @examples
 #' getBootstrapSummary(fitlist)
 #' @noRd
-getBootstrapSummary <- function(fitList, ci = 0.95) {
+getBootstrapSummary <- function(fitList, ci = 0.95, stdErrType = 'perc') {
   if (!(ci < 1 && ci > 0)) {
     stop("'ci' needs to be between 0 and 1", call. = FALSE)
   }
+  
   quantLevels <-
     c(0.5, (1 - ci) / 2, 1 - (1 - ci) / 2) # median, (1-ci)/2, 1-(1-ci)/2
 
@@ -648,11 +623,15 @@ getBootstrapSummary <- function(fitList, ci = 0.95) {
       quants <- apply(varVec, 1:2, function(x) {
         unname(quantile(x, quantLevels))
       })
-
       median <- quants[1, , ]
       confLower <- quants[2, , ]
       confUpper <- quants[3, , ]
-
+    
+      if (stdErrType!='perc'){
+        confLower = mn - qnorm(quantLevels[[2]])*sd
+        confUpper = mn + qnorm(quantLevels[[3]])*sd
+      }
+      
       lst <- list(
         mean = mn,
         median = median,
@@ -678,6 +657,11 @@ getBootstrapSummary <- function(fitList, ci = 0.95) {
       median <- quants[1, , ]
       confLower <- quants[2, , ]
       confUpper <- quants[3, , ]
+      
+      if (stdErrType!='perc'){
+        confLower = mn - qnorm(quantLevels[[2]])*sd
+        confUpper = mn + qnorm(quantLevels[[3]])*sd
+      }
 
       lst <- list(
         mean = mn,
