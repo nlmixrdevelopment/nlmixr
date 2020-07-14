@@ -101,11 +101,11 @@ bootstrapFit <- function(fit,
 
   if (performStrat){
     modelsList <-
-      modelBootstrap(fit, nboot, nSampIndiv, stratVar, pvalues, restart, fitName) # multiple models    
+      modelBootstrap(fit, nboot=nboot, nSampIndiv=nSampIndiv, stratVar=stratVar, pvalues=pvalues, restart=restart,fitName = fitName) # multiple models    
   }
   else{
     modelsList <-
-      modelBootstrap(fit, nboot, nSampIndiv, pvalues, restart, fitName) # multiple models
+      modelBootstrap(fit, nboot=nboot, nSampIndiv=nSampIndiv, pvalues=pvalues, restart=restart,fitName = fitName) # multiple models
   }
 
   
@@ -251,7 +251,6 @@ sampling <- function(data,
       dat = dataSubsets[[x]]
       
       uids <- unique(dat[, uid_colname])
-      print(uids)
       uids_samp <- sample(list(uids),
                           size = ceiling(nsamp*unname(tab[x])/nTab),
                           replace = TRUE,
@@ -265,11 +264,7 @@ sampling <- function(data,
     # new_id = 1
     .env <- environment()
     .env$new_id <- 1
-    # print(uids_samp)
     do.call(rbind, lapply(uids_samp, function(u) {
-      # print(dat)
-      # print(u)
-      # print('============')
       data_slice <- dat[dat[, uid_colname] == u, ]
       start <- NROW(sampled_df) + 1
       end <- start + NROW(data_slice) - 1
@@ -345,6 +340,7 @@ modelBootstrap <- function(fit,
   
   if (missing(stratVar)){
     performStrat = FALSE
+    stratVar = NULL
   }
   else{
     performStrat=TRUE
@@ -444,7 +440,7 @@ modelBootstrap <- function(fit,
         uid_colname = uidCol,
         pvalues = pvalues,
         performStrat = performStrat,
-        startVar = stratVar
+        stratVar = stratVar
       )
 
       # save bootData in curr directory: read the file using readRDS()
