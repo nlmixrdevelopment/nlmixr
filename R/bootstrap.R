@@ -179,9 +179,14 @@ bootstrapFit <- function(fit,
   if (plotHist) {
     df <- data.frame(deltOBJF = abs(unlist(deltOBJF)), refDistr = rchisq(1000, df = length(fit$theta)), criticalVal = qchisq(1 - 0.005, df = length(fit$theta)))
     ggplot2::ggplot(df) +
-      ggplot2::geom_histogram(aes(x = deltOBJF), color = "blue", fill = "blue", alpha = 0.2) +
-      ggplot2::geom_vline(aes(xintercept = criticalVal), color = "red", linetype = "dashed")
-  }
+      ggplot2::geom_density(aes(x = deltOBJF), color = "blue", fill = "blue", alpha = 0.2) +
+      ggplot2::geom_vline(aes(xintercept = criticalVal), color = "red", linetype = "dashed")+ggplot2::geom_density(aes(x = refDistr), color = "red", fill = "red", alpha = 0.2)+ ggplot2:: xlab(xlab("\u0394Objective function"))
+  # add legends
+  # footnote describing the interpretation of the plot: distr should be below ref distr.
+  # ylab: Density
+    # title: N, title for the plot
+    # ggtext() for footnotes
+    }
 }
 
 
