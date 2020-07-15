@@ -188,10 +188,6 @@ removeCovariate <- function(funstring, varName, covariate, theta) {
 }
 
 
-
-
-
-
 #' Adding covariate to a given variable in an nlmixr model expression
 #'
 #' @param fitobject an nlmixr 'fit' object
@@ -213,8 +209,8 @@ removeCovariate <- function(funstring, varName, covariate, theta) {
 addCovVar <- function(fitobject,
                       varName,
                       covariate,
-                      norm = c("median", "mean"),
-                      norm_type = c("mul", "div", "sub", "add"),
+                      norm = c("median", "mean", 'autoscale'),
+                      norm_type = c("mul", "div", "sub", "add", 'autoscale'),
                       categorical = FALSE,
                       isHS = FALSE,
                       initialEst = 0,
@@ -247,7 +243,8 @@ addCovVar <- function(fitobject,
       "div" = `/`,
       "mul" = `*`,
       "sub" = `-`,
-      "add" = `+`
+      "add" = `+`,
+      "autoscale"=c(`-`,`/`)
     )
   normOp <- norm_ops[[norm_type]]
 
@@ -279,7 +276,26 @@ addCovVar <- function(fitobject,
       normValVec <- norm
     }
     else {
-      if (norm %in% "mean") {
+      if (norm %in% "autoscale"){
+        normValVecMean = mean(data[, covariate])
+        normValVecSd = sd(data[, covariate])
+        
+        normValVec <- list(normValVecMean, normValVecSd)
+        
+        # uids <- unlist(unname(data[uidCol]))
+        # normValVecMean <- lapply(uids, function(x) {
+        #   datSlice <- data[data[uidCol] == x, ]
+        #   normVal <- mean(unlist(datSlice[covariate]))
+        # })
+        # 
+        # normValVecSd <- lapply(uids, function(x) {
+        #   datSlice <- data[data[uidCol] == x, ]
+        #   normVal <- sd(unlist(datSlice[covariate]))
+        # })
+        
+      }
+      
+      else if (norm %in% "mean") {
         # mean of the mean values
         uids <- unlist(unname(data[uidCol]))
         normValVec <- lapply(uids, function(x) {
@@ -371,8 +387,17 @@ performNorm <- function(data,
   if (!(isCat)) { # not categorical variable
     if (!(isHS)) { # not hockey stick
       datColNames <- paste0("centered_", covariate)
-      data[, datColNames] <-
-        normOp(unname(unlist(data[, covariate])), normValVec)
+      
+      if (length(normOp)>1){
+        data[, datColNames] <-
+          normOp[[1]](unname(unlist(data[, covariate])), normValVec[[1]])
+        data[, datColNames] <-
+          normOp[[2]](unname(unlist(data[, datColNames])), normValVec[[2]])
+      }
+      else{
+        data[, datColNames] <-
+          normOp(unname(unlist(data[, covariate])), normValVec)
+      }
 
       covNameMod1 <- datColNames
       covNameParam1 <- paste0("cov_", covariate)
@@ -520,13 +545,16 @@ makeDummies <- function(data, covariate) {
 #'
 #' @param covInfo a list of lists containing information on the covariates that need to be tested
 #' @param fitobject an nlmixr 'fit' object
-#' @param indep a boolean indicating if the covariates should be added independently (one after the other), or sequentially to the previous model; default is TRUE
+#' @param indep a boolean indicating if the covariates should be added independently, or sequentially (append to the previous model); default is TRUE
 #'
 #' @export
 #' @author Vipul Mann, Matthew Fidler
 #' @noRd
 #'
 addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
+  
+  covSearchRes = list()  # list to store fitobjects during the search
+  
   # create directory to store 'fit' objects for the covariate search
   outputDir <-
     paste0("nlmixrCovariateSearchCache_", as.character(substitute(fitobject)))
@@ -536,12 +564,15 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
   }
 
   # adding covariates independent of each other
-  if (!indep) {
-    mets <- lapply(covInfo, function(x) {
+  .env = environment()
+  .env$covSearchRes = list()
+  if (indep) {
+    lapply(1:length(covInfo), function(idx) {
+      x=covInfo[[idx]]
       res <- do.call(addCovVar, c(list(fitobject), x))
       updatedMod <- res[[1]]
       data <- res[[2]]
-
+      
       fit2 <- suppressWarnings(
         nlmixr(updatedMod, data, est = getFitMethod(fitobject))
       )
@@ -559,8 +590,12 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
           sep = ""
         )
       saveRDS(fit2, fnamefit2)
-      cli::cli_h1("Metrics for CovFit: AIC: {fit2$AIC}, BIC: {fit2$BIC}, OBJF: {fit2$OBJF}")
+      # cli::cli_h1("Metrics for CovFit: AIC: {fit2$AIC}, BIC: {fit2$BIC}, OBJF: {fit2$OBJF}")
+      
+      .env$covSearchRes[[idx]] = list(fit2, paste0(x$varName, "_", x$covariate))
     })
+    
+    covSearchRes = .env$covSearchRes
   }
 
   # adding covariates one after the other, appending to the previous model
@@ -575,33 +610,36 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 
       if (length(covsAdded) == 0) {
         covsAdded[[covsAddedIdx]] <- paste0(x$varName, "_", x$covariate)
+        fit2 <- suppressWarnings(
+          nlmixr(updatedMod, data, est = getFitMethod(fitobject))
+        )
+        covSearchRes[[covsAddedIdx]] = list(fit2, covsAdded[[covsAddedIdx]])
         covsAddedIdx <- covsAddedIdx + 1
       }
       else {
         covsAdded[[covsAddedIdx]] <-
           paste0(covsAdded[[covsAddedIdx - 1]], "_", x$varName, "_", x$covariate)
+        fit2 <- suppressWarnings(
+          nlmixr(updatedMod, data, est = getFitMethod(fitobject))
+        )
+        covSearchRes[[covsAddedIdx]] = list(fit2, covsAdded[[covsAddedIdx]])
         covsAddedIdx <- covsAddedIdx + 1
       }
 
-      fit2 <- suppressWarnings(
-        nlmixr(updatedMod, data, est = getFitMethod(fitobject))
-      )
-
       print(fit2$fun.txt)
-      cli::cli_h1("Metrics for CovFit: AIC: {fit2$AIC}, BIC: {fit2$BIC}, OBJF: {fit2$OBJF}")
+      # cli::cli_h1("Metrics for CovFit: AIC: {fit2$AIC}, BIC: {fit2$BIC}, OBJF: {fit2$OBJF}")
 
       fnamefit2 <-
         paste0(outputDir, "/", covsAdded[[covsAddedIdx - 1]],
           ".RData",
           sep = ""
         )
-      print(fnamefit2)
       saveRDS(fit2, fnamefit2)
-
-
       fitobject <- fit2
     }
   }
+  
+  covSearchRes
 }
 
 #' Stepwise Covariate Model-selection (SCM) method
@@ -616,7 +654,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 #' @author Vipul Mann, Matthew Fidler
 #'
 #' @examples
-covarSearchSCM <- function(fit, varsVec, covarsVec, covInformation = NULL, testAll = TRUE) {
+covarSearchSCM <- function(fit, varsVec, covarsVec, covInformation = NULL, testAll = TRUE, forward=TRUE) {
   if (testAll) {
     possiblePerms <- expand.grid(varsVec, covarsVec)
     possiblePerms <- list(as.character(possiblePerms[[1]]), as.character(possiblePerms[[2]]))
@@ -638,6 +676,19 @@ covarSearchSCM <- function(fit, varsVec, covarsVec, covInformation = NULL, testA
     }
   }
 
-  addCovMultiple(covInfo, fit, indep = TRUE)
+  # forward covariate search
+  covSearchRes = addCovMultiple(covInfo, fit, indep = TRUE)
+  
+  resTable = lapply(covSearchRes, function(res){
+    x = res[[1]]
+    nam=res[[2]]
+    list(nam, x$objf, x$objf-fit$objf, x$AIC, x$BIC)
+  })
+  
+  resTable =data.frame(do.call(rbind, resTable))
+  colnames(resTable) = c('varCovar', 'objf', 'deltObjf', 'AIC', 'BIC')
+  
+
+  resTable
   # Select best model, remove covar from possible Perms | metric: delta AIC, chi-square test | for now delta objf (without chi-square)
 }
