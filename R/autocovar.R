@@ -253,8 +253,11 @@ addCovVar <- function(fitobject,
     unlist(strsplit(funstring, split = "\\\n")) # split the string at \n
 
   # # look for the string that needs to be modified
-  idx <- grep(varName, funstringSplit)
+  # idx <- grep(varName, funstringSplit)
+  idx <- grep(paste0("(?<!\\w)", varName), funstringSplit, perl=TRUE)  # varName not preceded by any other character
+  
   if (length(idx) >= 2) {
+    print(funstring)
     stop("cannot update more than one variable at a time")
   }
 
@@ -592,7 +595,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       saveRDS(fit2, fnamefit2)
       # cli::cli_h1("Metrics for CovFit: AIC: {fit2$AIC}, BIC: {fit2$BIC}, OBJF: {fit2$OBJF}")
       
-      .env$covSearchRes[[idx]] = list(fit2, paste0(x$varName, "_", x$covariate))
+      .env$covSearchRes[[idx]] = list(fit2, paste0(x$covariate , "_", x$varName))
     })
     
     covSearchRes = .env$covSearchRes
@@ -609,7 +612,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       data <- res[[2]]
 
       if (length(covsAdded) == 0) {
-        covsAdded[[covsAddedIdx]] <- paste0(x$varName, "_", x$covariate)
+        covsAdded[[covsAddedIdx]] <- paste0(x$covariate , "_", x$varName)
         fit2 <- suppressWarnings(
           nlmixr(updatedMod, data, est = getFitMethod(fitobject))
         )
@@ -618,7 +621,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       }
       else {
         covsAdded[[covsAddedIdx]] <-
-          paste0(covsAdded[[covsAddedIdx - 1]], "_", x$varName, "_", x$covariate)
+          paste0(covsAdded[[covsAddedIdx - 1]], "_", x$covariate , "_", x$varName)
         fit2 <- suppressWarnings(
           nlmixr(updatedMod, data, est = getFitMethod(fitobject))
         )
@@ -669,26 +672,53 @@ covarSearchSCM <- function(fit, varsVec, covarsVec, covInformation = NULL, testA
   for (item in Map(list, possiblePerms$vars, possiblePerms$covars)) {
     listVarName <- paste0(item[[2]], "_", item[[1]])
     if (listVarName %in% names(covInformation)) { # search for name of var_covar in the list covInformation
-      covInfo[[length(covInfo) + 1]] <- c(list(varName = item[[1]], covariate = item[[2]]), covInformation[[listVarName]])
+      # covInfo[[length(covInfo) + 1]] <- c(list(varName = item[[1]], covariate = item[[2]]), covInformation[[listVarName]])
+      covInfo[[listVarName]] = c(list(varName = item[[1]], covariate = item[[2]]), covInformation[[listVarName]])
     }
     else {
-      covInfo[[length(covInfo) + 1]] <- list(varName = item[[1]], covariate = item[[2]])
+      # covInfo[[length(covInfo) + 1]] <- list(varName = item[[1]], covariate = item[[2]])
+      covInfo[[listVarName]] = list(varName = item[[1]], covariate = item[[2]])
     }
   }
 
-  # forward covariate search
-  covSearchRes = addCovMultiple(covInfo, fit, indep = TRUE)
+  if (forward){
+    
+  stepIdx <- 1
+  while(length(covInfo)>0){
+    # forward covariate search
+    covSearchRes = addCovMultiple(covInfo, fit, indep = TRUE)
+    
+    resTable = lapply(covSearchRes, function(res){
+      x = res[[1]]
+      nam=res[[2]]
+      list(nam, x$objf, x$objf-fit$objf, x$AIC, x$BIC)
+    })
+    
+    resTable =data.frame(do.call(rbind, resTable))
+    colnames(resTable) = c('varCovar', 'objf', 'deltObjf', 'AIC', 'BIC')
+    
+    bestRow = resTable[which.min(resTable$deltObjf),]
+    
+    if (bestRow$deltObjf<0){  # objf function value improved
+      cli::cli_h1('best model at step {stepIdx}: ')
+      print(bestRow)
+      
+      fit <- covSearchRes[[which.min(resTable$deltObjf)]][[1]]  # extract fit object corresponding to the best model
+      stepIdx <- stepIdx + 1
+      covInfo[[as.character(bestRow$varCovar)]]=NULL
+      
+      cli::cli_h2('removed {bestRow$varCovar}')
+    }
+    else{ # objf function value did not improve
+      cli::cli_h1('objf value did not improve, exiting the search ...')
+      break
+    }
+  }
+  cli::cli_h2(cli::col_red('forward search complete'))
+  }
   
-  resTable = lapply(covSearchRes, function(res){
-    x = res[[1]]
-    nam=res[[2]]
-    list(nam, x$objf, x$objf-fit$objf, x$AIC, x$BIC)
-  })
-  
-  resTable =data.frame(do.call(rbind, resTable))
-  colnames(resTable) = c('varCovar', 'objf', 'deltObjf', 'AIC', 'BIC')
-  
-
+  else{
+    cli::cli_alert('backward search not yet supported')
+  }
   resTable
-  # Select best model, remove covar from possible Perms | metric: delta AIC, chi-square test | for now delta objf (without chi-square)
 }
