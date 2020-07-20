@@ -406,17 +406,19 @@ removeCovVar <- function(fitobject,
       paste0(paste0("centered_", covariate),
              "*",
              paste0("cov_", covariate))
+    covNames = paste0("cov_", covariate)
   }
   
   else if (isHS) {
     # HS
-    
     prefix <- paste0("centered_", covariate, "_")
     prefix2 <- paste0("cov_", covariate, "_")
     s <- c("lower", "upper")
     covModExpr <-
       paste0(paste0(prefix, s), "*", paste0(prefix2, s))
     covNameMod <- paste(covModExpr, collapse = "+")
+    
+    covNames = paste0(prefix2, s)
     
   }
   
@@ -429,6 +431,7 @@ removeCovVar <- function(fitobject,
       paste0(paste0(prefix, s), "*", paste0(prefix2, s))
     covNameMod <- paste(covModExpr, collapse = "+")
     
+    covNames = paste0(prefix2, s)
   }
   
   else{
@@ -445,10 +448,47 @@ removeCovVar <- function(fitobject,
   cli::cli_alert_success("removed {covNameMod} from {varName}'s equation in the model")
   cli::cli_alert_success("updated funcition text: {funstringSplit[[idx]]}")
   
-  updatedMod = paste0("model(fitobject,{", funstringSplit[[idx]], "})")
-  updatedMod <- eval(parse(text = updatedMod))
+  # Retains the cov_WT variable but also retains the original model form
   
-  updatedMod
+  updatedModBest = NULL
+  for (fstring in funstringSplit){
+    updatedMod = paste0("model(fitobject,{", fstring, "})")
+    updatedMod <- eval(parse(text = updatedMod)) 
+    
+    # initialize (add) covars in the model
+    ini2 <- as.data.frame(updatedMod$ini)
+    for (covName in covNames) {
+      ini2[ini2$name == covName, "est"] <- 0
+      ini2[ini2$name == covName, "lower"] <- -Inf
+      ini2[ini2$name == covName, "upper"] <- Inf
+    }
+    
+    class(ini2) <- c("nlmixrBounds", "data.frame")
+    updatedMod$ini <- ini2
+    
+    if (length(updatedMod$ini$theta)>lngth){
+      lngth = length(updatedMod$ini$theta)
+      updatedModBest = updatedMod
+    }
+  }
+  
+
+  # Does not retain the cov_WT variable; removes it completely since funstringsplit[[idx]] doesn't contain it
+  
+  # # initialize (add) covars in the model
+  # ini2 <- as.data.frame(updatedMod$ini)
+  # for (covName in covNames) {
+  #   ini2[ini2$name == covName, "est"] <- 0
+  #   ini2[ini2$name == covName, "lower"] <- -Inf
+  #   ini2[ini2$name == covName, "upper"] <- Inf
+  # }
+  # 
+  # class(ini2) <- c("nlmixrBounds", "data.frame")
+  # updatedMod$ini <- ini2
+  # 
+  # updatedMod
+  
+  
 }
 
 #' Perform normalization of the covariate
@@ -644,9 +684,10 @@ removeCovMultiple <- function(covInfo, fitobject) {
   .env$covSearchRes = list()
   lapply(1:length(covInfo), function(idx) {
     x = covInfo[[idx]]
+
     updatedMod <- do.call(removeCovVar, c(list(fitobject), x))
     data <- getData(fitobject)
-    
+
     fit2 <-
       suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
     
@@ -800,6 +841,7 @@ covarSearchSCM <-
       }
     }
     
+    resTableComplete = data.frame(matrix(ncol=8, nrow=0))
     if (forward) {
       cli::cli_h1('starting forward search...')
       stepIdx <- 1
@@ -810,13 +852,16 @@ covarSearchSCM <-
         resTable = lapply(covSearchRes, function(res) {
           x = res[[1]]
           nam = res[[2]]
-          list(nam, x$objf, x$objf - fit$objf, x$AIC, x$BIC)
+          list(stepIdx, nam, x$objf, x$objf - fit$objf, x$AIC, x$BIC, length(x$uif$ini$est), qchisq(1-0.005, length(x$uif$ini$est)-length(fit$uif$ini$est) ))
         })
         
         resTable = data.frame(do.call(rbind, resTable))
-        colnames(resTable) = c('varCovar', 'objf', 'deltObjf', 'AIC', 'BIC')
-        
+        colnames(resTable) = c('step', 'varCovar', 'objf', 'deltObjf', 'AIC', 'BIC', '#Params', 'qChisq')
         bestRow = resTable[which.min(resTable$deltObjf),]
+        
+        colnames(resTableComplete) = colnames(resTable)
+        resTableComplete= rbind(resTableComplete, resTable)
+        
         
         if (bestRow$deltObjf < 0) {
           # objf function value improved
@@ -837,20 +882,21 @@ covarSearchSCM <-
         }
       }
       cli::cli_h2(cli::col_red('forward search complete'))
+      print(resTableComplete)
     }
     
     else{
       cli::cli_h1('starting backward search...')
 
       covSearchRes = addCovMultiple(covInfo, fit, indep = FALSE)
-      fit = covSearchRes[[length(covSearchRes)]][[1]]
+      fit = covSearchRes[[length(covSearchRes)]][[1]]  # get the last fit object with all covariates added # DOES NOT ADD $ini
       
       cli::cli_h2(cli::col_blue('initial function text to remove from:'))
       cli::cli_text(cli::col_red("{fit$fun.txt}"))
       
-      # Now remove covars step by step until the objf fun value
+      # Now remove covars step by step until the objf fun value...?
       stepIdx <- 1
-      while (length(covInfo) > 1) {
+      while (length(covInfo)>0) {
         # Remove covars on by one: if objf val increases retain covar; otherwise (objf val decreases), remove the covar
         # At any stage, retain the one that results in highest increase in objf value; exit if removal of none results in increase
         covSearchRes = removeCovMultiple(covInfo, fit)
@@ -866,8 +912,10 @@ covarSearchSCM <-
         
         bestRow = resTable[which.max(resTable$deltObjf),]
         
-        if (bestRow$deltObjf < 0) {
-          # objf function value improved
+        stop('')
+        
+        if (bestRow$deltObjf > 0) {
+          # objf function value increased after removal of covariate: retain the best covariate at this stage, test for the rest
           cli::cli_h1('best model at step {stepIdx}: ')
           print(bestRow)
           
@@ -887,6 +935,7 @@ covarSearchSCM <-
       }
 
       cli::cli_h2(cli::col_red('backward search complete'))
+      
     }
     resTable
   }
