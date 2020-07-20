@@ -77,11 +77,11 @@ bootstrapFit <- function(fit,
   if (missing(stdErrType)) {
     stdErrType <- "perc"
   }
-
+  
   if (!(ci < 1 && ci > 0)) {
     stop("'ci' needs to be between 0 and 1", call. = FALSE)
   }
-
+  
   if (missing(stratVar)) {
     performStrat <- FALSE
   }
@@ -92,45 +92,60 @@ bootstrapFit <- function(fit,
     }
     performStrat <- TRUE
   }
-
+  
   fitName <- as.character(substitute(fit))
-
+  
   if (is.null(fit$bootstrapMd5)) {
     bootstrapMd5 <- digest::digest(fit)
     assign("bootstrapMd5", bootstrapMd5, envir = fit$env)
   }
-
+  
   if (performStrat) {
     modelsList <-
-      modelBootstrap(fit, nboot = nboot, nSampIndiv = nSampIndiv, stratVar = stratVar, pvalues = pvalues, restart = restart, fitName = fitName) # multiple models
+      modelBootstrap(
+        fit,
+        nboot = nboot,
+        nSampIndiv = nSampIndiv,
+        stratVar = stratVar,
+        pvalues = pvalues,
+        restart = restart,
+        fitName = fitName
+      ) # multiple models
   }
   else {
     modelsList <-
-      modelBootstrap(fit, nboot = nboot, nSampIndiv = nSampIndiv, pvalues = pvalues, restart = restart, fitName = fitName) # multiple models
+      modelBootstrap(
+        fit,
+        nboot = nboot,
+        nSampIndiv = nSampIndiv,
+        pvalues = pvalues,
+        restart = restart,
+        fitName = fitName
+      ) # multiple models
   }
-
-
+  
+  
   bootSummary <-
     getBootstrapSummary(modelsList, ci, stdErrType) # aggregate values/summary
-
+  
   # modify the fit object
   nrws <- nrow(bootSummary$parFixedDf$mean)
   sigdig <- fit$control$sigdig
-
+  
   newParFixedDf <- fit$parFixedDf
   newParFixed <- fit$parFixed
-
+  
   # Add Estimate_boot
   est <- unname(bootSummary$parFixedDf$mean[1:nrws, 1])
   cLower <- unname(bootSummary$parFixedDf$confLower[1:nrws, 1])
   cUpper <- unname(bootSummary$parFixedDf$confUpper[1:nrws, 1])
   estEst <- est
-
+  
   estimateBoot <- addConfboundsToVar(est, cLower, cUpper, sigdig)
-
+  
   # Add SE_boot
   seBoot <- unname(bootSummary$parFixedDf$stdDev[1:nrws, 1])
-
+  
   # Add Back-transformed
   est <- unname(bootSummary$parFixedDf$mean[1:nrws, 4])
   cLowerBT <- unname(bootSummary$parFixedDf$confLower[1:nrws, 4])
@@ -138,35 +153,36 @@ bootstrapFit <- function(fit,
   backTransformed <-
     addConfboundsToVar(est, cLowerBT, cUpperBT, sigdig)
   estBT <- est
-
-
+  
+  
   newParFixedDf["Bootstrap Estimate"] <- estEst
   newParFixedDf["Bootstrap SE"] <- seBoot
   newParFixedDf["Bootstrap %RSE"] <- seBoot / estEst * 100
   newParFixedDf["Bootstrap CI Lower"] <- cLowerBT
   newParFixedDf["Bootstrap CI Upper"] <- cUpperBT
   newParFixedDf["Bootstrap Back-transformed"] <- estBT
-
+  
   newParFixed["Bootstrap Estimate"] <- estimateBoot
   newParFixed["Bootstrap SE"] <- signif(seBoot, sigdig)
   newParFixed["Bootstrap %RSE"] <-
     signif(seBoot / estEst * 100, sigdig)
   newParFixed["Bootstrap Back-transformed(95%CI)"] <-
     backTransformed
-
+  
   # compute delta objf values for each of the models
   deltOBJF <- lapply(modelsList, function(x) {
     x$objf - fit$objf
   })
-
+  
   # compute bias
-  bootstrapBias <- bootSummary$objf[[1]] - fit$objf # 1 corresponds to the mean value, 2 corresponds to the median
-
+  bootstrapBias <-
+    bootSummary$objf[[1]] - fit$objf # 1 corresponds to the mean value, 2 corresponds to the median
+  
   # compute covariance matrix
   covMatrix <- cov(getData(fit), getData(fit))
   corMatrix <- cor(getData(fit), getData(fit))
-
-
+  
+  
   assign("deltOBJF", deltOBJF, envir = fit$env)
   assign("bootstrapBias", bootstrapBias, envir = fit$env)
   assign("covMatrix", covMatrix, envir = fit$env)
@@ -174,18 +190,31 @@ bootstrapFit <- function(fit,
   assign("parFixedDf", newParFixedDf, envir = fit$env)
   assign("parFixed", newParFixed, envir = fit$env)
   assign("omegaSummary", bootSummary$omega, envir = fit$env)
-
+  
   # plot histogram
   if (plotHist) {
-    df <- data.frame(deltOBJF = abs(unlist(deltOBJF)), refDistr = rchisq(1000, df = length(fit$theta)), criticalVal = qchisq(1 - 0.005, df = length(fit$theta)))
+    df <-
+      data.frame(
+        deltOBJF = abs(unlist(deltOBJF)),
+        refDistr = rchisq(1000, df = length(fit$theta)),
+        criticalVal = qchisq(1 - 0.005, df = length(fit$theta))
+      )
+    
     ggplot2::ggplot(df) +
-      ggplot2::geom_density(aes(x = deltOBJF), color = "blue", fill = "blue", alpha = 0.2) +
-      ggplot2::geom_vline(aes(xintercept = criticalVal), color = "red", linetype = "dashed")+ggplot2::geom_density(aes(x = refDistr), color = "red", fill = "red", alpha = 0.2)+ ggplot2:: xlab(xlab("\u0394Objective function"))
-  # add legends
-  # footnote describing the interpretation of the plot: distr should be below ref distr.
-  # ylab: Density
-    # title: N, title for the plot
-    # ggtext() for footnotes
+      ggplot2::geom_density(
+        aes(x = deltOBJF, color='delta objective function'),
+        fill = "blue",
+        alpha = 0.2
+      ) + ggplot2::geom_density(
+        aes(x = refDistr, color='reference distribution'),
+        fill = "red",
+        alpha = 0.2
+      ) + ggplot2::xlab(xlab("\u0394 Objective function")) + 
+      ggplot2::labs(title=paste0('distribution of \u0394 objective function values for ', nboot, ' models'), 
+                    ylab='Density',
+                    caption='The delta objective function curve should ideally be below the refernce distribution') +
+      ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
+                                             'reference distribution' = 'red'))
     }
 }
 
@@ -216,23 +245,21 @@ sampling <- function(data,
   }
   else {
     checkmate::assert_integerish(nsamp,
-      len = 1,
-      any.missing = FALSE,
-      lower = 2
-    )
+                                 len = 1,
+                                 any.missing = FALSE,
+                                 lower = 2)
   }
-
+  
   if (performStrat && missing(stratVar)) {
     print("stratVar is required for stratifying")
     stop("aborting... stratVar not specified", call. = FALSE)
   }
-
+  
   checkmate::assert_integerish(nsamp,
-    lower = 2,
-    len = 1,
-    any.missing = FALSE
-  )
-
+                               lower = 2,
+                               len = 1,
+                               any.missing = FALSE)
+  
   if (missing(uid_colname)) {
     # search the dataframe for a column name of 'ID'
     colNames <- colnames(data)
@@ -247,33 +274,35 @@ sampling <- function(data,
   else {
     checkmate::assert_character(uid_colname)
   }
-
-
+  
+  
   if (performStrat) {
-    stratLevels <- as.character(unique(data[, stratVar])) # char to access freq. values
-
+    stratLevels <-
+      as.character(unique(data[, stratVar])) # char to access freq. values
+    
     dataSubsets <- lapply(stratLevels, function(x) {
       data[data[, stratVar] == x, ]
     })
-
+    
     names(dataSubsets) <- stratLevels
-
+    
     tab <- table(theo_sd[stratVar])
     nTab <- sum(tab)
-
+    
     sampledDataSubsets <- lapply(names(dataSubsets), function(x) {
       dat <- dataSubsets[[x]]
-
+      
       uids <- unique(dat[, uid_colname])
-      uids_samp <- sample(list(uids),
+      uids_samp <- sample(
+        list(uids),
         size = ceiling(nsamp * unname(tab[x]) / nTab),
         replace = TRUE,
         prob = pvalues
       )
-
+      
       sampled_df <-
         data.frame(dat)[0, ] # initialize an empty dataframe with the same col names
-
+      
       # populate dataframe based on sampled uids
       # new_id = 1
       .env <- environment()
@@ -282,38 +311,37 @@ sampling <- function(data,
         data_slice <- dat[dat[, uid_colname] == u, ]
         start <- NROW(sampled_df) + 1
         end <- start + NROW(data_slice) - 1
-
+        
         data_slice[uid_colname] <-
           .env$new_id # assign a new ID to the sliced dataframe
         .env$new_id <- .env$new_id + 1
         data_slice
       }))
     })
-
+    
     do.call("rbind", sampledDataSubsets)
   }
-
+  
   else {
     uids <- unique(data[, uid_colname])
     uids_samp <- sample(uids,
-      size = nsamp,
-      replace = TRUE,
-      prob = pvalues
-    )
-
+                        size = nsamp,
+                        replace = TRUE,
+                        prob = pvalues)
+    
     sampled_df <-
       data.frame(data)[0, ] # initialize an empty dataframe with the same col names
-
+    
     # populate dataframe based on sampled uids
     # new_id = 1
     .env <- environment()
     .env$new_id <- 1
-
+    
     do.call(rbind, lapply(uids_samp, function(u) {
       data_slice <- data[data[, uid_colname] == u, ]
       start <- NROW(sampled_df) + 1
       end <- start + NROW(data_slice) - 1
-
+      
       data_slice[uid_colname] <-
         .env$new_id # assign a new ID to the sliced dataframe
       .env$new_id <- .env$new_id + 1
@@ -348,7 +376,7 @@ modelBootstrap <- function(fit,
   if (!inherits(fit, "nlmixrFitCore")) {
     stop("'fit' needs to be a nlmixr fit", call. = FALSE)
   }
-
+  
   if (missing(stratVar)) {
     performStrat <- FALSE
     stratVar <- NULL
@@ -356,18 +384,17 @@ modelBootstrap <- function(fit,
   else {
     performStrat <- TRUE
   }
-
+  
   data <- getData(fit)
-
+  
   .w <- tolower(names(data)) == "id"
   uidCol <- names(data)[.w]
-
+  
   checkmate::assert_integerish(nboot,
-    len = 1,
-    any.missing = FALSE,
-    lower = 1
-  )
-
+                               len = 1,
+                               any.missing = FALSE,
+                               lower = 1)
+  
   if (missing(nSampIndiv)) {
     nSampIndiv <- length(unique(data[, uidCol]))
   }
@@ -379,7 +406,7 @@ modelBootstrap <- function(fit,
       lower = 2
     )
   }
-
+  
   # infer the ID column from data
   colNames <- names(data)
   colNamesLower <- tolower(colNames)
@@ -389,17 +416,17 @@ modelBootstrap <- function(fit,
   else {
     stop("cannot find the 'ID' column! aborting ...", call. = FALSE)
   }
-
+  
   uif <- fit$uif
   fitMeth <- getFitMethod(fit)
-
+  
   bootData <- vector(mode = "list", length = nboot)
-
+  
   if (is.null(fit$bootstrapMd5)) {
     bootstrapMd5 <- digest::digest(fit)
     assign("bootstrapMd5", bootstrapMd5, envir = fit$env)
   }
-
+  
   output_dir <-
     paste0("nlmixrBootstrapCache_", fitName, "_", fit$bootstrapMd5) # a new directory with this name will be created
   if (!dir.exists(output_dir)) {
@@ -409,93 +436,110 @@ modelBootstrap <- function(fit,
     unlink(output_dir, recursive = TRUE, force = TRUE) # unlink any of the previous directories
     dir.create(output_dir) # create a fresh directory
   }
-
-  fnameBootDataPattern <- paste0(as.character(substitute(boot_data)),
-    "_", "[0-9]+", ".RData",
-    sep = ""
-  )
-  fileExists <- list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
-
+  
+  fnameBootDataPattern <-
+    paste0(as.character(substitute(boot_data)),
+           "_", "[0-9]+", ".RData",
+           sep = "")
+  fileExists <-
+    list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
+  
   if (length(fileExists) == 0) {
     restart <- TRUE
   }
-
-  if (!restart) { # read saved bootData from boot_data files on disk
+  
+  if (!restart) {
+    # read saved bootData from boot_data files on disk
     if (length(fileExists) > 0) {
       cli::cli_alert_success("resuming bootstrap data sampling using data at {paste0('./', output_dir)}")
-
-
+      
+      
       bootData <- lapply(fileExists, function(x) {
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
-
+      
       startCtr <- length(bootData) + 1
     }
     else {
-      cli::cli_alert_danger(cli::col_red(
-        "need the data files at {.file {paste0(getwd(), '/', output_dir)}} to resume"
-      ))
+      cli::cli_alert_danger(
+        cli::col_red(
+          "need the data files at {.file {paste0(getwd(), '/', output_dir)}} to resume"
+        )
+      )
       stop("aborting...resume file missing", call. = FALSE)
     }
   }
-
+  
   else {
     startCtr <- 1
   }
-
+  
   # Generate additional samples (if nboot>startCtr)
   if (nboot >= startCtr) {
     for (mod_idx in startCtr:nboot) {
-      bootData[[mod_idx]] <- sampling(data,
+      bootData[[mod_idx]] <- sampling(
+        data,
         nsamp = nSampIndiv,
         uid_colname = uidCol,
         pvalues = pvalues,
         performStrat = performStrat,
         stratVar = stratVar
       )
-
+      
       # save bootData in curr directory: read the file using readRDS()
       attr(bootData, "randomSeed") <- .Random.seed
-      saveRDS(bootData[[mod_idx]], file = paste0("./", output_dir, "/", as.character(substitute(boot_data)), "_", mod_idx, ".RData"))
+      saveRDS(bootData[[mod_idx]],
+              file = paste0(
+                "./",
+                output_dir,
+                "/",
+                as.character(substitute(boot_data)),
+                "_",
+                mod_idx,
+                ".RData"
+              ))
     }
   }
-
+  
   # check if number of samples in stored file is the same as the required number of samples
-  fileExists <- list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
+  fileExists <-
+    list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
   bootData <- lapply(fileExists, function(x) {
     readRDS(paste0("./", output_dir, "/", x, sep = ""))
   })
-
+  
   currBootData <- length(bootData)
-
+  
   # Fitting models to bootData now
   .env <- environment()
-  fnameModelsEnsemblePattern <- paste0(as.character(substitute(modelsEnsemble)), "_", "[0-9]+",
-    ".RData",
-    sep = ""
-  )
-
-  modFileExists <- list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
-
+  fnameModelsEnsemblePattern <-
+    paste0(as.character(substitute(modelsEnsemble)), "_", "[0-9]+",
+           ".RData",
+           sep = "")
+  
+  modFileExists <-
+    list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
+  
   if (!restart) {
     if (length(modFileExists) > 0 &&
-      (length(fileExists) > 0)) { # read bootData and modelsEnsemble files from disk
+        (length(fileExists) > 0)) {
+      # read bootData and modelsEnsemble files from disk
       cli::cli_alert_success(
         "resuming bootstrap model fitting using data and models stored at {paste0(getwd(), '/', output_dir)}"
       )
-
-
+      
+      
       bootData <- lapply(fileExists, function(x) {
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
       modelsEnsembleLoaded <- lapply(modFileExists, function(x) {
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
-
+      
       .env$mod_idx <- length(modelsEnsembleLoaded) + 1
-
+      
       currNumModels <- .env$mod_idx - 1
-
+      
       if (currNumModels > nboot) {
         cli::cli_alert_danger(
           cli::col_red(
@@ -505,21 +549,19 @@ modelBootstrap <- function(fit,
         return(modelsEnsembleLoaded[1:nboot])
         # .env$mod_idx <- 1
       }
-
+      
       else if (currNumModels == nboot) {
         cli::col_red(
           "the model file already has {.env$mod_idx-1} models when max models is {nboot}; loading from {nboot} models already saved on disk"
         )
         return(modelsEnsembleLoaded)
       }
-
+      
       else if (currNumModels < nboot) {
-        cli::col_red(
-          "estimating the additional models ... "
-        )
+        cli::col_red("estimating the additional models ... ")
       }
     }
-
+    
     else {
       cli::cli_alert_danger(
         cli::col_red(
@@ -532,63 +574,71 @@ modelBootstrap <- function(fit,
       )
     }
   }
-
+  
   else {
     .env$mod_idx <- 1
   }
-
+  
   # get control settings for the 'fit' object and save computation effort by not computing the tables
   .ctl <- fit$origControl
   .ctl$print <- 0
   .ctl$covMethod <- ""
   .ctl$calcTables <- FALSE
-
+  
   modelsEnsemble <-
     lapply(bootData[.env$mod_idx:nboot], function(boot_data) {
       cli::cli_h1("Running nlmixr for model index: {.env$mod_idx}")
-
-      fit <- tryCatch(
-        {
-          fit <- suppressWarnings(nlmixr(
-            uif,
-            boot_data,
-            est = fitMeth,
-            control = .ctl
-          ))
-
-          .env$multipleFits <- list(
-            objf = fit$OBJF,
-            aic = fit$AIC,
-            omega = fit$omega,
-            parFixedDf = fit$parFixedDf,
-            method = fit$method,
-            message = fit$message,
-            warnings = fit$warnings
-          )
-
-          fit # to return 'fit'
-        },
-        error = function(error_message) {
-          print("error fitting the model")
-          print(error_message)
-          print("storing the models as NA ...")
-          return(NA) # return NA otherwise (instead of NULL)
-        }
+      
+      fit <- tryCatch({
+        fit <- suppressWarnings(nlmixr(uif,
+                                       boot_data,
+                                       est = fitMeth,
+                                       control = .ctl))
+        
+        .env$multipleFits <- list(
+          objf = fit$OBJF,
+          aic = fit$AIC,
+          omega = fit$omega,
+          parFixedDf = fit$parFixedDf,
+          method = fit$method,
+          message = fit$message,
+          warnings = fit$warnings
+        )
+        
+        fit # to return 'fit'
+      },
+      error = function(error_message) {
+        print("error fitting the model")
+        print(error_message)
+        print("storing the models as NA ...")
+        return(NA) # return NA otherwise (instead of NULL)
+      })
+      
+      saveRDS(
+        .env$multipleFits,
+        file = paste0(
+          "./",
+          output_dir,
+          "/",
+          as.character(substitute(modelsEnsemble)),
+          "_",
+          .env$mod_idx,
+          ".RData"
+        )
       )
-
-      saveRDS(.env$multipleFits, file = paste0("./", output_dir, "/", as.character(substitute(modelsEnsemble)), "_", .env$mod_idx, ".RData"))
       assign("mod_idx", .env$mod_idx + 1, .env)
     })
-
+  
   if (!restart) {
     modelsEnsemble <- c(modelsEnsembleLoaded, modelsEnsemble)
   }
-
-  modFileExists <- list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
+  
+  modFileExists <-
+    list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
   modelsEnsemble <- lapply(modFileExists, function(x) {
     readRDS(paste0("./", output_dir, "/", x, sep = ""))
   })
-
+  
   modelsEnsemble
 }
 
@@ -616,15 +666,15 @@ getFitMethod <- function(fit) {
     )
   methodsListMap <-
     c("focei", "nlme", "saem", "foce", "foi", "fo", "posthoc")
-
+  
   if (!(inherits(fit, "nlmixrFitCore"))) {
     stop("'fit' needs to be a nlmixr fit", call. = FALSE)
   }
-
+  
   res <- lapply(methodsList, function(met) {
     inherits(fit, met)
   })
-
+  
   methodsListMap[which(res == TRUE)]
 }
 
@@ -650,10 +700,10 @@ extractVars <- function(fitlist, id = "objf") {
     res <- lapply(fitlist, function(x) {
       x[[id]]
     })
-
-
+    
+    
     if (!(id == "omega" ||
-      id == "parFixedDf")) {
+          id == "parFixedDf")) {
       # check if all message strings are empty
       if (id == "message") {
         prev <- TRUE
@@ -669,7 +719,7 @@ extractVars <- function(fitlist, id = "objf") {
           unlist(res)
         }
       }
-
+      
       else {
         # if id does not equal 'message'
         unlist(res)
@@ -690,98 +740,99 @@ extractVars <- function(fitlist, id = "objf") {
 #' @examples
 #' getBootstrapSummary(fitlist)
 #' @noRd
-getBootstrapSummary <- function(fitList, ci = 0.95, stdErrType = "perc") {
-  if (!(ci < 1 && ci > 0)) {
-    stop("'ci' needs to be between 0 and 1", call. = FALSE)
-  }
-
-  quantLevels <-
-    c(0.5, (1 - ci) / 2, 1 - (1 - ci) / 2) # median, (1-ci)/2, 1-(1-ci)/2
-
-  varIds <-
-    names(fitList[[1]]) # number of different variables present in fitlist
-  summaryList <- lapply(varIds, function(id) {
-    if (!(id %in% c("omega", "parFixedDf", "method", "message", "warnings"))) {
-      varVec <- extractVars(fitList, id)
-      mn <- mean(varVec)
-      median <- median(varVec)
-      sd <- sd(varVec)
-
-      c(
-        mean = mn,
-        median = median,
-        stdDev = sd
-      )
+getBootstrapSummary <-
+  function(fitList,
+           ci = 0.95,
+           stdErrType = "perc") {
+    if (!(ci < 1 && ci > 0)) {
+      stop("'ci' needs to be between 0 and 1", call. = FALSE)
     }
-    else if (id == "omega") {
-      # omega estimates
-      varVec <- simplify2array(extractVars(fitList, id))
-      mn <- apply(varVec, 1:2, mean)
-      sd <- apply(varVec, 1:2, sd)
-
-      quants <- apply(varVec, 1:2, function(x) {
-        unname(quantile(x, quantLevels))
-      })
-      median <- quants[1, , ]
-      confLower <- quants[2, , ]
-      confUpper <- quants[3, , ]
-
-      if (stdErrType != "perc") {
-        confLower <- mn - qnorm(quantLevels[[2]]) * sd
-        confUpper <- mn + qnorm(quantLevels[[3]]) * sd
+    
+    quantLevels <-
+      c(0.5, (1 - ci) / 2, 1 - (1 - ci) / 2) # median, (1-ci)/2, 1-(1-ci)/2
+    
+    varIds <-
+      names(fitList[[1]]) # number of different variables present in fitlist
+    summaryList <- lapply(varIds, function(id) {
+      if (!(id %in% c("omega", "parFixedDf", "method", "message", "warnings"))) {
+        varVec <- extractVars(fitList, id)
+        mn <- mean(varVec)
+        median <- median(varVec)
+        sd <- sd(varVec)
+        
+        c(mean = mn,
+          median = median,
+          stdDev = sd)
       }
-
-      lst <- list(
-        mean = mn,
-        median = median,
-        stdDev = sd,
-        confLower = confLower,
-        confUpper = confUpper
-      )
-    }
-
-    else if (id == "parFixedDf") {
-      # parameter estimates (dataframe)
-      varVec <- extractVars(fitList, id)
-      mn <-
-        apply(simplify2array(lapply(varVec, as.matrix)), 1:2, mean, na.rm = TRUE)
-      sd <-
-        apply(simplify2array(lapply(varVec, as.matrix)), 1:2, sd, na.rm = TRUE)
-
-      quants <-
-        apply(simplify2array(lapply(varVec, as.matrix)), 1:2, function(x) {
-          unname(quantile(x, quantLevels, na.rm = TRUE))
+      else if (id == "omega") {
+        # omega estimates
+        varVec <- simplify2array(extractVars(fitList, id))
+        mn <- apply(varVec, 1:2, mean)
+        sd <- apply(varVec, 1:2, sd)
+        
+        quants <- apply(varVec, 1:2, function(x) {
+          unname(quantile(x, quantLevels))
         })
-
-      median <- quants[1, , ]
-      confLower <- quants[2, , ]
-      confUpper <- quants[3, , ]
-
-      if (stdErrType != "perc") {
-        confLower <- mn - qnorm(quantLevels[[2]]) * sd
-        confUpper <- mn + qnorm(quantLevels[[3]]) * sd
+        median <- quants[1, , ]
+        confLower <- quants[2, , ]
+        confUpper <- quants[3, , ]
+        
+        if (stdErrType != "perc") {
+          confLower <- mn - qnorm(quantLevels[[2]]) * sd
+          confUpper <- mn + qnorm(quantLevels[[3]]) * sd
+        }
+        
+        lst <- list(
+          mean = mn,
+          median = median,
+          stdDev = sd,
+          confLower = confLower,
+          confUpper = confUpper
+        )
       }
-
-      lst <- list(
-        mean = mn,
-        median = median,
-        stdDev = sd,
-        confLower = confLower,
-        confUpper = confUpper
-      )
-    }
-
-    else {
-      # if id equals method, message, or warning
-      extractVars(fitList, id)
-    }
-  })
-
-  names(summaryList) <- varIds
-
-  class(summaryList) <- "nlmixrBoostrapSummary"
-  summaryList
-}
+      
+      else if (id == "parFixedDf") {
+        # parameter estimates (dataframe)
+        varVec <- extractVars(fitList, id)
+        mn <-
+          apply(simplify2array(lapply(varVec, as.matrix)), 1:2, mean, na.rm = TRUE)
+        sd <-
+          apply(simplify2array(lapply(varVec, as.matrix)), 1:2, sd, na.rm = TRUE)
+        
+        quants <-
+          apply(simplify2array(lapply(varVec, as.matrix)), 1:2, function(x) {
+            unname(quantile(x, quantLevels, na.rm = TRUE))
+          })
+        
+        median <- quants[1, , ]
+        confLower <- quants[2, , ]
+        confUpper <- quants[3, , ]
+        
+        if (stdErrType != "perc") {
+          confLower <- mn - qnorm(quantLevels[[2]]) * sd
+          confUpper <- mn + qnorm(quantLevels[[3]]) * sd
+        }
+        
+        lst <- list(
+          mean = mn,
+          median = median,
+          stdDev = sd,
+          confLower = confLower,
+          confUpper = confUpper
+        )
+      }
+      
+      else {
+        # if id equals method, message, or warning
+        extractVars(fitList, id)
+      }
+    })
+    
+    names(summaryList) <- varIds
+    
+    class(summaryList) <- "nlmixrBoostrapSummary"
+    summaryList
+  }
 
 #' @export
 print.nlmixrBootstrapSummary <- function(x, ..., sigdig = NULL) {
@@ -792,16 +843,16 @@ print.nlmixrBootstrapSummary <- function(x, ..., sigdig = NULL) {
       sigdig <- 3
     }
   }
-
+  
   objf <- x$objf
   aic <- x$aic
   method <- x$method
   message <- x$message
   warnings <- x$warnings
-
+  
   omega <- x$omega
   parFixedDf <- x$parFixedDf
-
+  
   cli::cli_h1(
     cli::col_red(
       "Summary of the bootstrap models using method: {cli::col_yellow(method)}"
@@ -813,22 +864,22 @@ print.nlmixrBootstrapSummary <- function(x, ..., sigdig = NULL) {
     cli::col_yellow(" (summary$objf)")
   ))
   print(objf)
-
+  
   cli::cli_li(cli::col_blue(cli::style_bold("AIC"), cli::col_yellow(" (summary$aic)")))
   print(aic)
-
+  
   cli::cli_li(cli::col_magenta(
     cli::style_bold(
       "Omega matrices: mean, median, standard deviation, and confidence bousnds"
     ),
     cli::col_yellow(" (summary$omega)")
   ))
-
+  
   lapply(seq_along(omega), function(x) {
     cli::cli_text(cli::col_green(paste0("$", names(omega)[x])))
     print(signif(omega[[x]], sigdig))
   })
-
+  
   cli::cli_li(cli::col_magenta(
     cli::style_bold(
       "Estimated parameters: mean, median, standard deviation, and confidence bounds"
@@ -839,25 +890,25 @@ print.nlmixrBootstrapSummary <- function(x, ..., sigdig = NULL) {
     cli::cli_text(cli::col_yellow(paste0("$", names(parFixedDf)[x])))
     print(signif(parFixedDf[[x]], sigdig))
   })
-
+  
   cli::cli_li(cli::cli_text(
     cli::bg_green(cli::style_bold("Method")),
     cli::col_yellow(" (summary$method)")
   ))
   print(method)
-
+  
   cli::cli_li(cli::cli_text(
     cli::bg_yellow(cli::style_bold("Messages")),
     cli::col_yellow(" (summary$message)")
   ))
   print(message)
-
+  
   cli::cli_li(cli::cli_text(
     cli::bg_red(cli::style_bold(cli::col_white("Warnings"))),
     cli::col_yellow(" (summary$warnings)")
   ))
   print(warnings)
-
+  
   cli::cli_h1("end")
   invsibile(x)
 }
@@ -873,11 +924,11 @@ assignToEnv <- function(namedVars, fitobject) {
   if (!inherits(fitobject, "nlmixrFitCore")) {
     stop("'fit' needs to be a nlmixr fit", call. = FALSE)
   }
-
+  
   if (is.null(names(namedVars))) {
     stop("'namedVars needs to be a named list", call. = FALSE)
   }
-
+  
   if (length(namedVars) != length(names(namedVars))) {
     stop("'namedVars does not have all the elements named", call. = FALSE)
   }
