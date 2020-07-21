@@ -789,7 +789,15 @@ covarSearchSCM <-
            covarsVec,
            covInformation = NULL,
            testAll = TRUE,
-           forward = TRUE) {
+           searchType = c('full', 'forward', 'backward')) {
+    
+    searchType = match.arg(searchType)
+    
+    if (missing(searchType)){
+      searchType = 'full'
+    }
+    
+    
     if (testAll) {
       possiblePerms <- expand.grid(varsVec, covarsVec)
       possiblePerms <-
@@ -817,99 +825,122 @@ covarSearchSCM <-
       }
     }
     
-    resTableComplete = data.frame(matrix(ncol=8, nrow=0))
-    if (forward) {
-      cli::cli_h1('starting forward search...')
-      stepIdx <- 1
-      while (length(covInfo) > 0) {
-        # forward covariate search
-        covSearchRes = addCovMultiple(covInfo, fit, indep = TRUE)
-        
-        resTable = lapply(covSearchRes, function(res) {
-          x = res[[1]]
-          nam = res[[2]]
-          list(stepIdx, nam, x$objf, x$objf - fit$objf, x$AIC, x$BIC, length(x$uif$ini$est), qchisq(1-0.05, length(x$uif$ini$est)-length(fit$uif$ini$est) ))
-        })
-        
-        resTable = data.frame(do.call(rbind, resTable))
-        colnames(resTable) = c('step', 'varCovar', 'objf', 'deltObjf', 'AIC', 'BIC', '#Params', 'qChisq')
-        bestRow = resTable[which.min(resTable$deltObjf),]
-        
-        colnames(resTableComplete) = colnames(resTable)
-        resTableComplete= rbind(resTableComplete, resTable)
-        
-        
-        if (bestRow$deltObjf < 0) {  # should be based on p-value
-          # objf function value improved
-          cli::cli_h1('best model at step {stepIdx}: ')
-          print(bestRow)
-          
-          fit <-
-            covSearchRes[[which.min(resTable$deltObjf)]][[1]]  # extract fit object corresponding to the best model
-          stepIdx <- stepIdx + 1
-          covInfo[[as.character(bestRow$varCovar)]] = NULL
-          
-          cli::cli_h2('excluding {bestRow$varCovar} from list of covariates ...')  
-        }
-        else{
-          # objf function value did not improve
-          cli::cli_h1('objf value did not improve, exiting the search ...')
-          break
-        }
-      }
-      cli::cli_h2(cli::col_red('forward search complete'))
-      print(resTableComplete)
+    if (searchType %in% 'full'){
+      fitfwd = forwardSearch(covInfo, fit)
+      backwardSearch(covInfo, fitfwd)
+    }
+    
+    else if (searchType %in% 'forward'){
+      forwardSearch(covInfo, fit)
     }
     
     else{
-      cli::cli_h1('starting backward search...')
+      backwardSearch(covInfo, fit, reFitCovars = FALSE)
+    }
+    
+    ""
+}
 
+
+
+
+forwardSearch = function(covInfo, fit){
+  resTableComplete = data.frame(matrix(ncol=8, nrow=0))
+    cli::cli_h1('starting forward search...')
+    stepIdx <- 1
+    while (length(covInfo) > 0) {
+      # forward covariate search
+      covSearchRes = addCovMultiple(covInfo, fit, indep = TRUE)
+      
+      resTable = lapply(covSearchRes, function(res) {
+        x = res[[1]]
+        nam = res[[2]]
+        list(stepIdx, nam, x$objf, x$objf - fit$objf, x$AIC, x$BIC, length(x$uif$ini$est), qchisq(1-0.05, length(x$uif$ini$est)-length(fit$uif$ini$est) ))
+      })
+      
+      resTable = data.frame(do.call(rbind, resTable))
+      colnames(resTable) = c('step', 'varCovar', 'objf', 'deltObjf', 'AIC', 'BIC', '#Params', 'qChisq')
+      bestRow = resTable[which.min(resTable$deltObjf),]
+      
+      colnames(resTableComplete) = colnames(resTable)
+      resTableComplete= rbind(resTableComplete, resTable)
+      
+      
+      if (bestRow$deltObjf < 0) {  # should be based on p-value
+        # objf function value improved
+        cli::cli_h1('best model at step {stepIdx}: ')
+        print(bestRow)
+        
+        fit <-
+          covSearchRes[[which.min(resTable$deltObjf)]][[1]]  # extract fit object corresponding to the best model
+        stepIdx <- stepIdx + 1
+        covInfo[[as.character(bestRow$varCovar)]] = NULL
+        
+        cli::cli_h2('excluding {bestRow$varCovar} from list of covariates ...')  
+      }
+      else{
+        # objf function value did not improve
+        cli::cli_h1('objf value did not improve, exiting the search ...')
+        break
+      }
+    }
+    
+    cli::cli_h2(cli::col_red('forward search complete'))
+    print(resTableComplete)
+  
+    fit
+}
+
+backwardSearch = function(covInfo, fit, reFitCovars=FALSE){
+    cli::cli_h1('starting backward search...')
+    
+    if (reFitCovars){
       covSearchRes = addCovMultiple(covInfo, fit, indep = FALSE)
       fit = covSearchRes[[length(covSearchRes)]][[1]]  # get the last fit object with all covariates added # DOES NOT ADD $ini
+    }
+    
+    cli::cli_h2(cli::col_blue('initial function text to remove from:'))
+    cli::cli_text(cli::col_red("{fit$fun.txt}"))
+    
+    # Now remove covars step by step until the objf fun value...?
+    stepIdx <- 1
+    while (length(covInfo)>0) {
+      # Remove covars on by one: if objf val increases retain covar; otherwise (objf val decreases), remove the covar
+      # At any stage, retain the one that results in highest increase in objf value; exit if removal of none results in increase
+      covSearchRes = removeCovMultiple(covInfo, fit)
       
-      cli::cli_h2(cli::col_blue('initial function text to remove from:'))
-      cli::cli_text(cli::col_red("{fit$fun.txt}"))
+      resTable = lapply(covSearchRes, function(res) {
+        x = res[[1]]
+        nam = res[[2]]
+        list(nam, x$objf, x$objf - fit$objf, x$AIC, x$BIC)
+      })
       
-      # Now remove covars step by step until the objf fun value...?
-      stepIdx <- 1
-      while (length(covInfo)>0) {
-        # Remove covars on by one: if objf val increases retain covar; otherwise (objf val decreases), remove the covar
-        # At any stage, retain the one that results in highest increase in objf value; exit if removal of none results in increase
-        covSearchRes = removeCovMultiple(covInfo, fit)
+      resTable = data.frame(do.call(rbind, resTable))
+      colnames(resTable) = c('varCovar', 'objf', 'deltObjf', 'AIC', 'BIC')
+      
+      bestRow = resTable[which.max(resTable$deltObjf),]
+      
+      if (bestRow$deltObjf > 0) {
+        # objf function value increased after removal of covariate: retain the best covariate at this stage, test for the rest
+        cli::cli_h1('best model at step {stepIdx}: ')
+        print(bestRow)
         
-        resTable = lapply(covSearchRes, function(res) {
-          x = res[[1]]
-          nam = res[[2]]
-          list(nam, x$objf, x$objf - fit$objf, x$AIC, x$BIC)
-        })
+        fit <-
+          covSearchRes[[which.max(resTable$deltObjf)]][[1]]  # extract fit object corresponding to the best model
+        stepIdx <- stepIdx + 1
+        covInfo[[as.character(bestRow$varCovar)]] = NULL
         
-        resTable = data.frame(do.call(rbind, resTable))
-        colnames(resTable) = c('varCovar', 'objf', 'deltObjf', 'AIC', 'BIC')
-        
-        bestRow = resTable[which.max(resTable$deltObjf),]
-        
-        if (bestRow$deltObjf > 0) {
-          # objf function value increased after removal of covariate: retain the best covariate at this stage, test for the rest
-          cli::cli_h1('best model at step {stepIdx}: ')
-          print(bestRow)
-          
-          fit <-
-            covSearchRes[[which.max(resTable$deltObjf)]][[1]]  # extract fit object corresponding to the best model
-          stepIdx <- stepIdx + 1
-          covInfo[[as.character(bestRow$varCovar)]] = NULL
-          
-          cli::cli_h2('retaining {bestRow$varCovar}')
-        }
-        else{
-          # objf function value did not improve
-          cli::cli_h1('objf value did not improve, exiting the search ...')
-          break
-        }
-        
+        cli::cli_h2('retaining {bestRow$varCovar}')
       }
-
-      cli::cli_h2(cli::col_red('backward search complete'))
+      else{
+        # objf function value did not improve
+        cli::cli_h1('objf value did not improve, exiting the search ...')
+        break
+      }
       
     }
-    resTable
-  }
+    
+    cli::cli_h2(cli::col_red('backward search complete'))
+    
+    fit
+}
