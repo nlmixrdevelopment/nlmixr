@@ -210,9 +210,9 @@ bootstrapFit <- function(fit,
         fill = "red",
         alpha = 0.2
       ) + ggplot2::xlab(xlab("\u0394 Objective function")) + 
-      ggplot2::labs(title=paste0('distribution of \u0394 objective function values for ', nboot, ' models'), 
+      ggplot2::labs(title=paste0('Distribution of \u0394 objective function values for ', nboot, ' models'), 
                     ylab='Density',
-                    caption='The delta objective function curve should ideally be below the refernce distribution') +
+                    caption='The delta objective function curve should ideally be on or below the reference distribution curve') +
       ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
                                              'reference distribution' = 'red'))
     }
