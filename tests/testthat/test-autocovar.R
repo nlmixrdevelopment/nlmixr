@@ -11,12 +11,12 @@ context("autocovar")
 testthat::test_that("adding non-categorical covariate to funstring with log-transformation", {
   funstring <- "ka <- exp(tka + eta.ka)"
   varName <- "ka"
-  covariate <- "cov_WT*WT"
+  covariate <- "cov_WT_ka*WT"
   theta <- list("tka")
   isLog <- TRUE
 
   funstring1 <- addCovariate(funstring, varName, covariate, theta, isLog)
-  funstring2 <- "ka<-exp(tka+cov_WT*WT+eta.ka)"
+  funstring2 <- "ka<-exp(tka+cov_WT_ka*WT+eta.ka)"
 
   testthat::expect_equal(funstring1, funstring2)
 })
@@ -24,12 +24,12 @@ testthat::test_that("adding non-categorical covariate to funstring with log-tran
 testthat::test_that("adding non-categorical covariate to funstring without log-transformation", {
   funstring <- "ka <- tka + eta.ka"
   varName <- "ka"
-  covariate <- "cov_WT*WT"
+  covariate <- "cov_WT_ka*WT"
   theta <- list("tka")
   isLog <- FALSE
 
   funstring1 <- addCovariate(funstring, varName, covariate, theta, isLog)
-  funstring2 <- "ka<-(tka+eta.ka)*(cov_WT*WT)"
+  funstring2 <- "ka<-(tka+eta.ka)*(cov_WT_ka*WT)"
 
   testthat::expect_equal(funstring1, funstring2)
 })
@@ -38,12 +38,12 @@ testthat::test_that("adding non-categorical covariate to funstring without log-t
 testthat::test_that("adding categorical covariate to funstring with log-transformation", {
   funstring <- "ka <- exp(tka + eta.ka)"
   varName <- "ka"
-  covariate <- "cov_factor_1*factor_1 + cov_factor_2*factor_2 + cov_factor_3*factor_3"
+  covariate <- "cov_factor_1_ka*factor_1+cov_factor_2_ka*factor_2+cov_factor_3_ka*factor_3"
   theta <- list("tka")
   isLog <- TRUE
 
   funstring1 <- addCovariate(funstring, varName, covariate, theta, isLog)
-  funstring2 <- "ka<-exp(tka+cov_factor_1*factor_1+cov_factor_2*factor_2+cov_factor_3*factor_3+eta.ka)"
+  funstring2 <- "ka<-exp(tka+cov_factor_1_ka*factor_1+cov_factor_2_ka*factor_2+cov_factor_3_ka*factor_3+eta.ka)"
 
   testthat::expect_equal(funstring1, funstring2)
 })
@@ -51,12 +51,12 @@ testthat::test_that("adding categorical covariate to funstring with log-transfor
 testthat::test_that("adding categorical covariate to funstring without log-transformation", {
   funstring <- "ka <- tka + eta.ka"
   varName <- "ka"
-  covariate <- "cov_factor_1*factor_1 + cov_factor_2*factor_2 + cov_factor_3*factor_3"
+  covariate <- "cov_factor_1_ka*factor_1+cov_factor_2_ka*factor_2+cov_factor_3_ka*factor_3"
   theta <- list("tka")
   isLog <- FALSE
 
   funstring1 <- addCovariate(funstring, varName, covariate, theta, isLog)
-  funstring2 <- "ka<-(tka+eta.ka)*(cov_factor_1*factor_1+cov_factor_2*factor_2+cov_factor_3*factor_3)"
+  funstring2 <- "ka<-(tka+eta.ka)*(cov_factor_1_ka*factor_1+cov_factor_2_ka*factor_2+cov_factor_3_ka*factor_3)"
 
   testthat::expect_equal(funstring1, funstring2)
 })
@@ -65,9 +65,9 @@ testthat::test_that("adding categorical covariate to funstring without log-trans
 # ==== removeCovariate
 
 testthat::test_that("removing non-categorical covariate from funstring with log-transformation", {
-  funstring <- "ka<-exp(tka+cov_WT*WT+eta.ka)"
+  funstring <- "ka<-exp(tka+cov_WT_ka*WT+eta.ka)"
   varName <- "ka"
-  covariate <- "cov_WT*WT"
+  covariate <- "cov_WT_ka*WT"
   theta <- list("tka")
 
   funstring1 <- removeCovariate(funstring, varName, covariate, theta)
@@ -77,9 +77,9 @@ testthat::test_that("removing non-categorical covariate from funstring with log-
 })
 
 testthat::test_that("removing non-categorical covariate from funstring without log-transformation", {
-  funstring <- "ka<-(tka+eta.ka)*(cov_WT*WT)"
+  funstring <- "ka<-(tka+eta.ka)*(cov_WT_ka*WT)"
   varName <- "ka"
-  covariate <- "cov_WT*WT"
+  covariate <- "cov_WT_ka*WT"
   theta <- list("tka")
 
   funstring1 <- removeCovariate(funstring, varName, covariate, theta)
@@ -90,9 +90,9 @@ testthat::test_that("removing non-categorical covariate from funstring without l
 
 
 testthat::test_that("removing categorical covariate from funstring with log-transformation", {
-  funstring <- "ka<-exp(tka+cov_factor_1*factor_1+cov_factor_2*factor_2+cov_factor_3*factor_3+eta.ka)"
+  funstring <- "ka<-exp(tka+cov_factor_1_ka*factor_1+cov_factor_2_ka*factor_2+cov_factor_3_ka*factor_3+eta.ka)"
   varName <- "ka"
-  covariate <- "cov_factor_1*factor_1 + cov_factor_2*factor_2 + cov_factor_3*factor_3"
+  covariate <- "cov_factor_1_ka*factor_1 + cov_factor_2_ka*factor_2 + cov_factor_3_ka*factor_3"
   theta <- list("tka")
 
   funstring1 <- removeCovariate(funstring, varName, covariate, theta)
@@ -102,9 +102,9 @@ testthat::test_that("removing categorical covariate from funstring with log-tran
 })
 
 testthat::test_that("removing categorical covariate from funstring without log-transformation", {
-  funstring <- "ka<-(tka+eta.ka)*(cov_factor_1*factor_1+cov_factor_2*factor_2+cov_factor_3*factor_3)"
+  funstring <- "ka<-(tka+eta.ka)*(cov_factor_1_ka*factor_1+cov_factor_2_ka*factor_2+cov_factor_3_ka*factor_3)"
   varName <- "ka"
-  covariate <- "cov_factor_1*factor_1 + cov_factor_2*factor_2 + cov_factor_3*factor_3"
+  covariate <- "cov_factor_1_ka*factor_1 + cov_factor_2_ka*factor_2 + cov_factor_3_ka*factor_3"
   theta <- list("tka")
 
   funstring1 <- removeCovariate(funstring, varName, covariate, theta)
@@ -132,8 +132,8 @@ testthat::test_that("normalize non-categorical covariates using mean and norm ty
   covNames1 <- res1[[3]]
 
   dat2 <- theo_sd[, "WT"] * normValVec
-  covNameMod2 <- "centered_WT*cov_WT"
-  covNames2 <- "cov_WT"
+  covNameMod2 <- "centered_WT*cov_WT_ka"
+  covNames2 <- "cov_WT_ka"
 
   testthat::expect_equal(dat1, dat2)
   testthat::expect_equal(covNameMod1, covNameMod2)
@@ -157,8 +157,8 @@ testthat::test_that("normalize non-categorical covariates using mean and norm ty
   covNames1 <- res1[[3]]
 
   dat2 <- theo_sd[, "WT"] / normValVec
-  covNameMod2 <- "centered_WT*cov_WT"
-  covNames2 <- "cov_WT"
+  covNameMod2 <- "centered_WT*cov_WT_ka"
+  covNames2 <- "cov_WT_ka"
 
   testthat::expect_equal(dat1, dat2)
   testthat::expect_equal(covNameMod1, covNameMod2)
@@ -182,8 +182,8 @@ testthat::test_that("normalize non-categorical covariates using mean and norm ty
   covNames1 <- res1[[3]]
 
   dat2 <- theo_sd[, "WT"] - normValVec
-  covNameMod2 <- "centered_WT*cov_WT"
-  covNames2 <- "cov_WT"
+  covNameMod2 <- "centered_WT*cov_WT_ka"
+  covNames2 <- "cov_WT_ka"
 
   testthat::expect_equal(dat1, dat2)
   testthat::expect_equal(covNameMod1, covNameMod2)
@@ -207,8 +207,8 @@ testthat::test_that("normalize non-categorical covariates using mean and norm ty
   covNames1 <- res1[[3]]
 
   dat2 <- theo_sd[, "WT"] + normValVec
-  covNameMod2 <- "centered_WT*cov_WT"
-  covNames2 <- "cov_WT"
+  covNameMod2 <- "centered_WT*cov_WT_ka"
+  covNames2 <- "cov_WT_ka"
 
   testthat::expect_equal(dat1, dat2)
   testthat::expect_equal(covNameMod1, covNameMod2)
@@ -233,8 +233,8 @@ testthat::test_that("normalize non-categorical covariates with log-transformatio
   covNames1 <- res1[[3]]
 
   dat2 <- log(theo_sd[, "WT"] * normValVec)
-  covNameMod2 <- "centered_WT*cov_WT"
-  covNames2 <- "cov_WT"
+  covNameMod2 <- "centered_WT*cov_WT_ka"
+  covNames2 <- "cov_WT_ka"
 
   testthat::expect_equal(dat1, dat2)
   testthat::expect_equal(covNameMod1, covNameMod2)
@@ -259,8 +259,8 @@ testthat::test_that("normalize non-categorical covariates with log-transformatio
   covNames1 <- res1[[3]]
 
   dat2 <- log(theo_sd[, "WT"] / normValVec)
-  covNameMod2 <- "centered_WT*cov_WT"
-  covNames2 <- "cov_WT"
+  covNameMod2 <- "centered_WT*cov_WT_ka"
+  covNames2 <- "cov_WT_ka"
 
   testthat::expect_equal(dat1, dat2)
   testthat::expect_equal(covNameMod1, covNameMod2)
@@ -286,8 +286,8 @@ testthat::test_that("normalize non-categorical covariates with log-transformatio
   covNames1 <- res1[[3]]
 
   dat2 <- log(theo_sd[, "WT"] + normValVec)
-  covNameMod2 <- "centered_WT*cov_WT"
-  covNames2 <- "cov_WT"
+  covNameMod2 <- "centered_WT*cov_WT_ka"
+  covNames2 <- "cov_WT_ka"
 
   testthat::expect_equal(dat1, dat2)
   testthat::expect_equal(covNameMod1, covNameMod2)
@@ -312,8 +312,8 @@ testthat::test_that("normalize (with prefactor for Cl) for non-categorical covar
   covNames1 <- res1[[3]]
 
   dat2 <- 0.75 * log(theo_sd[, "WT"] + normValVec)
-  covNameMod2 <- "centered_WT*cov_WT"
-  covNames2 <- "cov_WT"
+  covNameMod2 <- "centered_WT*cov_WT_cl"
+  covNames2 <- "cov_WT_cl"
 
   testthat::expect_equal(dat1, dat2)
   testthat::expect_equal(covNameMod1, covNameMod2)
@@ -344,8 +344,8 @@ testthat::test_that("categorical covariates without normalization", {
   dat2b <- 1L * (data[, "factor"] == 2)
   dat2c <- 1L * (data[, "factor"] == 3)
 
-  covNameMod2 <- "categorical_factor_1*cov_factor_1+categorical_factor_2*cov_factor_2+categorical_factor_3*cov_factor_3"
-  covNames2 <- c("cov_factor_1", "cov_factor_2", "cov_factor_3")
+  covNameMod2 <- "categorical_factor_1*cov_factor_1_ka+categorical_factor_2*cov_factor_2_ka+categorical_factor_3*cov_factor_3_ka"
+  covNames2 <- c("cov_factor_1_ka", "cov_factor_2_ka", "cov_factor_3_ka")
 
   testthat::expect_equal(dat1a, dat2a)
   testthat::expect_equal(dat1b, dat2b)
@@ -359,10 +359,10 @@ testthat::test_that("categorical covariates without normalization", {
 testthat::test_that("creating hockey stick variables", {
   data <- theo_sd
   covariate <- "WT"
+  varName = 'ka'
   med <- median(data[, covariate])
 
-  res1 <- makeHockeyStick(data, covariate)
-  print(res1)
+  res1 <- makeHockeyStick(data, covariate, varName)
   dat1a <- res1[[1]][, "centered_WT_lower"]
   dat1b <- res1[[1]][, "centered_WT_upper"]
 
@@ -374,8 +374,8 @@ testthat::test_that("creating hockey stick variables", {
   dat2a <- 1L * (data[, covariate] < med) * data[, covariate]
   dat2b <- 1L * (data[, covariate] >= med) * data[, covariate]
 
-  covModExpr2 <- c("centered_WT_lower*cov_WT_lower", "centered_WT_upper*cov_WT_upper")
-  covNames2 <- c("cov_WT_lower", "cov_WT_upper")
+  covModExpr2 <- c("centered_WT_lower*cov_WT_lower_ka", "centered_WT_upper*cov_WT_upper_ka")
+  covNames2 <- c("cov_WT_lower_ka", "cov_WT_upper_ka")
 
   testthat::expect_equal(dat1a, dat2a)
   testthat::expect_equal(dat1b, dat2b)

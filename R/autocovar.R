@@ -514,7 +514,7 @@ performNorm <- function(data,
     }
     
     else {
-      res <- makeHockeyStick(data, covariate = covariate)
+      res <- makeHockeyStick(data, covariate = covariate, varName=varName)
       
       data <- res[[1]]
       covModExpr <- res[[2]]
@@ -528,7 +528,7 @@ performNorm <- function(data,
   else {
     # categorical variable
     # datColNames <- paste0("categorical_", covariate)
-    res <- makeDummies(data, covariate = covariate)
+    res <- makeDummies(data, covariate = covariate, varName=varName)
     data <- res[[1]]
     covModExpr <- res[[2]]
     covNames <- res[[3]]
@@ -602,7 +602,7 @@ initializeCovars <- function(fitobject,
 #' @export
 #' @author Vipul Mann, Matthew Fidler
 #' @noRd
-makeHockeyStick <- function(data, covariate) {
+makeHockeyStick <- function(data, covariate, varName) {
   v <- unlist(data[, covariate])
   
   prefix <- paste0("centered_", covariate, "_")
@@ -616,7 +616,7 @@ makeHockeyStick <- function(data, covariate) {
   newdat <- cbind(data, d)
   
   prefix2 <- paste0("cov_", covariate, "_")
-  covNames <- paste0(prefix2, s)
+  covNames <- paste0(prefix2, s, '_', varName)
   
   covModExpr <- paste0(names(d), "*", covNames)
   list(newdat, covModExpr, covNames, colnames(d))
@@ -633,7 +633,7 @@ makeHockeyStick <- function(data, covariate) {
 #' @author Vipul Mann, Matthew Fidler
 #'
 #' @noRd
-makeDummies <- function(data, covariate) {
+makeDummies <- function(data, covariate, varName) {
   v <- unlist(data[, covariate])
   
   prefix <- paste0("categorical_", covariate, "_")
@@ -645,8 +645,8 @@ makeDummies <- function(data, covariate) {
   colnames(d) <- paste0(prefix, s)
   newdat <- cbind(data, d)
   
-  prefix2 <- paste0("cov_", covariate, "_")
-  covNames <- paste0(prefix2, s, '_')
+  prefix2 <- paste0("cov_", covariate, '_')
+  covNames <- paste0(prefix2, s, '_', varName)
   
   covModExpr <- paste0(colnames(d), "*", covNames)
   list(newdat, covModExpr, covNames, colnames(d))
