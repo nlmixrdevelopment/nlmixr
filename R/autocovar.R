@@ -405,8 +405,8 @@ removeCovVar <- function(fitobject,
     covNameMod <-
       paste0(paste0("centered_", covariate),
              "*",
-             paste0("cov_", covariate))
-    covNames = paste0("cov_", covariate)
+             paste0("cov_", covariate, '_', varName))
+    covNames = paste0("cov_", covariate, '_', varName)
   }
   
   else if (isHS) {
@@ -415,7 +415,7 @@ removeCovVar <- function(fitobject,
     prefix2 <- paste0("cov_", covariate, "_")
     s <- c("lower", "upper")
     covModExpr <-
-      paste0(paste0(prefix, s), "*", paste0(prefix2, s))
+      paste0(paste0(prefix, s), "*", paste0(prefix2, s, '_', varName))
     covNameMod <- paste(covModExpr, collapse = "+")
     
     covNames = paste0(prefix2, s)
@@ -428,7 +428,7 @@ removeCovVar <- function(fitobject,
     prefix2 <- paste0("cov_", covariate, "_")
     s <- c("lower", "upper")
     covModExpr <-
-      paste0(paste0(prefix, s), "*", paste0(prefix2, s))
+      paste0(paste0(prefix, s), "*", paste0(prefix2, s, '_', varName))
     covNameMod <- paste(covModExpr, collapse = "+")
     
     covNames = paste0(prefix2, s)
@@ -448,45 +448,21 @@ removeCovVar <- function(fitobject,
   cli::cli_alert_success("removed {covNameMod} from {varName}'s equation in the model")
   cli::cli_alert_success("updated funcition text: {funstringSplit[[idx]]}")
   
-  # Retains the cov_WT variable but also retains the original model form
+  updatedMod = paste0("model(fitobject,{", funstringSplit[[idx]], "})")
+  updatedMod <- eval(parse(text = updatedMod)) 
   
-  updatedModBest = NULL
-  for (fstring in funstringSplit){
-    updatedMod = paste0("model(fitobject,{", fstring, "})")
-    updatedMod <- eval(parse(text = updatedMod)) 
-    
-    # initialize (add) covars in the model
-    ini2 <- as.data.frame(updatedMod$ini)
-    for (covName in covNames) {
-      ini2[ini2$name == covName, "est"] <- 0
-      ini2[ini2$name == covName, "lower"] <- -Inf
-      ini2[ini2$name == covName, "upper"] <- Inf
-    }
-    
-    class(ini2) <- c("nlmixrBounds", "data.frame")
-    updatedMod$ini <- ini2
-    
-    if (length(updatedMod$ini$theta)>lngth){
-      lngth = length(updatedMod$ini$theta)
-      updatedModBest = updatedMod
-    }
+  # initialize (add) covars in the model
+  ini2 <- as.data.frame(updatedMod$ini)
+  for (covName in covNames) {
+    ini2[ini2$name == covName, "est"] <- 0
+    ini2[ini2$name == covName, "lower"] <- -Inf
+    ini2[ini2$name == covName, "upper"] <- Inf
   }
-  
 
-  # Does not retain the cov_WT variable; removes it completely since funstringsplit[[idx]] doesn't contain it
-  
-  # # initialize (add) covars in the model
-  # ini2 <- as.data.frame(updatedMod$ini)
-  # for (covName in covNames) {
-  #   ini2[ini2$name == covName, "est"] <- 0
-  #   ini2[ini2$name == covName, "lower"] <- -Inf
-  #   ini2[ini2$name == covName, "upper"] <- Inf
-  # }
-  # 
-  # class(ini2) <- c("nlmixrBounds", "data.frame")
-  # updatedMod$ini <- ini2
-  # 
-  # updatedMod
+  class(ini2) <- c("nlmixrBounds", "data.frame")
+  updatedMod$ini <- ini2
+
+  updatedMod
   
   
 }
@@ -532,7 +508,7 @@ performNorm <- function(data,
       }
       
       covNameMod1 <- datColNames
-      covNameParam1 <- paste0("cov_", covariate)
+      covNameParam1 <- paste0("cov_", covariate, '_', varName)
       covNameMod <- paste0(covNameMod1, "*", covNameParam1)
       covNames <- covNameParam1
     }
@@ -670,7 +646,7 @@ makeDummies <- function(data, covariate) {
   newdat <- cbind(data, d)
   
   prefix2 <- paste0("cov_", covariate, "_")
-  covNames <- paste0(prefix2, s)
+  covNames <- paste0(prefix2, s, '_')
   
   covModExpr <- paste0(colnames(d), "*", covNames)
   list(newdat, covModExpr, covNames, colnames(d))
@@ -852,7 +828,7 @@ covarSearchSCM <-
         resTable = lapply(covSearchRes, function(res) {
           x = res[[1]]
           nam = res[[2]]
-          list(stepIdx, nam, x$objf, x$objf - fit$objf, x$AIC, x$BIC, length(x$uif$ini$est), qchisq(1-0.005, length(x$uif$ini$est)-length(fit$uif$ini$est) ))
+          list(stepIdx, nam, x$objf, x$objf - fit$objf, x$AIC, x$BIC, length(x$uif$ini$est), qchisq(1-0.05, length(x$uif$ini$est)-length(fit$uif$ini$est) ))
         })
         
         resTable = data.frame(do.call(rbind, resTable))
@@ -863,7 +839,7 @@ covarSearchSCM <-
         resTableComplete= rbind(resTableComplete, resTable)
         
         
-        if (bestRow$deltObjf < 0) {
+        if (bestRow$deltObjf < 0) {  # should be based on p-value
           # objf function value improved
           cli::cli_h1('best model at step {stepIdx}: ')
           print(bestRow)
@@ -873,7 +849,7 @@ covarSearchSCM <-
           stepIdx <- stepIdx + 1
           covInfo[[as.character(bestRow$varCovar)]] = NULL
           
-          cli::cli_h2('removed {bestRow$varCovar}')
+          cli::cli_h2('excluding {bestRow$varCovar} from list of covariates ...')  
         }
         else{
           # objf function value did not improve
@@ -911,8 +887,6 @@ covarSearchSCM <-
         colnames(resTable) = c('varCovar', 'objf', 'deltObjf', 'AIC', 'BIC')
         
         bestRow = resTable[which.max(resTable$deltObjf),]
-        
-        stop('')
         
         if (bestRow$deltObjf > 0) {
           # objf function value increased after removal of covariate: retain the best covariate at this stage, test for the rest
