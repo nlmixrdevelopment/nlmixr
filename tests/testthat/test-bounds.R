@@ -2018,9 +2018,9 @@ test_that("Total ETA FIXED (named)", {
       expect_error(nlmixrBounds(f7), regexp="invalid call in initial conditions: lCl < 3", fixed=TRUE)
     })
 
-# nlmixrBounds ####
+# nlmixrBoundsParser ####
 
-test_that("nlmixrBounds", {
+test_that("nlmixrBoundsParser", {
   expect_equal(
     nlmixrBoundsParser(
       function() {
