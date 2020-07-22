@@ -12,8 +12,8 @@ nlmixrBounds <- function(fun) {
   as.nlmixrBounds(df)
 }
 
-#' This is defines the columns and classes for the nlmixrBounds data.frame.
-#' (Done here to make testing easier and ensure consistency across functions.)
+# This is defines the columns and classes for the nlmixrBounds data.frame.
+# (Done here to make testing easier and ensure consistency across functions.)
 nlmixrBoundsTemplate <-
   data.frame(
     ntheta = NA_real_,
@@ -26,6 +26,7 @@ nlmixrBoundsTemplate <-
     fix = NA,
     err = NA_character_,
     label = NA_character_,
+    backTransform = "",
     condition = NA_character_,
     stringsAsFactors = FALSE
   )
@@ -438,7 +439,7 @@ nlmixrBoundsParser.call <- function(x) {
       # or 3.
       stop("report a bug.  invalid 'omega' assignment: ", deparse(x), call. = FALSE) # nocov
     }
-  } else if (as.character(x[[1]]) %in% c("label", "condition")) {
+  } else if (as.character(x[[1]]) %in% c("label", "backTransform")) {
     list(
       operation="attribute",
       varname=as.character(x[[1]]),
@@ -607,7 +608,8 @@ nlmixrBoundsParserOmega <- function(x, currentData) {
   } else {
     name1 <- name2 <- NA_character_
   }
-  finalData <- currentData[seq_along(neta1), ]
+  # rep() ensures that the default values are set for each row
+  finalData <- currentData[rep(1, length(neta1)), ]
   rownames(finalData) <- NULL
   finalData$lower <- -Inf
   finalData$est <- est
@@ -638,6 +640,32 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
       warning("only last label used: ", deparse(x$value))
     }
     currentData$label <- x$value[[2]]
+  } else if (x$varname == "backTransform") {
+    if (!all(currentData$backTransform %in% "")) {
+      warning("only last backTransform used: ", deparse(x$value))
+    }
+    if (length(x$value) == 1) {
+      # It is `backTransform()` without an argument, set to ""
+      currentData$backTransform <- ""
+    } else if (length(x$value) == 2) {
+      # `backTransform()` with a single argument, the expected way to set a backTransform
+      if (is.name(x$value[[2]])) {
+        # Make sure that a function name is a call instead of a bare name
+        x$value[[2]] <- as.call(list(x$value[[2]]))
+      } else if (is.character(x$value[[2]])) {
+        # Convert a character string to a call
+        x$value[[2]] <- as.call(list(as.name(x$value[[2]])))
+      } else if (!is.call(x$value[[2]])) {
+        stop(
+          "'backTransform()' argument must be a call, function name, or character string giving a function name: ",
+          deparse(x$value)
+        )
+      }
+      currentData$backTransform <- deparse(x$value[[2]])
+    } else {
+      # `backTransform()` with a multiple arguments, cannot handle
+      stop("'backTransform()' must have zero or one arguments: ", deparse(x$value))
+    }
   } else {
     # We could ignore this, but it is likely to indicate some form of accidental
     # misspecification.

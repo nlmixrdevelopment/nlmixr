@@ -2211,7 +2211,114 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
     info="Named vector omega assignment with correlation, some fixed"
   )
 })
-    
+
+# nlmixrBoundsParserAttribute ####
+
+test_that("nlmixrBoundsParserAttribute backTransform", {
+  expect_equal(
+    nlmixrBounds(function() {
+      0.1; backTransform(exp())
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        ntheta=1,
+        lower=-Inf,
+        est=0.1,
+        upper=Inf,
+        fix=FALSE,
+        backTransform="exp()",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Simple back-transform"
+  )
+  expect_equal(
+    nlmixrBounds(function() {
+      0.1; backTransform(exp)
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        ntheta=1,
+        lower=-Inf,
+        est=0.1,
+        upper=Inf,
+        fix=FALSE,
+        backTransform="exp()",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Simple back-transform as a name is replaced by the function name"
+  )
+  expect_equal(
+    nlmixrBounds(function() {
+      0.1; backTransform("exp")
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        ntheta=1,
+        lower=-Inf,
+        est=0.1,
+        upper=Inf,
+        fix=FALSE,
+        backTransform="exp()",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Simple back-transform as a character string is replaced by the function name"
+  )
+  expect_equal(
+    expect_warning(
+      nlmixrBounds(function() {
+        0.1; backTransform("exp"); backTransform("log")
+      }),
+      regexp='only last backTransform used: backTransform("log")',
+      fixed=TRUE
+    ),
+    as.nlmixrBounds(
+      data.frame(
+        ntheta=1,
+        lower=-Inf,
+        est=0.1,
+        upper=Inf,
+        fix=FALSE,
+        backTransform="log()",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Multiple backTransform()s keep the last one"
+  )
+  expect_equal(
+    nlmixrBounds(function() {
+      0.1; backTransform(function(x) x^2)
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        ntheta=1,
+        lower=-Inf,
+        est=0.1,
+        upper=Inf,
+        fix=FALSE,
+        backTransform="function(x) x^2",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="A function may be defined within the backTransform"
+  )
+  expect_error(
+    nlmixrBounds(function() {
+      0.1; backTransform(exp(), foo())
+    }),
+    regexp="'backTransform()' must have zero or one arguments: backTransform(exp(), foo())",
+    fixed=TRUE,
+    info="Multiple arguments to backTransform() are not allowed."
+  )
+})
+
 # nlmixrBoundsValueFixed ####
 
 test_that("nlmixrBoundsValueFixed", {

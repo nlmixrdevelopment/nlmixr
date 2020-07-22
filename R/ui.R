@@ -187,12 +187,25 @@ nlmixrfindLhs <- function(x) {
 #' that \code{fixed} is used, \code{FIX}, \code{FIXED}, or \code{fix} may be
 #' used equivalently.
 #' 
+#' For any value, standard mathematical operators or functions may be used to
+#' define the value.  For example, \code{exp(2)} and \code{24*30} may be used to
+#' define a value anywhere that a number can be used (e.g. lower bound,
+#' estimate, upper bound, variance, etc.).
+#' 
 #' Values may be labeled using the \code{label()} function after the assignment.
 #' Labels are are used to make reporting easier by giving a human-readable
 #' description of the parameter, but the labels do not have any effect on
 #' estimation.  The typical way to set a label so that the parameter \code{tvCL}
 #' has a label of "Typical Value of Clearance (L/hr)" is \code{tvCL <- 1;
 #' label("Typical Value of Clearance (L/hr)")}.
+#' 
+#' \code{nlmixr} will attempt to determine some back-transformations for the
+#' user.  For example, \code{CL <- exp(tvCL)} will detect that \code{tvCL} must
+#' be back-transformed by \code{exp()} for easier interpretation.  When you want
+#' to control the back-transformation, you can specify the back-transformation
+#' using \code{backTransform()} after the assignment.  For example, to set the
+#' back-transformation to \code{exp()}, you can use \code{tvCL <- 1;
+#' backTransform(exp())}.
 #' 
 #' @param ini Ini block or nlmixr model object
 #' @param ... Other arguments parsed by nlmixr
