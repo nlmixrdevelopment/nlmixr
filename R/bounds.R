@@ -295,7 +295,14 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
 
 #' Verify the accuracy of a nlmixrBounds object and update initial conditions,
 #' as required.
-as.nlmixrBounds <- function(df) {
+#' 
+#' @param df The data.frame to check and convert to an nlmixrBounds object.
+#' @param addMissingCols Should missing columns be added to the object?  (Should
+#'   typically be FALSE except for testing.)
+#' @return An nlmixrBounds object with data confirmed to be consistent.
+#' 
+#' @noRd
+as.nlmixrBounds <- function(df, addMissingCols=FALSE) {
   # Ensure that the format is data.frame (instead of data.table, tibble, etc.)
   df <- as.data.frame(df)
   if (nrow(df) == 0) {
@@ -307,8 +314,19 @@ as.nlmixrBounds <- function(df) {
   }
   missingColumns <- setdiff(names(nlmixrBoundsTemplate), names(df))
   if (length(missingColumns)) {
-    stop(paste0("columns missing: '", paste(missingColumns, collapse="', '"), "'"), call. = FALSE)
+    if (!addMissingCols) {
+      stop(paste0("columns missing: '", paste(missingColumns, collapse="', '"), "'"), call. = FALSE)
+    } else {
+      # Add in the missing columns, if requested.  This is mostly for ensuring
+      # that testing works even when new columns are added.
+      for (nm in missingColumns) {
+        df[[nm]] <- nlmixrBoundsTemplate[[nm]]
+      }
+    }
   }
+  # Ensure that the columns are in the expected order (mainly for simplification
+  # of testing)
+  df <- df[, names(nlmixrBoundsTemplate)]
   nlmixrBoundsSuggest(
     varname=df$name, lower=df$lower, est=df$est, upper=df$upper, fixed=df$fix
   )
@@ -514,32 +532,66 @@ nlmixrBoundsParserOmega <- function(x, currentData) {
         call. = FALSE
       )
     }
-    valueFix <- nlmixrBoundsValueFixed(x$value[[2]][[2]])
+    valueCor <- nlmixrBoundsValueCor(x$value[[2]][[2]])
   } else {
     # The condition is not specified, set to "ID"
     conditionValue <- "ID"
-    valueFix <- nlmixrBoundsValueFixed(x$value[[2]])
+    valueCor <- nlmixrBoundsValueCor(x$value[[2]])
+  }
+  if (length(valueCor$value) == 1 & all(valueCor$cor)) {
+    warning("'cor(...)' with a single value is ignored: ", deparse(x$value))
+  } else if (any(valueCor$cor) & !all(valueCor$cor)) {
+    stop("'cor(...)' must enclose all or none of the block: ", deparse(x$value))
+  }
+  # Make it a matrix so that decorrelation can occur, if necessary.
+  tmpValue <- valueCor$value
+  valueMatrix <- matrix(numeric(), nrow=0, ncol=0)
+  currentDiagIdx <- 0
+  while (length(tmpValue)) {
+    currentDiagIdx <- currentDiagIdx + 1
+    if (length(tmpValue) < currentDiagIdx) {
+      stop(
+        "incorrect lower triangular matrix dimensions: ", deparse(x$value),
+        call. = FALSE
+      )
+    }
+    valueMatrix <-
+      rbind(
+        cbind(
+          valueMatrix,
+          tmpValue[seq_len(currentDiagIdx - 1)]
+        ),
+        tmpValue[seq_len(currentDiagIdx)]
+      )
+    tmpValue <- tmpValue[-seq_len(currentDiagIdx)]
+  }
+  if (all(valueCor$cor)) {
+    # Confirm that all or none are fixed
+    if (!(all(valueCor$fixed) | all(!valueCor$fixed))) {
+      stop(
+        "either all or none of the elements may be fixed with cor(...): ",
+        deparse(x$value)
+      )
+    }
+    # Decorrelate the matrix
+    sdValues <- diag(valueMatrix)
+    diag(valueMatrix) <- 1
+    # Convert to variance-covariance matrix
+    valueMatrix <- sweep(sweep(valueMatrix, 1, sdValues, "*"), 2, sdValues, "*")
   }
   currentDiagIdx <- 0
   est <- numeric()
   fix <- logical()
   neta1 <- numeric()
   neta2 <- numeric()
-  while (length(valueFix$value)) {
-    currentDiagIdx <- currentDiagIdx + 1
-    if (length(valueFix$value) < currentDiagIdx) {
-      stop(
-        "incorrect lower triangular matrix dimensions: ", deparse(x$value),
-        call. = FALSE
-      )
-    }
+  for (currentDiagIdx in seq_len(nrow(valueMatrix))) {
     nextValues <- seq_len(currentDiagIdx)
-    est <- c(est, valueFix$value[nextValues])
-    fix <- c(fix, valueFix$fixed[nextValues])
+    est <- c(est, valueMatrix[currentDiagIdx, nextValues])
+    fix <- c(fix, valueCor$fixed[nextValues])
     neta1 <- c(neta1, rep(currentDiagIdx, currentDiagIdx))
     neta2 <- c(neta2, nextValues)
-    valueFix$value <- valueFix$value[-nextValues]
-    valueFix$fixed <- valueFix$fixed[-nextValues]
+    # Drop the values of 'fixed' that had just been used
+    valueCor$fixed <- valueCor$fixed[-nextValues]
   }
   if (class(x$varname) != "character") {
     # It has a name
@@ -601,7 +653,8 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
 #' * value: the numeric value of evaluating the expression
 #' * all_fixed: Are all values from the expression fixed ?
 #' * fixed: Which value(s) from \code{x} are fixed?
-#' @seealso \code{\link{nlmixrBoundsReplaceFixed}}
+#' @seealso \code{\link{nlmixrBoundsReplaceFixed}},
+#'   \code{\link{nlmixrBoundsValueCor}}
 #' @author Bill Denney
 #' @noRd
 nlmixrBoundsValueFixed <- function(x) {
@@ -769,6 +822,140 @@ nlmixrBoundsReplaceFixed <- function(x, replacementFun="fixed", replacementName=
   # No 'else' is required.  Other classes including name, numeric, character,
   # and logical that are likely valid within a call but not fixed.
   list(call=ret, fixed=fixed)
+}
+
+#' Detect \code{cor()} in omega blocks
+#' 
+#' @param x A call to check for correlation
+#' @return A list with elements for 'value', 'fixed', and 'cor'
+#' @seealso \code{\link{nlmixrBoundsValueFixed}}
+#' @noRd
+nlmixrBoundsValueCor <- function(x) {
+  x_nofixed_call <-
+    replaceCallName(
+      x=x,
+      replacementFun="c",
+      sourceNames=c("fix", "fixed", "FIX", "FIXED")
+    )
+  x_nofixed <-
+    replaceNameName(
+      x_nofixed_call,
+      replacementName=NULL,
+      sourceNames=c("fix", "fixed", "FIX", "FIXED")
+    )
+  # Handle both correlation and 
+  ret <-
+    nlmixrBoundsValueFixed(
+      replaceCallName(x, replacementFun="c", sourceNames="cor")
+    )
+  isCor <-
+    is.nan(eval(
+      x_nofixed,
+      envir=
+        list(
+          cor=function(...)
+            rep(NaN, length(sapply(list(...), FUN=eval)))
+        )
+    ))
+  ret$cor <- isCor
+  ret
+}
+
+#' Find all calls (i.e. function calls) and replace them
+#' 
+#' This does not apply to names that are not calls.
+#' 
+#' @param x A call to replace calls within
+#' @param replacementFun The name (or character string) to use as a replacement
+#' @param sourceNames The scalar or vector of names (or character strings) to
+#'   replace.
+#' @return \code{x} with calls to \code{sourceNames} replaced with
+#'   \code{replacementFun}
+#' @seealso \code{\link{replaceNameName}}
+#' @examples
+#' replaceCallName(x=a~b(), replacementFun="c", sourceNames="b")
+#' # names that are not calls are not replaced
+#' replaceCallName(x=a~b(b), replacementFun="c", sourceNames="b")
+#' @noRd
+replaceCallName <- function(x, replacementFun, sourceNames) {
+  if (length(replacementFun) != 1) {
+    stop("'replacementFun' must be a scalar")
+  } else if (!is.name(replacementFun)) {
+    replacementFun <- as.name(replacementFun)
+  }
+  if (!all(sapply(sourceNames, is.name))) {
+    sourceNames <- sapply(X=sourceNames, FUN=as.name)
+  }
+  if (is.call(x)) {
+    ret <- x
+    if (any(sapply(X=sourceNames, FUN=identical, y=x[[1]]))) {
+      # If one of the source names is the name of the call, replace it.
+      ret[[1]] <- replacementFun
+    }
+    for (idx in rev(seq_len(length(ret) - 1) + 1)) {
+      # Recurse through all the parts of the call, if there are more than one.
+      ret[[idx]] <-
+        replaceCallName(
+          ret[[idx]],
+          replacementFun=replacementFun,
+          sourceNames=sourceNames
+        )
+    }
+  } else {
+    # Almost any other class can be part of a call, so just return anything
+    # other than a call as-is.
+    ret <- x
+  }
+  ret
+}
+
+#' Replace a name that is not used as a function call with a new name.
+#' 
+#' This does not apply to names that are the function name of calls.
+#' 
+#' @inheritParams replaceCallName
+#' @param replacementName The name (or character string) to use as a
+#'   replacement; if \code{NULL}, the name is removed (which can make an invalid
+#'   call).
+#' @return \code{x} with calls to \code{sourceNames} replaced with
+#'   \code{replacementFun}
+#' @seealso \code{\link{replaceCallName}}
+#' @noRd
+replaceNameName <- function(x, replacementName, sourceNames) {
+  if (is.null(replacementName)) {
+    # do nothing, NULL is allowed and it removes a name
+  } else if (length(replacementName) != 1) {
+    stop("'replacementName' must be a scalar")
+  } else if (!is.name(replacementName)) {
+    replacementName <- as.name(replacementName)
+  }
+  if (!all(sapply(sourceNames, is.name))) {
+    sourceNames <- sapply(X=sourceNames, FUN=as.name)
+  }
+  if (is.call(x)) {
+    ret <- x
+    # Recurse through all the parts of the call after the first (i.e. do not
+    # replace function calls), if there are more than one.
+    for (idx in rev(seq_len(length(ret) - 1) + 1)) {
+      ret[[idx]] <-
+        replaceNameName(
+          ret[[idx]],
+          replacementName=replacementName,
+          sourceNames=sourceNames
+        )
+    }
+  } else if (is.name(x)) {
+    if (any(sapply(X=sourceNames, FUN=identical, y=x))) {
+      ret <- replacementName
+    } else {
+      ret <- x
+    }
+  } else {
+    # Almost any other class can be part of a call, so just return anything
+    # other than a call or a name as-is.
+    ret <- x
+  }
+  ret
 }
 
 # nlmixrBounds helpers ####

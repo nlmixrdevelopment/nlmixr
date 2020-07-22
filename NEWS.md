@@ -4,6 +4,9 @@
    in the initial conditions (#322). The most important user-facing change is
    that now arbitrary R expressions can be used when setting initial conditions
    such as tvCL <- log(3) (#253).
+ - The function as.nlmixrBounds() now supports adding the columns that are
+   missing into the input data.frame.
+ - omega definitions can be correlation matrices (#338)
 
 # Before nlmixr 1.1.1-9
 

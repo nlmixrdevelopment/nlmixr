@@ -13,8 +13,21 @@ test_that("as.nlmixrBounds, data.frame to bounds creation works", {
         paste0("'", setdiff(names(nlmixr:::nlmixrBoundsTemplate), "ntheta"), "'", collapse=", ")
       )
   )
+  ref <- nlmixr:::nlmixrBoundsTemplate
+  ref$ntheta <- 1
+  ref$lower <- 0
+  ref$est <- 1
+  ref$upper <- 2
+  expect_equal(
+    as.data.frame(as.nlmixrBounds(
+      data.frame(ntheta=1, est=1, lower=0, upper=2),
+      addMissingCols=TRUE
+    )),
+    ref,
+    info="Missing column addition works"
+  )
   {
-    zero_bound <- nlmixrBoundsTemplate[1:2,]
+    zero_bound <- nlmixr:::nlmixrBoundsTemplate[1:2,]
     zero_bound$ntheta <- 1:2
     zero_bound$lower <- c(-Inf, 0)
     zero_bound$est <- c(-5, 5)
@@ -47,7 +60,8 @@ test_that("bounds are extracted correctly", {
         label = c("A", NA, NA, NA, "e", NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "labels", NA, NA, NA),
         condition = c(NA, NA, NA, NA, NA, NA, NA, NA, "ID", "ID", "ID", "ID", "STUD", "STUD", "STUD", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", "ID", NA, NA, NA, NA, NA, NA),
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   testbounds <- function(){
@@ -136,7 +150,8 @@ test_that("Bad Lower trianglar matrices throw errors.", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
 
   bnd2 <- function(){
@@ -163,7 +178,8 @@ test_that("Bad Lower trianglar matrices throw errors.", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd4  <- function(){
@@ -199,7 +215,8 @@ test_that("Bad Lower trianglar matrices throw errors.", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
 
   bnd7  <- function(){
@@ -242,7 +259,8 @@ test_that("Bad Lower trianglar matrices throw errors.", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
 
   expect_equal(nlmixrBounds(bnd1), ref1);
@@ -277,7 +295,8 @@ test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd2 <- function(){
@@ -304,7 +323,8 @@ test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd4  <- function(){
@@ -340,7 +360,8 @@ test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd7  <- function(){
@@ -383,7 +404,8 @@ test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
 
   expect_equal(nlmixrBounds(bnd1), ref1);
@@ -449,7 +471,8 @@ test_that("Conditional statments are supported correctly.", {
         label = NA_character_,
         condition = c("ID", "STUD", "STUD", "STUD", "ID", "ID", "ID"),
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   expect_equal(nlmixrBounds(bnd1), ref)
 })
@@ -477,7 +500,8 @@ test_that("Error parsing is reasonable", {
         label = NA_character_,
         condition = NA_character_,
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd4 <- function(){
@@ -499,7 +523,8 @@ test_that("Error parsing is reasonable", {
         label = NA_character_,
         condition = NA_character_,
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   expect_equal(nlmixrBounds(bnd1), ref1)
@@ -522,7 +547,8 @@ test_that("Theta fix fixed are reasonable", {
         label = c("A", NA, NA, NA),
         condition = NA_character_,
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd1 <- function(){
@@ -604,7 +630,8 @@ test_that("Theta fix fixed are reasonable", {
         label = NA_character_,
         condition = NA_character_,
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   bnd1 <- function() {
     a <- fixed(0, 2, 3)
@@ -615,7 +642,6 @@ test_that("Theta fix fixed are reasonable", {
   expect_equal(nlmixrBounds(bnd1), ref2)
   expect_equal(nlmixrBounds(bnd2), ref2)
 })
-
 
 test_that("Total ETA fixed (unnamed)", {
   ref1 <-
@@ -633,7 +659,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd1 <- function(){
@@ -657,7 +684,8 @@ test_that("Total ETA fixed (unnamed)", {
         label =NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd2 <- function(){
@@ -706,7 +734,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd6 <- function(){
@@ -730,7 +759,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd7 <- function(){
@@ -754,7 +784,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd8 <- function(){
@@ -778,7 +809,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
 
   bnd9 <- function(){
@@ -802,7 +834,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd10 <- function(){
@@ -826,7 +859,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd11 <- function(){
@@ -857,7 +891,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd7 <- function(){
@@ -881,7 +916,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd8 <- function(){
@@ -905,7 +941,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd9 <- function(){
@@ -929,7 +966,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd10 <- function(){
@@ -953,7 +991,8 @@ test_that("Total ETA fixed (unnamed)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
 
   bnd11 <- function(){
@@ -986,7 +1025,8 @@ test_that("Total ETA fixed (unnamed) #a", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref7 <-
     as.nlmixrBounds(
@@ -1003,7 +1043,8 @@ test_that("Total ETA fixed (unnamed) #a", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref8 <-
     as.nlmixrBounds(
@@ -1020,7 +1061,8 @@ test_that("Total ETA fixed (unnamed) #a", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref9 <-
     as.nlmixrBounds(
@@ -1037,7 +1079,8 @@ test_that("Total ETA fixed (unnamed) #a", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref10 <-
     as.nlmixrBounds(
@@ -1054,7 +1097,8 @@ test_that("Total ETA fixed (unnamed) #a", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref11 <-
     as.nlmixrBounds(
@@ -1071,7 +1115,8 @@ test_that("Total ETA fixed (unnamed) #a", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
 
   bnd6a <- function(){
@@ -1169,7 +1214,8 @@ test_that("Total ETA fixed (unnamed) #b", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref7 <-
     as.nlmixrBounds(
@@ -1186,7 +1232,8 @@ test_that("Total ETA fixed (unnamed) #b", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref8 <-
     as.nlmixrBounds(
@@ -1203,7 +1250,8 @@ test_that("Total ETA fixed (unnamed) #b", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref9 <-
     as.nlmixrBounds(
@@ -1220,7 +1268,8 @@ test_that("Total ETA fixed (unnamed) #b", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref10 <-
     as.nlmixrBounds(
@@ -1237,7 +1286,8 @@ test_that("Total ETA fixed (unnamed) #b", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref11 <-
     as.nlmixrBounds(
@@ -1254,7 +1304,8 @@ test_that("Total ETA fixed (unnamed) #b", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd6b <- function(){
@@ -1352,7 +1403,8 @@ test_that("Total ETA fixed (unnamed) #c", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref7 <-
     as.nlmixrBounds(
@@ -1369,7 +1421,8 @@ test_that("Total ETA fixed (unnamed) #c", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref8 <-
     as.nlmixrBounds(
@@ -1386,7 +1439,8 @@ test_that("Total ETA fixed (unnamed) #c", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref9 <-
     as.nlmixrBounds(
@@ -1403,7 +1457,8 @@ test_that("Total ETA fixed (unnamed) #c", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref10 <-
     as.nlmixrBounds(
@@ -1420,7 +1475,8 @@ test_that("Total ETA fixed (unnamed) #c", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   ref11 <-
     as.nlmixrBounds(
@@ -1437,7 +1493,8 @@ test_that("Total ETA fixed (unnamed) #c", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
 
   bnd6c <- function(){
@@ -1536,7 +1593,8 @@ test_that("Total ETA FIXED (named)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd12 <- function(){
@@ -1560,10 +1618,10 @@ test_that("Total ETA FIXED (named)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
-  
-  
+
   bnd13 <- function(){
     eta1 + eta2 + eta3 ~ fix(40,
                              0.1, 20,
@@ -1611,7 +1669,8 @@ test_that("Total ETA FIXED (named)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd17 <- function(){
@@ -1636,7 +1695,8 @@ test_that("Total ETA FIXED (named)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd18 <- function(){
@@ -1660,7 +1720,8 @@ test_that("Total ETA FIXED (named)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd19 <- function(){
@@ -1684,7 +1745,8 @@ test_that("Total ETA FIXED (named)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd20 <- function(){
@@ -1707,7 +1769,9 @@ test_that("Total ETA FIXED (named)", {
         err = NA_character_,
         label = NA_character_,
         condition = "ID",
-        stringsAsFactors=FALSE)
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
     )
   
   bnd21 <- function(){
@@ -1731,7 +1795,8 @@ test_that("Total ETA FIXED (named)", {
         label = NA_character_,
         condition = "ID",
         stringsAsFactors=FALSE
-      )
+      ),
+      addMissingCols=TRUE
     )
   
   bnd22 <- function(){
@@ -1990,6 +2055,163 @@ test_that("nlmixrBounds", {
   )
 })
 
+# nlmixrBoundsParserOmega ####
+
+test_that("Implicitly test nlmixrBoundsParserOmega", {
+  expect_equal(
+    nlmixrBounds(function(){
+      ~1
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=1,
+        neta2=1,
+        name=NA_character_,
+        lower=-Inf,
+        est=1,
+        upper=Inf,
+        fix=FALSE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Unnamed omega scalar assignment"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a~1
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=1,
+        neta2=1,
+        name="a",
+        lower=-Inf,
+        est=1,
+        upper=Inf,
+        fix=FALSE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named omega scalar assignment"
+  )
+  expect_equal(
+    expect_warning(
+      nlmixrBounds(function(){
+        a~cor(1)
+      }),
+      regexp="'cor(...)' with a single value is ignored: ~cor(1)",
+      fixed=TRUE
+    ),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=1,
+        neta2=1,
+        name="a",
+        lower=-Inf,
+        est=1,
+        upper=Inf,
+        fix=FALSE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named scalar omega assignment with correlation"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a+b~cor(2, -0.5, 3)
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=c(1, 2, 2),
+        neta2=c(1, 1, 2),
+        name=c("a", "(b,a)", "b"),
+        lower=-Inf,
+        est=c(4, -3, 9),
+        upper=Inf,
+        fix=FALSE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named vector omega assignment with correlation"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a+b~fixed(cor(2, -0.5, 3))
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=c(1, 2, 2),
+        neta2=c(1, 1, 2),
+        name=c("a", "(b,a)", "b"),
+        lower=-Inf,
+        est=c(4, -3, 9),
+        upper=Inf,
+        fix=TRUE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named vector omega assignment with correlation, all fixed with an outer function"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a+b~cor(fixed(2, -0.5, 3))
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=c(1, 2, 2),
+        neta2=c(1, 1, 2),
+        name=c("a", "(b,a)", "b"),
+        lower=-Inf,
+        est=c(4, -3, 9),
+        upper=Inf,
+        fix=TRUE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named vector omega assignment with correlation, all fixed with an inner function"
+  )
+  expect_equal(
+    nlmixrBounds(function(){
+      a+b~cor(fixed(2), fixed(-0.5), fixed(3))
+    }),
+    as.nlmixrBounds(
+      data.frame(
+        neta1=c(1, 2, 2),
+        neta2=c(1, 1, 2),
+        name=c("a", "(b,a)", "b"),
+        lower=-Inf,
+        est=c(4, -3, 9),
+        upper=Inf,
+        fix=TRUE,
+        condition="ID",
+        stringsAsFactors=FALSE
+      ),
+      addMissingCols=TRUE
+    ),
+    info="Named vector omega assignment with correlation, all fixed with individual functions (unusual, but acceptable)"
+  )
+  expect_error(
+    nlmixrBounds(function(){
+      a+b~cor(2, fixed(-0.5), fixed(3))
+    }),
+    regexp="either all or none of the elements may be fixed with cor(...): ~cor(2, fixed(-0.5), fixed(3))",
+    fixed=TRUE,
+    info="Named vector omega assignment with correlation, some fixed"
+  )
+})
+    
 # nlmixrBoundsValueFixed ####
 
 test_that("nlmixrBoundsValueFixed", {
@@ -2200,6 +2422,54 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
   )
 })
 
+# nlmixrBoundsReplaceCor ####
+
+test_that("", {
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~cor(1, 2, 3))[[2]]),
+    list(
+      value=1:3,
+      fixed=rep(FALSE, 3),
+      cor=rep(TRUE, 3)
+    )
+  )
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~cor(1, fixed(2), 3))[[2]]),
+    list(
+      value=1:3,
+      fixed=c(FALSE, TRUE, FALSE),
+      cor=rep(TRUE, 3)
+    )
+  )
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~fixed(cor(1, fixed(2), 3)))[[2]]),
+    list(
+      value=1:3,
+      fixed=rep(TRUE, 3),
+      cor=rep(TRUE, 3)
+    ),
+    info="Unusual syntax works"
+  )
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~c(1, fixed(2), cor(3)))[[2]]),
+    list(
+      value=1:3,
+      fixed=c(FALSE, TRUE, FALSE),
+      cor=c(FALSE, FALSE, TRUE)
+    ),
+    info="Legitimacy of syntax checking will be confirmed elsewhere"
+  )
+  expect_equal(
+    nlmixrBoundsValueCor(x=(~c(1, 2, cor(3), fixed))[[2]]),
+    list(
+      value=1:3,
+      fixed=c(TRUE, TRUE, TRUE),
+      cor=c(FALSE, FALSE, TRUE)
+    ),
+    info="Trailing 'fixed' is handled correctly"
+  )
+})
+
 # nlmixrBoundsPrepareFun ####
 
 test_that("preparation of the function for bound extraction", {
@@ -2287,5 +2557,88 @@ test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments"
     # Env and srcref attributes will not be equal
     check.attributes=FALSE,
     info="This is challenging to parse, and it was formerly a bug.  It is the reason that we are moving to parsing and not string extraction."
+  )
+})
+
+# Test call and name replacement ####
+test_that("call replacement", {
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b(), replacementFun="c", sourceNames="b"),
+    a~c(),
+    check.attributes=FALSE,
+    info="Simple replacement works"
+  )
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b(c+d*b(e)), replacementFun="c", sourceNames="b"),
+    a~c(c+d*c(e)),
+    check.attributes=FALSE,
+    info="Nested replacement works"
+  )
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b, replacementFun="c", sourceNames="b"),
+    a~b,
+    check.attributes=FALSE,
+    info="Names that are not calls are not replaced"
+  )
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b(b), replacementFun="c", sourceNames="b"),
+    a~c(b),
+    check.attributes=FALSE,
+    info="Nested names that are not calls are not replaced"
+  )
+  expect_equal(
+    nlmixr:::replaceCallName(x=a~b(1+"A"), replacementFun="c", sourceNames="b"),
+    a~c(1+"A"),
+    check.attributes=FALSE,
+    info="Non-name values are permitted"
+  )
+})
+
+test_that("name replacement", {
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b, replacementName="c", sourceNames="b"),
+    a~c,
+    check.attributes=FALSE,
+    info="Names that are not calls are replaced"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(), replacementName="c", sourceNames="b"),
+    a~b(),
+    check.attributes=FALSE,
+    info="Function calls are skipped"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(c+d*b(e)), replacementName="c", sourceNames="b"),
+    a~b(c+d*b(e)),
+    check.attributes=FALSE,
+    info="Nested replacement still ignores function calls"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(b), replacementName="c", sourceNames="b"),
+    a~b(c),
+    check.attributes=FALSE,
+    info="Nested names that are not calls are replaced"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(1+"A"), replacementName="c", sourceNames="b"),
+    a~b(1+"A"),
+    check.attributes=FALSE,
+    info="Non-name values are permitted"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b(b), replacementName=NULL, sourceNames="b"),
+    a~b(),
+    check.attributes=FALSE,
+    info="Null removes the name"
+  )
+  expect_equal(
+    nlmixr:::replaceNameName(x=a~b*c, replacementName=NULL, sourceNames="b"),
+    {
+      comparison <- a~b*c
+      comparison[[3]][[2]] <- NULL
+      comparison
+    },
+    check.attributes=FALSE,
+    info="This is weird but consistent (and no longer a valid formula), you can remove anything"
   )
 })
