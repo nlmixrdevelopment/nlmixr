@@ -377,7 +377,8 @@ addCovVar <- function(fitobject,
     initialEstUB
   )
 
-  list(updatedMod, data) # return updated model and updated data
+  list(updatedMod, data, covNames) # return updated model and updated data
+
 }
 
 
@@ -423,19 +424,22 @@ removeCovVar <- function(fitobject,
       paste0(paste0(prefix, s), "*", paste0(prefix2, s, "_", varName))
     covNameMod <- paste(covModExpr, collapse = "+")
 
-    covNames <- paste0(prefix2, s)
+    covNames <- paste0(prefix2, s, "_", varName)
   }
 
   else if (categorical) {
     # CAT
     prefix <- paste0("categorical_", covariate, "_")
     prefix2 <- paste0("cov_", covariate, "_")
-    s <- c("lower", "upper")
+
+    v <- unlist(getData(fitobject)[, covariate])
+    s <- head(sort(unique(v)), -1) # remove the last column
+    
     covModExpr <-
       paste0(paste0(prefix, s), "*", paste0(prefix2, s, "_", varName))
     covNameMod <- paste(covModExpr, collapse = "+")
 
-    covNames <- paste0(prefix2, s)
+    covNames <- paste0(prefix2, s, "_", varName)
   }
 
   else {
@@ -468,7 +472,7 @@ removeCovVar <- function(fitobject,
   class(ini2) <- c("nlmixrBounds", "data.frame")
   updatedMod$ini <- ini2
 
-  updatedMod
+  list(updatedMod, covNames)
 }
 
 #' Perform normalization of the covariate
@@ -665,13 +669,15 @@ removeCovMultiple <- function(covInfo, fitobject) {
   lapply(1:length(covInfo), function(idx) {
     x <- covInfo[[idx]]
 
-    updatedMod <- do.call(removeCovVar, c(list(fitobject), x))
+    res = do.call(removeCovVar, c(list(fitobject), x))
+    updatedMod <- res[[1]]
     data <- getData(fitobject)
+    covNames = res[[2]]
 
     fit2 <-
       suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
 
-    .env$covSearchRes[[idx]] <- list(fit2, c(x$covariate, x$varName))
+    .env$covSearchRes[[idx]] <- list(fit2, c(x$covariate, x$varName), covNames)
   })
 
   covSearchRes <- .env$covSearchRes
@@ -700,12 +706,14 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       res <- do.call(addCovVar, c(list(fitobject), x))
       updatedMod <- res[[1]]
       data <- res[[2]]
+      covNames = res[[3]]
+
 
       fit2 <-
         suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
 
       # .env$covSearchRes[[idx]] <- list(fit2, paste0(x$covariate, x$varName))
-      .env$covSearchRes[[idx]] <- list(fit2, c(x$covariate, x$varName))
+      .env$covSearchRes[[idx]] <- list(fit2, c(x$covariate, x$varName), covNames)
     })
 
     covSearchRes <- .env$covSearchRes
@@ -720,6 +728,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       res <- do.call(addCovVar, c(list(fitobject), x))
       updatedMod <- res[[1]]
       data <- res[[2]]
+      covNames = res[[3]]
 
       if (length(covsAdded) == 0) {
         # covsAdded[[covsAddedIdx]] <- paste0(x$covariate, x$varName)
@@ -727,7 +736,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
         
         fit2 <-
           suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
-        covSearchRes[[covsAddedIdx]] <- list(fit2, covsAdded[[covsAddedIdx]])
+        covSearchRes[[covsAddedIdx]] <- list(fit2, covsAdded[[covsAddedIdx]], covNames)
         covsAddedIdx <- covsAddedIdx + 1
       }
       else {
@@ -737,7 +746,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
           c(covsAdded[[covsAddedIdx - 1]], x$covariate, x$varName)
         fit2 <-
           suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
-        covSearchRes[[covsAddedIdx]] <- list(fit2, covsAdded[[covsAddedIdx]])
+        covSearchRes[[covsAddedIdx]] <- list(fit2, covsAdded[[covsAddedIdx]], covNames)
         covsAddedIdx <- covsAddedIdx + 1
       }
 
@@ -841,8 +850,6 @@ covarSearchAuto <-  # unsuccessful runs info store
       return (list(summaryTable=summaryTable, resFwd=NULL, resBck=resBck))
       
     }
-
-    
   }
 
 
@@ -851,7 +858,7 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
     stop("please specify output directory to store the results for forward search. aborting ...")
   }
 
-  resTableComplete <- data.frame(matrix(ncol = 12, nrow = 0))
+  resTableComplete <- data.frame(matrix(ncol = 13, nrow = 0))
   cli::cli_h1("starting forward search...")
   stepIdx <- 1
 
@@ -912,16 +919,19 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
       x <- res[[1]]
       nam_covar <- res[[2]][[1]]
       nam_var <- res[[2]][[2]]
-
-      list(stepIdx, nam_covar, nam_var, x$objf, x$objf - fit$objf, x$AIC, x$BIC, length(x$uif$ini$est), qchisq(1 - pVal, length(x$uif$ini$est) - length(fit$uif$ini$est)), fit$parFixedDf['nam_covar','Estimate'],'', 'forward')
-    })
+      covNames = res[[3]]
+      
+      l1 = list(step=stepIdx, covar=nam_covar, var=nam_var, objf=x$objf, deltObjf=x$objf - fit$objf, AIC=x$AIC, BIC=x$BIC, numParams=length(x$uif$ini$est), qchisqr=qchisq(1 - pVal, length(x$uif$ini$est) - length(fit$uif$ini$est)),included='', searchType='forward')
+      l2 = list(covNames=covNames, covarEffect=x$parFixedDf[covNames,'Estimate'])
+      
+      c(l1, l2)
+      })
 
     resTable <- data.frame(do.call(rbind, resTable))
-    colnames(resTable) <- c("step", "covar", "var", "objf", "deltObjf", "AIC", "BIC", "#Params", "qChisq", "covarEffect", 'included', 'searchType')
+    colnames(resTable) <- c(names(resTable))
     bestRow <- resTable[which.min(resTable$deltObjf), ]
 
     colnames(resTableComplete) <- colnames(resTable)
-
 
     if (bestRow$deltObjf < 0) { # should be based on p-value
       # objf function value improved
@@ -959,6 +969,7 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
   cli::cli_h2(cli::col_red("forward search complete"))
 
   list(fit, resTableComplete)
+  
 }
 
 backwardSearch <- function(covInfo, fit, pVal = 0.1, reFitCovars = FALSE, outputDir, restart = FALSE) {
@@ -966,7 +977,7 @@ backwardSearch <- function(covInfo, fit, pVal = 0.1, reFitCovars = FALSE, output
     stop("please specify output directory to store the results for backward search. aborting ...")
   }
   cli::cli_h1("starting backward search...")
-  resTableComplete <- data.frame(matrix(ncol = 12, nrow = 0))
+  resTableComplete <- data.frame(matrix(ncol = 13, nrow = 0))
   
   stepIdx <- 1
   
@@ -1030,24 +1041,29 @@ backwardSearch <- function(covInfo, fit, pVal = 0.1, reFitCovars = FALSE, output
   cli::cli_h2(cli::col_blue("initial function text to remove from:"))
   cli::cli_text(cli::col_red("{fit$fun.txt}"))
 
-
-
   # Now remove covars step by step until the objf fun value...?
   while (length(covInfo) > 0) {
     # Remove covars on by one: if objf val increases retain covar; otherwise (objf val decreases), remove the covar
     # At any stage, retain the one that results in highest increase in objf value; exit if removal of none results in increase
+
     covSearchRes <- removeCovMultiple(covInfo, fit)
 
     resTable <- lapply(covSearchRes, function(res) {
       x <- res[[1]]
       nam_covar <- res[[2]][[1]]
       nam_var <- res[[2]][[2]]
-      list(stepIdx, nam_covar, nam_var, x$objf, x$objf - fit$objf, x$AIC, x$BIC, length(x$uif$ini$est), qchisq(1 - pVal, length(fit$uif$ini$est) - length(x$uif$ini$est)), fit$parFixedDf['nam_covar','Estimate'], '', 'backward')
+      covNames = res[[3]]
+  
+      l1 = list(step=stepIdx, covar=nam_covar, var=nam_var, objf=x$objf, deltObjf=x$objf - fit$objf, AIC=x$AIC, BIC=x$BIC, numParams=length(x$uif$ini$est), qchisqr=qchisq(1 - pVal, length(fit$uif$ini$est) - length(x$uif$ini$est)),included='', searchType='backward')
+      l2 = list(covNames=covNames, covarEffect=fit$parFixedDf[covNames,'Estimate'])
+      
+      c(l1, l2)
+      
     })
 
 
     resTable <- data.frame(do.call(rbind, resTable))
-    colnames(resTable) <- c("step", "covar", "var", "objf", "deltObjf", "AIC", "BIC", "#Params", "qChisq", "covarEffect", 'included','searchType')
+    colnames(resTable) <- c(names(resTable))
     
     colnames(resTableComplete) <- colnames(resTable)
     
