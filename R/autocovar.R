@@ -712,7 +712,6 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       fit2 <-
         suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
 
-      # .env$covSearchRes[[idx]] <- list(fit2, paste0(x$covariate, x$varName))
       .env$covSearchRes[[idx]] <- list(fit2, c(x$covariate, x$varName), covNames)
     })
 
@@ -771,11 +770,11 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 #' @author Vipul Mann, Matthew Fidler
 #'
 #' @examples
-covarSearchAuto <-  # unsuccessful runs info store
+covarSearchAuto <-  # unsuccessful runs info store; check for covInformation before resuming
   function(fit,
            varsVec,
            covarsVec,
-           pVal = list(fwd=0.05, bck=0.1),  # diff default vals for fwd and backward
+           pVal = list(fwd=0.05, bck=0.01),  # diff default vals for fwd and backward
            covInformation = NULL,
            testAll = TRUE,
            searchType = c("scm", "forward", "backward"),
@@ -858,7 +857,7 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
     stop("please specify output directory to store the results for forward search. aborting ...")
   }
 
-  resTableComplete <- data.frame(matrix(ncol = 13, nrow = 0))
+  resTableComplete <- data.frame(matrix(ncol = 14, nrow = 0))
   cli::cli_h1("starting forward search...")
   stepIdx <- 1
 
@@ -921,7 +920,19 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
       nam_var <- res[[2]][[2]]
       covNames = res[[3]]
       
-      l1 = list(step=stepIdx, covar=nam_covar, var=nam_var, objf=x$objf, deltObjf=x$objf - fit$objf, AIC=x$AIC, BIC=x$BIC, numParams=length(x$uif$ini$est), qchisqr=qchisq(1 - pVal, length(x$uif$ini$est) - length(fit$uif$ini$est)),included='', searchType='forward')
+      # fwd: if deltObjf <0: pchisq=1-pchisq(-deltObjf, dof), else pchisq=1
+      # bck: if deltObjf >0: pchisq=1-pchisq(deltObjf, dof), else pchisq=1
+      
+      dObjf = fit$objf - x$objf
+      dof = length(x$uif$ini$est) - length(fit$uif$ini$est)
+      if(dObjf<0){
+        pchisqr = 1-pchisq(-dObjf, df=dof)
+      }
+      else{
+        pchisqr = 1
+      }
+      
+      l1 = list(step=stepIdx, covar=nam_covar, var=nam_var, objf=x$objf, deltObjf=dObjf, AIC=x$AIC, BIC=x$BIC, numParams=length(x$uif$ini$est), qchisqr=qchisq(1 - pVal, dof),pchisqr=pchisqr, included='', searchType='forward')
       l2 = list(covNames=covNames, covarEffect=x$parFixedDf[covNames,'Estimate'])
       
       c(l1, l2)
@@ -929,14 +940,14 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
 
     resTable <- data.frame(do.call(rbind, resTable))
     colnames(resTable) <- c(names(resTable))
-    bestRow <- resTable[which.min(resTable$deltObjf), ]
+    bestRow <- resTable[which.min(resTable$pchisqr), ]
 
     colnames(resTableComplete) <- colnames(resTable)
 
-    if (bestRow$deltObjf < 0) { # should be based on p-value
+    if (bestRow$pchisqr < pVal) { # should be based on p-value
       # objf function value improved
       
-      resTable[which.min(resTable$deltObjf),'included']='yes'
+      resTable[which.min(resTable$pchisqr),'included']='yes'
       
       cli::cli_h1("best model at step {stepIdx}: ")
       print(bestRow)
@@ -972,12 +983,12 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
   
 }
 
-backwardSearch <- function(covInfo, fit, pVal = 0.1, reFitCovars = FALSE, outputDir, restart = FALSE) {
+backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outputDir, restart = FALSE) {
   if (missing(outputDir)) {
     stop("please specify output directory to store the results for backward search. aborting ...")
   }
   cli::cli_h1("starting backward search...")
-  resTableComplete <- data.frame(matrix(ncol = 13, nrow = 0))
+  resTableComplete <- data.frame(matrix(ncol = 14, nrow = 0))
   
   stepIdx <- 1
   
@@ -1054,26 +1065,38 @@ backwardSearch <- function(covInfo, fit, pVal = 0.1, reFitCovars = FALSE, output
       nam_var <- res[[2]][[2]]
       covNames = res[[3]]
   
-      l1 = list(step=stepIdx, covar=nam_covar, var=nam_var, objf=x$objf, deltObjf=x$objf - fit$objf, AIC=x$AIC, BIC=x$BIC, numParams=length(x$uif$ini$est), qchisqr=qchisq(1 - pVal, length(fit$uif$ini$est) - length(x$uif$ini$est)),included='', searchType='backward')
+      # fwd: if deltObjf <0: pchisq=1-pchisq(-deltObjf, dof), else pchisq=1
+      # bck: if deltObjf >0: pchisq=1-pchisq(deltObjf, dof), else pchisq=1
+      
+      dObjf = x$objf - fit$objf
+      dof = length(fit$uif$ini$est) - length(x$uif$ini$est)
+      
+      if(dObjf>0){
+        pchisqr = 1-pchisq(dObjf, df=dof)
+      }
+      else{
+        pchisqr = 1
+      }
+      
+      l1 = list(step=stepIdx, covar=nam_covar, var=nam_var, objf=x$objf, deltObjf=dObjf, AIC=x$AIC, BIC=x$BIC, numParams=length(x$uif$ini$est), qchisqr=qchisq(1 - pVal, dof), pchisqr=pchisqr, included='', searchType='backward')
       l2 = list(covNames=covNames, covarEffect=fit$parFixedDf[covNames,'Estimate'])
       
       c(l1, l2)
-      
+    
     })
-
 
     resTable <- data.frame(do.call(rbind, resTable))
     colnames(resTable) <- c(names(resTable))
     
     colnames(resTableComplete) <- colnames(resTable)
     
-    bestRow <- resTable[which.max(resTable$deltObjf), ]
+    bestRow <- resTable[which.min(resTable$pchisqr), ]
     
     
-    if (bestRow$deltObjf > 0) {
+    if (bestRow$pchisqr < pVal) {
       # objf function value increased after removal of covariate: retain the best covariate at this stage, test for the rest
       
-      resTable[which.max(resTable$deltObjf), 'included']='yes'
+      resTable[which.min(resTable$pchisqr), 'included']='yes'
       
       cli::cli_h1("best model at step {stepIdx}: ")
       print(bestRow)
