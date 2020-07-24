@@ -114,16 +114,15 @@ nlmixrfindLhs <- function(x) {
                                 if (.df$neta1[i] < .df$neta2[i]){
                                   return(NULL)
                                 }
-                                return(.data.frame(ntheta=NA_integer_,
-                                                  neta1=.df$neta1[i], neta2=.df$neta2[i],
-                                                  name=.df$name[i],
-                                                  lower=-Inf,
-                                                  est=.df$val[i],
-                                                  upper=Inf,
-                                                  fix=FALSE,
-                                                  label="",
-                                                  err=NA_real_,
-                                                  condition="ID"))
+                                .df2 <- nlmixrBoundsTemplate
+                                .df2$neta1 <- .df$neta1[i]
+                                .df2$neta2 <- .df$neta2[i]
+                                .df$name <- .df$name[i]
+                                .df2$est <- .df$val[i]
+                                .df2$lower <- -Inf
+                                .df2$upper <- Inf
+                                .df2$condition <- "ID"
+                                return(.df2)
                               }))
     .ini2 <- rbind(.ini2, .ini3)
     .ini2 <- .ini2[order(.ini2$neta1, .ini2$neta2), ]
@@ -140,17 +139,17 @@ nlmixrfindLhs <- function(x) {
 #'
 #' The ini block controls initial conditions for 'theta' (fixed effects),
 #' 'omega' (random effects), and 'sigma' (residual error) elements of the model.
-#' 
+#'
 #' 'theta' and 'sigma' can be set using either \code{<-} or \code{=} such as
 #' \code{tvCL <- 1} or equivalently \code{tvCL = 1}.  'omega' can be set with a
 #' \code{~}.
-#' 
+#'
 #' Parameters can be named or unnamed (though named parameters are preferred).
 #' A named parameter is set using the name on the left of the assignment while
 #' unnamed parameters are set without an assignment operator.  \code{tvCL <- 1}
 #' would set a named parameter of \code{tvCL} to \code{1}.  Unnamed parameters
 #' are set using just the value, such as \code{1}.
-#' 
+#'
 #' For some estimation methods, lower and upper bounds can be set for 'theta'
 #' and 'sigma' values.  To set a lower and/or upper bound, use a vector of
 #' values.  The vector is \code{c(lower, estimate, upper)}.  The vector may be
@@ -160,7 +159,7 @@ nlmixrfindLhs <- function(x) {
 #' lower bound to \code{-Inf}, \code{c(-Inf, estimate, upper)}.  When an
 #' estimation method does not support bounds, the bounds will be ignored with a
 #' warning.
-#' 
+#'
 #' 'omega' values can be set as a single value or as the values of a
 #' lower-triangular matrix.  The values may be set as either a
 #' variance-covariance matrix (the default) or as a correlation matrix for the
@@ -171,7 +170,7 @@ nlmixrfindLhs <- function(x) {
 #' \code{iivKa + iivCL~c(2, 2.5, 3)}.  To set a correlation matrix with standard
 #' deviations on the diagonal, use \code{cor()} like \code{iivKa + iivCL~cor(2,
 #' -0.5, 3)}.
-#' 
+#'
 #' Values may be fixed (and therefore not estimated) using either the name
 #' \code{fixed} at the end of the assignment or by calling \code{fixed()} as a
 #' function for the value to fix.  For 'theta' and 'sigma', either the estimate
@@ -186,19 +185,19 @@ nlmixrfindLhs <- function(x) {
 #' iivCL~fixed(1, 2, 3)}, or \code{iivKa + iivCL~c(1, 2, 3, fixed)}.  Anywhere
 #' that \code{fixed} is used, \code{FIX}, \code{FIXED}, or \code{fix} may be
 #' used equivalently.
-#' 
+#'
 #' For any value, standard mathematical operators or functions may be used to
 #' define the value.  For example, \code{exp(2)} and \code{24*30} may be used to
 #' define a value anywhere that a number can be used (e.g. lower bound,
 #' estimate, upper bound, variance, etc.).
-#' 
+#'
 #' Values may be labeled using the \code{label()} function after the assignment.
 #' Labels are are used to make reporting easier by giving a human-readable
 #' description of the parameter, but the labels do not have any effect on
 #' estimation.  The typical way to set a label so that the parameter \code{tvCL}
 #' has a label of "Typical Value of Clearance (L/hr)" is \code{tvCL <- 1;
 #' label("Typical Value of Clearance (L/hr)")}.
-#' 
+#'
 #' \code{nlmixr} will attempt to determine some back-transformations for the
 #' user.  For example, \code{CL <- exp(tvCL)} will detect that \code{tvCL} must
 #' be back-transformed by \code{exp()} for easier interpretation.  When you want
@@ -206,7 +205,7 @@ nlmixrfindLhs <- function(x) {
 #' using \code{backTransform()} after the assignment.  For example, to set the
 #' back-transformation to \code{exp()}, you can use \code{tvCL <- 1;
 #' backTransform(exp())}.
-#' 
+#'
 #' @param ini Ini block or nlmixr model object
 #' @param ... Other arguments parsed by nlmixr
 #' @return bounds expression or parsed ui object
@@ -462,10 +461,13 @@ model <- function(model, ..., .lines=NULL){
           for (.new in .addVars){
             if (!any(.ini$name==.new)){
               .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
-              .ini <- rbind(.ini,
-                            .data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
-                                       name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
-                                       err=NA,label=NA,condition=NA))
+              .d2 <- nlmixrBoundsTemplate
+              .d2$name <- .new
+              .d2$ntheta <- .maxTheta + 1
+              .d2$est <- 1
+              .d2$lower <- -Inf
+              .d2$upper <- Inf
+              .ini <- rbind(.ini, .d2)
             }
           }
         }
@@ -519,17 +521,25 @@ model <- function(model, ..., .lines=NULL){
               if (regexpr(.etaModelReg,.new) !=-1){
                 .maxEta <- suppressWarnings(max(.ini$neta1,na.rm=TRUE));
                 if (is.infinite(.maxEta)) .maxEta <- 0
-                .ini <- rbind(.ini,
-                              .data.frame(ntheta=NA, neta1=.maxEta+1, neta2=.maxEta+1,
-                                         name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
-                                         err=NA,label=NA,condition="ID"))
+                .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
+                .d2 <- nlmixrBoundsTemplate
+                .d2$neta1 <- .maxEta + 1
+                .d2$neta2 <- .maxEta + 1
+                .d2$est <- 1
+                .d2$lower <- -Inf
+                .d2$upper <- Inf
+                .d2$condition <- "ID"
+                .ini <- rbind(.ini, .d2)
 
               } else if (regexpr(.thetaModelReg, .new) !=-1) {
                 .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
-                .ini <- rbind(.ini,
-                              .data.frame(ntheta=.maxTheta+1, neta1=NA, neta2=NA,
-                                         name=.new,lower=-Inf,est=1,upper=Inf,fix=FALSE,
-                                         err=NA,label=NA,condition=NA))
+                .d2 <- nlmixrBoundsTemplate
+                .d2$ntheta <- .maxTheta + 1
+                .d2$est <- 1
+                .d2$lower <- -Inf
+                .d2$upper <- Inf
+                .d2$name <- .new
+                .ini <- rbind(.ini, .d2)
               }
             }
           }
