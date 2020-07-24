@@ -321,6 +321,12 @@ addCovVar <- function(fitobject,
         normValVec <- lapply(uids, function(x) {
           datSlice <- data[data[,uidCol] == x, ]
           normVal <- mean(unlist(datSlice[covariate]))
+          if (normVal==0){
+            cli::cli_alert_warning('normalization value for subject ID: {x} is zero; using with 1...')
+            normVal = 1
+          }
+          
+          normVal
         })
 
         normValVec <- mean(unlist(normValVec))
@@ -331,6 +337,11 @@ addCovVar <- function(fitobject,
         normValVec <- lapply(uids, function(x) {
           datSlice <- data[data[,uidCol] == x, ]
           normVal <- median(unlist(datSlice[covariate]))
+          if (normVal==0){
+            cli::cli_alert_warning('normalization value for subject ID: {x} is zero; using 1 instead...')
+            normVal = 1
+          }
+          normVal
         })
         normValVec <- mean(unlist(normValVec))
       }
@@ -503,14 +514,25 @@ performNorm <- function(data,
     if (!(isHS)) {
       # not hockey stick
       datColNames <- paste0("centered_", covariate)
+      
 
       if (length(normOp) > 1) {
+        if(normValVec[[2]]==0){
+          normValVec = 1
+          cli::cli_alert_warning('replacing the normalization value from 0 to 1')
+        }
+        
         data[, datColNames] <-
           normOp[[1]](unname(unlist(data[, covariate])), normValVec[[1]])
         data[, datColNames] <-
           normOp[[2]](unname(unlist(data[, datColNames])), normValVec[[2]])
       }
       else {
+        if(normValVec==0){
+          normValVec = 1
+          cli::cli_alert_warning('replacing the normalization value from 0 to 1')
+        }
+        
         data[, datColNames] <-
           normOp(unname(unlist(data[, covariate])), normValVec)
       }
@@ -551,12 +573,21 @@ performNorm <- function(data,
     if (varName %in% c("cl")) {
       # with 0.75 prefactor
       for (datColName in datColNames) {
+        print(log(data[, datColName]))
+        if (!all(is.finite(log(data[, datColName])))){
+          stop('non-finite values encountered in log-normalization. aborting...', call. = FALSE)
+        }
+        
         # for loop to handle both non-categorical and categorical vars
-        data[, datColName] <- 0.75 * log(data[, datColName])
+          data[, datColName] <- 0.75 * log(data[, datColName])
       }
     }
     else {
       for (datColName in datColNames) {
+        if (!all(is.finite(log(data[, datColName])))){
+          stop('non-finite values encountered in log-normalization. aborting...', call. = FALSE)
+        }
+        
         data[, datColName] <- log(data[, datColName])
       }
     }
@@ -1136,12 +1167,16 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
   list(fit, resTableComplete)
 }
 
+
 # fitDapto = readRDS('daptomycin.Rds')
-# # fun.txt: "    cl = exp(tcl+eta.cl)\n    q = exp(tq+eta.q)\n    v1 = exp(tv1+eta.v1)\n    v2=exp(tv2+eta.v2)\n    cp = linCmt()\n    cp ~ add(add.err)"
-# # data colnames: "id"    "time"  "CL"    "V1"    "Q"     "V2"    "A1"    "A2"    "Cp"    "centr" "peri"  "CRCL"  "WT"    "SEX"   "AGE"   "DV"
-# 
-# varsVec = c("cl", "q")
-# covarsVec = c("WT", "SEX")
+# varsVec = c("cl", 'v1')
+# covarsVec = c("SEX")
 # 
 # covarSearchAuto(fitDapto, varsVec, covarsVec, covInformation=NULL, restart = T)
+
+
+# covarSearchAuto(fitDapto, varsVec, covarsVec, covInformation=list(SEXcl=list(categorical=TRUE), SEXv1=list(categorical=TRUE)), restart = T)
+
+# fun.txt: "    cl = exp(tcl+eta.cl)\n    q = exp(tq+eta.q)\n    v1 = exp(tv1+eta.v1)\n    v2=exp(tv2+eta.v2)\n    cp = linCmt()\n    cp ~ add(add.err)"
+# data colnames: "id"    "time"  "CL"    "V1"    "Q"     "V2"    "A1"    "A2"    "Cp"    "centr" "peri"  "CRCL"  "WT"    "SEX"   "AGE"   "DV"
 
