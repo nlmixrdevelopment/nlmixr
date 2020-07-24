@@ -11,6 +11,15 @@
 #include <RcppArmadillo.h>
 #include <RxODE.h>
 #include <lbfgsb3c.h>
+
+#ifdef ENABLE_NLS
+#include <libintl.h>
+#define _(String) dgettext ("nlmixr", String)
+/* replace pkg as appropriate */
+#else
+#define _(String) (String)
+#endif
+
 #define NETAs 20
 #define NTHETAs 20
 #define NSUBs 100
@@ -36,6 +45,8 @@
 #define _safe_zero(a) (a)
 // #define _safe_sqrt(a) ((a) <= DOUBLE_EPS ? sqrt(DOUBLE_EPS) : sqrt(a))
 #define _safe_sqrt(a) sqrt(a)
+
+int silentErrNlmixr_=0;
 
 using namespace Rcpp;
 using namespace arma;
@@ -74,6 +85,8 @@ extern "C"{
   par_progress_t par_progress;
   typedef rx_solve* (*getRxSolve_t)();
   typedef int (*isRstudio_t)();
+  typedef int (*getSilentErr_t)();
+  getSilentErr_t getSilentErr;
   isRstudio_t isRstudio;
   getRxSolve_t getRx;
 }
@@ -2114,10 +2127,10 @@ void numericGrad(double *theta, double *g){
       op_focei.totTick = op_focei.npars * op_focei.gillK;
       op_focei.t0 = clock();
       if (op_focei.repeatGillN != 0){
-	Rprintf("Repeat %d Gill Diff/forward difference step size:\n",
+	Rprintf(_("repeat %d Gill diff/forward difference step size:\n"),
 		op_focei.repeatGillN);
       } else {
-	Rprintf("Calculate Gill Difference and optimize forward difference step size:\n");
+	Rprintf(_("calculate Gill Difference and optimize forward difference step size:\n"));
       }
     }
     for (int cpar = op_focei.npars; cpar--;){
@@ -4430,7 +4443,7 @@ NumericMatrix foceiCalcCov(Environment e){
       op_focei.totTick=0;
       op_focei.cur=0;
       op_focei.curTick=0;
-      Rprintf("Calculating covariance matrix\n");
+      Rprintf(_("calculating covariance matrix\n"));
       // Change options to covariance options
       // op_focei.scaleObjective = 0;
       op_focei.derivMethod = op_focei.covDerivMethod;
@@ -5283,6 +5296,7 @@ void foceiFinalizeTables(Environment e){
 //[[Rcpp::export]]
 Environment foceiFitCpp_(Environment e){
   if (!assignFn_){
+    getSilentErr = (getSilentErr_t) R_GetCCallable("RxODE", "getSilentErr");
     n1qn1_ = (n1qn1_fp) R_GetCCallable("n1qn1","n1qn1F");
     par_progress = (par_progress_t) R_GetCCallable("RxODE", "par_progress");
     getRx = (getRxSolve_t) R_GetCCallable("RxODE", "getRxSolve_");
@@ -5294,6 +5308,7 @@ Environment foceiFitCpp_(Environment e){
     powerD = (powerD_t) R_GetCCallable("RxODE", "powerD");
     assignFn_=true;
   }
+  silentErrNlmixr_ = getSilentErr();
   clock_t t0 = clock();
   List model = e["model"];
   bool doPredOnly = false;
@@ -5441,7 +5456,7 @@ Environment foceiFitCpp_(Environment e){
     if (e.exists("objective")){
       nlmixrEnvSetup(e, as<double>(e["objective"]));
     } else {
-      stop("Not setup right.");
+      stop(_("not setup right"));
     }
   } else {
     op_focei.didHessianReset=0;
@@ -5451,16 +5466,16 @@ Environment foceiFitCpp_(Environment e){
     op_focei.stickyRecalcN1=0;
     foceiOuter(e);
     if (op_focei.didHessianReset==1){
-      warning("Hessian reset during optimization; (Can control by foceiControl(resetHessianAndEta=.))");
+      warning(_("Hessian reset during optimization; (can control by foceiControl(resetHessianAndEta=.))"));
     }
     if (op_focei.didEtaNudge==1){
-      warning("Initial ETAs were nudged; (Can control by foceiControl(etaNudge=.))");
+      warning(_("initial ETAs were nudged; (can control by foceiControl(etaNudge=.))"));
     }
     if (op_focei.didEtaReset==1){
-      warning("ETAs were reset to zero during optimization; (Can control by foceiControl(resetEtaP=.))");
+      warning(_("ETAs were reset to zero during optimization; (Can control by foceiControl(resetEtaP=.))"));
     }
     if (op_focei.repeatGillN > 0){
-      warning("Tolerances were reduced during Gill Gradient, so it was repeated %d/%d times\nYou can control this with foceiControl(repeatGillMax=.)", op_focei.repeatGillN, op_focei.repeatGillMax);
+      warning(_("tolerances were reduced during Gill Gradient, so it was repeated %d/%d times\nYou can control this with foceiControl(repeatGillMax=.)"), op_focei.repeatGillN, op_focei.repeatGillMax);
     }
     if (op_focei.maxOuterIterations > 0  && R_FINITE(op_focei.resetThetaFinalSize)){
       focei_options *fop = &op_focei;
@@ -5553,28 +5568,28 @@ Environment foceiFitCpp_(Environment e){
   scaleInfo.attr("row.names") = IntegerVector::create(NA_INTEGER,-gillRet.size());
   e["scaleInfo"] = scaleInfo;
   if (warnGillC && warnGill){
-    warning("Gradient problems with initial estimate and covariance; see $scaleInfo");
+    warning(_("gradient problems with initial estimate and covariance; see $scaleInfo"));
   } else if (warnGill){
-    warning("Gradient problems with initial estimate; see $scaleInfo");
+    warning(_("gradient problems with initial estimate; see $scaleInfo"));
   } else if (warnGillC){
-    warning("Gradient problems with covariance; see $scaleInfo");
+    warning(_("gradient problems with covariance; see $scaleInfo"));
   }
   if (op_focei.reducedTol){
     if (op_focei.stickyTol){
-      warning("Tolerances (atol/rtol) were reduced (after %d bad solves) for some difficult ODE solving during the optimization.\nCan control with foceiControl(stickyRecalcN=)\nConsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model.", op_focei.stickyRecalcN);
+      warning(_("tolerances (atol/rtol) were reduced (after %d bad solves) for some difficult ODE solving during the optimization.\ncan control with foceiControl(stickyRecalcN=)\nconsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model"), op_focei.stickyRecalcN);
     } else {
-      warning("Tolerances (atol/rtol) were temporarily reduced for some difficult ODE solving during the optimization.\nConsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model.");
+      warning(_("tolerances (atol/rtol) were temporarily reduced for some difficult ODE solving during the optimization.\nconsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model"));
     }
   }
   if (op_focei.zeroGrad){
-    warning("Zero gradient replaced with small number (%f)", sqrt(DOUBLE_EPS));
+    warning(_("zero gradient replaced with small number (%f)"), sqrt(DOUBLE_EPS));
   }
   foceiFinalizeTables(e);
   // NumericVector scaleC(op_focei.ntheta+op_focei.omegan);
   // std::copy(&op_focei.scaleC[0], &op_focei.scaleC[0]+op_focei.ntheta+op_focei.omegan, scaleC.begin());
   // e["scaleC"]= scaleC;
   if (op_focei.maxOuterIterations){
-    Rprintf("done\n");
+    Rprintf(_("done\n"));
   }
   return e;
 }
