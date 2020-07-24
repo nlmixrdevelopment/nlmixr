@@ -464,6 +464,7 @@ model <- function(model, ..., .lines=NULL){
               .d2 <- nlmixrBoundsTemplate
               .d2$name <- .new
               .d2$ntheta <- .maxTheta + 1
+              .d2$est <- 1
               .d2$lower <- -Inf
               .d2$upper <- Inf
               .ini <- rbind(.ini, .d2)
@@ -524,6 +525,7 @@ model <- function(model, ..., .lines=NULL){
                 .d2 <- nlmixrBoundsTemplate
                 .d2$neta1 <- .maxEta + 1
                 .d2$neta2 <- .maxEta + 1
+                .d2$est <- 1
                 .d2$lower <- -Inf
                 .d2$upper <- Inf
                 .d2$condition <- "ID"
@@ -533,6 +535,7 @@ model <- function(model, ..., .lines=NULL){
                 .maxTheta <- max(.ini$ntheta,na.rm=TRUE);
                 .d2 <- nlmixrBoundsTemplate
                 .d2$ntheta <- .maxTheta + 1
+                .d2$est <- 1
                 .d2$lower <- -Inf
                 .d2$upper <- Inf
                 .d2$name <- .new
