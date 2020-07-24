@@ -317,9 +317,9 @@ addCovVar <- function(fitobject,
 
       else if (norm %in% "mean") {
         # mean of the mean values
-        uids <- unlist(unname(data[uidCol]))
+        uids <- unlist(unname(data[,uidCol]))
         normValVec <- lapply(uids, function(x) {
-          datSlice <- data[data[uidCol] == x, ]
+          datSlice <- data[data[,uidCol] == x, ]
           normVal <- mean(unlist(datSlice[covariate]))
         })
 
@@ -327,9 +327,9 @@ addCovVar <- function(fitobject,
       }
       else {
         # mean of the median values
-        uids <- unlist(unname(data[uidCol]))
+        uids <- unlist(unname(data[,uidCol]))
         normValVec <- lapply(uids, function(x) {
-          datSlice <- data[data[uidCol] == x, ]
+          datSlice <- data[data[,uidCol] == x, ]
           normVal <- median(unlist(datSlice[covariate]))
         })
         normValVec <- mean(unlist(normValVec))
@@ -944,26 +944,28 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
 
     colnames(resTableComplete) <- colnames(resTable)
 
-    if (bestRow$pchisqr < pVal) { # should be based on p-value
-      # objf function value improved
+    if (bestRow$pchisqr <= pVal) { # should be based on p-value
       
+      # objf function value improved
       resTable[which.min(resTable$pchisqr),'included']='yes'
       
       cli::cli_h1("best model at step {stepIdx}: ")
       print(bestRow)
 
       fit <-
-        covSearchRes[[which.min(resTable$deltObjf)]][[1]] # extract fit object corresponding to the best model
+        covSearchRes[[which.min(resTable$pchisqr)]][[1]] # extract fit object corresponding to the best model
+      
       covInfo[[paste0(as.character(bestRow$covar), as.character(bestRow$var))]] <- NULL
 
       cli::cli_h2("excluding {paste0(as.character(bestRow$covar), as.character(bestRow$var))} from list of covariates ...")
-
+    
       saveRDS(fit, file = paste0(outputDir, "/", "forward_", "step_", stepIdx, "_", "fit", "_", paste0(as.character(bestRow$covar), as.character(bestRow$var)), ".RData"))
       saveRDS(bestRow, file = paste0(outputDir, "/", "forward_", "step_", stepIdx, "_", "table", "_", paste0(as.character(bestRow$covar), as.character(bestRow$var)), ".RData"))
-      stepIdx <- stepIdx + 1
-      
       resTableComplete <- rbind(resTableComplete, resTable)
       saveRDS(resTableComplete, file = paste0(outputDir, "/", "forward_", "step_", stepIdx, "_", "completetable", "_", as.character(bestRow$covar), as.character(bestRow$var), ".RData"))
+      
+      stepIdx <- stepIdx + 1
+      
     }
     else {
       # objf function value did not improve
@@ -1052,6 +1054,10 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
   cli::cli_h2(cli::col_blue("initial function text to remove from:"))
   cli::cli_text(cli::col_red("{fit$fun.txt}"))
 
+  # check if covInfo vars in fit; abort if nonoe of the covaraites added in the forward search step
+  
+  
+  
   # Now remove covars step by step until the objf fun value...?
   while (length(covInfo) > 0) {
     # Remove covars on by one: if objf val increases retain covar; otherwise (objf val decreases), remove the covar
@@ -1093,7 +1099,7 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
     bestRow <- resTable[which.min(resTable$pchisqr), ]
     
     
-    if (bestRow$pchisqr < pVal) {
+    if (bestRow$pchisqr <= pVal) {
       # objf function value increased after removal of covariate: retain the best covariate at this stage, test for the rest
       
       resTable[which.min(resTable$pchisqr), 'included']='yes'
@@ -1102,17 +1108,16 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
       print(bestRow)
 
       fit <-
-        covSearchRes[[which.max(resTable$deltObjf)]][[1]] # extract fit object corresponding to the best model
+        covSearchRes[[which.min(resTable$pchisqr)]][[1]] # extract fit object corresponding to the best model
       covInfo[[paste0(as.character(bestRow$covar), as.character(bestRow$var))]] <- NULL
       
       saveRDS(fit, file = paste0(outputDir, "/", "backward_", "step_", stepIdx, "_", "fit", "_", paste0(as.character(bestRow$covar), as.character(bestRow$var)), ".RData"))
       saveRDS(bestRow, file = paste0(outputDir, "/", "backward_", "step_", stepIdx, "_", "table", "_", paste0(as.character(bestRow$covar), as.character(bestRow$var)), ".RData"))
-      
-      stepIdx <- stepIdx + 1
-
       cli::cli_h2("retaining {paste0(as.character(bestRow$covar), as.character(bestRow$var))}")
       resTableComplete <- rbind(resTableComplete, resTable)
       saveRDS(resTableComplete, file = paste0(outputDir, "/", "backward_", "step_", stepIdx, "_", "completetable", "_", as.character(bestRow$covar), as.character(bestRow$var), ".RData"))
+      
+      stepIdx <- stepIdx + 1
       
     }
     else {
@@ -1130,3 +1135,13 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
 
   list(fit, resTableComplete)
 }
+
+# fitDapto = readRDS('daptomycin.Rds')
+# # fun.txt: "    cl = exp(tcl+eta.cl)\n    q = exp(tq+eta.q)\n    v1 = exp(tv1+eta.v1)\n    v2=exp(tv2+eta.v2)\n    cp = linCmt()\n    cp ~ add(add.err)"
+# # data colnames: "id"    "time"  "CL"    "V1"    "Q"     "V2"    "A1"    "A2"    "Cp"    "centr" "peri"  "CRCL"  "WT"    "SEX"   "AGE"   "DV"
+# 
+# varsVec = c("cl", "q")
+# covarsVec = c("WT", "SEX")
+# 
+# covarSearchAuto(fitDapto, varsVec, covarsVec, covInformation=NULL, restart = T)
+
