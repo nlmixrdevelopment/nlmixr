@@ -70,6 +70,8 @@ We can now run the model...
 
 ```{r}
 fit <- nlmixr(one.cmt, theo_sd, est="focei")
+bootstrapFit(fit, 20)
+
 print(fit)
 ```
 

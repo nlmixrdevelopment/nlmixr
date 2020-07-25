@@ -204,28 +204,36 @@ bootstrapFit <- function(fit,
 
     .plot <- ggplot2::ggplot(df) +
       ggplot2::geom_density(
-        aes(x = deltOBJF, color='delta objective function'),
+        aes(x = deltOBJF, color = "delta objective function"),
         fill = "blue",
-        color=NA,
+        color = NA,
         alpha = 0.2
-      ) + ggplot2::geom_density(
-        aes(x = refDistr, color='reference distribution'),
+      ) +
+      ggplot2::geom_density(
+        aes(x = refDistr, color = "reference distribution"),
         fill = "red",
-        color=NA,
+        color = NA,
         alpha = 0.2
-      ) + ggplot2::xlab("\u0394 Objective function") +
+      ) +
+      ggplot2::xlab("\u0394 Objective function") +
       ggplot2::ylab("Density")
     .plot <- .plot + RxODE::rxTheme()
     if (requireNamespace("ggtext", quietly = TRUE)) {
       .plot <- .plot +
-        ggplot2::theme(plot.title=ggtext::element_markdown()) +
-        ggplot2::labs(title=paste0('Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', nboot,
-                                   ' models)</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
-                                   length(fit$ini$est), ')</style>'),
-                             caption='\u0394 objective function curve should be on or below the reference distribution curve')
-    } else  {
-      .plot <- ggplot2::labs(title=paste0('Distribution of \u0394 objective function values for ', nboot, ' models'),
-                             caption='\u0394 objective function curve should be on or below the reference distribution curve')
+        ggplot2::theme(plot.title = ggtext::element_markdown()) +
+        ggplot2::labs(
+          title = paste0(
+            'Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', nboot,
+            ' models)</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
+            length(fit$ini$est), ")</style>"
+          ),
+          caption = "\u0394 objective function curve should be on or below the reference distribution curve"
+        )
+    } else {
+      .plot <- ggplot2::labs(
+        title = paste0("Distribution of \u0394 objective function values for ", nboot, " models"),
+        caption = "\u0394 objective function curve should be on or below the reference distribution curve"
+      )
     }
 
     .plot
@@ -233,7 +241,7 @@ bootstrapFit <- function(fit,
     ##   ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
     ##                                                   'reference distribution' = 'red')) +
     ##   RxODE::rxTheme()
-    }
+  }
 }
 
 
@@ -263,9 +271,10 @@ sampling <- function(data,
   }
   else {
     checkmate::assert_integerish(nsamp,
-                                 len = 1,
-                                 any.missing = FALSE,
-                                 lower = 2)
+      len = 1,
+      any.missing = FALSE,
+      lower = 2
+    )
   }
 
   if (performStrat && missing(stratVar)) {
@@ -274,9 +283,10 @@ sampling <- function(data,
   }
 
   checkmate::assert_integerish(nsamp,
-                               lower = 2,
-                               len = 1,
-                               any.missing = FALSE)
+    lower = 2,
+    len = 1,
+    any.missing = FALSE
+  )
 
   if (missing(uid_colname)) {
     # search the dataframe for a column name of 'ID'
@@ -343,9 +353,10 @@ sampling <- function(data,
   else {
     uids <- unique(data[, uid_colname])
     uids_samp <- sample(uids,
-                        size = nsamp,
-                        replace = TRUE,
-                        prob = pvalues)
+      size = nsamp,
+      replace = TRUE,
+      prob = pvalues
+    )
 
     sampled_df <-
       data.frame(data)[0, ] # initialize an empty dataframe with the same col names
@@ -409,9 +420,10 @@ modelBootstrap <- function(fit,
   uidCol <- names(data)[.w]
 
   checkmate::assert_integerish(nboot,
-                               len = 1,
-                               any.missing = FALSE,
-                               lower = 1)
+    len = 1,
+    any.missing = FALSE,
+    lower = 1
+  )
 
   if (missing(nSampIndiv)) {
     nSampIndiv <- length(unique(data[, uidCol]))
@@ -457,8 +469,9 @@ modelBootstrap <- function(fit,
 
   fnameBootDataPattern <-
     paste0(as.character(substitute(boot_data)),
-           "_", "[0-9]+", ".RData",
-           sep = "")
+      "_", "[0-9]+", ".RData",
+      sep = ""
+    )
   fileExists <-
     list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
 
@@ -507,15 +520,16 @@ modelBootstrap <- function(fit,
       # save bootData in curr directory: read the file using readRDS()
       attr(bootData, "randomSeed") <- .Random.seed
       saveRDS(bootData[[mod_idx]],
-              file = paste0(
-                "./",
-                output_dir,
-                "/",
-                as.character(substitute(boot_data)),
-                "_",
-                mod_idx,
-                ".RData"
-              ))
+        file = paste0(
+          "./",
+          output_dir,
+          "/",
+          as.character(substitute(boot_data)),
+          "_",
+          mod_idx,
+          ".RData"
+        )
+      )
     }
   }
 
@@ -532,15 +546,16 @@ modelBootstrap <- function(fit,
   .env <- environment()
   fnameModelsEnsemblePattern <-
     paste0(as.character(substitute(modelsEnsemble)), "_", "[0-9]+",
-           ".RData",
-           sep = "")
+      ".RData",
+      sep = ""
+    )
 
   modFileExists <-
     list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
 
   if (!restart) {
     if (length(modFileExists) > 0 &&
-        (length(fileExists) > 0)) {
+      (length(fileExists) > 0)) {
       # read bootData and modelsEnsemble files from disk
       cli::cli_alert_success(
         "resuming bootstrap model fitting using data and models stored at {paste0(getwd(), '/', output_dir)}"
@@ -607,30 +622,33 @@ modelBootstrap <- function(fit,
     lapply(bootData[.env$mod_idx:nboot], function(boot_data) {
       cli::cli_h1("Running nlmixr for model index: {.env$mod_idx}")
 
-      fit <- tryCatch({
-        fit <- suppressWarnings(nlmixr(uif,
-                                       boot_data,
-                                       est = fitMeth,
-                                       control = .ctl))
+      fit <- tryCatch(
+        {
+          fit <- suppressWarnings(nlmixr(uif,
+            boot_data,
+            est = fitMeth,
+            control = .ctl
+          ))
 
-        .env$multipleFits <- list(
-          objf = fit$OBJF,
-          aic = fit$AIC,
-          omega = fit$omega,
-          parFixedDf = fit$parFixedDf,
-          method = fit$method,
-          message = fit$message,
-          warnings = fit$warnings
-        )
+          .env$multipleFits <- list(
+            objf = fit$OBJF,
+            aic = fit$AIC,
+            omega = fit$omega,
+            parFixedDf = fit$parFixedDf,
+            method = fit$method,
+            message = fit$message,
+            warnings = fit$warnings
+          )
 
-        fit # to return 'fit'
-      },
-      error = function(error_message) {
-        print("error fitting the model")
-        print(error_message)
-        print("storing the models as NA ...")
-        return(NA) # return NA otherwise (instead of NULL)
-      })
+          fit # to return 'fit'
+        },
+        error = function(error_message) {
+          print("error fitting the model")
+          print(error_message)
+          print("storing the models as NA ...")
+          return(NA) # return NA otherwise (instead of NULL)
+        }
+      )
 
       saveRDS(
         .env$multipleFits,
@@ -674,13 +692,13 @@ modelBootstrap <- function(fit,
 getFitMethod <- function(fit) {
   methodsList <-
     c(
-      "nlmixrFOCEi"="focei",
-      "nlmixrNlmeUI"="nlme",
-      "nlmixrSaem"="saem",
-      "nlmixrFOCE"="foce",
-      "nlmixrFOi"="foi",
-      "nlmixrFO"="fo",
-      "nlmixrPosthoc"="posthoc"
+      "nlmixrFOCEi" = "focei",
+      "nlmixrNlmeUI" = "nlme",
+      "nlmixrSaem" = "saem",
+      "nlmixrFOCE" = "foce",
+      "nlmixrFOi" = "foi",
+      "nlmixrFO" = "fo",
+      "nlmixrPosthoc" = "posthoc"
     )
 
   if (!(inherits(fit, "nlmixrFitCore"))) {
@@ -691,9 +709,10 @@ getFitMethod <- function(fit) {
     inherits(fit, met)
   })
   .w <- which(res == TRUE)
-  if (length(.w) != 1){
+  if (length(.w) != 1) {
     stop("cannot determine the method the nlmixr fit used, please submit a bug report",
-         call.=FALSE)
+      call. = FALSE
+    )
   }
   setNames(methodsList[.w], NULL)
 }
@@ -723,7 +742,7 @@ extractVars <- function(fitlist, id = "objf") {
 
 
     if (!(id == "omega" ||
-          id == "parFixedDf")) {
+      id == "parFixedDf")) {
       # check if all message strings are empty
       if (id == "message") {
         prev <- TRUE
@@ -780,9 +799,11 @@ getBootstrapSummary <-
         median <- median(varVec)
         sd <- sd(varVec)
 
-        c(mean = mn,
+        c(
+          mean = mn,
           median = median,
-          stdDev = sd)
+          stdDev = sd
+        )
       }
       else if (id == "omega") {
         # omega estimates
