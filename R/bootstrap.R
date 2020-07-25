@@ -198,8 +198,8 @@ bootstrapFit <- function(fit,
     df <-
       data.frame(
         deltOBJF = abs(unlist(deltOBJF)),
-        refDistr = rchisq(1000, df = length(fit$theta)),
-        criticalVal = qchisq(1 - 0.005, df = length(fit$theta))
+        refDistr = rchisq(1000, df = length(fit$ini$est)),
+        criticalVal = qchisq(1 - 0.005, df = length(fit$ini$est))
       )
 
     ggplot2::ggplot(df) +
