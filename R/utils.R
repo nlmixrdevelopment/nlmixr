@@ -2132,7 +2132,7 @@ as.dynmodel <- function(x) {
 }
 
 #' Generate a data.frame using the R4.0 convention
-#' 
+#'
 #' @param ... Passed to \code{base::data.frame()} or
 #'   \code{base::as.data.frame()}
 #' @param stringsAsFactors Captured so that it can be ignored and always set to
@@ -2144,4 +2144,55 @@ as.dynmodel <- function(x) {
 }
 .as.data.frame <- function(..., stringsAsFactors = FALSE) {
   base::as.data.frame(..., stringsAsFactors = FALSE)
+}
+
+
+.isTestthat <- function () {
+  return(regexpr("/tests/testthat/", getwd(), fixed = TRUE) != -1)
+}
+
+nlmixrTest <- function(expr, silent = .isTestthat(), test = "cran"){
+  .Call(`_nlmixr_setSilentErr`, 1L, PACKAGE="nlmixr")
+  RxODE::rxSetSilentErr(1L)
+  do.it <- TRUE
+  .test <- .test0 <- Sys.getenv("NOT_CRAN")
+  if (Sys.getenv("nmCran") != "") {
+    .test <- .test0 <- Sys.getenv("nmCran")
+  }
+  on.exit({
+    .Call(`_nlmixr_setSilentErr`, 0L, PACKAGE="nlmixr")
+    RxODE::rxSetSilentErr(0L)
+  })
+  if (any(.test == c("false", "", "cran"))) {
+    if (any(test == c("false", "", "cran"))) {
+      do.it <- TRUE
+    }
+    else {
+      do.it <- FALSE
+    }
+  }
+  else {
+    if (test == .test || .test == "true") {
+      do.it <- TRUE
+    }
+    else {
+      do.it <- FALSE
+    }
+  }
+  if (do.it) {
+    .lastCran <- Sys.getenv("NOT_CRAN")
+    Sys.setenv(NOT_CRAN = "true")
+    on.exit({
+      Sys.setenv(NOT_CRAN = .lastCran)
+    }, add = TRUE)
+    if (is(substitute(expr), "{")) {
+      if (silent) {
+        return(suppressMessages(eval(substitute(expr),
+                                     envir = parent.frame(1))))
+      }
+      else {
+        return(eval(substitute(expr), envir = parent.frame(1)))
+      }
+    }
+  }
 }

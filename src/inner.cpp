@@ -46,11 +46,10 @@
 // #define _safe_sqrt(a) ((a) <= DOUBLE_EPS ? sqrt(DOUBLE_EPS) : sqrt(a))
 #define _safe_sqrt(a) sqrt(a)
 
-int silentErrNlmixr_=0;
-
 using namespace Rcpp;
 using namespace arma;
 extern "C"{
+  void RSprintf(const char *format, ...);
   typedef void (*S2_fp) (int *, int *, double *, double *, double *, int *, float *, double *);
   typedef void (*n1qn1_fp)(S2_fp simul, int n[], double x[], double f[], double g[], double var[], double eps[],
 			   int mode[], int niter[], int nsim[], int imp[], int lp[], double zm[], int izs[],
@@ -85,8 +84,6 @@ extern "C"{
   par_progress_t par_progress;
   typedef rx_solve* (*getRxSolve_t)();
   typedef int (*isRstudio_t)();
-  typedef int (*getSilentErr_t)();
-  getSilentErr_t getSilentErr;
   isRstudio_t isRstudio;
   getRxSolve_t getRx;
 }
@@ -738,7 +735,7 @@ double likInner0(double *eta){
 	Vid.zeros();
       }
 
-      // Rprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
+      // RSprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
       // Calculate matricies
       int k = 0;//ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
       fInd->llik=0.0;
@@ -826,7 +823,7 @@ double likInner0(double *eta){
 	    // lhs 0 = F
 	    // lhs 1-eta = df/deta
 	    // FIXME faster initialization via copy or elm
-	    // Rprintf("id: %d k: %d j: %d\n", id, k, j);
+	    // RSprintf("id: %d k: %d j: %d\n", id, k, j);
 	    B(k, 0) = 2.0/_safe_zero(r);
 	    if (op_focei.interaction == 1) {
 	      for (i = op_focei.neta; i--; ) {
@@ -1051,8 +1048,8 @@ double likInner0(double *eta){
 	// print(wrap(fInd->llik));
 	std::copy(&eta[0], &eta[0] + op_focei.neta, &fInd->oldEta[0]);
 	// for (int ssi = op_focei.neta; ssi--;){
-	//   // Rprintf("ssi: %d :%d;\n",id, ssi);
-	//   // Rprintf("eta: %f\n", eta[ssi]);
+	//   // RSprintf("ssi: %d :%d;\n",id, ssi);
+	//   // RSprintf("eta: %f\n", eta[ssi]);
 	//   fInd->oldEta[ssi] = eta[ssi];
 	// }
       }
@@ -1355,8 +1352,8 @@ void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float
     *f = likInner0(x);
     fInd->nInnerF++;
     // if (op_focei.printInner != 0 && fInd->nInnerF % op_focei.printInner == 0){
-    //   for (int i = 0; i < *n; i++) Rprintf(" %#10g", x[i]);
-    //   Rprintf(" (nG: %d)\n", fInd->nInnerG);
+    //   for (int i = 0; i < *n; i++) RSprintf(" %#10g", x[i]);
+    //   RSprintf(" (nG: %d)\n", fInd->nInnerG);
     // }
   }
   if (*ind==3 || *ind==4) {
@@ -1639,13 +1636,13 @@ void innerOpt(){
       	  innerOpt1(id, 0);
         } catch (...) {
       	  // Now try resetting Hessian, and ETA
-      	  // Rprintf("Hessian Reset for ID: %d\n", id+1);
+      	  // RSprintf("Hessian Reset for ID: %d\n", id+1);
           indF->mode = 1;
           indF->uzm = 1;
 	  op_focei.didHessianReset=1;
           std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
       	  try {
-            // Rprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
+            // RSprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
             innerOpt1(id, 0);
           } catch (...){
             indF->mode = 1;
@@ -2127,10 +2124,10 @@ void numericGrad(double *theta, double *g){
       op_focei.totTick = op_focei.npars * op_focei.gillK;
       op_focei.t0 = clock();
       if (op_focei.repeatGillN != 0){
-	Rprintf(_("repeat %d Gill diff/forward difference step size:\n"),
+	RSprintf(_("repeat %d Gill diff/forward difference step size:\n"),
 		op_focei.repeatGillN);
       } else {
-	Rprintf(_("calculate Gill Difference and optimize forward difference step size:\n"));
+	RSprintf(_("calculate Gill Difference and optimize forward difference step size:\n"));
       }
     }
     for (int cpar = op_focei.npars; cpar--;){
@@ -2169,7 +2166,7 @@ void numericGrad(double *theta, double *g){
     if(op_focei.slow){
       op_focei.cur=op_focei.totTick;
       op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
-      Rprintf("\n");
+      RSprintf("\n");
     }
     op_focei.didGill=1;
     if (op_focei.reducedTol2 && op_focei.repeatGillN < op_focei.repeatGillMax){
@@ -2319,7 +2316,7 @@ void numericGrad(double *theta, double *g){
     if(op_focei.slow) {
       op_focei.cur=op_focei.totTick;
       op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
-      Rprintf("\n");
+      RSprintf("\n");
     }
     op_focei.calcGrad=0;
   }
@@ -3089,14 +3086,14 @@ void foceiOuterFinal(double *x, Environment e){
 }
 
 static inline void foceiPrintLine(int ncol){
-  Rprintf("|-----+---------------+");
+  RSprintf("|-----+---------------+");
   for (int i = 0; i < ncol; i++){
     if (i == ncol-1)
-      Rprintf("-----------|");
+      RSprintf("-----------|");
     else
-      Rprintf("-----------+");
+      RSprintf("-----------+");
   }
-  Rprintf("\n");
+  RSprintf("\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3139,16 +3136,16 @@ extern "C" double foceiOfvOptim(int n, double *x, void *ex){
   }
   if (op_focei.printOuter != 0 && op_focei.nF % op_focei.printOuter == 0){
     if (op_focei.useColor && !isRstudio())
-      Rprintf("|\033[1m%5d\033[0m|%#14.8g |", op_focei.nF+op_focei.nF2, ret);
+      RSprintf("|\033[1m%5d\033[0m|%#14.8g |", op_focei.nF+op_focei.nF2, ret);
     else
-      Rprintf("|%5d|%#14.8g |", op_focei.nF+op_focei.nF2, ret);
+      RSprintf("|%5d|%#14.8g |", op_focei.nF+op_focei.nF2, ret);
     for (i = 0; i < n; i++){
-      Rprintf("%#10.4g |", x[i]);
+      RSprintf("%#10.4g |", x[i]);
       if ((i + 1) != n && (i + 1) % op_focei.printNcol == 0){
         if (op_focei.useColor && op_focei.printNcol + i  > n){
-          Rprintf("\n\033[4m|.....................|");
+          RSprintf("\n\033[4m|.....................|");
         } else {
-          Rprintf("\n|.....................|");
+          RSprintf("\n|.....................|");
         }
 	finalize=1;
       }
@@ -3156,84 +3153,84 @@ extern "C" double foceiOfvOptim(int n, double *x, void *ex){
     if (finalize){
       while(true){
         if ((i++) % op_focei.printNcol == 0){
-          if (op_focei.useColor) Rprintf("\033[0m");
-          Rprintf("\n");
+          if (op_focei.useColor) RSprintf("\033[0m");
+          RSprintf("\n");
           break;
         } else {
-          Rprintf("...........|");
+          RSprintf("...........|");
         }
       }
     } else {
-      Rprintf("\n");
+      RSprintf("\n");
     }
     if (op_focei.scaleObjective){
-      Rprintf("|    U|%14.8g |", op_focei.initObjective * ret / op_focei.scaleObjectiveTo);
+      RSprintf("|    U|%14.8g |", op_focei.initObjective * ret / op_focei.scaleObjectiveTo);
     } else {
-      Rprintf("|    U|%14.8g |", ret);
+      RSprintf("|    U|%14.8g |", ret);
     }
     for (i = 0; i < n; i++){
       // new  = (theta[k] - op_focei.scaleTo)*op_focei.scaleC[k] +  op_focei.initPar[k]
       // (new-ini)/c+scaleTo = theta[]
-      Rprintf("%#10.4g |", unscalePar(x, i));
+      RSprintf("%#10.4g |", unscalePar(x, i));
       if ((i + 1) != n && (i + 1) % op_focei.printNcol == 0){
 	if (op_focei.useColor && op_focei.printNcol + i  > op_focei.npars){
-	  Rprintf("\n\033[4m|.....................|");
+	  RSprintf("\n\033[4m|.....................|");
 	} else {
-	  Rprintf("\n|.....................|");
+	  RSprintf("\n|.....................|");
 	}
       }
     }
     if (finalize){
       while(true){
 	if ((i++) % op_focei.printNcol == 0){
-	  if (op_focei.useColor) Rprintf("\033[0m");
-	  Rprintf("\n");
+	  if (op_focei.useColor) RSprintf("\033[0m");
+	  RSprintf("\n");
 	  break;
 	} else {
-	  Rprintf("...........|");
+	  RSprintf("...........|");
 	}
       }
     } else {
-      Rprintf("\n");
+      RSprintf("\n");
     }
     if (op_focei.scaleObjective){
       if (op_focei.useColor && !isRstudio()){
-	Rprintf("|    X|\033[1m%14.8g\033[0m |", op_focei.initObjective * ret / op_focei.scaleObjectiveTo);
+	RSprintf("|    X|\033[1m%14.8g\033[0m |", op_focei.initObjective * ret / op_focei.scaleObjectiveTo);
       } else {
-	Rprintf("|    X|%14.8g |", op_focei.initObjective * ret / op_focei.scaleObjectiveTo);
+	RSprintf("|    X|%14.8g |", op_focei.initObjective * ret / op_focei.scaleObjectiveTo);
       }
     } else {
       if (op_focei.useColor && !isRstudio())
-	Rprintf("|    X|\033[1m%14.8g\033[0m |", ret);
+	RSprintf("|    X|\033[1m%14.8g\033[0m |", ret);
       else
-	Rprintf("|    X|%14.8g |", ret);
+	RSprintf("|    X|%14.8g |", ret);
     }
     for (i = 0; i < n; i++){
       if (op_focei.xPar[i] == 1){
-	Rprintf("%#10.4g |", exp(unscalePar(x, i)));
+	RSprintf("%#10.4g |", exp(unscalePar(x, i)));
       } else {
-	Rprintf("%#10.4g |", unscalePar(x, i));
+	RSprintf("%#10.4g |", unscalePar(x, i));
       }
       if ((i + 1) != n && (i + 1) % op_focei.printNcol == 0){
 	if (op_focei.useColor && op_focei.printNcol + i >= op_focei.npars){
-	  Rprintf("\n\033[4m|.....................|");
+	  RSprintf("\n\033[4m|.....................|");
 	} else {
-	  Rprintf("\n|.....................|");
+	  RSprintf("\n|.....................|");
 	}
       }
     }
     if (finalize){
       while(true){
         if ((i++) % op_focei.printNcol == 0){
-          if (op_focei.useColor) Rprintf("\033[0m");
-          Rprintf("\n");
+          if (op_focei.useColor) RSprintf("\033[0m");
+          RSprintf("\n");
           break;
         } else {
-          Rprintf("...........|");
+          RSprintf("...........|");
         }
       }
     } else {
-      Rprintf("\n");
+      RSprintf("\n");
     }
   }
   return ret;
@@ -3266,45 +3263,45 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
     if (op_focei.useColor && op_focei.printNcol >= n){
       switch(gradType.back()){
       case 1:
-	Rprintf("|\033[4m    G|    Gill Diff. |");
+	RSprintf("|\033[4m    G|    Gill Diff. |");
 	break;
       case 2:
-	Rprintf("|\033[4m    M|   Mixed Diff. |");
+	RSprintf("|\033[4m    M|   Mixed Diff. |");
 	break;
       case 3:
-	Rprintf("|\033[4m    F| Forward Diff. |");
+	RSprintf("|\033[4m    F| Forward Diff. |");
 	break;
       case 4:
-	Rprintf("|\033[4m    C| Central Diff. |");
+	RSprintf("|\033[4m    C| Central Diff. |");
 	break;
       }
     } else {
       switch(gradType.back()){
       case 1:
-	Rprintf("|    G|    Gill Diff. |");
+	RSprintf("|    G|    Gill Diff. |");
 	break;
       case 2:
-	Rprintf("|    M|   Mixed Diff. |");
+	RSprintf("|    M|   Mixed Diff. |");
 	break;
       case 3:
-	Rprintf("|    F| Forward Diff. |");
+	RSprintf("|    F| Forward Diff. |");
 	break;
       case 4:
-	Rprintf("|    C| Central Diff. |");
+	RSprintf("|    C| Central Diff. |");
 	break;
       }
     }
     for (i = 0; i < n; i++){
-      Rprintf("%#10.4g ", gr[i]);
+      RSprintf("%#10.4g ", gr[i]);
       if (op_focei.useColor && op_focei.printNcol >= n && i == n-1){
-	Rprintf("\033[0m");
+	RSprintf("\033[0m");
       }
-      Rprintf("|");
+      RSprintf("|");
       if ((i + 1) != n && (i + 1) % op_focei.printNcol == 0){
         if (op_focei.useColor && op_focei.printNcol + i  >= op_focei.npars){
-          Rprintf("\n\033[4m|.....................|");
+          RSprintf("\n\033[4m|.....................|");
         } else {
-          Rprintf("\n|.....................|");
+          RSprintf("\n|.....................|");
         }
         finalize=1;
       }
@@ -3312,15 +3309,15 @@ extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex){
     if (finalize){
       while(true){
         if ((i++) % op_focei.printNcol == 0){
-          if (op_focei.useColor) Rprintf("\033[0m");
-          Rprintf("\n");
+          if (op_focei.useColor) RSprintf("\033[0m");
+          RSprintf("\n");
 	  break;
         } else {
-          Rprintf("...........|");
+          RSprintf("...........|");
 	}
       }
     } else {
-      Rprintf("\n");
+      RSprintf("\n");
     }
     if (!op_focei.useColor){
       foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
@@ -3629,17 +3626,17 @@ double nlmixrEval_(NumericVector theta, std::string md5){
 	gradInfo["thetaNames"]=tn;
       }
       CharacterVector thetaNames = gradInfo["thetaNames"];
-      Rprintf("|    #| Objective Fun |");
+      RSprintf("|    #| Objective Fun |");
       int i=0, finalize=0;
       std::string tmpS;
       for (i = 0; i < n; i++){
 	tmpS = thetaNames[i];
-	Rprintf("%#10s |", tmpS.c_str());
+	RSprintf("%#10s |", tmpS.c_str());
 	if ((i + 1) != n && (i + 1) % printNcol == 0){
 	  if (useColor && printNcol + i  >= n){
-	    Rprintf("\n\033[4m|.....................|");
+	    RSprintf("\n\033[4m|.....................|");
 	  } else {
-	    Rprintf("\n|.....................|");
+	    RSprintf("\n|.....................|");
 	  }
 	  finalize=1;
 	}
@@ -3647,15 +3644,15 @@ double nlmixrEval_(NumericVector theta, std::string md5){
       if (finalize){
 	while(true){
 	  if ((i++) % printNcol == 0){
-	    if (useColor) Rprintf("\033[0m");
-	    Rprintf("\n");
+	    if (useColor) RSprintf("\033[0m");
+	    RSprintf("\n");
 	    break;
 	  } else {
-	    Rprintf("...........|");
+	    RSprintf("...........|");
 	  }
 	}
       } else {
-	Rprintf("\n");
+	RSprintf("\n");
       }
     }
   }
@@ -3682,16 +3679,16 @@ double nlmixrEval_(NumericVector theta, std::string md5){
   }
   if (printN != 0 && cn % printN == 0){
     if (useColor && isRstudio)
-      Rprintf("|\033[1m%5d\033[0m|%#14.8g |", cn, f0);
+      RSprintf("|\033[1m%5d\033[0m|%#14.8g |", cn, f0);
     else
-      Rprintf("|%5d|%#14.8g |", cn, f0);
+      RSprintf("|%5d|%#14.8g |", cn, f0);
     for (i = 0; i < n; i++){
-      Rprintf("%#10.4g |", theta[i]);
+      RSprintf("%#10.4g |", theta[i]);
       if ((i + 1) != n && (i + 1) % printNcol == 0){
         if (useColor && printNcol + i  > n){
-          Rprintf("\n\033[4m|.....................|");
+          RSprintf("\n\033[4m|.....................|");
         } else {
-          Rprintf("\n|.....................|");
+          RSprintf("\n|.....................|");
         }
 	finalize=1;
       }
@@ -3699,15 +3696,15 @@ double nlmixrEval_(NumericVector theta, std::string md5){
     if (finalize){
       while(true){
         if ((i++) % printNcol == 0){
-          if (useColor) Rprintf("\033[0m");
-          Rprintf("\n");
+          if (useColor) RSprintf("\033[0m");
+          RSprintf("\n");
           break;
         } else {
-          Rprintf("...........|");
+          RSprintf("...........|");
         }
       }
     } else {
-      Rprintf("\n");
+      RSprintf("\n");
     }
   }
   if (doUnscaled){
@@ -3721,16 +3718,16 @@ double nlmixrEval_(NumericVector theta, std::string md5){
     }
     if (printN != 0 && cn % printN == 0){
       if (useColor && isRstudio)
-	Rprintf("|    U|%#14.8g |", f0);
+	RSprintf("|    U|%#14.8g |", f0);
       else 
-	Rprintf("|    U|%#14.8g |", f0);
+	RSprintf("|    U|%#14.8g |", f0);
       for (i = 0; i < n; i++){
-	Rprintf("%#10.4g |", thetaU[i]);
+	RSprintf("%#10.4g |", thetaU[i]);
 	if ((i + 1) != n && (i + 1) % printNcol == 0){
 	  if (useColor && printNcol + i  > n){
-	    Rprintf("\n\033[4m|.....................|");
+	    RSprintf("\n\033[4m|.....................|");
 	  } else {
-	    Rprintf("\n|.....................|");
+	    RSprintf("\n|.....................|");
 	  }
 	  finalize=1;
 	}
@@ -3738,15 +3735,15 @@ double nlmixrEval_(NumericVector theta, std::string md5){
       if (finalize){
 	while(true){
 	  if ((i++) % printNcol == 0){
-	    if (useColor) Rprintf("\033[0m");
-	    Rprintf("\n");
+	    if (useColor) RSprintf("\033[0m");
+	    RSprintf("\n");
 	    break;
 	  } else {
-	    Rprintf("...........|");
+	    RSprintf("...........|");
 	  }
 	}
       } else {
-	Rprintf("\n");
+	RSprintf("\n");
       }
     }  
   }
@@ -3760,45 +3757,45 @@ void nlmixrGradPrint(NumericVector gr, int gradType, int cn, bool useColor,
     if (useColor && printNcol >= n){
       switch(gradType){
       case 1:
-	Rprintf("|\033[4m    G|    Gill Diff. |");
+	RSprintf("|\033[4m    G|    Gill Diff. |");
 	break;
       case 2:
-	Rprintf("|\033[4m    M|   Mixed Diff. |");
+	RSprintf("|\033[4m    M|   Mixed Diff. |");
 	break;
       case 3:
-	Rprintf("|\033[4m    F| Forward Diff. |");
+	RSprintf("|\033[4m    F| Forward Diff. |");
 	break;
       case 4:
-	Rprintf("|\033[4m    C| Central Diff. |");
+	RSprintf("|\033[4m    C| Central Diff. |");
 	break;
       }
     } else {
       switch(gradType){
       case 1:
-	Rprintf("|    G|    Gill Diff. |");
+	RSprintf("|    G|    Gill Diff. |");
 	break;
       case 2:
-	Rprintf("|    M|   Mixed Diff. |");
+	RSprintf("|    M|   Mixed Diff. |");
 	break;
       case 3:
-	Rprintf("|    F| Forward Diff. |");
+	RSprintf("|    F| Forward Diff. |");
 	break;
       case 4:
-	Rprintf("|    C| Central Diff. |");
+	RSprintf("|    C| Central Diff. |");
 	break;
       }
     }
     for (i = 0; i < n; i++){
-      Rprintf("%#10.4g ", gr[i]);
+      RSprintf("%#10.4g ", gr[i]);
       if (useColor && printNcol >= n && i == n-1){
-	Rprintf("\033[0m");
+	RSprintf("\033[0m");
       }
-      Rprintf("|");
+      RSprintf("|");
       if ((i + 1) != n && (i + 1) % printNcol == 0){
         if (useColor && printNcol + i  >= n){
-          Rprintf("\n\033[4m|.....................|");
+          RSprintf("\n\033[4m|.....................|");
         } else {
-          Rprintf("\n|.....................|");
+          RSprintf("\n|.....................|");
         }
         finalize=1;
       }
@@ -3806,15 +3803,15 @@ void nlmixrGradPrint(NumericVector gr, int gradType, int cn, bool useColor,
     if (finalize){
       while(true){
         if ((i++) % printNcol == 0){
-          if (useColor) Rprintf("\033[0m");
-          Rprintf("\n");
+          if (useColor) RSprintf("\033[0m");
+          RSprintf("\n");
 	  break;
         } else {
-          Rprintf("...........|");
+          RSprintf("...........|");
 	}
       }
     } else {
-      Rprintf("\n");
+      RSprintf("\n");
     }
     if (!useColor){
       foceiPrintLine(min2(n, printNcol));
@@ -4121,9 +4118,9 @@ RObject nlmixrHess_(RObject thetaT, RObject fT, RObject e,
   }
   par_progress(totTick, totTick, cur, 1, t0, 0);
   if (isRstudio){
-      Rprintf("\n");
+      RSprintf("\n");
   } else {
-      Rprintf("\r                                                                                \r");
+      RSprintf("\r                                                                                \r");
   }
   return wrap(H);
 }
@@ -4184,7 +4181,7 @@ void foceiCalcR(Environment e){
       op_focei.cur++;
       op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       theta[i] = ti;
-      // Rprintf("-- i:%d, i: %d\n", i, i);
+      // RSprintf("-- i:%d, i: %d\n", i, i);
       // print(NumericVector::create(f1,f2,f3,f4,op_focei.lastOfv));
       H(i,i)=fnscale*(-f1+16*f2-30*op_focei.lastOfv+16*f3-f4)/(12*epsI*epsI*parScaleI*parScaleI);
       for (j = i; j--;){
@@ -4217,7 +4214,7 @@ void foceiCalcR(Environment e){
 	f4 = foceiOfv0(theta.begin());
 	op_focei.cur++;
 	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
-	// Rprintf("-- i:%d, j: %d\n", i, j);
+	// RSprintf("-- i:%d, j: %d\n", i, j);
 	// print(NumericVector::create(f1,f2,f3,f4));
 	H(i,j)= fnscale*(f1-f2-f3+f4)/(4*epsI*epsJ*parScaleI*parScaleJ);
 	H(j,i) = H(i,j);
@@ -4443,7 +4440,7 @@ NumericMatrix foceiCalcCov(Environment e){
       op_focei.totTick=0;
       op_focei.cur=0;
       op_focei.curTick=0;
-      Rprintf(_("calculating covariance matrix\n"));
+      RSprintf(_("calculating covariance matrix\n"));
       // Change options to covariance options
       // op_focei.scaleObjective = 0;
       op_focei.derivMethod = op_focei.covDerivMethod;
@@ -4580,7 +4577,7 @@ NumericMatrix foceiCalcCov(Environment e){
             }
           }
         } catch (...){
-          Rprintf("\rR matrix calculation failed; Switch to S-matrix covariance.\n");
+          RSprintf("\rR matrix calculation failed; Switch to S-matrix covariance.\n");
           op_focei.covMethod = 3;
           op_focei.cur += op_focei.npars*2;
           op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
@@ -4732,12 +4729,12 @@ NumericMatrix foceiCalcCov(Environment e){
           }
         } catch (...){
           if (op_focei.covMethod == 1){
-            Rprintf("\rS matrix calculation failed; Switch to R-matrix covariance.\n");
+            RSprintf("\rS matrix calculation failed; Switch to R-matrix covariance.\n");
             e["cov"] = wrap(e["covR"]);
             op_focei.covMethod = 2;
           } else {
             op_focei.covMethod=0;
-            Rprintf("\rCould not calculate covariance matrix.\n");
+            RSprintf("\rCould not calculate covariance matrix.\n");
 	    warning("Cannot calculate covariance");
             op_focei.cur++;
             op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
@@ -5296,7 +5293,6 @@ void foceiFinalizeTables(Environment e){
 //[[Rcpp::export]]
 Environment foceiFitCpp_(Environment e){
   if (!assignFn_){
-    getSilentErr = (getSilentErr_t) R_GetCCallable("RxODE", "getSilentErr");
     n1qn1_ = (n1qn1_fp) R_GetCCallable("n1qn1","n1qn1F");
     par_progress = (par_progress_t) R_GetCCallable("RxODE", "par_progress");
     getRx = (getRxSolve_t) R_GetCCallable("RxODE", "getRxSolve_");
@@ -5308,7 +5304,6 @@ Environment foceiFitCpp_(Environment e){
     powerD = (powerD_t) R_GetCCallable("RxODE", "powerD");
     assignFn_=true;
   }
-  silentErrNlmixr_ = getSilentErr();
   clock_t t0 = clock();
   List model = e["model"];
   bool doPredOnly = false;
@@ -5401,36 +5396,36 @@ Environment foceiFitCpp_(Environment e){
   std::string tmpS;
   if (op_focei.maxOuterIterations > 0 && op_focei.printTop == 1 && op_focei.printOuter != 0){
     if (op_focei.useColor)
-      Rprintf("\033[1mKey:\033[0m ");
+      RSprintf("\033[1mKey:\033[0m ");
     else
-      Rprintf("Key: ");
+      RSprintf("Key: ");
 
-    Rprintf("U: Unscaled Parameters; ");
-    Rprintf("X: Back-transformed parameters; ");
-    Rprintf("G: Gill difference gradient approximation\n");
-    Rprintf("F: Forward difference gradient approximation\n");
-    Rprintf("C: Central difference gradient approximation\n");
-    Rprintf("M: Mixed forward and central difference gradient approximation\n");
-    Rprintf("Unscaled parameters for Omegas=chol(solve(omega));\nDiagonals are transformed, as specified by foceiControl(diagXform=)\n");
+    RSprintf("U: Unscaled Parameters; ");
+    RSprintf("X: Back-transformed parameters; ");
+    RSprintf("G: Gill difference gradient approximation\n");
+    RSprintf("F: Forward difference gradient approximation\n");
+    RSprintf("C: Central difference gradient approximation\n");
+    RSprintf("M: Mixed forward and central difference gradient approximation\n");
+    RSprintf("Unscaled parameters for Omegas=chol(solve(omega));\nDiagonals are transformed, as specified by foceiControl(diagXform=)\n");
     op_focei.t0 = clock();
     foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
-    Rprintf("|    #| Objective Fun |");
+    RSprintf("|    #| Objective Fun |");
     int j,  i=0, finalize=0, k=1;
 
     for (i = 0; i < op_focei.npars; i++){
       j=op_focei.fixedTrans[i];
       if (j < thetaNames.size()){
 	tmpS = thetaNames[j];
-	Rprintf("%#10s |", tmpS.c_str());
+	RSprintf("%#10s |", tmpS.c_str());
       } else {
 	tmpS = "o" +std::to_string(k++);
-	Rprintf("%#10s |", tmpS.c_str());
+	RSprintf("%#10s |", tmpS.c_str());
       }
       if ((i + 1) != op_focei.npars && (i + 1) % op_focei.printNcol == 0){
 	if (op_focei.useColor && op_focei.printNcol + i  >= op_focei.npars){
-	  Rprintf("\n\033[4m|.....................|");
+	  RSprintf("\n\033[4m|.....................|");
 	} else {
-	  Rprintf("\n|.....................|");
+	  RSprintf("\n|.....................|");
 	}
 	finalize=1;
       }
@@ -5438,15 +5433,15 @@ Environment foceiFitCpp_(Environment e){
     if (finalize){
       while(true){
 	if ((i++) % op_focei.printNcol == 0){
-	  if (op_focei.useColor) Rprintf("\033[0m");
-	  Rprintf("\n");
+	  if (op_focei.useColor) RSprintf("\033[0m");
+	  RSprintf("\n");
 	  break;
 	} else {
-	  Rprintf("...........|");
+	  RSprintf("...........|");
 	}
       }
     } else {
-      Rprintf("\n");
+      RSprintf("\n");
     }
     if (!op_focei.useColor){
       foceiPrintLine(min2(op_focei.npars, op_focei.printNcol));
@@ -5589,7 +5584,7 @@ Environment foceiFitCpp_(Environment e){
   // std::copy(&op_focei.scaleC[0], &op_focei.scaleC[0]+op_focei.ntheta+op_focei.omegan, scaleC.begin());
   // e["scaleC"]= scaleC;
   if (op_focei.maxOuterIterations){
-    Rprintf(_("done\n"));
+    RSprintf(_("done\n"));
   }
   return e;
 }

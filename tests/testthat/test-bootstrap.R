@@ -1,4 +1,5 @@
-rxPermissive({
+nlmixrTest({
+
   context('bootstrap')
 
   samp_dat = theo_sd
@@ -105,7 +106,7 @@ rxPermissive({
       table = list(npde = TRUE, cwres = TRUE)
     ))
 
-    fitlist <- modelBootstrap(fit, nboot = 4, restart = TRUE)
+    fitlist <- nlmixr:::modelBootstrap(fit, nboot = 4, restart = TRUE)
     bootSummary1 <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.95)
     bootSummary2 <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.75)
 
@@ -151,7 +152,7 @@ rxPermissive({
     ))
 
     colsBefore = colnames(fit$parFixedDf)
-    fitlist = modelBootstrap(fit, nboot = 4, restart = TRUE)
+    fitlist = nlmixr:::modelBootstrap(fit, nboot = 4, restart = TRUE)
 
     bootSummary <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.95)
 
@@ -160,4 +161,4 @@ rxPermissive({
     testthat::expect_equal(colsAfter, colsBefore)
   })
 
-}, silent=TRUE)
+}, silent=TRUE, test="lvl2")
