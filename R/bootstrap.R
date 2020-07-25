@@ -202,21 +202,37 @@ bootstrapFit <- function(fit,
         criticalVal = qchisq(1 - 0.005, df = length(fit$ini$est))
       )
 
-    ggplot2::ggplot(df) +
+    .plot <- ggplot2::ggplot(df) +
       ggplot2::geom_density(
         aes(x = deltOBJF, color='delta objective function'),
         fill = "blue",
+        color=NA,
         alpha = 0.2
       ) + ggplot2::geom_density(
         aes(x = refDistr, color='reference distribution'),
         fill = "red",
+        color=NA,
         alpha = 0.2
-      ) + ggplot2::xlab(xlab("\u0394 Objective function")) +
-      ggplot2::labs(title=paste0('Distribution of \u0394 objective function values for ', nboot, ' models'),
-                    ylab='Density',
-                    caption='The delta objective function curve should ideally be on or below the reference distribution curve') +
-      ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
-                                             'reference distribution' = 'red'))
+      ) + ggplot2::xlab("\u0394 Objective function") +
+      ggplot2::ylab("Density")
+    .plot <- .plot + RxODE::rxTheme()
+    if (requireNamespace("ggtext", quietly = TRUE)) {
+      .plot <- .plot +
+        ggplot2::theme(plot.title=ggtext::element_markdown()) +
+        ggplot2::labs(title=paste0('Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', nboot,
+                                   ' models)</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
+                                   length(fit$ini$est), ')</style>'),
+                             caption='\u0394 objective function curve should be on or below the reference distribution curve')
+    } else  {
+      .plot <- ggplot2::labs(title=paste0('Distribution of \u0394 objective function values for ', nboot, ' models'),
+                             caption='\u0394 objective function curve should be on or below the reference distribution curve')
+    }
+
+    .plot
+    ## +
+    ##   ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
+    ##                                                   'reference distribution' = 'red')) +
+    ##   RxODE::rxTheme()
     }
 }
 
