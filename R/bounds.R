@@ -691,7 +691,7 @@ nlmixrBoundsValueFixed <- function(x) {
   valueFixed <- nlmixrBoundsReplaceFixed(x, replacementName = NULL)
   # determine the numeric value after removing 'fixed' names and using 'fixed()'
   # like 'c()'
-  value <- try(eval(valueFixed$call, list(fixed = c)))
+  value <- try(eval(valueFixed$call, list(fixed = c)), silent=TRUE)
   if (inherits(value, "try-error")) {
     stop(
       "error parsing initial condition '", deparse(x), "': ", attr(value, "condition")$message,
