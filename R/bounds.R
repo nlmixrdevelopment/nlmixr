@@ -992,7 +992,7 @@ replaceNameName <- function(x, replacementName, sourceNames) {
 # nlmixrBounds helpers ####
 
 is.nlmixrBounds <- function(x) {
-  should <- c("ntheta", "neta1", "neta2", "name", "lower", "est", "upper", "fix", "err", "label", "condition")
+  should <- names(nlmixrBoundsTemplate)
   what <- names(x)
   if (length(should) == length(what)) {
     return(all(what == should))
