@@ -2,11 +2,11 @@ context("Test bounds extraction")
 
 test_that("as.nlmixrBounds, data.frame to bounds creation works", {
   expect_error(
-    as.nlmixrBounds(data.frame()),
+    nlmixr:::as.nlmixrBounds(data.frame()),
     regexp = "no parameter information"
   )
   expect_error(
-    as.nlmixrBounds(data.frame(ntheta = 1)),
+    nlmixr:::as.nlmixrBounds(data.frame(ntheta = 1)),
     regexp =
       paste(
         "columns missing:",
@@ -19,7 +19,7 @@ test_that("as.nlmixrBounds, data.frame to bounds creation works", {
   ref$est <- 1
   ref$upper <- 2
   expect_equal(
-    as.data.frame(as.nlmixrBounds(
+    as.data.frame(nlmixr:::as.nlmixrBounds(
       data.frame(ntheta = 1, est = 1, lower = 0, upper = 2),
       addMissingCols = TRUE
     )),
@@ -33,7 +33,7 @@ test_that("as.nlmixrBounds, data.frame to bounds creation works", {
     zero_bound$est <- c(-5, 5)
     zero_bound$upper <- c(0, Inf)
     expect_equal(
-      as.data.frame(as.nlmixrBounds(zero_bound)[, c("lower", "upper")]),
+      as.data.frame(nlmixr:::as.nlmixrBounds(zero_bound)[, c("lower", "upper")]),
       data.frame(
         lower = c(-Inf, sqrt(.Machine$double.eps)),
         upper = c(-sqrt(.Machine$double.eps), Inf)
@@ -46,7 +46,7 @@ test_that("as.nlmixrBounds, data.frame to bounds creation works", {
 
 test_that("bounds are extracted correctly", {
   ref <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = c(1, 2, 3, 4, 5, 6, 7, 8, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 9, 10, 11, 12, 13, 14),
         neta1 = c(NA, NA, NA, NA, NA, NA, NA, NA, 1, 2, 3, 4, 5, 6, 6, 7, 8, 8, 9, 9, 9, 10, 11, 11, 12, 12, 12, NA, NA, NA, NA, NA, NA),
@@ -142,7 +142,7 @@ test_that("Bad Lower trianglar matrices throw errors.", {
     ~ c(1)
   }
   ref1 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = 1,
@@ -172,7 +172,7 @@ test_that("Bad Lower trianglar matrices throw errors.", {
   }
 
   ref3 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2),
@@ -215,7 +215,7 @@ test_that("Bad Lower trianglar matrices throw errors.", {
   }
 
   ref6 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -267,7 +267,7 @@ test_that("Bad Lower trianglar matrices throw errors.", {
   }
 
   ref10 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4),
@@ -303,7 +303,7 @@ test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
   }
 
   ref1 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = 1,
@@ -333,7 +333,7 @@ test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
   }
 
   ref3 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2),
@@ -376,7 +376,7 @@ test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
   }
 
   ref6 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -428,7 +428,7 @@ test_that("Bad Lower trianglar matrices (with labels) throw errors.", {
   }
 
   ref10 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4),
@@ -505,7 +505,7 @@ test_that("Conditional statments are supported correctly.", {
   }
 
   ref <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = as.numeric(c(NA, NA, NA, NA, NA, NA, NA)),
         neta1 = c(1, 2, 3, 3, 4, 5, 5),
@@ -525,63 +525,9 @@ test_that("Conditional statments are supported correctly.", {
   expect_equal(nlmixrBounds(bnd1), ref)
 })
 
-test_that("Error parsing is reasonable", {
-  skip("Error parsing no longer occurs in nlmixrBounds()")
-  ## Now test err/pred type parsing.
-
-  bnd1 <- function() {
-    err ~ add(0.1)
-  }
-
-  ref1 <-
-    as.nlmixrBounds(
-      data.frame(
-        ntheta = 1,
-        neta1 = NA_real_,
-        neta2 = NA_real_,
-        name = "err",
-        lower = 1.49011611938477e-08,
-        est = 0.1,
-        upper = Inf,
-        fix = TRUE,
-        err = "add",
-        label = NA_character_,
-        condition = NA_character_,
-        stringsAsFactors = FALSE
-      ),
-      addMissingCols = TRUE
-    )
-
-  bnd4 <- function() {
-    err ~ prop(0.1)
-  }
-
-  ref4 <-
-    as.nlmixrBounds(
-      data.frame(
-        ntheta = 1,
-        neta1 = NA_real_,
-        neta2 = NA_real_,
-        name = "err",
-        lower = 1.49011611938477e-08,
-        est = 0.1,
-        upper = Inf,
-        fix = TRUE,
-        err = "prop",
-        label = NA_character_,
-        condition = NA_character_,
-        stringsAsFactors = FALSE
-      ),
-      addMissingCols = TRUE
-    )
-
-  expect_equal(nlmixrBounds(bnd1), ref1)
-  expect_equal(nlmixrBounds(bnd4), ref4)
-})
-
 test_that("Theta fix fixed are reasonable", {
   ref1 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = 1:4,
         neta1 = NA_real_,
@@ -664,7 +610,7 @@ test_that("Theta fix fixed are reasonable", {
   expect_equal(nlmixrBounds(bnd8), ref1)
 
   ref2 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = 1,
         neta1 = NA_real_,
@@ -693,7 +639,7 @@ test_that("Theta fix fixed are reasonable", {
 
 test_that("Total ETA fixed (unnamed)", {
   ref1 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -720,7 +666,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref2 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -778,7 +724,7 @@ test_that("Total ETA fixed (unnamed)", {
 
 test_that("Total ETA fixed (unnamed)", {
   ref6 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -805,7 +751,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref7 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -832,7 +778,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref8 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -859,7 +805,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref9 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -886,7 +832,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref10 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -913,7 +859,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref11 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -949,7 +895,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref7 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -976,7 +922,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref8 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1003,7 +949,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref9 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1030,7 +976,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref10 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1057,7 +1003,7 @@ test_that("Total ETA fixed (unnamed)", {
   }
 
   ref11 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1093,7 +1039,7 @@ test_that("Total ETA fixed (unnamed)", {
 
 test_that("Total ETA fixed (unnamed) #a", {
   ref6 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1111,7 +1057,7 @@ test_that("Total ETA fixed (unnamed) #a", {
       addMissingCols = TRUE
     )
   ref7 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1129,7 +1075,7 @@ test_that("Total ETA fixed (unnamed) #a", {
       addMissingCols = TRUE
     )
   ref8 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1147,7 +1093,7 @@ test_that("Total ETA fixed (unnamed) #a", {
       addMissingCols = TRUE
     )
   ref9 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1165,7 +1111,7 @@ test_that("Total ETA fixed (unnamed) #a", {
       addMissingCols = TRUE
     )
   ref10 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1183,7 +1129,7 @@ test_that("Total ETA fixed (unnamed) #a", {
       addMissingCols = TRUE
     )
   ref11 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1306,7 +1252,7 @@ test_that("Total ETA fixed (unnamed) #a", {
 
 test_that("Total ETA fixed (unnamed) #b", {
   ref6 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1324,7 +1270,7 @@ test_that("Total ETA fixed (unnamed) #b", {
       addMissingCols = TRUE
     )
   ref7 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1342,7 +1288,7 @@ test_that("Total ETA fixed (unnamed) #b", {
       addMissingCols = TRUE
     )
   ref8 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1360,7 +1306,7 @@ test_that("Total ETA fixed (unnamed) #b", {
       addMissingCols = TRUE
     )
   ref9 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1378,7 +1324,7 @@ test_that("Total ETA fixed (unnamed) #b", {
       addMissingCols = TRUE
     )
   ref10 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1396,7 +1342,7 @@ test_that("Total ETA fixed (unnamed) #b", {
       addMissingCols = TRUE
     )
   ref11 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1519,7 +1465,7 @@ test_that("Total ETA fixed (unnamed) #b", {
 
 test_that("Total ETA fixed (unnamed) #c", {
   ref6 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1537,7 +1483,7 @@ test_that("Total ETA fixed (unnamed) #c", {
       addMissingCols = TRUE
     )
   ref7 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1555,7 +1501,7 @@ test_that("Total ETA fixed (unnamed) #c", {
       addMissingCols = TRUE
     )
   ref8 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1573,7 +1519,7 @@ test_that("Total ETA fixed (unnamed) #c", {
       addMissingCols = TRUE
     )
   ref9 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1591,7 +1537,7 @@ test_that("Total ETA fixed (unnamed) #c", {
       addMissingCols = TRUE
     )
   ref10 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1609,7 +1555,7 @@ test_that("Total ETA fixed (unnamed) #c", {
       addMissingCols = TRUE
     )
   ref11 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1733,7 +1679,7 @@ test_that("Total ETA fixed (unnamed) #c", {
 
 test_that("Total ETA FIXED (named)", {
   ref12 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1760,7 +1706,7 @@ test_that("Total ETA FIXED (named)", {
   }
 
   ref13 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1819,7 +1765,7 @@ test_that("Total ETA FIXED (named)", {
   })
 
   ref17 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1847,7 +1793,7 @@ test_that("Total ETA FIXED (named)", {
 
 
   ref18 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1874,7 +1820,7 @@ test_that("Total ETA FIXED (named)", {
   }
 
   ref19 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1901,7 +1847,7 @@ test_that("Total ETA FIXED (named)", {
   }
 
   ref20 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1928,7 +1874,7 @@ test_that("Total ETA FIXED (named)", {
   }
 
   ref21 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -1955,7 +1901,7 @@ test_that("Total ETA FIXED (named)", {
   }
 
   ref22 <-
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = NA_real_,
         neta1 = c(1, 2, 2, 3, 3, 3),
@@ -2293,7 +2239,7 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
     nlmixrBounds(function() {
       ~1
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         neta1 = 1,
         neta2 = 1,
@@ -2313,7 +2259,7 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
     nlmixrBounds(function() {
       a ~ 1
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         neta1 = 1,
         neta2 = 1,
@@ -2337,7 +2283,7 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
       regexp = "'cor(...)' with a single value is ignored: ~cor(1)",
       fixed = TRUE
     ),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         neta1 = 1,
         neta2 = 1,
@@ -2357,7 +2303,7 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
     nlmixrBounds(function() {
       a + b ~ cor(2, -0.5, 3)
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         neta1 = c(1, 2, 2),
         neta2 = c(1, 1, 2),
@@ -2377,7 +2323,7 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
     nlmixrBounds(function() {
       a + b ~ fixed(cor(2, -0.5, 3))
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         neta1 = c(1, 2, 2),
         neta2 = c(1, 1, 2),
@@ -2397,7 +2343,7 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
     nlmixrBounds(function() {
       a + b ~ cor(fixed(2, -0.5, 3))
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         neta1 = c(1, 2, 2),
         neta2 = c(1, 1, 2),
@@ -2417,7 +2363,7 @@ test_that("Implicitly test nlmixrBoundsParserOmega", {
     nlmixrBounds(function() {
       a + b ~ cor(fixed(2), fixed(-0.5), fixed(3))
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         neta1 = c(1, 2, 2),
         neta2 = c(1, 1, 2),
@@ -2451,7 +2397,7 @@ test_that("nlmixrBoundsParserAttribute backTransform", {
       0.1
       backTransform(exp())
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = 1,
         lower = -Inf,
@@ -2470,7 +2416,7 @@ test_that("nlmixrBoundsParserAttribute backTransform", {
       0.1
       backTransform(exp)
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = 1,
         lower = -Inf,
@@ -2489,7 +2435,7 @@ test_that("nlmixrBoundsParserAttribute backTransform", {
       0.1
       backTransform("exp")
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = 1,
         lower = -Inf,
@@ -2513,7 +2459,7 @@ test_that("nlmixrBoundsParserAttribute backTransform", {
       regexp = 'only last backTransform used: backTransform("log")',
       fixed = TRUE
     ),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = 1,
         lower = -Inf,
@@ -2532,7 +2478,7 @@ test_that("nlmixrBoundsParserAttribute backTransform", {
       0.1
       backTransform(function(x) x^2)
     }),
-    as.nlmixrBounds(
+    nlmixr:::as.nlmixrBounds(
       data.frame(
         ntheta = 1,
         lower = -Inf,
@@ -2771,7 +2717,7 @@ test_that("nlmixrBoundsReplaceFixed, testing replacement of fixed function calls
 
 test_that("", {
   expect_equal(
-    nlmixrBoundsValueCor(x = (~ cor(1, 2, 3))[[2]]),
+    nlmixr:::nlmixrBoundsValueCor(x = (~ cor(1, 2, 3))[[2]]),
     list(
       value = 1:3,
       fixed = rep(FALSE, 3),
@@ -2779,7 +2725,7 @@ test_that("", {
     )
   )
   expect_equal(
-    nlmixrBoundsValueCor(x = (~ cor(1, fixed(2), 3))[[2]]),
+    nlmixr:::nlmixrBoundsValueCor(x = (~ cor(1, fixed(2), 3))[[2]]),
     list(
       value = 1:3,
       fixed = c(FALSE, TRUE, FALSE),
@@ -2787,7 +2733,7 @@ test_that("", {
     )
   )
   expect_equal(
-    nlmixrBoundsValueCor(x = (~ fixed(cor(1, fixed(2), 3)))[[2]]),
+    nlmixr:::nlmixrBoundsValueCor(x = (~ fixed(cor(1, fixed(2), 3)))[[2]]),
     list(
       value = 1:3,
       fixed = rep(TRUE, 3),
@@ -2796,7 +2742,7 @@ test_that("", {
     info = "Unusual syntax works"
   )
   expect_equal(
-    nlmixrBoundsValueCor(x = (~ c(1, fixed(2), cor(3)))[[2]]),
+    nlmixr:::nlmixrBoundsValueCor(x = (~ c(1, fixed(2), cor(3)))[[2]]),
     list(
       value = 1:3,
       fixed = c(FALSE, TRUE, FALSE),
@@ -2805,7 +2751,7 @@ test_that("", {
     info = "Legitimacy of syntax checking will be confirmed elsewhere"
   )
   expect_equal(
-    nlmixrBoundsValueCor(x = (~ c(1, 2, cor(3), fixed))[[2]]),
+    nlmixr:::nlmixrBoundsValueCor(x = (~ c(1, 2, cor(3), fixed))[[2]]),
     list(
       value = 1:3,
       fixed = c(TRUE, TRUE, TRUE),
