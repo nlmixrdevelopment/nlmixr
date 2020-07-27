@@ -293,6 +293,13 @@ addCovVar <- function(fitobject,
   }
 
   if (covariate %in% colnames(data)) {
+    
+    # infer categorical covariates if not specified
+    if(missing(categorical) && is.factor(data[,covariate])){
+      categorical = TRUE
+      cli::cli_alert_info('treating {covariate} as categorical variable ...')
+    }
+
     if (inherits(norm, "numeric")) {
       normValVec <- norm
     }
@@ -300,19 +307,15 @@ addCovVar <- function(fitobject,
       if (norm %in% "autoscale") {
         normValVecMean <- mean(data[, covariate])
         normValVecSd <- sd(data[, covariate])
-
+        
+        if (normValVecSd==0){
+          # if (!categorical){  # print warning only for non-categorical variables
+          #   cli::cli_alert_warning('normalization value for subject ID: {x} is zero; using with 1...')
+          # }
+          normValVecSd = 1
+        }
+        
         normValVec <- list(normValVecMean, normValVecSd)
-
-        # uids <- unlist(unname(data[uidCol]))
-        # normValVecMean <- lapply(uids, function(x) {
-        #   datSlice <- data[data[uidCol] == x, ]
-        #   normVal <- mean(unlist(datSlice[covariate]))
-        # })
-        #
-        # normValVecSd <- lapply(uids, function(x) {
-        #   datSlice <- data[data[uidCol] == x, ]
-        #   normVal <- sd(unlist(datSlice[covariate]))
-        # })
       }
 
       else if (norm %in% "mean") {
@@ -322,7 +325,9 @@ addCovVar <- function(fitobject,
           datSlice <- data[data[,uidCol] == x, ]
           normVal <- mean(unlist(datSlice[covariate]))
           if (normVal==0){
-            cli::cli_alert_warning('normalization value for subject ID: {x} is zero; using with 1...')
+            if (!categorical && !all(unlist(datSlice[covariate])==0)){  # print warning only for non-categorical variables
+              cli::cli_alert_warning('normalization value for subject ID: {x} is zero; using with 1...')
+            }
             normVal = 1
           }
           
@@ -338,7 +343,9 @@ addCovVar <- function(fitobject,
           datSlice <- data[data[,uidCol] == x, ]
           normVal <- median(unlist(datSlice[covariate]))
           if (normVal==0){
-            cli::cli_alert_warning('normalization value for subject ID: {x} is zero; using 1 instead...')
+            if (!categorical && !all(unlist(datSlice[covariate])==0)){  # print warning only for non-categorical variables
+              cli::cli_alert_warning('normalization value for subject ID: {x} is zero; using with 1...')
+            }
             normVal = 1
           }
           normVal
@@ -573,7 +580,6 @@ performNorm <- function(data,
     if (varName %in% c("cl")) {
       # with 0.75 prefactor
       for (datColName in datColNames) {
-        print(log(data[, datColName]))
         if (!all(is.finite(log(data[, datColName])))){
           stop('non-finite values encountered in log-normalization. aborting...', call. = FALSE)
         }
@@ -707,6 +713,8 @@ removeCovMultiple <- function(covInfo, fitobject) {
 
     fit2 <-
       suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
+    
+    AIC(fit2)
 
     .env$covSearchRes[[idx]] <- list(fit2, c(x$covariate, x$varName), covNames)
   })
@@ -742,6 +750,8 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 
       fit2 <-
         suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
+      
+      AIC(fit2)
 
       .env$covSearchRes[[idx]] <- list(fit2, c(x$covariate, x$varName), covNames)
     })
@@ -761,7 +771,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       covNames = res[[3]]
 
       if (length(covsAdded) == 0) {
-        # covsAdded[[covsAddedIdx]] <- paste0(x$covariate, x$varName)
+        # covsAdded[[covsAddedIdx]] <- paste0(x$covariate, x$varName) 
         covsAdded[[covsAddedIdx]] <- c(x$covariate, x$varName)
         
         fit2 <-
@@ -807,7 +817,7 @@ covarSearchAuto <-  # unsuccessful runs info store; check for covInformation bef
            covarsVec,
            pVal = list(fwd=0.05, bck=0.01),  # diff default vals for fwd and backward
            covInformation = NULL,
-           testAll = TRUE,
+           catCovariates=NULL, 
            searchType = c("scm", "forward", "backward"),
            restart = FALSE) {
     
@@ -832,24 +842,26 @@ covarSearchAuto <-  # unsuccessful runs info store; check for covInformation bef
       dir.create(outputDir) # create a fresh directory
     }
 
-    if (testAll) {
-      possiblePerms <- expand.grid(varsVec, covarsVec)
-      possiblePerms <-
-        list(
-          as.character(possiblePerms[[1]]),
-          as.character(possiblePerms[[2]])
-        )
-      names(possiblePerms) <- c("vars", "covars")
-    }
-    else {
-      possiblePerms <-
-        list(names(relationsVarCovar), unlist(unname(relationsVarCovar)))
-      names(possiblePerms) <- c("vars", "covars")
-    }
+    possiblePerms <- expand.grid(varsVec, covarsVec)
+    possiblePerms <-
+      list(
+        as.character(possiblePerms[[1]]),
+        as.character(possiblePerms[[2]])
+      )
+    names(possiblePerms) <- c("vars", "covars")
 
-    covInfo <- list()
+
+    covInfo <- list()  # reversivle listVarName!!
     for (item in Map(list, possiblePerms$vars, possiblePerms$covars)) {
       listVarName <- paste0(item[[2]], item[[1]])
+      
+      if (item[[2]] %in% catCovariates){
+        covInformation[[listVarName]]$categorical=TRUE
+      }
+      else{
+        covInformation[[listVarName]]$categorical=FALSE
+      }
+      
       if (listVarName %in% names(covInformation)) {
         covInfo[[listVarName]] <- c(list(varName = item[[1]], covariate = item[[2]]), covInformation[[listVarName]])
       }
@@ -1168,14 +1180,21 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
 }
 
 
-# fitDapto = readRDS('daptomycin.Rds')
-# varsVec = c("cl", 'v1')
-# covarsVec = c("SEX")
-# 
-# covarSearchAuto(fitDapto, varsVec, covarsVec, covInformation=NULL, restart = T)
+# check for AIC before running anything! - trycatch
 
+# 
+# fitDapto = readRDS('daptomycin.Rds')
+# varsVec = c('cl')
+# covarsVec = c('WT')
+# covarSearchAuto(fitDapto, varsVec, covarsVec, catCovariates = c('SEX'), restart = T)
 
 # covarSearchAuto(fitDapto, varsVec, covarsVec, covInformation=list(SEXcl=list(categorical=TRUE), SEXv1=list(categorical=TRUE)), restart = T)
+
+
+# covarsVec = c("SEX", 'WT')
+# 
+# # covarSearchAuto(fitDapto, varsVec, covarsVec, covInformation=NULL, restart = T)
+# 
 
 # fun.txt: "    cl = exp(tcl+eta.cl)\n    q = exp(tq+eta.q)\n    v1 = exp(tv1+eta.v1)\n    v2=exp(tv2+eta.v2)\n    cp = linCmt()\n    cp ~ add(add.err)"
 # data colnames: "id"    "time"  "CL"    "V1"    "Q"     "V2"    "A1"    "A2"    "Cp"    "centr" "peri"  "CRCL"  "WT"    "SEX"   "AGE"   "DV"
