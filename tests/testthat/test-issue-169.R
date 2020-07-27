@@ -1,6 +1,4 @@
-
-RxODE::rxPermissive(
-  {
+nlmixrTest({
     context("Make sure SAEM/nlme throws an error with time varying covariates")
     test_that("Error w/time-varying covariates", {
       d <- theo_sd
@@ -38,5 +36,5 @@ RxODE::rxPermissive(
       expect_true(inherits(f, "nlmixrFOCEi"))
     })
   },
-  on.validate = "NLMIXR_VALIDATION"
+  test = "cran"
 )

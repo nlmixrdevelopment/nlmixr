@@ -1,4 +1,4 @@
-rxPermissive({
+nlmixrTest({
   context("Test FO, FOCE, and FOCEi objective functions")
 
   ## For some reason the ODE and solved FOCE proportional models
@@ -529,4 +529,4 @@ rxPermissive({
   test_that("Matches NONMEM objective Yeo-Johnson error FO; ODE (Based on Wang2007)", {
     expect_equal(round(fit.yeoJohnson2$objective, 3), 62.677)
   })
-})
+}, test="focei")

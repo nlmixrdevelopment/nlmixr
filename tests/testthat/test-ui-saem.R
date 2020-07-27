@@ -1,4 +1,4 @@
-rxPermissive({
+nlmixrTest({
   context("UI SAEM tests")
 
   m1 <- function() {
@@ -75,4 +75,4 @@ rxPermissive({
     expect_equal(c(200, 60, 1.5, 0.75, 1, NA), m1$saem.init.theta)
     expect_equal(c("lCl", "AllomCL", "lVc", "AllomV", "lKA"), m1$saem.theta.name)
   })
-})
+}, test="saem")

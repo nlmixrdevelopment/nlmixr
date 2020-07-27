@@ -1,5 +1,5 @@
-library(RxODE)
-rxPermissive({
+nlmixrTest({
+
   f <- function() {
     ini({
       popKe <- 0.5
@@ -47,4 +47,4 @@ rxPermissive({
   }
 
   lapply(c("focei", "foce", "foi", "fo"), testIt)
-})
+}, test="focei")

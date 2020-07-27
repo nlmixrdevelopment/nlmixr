@@ -1,4 +1,5 @@
-rxPermissive({
+nlmixrTest({
+
   context("full cov FOCEi (posthoc surrogate)")
 
   library(dplyr)
@@ -49,4 +50,5 @@ rxPermissive({
 
   f <- nlmixr(One.SD.ODE, dat, "posthoc")
   expect_true(inherits(f, "nlmixrPosthoc"))
-})
+
+}, test="focei")

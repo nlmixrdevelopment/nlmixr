@@ -1,5 +1,4 @@
-rxPermissive(
-  {
+nlmixrTest({
     context("Bad UI models should raise errors")
 
     test_that("Duplicate parameters raise errors", {
@@ -29,7 +28,7 @@ rxPermissive(
         })
       }
 
-      expect_error(nlmixr(uif), rex::rex("The following parameter names were duplicated: eta.Cl."))
+      expect_error(nlmixr(uif), rex::rex("duplicated parameter names: 'eta.Cl'"))
     })
 
     test_that("Un-estimated paramteres raise errors", {
@@ -208,7 +207,6 @@ rxPermissive(
 
       expect_error(nlmixr(uif), rex::rex("The following parameters initial estimates are NA: tka"))
 
-
       uif <- function() {
         ini({
           tka <- 3
@@ -255,5 +253,5 @@ rxPermissive(
       expect_error(nlmixr(uif), "There must be at least one prediction")
     })
   },
-  on.validate = "NLMIXR_VALIDATION"
+ test="cran"
 )

@@ -161,5 +161,5 @@ nlmixrTest(
     })
   },
   silent = TRUE,
-  test = "lvl2"
+  test = "bootstrap"
 )

@@ -1,4 +1,4 @@
-rxPermissive({
+nlmixrTest({
   tol <- 1e-5
   ## From https://raw.githubusercontent.com/bbolker/broom.mixed/master/tests/testthat/helper-checkers.R
 
@@ -557,4 +557,4 @@ rxPermissive({
     expect_equal(td1, td2, tolerance = tol)
     expect_equal(td2, td3, tolerance = tol)
   })
-})
+}, test="broom")

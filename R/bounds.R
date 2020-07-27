@@ -333,6 +333,10 @@ as.nlmixrBounds <- function(df, addMissingCols = FALSE) {
   nlmixrBoundsSuggest(
     varname = df$name, lower = df$lower, est = df$est, upper = df$upper, fixed = df$fix
   )
+  .w <- which(!is.finite(df$est))
+  if (length(.w) > 0) stop("infinite/NA initial parameters: '",
+                           paste(df$name[.w], collapse="', '"),
+                           "'", call.=FALSE)
   w <- which(df$lower == 0)
   if (length(w) > 0) df$lower[w] <- sqrt(.Machine$double.eps)
   w <- which(df$upper == 0)

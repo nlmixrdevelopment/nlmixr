@@ -1,4 +1,5 @@
-rxPermissive({
+nlmixrTest({
+
   one.compartment <- function() {
     ini({
       tka <- 0.45 # Log Ka
@@ -204,4 +205,5 @@ rxPermissive({
       0.01, 0.2
     )))
   })
-})
+
+}, test="cran")
