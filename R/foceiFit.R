@@ -2553,7 +2553,8 @@ plot.nlmixrFitData <- function(x, ...) {
       ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
       ggplot2::geom_point() +
       xlab("Predictions") +
-      ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
+      ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED") +
+      RxODE::rxTheme()
     .lst[[length(.lst) + 1]] <- .p1
 
     if (.hasCwres) {
@@ -2564,7 +2565,8 @@ plot.nlmixrFitData <- function(x, ...) {
         ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
         ggplot2::geom_point() +
         xlab("Predictions") +
-        ggplot2::ggtitle(.cmt, "DV vs CPRED/IPRED")
+        ggplot2::ggtitle(.cmt, "DV vs CPRED/IPRED") +
+        RxODE::rxTheme()
       .lst[[length(.lst) + 1]] <- .p1
     }
 
@@ -2576,58 +2578,67 @@ plot.nlmixrFitData <- function(x, ...) {
         ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
         ggplot2::geom_point() +
         xlab("Predictions") +
-        ggplot2::ggtitle(.cmt, "DV vs EPRED/IPRED")
+        ggplot2::ggtitle(.cmt, "DV vs EPRED/IPRED") +
+        RxODE::rxTheme()
       .lst[[length(.lst) + 1]] <- .p1
     }
 
     .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "IPRED", y = "IRES")) +
       ggplot2::geom_point() +
       ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-      ggplot2::ggtitle(.cmt, "IRES vs IPRED")
+      ggplot2::ggtitle(.cmt, "IRES vs IPRED") +
+      RxODE::rxTheme()
     .lst[[length(.lst) + 1]] <- .p2
 
     .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "TIME", y = "IRES")) +
       ggplot2::geom_point() +
       ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-      ggplot2::ggtitle(.cmt, "IRES vs TIME")
+      ggplot2::ggtitle(.cmt, "IRES vs TIME") +
+      RxODE::rxTheme()
     .lst[[length(.lst) + 1]] <- .p2
 
     .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "IPRED", y = "IWRES")) +
       ggplot2::geom_point() +
       ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-      ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
+      ggplot2::ggtitle(.cmt, "IWRES vs IPRED") +
+      RxODE::rxTheme()
     .lst[[length(.lst) + 1]] <- .p2
 
     .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "TIME", y = "IWRES")) +
       ggplot2::geom_point() +
       ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-      ggplot2::ggtitle(.cmt, "IWRES vs IPRED")
+      ggplot2::ggtitle(.cmt, "IWRES vs IPRED")+
+      RxODE::rxTheme()
     .lst[[length(.lst) + 1]] <- .p2
 
     if (.hasCwres) {
       .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "CPRED", y = "CWRES")) +
         ggplot2::geom_point() +
         ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-        ggplot2::ggtitle(.cmt, "CWRES vs CPRED")
+        ggplot2::ggtitle(.cmt, "CWRES vs CPRED") +
+        RxODE::rxTheme()
       .lst[[length(.lst) + 1]] <- .p2
 
       .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "TIME", y = "CWRES")) +
         ggplot2::geom_point() +
         ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-        ggplot2::ggtitle(.cmt, "CWRES vs CPRED")
+        ggplot2::ggtitle(.cmt, "CWRES vs CPRED")+
+        RxODE::rxTheme()
       .lst[[length(.lst) + 1]] <- .p2
     }
     if (.hasNpde) {
       .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "EPRED", y = "NPDE")) +
         ggplot2::geom_point() +
         ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-        ggplot2::ggtitle(.cmt, "NPDE vs EPRED")
+        ggplot2::ggtitle(.cmt, "NPDE vs EPRED") +
+        RxODE::rxTheme()
       .lst[[length(.lst) + 1]] <- .p2
 
       .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "TIME", y = "NPDE")) +
         ggplot2::geom_point() +
         ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-        ggplot2::ggtitle(.cmt, "NPDE vs EPRED")
+        ggplot2::ggtitle(.cmt, "NPDE vs EPRED") +
+        RxODE::rxTheme()
       .lst[[length(.lst) + 1]] <- .p2
     }
     ## .idPlot <- try(plot.nlmixrAugPred(nlmixrAugPred(object)));
@@ -2646,7 +2657,8 @@ plot.nlmixrFitData <- function(x, ...) {
         ggplot2::geom_line(aes(x = TIME, y = IPRED), col = "red", size = 1.2) +
         ggplot2::geom_line(aes(x = TIME, y = PRED), col = "blue", size = 1.2) +
         ggplot2::facet_wrap(~ID) +
-        ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s)))
+        ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s))) +
+        RxODE::rxTheme()
       .lst[[length(.lst) + 1]] <- .p3
     }
   }
@@ -2932,6 +2944,7 @@ traceplot.nlmixrFitCore <- function(x, ...) {
     if (!is.null(x$mcmc)) {
       .p0 <- .p0 + ggplot2::geom_vline(xintercept = x$mcmc$niter[1], col = "blue", size = 1.2)
     }
+    .p0 <- .p0 + RxODE::rxTheme()
     return(.p0)
   } else {
     return(invisible(NULL))
