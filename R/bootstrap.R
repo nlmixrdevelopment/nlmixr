@@ -38,6 +38,7 @@ addConfboundsToVar <-
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' one.cmt <- function() {
 #'   ini({
 #'     ## You may label each parameter with a comment
@@ -66,6 +67,7 @@ addConfboundsToVar <-
 #' bootstrapFit(fit)
 #' bootstrapFit(fit, nboot = 5, restart = TRUE) # overwrites any of the existing data or model files
 #' bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
+#' }
 bootstrapFit <- function(fit,
                          nboot = 500,
                          nSampIndiv,
@@ -184,7 +186,6 @@ bootstrapFit <- function(fit,
   covMatrix <- cov(getData(fit), getData(fit))
   corMatrix <- cor(getData(fit), getData(fit))
 
-
   assign("deltOBJF", deltOBJF, envir = fit$env)
   assign("bootstrapBias", bootstrapBias, envir = fit$env)
   assign("covMatrix", covMatrix, envir = fit$env)
@@ -195,52 +196,90 @@ bootstrapFit <- function(fit,
 
   # plot histogram
   if (plotHist) {
-    df <-
-      data.frame(
-        deltOBJF = abs(unlist(deltOBJF)),
-        refDistr = rchisq(1000, df = length(fit$ini$est)),
-        criticalVal = qchisq(1 - 0.005, df = length(fit$ini$est))
-      )
 
-    .plot <- ggplot2::ggplot(df) +
-      ggplot2::geom_density(
-        aes(x = deltOBJF, color = "delta objective function"),
-        fill = "blue",
-        color = NA,
-        alpha = 0.2
-      ) +
-      ggplot2::geom_density(
-        aes(x = refDistr, color = "reference distribution"),
-        fill = "red",
-        color = NA,
-        alpha = 0.2
-      ) +
-      ggplot2::xlab("\u0394 Objective function") +
-      ggplot2::ylab("Density")
-    .plot <- .plot + RxODE::rxTheme()
+    .deltaO <- sort(abs(unlist(deltOBJF)))
+
+    .deltaN <- length(.deltaO)
+
+    .df <- length(fit$ini$est)
+
+    .chisq <- rbind(data.frame(deltaofv=qchisq(seq(0,0.99,0.01),df=.df),
+                               quantiles=seq(0,0.99,0.01),
+                               Distribution=1L,
+                               stringsAsFactors = FALSE),
+                    data.frame(deltaofv=.deltaO,
+                               quantiles=seq(.deltaN) / .deltaN,
+                               Distribution=2L,
+                               stringsAsFactors = FALSE))
+
+    .fdelta <- approxfun(seq(.deltaN) / .deltaN, .deltaO)
+
+    .df2 <- round(mean(.deltaO, na.rm=TRUE))
+
+    .dfD <- data.frame(label=paste(c("df\u2248", "df="), c(.df2, .df)),
+                       Distribution=c(2L, 1L),
+                       quantiles=0.7,
+                       deltaofv=c(.fdelta(0.7), qchisq(0.7, df=.df))
+                       )
+
+    .dfD$Distribution <- factor(.dfD$Distribution, c(1L, 2L),
+                                c("Reference distribution", "\u0394 objective function"))
+
+    .chisq$Distribution <- factor(.chisq$Distribution, c(1L, 2L),
+                                  c("Reference distribution", "\u0394 objective function"))
+
+    assign(".chisq", .chisq, globalenv())
+
+    .plot <- ggplot2::ggplot(.chisq, aes(quantiles, deltaofv, color=Distribution)) +
+      ggplot2::geom_line() + ggplot2::ylab("\u0394 objective function") +
+      ggplot2::geom_text(data=.dfD, aes(label=label), hjust=0) +
+      ggplot2::xlab("Distribution quantiles") +
+      ggplot2::scale_color_manual(values=c("red", "blue")) +
+      RxODE::rxTheme() +
+      ggplot2::theme(legend.position="bottom",legend.box="horizontal")
+
     if (requireNamespace("ggtext", quietly = TRUE)) {
       .plot <- .plot +
-        ggplot2::theme(plot.title = ggtext::element_markdown()) +
+        ggplot2::theme(plot.title = ggtext::element_markdown(),
+                       legend.position="none") +
         ggplot2::labs(
           title = paste0(
-            'Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', nboot,
-            ' models)</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
+            'Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', .deltaN,
+            ' models, df\u2248', .df2, ')</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
             length(fit$ini$est), ")</style>"
           ),
           caption = "\u0394 objective function curve should be on or below the reference distribution curve"
         )
     } else {
       .plot <- ggplot2::labs(
-        title = paste0("Distribution of \u0394 objective function values for ", nboot, " models"),
+        title = paste0("Distribution of \u0394 objective function values for ", .deltaN, ' df=', .df2, " models"),
         caption = "\u0394 objective function curve should be on or below the reference distribution curve"
       )
     }
 
-    .plot
+
+
+    ## df <-
+    ##   data.frame(
+    ##     vals = c(.deltaO, rchisq(2000, df = length(fit$ini$est))),
+    ##     Distribution=factor(c(rep(1, length(.deltaO)), rep(2, 2000)),
+    ##                         levels=c(1, 2), labels=c("delta objective function", "reference distribution"))
+    ##   )
+
+    ## .plot <- ggplot2::ggplot(df, ggplot2::aes(vals, fill=Distribution)) +
+    ##   ggplot2::geom_density( color = NA, alpha = 0.2) +
+    ##   ggplot2::xlab("\u0394 Objective function") +
+    ##   ggplot2::ylab("Density") +
+    ##   ggplot2::scale_fill_manual(values=c("red", "blue"))
+    ## .plot <- .plot + RxODE::rxTheme(grid=FALSE)
+
+
+    ## .plot
     ## +
     ##   ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
     ##                                                   'reference distribution' = 'red')) +
     ##   RxODE::rxTheme()
+    .plot
   }
 }
 
