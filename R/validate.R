@@ -47,7 +47,7 @@ nlmixrValidate <- function(type = NULL, check = FALSE) {
           Sys.unsetenv("nmCran")
         })
         Sys.setenv(nmCran = "true")
-        path <- file.path(system.file("tests", package = "RxODE"),
+        path <- file.path(system.file("tests", package = "nlmixr"),
                           "testthat")
         setwd(path)
         pt <- proc.time()
