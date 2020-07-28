@@ -102,4 +102,4 @@ nlmixrTest({
   expect_false(isTRUE(all.equal(f.foce$objf, f.foceL4$objf)))
   expect_false(isTRUE(all.equal(f.foceL$objf, f.foceL4$objf)))
 },
-test="cran")
+test="focei")

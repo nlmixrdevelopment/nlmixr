@@ -60,14 +60,13 @@ sys1 <- RxODE(model = ode)
 
 
 ## ------------------------------------------------------------------------
-dat <- read.table("invgaussian.txt", header=TRUE)
+dat <- read.table("invgaussian.txt", header = TRUE)
 mod <- cp ~ C2 + prop(.1)
-inits <- c(MIT=190, CVI2=.65, F=.92)
-fixPars <- c(CL=.0793, V2=.64, Q=.292, V3=9.63)
+inits <- c(MIT = 190, CVI2 = .65, F = .92)
+fixPars <- c(CL = .0793, V2 = .64, Q = .292, V3 = 9.63)
 ev <- eventTable()
 ev$add.sampling(c(0, dat$time))
 (fit <- dynmodel.mcmc(sys1, mod, ev, inits, dat, fixPars))
-
 }
 }
 \author{
