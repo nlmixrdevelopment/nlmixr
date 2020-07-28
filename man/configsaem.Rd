@@ -47,44 +47,43 @@ Fit a generalized nonlinear mixed-effect model by he Stochastic
 \dontrun{
 library(nlmixr)
 
-#ode <- "d/dt(depot) =-KA*depot;
+# ode <- "d/dt(depot) =-KA*depot;
 #        d/dt(centr) = KA*depot - KE*centr;"
-#m1 = RxODE(ode, modName="m1")
-#ode <- "C2 = centr/V;
+# m1 = RxODE(ode, modName="m1")
+# ode <- "C2 = centr/V;
 #      d/dt(depot) =-KA*depot;
 #      d/dt(centr) = KA*depot - KE*centr;"
-#m2 = RxODE(ode, modName="m2")
+# m2 = RxODE(ode, modName="m2")
 
-#Note: only use the '=' assignment, not the '<-' at this point
+# Note: only use the '=' assignment, not the '<-' at this point
 
-PKpars = function()
-{
-  CL = exp(lCL)
-  V  = exp(lV)
-  KA = exp(lKA)
-  KE = CL / V
-  #initCondition = c(0, KE - CL/V)
+PKpars <- function() {
+  CL <- exp(lCL)
+  V <- exp(lV)
+  KA <- exp(lKA)
+  KE <- CL / V
+  # initCondition = c(0, KE - CL/V)
 }
-PRED = function() centr / V
-PRED2 = function() C2
+PRED <- function() centr / V
+PRED2 <- function() C2
 
-saem_fit <- gen_saem_user_fn(model=lincmt(ncmt=1, oral=T))
-#saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
-#saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
+saem_fit <- gen_saem_user_fn(model = lincmt(ncmt = 1, oral = T))
+# saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
+# saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
 
 
 #--- saem cfg
-nmdat = theo_sd
-model = list(saem_mod=saem_fit, covars="WT")
-inits = list(theta=c(.05, .5, 2))
-cfg   = configsaem(model, nmdat, inits)
-cfg$print = 50
+nmdat <- theo_sd
+model <- list(saem_mod = saem_fit, covars = "WT")
+inits <- list(theta = c(.05, .5, 2))
+cfg <- configsaem(model, nmdat, inits)
+cfg$print <- 50
 
-#cfg$Rfn = nlmixr:::Ruser_function_cmt
-#dyn.load("m1.d/m1.so");cfg$Rfn = nlmixr:::Ruser_function_ode
-fit = saem_fit(cfg)
-df = simple.gof(fit)
-xyplot(DV~TIME|ID, df, type=c("p","l"), lwd=c(NA,1), pch=c(1,NA), groups=grp)
+# cfg$Rfn = nlmixr:::Ruser_function_cmt
+# dyn.load("m1.d/m1.so");cfg$Rfn = nlmixr:::Ruser_function_ode
+fit <- saem_fit(cfg)
+df <- simple.gof(fit)
+xyplot(DV ~ TIME | ID, df, type = c("p", "l"), lwd = c(NA, 1), pch = c(1, NA), groups = grp)
 fit
 }
 }

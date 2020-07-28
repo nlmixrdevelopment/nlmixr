@@ -31,6 +31,7 @@ bootstrapFit(
 Bootstrap input dataset and rerun the model to get confidence bounds and aggregated parameters
 }
 \examples{
+\dontrun{
 one.cmt <- function() {
   ini({
     ## You may label each parameter with a comment
@@ -59,6 +60,7 @@ fit <- nlmixr(one.cmt, theo_sd, "focei")
 bootstrapFit(fit)
 bootstrapFit(fit, nboot = 5, restart = TRUE) # overwrites any of the existing data or model files
 bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
+}
 }
 \author{
 Vipul Mann, Matthew Fidler
