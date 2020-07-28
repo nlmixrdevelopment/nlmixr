@@ -65,7 +65,7 @@ plot.nlmixrFitData <- function(x, ...) {
     .dat0 <- .dat[.dat$CMT == .cmt, ]
     .hasCwres <- any(names(.dat0) == "CWRES")
     .hasNpde <- any(names(.dat0) == "NPDE")
-    .p1 <- .dvPlot(.dat0, c("PRED", "IPRED"))
+    .p1 <- .dvPlot(.dat0, c("PRED", "IPRED")) +
       ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
     .lst[[length(.lst) + 1]] <- .p1
 
