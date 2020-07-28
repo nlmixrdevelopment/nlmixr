@@ -194,6 +194,9 @@ plot.nlmixrFitData <- function(x, ...) {
         ggplot2::facet_wrap(~ID) +
         ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s))) +
         RxODE::rxTheme()
+      if (any(names(.d1) == "lowerLim")) {
+        .p3 <- .p3 + geom_cens(aes(lower=lowerLim, upper=upperLim), fill="purple")
+      }
       .lst[[length(.lst) + 1]] <- .p3
     }
   }
