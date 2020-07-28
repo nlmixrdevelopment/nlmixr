@@ -25,10 +25,8 @@
 #' @examples
 #' gauss.quad(5)
 #' @export
-gauss.quad <- function(n)
-{
-    s <- fastGHQuad::gaussHermiteData(n)
-    names(s) = c("nodes", "weights")
-    s
+gauss.quad <- function(n) {
+  s <- fastGHQuad::gaussHermiteData(n)
+  names(s) <- c("nodes", "weights")
+  s
 }
-

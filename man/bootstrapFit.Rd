@@ -4,7 +4,17 @@
 \alias{bootstrapFit}
 \title{Bootstrap nlmixr fit}
 \usage{
-bootstrapFit(fit, nboot = 500, nSampIndiv, pvalues = NULL, resume = TRUE)
+bootstrapFit(
+  fit,
+  nboot = 500,
+  nSampIndiv,
+  stratVar,
+  stdErrType = c("perc", "se"),
+  ci = 0.95,
+  pvalues = NULL,
+  restart = FALSE,
+  plotHist = TRUE
+)
 }
 \arguments{
 \item{fit}{the nlmixr fit object}
@@ -15,12 +25,13 @@ bootstrapFit(fit, nboot = 500, nSampIndiv, pvalues = NULL, resume = TRUE)
 
 \item{pvalues}{a vector of pvalues indicating the probability of each subject to get selected; default value is NULL implying that probability of each subject is the same}
 
-\item{resume}{a boolean that indicates if a previous session has to be resumed; default value is TRUE}
+\item{restart}{a boolean that indicates if a previous session has to be restarted; default value is FALSE}
 }
 \description{
 Bootstrap input dataset and rerun the model to get confidence bounds and aggregated parameters
 }
 \examples{
+\dontrun{
 one.cmt <- function() {
   ini({
     ## You may label each parameter with a comment
@@ -28,7 +39,8 @@ one.cmt <- function() {
     tcl <- 1 # Log Cl
     ## This works with interactive models
     ## You may also label the preceding line with label("label text")
-    tv <- 3.45; label("log V")
+    tv <- 3.45
+    label("log V")
     ## the label("Label name") works with all models
     eta.ka ~ 0.6
     eta.cl ~ 0.3
@@ -46,8 +58,9 @@ one.cmt <- function() {
 fit <- nlmixr(one.cmt, theo_sd, "focei")
 
 bootstrapFit(fit)
-bootstrapFit(fit, nboot = 5, resume = FALSE) # overwrites any of the existing data or model files
+bootstrapFit(fit, nboot = 5, restart = TRUE) # overwrites any of the existing data or model files
 bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
+}
 }
 \author{
 Vipul Mann, Matthew Fidler

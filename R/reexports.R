@@ -174,32 +174,32 @@ RxODE::rxSymPySetupPred
 RxODE::et
 
 
-##'@importFrom generics tidy
-##'@export
+##' @importFrom generics tidy
+##' @export
 generics::tidy
 
 
-##'@importFrom generics glance
-##'@export
+##' @importFrom generics glance
+##' @export
 generics::glance
 
-##'@importFrom generics glance
-##'@export
+##' @importFrom generics glance
+##' @export
 generics::glance
 
-##'@importFrom generics augment
-##'@export
+##' @importFrom generics augment
+##' @export
 generics::augment
 
-##'@importFrom RxODE rxParams
-##'@export
+##' @importFrom RxODE rxParams
+##' @export
 RxODE::rxParams
 
-##'@importFrom RxODE rxParam
-##'@export
+##' @importFrom RxODE rxParam
+##' @export
 RxODE::rxParam
 
 
-##'@importFrom RxODE et
-##'@export
+##' @importFrom RxODE et
+##' @export
 RxODE::et

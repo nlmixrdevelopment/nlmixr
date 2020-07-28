@@ -135,9 +135,7 @@ default value is determined by the solver (when hini = 0)}
 method.  The default value is 5.  This can be between 1 and 5.}
 
 \item{cores}{Number of cores used in parallel ODE solving.  This
-defaults to the number or system cores determined by
-\code{\link[RxODE]{rxCores}} for methods that support parallel
-solving (ie thread-safe methods like "liblsoda").}
+is equivalent to calling \code{\link[RxODE]{setRxThreads}}}
 
 \item{covsInterpolation}{specifies the interpolation method for
     time-varying covariates. When solving ODEs it often samples
@@ -172,12 +170,10 @@ observation in the solved system.}
 default it is equivalent to \code{Inf}, or a normal distribution.}
 
 \item{nCoresRV}{Number of cores used for the simulation of the
-sigma variables.  By default this is 1. This uses the package
-\code{\link[mvnfast]{rmvn}} and \code{\link[mvnfast]{rmvt}}.
-To reproduce the results you need to run on the same platform
-with the same number of cores. This is the reason this is set
-to be one, regardless of what the number of cores are used in
-threaded ODE solving.}
+sigma variables.  By default this is 1. To reproduce the results
+you need to run on the same platform with the same number of
+cores. This is the reason this is set to be one, regardless of
+what the number of cores are used in threaded ODE solving.}
 
 \item{sigmaIsChol}{Boolean indicating if the sigma is in the
 Cholesky decomposition instead of a symmetric covariance}

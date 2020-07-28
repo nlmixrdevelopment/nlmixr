@@ -218,9 +218,7 @@ default value is determined by the solver (when hini = 0)}
 method.  The default value is 5.  This can be between 1 and 5.}
 
 \item{cores}{Number of cores used in parallel ODE solving.  This
-defaults to the number or system cores determined by
-\code{\link[RxODE]{rxCores}} for methods that support parallel
-solving (ie thread-safe methods like "liblsoda").}
+is equivalent to calling \code{\link[RxODE]{setRxThreads}}}
 
 \item{covsInterpolation}{specifies the interpolation method for
     time-varying covariates. When solving ODEs it often samples
