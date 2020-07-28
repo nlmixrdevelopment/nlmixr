@@ -35,10 +35,14 @@
 }
 
 .setupCensParams <- function(data, params){
-  if (!is.null(params$width))
-    return(params)
-  params$width <- 0.01
+  if (is.null(params$width))
+    params$width <- 0.01
+  return(params)
 }
+
+GeomPolygonCens <- ggplot2::ggproto("GeomPolygonCens", ggplot2::GeomPolygon,
+                                    default_aes = aes(colour = NA, fill = "red", size = 0.5, linetype = 1,
+                                                      alpha = 0.5))
 
 StatCens <- ggplot2::ggproto('StatCens', ggplot2::Stat,
                              setup_params = function(data, params) {
@@ -59,7 +63,7 @@ StatCens <- ggplot2::ggproto('StatCens', ggplot2::Stat,
 ##' Censoring geom/stat
 ##'
 ##'
-##' 
+##'
 ##' Requires the following aesthetics:
 ##'
 ##' \itemize{
@@ -75,11 +79,11 @@ StatCens <- ggplot2::ggproto('StatCens', ggplot2::Stat,
 ##' @param width represents the width (in \% of range) of the
 ##'   censoring box
 ##' @inheritParams ggplot2::stat_identity
-stat_cens <- function(mapping = NULL, data = NULL, 
+stat_cens <- function(mapping = NULL, data = NULL,
                       position = "identity",  show.legend = NA,
                       inherit.aes = TRUE, width=0.01, ...) {
   ggplot2::layer(
-    stat = StatCens, data = data, mapping = mapping, geom = "polygon",
+    stat = StatCens, data = data, mapping = mapping, geom = GeomPolygonCens,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
     params = list(na.rm = TRUE, width=width, ...)
   )
