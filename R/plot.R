@@ -27,21 +27,81 @@
   return(.dat)
 }
 
-.dvPlot <- function(.dat0, vars){
+.dvPlot <- function(.dat0, vars, log=FALSE){
+  .xgxr <- getOption("RxODE.xgxr", TRUE) &&
+    requireNamespace("xgxr", quietly = TRUE)
   if (any(names(.dat0) == "CENS")){
     .data <- data.frame(DV = .dat0$DV, CENS=.dat0$CENS, stack(.dat0[, vars]))
     .aes <- ggplot2::aes(.data$values, .data$DV, color = .data$CENS)
+    if (length(levels(.data$CENS)) == 3){
+      .color <- ggplot2::scale_color_manual(values=c("blue", "black", "red"))
+    } else {
+      .color <- ggplot2::scale_color_manual(values=c("black", "red"))
+    }
+    .legendPos <- ggplot2::theme(legend.position="bottom",legend.box="horizontal",
+                                 legend.title = ggplot2::element_blank())
   } else {
     .data <- data.frame(DV = .dat0$DV, stack(.dat0[, vars]))
     .aes <- ggplot2::aes(.data$values, .data$DV)
+    .color <- NULL
+    .legendPos <- NULL
+  }
+  .logx <- NULL
+  .logy <- NULL
+  if (log){
+    if (.xgxr) {
+      .logx <- xgxr::xgx_scale_x_log10()
+      .logy <- xgxr::xgx_scale_y_log10()
+    } else {
+      .logx <- ggplot2::scale_x_log10()
+      .logy <- ggplot2::scale_y_log10()
+    }
   }
   ggplot2::ggplot(.data, .aes) +
-      ggplot2::facet_wrap(~ind) +
-      ggplot2::geom_abline(slope = 1, intercept = 0, col = "red", size = 1.2) +
-      ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
-      ggplot2::geom_point() +
-      xlab("Predictions") +
-      RxODE::rxTheme()
+    ggplot2::facet_wrap(~ind) +
+    ggplot2::geom_abline(slope = 1, intercept = 0, col = "red", size = 1.2) +
+    .logx + .logy +
+    ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
+    ggplot2::geom_point(alpha=0.5) +
+    xlab("Predictions") +
+    RxODE::rxTheme() + .color + .legendPos
+}
+
+.scatterPlot <- function(.dat0, vars, .cmt, log=FALSE){
+  .data <- .dat0
+  .data$x <- .data[[vars[1]]]
+  .data$y <- .data[[vars[2]]]
+  if (any(names(.dat0) == "CENS")){
+    .aes <- ggplot2::aes(.data$x, .data$y, color = .data$CENS)
+    if (length(levels(.data$CENS)) == 3){
+      .color <- ggplot2::scale_color_manual(values=c("blue", "black", "red"))
+    } else {
+      .color <- ggplot2::scale_color_manual(values=c("black", "red"))
+    }
+    .legendPos <- ggplot2::theme(legend.position="bottom",legend.box="horizontal",
+                                 legend.title = ggplot2::element_blank())
+  } else {
+    .aes <- ggplot2::aes(.data$x, .data$y)
+    .aes <- ggplot2::aes(.data$values, .data$DV)
+    .color <- NULL
+    .legendPos <- NULL
+  }
+  .xgxr <- getOption("RxODE.xgxr", TRUE) &&
+    requireNamespace("xgxr", quietly = TRUE)
+  .logx <- NULL
+  if (log){
+    if (.xgxr) {
+      .logx <- xgxr::xgx_scale_x_log10()
+    } else {
+      .logx <- ggplot2::scale_x_log10()
+    }
+  }
+  ggplot2::ggplot(.data, .aes) +
+    ggplot2::geom_point(alpha=0.5) +
+    ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
+    ggplot2::ggtitle(.cmt, paste0(vars[1], " vs ", vars[2])) +
+    ggplot2::xlab(vars[1]) + ggplot2::ylab(vars[2]) +
+    RxODE::rxTheme() + .color + .legendPos + .logx
 }
 
 
@@ -69,89 +129,52 @@ plot.nlmixrFitData <- function(x, ...) {
       ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
     .lst[[length(.lst) + 1]] <- .p1
 
+    .p1 <- .dvPlot(.dat0, c("PRED", "IPRED"), TRUE) +
+      ggplot2::ggtitle(.cmt, "log-scale DV vs PRED/IPRED")
+    .lst[[length(.lst) + 1]] <- .p1
+
     if (.hasCwres) {
-      .d1 <- data.frame(DV = .dat0$DV, stack(.dat0[, c("CPRED", "IPRED")]))
-      .p1 <- ggplot2::ggplot(.d1, ggplot2::aes_string("values", "DV")) +
-        ggplot2::facet_wrap(~ind) +
-        ggplot2::geom_abline(slope = 1, intercept = 0, col = "red", size = 1.2) +
-        ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
-        ggplot2::geom_point() +
-        xlab("Predictions") +
-        ggplot2::ggtitle(.cmt, "DV vs CPRED/IPRED") +
-        RxODE::rxTheme()
+      .p1 <- .dvPlot(.dat0, c("CPRED", "IPRED")) +
+        ggplot2::ggtitle(.cmt, "DV vs CPRED/IPRED")
+      .lst[[length(.lst) + 1]] <- .p1
+
+      .p1 <- .dvPlot(.dat0, c("CPRED", "IPRED"), TRUE) +
+        ggplot2::ggtitle(.cmt, "log-scale DV vs CPRED/IPRED")
       .lst[[length(.lst) + 1]] <- .p1
     }
 
     if (.hasNpde) {
-      .d1 <- data.frame(DV = .dat0$DV, stack(.dat0[, c("EPRED", "IPRED")]))
-      .p1 <- ggplot2::ggplot(.d1, ggplot2::aes_string("values", "DV")) +
-        ggplot2::facet_wrap(~ind) +
-        ggplot2::geom_abline(slope = 1, intercept = 0, col = "red", size = 1.2) +
-        ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
-        ggplot2::geom_point() +
-        xlab("Predictions") +
-        ggplot2::ggtitle(.cmt, "DV vs EPRED/IPRED") +
-        RxODE::rxTheme()
+      .p1 <- .dvPlot(.dat0, c("EPRED", "IPRED"))  +
+        ggplot2::ggtitle(.cmt, "DV vs EPRED/IPRED")
+      .lst[[length(.lst) + 1]] <- .p1
+
+      .p1 <- .dvPlot(.dat0, c("EPRED", "IPRED"), TRUE)  +
+        ggplot2::ggtitle(.cmt, "log-scale DV vs EPRED/IPRED")
       .lst[[length(.lst) + 1]] <- .p1
     }
 
-    .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "IPRED", y = "IRES")) +
-      ggplot2::geom_point() +
-      ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-      ggplot2::ggtitle(.cmt, "IRES vs IPRED") +
-      RxODE::rxTheme()
-    .lst[[length(.lst) + 1]] <- .p2
+    for (x in c("IPRED", "PRED", "CPRED", "EPRED", "TIME")) {
+      if (any(names(.dat0) == x)){
+        for (y in c("IWRES", "IRES", "RES", "CWRES", "NPDE")) {
+          if (any(names(.dat0) == y)){
+            .doIt <- FALSE
+            if (y == "CWRES" && x %in% c("TIME", "CPRED")){
+              .doIt <- TRUE
+            } else if (y == "NPDE" && x %in% c("TIME", "EPRED")) {
+              .doIt <- TRUE
+            } else if (!(y %in% c("CWRES", "NPDE"))) {
+              .doIt <- TRUE
+            }
+            if (.doIt){
+              .p2 <- .scatterPlot(.dat0, c(x, y), .cmt, log=FALSE)
+              .lst[[length(.lst) + 1]] <- .p2
+              .p2 <- .scatterPlot(.dat0, c(x, y), .cmt, log=TRUE)
+              .lst[[length(.lst) + 1]] <- .p2
+            }
 
-    .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "TIME", y = "IRES")) +
-      ggplot2::geom_point() +
-      ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-      ggplot2::ggtitle(.cmt, "IRES vs TIME") +
-      RxODE::rxTheme()
-    .lst[[length(.lst) + 1]] <- .p2
-
-    .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "IPRED", y = "IWRES")) +
-      ggplot2::geom_point() +
-      ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-      ggplot2::ggtitle(.cmt, "IWRES vs IPRED") +
-      RxODE::rxTheme()
-    .lst[[length(.lst) + 1]] <- .p2
-
-    .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "TIME", y = "IWRES")) +
-      ggplot2::geom_point() +
-      ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-      ggplot2::ggtitle(.cmt, "IWRES vs IPRED")+
-      RxODE::rxTheme()
-    .lst[[length(.lst) + 1]] <- .p2
-
-    if (.hasCwres) {
-      .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "CPRED", y = "CWRES")) +
-        ggplot2::geom_point() +
-        ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-        ggplot2::ggtitle(.cmt, "CWRES vs CPRED") +
-        RxODE::rxTheme()
-      .lst[[length(.lst) + 1]] <- .p2
-
-      .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "TIME", y = "CWRES")) +
-        ggplot2::geom_point() +
-        ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-        ggplot2::ggtitle(.cmt, "CWRES vs CPRED")+
-        RxODE::rxTheme()
-      .lst[[length(.lst) + 1]] <- .p2
-    }
-    if (.hasNpde) {
-      .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "EPRED", y = "NPDE")) +
-        ggplot2::geom_point() +
-        ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-        ggplot2::ggtitle(.cmt, "NPDE vs EPRED") +
-        RxODE::rxTheme()
-      .lst[[length(.lst) + 1]] <- .p2
-
-      .p2 <- ggplot2::ggplot(.dat0, ggplot2::aes_string(x = "TIME", y = "NPDE")) +
-        ggplot2::geom_point() +
-        ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-        ggplot2::ggtitle(.cmt, "NPDE vs EPRED") +
-        RxODE::rxTheme()
-      .lst[[length(.lst) + 1]] <- .p2
+          }
+        }
+      }
     }
     ## .idPlot <- try(plot.nlmixrAugPred(nlmixrAugPred(object)));
     ## if (inherits(.idPlot, "try-error")){
