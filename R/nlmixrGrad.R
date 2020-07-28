@@ -73,17 +73,17 @@
 ##' max(abs(exact - g$df)/(1 + abs(exact)))
 ##'
 ##' @export
-nlmixrGill83 <- function(what, args, envir=parent.frame(),
-                         which, gillRtol=sqrt(.Machine$double.eps), gillK=10L, gillStep=2, gillFtol=0){
-    if (missing(which)){
-        which <- rep(TRUE, length(args));
-    }
-    return(nlmixrGill83_(what, args, envir, which,
-                         gillRtol=sqrt(.Machine$double.eps), gillK=10L, gillStep=2, gillFtol=0))
+nlmixrGill83 <- function(what, args, envir = parent.frame(),
+                         which, gillRtol = sqrt(.Machine$double.eps), gillK = 10L, gillStep = 2, gillFtol = 0) {
+  if (missing(which)) {
+    which <- rep(TRUE, length(args))
+  }
+  return(nlmixrGill83_(what, args, envir, which,
+    gillRtol = sqrt(.Machine$double.eps), gillK = 10L, gillStep = 2, gillFtol = 0
+  ))
 }
 
-.nlmixrGradInfo <- new.env(parent=emptyenv());
-
+.nlmixrGradInfo <- new.env(parent = emptyenv())
 ##' Create a gradient function based on gill numerical differences
 ##'
 ##' @param thetaNames Names for the theta parameters
@@ -114,42 +114,42 @@ nlmixrGill83 <- function(what, args, envir=parent.frame(),
 ##' gf$hist()
 ##'
 ##' @export
-nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
-                          gillRtol=sqrt(.Machine$double.eps), gillK=10L, gillStep=2, gillFtol=0,
-                          useColor=crayon::has_color(),
-                          printNcol=floor((getOption("width") - 23)/12),
-                          print=1){
-    .md5 <- digest::digest(list(what, gillRtol, gillK, gillStep, gillFtol))
-    .nlmixrGradInfo[["printNcol"]] <- printNcol;
-    .nlmixrGradInfo[["useColor"]] <- useColor;
-    .nlmixrGradInfo[["isRstudio"]] <- (Sys.getenv("RSTUDIO")=="1");
-    .nlmixrGradInfo[["print"]] <- print;
-    if (!missing(which)){
-        .nlmixrGradInfo[[paste0(.md5, ".w")]] <- which;
-    }
-    if (!missing(thetaNames)){
-        .nlmixrGradInfo[["thetaNames"]] <- thetaNames;
-    }
-    .nlmixrGradInfo[[paste0(.md5, ".n")]] <- 0L
-    .nlmixrGradInfo[[paste0(.md5, ".f")]] <- what
-    .nlmixrGradInfo[[paste0(.md5, ".e")]] <- envir
-    .nlmixrGradInfo[[paste0(.md5, ".rtol")]] <- gillRtol
-    .nlmixrGradInfo[[paste0(.md5, ".k")]] <- gillK
-    .nlmixrGradInfo[[paste0(.md5, ".s")]] <- gillStep
-    .nlmixrGradInfo[[paste0(.md5, ".ftol")]] <- gillFtol
-    .eval <- eval(parse(text=paste0("function(theta){
+nlmixrGradFun <- function(what, envir = parent.frame(), which, thetaNames,
+                          gillRtol = sqrt(.Machine$double.eps), gillK = 10L, gillStep = 2, gillFtol = 0,
+                          useColor = crayon::has_color(),
+                          printNcol = floor((getOption("width") - 23) / 12),
+                          print = 1) {
+  .md5 <- digest::digest(list(what, gillRtol, gillK, gillStep, gillFtol))
+  .nlmixrGradInfo[["printNcol"]] <- printNcol
+  .nlmixrGradInfo[["useColor"]] <- useColor
+  .nlmixrGradInfo[["isRstudio"]] <- (Sys.getenv("RSTUDIO") == "1")
+  .nlmixrGradInfo[["print"]] <- print
+  if (!missing(which)) {
+    .nlmixrGradInfo[[paste0(.md5, ".w")]] <- which
+  }
+  if (!missing(thetaNames)) {
+    .nlmixrGradInfo[["thetaNames"]] <- thetaNames
+  }
+  .nlmixrGradInfo[[paste0(.md5, ".n")]] <- 0L
+  .nlmixrGradInfo[[paste0(.md5, ".f")]] <- what
+  .nlmixrGradInfo[[paste0(.md5, ".e")]] <- envir
+  .nlmixrGradInfo[[paste0(.md5, ".rtol")]] <- gillRtol
+  .nlmixrGradInfo[[paste0(.md5, ".k")]] <- gillK
+  .nlmixrGradInfo[[paste0(.md5, ".s")]] <- gillStep
+  .nlmixrGradInfo[[paste0(.md5, ".ftol")]] <- gillFtol
+  .eval <- eval(parse(text = paste0("function(theta){
         nlmixrEval_(theta, \"", .md5, "\");
     }")))
-    .grad <- eval(parse(text=paste0("function(theta){
+  .grad <- eval(parse(text = paste0("function(theta){
         nlmixrGrad_(theta, \"", .md5, "\");
     }")))
-    .hist <- eval(parse(text=paste0("function(){
+  .hist <- eval(parse(text = paste0("function(){
         nlmixrParHist_(md5=\"", .md5, "\");
     }")))
-    .unscaled <- eval(parse(text=paste0("function(theta){
+  .unscaled <- eval(parse(text = paste0("function(theta){
         nlmixrUnscaled_(theta,md5=\"", .md5, "\");
     }")))
-    return(list(eval=.eval, grad=.grad, hist=.hist, unscaled=.unscaled))
+  return(list(eval = .eval, grad = .grad, hist = .hist, unscaled = .unscaled))
 }
 
 ##' Calculate Hessian
@@ -197,7 +197,7 @@ nlmixrGradFun <- function(what, envir=parent.frame(), which, thetaNames,
 ##' ## in this case h3 is closer to h1 where the gradient is known
 ##'
 ##' h3 <- nlmixrHess(c(1.2,1.2), fr)
-nlmixrHess <- function (par, fn, ..., envir=parent.frame()){
-    .gill <- nlmixrGill83(fn, par, envir=envir,...);
-    return(nlmixrHess_(par, fn, envir, .gill))
+nlmixrHess <- function(par, fn, ..., envir = parent.frame()) {
+  .gill <- nlmixrGill83(fn, par, envir = envir, ...)
+  return(nlmixrHess_(par, fn, envir, .gill))
 }

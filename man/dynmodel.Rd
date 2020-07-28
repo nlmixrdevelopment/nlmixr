@@ -45,33 +45,33 @@ ode <- "
       "
 ode_system <- RxODE(model = ode)
 model_error_structure <- cp ~ C + add(0.01) + prop(0.01)
-inits = c(CL=1, V=10)
-control =  dynmodelControl(method = "Nelder-Mead")
+inits <- c(CL = 1, V = 10)
+control <- dynmodelControl(method = "Nelder-Mead")
 fit <-
   dynmodel(
-    system=ode_system,
-    model=model_error_structure,
-    data=Bolus_1CPT,
-    inits=inits,
-    control=control
+    system = ode_system,
+    model = model_error_structure,
+    data = Bolus_1CPT,
+    inits = inits,
+    control = control
   )
 
 # nlmixr example ----------------------------------------------------------
 model_onecmt_bolus <- function() {
   ini({
-    CL <- c(0,5,10) # Clearance (L/hr)
-    V <- c(0,50,100) # Volume of Distribution
-    prop.err <- c(0,0.01,1)
+    CL <- c(0, 5, 10) # Clearance (L/hr)
+    V <- c(0, 50, 100) # Volume of Distribution
+    prop.err <- c(0, 0.01, 1)
   })
   model({
-    kel = CL/V
-    d/dt(X) = -kel*X
-    cp = X/V
+    kel <- CL / V
+    d / dt(X) <- -kel * X
+    cp <- X / V
     cp ~ prop(prop.err)
   })
 }
 
-fit <- nlmixr(object = model_onecmt_bolus, data=Bolus_1CPT, est="dynmodel")
+fit <- nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "dynmodel")
 }
 \author{
 Wenping Wang, Mason McComb and Matt Fidler

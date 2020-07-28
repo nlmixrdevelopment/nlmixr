@@ -5,9 +5,9 @@
 \alias{nmTest}
 \title{Validate nlmixr}
 \usage{
-nlmixrValidate(full = FALSE)
+nlmixrValidate(type = NULL, check = FALSE)
 
-nmTest(full = FALSE)
+nmTest(type = NULL, check = FALSE)
 }
 \arguments{
 \item{full}{Should a full validation be performed?  (By default

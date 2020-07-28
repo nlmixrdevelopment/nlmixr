@@ -51,33 +51,32 @@ Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (
 Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (AGQ)
 }
 \examples{
-llik <- function()
-{
-	lp = THETA[1]*x1+THETA[2]*x2+(x1+x2*THETA[3])*ETA[1]
-	p = pnorm(lp)
-	dbinom(x, m, p, log=TRUE)
+llik <- function() {
+  lp <- THETA[1] * x1 + THETA[2] * x2 + (x1 + x2 * THETA[3]) * ETA[1]
+  p <- pnorm(lp)
+  dbinom(x, m, p, log = TRUE)
 }
-inits = list(THTA=c(1,1,1), OMGA=list(ETA[1]~1))
+inits <- list(THTA = c(1, 1, 1), OMGA = list(ETA[1] ~ 1))
 
-gnlmm(llik, rats, inits, control=list(nAQD=3))
-
-
+gnlmm(llik, rats, inits, control = list(nAQD = 3))
 \dontrun{
-llik <- function()
-{
-	if (group==1) lp = THETA[1]+THETA[2]*logtstd+ETA[1]
-	else          lp = THETA[3]+THETA[4]*logtstd+ETA[1]
-	lam = exp(lp)
-	dpois(y, lam, log=TRUE)
+llik <- function() {
+  if (group == 1) {
+    lp <- THETA[1] + THETA[2] * logtstd + ETA[1]
+  } else {
+    lp <- THETA[3] + THETA[4] * logtstd + ETA[1]
+  }
+  lam <- exp(lp)
+  dpois(y, lam, log = TRUE)
 }
-inits = list(THTA=c(1,1,1,1), OMGA=list(ETA[1]~1))
+inits <- list(THTA = c(1, 1, 1, 1), OMGA = list(ETA[1] ~ 1))
 
-fit = gnlmm(llik, pump, inits,
-	control=list(
-	    reltol.outer=1e-4,
-		optim.outer="nmsimplex",
-		nAQD=5
-	)
+fit <- gnlmm(llik, pump, inits,
+  control = list(
+    reltol.outer = 1e-4,
+    optim.outer = "nmsimplex",
+    nAQD = 5
+  )
 )
 
 
@@ -86,31 +85,30 @@ ode <- "
 d/dt(depot) =-KA*depot;
 d/dt(centr) = KA*depot - KE*centr;
 "
-sys1 = RxODE(ode)
+sys1 <- RxODE(ode)
 
-pars <- function()
-{
-	CL = exp(THETA[1] + ETA[1])#; if (CL>100) CL=100
-	KA = exp(THETA[2] + ETA[2])#; if (KA>20) KA=20
-	KE = exp(THETA[3])
-	V  = CL/KE
-	sig2 = exp(THETA[4])
+pars <- function() {
+  CL <- exp(THETA[1] + ETA[1]) # ; if (CL>100) CL=100
+  KA <- exp(THETA[2] + ETA[2]) # ; if (KA>20) KA=20
+  KE <- exp(THETA[3])
+  V <- CL / KE
+  sig2 <- exp(THETA[4])
 }
 llik <- function() {
-	pred = centr/V
-	dnorm(DV, pred, sd=sqrt(sig2), log=TRUE)
+  pred <- centr / V
+  dnorm(DV, pred, sd = sqrt(sig2), log = TRUE)
 }
-inits = list(THTA=c(-3.22, 0.47, -2.45, 0))
-inits$OMGA=list(ETA[1]~.027, ETA[2]~.37)
-#inits$OMGA=list(ETA[1]+ETA[2]~c(.027, .01, .37))
-theo <- read.table("theo_md.txt", head=TRUE)
+inits <- list(THTA = c(-3.22, 0.47, -2.45, 0))
+inits$OMGA <- list(ETA[1] ~ .027, ETA[2] ~ .37)
+# inits$OMGA=list(ETA[1]+ETA[2]~c(.027, .01, .37))
+theo <- read.table("theo_md.txt", head = TRUE)
 
-fit = gnlmm(llik, theo, inits, pars, sys1,
-	control=list(trace=TRUE, nAQD=5))
+fit <- gnlmm(llik, theo, inits, pars, sys1,
+  control = list(trace = TRUE, nAQD = 5)
+)
 
-cv = calcCov(fit)
-cbind(fit$par[fit$nsplt==1], sqrt(diag(cv)))
-
+cv <- calcCov(fit)
+cbind(fit$par[fit$nsplt == 1], sqrt(diag(cv)))
 }
 }
 \author{

@@ -1,11 +1,11 @@
-.onLoad <- function(libname, pkgname){
+.onLoad <- function(libname, pkgname) {
 }
 
 orig.onAttach <- function(libname, pkgname) {
   ## nocov start
   ## Setup RxODE.prefer.tbl
   nlmixrSetupMemoize()
-  options(keep.source=TRUE)
+  options(keep.source = TRUE)
   ## nocov end
 }
 
@@ -26,12 +26,12 @@ nlmixrSetupMemoize <- function() {
   reSlow <- rex::rex(".slow", end)
   f <- sys.function(-1)
   ns <- environment(f)
-  .slow <- ls(pattern=reSlow,envir=ns)
-  for (slow in .slow){
+  .slow <- ls(pattern = reSlow, envir = ns)
+  for (slow in .slow) {
     fast <- sub(reSlow, "", slow)
-    if (!memoise::is.memoised(get(fast, envir=ns)) && is.null(get(slow, envir=ns))){
-      utils::assignInMyNamespace(slow, get(fast, envir=ns))
-      utils::assignInMyNamespace(fast, memoise::memoise(get(slow, envir=ns)))
+    if (!memoise::is.memoised(get(fast, envir = ns)) && is.null(get(slow, envir = ns))) {
+      utils::assignInMyNamespace(slow, get(fast, envir = ns))
+      utils::assignInMyNamespace(fast, memoise::memoise(get(slow, envir = ns)))
     }
   }
 }
@@ -42,13 +42,13 @@ nlmixrSetupMemoize <- function() {
 ##' @keywords internal
 ##' @export
 nlmixrForget <- function() {
-  reSlow <- rex::rex(".slow",end)
+  reSlow <- rex::rex(".slow", end)
   f <- sys.function(-1)
   ns <- environment(f)
-  .slow <- ls(pattern=reSlow,envir=ns)
-  for (slow in .slow){
+  .slow <- ls(pattern = reSlow, envir = ns)
+  for (slow in .slow) {
     fast <- sub(reSlow, "", slow)
-    memoise::forget(get(fast, envir=ns))
+    memoise::forget(get(fast, envir = ns))
   }
 }
 
@@ -83,19 +83,19 @@ nlmixr.logo <- "         _             _             \n        | | %9s (_) %s\n 
 ##' @param str String to print
 ##' @param version Version information (by default use package version)
 ##' @author Matthew L. Fidler
-nlmixrLogo <- function(str="", version=sessionInfo()$otherPkgs$nlmixr$Version){
-    message(sprintf(nlmixr.logo, str, version))
+nlmixrLogo <- function(str = "", version = sessionInfo()$otherPkgs$nlmixr$Version) {
+  message(sprintf(nlmixr.logo, str, version))
 }
 ##' Display nlmixr's version
 ##'
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixrVersion <- function(){
+nlmixrVersion <- function() {
   nlmixrLogo()
 }
 
-armaVersion <- function(){
-  nlmixrLogo(str="RcppArmadiilo", RcppArmadillo::armadillo_version())
+armaVersion <- function() {
+  nlmixrLogo(str = "RcppArmadiilo", RcppArmadillo::armadillo_version())
 }
 
 .nlmixrTime <- NULL
@@ -118,10 +118,10 @@ armaVersion <- function(){
 ##' @return Either a nlmixr model or a nlmixr fit object
 ##' @author Matthew L. Fidler, Rik Schoemaker
 ##' @export
-nlmixr <- function(object, data, est=NULL, control=list(),
-                   table=tableControl(), ...,save=NULL,
-                   envir=parent.frame()){
-  assignInMyNamespace(".nlmixrTime",proc.time())
+nlmixr <- function(object, data, est = NULL, control = list(),
+                   table = tableControl(), ..., save = NULL,
+                   envir = parent.frame()) {
+  assignInMyNamespace(".nlmixrTime", proc.time())
   RxODE::.setWarnIdSort(FALSE)
   on.exit(RxODE::.setWarnIdSort(TRUE))
   force(est)
@@ -132,55 +132,55 @@ nlmixr <- function(object, data, est=NULL, control=list(),
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.function <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
-                            save=NULL, envir=parent.frame()){
-  .args <- as.list(match.call(expand.dots=TRUE))[-1]
+nlmixr.function <- function(object, data, est = NULL, control = list(), table = tableControl(), ...,
+                            save = NULL, envir = parent.frame()) {
+  .args <- as.list(match.call(expand.dots = TRUE))[-1]
   .modName <- deparse(substitute(object))
   .uif <- nlmixrUI(object)
   class(.uif) <- "list"
   .uif$nmodel$model.name <- .modName
-  if (missing(data) && missing(est)){
+  if (missing(data) && missing(est)) {
     class(.uif) <- "nlmixrUI"
     return(.uif)
   } else {
     .uif$nmodel$data.name <- deparse(substitute(data))
     class(.uif) <- "nlmixrUI"
     .args$data <- data
-    .args$est  <- est
-    .args <- c(list(uif=.uif), .args[-1])
-    if (is.null(est)){
+    .args$est <- est
+    .args <- c(list(uif = .uif), .args[-1])
+    if (is.null(est)) {
       stop("Need to supply an estimation routine with est=.")
     }
-    return(do.call(nlmixr_fit, .args, envir=envir))
+    return(do.call(nlmixr_fit, .args, envir = envir))
   }
-}
-
-##'@rdname nlmixr
-##'@export
-nlmixr.nlmixrFitCore <- function(object, data, est=NULL, control=list(), table=tableControl(), ...,
-                                 save=NULL, envir=parent.frame()){
-  .uif <- .getUif(object)
-  if (missing(data)){
-    data <- getData(object)
-  }
-  .args <- as.list(match.call(expand.dots=TRUE))[-1]
-  .args$data <- data
-  .args$est <- est
-  .args <- c(list(uif=.uif), .args[-1])
-  return(do.call(nlmixr_fit, .args, envir=envir))
 }
 
 ##' @rdname nlmixr
 ##' @export
-nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
-                            save=NULL, envir=parent.frame()) {
-  .args <- as.list(match.call(expand.dots=TRUE))[-1]
+nlmixr.nlmixrFitCore <- function(object, data, est = NULL, control = list(), table = tableControl(), ...,
+                                 save = NULL, envir = parent.frame()) {
+  .uif <- .getUif(object)
+  if (missing(data)) {
+    data <- getData(object)
+  }
+  .args <- as.list(match.call(expand.dots = TRUE))[-1]
+  .args$data <- data
+  .args$est <- est
+  .args <- c(list(uif = .uif), .args[-1])
+  return(do.call(nlmixr_fit, .args, envir = envir))
+}
+
+##' @rdname nlmixr
+##' @export
+nlmixr.nlmixrUI <- function(object, data, est = NULL, control = list(), ...,
+                            save = NULL, envir = parent.frame()) {
+  .args <- as.list(match.call(expand.dots = TRUE))[-1]
   .uif <- object
-  if (missing(data) && missing(est)){
+  if (missing(data) && missing(est)) {
     return(.uif)
   } else {
-    .args <- c(list(uif=.uif), .args[-1])
-    if (missing(data) && !is.null(.getPipedData())){
+    .args <- c(list(uif = .uif), .args[-1])
+    if (missing(data) && !is.null(.getPipedData())) {
       data <- .getPipedData()
       .args$data <- data
       .args$est <- est
@@ -189,7 +189,7 @@ nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
       .args$data <- data
       .args$est <- est
     }
-    return(do.call(nlmixr_fit, .args, envir=envir))
+    return(do.call(nlmixr_fit, .args, envir = envir))
   }
 }
 
@@ -203,77 +203,79 @@ nlmixr.nlmixrUI <- function(object, data, est=NULL, control=list(), ...,
 ##' @author Matthew L. Fidler
 ##' @keywords internal
 ##' @export
-nlmixrData <- function(data, model=NULL){
+nlmixrData <- function(data, model = NULL) {
   UseMethod("nlmixrData")
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.character <- function(data, model=NULL){
-  if (!file.exists(data)){
+nlmixrData.character <- function(data, model = NULL) {
+  if (!file.exists(data)) {
     stop(sprintf("%s does not exist.", data))
   }
-  if (regexpr(rex::rex(".csv", end), data) != -1){
-    return(nlmixrData.default(utils::read.csv(data, na.strings=c(".", "NA", "na", ""))))
+  if (regexpr(rex::rex(".csv", end), data) != -1) {
+    return(nlmixrData.default(utils::read.csv(data, na.strings = c(".", "NA", "na", ""))))
   } else {
     stop(sprintf("Do not know how to read in %s", data))
   }
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.default <- function(data, model=NULL){
-  if (!is.null(model)){
-    dat  <- RxODE::etTrans(data, model,addCmt=TRUE,dropUnits=TRUE,allTimeVar=TRUE)
+nlmixrData.default <- function(data, model = NULL) {
+  if (!is.null(model)) {
+    dat <- RxODE::etTrans(data, model, addCmt = TRUE, dropUnits = TRUE, allTimeVar = TRUE)
   } else {
     dat <- .as.data.frame(data)
   }
   return(dat)
 }
-nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
-                        sum.prod=FALSE, table=tableControl(),
-                        envir=parent.frame()){
-  if (is.null(est)){
+nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
+                        sum.prod = FALSE, table = tableControl(),
+                        envir = parent.frame()) {
+  if (is.null(est)) {
     stop("Estimation type must be specified by est=''")
   }
   .clearPipedData()
   .tmp <- deparse(body(uif$theta.pars))[-1]
   .tmp <- .tmp[-length(.tmp)]
   .origData <- data
-  data <- RxODE::etTrans(data,paste(paste(.tmp,collapse="\n"),"\n",uif$rxode),TRUE,TRUE, TRUE)
+  data <- RxODE::etTrans(data, paste(paste(.tmp, collapse = "\n"), "\n", uif$rxode), TRUE, TRUE, TRUE)
 
-  .nTv  <- attr(class(data),".RxODE.lst")$nTv
-  .lab  <- attr(class(data),".RxODE.lst")$idLvl
-  .nid  <- attr(class(data), ".RxODE.lst")$nid
+  .nTv <- attr(class(data), ".RxODE.lst")$nTv
+  .lab <- attr(class(data), ".RxODE.lst")$idLvl
+  .nid <- attr(class(data), ".RxODE.lst")$nid
   .modelId <-
     digest::digest(
-      list(sessionInfo()$otherPkgs$nlmixr$Version,
-           uif, data, est, control, sum.prod, table,...)
+      list(
+        sessionInfo()$otherPkgs$nlmixr$Version,
+        uif, data, est, control, sum.prod, table, ...
+      )
     )
   .meta <- uif$meta
   .missingEst <- is.null(est)
-  if (.missingEst & exists("est", envir=.meta)){
+  if (.missingEst & exists("est", envir = .meta)) {
     est <- .meta$est
   }
-  if (.missingEst & missing(control) & exists("control", envir=.meta)){
+  if (.missingEst & missing(control) & exists("control", envir = .meta)) {
     control <- .meta$control
-    if (is(control, "foceiControl")){
+    if (is(control, "foceiControl")) {
       est <- "focei"
-      if (.missingEst && est != "focei"){
+      if (.missingEst && est != "focei") {
         warning(sprintf("Using focei instead of %s since focei controls were specified.", est))
       }
-    } else if (is(control, "saemControl")){
+    } else if (is(control, "saemControl")) {
       est <- "saem"
-      if (.missingEst && est != "saem"){
+      if (.missingEst && est != "saem") {
         warning(sprintf("Using saem instead of %s since saem controls were specified.", est))
       }
     }
   }
-  if (missing(table) && exists("table", envir=.meta)){
+  if (missing(table) && exists("table", envir = .meta)) {
     table <- .meta$table
   }
   start.time <- Sys.time()
-  if (!is(table, "tableControl")){
-    if (is(table, "list")){
-      table <- do.call(tableControl, table, envir=envir)
+  if (!is(table, "tableControl")) {
+    if (is(table, "list")) {
+      table <- do.call(tableControl, table, envir = envir)
     } else {
       table <- tableControl()
     }
@@ -282,21 +284,21 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
   nobs2 <- sum(dat$EVID == 0)
   up.covs <- toupper(uif$all.covs)
   up.names <- toupper(names(dat))
-  for (i in seq_along(up.covs)){
+  for (i in seq_along(up.covs)) {
     w <- which(up.covs[i] == up.names)
-    if (length(w) == 1){
-      names(dat)[w] = uif$all.covs[i]
+    if (length(w) == 1) {
+      names(dat)[w] <- uif$all.covs[i]
     }
   }
   ## backSort <- attr(dat, "backSort")
   ## backSort2 <- attr(dat, "backSort2")
   ## attr(dat, "backSort") <- NULL
   ## attr(dat, "backSort2") <- NULL
-  if (!is.null(uif$nmodel$lin.solved)==1L){
-    uif$env$infusion <- max(dat$EVID)>10000
+  if (!is.null(uif$nmodel$lin.solved) == 1L) {
+    uif$env$infusion <- max(dat$EVID) > 10000
   }
   bad.focei <- "Problem calculating residuals, returning fit without residuals."
-  fix.dat <- function(x){
+  fix.dat <- function(x) {
     .cls <- class(x)
     class(x) <- "data.frame"
     x$ID <- as.integer(x$ID)
@@ -317,12 +319,12 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     class(.ranef$ID) <- "factor"
     .uif <- x$uif
     .thetas <- x$theta
-    for (.n in names(.thetas)){
+    for (.n in names(.thetas)) {
       .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n]
     }
     .omega <- x$omega
-    for (.i in seq_along(.uif$ini$neta1)){
-      if (!is.na(.uif$ini$neta1[.i])){
+    for (.i in seq_along(.uif$ini$neta1)) {
+      if (!is.na(.uif$ini$neta1[.i])) {
         .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]]
       }
     }
@@ -333,84 +335,94 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     .env$uif <- .uif
     .env$ranef <- .ranef
     .predDf <- .uif$predDf
-    if (any(.predDf$cond != "") & any(names(x) == "CMT")){
+    if (any(.predDf$cond != "") & any(names(x) == "CMT")) {
       .cls <- class(x)
       class(x) <- "data.frame"
-      x$CMT <- factor(x$CMT, levels=.predDf$cmt, labels=.predDf$cond)
+      x$CMT <- factor(x$CMT, levels = .predDf$cmt, labels = .predDf$cond)
       class(x) <- .cls
     }
     return(x)
   }
-  .addNpde <- function(x){
+  .addNpde <- function(x) {
     .doIt <- table$npde
-    if (is.null(.doIt)){
-      if (est == "saem"){
+    if (is.null(.doIt)) {
+      if (est == "saem") {
         .doIt <- table$saemNPDE
-      } else if (est == "focei"){
+      } else if (est == "focei") {
         .doIt <- table$foceiNPDE
-      } else if (est == "foce"){
+      } else if (est == "foce") {
         .doIt <- table$foceNPDE
-      } else if (est == "nlme"){
+      } else if (est == "nlme") {
         .doIt <- table$nlmeNPDE
       } else {
         .doIt <- FALSE
       }
     }
-    if (!is.logical(.doIt)) return(x)
-    if (is.na(.doIt)) return(x)
-    if (!.doIt) return (x)
-    .ret <- try(addNpde(x,nsim=table$nsim, ties=table$ties, seed=table$seed, updateObject=FALSE), silent=TRUE)
-    if (inherits(.ret, "try-error")) return(x)
+    if (!is.logical(.doIt)) {
+      return(x)
+    }
+    if (is.na(.doIt)) {
+      return(x)
+    }
+    if (!.doIt) {
+      return(x)
+    }
+    .ret <- try(addNpde(x, nsim = table$nsim, ties = table$ties, seed = table$seed, updateObject = FALSE), silent = TRUE)
+    if (inherits(.ret, "try-error")) {
+      return(x)
+    }
     return(.ret)
   }
   calc.resid <- table$cwres
-  if (is.null(calc.resid)){
-    if (est == "saem"){
+  if (is.null(calc.resid)) {
+    if (est == "saem") {
       calc.resid <- table$saemCWRES
-    } else if (est == "nlme"){
+    } else if (est == "nlme") {
       calc.resid <- table$nlmeCWRES
     }
   }
-  if (est == "saem"){
+  if (est == "saem") {
     if (.nid <= 1) stop("SAEM is for mixed effects models, try 'dynmodel' (need more than 1 individual)")
     if (.nTv != 0) stop("SAEM does not support time-varying covariates (yet)")
     pt <- proc.time()
-    if (length(uif$noMuEtas) > 0){
-      stop(sprintf("Cannot run SAEM since some of the parameters are not mu-referenced (%s)", paste(uif$noMuEtas, collapse=", ")))
+    if (length(uif$noMuEtas) > 0) {
+      stop(sprintf("Cannot run SAEM since some of the parameters are not mu-referenced (%s)", paste(uif$noMuEtas, collapse = ", ")))
     }
-    args <- as.list(match.call(expand.dots=TRUE))[-1]
+    args <- as.list(match.call(expand.dots = TRUE))[-1]
     default <- saemControl()
-    .getOpt <- function(arg, envir=parent.frame(1)){
-      if (arg %in% names(args)){
-        assign(paste0(".", arg), args[[arg]], envir=envir)
-      } else if (arg %in% names(control)){
-        assign(paste0(".", arg), control[[arg]], envir=envir)
-      } else if (arg %in% names(default)){
-        assign(paste0(".", arg), default[[arg]], envir=envir)
+    .getOpt <- function(arg, envir = parent.frame(1)) {
+      if (arg %in% names(args)) {
+        assign(paste0(".", arg), args[[arg]], envir = envir)
+      } else if (arg %in% names(control)) {
+        assign(paste0(".", arg), control[[arg]], envir = envir)
+      } else if (arg %in% names(default)) {
+        assign(paste0(".", arg), default[[arg]], envir = envir)
       }
     }
-    for (a in c("mcmc", "ODEopt", "seed", "print",
-                "DEBUG", "covMethod", "calcTables",
-                "logLik", "nnodes.gq",
-                "nsd.gq", "nsd.gq", "adjObf",
-                "optExpression")){
+    for (a in c(
+      "mcmc", "ODEopt", "seed", "print",
+      "DEBUG", "covMethod", "calcTables",
+      "logLik", "nnodes.gq",
+      "nsd.gq", "nsd.gq", "adjObf",
+      "optExpression"
+    )) {
       .getOpt(a)
     }
     uif$env$optExpression <- .optExpression
     .addCov <- .covMethod == "linFim"
 
-    if (uif$saemErr!=""){
-      stop(paste0("For SAEM:\n",uif$saemErr))
+    if (uif$saemErr != "") {
+      stop(paste0("For SAEM:\n", uif$saemErr))
     }
-    if (is.null(uif$nlme.fun.mu)){
+    if (is.null(uif$nlme.fun.mu)) {
       stop("SAEM requires all ETAS to be mu-referenced")
     }
-    .err  <- uif$ini$err
+    .err <- uif$ini$err
     .low <- uif$ini$lower
     .low <- .low[!is.na(.low) & is.na(.err)]
     .up <- uif$ini$upper
     .up <- .up[!is.na(.up) & is.na(.err)]
-    if (any(.low != -Inf) | any(.up != Inf)){
+    if (any(.low != -Inf) | any(.up != Inf)) {
       warning("Bounds are ignored in SAEM")
     }
     uif$env$mcmc <- .mcmc
@@ -420,38 +432,42 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     .dist <- uif$saem.distribution
     model <- uif$saem.model
     inits <- uif$saem.init
-    if (length(uif$saem.fixed)>0) {
-      nphi = attr(model$saem_mod, "nrhs")
-      m = cumsum(!is.na(matrix(inits$theta, byrow=TRUE, ncol=nphi)))
-      fixid = match(uif$saem.fixed, t(matrix(m,ncol=nphi)))
+    if (length(uif$saem.fixed) > 0) {
+      nphi <- attr(model$saem_mod, "nrhs")
+      m <- cumsum(!is.na(matrix(inits$theta, byrow = TRUE, ncol = nphi)))
+      fixid <- match(uif$saem.fixed, t(matrix(m, ncol = nphi)))
 
-      names(inits$theta) = rep("", length(inits$theta))
-      names(inits$theta)[fixid] = "FIXED"
+      names(inits$theta) <- rep("", length(inits$theta))
+      names(inits$theta)[fixid] <- "FIXED"
     }
-    .cfg <- configsaem(model=model, data=dat, inits=inits,
-                      mcmc=.mcmc, ODEopt=.ODEopt, seed=.seed,
-                      distribution=.dist, DEBUG=.DEBUG)
-    if (is(.print, "numeric")){
+    .cfg <- configsaem(
+      model = model, data = dat, inits = inits,
+      mcmc = .mcmc, ODEopt = .ODEopt, seed = .seed,
+      distribution = .dist, DEBUG = .DEBUG
+    )
+    if (is(.print, "numeric")) {
       .cfg$print <- as.integer(.print)
     }
     .fit <- model$saem_mod(.cfg)
     .ret <-
       try(
         as.focei.saemFit(
-          .fit, uif, pt, data=dat, calcResid=calc.resid, obf=.logLik,
-          nnodes.gq=.nnodes.gq, nsd.gq=.nsd.gq, adjObf=.adjObf,
-          calcCov=.addCov, calcTables=.calcTables),
-        silent=TRUE
+          .fit, uif, pt,
+          data = dat, calcResid = calc.resid, obf = .logLik,
+          nnodes.gq = .nnodes.gq, nsd.gq = .nsd.gq, adjObf = .adjObf,
+          calcCov = .addCov, calcTables = .calcTables
+        ),
+        silent = TRUE
       )
-    if (inherits(.ret, "try-error")){
+    if (inherits(.ret, "try-error")) {
       warning("Error converting to nlmixr UI object, returning saem object")
       return(.fit)
     }
-    if (inherits(.ret, "nlmixrFitData")){
+    if (inherits(.ret, "nlmixrFitData")) {
       .ret <- fix.dat(.ret)
       .ret <- .addNpde(.ret)
     }
-    if (inherits(.ret, "nlmixrFitCore")){
+    if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
       .env$adjObj <- .adjObf
       .env$nnodes.gq <- .nnodes.gq
@@ -463,28 +479,28 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
       assign("modelId", .modelId, .env)
     }
     return(.ret)
-  } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free"){
+  } else if (est == "nlme" || est == "nlme.mu" || est == "nlme.mu.cov" || est == "nlme.free") {
     if (.nid <= 1) stop("nlme is for mixed effects models, try 'dynmodel' (need more than 1 individual)")
     if (.nTv != 0) stop("nlme does not support time-varying covariates (yet)")
     data <- .as.data.frame(data)
     if (length(uif$predDf$cond) > 1) stop("nlmixr nlme does not support multiple endpoints.")
     pt <- proc.time()
     est.type <- est
-    if (est == "nlme.free"){
+    if (est == "nlme.free") {
       fun <- uif$nlme.fun
       specs <- uif$nlme.specs
-    } else if (est == "nlme.mu"){
+    } else if (est == "nlme.mu") {
       fun <- uif$nlme.fun.mu
       specs <- uif$nlme.specs.mu
-    } else if (est == "nlme.mu.cov"){
+    } else if (est == "nlme.mu.cov") {
       fun <- uif$nlme.fun.mu.cov
       specs <- uif$nlme.specs.mu.cov
     } else {
-      if (!is.null(uif$nlme.fun.mu.cov)){
+      if (!is.null(uif$nlme.fun.mu.cov)) {
         est.type <- "nlme.mu.cov"
         fun <- uif$nlme.fun.mu.cov
         specs <- uif$nlme.specs.mu.cov
-      } else if (!is.null(uif$nlme.fun.mu)){
+      } else if (!is.null(uif$nlme.fun.mu)) {
         est.type <- "nlme.mu"
         fun <- uif$nlme.fun.mu
         specs <- uif$nlme.specs.mu
@@ -496,7 +512,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     }
     grp.fn <- uif$grp.fn
     dat$nlmixr.grp <-
-      factor(apply(dat, 1, function(x){
+      factor(apply(dat, 1, function(x) {
         cur <- x
         names(cur) <- names(dat)
         with(as.list(cur), {
@@ -505,7 +521,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
       }))
     dat$nlmixr.num <- seq_along(dat$nlmixr.grp)
     weight <- uif$nlme.var
-    if (sum.prod){
+    if (sum.prod) {
       rxode <- RxODE::rxSumProdModel(uif$rxode.pred)
     } else {
       rxode <- uif$rxode.pred
@@ -515,64 +531,70 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     .rtol <- 1e-8
     if (!is.null(control$rtol)) .rtol <- control$rtol
     fit <- nlme_ode(dat,
-                    model=rxode,
-                    par_model=specs,
-                    par_trans=fun,
-                    response="nlmixr_pred",
-                    weight=weight,
-                    verbose=TRUE,
-                    control=control,
-                    atol=.atol,
-                    rtol=.rtol,
-                    ...)
+      model = rxode,
+      par_model = specs,
+      par_trans = fun,
+      response = "nlmixr_pred",
+      weight = weight,
+      verbose = TRUE,
+      control = control,
+      atol = .atol,
+      rtol = .rtol,
+      ...
+    )
     class(fit) <- c(est.type, class(fit))
-    .ret <- try({as.focei.nlmixrNlme(fit, uif, pt, data=dat, calcResid=calc.resid, nobs2=nobs2)})
-    if (inherits(.ret, "try-error")){
+    .ret <- try({
+      as.focei.nlmixrNlme(fit, uif, pt, data = dat, calcResid = calc.resid, nobs2 = nobs2)
+    })
+    if (inherits(.ret, "try-error")) {
       warning("Error converting to nlmixr UI object, returning nlme object")
       return(fit)
     }
-    if (inherits(.ret, "nlmixrFitData")){
+    if (inherits(.ret, "nlmixrFitData")) {
       .ret <- fix.dat(.ret)
       .ret <- .addNpde(.ret)
     }
-    if (inherits(.ret, "nlmixrFitCore")){
+    if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
       assign("startTime", start.time, .env)
       assign("est", est, .env)
       assign("stopTime", Sys.time(), .env)
-      assign("origControl",control,.env)
-      assign("modelId",.modelId,.env)
+      assign("origControl", control, .env)
+      assign("modelId", .modelId, .env)
     }
     return(.ret)
-  } else if (any(est == c("foce", "focei", "fo", "foi"))){
+  } else if (any(est == c("foce", "focei", "fo", "foi"))) {
     if (.nid <= 1) stop(sprintf("%s is for mixed effects models, try 'dynmodel' (need more than 1 individual)", est))
-    if (any(est == c("foce", "fo"))){
+    if (any(est == c("foce", "fo"))) {
       control$interaction <- FALSE
     }
-    env <- new.env(parent=emptyenv())
+    env <- new.env(parent = emptyenv())
     env$uif <- uif
-    if (any(est == c("fo", "foi"))){
+    if (any(est == c("fo", "foi"))) {
       control$maxInnerIterations <- 0
-      control$fo <-TRUE
+      control$fo <- TRUE
       control$boundTol <- 0
       env$skipTable <- TRUE
     }
     fit <- foceiFit(dat,
-                    inits=uif$focei.inits,
-                    PKpars=uif$theta.pars,
-                    ## par_trans=fun,
-                    model=uif$rxode.pred,
-                    pred=function(){return(nlmixr_pred)},
-                    err=uif$error,
-                    lower=uif$focei.lower,
-                    upper=uif$focei.upper,
-                    fixed=uif$focei.fixed,
-                    thetaNames=uif$focei.names,
-                    etaNames=uif$eta.names,
-                    control=control,
-                    env=env,
-                    ...)
-    if (any(est == c("fo", "foi"))){
+      inits = uif$focei.inits,
+      PKpars = uif$theta.pars,
+      ## par_trans=fun,
+      model = uif$rxode.pred,
+      pred = function() {
+        return(nlmixr_pred)
+      },
+      err = uif$error,
+      lower = uif$focei.lower,
+      upper = uif$focei.upper,
+      fixed = uif$focei.fixed,
+      thetaNames = uif$focei.names,
+      etaNames = uif$eta.names,
+      control = control,
+      env = env,
+      ...
+    )
+    if (any(est == c("fo", "foi"))) {
       ## Add posthoc.
       .default <- foceiControl()
       control$maxInnerIterations <- .default$maxInnerIterations
@@ -581,12 +603,12 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
       control$fo <- 0L
       .uif <- fit$uif
       .thetas <- fit$theta
-      for (.n in names(.thetas)){
+      for (.n in names(.thetas)) {
         .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n]
       }
       .omega <- fit$omega
-      for (.i in seq_along(.uif$ini$neta1)){
-        if (!is.na(.uif$ini$neta1[.i])){
+      for (.i in seq_along(.uif$ini$neta1)) {
+        if (!is.na(.uif$ini$neta1[.i])) {
           .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]]
         }
       }
@@ -594,53 +616,56 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
       .objDf <- fit$objDf
       .message <- fit$env$message
       .time <- fit$time
-      env <- new.env(parent=emptyenv())
-      for (.w in c("cov", "covR", "covS", "covMethod")){
-        if (exists(.w, fit$env)){
-          assign(.w, get(.w, envir=fit$env), envir=env)
+      env <- new.env(parent = emptyenv())
+      for (.w in c("cov", "covR", "covS", "covMethod")) {
+        if (exists(.w, fit$env)) {
+          assign(.w, get(.w, envir = fit$env), envir = env)
         }
       }
       env$time2 <- time
       env$uif <- .uif
       env$method <- "FO"
-      fit0<-
+      fit0 <-
         try(
           foceiFit(
             dat,
-            inits=.uif$focei.inits,
-            PKpars=.uif$theta.pars,
+            inits = .uif$focei.inits,
+            PKpars = .uif$theta.pars,
             ## par_trans=fun,
-            model=.uif$rxode.pred,
-            pred=function(){return(nlmixr_pred)},
-            err=.uif$error,
-            lower=.uif$focei.lower,
-            upper=.uif$focei.upper,
-            fixed=.uif$focei.fixed,
-            thetaNames=.uif$focei.names,
-            etaNames=.uif$eta.names,
-            control=control,
-            env=env,
-            ...),
+            model = .uif$rxode.pred,
+            pred = function() {
+              return(nlmixr_pred)
+            },
+            err = .uif$error,
+            lower = .uif$focei.lower,
+            upper = .uif$focei.upper,
+            fixed = .uif$focei.fixed,
+            thetaNames = .uif$focei.names,
+            etaNames = .uif$eta.names,
+            control = control,
+            env = env,
+            ...
+          ),
           silent = TRUE
         )
-      if (inherits(fit0, "try-error")){
+      if (inherits(fit0, "try-error")) {
       } else {
         fit <- fit0
         assign("message2", fit$env$message, env)
         assign("message", .message, env)
         .tmp1 <- env$objDf
         if (any(names(.objDf) == "Condition Number")) {
-          .tmp1 <- .data.frame(.tmp1, "Condition Number"=NA, check.names=FALSE)
+          .tmp1 <- .data.frame(.tmp1, "Condition Number" = NA, check.names = FALSE)
         }
         if (any(names(.tmp1) == "Condition Number")) {
-          .objDf <- .data.frame(.objDf, "Condition Number"=NA, check.names=FALSE)
+          .objDf <- .data.frame(.objDf, "Condition Number" = NA, check.names = FALSE)
         }
         env$objDf <- rbind(.tmp1, .objDf)
         row.names(env$objDf) <- c(ifelse(est == "fo", "FOCE", "FOCEi"), "FO")
         .tmp1 <- env$time
         .tmp1$optimize <- .time$optimize
         .tmp1$covariance <- .time$covariance
-        assign("time", .tmp1, envir=env)
+        assign("time", .tmp1, envir = env)
         env$objDf <- env$objDf[, c("OBJF", "AIC", "BIC", "Log-likelihood", "Condition Number")]
         setOfv(env, "fo")
       }
@@ -650,34 +675,37 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     assign("start.time", start.time, env)
     assign("est", est, env)
     assign("stop.time", Sys.time(), env)
-    assign("origControl",control, env)
-    assign("modelId",.modelId, env)
+    assign("origControl", control, env)
+    assign("modelId", .modelId, env)
     return(fit)
-  } else if (est == "posthoc"){
+  } else if (est == "posthoc") {
     if (.nid <= 1) stop("'posthoc' estimation is for mixed effects models, try 'dynmodel' (need more than 1 individual)")
-    if (class(control) !="foceiControl") control <- do.call(nlmixr::foceiControl, control)
+    if (class(control) != "foceiControl") control <- do.call(nlmixr::foceiControl, control)
     control$covMethod <- 0L
     control$maxOuterIterations <- 0L
-    .env <- new.env(parent=emptyenv())
+    .env <- new.env(parent = emptyenv())
     .env$uif <- uif
     fit <- foceiFit(dat,
-                    inits=uif$focei.inits,
-                    PKpars=uif$theta.pars,
-                    ## par_trans=fun,
-                    model=uif$rxode.pred,
-                    pred=function(){return(nlmixr_pred)},
-                    err=uif$error,
-                    lower=uif$focei.lower,
-                    upper=uif$focei.upper,
-                    thetaNames=uif$focei.names,
-                    etaNames=uif$eta.names,
-                    control=control,
-                    env=.env,
-                    ...)
-    if (inherits(fit, "nlmixrFitData")){
+      inits = uif$focei.inits,
+      PKpars = uif$theta.pars,
+      ## par_trans=fun,
+      model = uif$rxode.pred,
+      pred = function() {
+        return(nlmixr_pred)
+      },
+      err = uif$error,
+      lower = uif$focei.lower,
+      upper = uif$focei.upper,
+      thetaNames = uif$focei.names,
+      etaNames = uif$eta.names,
+      control = control,
+      env = .env,
+      ...
+    )
+    if (inherits(fit, "nlmixrFitData")) {
       .cls <- class(fit)
       .env <- attr(.cls, ".foceiEnv")
-      .cls[1]  <- "nlmixrPosthoc"
+      .cls[1] <- "nlmixrPosthoc"
       class(fit) <- .cls
     }
     assign("uif", uif, fit$env)
@@ -688,19 +716,19 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     ## assign("est", est, env)
     ## assign("stop.time", Sys.time(), env)
     fit <- fix.dat(fit)
-    assign("origControl",control,fit$env)
-    assign("modelId",.modelId,fit$env)
+    assign("origControl", control, fit$env)
+    assign("modelId", .modelId, fit$env)
     return(fit)
   } else if (est == "dynmodel") {
-    if (class(control) !="dynmodelControl") control <- do.call(dynmodelControl, control)
-    env <- new.env(parent=emptyenv())
+    if (class(control) != "dynmodelControl") control <- do.call(dynmodelControl, control)
+    env <- new.env(parent = emptyenv())
 
     env$uif <- NULL
 
     # update data to merge for origData and data. first add zeros or whatever is filled in for DV when there is no observations
     # to match the lengths, then merge observed data for both origData and data, and send to RxODE.
 
-    #.dynmodelData <- data
+    # .dynmodelData <- data
     # nlmixr Object ---
     .nmf <- uif
     # Conversion ---
@@ -713,9 +741,9 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     .model <- .dynNlmixr$model
     # Optional Control ---
     control$nlmixrOutput <- T
-    control$fixPars <- if(!is.null(.dynNlmixr$fixPars)) .dynNlmixr$fixPars else NULL
-    control$lower <- if(!is.null(.dynNlmixr$lower)) .dynNlmixr$lower else NULL
-    control$upper <- if(!is.null(.dynNlmixr$upper)) .dynNlmixr$upper else NULL
+    control$fixPars <- if (!is.null(.dynNlmixr$fixPars)) .dynNlmixr$fixPars else NULL
+    control$lower <- if (!is.null(.dynNlmixr$lower)) .dynNlmixr$lower else NULL
+    control$upper <- if (!is.null(.dynNlmixr$upper)) .dynNlmixr$upper else NULL
 
     fit <-
       dynmodel(
@@ -724,7 +752,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
         inits = .inits,
         data = .origData,
         nlmixrObject = .nmf,
-        control=control
+        control = control
       )
     assign("origData", .origData, fit$env)
     assign(".fit", fit, envir = .GlobalEnv)
@@ -732,7 +760,7 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
     return(fit)
   }
   else {
-    stop(sprintf("Unknown estimation method est=\"%s\"",est))
+    stop(sprintf("Unknown estimation method est=\"%s\"", est))
   }
 }
 
@@ -759,69 +787,75 @@ nlmixr_fit0 <- function(uif, data, est=NULL, control=list(), ...,
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
-                        sum.prod=FALSE, table=tableControl(),
-                        save=NULL, envir=parent.frame()){
+nlmixr_fit <- function(uif, data, est = NULL, control = list(), ...,
+                       sum.prod = FALSE, table = tableControl(),
+                       save = NULL, envir = parent.frame()) {
   RxODE::.setWarnIdSort(FALSE)
   on.exit(RxODE::.setWarnIdSort(TRUE))
-  if (is.null(save)){
+  if (is.null(save)) {
     save <- getOption("nlmixr.save", FALSE)
   }
-  if (save){
-    .modName  <- ifelse(is.null(uif$model.name),"",paste0(uif$model.name,"-"))
-    if (.modName==".-") .modName <- ""
-    .dataName  <- ifelse(is.null(uif$data.name),"",paste0(uif$data.name,"-"))
-    if (.dataName==".-") .dataName <- ""
+  if (save) {
+    .modName <- ifelse(is.null(uif$model.name), "", paste0(uif$model.name, "-"))
+    if (.modName == ".-") .modName <- ""
+    .dataName <- ifelse(is.null(uif$data.name), "", paste0(uif$data.name, "-"))
+    if (.dataName == ".-") .dataName <- ""
     .digest <-
       digest::digest(
-        list(gsub("<-","=",gsub(" +","",uif$fun.txt)),
-             .as.data.frame(uif$ini),
-             data,
-             est,
-             control,
-             sum.prod,
-             table,
-             ...,
-             as.character(utils::packageVersion("nlmixr")),
-             as.character(utils::packageVersion("RxODE")))
+        list(
+          gsub("<-", "=", gsub(" +", "", uif$fun.txt)),
+          .as.data.frame(uif$ini),
+          data,
+          est,
+          control,
+          sum.prod,
+          table,
+          ...,
+          as.character(utils::packageVersion("nlmixr")),
+          as.character(utils::packageVersion("RxODE"))
+        )
       )
-    .saveFile  <- file.path(getOption("nlmixr.save.dir", getwd()),
-                            paste0("nlmixr-",.modName,.dataName,est,"-",.digest,".rds"))
-    if (file.exists(.saveFile)){
-      message(sprintf("Loading model already run (%s)",.saveFile))
-      .ret  <- readRDS(.saveFile)
-      if (!is.null(.ret$warnings)){
+    .saveFile <- file.path(
+      getOption("nlmixr.save.dir", getwd()),
+      paste0("nlmixr-", .modName, .dataName, est, "-", .digest, ".rds")
+    )
+    if (file.exists(.saveFile)) {
+      message(sprintf("Loading model already run (%s)", .saveFile))
+      .ret <- readRDS(.saveFile)
+      if (!is.null(.ret$warnings)) {
         sapply(.ret$warnings, warning)
       }
       return(.ret)
     }
   }
-  .ret  <-
+  .ret <-
     .collectWarnings(
-      nlmixr_fit0(uif=uif, data=data, est=est, control=control, ...,
-                  sum.prod=sum.prod, table=table, envir=envir),
+      nlmixr_fit0(
+        uif = uif, data = data, est = est, control = control, ...,
+        sum.prod = sum.prod, table = table, envir = envir
+      ),
       TRUE
     )
-  .ws  <- .ret[[2]]
-  .ret  <- .ret[[1]]
-  if (inherits(.ret, "nlmixrFitCore")){
+  .ws <- .ret[[2]]
+  .ret <- .ret[[1]]
+  if (inherits(.ret, "nlmixrFitCore")) {
     .env <- .ret$env
     .env$warnings <- .ws
   }
-  for (.i in seq_along(.ws)){
+  for (.i in seq_along(.ws)) {
     warning(.ws[.i])
   }
-  if (inherits(.ret, "nlmixrFitCore")){
-    if (save){
-      AIC(.ret); # Calculate SAEM AIC when saving...
+  if (inherits(.ret, "nlmixrFitCore")) {
+    if (save) {
+      AIC(.ret) # Calculate SAEM AIC when saving...
       .env <- .ret$env
       .extra <- (proc.time() - .nlmixrTime)["elapsed"] - sum(.env$time)
-      .env$time <- .data.frame(.env$time,"other"=.extra, check.names=FALSE)
-      saveRDS(.ret,file=.saveFile)
+      .env$time <- .data.frame(.env$time, "other" = .extra, check.names = FALSE)
+      saveRDS(.ret, file = .saveFile)
     } else {
       .env <- .ret$env
       .extra <- (proc.time() - .nlmixrTime)["elapsed"] - sum(.env$time)
-      .env$time <- .data.frame(.env$time,"other"=.extra, check.names=FALSE)
+      .env$time <- .data.frame(.env$time, "other" = .extra, check.names = FALSE)
     }
   }
   return(.ret)
@@ -907,51 +941,55 @@ nlmixr_fit  <- function(uif, data, est=NULL, control=list(), ...,
 ##'     SAEM.
 ##' @author Wenping Wang & Matthew L. Fidler
 ##' @export
-saemControl <- function(seed=99,
-                        nBurn=200, nEm=300,
-                        nmc=3,
-                        nu=c(2, 2, 2),
+saemControl <- function(seed = 99,
+                        nBurn = 200, nEm = 300,
+                        nmc = 3,
+                        nu = c(2, 2, 2),
                         atol = 1e-06,
                         rtol = 1e-04,
                         method = "lsoda",
                         transitAbs = FALSE,
-                        print=1,
-                        trace=0,
-                        covMethod=c("linFim", "fim", "r,s", "r", "s", ""),
-                        calcTables=TRUE,
-                        logLik=FALSE,
-                        nnodes.gq=3,
-                        nsd.gq=1.6,
-                        optExpression=TRUE,
-                        maxsteps=100000L,
-                        adjObf=TRUE,
-                        ...){
+                        print = 1,
+                        trace = 0,
+                        covMethod = c("linFim", "fim", "r,s", "r", "s", ""),
+                        calcTables = TRUE,
+                        logLik = FALSE,
+                        nnodes.gq = 3,
+                        nsd.gq = 1.6,
+                        optExpression = TRUE,
+                        maxsteps = 100000L,
+                        adjObf = TRUE,
+                        ...) {
   .xtra <- list(...)
   .rm <- c()
-  if (missing(transitAbs) && !is.null(.xtra$transit_abs)){
+  if (missing(transitAbs) && !is.null(.xtra$transit_abs)) {
     transitAbs <- .xtra$transit_abs
     .rm <- c(.rm, "transit_abs")
   }
-  if (missing(nBurn) && !is.null(.xtra$n.burn)){
+  if (missing(nBurn) && !is.null(.xtra$n.burn)) {
     nBurn <- .xtra$n.burn
     .rm <- c(.rm, "n.burn")
   }
-  if (missing(nEm) && !is.null(.xtra$n.em)){
+  if (missing(nEm) && !is.null(.xtra$n.em)) {
     nEm <- .xtra$n.em
     .rm <- c(.rm, "n.em")
   }
-  .ret <- list(mcmc=list(niter=c(nBurn, nEm), nmc=nmc, nu=nu),
-               ODEopt=RxODE::rxControl(atol=atol, rtol=rtol, method=method,
-                                       transitAbs = transitAbs,maxsteps=maxsteps,...),
-               seed=seed,
-               print=print,
-               DEBUG=trace,
-               optExpression=optExpression,
-               nnodes.gq=nnodes.gq,
-               nsd.gq=nsd.gq,
-               adjObf=adjObf,
-               ...)
-  if (length(.rm) > 0){
+  .ret <- list(
+    mcmc = list(niter = c(nBurn, nEm), nmc = nmc, nu = nu),
+    ODEopt = RxODE::rxControl(
+      atol = atol, rtol = rtol, method = method,
+      transitAbs = transitAbs, maxsteps = maxsteps, ...
+    ),
+    seed = seed,
+    print = print,
+    DEBUG = trace,
+    optExpression = optExpression,
+    nnodes.gq = nnodes.gq,
+    nsd.gq = nsd.gq,
+    adjObf = adjObf,
+    ...
+  )
+  if (length(.rm) > 0) {
     .ret <- .ret[!(names(.ret) %in% .rm)]
   }
   .ret[["covMethod"]] <- match.arg(covMethod)
@@ -973,73 +1011,77 @@ saemControl <- function(seed=99,
 ##' @return fit with CWRES
 ##' @author Matthew L. Fidler
 ##' @export
-addCwres <- function(fit, updateObject=TRUE, envir=globalenv()){
+addCwres <- function(fit, updateObject = TRUE, envir = globalenv()) {
   RxODE::.setWarnIdSort(FALSE)
   on.exit(RxODE::.setWarnIdSort(TRUE))
-  .pt  <- proc.time()
+  .pt <- proc.time()
   .oTime <- fit$env$time
   .objName <- substitute(fit)
-  if(any(names(fit) == "CWRES")){
+  if (any(names(fit) == "CWRES")) {
     ## warning("Already contains CWRES")
     return(fit)
   }
   .uif <- fit$uif
   .saem <- fit$saem
   .od <- fit$origData
-  if (!is.null(.saem)){
-    assign("saem",NULL,fit$env)
-    on.exit({assign("saem",.saem,fit$env)})
-    .newFit <- as.focei.saemFit(.saem, .uif, data=.nmGetData(fit), calcResid = TRUE, obf=NA,
-                                calcCov=fit$cov, covMethod=fit$covMethod,
-                                calcCovTime= as.vector(fit$time[["covariance"]]))
+  if (!is.null(.saem)) {
+    assign("saem", NULL, fit$env)
+    on.exit({
+      assign("saem", .saem, fit$env)
+    })
+    .newFit <- as.focei.saemFit(.saem, .uif,
+      data = .nmGetData(fit), calcResid = TRUE, obf = NA,
+      calcCov = fit$cov, covMethod = fit$covMethod,
+      calcCovTime = as.vector(fit$time[["covariance"]])
+    )
     .ob1 <- .newFit$objDf
     .ob2 <- fit$objDf
-    if (any(names(.ob2) == "Condition Number")){
+    if (any(names(.ob2) == "Condition Number")) {
       .cn <- unique(.ob2[["Condition Number"]])
       .cn <- .cn[!is.na(.cn)]
-      if (length(.cn)==1){
-        .ob1[,"Condition Number"] <- .cn
+      if (length(.cn) == 1) {
+        .ob1[, "Condition Number"] <- .cn
       } else {
-        .ob1[,"Condition Number"] <- NA
+        .ob1[, "Condition Number"] <- NA
       }
     }
-    .ob1 <- rbind(.ob1,.ob2)
-    .ob1 <- .ob1[order(row.names(.ob1)),]
-    .ob1 <- .ob1[!is.na(.ob1$OBJF),]
-    assign("objDf", .ob1, envir=.newFit$env)
-    assign("saem",.saem,fit$env)
-    assign("adjObj",fit$env$adjObj, .newFit$env)
+    .ob1 <- rbind(.ob1, .ob2)
+    .ob1 <- .ob1[order(row.names(.ob1)), ]
+    .ob1 <- .ob1[!is.na(.ob1$OBJF), ]
+    assign("objDf", .ob1, envir = .newFit$env)
+    assign("saem", .saem, fit$env)
+    assign("adjObj", fit$env$adjObj, .newFit$env)
     .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")]
     ## Add CWRES timing to fit.
     .new <- cbind(fit, .df)
   }
   .nlme <- fit$nlme
-  if (!is.null(.nlme)){
-    .newFit <- as.focei(.nlme, .uif, data=.nmGetData(fit), calcResid = TRUE)
-    assign("adjObj",fit$env$adjObj, .newFit$env)
+  if (!is.null(.nlme)) {
+    .newFit <- as.focei(.nlme, .uif, data = .nmGetData(fit), calcResid = TRUE)
+    assign("adjObj", fit$env$adjObj, .newFit$env)
     .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")]
     .new <- cbind(fit, .df)
   }
   class(.new) <- class(.newFit)
-  if (!is.null(.saem)){
+  if (!is.null(.saem)) {
     setOfv(.new, "FOCEi")
   }
-  if (updateObject){
+  if (updateObject) {
     .parent <- envir
-    .bound <- do.call("c", lapply(ls(.parent, all.names=TRUE), function(.cur){
-      if (.cur == .objName && identical(.parent[[.cur]]$env, fit$env)){
+    .bound <- do.call("c", lapply(ls(.parent, all.names = TRUE), function(.cur) {
+      if (.cur == .objName && identical(.parent[[.cur]]$env, fit$env)) {
         return(.cur)
       }
       return(NULL)
     }))
-    if (length(.bound) == 1){
-      if (exists(.bound, envir=.parent)){
-        assign(.bound, .new, envir=.parent)
+    if (length(.bound) == 1) {
+      if (exists(.bound, envir = .parent)) {
+        assign(.bound, .new, envir = .parent)
       }
     }
   }
   .env <- .new$env
-  .env$time <- .data.frame(.oTime,cwres=(proc.time() - .pt)["elapsed"],check.names=FALSE)
+  .env$time <- .data.frame(.oTime, cwres = (proc.time() - .pt)["elapsed"], check.names = FALSE)
   assign("origData", .od, .env)
   return(.new)
 }

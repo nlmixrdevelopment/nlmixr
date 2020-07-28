@@ -317,7 +317,8 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
   .temp.theta.index <-
     c(1:sum(
       as.data.frame(
-        .nlmixrObject$ini)$fix == F &
+        .nlmixrObject$ini
+      )$fix == F &
         is.na(as.data.frame(.nlmixrObject$ini)$err)
     ))
   .temp.replacements <- .dynmodelObject$res[.theta.index, 1]
@@ -669,203 +670,210 @@ nlmixrDynmodelConvert <- function(.nmf) {
 #' @author Mason McComb and Matthew L. Fidler
 #' @export
 dynmodelControl <- function(...,
-                            ci=0.95,
-                            nlmixrOutput=FALSE,
-                            digs=3,
+                            ci = 0.95,
+                            nlmixrOutput = FALSE,
+                            digs = 3,
                             lower = -Inf,
                             upper = Inf,
                             ## mma doesn't work
                             ## lbfgsbLG
                             ## slsqp
-                            method=c("bobyqa", "Nelder-Mead", "lbfgsb3c", "L-BFGS-B", "PORT",
-                                     "mma", "lbfgsbLG", "slsqp", "Rvmmin"),
-                            ftol_rel=1e-6,
-                            maxeval=999,
-                            scaleTo=1.0,
-                            scaleObjective=0,
-                            normType=c("rescale2", "constant", "mean", "rescale", "std", "len"),
-                            scaleType=c("nlmixr", "norm", "mult", "multAdd"),
-                            scaleCmax=1e5,
-                            scaleCmin=1e-5,
-                            scaleC=NULL,
-                            scaleC0=1e5,
+                            method = c(
+                              "bobyqa", "Nelder-Mead", "lbfgsb3c", "L-BFGS-B", "PORT",
+                              "mma", "lbfgsbLG", "slsqp", "Rvmmin"
+                            ),
+                            ftol_rel = 1e-6,
+                            maxeval = 999,
+                            scaleTo = 1.0,
+                            scaleObjective = 0,
+                            normType = c("rescale2", "constant", "mean", "rescale", "std", "len"),
+                            scaleType = c("nlmixr", "norm", "mult", "multAdd"),
+                            scaleCmax = 1e5,
+                            scaleCmin = 1e-5,
+                            scaleC = NULL,
+                            scaleC0 = 1e5,
                             # RxODE
-                            atol=NULL,
-                            rtol=NULL,
-                            atolSS=NULL,
-                            rtolSS=NULL,
+                            atol = NULL,
+                            rtol = NULL,
+                            atolSS = NULL,
+                            rtolSS = NULL,
                             # bobyqaControl
                             npt = NULL,
                             rhobeg = 0.2,
                             rhoend = NULL,
                             iprint = 0,
-                            print=1,
+                            print = 1,
                             maxfun = NULL,
                             # lbfgsb3c
-                            trace=0,
-                            factr=NULL,
-                            pgtol=NULL,
-                            abstol=NULL,
-                            reltol=NULL,
-                            lmm=NULL,
-                            maxit=100000L,
-                            #,iprint=NULL repreated above
+                            trace = 0,
+                            factr = NULL,
+                            pgtol = NULL,
+                            abstol = NULL,
+                            reltol = NULL,
+                            lmm = NULL,
+                            maxit = 100000L,
+                            # ,iprint=NULL repreated above
                             # nlminb (PORT)
-                            eval.max=NULL,
-                            iter.max=NULL,
-                            #trace=NULL,
-                            abs.tol=NULL,
-                            rel.tol=NULL,
-                            x.tol=NULL,
-                            xf.tol=NULL,
-                            step.min=NULL,
-                            step.max=NULL,
-                            sing.tol=NULL,
-                            scale.init=NULL,
-                            diff.g=NULL,
+                            eval.max = NULL,
+                            iter.max = NULL,
+                            # trace=NULL,
+                            abs.tol = NULL,
+                            rel.tol = NULL,
+                            x.tol = NULL,
+                            xf.tol = NULL,
+                            step.min = NULL,
+                            step.max = NULL,
+                            sing.tol = NULL,
+                            scale.init = NULL,
+                            diff.g = NULL,
                             ## Sigdig
-                            boundTol=NULL,
-                            epsilon=NULL,
-                            derivSwitchTol=NULL,
-                            sigdig=4,
-                            covMethod=c("nlmixrHess", "optimHess"),
+                            boundTol = NULL,
+                            epsilon = NULL,
+                            derivSwitchTol = NULL,
+                            sigdig = 4,
+                            covMethod = c("nlmixrHess", "optimHess"),
                             # rxControl
-                            gillK=10L,
-                            gillStep=4,
-                            gillFtol=0,
-                            gillRtol=sqrt(.Machine$double.eps),
-                            gillKcov=10L,
-                            gillStepCov=2,
-                            gillFtolCov=0,
-                            rxControl = NULL
-                            ) {
-  if (is.null(boundTol)){
-    boundTol <- 5 * 10 ^ (-sigdig + 1)
+                            gillK = 10L,
+                            gillStep = 4,
+                            gillFtol = 0,
+                            gillRtol = sqrt(.Machine$double.eps),
+                            gillKcov = 10L,
+                            gillStepCov = 2,
+                            gillFtolCov = 0,
+                            rxControl = NULL) {
+  if (is.null(boundTol)) {
+    boundTol <- 5 * 10^(-sigdig + 1)
   }
-  if (is.null(epsilon)){
-    epsilon <- 10 ^ (-sigdig - 1)
+  if (is.null(epsilon)) {
+    epsilon <- 10^(-sigdig - 1)
   }
-  if (is.null(abstol)){
-    abstol <- 10 ^ (-sigdig - 1)
+  if (is.null(abstol)) {
+    abstol <- 10^(-sigdig - 1)
   }
-  if (is.null(reltol)){
-    reltol <- 10 ^ (-sigdig - 1)
+  if (is.null(reltol)) {
+    reltol <- 10^(-sigdig - 1)
   }
 
-  if (is.null(rhoend)){
-    rhoend <- 10 ^ (-sigdig - 1);
+  if (is.null(rhoend)) {
+    rhoend <- 10^(-sigdig - 1)
   }
-  if (is.null(factr)){
-    factr <- 10 ^ (-sigdig - 1) / .Machine$double.eps;
+  if (is.null(factr)) {
+    factr <- 10^(-sigdig - 1) / .Machine$double.eps
   }
-  if (is.null(atol)){
-    atol <- 0.5 * 10 ^ (-sigdig - 2);
+  if (is.null(atol)) {
+    atol <- 0.5 * 10^(-sigdig - 2)
   }
-  if (is.null(rtol)){
-    rtol <- 0.5 * 10 ^ (-sigdig - 2);
+  if (is.null(rtol)) {
+    rtol <- 0.5 * 10^(-sigdig - 2)
   }
-  if (is.null(atolSS)){
-    atolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+  if (is.null(atolSS)) {
+    atolSS <- 0.5 * 10^(-sigdig - 1.5)
   }
-  if (is.null(rtolSS)){
-    rtolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+  if (is.null(rtolSS)) {
+    rtolSS <- 0.5 * 10^(-sigdig - 1.5)
   }
-  if (is.null(rel.tol)){
-    rel.tol <- 10 ^ (-sigdig - 1);
+  if (is.null(rel.tol)) {
+    rel.tol <- 10^(-sigdig - 1)
   }
-  if (is.null(x.tol)){
-    x.tol <- 10 ^ (-sigdig - 1);
+  if (is.null(x.tol)) {
+    x.tol <- 10^(-sigdig - 1)
   }
-  if (is.null(derivSwitchTol)){
-    derivSwitchTol <- 2 * 10 ^ (-sigdig-1);
+  if (is.null(derivSwitchTol)) {
+    derivSwitchTol <- 2 * 10^(-sigdig - 1)
   }
-  if (inherits(rxControl, "list")){
-    if (!any(names(rxControl) == "atol")){
-      rxControl$atol <- 0.5 * 10 ^ (-sigdig - 2);
+  if (inherits(rxControl, "list")) {
+    if (!any(names(rxControl) == "atol")) {
+      rxControl$atol <- 0.5 * 10^(-sigdig - 2)
     }
-    if (!any(names(rxControl) == "rtol")){
-      rxControl$rtol <- 0.5 * 10 ^ (-sigdig - 2);
+    if (!any(names(rxControl) == "rtol")) {
+      rxControl$rtol <- 0.5 * 10^(-sigdig - 2)
     }
-    if (!any(names(rxControl) == "atolSS")){
-      rxControl$atolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+    if (!any(names(rxControl) == "atolSS")) {
+      rxControl$atolSS <- 0.5 * 10^(-sigdig - 1.5)
     }
-    if (!any(names(rxControl) == "rtolSS")){
-      rxControl$rtolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
+    if (!any(names(rxControl) == "rtolSS")) {
+      rxControl$rtolSS <- 0.5 * 10^(-sigdig - 1.5)
     }
-    rxControl <- do.call(RxODE::rxControl, rxControl);
+    rxControl <- do.call(RxODE::rxControl, rxControl)
   } else {
-    atol <- 0.5 * 10 ^ (-sigdig - 2);
-    rtol <- 0.5 * 10 ^ (-sigdig - 2);
-    atolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
-    rtolSS <- 0.5 * 10 ^ (-sigdig - 1.5);
-    rxControl = RxODE::rxControl(atol=atol,rtol=rtol,atolSS=atolSS,rtolSS=rtolSS);
+    atol <- 0.5 * 10^(-sigdig - 2)
+    rtol <- 0.5 * 10^(-sigdig - 2)
+    atolSS <- 0.5 * 10^(-sigdig - 1.5)
+    rtolSS <- 0.5 * 10^(-sigdig - 1.5)
+    rxControl <- RxODE::rxControl(atol = atol, rtol = rtol, atolSS = atolSS, rtolSS = rtolSS)
   }
 
-  if (missing(method)){method = "bobyqa"}
-  if (missing(normType)){normType = "rescale2"} # normType= 'constant'
-  if (missing(scaleType)){scaleType = "nlmixr"} # scaleType= 'norm'
+  if (missing(method)) {
+    method <- "bobyqa"
+  }
+  if (missing(normType)) {
+    normType <- "rescale2"
+  } # normType= 'constant'
+  if (missing(scaleType)) {
+    scaleType <- "nlmixr"
+  } # scaleType= 'norm'
 
   .ret <- list(
-    ci=ci,
-    nlmixrOutput=nlmixrOutput,
-    digs=digs,
-    lower=lower,
-    upper=upper,
-    method=method,
-    ftol_rel=ftol_rel,
-    maxeval=maxeval,
-    scaleTo=scaleTo,
-    scaleObjective=scaleObjective,
-    normType=normType,
-    scaleType=scaleType,
-    scaleCmax=scaleCmax,
-    scaleCmin=scaleCmin,
-    scaleC=scaleC, #NULL,
-    scaleC0=scaleC0,
+    ci = ci,
+    nlmixrOutput = nlmixrOutput,
+    digs = digs,
+    lower = lower,
+    upper = upper,
+    method = method,
+    ftol_rel = ftol_rel,
+    maxeval = maxeval,
+    scaleTo = scaleTo,
+    scaleObjective = scaleObjective,
+    normType = normType,
+    scaleType = scaleType,
+    scaleCmax = scaleCmax,
+    scaleCmin = scaleCmin,
+    scaleC = scaleC, # NULL,
+    scaleC0 = scaleC0,
     # RxODE
-    atol=atol,
-    rtol=rtol,
+    atol = atol,
+    rtol = rtol,
     # bobyqa
     npt = npt,
     rhobeg = rhobeg,
     rhoend = rhoend,
-    iprint = iprint, #also used in lbfgsb3c
-    print=print,
+    iprint = iprint, # also used in lbfgsb3c
+    print = print,
     maxfun = maxfun,
     # lbfgsb3c
-    trace=trace,
-    factr=factr,
-    pgtol=pgtol,
-    abstol=abstol,
-    reltol=reltol,
-    lmm=lmm,
-    maxit=maxit,
-    #,iprint = iprint,
+    trace = trace,
+    factr = factr,
+    pgtol = pgtol,
+    abstol = abstol,
+    reltol = reltol,
+    lmm = lmm,
+    maxit = maxit,
+    # ,iprint = iprint,
     # nlminb (PORT)
-    eval.max=eval.max,
-    iter.max=iter.max,
-    #trace=NULL,
-    abs.tol=abs.tol,
-    rel.tol=rel.tol,
-    x.tol=x.tol,
-    xf.tol=xf.tol,
-    step.min=step.min,
-    step.max=step.max,
-    sing.tol=sing.tol,
-    scale.init=scale.init,
-    diff.g=diff.g,
-    covMethod=match.arg(covMethod),
+    eval.max = eval.max,
+    iter.max = iter.max,
+    # trace=NULL,
+    abs.tol = abs.tol,
+    rel.tol = rel.tol,
+    x.tol = x.tol,
+    xf.tol = xf.tol,
+    step.min = step.min,
+    step.max = step.max,
+    sing.tol = sing.tol,
+    scale.init = scale.init,
+    diff.g = diff.g,
+    covMethod = match.arg(covMethod),
     rxControl = rxControl,
-    gillK=as.integer(gillK),
-    gillKcov=as.integer(gillKcov),
-    gillRtol=as.double(gillRtol),
-    gillStep=as.double(gillStep),
-    gillStepCov=as.double(gillStepCov),
-    gillFtol=as.double(gillFtol),
-    gillFtolCov=as.double(gillFtolCov)
+    gillK = as.integer(gillK),
+    gillKcov = as.integer(gillKcov),
+    gillRtol = as.double(gillRtol),
+    gillStep = as.double(gillStep),
+    gillStepCov = as.double(gillStepCov),
+    gillFtol = as.double(gillFtol),
+    gillFtolCov = as.double(gillFtolCov)
   )
   .w <- which(sapply(.ret, is.null))
-  .ret <- .ret[-.w];
+  .ret <- .ret[-.w]
   class(.ret) <- "dynmodelControl"
   return(.ret)
 }
@@ -894,33 +902,33 @@ dynmodelControl <- function(...,
 #'       "
 #' ode_system <- RxODE(model = ode)
 #' model_error_structure <- cp ~ C + add(0.01) + prop(0.01)
-#' inits = c(CL=1, V=10)
-#' control =  dynmodelControl(method = "Nelder-Mead")
+#' inits <- c(CL = 1, V = 10)
+#' control <- dynmodelControl(method = "Nelder-Mead")
 #' fit <-
 #'   dynmodel(
-#'     system=ode_system,
-#'     model=model_error_structure,
-#'     data=Bolus_1CPT,
-#'     inits=inits,
-#'     control=control
+#'     system = ode_system,
+#'     model = model_error_structure,
+#'     data = Bolus_1CPT,
+#'     inits = inits,
+#'     control = control
 #'   )
 #'
 #' # nlmixr example ----------------------------------------------------------
 #' model_onecmt_bolus <- function() {
 #'   ini({
-#'     CL <- c(0,5,10) # Clearance (L/hr)
-#'     V <- c(0,50,100) # Volume of Distribution
-#'     prop.err <- c(0,0.01,1)
+#'     CL <- c(0, 5, 10) # Clearance (L/hr)
+#'     V <- c(0, 50, 100) # Volume of Distribution
+#'     prop.err <- c(0, 0.01, 1)
 #'   })
 #'   model({
-#'     kel = CL/V
-#'     d/dt(X) = -kel*X
-#'     cp = X/V
+#'     kel <- CL / V
+#'     d / dt(X) <- -kel * X
+#'     cp <- X / V
 #'     cp ~ prop(prop.err)
 #'   })
 #' }
 #'
-#' fit <- nlmixr(object = model_onecmt_bolus, data=Bolus_1CPT, est="dynmodel")
+#' fit <- nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "dynmodel")
 #' @export
 dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = NULL, control = list(), ...) {
   # Timing and environment --------------------------------------------------
@@ -1619,16 +1627,21 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   }
 
   # reassign the negative values to positive for add, prop/pow since they are standard deviations
-  if (!is.na(match("add", names(inits))))
+  if (!is.na(match("add", names(inits)))) {
     fit$par[match("add", names(inits))] <- abs(fit$par[match("add", names(inits))])
-  if (!is.na(match("prop", names(inits))))
+  }
+  if (!is.na(match("prop", names(inits)))) {
     fit$par[match("prop", names(inits))] <- abs(fit$par[match("prop", names(inits))])
-  if (!is.na(match("pow", names(inits))))
+  }
+  if (!is.na(match("pow", names(inits)))) {
     fit$par[match("pow", names(inits))] <- abs(fit$par[match("pow", names(inits))])
-  if (!is.na(match("norm", names(inits))))
+  }
+  if (!is.na(match("norm", names(inits)))) {
     fit$par[match("norm", names(inits))] <- abs(fit$par[match("norm", names(inits))])
-  if (!is.na(match("dnorm", names(inits))))
+  }
+  if (!is.na(match("dnorm", names(inits)))) {
     fit$par[match("dnorm", names(inits))] <- abs(fit$par[match("dnorm", names(inits))])
+  }
 
   .time$hessianTime <- (proc.time() - .ht)["elapsed"]
   # dynmodel Output -------------------------------------------------------
@@ -1708,8 +1721,9 @@ genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
 
     inits.err <<- c(inits.err, sig.add, sig.pro)
 
-    if (any(is.na(inits.err) | inits.err <= 0))
+    if (any(is.na(inits.err) | inits.err <= 0)) {
       stop("error model misspecification")
+    }
 
     s <- c(s[2:3], err.type)
     names(s) <- c("dv", "pred", "err")
@@ -1853,14 +1867,13 @@ do.slice <- function(pars, fr0) {
 #'
 #'
 #' ## ------------------------------------------------------------------------
-#' dat <- read.table("invgaussian.txt", header=TRUE)
+#' dat <- read.table("invgaussian.txt", header = TRUE)
 #' mod <- cp ~ C2 + prop(.1)
-#' inits <- c(MIT=190, CVI2=.65, F=.92)
-#' fixPars <- c(CL=.0793, V2=.64, Q=.292, V3=9.63)
+#' inits <- c(MIT = 190, CVI2 = .65, F = .92)
+#' fixPars <- c(CL = .0793, V2 = .64, Q = .292, V3 = 9.63)
 #' ev <- eventTable()
 #' ev$add.sampling(c(0, dat$time))
 #' (fit <- dynmodel.mcmc(sys1, mod, ev, inits, dat, fixPars))
-#'
 #' }
 #' @export
 dynmodel.mcmc <- function(system, model, evTable, inits, data,
@@ -1904,7 +1917,7 @@ dynmodel.mcmc <- function(system, model, evTable, inits, data,
 #' @rdname print.dyn.mcmc
 #' @export
 summary.dyn.mcmc <- function(object, ...) {
-  print.dyn.mcmc(x=object, ...)
+  print.dyn.mcmc(x = object, ...)
 }
 
 #' Print summary of a non-population dynamic model fit using mcmc
@@ -1941,13 +1954,13 @@ plot.dyn.mcmc <- function(x, ...) {
 #
 # ####################################################################### #
 
-refresh <- function(){
+refresh <- function() {
   ## nocov start
   source(devtools::package_file("build/refresh.R"))
   ## nocov end
 }
 
-nsis <- function(){ ## build installer...
+nsis <- function() { ## build installer...
   ## nocov start
   source(devtools::package_file("build/nsis.R"))
   ## nocov end
@@ -2003,8 +2016,10 @@ nsis <- function(){ ## build installer...
 nlmixrPrint <- function(x, ...) {
   this.env <- environment()
   message(invisible(paste(
-    .captureOutput(assign("x", print(x, ...), this.env)), collapse = "\n")),
-    appendLF = TRUE
+    .captureOutput(assign("x", print(x, ...), this.env)),
+    collapse = "\n"
+  )),
+  appendLF = TRUE
   )
   invisible(x)
 }
@@ -2132,7 +2147,7 @@ as.dynmodel <- function(x) {
 }
 
 #' Generate a data.frame using the R4.0 convention
-#' 
+#'
 #' @param ... Passed to \code{base::data.frame()} or
 #'   \code{base::as.data.frame()}
 #' @param stringsAsFactors Captured so that it can be ignored and always set to
@@ -2144,4 +2159,59 @@ as.dynmodel <- function(x) {
 }
 .as.data.frame <- function(..., stringsAsFactors = FALSE) {
   base::as.data.frame(..., stringsAsFactors = FALSE)
+}
+
+
+.isTestthat <- function() {
+  return(regexpr("/tests/testthat/", getwd(), fixed = TRUE) != -1)
+}
+
+nlmixrTest <- function(expr, silent = .isTestthat(), test = "cran") {
+  .Call(`_nlmixr_setSilentErr`, 1L, PACKAGE = "nlmixr")
+  RxODE::rxSetSilentErr(1L)
+  do.it <- TRUE
+  .test <- .test0 <- Sys.getenv("NOT_CRAN")
+  if (Sys.getenv("nmCran") != "") {
+    .test <- .test0 <- Sys.getenv("nmCran")
+  }
+  on.exit({
+    .Call(`_nlmixr_setSilentErr`, 0L, PACKAGE = "nlmixr")
+    RxODE::rxSetSilentErr(0L)
+  })
+  if (any(.test == c("false", "", "cran"))) {
+    if (any(test == c("false", "", "cran"))) {
+      do.it <- TRUE
+    }
+    else {
+      do.it <- FALSE
+    }
+  }
+  else {
+    if (test == .test || .test == "true") {
+      do.it <- TRUE
+    }
+    else {
+      do.it <- FALSE
+    }
+  }
+  if (do.it) {
+    .lastCran <- Sys.getenv("NOT_CRAN")
+    Sys.setenv(NOT_CRAN = "true")
+    on.exit(
+      {
+        Sys.setenv(NOT_CRAN = .lastCran)
+      },
+      add = TRUE
+    )
+    if (is(substitute(expr), "{")) {
+      if (silent) {
+        return(suppressMessages(eval(substitute(expr),
+          envir = parent.frame(1)
+        )))
+      }
+      else {
+        return(eval(substitute(expr), envir = parent.frame(1)))
+      }
+    }
+  }
 }

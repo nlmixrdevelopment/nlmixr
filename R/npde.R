@@ -12,61 +12,65 @@
 ##' @return New nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
-addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE,
-                    cholSEtol=(.Machine$double.eps)^(1/3), ...){
-    RxODE::.setWarnIdSort(FALSE);
-    on.exit(RxODE::.setWarnIdSort(TRUE));
-    .pt  <- proc.time();
-    .objName <- substitute(object);
-    if (any(names(object) == "NPDE")){
-        warning("Already contains NPDE")
-        return(object)
+addNpde <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject = TRUE,
+                    cholSEtol = (.Machine$double.eps)^(1 / 3), ...) {
+  RxODE::.setWarnIdSort(FALSE)
+  on.exit(RxODE::.setWarnIdSort(TRUE))
+  .pt <- proc.time()
+  .objName <- substitute(object)
+  if (any(names(object) == "NPDE")) {
+    warning("Already contains NPDE")
+    return(object)
+  }
+  set.seed(seed)
+  .si <- object$simInfo
+  .rx <- .si$rx
+  .rx <- gsub(rex::rex(capture("ipred"), or("=", "~"), capture(except_any_of("\n;")), any_of("\n;")), "ipred~\\2;\n", .rx)
+  .rx <- gsub(rex::rex("d/dt(", capture(except_any_of("\n;)")), ")", or("=", "~")), "d/dt(\\1)~", .rx)
+  .rx <- gsub(
+    rex::rex("sim", or("=", "~"), "rxTBSi(", capture(except_any_of(",)")), ",", anything, any_of("\n;")),
+    "sim=\\1", .rx
+  )
+  .si$rx <- .rx
+  .dat <- nlmixrData(.nmGetData(object))
+  .dat <- .dat[.dat$EVID == 0, ]
+  .si$object <- object
+  .si$returnType <- "data.frame.TBS"
+  .si$nsim <- nsim
+  .si <- c(.si, list(...))
+  .si$modelName <- "NPDE"
+  .pt <- proc.time()
+  .si$dfObs <- 0
+  .si$dfSub <- 0
+  .si$thetaMat <- NA
+  .sim <- do.call("nlmixrSim", .si)
+  .dv <- object$DV
+  .dvl <- length(.dv)
+  .cls <- class(object)
+  .evid <- rep(0L, .dvl)
+  .evid[is.na(object$RES) & !is.na(object$PRED)] <- 2L
+  .new <- cbind(object, .Call(
+    `_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj, ties,
+    cholSEtol
+  ))
+  class(.new) <- .cls
+  if (updateObject) {
+    .parent <- parent.frame(2)
+    .bound <- do.call("c", lapply(ls(.parent, all.names = TRUE), function(.cur) {
+      if (.cur == .objName && identical(.parent[[.cur]], object)) {
+        return(.cur)
+      }
+      return(NULL)
+    }))
+    if (length(.bound) == 1) {
+      if (exists(.bound, envir = .parent)) {
+        assign(.bound, .new, envir = .parent)
+      }
     }
-    set.seed(seed);
-    .si <- object$simInfo
-    .rx <- .si$rx;
-    .rx <- gsub(rex::rex(capture("ipred"), or("=", "~"),  capture(except_any_of("\n;")), any_of("\n;")), "ipred~\\2;\n", .rx)
-    .rx <- gsub(rex::rex("d/dt(", capture(except_any_of("\n;)")), ")", or("=", "~")), "d/dt(\\1)~", .rx);
-    .rx <- gsub(rex::rex("sim", or("=", "~"), "rxTBSi(", capture(except_any_of(",)")), ",", anything, any_of("\n;")),
-                "sim=\\1", .rx)
-    .si$rx <- .rx
-    .dat <- nlmixrData(.nmGetData(object))
-    .dat <- .dat[.dat$EVID == 0, ]
-    .si$object <- object;
-    .si$returnType <- "data.frame.TBS";
-    .si$nsim <- nsim;
-    .si <- c(.si, list(...))
-    .si$modelName <- "NPDE"
-    .pt <- proc.time();
-    .si$dfObs <- 0
-    .si$dfSub <- 0
-    .si$thetaMat <- NA
-    .sim <- do.call("nlmixrSim", .si);
-    .dv <- object$DV;
-    .dvl <- length(.dv)
-    .cls <- class(object)
-    .evid <- rep(0L,.dvl);
-    .evid[is.na(object$RES) & !is.na(object$PRED)] <- 2L;
-    .new <- cbind(object, .Call(`_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj, ties,
-                                cholSEtol))
-    class(.new) <- .cls;
-    if (updateObject){
-        .parent <- parent.frame(2);
-        .bound <- do.call("c", lapply(ls(.parent, all.names=TRUE), function(.cur){
-                                   if (.cur == .objName && identical(.parent[[.cur]], object)){
-                                       return(.cur)
-                                   }
-                                   return(NULL);
-                               }))
-        if (length(.bound) == 1){
-            if (exists(.bound, envir=.parent)){
-                assign(.bound, .new, envir=.parent)
-            }
-        }
-    }
-    .env <- .new$env
-    .env$time <- .data.frame(.env$time, npde=(proc.time() - .pt)["elapsed"], check.names=FALSE)
-    return(.new)
+  }
+  .env <- .new$env
+  .env$time <- .data.frame(.env$time, npde = (proc.time() - .pt)["elapsed"], check.names = FALSE)
+  return(.new)
 }
 ##' Output table/data.frame options
 ##'
@@ -112,23 +116,25 @@ addNpde <- function(object, nsim=300, ties=TRUE, seed=1009, updateObject=TRUE,
 ##' @return A list of table options for nlmixr
 ##' @author Matthew L. Fidler
 ##' @export
-tableControl <- function(npde=NULL,
-                         cwres=NULL,
-                         saemNPDE=FALSE,
-                         saemCWRES=FALSE,
-                         nlmeNPDE=FALSE,
-                         nlmeCWRES=FALSE,
-                         foceiNPDE=FALSE,
-                         foceNPDE=FALSE,
-                         nsim=300, ties=TRUE, seed=1009){
-    .ret <- list(npde=npde, cwres=cwres,
-                 saemNPDE=saemNPDE,
-                 saemCWRES=saemCWRES,
-                 nlmeNPDE=nlmeNPDE,
-                 nlmeCWRES=nlmeCWRES,
-                 foceiNPDE=foceiNPDE,
-                 foceNPDE=foceNPDE,
-                 nsim=nsim, ties=ties, seed=seed)
-    class(.ret) <- "tableControl";
-    return(.ret)
+tableControl <- function(npde = NULL,
+                         cwres = NULL,
+                         saemNPDE = FALSE,
+                         saemCWRES = FALSE,
+                         nlmeNPDE = FALSE,
+                         nlmeCWRES = FALSE,
+                         foceiNPDE = FALSE,
+                         foceNPDE = FALSE,
+                         nsim = 300, ties = TRUE, seed = 1009) {
+  .ret <- list(
+    npde = npde, cwres = cwres,
+    saemNPDE = saemNPDE,
+    saemCWRES = saemCWRES,
+    nlmeNPDE = nlmeNPDE,
+    nlmeCWRES = nlmeCWRES,
+    foceiNPDE = foceiNPDE,
+    foceNPDE = foceNPDE,
+    nsim = nsim, ties = ties, seed = seed
+  )
+  class(.ret) <- "tableControl"
+  return(.ret)
 }

@@ -28,33 +28,33 @@ ode <- "
 d/dt(depot) =-KA*depot;
 d/dt(centr) = KA*depot - KE*centr;
 "
-sys1 = RxODE(ode)
+sys1 <- RxODE(ode)
 
-pars <- function()
-{
-	CL = exp(THETA[1] + ETA[1])#; if (CL>100) CL=100
-	KA = exp(THETA[2] + ETA[2])#; if (KA>20) KA=20
-	KE = exp(THETA[3])
-	V  = CL/KE
-	sig2 = exp(THETA[4])
+pars <- function() {
+  CL <- exp(THETA[1] + ETA[1]) # ; if (CL>100) CL=100
+  KA <- exp(THETA[2] + ETA[2]) # ; if (KA>20) KA=20
+  KE <- exp(THETA[3])
+  V <- CL / KE
+  sig2 <- exp(THETA[4])
 }
 llik <- function() {
-	pred = centr/V
-	dnorm(DV, pred, sd=sqrt(sig2), log=TRUE)
+  pred <- centr / V
+  dnorm(DV, pred, sd = sqrt(sig2), log = TRUE)
 }
-inits = list(THTA=c(-3.22, 0.47, -2.45, 0))
-inits$OMGA=list(ETA[1]~.027, ETA[2]~.37)
-theo <- read.table("theo_md.txt", head=TRUE)
+inits <- list(THTA = c(-3.22, 0.47, -2.45, 0))
+inits$OMGA <- list(ETA[1] ~ .027, ETA[2] ~ .37)
+theo <- read.table("theo_md.txt", head = TRUE)
 
-fit = gnlmm(llik, theo, inits, pars, sys1,
-	control=list(trace=TRUE, nAQD=5))
+fit <- gnlmm(llik, theo, inits, pars, sys1,
+  control = list(trace = TRUE, nAQD = 5)
+)
 
-pred = function() {
-	pred = centr/V
+pred <- function() {
+  pred <- centr / V
 }
 
-s = prediction(fit, pred)
-plot(s$p, s$dv); abline(0,1,col="red")
-
+s <- prediction(fit, pred)
+plot(s$p, s$dv)
+abline(0, 1, col = "red")
 }
 }

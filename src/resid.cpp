@@ -5,6 +5,7 @@
 #include <R.h>
 #include <Rmath.h>
 #include "nlmixr_types.h"
+#include <RxODE.h>
 
 typedef double (*rxPow)(double x, double lambda, int yj);
 
@@ -102,6 +103,24 @@ List nlmixrShrink(NumericMatrix &omegaMat,DataFrame etasDf, List etaLst){
   return etaLst;
 }
 
+static inline double truncnorm(double mean, double sd, double low, double hi){
+  NumericMatrix sigma(1,1);
+  sigma(0,0)=sd;
+  SEXP ret =RxODE::rxRmvnSEXP(wrap(IntegerVector::create(1)),
+			      wrap(NumericVector::create(mean)),
+			      wrap(sigma),
+			      wrap(NumericVector::create(low)),
+			      wrap(NumericVector::create(hi)),
+			      wrap(IntegerVector::create(1)),
+			      wrap(LogicalVector::create(false)),
+			      wrap(LogicalVector::create(false)),
+			      wrap(NumericVector::create(0.4)),
+			      wrap(NumericVector::create(2.05)),
+			      wrap(NumericVector::create(1e-10)),
+			      wrap(IntegerVector::create(100)));
+  return REAL(ret)[0];
+}
+
 // [[Rcpp::export]]
 List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
 		 IntegerVector &evid, NumericVector &lambda, NumericVector &yj,
@@ -121,6 +140,9 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
   ipred.erase(0,2);
   NumericVector iprednv = as<NumericVector>(ipred[0]);
   NumericVector iprednvI(iprednv.size());
+  NumericVector lowerLim(iprednv.size());
+  NumericVector upperLim(iprednv.size());
+  bool interestingLim=false;
   ipred.erase(0);
   // Now get fp r, rp
   unsigned int neta = omegaMat.nrow();
@@ -170,69 +192,48 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
 	double lim0TBS = powerD(limit[i], lambda[i], (int)yj[i]);
 	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
 	double sd = sqrt(ri[i]);
-	double cur;
-	dvTBS[i] = NA_REAL;
-	dv[i] = NA_REAL;
-	while (true){
-	  cur = iprednv[i]+R::norm_rand()*sd;
-	  if (lim0TBS < cur  &&  cur < lim1TBS){
-	    dvTBS[i] = cur;
-	    dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
-	    break;
-	  }
-	}
+	interestingLim=true;
+	lowerLim[i] = limit[i];
+	upperLim[i] = dv[i];
+	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
+	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
       } else {
 	// (-Inf, dv)
 	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
 	double sd = sqrt(ri[i]);
-	double cur;
-	dvTBS[i] = NA_REAL;
-	dv[i] = NA_REAL;
-	while (true){
-	  cur = iprednv[i]+R::norm_rand()*sd;
-	  if (cur < lim1TBS){
-	    dvTBS[i] = cur;
-	    dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
-	    break;
-	  }
-	}
+	interestingLim=true;
+	lowerLim[i] = R_NegInf;
+	upperLim[i] = dv[i];
+	dvTBS[i] = truncnorm(iprednv[i], sd, R_NegInf, lim1TBS);
+	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
       }
       break;
     case -1:
       // (dv, limit); limit could be +inf
       if (R_FINITE(limit[i])){
+	//(dv, limit)
 	double lim1TBS = powerD(limit[i], lambda[i], (int)yj[i]);
 	double lim0TBS = powerD(dv[i], lambda[i], (int) yj[i]);
 	double sd = sqrt(ri[i]);
-	double cur;
-	dvTBS[i] = NA_REAL;
-	dv[i] = NA_REAL;
-	while (true){
-	  cur = iprednv[i]+R::norm_rand()*sd;
-	  if (lim0TBS < cur  &&  cur < lim1TBS){
-	    dvTBS[i] = cur;
-	    dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
-	    break;
-	  }
-	}
+	interestingLim=true;
+	lowerLim[i] = dv[i];
+	upperLim[i] = limit[i];
+	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
+	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
       } else {
 	// (dv, Inf)
 	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
 	double sd = sqrt(ri[i]);
-	double cur;
-	dvTBS[i] = NA_REAL;
-	dv[i] = NA_REAL;
-	while (true){
-	  cur = iprednv[i]+R::norm_rand()*sd;
-	  if (cur > lim1TBS){
-	    dvTBS[i] = cur;
-	    dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
-	    break;
-	  }
-	}
+	interestingLim=true;
+	lowerLim[i] = dv[i];
+	upperLim[i] = R_PosInf;
+	dvTBS[i] = truncnorm(iprednv[i], sd, lim1TBS, R_PosInf);
+	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
       }
       break;
     case 0:
+      lowerLim[i] = NA_REAL;
+      upperLim[i] = NA_REAL;
       dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
       break;
     }
@@ -440,15 +441,29 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
 	ires[i] = NA_REAL;
       }
     }
-    ret[0] = DataFrame::create(_["PRED"]=prednvI,
-			       _["RES"]=resI,
-			       _["WRES"]=wrap(wres),
-			       _["IPRED"]=iprednvI,
-			       _["IRES"]=ires,
-			       _["IWRES"]=iwres,
-			       _["CPRED"]=cpredI,
-			       _["CRES"]=cresI,
-			       _["CWRES"]=cwres);
+    if (interestingLim){
+      ret[0] = DataFrame::create(_["PRED"]=prednvI,
+				 _["RES"]=resI,
+				 _["WRES"]=wrap(wres),
+				 _["IPRED"]=iprednvI,
+				 _["IRES"]=ires,
+				 _["IWRES"]=iwres,
+				 _["CPRED"]=cpredI,
+				 _["CRES"]=cresI,
+				 _["CWRES"]=cwres,
+				 _["lowerLim"] = lowerLim,
+				 _["upperLim"] = upperLim);
+    } else {
+      ret[0] = DataFrame::create(_["PRED"]=prednvI,
+				 _["RES"]=resI,
+				 _["WRES"]=wrap(wres),
+				 _["IPRED"]=iprednvI,
+				 _["IRES"]=ires,
+				 _["IWRES"]=iwres,
+				 _["CPRED"]=cpredI,
+				 _["CRES"]=cresI,
+				 _["CWRES"]=cwres);
+    }
   } else {
     NumericVector ires = dv-iprednvI;
     for (i = ires.size(); i--;){
@@ -457,11 +472,21 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
 	ires[i] = NA_REAL;
       }
     }
-    ret[0] = DataFrame::create(_["PRED"]=prednvI,
-                               _["RES"]=resI,
-                               _["IPRED"]=iprednvI,
-                               _["IRES"]=ires,
-                               _["IWRES"]=iwres);
+    if (interestingLim){
+      ret[0] = DataFrame::create(_["PRED"]=prednvI,
+				 _["RES"]=resI,
+				 _["IPRED"]=iprednvI,
+				 _["IRES"]=ires,
+				 _["IWRES"]=iwres,
+				 _["lowerLim"] = lowerLim,
+				 _["upperLim"] = upperLim);
+    } else {
+      ret[0] = DataFrame::create(_["PRED"]=prednvI,
+				 _["RES"]=resI,
+				 _["IPRED"]=iprednvI,
+				 _["IRES"]=ires,
+				 _["IWRES"]=iwres);
+    }
   }
   ret[1] = etaLst;
   ret[2] = etasDfFull;
