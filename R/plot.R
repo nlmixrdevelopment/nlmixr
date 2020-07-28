@@ -1,3 +1,50 @@
+.setupPlotData <- function(data, cmt){
+  .dat <- as.data.frame(data)
+  .doCmt <- FALSE
+  if (any(names(.dat) == "CMT")) {
+    if (length(levels(.dat$CMT)) > 1) {
+      .doCmt <- TRUE
+    }
+  }
+  if (!.doCmt) {
+    .dat$CMT <- factor(rep(1, length(.dat[, 1])), 1, "All Data")
+  } else {
+    levels(.dat$CMT) <- paste("Endpoint: ", levels(.dat$CMT))
+  }
+  if (any(names(.dat) == "CENS")) {
+    .censLeft <- any(.dat$CENS == 1)
+    .censRight <- any(.dat$CENS == -1)
+    if (.censLeft & .censRight){
+      .dat$CENS <- factor(.dat$CENS, c(-1, 0, 1), c("Right censored data", "Observed data", "left censored data"))
+    } else if (.censLeft){
+      .dat$CENS <- factor(.dat$CENS, c(0, 1), c("Observed data", "Censored data"))
+    } else if (.censRight) {
+      .dat$CENS <- factor(.dat$CENS, c(0, -1), c("Observed data", "Censored data"))
+    } else {
+      .dat <- .dat[, names(.dat) != "CENS"]
+    }
+  }
+  return(.dat)
+}
+
+.dvPlot <- function(.dat0, vars){
+  if (any(names(.dat0) == "CENS")){
+    .data <- data.frame(DV = .dat0$DV, CENS=.dat0$CENS, stack(.dat0[, vars]))
+    .aes <- ggplot2::aes(.data$values, .data$DV, color = .data$CENS)
+  } else {
+    .data <- data.frame(DV = .dat0$DV, stack(.dat0[, vars]))
+    .aes <- ggplot2::aes(.data$values, .data$DV)
+  }
+  ggplot2::ggplot(.data, .aes) +
+      ggplot2::facet_wrap(~ind) +
+      ggplot2::geom_abline(slope = 1, intercept = 0, col = "red", size = 1.2) +
+      ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
+      ggplot2::geom_point() +
+      xlab("Predictions") +
+      RxODE::rxTheme()
+}
+
+
 #' Plot a nlmixr data object
 #'
 #' Plot some standard goodness of fit plots for the focei fitted object
@@ -13,31 +60,13 @@ plot.nlmixrFitData <- function(x, ...) {
   IWRES <- NULL
   .tp <- traceplot(x)
   if (!is.null(.tp)) .lst[[length(.lst) + 1]] <- .tp
-  .dat <- as.data.frame(x)
-  .doCmt <- FALSE
-  if (any(names(.dat) == "CMT")) {
-    if (length(levels(.dat$CMT)) > 1) {
-      .doCmt <- TRUE
-    }
-  }
-  if (!.doCmt) {
-    .dat$CMT <- factor(rep(1, length(.dat[, 1])), 1, "All Data")
-  } else {
-    levels(.dat$CMT) <- paste("Endpoint: ", levels(.dat$CMT))
-  }
+  .dat <- .setupPlotData(x)
   for (.cmt in levels(.dat$CMT)) {
     .dat0 <- .dat[.dat$CMT == .cmt, ]
     .hasCwres <- any(names(.dat0) == "CWRES")
     .hasNpde <- any(names(.dat0) == "NPDE")
-    .d1 <- data.frame(DV = .dat0$DV, stack(.dat0[, c("PRED", "IPRED")]))
-    .p1 <- ggplot2::ggplot(.d1, ggplot2::aes_string("values", "DV")) +
-      ggplot2::facet_wrap(~ind) +
-      ggplot2::geom_abline(slope = 1, intercept = 0, col = "red", size = 1.2) +
-      ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
-      ggplot2::geom_point() +
-      xlab("Predictions") +
-      ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED") +
-      RxODE::rxTheme()
+    .p1 <- .dvPlot(.dat0, c("PRED", "IPRED"))
+      ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
     .lst[[length(.lst) + 1]] <- .p1
 
     if (.hasCwres) {
