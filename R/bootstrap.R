@@ -61,13 +61,13 @@ addConfboundsToVar <-
 #'     linCmt() ~ add(add.sd)
 #'   })
 #' }
-#'
+#' 
 #' fit <- nlmixr(one.cmt, theo_sd, "focei")
 #'
 #' bootstrapFit(fit)
 #' bootstrapFit(fit, nboot = 5, restart = TRUE) # overwrites any of the existing data or model files
 #' bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
-#' }
+# }
 bootstrapFit <- function(fit,
                          nboot = 500,
                          nSampIndiv,
@@ -105,7 +105,7 @@ bootstrapFit <- function(fit,
   }
 
   if (performStrat) {
-    modelsList <-
+    resBootstrap <-
       modelBootstrap(
         fit,
         nboot = nboot,
@@ -115,9 +115,12 @@ bootstrapFit <- function(fit,
         restart = restart,
         fitName = fitName
       ) # multiple models
+    
+    modelsList = resBootstrap[[1]]
+    fitList = resBootstrap[[2]]
   }
   else {
-    modelsList <-
+    resBootstrap <-
       modelBootstrap(
         fit,
         nboot = nboot,
@@ -126,6 +129,8 @@ bootstrapFit <- function(fit,
         restart = restart,
         fitName = fitName
       ) # multiple models
+    modelsList = resBootstrap[[1]]
+    fitList = resBootstrap[[2]]
   }
 
 
@@ -172,12 +177,7 @@ bootstrapFit <- function(fit,
     signif(seBoot / estEst * 100, sigdig)
   newParFixed["Bootstrap Back-transformed(95%CI)"] <-
     backTransformed
-
-  # compute delta objf values for each of the models
-  deltOBJF <- lapply(modelsList, function(x) {
-    x$objf - fit$objf
-  })
-
+  
   # compute bias
   bootstrapBias <-
     bootSummary$objf[[1]] - fit$objf # 1 corresponds to the mean value, 2 corresponds to the median
@@ -186,7 +186,7 @@ bootstrapFit <- function(fit,
   covMatrix <- cov(getData(fit), getData(fit))
   corMatrix <- cor(getData(fit), getData(fit))
 
-  assign("deltOBJF", deltOBJF, envir = fit$env)
+  # assign("deltOBJF", deltOBJF, envir = fit$env)
   assign("bootstrapBias", bootstrapBias, envir = fit$env)
   assign("covMatrix", covMatrix, envir = fit$env)
   assign("corMatrix", corMatrix, envir = fit$env)
@@ -196,6 +196,32 @@ bootstrapFit <- function(fit,
 
   # plot histogram
   if (plotHist) {
+    
+    # compute delta objf values for each of the models
+    origData = getData(fit)
+    
+    if (is.null(fit$bootstrapMd5)) {
+      bootstrapMd5 <- digest::digest(fit)
+      assign("bootstrapMd5", bootstrapMd5, envir = fit$env)
+    }
+    
+    # already exists
+    output_dir <- paste0("nlmixrBootstrapCache_", as.character(substitute(fit)), "_", fit$bootstrapMd5)
+    
+    deltOBJFloaded = NULL
+    deltOBJF = NULL
+    if (!restart){
+      deltOBJFloaded = readRDS(paste0("./", output_dir,"/",'deltOBJF',".RData"))
+      deltOBJF = c(deltOBJFloaded, deltOBJF)
+    }
+    else{
+      deltOBJF <- lapply(fitList, function(x) {
+        xPosthoc = suppressWarnings(nlmixr(x, data=origData, est='posthoc'))
+        xPosthoc$objf - fit$objf
+      })
+      deltOBJF = c(deltOBJFloaded, deltOBJF)
+      saveRDS(deltOBJF, file = paste0("./", output_dir,"/",'deltOBJF',".RData"))
+    }
 
     .deltaO <- sort(abs(unlist(deltOBJF)))
 
@@ -522,8 +548,7 @@ modelBootstrap <- function(fit,
     # read saved bootData from boot_data files on disk
     if (length(fileExists) > 0) {
       cli::cli_alert_success("resuming bootstrap data sampling using data at {paste0('./', output_dir)}")
-
-
+      
       bootData <- lapply(fileExists, function(x) {
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
@@ -588,23 +613,33 @@ modelBootstrap <- function(fit,
       ".RData",
       sep = ""
     )
-
   modFileExists <-
     list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
+  
+  fnameFitEnsemblePattern <-
+    paste0(as.character(substitute(fitEnsemble)), "_", "[0-9]+",
+           ".RData",
+           sep = ""
+    )
+  fitFileExists <- list.files(paste0("./", output_dir), pattern = fnameFitEnsemblePattern)
 
   if (!restart) {
     if (length(modFileExists) > 0 &&
       (length(fileExists) > 0)) {
+      
       # read bootData and modelsEnsemble files from disk
       cli::cli_alert_success(
         "resuming bootstrap model fitting using data and models stored at {paste0(getwd(), '/', output_dir)}"
       )
 
-
       bootData <- lapply(fileExists, function(x) {
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
       modelsEnsembleLoaded <- lapply(modFileExists, function(x) {
+        readRDS(paste0("./", output_dir, "/", x, sep = ""))
+      })
+      
+      fitEnsembleLoaded <- lapply(fitFileExists, function(x){
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
 
@@ -618,15 +653,18 @@ modelBootstrap <- function(fit,
             "the model file already has {.env$mod_idx-1} models when max models is {nboot}; using only the first {nboot} model(s)"
           )
         )
-        return(modelsEnsembleLoaded[1:nboot])
-        # .env$mod_idx <- 1
+        return(list(modelsEnsembleLoaded[1:nboot], fitEnsembleLoaded[1:nboot]))
+        
+        # return(modelsEnsembleLoaded[1:nboot])
       }
 
       else if (currNumModels == nboot) {
         cli::col_red(
           "the model file already has {.env$mod_idx-1} models when max models is {nboot}; loading from {nboot} models already saved on disk"
         )
-        return(modelsEnsembleLoaded)
+        return(list(modelsEnsembleLoaded, fitEnsembleLoaded))
+        
+        # return(modelsEnsembleLoaded)
       }
 
       else if (currNumModels < nboot) {
@@ -701,20 +739,45 @@ modelBootstrap <- function(fit,
           ".RData"
         )
       )
+      
+      saveRDS(
+        fit,
+        file = paste0(
+          "./",
+          output_dir,
+          "/",
+          as.character(substitute(fitEnsemble)),
+          "_",
+          .env$mod_idx,
+          ".RData"
+        )
+      )
+      
       assign("mod_idx", .env$mod_idx + 1, .env)
     })
+  
+  fitEnsemble <- NULL
 
   if (!restart) {
     modelsEnsemble <- c(modelsEnsembleLoaded, modelsEnsemble)
+    fitEnsemble <- c(fitEnsembleLoaded, fitEnsemble)
   }
 
   modFileExists <-
     list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
+  
   modelsEnsemble <- lapply(modFileExists, function(x) {
     readRDS(paste0("./", output_dir, "/", x, sep = ""))
   })
+  
+  fitFileExists <- list.files(paste0("./", output_dir), pattern = fnameFitEnsemblePattern)
+  fitEnsemble <- lapply(fitFileExists, function(x) {
+    readRDS(paste0("./", output_dir, "/", x, sep = ""))
+  })
+  
+  
 
-  modelsEnsemble
+  list(modelsEnsemble, fitEnsemble)
 }
 
 #' Get the nlmixr method used for fitting the model
