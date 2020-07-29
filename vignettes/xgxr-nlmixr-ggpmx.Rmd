@@ -222,7 +222,6 @@ dat <- case1_pkpd %>%
     rename(DV=LIDV) %>%
     filter(CMT %in% 1:2) %>%
     # Filter (for now) since CENS supprot in nlmixr is in development
-    filter(CENS == 0) %>%
     filter(TRTACT != "Placebo")
 ```
 
