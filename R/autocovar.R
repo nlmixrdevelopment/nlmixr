@@ -21,7 +21,7 @@ addCovariate <-
       }
       else if (is.name(x)) {
         if (isCov) {
-          if (any(as.character(x) == theta)) {
+          if (any(as.character(x) == theta) && regexpr('^cov\\_', as.character(x))==-1) {
             return(eval(parse(
               text = paste0("quote(", x, "+", covariate, ")")
             )))
@@ -373,6 +373,8 @@ addCovVar <- function(fitobject,
     covNameMod <- res[[2]]
     covNames <- res[[3]]
 
+    # cli::cli_h1('theta: {names(fitobject$theta)}')
+    # cli::cli_h1('previous value: {funstringSplit[[idx]]}')
     funstringSplit[[idx]] <-
       addCovariate(
         funstringSplit[[idx]],
@@ -474,7 +476,7 @@ removeCovVar <- function(fitobject,
 
 
   cli::cli_alert_success("removed {covNameMod} from {varName}'s equation in the model")
-  cli::cli_alert_success("updated funcition text: {funstringSplit[[idx]]}")
+  cli::cli_alert_success("updated function text: {funstringSplit[[idx]]}")
 
   updatedMod <- paste0("model(fitobject,{", funstringSplit[[idx]], "})")
   updatedMod <- eval(parse(text = updatedMod))
@@ -746,13 +748,26 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       updatedMod <- res[[1]]
       data <- res[[2]]
       covNames = res[[3]]
-
+      
+      # assign('fitobject', fitobject, envir = .GlobalEnv)
+      # assign('updatedMod', updatedMod, envir = .GlobalEnv)
+      
+      reassignVars = rownames(fitobject$parFixedDf)[fitobject$parFixedDf$Estimate!=fitobject$parFixedDf[,'Back-transformed'] & fitobject$parFixedDf[,'Back-transformed']==0]
+      if (length(reassignVars)>0){
+        ini2 <- as.data.frame(updatedMod$ini)
+        
+        for (r in reassignVars){
+          ini2[ini2$name == r, "est"] <- 1.0
+          cli::cli_alert_warning('reasssigned initial value for {r} to 1.0')
+        }
+        
+        class(ini2) <- c("nlmixrBounds", "data.frame")
+        updatedMod$ini <- ini2
+        
+      }
 
       fit2 <-
-        nlmixr(updatedMod, data, est = getFitMethod(fitobject))
-      
-      assign('updatedMod', updatedMod, envir = .GlobalEnv)
-      assign('fit2', fit2, envir = .GlobalEnv)
+        suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
       
       AIC(fit2)
 
@@ -834,8 +849,11 @@ covarSearchAuto <-  # unsuccessful runs info store; check for covInformation bef
       stop("pVal should be list of two with names  'fwd' and 'bck' ")
     }
 
+    # outputDir <-
+    #   paste0("nlmixrCovariateSearchCache_", as.character(substitute(fit)), "_", digest::digest(fit)) # a new directory with this name will be created
+
     outputDir <-
-      paste0("nlmixrCovariateSearchCache_", as.character(substitute(fit)), "_", digest::digest(fit)) # a new directory with this name will be created
+      paste0("nlmixrCovariateSearchCache_", as.character(substitute(fit)), "_", 'dbdf08b8c1b4cb9cb021c52008d3c343') # a new directory with this name will be created
 
     if (!dir.exists(outputDir)) {
       dir.create(outputDir)
@@ -875,21 +893,21 @@ covarSearchAuto <-  # unsuccessful runs info store; check for covInformation bef
 
     if (searchType %in% "scm") {
       resFwd <- forwardSearch(covInfo, fit, pVal$fwd, outputDir = outputDir, restart = restart)
-      resBck<- backwardSearch(covInfo, resFwd[[1]], pVal$bck, reFitCovars = FALSE, outputDir = outputDir, restart = restart)
+      resBck<- backwardSearch(covInfo, fitorig=fit, fitupdated=resFwd[[1]], pVal=pVal$bck, reFitCovars = FALSE, outputDir = outputDir, restart = restart)
       summaryTable = Reduce(rbind, list(resFwd[[2]], resBck[[2]]))
       
       return (list(summaryTable=summaryTable, resFwd=resFwd, resBck=resBck))
     }
 
     else if (searchType %in% "forward") {
-      resFwd<-forwardSearch(covInfo, fit, pVal$fwd, outputDir = outputDir, restart = restart)
+      resFwd<-forwardSearch(covInfo, fit, pVal=pVal$fwd, outputDir = outputDir, restart = restart)
       summaryTable = Reduce(rbind, list(resFwd[[2]], NULL))
       
       return (list(summaryTable=summaryTable, resFwd=resFwd, resBck=NULL))      
     }
 
     else {
-      resBck<-backwardSearch(covInfo, fit, pVal$bck, reFitCovars = TRUE, outputDir = outputDir, restart = restart)
+      resBck<-backwardSearch(covInfo, fitorig=fit, pVal=pVal$bck, reFitCovars = TRUE, outputDir = outputDir, restart = restart)
       summaryTable = Reduce(rbind, list(NULL, resBck[[2]]))
       
       return (list(summaryTable=summaryTable, resFwd=NULL, resBck=resBck))
@@ -994,6 +1012,7 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
       
       # objf function value improved
       resTable[which.min(resTable$pchisqr),'included']='yes'
+      bestRow[,'included']='yes'
       
       cli::cli_h1("best model at step {stepIdx}: ")
       print(bestRow)
@@ -1031,7 +1050,7 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
   
 }
 
-backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outputDir, restart = FALSE) {
+backwardSearch <- function(covInfo, fitorig, fitupdated, pVal = 0.01, reFitCovars = FALSE, outputDir, restart = FALSE) {
   if (missing(outputDir)) {
     stop("please specify output directory to store the results for backward search. aborting ...")
   }
@@ -1040,10 +1059,23 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
   
   stepIdx <- 1
   
-
+  if(!missing(fitupdated)){
+    print(names(fitorig$ini$theta))
+    print(names(fitupdated$ini$theta))
+    
+    if (names(fitupdated$ini$theta) %in% all(names(fitorig$ini$theta))){
+      cli::cli_alert_warning('no covariates added in the forward search, skipping backward search')
+      return(list(fitorig, NULL))
+    }
+    else{
+      fit = fitupdated
+    }
+  }
+  
   if (reFitCovars) {
-    covSearchRes <- addCovMultiple(covInfo, fit, indep = FALSE)
-    fit <- covSearchRes[[length(covSearchRes)]][[1]] # get the last fit object with all covariates added # DOES NOT ADD $ini
+    covSearchRes <- addCovMultiple(covInfo, fitorig, indep = FALSE)
+    fitupdated <- covSearchRes[[length(covSearchRes)]][[1]] # get the last fit object with all covariates added # DOES NOT ADD $ini
+    fit = fitupdated
   }
 
   fnameTablePatternBackward <-
@@ -1149,6 +1181,8 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
       # objf function value increased after removal of covariate: retain the best covariate at this stage, test for the rest
       
       resTable[which.min(resTable$pchisqr), 'included']='yes'
+      bestRow[,'included']='yes'
+      
       
       cli::cli_h1("best model at step {stepIdx}: ")
       print(bestRow)
@@ -1185,19 +1219,10 @@ backwardSearch <- function(covInfo, fit, pVal = 0.01, reFitCovars = FALSE, outpu
 
 # check for AIC before running anything! - trycatch
 
-# 
+ 
 # fitDapto = readRDS('daptomycin.Rds')
-# varsVec = c('cl')
-# covarsVec = c('WT')
-# covarSearchAuto(fitDapto, varsVec, covarsVec, catCovariates = c('SEX'), restart = T)
+# covarSearchAuto(fitDapto, c('v1', 'v2'), c('WT', 'SEX'), catCovariates = 'SEX', restart = FALSE, pVal=list(fwd=1, bck=1))
 
-# covarSearchAuto(fitDapto, varsVec, covarsVec, covInformation=list(SEXcl=list(categorical=TRUE), SEXv1=list(categorical=TRUE)), restart = T)
-
-
-# covarsVec = c("SEX", 'WT')
-# 
-# # covarSearchAuto(fitDapto, varsVec, covarsVec, covInformation=NULL, restart = T)
-# 
 
 # fun.txt: "    cl = exp(tcl+eta.cl)\n    q = exp(tq+eta.q)\n    v1 = exp(tv1+eta.v1)\n    v2=exp(tv2+eta.v2)\n    cp = linCmt()\n    cp ~ add(add.err)"
 # data colnames: "id"    "time"  "CL"    "V1"    "Q"     "V2"    "A1"    "A2"    "Cp"    "centr" "peri"  "CRCL"  "WT"    "SEX"   "AGE"   "DV"
