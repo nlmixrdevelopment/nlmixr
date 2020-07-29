@@ -712,6 +712,20 @@ removeCovMultiple <- function(covInfo, fitobject) {
     updatedMod <- res[[1]]
     data <- getData(fitobject)
     covNames = res[[2]]
+    
+    reassignVars = rownames(fitobject$parFixedDf)[fitobject$parFixedDf$Estimate!=fitobject$parFixedDf[,'Back-transformed'] & fitobject$parFixedDf[,'Back-transformed']==0]
+    if (length(reassignVars)>0){
+      ini2 <- as.data.frame(updatedMod$ini)
+      
+      for (r in reassignVars){
+        ini2[ini2$name == r, "est"] <- 1.0
+        cli::cli_alert_warning('reasssigned initial value for {r} to 1.0')
+      }
+      
+      class(ini2) <- c("nlmixrBounds", "data.frame")
+      updatedMod$ini <- ini2
+      
+    }
 
     fit2 <-
       suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
@@ -1060,8 +1074,6 @@ backwardSearch <- function(covInfo, fitorig, fitupdated, pVal = 0.01, reFitCovar
   stepIdx <- 1
   
   if(!missing(fitupdated)){
-    print(names(fitorig$ini$theta))
-    print(names(fitupdated$ini$theta))
     
     if (names(fitupdated$ini$theta) %in% all(names(fitorig$ini$theta))){
       cli::cli_alert_warning('no covariates added in the forward search, skipping backward search')
