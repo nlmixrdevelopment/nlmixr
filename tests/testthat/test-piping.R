@@ -36,6 +36,10 @@ nlmixrTest({
     if (!is.null(exclude)) {
       expect_false(any(exclude %in% paste(ui$ini$name)))
     }
+    ## General UI properties
+    expect_true(all(!is.na(ui$ini$fix)))
+    expect_true(all(!is.na(ui$ini$lower)))
+    expect_true(all(!is.na(ui$ini$upper)))
   }
 
   test_that("UI updates work correctly", {

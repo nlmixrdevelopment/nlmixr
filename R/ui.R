@@ -125,6 +125,7 @@ nlmixrfindLhs <- function(x) {
       .df2$est <- .df$val[i]
       .df2$lower <- -Inf
       .df2$upper <- Inf
+      .df2$fix <- FALSE
       .df2$condition <- "ID"
       return(.df2)
     }))
@@ -298,11 +299,13 @@ ini <- function(ini, ...) {
               .uif$ini$est[.w] <- .val[2]
               ## Warning here? The upper should be inf?
               .uif$ini$est[.w] <- Inf
+              .uif$ini$fix[.w] <- FALSE
             } else if (length(.val) == 3) {
               .uif$ini$lower[.w] <- .val[1]
               .uif$ini$est[.w] <- .val[2]
               ## Warning here? The upper should be inf?
               .uif$ini$upper[.w] <- .val[3]
+              .uif$ini$fix[.w] <- FALSE
             } else {
               stop(sprintf("Cannot figure out what you are trying to do to the '%s' estimate.", .n))
             }
@@ -325,10 +328,12 @@ ini <- function(ini, ...) {
               .uif$ini$lower[.w] <- .val[1]
               .uif$ini$est[.w] <- .val[2]
               .uif$ini$upper[.w] <- Inf
+              .uif$ini$fix[.w] <- FALSE
             } else if (length(.val) == 3) {
               .uif$ini$lower[.w] <- .val[1]
               .uif$ini$est[.w] <- .val[2]
               .uif$ini$upper[.w] <- .val[3]
+              .uif$ini$fix[.w] <- FALSE
             } else {
               stop(sprintf("Cannot figure out what to do with '%s'", .n))
             }
@@ -479,6 +484,7 @@ model <- function(model, ..., .lines = NULL) {
               .d2$est <- 1
               .d2$lower <- -Inf
               .d2$upper <- Inf
+              .d2$fix <- FALSE
               .ini <- rbind(.ini, .d2)
             }
           }
@@ -544,6 +550,7 @@ model <- function(model, ..., .lines = NULL) {
                 .d2$est <- 1
                 .d2$lower <- -Inf
                 .d2$upper <- Inf
+                .d2$fix <- FALSE
                 .d2$condition <- "ID"
                 .ini <- rbind(.ini, .d2)
               } else if (regexpr(.thetaModelReg, .new) != -1) {
@@ -553,6 +560,7 @@ model <- function(model, ..., .lines = NULL) {
                 .d2$est <- 1
                 .d2$lower <- -Inf
                 .d2$upper <- Inf
+                .d2$fix <- FALSE
                 .d2$name <- .new
                 .ini <- rbind(.ini, .d2)
               }

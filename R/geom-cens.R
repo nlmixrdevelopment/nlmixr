@@ -20,17 +20,44 @@
 }
 
 .setupGroupCensBox <- function(data, params){
-  .dat <- data[!is.na(data$lower), ]
-  .r <- c(data$y, data$upper[is.finite(data$upper)], data$lower[is.finite(data$lower)])
-  .r <- range(.r, na.rm=TRUE)
-  .rw <- .r[2] - .r[1]
-  .dat$..ni <- .r[1] - 0.01 * .rw
-  .dat$..pi <- .r[2] + 0.01 * .rw
-  .dat$..delta <- .rw
-  .r <- range(data$x, na.rm=TRUE)
-  .dat$..width <- (.r[2] - .r[1]) * params$width
-  .dat$lower <- ifelse(is.finite(.dat$lower), .dat$lower, .dat$..ni)
-  .dat$upper <- ifelse(is.finite(.dat$upper), .dat$upper, .dat$..pi)
+  .dat <- data
+  if (any(names(data) == "cens")) {
+    if (any(names(data) == "lower")) {
+      stop("stat_cens cannot have lower aesthetic with cens aesthetic", call.=FALSE)
+    }
+    if (any(names(data) == "upper")) {
+      stop("stat_cens cannot have lower aesthetic with cens aesthetic", call.=FALSE)
+    }
+    .dat$lower <- ifelse(.dat$cens == 0, NA_real_, -Inf)
+    .dat$upper <- ifelse(.dat$cens == 0, NA_real_, Inf)
+    if (any(names(data) == "limit")){
+      .dat$upper <- ifelse(.dat$cens == 1, .dat$y, ifelse(is.na(.dat$limit), .dat$upper, .dat$limit))
+      .dat$lower <- ifelse(.dat$cens == -1, .dat$y, ifelse(is.na(.dat$limit), .dat$lower, .dat$limit))
+    } else {
+      .dat$upper <- ifelse(.dat$cens == 1, .dat$y, .dat$upper)
+      .dat$lower <- ifelse(.dat$cens == -1, .dat$y, .dat$lower)
+    }
+    data <- .dat
+  }
+  if (any(names(data) == "lower")){
+    if (!any(names(data) == "upper")){
+      stop("stat_cens requires the following aesthetics: upper, lower or cens (and optionally limit)",
+           call.=FALSE)
+    }
+    .dat <- data[!is.na(data$lower), ,drop = FALSE]
+    if (length(.dat[, 1]) > 0){
+      .r <- c(data$y, data$upper[is.finite(data$upper)], data$lower[is.finite(data$lower)])
+      .r <- range(.r, na.rm=TRUE)
+      .rw <- .r[2] - .r[1]
+      .dat$..ni <- .r[1] - 0.01 * .rw
+      .dat$..pi <- .r[2] + 0.01 * .rw
+      .dat$..delta <- .rw
+      .r <- range(data$x, na.rm=TRUE)
+      .dat$..width <- (.r[2] - .r[1]) * params$width
+      .dat$lower <- ifelse(is.finite(.dat$lower), .dat$lower, .dat$..ni)
+      .dat$upper <- ifelse(is.finite(.dat$upper), .dat$upper, .dat$..pi)
+    }
+  }
   .dat
 }
 
@@ -57,7 +84,7 @@ StatCens <- ggplot2::ggproto('StatCens', ggplot2::Stat,
                              compute_group=function(data, scales, width) {
                                .createCensBox(data)
                              },
-                             required_aes=c("x", "y", "lower", "upper")
+                             required_aes=c("x", "y")
                              )
 
 ##' Censoring geom/stat
