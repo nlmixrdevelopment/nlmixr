@@ -479,16 +479,16 @@ removeCovVar <- function(fitobject,
   updatedMod <- paste0("model(fitobject,{", funstringSplit[[idx]], "})")
   updatedMod <- eval(parse(text = updatedMod))
 
-  # initialize (add) covars in the model
-  ini2 <- as.data.frame(updatedMod$ini)
-  for (covName in covNames) {
-    ini2[ini2$name == covName, "est"] <- 0
-    ini2[ini2$name == covName, "lower"] <- -Inf
-    ini2[ini2$name == covName, "upper"] <- Inf
-  }
-
-  class(ini2) <- c("nlmixrBounds", "data.frame")
-  updatedMod$ini <- ini2
+  # # initialize (add) covars in the model
+  # ini2 <- as.data.frame(updatedMod$ini)
+  # for (covName in covNames) {
+  #   ini2[ini2$name == covName, "est"] <- 0
+  #   ini2[ini2$name == covName, "lower"] <- -Inf
+  #   ini2[ini2$name == covName, "upper"] <- Inf
+  # }
+  # 
+  # class(ini2) <- c("nlmixrBounds", "data.frame")
+  # updatedMod$ini <- ini2
 
   list(updatedMod, covNames)
 }
@@ -749,7 +749,10 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 
 
       fit2 <-
-        suppressWarnings(nlmixr(updatedMod, data, est = getFitMethod(fitobject)))
+        nlmixr(updatedMod, data, est = getFitMethod(fitobject))
+      
+      assign('updatedMod', updatedMod, envir = .GlobalEnv)
+      assign('fit2', fit2, envir = .GlobalEnv)
       
       AIC(fit2)
 
