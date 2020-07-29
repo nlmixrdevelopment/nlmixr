@@ -493,7 +493,7 @@ nlmixrBoundsParser.integer <- function(x) {
 #' Where 'fixed' can be 'FIX', 'FIXED', 'fix', or 'fixed'.
 nlmixrBoundsParserTheta <- function(x, currentData) {
   currentData$name <- x$varname
-  valueFix <- nlmixrBoundsValueFixed(x$value)
+  valueFix <- nlmixrBoundsValueFixed(x$value, x$varname)
   # Set the lower bound, estimate, and upper bound for theta
   value <- valueFix$value
   if (length(value) == 1) {
@@ -690,31 +690,38 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
 #' Determine the values and what is fixed
 #'
 #' @param x A call that may have fixed values
+#' @param varName Variable name, useful for error messages
 #' @return A list with elements of:
 #' * value: the numeric value of evaluating the expression
 #' * all_fixed: Are all values from the expression fixed ?
 #' * fixed: Which value(s) from \code{x} are fixed?
 #' @seealso \code{\link{nlmixrBoundsReplaceFixed}},
 #'   \code{\link{nlmixrBoundsValueCor}}
-#' @author Bill Denney
+#' @author Bill Denney, Matthew Fidler
 #' @noRd
-nlmixrBoundsValueFixed <- function(x) {
+nlmixrBoundsValueFixed <- function(x, varName="") {
   valueFixed <- nlmixrBoundsReplaceFixed(x, replacementName = NULL)
   # determine the numeric value after removing 'fixed' names and using 'fixed()'
   # like 'c()'
   value <- try(eval(valueFixed$call, list(fixed = c)), silent=TRUE)
   if (inherits(value, "try-error")) {
     stop(
-      "error parsing initial condition '", deparse(x), "': ", attr(value, "condition")$message,
+      "error parsing initial condition '", deparse(x), "'",
+      ifelse(varName == "", "", paste0(" for '", varName, "'")),
+      ": ", attr(value, "condition")$message,
       call. = FALSE
     )
   } else if (!is.numeric(value)) {
     stop(
-      "non-numeric values in initial condition: ", deparse(x),
+      "non-numeric values in initial condition",
+      ifelse(varName == "", "", paste0(" for '", varName, "'")),
+      ": ", deparse(x),
       call. = FALSE
     )
   } else if (any(is.nan(value))) {
-    stop("NaN values in initial condition: ", deparse(x), call. = FALSE)
+    stop("NaN values in initial condition",
+         ifelse(varName == "", "", paste0(" for '", varName, "'")),
+         ": ", deparse(x), call. = FALSE)
   }
   isFixed <- valueFixed$fixed
   if (length(isFixed) != 1) {

@@ -110,7 +110,7 @@ nlmixrTest({
         })
       }
 
-      expect_error(nlmixr(uif), rex::rex("Residual error component(s) need to be defined with assignment ('=' or '<-') in ini block (not '~'): add.err"))
+      expect_error(nlmixr(uif), rex::rex("residual error component(s) need to be defined with assignment ('=' or '<-') in ini block (not '~'): add.err"))
     })
 
     test_that("Parameters need to be named", {
@@ -183,7 +183,7 @@ nlmixrTest({
           cp ~ add(add.err)
         })
       }
-      expect_error(nlmixr(uif), rex::rex("The following parameters initial estimates are infinite: tka"))
+      expect_error(nlmixr(uif), rex::rex("infinite/NA initial parameters: 'tka'"))
 
       uif <- function() {
         ini({
@@ -205,7 +205,7 @@ nlmixrTest({
         })
       }
 
-      expect_error(nlmixr(uif), rex::rex("The following parameters initial estimates are NA: tka"))
+      expect_error(nlmixr(uif), rex::rex("non-numeric values in initial condition for 'tka': NA"))
 
       uif <- function() {
         ini({
@@ -214,7 +214,6 @@ nlmixrTest({
           tv <- exp(1)
           eta.ka ~ 0.1
           eta.cl ~ 0.2
-          add.err
         })
         model({
           ka <- tka + eta.ka
@@ -230,10 +229,10 @@ nlmixrTest({
       expect_error(nlmixr(uif), rex::rex("Residual distribution parameter(s) estimates were not found in ini block"))
     })
 
-    test_that("Parameters cannot be missing or Infinite", {
+    test_that("There must be at least one prediction", {
       uif <- function() {
         ini({
-          tka <- NA
+          tka <- 4
           tcl <- exp(-3.2)
           tv <- exp(1)
           eta.ka ~ 0.1

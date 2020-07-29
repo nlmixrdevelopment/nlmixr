@@ -660,11 +660,14 @@ update.function <- .nlmixrUpdate
   }
   ns <- fun2$name[which(!is.na(fun2$neta1) & !is.na(fun2$err))]
   if (length(ns) > 0) {
-    stop(sprintf("Residual error component(s) need to be defined with assignment ('=' or '<-') in ini block (not '~'): %s", paste(ns, collapse = ", ")))
+    stop("residual error component(s) need to be defined with assignment ('=' or '<-') in ini block (not '~'): ",
+         paste(ns, collapse = ", "), call. = FALSE)
   }
   ns <- fun2$name[is.na(fun2$est)]
   if (length(ns) > 0) {
-    stop(sprintf("The following parameters initial estimates are NA: %s", paste(ns, collapse = ", ")))
+    ## Now handled by bounds (in theory), keeping here just in case.
+    stop(sprintf("the following parameters initial estimates are NA: %s", paste(ns, collapse = ", ")),
+         call.=FALSE) #nocov
   }
   fun2$meta <- list2env(meta, parent = emptyenv())
   .mv <- RxODE::rxModelVars(fun2$rxode)
@@ -677,7 +680,11 @@ update.function <- .nlmixrUpdate
       .predDf <- .predDf[.predDf$var %in% .tmp, ]
       .predDf <- .predDf[.predDf$var == .predDf$cond, , drop = FALSE]
       if (length(.predDf$var) > 0) {
-        stop(sprintf("Multiple compartment models with expressions need to be conditioned by `|`\n ie log(cp) ~ add(err) | cmt\n The following endpoints need to be corrected: %s", paste(.predDf$var, collapse = ", ")))
+        stop("multiple compartment models with expressions need to be conditioned by `|`\n",
+             "ie log(cp) ~ add(err) | cmt\n",
+             "The following endpoints need to be corrected: ",
+             paste(.predDf$var, collapse = ", "),
+             call.=FALSE)
       }
     }
     .tmp <- lapply(.tmp, function(x) {
