@@ -78,7 +78,7 @@ nlmixrBounds_df <- function(fun) {
           currentData = df[currentRows, ]
         )
     } else {
-      stop(paste0("report a bug.  unknown nlmixrBounds operation: '", funParsed[[currentParse]]$operation, "'"), call. = FALSE) # nocov
+      stop("report a bug.  unknown nlmixrBounds operation: '", funParsed[[currentParse]]$operation, "'", call. = FALSE) # nocov
     }
   }
   df
@@ -114,6 +114,14 @@ nlmixrBoundsPrepareFunComments <- function(fun_char) {
   if (length(w) > 0) {
     fun_char <- fun_char[-w]
   }
+  w <- which(regexpr("^ *function[(] *[)] *[(] *[{] *#+.*", fun_char) == 1)
+  if (length(w) > 0) {
+    fun_char[w] <- "function()({"
+  }
+  w <- which(regexpr("^ *function[(] *[)] *[{] *#+.*", fun_char) == 1)
+  if (length(w) > 0) {
+    fun_char[w] <- "function(){"
+  }
   # convert comments to 'label()' values
   w <- which(regexpr("^ *[^\n\"]+ *#+.*", fun_char) != -1)
   if (length(w) > 0) {
@@ -130,6 +138,7 @@ nlmixrBoundsPrepareFunComments <- function(fun_char) {
     fun_char <- c(fun_char, labels)[order(c(seq_along(fun_char), w))]
   }
   # Perform final parsing of the modified function
+
   fun_parsed <-
     try(
       eval(parse(text = paste0(fun_char, collapse = "\n"))),
@@ -148,11 +157,9 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
   maskDupVarname <- duplicated(varnameC)
   if (any(maskDupVarname)) {
     stop(
-      paste0(
         "duplicated parameter names: '",
         paste(unique(varnameC[maskDupVarname]), collapse = "', '"),
-        "'"
-      ),
+        "'",
       call. = FALSE
     )
   }
