@@ -121,7 +121,7 @@ nlmixrfindLhs <- function(x) {
       .df2 <- nlmixrBoundsTemplate
       .df2$neta1 <- .df$neta1[i]
       .df2$neta2 <- .df$neta2[i]
-      .df$name <- .df$name[i]
+      .df2$name <- .df$name[i]
       .df2$est <- .df$val[i]
       .df2$lower <- -Inf
       .df2$upper <- Inf
