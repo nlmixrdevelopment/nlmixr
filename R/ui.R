@@ -360,9 +360,10 @@ ini <- function(ini, ...) {
 }
 
 
+.thetamodelVars <- or("tv", "t", "pop", "POP", "Pop", "TV", "T", "cov", "err", "eff", "centered")
 .thetaModelReg <- rex::rex(or(
-  group(start, or("tv", "t", "pop", "POP", "Pop", "TV", "T", "cov", "err", "eff")),
-  group(or("tv", "pop", "POP", "pop", "TV", "cov", "err", "eff"), end)
+  group(start, .thetamodelVars),
+  group(.thetamodelVars, end)
 ))
 .etaParts <- c(
   "eta", "ETA", "Eta", "ppv", "PPV", "Ppv", "iiv", "Iiv", "bsv", "Bsv", "BSV",
