@@ -301,9 +301,9 @@ nlmixrTest({
   }
 
   test_that("Good Parsing of proper variance specifications", {
-    expect_equal(class(nlmixr:::nlmixr(fn1)), "nlmixrUI")
-    expect_equal(class(nlmixr:::nlmixr(fn34)), "nlmixrUI")
-    expect_equal(class(nlmixr:::nlmixr(fn35)), "nlmixrUI")
+    expect_equal(class(nlmixr(fn1)), "nlmixrUI")
+    expect_equal(class(nlmixr(fn34)), "nlmixrUI")
+    expect_equal(class(nlmixr(fn35)), "nlmixrUI")
   })
 },
 test="cran")

@@ -5,8 +5,8 @@ nlmixrTest(
     samp_dat <- theo_sd
 
     test_that("sampling should return different datasets at each call", {
-      a <- digest::digest(nlmixr:::sampling(samp_dat))
-      b <- digest::digest(nlmixr:::sampling(samp_dat))
+      a <- digest::digest(nlmixr::sampling(samp_dat))
+      b <- digest::digest(nlmixr::sampling(samp_dat))
       testthat::expect_false(isTRUE(all.equal(a, b)))
     })
 
@@ -111,6 +111,7 @@ nlmixrTest(
 
       a <- digest::digest(bootSummary1$parFixedDf$confLower)
       b <- digest::digest(bootSummary2$parFixedDf$confLower)
+
       testthat::expect_false(isTRUE(all.equal(a, b)))
 
       a <- digest::digest(bootSummary1$parFixedDf$confUpper)

@@ -2324,7 +2324,9 @@ foceiFit.data.frame0 <- function(data,
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE) {
   .env <- obj
-  if (arg == "posthoc") {
+  if (arg == "md5"){
+    return(.nlmixrMd5(obj))
+  } else if (arg == "posthoc") {
     return(nlmixrPosthoc(obj))
   } else if (arg == "notes") {
     return(.notesFit(obj))
@@ -2404,7 +2406,9 @@ foceiFit.data.frame0 <- function(data,
 ##' @export
 `$.nlmixrFitData` <- function(obj, arg, exact = FALSE) {
   .ret <- obj[[arg]]
-  if (is.null(.ret)) {
+  if (arg == "md5"){
+    return(.nlmixrMd5(obj))
+  } else if (is.null(.ret)) {
     if (arg == "posthoc") {
       return(nlmixrPosthoc(obj))
     }
