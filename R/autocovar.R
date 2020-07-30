@@ -87,7 +87,6 @@ addCovariate <-
 #' @param varName the variable to which the given string corresponds to in the model expression
 #' @param covariate the covariate expression that needs to be removed (from the appropriate place)
 #' @param theta a list of names of the 'theta' parameters in the 'fit' object
-#' @param isLog a boolean signifying the presence of log-transformation in the funstring
 #'
 #' @return returns the modified string with the covariate removed from the function string
 #'
@@ -104,19 +103,6 @@ removeCovariate <- function(funstring, varName, covariate, theta) {
     if (is.atomic(x)) {
       return(x)
     } else if (is.name(x)) {
-      # x is a name recognized by R eg. in-built functions, etc.
-      # if (isCov) {  # the equaitons corresponds to the varName's equation where the covariate is added
-      #   # if (any(as.character(x) == theta)) {
-      #     if (any(as.character(x) == covariateSplit)){
-      #         return(eval(parse(
-      #         # text = paste0("quote(", 0,")")
-      #           text = ""
-      #       )))
-      #
-      #     }
-      #
-      #   # }
-      # }
       return(x)
     } else if (is.pairlist(x)) {
       return(x)
@@ -401,6 +387,22 @@ addCovVar <- function(fitobject,
 }
 
 
+#' Remove covariate from function string
+#'
+#' Function to remove covariates from a given variable's equation in the function string text
+#'
+#' @param fitobject an nlmixr 'fit' object
+#' @param varName a string giving the variable name to which covariate needs to be added
+#' @param covariate a string giving the covariate name; must be present in the data used for 'fit'
+#' @param categorical a boolean to represent if the covariate to be added is categorical
+#' @param isHS a boolean to represent if the covariate to be added is hockey-stick normalized
+#'
+#' @return returns a list containing the updated model and the parameter names for the covariates added
+#'
+#' @author Vipul Mann, Matthew Fidler
+#'
+#' @export
+#' @noRd
 removeCovVar <- function(fitobject,
                          varName,
                          covariate,
@@ -479,17 +481,6 @@ removeCovVar <- function(fitobject,
 
   updatedMod <- paste0("model(fitobject,{", funstringSplit[[idx]], "})")
   updatedMod <- eval(parse(text = updatedMod))
-
-  # # initialize (add) covars in the model
-  # ini2 <- as.data.frame(updatedMod$ini)
-  # for (covName in covNames) {
-  #   ini2[ini2$name == covName, "est"] <- 0
-  #   ini2[ini2$name == covName, "lower"] <- -Inf
-  #   ini2[ini2$name == covName, "upper"] <- Inf
-  # }
-  #
-  # class(ini2) <- c("nlmixrBounds", "data.frame")
-  # updatedMod$ini <- ini2
 
   list(updatedMod, covNames)
 }
@@ -643,6 +634,7 @@ initializeCovars <- function(fitobject,
 #'
 #' @param data a dataframe containing the dataset that needs to be used
 #' @param covariate the covariate that needs to be converted to hockey-stick; must be present in the data
+#' @param varName the variable name to which the given covariate is to be added
 #'
 #' @return a list of updated data with covariates added, an expression that needs to be added to the model expression, the list of covariate names, and the column names corresponding to the hockey-stick covariates
 #' @export
@@ -673,6 +665,7 @@ makeHockeyStick <- function(data, covariate, varName) {
 #'
 #' @param data a dataframe containing the dataset that needs to be used
 #' @param covariate the covariate that needs to be converted to categorical; must be present in the data
+#' @param varName the variable name to which the given covariate is to be added
 #'
 #' @return a list of updated data with covariates added, an expression that needs to be added to the model expression, the list of covariate names, and the column names corresponding to the categorical covariates
 #' @export
@@ -698,6 +691,18 @@ makeDummies <- function(data, covariate, varName) {
   list(newdat, covModExpr, covNames, colnames(d))
 }
 
+
+#' Removing multiple covariates
+#'
+#' @param covInfo a list containing information about each variable-covariate pair
+#' @param fitobject an nlmixr 'fit' object
+#'
+#' @return a list with the updated fit object, the variable-covariate pair string, and the parameter names for the corresponding covaraites removed
+#' @export
+#' @noRd
+#'
+#' @author Vipul Mann, Matthew Fidler
+#'
 removeCovMultiple <- function(covInfo, fitobject) {
   covSearchRes <- list() # list to store fitobjects during the search
 
@@ -753,7 +758,7 @@ removeCovMultiple <- function(covInfo, fitobject) {
 
 #' Add multiple covariates to a given model, sequentially or all at once
 #'
-#' @param covInfo a list of lists containing information on the covariates that need to be tested
+#' @param covInfo a list containing information about each variable-covariate pair
 #' @param fitobject an nlmixr 'fit' object
 #' @param indep a boolean indicating if the covariates should be added independently, or sequentially (append to the previous model); default is TRUE
 #'
@@ -892,13 +897,19 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 #' @param fit an nlmixr 'fit' object
 #' @param varsVec a list of candidate variables to which the covariates could be added
 #' @param covarsVec a list of candidate covariates that need to be tested
-#' @param covInformation a list containing information on the variables-covariates pairs
-#' @param testAll a boolean indicating if all possible permutations between varsVec and covarsVec need to be tested
+#' @param pVal a named list with names 'fwd' and 'bck' for specifying the p-values for the forward and backward searches, respectively
+#' @param covInformation a list containing additionl information on the variables-covariates pairs that should be passed on to addCovMultiple function
+#' @param catCovaraites a list of covariates that should be treated as categorical
+#' @param searchType one of 'scm', 'forward' and 'backward' to specify the covariate search method; default is 'scm'
+#' @param restart a boolean that controls if the search should be restarted; default is FALSE
 #'
 #' @export
 #' @author Vipul Mann, Matthew Fidler
 #'
 #' @examples
+#' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"))
+#' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"), restart = TRUE)
+#' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"), restart = TRUE, searchType = "forward")
 covarSearchAuto <- # unsuccessful runs info store; check for covInformation before resuming
   function(fit,
            varsVec,
@@ -990,6 +1001,19 @@ covarSearchAuto <- # unsuccessful runs info store; check for covInformation befo
   }
 
 
+#' Forward covariate search
+#'
+#' @param covInfo a list containing information about each variable-covariate pair
+#' @param fit  an nlmixr 'fit' object
+#' @param pVal p-value that should be used for selecting covariates in the forward search
+#' @param outputDir the name of the output directory that stores the covariate search result
+#' @param restart a boolean that controls if the search should be restarted; default is FALSE
+#'
+#' @return returns the updated 'fit' object at the end of the forward search and a table of information for all the covaraites tested
+#' @export
+#' @author Vipul Mann, Matthew Fidler
+#' @noRd
+#'
 forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE) {
   if (missing(outputDir)) {
     stop("please specify output directory to store the results for forward search. aborting ...")
@@ -1121,6 +1145,36 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
   list(fit, resTableComplete)
 }
 
+
+#' Forward covariate search
+#'
+#' @param covInfo a list containing information about each variable-covariate pair
+#' @param fit  an nlmixr 'fit' object
+#' @param pVal p-value that should be used for selecting covariates in the forward search
+#' @param outputDir the name of the output directory that stores the covariate search result
+#' @param restart a boolean that controls if the search should be restarted; default is FALSE
+#'
+#' @return returns the updated 'fit' object at the end of the forward search and a table of information for all the covaraites tested
+#' @export
+#' @author Vipul Mann, Matthew Fidler
+#' @noRd
+#'
+#'
+#'
+#' Backward covariate search
+#'
+#' @param covInfo a list containing information about each variable-covariate pair
+#' @param fitorig the original 'fit' object before forward search
+#' @param fitupdated the updatef 'fit' object, if any, after the forward search
+#' @param pVal p-value that should be used for selecting covariates in the forward search
+#' @param reFitCovars if the covariates should be added before performing backward search - useful for directly performing backward search without forward search; default is FALSE
+#' @param outputDir the name of the output directory that stores the covariate search result
+#' @param restart a boolean that controls if the search should be restarted; default is FALSE
+#'
+#' @return returns the updated 'fit' object at the end of the backward search and a table of information for all the covariates tested
+#' @export
+#'
+#' @author Vipul Mann, Matthew Fidler
 backwardSearch <- function(covInfo, fitorig, fitupdated, pVal = 0.01, reFitCovars = FALSE, outputDir, restart = FALSE) {
   if (missing(outputDir)) {
     stop("please specify output directory to store the results for backward search. aborting ...")
@@ -1282,8 +1336,8 @@ backwardSearch <- function(covInfo, fitorig, fitupdated, pVal = 0.01, reFitCovar
 }
 
 
-fitDapto <- readRDS("daptomycin.Rds")
-covarSearchAuto(fitDapto, c("v1"), c("SEX"), catCovariates = "SEX", restart = T, pVal = list(fwd = 1, bck = 1))
+# fitDapto <- readRDS("daptomycin.Rds")
+# covarSearchAuto(fitDapto, c("v1"), c("SEX"), catCovariates = "SEX", restart = T, pVal = list(fwd = 1, bck = 1))
 
 # covarSearchAuto(fitDapto, c('v1', 'v2'), c('WT', 'SEX'), catCovariates = 'SEX', restart = FALSE, pVal=list(fwd=1, bck=1))
 

@@ -1,12 +1,5 @@
 context("autocovar")
 
-# Test cases
-# 1. addCovariate -  categorical, HS, non-categorical, log/not-log -- done
-# 2. removecovariate - categorical, HS, non-categorical, log/not-log -- done
-# 3. addCovVar --> performNorm() -- done
-# 4. performNorm - norm-median/mean, norm type - mul, div, add, sub, initial Est  - done
-# 5. addCovMultiple - function not complete (yet!)
-
 # === addCovariate
 testthat::test_that("adding non-categorical covariate to funstring with log-transformation", {
   funstring <- "ka <- exp(tka + eta.ka)"
