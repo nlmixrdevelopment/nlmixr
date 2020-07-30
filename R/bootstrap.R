@@ -215,20 +215,26 @@ bootstrapFit <- function(fit,
     ##   deltOBJF = c(deltOBJFloaded, deltOBJF)
     ## }
     ## else{
+    RxODE::rxProgress(length(fitList))
+    cli::cli_h1("Loading/Calculating \u0394 Objective function")
     deltOBJF <- lapply(seq_along(fitList), function(i) {
       x <- fitList[[i]]
       .path <- file.path(output_dir, paste0("posthoc_", i, ".rds"))
       if (file.exists(.path)){
         xPosthoc <- readRDS(.path)
+        RxODE::rxTick()
       } else {
+        RxODE::rxProgressAbort()
         ## Don't calculate the tables
-        cli::cli_h1("Running nlmixr posthoc with bootstrap estimates on original data for  model index: {i}")
+        .msg <- paste0(gettext("Running bootstrap estimates on original data for model index: "), i)
+        cli::cli_h1(.msg)
         xPosthoc = suppressWarnings(nlmixr(x, data=origData, est='posthoc',
                                            control=list(calcTables=FALSE)))
         saveRDS(xPosthoc, .path)
       }
       xPosthoc$objf - fit$objf
     })
+    RxODE::rxProgressStop()
     deltOBJF = c(deltOBJFloaded, deltOBJF)
 
     .deltaO <- sort(abs(unlist(deltOBJF)))
