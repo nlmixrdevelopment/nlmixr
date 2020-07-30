@@ -189,17 +189,47 @@ bootstrapFit <- function(fit,
     backTransformed
 
   # compute bias
-  bootstrapBias <-
-    bootSummary$objf[[1]] - fit$objf # 1 corresponds to the mean value, 2 corresponds to the median
-
+  bootParams = bootSummary$parFixedDf$mean
+  origParams = data.frame(list('Estimate'=fit$parFixedDf$Estimate, 'Back-transformed'=fit$parFixedDf$`Back-transformed`))
+  bootstrapBiasParfixed = abs(origParams - bootParams)
+  
+  bootstrapBiasOmega = abs(fit$omega - bootSummary$omega$mean)
+  
   # compute covariance matrix
-  covMatrix <- cov(getData(fit), getData(fit))
-  corMatrix <- cor(getData(fit), getData(fit))
+  covMatrixParfixed <- cov(bootParams)
+  corMatrixParfixed <- cor(bootParams)
+  
+  omgMat = bootSummary$omega$mean
+  omgVec = omgMat[lower.tri(omgMat, TRUE)]
+  omgVecRep = matrix(rep(omgVec, 10), nrow=10, byrow = TRUE) + rnorm(length(omgVec))
+  
+  covMatrixOmega <- cov(omgVecRep)
+  corMatrixOmega <- cor(omgVecRep)
+  
+  idxName=1
+  namesList=list()
+  for (nam1 in colnames(omgMat)){
+    for (nam2 in colnames(omgMat)){
+      nam = paste0(nam1, '_', nam2)
+      namRev = paste0(nam2, '_', nam1)
+      if (!(nam %in% namesList | namRev %in% namesList) ){
+        namesList[idxName]= nam
+        idxName = idxName+1
+      }
+    }
+  }
 
+  colnames(covMatrixOmega) = namesList
+  rownames(covMatrixOmega) = namesList
+  
   # assign("deltOBJF", deltOBJF, envir = fit$env)
-  assign("bootBias", bootstrapBias, envir = fit$env)
-  assign("bootCovMatrix", covMatrix, envir = fit$env)
-  assign("bootCorMatrix", corMatrix, envir = fit$env)
+  assign("bootBiasParfixed", bootstrapBiasParfixed, envir = fit$env)
+  assign("bootBiasOmega", bootstrapBiasOmega, envir = fit$env)
+  
+  assign("bootCovMatrixParfixed", covMatrixParfixed, envir = fit$env)
+  assign("bootCorMatrixParfixed", corMatrixParfixed, envir = fit$env)
+  assign("bootCovMatrixOmega", covMatrixOmega, envir = fit$env)
+  assign("bootCorMatrixOmega", corMatrixOmega, envir = fit$env)
   assign("parFixedDf", newParFixedDf, envir = fit$env)
   assign("parFixed", newParFixed, envir = fit$env)
   assign("bootOmegaSummary", bootSummary$omega, envir = fit$env)
