@@ -263,7 +263,6 @@ bootstrapFit <- function(fit,
                                   c("Reference distribution", "\u0394 objective function"))
     .dataList <- list(dfD=.dfD, chisq=.chisq,
                       deltaN=.deltaN, df2=.df2)
-
     assign(".bootPlotData", .dataList, envir=fit$env)
 
   }

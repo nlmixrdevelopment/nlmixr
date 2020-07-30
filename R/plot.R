@@ -111,45 +111,52 @@
 #' @return Fit traceplot or nothing.
 #' @author Vipul Mann,  Matthew L. Fidler
 #' @export
-bootplot <- function(obj, ...){
-  if (inherits(obj, "nlmixrFitCore")) {
-    if (exists(".bootPlotData", obj$env)){
-      with(obj$env$.bootPlotData, {
-        .plot <- ggplot2::ggplot(chisq, aes(quantiles, deltaofv, color=Distribution)) +
-          ggplot2::geom_line() + ggplot2::ylab("\u0394 objective function") +
-          ggplot2::geom_text(data=dfD, aes(label=label), hjust=0) +
-          ggplot2::xlab("Distribution quantiles") +
-          ggplot2::scale_color_manual(values=c("red", "blue")) +
-          RxODE::rxTheme() +
-          ggplot2::theme(legend.position="bottom",legend.box="horizontal")
+bootplot <- function(x, ...){
+  UseMethod("bootplot")
+}
+##' @rdname traceplot
+##' @export
+bootplot.nlmixrFitCore <- function(x, ...) {
+  if (inherits(x, "nlmixrFitCore")) {
+    if (exists(".bootPlotData", x$env)){
+      .chisq <- x$env$.bootPlotData$chisq
+      .dfD <- x$env$.bootPlotData$dfD
+      .deltaN <- x$env$.bootPlotData$deltaN
+      .df2 <- x$env$.bootPlotData$df2
+      .plot <- ggplot2::ggplot(.chisq, aes(quantiles, deltaofv, color=Distribution)) +
+        ggplot2::geom_line() + ggplot2::ylab("\u0394 objective function") +
+        ggplot2::geom_text(data=.dfD, aes(label=label), hjust=0) +
+        ggplot2::xlab("Distribution quantiles") +
+        ggplot2::scale_color_manual(values=c("red", "blue")) +
+        RxODE::rxTheme() +
+        ggplot2::theme(legend.position="bottom",legend.box="horizontal")
 
-        if (requireNamespace("ggtext", quietly = TRUE)) {
-          .plot <- .plot +
-            ggplot2::theme(plot.title = ggtext::element_markdown(),
-                           legend.position="none") +
-            ggplot2::labs(
-              title = paste0(
-                'Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', deltaN,
-                ' models, df\u2248', df2, ')</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
-                length(fit$ini$est), ")</style>"
-              ),
-              caption = "\u0394 objective function curve should be on or below the reference distribution curve"
-            )
-        } else {
-          .plot <- ggplot2::labs(
-            title = paste0("Distribution of \u0394 objective function values for ", deltaN, ' df=', df2, " models"),
+      if (requireNamespace("ggtext", quietly = TRUE)) {
+        .plot <- .plot +
+          ggplot2::theme(plot.title = ggtext::element_markdown(),
+                         legend.position="none") +
+          ggplot2::labs(
+            title = paste0(
+              'Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', .deltaN,
+              ' models, df\u2248', .df2, ')</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
+              length(fit$ini$est), ")</style>"
+            ),
             caption = "\u0394 objective function curve should be on or below the reference distribution curve"
           )
-        }
-        return(.plot)
-      })
+      } else {
+        .plot <- ggplot2::labs(
+          title = paste0("Distribution of \u0394 objective function values for ", .deltaN, ' df=', .df2, " models"),
+          caption = "\u0394 objective function curve should be on or below the reference distribution curve"
+        )
+      }
+      .plot
     } else {
       stop("this nlmixr object does not include boostrap distribution statics for comparison",
            call.=FALSE)
     }
   } else {
     stop("this is not a nlmixr object",
-           call.=FALSE)
+         call.=FALSE)
   }
 }
 
@@ -169,8 +176,8 @@ plot.nlmixrFitData <- function(x, ...) {
   IWRES <- NULL
   .tp <- traceplot(x)
   if (!is.null(.tp)) .lst[[length(.lst) + 1]] <- .tp
-  .bp <- try(bootplot(x), silent=TRUE)
-  if (!inherits(.bp, "try-error")) {
+  if (exists(".bootPlotData", object$env)){
+    .bp <- bootplot(x)
     .lst[[length(.lst) + 1]] <- .bp
   }
   .dat <- .setupPlotData(x)
@@ -207,10 +214,9 @@ plot.nlmixrFitData <- function(x, ...) {
     }
 
     for (x in c("IPRED", "PRED", "CPRED", "EPRED", "TIME")) {
-      if (any(names(.dat0) == x)){
+      if (any(names(.dat0) == x)) {
         for (y in c("IWRES", "IRES", "RES", "CWRES", "NPDE")) {
-          if (any(names(.dat0) == y)){
-            .doIt <- FALSE
+          if (any(names(.dat0) == y)) {
             if (y == "CWRES" && x %in% c("TIME", "CPRED")){
               .doIt <- TRUE
             } else if (y == "NPDE" && x %in% c("TIME", "EPRED")) {

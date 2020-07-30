@@ -4,12 +4,12 @@
 \alias{bootplot}
 \title{Produce trace-plot for fit if applicable}
 \usage{
-bootplot(obj, ...)
+bootplot(x, ...)
 }
 \arguments{
-\item{...}{other parameters}
-
 \item{x}{fit object}
+
+\item{...}{other parameters}
 }
 \value{
 Fit traceplot or nothing.
