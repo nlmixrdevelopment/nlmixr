@@ -950,6 +950,8 @@ getBootstrapSummary <-
 
     names(summaryList) <- varIds
 
+    summaryList$nboot <- length(fitList)
+
     summaryList$warnings <- unique(summaryList$warnings)
 
     summaryList$message <- unique(summaryList$message)
