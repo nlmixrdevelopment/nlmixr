@@ -689,8 +689,8 @@ modelBootstrap <- function(fit,
             objf = fit$OBJF,
             aic = fit$AIC,
             omega = fit$omega,
-            parFixedDf = fit$parFixedDf,
-            method = fit$method,
+            parFixedDf = fit$parFixedDf[, c("Estimate", "Back-transformed")],
+            method = getFitMethod(fit),
             message = fit$message,
             warnings = fit$warnings
           )
