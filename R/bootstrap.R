@@ -211,7 +211,7 @@ bootstrapFit <- function(fit,
     deltOBJFloaded = NULL
     deltOBJF = NULL
     ## if (!restart){
-    ##   deltOBJFloaded = readRDS(paste0("./", output_dir,"/",'deltOBJF',".RData"))
+    ##   deltOBJFloaded = readRDS(paste0("./", output_dir,"/",'deltOBJF',".rds"))
     ##   deltOBJF = c(deltOBJFloaded, deltOBJF)
     ## }
     ## else{
@@ -549,7 +549,7 @@ modelBootstrap <- function(fit,
 
   fnameBootDataPattern <-
     paste0(as.character(substitute(boot_data)),
-      "_", "[0-9]+", ".RData",
+      "_", "[0-9]+", ".rds",
       sep = ""
     )
   fileExists <-
@@ -606,7 +606,7 @@ modelBootstrap <- function(fit,
           as.character(substitute(boot_data)),
           "_",
           mod_idx,
-          ".RData"
+          ".rds"
         )
       )
     }
@@ -625,7 +625,7 @@ modelBootstrap <- function(fit,
   .env <- environment()
   fnameModelsEnsemblePattern <-
     paste0(as.character(substitute(modelsEnsemble)), "_", "[0-9]+",
-      ".RData",
+      ".rds",
       sep = ""
     )
   modFileExists <-
@@ -633,7 +633,7 @@ modelBootstrap <- function(fit,
 
   fnameFitEnsemblePattern <-
     paste0(as.character(substitute(fitEnsemble)), "_", "[0-9]+",
-           ".RData",
+           ".rds",
            sep = ""
     )
   fitFileExists <- list.files(paste0("./", output_dir), pattern = fnameFitEnsemblePattern)
@@ -751,7 +751,7 @@ modelBootstrap <- function(fit,
           as.character(substitute(modelsEnsemble)),
           "_",
           .env$mod_idx,
-          ".RData"
+          ".rds"
         )
       )
 
@@ -764,7 +764,7 @@ modelBootstrap <- function(fit,
           as.character(substitute(fitEnsemble)),
           "_",
           .env$mod_idx,
-          ".RData"
+          ".rds"
         )
       )
 
