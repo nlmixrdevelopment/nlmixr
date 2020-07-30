@@ -951,6 +951,10 @@ getBootstrapSummary <-
 
     names(summaryList) <- varIds
 
+    summaryList$warnings <- unique(summaryList$warnings)
+
+    summaryList$message <- unique(summaryList$message)
+
     class(summaryList) <- "nlmixrBoostrapSummary"
     summaryList
   }
@@ -972,7 +976,7 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
   warnings <- x$warnings
 
   omega <- x$omega
-  parFixedDf <- x$parFixedDf
+  parFixedDf <- x$parFixedDf[, c("Estimate", "Back-transformed")]
 
   cli::cli_h1(
     cli::col_red(
@@ -1031,7 +1035,7 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
   print(warnings)
 
   cli::cli_h1("end")
-  invsibile(x)
+  invisible(x)
 }
 
 
