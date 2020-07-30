@@ -210,18 +210,26 @@ bootstrapFit <- function(fit,
 
     deltOBJFloaded = NULL
     deltOBJF = NULL
-    if (!restart){
-      deltOBJFloaded = readRDS(paste0("./", output_dir,"/",'deltOBJF',".RData"))
-      deltOBJF = c(deltOBJFloaded, deltOBJF)
-    }
-    else{
-      deltOBJF <- lapply(fitList, function(x) {
-        xPosthoc = suppressWarnings(nlmixr(x, data=origData, est='posthoc'))
-        xPosthoc$objf - fit$objf
-      })
-      deltOBJF = c(deltOBJFloaded, deltOBJF)
-      saveRDS(deltOBJF, file = paste0("./", output_dir,"/",'deltOBJF',".RData"))
-    }
+    ## if (!restart){
+    ##   deltOBJFloaded = readRDS(paste0("./", output_dir,"/",'deltOBJF',".RData"))
+    ##   deltOBJF = c(deltOBJFloaded, deltOBJF)
+    ## }
+    ## else{
+    deltOBJF <- lapply(seq_along(fitList), function(i) {
+      x <- fitList[[i]]
+      .path <- file.path(output_dir, paste0("posthoc_", i, ".rds"))
+      if (file.exists(.path)){
+        xPosthoc <- readRDS(.path)
+      } else {
+        ## Don't calculate the tables
+        cli::cli_h1("Running nlmixr posthoc for model index: {i}")
+        xPosthoc = suppressWarnings(nlmixr(x, data=origData, est='posthoc',
+                                           control=list(calcTables=FALSE)))
+        saveRDS(xPosthoc, .path)
+      }
+      xPosthoc$objf - fit$objf
+    })
+    deltOBJF = c(deltOBJFloaded, deltOBJF)
 
     .deltaO <- sort(abs(unlist(deltOBJF)))
 
@@ -305,14 +313,14 @@ bootstrapFit <- function(fit,
     ##   ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
     ##                                                   'reference distribution' = 'red')) +
     ##   RxODE::rxTheme()
-    
+
     # .plot
-    
+
     assign("bootstrapSummaryplot", .plot, envir = fit$env)
-    
+
   }
-  
-  
+
+
   fit
 }
 
