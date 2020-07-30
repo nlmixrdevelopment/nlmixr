@@ -305,8 +305,15 @@ bootstrapFit <- function(fit,
     ##   ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
     ##                                                   'reference distribution' = 'red')) +
     ##   RxODE::rxTheme()
-    .plot
+    
+    # .plot
+    
+    assign("bootstrapSummaryplot", .plot, envir = fit$env)
+    
   }
+  
+  
+  fit
 }
 
 

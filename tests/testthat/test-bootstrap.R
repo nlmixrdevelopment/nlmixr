@@ -105,7 +105,7 @@ nlmixrTest(
         table = list(npde = TRUE, cwres = TRUE)
       ))
 
-      fitlist <- nlmixr:::modelBootstrap(fit, nboot = 4, restart = TRUE)
+      fitlist <- nlmixr:::modelBootstrap(fit, nboot = 4, restart = TRUE)[[1]]
       bootSummary1 <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.95)
       bootSummary2 <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.75)
 
@@ -152,7 +152,7 @@ nlmixrTest(
       ))
 
       colsBefore <- colnames(fit$parFixedDf)
-      fitlist <- nlmixr:::modelBootstrap(fit, nboot = 4, restart = TRUE)
+      fitlist <- nlmixr:::modelBootstrap(fit, nboot = 4, restart = TRUE)[[1]]
 
       bootSummary <- nlmixr:::getBootstrapSummary(fitlist, ci = 0.95)
 
