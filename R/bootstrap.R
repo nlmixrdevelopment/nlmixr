@@ -28,10 +28,20 @@ addConfboundsToVar <-
 #' Bootstrap input dataset and rerun the model to get confidence bounds and aggregated parameters
 #'
 #' @param fit the nlmixr fit object
-#' @param nboot an integer giving the number of bootstrapped models to be fit; default value is 100
-#' @param nSampIndiv an integer specifying the number of samples in each bootstrapped sample; default is the number of unique subjects in the original dataset
-#' @param pvalues a vector of pvalues indicating the probability of each subject to get selected; default value is NULL implying that probability of each subject is the same
-#' @param restart a boolean that indicates if a previous session has to be restarted; default value is FALSE
+#' @param nboot an integer giving the number of bootstrapped models to
+#'   be fit; default value is 200
+#' @param nSampIndiv an integer specifying the number of samples in
+#'   each bootstrapped sample; default is the number of unique
+#'   subjects in the original dataset
+#' @param stratVar Variable in the original dataset to stratify on;
+#'   This is useful to distinguish between sparse and full sampling
+#'   and other features you may wish to keep distinct in your
+#'   bootstrap
+#' @param pvalues a vector of pvalues indicating the probability of
+#'   each subject to get selected; default value is NULL implying that
+#'   probability of each subject is the same
+#' @param restart a boolean that indicates if a previous session has
+#'   to be restarted; default value is FALSE
 #'
 #'
 #' @author Vipul Mann, Matthew Fidler
@@ -69,14 +79,14 @@ addConfboundsToVar <-
 #' bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
 # }
 bootstrapFit <- function(fit,
-                         nboot = 500,
+                         nboot = 200,
                          nSampIndiv,
                          stratVar,
                          stdErrType = c("perc", "se"),
                          ci = 0.95,
                          pvalues = NULL,
                          restart = FALSE,
-                         plotHist = TRUE) {
+                         plotHist = FALSE) {
   stdErrType <- match.arg(stdErrType)
   if (missing(stdErrType)) {
     stdErrType <- "perc"
@@ -193,6 +203,7 @@ bootstrapFit <- function(fit,
   assign("parFixedDf", newParFixedDf, envir = fit$env)
   assign("parFixed", newParFixed, envir = fit$env)
   assign("bootOmegaSummary", bootSummary$omega, envir = fit$env)
+  assign("bootSummary", bootSummary, envir=fit$env)
 
   # plot histogram
   if (plotHist) {
@@ -224,7 +235,7 @@ bootstrapFit <- function(fit,
         xPosthoc <- readRDS(.path)
         RxODE::rxTick()
       } else {
-        RxODE::rxProgressAbort()
+        RxODE::rxProgressAbort("Starting to posthoc estimates")
         ## Don't calculate the tables
         .msg <- paste0(gettext("Running bootstrap estimates on original data for model index: "), i)
         cli::cli_h1(.msg)
@@ -272,7 +283,6 @@ bootstrapFit <- function(fit,
     assign(".bootPlotData", .dataList, envir=fit$env)
 
   }
-
 
   fit
 }
@@ -946,7 +956,7 @@ getBootstrapSummary <-
   }
 
 #' @export
-print.nlmixrBootstrapSummary <- function(x, ..., sigdig = NULL) {
+print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
   if (is.null(sigdig)) {
     if (any(names(x) == "sigdig")) {
       sigdig <- x$sigdig

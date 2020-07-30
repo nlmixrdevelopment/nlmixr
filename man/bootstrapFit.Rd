@@ -6,26 +6,37 @@
 \usage{
 bootstrapFit(
   fit,
-  nboot = 500,
+  nboot = 200,
   nSampIndiv,
   stratVar,
   stdErrType = c("perc", "se"),
   ci = 0.95,
   pvalues = NULL,
   restart = FALSE,
-  plotHist = TRUE
+  plotHist = FALSE
 )
 }
 \arguments{
 \item{fit}{the nlmixr fit object}
 
-\item{nboot}{an integer giving the number of bootstrapped models to be fit; default value is 100}
+\item{nboot}{an integer giving the number of bootstrapped models to
+be fit; default value is 200}
 
-\item{nSampIndiv}{an integer specifying the number of samples in each bootstrapped sample; default is the number of unique subjects in the original dataset}
+\item{nSampIndiv}{an integer specifying the number of samples in
+each bootstrapped sample; default is the number of unique
+subjects in the original dataset}
 
-\item{pvalues}{a vector of pvalues indicating the probability of each subject to get selected; default value is NULL implying that probability of each subject is the same}
+\item{stratVar}{Variable in the original dataset to stratify on;
+This is useful to distinguish between sparse and full sampling
+and other features you may wish to keep distinct in your
+bootstrap}
 
-\item{restart}{a boolean that indicates if a previous session has to be restarted; default value is FALSE}
+\item{pvalues}{a vector of pvalues indicating the probability of
+each subject to get selected; default value is NULL implying that
+probability of each subject is the same}
+
+\item{restart}{a boolean that indicates if a previous session has
+to be restarted; default value is FALSE}
 }
 \description{
 Bootstrap input dataset and rerun the model to get confidence bounds and aggregated parameters
