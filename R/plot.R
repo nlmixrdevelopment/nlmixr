@@ -82,7 +82,6 @@
                                  legend.title = ggplot2::element_blank())
   } else {
     .aes <- ggplot2::aes(.data$x, .data$y)
-    .aes <- ggplot2::aes(.data$values, .data$DV)
     .color <- NULL
     .legendPos <- NULL
   }
