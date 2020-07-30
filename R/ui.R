@@ -360,7 +360,7 @@ ini <- function(ini, ...) {
 }
 
 
-.thetamodelVars <- or("tv", "t", "pop", "POP", "Pop", "TV", "T", "cov", "err", "eff")
+.thetamodelVars <- rex::rex(or("tv", "t", "pop", "POP", "Pop", "TV", "T", "cov", "err", "eff"))
 .thetaModelReg <- rex::rex(or(
   group(start, .thetamodelVars),
   group(.thetamodelVars, end)

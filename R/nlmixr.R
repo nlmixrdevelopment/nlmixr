@@ -423,7 +423,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     .up <- uif$ini$upper
     .up <- .up[!is.na(.up) & is.na(.err)]
     if (any(.low != -Inf) | any(.up != Inf)) {
-      warning("Bounds are ignored in SAEM")
+      warning("Bounds are ignored in SAEM", call.=FALSE)
     }
     uif$env$mcmc <- .mcmc
     uif$env$ODEopt <- .ODEopt

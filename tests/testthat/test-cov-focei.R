@@ -48,7 +48,7 @@ nlmixrTest({
   }
 
 
-  f <- nlmixr(One.SD.ODE, dat, "posthoc")
+  f <- suppressWarnings(nlmixr(One.SD.ODE, dat, "posthoc"))
   expect_true(inherits(f, "nlmixrPosthoc"))
 
 }, test="focei")
