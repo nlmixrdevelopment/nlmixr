@@ -169,6 +169,10 @@ plot.nlmixrFitData <- function(x, ...) {
   IWRES <- NULL
   .tp <- traceplot(x)
   if (!is.null(.tp)) .lst[[length(.lst) + 1]] <- .tp
+  .bp <- try(bootplot(x), silent=TRUE)
+  if (!inherits(.bp, "try-error")) {
+    .lst[[length(.lst) + 1]] <- .bp
+  }
   .dat <- .setupPlotData(x)
   for (.cmt in levels(.dat$CMT)) {
     .dat0 <- .dat[.dat$CMT == .cmt, ]
