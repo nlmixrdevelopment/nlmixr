@@ -166,9 +166,9 @@ bootstrapFit <- function(fit,
   seBoot <- unname(bootSummary$parFixedDf$stdDev[1:nrws, 1])
 
   # Add Back-transformed
-  est <- unname(bootSummary$parFixedDf$mean[1:nrws, 4])
-  cLowerBT <- unname(bootSummary$parFixedDf$confLower[1:nrws, 4])
-  cUpperBT <- unname(bootSummary$parFixedDf$confUpper[1:nrws, 4])
+  est <- unname(bootSummary$parFixedDf$mean[1:nrws, 2])
+  cLowerBT <- unname(bootSummary$parFixedDf$confLower[1:nrws, 2])
+  cUpperBT <- unname(bootSummary$parFixedDf$confUpper[1:nrws, 2])
   backTransformed <-
     addConfboundsToVar(est, cLowerBT, cUpperBT, sigdig)
   estBT <- est
@@ -690,7 +690,6 @@ modelBootstrap <- function(fit,
             aic = fit$AIC,
             omega = fit$omega,
             parFixedDf = fit$parFixedDf[, c("Estimate", "Back-transformed")],
-            method = getFitMethod(fit),
             message = fit$message,
             warnings = fit$warnings
           )
@@ -971,16 +970,15 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
 
   objf <- x$objf
   aic <- x$aic
-  method <- x$method
   message <- x$message
   warnings <- x$warnings
 
   omega <- x$omega
-  parFixedDf <- x$parFixedDf[, c("Estimate", "Back-transformed")]
+  parFixedDf <- x$parFixedDf
 
   cli::cli_h1(
     cli::col_red(
-      "Summary of the bootstrap models using method: {cli::col_yellow(method)}"
+      "Summary of the bootstrap models"
     )
   )
   cli::cli_ol()
@@ -1015,12 +1013,6 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
     cli::cli_text(cli::col_yellow(paste0("$", names(parFixedDf)[x])))
     print(signif(parFixedDf[[x]], sigdig))
   })
-
-  cli::cli_li(cli::cli_text(
-    cli::bg_green(cli::style_bold("Method")),
-    cli::col_yellow(" (summary$method)")
-  ))
-  print(method)
 
   cli::cli_li(cli::cli_text(
     cli::bg_yellow(cli::style_bold("Messages")),
