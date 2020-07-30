@@ -187,12 +187,12 @@ bootstrapFit <- function(fit,
   corMatrix <- cor(getData(fit), getData(fit))
 
   # assign("deltOBJF", deltOBJF, envir = fit$env)
-  assign("bootstrapBias", bootstrapBias, envir = fit$env)
-  assign("covMatrix", covMatrix, envir = fit$env)
-  assign("corMatrix", corMatrix, envir = fit$env)
+  assign("bootBias", bootstrapBias, envir = fit$env)
+  assign("bootCovMatrix", covMatrix, envir = fit$env)
+  assign("bootCorMatrix", corMatrix, envir = fit$env)
   assign("parFixedDf", newParFixedDf, envir = fit$env)
   assign("parFixed", newParFixed, envir = fit$env)
-  assign("omegaSummary", bootSummary$omega, envir = fit$env)
+  assign("bootOmegaSummary", bootSummary$omega, envir = fit$env)
 
   # plot histogram
   if (plotHist) {
@@ -222,7 +222,7 @@ bootstrapFit <- function(fit,
         xPosthoc <- readRDS(.path)
       } else {
         ## Don't calculate the tables
-        cli::cli_h1("Running nlmixr posthoc for model index: {i}")
+        cli::cli_h1("Running nlmixr posthoc with bootstrap estimates on original data for  model index: {i}")
         xPosthoc = suppressWarnings(nlmixr(x, data=origData, est='posthoc',
                                            control=list(calcTables=FALSE)))
         saveRDS(xPosthoc, .path)
@@ -261,62 +261,10 @@ bootstrapFit <- function(fit,
 
     .chisq$Distribution <- factor(.chisq$Distribution, c(1L, 2L),
                                   c("Reference distribution", "\u0394 objective function"))
+    .dataList <- list(dfD=.dfD, chisq=.chisq,
+                      deltaN=.deltaN, df2=.df2)
 
-    assign(".chisq", .chisq, globalenv())
-
-    .plot <- ggplot2::ggplot(.chisq, aes(quantiles, deltaofv, color=Distribution)) +
-      ggplot2::geom_line() + ggplot2::ylab("\u0394 objective function") +
-      ggplot2::geom_text(data=.dfD, aes(label=label), hjust=0) +
-      ggplot2::xlab("Distribution quantiles") +
-      ggplot2::scale_color_manual(values=c("red", "blue")) +
-      RxODE::rxTheme() +
-      ggplot2::theme(legend.position="bottom",legend.box="horizontal")
-
-    if (requireNamespace("ggtext", quietly = TRUE)) {
-      .plot <- .plot +
-        ggplot2::theme(plot.title = ggtext::element_markdown(),
-                       legend.position="none") +
-        ggplot2::labs(
-          title = paste0(
-            'Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', .deltaN,
-            ' models, df\u2248', .df2, ')</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
-            length(fit$ini$est), ")</style>"
-          ),
-          caption = "\u0394 objective function curve should be on or below the reference distribution curve"
-        )
-    } else {
-      .plot <- ggplot2::labs(
-        title = paste0("Distribution of \u0394 objective function values for ", .deltaN, ' df=', .df2, " models"),
-        caption = "\u0394 objective function curve should be on or below the reference distribution curve"
-      )
-    }
-
-
-
-    ## df <-
-    ##   data.frame(
-    ##     vals = c(.deltaO, rchisq(2000, df = length(fit$ini$est))),
-    ##     Distribution=factor(c(rep(1, length(.deltaO)), rep(2, 2000)),
-    ##                         levels=c(1, 2), labels=c("delta objective function", "reference distribution"))
-    ##   )
-
-    ## .plot <- ggplot2::ggplot(df, ggplot2::aes(vals, fill=Distribution)) +
-    ##   ggplot2::geom_density( color = NA, alpha = 0.2) +
-    ##   ggplot2::xlab("\u0394 Objective function") +
-    ##   ggplot2::ylab("Density") +
-    ##   ggplot2::scale_fill_manual(values=c("red", "blue"))
-    ## .plot <- .plot + RxODE::rxTheme(grid=FALSE)
-
-
-    ## .plot
-    ## +
-    ##   ggplot2::scale_color_manual(name='', values = c('delta objective function' = 'blue',
-    ##                                                   'reference distribution' = 'red')) +
-    ##   RxODE::rxTheme()
-
-    # .plot
-
-    assign("bootstrapSummaryplot", .plot, envir = fit$env)
+    assign(".bootPlotData", .dataList, envir=fit$env)
 
   }
 

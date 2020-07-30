@@ -104,6 +104,55 @@
     RxODE::rxTheme() + .color + .legendPos + .logx
 }
 
+#' @title Produce trace-plot for fit if applicable
+#'
+#' @param x fit object
+#' @param ... other parameters
+#' @return Fit traceplot or nothing.
+#' @author Vipul Mann,  Matthew L. Fidler
+#' @export
+bootplot <- function(obj, ...){
+  if (inherits(obj, "nlmixrFitCore")) {
+    if (exists(".bootPlotData", obj$env)){
+      with(obj$env$.bootPlotData, {
+        .plot <- ggplot2::ggplot(chisq, aes(quantiles, deltaofv, color=Distribution)) +
+          ggplot2::geom_line() + ggplot2::ylab("\u0394 objective function") +
+          ggplot2::geom_text(data=dfD, aes(label=label), hjust=0) +
+          ggplot2::xlab("Distribution quantiles") +
+          ggplot2::scale_color_manual(values=c("red", "blue")) +
+          RxODE::rxTheme() +
+          ggplot2::theme(legend.position="bottom",legend.box="horizontal")
+
+        if (requireNamespace("ggtext", quietly = TRUE)) {
+          .plot <- .plot +
+            ggplot2::theme(plot.title = ggtext::element_markdown(),
+                           legend.position="none") +
+            ggplot2::labs(
+              title = paste0(
+                'Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', deltaN,
+                ' models, df\u2248', df2, ')</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
+                length(fit$ini$est), ")</style>"
+              ),
+              caption = "\u0394 objective function curve should be on or below the reference distribution curve"
+            )
+        } else {
+          .plot <- ggplot2::labs(
+            title = paste0("Distribution of \u0394 objective function values for ", deltaN, ' df=', df2, " models"),
+            caption = "\u0394 objective function curve should be on or below the reference distribution curve"
+          )
+        }
+        return(.plot)
+      })
+    } else {
+      stop("this nlmixr object does not include boostrap distribution statics for comparison",
+           call.=FALSE)
+    }
+  } else {
+    stop("this is not a nlmixr object",
+           call.=FALSE)
+  }
+}
+
 
 #' Plot a nlmixr data object
 #'
