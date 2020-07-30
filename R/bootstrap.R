@@ -978,9 +978,10 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
   omega <- x$omega
   parFixedDf <- x$parFixedDf
 
+  nboot <- x$nboot
   cli::cli_h1(
     cli::col_red(
-      "Summary of the bootstrap models"
+      "Summary of the bootstrap models (nboot: {nboot})"
     )
   )
   cli::cli_ol()
