@@ -934,7 +934,7 @@ getBootstrapSummary <-
         parFixedOmegaCombined = cbind(parFixedlistVec, omgVecBoot)
 
         covMatrix <- cov(parFixedOmegaCombined)
-        corMatrix <- cov2cor(covMatrix)
+        corMatrix <- cor(parFixedOmegaCombined)
         lst <- list(
           mean = mn,
           median = median,
