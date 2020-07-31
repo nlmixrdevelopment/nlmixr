@@ -715,8 +715,8 @@ modelBootstrap <- function(fit,
           ))
 
           .env$multipleFits <- list(
-            objf = fit$OBJF,
-            aic = fit$AIC,
+            # objf = fit$OBJF,
+            # aic = fit$AIC,
             omega = fit$omega,
             parFixedDf = fit$parFixedDf[, c("Estimate", "Back-transformed")],
             message = fit$message,
@@ -837,7 +837,7 @@ getFitMethod <- function(fit) {
 #' extractVars(fitlist, 1) # returns a vector of OBJF values
 #' extractVars(fitlist, 4) # returns a list of dataframes containing parFixedDf values
 #' @noRd
-extractVars <- function(fitlist, id = "objf") {
+extractVars <- function(fitlist, id = "method") {
   if (id == "method") {
     # no lapply for 'method'
     unlist(unname(fitlist[[1]][id]))
@@ -901,19 +901,19 @@ getBootstrapSummary <-
     varIds <-
       names(fitList[[1]]) # number of different variables present in fitlist
     summaryList <- lapply(varIds, function(id) {
-      if (!(id %in% c("omega", "parFixedDf", "method", "message", "warnings"))) {
-        varVec <- extractVars(fitList, id)
-        mn <- mean(varVec)
-        median <- median(varVec)
-        sd <- sd(varVec)
-
-        c(
-          mean = mn,
-          median = median,
-          stdDev = sd
-        )
-      }
-      else if (id == "omega") {
+      # if (!(id %in% c("omega", "parFixedDf", "method", "message", "warnings"))) {
+      #   varVec <- extractVars(fitList, id)
+      #   mn <- mean(varVec)
+      #   median <- median(varVec)
+      #   sd <- sd(varVec)
+      # 
+      #   c(
+      #     mean = mn,
+      #     median = median,
+      #     stdDev = sd
+      #   )
+      # }
+      if (id == "omega") {
         # omega estimates
         omegaMatlist = extractVars(fitList, id)
         varVec <- simplify2array(omegaMatlist)
@@ -1045,8 +1045,8 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
     }
   }
 
-  objf <- x$objf
-  aic <- x$aic
+  # objf <- x$objf
+  # aic <- x$aic
   message <- x$message
   warnings <- x$warnings
 
@@ -1062,12 +1062,12 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
   cli::cli_ol()
   cli::cli_li(cli::col_blue(
     cli::style_bold("Objective function"),
-    cli::col_yellow(" (summary$objf)")
+    # cli::col_yellow(" (summary$objf)")
   ))
-  print(objf)
+  # print(objf)
 
-  cli::cli_li(cli::col_blue(cli::style_bold("AIC"), cli::col_yellow(" (summary$aic)")))
-  print(aic)
+  # cli::cli_li(cli::col_blue(cli::style_bold("AIC"), cli::col_yellow(" (summary$aic)")))
+  # print(aic)
 
   cli::cli_li(cli::col_magenta(
     cli::style_bold(
