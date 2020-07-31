@@ -189,17 +189,46 @@ bootstrapFit <- function(fit,
     backTransformed
 
   # compute bias
-  bootstrapBias <-
-    bootSummary$objf[[1]] - fit$objf # 1 corresponds to the mean value, 2 corresponds to the median
-
-  # compute covariance matrix
-  covMatrix <- cov(getData(fit), getData(fit))
-  corMatrix <- cor(getData(fit), getData(fit))
-
+  bootParams = bootSummary$parFixedDf$mean
+  origParams = data.frame(list('Estimate'=fit$parFixedDf$Estimate, 'Back-transformed'=fit$parFixedDf$`Back-transformed`))
+  bootstrapBiasParfixed = abs(origParams - bootParams)
+  bootstrapBiasOmega = abs(fit$omega - bootSummary$omega$mean)
+  
+  # # compute covariance matrix
+  # covMatrixParfixed <- cov(bootParams)
+  # corMatrixParfixed <- cor(bootParams)
+  # 
+  # omgMat = bootSummary$omega$mean
+  # omgVec = omgMat[lower.tri(omgMat, TRUE)]
+  # omgVecRep = matrix(rep(omgVec, 10), nrow=10, byrow = TRUE) + rnorm(length(omgVec))
+  # 
+  # covMatrixOmega <- cov(omgVecRep)
+  # corMatrixOmega <- cor(omgVecRep)
+  # 
+  # idxName=1
+  # namesList=list()
+  # for (nam1 in colnames(omgMat)){
+  #   for (nam2 in colnames(omgMat)){
+  #     nam = paste0(nam1, '_', nam2)
+  #     namRev = paste0(nam2, '_', nam1)
+  #     if (!(nam %in% namesList | namRev %in% namesList) ){
+  #       namesList[idxName]= nam
+  #       idxName = idxName+1
+  #     }
+  #   }
+  # }
+  # 
+  # colnames(covMatrixOmega) = namesList
+  # rownames(covMatrixOmega) = namesList
+  
   # assign("deltOBJF", deltOBJF, envir = fit$env)
-  assign("bootBias", bootstrapBias, envir = fit$env)
-  assign("bootCovMatrix", covMatrix, envir = fit$env)
-  assign("bootCorMatrix", corMatrix, envir = fit$env)
+  assign("bootBiasParfixed", bootstrapBiasParfixed, envir = fit$env)
+  assign("bootBiasOmega", bootstrapBiasOmega, envir = fit$env)
+  
+  # assign("bootCovMatrixParfixed", covMatrixParfixed, envir = fit$env)
+  # assign("bootCorMatrixParfixed", corMatrixParfixed, envir = fit$env)
+  assign("bootCovMatrix", bootSummary$omega$covMatrix, envir = fit$env)
+  assign("bootCorMatrix", bootSummary$omega$corMatrix, envir = fit$env)
   assign("parFixedDf", newParFixedDf, envir = fit$env)
   assign("parFixed", newParFixed, envir = fit$env)
   assign("bootOmegaSummary", bootSummary$omega, envir = fit$env)
@@ -686,8 +715,8 @@ modelBootstrap <- function(fit,
           ))
 
           .env$multipleFits <- list(
-            objf = fit$OBJF,
-            aic = fit$AIC,
+            # objf = fit$OBJF,
+            # aic = fit$AIC,
             omega = fit$omega,
             parFixedDf = fit$parFixedDf[, c("Estimate", "Back-transformed")],
             message = fit$message,
@@ -808,7 +837,7 @@ getFitMethod <- function(fit) {
 #' extractVars(fitlist, 1) # returns a vector of OBJF values
 #' extractVars(fitlist, 4) # returns a list of dataframes containing parFixedDf values
 #' @noRd
-extractVars <- function(fitlist, id = "objf") {
+extractVars <- function(fitlist, id = "method") {
   if (id == "method") {
     # no lapply for 'method'
     unlist(unname(fitlist[[1]][id]))
@@ -872,21 +901,22 @@ getBootstrapSummary <-
     varIds <-
       names(fitList[[1]]) # number of different variables present in fitlist
     summaryList <- lapply(varIds, function(id) {
-      if (!(id %in% c("omega", "parFixedDf", "method", "message", "warnings"))) {
-        varVec <- extractVars(fitList, id)
-        mn <- mean(varVec)
-        median <- median(varVec)
-        sd <- sd(varVec)
-
-        c(
-          mean = mn,
-          median = median,
-          stdDev = sd
-        )
-      }
-      else if (id == "omega") {
+      # if (!(id %in% c("omega", "parFixedDf", "method", "message", "warnings"))) {
+      #   varVec <- extractVars(fitList, id)
+      #   mn <- mean(varVec)
+      #   median <- median(varVec)
+      #   sd <- sd(varVec)
+      # 
+      #   c(
+      #     mean = mn,
+      #     median = median,
+      #     stdDev = sd
+      #   )
+      # }
+      if (id == "omega") {
         # omega estimates
-        varVec <- simplify2array(extractVars(fitList, id))
+        omegaMatlist = extractVars(fitList, id)
+        varVec <- simplify2array(omegaMatlist)
         mn <- apply(varVec, 1:2, mean)
         sd <- apply(varVec, 1:2, sd)
 
@@ -901,13 +931,58 @@ getBootstrapSummary <-
           confLower <- mn - qnorm(quantLevels[[2]]) * sd
           confUpper <- mn + qnorm(quantLevels[[3]]) * sd
         }
+        
+        # computing the covariance and correlation matrices
+        # =======================================================
+        parFixedOmegaBootVec = list()
+        
+        parFixedlist = extractVars(fitList, id='parFixedDf')
+        parFixedlistVec = lapply(parFixedlist, function(x){
+          x$Estimate
+        })
+        parFixedlistVec = do.call('rbind', parFixedlistVec)
+        
+        omgVecBoot = list()
+        omegaIdx = seq(length(omegaMatlist))
+        
+        omgVecBoot = lapply(omegaIdx, function(idx){
+          omgMat = omegaMatlist[[idx]]
+          omgVec = omgMat[lower.tri(omgMat, TRUE)]
+          omgVecBoot[[idx]] = omgVec
+        })
+        omgVecBoot = do.call('rbind', omgVecBoot)
+        
+        idxName=1
+        namesList=list()
+        for (nam1 in colnames(omegaMatlist[[1]])){
+          for (nam2 in colnames(omegaMatlist[[1]])){
+            nam = paste0(nam1, '_', nam2)
+            namRev = paste0(nam2, '_', nam1)
+            if (!(nam %in% namesList | namRev %in% namesList) ){
+              namesList[idxName]= nam
+              idxName = idxName+1
+            }
+          }
+        }
+        
+        colnames(omgVecBoot) = namesList
+        
+        print(omgVecBoot)
+        print(parFixedlistVec)
+
+        parFixedOmegaCombined = cbind(parFixedlistVec, omgVecBoot)
+        
+        covMatrix <- cov(parFixedOmegaCombined)
+        corMatrix <- cor(parFixedOmegaCombined)
 
         lst <- list(
           mean = mn,
           median = median,
           stdDev = sd,
           confLower = confLower,
-          confUpper = confUpper
+          confUpper = confUpper,
+          covMatrixCombined = covMatrix, 
+          corMatrixCombined = corMatrix
         )
       }
 
@@ -970,8 +1045,8 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
     }
   }
 
-  objf <- x$objf
-  aic <- x$aic
+  # objf <- x$objf
+  # aic <- x$aic
   message <- x$message
   warnings <- x$warnings
 
@@ -987,12 +1062,12 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
   cli::cli_ol()
   cli::cli_li(cli::col_blue(
     cli::style_bold("Objective function"),
-    cli::col_yellow(" (summary$objf)")
+    # cli::col_yellow(" (summary$objf)")
   ))
-  print(objf)
+  # print(objf)
 
-  cli::cli_li(cli::col_blue(cli::style_bold("AIC"), cli::col_yellow(" (summary$aic)")))
-  print(aic)
+  # cli::cli_li(cli::col_blue(cli::style_bold("AIC"), cli::col_yellow(" (summary$aic)")))
+  # print(aic)
 
   cli::cli_li(cli::col_magenta(
     cli::style_bold(
