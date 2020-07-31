@@ -193,40 +193,10 @@ bootstrapFit <- function(fit,
   origParams = data.frame(list('Estimate'=fit$parFixedDf$Estimate, 'Back-transformed'=fit$parFixedDf$`Back-transformed`))
   bootstrapBiasParfixed = abs(origParams - bootParams)
   bootstrapBiasOmega = abs(fit$omega - bootSummary$omega$mean)
-  
-  # # compute covariance matrix
-  # covMatrixParfixed <- cov(bootParams)
-  # corMatrixParfixed <- cor(bootParams)
-  # 
-  # omgMat = bootSummary$omega$mean
-  # omgVec = omgMat[lower.tri(omgMat, TRUE)]
-  # omgVecRep = matrix(rep(omgVec, 10), nrow=10, byrow = TRUE) + rnorm(length(omgVec))
-  # 
-  # covMatrixOmega <- cov(omgVecRep)
-  # corMatrixOmega <- cor(omgVecRep)
-  # 
-  # idxName=1
-  # namesList=list()
-  # for (nam1 in colnames(omgMat)){
-  #   for (nam2 in colnames(omgMat)){
-  #     nam = paste0(nam1, '_', nam2)
-  #     namRev = paste0(nam2, '_', nam1)
-  #     if (!(nam %in% namesList | namRev %in% namesList) ){
-  #       namesList[idxName]= nam
-  #       idxName = idxName+1
-  #     }
-  #   }
-  # }
-  # 
-  # colnames(covMatrixOmega) = namesList
-  # rownames(covMatrixOmega) = namesList
-  
-  # assign("deltOBJF", deltOBJF, envir = fit$env)
+
   assign("bootBiasParfixed", bootstrapBiasParfixed, envir = fit$env)
   assign("bootBiasOmega", bootstrapBiasOmega, envir = fit$env)
-  
-  # assign("bootCovMatrixParfixed", covMatrixParfixed, envir = fit$env)
-  # assign("bootCorMatrixParfixed", corMatrixParfixed, envir = fit$env)
+
   assign("bootCovMatrix", bootSummary$omega$covMatrix, envir = fit$env)
   assign("bootCorMatrix", bootSummary$omega$corMatrix, envir = fit$env)
   assign("parFixedDf", newParFixedDf, envir = fit$env)
@@ -250,11 +220,6 @@ bootstrapFit <- function(fit,
 
     deltOBJFloaded = NULL
     deltOBJF = NULL
-    ## if (!restart){
-    ##   deltOBJFloaded = readRDS(paste0("./", output_dir,"/",'deltOBJF',".rds"))
-    ##   deltOBJF = c(deltOBJFloaded, deltOBJF)
-    ## }
-    ## else{
     RxODE::rxProgress(length(fitList))
     cli::cli_h1("Loading/Calculating \u0394 Objective function")
     deltOBJF <- lapply(seq_along(fitList), function(i) {
@@ -271,6 +236,7 @@ bootstrapFit <- function(fit,
         xPosthoc = suppressWarnings(nlmixr(x, data=origData, est='posthoc',
                                            control=list(calcTables=FALSE)))
         saveRDS(xPosthoc, .path)
+        setOfv(fit, "focei") # just in case
       }
       xPosthoc$objf - fit$objf
     })
@@ -906,7 +872,7 @@ getBootstrapSummary <-
       #   mn <- mean(varVec)
       #   median <- median(varVec)
       #   sd <- sd(varVec)
-      # 
+      #
       #   c(
       #     mean = mn,
       #     median = median,
@@ -931,27 +897,27 @@ getBootstrapSummary <-
           confLower <- mn - qnorm(quantLevels[[2]]) * sd
           confUpper <- mn + qnorm(quantLevels[[3]]) * sd
         }
-        
+
         # computing the covariance and correlation matrices
         # =======================================================
         parFixedOmegaBootVec = list()
-        
+
         parFixedlist = extractVars(fitList, id='parFixedDf')
         parFixedlistVec = lapply(parFixedlist, function(x){
           x$Estimate
         })
         parFixedlistVec = do.call('rbind', parFixedlistVec)
-        
+
         omgVecBoot = list()
         omegaIdx = seq(length(omegaMatlist))
-        
+
         omgVecBoot = lapply(omegaIdx, function(idx){
           omgMat = omegaMatlist[[idx]]
           omgVec = omgMat[lower.tri(omgMat, TRUE)]
           omgVecBoot[[idx]] = omgVec
         })
         omgVecBoot = do.call('rbind', omgVecBoot)
-        
+
         idxName=1
         namesList=list()
         for (nam1 in colnames(omegaMatlist[[1]])){
@@ -964,14 +930,14 @@ getBootstrapSummary <-
             }
           }
         }
-        
+
         colnames(omgVecBoot) = namesList
-        
+
         print(omgVecBoot)
         print(parFixedlistVec)
 
         parFixedOmegaCombined = cbind(parFixedlistVec, omgVecBoot)
-        
+
         covMatrix <- cov(parFixedOmegaCombined)
         corMatrix <- cor(parFixedOmegaCombined)
 
@@ -981,7 +947,7 @@ getBootstrapSummary <-
           stdDev = sd,
           confLower = confLower,
           confUpper = confUpper,
-          covMatrixCombined = covMatrix, 
+          covMatrixCombined = covMatrix,
           corMatrixCombined = corMatrix
         )
       }
