@@ -187,8 +187,8 @@ bootstrapFit <- function(fit,
   newParFixed["Bootstrap %RSE"] <-
     signif(seBoot / estEst * 100, sigdig)
   .w <- which(regexpr("^Bootstrap +Back[-]transformed", names(newParFixed)) != -1)
-  if (length(.w) > 1) newParFixed <- newParFixed[, -w]
-  newParFixed[sprintf("Bootstrap Back-transformed(%f%%CI)", ci * 100)] <-
+  if (length(.w) > 1) newParFixed <- newParFixed[, -.w]
+  newParFixed[sprintf("Bootstrap Back-transformed(%s%%CI)", ci * 100)] <-
     backTransformed
 
   # compute bias
