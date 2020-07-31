@@ -10,7 +10,7 @@
 #' @return fit with CWRES
 #' @author Matthew L. Fidler
 #' @export
-addCwres <- function(fit, updateObject = TRUE, envir = globalenv()) {
+addCwres <- function(fit, updateObject = TRUE, envir = parent.frame(1)) {
   RxODE::.setWarnIdSort(FALSE)
   on.exit(RxODE::.setWarnIdSort(TRUE))
   .pt <- proc.time()
@@ -183,10 +183,7 @@ setOfv <- function(x, type) {
       .env$ofvType <- type
       invisible(x)
     } else {
-      if (tolower(type) == "focei") {
-        .tmp <- addCwres(x, TRUE, globalenv())
-        return(setOfv(.tmp, "FOCEi"))
-      } else if (any(tolower(type) == c("foce", "fo"))) {
+      if (any(tolower(type) == c("focei", "foce", "fo"))) {
         return(.setOfvFo(x, tolower(type)))
       } else if (!is.null(x$saem)) {
         .ret <- x$saem

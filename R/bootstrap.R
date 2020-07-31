@@ -225,7 +225,7 @@ bootstrapFit <- function(fit,
     cli::cli_h1("Loading/Calculating \u0394 Objective function")
     setOfv(fit, "focei") # Make sure we are using focei objective function
     deltOBJF <- lapply(seq_along(fitList), function(i) {
-      x <- fitList[[i]]
+      x <- readRDS(file.path(output_dir, paste0("fitEnsemble_", i, ".rds")))
       .path <- file.path(output_dir, paste0("posthoc_", i, ".rds"))
       if (file.exists(.path)){
         xPosthoc <- readRDS(.path)
@@ -236,14 +236,13 @@ bootstrapFit <- function(fit,
         ## Don't calculate the tables
         .msg <- paste0(gettext("Running bootstrap estimates on original data for model index: "), i)
         cli::cli_h1(.msg)
-        xPosthoc = suppressWarnings(nlmixr(x, data=origData, est='posthoc',
-                                           control=list(calcTables=FALSE)))
+        xPosthoc = nlmixr(x, data=origData, est='posthoc',
+                          control=list(calcTables=FALSE, print=1))
         saveRDS(xPosthoc, .path)
       }
       xPosthoc$objf - fit$objf
     })
     RxODE::rxProgressStop()
-    deltOBJF = c(deltOBJFloaded, deltOBJF)
 
     .deltaO <- sort(abs(unlist(deltOBJF)))
 
@@ -916,22 +915,32 @@ getBootstrapSummary <-
         namesList=list()
         for (nam1 in colnames(omegaMatlist[[1]])){
           for (nam2 in colnames(omegaMatlist[[1]])){
-            nam = paste0(nam1, '_', nam2)
-            namRev = paste0(nam2, '_', nam1)
-            if (!(nam %in% namesList | namRev %in% namesList) ){
-              namesList[idxName]= nam
-              idxName = idxName+1
+            if (nam1 == nam2){
+              if (!(nam1 %in% namesList) ){
+                namesList[idxName]= nam1
+                idxName = idxName+1
+              }
+            } else {
+              nam = paste0("(", nam1, ",", nam2, ")")
+              namRev = paste0("(", nam2, ",", nam1, ")")
+              if (!(nam %in% namesList | namRev %in% namesList) ){
+                namesList[idxName]= nam
+                idxName = idxName+1
+              }
             }
           }
         }
-
         colnames(omgVecBoot) = namesList
+
+        .w <- which(sapply(namesList, function(x){!all(omgVecBoot[, x] == 0)}))
+        omgVecBoot <- omgVecBoot[, .w]
 
 
         parFixedOmegaCombined = cbind(parFixedlistVec, omgVecBoot)
 
         covMatrix <- cov(parFixedOmegaCombined)
-        corMatrix <- cor(parFixedOmegaCombined)
+        corMatrix <- cov2cor(covMatrix)
+        diag(corMatrix) <- sqrt(diag(covMatrix))
         lst <- list(
           mean = mn,
           median = median,

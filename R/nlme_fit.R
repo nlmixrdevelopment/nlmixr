@@ -974,6 +974,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcRe
     .cls[1] <- "nlmixrNlmeUI"
     class(fit.f) <- .cls
   }
+  assign("uif", .syncUif(fit.f$uif, fit.f$popDf, fit.f$omega), fit.f$env)
   return(fit.f)
 }
 
