@@ -278,8 +278,7 @@ bootstrapFit <- function(fit,
     assign(".bootPlotData", .dataList, envir=fit$env)
 
   }
-
-  fit
+  invisible(fit)
 }
 
 
@@ -935,8 +934,7 @@ getBootstrapSummary <-
         parFixedOmegaCombined = cbind(parFixedlistVec, omgVecBoot)
 
         covMatrix <- cov(parFixedOmegaCombined)
-        corMatrix <- cor(parFixedOmegaCombined)
-
+        corMatrix <- cov2cor(covMatrix)
         lst <- list(
           mean = mn,
           median = median,
