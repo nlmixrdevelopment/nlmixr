@@ -222,6 +222,7 @@ bootstrapFit <- function(fit,
     deltOBJF = NULL
     RxODE::rxProgress(length(fitList))
     cli::cli_h1("Loading/Calculating \u0394 Objective function")
+    setOfv(fit, "focei") # Make sure we are using focei objective function
     deltOBJF <- lapply(seq_along(fitList), function(i) {
       x <- fitList[[i]]
       .path <- file.path(output_dir, paste0("posthoc_", i, ".rds"))
@@ -236,7 +237,6 @@ bootstrapFit <- function(fit,
         xPosthoc = suppressWarnings(nlmixr(x, data=origData, est='posthoc',
                                            control=list(calcTables=FALSE)))
         saveRDS(xPosthoc, .path)
-        setOfv(fit, "focei") # just in case
       }
       xPosthoc$objf - fit$objf
     })

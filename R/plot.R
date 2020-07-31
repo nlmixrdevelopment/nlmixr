@@ -117,6 +117,9 @@ bootplot <- function(x, ...){
 ##' @export
 bootplot.nlmixrFitCore <- function(x, ...) {
   if (inherits(x, "nlmixrFitCore")) {
+    if (exists("bootSummary", x$env) & !exists(".bootPlotData", x$env)){
+      bootstrapFit(x, x$bootSummary$nboot, plotHist=TRUE)
+    }
     if (exists(".bootPlotData", x$env)){
       .chisq <- x$env$.bootPlotData$chisq
       .dfD <- x$env$.bootPlotData$dfD
