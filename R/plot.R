@@ -116,9 +116,10 @@ bootplot <- function(x, ...){
 ##' @rdname traceplot
 ##' @export
 bootplot.nlmixrFitCore <- function(x, ...) {
+  .fitName <- as.character(substitute(fit))
   if (inherits(x, "nlmixrFitCore")) {
     if (exists("bootSummary", x$env) & !exists(".bootPlotData", x$env)){
-      bootstrapFit(x, x$bootSummary$nboot, plotHist=TRUE)
+      bootstrapFit(x, x$bootSummary$nboot, plotHist=TRUE, fitName=.fitName)
     }
     if (exists(".bootPlotData", x$env)){
       .chisq <- x$env$.bootPlotData$chisq

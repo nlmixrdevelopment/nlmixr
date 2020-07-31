@@ -13,7 +13,8 @@ bootstrapFit(
   ci = 0.95,
   pvalues = NULL,
   restart = FALSE,
-  plotHist = FALSE
+  plotHist = FALSE,
+  fitName = as.character(substitute(fit))
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ probability of each subject is the same}
 
 \item{restart}{a boolean that indicates if a previous session has
 to be restarted; default value is FALSE}
+
+\item{fitName}{Name of fit to be saved (by default the variable name supplied to fit)}
 }
 \description{
 Bootstrap input dataset and rerun the model to get confidence bounds and aggregated parameters

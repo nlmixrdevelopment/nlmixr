@@ -43,6 +43,8 @@ addConfboundsToVar <-
 #' @param restart a boolean that indicates if a previous session has
 #'   to be restarted; default value is FALSE
 #'
+#' @param fitName Name of fit to be saved (by default the variable name supplied to fit)
+#'
 #'
 #' @author Vipul Mann, Matthew Fidler
 #' @export
@@ -86,7 +88,8 @@ bootstrapFit <- function(fit,
                          ci = 0.95,
                          pvalues = NULL,
                          restart = FALSE,
-                         plotHist = FALSE) {
+                         plotHist = FALSE,
+                         fitName=as.character(substitute(fit))) {
   stdErrType <- match.arg(stdErrType)
   if (missing(stdErrType)) {
     stdErrType <- "perc"
@@ -106,8 +109,6 @@ bootstrapFit <- function(fit,
     }
     performStrat <- TRUE
   }
-
-  fitName <- as.character(substitute(fit))
 
   if (is.null(fit$bootstrapMd5)) {
     bootstrapMd5 <- fit$md5
@@ -230,7 +231,8 @@ bootstrapFit <- function(fit,
         xPosthoc <- readRDS(.path)
         RxODE::rxTick()
       } else {
-        RxODE::rxProgressAbort("Starting to posthoc estimates")
+        RxODE::rxProgressStop()
+        ## RxODE::rxProgressAbort("Starting to posthoc estimates")
         ## Don't calculate the tables
         .msg <- paste0(gettext("Running bootstrap estimates on original data for model index: "), i)
         cli::cli_h1(.msg)
