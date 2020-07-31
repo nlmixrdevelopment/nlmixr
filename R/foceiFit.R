@@ -2353,7 +2353,7 @@ foceiFit.data.frame0 <- function(data,
           .tmp <- try(setOfv(obj, paste0("gauss", .nnodes, "_", .nsd)), silent=TRUE)
         }
         if (inherits(.tmp, "try-error")) {
-          message("Gaussian quadrature failed, changed to focei")
+          message("gaussian quadrature failed, changed to focei")
           setOfv(obj, "focei")
         }
       }
@@ -3107,10 +3107,12 @@ setOfv <- function(x, type) {
         .env$objDf <- .env$objDf[!is.na(.env$objDf$OBJF), ]
         return(setOfv(x, type))
       }
-      stop(sprintf("Cannot switch objective function to '%s' type.", type))
+      stop("cannot switch objective function to '", type, "' type",
+           call.=FALSE)
     }
   } else {
-    stop("Wrong type of object.")
+    stop("wrong type of object",
+         call.=FALSE)
   }
 }
 
