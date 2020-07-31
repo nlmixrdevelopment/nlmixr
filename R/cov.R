@@ -1,4 +1,6 @@
 .setCov <- function(obj, ...) {
+  RxODE::.setWarnIdSort(FALSE)
+  on.exit(RxODE::.setWarnIdSort(TRUE))
   .env <- obj
   if (RxODE::rxIs(obj, "nlmixrFitData")) {
     .env <- obj$env
