@@ -590,7 +590,7 @@ modelBootstrap <- function(fit,
     list.files(paste0("./", output_dir), pattern = fnameModelsEnsemblePattern)
 
   fnameFitEnsemblePattern <-
-    paste0(as.character(substitute(fitEnsemble)), "_", "[0-9]+",
+    paste0("fitEnsemble_", "[0-9]+",
            ".rds",
            sep = ""
     )
@@ -717,9 +717,7 @@ modelBootstrap <- function(fit,
         file = paste0(
           "./",
           output_dir,
-          "/",
-          as.character(substitute(fitEnsemble)),
-          "_",
+          "/fitEnsemble_",
           .env$mod_idx,
           ".rds"
         )
@@ -933,8 +931,6 @@ getBootstrapSummary <-
 
         colnames(omgVecBoot) = namesList
 
-        print(omgVecBoot)
-        print(parFixedlistVec)
 
         parFixedOmegaCombined = cbind(parFixedlistVec, omgVecBoot)
 
@@ -1025,16 +1021,6 @@ print.nlmixrBoostrapSummary <- function(x, ..., sigdig = NULL) {
       "Summary of the bootstrap models (nboot: {nboot})"
     )
   )
-  cli::cli_ol()
-  cli::cli_li(cli::col_blue(
-    cli::style_bold("Objective function"),
-    # cli::col_yellow(" (summary$objf)")
-  ))
-  # print(objf)
-
-  # cli::cli_li(cli::col_blue(cli::style_bold("AIC"), cli::col_yellow(" (summary$aic)")))
-  # print(aic)
-
   cli::cli_li(cli::col_magenta(
     cli::style_bold(
       "Omega matrices: mean, median, standard deviation, and confidence bousnds"
