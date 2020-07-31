@@ -217,7 +217,7 @@ bootstrapFit <- function(fit,
     }
 
     # already exists
-    output_dir <- paste0("nlmixrBootstrapCache_", as.character(substitute(fit)), "_", fit$bootstrapMd5)
+    output_dir <- paste0("nlmixrBootstrapCache_", fitName, "_", fit$bootstrapMd5)
 
     deltOBJFloaded = NULL
     deltOBJF = NULL
@@ -507,8 +507,7 @@ modelBootstrap <- function(fit,
   }
 
   fnameBootDataPattern <-
-    paste0(as.character(substitute(boot_data)),
-      "_", "[0-9]+", ".rds",
+    paste0("boot_data_", "[0-9]+", ".rds",
       sep = ""
     )
   fileExists <-
@@ -561,9 +560,7 @@ modelBootstrap <- function(fit,
         file = paste0(
           "./",
           output_dir,
-          "/",
-          as.character(substitute(boot_data)),
-          "_",
+          "/boot_data_",
           mod_idx,
           ".rds"
         )
@@ -583,7 +580,7 @@ modelBootstrap <- function(fit,
   # Fitting models to bootData now
   .env <- environment()
   fnameModelsEnsemblePattern <-
-    paste0(as.character(substitute(modelsEnsemble)), "_", "[0-9]+",
+    paste0("modelsEnsemble_", "[0-9]+",
       ".rds",
       sep = ""
     )
@@ -705,9 +702,7 @@ modelBootstrap <- function(fit,
         file = paste0(
           "./",
           output_dir,
-          "/",
-          as.character(substitute(modelsEnsemble)),
-          "_",
+          "/modelsEnsemble_",
           .env$mod_idx,
           ".rds"
         )

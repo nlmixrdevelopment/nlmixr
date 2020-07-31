@@ -118,7 +118,8 @@ bootplot <- function(x, ...){
 bootplot.nlmixrFitCore <- function(x, ...) {
   .fitName <- as.character(substitute(fit))
   if (inherits(x, "nlmixrFitCore")) {
-    if (exists("bootSummary", x$env) & !exists(".bootPlotData", x$env)){
+    if (exists("bootSummary", x$env) & (!exists(".bootPlotData", x$env) |
+                                          x$bootSummary$nboot != x$env$.bootPlotData$deltaN)){
       bootstrapFit(x, x$bootSummary$nboot, plotHist=TRUE, fitName=.fitName)
     }
     if (exists(".bootPlotData", x$env)){
