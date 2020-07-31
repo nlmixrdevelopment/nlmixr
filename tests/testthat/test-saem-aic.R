@@ -28,5 +28,13 @@ nlmixrTest({
   expect_true(inherits(fit, "nlmixrFitCore"))
   expect_false(inherits(fit, "data.frame"))
   expect_false(inherits(fit, "nlmixrFitData"))
+
   expect_error(setOfv(fit, "focei"), NA)
+  expect_error(setOfv(fit, "foce"), NA)
+  expect_error(setOfv(fit, "fo"), NA)
+  expect_error(setOfv(fit, "gauss3_1.6"), NA)
+  expect_error(setOfv(fit, "laplace2"), NA)
+
+  setOfv(fit, "laplace3")
+
 }, test="saem")
