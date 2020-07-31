@@ -49,14 +49,12 @@ preconditionFit <- function(fit, estType = c("full", "posthoc", "none")) {
     .ctl$boundTol <- 0
     .ctl$calcTables <- FALSE
   }
-  ## Fixme compare objective functions
+  ## FIXME compare objective functions
   newFit <- suppressWarnings(nlmixr(newModel, getData(fit), est = "focei", control = .ctl))
   cov <- pre %*% newFit$cov %*% t(pre)
   dimnames(cov) <- dimnames(pre)
   assign("precondition", cov, env=fit$env)
   .setCov(fit, covMethod=cov)
   assign("covMethod", "precondition", fit$env)
-  print(getVarCov(fit))
-  print(cov)
   return(fit$env$precondition)
 }
