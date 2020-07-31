@@ -1,6 +1,14 @@
-
-##'@export
+#' Linearly re-parameterize the model to be less sensitive to rounding errors
+#'
+#' @param fit A nlmixr fit to be preconditioned
+#' @param estType Once the fit has been linearly reparametrized,
+#'   should a "full" estimation, "posthoc" estimation or simply a
+#'   estimation of the covariance matrix "none" before the fit is updated
+#'
+#'@export
 preconditionFit <- function(fit, estType = c("full", "posthoc", "none")) {
+  RxODE::.setWarnIdSort(FALSE)
+  on.exit(RxODE::.setWarnIdSort(TRUE))
   pre <- preCondInv(fit$R)
   P <- symengine::Matrix(pre)
   d0 <- dimnames(fit$R)[[1]]
@@ -41,10 +49,14 @@ preconditionFit <- function(fit, estType = c("full", "posthoc", "none")) {
     .ctl$boundTol <- 0
     .ctl$calcTables <- FALSE
   }
-  ## FIXME use vipul's get estimate routine
-  newFit <- nlmixr(newModel, getData(fit), est = "focei", control = .ctl)
+  ## Fixme compare objective functions
+  newFit <- suppressWarnings(nlmixr(newModel, getData(fit), est = "focei", control = .ctl))
   cov <- pre %*% newFit$cov %*% t(pre)
   dimnames(cov) <- dimnames(pre)
-  ## FIXME use back-transformation implemented by bill to update se to have full model definition
-  return(cov)
+  assign("precondition", cov, env=fit$env)
+  .setCov(fit, covMethod=cov)
+  assign("covMethod", "precondition", fit$env)
+  print(getVarCov(fit))
+  print(cov)
+  return(fit$env$precondition)
 }
