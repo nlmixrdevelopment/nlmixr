@@ -1,3 +1,5 @@
+
+##'@export
 preconditionFit <- function(fit, estType = c("full", "posthoc", "none")) {
   pre <- preCondInv(fit$R)
   P <- symengine::Matrix(pre)
