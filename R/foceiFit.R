@@ -2348,9 +2348,13 @@ foceiFit.data.frame0 <- function(data,
           .nsd <- .env$nsd.gq
         }
         if (.nnodes == 1) {
-          setOfv(obj, paste0("laplace", .nsd))
+          .tmp <- try(setOfv(obj, paste0("laplace", .nsd)), silent=TRUE)
         } else {
-          setOfv(obj, paste0("gauss", .nnodes, "_", .nsd))
+          .tmp <- try(setOfv(obj, paste0("gauss", .nnodes, "_", .nsd)), silent=TRUE)
+        }
+        if (inherits(.tmp, "try-error")) {
+          message("Gaussian quadrature failed, changed to focei")
+          setOfv(obj, "focei")
         }
       }
     }
