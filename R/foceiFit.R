@@ -2997,8 +2997,12 @@ iYeoJohnson <- function(x, lambda = 1) {
 .setSaemExtra <- function(.env, type) {
   .uif <- .env$uif
   .txt <- paste0("(", crayon::italic(ifelse(is.null(.uif$nmodel$lin.solved), ifelse(.uif$predSys, "PRED", "ODE"), "Solved")), "); ")
-  if (type == "FOCEi") {
+  if (tolower(type) == "focei") {
     .txt <- paste0(.txt, crayon::blurred$italic("OBJF by FOCEi approximation"))
+  } else if (tolower(type) == "foce") {
+    .txt <- paste0(.txt, crayon::blurred$italic("OBJF by FOCE approximation"))
+  } else if (tolower(type) == "fo") {
+    .txt <- paste0(.txt, crayon::blurred$italic("OBJF by FO approximation"))
   } else if (type == "") {
     .txt <- paste0(.txt, crayon::blurred$italic("OBJF not calculated"))
   } else {

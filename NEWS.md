@@ -31,6 +31,7 @@
 
  - `saem` fits now gracefully fall back to the `focei` likelihood when
    they support files are no longer on the loaded disk
+ - `saem` fits now can add in `fo`, `foce` and `focei` likelihood
 
 ## New Utilities
 
@@ -46,8 +47,10 @@
 
  - Changed the way that Rstudio notebooks display `nlmixr` objects; It
    should be more legible in Rstudio.
-r
+
  - Graphics have been revamped to show censoring (including adding
-   ggplot stat/geom `geom_cens`) as well as use `RxODE`'s themes
+   ggplot stat/geom `geom_cens`) as well as use `RxODE`'s ggplot theme
+   (`rxTheme()`).  Additionally time after dose is calculated as `tad`
+   for all `nlmixr` models
 
 Note this includes all the RxODE changes *including* dropping python.
