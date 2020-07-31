@@ -959,6 +959,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcRe
     row.names(env$objDf) <- c("FOCEi", "nlme")
   }
   .env <- fit.f$env
+  .env$ofvType <- "nlme"
   .time <- .env$time
   .time <- .time[, !(names(.time) %in% c("optimize", "covariance"))]
   .nlmeTime <- .nlmeTime["elapsed"]
