@@ -5245,10 +5245,13 @@ void foceiFinalizeTables(Environment e){
   }
   if (op_focei.fo){
     objDf.attr("row.names") = CharacterVector::create("FO");
+    e["ofvType"] = "fo";
   } else if (op_focei.interaction){
     objDf.attr("row.names") = CharacterVector::create("FOCEi");
+    e["ofvType"] = "focei";
   } else {
     objDf.attr("row.names") = CharacterVector::create("FOCE");
+    e["ofvType"] = "foce";
   }
   objDf.attr("class") = "data.frame";
   e["objDf"]=objDf;
