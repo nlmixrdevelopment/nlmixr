@@ -99,7 +99,7 @@ one.compartment <- function() {
   })
 }
 ```
-u
+
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```{r}

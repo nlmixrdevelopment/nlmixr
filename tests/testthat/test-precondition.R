@@ -22,13 +22,13 @@ nlmixrTest({
     })
   }
 
-  fit2 <- nlmixr(one.compartment, theo_sd, est="focei",control=list(print=0))
+  fit2 <- suppressWarnings(nlmixr(one.compartment, theo_sd, est="focei",control=list(print=0)))
 
   df1 <- fit2$parFixedDf
   cov1 <- fit2$cov
 
   ## Simply re-evaluate with no estimation (including inner estimation)
-  preconditionFit(fit2, estType = "none")
+  suppressWarnings(preconditionFit(fit2, estType = "none"))
 
   df2 <- fit2$parFixedDf
   cov2 <- fit2$cov
