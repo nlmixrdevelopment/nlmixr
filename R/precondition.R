@@ -22,7 +22,7 @@ preconditionFit <- function(fit, estType = c("full", "posthoc", "none"),
   .i <- 1
   while(.i < ntry & .covMethod != "r,s"){
     .i <- .i + 1
-    pre <- preCondInv(R)
+    pre <- preCondInv(.R)
     P <- symengine::Matrix(pre)
     d0 <- dimnames(fit$R)[[1]]
     d <- paste0("nlmixrPre_", dimnames(fit$R)[[1]])
@@ -75,5 +75,5 @@ preconditionFit <- function(fit, estType = c("full", "posthoc", "none"),
   assign("precondition", cov, env=fit$env)
   .setCov(fit, covMethod=cov)
   assign("covMethod", "precondition", fit$env)
-  return(fit$env$precondition)
+  return(invisible(fit$env$precondition))
 }
