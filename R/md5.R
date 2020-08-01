@@ -3,7 +3,7 @@
     .cls <- class(obj);
     attr(.cls,".foceiEnv") <- NULL
     .tmp <- list(.cls, obj$uif$ini, obj$fun.txt,
-         fit$origControl)
+         obj$origControl)
     if (inherits(obj, "data.frame")){
       .tmp <- c(.tmp, list(as.data.frame(obj)))
     }

@@ -281,6 +281,8 @@ bootstrapFit <- function(fit,
     assign(".bootPlotData", .dataList, envir=fit$env)
 
   }
+  ## Update covariance estimate
+  .nm <- names(fit$theta)[!fit$skipCov[seq_along(fit$theta)]]
   invisible(fit)
 }
 
