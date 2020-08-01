@@ -283,6 +283,9 @@ bootstrapFit <- function(fit,
   }
   ## Update covariance estimate
   .nm <- names(fit$theta)[!fit$skipCov[seq_along(fit$theta)]]
+  .cov <- fit$bootSummary$omega$covMatrixCombined[.nm, .nm]
+  .setCov(fit, covMethod=.cov)
+  assign("covMethod", paste0("boot", fit$bootSummary$nboot), fit$env)
   invisible(fit)
 }
 
