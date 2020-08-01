@@ -20,6 +20,7 @@
       .control$covMethod <- .covMethodIdx[.lst$covMethod]
     } else if (inherits(.lst$covMethod, "matrix")){
       .env2$cov <- eval(.lst$covMethod)
+      .env2$uif <- obj$uif
     } else if (length(.lst$covMethod) == 1) {
       if (.lst$covMethod == "") {
         .control$covMethod <- 0L
