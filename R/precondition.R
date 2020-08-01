@@ -61,6 +61,7 @@ preconditionFit <- function(fit, estType = c("full", "posthoc", "none"),
       .ctl$boundTol <- 0
       .ctl$calcTables <- FALSE
     }
+    .ctl$covMethod <- 1L
     ## FIXME compare objective functions
     newFit <- suppressWarnings(nlmixr(newModel, getData(fit), est = "focei", control = .ctl))
     .R <- newFit$R
