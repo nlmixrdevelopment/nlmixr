@@ -269,6 +269,11 @@ print.nlmixrFitCore <- function(x, ...) {
       "  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
       crayon::bold(x$covMethod), "\n"
     ))
+    if (exists("covList", x$env)){
+      cat("    other calculated covs (", crayon::bold$blue("setCov()"), "): ",
+          paste(crayon::bold(names(x$env$covList)), collapse=", "),
+          "\n", sep="")
+    }
     if (exists("cor", x$env)) {
       .tmp <- .getR(x$cor)
       if (any(abs(.tmp) >= getOption("nlmixr.strong.corr", 0.7))) {
