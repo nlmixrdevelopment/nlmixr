@@ -154,7 +154,7 @@ setCov <- function(fit, method) {
     if (!is.null(.cov)) {
       .setCov(fit, covMethod=.cov)
       .env$covMethod <- method
-      return(fit)
+      return(invisible(fit))
     }
   }
   stop("different covariance types have not been calculated",
