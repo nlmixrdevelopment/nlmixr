@@ -219,7 +219,7 @@ plot.nlmixrFitData <- function(x, ...) {
       .lst[[length(.lst) + 1]] <- .p1
     }
 
-    for (x in c("IPRED", "PRED", "CPRED", "EPRED", "TIME")) {
+    for (x in c("IPRED", "PRED", "CPRED", "EPRED", "TIME", "tad")) {
       if (any(names(.dat0) == x)) {
         for (y in c("IWRES", "IRES", "RES", "CWRES", "NPDE")) {
           if (any(names(.dat0) == y)) {
@@ -264,7 +264,31 @@ plot.nlmixrFitData <- function(x, ...) {
       }
       .lst[[length(.lst) + 1]] <- .p3
     }
+    .dat0$id2 <- factor(paste0("id: ", .dat0$ID, "; dose#: ", .dat0$dosenum))
+    .ids <- unique(.dat0$id2)
+    .s <- seq(1, length(.ids), by = 16)
+    .j <- 0
+    ## for (i in .s) {
+    ##   .j <- .j + 1
+    ##   .tmp <- .ids[seq(i, i + 15)]
+    ##   .tmp <- .tmp[!is.na(.tmp)]
+    ##   .d1 <- .dat0[.dat0$id2 %in% .tmp, ]
+
+    ##   .p3 <- ggplot2::ggplot(.d1, aes(x = tad, y = DV)) +
+    ##     ggplot2::geom_point() +
+    ##     ggplot2::geom_line(aes(x = tad, y = IPRED), col = "red", size = 1.2) +
+    ##     ggplot2::geom_line(aes(x = tad, y = PRED), col = "blue", size = 1.2) +
+    ##     ggplot2::facet_wrap(~id2) +
+    ##     ggplot2::ggtitle(.cmt, sprintf("Individual TAD Plots (%s of %s)", .j, length(.s))) +
+    ##     RxODE::rxTheme()
+    ##   if (any(names(.d1) == "lowerLim")) {
+    ##     .p3 <- .p3 + geom_cens(aes(lower=lowerLim, upper=upperLim), fill="purple")
+    ##   }
+    ##   .lst[[length(.lst) + 1]] <- .p3
+    ## }
   }
+
+  ## .id <- unique(.dat0$id2)
   ## if (grDevices::dev.cur() != 1){
   ##     .x  <- .lst
   ##     for (.i in seq_along(.x)){
