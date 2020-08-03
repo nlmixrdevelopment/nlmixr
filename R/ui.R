@@ -3364,6 +3364,38 @@ str.nlmixrUI <- function(object, ...) {
   cat(" $ muRefTable: table/huxtable of mu-referenced items in a model\n")
 }
 
+.syncUif <- function(uif, popDf=NULL, omega=NULL){
+  if (inherits(uif, "nlmixrFitCore")){
+    popDf <- uif$popDf
+    omega <- uif$omega
+    uif <- uif$uif
+  }
+  .rn <- rownames(popDf)
+  .est <- popDf$Estimate
+  .ini <- as.data.frame(uif$ini)
+  for( i in seq_along(popDf)) {
+    .name <- .rn[i]
+    .curEst <- .est[i]
+    .w <- which(.ini$name == .name)
+    .ini$est[.w] <-.curEst
+  }
+  .dn <- dimnames(omega)[[1]]
+  for (.n1 in .dn){
+    .w <- which(.ini$name == .n1)
+    .ini$est[.w] <- omega[.n1, .n1]
+    for (.n2 in .dn){
+      .name <- paste0("(", .n1, ",", .n2, ")")
+      .w <- which(.ini$name == .name)
+      if (length(.w) == 1){
+        .ini$est[.w] = omega[.n1, .n2]
+      }
+    }
+  }
+  class(.ini) <- c("nlmixrBounds", "data.frame")
+  uif$ini <- .ini
+  return(uif)
+}
+
 
 ## Local Variables:
 ## ess-indent-offset: 2

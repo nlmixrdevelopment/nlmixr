@@ -4,7 +4,7 @@
 \alias{addCwres}
 \title{Add CWRES}
 \usage{
-addCwres(fit, updateObject = TRUE, envir = globalenv())
+addCwres(fit, updateObject = TRUE, envir = parent.frame(1))
 }
 \arguments{
 \item{fit}{nlmixr fit without WRES/CWRES}

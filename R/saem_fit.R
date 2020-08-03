@@ -2049,6 +2049,7 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
     .cls[1] <- "nlmixrSaem"
     class(fit.f) <- .cls
   }
+  assign("uif", .syncUif(fit.f$uif, fit.f$popDf, fit.f$omega), fit.f$env)
   return(fit.f)
 }
 

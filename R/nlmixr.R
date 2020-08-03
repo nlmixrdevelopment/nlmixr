@@ -708,13 +708,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       .cls[1] <- "nlmixrPosthoc"
       class(fit) <- .cls
     }
-    assign("uif", uif, fit$env)
-    ## assign("start.time", start.time, env)
-    ## assign("est", est, env)
-    ## assign("stop.time", Sys.time(), env)
-    ## assign("start.time", start.time, env)
-    ## assign("est", est, env)
-    ## assign("stop.time", Sys.time(), env)
+    assign("uif", .syncUif(fit, fit$popDf, fit$omega), fit$env)
     fit <- fix.dat(fit)
     assign("origControl", control, fit$env)
     assign("modelId", .modelId, fit$env)
