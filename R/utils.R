@@ -1170,7 +1170,7 @@ reducedTol <- FALSE
         .logn.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
         # back-transformed  -2 log-likelihood function, with penalty added
         .n2ll = .logn.n2ll - 2*(0-1)*log(yo) -2*log(2*pi) # lambda is zero here
-        sgy <<- h.y.var
+        sgy <<- .h.y.var
         # negative log-likelihood function for output
         ll = .5*(.n2ll)
       }
@@ -1187,7 +1187,7 @@ reducedTol <- FALSE
         .boxCox.n2ll = log(.h.y.var) + ((.h.x - .h.y)^2)/.h.y.var
         # back-transformed  -2 log-likelihood function, with penalty added
         .n2ll = .boxCox.n2ll - 2*(lambda-1)*log(yo) -2*log(2*pi)
-        sgy <<- h.y.var
+        sgy <<- .h.y.var
         # negative log-likelihood function for output
         ll = .5*(.n2ll)
       }
@@ -1207,7 +1207,7 @@ reducedTol <- FALSE
                         .yeoJohnson.n2ll -2*(lambda-1)*log(yo+1) -2*log(2*pi),
                         .yeoJohnson.n2ll -2*(1-lambda)*log(-yo+1) -2*log(2*pi)
         )
-        sgy <<- h.y.var
+        sgy <<- .h.y.var
         # negative log-likelihood function for output
         ll = .5*(.n2ll)
       }
