@@ -40,7 +40,7 @@ preconditionFit <- function(fit, estType = c("full", "posthoc", "none"),
       .ini$name[.w] <- paste0("nlmixrPre_", v)
     }
     .newModel <- eval(parse(text = paste0("function(){", modExtra, "\n", fit$uif$fun.txt, "}"), keep.source = TRUE))
-    class(ini) <- c("nlmixrBounds", "data.frame")
+    class(.ini) <- c("nlmixrBounds", "data.frame")
     newModel <- .finalizeUiModel(
       nlmixrUIModel(.newModel, .ini, NULL),
       as.list(fit$uif$meta)
