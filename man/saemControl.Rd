@@ -24,6 +24,7 @@ saemControl(
   optExpression = TRUE,
   maxsteps = 100000L,
   adjObf = TRUE,
+  sum.prod = FALSE,
   ...
 )
 }

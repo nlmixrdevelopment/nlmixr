@@ -17,464 +17,59 @@
 ## You should have received a copy of the GNU General Public License
 ## along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
-saem_ode_str <- '#define ARMA_DONT_PRINT_ERRORS
-#define ARMA_DONT_USE_OPENMP // Known to cause speed problems
-#include <RcppArmadillo.h>
-#include <RxODE.h>
-#include "saem_class_rcpp.hpp"
-//#include <omp.h>
-
-
-using namespace std;
-using namespace arma;
-
-extern "C" {
-
-typedef void (*rxSingleSolve_t)(int subid, double *_theta, double *timep,
-			  int *evidp, int *ntime,
-			  double *initsp, double *dosep,
-			  double *ii, double *retp,
-			  double *lhsp, int *rc,
-			  double *newTime, int *newEvid,
-			  int *on, int *ix,
-			  int *slvr_counter, int *dadt_counter, int *jac_counter,
-			  double *InfusionRate, int *BadDose, int *idose,
-			  double *scale, int *stateIgnore, double *mtime);
-
-rxSingleSolve_t rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
-
-typedef rx_solve *(*getRxSolve_t)();
-getRxSolve_t getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
-
-rx_solve* _rx = NULL;
-
-}
-
-Function ff("sd");
-
-RObject mat2NumMat(const mat &m) {
-	RObject x = wrap( m.memptr() , m.memptr() + m.n_elem ) ;
-	x.attr( "dim" ) = Dimension( m.n_rows, m.n_cols ) ;
-	return x;
-}
-
-vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
-  RObject phi, evt;
-  phi = mat2NumMat(phi_);
-  evt = mat2NumMat(evt_);
-  NumericVector g;
-  g = ff(phi, evt);
-  vec yp(g);
-  return yp;
-}
-
-
-vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
-  rx_solving_options* _op = _rx->op;
-  vec _id = _evt.col(0);
-  int _N=_id.max()+1;
-  int _cores = 1;//_op->cores;
-  uvec _ix;
-  _ix = find(_evt.col(2) == 0);
-  vec _yp(_ix.n_elem);
-  double *_p=_yp.memptr();
-  vec _id0 = _id(_ix);
-  int _DEBUG = _opt["DEBUG"];
-  uvec _cmt_endpnt = _opt["cmt_endpnt"];
-  for (int _i=0; _i<_N; _i++) {
-     int _nlhs = _op->nlhs;
-     vec _inits(_op->neq, fill::zeros);
-     vec _scale(_op->neq, fill::ones);
-     ivec _stateIgnore(_op->neq, fill::zeros);
-
-     mat _wm;
-     vec _wv, _wv2;
-
-     //////////////////////////////////////////////////////////////////////
-     // declPars
-<%=declPars%>
-     int _slvr_counter=0, _dadt_counter=0, _jac_counter=0;
-
-     //////////////////////////////////////////////////////////////////////
-     // assgnPars
-<%=assgnPars%>
-
-     vec _InfusionRate(_op->neq, fill::zeros);
-     ivec _BadDose(_op->neq, fill::zeros);
-     ivec _on(_op->neq, fill::ones);
-    _wm = _evt.rows( find(_id == _i) );
-    if(_wm.n_rows==0) {
-        Rcout << "ID = " << _i+1 << " has no data. Please check." << endl;
-        arma_stop_runtime_error("");
-    }
-    vec _time__;
-    _time__ = _wm.col(1);
-    int _ntime = _time__.n_elem;
-    vec _newTime(_ntime);
-    _wv = _wm.col(2);
-    ivec _evid(_ntime);
-    ivec _evid2(_ntime);
-    _wv2 = _wm.col(5);
-    ivec _cmt(_ntime);
-    for (int _k=_ntime; _k--;){
-      _evid(_k) = _wv(_k);
-      _cmt(_k) = _wv2(_k);
-    }
-    _wv = _wm.col(3);
-    uvec _ds  = find(_evid > 99 || _evid == 3);
-    vec _amt;
-    _amt = _wv(_ds);
-    ivec _idose(_amt.n_elem);
-    _wv = _wm.col(4);
-    vec _ii;
-    _ii = _wv(_ds);
-    ivec _ix2(_ntime);
-    for (int _jj = _ntime; _jj--;) _ix2[_jj] = _jj;
-    //std::iota(_ix2.memptr(),_ix2.memptr()+_ntime, 0); // 0, 1, 2, 3...
-    vec _mtime(<%=nmtime%>, fill::zeros);
-
-    // _inits.zeros();
-    //std::copy(&_op->inits[0], &_op->inits[0]+_op->neq, &_inits[0]);
-    //_inits.zeros(); //as<vec>(_opt["inits"]);	//FIXME
-
-<%=foo%>
-
-<%=pars%>
-<%=inits%>
-
-
-    int _rc=0;
-
-    mat _ret(_op->neq, _ntime);
-    mat _lhs(_nlhs, _ntime);
-
-    rxSingleSolve(_i, _params.memptr(), _time__.memptr(),
-	    _evid.memptr(), &_ntime, _inits.memptr(), _amt.memptr(), _ii.memptr(),
-            _ret.memptr(), _lhs.memptr(), &_rc, _newTime.memptr(), _evid2.memptr(),
-            _on.memptr(), _ix2.memptr(), &_slvr_counter,&_dadt_counter, &_jac_counter,
-            _InfusionRate.memptr(), _BadDose.memptr(), _idose.memptr(), _scale.memptr(),
-            _stateIgnore.memptr(), _mtime.memptr());
-
-    if ( _DEBUG > 4 && _rc != 0 ) {
-
-        Rcout << "pars: " << _params.t();
-        Rcout << "_inits: " << _inits.t();
-        Rcout << "LSODA return code: " << _rc << endl;
-        Rcout << _wm << endl;
-    }
-	_ret = join_cols(join_cols(_newTime.t(), _ret), _lhs).t();
-	uvec _r  = find(_evid2 == 0);
-	_ret = _ret.rows(_r);
-	ivec _cmtObs = _cmt(find(_evid==0));
-
-<%=model_vars_decl%>
-
-
-mat _g(time.n_elem, <%=nendpnt%>);
-<%=pred_expr%>
-
-if (_g.has_nan()) {
-	Rcout << "NaN in prediction. Consider to: relax atol & rtol; change initials; change seed; change structure model." << endl;
-    if ( _DEBUG > 4) {
-	Rcout << "pars: " << _params.t();
-	Rcout << "inits: " << _inits.t();
-	Rcout << "LSODA code: " << _rc << endl;
-	Rcout << "input data:" << endl;
-	Rcout << _wm;
-	Rcout << "LSODA solutions:" << endl;
-	Rcout << _ret << endl;
-	}
-	_g.replace(datum::nan, 1.0e99);
-}
-
-uvec _b0(1), _b1(1); _b0(0) = 0;
-
-for (int _b=1; _b< <%=nendpnt%>; ++_b) {
-  _b1(0) = _b;
-  uvec _r;
-  _r = find( _cmtObs==_cmt_endpnt(_b) );
-  _g.submat(_r, _b0) = _g.submat(_r, _b1);
-}
-
-
-    int _no = _cmtObs.n_elem;
-    memcpy(_p, _g.memptr(), _no*sizeof(double));
-    _p += _no;
-  }
-  return _yp;
-}
-
-// definition
-SEXP _<%=saem.base%>_dopred(SEXP in_phi, SEXP in_evt, SEXP in_opt) {
-    if (getRx == NULL) getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
-    if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
-    _rx=getRx();
-    mat phi = as<mat>(in_phi);
-    mat evt = as<mat>(in_evt);
-    List opt= as<List>(in_opt);
-    int distribution = as<int>(opt["distribution"]);
-    vec g = user_function(phi, evt, opt);
-    if (distribution == 4) g = log(g);
-    return Rcpp::wrap(g);
-}
-
-SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
-  if (getRx == NULL) getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
-  if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
-  _rx=getRx();
-  List x(xSEXP);
-
-  SAEM saem;
-  saem.inits(x);
-
-  if(x.containsElementNamed("Rfn")) {
-    ff = as<Function>(x["Rfn"]);
-    saem.set_fn(Ruser_function);
-  } else {
-    saem.set_fn(user_function);
-  }
-
-  saem.saem_fit();
-
-  List out = List::create(
-    Named("resMat") = saem.get_resMat(),
-    Named("mprior_phi") = saem.get_mprior_phi(),
-    Named("mpost_phi") = saem.get_mpost_phi(),
-    Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),
-    Named("Plambda") = saem.get_Plambda(),
-    Named("Ha") = saem.get_Ha(),
-    Named("sig2") = saem.get_sig2(),
-    Named("eta") = saem.get_eta(),
-    Named("par_hist") = saem.get_par_hist()
-  );
-  out.attr("saem.cfg") = x;
-  out.attr("class") = "saemFit";
-  return out;
-}
-extern "C" {
-SEXP _<%=saem.base%>_call(){
-  return R_NilValue;
-}
-void R_init_<%=saem.base%>(DllInfo *dll)
-{
-  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_saem_fit",(DL_FUNC) &_<%=saem.base%>_saem_fit);
-  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_dopred",(DL_FUNC) &_<%=saem.base%>_dopred);
-  static const R_CallMethodDef callMethods[]  = {
-    {"_<%=saem.base%>_call", (DL_FUNC) &_<%=saem.base%>_call, 0},
-    {NULL, NULL, 0}
-  };
-  R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
-  R_useDynamicSymbols(dll, FALSE);
-}
-}
-'
-
-
-saem_cmt_str <- '#include <RcppArmadillo.h>
-#include <R_ext/Rdynload.h>
-#include <Eigen/Dense>
-#include "saem_class_rcpp.hpp"
-#include "lin_cmt.hpp"
-
-
-using namespace std;
-using namespace arma;
-using Eigen::Map;
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-
-Function ff("sd");
-
-RObject mat2NumMat(const mat &m) {
-	RObject x = wrap( m.memptr() , m.memptr() + m.n_elem ) ;
-	x.attr( "dim" ) = Dimension( m.n_rows, m.n_cols ) ;
-	return x;
-}
-
-vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
-  RObject phi, evt;
-  phi = mat2NumMat(phi_);
-  evt = mat2NumMat(evt_);
-  NumericVector g;
-  g = ff(phi, evt);
-  vec yp(g);
-
-  return yp;
-}
-
-
-vec user_function(const mat &_phi, const mat &_evt, const List &_opt) {
-  uvec _ix;
-  vec _id = _evt.col(0);
-  mat _wm;
-  vec _obs_time, _dose_time, _dose, _wv;
-
-  _ix = find(_evt.col(2) == 0);
-  vec _yp(_ix.n_elem);
-  double *_p=_yp.memptr();
-  int _N=_id.max()+1;
-
-  for (int _i=0; _i<_N; _i++) {
-    _ix = find(_id == _i);
-    _wm = _evt.rows(_ix);
-
-    _ix = find(_wm.col(2) == 0);
-    _wv = _wm.col(1);
-    _wv = _wv(_ix);
-    const Map<MatrixXd> __obs_time(_wv.memptr(), _wv.n_elem, 1);
-    const VectorXd _obs_time(__obs_time);
-
-    _ix = find(_wm.col(2) > 0);
-    _wv = _wm.col(1);
-    _wv = _wv(_ix);
-    const Map<MatrixXd> __dose_time(_wv.memptr(), _wv.n_elem, 1);
-    const VectorXd _dose_time(__dose_time);
-
-    _wv = _wm.col(3);
-    _wv = _wv(_ix);
-    const Map<MatrixXd> __dose(_wv.memptr(), _wv.n_elem, 1);
-    const VectorXd _dose(__dose);
-
-    _wv = _wm.col(4);
-    _wv = _wv(_ix);
-    const Map<MatrixXd> __Tinf(_wv.memptr(), _wv.n_elem, 1);
-    const VectorXd _Tinf(__Tinf);
-
-<%=foo%>
-<%=pars%>
-
-    int _no=_obs_time.size();
-    VectorXd _g(_obs_time.size());
-    int _ncmt=<%=ncmt%>, _oral=<%=oral%>, _infusion=<%=infusion%>, _parameterization=<%=parameterization%>;
-
-	_g = generic_cmt_interface(
-      _obs_time,
-      _dose_time,
-      _dose,
-      _Tinf,
-      _params,
-      _ncmt,
-      _oral,
-      _infusion,
-      _parameterization);
-
-    memcpy(_p, _g.data(), _no*sizeof(double));
-    _p += _no;
-	//cout << "ok " << _i <<endl;
-  }
-
-  return _yp;
-}
-
-// definition
-extern "C"  SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt ) {
-    Rcpp::traits::input_parameter< mat& >::type phi(in_phi);
-    Rcpp::traits::input_parameter< mat& >::type evt(in_evt);
-    List opt(in_opt);
-    int distribution = as<int>(opt["distribution"]);
-    vec g = user_function(phi, evt, opt);
-    if (distribution == 4) g = log(g);
-    return Rcpp::wrap(g);
-}
-
-extern "C" SEXP _<%=saem.base%>_saem_fit(SEXP xSEXP) {
-  List x(xSEXP);
-  SAEM saem;
-  saem.inits(x);
-
-  if(x.containsElementNamed("Rfn")) {
-    ff = as<Function>(x["Rfn"]);
-    saem.set_fn(Ruser_function);
-  } else {
-    saem.set_fn(user_function);
-  }
-
-  saem.saem_fit();
-
-  List out = List::create(
-    Named("resMat") = saem.get_resMat(),
-    Named("mprior_phi") = saem.get_mprior_phi(),
-    Named("mpost_phi") = saem.get_mpost_phi(),
-    Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),
-    Named("Plambda") = saem.get_Plambda(),
-    Named("Ha") = saem.get_Ha(),
-    Named("sig2") = saem.get_sig2(),
-    Named("eta") = saem.get_eta(),
-    Named("par_hist") = saem.get_par_hist()
-  );
-  out.attr("saem.cfg") = x;
-  out.attr("class") = "saemFit";
-  return out;
-}
-
-extern "C" {
-SEXP _<%=saem.base%>_call(){
-  return R_NilValue;
-}
-void R_init_<%=saem.base%>(DllInfo *dll)
-{
-  R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_saem_fit",(DL_FUNC) &_<%=saem.base%>_saem_fit);
-R_RegisterCCallable("<%=saem.base%>","_<%=saem.base%>_dopred",(DL_FUNC) &_<%=saem.base%>_dopred);
-  static const R_CallMethodDef callMethods[]  = {
-    {"_<%=saem.base%>_call", (DL_FUNC) &_<%=saem.base%>_call, 0},
-    {NULL, NULL, 0}
-  };
-  R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
-  R_useDynamicSymbols(dll, FALSE);
-}
-}
-'
-
-
-##' Get a list of directories for inclusion
-##'
-##' @param pkg a string or list of string for packages to be included.
-##' @return An inclusion string for Makevars
-##' @author Matthew L. Fidler
-##' @keywords internal
-##' @export
-nmxInclude <- function(pkg = "nlmixr") {
-  if (length(pkg) == 1) {
-    x <- system.file("", package = pkg)
-    if (.Platform$OS.type == "windows") x <- gsub("\\\\", "/", utils::shortPathName(x))
-    x <- paste0("-I", x, "/include")
-    return(x)
-  } else {
-    paste(sapply(pkg, nmxInclude), collapse = " ")
-  }
-}
-
-..saemCountDll <- list()
-.saemCountDll <- function(dll, inc = NULL) {
-  .what <- ..saemCountDll[[dll]]
-  if (is.null(.what)) {
-    if (is.integer(inc)) {
-      .lst <- ..saemCountDll
-      .lst[[dll]] <- inc
-      assignInMyNamespace("..saemCountDll", .lst)
-      return(inc)
-    } else {
-      return(0L)
-    }
-  } else if (is.null(inc)) {
-    return(.what)
-  } else {
-    .lst <- ..saemCountDll
-    .what <- .what + inc
-    .lst[[dll]] <- .what
-    assignInMyNamespace("..saemCountDll", .lst)
-    return(.what)
-  }
-}
-
-.protectSaemDll <- ""
-
-
-# genSaemUserFunction(f$rxode.pred, f$saem.pars, f$predSaem, f$error)
+# genSaemUserFunction(f$rxode.pred, f$saem.pars, f$pred, f$error)
 genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pred = NULL, control=saemControl()) {
-  RxODE::rxGenSaem(model, pred, PKpars,
-                   sum.prod=control$sum.prod,
-                   optExpression=control$optExpression)
+  .mod <- RxODE(RxODE::rxGenSaem(model, pred, PKpars,
+                                 sum.prod=control$sum.prod,
+                                 optExpression=control$optExpression))
+  .fnPred <- eval(bquote(function(a, b, c){
+    RxODE::rxLoad(.(.mod))
+    RxODE::rxLock(.(.mod))
+    RxODE::rxAllowUnload(FALSE)
+    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE)})
+    .Call(`_nlmixr_saem_do_pred`, a, b, c);
+  }))
+  .fn1 <-  eval(bquote(function(a){
+    RxODE::rxLoad(.(.mod))
+    RxODE::rxLock(.(.mod))
+    RxODE::rxAllowUnload(FALSE)
+    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE)})
+    .l1 <- length(unique(a$evt[, "ID"]));
+    .l2 <- length(unique(a$evtM[, "ID"]))
+    if (.l2 > .l1){
+      suppressWarnings(do.call(RxODE::rxSolve,
+                               c(list(object=.(model), params=a$opt$.pars,
+                                      events=a$evtM,.setupOnly=1L),
+                                 a$optM)))
+    } else {
+      suppressWarnings(do.call(RxODE::rxSolve,
+                               c(list(object=.(model), params=a$opt$.pars,
+                                      events=a$evt,.setupOnly=1L),
+                                 a$optM)))
+    }}))
+
+  .fn <- eval(bquote(function(a, b, c){
+    RxODE::rxLoad(.(model))
+    RxODE::rxLock(.(model))
+    on.exit({RxODE::rxUnlock(.(model)); RxODE::rxAllowUnload(TRUE);})
+    if (missing(b) && missing(c)){
+      .curFn <- .(.fn1)
+      .ret <- .curFn(a)
+      attr(.ret, "dopred") <- .(.fnPred)
+      return(.ret)
+    } else {
+      .curFn <- .(.fnPred)
+      return(.curFn(a, b, c))
+    }
+  }))
+  attr(.fn, "form") <- "ode" ## Not sure this is necessary any more
+  attr(.fn, "neq") <- length(RxODE::rxState(.mod))
+  attr(.fn, "nlhs") = length(RxODE::rxLhs(.mod))
+  attr(.fn, "nrhs") = length(RxODE::rxParam(.mod))
+  attr(.fn, "rx") = .mod
+  ## attr(.fn, "inPars") = inPars
+  ## attr(fn, "nendpnt") = nendpnt # not calculated; Is this a problem?
+  return(.fn)
 }
 
 #' Generate an SAEM model
@@ -483,7 +78,7 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
 #'
 #' @param model a compiled SAEM model by gen_saem_user_fn()
 #' @param PKpars PKpars function
-#' @param pred pred function
+#' @param pred pred function;  This will be a focei-style pred
 #' @param inPars a character vector of parameters to be read from the
 #'   input dataset (including time varying covariates)
 #' @details Fit a generalized nonlinear mixed-effect model using the
@@ -491,110 +86,9 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
 #'   algorithm
 #'
 #' @author Matthew Fidler & Wenping Wang
+#' @keywords internal
 #' @export
 gen_saem_user_fn <- genSaemUserFunction
-
-
-##' @title SAEM dll prodection from garbage collection
-##'
-##' @description
-##' This protects the saem dll from being prematurely unloaded while
-##' running it due to garbage collection.
-##'
-##' @param dll dll to protect
-##'
-##' @return nothing
-##'
-##' @export
-.protectSaem <- function(dll) {
-  assignInMyNamespace(".protectSaemDll", dll)
-}
-##' @rdname .protectSaem
-##' @export
-.unprotectSaem <- function(dll) {
-  assignInMyNamespace(".protectSaemDll", "")
-}
-##' Cleanup saem_fit environment by removing dll after the object is no longer used by R.
-##'
-##' @param env Environment where cleanup needs to occur.
-##' @author Matthew L. Fidler
-##' @export
-saem.cleanup <- function(env) {
-  if (is(env, "nlmixr.ui.saem")) env <- as.saem(env)
-  if (is(env, "saemFit")) env <- attr(env, "env")
-  ## if (!any(.protectSaemDll== env$saem.dll)){
-  ##     try({dyn.unload(env$saem.dll)}, silent=TRUE);
-  ##     if (env$is.ode){
-  ##         try({RxODE::rxUnload(env$model)}, silent=TRUE)
-  ##     }
-  ##     if (file.exists(env$saem.cpp))
-  ##         unlink(env$saem.cpp);
-  ## }
-}
-
-parfn.list <- c(
-  par.1cmt.CL,
-  par.1cmt.CL.oral,
-  par.1cmt.CL.oral.tlag,
-  par.2cmt.CL,
-  par.2cmt.CL.oral,
-  par.2cmt.CL.oral.tlag,
-  par.3cmt.CL,
-  par.3cmt.CL.oral,
-  par.3cmt.CL.oral.tlag,
-  par.1cmt.micro,
-  par.1cmt.micro.oral,
-  par.1cmt.micro.oral.tlag,
-  par.2cmt.micro,
-  par.2cmt.micro.oral,
-  par.2cmt.micro.oral.tlag,
-  par.3cmt.micro,
-  par.3cmt.micro.oral,
-  par.3cmt.micro.oral.tlag
-)
-
-#' Parameters for a linear compartment model for SAEM
-#'
-#' Parameters for a linear compartment model using closed-form solutions and the SAEM algorithm.
-#'
-#' @param ncmt number of compartments
-#' @param oral logical, whether oral absorption is true
-#' @param tlag logical, whether lag time is present
-#' @param infusion logical, whether infusion is true
-#' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
-#' @return parameters for a linear compartment model
-#' @author Wenping Wang
-#' @export
-lincmt <- function(ncmt, oral = T, tlag = F, infusion = F, parameterization = 1) {
-  # ncmt=1; oral=T; tlag=F; parameterization=1
-  # print(as.list(match.call()))
-  if (infusion) {
-    oral <- F
-    tlag <- F
-  }
-
-  # master par list
-  pm <- list(
-    c("CL", "V", "KA", "TLAG"),
-    c("CL", "V", "CLD", "VT", "KA", "TLAG"),
-    c("CL", "V", "CLD", "VT", "CLD2", "VT2", "KA", "TLAG"),
-    c("KE", "V", "KA", "TLAG"),
-    c("KE", "V", "K12", "K21", "KA", "TLAG"),
-    c("KE", "V", "K12", "K21", "K13", "K31", "KA", "TLAG")
-  )
-  dim(pm) <- c(3, 2)
-
-  pars <- pm[[ncmt, parameterization]]
-  if (!tlag) pars[2 * ncmt + 2] <- "0"
-  if (!oral) pars <- pars[1:(2 * ncmt)]
-  npar <- length(pars)
-  s <- sprintf("_params(%d) = %s;", 1:npar - 1, pars)
-  pars <- paste(c(sprintf("VectorXd _params(%d);", 2 * ncmt + 2), s), collapse = "\n")
-  attr(pars, "calls") <- list(ncmt = ncmt, oral = oral, tlag = tlag, infusion = infusion, parameterization = parameterization)
-  ix <- (parameterization - 1) * 9 + (ncmt - 1) * 3 + oral + tlag + 1
-  attr(pars, "default.pars") <- parfn.list[[ix]]
-  pars
-}
 
 #' Configure an SAEM model
 #'
@@ -618,9 +112,9 @@ lincmt <- function(ncmt, oral = T, tlag = F, infusion = F, parameterization = 1)
 #' \dontrun{
 #' library(nlmixr)
 #'
-#' # ode <- "d/dt(depot) =-KA*depot;
-#' #        d/dt(centr) = KA*depot - KE*centr;"
-#' # m1 = RxODE(ode, modName="m1")
+#' ode <- "d/dt(depot) =-KA*depot;
+#'         d/dt(centr) = KA*depot - KE*centr;"
+#' m1 = RxODE(ode, modName="m1")
 #' # ode <- "C2 = centr/V;
 #' #      d/dt(depot) =-KA*depot;
 #' #      d/dt(centr) = KA*depot - KE*centr;"
@@ -638,8 +132,7 @@ lincmt <- function(ncmt, oral = T, tlag = F, infusion = F, parameterization = 1)
 #' PRED <- function() centr / V
 #' PRED2 <- function() C2
 #'
-#' saem_fit <- gen_saem_user_fn(model = lincmt(ncmt = 1, oral = T))
-#' # saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
+#'  saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
 #' # saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
 #'
 #'
@@ -789,14 +282,14 @@ configsaem <- function(model, data, inits,
   ix <- rep(1:dim(io)[1], nmc)
   ioM <- io[ix, ]
   indioM <- grep(1, t(ioM)) - 1
-  mPars <- if (ninputpars == 0) NULL else unlist(stats::aggregate(.as.data.frame(data$data[, inPars]), list(id), unique)[, -1])
-  if (!is.null(mPars)) {
-    dim(mPars) <- c(N, ninputpars)
-    opt$mPars <- mPars
-    ix <- rep(1:dim(mPars)[1], nmc)
-    optM$mPars <- mPars[ix, ]
-    dim(optM$mPars) <- c(nmc * N, ninputpars)
-  }
+  ## mPars <- if (ninputpars == 0) NULL else unlist(stats::aggregate(.as.data.frame(data$data[, inPars]), list(id), unique)[, -1])
+  ## if (!is.null(mPars)) {
+  ##   dim(mPars) <- c(N, ninputpars)
+  ##   opt$mPars <- mPars
+  ##   ix <- rep(1:dim(mPars)[1], nmc)
+  ##   optM$mPars <- mPars[ix, ]
+  ##   dim(optM$mPars) <- c(nmc * N, ninputpars)
+  ## }
 
   if (is.null(data$nmdat$CMT)) data$nmdat$CMT <- 1 ## CHECKME
   if (any(is.na(data$nmdat$CMT))) {

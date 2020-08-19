@@ -2940,16 +2940,6 @@ nlmixrUI.saem.fit <- function(obj) {
     if (is.null(obj$saem.pars)) {
       stop("SAEM requires mu-referenced parameters")
     }
-    message("Compiling RxODE equations...", appendLF = FALSE)
-    if (obj$env$sum.prod) {
-      ode <- RxODE::RxODE(RxODE::rxSumProdModel(obj$rxode))
-    } else {
-      ode <- RxODE::RxODE(obj$rxode)
-    }
-    RxODE::rxLoad(ode)
-    obj$env$saem.ode <- ode
-    RxODE::rxLoad(ode)
-    message("done.")
     inPars <- obj$saem.inPars
     if (length(inPars) == 0) {
       inPars <- NULL
@@ -2961,7 +2951,10 @@ nlmixrUI.saem.fit <- function(obj) {
         inPars <- c(inPars, .extra)
       }
     }
-    saem.fit <- gen_saem_user_fn(model = ode, obj$saem.pars, pred = obj$predSaem, inPars = inPars)
+    ## saem.fit <- gen_saem_user_fn(model = ode, obj$saem.pars, pred = obj$predSaem, inPars = inPars)
+    saem.fit <- gen_saem_user_fn(model = ode, obj$saem.pars, pred= function() {
+      return(nlmixr_pred)}, inPars = inPars)
+    ## obj$env$saem.ode <- attr(saem.fit, "rx")
     obj$env$saem.fit <- saem.fit
     return(obj$env$saem.fit)
   }

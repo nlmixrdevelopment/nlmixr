@@ -173,11 +173,11 @@ augPredTrans <- function(pred, ipred, lambda, yjIn) {
     .Call(`_nlmixr_augPredTrans`, pred, ipred, lambda, yjIn)
 }
 
-saemDoPred <- function(in_phi, in_evt, in_opt, cur, model, dll) {
-    .Call(`_nlmixr_saemDoPred`, in_phi, in_evt, in_opt, cur, model, dll)
+saem_do_pred <- function(in_phi, in_evt, in_opt) {
+    .Call(`_nlmixr_saem_do_pred`, in_phi, in_evt, in_opt)
 }
 
-saemFit <- function(xSEXP, cur, model, dll) {
-    .Call(`_nlmixr_saemFit`, xSEXP, cur, model, dll)
+saem_fit <- function(xSEXP) {
+    .Call(`_nlmixr_saem_fit`, xSEXP)
 }
 
