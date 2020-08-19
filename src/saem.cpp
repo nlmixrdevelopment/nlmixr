@@ -72,8 +72,8 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt){
       } else if (ind->evid[j] == 0) {
 	saem_lhs((int)id, ind->all_times[j],
 		 getSolve(j), ind->lhs);
-      }
-      g[elt++] = ind->lhs[0];
+	g[elt++] = ind->lhs[0];
+      } // evid=2 does not need to be calculated
     }
   }
   return g;
