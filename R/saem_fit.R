@@ -205,7 +205,7 @@ for (int _b=1; _b< <%=nendpnt%>; ++_b) {
 }
 
 // definition
-SEXP _<%=saem.base%>_dopred( SEXP in_phi, SEXP in_evt, SEXP in_opt){
+SEXP _<%=saem.base%>_dopred(SEXP in_phi, SEXP in_evt, SEXP in_opt) {
     if (getRx == NULL) getRx = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
     if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
     _rx=getRx();
@@ -524,7 +524,6 @@ gen_saem_user_fn <- function(model, PKpars = attr(model, "default.pars"), pred =
   }
 
   saem.cpp <- paste0("saem", .md5, .Platform$r_arch)
-  ## }
   saem.base <- saem.cpp
   saem.dll <- paste0(saem.cpp, .Platform$dynlib.ext)
   saem.cpp <- paste0(saem.cpp, ".cpp")
@@ -805,6 +804,16 @@ gen_saem_user_fn <- function(model, PKpars = attr(model, "default.pars"), pred =
   fn
 }
 .protectSaemDll <- ""
+
+
+# genSaemUserFunction(f$rxode.pred, f$saem.pars, f$predSaem, f$error)
+genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pred = NULL, err=NULL,
+                                control=saemControl()) {
+  RxODE:::.rxGenFun(model, pred, PKpars, err,
+                          init=NULL, promoteLinSens=FALSE)
+}
+
+
 ##' @title SAEM dll prodection from garbage collection
 ##'
 ##' @description

@@ -749,13 +749,9 @@ double likInner0(double *eta){
 	if (isDose(ind->evid[j])){
 	  ind->tlast = ind->all_times[j];
 	  // Need to calculate for advan sensitivities
-	  rxInner.calc_lhs((int)id, ind->all_times[j],
-			   &ind->solve[j * op->neq],
-			   ind->lhs);
+	  rxInner.calc_lhs((int)id, ind->all_times[j], getSolve(j), ind->lhs);
 	} else if (ind->evid[j] == 0) {
-	  rxInner.calc_lhs((int)id, ind->all_times[j],
-			 &ind->solve[j * op->neq],
-			 ind->lhs);
+	  rxInner.calc_lhs((int)id, ind->all_times[j], getSolve(j), ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
 	  if (ISNA(f))
 	    throw std::runtime_error("bad solve");
@@ -793,8 +789,7 @@ double likInner0(double *eta){
 		// Calculate derivatives by finite difference
 		ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		predOde(id); // Assumes same order of parameters
-		rxPred.calc_lhs((int)id, ind->all_times[j],
-				&ind->solve[j * op->neq], // Solve space is smaller
+		rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				ind->lhs);
 		ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		if (!op_focei.eventCentral) {
@@ -806,8 +801,7 @@ double likInner0(double *eta){
 		  fpm = ind->lhs[0];
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs((int)id, ind->all_times[j],
-				  &ind->solve[j * op->neq], // Solve space is smaller
+		  rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				  ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
@@ -842,8 +836,7 @@ double likInner0(double *eta){
 		  // Calculate derivatives by finite difference
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs((int)id, ind->all_times[j],
-				&ind->solve[j * op->neq], // Solve space is smaller
+		  rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  if (!op_focei.eventCentral) {
@@ -860,8 +853,7 @@ double likInner0(double *eta){
 		    // LHS #1 =  r
 		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs((int)id, ind->all_times[j],
-				    &ind->solve[j * op->neq], // Solve space is smaller
+		    rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				    ind->lhs); // nlhs is smaller
 		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
 		    rp = (rp-ind->lhs[1])/(2*op_focei.eventFD);
@@ -941,8 +933,7 @@ double likInner0(double *eta){
 		if (op_focei.etaFD[i]==1){
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs((int)id, ind->all_times[j],
-				&ind->solve[j * op->neq], // Solve space is smaller
+		  rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  if (!op_focei.eventCentral) {
@@ -953,8 +944,7 @@ double likInner0(double *eta){
 		    fpm = f;
 		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs((int)id, ind->all_times[j],
-				&ind->solve[j * op->neq], // Solve space is smaller
+		    rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				ind->lhs);
 		    fpm = a(k, i) = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;

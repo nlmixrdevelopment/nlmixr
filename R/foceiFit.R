@@ -1805,7 +1805,7 @@ foceiFit.data.frame0 <- function(data,
       .atol <- rep(control$atol, length(RxODE::rxModelVars(model)$state))
       .rtol <- rep(control$rtol, length(RxODE::rxModelVars(model)$state))
       .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err,
-        grad = (control$derivMethod == 2L),
+        grad = FALSE,
         pred.minus.dv = TRUE, sum.prod = control$sumProd,
         theta.derivs = FALSE, optExpression = control$optExpression, run.internal = TRUE,
         only.numeric = TRUE

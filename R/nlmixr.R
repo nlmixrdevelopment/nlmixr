@@ -953,6 +953,7 @@ saemControl <- function(seed = 99,
                         optExpression = TRUE,
                         maxsteps = 100000L,
                         adjObf = TRUE,
+                        sumProd=FALSE,
                         ...) {
   .xtra <- list(...)
   .rm <- c()
@@ -978,6 +979,7 @@ saemControl <- function(seed = 99,
     print = print,
     DEBUG = trace,
     optExpression = optExpression,
+    sumProd=sumProd,
     nnodes.gq = nnodes.gq,
     nsd.gq = nsd.gq,
     adjObf = adjObf,
