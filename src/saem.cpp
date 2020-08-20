@@ -15,6 +15,9 @@ typedef t_calc_lhs (*getRxLhs_t)();
 
 getRxLhs_t getRxLhs = (getRxLhs_t) R_GetCCallable("RxODE","getRxLhs");
 
+typedef void (*sortIds_t)(rx_solve* rx, int ini);
+
+sortIds_t sortIds = (sortIds_t) R_GetCCallable("RxODE", "sortIds");
 
 typedef t_update_inis (*getUpdateInis_t)();
 getUpdateInis_t getUpdateInis = (getUpdateInis_t) R_GetCCallable("RxODE", "getUpdateInis");
@@ -92,36 +95,23 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt){
       } // evid=2 does not need to be calculated
     }
   }
+  if (op->stiff == 2) { // liblsoda
+    // Order by the the overall solve time
+    // Should it be done every time? Every x times?
+    sortIds(_rx, 0);
+  }
   return g;
 }
 
-//[[Rcpp::export]]
-SEXP saem_do_pred(SEXP in_phi, SEXP in_evt, SEXP in_opt) {
-  saem_lhs = getRxLhs();
-  saem_inis = getUpdateInis();
-  mat phi = as<mat>(in_phi);
-  mat evt = as<mat>(in_evt);
-  List opt= as<List>(in_opt);
-  int distribution = as<int>(opt["distribution"]);
-  vec g = user_function(phi, evt, opt);
-  if (distribution == 4) g = log(g);
-  return wrap(g);
-}
-
-
-//[[Rcpp::export]]
-SEXP saem_fit(SEXP xSEXP) {
-  if (getRx_ == NULL) getRx_ = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
-  List x(xSEXP);
-  List opt = x["opt"];
+void setupRx(List &opt, SEXP evt, SEXP evtM) {
   RObject obj = opt[".rx"];
   if (!Rf_isNull(obj)){
     // Now need to get the largest item to setup the solving space
     // foceiSetupEta_(etaMat0);
     RObject pars = opt[".pars"];
-    List odeO = x["ODEopt"];
-    SEXP evt = x["evt"];
-    SEXP evtM = x["evtM"];
+    List odeO = opt["ODEopt"];
+    // SEXP evt = x["evt"];
+    // SEXP evtM = x["evtM"];
     int nEvt = INTEGER(Rf_getAttrib(evt, R_DimSymbol))[0];
     int nEvtM = INTEGER(Rf_getAttrib(evtM, R_DimSymbol))[0];
     SEXP ev;
@@ -140,6 +130,29 @@ SEXP saem_fit(SEXP xSEXP) {
   } else {
     stop("cannot find RxODE model");
   }
+}
+
+//[[Rcpp::export]]
+SEXP saem_do_pred(SEXP in_phi, SEXP in_evt, SEXP in_opt) {
+  List opt = List(in_opt);
+  setupRx(opt, in_evt, in_evt);
+  saem_lhs = getRxLhs();
+  saem_inis = getUpdateInis();
+  mat phi = as<mat>(in_phi);
+  mat evt = as<mat>(in_evt);
+  int distribution = as<int>(opt["distribution"]);
+  vec g = user_function(phi, evt, opt);
+  if (distribution == 4) g = log(g);
+  return wrap(g);
+}
+
+
+//[[Rcpp::export]]
+SEXP saem_fit(SEXP xSEXP) {
+  if (getRx_ == NULL) getRx_ = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+  List x(xSEXP);
+  List opt = x["opt"];
+  setupRx(opt,x["evt"],x["evtM"]);
   // if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
   saem_lhs = getRxLhs();
   saem_inis = getUpdateInis();

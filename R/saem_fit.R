@@ -32,13 +32,13 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
     RxODE::rxLoad(.(.mod))
     RxODE::rxLock(.(.mod))
     RxODE::rxAllowUnload(FALSE)
-    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE)})
+    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE); RxODE::rxSolveFree()})
     .Call(`_nlmixr_saem_do_pred`, a, b, c);
   })
   .fn <- bquote(function(a, b, c){
     RxODE::rxLoad(.(.mod))
     RxODE::rxLock(.(.mod))
-    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE);})
+    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE); RxODE::rxSolveFree()})
     if (missing(b) && missing(c)){
       .ret <- .Call(`_nlmixr_saem_fit`, a, PACKAGE="nlmixr")
       attr(.ret, "dopred") <- .(.fnPred)
@@ -49,25 +49,25 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
     }
   })
   .param <- RxODE::rxParam(.mod)
+  .inits <- names(RxODE::rxInits(.mod))
+  .nrhs <- length(.param) - length(.inits)
   if (any(.param == "CMT")){
-    inPars <- unique(c(.param, "CMT"))
+    inPars <- unique(c(inPars, "CMT"))
   }
-  if (is.null(inPars)) {
-    .parmUpdate <- rep(1L, length(.param))
-  } else {
-    .parmUpdate <- sapply(.param, function(x) {
-      if (any(x == inPars)) {
-        return(0L)
-      } else {
-        return(1L)
-      }
-    })
-  }
+  .parmUpdate <- sapply(.param, function(x) {
+    if (any(x == inPars)) {
+      return(0L)
+    } else if (any(x == .inits)) {
+      return(0L)
+    } else {
+      return(1L)
+    }
+  })
   .fn <- eval(.fn)
   attr(.fn, "form") <- "ode" ## Not sure this is necessary any more
   attr(.fn, "neq") <- length(RxODE::rxState(.mod))
   attr(.fn, "nlhs") <- length(RxODE::rxLhs(.mod))
-  attr(.fn, "nrhs") <- length(.param) - length(inPars)
+  attr(.fn, "nrhs") <- sum(.parmUpdate)
   attr(.fn, "paramUpdate") <- .parmUpdate
   attr(.fn, "rx") <- .mod
   attr(.fn, "inPars") <- inPars
@@ -197,7 +197,6 @@ configsaem <- function(model, data, inits,
   if (is.null(mcmc$print)) mcmc$print <- 1
   if (is.null(names(inits$theta))) names(inits$theta) <- rep("", length(inits$theta))
   inits.save <- inits
-  print(inits$theta)
   inits$theta.fix <- matrix(names(inits$theta),
                             byrow = T,
                             ncol = model$N.eta)
@@ -458,15 +457,14 @@ configsaem <- function(model, data, inits,
   ilambda1 <- ilambda1[ilambda1 > 0] - 1
   ilambda0 <- mcov[, i0]
   ilambda0 <- ilambda0[ilambda0 > 0] - 1
-  # print(mcov)
-  # print(mcov[,i1]); print(ilambda1)
-  # print(mcov[,i0]); print(ilambda0)
 
   i1 <- i1 - 1
   i0 <- i0 - 1
   opt$distribution <- distribution
   opt$paramUpdate <- attr(model$saem_mod, "paramUpdate")
   optM$paramUpdate <- attr(model$saem_mod, "paramUpdate")
+  opt$ODEopt <- ODEopt
+  optM$ODEopt <- ODEopt
   cfg <- list(
     ODEopt=ODEopt,
     inits = inits.save,
