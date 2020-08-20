@@ -941,7 +941,7 @@ saemControl <- function(seed = 99,
                         nu = c(2, 2, 2),
                         atol = 1e-06,
                         rtol = 1e-04,
-                        method = "lsoda",
+                        method = "liblsoda",
                         transitAbs = FALSE,
                         print = 1,
                         trace = 0,
@@ -983,8 +983,7 @@ saemControl <- function(seed = 99,
     nnodes.gq = nnodes.gq,
     nsd.gq = nsd.gq,
     adjObf = adjObf,
-    ...
-  )
+    ...)
   if (length(.rm) > 0) {
     .ret <- .ret[!(names(.ret) %in% .rm)]
   }

@@ -56,10 +56,26 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt){
   // yp has all the observations in the dataset
   rx_solving_options_ind *ind;
   rx_solving_options *op = _rx->op;
+  vec _id = _evt.col(0);
+  int _N=_id.max()+1;
+  SEXP paramUpdate = _opt["paramUpdate"];
+  int *doParam = INTEGER(paramUpdate);
+  int nPar = Rf_length(paramUpdate);
+  // Fill in subject parameter information
+  for (int _i = 0; _i < _N; ++_i) {
+    ind = &(_rx->subjects[_i]);
+    // ind->par_ptr
+    int k=0;
+    for (int _j = 0; _j < nPar; _j++){
+      if (doParam[_j] == 1) {
+	ind->par_ptr[_j] = _phi(_i, k++);
+      }
+    }
+  }
   saem_solve(_rx); // Solve the complete system (possibly in parallel)
   vec g(_rx->nobs2); // nobs EXCLUDING EVID=2
-  int elt = 0;
-  for (int id = 0; id < _rx->nsub; ++id) {
+  int elt=0;
+  for (int id = 0; id < _N; ++id) {
     ind = &(_rx->subjects[id]);
     iniSubjectE(op->neq, 1, ind, op, _rx, saem_inis);
     for (int j = 0; j < ind->n_all_times; ++j){
@@ -96,11 +112,38 @@ SEXP saem_do_pred(SEXP in_phi, SEXP in_evt, SEXP in_opt) {
 //[[Rcpp::export]]
 SEXP saem_fit(SEXP xSEXP) {
   if (getRx_ == NULL) getRx_ = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+  List x(xSEXP);
+  List opt = x["opt"];
+  RObject obj = opt[".rx"];
+  if (!Rf_isNull(obj)){
+    // Now need to get the largest item to setup the solving space
+    // foceiSetupEta_(etaMat0);
+    RObject pars = opt[".pars"];
+    List odeO = x["ODEopt"];
+    SEXP evt = x["evt"];
+    SEXP evtM = x["evtM"];
+    int nEvt = INTEGER(Rf_getAttrib(evt, R_DimSymbol))[0];
+    int nEvtM = INTEGER(Rf_getAttrib(evtM, R_DimSymbol))[0];
+    SEXP ev;
+    if (nEvt > nEvtM) {
+      ev = evt;
+    } else {
+      ev = evtM;
+    }
+    RxODE::rxSolve_(obj, odeO,
+     		    R_NilValue,//const Nullable<CharacterVector> &specParams =
+     		    R_NilValue,//const Nullable<List> &extraArgs =
+     		    pars,//const RObject &params =
+     		    ev,//const RObject &events =
+     		    R_NilValue, // inits
+     		    1);//const int setupOnly = 0
+  } else {
+    stop("cannot find RxODE model");
+  }
   // if (rxSingleSolve == NULL) rxSingleSolve = (rxSingleSolve_t) R_GetCCallable("RxODE","rxSingleSolve");
   saem_lhs = getRxLhs();
   saem_inis = getUpdateInis();
   _rx=getRx_();
-  List x(xSEXP);
 
   SAEM saem;
   saem.inits(x);

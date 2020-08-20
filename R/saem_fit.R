@@ -18,57 +18,57 @@
 ## along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
 # genSaemUserFunction(f$rxode.pred, f$saem.pars, f$pred, f$error)
-genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pred = NULL, control=saemControl()) {
-  .mod <- RxODE(RxODE::rxGenSaem(model, pred, PKpars,
-                                 sum.prod=control$sum.prod,
-                                 optExpression=control$optExpression))
-  .fnPred <- eval(bquote(function(a, b, c){
+genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pred = NULL, control=saemControl(),
+                                inPars=NULL) {
+  .x <- deparse(body(pred))
+  .len <- length(.x)
+  .x <- if(.x[1]=="{") .x[2:(.len-1)] else .x
+  .len <- length(.x)
+  .nendpnt <- .len
+  .mod <- RxODE::RxODE(RxODE::rxGenSaem(model, function() { return(nlmixr_pred)}, PKpars,
+                                        sum.prod=control$sum.prod,
+                                        optExpression=control$optExpression))
+  .fnPred <- bquote(function(a, b, c){
     RxODE::rxLoad(.(.mod))
     RxODE::rxLock(.(.mod))
     RxODE::rxAllowUnload(FALSE)
     on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE)})
     .Call(`_nlmixr_saem_do_pred`, a, b, c);
-  }))
-  .fn1 <-  eval(bquote(function(a){
+  })
+  .fn <- bquote(function(a, b, c){
     RxODE::rxLoad(.(.mod))
     RxODE::rxLock(.(.mod))
-    RxODE::rxAllowUnload(FALSE)
-    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE)})
-    .l1 <- length(unique(a$evt[, "ID"]));
-    .l2 <- length(unique(a$evtM[, "ID"]))
-    if (.l2 > .l1){
-      suppressWarnings(do.call(RxODE::rxSolve,
-                               c(list(object=.(model), params=a$opt$.pars,
-                                      events=a$evtM,.setupOnly=1L),
-                                 a$optM)))
-    } else {
-      suppressWarnings(do.call(RxODE::rxSolve,
-                               c(list(object=.(model), params=a$opt$.pars,
-                                      events=a$evt,.setupOnly=1L),
-                                 a$optM)))
-    }}))
-
-  .fn <- eval(bquote(function(a, b, c){
-    RxODE::rxLoad(.(model))
-    RxODE::rxLock(.(model))
-    on.exit({RxODE::rxUnlock(.(model)); RxODE::rxAllowUnload(TRUE);})
+    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE);})
     if (missing(b) && missing(c)){
-      .curFn <- .(.fn1)
-      .ret <- .curFn(a)
+      .ret <- .Call(`_nlmixr_saem_fit`, a, PACKAGE="nlmixr")
       attr(.ret, "dopred") <- .(.fnPred)
       return(.ret)
     } else {
       .curFn <- .(.fnPred)
       return(.curFn(a, b, c))
     }
-  }))
+  })
+  .param <- RxODE::rxParam(.mod)
+  if (is.null(inPars)) {
+    .parmUpdate <- rep(1L, length(.param))
+  } else {
+    .parmUpdate <- sapply(.param, function(x) {
+      if (any(x == inPars)) {
+        return(0L)
+      } else {
+        return(1L)
+      }
+    })
+  }
+  .fn <- eval(.fn)
   attr(.fn, "form") <- "ode" ## Not sure this is necessary any more
   attr(.fn, "neq") <- length(RxODE::rxState(.mod))
-  attr(.fn, "nlhs") = length(RxODE::rxLhs(.mod))
-  attr(.fn, "nrhs") = length(RxODE::rxParam(.mod))
-  attr(.fn, "rx") = .mod
-  ## attr(.fn, "inPars") = inPars
-  ## attr(fn, "nendpnt") = nendpnt # not calculated; Is this a problem?
+  attr(.fn, "nlhs") <- length(RxODE::rxLhs(.mod))
+  attr(.fn, "nrhs") <- length(.param)
+  attr(.fn, "paramUpdate") <- .parmUpdate
+  attr(.fn, "rx") <- .mod
+  attr(.fn, "inPars") <- inPars
+  attr(.fn, "nendpnt") <- .nendpnt # not calculated; Is this a problem?
   return(.fn)
 }
 
@@ -173,11 +173,11 @@ configsaem <- function(model, data, inits,
   ## RxODE::rxTrans(data, model)
   data <- list(nmdat = data)
 
-  neq <- attr(model$saem_mod, "neq")
-  nlhs <- attr(model$saem_mod, "nlhs")
+  neq    <- attr(model$saem_mod, "neq")
+  nlhs   <- attr(model$saem_mod, "nlhs")
   inPars <- attr(model$saem_mod, "inPars")
   ninputpars <- length(inPars)
-  opt <- optM <- c(list(neq = neq, nlhs = nlhs, inits = numeric(neq)), ODEopt,
+  opt <- optM <- c(list(neq = neq, nlhs = nlhs, inits = numeric(neq)),
     ninputpars = ninputpars, inPars = inPars
   )
 
@@ -298,31 +298,22 @@ configsaem <- function(model, data, inits,
   ## CHECKME
   form <- attr(model$saem_mod, "form")
   .nobs <- 0
-  if (form != "cls") {
-    dat <- RxODE::etTrans(data$nmdat, attr(model$saem_mod, "rx"), TRUE, TRUE)
-    .nobs <- attr(class(dat), ".RxODE.lst")$nobs
-    ## if(length(dat) !=7) stop("SAEM doesn't support time varying covariates yet.");
-    .rx <- attr(model$saem_mod, "rx")
-    .pars <- .rx$params
-    .pars <- setNames(rep(1.1, length(.pars)), .pars)
-    ## opt$.rx <- .rx;
-    opt$.pars <- .pars
-    ## opt$.dat <- dat;
-    dat <- .as.data.frame(dat[, -6])
-    names(dat) <- toupper(names(dat))
-    dat$ID <- as.integer(dat$ID)
-  } else {
-    dat <- data$nmdat[, c("ID", "TIME", "EVID", "AMT", "CMT")]
-    infusion <- max(dat$EVID) > 10000
-    if (infusion) {
-      dat <- .fmtInfusionData(dat)
-    } else {
-      dat$DUR <- -1
-    }
-  }
+  dat <- RxODE::etTrans(data$nmdat, attr(model$saem_mod, "rx"), TRUE, TRUE)
+  .nobs <- attr(class(dat), ".RxODE.lst")$nobs
+  ## if(length(dat) !=7) stop("SAEM doesn't support time varying covariates yet.");
+  .rx <- attr(model$saem_mod, "rx")
+  .pars <- .rx$params
+  .pars <- setNames(rep(1.1, length(.pars)), .pars)
+  opt$.rx <- .rx
+  opt$.pars <- .pars
+  ## opt$.dat <- dat;
+  dat <- .as.data.frame(dat[, -6])
+  names(dat) <- toupper(names(dat))
+  dat$ID <- as.integer(dat$ID)
 
   evt <- dat
   evt$ID <- evt$ID - 1
+  ## r
   evtM <- evt[rep(1:dim(evt)[1], nmc), ]
   evtM$ID <- cumsum(c(FALSE, diff(evtM$ID) != 0))
 
@@ -468,7 +459,10 @@ configsaem <- function(model, data, inits,
   i1 <- i1 - 1
   i0 <- i0 - 1
   opt$distribution <- distribution
+  opt$paramUpdate <- attr(model$saem_mod, "paramUpdate")
+  optM$paramUpdate <- attr(model$saem_mod, "paramUpdate")
   cfg <- list(
+    ODEopt=ODEopt,
     inits = inits.save,
     nu = mcmc$nu,
     niter = niter,

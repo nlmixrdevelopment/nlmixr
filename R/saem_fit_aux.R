@@ -23,40 +23,8 @@
 ##' @export
 calc.2LL <- function(fit, nnodes.gq = 8, nsd.gq = 4) {
   ## nnodes.gq=8, nsd.gq=4
-  .env <- attr(fit, "env")
   saem.cfg <- attr(fit, "saem.cfg")
-  if (.env$is.ode) {
-    ## .env$model$assignPtr()
-    .evtM <- saem.cfg$evtM
-    .rx <- .env$model
-    RxODE::rxLoad(.env$model)
-    .pars <- .rx$params
-    .pars <- setNames(rep(1.1, length(.pars)), .pars)
-    suppressWarnings(do.call(
-      RxODE::rxSolve,
-      c(
-        list(
-          object = .rx, params = .pars,
-          events = .evtM, .setupOnly = 1L
-        ),
-        saem.cfg$optM
-      )
-    ))
-    RxODE::rxLock(.rx)
-    RxODE::rxAllowUnload(FALSE)
-    on.exit({
-      RxODE::rxUnlock(.rx)
-      RxODE::rxAllowUnload(TRUE)
-    })
-  }
-  dyn.load(.env$saem.dll)
-  assignInMyNamespace(".protectSaemDll", .env$saem.dll)
-  on.exit(
-    {
-      assignInMyNamespace(".protectSaemDll", "")
-    },
-    add = TRUE
-  )
+  .evtM <- saem.cfg$evtM
   dopred <- attr(fit, "dopred")
   resMat <- fit$resMat
   ares <- resMat[, 1]
@@ -146,31 +114,9 @@ calc.2LL <- function(fit, nnodes.gq = 8, nsd.gq = 4) {
 plot.saemFit <- function(x, ...) {
   CMT <- RES <- NULL
   fit <- x
-  .env <- attr(fit, "env")
   saem.cfg <- attr(fit, "saem.cfg")
-  if (.env$is.ode) {
-    ## .env$model$assignPtr()
-    .evtM <- saem.cfg$evtM
-    .rx <- .env$model
-    .pars <- .rx$params
-    .pars <- setNames(rep(1.1, length(.pars)), .pars)
-    suppressWarnings(do.call(
-      RxODE::rxSolve,
-      c(
-        list(
-          object = .rx, params = .pars,
-          events = .evtM, .setupOnly = 1L
-        ),
-        saem.cfg$optM
-      )
-    ))
-    RxODE::rxLock(.rx)
-    RxODE::rxAllowUnload(FALSE)
-    on.exit({
-      RxODE::rxUnlock(.rx)
-      RxODE::rxAllowUnload(TRUE)
-    })
-  }
+  ## .env$model$assignPtr()
+  .evtM <- saem.cfg$evtM
   dat <- .as.data.frame(saem.cfg$evt)
   dat <- cbind(dat[dat$EVID == 0, ], DV = saem.cfg$y)
   df <- rbind(cbind(dat, grp = 1), cbind(dat, grp = 2), cbind(dat, grp = 3))
@@ -396,38 +342,10 @@ calc.COV <- function(fit0) {
   }
   .env <- attr(fit, "env")
   saem.cfg <- attr(fit, "saem.cfg")
-  if (.env$is.ode) {
-    ## .env$model$assignPtr()
-    .evtM <- saem.cfg$evtM
-    .rx <- .env$model
-    RxODE::rxLoad(.rx)
-    .pars <- .rx$params
-    .pars <- setNames(rep(1.1, length(.pars)), .pars)
-    suppressWarnings(do.call(
-      RxODE::rxSolve,
-      c(
-        list(
-          object = .rx, params = .pars,
-          events = .evtM, .setupOnly = 1L
-        ),
-        saem.cfg$optM
-      )
-    ))
-    RxODE::rxLock(.rx)
-    RxODE::rxAllowUnload(FALSE)
-    on.exit({
-      RxODE::rxUnlock(.rx)
-      RxODE::rxAllowUnload(TRUE)
-    })
-  }
-  dyn.load(.env$saem.dll)
-  assignInMyNamespace(".protectSaemDll", .env$saem.dll)
-  on.exit(
-    {
-      assignInMyNamespace(".protectSaemDll", "")
-    },
-    add = TRUE
-  )
+  .evtM <- saem.cfg$evtM
+  .rx <- .env$model
+  .pars <- .rx$params
+  .pars <- setNames(rep(1.1, length(.pars)), .pars)
   dopred <- attr(fit, "dopred")
   resMat <- fit$resMat
   ares <- resMat[, 1]

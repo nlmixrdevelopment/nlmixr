@@ -2952,8 +2952,7 @@ nlmixrUI.saem.fit <- function(obj) {
       }
     }
     ## saem.fit <- gen_saem_user_fn(model = ode, obj$saem.pars, pred = obj$predSaem, inPars = inPars)
-    saem.fit <- gen_saem_user_fn(model = ode, obj$saem.pars, pred= function() {
-      return(nlmixr_pred)}, inPars = inPars)
+    saem.fit <- gen_saem_user_fn(obj$rxode.pred, obj$saem.pars, obj$predSaem, inPars = inPars)
     ## obj$env$saem.ode <- attr(saem.fit, "rx")
     obj$env$saem.fit <- saem.fit
     return(obj$env$saem.fit)
