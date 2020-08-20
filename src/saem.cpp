@@ -96,7 +96,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt){
     }
   }
   if (op->stiff == 2) { // liblsoda
-    // Order by the the overall solve time
+    // Order by the overall solve time
     // Should it be done every time? Every x times?
     sortIds(_rx, 0);
   }
