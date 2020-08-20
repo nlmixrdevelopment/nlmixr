@@ -22,36 +22,7 @@ rmvnorm <- function(n, mu, vmat) multi2(mu, vmat, n)
 ##' @export
 vpc_saemFit <- function(fit, dat, nsim = 100, by = NULL, ...) {
   if (class(fit) == "nlmixr.ui.saem") fit <- as.saem(fit)
-  .env <- attr(fit, "env")
   saem.cfg <- attr(fit, "saem.cfg")
-  .evtM <- saem.cfg$evtM
-  .rx <- .env$model
-  .pars <- .rx$params
-  .pars <- setNames(rep(1.1, length(.pars)), .pars)
-  suppressWarnings(do.call(
-    RxODE::rxSolve,
-    c(
-      list(
-        object = .rx, params = .pars,
-        events = .evtM, .setupOnly = 2L
-      ),
-      saem.cfg$optM
-    )
-  ))
-  RxODE::rxLock(.rx)
-  RxODE::rxAllowUnload(FALSE)
-  on.exit({
-    RxODE::rxUnlock(.rx)
-    RxODE::rxAllowUnload(TRUE)
-  })
-  dyn.load(.env$saem.dll)
-  assignInMyNamespace(".protectSaemDll", .env$saem.dll)
-  on.exit(
-    {
-      assignInMyNamespace(".protectSaemDll", "")
-    },
-    add = TRUE
-  )
   dopred <- attr(fit, "dopred")
   resMat <- fit$resMat
   ares <- resMat[, 1]

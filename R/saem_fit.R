@@ -49,6 +49,9 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
     }
   })
   .param <- RxODE::rxParam(.mod)
+  if (any(.param == "CMT")){
+    inPars <- unique(c(.param, "CMT"))
+  }
   if (is.null(inPars)) {
     .parmUpdate <- rep(1L, length(.param))
   } else {
@@ -64,7 +67,7 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
   attr(.fn, "form") <- "ode" ## Not sure this is necessary any more
   attr(.fn, "neq") <- length(RxODE::rxState(.mod))
   attr(.fn, "nlhs") <- length(RxODE::rxLhs(.mod))
-  attr(.fn, "nrhs") <- length(.param)
+  attr(.fn, "nrhs") <- length(.param) - length(inPars)
   attr(.fn, "paramUpdate") <- .parmUpdate
   attr(.fn, "rx") <- .mod
   attr(.fn, "inPars") <- inPars
@@ -194,7 +197,10 @@ configsaem <- function(model, data, inits,
   if (is.null(mcmc$print)) mcmc$print <- 1
   if (is.null(names(inits$theta))) names(inits$theta) <- rep("", length(inits$theta))
   inits.save <- inits
-  inits$theta.fix <- matrix(names(inits$theta), byrow = T, ncol = model$N.eta)
+  print(inits$theta)
+  inits$theta.fix <- matrix(names(inits$theta),
+                            byrow = T,
+                            ncol = model$N.eta)
   inits$theta <- matrix(inits$theta, byrow = T, ncol = model$N.eta)
   model$cov.mod <- 1 - is.na(inits$theta)
   data$N.covar <- nrow(inits$theta) - 1
