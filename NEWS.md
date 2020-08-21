@@ -32,6 +32,8 @@
  - `saem` fits now gracefully fall back to the `focei` likelihood when
    they support files are no longer on the loaded disk
  - `saem` fits now can add in `fo`, `foce` and `focei` likelihood
+ - `saem` fits now use `liblsoda` by default and are multi-threaded when
+   running (controlled by `RxODE`)
 
 ## New Utilities
 
