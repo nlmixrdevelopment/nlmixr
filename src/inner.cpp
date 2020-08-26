@@ -88,6 +88,12 @@ extern "C"{
   getRxSolve_t getRx;
 }
 
+typedef int (*iniSubjectI_t)(int solveid, int inLhs, rx_solving_options_ind *ind, rx_solving_options *op, rx_solve *rx,
+			     t_update_inis u_inis);
+
+iniSubjectI_t iniSubjectI = (iniSubjectI_t) R_GetCCallable("RxODE","iniSubjectE");
+
+
 bool assignFn_ = false;
 
 extern void lin_cmt_stanC(double *obs_timeD, const int nobs, double *dose_timeD, const int ndose, double *doseD, double *TinfD,
@@ -697,6 +703,7 @@ double likInner0(double *eta){
       op_focei.stickyRecalcN2=0;
     }
     ind->solved = -1;
+    iniSubjectI(op->neq, 0, ind, op, rx, rxInner.update_inis);
     // Solve ODE
     innerOde(id);
     j=0;
@@ -706,8 +713,8 @@ double likInner0(double *eta){
       op_focei.reducedTol2=1;
       // Not thread safe
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
-      op->badSolve=0;
-      ind->solved=-1;
+      ind->solved = -1;
+      iniSubjectI(op->neq, 0, ind, op, rx, rxInner.update_inis);
       innerOde(id);
       j++;
     }
@@ -743,11 +750,11 @@ double likInner0(double *eta){
       double f, err, r, fpm, rp = 0,lnr, limit, dv;
       int cens;
       int oldNeq = op->neq;
-      ind->solved = -1;
+      iniSubjectI(op->neq, 1, ind, op, rx, rxInner.update_inis);
       for (j = 0; j < ind->n_all_times; ++j){
 	ind->idx=j;
 	if (isDose(ind->evid[j])){
-	  ind->tlast = ind->all_times[j];
+	  // ind->tlast = ind->all_times[j];
 	  // Need to calculate for advan sensitivities
 	  rxInner.calc_lhs((int)id, ind->all_times[j], getSolve(j), ind->lhs);
 	} else if (ind->evid[j] == 0) {
