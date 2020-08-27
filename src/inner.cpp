@@ -50,10 +50,12 @@ using namespace Rcpp;
 using namespace arma;
 extern "C"{
   void RSprintf(const char *format, ...);
-  typedef void (*S2_fp) (int *, int *, double *, double *, double *, int *, float *, double *);
-  typedef void (*n1qn1_fp)(S2_fp simul, int n[], double x[], double f[], double g[], double var[], double eps[],
-			   int mode[], int niter[], int nsim[], int imp[], int lp[], double zm[], int izs[],
-			   float rzs[], double dzs[]);
+  typedef void (*S2_fp) (int *, int *, double *, double *, double *, int *, float *,
+			 double *, int *);
+  typedef void (*n1qn1_fp)(S2_fp simul, int n[], double x[], double f[], double g[],
+			   double var[], double eps[], int mode[], int niter[], int nsim[],
+			   int imp[], double zm[], int izs[], float rzs[], double dzs[],
+			   int id[]);
 
   n1qn1_fp n1qn1_;
 
@@ -666,6 +668,7 @@ static inline void likM2(focei_ind *fInd, double& limit, double&f, double &r) {
     fInd->llik += -log(1-0.5*(1+erf(((limit<f)*2-1)*(limit-f)/sqrt(r)/M_SQRT2)));    
   }
 }
+
 static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, double& dv, double &r) {
   fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
   if (R_FINITE(limit)){
@@ -673,24 +676,21 @@ static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, 
   }
 }
 
-double likInner0(double *eta){
-  // id = eta[#neta]
-  // eta = eta
+double likInner0(double *eta, int id){
   rx = getRx();
-  unsigned int id = (unsigned int)(eta[op_focei.neta]);
   rx_solving_options_ind *ind = &(rx->subjects[id]);
   rx_solving_options *op = rx->op;
   focei_ind *fInd = &(inds_focei[id]);
   int i, j;
   bool recalc = false;
   if (!fInd->setup){
-    recalc=true;
+    recalc = true;
     fInd->setup = 1;
   } else {
     // Check to see if old ETA matches.
     for (j = op_focei.neta; j--;){
       if (fInd->oldEta[j] != eta[j]){
-	recalc=true;
+	recalc = true;
 	break;
       }
     }
@@ -753,12 +753,12 @@ double likInner0(double *eta){
       iniSubjectI(op->neq, 1, ind, op, rx, rxInner.update_inis);
       for (j = 0; j < ind->n_all_times; ++j){
 	ind->idx=j;
-	if (isDose(ind->evid[j])){
+	if (isDose(ind->evid[j])) {
 	  // ind->tlast = ind->all_times[j];
 	  // Need to calculate for advan sensitivities
-	  rxInner.calc_lhs((int)id, ind->all_times[j], getSolve(j), ind->lhs);
+	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
 	} else if (ind->evid[j] == 0) {
-	  rxInner.calc_lhs((int)id, ind->all_times[j], getSolve(j), ind->lhs);
+	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
 	  if (ISNA(f))
 	    throw std::runtime_error("bad solve");
@@ -781,22 +781,22 @@ double likInner0(double *eta){
 	  if (ISNA(ind->lhs[op_focei.neta + 1]))
 	    throw std::runtime_error("bad solve");
 	  r = _safe_zero(ind->lhs[op_focei.neta + 1]);
-	  if (op_focei.fo){
+	  if (op_focei.fo) {
 	    // FO
 	    B(k, 0) = err; // res
 	    Vid(k, k) = r;
-	    for (i = op_focei.neta; i--; ){
+	    for (i = op_focei.neta; i--; ) {
 	      if (op_focei.etaFD[i]==0){
 		a(k, i) = ind->lhs[i+1];
 	      }
 	    }
 	    op->neq = op_focei.predNeq;
-	    for (i = op_focei.neta; i--; ){
+	    for (i = op_focei.neta; i--; ) {
 	      if (op_focei.etaFD[i]==1){
 		// Calculate derivatives by finite difference
 		ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		predOde(id); // Assumes same order of parameters
-		rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				ind->lhs);
 		ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		if (!op_focei.eventCentral) {
@@ -808,7 +808,7 @@ double likInner0(double *eta){
 		  fpm = ind->lhs[0];
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		  rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				  ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
@@ -828,7 +828,7 @@ double likInner0(double *eta){
 	    B(k, 0) = 2.0/_safe_zero(r);
 	    if (op_focei.interaction == 1) {
 	      for (i = op_focei.neta; i--; ) {
-		if (op_focei.etaFD[i]==0){
+		if (op_focei.etaFD[i]==0) {
 		  fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
 		  rp  = ind->lhs[i + op_focei.neta + 2];
 		  c(k, i) = rp/_safe_zero(r);
@@ -843,7 +843,7 @@ double likInner0(double *eta){
 		  // Calculate derivatives by finite difference
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		  rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  if (!op_focei.eventCentral) {
@@ -860,7 +860,7 @@ double likInner0(double *eta){
 		    // LHS #1 =  r
 		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		    rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				    ind->lhs); // nlhs is smaller
 		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
 		    rp = (rp-ind->lhs[1])/(2*op_focei.eventFD);
@@ -940,7 +940,7 @@ double likInner0(double *eta){
 		if (op_focei.etaFD[i]==1){
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		  rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  if (!op_focei.eventCentral) {
@@ -951,7 +951,7 @@ double likInner0(double *eta){
 		    fpm = f;
 		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs((int)id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		    rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				ind->lhs);
 		    fpm = a(k, i) = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
@@ -1055,10 +1055,9 @@ double likInner0(double *eta){
   return fInd->llik;
 }
 
-double *lpInner(double *eta, double *g){
-  unsigned int id = (unsigned int)(eta[op_focei.neta]);
+double *lpInner(double *eta, double *g, int id){
   focei_ind *fInd = &(inds_focei[id]);
-  likInner0(eta);
+  likInner0(eta, id);
   std::copy(&fInd->lp[0], &fInd->lp[0] + op_focei.neta,
 	    &g[0]);
   return &g[0];
@@ -1066,21 +1065,21 @@ double *lpInner(double *eta, double *g){
 
 //[[Rcpp::export]]
 NumericVector foceiInnerLp(NumericVector eta, int id = 1){
-  double *etad = new double[eta.size()+1];
+  double *etad = new double[eta.size()];
   std::copy(eta.begin(),eta.end(),&etad[0]);
-  etad[eta.size()]=(double)(id-1);
   NumericVector lp(eta.size());
-  lpInner(etad,&lp[0]);
+  int curId = id - 1;
+  lpInner(etad,&lp[0], curId);
   delete[] etad;
   return lp;
 }
 
 //[[Rcpp::export]]
 double likInner(NumericVector eta, int id = 1){
-  double *etad = new double[eta.size()+1];
+  double *etad = new double[eta.size()];
   std::copy(eta.begin(),eta.end(),&etad[0]);
-  etad[eta.size()]=(double)(id-1);
-  double llik = likInner0(etad);
+  int curId = id - 1;
+  double llik = likInner0(etad, curId);
   delete[] etad;
   return llik;
 }
@@ -1255,8 +1254,7 @@ NumericMatrix cholSE_(NumericMatrix A, double tol){
   return wrap(Ao);
 }
 
-double LikInner2(double *eta, int likId){
-  unsigned int id = (unsigned int)(eta[op_focei.neta]);
+double LikInner2(double *eta, int likId, int id){
   focei_ind *fInd = &(inds_focei[id]);
   // print(wrap(-likInner0(eta)));
   // print(wrap(op_focei.logDetOmegaInv5));
@@ -1265,7 +1263,7 @@ double LikInner2(double *eta, int likId){
     // Already almost completely calculated.
     lik = fInd->llik;
   } else {
-    lik = -likInner0(eta) + op_focei.logDetOmegaInv5;
+    lik = -likInner0(eta, id) + op_focei.logDetOmegaInv5;
     // print(wrap(lik));
     rx = getRx();
     rx_solving_options_ind *ind = &(rx->subjects[id]);
@@ -1332,44 +1330,42 @@ double LikInner2(double *eta, int likId){
 }
 
 // Scli-lab style cost function for inner
-void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float *tr, double *td){
-  int id = (int)(x[op_focei.neta]);
+void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float *tr, double *td, int *id){
   rx = getRx();
-  if (id < 0 || id >= rx->nsub){
+  if (*id < 0 || *id >= rx->nsub){
     // Stops from accessing bad memory, but it doesn't fix any
     // problems here.  Rather, this allows the error without a R
     // session crash.
-    stop("Unexpected id for solving (id=%d and should be between 0 and %d)", id, rx->nsub);
+    stop("Unexpected id for solving (id=%d and should be between 0 and %d)", *id, rx->nsub);
   }
-  focei_ind *fInd = &(inds_focei[id]);
+  focei_ind *fInd = &(inds_focei[*id]);
 
   if (*ind==2 || *ind==4) {
     // Function
     // Make sure ID remains installed
-    *f = likInner0(x);
+    *f = likInner0(x, *id);
     fInd->nInnerF++;
     // if (op_focei.printInner != 0 && fInd->nInnerF % op_focei.printInner == 0){
-    //   for (int i = 0; i < *n; i++) RSprintf(" %#10g", x[i]);
-    //   RSprintf(" (nG: %d)\n", fInd->nInnerG);
+    // RSprintf("%03d: ", *id);
+    // for (int i = 0; i < *n; i++) RSprintf(" %#10g", x[i]);
+    // RSprintf(" (nG: %d)\n", fInd->nInnerG);
     // }
   }
   if (*ind==3 || *ind==4) {
     // Gradient
-    lpInner(x, g);
-    g[op_focei.neta] = 0; // Id shouldn't change.
+    lpInner(x, g, *id);
     fInd->nInnerG++;
   }
-  x[op_focei.neta] = (double)(id);
 }
 
 static inline void innerEval(int id){
   focei_ind *fInd = &(inds_focei[id]);
   // Use eta
-  likInner0(fInd->eta);
-  LikInner2(fInd->eta, 0);
+  likInner0(fInd->eta, id);
+  LikInner2(fInd->eta, 0, id);
 }
 
-static inline void innerOpt1(int id, int likId){
+static inline void innerOpt1(int id, int likId) {
   focei_ind *fInd = &(inds_focei[id]);
   focei_options *fop = &op_focei;
   fInd->nInnerF=0;
@@ -1423,78 +1419,106 @@ static inline void innerOpt1(int id, int likId){
     }
   }
   updateZm(fInd);
-  int lp = 6;
 
   std::fill_n(&fInd->var[0], fop->neta, 0.1);
-  fInd->var[fop->neta] = 0; // No change; ID.
 
   int npar = fop->neta+1;
 
-  std::copy(&fInd->eta[0], &fInd->eta[0]+fop->neta+1,fInd->x);
-  double f, epsilon = fop->epsilon;
+  std::copy(&fInd->eta[0], &fInd->eta[0]+fop->neta, fInd->x);
+  double f, epsilon = max2(fop->epsilon, sqrt(DOUBLE_EPS));
 
   // Since these are pointers, without reassignment they are modified.
   int mode = fInd->mode, maxInnerIterations=fop->maxInnerIterations,
     nsim=fop->nsim, imp=fop->imp;
   int izs; float rzs; double dzs;
 
-  fInd->x[fop->neta] = id;
+  int nF = fInd->nInnerF;
   n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 	 fInd->var, &epsilon,
 	 &mode, &maxInnerIterations, &nsim,
-	 &imp, &lp,
-	 fInd->zm,
-	 &izs, &rzs, &dzs);
+	 &imp, fInd->zm,
+	 &izs, &rzs, &dzs, &id);
+  nF = fInd->nInnerF-nF;
+  // REprintf("innerCost id: %d, fInd->nInnerF: %d", id, fInd->nInnerF);
   // If stays at zero try another point?
   if (fInd->doEtaNudge == 1 && op_focei.etaNudge != 0.0){
+    bool tryAgain=false;
+    if (nF <= 3) tryAgain = true;
     op_focei.didEtaNudge =1;
-    bool tryAgain=true;
-    for (int i = fop->neta; i--;){
-      if (fInd->x[i] != 0){
-	tryAgain=false;
-	break;
+    if (!tryAgain){
+      tryAgain = true;
+      for (int i = fop->neta; i--;){
+	if (fInd->x[i] != 0.0){
+	  tryAgain=false;
+	  break;
+	}
       }
     }
     if (tryAgain){
       fInd->mode = 1;
       fInd->uzm = 1;
       op_focei.didHessianReset=1;
-      std::fill_n(fInd->x, fop->neta, 0.01);
-      fInd->x[fop->neta] = id;
+      std::fill_n(fInd->x, fop->neta, op_focei.etaNudge);
+      nF = fInd->nInnerF;
       n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 	     fInd->var, &epsilon,
 	     &mode, &maxInnerIterations, &nsim,
-	     &imp, &lp,
-	     fInd->zm,
-	     &izs, &rzs, &dzs);
-      for (int i = fop->neta; i--;){
-	if (fInd->x[i] != 0.01){
-	  tryAgain=false;
-	  break;
+	     &imp, fInd->zm,
+	     &izs, &rzs, &dzs, &id);
+      nF = fInd->nInnerF - nF;
+      if (nF > 3) tryAgain = false;
+      if (!tryAgain){
+	tryAgain = true;
+	for (int i = fop->neta; i--;){
+	  if (fInd->x[i] != op_focei.etaNudge){
+	    tryAgain=false;
+	    break;
+	  }
 	}
       }
       if (tryAgain){
 	fInd->mode = 1;
 	fInd->uzm = 1;
 	op_focei.didHessianReset=1;
-	std::fill_n(fInd->x, fop->neta, -0.01);
-	fInd->x[fop->neta] = id;
+	std::fill_n(fInd->x, fop->neta, -op_focei.etaNudge);
+	nF = fInd->nInnerF;
 	n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 	       fInd->var, &epsilon,
 	       &mode, &maxInnerIterations, &nsim,
-	       &imp, &lp,
-	       fInd->zm,
-	       &izs, &rzs, &dzs);
-	for (int i = fop->neta; i--;){
-	  if (fInd->x[i] != 0.01){
-	    tryAgain=false;
-	    break;
+	       &imp, fInd->zm, &izs, &rzs, &dzs, &id);
+	nF = fInd->nInnerF - nF;
+	if (nF > 3) tryAgain = false;
+	if (!tryAgain){
+	  tryAgain = true;
+	  for (int i = fop->neta; i--;){
+	    if (fInd->x[i] != -op_focei.etaNudge){
+	      tryAgain=false;
+	      break;
+	    }
 	  }
 	}
 	if (tryAgain){
 	  std::fill_n(fInd->x, fop->neta, 0);
-	  fInd->doEtaNudge=0;
-	  tryAgain=false;
+	  std::fill_n(&fInd->var[0], fop->neta, 0.2);
+	  nF = fInd->nInnerF;
+	  n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
+		 fInd->var, &epsilon,
+		 &mode, &maxInnerIterations, &nsim,
+		 &imp, fInd->zm,
+		 &izs, &rzs, &dzs, &id);
+	  std::fill_n(&fInd->var[0], fop->neta, 0.1);
+	  nF = fInd->nInnerF-nF;
+	  if (nF > 3) tryAgain = false;
+	  if (!tryAgain){
+	    tryAgain = true;
+	    for (int i = fop->neta; i--;){
+	      if (fInd->x[i] != -op_focei.etaNudge){
+		tryAgain=false;
+		break;
+	      }
+	    }
+	    std::fill_n(fInd->x, fop->neta, 0);
+	  }
 	}
       }
     }
@@ -1513,7 +1537,7 @@ static inline void innerOpt1(int id, int likId){
   // Use saved Hessian on next opimization.
   fInd->mode=2;
   fInd->uzm =0;
-  LikInner2(fInd->eta, likId);
+  LikInner2(fInd->eta, likId, id);
 }
 
 void thetaReset(double size){
@@ -2551,7 +2575,7 @@ NumericVector foceiSetup_(const RObject &obj,
   List odeO = as<List>(control);
   // This fills in op_focei.neta
   List mvi;
-  if (!RxODE::rxIs(obj, "NULL")){
+  if (!Rf_isNull(obj)){
     if (!RxODE::rxDynLoad(obj)){
       stop("Cannot load RxODE dlls for this model.");
     }
@@ -2589,10 +2613,10 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.nfixed = as<int>(odeO["nfixed"]);
   if (op_focei.maxOuterIterations <= 0){
     // No scaling.
-    foceiSetupTheta_(mvi, theta, thetaFixed, 0.0, !RxODE::rxIs(obj, "NULL"));
+    foceiSetupTheta_(mvi, theta, thetaFixed, 0.0, !Rf_isNull(obj));
     op_focei.scaleObjective=0;
   } else {
-    foceiSetupTheta_(mvi, theta, thetaFixed, as<double>(odeO["scaleTo"]), !RxODE::rxIs(obj, "NULL"));
+    foceiSetupTheta_(mvi, theta, thetaFixed, as<double>(odeO["scaleTo"]), !Rf_isNull(obj));
     op_focei.scaleObjectiveTo=as<double>(odeO["scaleObjective"]);
     if (op_focei.scaleObjectiveTo <= 0){
       op_focei.scaleObjective=0;
@@ -2654,7 +2678,7 @@ NumericVector foceiSetup_(const RObject &obj,
   CharacterVector dims;
   if (hasDimn){
     List diml = etaMat0.attr("dimnames");
-    if (!RxODE::rxIs(as<RObject>(diml[1]),"NULL")){
+    if (!Rf_isNull(as<RObject>(diml[1]))){
       dims = as<CharacterVector>(diml[1]);
     } else {
       hasDimn=false;
@@ -2672,7 +2696,7 @@ NumericVector foceiSetup_(const RObject &obj,
   params.attr("class") = "data.frame";
   params.attr("row.names") = IntegerVector::create(NA_INTEGER,-nsub);
   // Now pre-fill parameters.
-  if (!RxODE::rxIs(obj, "NULL")){
+  if (!Rf_isNull(obj)) {
     RxODE::rxSolve_(obj, odeO["rxControl"],
 		    R_NilValue,//const Nullable<CharacterVector> &specParams =
 		    R_NilValue,//const Nullable<List> &extraArgs =
@@ -5293,7 +5317,7 @@ void foceiFinalizeTables(Environment e){
 //[[Rcpp::export]]
 Environment foceiFitCpp_(Environment e){
   if (!assignFn_){
-    n1qn1_ = (n1qn1_fp) R_GetCCallable("n1qn1","n1qn1F");
+    n1qn1_ = (n1qn1_fp) R_GetCCallable("n1qn1","n1qn1_");
     par_progress = (par_progress_t) R_GetCCallable("RxODE", "par_progress");
     getRx = (getRxSolve_t) R_GetCCallable("RxODE", "getRxSolve_");
     isRstudio = (isRstudio_t) R_GetCCallable("RxODE", "isRstudio");
