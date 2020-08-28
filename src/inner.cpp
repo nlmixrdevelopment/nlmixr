@@ -1,9 +1,9 @@
 // [[Rcpp::plugins(openmp)]]
 #define ARMA_DONT_PRINT_ERRORS
 #define ARMA_DONT_USE_OPENMP // Known to cause speed problems
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+// #ifdef _OPENMP
+// #include <omp.h>
+// #endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -1616,17 +1616,17 @@ void thetaReset(double size){
 }
 
 void innerOpt(){
-#ifdef _OPENMP
-  int cores = rx->op->cores;
-#endif
+// #ifdef _OPENMP
+//   int cores = rx->op->cores;
+// #endif
   rx = getRx();
   op_focei.omegaInv=getOmegaInv();
   op_focei.logDetOmegaInv5 = getOmegaDet();
   if (op_focei.maxInnerIterations <= 0){
     std::fill_n(&op_focei.goldEta[0], op_focei.gEtaGTransN, -42.0); // All etas = -42;  Unlikely if normal
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(cores)
-#endif
+// #ifdef _OPENMP
+// #pragma omp parallel for num_threads(cores)
+// #endif
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
       indF->doChol = 1;
@@ -1641,9 +1641,9 @@ void innerOpt(){
       }
     }
   } else {
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(cores)
-#endif
+// #ifdef _OPENMP
+// #pragma omp parallel for num_threads(cores)
+// #endif
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
       try {
