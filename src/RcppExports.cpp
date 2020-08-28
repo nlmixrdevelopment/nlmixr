@@ -428,6 +428,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrResid0
+List nlmixrResid0(DataFrame& cipred, NumericVector& cdv, IntegerVector& evid, NumericVector& lambda, NumericVector& yj, IntegerVector& cens, NumericVector& limit);
+RcppExport SEXP _nlmixr_nlmixrResid0(SEXP cipredSEXP, SEXP cdvSEXP, SEXP evidSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP censSEXP, SEXP limitSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DataFrame& >::type cipred(cipredSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type cdv(cdvSEXP);
+    Rcpp::traits::input_parameter< IntegerVector& >::type evid(evidSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type yj(yjSEXP);
+    Rcpp::traits::input_parameter< IntegerVector& >::type cens(censSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type limit(limitSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrResid0(cipred, cdv, evid, lambda, yj, cens, limit));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nlmixrResid
 List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& cdv, IntegerVector& evid, NumericVector& lambda, NumericVector& yj, IntegerVector& cens, NumericVector& limit, DataFrame etasDf, List etaLst);
 RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP cdvSEXP, SEXP evidSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP censSEXP, SEXP limitSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {

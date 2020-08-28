@@ -161,6 +161,10 @@ nlmixrShrink <- function(omegaMat, etasDf, etaLst) {
     .Call(`_nlmixr_nlmixrShrink`, omegaMat, etasDf, etaLst)
 }
 
+nlmixrResid0 <- function(cipred, cdv, evid, lambda, yj, cens, limit) {
+    .Call(`_nlmixr_nlmixrResid0`, cipred, cdv, evid, lambda, yj, cens, limit)
+}
+
 nlmixrResid <- function(innerList, omegaMat, cdv, evid, lambda, yj, cens, limit, etasDf, etaLst) {
     .Call(`_nlmixr_nlmixrResid`, innerList, omegaMat, cdv, evid, lambda, yj, cens, limit, etasDf, etaLst)
 }

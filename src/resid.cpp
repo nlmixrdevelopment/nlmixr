@@ -121,6 +121,136 @@ static inline double truncnorm(double mean, double sd, double low, double hi){
   return REAL(ret)[0];
 }
 
+//[[Rcpp::export]]
+List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
+		  NumericVector &lambda, NumericVector &yj, IntegerVector &cens, NumericVector &limit) {
+  NumericVector dv = clone(cdv);
+  DataFrame ipred = clone(cipred);
+  IntegerVector ID= as<IntegerVector>(ipred[0]);
+  NumericVector TIME= as<NumericVector>(ipred[1]);
+  // ipred.erase(0,2);
+  NumericVector iprednv = as<NumericVector>(ipred[3]);
+  NumericVector iprednvI(iprednv.size());
+  NumericVector lowerLim(iprednv.size());
+  NumericVector upperLim(iprednv.size());
+  bool interestingLim=false;
+  // ipred.erase(0);
+  NumericVector ri = ipred[4];
+  // ipred.erase(0);
+  ipred.erase(0,5);
+  NumericVector dvTBS(dv.size());
+  for (int i = dv.size(); i--;){
+    iprednvI[i]= powerDi(iprednv[i], lambda[i], (int)yj[i]);
+    switch (cens[i]){
+    case 1:
+      // (limit, dv) ; limit could be -inf
+      if (R_FINITE(limit[i])){
+	double lim0TBS = powerD(limit[i], lambda[i], (int)yj[i]);
+	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double sd = sqrt(ri[i]);
+	interestingLim=true;
+	lowerLim[i] = limit[i];
+	upperLim[i] = dv[i];
+	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
+	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+      } else {
+	// (-Inf, dv)
+	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double sd = sqrt(ri[i]);
+	interestingLim=true;
+	lowerLim[i] = R_NegInf;
+	upperLim[i] = dv[i];
+	dvTBS[i] = truncnorm(iprednv[i], sd, R_NegInf, lim1TBS);
+	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+      }
+      break;
+    case -1:
+      // (dv, limit); limit could be +inf
+      if (R_FINITE(limit[i])){
+	//(dv, limit)
+	double lim1TBS = powerD(limit[i], lambda[i], (int)yj[i]);
+	double lim0TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double sd = sqrt(ri[i]);
+	interestingLim=true;
+	lowerLim[i] = dv[i];
+	upperLim[i] = limit[i];
+	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
+	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+      } else {
+	// (dv, Inf)
+	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double sd = sqrt(ri[i]);
+	interestingLim=true;
+	lowerLim[i] = dv[i];
+	upperLim[i] = R_PosInf;
+	dvTBS[i] = truncnorm(iprednv[i], sd, lim1TBS, R_PosInf);
+	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+      }
+      break;
+    case 0:
+      lowerLim[i] = NA_REAL;
+      upperLim[i] = NA_REAL;
+      dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
+      break;
+    }
+  }
+  int warn1 = 0;
+  int warn2 = 0;
+  for (unsigned int j = ri.size(); j--;){
+    if (ri[j] < DOUBLE_EPS){
+      warn1 = 1;
+      ri[j] = 1;
+    }
+    if (ISNAN(ri[j])){
+      warn2 = 1;
+      ri[j] = 1;
+    }
+  }
+  arma::vec riv = as<arma::vec>(ri);
+  NumericVector iwres=(dvTBS-iprednv)/sqrt(ri);
+  NumericVector ires = dv-iprednvI;
+  int ncol = 6;
+  if (interestingLim) ncol+=2;
+  ncol += ipred.size()-2;
+  List res(ncol);
+  CharacterVector resN(ncol);
+  int curCol=6;
+  res[0] = ID;
+  resN[0] = "ID";
+  res[1] = TIME;
+  resN[1] = "TIME";
+  res[2] = evid;
+  resN[2] = "EVID";
+  res[3] = iprednvI;
+  resN[3] = "IPRED";
+  res[4] = ires;
+  resN[4] = "IRES";
+  res[5] = iwres;
+  resN[5] = "IWRES";
+  if (interestingLim){
+    res[6] = lowerLim;
+    resN[6] = "lowerLim";
+    res[7] = upperLim;
+    resN[7] = "upperLim";
+    curCol=8;
+  }
+  CharacterVector iname = ipred.names();
+  for (int i = 0; i < ipred.size()-2; i++){
+    res[curCol] = ipred[i];
+    resN[curCol++] = iname[i];
+  }
+  res.names() = resN;
+  res.attr("row.names") = cipred.attr("row.names");
+  res.attr("class") = CharacterVector::create("data.frame");
+  if (warn1){
+    warning("some variances were zero, replaced with 1");
+  }
+  if (warn2){
+    warning("some variances were NA/NaN, replaced with 1");
+  }
+  return res;
+}
+
 // [[Rcpp::export]]
 List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
 		 IntegerVector &evid, NumericVector &lambda, NumericVector &yj,
@@ -130,7 +260,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
   bool doCwres = (innerList.size() == 2);
   DataFrame pred = as<DataFrame>(innerList["pred"]);
   IntegerVector ID= as<IntegerVector>(pred[0]);
-  IntegerVector TIME= as<IntegerVector>(pred[1]);
+  NumericVector TIME= as<NumericVector>(pred[1]);
   pred.erase(0,2);
   NumericVector prednv = as<NumericVector>(pred[0]);
   NumericVector prednvI(prednv.size());

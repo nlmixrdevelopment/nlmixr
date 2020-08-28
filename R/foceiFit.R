@@ -1737,6 +1737,7 @@ foceiFit.data.frame0 <- function(data,
   }
   .covNames <- .parNames <- c()
   .ret$adjLik <- control$adjLik
+  .mixed <- !is.null(inits$OMGA) && length(inits$OMGA) > 0
   if (!exists("noLik", envir = .ret)) {
     .atol <- rep(control$atol, length(RxODE::rxModelVars(model)$state))
     .rtol <- rep(control$rtol, length(RxODE::rxModelVars(model)$state))
@@ -1747,8 +1748,8 @@ foceiFit.data.frame0 <- function(data,
       pred.minus.dv = TRUE, sum.prod = control$sumProd,
       theta.derivs = FALSE, optExpression = control$optExpression,
       interaction = (control$interaction == 1L),
-      run.internal = TRUE
-    )
+      only.numeric=!.mixed,
+      run.internal = TRUE)
     if (!is.null(.ret$model$inner)) {
       .atol <- c(.atol, rep(
         control$atolSens,
@@ -1943,40 +1944,48 @@ foceiFit.data.frame0 <- function(data,
   .w <- which(!(names(.ret$dataSav) %in% .covNames))
   names(.ret$dataSav)[.w] <- tolower(names(.ret$dataSav[.w])) # needed in ev
 
-  .lh <- .parseOM(inits$OMGA)
-  .nlh <- sapply(.lh, length)
-  .osplt <- rep(1:length(.lh), .nlh)
-  .lini <- list(inits$THTA, unlist(.lh))
-  .nlini <- sapply(.lini, length)
-  .nsplt <- rep(1:length(.lini), .nlini)
+  if (.mixed) {
+    .lh <- .parseOM(inits$OMGA)
+    .nlh <- sapply(.lh, length)
+    .osplt <- rep(1:length(.lh), .nlh)
+    .lini <- list(inits$THTA, unlist(.lh))
+    .nlini <- sapply(.lini, length)
+    .nsplt <- rep(1:length(.lini), .nlini)
 
-  .om0 <- .genOM(.lh)
-  if (length(etaNames) == dim(.om0)[1]) {
-    .ret$etaNames <- .ret$etaNames
+    .om0 <- .genOM(.lh)
+    if (length(etaNames) == dim(.om0)[1]) {
+      .ret$etaNames <- .ret$etaNames
+    } else {
+      .ret$etaNames <- sprintf("ETA[%d]", seq(1, dim(.om0)[1]))
+    }
+    .ret$rxInv <- RxODE::rxSymInvCholCreate(mat = .om0, diag.xform = control$diagXform)
+    .ret$xType <- .ret$rxInv$xType
+    .om0a <- .om0
+    .om0a <- .om0a / control$diagOmegaBoundLower
+    .om0b <- .om0
+    .om0b <- .om0b * control$diagOmegaBoundUpper
+    .om0a <- RxODE::rxSymInvCholCreate(mat = .om0a, diag.xform = control$diagXform)
+    .om0b <- RxODE::rxSymInvCholCreate(mat = .om0b, diag.xform = control$diagXform)
+    .omdf <- data.frame(a = .om0a$theta, m = .ret$rxInv$theta, b = .om0b$theta, diag = .om0a$theta.diag)
+    .omdf$lower <- with(.omdf, ifelse(a > b, b, a))
+    .omdf$lower <- with(.omdf, ifelse(lower == m, -Inf, lower))
+    .omdf$lower <- with(.omdf, ifelse(!diag, -Inf, lower))
+    .omdf$upper <- with(.omdf, ifelse(a < b, b, a))
+    .omdf$upper <- with(.omdf, ifelse(upper == m, Inf, upper))
+    .omdf$upper <- with(.omdf, ifelse(!diag, Inf, upper))
+    .ret$control$nomega <- length(.omdf$lower)
+    .ret$control$neta <- sum(.omdf$diag)
+    .ret$control$ntheta <- length(lower)
+    .ret$control$nfixed <- sum(fixed)
+    lower <- c(lower, .omdf$lower)
+    upper <- c(upper, .omdf$upper)
   } else {
-    .ret$etaNames <- sprintf("ETA[%d]", seq(1, dim(.om0)[1]))
+    .ret$control$nomega <- 0
+    .ret$control$neta <- 0
+    .ret$xType <- -1
+    .ret$control$ntheta <- length(lower)
+    .ret$control$nfixed <- sum(fixed)
   }
-  .ret$rxInv <- RxODE::rxSymInvCholCreate(mat = .om0, diag.xform = control$diagXform)
-  .ret$xType <- .ret$rxInv$xType
-  .om0a <- .om0
-  .om0a <- .om0a / control$diagOmegaBoundLower
-  .om0b <- .om0
-  .om0b <- .om0b * control$diagOmegaBoundUpper
-  .om0a <- RxODE::rxSymInvCholCreate(mat = .om0a, diag.xform = control$diagXform)
-  .om0b <- RxODE::rxSymInvCholCreate(mat = .om0b, diag.xform = control$diagXform)
-  .omdf <- data.frame(a = .om0a$theta, m = .ret$rxInv$theta, b = .om0b$theta, diag = .om0a$theta.diag)
-  .omdf$lower <- with(.omdf, ifelse(a > b, b, a))
-  .omdf$lower <- with(.omdf, ifelse(lower == m, -Inf, lower))
-  .omdf$lower <- with(.omdf, ifelse(!diag, -Inf, lower))
-  .omdf$upper <- with(.omdf, ifelse(a < b, b, a))
-  .omdf$upper <- with(.omdf, ifelse(upper == m, Inf, upper))
-  .omdf$upper <- with(.omdf, ifelse(!diag, Inf, upper))
-  .ret$control$ntheta <- length(lower)
-  .ret$control$nomega <- length(.omdf$lower)
-  .ret$control$neta <- sum(.omdf$diag)
-  .ret$control$nfixed <- sum(fixed)
-  lower <- c(lower, .omdf$lower)
-  upper <- c(upper, .omdf$upper)
 
   .ret$lower <- lower
   .ret$upper <- upper
@@ -2140,14 +2149,6 @@ foceiFit.data.frame0 <- function(data,
   }
   if (inherits(.ret0, "try-error")) stop("Could not fit data.")
   .ret <- .ret0
-  if (!control$calcTables) {
-    .etas <- .ret$ranef
-    .thetas <- .ret$fixef
-    .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
-    .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)])
-    .updateParFixed(.ret)
-    return(.ret)
-  }
   if (exists("parHistData", .ret)) {
     .tmp <- .ret$parHistData
     .tmp <- .tmp[.tmp$type == "Unscaled", names(.tmp) != "type"]
@@ -2156,6 +2157,19 @@ foceiFit.data.frame0 <- function(data,
     .ret$parHistStacked <- data.frame(stack(.tmp), iter = .iter)
     names(.ret$parHistStacked) <- c("val", "par", "iter")
     .ret$parHist <- data.frame(iter = .iter, .tmp)
+  }
+  if (!control$calcTables) {
+    if (.mixed) {
+      .etas <- .ret$ranef
+      .thetas <- .ret$fixef
+      .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
+      .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)])
+      .updateParFixed(.ret)
+      return(.ret)
+    } else {
+      .updateParFixed(.ret)
+      return(.ret)
+    }
   }
   .solve <- function(...) {
     .ret <- RxODE::rxSolve(..., warnIdSort = FALSE)
@@ -2203,122 +2217,168 @@ foceiFit.data.frame0 <- function(data,
     }
     return(.res)
   }
-  if (exists("noLik", envir = .ret)) {
-    if (.ret$noLik) {
+  if (!.mixed) {
+    .pt <- proc.time()
+    message("Calculating residuals/tables")
+    .updateParFixed(.ret)
+
+    .vars <- .ret$fixef
+    names(.vars) <- paste0("THETA[", seq_along(.vars), "]")
+    .ipred <- .solve(.ret$model$pred.only, .vars, .ret$dataSav,
+                     returnType = "data.frame.TBS",
+                     atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
+                     hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                     transitAbs = .ret$control$TransitAbs,
+                     maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                     method = .ret$control$method)
+    if (!is.null(.censName)) {
+      .cens <- data[, .censName]
+    } else {
+      .cens <- rep(0L, length(data$DV))
+    }
+    if (!is.null(.limitName)) {
+      .limit <- data[, .limitName]
+    } else {
+      .limit <- rep(-Inf, length(data$DV))
+    }
+    .df <- .Call(`_nlmixr_nlmixrResid0`, .ipred, data$DV, data$EVID, .ipred$rxLambda, .ipred$rxYj,
+                 .cens, .limit)
+    .ret$tableTime <- (proc.time() - .pt)["elapsed"]
+    .ret$time <- data.frame(.ret$time, table = .ret$tableTime)
+    .isDplyr <- requireNamespace("dplyr", quietly = TRUE)
+    if (!.isDplyr) {
+      .isDataTable <- requireNamespace("data.table", quietly = TRUE)
+      if (.isDataTable) {
+        .df <- data.table::data.table(.df)
+      }
+    } else {
+      .df <- tibble::as_tibble(.df)
+    }
+    .cls <- class(.df)
+    .cls <- c("nlmixrPop", "nlmixrFitData", "nlmixrFitCore", .cls)
+    class(.ret) <- "nlmixrFitCoreSilent"
+    attr(.cls, ".foceiEnv") <- .ret
+    class(.df) <- .cls
+    message("done")
+    return(.df)
+  } else {
+    if (exists("noLik", envir = .ret)) {
+      if (.ret$noLik) {
+        message("Calculating residuals/tables")
+        .pt <- proc.time()
+        .etas <- .ret$ranef
+        .thetas <- .ret$fixef
+        .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
+        .preds <- list(
+          ipred = .solve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,
+                         returnType = "data.frame.TBS",
+                         atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
+                         hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                         transitAbs = .ret$control$TransitAbs,
+                         maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                         method = .ret$control$method
+                         ),
+          pred = .solvePred(),
+          cwres = FALSE
+        )
+      } else {
+        .pt <- proc.time()
+        .etas <- .ret$ranef
+        .thetas <- .ret$fixef
+        .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
+        .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)])
+        .updateParFixed(.ret)
+        return(.ret)
+      }
+    } else {
+      if (exists("skipTable", envir = .ret)) {
+        .etas <- .ret$ranef
+        .thetas <- .ret$fixef
+        .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
+        .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)])
+        .updateParFixed(.ret)
+        if (.ret$skipTable) {
+          return(.ret)
+        }
+      }
       message("Calculating residuals/tables")
       .pt <- proc.time()
       .etas <- .ret$ranef
       .thetas <- .ret$fixef
       .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
       .preds <- list(
-        ipred = .solve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,
-          returnType = "data.frame.TBS",
-          atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
-          hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-          transitAbs = .ret$control$TransitAbs,
-          maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-          method = .ret$control$method
-        ),
-        pred = .solvePred(),
-        cwres = FALSE
+        ipred = .solve(.ret$model$inner, .pars$ipred, .ret$dataSav,
+                       returnType = "data.frame.TBS",
+                       atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
+                       hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+                       transitAbs = .ret$control$TransitAbs,
+                       maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                       method = .ret$control$method
+                       ),
+        pred = .solvePred()
       )
+    }
+    if (!is.null(.censName)) {
+      .cens <- data[, .censName]
     } else {
-      .pt <- proc.time()
-      .etas <- .ret$ranef
-      .thetas <- .ret$fixef
-      .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
-      .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)])
-      .updateParFixed(.ret)
-      return(.ret)
+      .cens <- rep(0L, length(data$DV))
     }
-  } else {
-    if (exists("skipTable", envir = .ret)) {
-      .etas <- .ret$ranef
-      .thetas <- .ret$fixef
-      .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
-      .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)])
-      .updateParFixed(.ret)
-      if (.ret$skipTable) {
-        return(.ret)
-      }
+    if (!is.null(.limitName)) {
+      .limit <- data[, .limitName]
+    } else {
+      .limit <- rep(-Inf, length(data$DV))
     }
-    message("Calculating residuals/tables")
-    .pt <- proc.time()
-    .etas <- .ret$ranef
-    .thetas <- .ret$fixef
-    .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
-    .preds <- list(
-      ipred = .solve(.ret$model$inner, .pars$ipred, .ret$dataSav,
-        returnType = "data.frame.TBS",
-        atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
-        hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-        transitAbs = .ret$control$TransitAbs,
-        maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-        method = .ret$control$method
-      ),
-      pred = .solvePred()
+    .lst <- .Call(
+      `_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, data$EVID, .preds$ipred$rxLambda, .preds$ipred$rxYj,
+      .cens, .limit, .etas, .pars$eta.lst
     )
-  }
-  if (!is.null(.censName)) {
-    .cens <- data[, .censName]
-  } else {
-    .cens <- rep(0L, length(data$DV))
-  }
-  if (!is.null(.limitName)) {
-    .limit <- data[, .limitName]
-  } else {
-    .limit <- rep(-Inf, length(data$DV))
-  }
-  .lst <- .Call(
-    `_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, data$EVID, .preds$ipred$rxLambda, .preds$ipred$rxYj,
-    .cens, .limit, .etas, .pars$eta.lst
-  )
-  if (is.null(.preds$cwres)) {
-    .df <- RxODE::rxSolve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,
-      returnType = "data.frame",
-      hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
-      maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-      method = .ret$control$method,
-      warnIdSort = FALSE
-    )[, -(1:4)]
-  } else {
-    .df <- .preds$ipred[, -c(1:4, length(names(.preds$ipred)) - 0:1), drop = FALSE]
-  }
-  .df <- .df[, !(names(.df) %in% c("nlmixr_pred", names(.etas), names(.thetas)))]
-  if (any(names(.df) %in% names(.lst[[1]]))) {
-    warning("Calculated residuals like IPRED are masked by nlmixr calculated values")
-    .df <- .df[, !(names(.df) %in% names(.lst[[1]]))]
-  }
-  if (any(names(.df) %in% names(.lst[[3]]))) {
-    .df <- .df[, !(names(.df) %in% names(.lst[[3]]))]
-  }
-  .lst[[5]] <- .df
-  .ret$shrink <- .lst[[2]]
-  .updateParFixed(.ret)
-  .df <- cbind(as.data.frame(data), .lst[[1]], .lst[[3]], .lst[[5]])
-  .df$DV <- .lst[[4]]
-  .ret$tableTime <- (proc.time() - .pt)["elapsed"]
-  .ret$time <- data.frame(.ret$time, table = .ret$tableTime)
-  .isDplyr <- requireNamespace("dplyr", quietly = TRUE)
-  if (!.isDplyr) {
-    .isDataTable <- requireNamespace("data.table", quietly = TRUE)
-    if (.isDataTable) {
-      .df <- data.table::data.table(.df)
+    if (is.null(.preds$cwres)) {
+      .df <- RxODE::rxSolve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,
+                            returnType = "data.frame",
+                            hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
+                            maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+                            method = .ret$control$method,
+                            warnIdSort = FALSE
+                            )[, -(1:4)]
+    } else {
+      .df <- .preds$ipred[, -c(1:4, length(names(.preds$ipred)) - 0:1), drop = FALSE]
     }
-  } else {
-    .df <- tibble::as_tibble(.df)
+    .df <- .df[, !(names(.df) %in% c("nlmixr_pred", names(.etas), names(.thetas)))]
+    if (any(names(.df) %in% names(.lst[[1]]))) {
+      warning("Calculated residuals like IPRED are masked by nlmixr calculated values")
+      .df <- .df[, !(names(.df) %in% names(.lst[[1]]))]
+    }
+    if (any(names(.df) %in% names(.lst[[3]]))) {
+      .df <- .df[, !(names(.df) %in% names(.lst[[3]]))]
+    }
+    .lst[[5]] <- .df
+    .ret$shrink <- .lst[[2]]
+    .updateParFixed(.ret)
+    .df <- cbind(as.data.frame(data), .lst[[1]], .lst[[3]], .lst[[5]])
+    .df$DV <- .lst[[4]]
+    .ret$tableTime <- (proc.time() - .pt)["elapsed"]
+    .ret$time <- data.frame(.ret$time, table = .ret$tableTime)
+    .isDplyr <- requireNamespace("dplyr", quietly = TRUE)
+    if (!.isDplyr) {
+      .isDataTable <- requireNamespace("data.table", quietly = TRUE)
+      if (.isDataTable) {
+        .df <- data.table::data.table(.df)
+      }
+    } else {
+      .df <- tibble::as_tibble(.df)
+    }
+    .cls <- class(.df)
+    if (control$interaction) {
+      .cls <- c(paste0("nlmixr", .ret$method, "i"), "nlmixrFitData", "nlmixrFitCore", .cls)
+    } else {
+      .cls <- c(paste0("nlmixr", .ret$method), "nlmixrFitData", "nlmixrFitCore", .cls)
+    }
+    class(.ret) <- "nlmixrFitCoreSilent"
+    attr(.cls, ".foceiEnv") <- .ret
+    class(.df) <- .cls
+    message("done.")
+    return(.df)
   }
-  .cls <- class(.df)
-  if (control$interaction) {
-    .cls <- c(paste0("nlmixr", .ret$method, "i"), "nlmixrFitData", "nlmixrFitCore", .cls)
-  } else {
-    .cls <- c(paste0("nlmixr", .ret$method), "nlmixrFitData", "nlmixrFitCore", .cls)
-  }
-  class(.ret) <- "nlmixrFitCoreSilent"
-  attr(.cls, ".foceiEnv") <- .ret
-  class(.df) <- .cls
-  message("done.")
-  return(.df)
 }
 
 ##' @export

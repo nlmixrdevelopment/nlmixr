@@ -258,11 +258,14 @@ print.nlmixrFitCore <- function(x, ...) {
       .pf <- gsub(rex::rex(capture(.regNum), "="), "\\1 ", .pf, perl = TRUE)
     }
     cat(paste(.pf, collapse = "\n"), "\n")
-    .mu <- dim(x$omega)[1] == length(x$mu.ref)
-    if (!.mu) {
-      .fmt3("BSV Covariance", .bound, "omega")
-      print(x$omega)
-      cat(paste0("\n  Not all variables are ", ifelse(use.utf(), "\u03bc", "mu"), "-referenced.\n  Can also see BSV Correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n"))
+    if (!is.null(x$omega)) {
+      .mu <- dim(x$omega)[1] == length(x$mu.ref)
+      if (!.mu) {
+        .fmt3("BSV Covariance", .bound, "omega")
+        print(x$omega)
+        cat(paste0("\n  Not all variables are ", ifelse(use.utf(), "\u03bc", "mu"), "-referenced.\n  Can also see BSV Correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n"))
+      }
+
     }
     ## Correlations
     cat(paste0(
@@ -284,36 +287,38 @@ print.nlmixrFitCore <- function(x, ...) {
       }
     }
     .tmp <- x$omega
-    diag(.tmp) <- 0
-    if (.mu & !.noEta) {
-      if (all(.tmp == 0)) {
-        cat("  No correlations in between subject variability (BSV) matrix\n")
-      } else {
-        cat("  Correlations in between subject variability (BSV) matrix:\n")
-        .getCorPrint(x$omegaR)
-      }
-      if (.boundChar * 2 + 70 < .width & !.noEta) {
-        cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"), "\n")
-      } else if (!.noEta) {
-        if (.boundChar + 43 < .width) {
-          cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"), "\n")
-          cat("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)", "\n")
+    if (!is.null(.tmp)) {
+      diag(.tmp) <- 0
+      if (.mu & !.noEta) {
+        if (all(.tmp == 0)) {
+          cat("  No correlations in between subject variability (BSV) matrix\n")
         } else {
-          cat(paste0("  Full BSV covariance (", crayon::bold$blue("$omega"), ")\n"))
-          cat("    or correlation (", crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n")
+          cat("  Correlations in between subject variability (BSV) matrix:\n")
+          .getCorPrint(x$omegaR)
+        }
+        if (.boundChar * 2 + 70 < .width & !.noEta) {
+          cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ") or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)"), "\n")
+        } else if (!.noEta) {
+          if (.boundChar + 43 < .width) {
+            cat(paste0("  Full BSV covariance (", crayon::yellow(.bound), crayon::bold$blue("$omega"), ")"), "\n")
+            cat("    or correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)", "\n")
+          } else {
+            cat(paste0("  Full BSV covariance (", crayon::bold$blue("$omega"), ")\n"))
+            cat("    or correlation (", crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n")
+          }
         }
       }
-    }
-    if (.boundChar + 74 < .width & !.noEta) {
-      cat(paste0(
-        "  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
-        crayon::yellow(.bound), crayon::bold$blue("$shrink")
-      ), "\n")
-    } else if (!.noEta) {
-      cat(paste0(
-        "  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
-        crayon::bold$blue("$shrink")
-      ), "\n")
+      if (.boundChar + 74 < .width & !.noEta) {
+        cat(paste0(
+          "  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+          crayon::yellow(.bound), crayon::bold$blue("$shrink")
+        ), "\n")
+      } else if (!.noEta) {
+        cat(paste0(
+          "  Distribution stats (mean/skewness/kurtosis/p-value) available in ",
+          crayon::bold$blue("$shrink")
+        ), "\n")
+      }
     }
 
     if (x$message != "") {
