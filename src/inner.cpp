@@ -703,7 +703,6 @@ double likInner0(double *eta, int id){
       op_focei.stickyRecalcN2=0;
     }
     ind->solved = -1;
-    iniSubjectI(op->neq, 0, ind, op, rx, rxInner.update_inis);
     // Solve ODE
     innerOde(id);
     j=0;
@@ -714,7 +713,6 @@ double likInner0(double *eta, int id){
       // Not thread safe
       RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
       ind->solved = -1;
-      iniSubjectI(op->neq, 0, ind, op, rx, rxInner.update_inis);
       innerOde(id);
       j++;
     }

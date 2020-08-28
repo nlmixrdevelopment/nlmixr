@@ -68,7 +68,6 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt){
   for (int _i = 0; _i < _N; ++_i) {
     ind = &(_rx->subjects[_i]);
     ind->solved = -1;
-    iniSubjectE(op->neq, 0, ind, op, _rx, saem_inis);
     // ind->par_ptr
     int k=0;
     for (int _j = 0; _j < nPar; _j++){
