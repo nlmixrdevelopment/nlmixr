@@ -129,13 +129,13 @@ List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
   IntegerVector ID= as<IntegerVector>(ipred[0]);
   NumericVector TIME= as<NumericVector>(ipred[1]);
   // ipred.erase(0,2);
-  NumericVector iprednv = as<NumericVector>(ipred[3]);
+  NumericVector iprednv = as<NumericVector>(ipred[2]);
   NumericVector iprednvI(iprednv.size());
   NumericVector lowerLim(iprednv.size());
   NumericVector upperLim(iprednv.size());
   bool interestingLim=false;
   // ipred.erase(0);
-  NumericVector ri = ipred[4];
+  NumericVector ri = ipred[3];
   // ipred.erase(0);
   ipred.erase(0,5);
   NumericVector dvTBS(dv.size());
@@ -209,30 +209,33 @@ List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
   arma::vec riv = as<arma::vec>(ri);
   NumericVector iwres=(dvTBS-iprednv)/sqrt(ri);
   NumericVector ires = dv-iprednvI;
-  int ncol = 6;
+  int ncol = 7;
   if (interestingLim) ncol+=2;
   ncol += ipred.size()-2;
   List res(ncol);
   CharacterVector resN(ncol);
-  int curCol=6;
+  int curCol = 7;
   res[0] = ID;
   resN[0] = "ID";
   res[1] = TIME;
   resN[1] = "TIME";
-  res[2] = evid;
-  resN[2] = "EVID";
-  res[3] = iprednvI;
-  resN[3] = "IPRED";
-  res[4] = ires;
-  resN[4] = "IRES";
-  res[5] = iwres;
-  resN[5] = "IWRES";
+  res[2] = cdv;
+  resN[2] = "DV";
+  res[3] = evid;
+  resN[3] = "EVID";
+  res[4] = iprednvI;
+  resN[4] = "IPRED";
+  res[5] = ires;
+  resN[5] = "IRES";
+  res[6] = iwres;
+  resN[6] = "IWRES";
+  
   if (interestingLim){
-    res[6] = lowerLim;
-    resN[6] = "lowerLim";
-    res[7] = upperLim;
-    resN[7] = "upperLim";
-    curCol=8;
+    res[7] = lowerLim;
+    resN[7] = "lowerLim";
+    res[8] = upperLim;
+    resN[8] = "upperLim";
+    curCol=9;
   }
   CharacterVector iname = ipred.names();
   for (int i = 0; i < ipred.size()-2; i++){

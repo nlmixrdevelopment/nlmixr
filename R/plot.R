@@ -31,7 +31,7 @@
   .xgxr <- getOption("RxODE.xgxr", TRUE) &&
     requireNamespace("xgxr", quietly = TRUE)
   if (any(names(.dat0) == "CENS")){
-    .data <- data.frame(DV = .dat0$DV, CENS=.dat0$CENS, stack(.dat0[, vars]))
+    .data <- data.frame(DV = .dat0$DV, CENS=.dat0$CENS, stack(.dat0[, vars, drop = FALSE]))
     .aes <- ggplot2::aes(.data$values, .data$DV, color = .data$CENS)
     if (length(levels(.data$CENS)) == 3){
       .color <- ggplot2::scale_color_manual(values=c("blue", "black", "red"))
@@ -41,7 +41,7 @@
     .legendPos <- ggplot2::theme(legend.position="bottom",legend.box="horizontal",
                                  legend.title = ggplot2::element_blank())
   } else {
-    .data <- data.frame(DV = .dat0$DV, stack(.dat0[, vars]))
+    .data <- data.frame(DV = .dat0$DV, stack(.dat0[, vars, drop = FALSE]))
     .aes <- ggplot2::aes(.data$values, .data$DV)
     .color <- NULL
     .legendPos <- NULL
@@ -61,7 +61,6 @@
     ggplot2::facet_wrap(~ind) +
     ggplot2::geom_abline(slope = 1, intercept = 0, col = "red", size = 1.2) +
     .logx + .logy +
-    ## ggplot2::geom_smooth(col="blue", lty=2, formula=DV ~ values + 0, size=1.2) +
     ggplot2::geom_point(alpha=0.5) +
     xlab("Predictions") +
     RxODE::rxTheme() + .color + .legendPos
@@ -191,13 +190,26 @@ plot.nlmixrFitData <- function(x, ...) {
     .dat0 <- .dat[.dat$CMT == .cmt, ]
     .hasCwres <- any(names(.dat0) == "CWRES")
     .hasNpde <- any(names(.dat0) == "NPDE")
-    .p1 <- .dvPlot(.dat0, c("PRED", "IPRED")) +
-      ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
-    .lst[[length(.lst) + 1]] <- .p1
+    .hasPred <- any(names(.dat0) == "PRED")
+    .hasIpred <- any(names(.dat0) == "IPRED")
+    if (.hasPred){
+      .p1 <- .dvPlot(.dat0, c("PRED", "IPRED")) +
+        ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
+      .lst[[length(.lst) + 1]] <- .p1
 
-    .p1 <- .dvPlot(.dat0, c("PRED", "IPRED"), TRUE) +
+      .p1 <- .dvPlot(.dat0, c("PRED", "IPRED"), TRUE) +
       ggplot2::ggtitle(.cmt, "log-scale DV vs PRED/IPRED")
-    .lst[[length(.lst) + 1]] <- .p1
+      .lst[[length(.lst) + 1]] <- .p1
+    } else if (.hasIpred){
+      .p1 <- .dvPlot(.dat0, c("IPRED")) +
+        ggplot2::ggtitle(.cmt, "DV vs IPRED")
+      .lst[[length(.lst) + 1]] <- .p1
+
+      .p1 <- .dvPlot(.dat0, c("IPRED"), TRUE) +
+      ggplot2::ggtitle(.cmt, "log-scale DV vs IPRED")
+      .lst[[length(.lst) + 1]] <- .p1
+    }
+
 
     if (.hasCwres) {
       .p1 <- .dvPlot(.dat0, c("CPRED", "IPRED")) +
@@ -254,9 +266,11 @@ plot.nlmixrFitData <- function(x, ...) {
 
       .p3 <- ggplot2::ggplot(.d1, aes(x = TIME, y = DV)) +
         ggplot2::geom_point() +
-        ggplot2::geom_line(aes(x = TIME, y = IPRED), col = "red", size = 1.2) +
-        ggplot2::geom_line(aes(x = TIME, y = PRED), col = "blue", size = 1.2) +
-        ggplot2::facet_wrap(~ID) +
+        ggplot2::geom_line(aes(x = TIME, y = IPRED), col = "red", size = 1.2)
+      if (any(names(.d1) == "PRED")) {
+        .p3 <- .p3 + ggplot2::geom_line(aes(x = TIME, y = PRED), col = "blue", size = 1.2)
+      }
+      .p3 <- .p3 + ggplot2::facet_wrap(~ID) +
         ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s))) +
         RxODE::rxTheme()
       if (any(names(.d1) == "lowerLim")) {
