@@ -666,7 +666,6 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
         .tmp1$optimize <- .time$optimize
         .tmp1$covariance <- .time$covariance
         assign("time", .tmp1, envir = env)
-        env$objDf <- env$objDf[, c("OBJF", "AIC", "BIC", "Log-likelihood", "Condition Number")]
         setOfv(env, "fo")
       }
     }
