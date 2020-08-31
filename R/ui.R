@@ -2330,7 +2330,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   cur <- 1
   if (!all(is.na(saem.theta.trans))) {
     while (cur <= max(saem.theta.trans, na.rm = TRUE)) {
-      while (!any(saem.theta.trans[!is.na(saem.theta.trans)] == cur)) {
+      while (!any(saem.theta.trans[!is.na(abs(saem.theta.trans))] == cur)) {
         w <- which(saem.theta.trans > cur)
         saem.theta.trans[w] <- saem.theta.trans[w] - 1
       }
@@ -2784,7 +2784,7 @@ nlmixrUI.focei.inits <- function(obj) {
 nlmixrUI.saem.eta.trans <- function(obj) {
   eta.names <- obj$eta.names
   theta.names <- obj$theta.names
-  theta.trans <- obj$saem.theta.trans
+  theta.trans <- .saemThetaTrans(obj)
   mu.ref <- obj$mu.ref
   trans <- rep(NA, length(eta.names))
   for (i in seq_along(eta.names)) {
@@ -2807,7 +2807,7 @@ nlmixrUI.saem.eta.trans <- function(obj) {
 ##' @return SAEM model$omega spec
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.model.omega <- function(obj) {
-  dm <- sum(!is.na(obj$saem.theta.trans))
+  dm <- sum(!is.na(.saemThetaTrans(obj)))
   et <- obj$saem.eta.trans
   mat <- matrix(rep(0, dm * dm), dm)
   etd <- which(!is.na(obj$neta1))
@@ -2914,9 +2914,9 @@ nlmixrUI.saem.bres <- function(obj) {
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.log.eta <- function(obj) {
   lt <- obj$log.theta
-  dm <- sum(!is.na(obj$saem.theta.trans))
+  dm <- sum(!is.na(.saemThetaTrans(obj)))
   ret <- rep(FALSE, dm)
-  theta.trans <- obj$saem.theta.trans
+  theta.trans <- .saemThetaTrans(obj)
   theta.names <- obj$theta.names
   for (n in lt) {
     w <- which(n == theta.names)
@@ -2951,8 +2951,41 @@ nlmixrUI.saem.fit <- function(obj) {
         inPars <- c(inPars, .extra)
       }
     }
+    pars <- obj$saem.pars
+    if (!is.null(obj$env$.curTv)) {
+      ## need to add back .curTv to pars
+      .curTv <- obj$env$.curTv
+      .covRef <- obj$nmodel$cov.ref
+      .f <- function(x, theta, extra){
+        if (is.atomic(x)) {
+          return(x)
+        } else if (is.name(x)) {
+          if (any(as.character(x) == theta)) {
+            return(eval(parse(
+              text = paste0("quote(", x, "+", extra, ")")
+            )))
+          } else {
+            return(x)
+          }
+        } else if (is.call(x)){
+          return(as.call(lapply(x, .f, theta=theta, extra=extra)))
+        }
+      }
+      .bpars <- body(pars)
+      for (.var in .curTv) {
+        .lst <- .covRef[[.var]]
+        .estPar <- paste0(.var, "*", names(.lst))
+        .thetaPar <- setNames(.lst, NULL)
+        for (i in seq_along(.estPar)) {
+          .bpars <- .f(.bpars, .thetaPar[i], .estPar[i])
+        }
+      }
+      body(pars) <- .bpars
+      obj$env$.bpars <- pars
+      inPars <- unique(c(inPars, .curTv))
+    }
     ## saem.fit <- gen_saem_user_fn(model = ode, obj$saem.pars, pred = obj$predSaem, inPars = inPars)
-    saem.fit <- gen_saem_user_fn(obj$rxode.pred, obj$saem.pars, obj$predSaem, inPars = inPars)
+    saem.fit <- gen_saem_user_fn(obj$rxode.pred, pars, obj$predSaem, inPars = inPars)
     ## obj$env$saem.ode <- attr(saem.fit, "rx")
     obj$env$saem.fit <- saem.fit
     return(obj$env$saem.fit)
@@ -2966,7 +2999,14 @@ nlmixrUI.saem.fit <- function(obj) {
 nlmixrUI.saem.model <- function(obj) {
   mod <- list(saem_mod = obj$saem.fit)
   if (length(obj$saem.all.covs > 0)) {
-    mod$covars <- obj$saem.all.covs
+    if (!is.null(obj$env$.curTv)) {
+      .covars <- setdiff(obj$saem.all.covs, obj$env$.curTv)
+      if (length(.covars) > 0){
+        mod$covars <- .covars
+      }
+    } else {
+      mod$covars <- obj$saem.all.covs
+    }
   }
   mod$res.mod <- obj$saem.res.mod
   mod$log.eta <- obj$saem.log.eta
@@ -2978,19 +3018,45 @@ nlmixrUI.saem.model <- function(obj) {
   mod$omega <- obj$saem.model.omega
   return(mod)
 }
+.saemThetaTrans <- function(uif) {
+  .tv <- uif$env$.curTv
+  if (is.null(.tv)) {
+    .trans <- uif$saem.theta.trans
+  } else {
+    .ret <- as.character(body(uif$env$.bpars))
+    if (.ret[1] == "{") .ret <- .ret[-1]
+    .pars <- RxODE::rxModelVars(paste(.ret, collapse="\n"))$params
+    .thetaNames <- uif$ini$theta.names
+    .pars <- setdiff(.pars, uif$all.covs)
+    .trans <- setNames(sapply(.thetaNames, function(x){
+      .w <- which(x == .pars)
+      if (length(.w) == 1) return(.w)
+      return(NA_integer_)
+    }), NULL)
+  }
+  return(.trans)
+}
+.saemAllCov <- function(uif) {
+  all.covs <- uif$saem.all.covs
+  .tv <- uif$env$.curTv
+  if (!is.null(.tv)) {
+    all.covs <- setdiff(all.covs, uif$env$.curTv)
+  }
+  return(all.covs)
+}
 ##' Get THETA names for nlmixr's SAEM
 ##'
 ##' @param uif nlmixr UI object
 ##' @return SAEM theta names
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.theta.name <- function(uif) {
-  .trans <- uif$saem.theta.trans
+  .trans <- .saemThetaTrans(uif)
   .df <- .as.data.frame(uif$ini)
   .df <- .df[!is.na(.df$ntheta), ]
   .transName <- paste(.df$name[which(!is.na(.trans))])
   .trans <- .trans[!is.na(.trans)]
   theta.name <- .transName[order(.trans)]
-  all.covs <- uif$saem.all.covs
+  all.covs <- .saemAllCov(uif)
   lc <- length(all.covs)
   if (lc > 0) {
     m <- matrix(rep(NA, length(theta.name) * (lc + 1)), nrow = lc + 1)
@@ -3016,7 +3082,12 @@ nlmixrUI.saem.theta.name <- function(uif) {
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.init.theta <- function(obj) {
   theta.name <- obj$saem.theta.name
-  cov.names <- unique(names(unlist(structure(obj$cov.ref, .Names = NULL))))
+  .tv <- obj$env$.curTv
+  if (is.null(.tv)) {
+    cov.names <- unique(names(unlist(structure(obj$cov.ref, .Names = NULL))))
+  } else {
+    cov.names <- unique(names(unlist(structure(obj$cov.ref[!(names(obj$cov.ref) %in% .tv)], .Names = NULL))))
+  }
   theta.name <- theta.name[!(theta.name %in% cov.names)]
   nm <- paste(obj$ini$name)
   lt <- obj$log.theta
@@ -3031,17 +3102,19 @@ nlmixrUI.saem.init.theta <- function(obj) {
       return(obj$ini$est[w])
     }
   })
-  all.covs <- obj$saem.all.covs
+  all.covs <- .saemAllCov(obj)
   lc <- length(all.covs)
   if (lc > 0) {
     m <- matrix(rep(NA, lc * length(theta.name)), ncol = lc)
     dimnames(m) <- list(theta.name, all.covs)
     for (cn in names(obj$cov.ref)) {
-      v <- obj$cov.ref[[cn]]
-      for (var in names(v)) {
-        rn <- v[var]
-        w <- which(var == nm)
-        m[rn, cn] <- obj$ini$est[w]
+      if (!(cn %in% .tv)) {
+        v <- obj$cov.ref[[cn]]
+        for (var in names(v)) {
+          rn <- v[var]
+          w <- which(var == nm)
+          m[rn, cn] <- obj$ini$est[w]
+        }
       }
     }
     return(as.vector(c(theta.ini, as.vector(m))))
@@ -3056,7 +3129,7 @@ nlmixrUI.saem.init.theta <- function(obj) {
 ##' @return Return initial matrix
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.init.omega <- function(obj, names = FALSE) {
-  dm <- sum(!is.na(obj$saem.theta.trans))
+  dm <- sum(!is.na(.saemThetaTrans(obj)))
   et <- obj$saem.eta.trans
   ret <- rep(NA, dm)
   etd <- which(obj$neta1 == obj$neta2)

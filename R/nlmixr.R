@@ -382,9 +382,13 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     }
   }
   if (est == "saem") {
-    if (.nid <= 1) stop("SAEM is for mixed effects models, try 'dynmodel' (need more than 1 individual)")
-    if (.nTv != 0) stop("SAEM does not support time-varying covariates (yet)")
+    if (.nid <= 1) stop("SAEM is for mixed effects models, try 'focei', which downgrades to nonlinear regression")
     pt <- proc.time()
+    .tv <- NULL
+    if (.nTv != 0) {
+      .tv <- names(data)[-seq(1,6)]
+    }
+    uif$env$.curTv <- .tv
     if (length(uif$noMuEtas) > 0) {
       stop(sprintf("Cannot run SAEM since some of the parameters are not mu-referenced (%s)", paste(uif$noMuEtas, collapse = ", ")))
     }
@@ -436,10 +440,12 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       nphi <- attr(model$saem_mod, "nrhs")
       m <- cumsum(!is.na(matrix(inits$theta, byrow = TRUE, ncol = nphi)))
       fixid <- match(uif$saem.fixed, t(matrix(m, ncol = nphi)))
-
       names(inits$theta) <- rep("", length(inits$theta))
       names(inits$theta)[fixid] <- "FIXED"
     }
+    ## print(model)
+    print(inits)
+    ## print(.mcmc)
     .cfg <- configsaem(
       model = model, data = dat, inits = inits,
       mcmc = .mcmc, ODEopt = .ODEopt, seed = .seed,
