@@ -443,9 +443,6 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       names(inits$theta) <- rep("", length(inits$theta))
       names(inits$theta)[fixid] <- "FIXED"
     }
-    ## print(model)
-    print(inits)
-    ## print(.mcmc)
     .cfg <- configsaem(
       model = model, data = dat, inits = inits,
       mcmc = .mcmc, ODEopt = .ODEopt, seed = .seed,
