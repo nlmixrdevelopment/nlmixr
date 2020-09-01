@@ -21,36 +21,32 @@
 #ifndef __SAEM_CLASS_RCPP_HPP__
 #define __SAEM_CLASS_RCPP_HPP__
 #include <RcppArmadillo.h>
+#include <RxODE.h>
 #define MAXENDPNT 40
 using namespace std;
 using namespace arma;
 using namespace Rcpp;
 
-typedef void (*fn_ptr) (double *, double *);
+typedef void (*fn_ptr) (double *, double *, double *yptr, double *fptr, int len);
 
 extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
 			  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
 			  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
-			  int *iprint);
+			  int *iprint, double *yptr, double *fptr, int len);
 
+void obj(double *ab, double *fx, double *yptr, double *fptr, int len) {
+  int i;
+  double g, sum;
+  double xmin = 1.0e-200;
 
-double *yptr, *fptr;	//CHK
-int len;	//CHK
+  for (i=0, sum=0; i<len; ++i) {
+    // nelder_() does not allow lower bounds; we force ab[] be positive here
+    g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
+    if (g < xmin) g = xmin;
+    sum += pow((yptr[i]-fptr[i])/g, 2.0) + 2*log(g);
+  }
 
-void obj(double *ab, double *fx)
-{
-	int i;
-	double g, sum;
-    double xmin = 1.0e-200;
-
-	for (i=0, sum=0; i<len; ++i) {
-        // nelder_() does not allow lower bounds; we force ab[] be positive here
-		g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
-		if (g < xmin) g = xmin;
-		sum += pow((yptr[i]-fptr[i])/g, 2.0) + 2*log(g);
-	}
-
-	*fx = sum;
+  *fx = sum;
 }
 
 // FIXME obj for boxCox and yeoJohnson and pow() instead of prop()
