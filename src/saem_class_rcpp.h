@@ -21,12 +21,39 @@
 #ifndef __SAEM_CLASS_RCPP_HPP__
 #define __SAEM_CLASS_RCPP_HPP__
 #include <RcppArmadillo.h>
-#include <neldermead.hpp>
 #define MAXENDPNT 40
 using namespace std;
 using namespace arma;
 using namespace Rcpp;
 
+typedef void (*fn_ptr) (double *, double *);
+
+extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
+			  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
+			  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
+			  int *iprint);
+
+
+double *yptr, *fptr;	//CHK
+int len;	//CHK
+
+void obj(double *ab, double *fx)
+{
+	int i;
+	double g, sum;
+    double xmin = 1.0e-200;
+
+	for (i=0, sum=0; i<len; ++i) {
+        // nelder_() does not allow lower bounds; we force ab[] be positive here
+		g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
+		if (g < xmin) g = xmin;
+		sum += pow((yptr[i]-fptr[i])/g, 2.0) + 2*log(g);
+	}
+
+	*fx = sum;
+}
+
+// FIXME obj for boxCox and yeoJohnson and pow() instead of prop()
 
 struct mcmcphi {
   int nphi;
@@ -488,8 +515,8 @@ public:
 	    int n=2, itmax=50, iconv, it, nfcall, iprint=0;
 	    double start[2]={sqrt(ares(b)), sqrt(fabs(b))};                  //force are & bres to be positive
 	    double step[2]={-.2, -.2}, ynewlo;
-	    nelder_(obj, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
+	    nelder_fn(obj, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
+		      &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	    ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
 	    bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
 	  }
