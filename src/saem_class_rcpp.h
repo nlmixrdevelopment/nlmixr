@@ -309,6 +309,7 @@ public:
 
       vec f = fsave;
       vec g = vecares + vecbres % abs(f);                          //make sure g > 0
+      g.elem( find( g == 0.0) ).fill(1.0); // like Uppusla IWRES allows prop when f=0
       g.elem( find( g < double_xmin) ).fill(double_xmin);
 
       //fsave = f;
@@ -388,6 +389,7 @@ public:
 	  if (res_mod(b)==2) {
 	    //double epsilon = std::numeric_limits<double>::epsilon();
 	    gk = abs(fk(span(y_offset(b),y_offset(b+1)-1)));            //CHK: range & chk resize & .memptr()
+	    gk.elem( find( gk == 0.0) ).fill(1.0);
 	    gk.elem( find( gk < double_xmin) ).fill(double_xmin);
 	    resid = resid/gk;
 	  }
@@ -503,16 +505,17 @@ public:
 	    ysb = ysM(idx);
 	    fsb = fsM(idx);
 
-	    yptr = ysb.memptr();
-	    fptr = fsb.memptr();
-	    len = ysb.n_elem;                                        //CHK: needed by nelder
+	    // yptr = ysb.memptr();
+	    // fptr = fsb.memptr();
+	    //len = ysb.n_elem;                                        //CHK: needed by nelder
 	    vec xmin(2);
 	    double *pxmin = xmin.memptr();
 	    int n=2, itmax=50, iconv, it, nfcall, iprint=0;
 	    double start[2]={sqrt(ares(b)), sqrt(fabs(b))};                  //force are & bres to be positive
 	    double step[2]={-.2, -.2}, ynewlo;
 	    nelder_fn(obj, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		      &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
+		      &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
+		      ysb.memptr(), fsb.memptr(), ysb.n_elem);
 	    ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
 	    bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
 	  }
@@ -709,6 +712,7 @@ private:
 	  fc = log(fc);
 	}
 	gc = vecares + vecbres % abs(fc);                            //make sure gc > 0
+	gc.elem( find( gc == 0.0) ).fill(1);
 	gc.elem( find( gc < double_xmin) ).fill(double_xmin);
 	if (distribution == 1 || distribution == 4) DYF(mx.indioM)=0.5*(((mx.yM-fc)/gc)%((mx.yM-fc)/gc))+log(gc);
 	else if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
