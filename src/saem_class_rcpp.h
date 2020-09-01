@@ -61,7 +61,7 @@ uvec getObsIdx(umat m) {
 
 // class def starts
 class SAEM {
-  typedef vec (*user_funct) (const mat&, const mat&, const List&);
+  typedef mat (*user_funct) (const mat&, const mat&, const List&);
 
 public:
 
@@ -251,7 +251,8 @@ public:
     phiFile.open(phiMFile[0].c_str());
 
     if (DEBUG>0) Rcout << "initialization successful\n";
-    fsave = user_fn(phiM, evtM, optM);
+    fsaveMat = user_fn(phiM, evtM, optM);
+    fsave = fsaveMat.col(0);
     if (distribution == 4){
       fsave.elem(find( fsave < double_xmin)).fill(double_xmin);
       fsave = log(fsave);
@@ -289,14 +290,12 @@ public:
 
       //fsave = f;
       if (distribution == 1 || distribution == 4) DYF(indioM)=0.5*(((yM-f)/g)%((yM-f)/g))+log(g);
-      else
-	if (distribution == 2) DYF(indioM)=-yM%log(f)+f;
-	else
-	  if (distribution == 3) DYF(indioM)=-yM%log(f)-(1-yM)%log(1-f);
-	  else {
-	    Rcout << "unknown distribution (id=" <<  distribution << ")\n";
-	    return;
-	  }
+      else if (distribution == 2) DYF(indioM)=-yM%log(f)+f;
+      else if (distribution == 3) DYF(indioM)=-yM%log(f)-(1-yM)%log(1-f);
+      else {
+	Rcout << "unknown distribution (id=" <<  distribution << ")\n";
+	return;
+      }
       //U_y is a vec of subject llik; summed over obs for each subject
       vec U_y=sum(DYF,0).t();
 
@@ -613,6 +612,9 @@ private:
   int nres;
   uvec ix_sorting;
   vec ysM;
+  mat fsaveMat;
+  vec cens;
+  vec limit;
   vec fsave;
 
   int DEBUG;
@@ -633,6 +635,24 @@ private:
     mphi1.mprior_phiM = repmat(mprior_phi1,nmc,1);
   }
 
+  void doCens(mat &DYF, vec &cens, vec &limit, vec &fc, vec &r, const vec &dv, int &distribution) {
+    for (int j = (int)cens.size(); j--;) {
+      double lim = limit[j];
+      if (distribution == 4) lim = log(lim);
+      if (cens[j] == 0.0) {
+	// M2 adds likelihood even when the observation is defined
+	if (R_FINITE(lim) && !ISNA(lim)) {
+	  DYF(j) = DYF(j) - log(1.0 - 0.5*(1.0 + erf(((lim<fc[j])*2.0 - 1.0)*(lim - fc[j])/sqrt(r[j])/M_SQRT2)));
+	}
+      } else if (cens[j] == 1.0 || cens[j] == -1.0) {
+	DYF(j) = log(0.5*(1+erf(((double)(cens[j])*(dv[j]-fc[j]))/sqrt(r[j])/M_SQRT2)));
+	if (R_FINITE(lim) && !ISNA(lim)) {
+	  DYF(j) = DYF(j) - log(1.0 - 0.5*(1.0 + erf((double)(cens[j])*(lim - fc[j])/sqrt(r[j])/M_SQRT2)));
+	}
+      }
+    }
+  }
+
   void do_mcmc(const int method,
 	       const int nu,
 	       const mcmcaux &mx,
@@ -641,6 +661,7 @@ private:
 	       mat &phiM,
 	       vec &U_y,
 	       vec &U_phi) {
+    mat fcMat;
     vec fc, Uc_y, Uc_phi, deltu;
     uvec ind;
     vec gc;
@@ -658,18 +679,18 @@ private:
 	if (method==3)
 	  phiMc.col(i(k1))=phiM.col(i(k1))+randn<vec>(mx.nM)*mphi.Gdiag_phi(k1,k1);
 
-	fc = user_fn(phiMc, mx.evtM, mx.optM);
+	fcMat = user_fn(phiMc, mx.evtM, mx.optM);
+	fc = fcMat.col(0);
 	if (distribution == 4){
-	  fc.elem(find( fc < double_xmin)).fill(double_xmin);
+	  fc.elem(find(fc < double_xmin)).fill(double_xmin);
 	  fc = log(fc);
 	}
 	gc = vecares + vecbres % abs(fc);                            //make sure gc > 0
 	gc.elem( find( gc < double_xmin) ).fill(double_xmin);
 	if (distribution == 1 || distribution == 4) DYF(mx.indioM)=0.5*(((mx.yM-fc)/gc)%((mx.yM-fc)/gc))+log(gc);
-	else
-	  if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
-	  else
-	    if (distribution == 3) DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
+	else if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
+	else if (distribution == 3) DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
+	doCens(DYF, cens, limit, fc, gc, mx.yM, distribution);
 
 	Uc_y=sum(DYF,0).t();
 	if (method==1) deltu=Uc_y-U_y;

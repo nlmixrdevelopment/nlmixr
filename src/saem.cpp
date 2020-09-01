@@ -42,20 +42,7 @@ RObject mat2NumMat(const mat &m) {
   return x;
 }
 
-// FIXME use C to calculate sd
-Function ff("sd");
-
-vec Ruser_function(const mat &phi_, const mat &evt_, const List &opt) {
-  RObject phi, evt;
-  phi = mat2NumMat(phi_);
-  evt = mat2NumMat(evt_);
-  NumericVector g;
-  g = ff(phi, evt);
-  vec yp(g);
-  return yp;
-}
-
-vec user_function(const mat &_phi, const mat &_evt, const List &_opt){
+mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   // yp has all the observations in the dataset
   rx_solving_options_ind *ind;
   rx_solving_options *op = _rx->op;
@@ -77,7 +64,7 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt){
     }
   }
   saem_solve(_rx); // Solve the complete system (possibly in parallel)
-  vec g(_rx->nobs2); // nobs EXCLUDING EVID=2
+  mat g(_rx->nobs2, 3); // nobs EXCLUDING EVID=2
   int elt=0;
   for (int id = 0; id < _N; ++id) {
     ind = &(_rx->subjects[id]);
@@ -92,7 +79,18 @@ vec user_function(const mat &_phi, const mat &_evt, const List &_opt){
       } else if (ind->evid[j] == 0) {
 	saem_lhs((int)id, ind->all_times[j],
 		 getSolve(j), ind->lhs);
-	g[elt++] = ind->lhs[0];
+	g(elt, 0) = ind->lhs[0];
+	if (_rx->cens) {
+	  g(elt, 1) = ind->cens[j];
+	} else {
+	  g(elt, 1) = 0;
+	}
+	if (_rx->limit) {
+	  g(elt, 2) = ind->limit[j];
+	} else {
+	  g(elt, 2) = R_NegInf;
+	}
+	elt++;
       } // evid=2 does not need to be calculated
     }
   }
@@ -142,7 +140,8 @@ SEXP saem_do_pred(SEXP in_phi, SEXP in_evt, SEXP in_opt) {
   mat phi = as<mat>(in_phi);
   mat evt = as<mat>(in_evt);
   int distribution = as<int>(opt["distribution"]);
-  vec g = user_function(phi, evt, opt);
+  mat gMat = user_function(phi, evt, opt);
+  vec g = gMat.col(0);
   if (distribution == 4) g = log(g);
   return wrap(g);
 }
@@ -161,14 +160,7 @@ SEXP saem_fit(SEXP xSEXP) {
 
   SAEM saem;
   saem.inits(x);
-
-  if(x.containsElementNamed("Rfn")) {
-    ff = as<Function>(x["Rfn"]);
-    saem.set_fn(Ruser_function);
-  } else {
-    saem.set_fn(user_function);
-  }
-
+  saem.set_fn(user_function);
   saem.saem_fit();
 
   List out = List::create(

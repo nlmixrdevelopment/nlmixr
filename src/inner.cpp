@@ -671,13 +671,13 @@ static inline void likM2(focei_ind *fInd, double& limit, double&f, double &r) {
   if (R_FINITE(limit) && !ISNA(limit)) {
     // When limit < f, this is M2
     // When limit >=f, the limit is an upper limit (instead of lower limit)
-    fInd->llik += -log(1-0.5*(1+erf(((limit<f)*2-1)*(limit-f)/sqrt(r)/M_SQRT2)));    
+    fInd->llik += -log(1-0.5*(1+erf(((limit<f)*2-1)*(limit-f)/sqrt(r)/M_SQRT2)));
   }
 }
 
 static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, double& dv, double &r) {
   fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
-  if (R_FINITE(limit)){
+  if (R_FINITE(limit)  && !ISNA(limit)){
     fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
   }
 }
