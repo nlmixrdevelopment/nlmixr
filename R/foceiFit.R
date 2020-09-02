@@ -2031,6 +2031,15 @@ foceiFit.data.frame0 <- function(data,
     for (.i in .ini$model$extraProps$log) {
       if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- log(abs(.ini$est[.i])) * abs(.ini$est[.i])
     }
+    ## for (.i in .ini$model$extraProps$expit) {
+    ##   ## expit(a,b,c) ->
+    ##   ## 1.0*(-b + c)*exp(-a)/((1.0 + exp(-a))^2*(b + 1.0*(-b + c)/(1.0 + exp(-a))))
+    ## }
+    ## for (.i in .ini$model$extraProp$logit) {
+    ##   ## logit(a,b,c) ->
+    ##   ##-1.0*(-b + c)/((a - b)^2*(-1.0 + 1.0*(-b + c)/(a - b))*log(-1.0 + 1.0*(-b + c)/(a - b)))
+    ## }
+
     ## FIXME: needs to be based on actual initial values in sin because typically change to correct scale
     ## Ctime is also usually used for circadian rhythm models
     ## for (.i in .ini$model$extraProps$sin){
