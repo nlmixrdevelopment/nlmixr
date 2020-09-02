@@ -7,20 +7,6 @@
 #include "nlmixr_types.h"
 #include <RxODE.h>
 
-typedef double (*rxPow)(double x, double lambda, int yj);
-
-double powerDi(double x, double lambda, int yj){
-  static rxPow fun=NULL;
-  if (fun == NULL) fun = (rxPow) R_GetCCallable("RxODE","powerDi");
-  return fun(x, lambda, yj);
-}
-
-double powerD(double x, double lambda, int yj){
-  static rxPow fun=NULL;
-  if (fun == NULL) fun = (rxPow) R_GetCCallable("RxODE","powerD");
-  return fun(x, lambda, yj);
-}
-
 using namespace Rcpp;
 using namespace R;
 using namespace arma;
@@ -123,7 +109,8 @@ static inline double truncnorm(double mean, double sd, double low, double hi){
 
 //[[Rcpp::export]]
 List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
-		  NumericVector &lambda, NumericVector &yj, IntegerVector &cens, NumericVector &limit) {
+		  NumericVector &lambda, NumericVector &yj, NumericVector &low, NumericVector &hi,
+		  IntegerVector &cens, NumericVector &limit) {
   NumericVector dv = clone(cdv);
   DataFrame ipred = clone(cipred);
   IntegerVector ID= as<IntegerVector>(ipred[0]);
@@ -140,57 +127,57 @@ List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
   ipred.erase(0,5);
   NumericVector dvTBS(dv.size());
   for (int i = dv.size(); i--;){
-    iprednvI[i]= powerDi(iprednv[i], lambda[i], (int)yj[i]);
+    iprednvI[i]= _powerDi(iprednv[i], lambda[i], (int)yj[i], low[i], hi[i]);
     switch (cens[i]){
     case 1:
       // (limit, dv) ; limit could be -inf
       if (R_FINITE(limit[i])){
-	double lim0TBS = powerD(limit[i], lambda[i], (int)yj[i]);
-	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double lim0TBS = _powerD(limit[i], lambda[i], (int)yj[i], low[i], hi[i]);
+	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
 	double sd = sqrt(ri[i]);
 	interestingLim=true;
 	lowerLim[i] = limit[i];
 	upperLim[i] = dv[i];
 	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
-	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	dv[i] =_powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
       } else {
 	// (-Inf, dv)
-	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
 	double sd = sqrt(ri[i]);
 	interestingLim=true;
 	lowerLim[i] = R_NegInf;
 	upperLim[i] = dv[i];
 	dvTBS[i] = truncnorm(iprednv[i], sd, R_NegInf, lim1TBS);
-	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
       }
       break;
     case -1:
       // (dv, limit); limit could be +inf
       if (R_FINITE(limit[i])){
 	//(dv, limit)
-	double lim1TBS = powerD(limit[i], lambda[i], (int)yj[i]);
-	double lim0TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double lim1TBS = _powerD(limit[i], lambda[i], (int)yj[i], low[i], hi[i]);
+	double lim0TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
 	double sd = sqrt(ri[i]);
 	interestingLim=true;
 	lowerLim[i] = dv[i];
 	upperLim[i] = limit[i];
 	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
-	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
       } else {
 	// (dv, Inf)
-	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
 	double sd = sqrt(ri[i]);
 	interestingLim=true;
 	lowerLim[i] = dv[i];
 	upperLim[i] = R_PosInf;
 	dvTBS[i] = truncnorm(iprednv[i], sd, lim1TBS, R_PosInf);
-	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
       }
       break;
     case 0:
       lowerLim[i] = NA_REAL;
       upperLim[i] = NA_REAL;
-      dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
+      dvTBS[i] = _powerD(dv[i], lambda[i], (int)yj[i], low[i], hi[i]);
       break;
     }
   }
@@ -257,7 +244,8 @@ List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
 // [[Rcpp::export]]
 List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
 		 IntegerVector &evid, NumericVector &lambda, NumericVector &yj,
-		 IntegerVector &cens, NumericVector &limit,
+		 NumericVector &low, NumericVector &hi,
+		 IntegerVector &cens, NumericVector &limit, 
 		 DataFrame etasDf, List etaLst){
   NumericVector dv = clone(cdv);
   bool doCwres = (innerList.size() == 2);
@@ -316,58 +304,58 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
   NumericVector ri = ipred[0];
   NumericVector dvTBS(dv.size());
   for (i = dv.size(); i--;){
-    iprednvI[i]= powerDi(iprednv[i], lambda[i], (int)yj[i]);
-    prednvI[i] = powerDi(prednv[i], lambda[i], (int)yj[i]);
+    iprednvI[i]= _powerDi(iprednv[i], lambda[i], (int)yj[i], low[i], hi[i]);
+    prednvI[i] = _powerDi(prednv[i], lambda[i], (int)yj[i], low[i], hi[i]);
     switch (cens[i]){
     case 1:
       // (limit, dv) ; limit could be -inf
       if (R_FINITE(limit[i])){
-	double lim0TBS = powerD(limit[i], lambda[i], (int)yj[i]);
-	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double lim0TBS = _powerD(limit[i], lambda[i], (int)yj[i], low[i], hi[i]);
+	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
 	double sd = sqrt(ri[i]);
 	interestingLim=true;
 	lowerLim[i] = limit[i];
 	upperLim[i] = dv[i];
 	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
-	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	dv[i] =_powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
       } else {
 	// (-Inf, dv)
-	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
 	double sd = sqrt(ri[i]);
 	interestingLim=true;
 	lowerLim[i] = R_NegInf;
 	upperLim[i] = dv[i];
 	dvTBS[i] = truncnorm(iprednv[i], sd, R_NegInf, lim1TBS);
-	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
       }
       break;
     case -1:
       // (dv, limit); limit could be +inf
       if (R_FINITE(limit[i])){
 	//(dv, limit)
-	double lim1TBS = powerD(limit[i], lambda[i], (int)yj[i]);
-	double lim0TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double lim1TBS = _powerD(limit[i], lambda[i], (int)yj[i], low[i], hi[i]);
+	double lim0TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
 	double sd = sqrt(ri[i]);
 	interestingLim=true;
 	lowerLim[i] = dv[i];
 	upperLim[i] = limit[i];
 	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
-	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
       } else {
 	// (dv, Inf)
-	double lim1TBS = powerD(dv[i], lambda[i], (int) yj[i]);
+	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
 	double sd = sqrt(ri[i]);
 	interestingLim=true;
 	lowerLim[i] = dv[i];
 	upperLim[i] = R_PosInf;
 	dvTBS[i] = truncnorm(iprednv[i], sd, lim1TBS, R_PosInf);
-	dv[i] =powerDi(dvTBS[i], lambda[i], (int) yj[i]);
+	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
       }
       break;
     case 0:
       lowerLim[i] = NA_REAL;
       upperLim[i] = NA_REAL;
-      dvTBS[i] = powerD(dv[i], lambda[i], (int)yj[i]);
+      dvTBS[i] = _powerD(dv[i], lambda[i], (int)yj[i], low[i], hi[i]);
       break;
     }
   }
@@ -509,7 +497,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
     cres = dvTBS-cpred;
     cresI = NumericVector(cres.size());
     for (i = cres.size(); i--;){
-      cpredI[i] = powerDi(cpred[i], lambda[i], (int)yj[i]);
+      cpredI[i] = _powerDi(cpred[i], lambda[i], (int)yj[i], low[i], hi[i]);
       cresI[i]  = dv[i] - cpredI[i];
     }
     //W <- sqrt(fitted(object, population=FALSE, type="Vfo") + fitted(object, population=FALSE, type="Vi"))
@@ -638,6 +626,7 @@ arma::mat cholSE__(arma::mat A, double tol);
 // [[Rcpp::export]]
 List npde(IntegerVector id, NumericVector dv, IntegerVector evid,
 	  NumericVector sim, NumericVector lambda, NumericVector yj,
+	  NumericVector low, NumericVector hi,
 	  bool ties, double tolChol){
   bool warn1 = false;
   bool warn2 = false;
@@ -683,8 +672,8 @@ List npde(IntegerVector id, NumericVector dv, IntegerVector evid,
       }
     }
     // Calculate dvt, EPRED, ERES ERESt
-    dvt[i] = powerD(dv[i], lambda[i], (int)yj[i]);
-    epred[i] = powerDi(epredt[i], lambda[i], (int)yj[i]);
+    dvt[i] = _powerD(dv[i], lambda[i], (int)yj[i], low[i], hi[i]);
+    epred[i] = _powerDi(epredt[i], lambda[i], (int)yj[i], low[i], hi[i]);
     eres[i] = dv[i] - epred[i];
     if (evid[i] != 0) eres[i] = NA_REAL;
     erest[i] = dvt[i] - epredt[i];
@@ -877,11 +866,11 @@ List npde(IntegerVector id, NumericVector dv, IntegerVector evid,
 
 //[[Rcpp::export]]
 RObject augPredTrans(NumericVector& pred, NumericVector& ipred, NumericVector& lambda,
-		     RObject& yjIn){
+		     RObject& yjIn, NumericVector& low, NumericVector& hi){
   IntegerVector yj = as<IntegerVector>(yjIn);
   for (int i = pred.size(); i--;){
-    pred[i] = powerDi(pred[i], lambda[i], yj[i]);
-    ipred[i] = powerDi(ipred[i], lambda[i], yj[i]);
+    pred[i] = _powerDi(pred[i], lambda[i], yj[i], low[i], hi[i]);
+    ipred[i] = _powerDi(ipred[i], lambda[i], yj[i], low[i] ,hi[i]);
   }
   return R_NilValue;
 }

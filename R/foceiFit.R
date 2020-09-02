@@ -2242,7 +2242,7 @@ foceiFit.data.frame0 <- function(data,
       .limit <- rep(-Inf, length(data$DV))
     }
     .df <- .Call(`_nlmixr_nlmixrResid0`, .ipred, data$DV, data$EVID, .ipred$rxLambda, .ipred$rxYj,
-                 .cens, .limit)
+                 .ipred$rxLow, .ipred$rxHi, .cens, .limit)
     .ret$tableTime <- (proc.time() - .pt)["elapsed"]
     .ret$time <- data.frame(.ret$time, table = .ret$tableTime)
     .isDplyr <- requireNamespace("dplyr", quietly = TRUE)
@@ -2330,7 +2330,7 @@ foceiFit.data.frame0 <- function(data,
     }
     .lst <- .Call(
       `_nlmixr_nlmixrResid`, .preds, .ret$omega, data$DV, data$EVID, .preds$ipred$rxLambda, .preds$ipred$rxYj,
-      .cens, .limit, .etas, .pars$eta.lst
+      .preds$ipred$rxLow, .preds$ipred$rxHi, .cens, .limit, .etas, .pars$eta.lst
     )
     if (is.null(.preds$cwres)) {
       .df <- RxODE::rxSolve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,

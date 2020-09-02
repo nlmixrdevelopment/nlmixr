@@ -916,11 +916,12 @@ dists <- list(
   "yeoJohnson" = 1,
   "logn" = 1,
   "dlogn" = 1,
+  "logitNorm"=1:3,
   "lnorm" = 1,
   "dlnorm" = 1
 )
 
-distsPositive <- c("add", "norm", "dnorm", "prop", "pow", "logn", "dlogn", "lnorm", "dlnorm")
+distsPositive <- c("add", "norm", "dnorm", "prop", "pow", "logn", "dlogn", "lnorm", "dlnorm", "logitNorm")
 
 allVars <- function(x) {
   defined <- character()
@@ -1221,19 +1222,32 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       distArgs <- gsub(.regPar, "\\1", distArgs)
     }
     if (!any(names(dists) == distName)) {
-      stop(sprintf("The %s distribution is currently unsupported.", distName))
+      stop(sprintf("the %s distribution is currently unsupported", distName))
     }
     .nargs <- dists[[distName]]
     if (length(.nargs) == 1) {
       if (length(distArgs) != .nargs) {
-        stop(sprintf("The %s distribution requires %s argument%s.", distName, .nargs, ifelse(.nargs == 1, "", "s")))
+        stop(sprintf("the %s distribution requires %s argument%s", distName, .nargs, ifelse(.nargs == 1, "", "s")))
       }
     } else {
       .minNargs <- min(.nargs)
       .maxNargs <- max(.nargs)
       if (length(distArgs) < .minNargs | length(distArgs) > .maxNargs) {
-        stop(sprintf("The %s distribution requires %s-%s arguments.", distName, min(.nargs), max(.nargs)))
+        stop(sprintf("the %s distribution requires %s-%s arguments", distName, min(.nargs), max(.nargs)))
       }
+    }
+    if (distName == "logitNorm") {
+      if (length(distArgs) >= 2) {
+        if (is.na(suppressWarnings(as.numeric(distArgs[2])))) {
+          stop("logitNorm lower bound must be numeric")
+        }
+        if (length(distArgs) == 3) {
+          if (is.na(suppressWarnings(as.numeric(distArgs[3])))) {
+            stop("logitNorm upper bound must be numeric")
+          }
+        }
+      }
+      distArgs <- distArgs[1]
     }
     if (length(distArgs) == 0L) {
       .tmp <- .as.data.frame(bounds)

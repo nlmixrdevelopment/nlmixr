@@ -35,10 +35,10 @@
 #define getOmegaN() as<int>(RxODE::rxSymInvCholEnvCalculate(_rxInv, "ntheta", R_NilValue))
 #define getOmegaTheta() as<NumericVector>(RxODE::rxSymInvCholEnvCalculate(_rxInv, "theta", R_NilValue));
 #define setOmegaTheta(x) RxODE::rxSymInvCholEnvCalculate(_rxInv, "theta", x)
-#define tbs(x) powerD(x,    ind->lambda, (int)(ind->yj))
-#define tbsL(x) powerL(x,   ind->lambda, (int)(ind->yj))
-#define tbsDL(x) powerDL(x, ind->lambda, (int)(ind->yj))
-#define tbsD(x) powerDD(x,  ind->lambda, (int)(ind->yj))
+#define tbs(x) _powerD(x,    ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
+#define tbsL(x) _powerL(x,   ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
+#define tbsDL(x) _powerDL(x, ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
+#define tbsD(x) _powerDD(x,  ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
 //#define _safe_log(a) (((a) <= DOUBLE_EPS) ? log(DOUBLE_EPS) : log(a))
 #define _safe_log(a) log(a)
 //#define _safe_zero(a) ((a) <= DOUBLE_EPS ? DOUBLE_EPS : (a))
@@ -74,14 +74,6 @@ extern "C"{
 			      t_dydt_lsoda_dum dydt_lsoda, t_jdum_lsoda jdum,
 			      t_dydt c_dydt, t_update_inis u_inis, int jt);
   ind_solve_t ind_solve;
-  typedef double (*powerD_t)(double x, double lambda, int yj);
-  powerD_t powerD;
-  typedef double (*powerL_t)(double x, double lambda, int yj);
-  powerL_t powerL;
-  typedef double (*powerDL_t)(double x, double lambda, int yj);
-  powerDL_t powerDL;
-  typedef double (*powerDD_t)(double x, double lambda, int yj);
-  powerDD_t powerDD;
   typedef int (*par_progress_t)(int c, int n, int d, int cores, clock_t t0, int stop);
   par_progress_t par_progress;
   typedef rx_solve* (*getRxSolve_t)();
@@ -5431,10 +5423,6 @@ Environment foceiFitCpp_(Environment e){
     getRx = (getRxSolve_t) R_GetCCallable("RxODE", "getRxSolve_");
     isRstudio = (isRstudio_t) R_GetCCallable("RxODE", "isRstudio");
     ind_solve=(ind_solve_t) R_GetCCallable("RxODE", "ind_solve");
-    powerDD = (powerDD_t) R_GetCCallable("RxODE", "powerDD");
-    powerDL = (powerDL_t) R_GetCCallable("RxODE", "powerDL");
-    powerL = (powerL_t) R_GetCCallable("RxODE", "powerL");
-    powerD = (powerD_t) R_GetCCallable("RxODE", "powerD");
     assignFn_=true;
   }
   clock_t t0 = clock();
@@ -5727,7 +5715,7 @@ Environment foceiFitCpp_(Environment e){
 NumericVector boxCox_(NumericVector x = 1, double lambda=1, int yj = 0){
   NumericVector ret(x.size());
   for (unsigned int i = x.size(); i--;){
-    ret[i] = _powerD(x[i], lambda, yj);
+    ret[i] = _powerD(x[i], lambda, yj, 0.0, 1.0);
   }
   return ret;
 }
@@ -5736,7 +5724,7 @@ NumericVector boxCox_(NumericVector x = 1, double lambda=1, int yj = 0){
 NumericVector iBoxCox_(NumericVector x = 1, double lambda=1, int yj = 0){
   NumericVector ret(x.size());
   for (unsigned int i = x.size(); i--;){
-    ret[i] = _powerDi(x[i], lambda, yj);
+    ret[i] = _powerDi(x[i], lambda, yj, 0.0, 1.0);
   }
   return ret;
 }

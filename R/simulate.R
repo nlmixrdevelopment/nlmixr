@@ -656,7 +656,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("locf", "linear", "
   dat.new <- do.call("nlmixrPred", lst, envir = parent.frame(2))
   .Call(
     `_nlmixr_augPredTrans`, dat.new$pred, dat.new$ipred,
-    dat.new$rxLambda, dat.new$rxYj
+    dat.new$rxLambda, dat.new$rxYj, dat.new$rxLow, dat.new$rxHi
   )
   dat.new <- dat.new[, !(names(dat.new) %in% c("rxLambda", "rxYj"))]
   dat.new$id <- factor(dat.new$id)
