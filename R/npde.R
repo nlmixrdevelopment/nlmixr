@@ -43,6 +43,20 @@ addNpde <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject =
   .si$dfObs <- 0
   .si$dfSub <- 0
   .si$thetaMat <- NA
+  ## Now we need to keep censoring information if available;
+  .ndat <- names(.dat)
+  .keep <- c()
+  .w <- which(tolower(names(.dat)) == "cens")
+  if (length(.w) == 1) {
+    .keep <- c(.keep, .ndat[.w])
+  }
+  .w <- which(tolower(names(.dat)) == "limit")
+  if (length(.w) == 1) {
+    .keep <- c(.keep, .ndat[.w])
+  }
+  if (length(.keep) > 0) {
+    .si$keep <- .keep
+  }
   .sim <- do.call("nlmixrSim", .si)
   .dv <- object$DV
   .dvl <- length(.dv)
@@ -50,9 +64,8 @@ addNpde <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject =
   .evid <- rep(0L, .dvl)
   .evid[is.na(object$RES) & !is.na(object$PRED)] <- 2L
   .new <- cbind(object, .Call(
-    `_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj, ties,
-    cholSEtol
-  ))
+    `_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj,
+    .sim$rxLow, .sim$rxHi, ties, cholSEtol))
   class(.new) <- .cls
   if (updateObject) {
     .parent <- parent.frame(2)
