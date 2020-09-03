@@ -48,6 +48,12 @@
 
 using namespace Rcpp;
 using namespace arma;
+
+double expit(double alpha, double low, double high) {
+  double p = 1/(1+exp(-alpha));
+  return (high-low)*p+low;
+}
+
 extern "C"{
   void RSprintf(const char *format, ...);
   typedef void (*S2_fp) (int *, int *, double *, double *, double *, int *, float *,
@@ -291,6 +297,8 @@ typedef struct {
   bool alloc=false;
   bool zeroGrad = false;
   int nfixed=0;
+  NumericVector logitThetaHi;
+  NumericVector logitThetaLow;
 } focei_options;
 
 focei_options op_focei;
@@ -2810,9 +2818,8 @@ NumericVector foceiSetup_(const RObject &obj,
 
   IntegerVector muRef;
   if (odeO.containsElementNamed("focei.mu.ref")){
-    try {
+    if (RxODE::rxIs(odeO["focei.mu.ref"], "numeric")) {
       muRef = as<IntegerVector>(odeO["focei.mu.ref"]);
-    } catch (...){
     }
   }
   if (muRef.size() == 0){
@@ -3184,7 +3191,6 @@ void foceiOuterFinal(double *x, Environment e){
     e["omega"] = getOmega();
     e["etaObf"] = foceiEtas();
   }
-  // REprintf("here!\n");
   nlmixrEnvSetup(e, fmin);
 }
 
@@ -3233,6 +3239,9 @@ extern "C" double foceiOfvOptim(int n, double *x, void *ex){
   for (i = 0; i < n; i++){
     if (op_focei.xPar[i] == 1){
       vPar.push_back(exp(unscalePar(x, i)));
+    } else if (op_focei.xPar[i] < 0){
+      int m = -op_focei.xPar[i];
+      vPar.push_back(expit(unscalePar(x, i), op_focei.logitThetaLow[m], op_focei.logitThetaHi[m]));
     } else {
       vPar.push_back(unscalePar(x, i));
     }
@@ -3311,6 +3320,9 @@ extern "C" double foceiOfvOptim(int n, double *x, void *ex){
     for (i = 0; i < n; i++){
       if (op_focei.xPar[i] == 1){
 	RSprintf("%#10.4g |", exp(unscalePar(x, i)));
+      } else if (op_focei.xPar[i] < 0){
+	int m = -op_focei.xPar[i];
+	RSprintf("%#10.4g |", expit(unscalePar(x, i), op_focei.logitThetaLow[m], op_focei.logitThetaHi[m]));
       } else {
 	RSprintf("%#10.4g |", unscalePar(x, i));
       }
@@ -5068,7 +5080,7 @@ void foceiFinalizeTables(Environment e){
   NumericVector cv(theta.size());
   std::fill_n(&se[0], theta.size(), NA_REAL);
   std::fill_n(&cv[0], theta.size(), NA_REAL);
-  int j=0;
+  int j=0, k=0;
   if (covExists){
     for (int k = 0; k < se.size(); k++){
       if (k >= skipCov.size()) break;
@@ -5160,22 +5172,30 @@ void foceiFinalizeTables(Environment e){
   // Rf_pt(stat[7],(double)n1,1,0)
   // FIXME figure out log thetas outside of foceisetup.
   IntegerVector logTheta;
+  IntegerVector logitTheta;
+  NumericVector logitThetaHi;
+  NumericVector logitThetaLow;
   if (e.exists("logThetasF")){
     logTheta =  as<IntegerVector>(e["logThetasF"]);
   } else if (e.exists("model")){
     List model = e["model"];
     logTheta =  as<IntegerVector>(model["log.thetas"]);
   }
+  if (e.exists("logitThetasF")) {
+    logitTheta = as<IntegerVector>(e["logThetasF"]);
+    logitThetaHi = as<NumericVector>(e["logThetasHiF"]);
+    logitThetaLow = as<NumericVector>(e["logThetasHiF"]);
+  }
   j = logTheta.size()-1;
+  k = logitTheta.size()-1;
   double qn= Rf_qnorm5(1.0-(1-op_focei.ci)/2, 0.0, 1.0, 1, 0);
   std::string cur;
   char buff[100];
   LogicalVector thetaFixed =thetaDf["fixed"];
-
   for (i = Estimate.size(); i--;){
     snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, Estimate[i]);
     EstS[i]=buff;
-    if (logTheta.size() > 0 && j >= 0 && logTheta[j]-1==i){
+    if (logTheta.size() > 0 && j >= 0 && logTheta[j]-1==i) {
       EstBT[i] = exp(Estimate[i]);
       snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, EstBT[i]);
       cur = buff;
@@ -5203,6 +5223,34 @@ void foceiFinalizeTables(Environment e){
       }
       btCi[i] = cur;
       j--;
+    } else if (logitTheta.size() > 0 && k >= 0 && logitTheta[k]-1==i){
+      EstBT[i] = expit(Estimate[i], logitThetaLow[k], logitThetaHi[k]);
+      snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, EstBT[i]);
+      cur = buff;
+      if (ISNA(SE[i])){
+        EstLower[i] = NA_REAL;
+        EstUpper[i] = NA_REAL;
+	if (thetaFixed[i]){
+          SeS[i]  = "FIXED";
+          rseS[i] = "FIXED";
+	} else {
+          SeS[i] = "";
+          rseS[i]="";
+        }
+      } else {
+        EstLower[i] = expit(Estimate[i]-SE[i]*qn, logitThetaLow[k], logitThetaHi[k]);
+        EstUpper[i] = expit(Estimate[i]+SE[i]*qn, logitThetaLow[k], logitThetaHi[k]);
+	snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, SE[i]);
+        SeS[i]=buff;
+	snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, RSE[i]);
+        rseS[i]=buff;
+        snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, EstLower[i]);
+	cur = cur + " (" + buff + ", ";
+        snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, EstUpper[i]);
+	cur = cur + buff + ")";
+      }
+      btCi[i] = cur;
+      k--;
     } else {
       EstBT[i]= Estimate[i];
       snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, Estimate[i]);
@@ -5483,6 +5531,7 @@ Environment foceiFitCpp_(Environment e){
   t0 = clock();
   CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
   IntegerVector logTheta;
+  IntegerVector logitTheta;
   IntegerVector xType = e["xType"];
   std::fill_n(&op_focei.scaleC[0], op_focei.ntheta+op_focei.omegan, NA_REAL);
   if (e.exists("scaleC")){
@@ -5499,6 +5548,20 @@ Environment foceiFitCpp_(Environment e){
       }
     }
   }
+  if (e.exists("logitThetas") && e.exists("logitThetasLow") &&
+      e.exists("logitThetasHi")) {
+    logitTheta = as<IntegerVector>(e["logitThetas"]);
+    if (logitTheta.size() != 0) {
+      op_focei.logitThetaLow = as<NumericVector>(e["logitThetasLow"]);
+      op_focei.logitThetaHi = as<NumericVector>(e["logitThetasHi"]);
+    } else {
+      op_focei.logitThetaLow=NumericVector(0);
+      op_focei.logitThetaHi=NumericVector(0);
+    }
+  } else {
+    op_focei.logitThetaLow=NumericVector(0);
+    op_focei.logitThetaHi=NumericVector(0);
+  }
   int j;
   // Setup which parameters are transformed
   for (unsigned int k = op_focei.npars; k--;){
@@ -5510,6 +5573,12 @@ Environment foceiFitCpp_(Environment e){
       for (unsigned int m=logTheta.size(); m--;){
 	if (logTheta[m]-1 == j){
 	  op_focei.xPar[k] = 1;
+	  break;
+	}
+      }
+      for (int m = logitTheta.size(); m--;) {
+	if (logitTheta[m]-1 == j){
+	  op_focei.xPar[k] = -m;
 	  break;
 	}
       }

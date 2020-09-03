@@ -242,7 +242,7 @@ ini <- function(ini, ...) {
         if (length(.w) == 1) {
           if (any(.deparse(.call[[.n]]) == c("fix", "fixed", "FIX", "FIXED"))) {
             if (.uif$ini$fix[.w]) {
-              warning(sprintf("Trying to fix '%s', but already fixed.", .n))
+              warning("trying to fix '", n, "', but already fixed")
             } else {
               .uif$ini$fix[.w] <- TRUE
             }
@@ -250,12 +250,12 @@ ini <- function(ini, ...) {
             if (.uif$ini$fix[.w]) {
               .uif$ini$fix[.w] <- FALSE
             } else {
-              warning(sprintf("Trying to unfix '%s', but not fixed.", .n))
+              warning("trying to unfix '", .n, "', but not fixed")
             }
           } else if (regexpr(rex::rex(or(c("fix", "fixed", "FIX", "FIXED")), "(", anything, ")"), .deparse(.call[[.n]])) != -1) {
             .val <- eval(.call[[.n]][[2]])
             if (.uif$ini$fix[.w]) {
-              warning(sprintf("Trying to fix '%s', but already fixed.  Still assigned to '%s'", .n, .val))
+              warning("trying to fix '", .n, "', but already fixed, still assigned to '", .val, "'")
             } else {
               .uif$ini$fix[.w] <- TRUE
             }
@@ -265,7 +265,7 @@ ini <- function(ini, ...) {
             if (.uif$ini$fix[.w]) {
               .uif$ini$fix[.w] <- FALSE
             } else {
-              warning(sprintf("Trying to unfix '%s', but not fixed.  Still assigned to '%s'", .n, .val))
+              warning("trying to unfix '", .n, "', but not fixed, still assigned to '", .val, "'")
             }
             .uif$ini$est[.w] <- .val
           } else {
@@ -311,7 +311,7 @@ ini <- function(ini, ...) {
             }
           }
         } else {
-          warning(sprintf("The model does not have a parameter named '%s', modification ignored.", .n))
+          warning("the model does not have a parameter named '", .n., "', modification ignored")
         }
       }
     } else if (length(.call) == 1) {
@@ -769,7 +769,7 @@ nlmixrUI <- function(fun) {
     .ini <- fun$.ini
     env <- new.env(parent = .GlobalEnv)
     lhs0 <- c("data", "desc", "ref", "imp", "est", "control", "table")
-    warning("Some information (like parameter labels) is lost by evaluating a nlmixr function")
+    warning("some information (like parameter labels) is lost by evaluating a nlmixr function")
     fun <- paste0(
       "function(){\n",
       paste(sapply(lhs0, function(var) {
@@ -1061,7 +1061,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   ))
   .wd <- RxODE::rxTempDir()
   if (.wd == "") {
-    warning("rxTempDir did not work.")
+    warning("rxTempDir did not work")
     .wd <- tempfile()
     dir.create(.wd, recursive = TRUE)
   } else {
@@ -1096,7 +1096,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
     for (.w in .lst$ws) {
       warning(.w)
     }
-    stop(sprintf("%s\nBad parsed model (cached %s).", .lst$em, .uiBad))
+    stop(sprintf("%s\nbad parsed model (cached %s)", .lst$em, .uiBad))
   } else if (file.exists(.uiFile)) {
     load(file = .uiFile)
     return(ret)
@@ -1164,10 +1164,17 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   eta.names <- c()
   .mu.ref <- list()
   .oneTheta <- c()
+  .oneThetaLogit <- c()
   cov.ref <- list()
   cov.theta <- c()
   log.theta <- c()
+  logit.theta <- c()
+  logit.theta.low <- c()
+  logit.theta.hi <- c()
   log.eta <- c()
+  logit.eta <- c()
+  logit.eta.low <- c()
+  logit.eta.hi <- c()
   this.env <- environment()
   if (!is.null(ini)) {
     unnamed.thetas <- ini$ntheta[(!is.na(ini$ntheta) & is.na(ini$name))]
@@ -1592,6 +1599,61 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       } else if (identical(x[[1]], quote(`<-`)) && do.pred == 4) {
         ## SAEM requires = instead of <-
         x[[1]] <- quote(`=`)
+        return(as.call(lapply(x, f)))
+      } else if (identical(x[[1]], quote(`expit`)) && any(do.pred == c(4, 5))) {
+        .low <- 0
+        .hi <- 1
+        if (length(x) >= 3) {
+          .tmp <- try(eval(x[[3]]), silent=TRUE)
+          if (inherits(.tmp, "numeric")) {
+            .low <- .tmp
+          } else {
+            .low <- NA_real_
+          }
+          if (length(x) >= 4) {
+            .tmp <- try(eval(x[[4]]), silent=TRUE)
+            if (inherits(.tmp, "numeric")) {
+              .hi <- .tmp
+            } else {
+              .hi <- NA_real_
+            }
+          }
+        }
+        find.logit <- function(x) {
+          if (is.atomic(x) || is.name(x)) {
+            if (any.theta.names(as.character(x), theta.names)) {
+              assign("logit.theta", unique(c(logit.theta, as.character(x))), this.env)
+              if (!(as.character(x) %in% names(logit.theta.hi))) {
+                assign("logit.theta.hi", c(logit.theta.hi, setNames(.hi, as.character(x))), this.env)
+              }
+              if (!(as.character(x) %in% names(logit.theta.low))) {
+                assign("logit.theta.low", c(logit.theta.low, setNames(.low, as.character(x))), this.env)
+              }
+            } else if (any.theta.names(as.character(x), eta.names)) {
+              assign("logit.eta", unique(c(logit.eta, as.character(x))), this.env)
+              if (!(as.character(x) %in% names(logit.eta.hi))) {
+                assign("logit.eta.hi", c(logit.eta.hi, setNames(.hi, as.character(x))), this.env)
+              }
+              if (!(as.character(x) %in% names(logit.eta.low))) {
+                assign("logit.eta.low", c(logit.eta.low, setNames(.low, as.character(x))), this.env)
+              }
+            }
+            return(x)
+          } else if (is.pairlist(x)) {
+            return(lapply(x, find.log))
+          } else if (is.call(x)) {
+            return(lapply(x, find.log))
+          } else {
+            stop("Don't know how to handle type ", typeof(x),
+              call. = FALSE
+            )
+          }
+        }
+        find.logit(x[[2]])
+        if (length(x[[2]]) == 1 && any.theta.names(as.character(x[[2]]), theta.names)) {
+          tmp <- as.character(x[[2]])
+          .oneThetaLogit <<- unique(c(.oneThetaLogit, tmp))
+        }
         return(as.call(lapply(x, f)))
       } else if (identical(x[[1]], quote(`exp`)) && any(do.pred == c(4, 5))) {
         ## Need traverse the parsing tree to get log theta/eta
@@ -2473,8 +2535,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       predDf = .predDf, predSaem = .predSaem, env = env, predSys = .pred,
       noMuEtas = .no.mu.etas,
       saemErr = .saemErr, cmtEndpoints = .cmtEndpoints,
-      oneTheta = .oneTheta, extra = .extra
-    )
+      oneTheta = .oneTheta, oneThetaLogit=.oneThetaLogit, extra = .extra,
+      logit.theta=logit.theta, logit.theta.hi=logit.theta.hi, logit.theta.low=logit.theta.low,
+      logit.eta=logit.eta, logit.eta.hi=logit.eta.hi, logit.eta.low=logit.eta.low)
   )
   if (.linCmt) {
     ret$nmodel$lin.solved <- TRUE
@@ -2653,7 +2716,7 @@ nlmixrUI.nlme.var <- function(object) {
   if (all(!add.prop.errs$prop)) {
     tmp <- sprintf("varIdent(form = ~ 1%s)", grp)
     if (tmp == "varIdent(form = ~ 1)") {
-      warning("Initial condition for additive error ignored with nlme")
+      warning("initial condition for additive error ignored with nlme")
       return(NULL)
     }
   } else if (all(!add.prop.errs$add)) {
@@ -3252,7 +3315,7 @@ nlmixrUI.poped.sigma <- function(obj) {
   return(setNames(.tmp$est * .tmp$est, paste(.tmp$name)))
 }
 
-nlmixUI.logThetasList <- function(obj) {
+nlmixrUI.logThetasList <- function(obj) {
   .ini <- .as.data.frame(obj$ini)
   .logThetas <- as.integer(which(setNames(sapply(obj$focei.names, function(x) any(x == obj$log.theta)), NULL)))
   .thetas <- .ini[!is.na(.ini$ntheta), ]
@@ -3262,6 +3325,30 @@ nlmixUI.logThetasList <- function(obj) {
   list(.logThetas, .logThetasF)
 }
 
+nlmixrUI.logitThetasList <- function(obj) {
+  .ini <- .as.data.frame(obj$ini)
+  .logitThetas <- as.integer(which(setNames(sapply(obj$focei.names, function(x) any(x == obj$logit.theta)), NULL)))
+  .thetas <- .ini[!is.na(.ini$ntheta), ]
+  .one <- obj$oneThetaLogit
+  .logitThetasF <- .thetas[.thetas$name %in% .one, "ntheta"]
+  .logitThetasF <- intersect(.logitThetas, .logitThetasF)
+  list(.logitThetas, .logitThetasF)
+}
+
+nlmixrUI.logitThetasListHi <- function(obj) {
+  .thetaList <- nlmixrUI.logitThetasList(obj)
+  .names <- obj$focei.names
+  .hi <- obj$logit.theta.hi
+  list(.hi[.names[.thetaList[[1]]]],
+       .hi[.names[.thetaList[[2]]]])
+}
+nlmixrUI.logitThetasListLow <- function(obj) {
+  .thetaList <- nlmixrUI.logitThetasList(obj)
+  .names <- obj$focei.names
+  .low <- obj$logit.theta.low
+  list(.low[.names[.thetaList[[1]]]],
+       .low[.names[.thetaList[[2]]]])
+}
 
 nlmixrUI.poped.ff_fun <- function(obj) {
   if (!is.null(obj$lin.solved)) {
@@ -3367,7 +3454,13 @@ nlmixrUI.poped.ff_fun <- function(obj) {
   } else if (arg == "poped.sigma") {
     return(nlmixrUI.poped.sigma(obj))
   } else if (arg == "logThetasList") {
-    return(nlmixUI.logThetasList(obj))
+    return(nlmixrUI.logThetasList(obj))
+  } else if (arg == "logitThetasListLow") {
+    return(nlmixrUI.logitThetasListLow(obj))
+  } else if (arg == "logitThetasListHi") {
+    return(nlmixrUI.logitThetasListHi(obj))
+  } else if (arg == "logitThetasList") {
+    return(nlmixrUI.logitThetasList(obj))
   } else if (arg == ".clean.dll") {
     if (exists(".clean.dll", envir = x$meta)) {
       clean <- x$meta$.clean.dll

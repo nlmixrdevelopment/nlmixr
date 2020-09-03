@@ -2031,10 +2031,13 @@ foceiFit.data.frame0 <- function(data,
     for (.i in .ini$model$extraProps$log) {
       if (is.na(.ret$scaleC[.i])) .ret$scaleC[.i] <- log(abs(.ini$est[.i])) * abs(.ini$est[.i])
     }
-    ## for (.i in .ini$model$extraProps$expit) {
-    ##   ## expit(a,b,c) ->
-    ##   ## 1.0*(-b + c)*exp(-a)/((1.0 + exp(-a))^2*(b + 1.0*(-b + c)/(1.0 + exp(-a))))
-    ## }
+    for (.i in .ret$logitThetas) {
+      .b <- .ret$logitThetasLow[.i]
+      .c <- .ret$logitThetasHi[.i]
+      .a <- .ini$est[.i]
+      if (is.na(.ret$scaleC[.i]))
+        .ret$scaleC[.i] <- 1.0*(-.b + .c)*exp(-.a)/((1.0 + exp(-.a))^2*(.b + 1.0*(-.b + .c)/(1.0 + exp(-.a))))
+    }
     ## for (.i in .ini$model$extraProp$logit) {
     ##   ## logit(a,b,c) ->
     ##   ##-1.0*(-b + c)/((a - b)^2*(-1.0 + 1.0*(-b + c)/(a - b))*log(-1.0 + 1.0*(-b + c)/(a - b)))
@@ -2063,8 +2066,23 @@ foceiFit.data.frame0 <- function(data,
     .tmp <- .ret$uif$logThetasList
     .ret$logThetas <- .tmp[[1]]
     .ret$logThetasF <- .tmp[[2]]
+    .tmp <- .ret$uif$logitThetasList
+    .ret$logitThetas <- .tmp[[1]]
+    .ret$logitThetasF <- .tmp[[2]]
+    .tmp <- .ret$uif$logitThetasListLow
+    .ret$logitThetasLow <- .tmp[[1]]
+    .ret$logitThetasLowF <- .tmp[[2]]
+    .tmp <- .ret$uif$logitThetasListHi
+    .ret$logitThetasHi <- .tmp[[1]]
+    .ret$logitThetasHiF <- .tmp[[2]]
   } else {
     .ret$logThetasF <- integer(0)
+    .ret$logitThetasF <- integer(0)
+    .ret$logitThetasHiF <- integer(0)
+    .ret$logitThetasLowF <- integer(0)
+    .ret$logitThetas <- integer(0)
+    .ret$logitThetasHi <- integer(0)
+    .ret$logitThetasLow <- integer(0)
   }
   if (exists("noLik", envir = .ret)) {
     if (!.ret$noLik) {
