@@ -5182,9 +5182,11 @@ void foceiFinalizeTables(Environment e){
     logTheta =  as<IntegerVector>(model["log.thetas"]);
   }
   if (e.exists("logitThetasF")) {
-    logitTheta = as<IntegerVector>(e["logThetasF"]);
-    logitThetaHi = as<NumericVector>(e["logThetasHiF"]);
-    logitThetaLow = as<NumericVector>(e["logThetasHiF"]);
+    logitTheta = as<IntegerVector>(e["logitThetasF"]);
+    if (logitTheta.size() != 0) {
+      logitThetaHi = as<NumericVector>(e["logitThetasHiF"]);
+      logitThetaLow = as<NumericVector>(e["logitThetasLowF"]);
+    }
   }
   j = logTheta.size()-1;
   k = logitTheta.size()-1;

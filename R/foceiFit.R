@@ -2066,23 +2066,26 @@ foceiFit.data.frame0 <- function(data,
     .tmp <- .ret$uif$logThetasList
     .ret$logThetas <- .tmp[[1]]
     .ret$logThetasF <- .tmp[[2]]
+
     .tmp <- .ret$uif$logitThetasList
     .ret$logitThetas <- .tmp[[1]]
     .ret$logitThetasF <- .tmp[[2]]
+
     .tmp <- .ret$uif$logitThetasListLow
     .ret$logitThetasLow <- .tmp[[1]]
     .ret$logitThetasLowF <- .tmp[[2]]
+
     .tmp <- .ret$uif$logitThetasListHi
     .ret$logitThetasHi <- .tmp[[1]]
     .ret$logitThetasHiF <- .tmp[[2]]
   } else {
     .ret$logThetasF <- integer(0)
     .ret$logitThetasF <- integer(0)
-    .ret$logitThetasHiF <- integer(0)
-    .ret$logitThetasLowF <- integer(0)
+    .ret$logitThetasHiF <- numeric(0)
+    .ret$logitThetasLowF <- numeric(0)
     .ret$logitThetas <- integer(0)
-    .ret$logitThetasHi <- integer(0)
-    .ret$logitThetasLow <- integer(0)
+    .ret$logitThetasHi <- numeric(0)
+    .ret$logitThetasLow <- numeric(0)
   }
   if (exists("noLik", envir = .ret)) {
     if (!.ret$noLik) {

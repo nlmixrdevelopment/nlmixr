@@ -34,6 +34,7 @@
  - `saem` fits now can add in `fo`, `foce` and `focei` likelihood
  - `saem` fits now use `liblsoda` by default and are multi-threaded when
    running (controlled by `RxODE`)
+ - `saem` now supports time-varying covariates (like clock-time)
 
 ## New Utilities
 
