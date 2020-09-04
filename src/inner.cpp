@@ -3240,7 +3240,7 @@ extern "C" double foceiOfvOptim(int n, double *x, void *ex){
     if (op_focei.xPar[i] == 1){
       vPar.push_back(exp(unscalePar(x, i)));
     } else if (op_focei.xPar[i] < 0){
-      int m = -op_focei.xPar[i];
+      int m = -op_focei.xPar[i]-1;
       vPar.push_back(expit(unscalePar(x, i), op_focei.logitThetaLow[m], op_focei.logitThetaHi[m]));
     } else {
       vPar.push_back(unscalePar(x, i));
@@ -3321,7 +3321,7 @@ extern "C" double foceiOfvOptim(int n, double *x, void *ex){
       if (op_focei.xPar[i] == 1){
 	RSprintf("%#10.4g |", exp(unscalePar(x, i)));
       } else if (op_focei.xPar[i] < 0){
-	int m = -op_focei.xPar[i];
+	int m = -op_focei.xPar[i]-1;
 	RSprintf("%#10.4g |", expit(unscalePar(x, i), op_focei.logitThetaLow[m], op_focei.logitThetaHi[m]));
       } else {
 	RSprintf("%#10.4g |", unscalePar(x, i));
@@ -5580,7 +5580,7 @@ Environment foceiFitCpp_(Environment e){
       }
       for (int m = logitTheta.size(); m--;) {
 	if (logitTheta[m]-1 == j){
-	  op_focei.xPar[k] = -m;
+	  op_focei.xPar[k] = -m-1;
 	  break;
 	}
       }
