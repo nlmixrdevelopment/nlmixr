@@ -6,7 +6,7 @@
 \usage{
 addNpde(
   object,
-  nsim = 300,
+  nsim = 1000,
   ties = TRUE,
   seed = 1009,
   updateObject = TRUE,

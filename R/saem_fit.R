@@ -194,6 +194,8 @@ configsaem <- function(model, data, inits,
   if (is.null(inits$omega)) inits$omega <- rep(1, model$N.eta) * 4
   if (is.null(inits$ares)) inits$ares <- 10
   if (is.null(inits$bres)) inits$bres <- 1
+  if (is.null(inits$cres)) inits$cres <- 1
+  if (is.null(inits$lres)) inits$lres <- 1
   if (is.null(mcmc$print)) mcmc$print <- 1
   if (is.null(names(inits$theta))) names(inits$theta) <- rep("", length(inits$theta))
   inits.save <- inits
@@ -524,11 +526,13 @@ configsaem <- function(model, data, inits,
     res.mod = model$res.mod,
     ares = inits$ares,
     bres = inits$bres,
+    cres = inits$cres,
+    lres = inits$lres,
     opt = opt,
     optM = optM,
     print = mcmc$print,
     distribution = distribution,
-    par.hist = matrix(0, sum(niter), nlambda1 + nlambda0 + nphi1 + 1 + (model$res.mod > 2)),
+    par.hist = matrix(0, sum(niter), nlambda1 + nlambda0 + nphi1 + 1 + (model$res.mod == 2) + 2 * (model$res.mod == 4)),
     seed = seed,
     fixed.i1 = fixed.i1,
     fixed.i0 = fixed.i0,
@@ -559,38 +563,18 @@ configsaem <- function(model, data, inits,
 
   cfg$ares <- rep(10, cfg$nendpnt)
   cfg$bres <- rep(1, cfg$nendpnt)
+  cfg$cres <- rep(1, cfg$nendpnt)
+  cfg$lres <- rep(1, cfg$nendpnt)
   cfg$ares[cfg$res.mod == 2] <- 0
   cfg$bres[cfg$res.mod == 1] <- 0
 
-  nres <- (1:2)[(cfg$res.mod == 3) + 1]
+  nres <- (1:3)[(cfg$res.mod == 4) * 2 + (cfg$res.mod == 3) + 1]
   cfg$res_offset <- cumsum(c(0, nres))
   cfg$par.hist <- matrix(0, cfg$niter, nlambda1 + nlambda0 + nphi1 + sum(nres))
 
   cfg$DEBUG <- cfg$opt$DEBUG <- cfg$optM$DEBUG <- DEBUG
   cfg$phiMFile <- tempfile()
   cfg
-}
-
-
-
-reINITS <- "^\\s*initCondition\\s*=\\s*c\\((?<inits>.+)\\)\\s*$"
-reDATAPAR <- "^\\s*ParamFromData\\s*=\\s*c\\((?<inits>.+)\\)\\s*$"
-
-getInits <- function(x, re, collapse = TRUE) {
-  # x = "initCondition = c(1,2,3,4)"
-  # re = "^\\s*initCondition\\s*=\\s*c\\((?<inits>.+)\\)\\s*$"
-  m <- regexpr(re, x, perl = T)
-  if (m < 0) stop("invalid initCondition input")
-  start <- attr(m, "capture.start")
-  len <- attr(m, "capture.length")
-  inits <- substring(x, start, start + len - 1)
-  s <- strsplit(inits, ",")[[1]]
-
-  if (collapse) {
-    paste0(sprintf("\t_inits[%d] = %s;", 1:length(s) - 1, s), collapse = "\n")
-  } else {
-    s
-  }
 }
 
 #' Print an SAEM model fit summary

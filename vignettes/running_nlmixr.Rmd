@@ -62,9 +62,11 @@ one.cmt <- function() {
     ka <- exp(tka + eta.ka)
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
-    linCmt() ~ add(add.sd)
+    linCmt() ~ logitNorm(add.sd, -0.5, 12)
   })
 }
+
+f <- nlmixr(one.cmt)
 ```
 We can now run the model...
 
@@ -95,7 +97,7 @@ one.compartment <- function() {
     d/dt(depot) = -ka * depot
     d/dt(center) = ka * depot - cl / v * center
     cp = center / v
-    cp ~ add(add.sd)
+    cp ~ prop(add.sd)
   })
 }
 ```
@@ -103,15 +105,15 @@ one.compartment <- function() {
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```{r}
-fit2 <- nlmixr(one.compartment, theo_sd, est="saem", control=list(print=0))
-print(fit2)
+fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
+## print(fit2)
 ```
 
 And if we wanted to, we could even apply the First-Order Conditional
 Estimation (FOCEi) method to this model:
 
 ```{r}
-fitF <- nlmixr(one.compartment, theo_sd, est="focei", control=list(print=0))
+fitF <- nlmixr(one.compartment, theo_sd, est="focei")
 print(fitF)
 ```
 

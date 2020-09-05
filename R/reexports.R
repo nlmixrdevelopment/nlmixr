@@ -6,6 +6,15 @@ magrittr::`%>%`
 ##' @export
 RxODE::RxODE
 
+
+##' @importFrom RxODE logit
+##' @export
+RxODE::logit
+
+##' @importFrom RxODE expit
+##' @export
+RxODE::expit
+
 ##' @importFrom RxODE rxSolve
 ##' @export
 RxODE::rxSolve

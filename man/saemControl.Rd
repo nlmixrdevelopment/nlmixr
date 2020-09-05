@@ -12,7 +12,7 @@ saemControl(
   nu = c(2, 2, 2),
   atol = 1e-06,
   rtol = 1e-04,
-  method = "lsoda",
+  method = "liblsoda",
   transitAbs = FALSE,
   print = 1,
   trace = 0,

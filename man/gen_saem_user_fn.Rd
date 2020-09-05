@@ -8,7 +8,8 @@ gen_saem_user_fn(
   model,
   PKpars = attr(model, "default.pars"),
   pred = NULL,
-  control = saemControl()
+  control = saemControl(),
+  inPars = NULL
 )
 }
 \arguments{
