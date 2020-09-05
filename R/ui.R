@@ -1770,9 +1770,18 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
               ## mod$res.mod = 1 = additive or poisson
               ## mod$res.mod = 2 = proportional
               ## mod$res.mod = 3 = additive + proportional
+              ## mod$res.mod = 4 = additive + power
+              ## mod$res.mod = 5 = power
+              ## mod$res.mod = 6 = additive + lambda
+              ## mod$res.mod = 7 = prop + lambda
+              ## mod$res.mod = 8 = power + lambda
+              ## mod$res.mod = 9 = additive + prop + lambda
+              ## mod$res.mod = 10 = additive + pow + lambda
               ## a+b*f
               ## mod$ares = initial estimate of res
-              ## mod$bres = initial estimate of
+              ## mod$bres = initial estimate of power/prop
+              ## mod$cres = initial estimate of exponent
+              ## mod$lres = initial estimate of lambda transformation (either box-cox or yeo-johnson)
               return(x[[2]])
             } else if (any.theta.names(as.character(x[[3]]), eta.names) &&
               length(x[[2]]) > 1) {
@@ -2907,17 +2916,27 @@ nlmixrUI.saem.res.mod <- function(obj) {
   .ini <- .ini[!is.na(.ini$err), ]
   return(sapply(.predDf$cond, function(x) {
     .tmp <- .ini[which(.ini$condition == x), ]
-    .hasAdd <- any(.tmp$err == "add") | any(.tmp$err == "norm") | any(.tmp$err == "dnorm") |
-      any(.tmp$err == "dlnorm") | any(.tmp$err == "lnorm") | any(.tmp$err == "logn") |
+    .hasAdd <- any(.tmp$err == "add") | any(.tmp$err == "norm") | any(.tmp$err == "dnorm")
+    .hasLog <- any(.tmp$err == "dlnorm") | any(.tmp$err == "lnorm") | any(.tmp$err == "logn") |
       any(.tmp$err == "dlogn")
+    .hasLogit <- any(.tmp$err == "logitNorm")
     .hasProp <- any(.tmp$err == "prop")
-    if (.hasAdd & .hasProp) {
-      return(3)
+    .hasPow <- any(.tmp$err == "pow")
+    .boxCox <- any(.tmp$err == "boxCox")
+    .yeoJohnson <- any(.tmp$err == "yeoJohnson")
+    if (.boxCox | .yeoJohnson) {
+    } else {
+      if (.hasAdd & .hasPow) {
+        return(4L)
+      }
+      if (.hasAdd & .hasProp) {
+        return(3L)
+      }
+      if (.hasAdd) {
+        return(1L)
+      }
+      return(2L)
     }
-    if (.hasAdd) {
-      return(1)
-    }
-    return(2)
   }))
 }
 ##' Get error names for SAEM

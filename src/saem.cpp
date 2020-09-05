@@ -172,7 +172,8 @@ SEXP saem_fit(SEXP xSEXP) {
     Named("Ha") = saem.get_Ha(),
     Named("sig2") = saem.get_sig2(),
     Named("eta") = saem.get_eta(),
-    Named("par_hist") = saem.get_par_hist()
+    Named("par_hist") = saem.get_par_hist(),
+    Named("res_info") = saem.get_resInfo()
   );
   out.attr("saem.cfg") = x;
   out.attr("class") = "saemFit";

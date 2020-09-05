@@ -27,25 +27,70 @@ using namespace std;
 using namespace arma;
 using namespace Rcpp;
 
-typedef void (*fn_ptr) (double *, double *, double *yptr, double *fptr, int len);
+typedef void (*fn_ptr) (double *, double *, double *yptr, double *fptr, int len,
+			int yj, double lambda, double low, double hi);
 
 extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
 			  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
 			  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
-			  int *iprint, double *yptr, double *fptr, int len);
+			  int *iprint, double *yptr, double *fptr, int len, int yt, double lambda,
+			  double low, double hi);
 
-void obj(double *ab, double *fx, double *yptr, double *fptr, int len) {
+// add+prop
+void obj(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
   int i;
-  double g, sum;
-  double xmin = 1.0e-200;
+  double g, sum, cur;
+  double xmin = 1.0e-200, ft, ytr;
   for (i=0, sum=0; i<len; ++i) {
     // nelder_() does not allow lower bounds; we force ab[] be positive here
+    ft = _powerD(fptr[i],  lambda, yj, low, hi);
+    ytr = _powerD(yptr[i], lambda, yj, low, hi);
+    // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
+    // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
     g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
     if (g < xmin) g = xmin;
-    sum += pow((yptr[i]-fptr[i])/g, 2.0) + 2*log(g);
+    cur = (ytr-ft)/g;
+    sum += cur*cur + 2*log(g);
   }
   *fx = sum;
 }
+
+// add + pow
+void objC(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+  int i;
+  double g, sum, cur, ft, ytr;
+  double xmin = 1.0e-200;
+  for (i=0, sum=0; i<len; ++i) {
+    // nelder_() does not allow lower bounds; we force ab[] be positive here
+    ft = _powerD(fptr[i], lambda, yj, low, hi);
+    ytr = _powerD(yptr[i], lambda, yj, low, hi);
+    // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
+    // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
+    g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fptr[i], ab[2]);
+    if (g < xmin) g = xmin;
+    cur = (ytr-ft)/g;
+    sum += cur * cur + 2*log(g);
+  }
+  *fx = sum;
+}
+
+// Power only
+void objD(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+  int i;
+  double g, sum, cur, ft, ytr;
+  double xmin = 1.0e-200;
+  for (i=0, sum=0; i<len; ++i) {
+    // nelder_() does not allow lower bounds; we force ab[] be positive here
+    ft = _powerD(fptr[i],  lambda, yj, low, hi);
+    ytr = _powerD(yptr[i], lambda, yj, low, hi);
+    g = ab[0]*ab[0]*pow(fabs(ft), ab[1]);
+    if (g < xmin) g = xmin;
+    cur = (ytr-ft)/g;
+    sum += cur * cur + 2*log(g);
+  }
+  *fx = sum;
+}
+
 
 // FIXME obj for boxCox and yeoJohnson and pow() instead of prop()
 
@@ -127,6 +172,17 @@ public:
   
   vec get_sig2() {
     return vcsig2;                                       //FIXME: regression due to multiple endpnts?
+  }
+
+  List get_resInfo() {
+    vec sig2(bres.size());
+    std::copy(sigma2, sigma2+bres.size(), &sig2[0]);
+    return List::create(_("sigma2") = wrap(sig2),
+			_("ares") = wrap(ares),
+			_("bres") = wrap(bres),
+			_("cres") = wrap(cres),
+			_("lres") = wrap(lres),
+			_("res_mod") = wrap(res_mod));
   }
   
   mat get_par_hist() {
@@ -222,6 +278,13 @@ public:
     res_mod = as<vec>(x["res.mod"]);
     ares = as<vec>(x["ares"]);
     bres = as<vec>(x["bres"]);
+    cres = as<vec>(x["cres"]);
+    lres = as<vec>(x["lres"]);
+    yj = as<vec>(x["yj"]);
+    lambda = as<vec>(x["lambda"]);
+    low = as<vec>(x["low"]);
+    hi = as<vec>(x["hi"]);
+    
     ix_endpnt=as<uvec>(x["ix_endpnt"]);
     ix_idM=as<umat>(x["ix_idM"]);
     res_offset=as<uvec>(x["res_offset"]);
@@ -229,6 +292,8 @@ public:
     vcsig2.set_size(nres);
     vecares = ares(ix_endpnt);
     vecbres = bres(ix_endpnt);
+    veccres = cres(ix_endpnt);
+    veclres = lres(ix_endpnt);
     for (int b=0; b<nendpnt; ++b) {
       sigma2[b] = 10.0;
       if (res_mod(b)==1)
@@ -274,10 +339,10 @@ public:
     if (DEBUG>0) Rcout << "initialization successful\n";
     fsaveMat = user_fn(phiM, evtM, optM);
     fsave = fsaveMat.col(0);
-    if (distribution == 4){
-      fsave.elem(find( fsave < double_xmin)).fill(double_xmin);
-      fsave = log(fsave);
-    }
+    // if (distribution == 4){
+    //   fsave.elem(find( fsave < double_xmin)).fill(double_xmin);
+    //   fsave = log(fsave);
+    // }
     if (DEBUG>0) Rcout << "initial user_fn successful\n";
     for (unsigned int kiter=0; kiter<(unsigned int)(niter); kiter++) {
       gamma2_phi1=Gamma2_phi1.diag();
@@ -306,14 +371,29 @@ public:
       }
 
       vec f = fsave;
-      vec g = vecares + vecbres % abs(f);                          //make sure g > 0
-      g.elem( find( g == 0.0) ).fill(1.0); // like Uppusla IWRES allows prop when f=0
-      g.elem( find( g < double_xmin) ).fill(double_xmin);
 
       //fsave = f;
-      if (distribution == 1 || distribution == 4) DYF(indioM)=0.5*(((yM-f)/g)%((yM-f)/g))+log(g);
-      else if (distribution == 2) DYF(indioM)=-yM%log(f)+f;
-      else if (distribution == 3) DYF(indioM)=-yM%log(f)-(1-yM)%log(1-f);
+      if (distribution == 1){
+	vec ft = f;
+	vec yt = yM;
+	for (int i = ft.size(); i--;) {
+	  int cur = ix_endpnt(i);
+	  ft(i) = _powerD(f(i), lambda(cur), yj(cur), low(cur), hi(cur));
+	  yt(i) = _powerD(yM(i), lambda(cur), yj(cur), low(cur), hi(cur));
+	}
+	// focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
+	// focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
+	// This does not match focei's definition of add+prop
+	vec g = vecares + vecbres % abs(f);                          //make sure g > 0
+	g.elem( find( g == 0.0) ).fill(1.0); // like Uppusla IWRES allows prop when f=0
+	g.elem( find( g < double_xmin) ).fill(double_xmin);
+
+	DYF(indioM)=0.5*(((yt-ft)/g)%((yt-ft)/g)) + log(g);
+      } else if (distribution == 2){
+	DYF(indioM)=-yM%log(f)+f;
+      } else if (distribution == 3) {
+	DYF(indioM)=-yM%log(f)-(1-yM)%log(1-f);
+      }
       else {
 	Rcout << "unknown distribution (id=" <<  distribution << ")\n";
 	return;
@@ -378,15 +458,21 @@ public:
 	vec fk = fsave(span(k*ntotal, (k+1)*ntotal-1));
 	fk = fk(ix_sorting);    //sorted by endpnt
 	fsM = join_cols(fsM, fk);
-	vec resid_all = ys - fk;
-	vec gk, resid;
+	// vec resid_all(ys.size());// = ys - fk;
+	vec gk, y_cur, f_cur;
 
 	//loop thru endpoints here
 	for(int b=0; b<nendpnt; ++b) {
-	  resid = resid_all(span(y_offset(b),y_offset(b+1)-1));
+	  y_cur = ys(span(y_offset(b), y_offset(b+1)-1));
+	  f_cur = fk(span(y_offset(b), y_offset(b+1)-1));
+	  vec resid(y_cur.size());
+	  for (int i = y_cur.size(); i--;){
+	    // lambda(cur), yj(cur), low(cur), hi(cur)
+	    resid(i) = _powerD(y_cur[i], lambda(b), yj(b), low(b), hi(b)) - _powerD(f_cur[i], lambda(b), yj(b), low(b), hi(b));
+	  }
 	  if (res_mod(b)==2) {
 	    //double epsilon = std::numeric_limits<double>::epsilon();
-	    gk = abs(fk(span(y_offset(b),y_offset(b+1)-1)));            //CHK: range & chk resize & .memptr()
+	    gk = abs(f_cur);            //CHK: range & chk resize & .memptr()
 	    gk.elem( find( gk == 0.0) ).fill(1.0);
 	    gk.elem( find( gk < double_xmin) ).fill(double_xmin);
 	    resid = resid/gk;
@@ -492,7 +578,7 @@ public:
 	double sig2=statrese[b]/(y_offset(b+1)-y_offset(b));       //CHK: range
 	if (res_mod(b)==1) ares(b) = sqrt(sig2);
 	else if (res_mod(b)==2) bres(b) = sqrt(sig2);
-	else {
+	else if (res_mod(b) == 3) {
 	  uvec idx;
 	  idx = find(ix_endpnt==b);
 	  vec ysb, fsb;
@@ -506,13 +592,64 @@ public:
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
 	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
-	  double start[2]={sqrt(ares(b)), sqrt(fabs(b))};                  //force are & bres to be positive
+	  double start[2]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b)))};                  //force are & bres to be positive
 	  double step[2]={-.2, -.2}, ynewlo;
 	  nelder_fn(obj, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
 		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem);
+		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
+		    (int)yj(b), lambda(b), low(b), hi(b));
 	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
+	} else if (res_mod(b) == 4) { // add + pow
+	  uvec idx;
+	  idx = find(ix_endpnt==b);
+	  vec ysb, fsb;
+
+	  ysb = ysM(idx);
+	  fsb = fsM(idx);
+
+	  // yptr = ysb.memptr();
+	  // fptr = fsb.memptr();
+	  //len = ysb.n_elem;                                        //CHK: needed by nelder
+	  vec xmin(2);
+	  double *pxmin = xmin.memptr();
+	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
+	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), cres(b)};                  //force are & bres to be positive
+	  double step[3]={-.2, -.2, -.2}, ynewlo;
+	  nelder_fn(objC, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
+		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
+		    (int)yj(b), lambda(b), low(b), hi(b));
+	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
+	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
+	  cres(b) = cres(b) + pas(kiter)*(pxmin[2] - cres(b));            //force are & bres to be positive
+	} else if (res_mod(b) == 5) { // 
+	  uvec idx;
+	  idx = find(ix_endpnt==b);
+	  vec ysb, fsb;
+
+	  ysb = ysM(idx);
+	  fsb = fsM(idx);
+
+	  // yptr = ysb.memptr();
+	  // fptr = fsb.memptr();
+	  //len = ysb.n_elem;                                        //CHK: needed by nelder
+	  vec xmin(2);
+	  double *pxmin = xmin.memptr();
+	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
+	  double start[2]={sqrt(fabs(bres(b))), cres(b)};                  //force are & bres to be positive
+	  double step[2]={ -.2, -.2}, ynewlo;
+	  nelder_fn(objD, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
+		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
+		    (int)yj(b), lambda(b), low(b), hi(b));
+	  bres(b) = bres(b) + pas(kiter)*(pxmin[0]*pxmin[1] - bres(b));    //force are & bres to be positive
+	  cres(b) = cres(b) + pas(kiter)*(pxmin[1] - cres(b));            //force are & bres to be positive
+	} else if (res_mod(b) == 6) { // additive + lambda
+	} else if (res_mod(b) == 7) { // prop + lambda
+	} else if (res_mod(b) == 8) { // pow + lambda
+	} else if (res_mod(b) == 9) { // add + prop + lambda
+	} else if (res_mod(b) == 10) { // add + pow + lambda
 	}
 	sigma2[b] = sig2;                                          //CHK: sigma2[] use
 	if (sigma2[b]>1.0e99) sigma2[b] = 1.0e99;
@@ -607,8 +744,8 @@ private:
   mat statphi01, statphi02, statphi11, statphi12;
   double statrese[MAXENDPNT];
   double sigma2[MAXENDPNT];
-  vec ares, bres;
-  vec vecares, vecbres;
+  vec ares, bres, cres, lres, yj, lambda, low, hi;
+  vec vecares, vecbres, veccres, veclres;
   vec res_mod;
 
   mat DYF;
@@ -702,14 +839,16 @@ private:
 
 	fcMat = user_fn(phiMc, mx.evtM, mx.optM);
 	fc = fcMat.col(0);
-	if (distribution == 4){
-	  fc.elem(find(fc < double_xmin)).fill(double_xmin);
-	  fc = log(fc);
+	vec yt(fc.size());
+	for (int i = fc.size(); i--;) {
+	  int cur = ix_endpnt(i);
+	  fc(i) = _powerD(fc(i), lambda(cur), yj(cur), low(cur), hi(cur));
+	  yt(i) = _powerD(mx.yM(i), lambda(cur), yj(cur), low(cur), hi(cur));
 	}
 	gc = vecares + vecbres % abs(fc);                            //make sure gc > 0
 	gc.elem( find( gc == 0.0) ).fill(1);
 	gc.elem( find( gc < double_xmin) ).fill(double_xmin);
-	if (distribution == 1 || distribution == 4) DYF(mx.indioM)=0.5*(((mx.yM-fc)/gc)%((mx.yM-fc)/gc))+log(gc);
+	if (distribution == 1 || distribution == 4) DYF(mx.indioM)=0.5*(((yt-fc)/gc)%((yt-fc)/gc))+log(gc);
 	else if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
 	else if (distribution == 3) DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
 	doCens(DYF, cens, limit, fc, gc, mx.yM, distribution);

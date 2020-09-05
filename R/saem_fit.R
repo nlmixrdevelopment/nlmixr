@@ -18,8 +18,8 @@
 ## along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
 # genSaemUserFunction(f$rxode.pred, f$saem.pars, f$pred, f$error)
-genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pred = NULL, control=saemControl(),
-                                inPars=NULL) {
+genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pred = NULL, err=NULL,
+                                control=saemControl(), inPars=NULL) {
   .x <- deparse(body(pred))
   .len <- length(.x)
   .x <- if(.x[1]=="{") .x[2:(.len-1)] else .x
@@ -565,6 +565,10 @@ configsaem <- function(model, data, inits,
   cfg$bres <- rep(1, cfg$nendpnt)
   cfg$cres <- rep(1, cfg$nendpnt)
   cfg$lres <- rep(1, cfg$nendpnt)
+  cfg$yj <- rep(2L, cfg$nendpnt)
+  cfg$lambda <- rep(1.0, cfg$nendpnt)
+  cfg$low <- rep(0.0, cfg$nendpnt)
+  cfg$hi <- rep(1.0, cfg$nendpnt)
   cfg$ares[cfg$res.mod == 2] <- 0
   cfg$bres[cfg$res.mod == 1] <- 0
 
