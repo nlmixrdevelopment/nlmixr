@@ -559,6 +559,7 @@ is.latex <- function() {
 ##' @param gradProgressOfvTime This is the time for a single objective
 ##'     function evaluation (in seconds) to start progress bars on gradient evaluations
 ##'
+##' @inheritParams configsaem
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
 ##' @inheritParams foceiFit
@@ -688,7 +689,8 @@ foceiControl <- function(sigdig = 3, ...,
                          etaMat = NULL,
                          repeatGillMax = 3,
                          stickyRecalcN = 5,
-                         gradProgressOfvTime = 10) {
+                         gradProgressOfvTime = 10,
+                         addProp=c("combined2","combined1")) {
   if (is.null(boundTol)) {
     boundTol <- 5 * 10^(-sigdig + 1)
   }
@@ -985,6 +987,7 @@ foceiControl <- function(sigdig = 3, ...,
     eventFD = eventFD,
     eventCentral = as.integer(eventCentral),
     gradProgressOfvTime = gradProgressOfvTime,
+    addProp=match.arg(addProp),
     ...
   )
   if (!missing(etaMat) && missing(maxInnerIterations)) {
@@ -1748,8 +1751,7 @@ foceiFit.data.frame0 <- function(data,
       pred.minus.dv = TRUE, sum.prod = control$sumProd,
       theta.derivs = FALSE, optExpression = control$optExpression,
       interaction = (control$interaction == 1L),
-      only.numeric=!.mixed,
-      run.internal = TRUE)
+      only.numeric=!.mixed, run.internal = TRUE, addProp=control$addProp)
     if (!is.null(.ret$model$inner)) {
       .atol <- c(.atol, rep(
         control$atolSens,
@@ -1806,11 +1808,9 @@ foceiFit.data.frame0 <- function(data,
       .atol <- rep(control$atol, length(RxODE::rxModelVars(model)$state))
       .rtol <- rep(control$rtol, length(RxODE::rxModelVars(model)$state))
       .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err,
-        grad = FALSE,
-        pred.minus.dv = TRUE, sum.prod = control$sumProd,
+        grad = FALSE, pred.minus.dv = TRUE, sum.prod = control$sumProd,
         theta.derivs = FALSE, optExpression = control$optExpression, run.internal = TRUE,
-        only.numeric = TRUE
-      )
+        only.numeric = TRUE, addProp=control$addProp)
       if (!is.null(.ret$model$inner)) {
         .atol <- c(.atol, rep(
           control$atolSens,

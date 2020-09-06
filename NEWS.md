@@ -26,6 +26,12 @@
 
 - `focei` now allows `eta`s on dose-related modeled events like
   `alag`, `f`, etc by finite difference sensitivities.
+  
+- `focei` now supports 2 combined additive + proportional error
+  models; 
+  - `combined1`: `trans(y) = trans(f) + (a+b*f^c)*err`
+  - `combined2`: `trans(y) = trans(f) + (a^2+b^2*f^(2c))*err`
+
 
 ## SAEM changes
 
@@ -35,6 +41,17 @@
  - `saem` fits now use `liblsoda` by default and are multi-threaded when
    running (controlled by `RxODE`)
  - `saem` now supports time-varying covariates (like clock-time)
+ - `saem` now supports 2 combined additive + proportional error models:
+    - `combined1`: `trans(y) = trans(f) + (a+b*f^c)*err`
+	- `combined2`: `trans(y) = trans(f) + (a^2+b^2*f^(2c))*err`
+ - `saem` now supports censoring a similar way as `monolix` does, with
+  `cens` and `limit` columns
+ - The default of `saem` additive + proportional error has been
+   switched to `combined2`, which was the `focei` default, but you can
+   change this back with `saemControl(addProp="combined2")`.  The
+   table results will likely be different because in the last release
+   the `saem` calculated `combined1` and then used these coefficients
+   in the `combined2` focei problem.
 
 ## New Utilities
 
@@ -55,5 +72,11 @@
    ggplot stat/geom `geom_cens`) as well as use `RxODE`'s ggplot theme
    (`rxTheme()`).  Additionally time after dose is calculated as `tad`
    for all `nlmixr` models
+
+## Bug Fixes
+
+ - Aligned `saem` and `focei` additive + proportional error models, so
+   `saem` `additive+proportional` outputs will be different using the
+   correct `focei` method
 
 Note this includes all the RxODE changes *including* dropping python.

@@ -27,6 +27,8 @@ using namespace std;
 using namespace arma;
 using namespace Rcpp;
 
+int addProp;
+
 typedef void (*fn_ptr) (double *, double *, double *yptr, double *fptr, int len,
 			int yj, double lambda, double low, double hi);
 
@@ -47,7 +49,14 @@ void obj(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, do
     ytr = _powerD(yptr[i], lambda, yj, low, hi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
-    g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
+    if (addProp == 1) {
+      g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
+    } else {
+      double ab02 = ab[0]*ab[0];
+      double ab12 = ab[1]*ab[1];
+      double fa = fabs(fptr[i]);
+      g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
+    }
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
     sum += cur*cur + 2*log(g);
@@ -66,7 +75,13 @@ void objC(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
     ytr = _powerD(yptr[i], lambda, yj, low, hi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
-    g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fptr[i], ab[2]);
+    if (addProp == 1){
+      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fabs(fptr[i]), ab[2]);
+    } else {
+      double ab02 = ab[0]*ab[0];
+      double ab12 = ab[1]*ab[1];
+      g = ab02*ab02 + ab12*ab12*pow(fabs(fptr[i]), 2*ab[2]);
+    }
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
@@ -83,7 +98,7 @@ void objD(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
     // nelder_() does not allow lower bounds; we force ab[] be positive here
     ft = _powerD(fptr[i],  lambda, yj, low, hi);
     ytr = _powerD(yptr[i], lambda, yj, low, hi);
-    g = ab[0]*ab[0]*pow(fabs(ft), ab[1]);
+    g = ab[0]*ab[0]*pow(fabs(fptr[i]), ab[1]);
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
@@ -288,6 +303,7 @@ public:
     ix_endpnt=as<uvec>(x["ix_endpnt"]);
     ix_idM=as<umat>(x["ix_idM"]);
     res_offset=as<uvec>(x["res_offset"]);
+    addProp=as<int>(x["addProp"]);
     nres = res_offset.max();
     vcsig2.set_size(nres);
     vecares = ares(ix_endpnt);

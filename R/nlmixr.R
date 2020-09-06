@@ -408,7 +408,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       "DEBUG", "covMethod", "calcTables",
       "logLik", "nnodes.gq",
       "nsd.gq", "nsd.gq", "adjObf",
-      "optExpression"
+      "optExpression", "addProp"
     )) {
       .getOpt(a)
     }
@@ -446,7 +446,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     .cfg <- configsaem(
       model = model, data = dat, inits = inits,
       mcmc = .mcmc, ODEopt = .ODEopt, seed = .seed,
-      distribution = .dist, DEBUG = .DEBUG
+      distribution = .dist, DEBUG = .DEBUG,
+      addProp=.addProp
     )
     if (is(.print, "numeric")) {
       .cfg$print <- as.integer(.print)

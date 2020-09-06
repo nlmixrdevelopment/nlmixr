@@ -103,14 +103,22 @@ gen_saem_user_fn <- genSaemUserFunction
 #' @param mcmc a list of various mcmc options
 #' @param ODEopt optional ODE solving options
 #' @param seed seed for random number generator
-#' @param distribution one of c("normal","poisson","binomial", "lnorm")
+#' @param distribution one of c("normal","poisson","binomial")
+#' @param addProp one of "combined1" and "combined2"; These are the
+#'   two forms of additive+proportional errors supported by
+#'   monolix/nonmem:
+#'
+#' combined1: transform(y)=transform(f)+(a+b*abs(f)^c)\vareps
+#'
+#' combined2: transform(y)=transform(f)+(a^2+b^2*abs(f)^(2c))\vareps
+#'
 #' @param fixed a character vector of fixed effect only parameters (no random effects attached) to be fixed
 #' @param DEBUG Integer determining if debugging is enabled.
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by he Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
 #'
-#' @author Wenping Wang
+#' @author Wenping Wang & Matthew Fidler
 #' @examples
 #' \dontrun{
 #' library(nlmixr)
@@ -157,7 +165,8 @@ gen_saem_user_fn <- genSaemUserFunction
 configsaem <- function(model, data, inits,
                        mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                        ODEopt = list(atol = 1e-6, rtol = 1e-4, method = "lsoda", transitAbs = FALSE, maxeval = 100000),
-                       distribution = c("normal", "poisson", "binomial", "lnorm"),
+                       distribution = c("normal", "poisson", "binomial"),
+                       addProp=c("combined2","combined1"),
                        seed = 99, fixed = NULL, DEBUG = 0) {
   names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt))
   ODEopt <- do.call(RxODE::rxControl, ODEopt)
@@ -575,6 +584,7 @@ configsaem <- function(model, data, inits,
   nres <- (1:3)[(cfg$res.mod == 4) * 2 + (cfg$res.mod == 3) + 1]
   cfg$res_offset <- cumsum(c(0, nres))
   cfg$par.hist <- matrix(0, cfg$niter, nlambda1 + nlambda0 + nphi1 + sum(nres))
+  cfg$addProp <- c("combined1" = 1L, "combined2" = 2L)[match.arg(addProp)]
 
   cfg$DEBUG <- cfg$opt$DEBUG <- cfg$optM$DEBUG <- DEBUG
   cfg$phiMFile <- tempfile()
@@ -1095,17 +1105,17 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
     .ctl$optExpression <- uif$env$optExpression
     .ctl$scaleTo <- 0
     .ctl$calcTables <- calcTables
+    if (.saemCfg$addProp == 1L) {
+      .ctl$addProp <- "combined1"
+    } else {
+      .ctl$addProp <- "combined2"
+    }
     .ctl <- do.call(foceiControl, .ctl)
     fit.f <- try(foceiFit.data.frame(
-      data = dat,
-      inits = init,
-      PKpars = uif$theta.pars,
-      ## par_trans=fun,
-      model = uif$rxode.pred,
-      pred = function() {
+      data = dat, inits = init, PKpars = uif$theta.pars,
+      model = uif$rxode.pred, pred = function() {
         return(nlmixr_pred)
-      },
-      err = uif$error,
+      }, err = uif$error,
       lower = uif$focei.lower,
       upper = uif$focei.upper,
       thetaNames = uif$focei.names,
