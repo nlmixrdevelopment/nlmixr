@@ -106,6 +106,111 @@ void objD(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
   *fx = sum;
 }
 
+// add+lambda only
+void objE(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+  int i;
+  double g, sum, cur, ft, ytr;
+  double xmin = 1.0e-200;
+  for (i=0, sum=0; i<len; ++i) {
+    // nelder_() does not allow lower bounds; we force ab[] be positive here
+    ft = _powerD(fptr[i],  ab[1], yj, low, hi);
+    ytr = _powerD(yptr[i], ab[1], yj, low, hi);
+    g = ab[0]*ab[0];
+    if (g < xmin) g = xmin;
+    cur = (ytr-ft)/g;
+    sum += cur * cur + 2*log(g);
+  }
+  *fx = sum;
+}
+
+// prop+lambda only
+void objF(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+  int i;
+  double g, sum, cur, ft, ytr;
+  double xmin = 1.0e-200;
+  for (i=0, sum=0; i<len; ++i) {
+    // nelder_() does not allow lower bounds; we force ab[] be positive here
+    ft = _powerD(fptr[i],  ab[1], yj, low, hi);
+    ytr = _powerD(yptr[i], ab[1], yj, low, hi);
+    g = ab[0]*ab[0]*fabs(fptr[i]);
+    if (g == 0) g = 1;
+    if (g < xmin) g = xmin;
+    cur = (ytr-ft)/g;
+    sum += cur * cur + 2*log(g);
+  }
+  *fx = sum;
+}
+
+// pow+lambda only
+void objG(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+  int i;
+  double g, sum, cur, ft, ytr;
+  double xmin = 1.0e-200;
+  for (i=0, sum=0; i<len; ++i) {
+    // nelder_() does not allow lower bounds; we force ab[] be positive here
+    ft = _powerD(fptr[i],  ab[2], yj, low, hi);
+    ytr = _powerD(yptr[i], ab[2], yj, low, hi);
+    g = ab[0]*ab[0]*pow(fabs(fptr[i]), ab[1]);
+    if (g == 0) g = 1;
+    if (g < xmin) g = xmin;
+    cur = (ytr-ft)/g;
+    sum += cur * cur + 2*log(g);
+  }
+  *fx = sum;
+}
+
+// add + prop + lambda
+void objH(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+  int i;
+  double g, sum, cur;
+  double xmin = 1.0e-200, ft, ytr;
+  for (i=0, sum=0; i<len; ++i) {
+    // nelder_() does not allow lower bounds; we force ab[] be positive here
+    ft = _powerD(fptr[i],  ab[2], yj, low, hi);
+    ytr = _powerD(yptr[i], ab[2], yj, low, hi);
+    // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
+    // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
+    if (addProp == 1) {
+      g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
+    } else {
+      double ab02 = ab[0]*ab[0];
+      double ab12 = ab[1]*ab[1];
+      double fa = fabs(fptr[i]);
+      g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
+    }
+    if (g < xmin) g = xmin;
+    cur = (ytr-ft)/g;
+    sum += cur*cur + 2*log(g);
+  }
+  *fx = sum;
+}
+
+// add + pow + lambda
+void objI(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+  int i;
+  double g, sum, cur;
+  double xmin = 1.0e-200, ft, ytr;
+  for (i=0, sum=0; i<len; ++i) {
+    // nelder_() does not allow lower bounds; we force ab[] be positive here
+    ft = _powerD(fptr[i],  ab[3], yj, low, hi);
+    ytr = _powerD(yptr[i], ab[3], yj, low, hi);
+    // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
+    // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
+    if (addProp == 1) {
+      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fabs(fptr[i]),ab[2]);
+    } else {
+      double ab02 = ab[0]*ab[0];
+      double ab12 = ab[1]*ab[1];
+      double fa = pow(fabs(fptr[i]), ab[2]);
+      g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
+    }
+    if (g < xmin) g = xmin;
+    cur = (ytr-ft)/g;
+    sum += cur*cur + 2*log(g);
+  }
+  *fx = sum;
+}
+
 
 // FIXME obj for boxCox and yeoJohnson and pow() instead of prop()
 
@@ -629,7 +734,7 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
+	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
 	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), cres(b)};                  //force are & bres to be positive
 	  double step[3]={-.2, -.2, -.2}, ynewlo;
 	  nelder_fn(objC, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
@@ -639,7 +744,7 @@ public:
 	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
 	  cres(b) = cres(b) + pas(kiter)*(pxmin[2] - cres(b));            //force are & bres to be positive
-	} else if (res_mod(b) == 5) { // 
+	} else if (res_mod(b) == 5) { // power 
 	  uvec idx;
 	  idx = find(ix_endpnt==b);
 	  vec ysb, fsb;
@@ -647,8 +752,6 @@ public:
 	  ysb = ysM(idx);
 	  fsb = fsM(idx);
 
-	  // yptr = ysb.memptr();
-	  // fptr = fsb.memptr();
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
@@ -662,10 +765,109 @@ public:
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[0]*pxmin[1] - bres(b));    //force are & bres to be positive
 	  cres(b) = cres(b) + pas(kiter)*(pxmin[1] - cres(b));            //force are & bres to be positive
 	} else if (res_mod(b) == 6) { // additive + lambda
+	  uvec idx;
+	  idx = find(ix_endpnt==b);
+	  vec ysb, fsb;
+
+	  ysb = ysM(idx);
+	  fsb = fsM(idx);
+
+	  //len = ysb.n_elem;                                        //CHK: needed by nelder
+	  vec xmin(2);
+	  double *pxmin = xmin.memptr();
+	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
+	  double start[2]={sqrt(fabs(ares(b))), lres(b)};                  //force are & bres to be positive
+	  double step[2]={ -.2, -.2}, ynewlo;
+	  nelder_fn(objE, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
+		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
+		    (int)yj(b), lambda(b), low(b), hi(b));
+	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
+	  lres(b) = lres(b) + pas(kiter)*(pxmin[1] - lres(b));            //force are & bres to be positive
 	} else if (res_mod(b) == 7) { // prop + lambda
+	  uvec idx;
+	  idx = find(ix_endpnt==b);
+	  vec ysb, fsb;
+
+	  ysb = ysM(idx);
+	  fsb = fsM(idx);
+
+	  //len = ysb.n_elem;                                        //CHK: needed by nelder
+	  vec xmin(2);
+	  double *pxmin = xmin.memptr();
+	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
+	  double start[2]={sqrt(fabs(bres(b))), lres(b)};                  //force are & bres to be positive
+	  double step[2]={ -.2, -.2}, ynewlo;
+	  nelder_fn(objF, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
+		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
+		    (int)yj(b), lambda(b), low(b), hi(b));
+	  bres(b) = bres(b) + pas(kiter)*(pxmin[0]*pxmin[0] - bres(b));    //force are & bres to be positive
+	  lres(b) = lres(b) + pas(kiter)*(pxmin[1] - lres(b));            //force are & bres to be positive
 	} else if (res_mod(b) == 8) { // pow + lambda
+	  uvec idx;
+	  idx = find(ix_endpnt==b);
+	  vec ysb, fsb;
+
+	  ysb = ysM(idx);
+	  fsb = fsM(idx);
+
+	  //len = ysb.n_elem;                                        //CHK: needed by nelder
+	  vec xmin(2);
+	  double *pxmin = xmin.memptr();
+	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
+	  double start[3]={sqrt(fabs(bres(b))), cres(b), lres(b)};                  //force are & bres to be positive
+	  double step[3]={ -.2, -.2, -.2}, ynewlo;
+	  nelder_fn(objG, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
+		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
+		    (int)yj(b), lambda(b), low(b), hi(b));
+	  bres(b) = bres(b) + pas(kiter)*(pxmin[0]*pxmin[0] - bres(b));    //force are & bres to be positive
+	  cres(b) = cres(b) + pas(kiter)*(pxmin[1] - cres(b));    //force are & bres to be positive
+	  lres(b) = lres(b) + pas(kiter)*(pxmin[2] - lres(b));            //force are & bres to be positive
 	} else if (res_mod(b) == 9) { // add + prop + lambda
+	  uvec idx;
+	  idx = find(ix_endpnt==b);
+	  vec ysb, fsb;
+
+	  ysb = ysM(idx);
+	  fsb = fsM(idx);
+
+	  //len = ysb.n_elem;                                        //CHK: needed by nelder
+	  vec xmin(2);
+	  double *pxmin = xmin.memptr();
+	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
+	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), lres(b)};                  //force are & bres to be positive
+	  double step[3]={ -.2, -.2, -.2}, ynewlo;
+	  nelder_fn(objH, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
+		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
+		    (int)yj(b), lambda(b), low(b), hi(b));
+	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
+	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
+	  lres(b) = lres(b) + pas(kiter)*(pxmin[2] - lres(b));            //force are & bres to be positive
 	} else if (res_mod(b) == 10) { // add + pow + lambda
+	  uvec idx;
+	  idx = find(ix_endpnt==b);
+	  vec ysb, fsb;
+
+	  ysb = ysM(idx);
+	  fsb = fsM(idx);
+
+	  //len = ysb.n_elem;                                        //CHK: needed by nelder
+	  vec xmin(2);
+	  double *pxmin = xmin.memptr();
+	  int n=4, itmax=50, iconv, it, nfcall, iprint=0;
+	  double start[4]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), cres(b), lres(b)};                  //force are & bres to be positive
+	  double step[4]={ -.2, -.2, -.2, -.2}, ynewlo;
+	  nelder_fn(objI, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
+		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
+		    (int)yj(b), lambda(b), low(b), hi(b));
+	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
+	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
+	  cres(b) = cres(b) + pas(kiter)*(pxmin[2] - cres(b));    //force are & bres to be positive
+	  lres(b) = lres(b) + pas(kiter)*(pxmin[3] - lres(b));            //force are & bres to be positive
 	}
 	sigma2[b] = sig2;                                          //CHK: sigma2[] use
 	if (sigma2[b]>1.0e99) sigma2[b] = 1.0e99;
