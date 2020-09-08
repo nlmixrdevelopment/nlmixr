@@ -789,8 +789,6 @@ double likInner0(double *eta, int id){
 	  if (ISNA(ind->lhs[op_focei.neta + 1]))
 	    throw std::runtime_error("bad solve");
 	  r = ind->lhs[op_focei.neta + 1];
-	  //Does not seem to help...
-	  //if (r <= sqrt(DOUBLE_EPS)) r = 1.0; // for prop errors
 	  if (op_focei.neta == 0) {
 	    lnr =_safe_log(r);
 	    //llik <- -0.5 * sum(err ^ 2 / R + log(R));

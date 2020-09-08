@@ -31,6 +31,9 @@
   models; 
   - `combined1`: `trans(y) = trans(f) + (a+b*f^c)*err`
   - `combined2`: `trans(y) = trans(f) + (a^2+b^2*f^(2c))*err`
+  
+- `focei` proportional and power models are more tolerant of 0 
+  predictions in your data
 
 
 ## SAEM changes
@@ -44,6 +47,8 @@
  - `saem` now supports 2 combined additive + proportional error models:
     - `combined1`: `trans(y) = trans(f) + (a+b*f^c)*err`
 	- `combined2`: `trans(y) = trans(f) + (a^2+b^2*f^(2c))*err`
+ - `saem` proportional and power models are more tolerant of 0 
+    predictions in your data
  - `saem` now supports censoring a similar way as `monolix` does, with
   `cens` and `limit` columns
  - The default of `saem` additive + proportional error has been
