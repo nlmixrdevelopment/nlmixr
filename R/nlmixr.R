@@ -957,6 +957,7 @@ saemControl <- function(seed = 99,
                         maxsteps = 100000L,
                         adjObf = TRUE,
                         sum.prod=FALSE,
+                        addProp=c("combined2","combined1"),
                         ...) {
   .xtra <- list(...)
   .rm <- c()
@@ -986,6 +987,7 @@ saemControl <- function(seed = 99,
     nnodes.gq = nnodes.gq,
     nsd.gq = nsd.gq,
     adjObf = adjObf,
+    addProp=match.arg(addProp),
     ...)
   if (length(.rm) > 0) {
     .ret <- .ret[!(names(.ret) %in% .rm)]
