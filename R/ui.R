@@ -2340,7 +2340,10 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
     .extra <- paste(.predDf$cond[.w])
     .extra <- .extra[regexpr("[()+-]", .extra) == -1]
     if (length(.extra) > 0) {
-      rxode <- paste0(rxode, ";\n", paste(c(paste0("cmt(", .extra, ");\n")), collapse = ""))
+      .extra <- paste(c(paste0("cmt(", .extra, ");\n"))
+      rxode <- paste0(rxode, ";\n", .extra, collapse = ""))
+    } else {
+      .extra <- ""
     }
     if (any(is.na(.predDf$cmt))) {
       .predDfNa <- .predDf[is.na(.predDf$cmt), names(.predDf) != "cmt"]
@@ -2353,8 +2356,10 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         merge(.predDfNa, .tmp, all.x = TRUE, by = "cond")[names(.predDf)]
       )
     }
+    .dvid <- ""
     if (length(.predDf$cond) > 1) {
-      rxode <- paste0(rxode, ";\ndvid(", paste(.predDf[order(.predDf$dvid), "cmt"], collapse = ","), ");\n")
+      .dvid <- paste0("dvid(", paste(.predDf[order(.predDf$dvid), "cmt"], collapse = ","), ")")
+      rxode <- paste0(rxode, ";\n", .dvid, ";\n")
     }
     if (length(.predDf$cmt) > 1L) {
       if (length(.w) > 0L) {
@@ -2570,7 +2575,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       oneTheta = .oneTheta, oneThetaLogit=.oneThetaLogit, extra = .extra,
       logit.theta=logit.theta, logit.theta.hi=logit.theta.hi, logit.theta.low=logit.theta.low,
       logit.eta=logit.eta, logit.eta.hi=logit.eta.hi, logit.eta.low=logit.eta.low,
-      saem.fun1=saem.fun0, focei.fun1=rest0)
+      saem.fun1=saem.fun0, focei.fun1=rest0, extra=paste0(.extra, ifelse(.extra == "", "", ";\n"), .dvid, ifelse(.dvid == "", "", ";\n")))
   )
   if (.linCmt) {
     ret$nmodel$lin.solved <- TRUE
