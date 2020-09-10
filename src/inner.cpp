@@ -772,6 +772,7 @@ double likInner0(double *eta, int id){
 	    throw std::runtime_error("bad solve");
 	  // fInd->f(k, 0) = ind->lhs[0];
 	  dv = tbs(ind->dv[j]);
+	  // REprintf("f: %f: dv: %f tbs(dv): %f\n", f, ind->dv[j], dv);
 	  err = f - dv;
 	  limit = R_NegInf;
 	  if (rx->limit) {

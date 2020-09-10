@@ -104,16 +104,9 @@ gen_saem_user_fn <- genSaemUserFunction
 #' @param ODEopt optional ODE solving options
 #' @param seed seed for random number generator
 #' @param distribution one of c("normal","poisson","binomial")
-#' @param addProp one of "combined1" and "combined2"; These are the
-#'   two forms of additive+proportional errors supported by
-#'   monolix/nonmem:
-#'
-#' combined1: transform(y)=transform(f)+(a+b*abs(f)^c)\vareps
-#'
-#' combined2: transform(y)=transform(f)+(a^2+b^2*abs(f)^(2c))\vareps
-#'
 #' @param fixed a character vector of fixed effect only parameters (no random effects attached) to be fixed
 #' @param DEBUG Integer determining if debugging is enabled.
+#' @inheritParams RxODE::rxSEinner
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by he Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm

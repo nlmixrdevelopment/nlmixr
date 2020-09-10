@@ -1,4 +1,3 @@
-
 nlmixrfindLhs <- function(x) {
   ## Modified from http://adv-r.had.co.nz/Expressions.html find_assign4
   if (is.atomic(x) || is.name(x)) {
@@ -2074,6 +2073,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   do.pred <- 2
   rest.txt <- .deparse(f(body(fun)))
   rest <- new.fn(rest.txt)
+  rest0 <- rest
   rest.funs <- allCalls(body(rest))
   rest.vars <- allVars(body(rest))
   all.covs <- setdiff(rest.vars, paste0(bounds$name))
@@ -2082,8 +2082,11 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   do.pred <- 4
   saem.pars <- try(.deparse(f(body(fun))), silent = TRUE)
   nlme.mu.fun2 <- NULL
+  saem.fun0 <- NULL
   if (inherits(saem.pars, "try-error")) {
     saem.pars <- NULL
+  } else {
+    saem.fun0 <- new.fn(saem.pars)
   }
   do.pred <- 5
   nlme.mu.fun <- try(.deparse(f(body(fun))), silent = TRUE)
@@ -2546,7 +2549,8 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       saemErr = .saemErr, cmtEndpoints = .cmtEndpoints,
       oneTheta = .oneTheta, oneThetaLogit=.oneThetaLogit, extra = .extra,
       logit.theta=logit.theta, logit.theta.hi=logit.theta.hi, logit.theta.low=logit.theta.low,
-      logit.eta=logit.eta, logit.eta.hi=logit.eta.hi, logit.eta.low=logit.eta.low)
+      logit.eta=logit.eta, logit.eta.hi=logit.eta.hi, logit.eta.low=logit.eta.low,
+      saem.fun1=saem.fun0, focei.fun1=rest0)
   )
   if (.linCmt) {
     ret$nmodel$lin.solved <- TRUE

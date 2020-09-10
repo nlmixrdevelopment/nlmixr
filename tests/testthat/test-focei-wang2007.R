@@ -47,23 +47,23 @@ nlmixrTest({
                       control=foceiControl(maxOuterIterations=0, covMethod="",
                                            addProp=paste0("combined", addProp)))
     fit2 <- .foceiFit(dat, inits, mypar1, mod, pred, fun,
-                        control=foceiControl(maxOuterIterations=0, covMethod="",
-                                             addProp=paste0("combined", addProp)))
+                      control=foceiControl(maxOuterIterations=0, covMethod="",
+                                           addProp=paste0("combined", addProp)))
     fit3 <- .foceiFit(dat2, inits, mypar1, m1, pred, fun,
-                        control=foceiControl(maxOuterIterations=0, covMethod="",
-                                             addProp=paste0("combined", addProp),
-                                             interaction=FALSE))
+                      control=foceiControl(maxOuterIterations=0, covMethod="",
+                                           addProp=paste0("combined", addProp),
+                                           interaction=FALSE))
     fit4 <- .foceiFit(dat, inits, mypar1, mod, pred, fun,
-                        control=foceiControl(maxOuterIterations=0, covMethod="",
-                                             addProp=paste0("combined", addProp), interaction=FALSE),
+                      control=foceiControl(maxOuterIterations=0, covMethod="",
+                                           addProp=paste0("combined", addProp), interaction=FALSE),
                       interaction=FALSE)
     fit5 <- .foceiFit(dat2, inits, mypar1, m1, pred, fun,
-                        control=foceiControl(maxOuterIterations=0, covMethod="",
-                                             addProp=paste0("combined", addProp),
-                                             interaction=FALSE, fo=TRUE))
+                      control=foceiControl(maxOuterIterations=0, covMethod="",
+                                           addProp=paste0("combined", addProp),
+                                           interaction=FALSE, fo=TRUE))
     fit6 <- .foceiFit(dat, inits, mypar1, mod, pred, fun,
-                        control=foceiControl(maxOuterIterations=0, covMethod="",
-                                             addProp=paste0("combined", addProp), interaction=FALSE),
+                      control=foceiControl(maxOuterIterations=0, covMethod="",
+                                           addProp=paste0("combined", addProp), interaction=FALSE),
                       interaction=FALSE, fo=TRUE)
     .n <- paste(type, c("focei ode", "focei", "foce ode", "foce", "fo ode", "fo"), paste0("combined", addProp))
     ret <- c(fit1$objective, fit2$objective, fit3$objective, fit4$objective, fit5$objective, fit6$objective)
@@ -150,7 +150,6 @@ nlmixrTest({
     add(.1) + prop(.1)
   }, c(43.554, 43.554, 43.415, 43.394, 43.398, 43.394), addProp=1)
 
-
   testErr("add+pow", function(){
     add(.1) + pow(.1, 0.5)
   }, c(21.108, 21.108, 21.065, 20.725, 20.788, 20.725), addProp=2)
@@ -167,33 +166,27 @@ nlmixrTest({
     lnorm(NA) + prop(0.1)
   }, c(118.419, 118.419, 118.279, 118.311, 118.311, 118.311), addProp=1)
 
-
   testErr("lnorm(NA)+pow", function(){
     lnorm(NA) + pow(0.1, 0.5)
   }, c(94.535, 94.535, 94.461, 94.478, 94.478, 94.478), addProp=1)
-
 
   testErr("lnorm+prop", function(){
     lnorm(0.1) + prop(0.1)
   },  c(123.318, 123.318, 123.219, 123.24, 123.24, 123.24), addProp=1)
 
-
   testErr("lnorm+prop", function(){
     lnorm(0.1) + prop(0.1)
   }, c(118.777, 118.777, 118.646, 118.676, 118.676, 118.676), addProp=2)
 
-
   testErr("lnorm+pow", function(){
     lnorm(0.1) + pow(0.1, 0.5)
   }, c(102.899, 102.899, 102.85, 102.865, 102.865, 102.865), addProp=1)
-
 
   testErr("lnorm+pow", function(){
     lnorm(0.1) + pow(0.1, 0.5)
   }, c(95.634, 95.634, 95.57, 95.585, 95.585, 95.585), addProp=2)
 
   ## Box Cox
-
   testErr("add+boxCox", function() {
     return(add(.1) + boxCox(.5))
   }, c(2.06, 2.06, 2.06, 2.06, 3.529, 2.06))
@@ -223,7 +216,6 @@ nlmixrTest({
   }, c(40.451, 40.451, 40.372, 40.313, 40.32, 40.313), addProp=2)
 
   # Now yeoJohnson
-
   testErr("add+yeoJohnson", function() {
     return(add(.1) + yeoJohnson(.5))
   }, c(2.339, 2.339, 2.339, 2.339, 3.575, 2.339))
@@ -253,7 +245,6 @@ nlmixrTest({
   }, c(41.628, 41.628, 41.548, 41.503, 41.509, 41.503), addProp=2)
 
   ## logitNorm
-
   testErr("logitNorm", function() {
     return(logitNorm(.1, 0, 12))
   }, c(0.612, 0.612, 0.612, 0.612, 0.786, 0.612))
@@ -262,33 +253,27 @@ nlmixrTest({
     return(logitNorm(NA, 0, 12) + prop(0.1))
   }, c(67.882, 67.882, 67.731, 67.765, 67.765, 67.765))
 
-
   testErr("logitNorm(NA)+pow", function() {
     return(logitNorm(NA, 0, 12) + pow(0.1, 0.5))
   }, c(44.632, 44.632, 44.534, 44.556, 44.556, 44.556))
-
 
   testErr("logitNorm+prop", function() {
     return(logitNorm(.1, 0, 12) + prop(0.1))
   }, c(72.699, 72.699, 72.591, 72.615, 72.615, 72.615), addProp=1)
 
-
   testErr("logitNorm+prop", function() {
     return(logitNorm(.1, 0, 12) + prop(0.1))
   }, c(68.233, 68.233, 68.09, 68.122, 68.123, 68.122), addProp=2)
 
-
   testErr("logitNorm+pow", function() {
     return(logitNorm(.1, 0, 12) + pow(0.1, 0.5))
   }, c(52.641, 52.641, 52.581, 52.6, 52.6, 52.6), addProp=1)
-
 
   testErr("logitNorm+pow", function() {
     return(logitNorm(.1, 0, 12) + pow(0.1, 0.5))
   }, c(45.668, 45.668, 45.583, 45.603, 45.603, 45.603), addProp=2)
 
   ## logitNorm + yeoJohnson
-
   testErr("logitNorm+yeoJohnson", function() {
     return(logitNorm(.1, 0, 12) + yeoJohnson(0.5))
   }, c(5.127, 5.127, 5.127, 5.127, 5.484, 5.127))
@@ -296,7 +281,6 @@ nlmixrTest({
   testErr("logitNorm(NA)+prop+yeoJohnson", function() {
     return(logitNorm(NA, 0, 12) + prop(0.1) + yeoJohnson(0.5))
   }, c(73.881, 73.881, 73.73, 73.764, 73.764, 73.764))
-
 
   testErr("logitNorm(NA)+pow+yeoJohnson", function() {
     return(logitNorm(NA, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
@@ -306,22 +290,76 @@ nlmixrTest({
     return(logitNorm(.1, 0, 12) + prop(0.1) + yeoJohnson(0.5))
   }, c(78.693, 78.693, 78.585, 78.609, 78.609, 78.609), addProp=1)
 
-
   testErr("logitNorm+prop+yeoJohnson", function() {
     return(logitNorm(.1, 0, 12) + prop(0.1) + yeoJohnson(0.5))
   }, c(74.231, 74.231, 74.088, 74.12, 74.12, 74.12), addProp=2)
-
 
   testErr("logitNorm+pow+yeoJohnson", function() {
     return(logitNorm(.1, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
   }, c(58.628, 58.628, 58.568, 58.586, 58.586, 58.586), addProp=1)
 
-
   testErr("logitNorm+pow+yeoJohnson", function() {
     return(logitNorm(.1, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
   }, c(51.662, 51.662, 51.578, 51.595, 51.595, 51.595), addProp=2)
 
-  #%>% setNames(., NULL) %>% round(., 3) -> ret
+  ## probitNorm
+  testErr("probitNorm", function() {
+    return(probitNorm(.1, 0, 12))
+  }, c(12.827, 12.827, 12.827, 12.827, 12.847, 12.827))
+
+  testErr("probitNorm(NA)+prop", function() {
+    return(probitNorm(NA, 0, 12) + prop(0.1))
+  }, c(88.875, 88.875, 88.733, 88.766, 88.766, 88.766))
+
+  testErr("probitNorm(NA)+pow", function() {
+    return(probitNorm(NA, 0, 12) + pow(0.1, 0.5))
+  }, c(65.098, 65.098, 65.02, 65.037, 65.037, 65.037))
+
+  testErr("probitNorm+prop", function() {
+    return(probitNorm(0.1, 0, 12) + prop(0.1))
+  }, c(93.761, 93.761, 93.661, 93.682, 93.682, 93.682), addProp=1)
+
+  testErr("probitNorm+prop", function() {
+    return(probitNorm(0.1, 0, 12) + prop(0.1))
+  }, c(89.232, 89.232, 89.098, 89.129, 89.129, 89.129), addProp=2)
+
+  testErr("probitNorm+pow", function() {
+    return(probitNorm(0.1, 0, 12) + pow(0.1, 0.5))
+  }, c(73.405, 73.405, 73.348, 73.37, 73.37, 73.37), addProp=1)
+
+  testErr("probitNorm+pow", function() {
+    return(probitNorm(0.1, 0, 12) + pow(0.1, 0.5))
+  }, c(66.187, 66.187, 66.118, 66.135, 66.135, 66.135), addProp=2)
+
+  ## probitNorm + yeoJohnson
+
+  testErr("probitNorm+yeoJohnson", function() {
+    return(probitNorm(.1, 0, 12) + yeoJohnson(0.5))
+  }, c(16.768, 16.768, 16.768, 16.768, 16.799, 16.768))
+
+  testErr("probitNorm(NA)+prop+yeoJohnson", function() {
+    return(probitNorm(NA, 0, 12) + prop(0.1) + yeoJohnson(0.5))
+  }, c(93.071, 93.071, 92.929, 92.962, 92.962, 92.962))
+
+  testErr("probitNorm(NA)+pow+yeoJohnson", function() {
+    return(probitNorm(NA, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
+  }, c(69.295, 69.295, 69.217, 69.234, 69.234, 69.234))
+
+  testErr("probitNorm(0.1)+prop+yeoJohnson", function() {
+    return(probitNorm(0.1, 0, 12) + prop(0.1) + yeoJohnson(0.5))
+  }, c(97.957, 97.957, 97.856, 97.878, 97.878, 97.878), addProp=1)
+
+  testErr("probitNorm(0.1)+prop+yeoJohnson", function() {
+    return(probitNorm(0.1, 0, 12) + prop(0.1) + yeoJohnson(0.5))
+  }, c(93.429, 93.429, 93.295, 93.326, 93.326, 93.326), addProp=2)
+
+  testErr("probitNorm(0.1)+pow+yeoJohnson", function() {
+    return(probitNorm(0.1, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
+  }, c(77.599, 77.599, 77.542, 77.564, 77.564, 77.564), addProp=1)
+
+  testErr("probitNorm(0.1)+pow+yeoJohnson", function() {
+    return(probitNorm(0.1, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
+  }, c(70.383, 70.383, 70.314, 70.331, 70.331, 70.331), addProp=2) %>% setNames(., NULL) %>% round(., 3) -> ret
 
   ## lognormal -- equivalent to add on log-space and back-transformed.
 
@@ -331,7 +369,6 @@ nlmixrTest({
   datl2 <- dat2
   datl2$DV <- log(datl2$DV)
   predl <- function() log(ipre)
-
 
   fit.lnorm <- .foceiFit(dat, inits, mypar1, mod, pred, function() {
     return(lnorm(.1))
