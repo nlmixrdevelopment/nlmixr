@@ -408,11 +408,13 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       "DEBUG", "covMethod", "calcTables",
       "logLik", "nnodes.gq",
       "nsd.gq", "nsd.gq", "adjObf",
-      "optExpression", "addProp"
+      "optExpression", "addProp",
+      "singleOde"
     )) {
       .getOpt(a)
     }
     uif$env$optExpression <- .optExpression
+    uif$env$singleOde <- .singleOde
     .addCov <- .covMethod == "linFim"
 
     if (uif$saemErr != "") {
@@ -580,7 +582,9 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       control$boundTol <- 0
       env$skipTable <- TRUE
     }
+    uif$env$singleOde <- control$singleOde
     if (control$singleOde) {
+      message("singleOde")
       .mod <- uif$focei.rx1
       .pars <- NULL
     } else {
