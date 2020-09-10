@@ -2556,6 +2556,8 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
     .w <- which(bounds$condition == "")
     bounds$condition[.w] <- paste(.predDf$cond)
   }
+  ## Take out error terms (if present)
+  saem.theta.trans <- setdiff(saem.theta.trans, bounds$ntheta[which(!is.na(bounds$err) & !is.na(bounds$ntheta))])
   ret <- list(
     ini = bounds, model = bigmodel,
     nmodel = list(
