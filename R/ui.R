@@ -2051,9 +2051,11 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   ))
   .lhsReg <- rex::rex(boundary, or(.lhs), boundary)
   fun <- eval(parse(text = paste(c("function()({", .fun00(.tmp), "})"), collapse = "\n")))
+  fun.all <- eval(parse(text = paste(c("function()({", .tmp, "})"), collapse = "\n")))
   all.covs <- character()
   do.pred <- 1
   pred.txt <- .deparse(f(body(fun)))
+  pred.txt.all <- .deparse(f(body(fun)))
   .reg <- rex::rex(or(
     group(any_spaces, "(", any_spaces, "{", any_spaces),
     group(any_spaces, "}", any_spaces, ")", any_spaces),
@@ -2070,10 +2072,13 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   pred <- new.fn(pred.txt)
   do.pred <- 0
   err <- new.fn(.deparse(f(body(fun))))
+  pred.all <- new.fn(pred.txt.all)
+  err.all <- new.fn(.deparse(f(body(fun.all))))
   do.pred <- 2
   rest.txt <- .deparse(f(body(fun)))
+  rest.txt.all <- .deparse(f(body(fun.all)))
   rest <- new.fn(rest.txt)
-  rest0 <- rest
+  rest0 <- new.fn(rest.txt.all)
   rest.funs <- allCalls(body(rest))
   rest.vars <- allVars(body(rest))
   all.covs <- setdiff(rest.vars, paste0(bounds$name))
@@ -2081,12 +2086,13 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   grp.fn <- new.fn(.deparse(f(body(fun))))
   do.pred <- 4
   saem.pars <- try(.deparse(f(body(fun))), silent = TRUE)
+  saem.pars.all <- try(.deparse(f(body(fun.all))), silent = TRUE)
   nlme.mu.fun2 <- NULL
   saem.fun0 <- NULL
   if (inherits(saem.pars, "try-error")) {
     saem.pars <- NULL
   } else {
-    saem.fun0 <- new.fn(saem.pars)
+    saem.fun0 <- new.fn(saem.pars.all)
   }
   do.pred <- 5
   nlme.mu.fun <- try(.deparse(f(body(fun))), silent = TRUE)
@@ -2758,12 +2764,12 @@ nlmixrUI.rxode.pred <- function(object) {
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.rx1 <- function(object) {
   .prd <- .deparse1(body(object$pred))
-  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
+  if (any(regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1)) {
     .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
   }
   .ret <- paste(c(.deparse1(body(object$saem.fun1)),
                   .prd), collapse="\n")
-  if (regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1){
+  if (any(regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1)) {
     .ret <- RxODE::rxNorm(RxODE::rxGetLin(.ret))
   }
   .ret
@@ -2782,12 +2788,12 @@ nlmixrUI.focei.rx1 <- function(obj) {
   .eta <- .eta[.eta$neta1 == .eta$neta2, ]
   .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
   .prd <- .deparse1(body(obj$pred))
-  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd, perl=TRUE) != -1){
-    .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
+  if (any(regexpr("\\bnlmixr_lincmt_pred\\b", .prd, perl=TRUE) != -1)){
+    .prd <- c(.prd, "nlmixr_lincmt_pred <- linCmt()\n")
   }
   .ret <- paste(c(.unfixed, .eta, .deparse1(body(obj$focei.fun1)),
                   .prd), collapse="\n")
-  if (regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1){
+  if (any(regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1)){
     .ret <- RxODE::rxNorm(RxODE::rxGetLin(.ret))
   }
   .ret
