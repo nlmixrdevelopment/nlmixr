@@ -2761,8 +2761,12 @@ nlmixrUI.saem.rx1 <- function(object) {
   if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
     .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
   }
-  paste(c(.deparse1(body(object$saem.fun1)),
-          .prd), collapse="\n")
+  .ret <- paste(c(.deparse1(body(object$saem.fun1)),
+                  .prd), collapse="\n")
+  if (regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1){
+    .ret <- RxODE::rxNorm(RxODE::rxGetLin(.ret))
+  }
+  .ret
 }
 
 ##' Return RxODE model with predictions appended
@@ -2778,11 +2782,15 @@ nlmixrUI.focei.rx1 <- function(obj) {
   .eta <- .eta[.eta$neta1 == .eta$neta2, ]
   .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
   .prd <- .deparse1(body(obj$pred))
-  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
+  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd, perl=TRUE) != -1){
     .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
   }
-  paste(c(.unfixed, .eta, .deparse1(body(obj$focei.fun1)),
-          .prd), collapse="\n")
+  .ret <- paste(c(.unfixed, .eta, .deparse1(body(obj$focei.fun1)),
+                  .prd), collapse="\n")
+  if (regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1){
+    .ret <- RxODE::rxNorm(RxODE::rxGetLin(.ret))
+  }
+  .ret
 }
 
 ##' Get the Parameter  function with THETA/ETAs defined
