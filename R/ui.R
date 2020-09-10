@@ -2756,43 +2756,20 @@ nlmixrUI.rxode.pred <- function(object) {
 ##' @param object UI object
 ##' @return Combined focei model text for RxODE
 ##' @author Matthew L. Fidler
-nlmixrUI.focei.rx1 <- function(object) {
-  .prd <- .deparse1(body(object$pred))
+nlmixrUI.focei.rx1 <- function(obj) {
+  .df <- .as.data.frame(obj$ini)
+  .dft <- .df[!is.na(.df$ntheta), ]
+  .unfixed <- with(.dft, sprintf("%s=THETA[%d]", name, seq_along(.dft$name)))
+  .eta <- .df[!is.na(.df$neta1), ]
+  .eta <- .eta[.eta$neta1 == .eta$neta2, ]
+  .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
+  .prd <- .deparse1(body(obj$pred))
   if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
     .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
   }
-  paste(c(.deparse1(body(object$focei.fun1)),
+  paste(c(.unfixed, .eta, .deparse1(body(obj$focei.fun1)),
           .prd), collapse="\n")
 }
-
-##' Return RxODE model with predictions appended
-##'
-##' @param object UI object
-##' @return Combined focei model text for RxODE
-##' @author Matthew L. Fidler
-nlmixrUI.saem.rx1 <- function(object) {
-  .prd <- .deparse1(body(object$pred))
-  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
-    .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
-  }
-  paste(c(.deparse1(body(object$saem.fun1)),
-          .prd), collapse="\n")
-}
-
-##' Return RxODE model with predictions appended
-##'
-##' @param object UI object
-##' @return String or NULL if RxODE is not specified by UI.
-##' @author Matthew L. Fidler
-nlmixrUI.focei.rx1 <- function(object) {
-  .prd <- .deparse1(body(object$pred))
-  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
-    .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
-  }
-  paste(c(.deparse1(body(object$focei.fun1)),
-          .prd), collapse="\n")
-}
-
 
 ##' Get the Parameter  function with THETA/ETAs defined
 ##'
