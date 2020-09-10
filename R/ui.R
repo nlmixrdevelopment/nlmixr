@@ -1139,9 +1139,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
 }
 .nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   ## Parses the UI function to extract predictions and errors, and the other model specification.
-  .noAssign <- FALSE
+  .doAssign <- TRUE
   .assign <- function(...){
-    if (!.noAssign) assign(...)
+    if (.doAssign) assign(...)
   }
   .fun000 <- fun
   rxode <- FALSE
@@ -2058,11 +2058,10 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   fun.all <- eval(parse(text = paste(c("function()({", .tmp, "})"), collapse = "\n")))
   all.covs <- character()
   do.pred <- 1
-  .noAssign <- FALSE
   pred.txt <- .deparse(f(body(fun)))
-  .noAssign <- TRUE
+  .doAssign <- FALSE
   pred.txt.all <- .deparse(f(body(fun)))
-  .noAssign <- FALSE
+  .doAssign <- TRUE
   .reg <- rex::rex(or(
     group(any_spaces, "(", any_spaces, "{", any_spaces),
     group(any_spaces, "}", any_spaces, ")", any_spaces),
@@ -2079,19 +2078,17 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   pred <- new.fn(pred.txt)
   do.pred <- 0
   err <- new.fn(.deparse(f(body(fun))))
-  .noAssign <- TRUE
+  .doAssign <- FALSE
   pred.all <- new.fn(pred.txt.all)
   err.all <- new.fn(.deparse(f(body(fun.all))))
-  .noAssign <- FALSE
+  .doAssign <- TRUE
   do.pred <- 2
   rest.txt <- .deparse(f(body(fun)))
-  .noAssign <- TRUE
+  .doAssign <- FALSE
   rest.txt.all <- .deparse(f(body(fun.all)))
-  .noAssign <- FALSE
-  rest <- new.fn(rest.txt)
-  .noAssign <- TRUE
   rest0 <- new.fn(rest.txt.all)
-  .noAssign <- FALSE
+  .doAssign <- TRUE
+  rest <- new.fn(rest.txt)
   rest.funs <- allCalls(body(rest))
   rest.vars <- allVars(body(rest))
   all.covs <- setdiff(rest.vars, paste0(bounds$name))
@@ -2099,13 +2096,17 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   grp.fn <- new.fn(.deparse(f(body(fun))))
   do.pred <- 4
   saem.pars <- try(.deparse(f(body(fun))), silent = TRUE)
+  .doAssign <- FALSE
   saem.pars.all <- try(.deparse(f(body(fun.all))), silent = TRUE)
+  .doAssign <- TRUE
   nlme.mu.fun2 <- NULL
   saem.fun0 <- NULL
   if (inherits(saem.pars, "try-error")) {
     saem.pars <- NULL
   } else {
+    .doAssign <- FALSE
     saem.fun0 <- new.fn(saem.pars.all)
+    .doAssign <- TRUE
   }
   do.pred <- 5
   nlme.mu.fun <- try(.deparse(f(body(fun))), silent = TRUE)
@@ -2777,8 +2778,9 @@ nlmixrUI.rxode.pred <- function(object) {
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.rx1 <- function(object) {
   .prd <- .deparse1(body(object$pred))
-  if (any(regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1)) {
-    .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
+  .w <- any(regexpr("\\bnlmixr_lincmt_pred\\b", .prd, perl=TRUE) != -1)
+  if (length(.w) == 1){
+    .prd[.w] <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd[.w])
   }
   .ret <- paste(c(.deparse1(body(object$saem.fun1)),
                   .prd), collapse="\n")
@@ -2801,8 +2803,9 @@ nlmixrUI.focei.rx1 <- function(obj) {
   .eta <- .eta[.eta$neta1 == .eta$neta2, ]
   .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
   .prd <- .deparse1(body(obj$pred))
-  if (any(regexpr("\\bnlmixr_lincmt_pred\\b", .prd, perl=TRUE) != -1)){
-    .prd <- c(.prd, "nlmixr_lincmt_pred <- linCmt()\n")
+  .w <- any(regexpr("\\bnlmixr_lincmt_pred\\b", .prd, perl=TRUE) != -1)
+  if (length(.w) == 1){
+    .prd[.w] <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd[.w])
   }
   .ret <- paste(c(.unfixed, .eta, .deparse1(body(obj$focei.fun1)),
                   .prd), collapse="\n")
