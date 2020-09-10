@@ -890,6 +890,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcRe
       if (object$method == "REML") env$objectiveType <- "nlmeREML"
       env$extra <- paste(env$extra, "nlme OBF")
     }
+    ## In this case the pars/ode  is separated, so use separated focei parameters
     fit.f <- try(foceiFit.data.frame(
       data = dat,
       inits = init,

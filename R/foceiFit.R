@@ -559,6 +559,10 @@ is.latex <- function() {
 ##' @param gradProgressOfvTime This is the time for a single objective
 ##'     function evaluation (in seconds) to start progress bars on gradient evaluations
 ##'
+##' @param singleOde This option allows a single ode model to include
+##'   the PK parameter information instead of splitting it into a
+##'   function and a RxODE model
+##'
 ##' @inheritParams configsaem
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
@@ -690,7 +694,8 @@ foceiControl <- function(sigdig = 3, ...,
                          repeatGillMax = 3,
                          stickyRecalcN = 5,
                          gradProgressOfvTime = 10,
-                         addProp=c("combined2","combined1")) {
+                         addProp=c("combined2","combined1"),
+                         singleOde=TRUE) {
   if (is.null(boundTol)) {
     boundTol <- 5 * 10^(-sigdig + 1)
   }
@@ -988,6 +993,7 @@ foceiControl <- function(sigdig = 3, ...,
     eventCentral = as.integer(eventCentral),
     gradProgressOfvTime = gradProgressOfvTime,
     addProp=match.arg(addProp),
+    singleOde=singleOde,
     ...
   )
   if (!missing(etaMat) && missing(maxInnerIterations)) {

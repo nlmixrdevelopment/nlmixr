@@ -568,7 +568,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     }
     return(.ret)
   } else if (any(est == c("foce", "focei", "fo", "foi"))) {
-    if (.nid <= 1) stop(sprintf("%s is for mixed effects models, try 'dynmodel' (need more than 1 individual)", est))
+    if (class(control) != "foceiControl") control <- do.call(nlmixr::foceiControl, control)
     if (any(est == c("foce", "fo"))) {
       control$interaction <- FALSE
     }
@@ -580,11 +580,18 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       control$boundTol <- 0
       env$skipTable <- TRUE
     }
+    if (control$singleOde) {
+      .mod <- uif$focei.rx1
+      .pars <- NULL
+    } else {
+      .mod <- uif$rxode.pred
+      .pars <- uif$theta.pars
+    }
     fit <- foceiFit(dat,
       inits = uif$focei.inits,
-      PKpars = uif$theta.pars,
+      PKpars = .pars,
       ## par_trans=fun,
-      model = uif$rxode.pred,
+      model = .mod,
       pred = function() {
         return(nlmixr_pred)
       },
@@ -629,14 +636,21 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       env$time2 <- time
       env$uif <- .uif
       env$method <- "FO"
+      if (control$singleOde) {
+        .mod <- uif$focei.rx1
+        .pars <- NULL
+      } else {
+        .mod <- uif$rxode.pred
+        .pars <- uif$theta.pars
+      }
       fit0 <-
         try(
           foceiFit(
             dat,
             inits = .uif$focei.inits,
-            PKpars = .uif$theta.pars,
+            PKpars = .pars,
             ## par_trans=fun,
-            model = .uif$rxode.pred,
+            model = .mod,
             pred = function() {
               return(nlmixr_pred)
             },
@@ -688,11 +702,18 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     control$maxOuterIterations <- 0L
     .env <- new.env(parent = emptyenv())
     .env$uif <- uif
+    if (control$singleOde) {
+      .mod <- uif$focei.rx1
+      .pars <- NULL
+    } else {
+      .mod <- uif$rxode.pred
+      .pars <- uif$theta.pars
+    }
     fit <- foceiFit(dat,
       inits = uif$focei.inits,
-      PKpars = uif$theta.pars,
+      PKpars = .pars,
       ## par_trans=fun,
-      model = uif$rxode.pred,
+      model = .mod,
       pred = function() {
         return(nlmixr_pred)
       },
@@ -958,6 +979,7 @@ saemControl <- function(seed = 99,
                         adjObf = TRUE,
                         sum.prod=FALSE,
                         addProp=c("combined2","combined1"),
+                        singleOde=TRUE,
                         ...) {
   .xtra <- list(...)
   .rm <- c()
@@ -988,6 +1010,7 @@ saemControl <- function(seed = 99,
     nsd.gq = nsd.gq,
     adjObf = adjObf,
     addProp=match.arg(addProp),
+    singleOde=singleOde,
     ...)
   if (length(.rm) > 0) {
     .ret <- .ret[!(names(.ret) %in% .rm)]

@@ -97,7 +97,7 @@ one.compartment <- function() {
     d/dt(depot) = -ka * depot
     d/dt(center) = ka * depot - cl / v * center
     cp = center / v
-    cp ~ prop(add.sd)
+    cp ~ add(add.sd)
   })
 }
 ```

@@ -1104,9 +1104,16 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
       .ctl$addProp <- "combined2"
     }
     .ctl <- do.call(foceiControl, .ctl)
+    if (.ctl$singleOde) {
+      .pars <- NULL
+      .mod <- uif$focei.rx1
+    } else {
+      .pars <- uif$theta.pars
+      .mod <- uif$rxode.pred
+    }
     fit.f <- try(foceiFit.data.frame(
-      data = dat, inits = init, PKpars = uif$theta.pars,
-      model = uif$rxode.pred, pred = function() {
+      data = dat, inits = init, PKpars = .pars,
+      model = .mod, pred = function() {
         return(nlmixr_pred)
       }, err = uif$error,
       lower = uif$focei.lower,
