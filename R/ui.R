@@ -1139,6 +1139,10 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
 }
 .nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   ## Parses the UI function to extract predictions and errors, and the other model specification.
+  .noAssign <- FALSE
+  .assign <- function(...){
+    if (!.noAssign) assign(...)
+  }
   .fun000 <- fun
   rxode <- FALSE
   all.names <- allNames(body(fun))
@@ -1268,7 +1272,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       }
       .tmp <- rbind(.tmp, .tmp1)
       class(.tmp) <- c("nlmixrBounds", "data.frame")
-      assign("bounds", .tmp, this.env)
+      .assign("bounds", .tmp, this.env)
       return(errn)
     }
     for (.i in seq_along(distArgs)) {
@@ -1298,7 +1302,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         .tmp$condition[.w] <- ""
       }
       class(.tmp) <- c("nlmixrBounds", "data.frame")
-      assign("bounds", .tmp, this.env)
+      .assign("bounds", .tmp, this.env)
     }
     return(errn)
   }
@@ -1309,12 +1313,12 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
     if (!is.na(suppressWarnings(as.numeric(err1.v)))) {
       stop("Distribution parameters cannot be numeric, but need to be estimated.")
     }
-    assign("errs.specified", unique(errs.specified, err1), this.env)
+    .assign("errs.specified", unique(errs.specified, err1), this.env)
     if (any(do.pred == c(2, 4, 5))) {
       return(quote(nlmixrIgnore()))
     }
     else if (any(do.pred == c(1, 4, 5))) {
-      assign(".predDf", rbind(
+      .assign(".predDf", rbind(
         .predDf,
         .data.frame(
           cond = ifelse(.bCond, "", sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
@@ -1331,14 +1335,14 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         any(paste(tmp$err) == "lnorm") || any(paste(tmp$err) == "dlnorm") || any(paste(tmp$err) == "logn") ||
         any(paste(tmp$err) == "dlogn")) &&
         any(paste(tmp$err) == "prop")) {
-        assign("errn", errn + 1, this.env)
-        assign("add.prop.errs", rbind(
+        .assign("errn", errn + 1, this.env)
+        .assign("add.prop.errs", rbind(
           add.prop.errs,
           .data.frame(y = sprintf("Y%02d", errn), add = TRUE, prop = TRUE)
         ), this.env)
       } else if (any(paste(tmp$err) == "prop")) {
-        assign("errn", errn + 1, this.env)
-        assign("add.prop.errs", rbind(
+        .assign("errn", errn + 1, this.env)
+        .assign("add.prop.errs", rbind(
           add.prop.errs,
           .data.frame(y = sprintf("Y%02d", errn), add = FALSE, prop = TRUE)
         ), this.env)
@@ -1362,12 +1366,12 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
     if (any(err1 == add.dists) &&
       any(err2 == add.dists)) {
       tmp <- paste(sort(c(err1, err2)), collapse = "+")
-      assign("errs.specified", unique(errs.specified, tmp), this.env)
+      .assign("errs.specified", unique(errs.specified, tmp), this.env)
       if (any(do.pred == c(2, 4, 5))) {
         return(quote(nlmixrIgnore()))
       }
       else if (any(do.pred == c(1, 4, 5))) {
-        assign(".predDf", rbind(
+        .assign(".predDf", rbind(
           .predDf,
           .data.frame(
             cond = ifelse(.bCond, "", sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
@@ -1389,8 +1393,8 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
           any(paste(tmp$err) == "logn") ||
           any(paste(tmp$err) == "dlogn")
         ) && any(paste(tmp$err) == "prop")) {
-          assign("errn", errn + 1, this.env)
-          assign("add.prop.errs", rbind(
+          .assign("errn", errn + 1, this.env)
+          .assign("add.prop.errs", rbind(
             add.prop.errs,
             .data.frame(y = sprintf("Y%02d", errn), add = TRUE, prop = TRUE)
           ), this.env)
@@ -1425,12 +1429,12 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       any(err2 == add.dists) &&
       any(err3 == add.dists)) {
       tmp <- paste(sort(c(err1, err2, err3)), collapse = "+")
-      assign("errs.specified", unique(errs.specified, tmp), this.env)
+      .assign("errs.specified", unique(errs.specified, tmp), this.env)
       if (any(do.pred == c(2, 4, 5))) {
         return(quote(nlmixrIgnore()))
       }
       else if (any(do.pred == c(1, 4, 5))) {
-        assign(".predDf", rbind(
+        .assign(".predDf", rbind(
           .predDf,
           .data.frame(
             cond = ifelse(.bCond, "", sub(rex::rex(or("cmt", "CMT"), any_spaces, "==", any_spaces), "", .deparse(curCond))),
@@ -1453,8 +1457,8 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
           any(paste(tmp$err) == "logn") ||
           any(paste(tmp$err) == "dlogn")
         ) && any(paste(tmp$err) == "prop")) {
-          assign("errn", errn + 1, this.env)
-          assign("add.prop.errs", rbind(
+          .assign("errn", errn + 1, this.env)
+          .assign("add.prop.errs", rbind(
             add.prop.errs,
             .data.frame(y = sprintf("Y%02d", errn), add = TRUE, prop = TRUE)
           ), this.env)
@@ -1475,7 +1479,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   f <- function(x) {
     if (is.name(x)) {
       if (any.theta.names(as.character(x), theta.names)) {
-        assign("theta.ord", unique(c(theta.ord, as.character(x))), this.env)
+        .assign("theta.ord", unique(c(theta.ord, as.character(x))), this.env)
       }
       return(x)
     } else if (is.call(x)) {
@@ -1621,20 +1625,20 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         find.logit <- function(x) {
           if (is.atomic(x) || is.name(x)) {
             if (any.theta.names(as.character(x), theta.names)) {
-              assign("logit.theta", unique(c(logit.theta, as.character(x))), this.env)
+              .assign("logit.theta", unique(c(logit.theta, as.character(x))), this.env)
               if (!(as.character(x) %in% names(logit.theta.hi))) {
-                assign("logit.theta.hi", c(logit.theta.hi, setNames(.hi, as.character(x))), this.env)
+                .assign("logit.theta.hi", c(logit.theta.hi, setNames(.hi, as.character(x))), this.env)
               }
               if (!(as.character(x) %in% names(logit.theta.low))) {
-                assign("logit.theta.low", c(logit.theta.low, setNames(.low, as.character(x))), this.env)
+                .assign("logit.theta.low", c(logit.theta.low, setNames(.low, as.character(x))), this.env)
               }
             } else if (any.theta.names(as.character(x), eta.names)) {
-              assign("logit.eta", unique(c(logit.eta, as.character(x))), this.env)
+              .assign("logit.eta", unique(c(logit.eta, as.character(x))), this.env)
               if (!(as.character(x) %in% names(logit.eta.hi))) {
-                assign("logit.eta.hi", c(logit.eta.hi, setNames(.hi, as.character(x))), this.env)
+                .assign("logit.eta.hi", c(logit.eta.hi, setNames(.hi, as.character(x))), this.env)
               }
               if (!(as.character(x) %in% names(logit.eta.low))) {
-                assign("logit.eta.low", c(logit.eta.low, setNames(.low, as.character(x))), this.env)
+                .assign("logit.eta.low", c(logit.eta.low, setNames(.low, as.character(x))), this.env)
               }
             }
             return(x)
@@ -1660,9 +1664,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         find.log <- function(x) {
           if (is.atomic(x) || is.name(x)) {
             if (any.theta.names(as.character(x), theta.names)) {
-              assign("log.theta", unique(c(log.theta, as.character(x))), this.env)
+              .assign("log.theta", unique(c(log.theta, as.character(x))), this.env)
             } else if (any.theta.names(as.character(x), eta.names)) {
-              assign("log.eta", unique(c(log.eta, as.character(x))), this.env)
+              .assign("log.eta", unique(c(log.eta, as.character(x))), this.env)
             }
             return(x)
           } else if (is.pairlist(x)) {
@@ -1735,11 +1739,11 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
                 if (muRef && !isMinus && length(th0) == 1 && do.pred == 4) {
                   tmp <- get("cov.ref", this.env)
                   tmp[[cov]] <- c(tmp[[cov]], structure(th0, .Names = th))
-                  assign("cov.ref", tmp, this.env)
+                  .assign("cov.ref", tmp, this.env)
                   return(f(x[[wm0]]))
                 }
                 tmp <- get("cov.theta", this.env)
-                assign("cov.theta", unique(c(tmp, th)), this.env)
+                .assign("cov.theta", unique(c(tmp, th)), this.env)
               }
             }
             if (any.theta.names(as.character(x[[2]]), eta.names) &&
@@ -1747,7 +1751,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
               ## Found ETA+THETA
               tmp <- .mu.ref
               tmp[[as.character(x[[2]])]] <- as.character(x[[3]])
-              ## assign("mu.ref", tmp, this.env);
+              ## .assign("mu.ref", tmp, this.env);
               .mu.ref <<- tmp
               tmp <- as.character(x[[3]])
               .oneTheta <<- unique(c(.oneTheta, tmp))
@@ -1758,7 +1762,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
               ## Found THETA+ETA
               tmp <- .mu.ref
               tmp[[as.character(x[[3]])]] <- as.character(x[[2]])
-              ## assign(".mu.ref", tmp, this.env)
+              ## .assign(".mu.ref", tmp, this.env)
               .mu.ref <<- tmp
               tmp <- as.character(x[[2]])
               .oneTheta <<- unique(c(.oneTheta, tmp))
@@ -1792,7 +1796,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
               if (length(th) == 1) {
                 tmp <- .mu.ref
                 tmp[[eta]] <- th
-                ## assign("tmp", .mu.ref, this.env)
+                ## .assign("tmp", .mu.ref, this.env)
                 .mu.ref <<- tmp
                 tmp <- as.character(th)
                 .oneTheta <<- unique(c(.oneTheta, tmp))
@@ -1828,7 +1832,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
               if (length(.etas) == 1) {
                 tmp <- .mu.ref
                 tmp[[.etas]] <- theta
-                ## assign("tmp", .mu.ref, this.env);
+                ## .assign("tmp", .mu.ref, this.env);
                 .mu.ref <<- tmp
                 tmp <- as.character(theta)
                 .oneTheta <<- unique(c(.oneTheta, tmp))
@@ -1881,7 +1885,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   new.fn <- function(x) {
     x <- rm.empty(x)
     if (do.pred == 2) {
-      assign("rxode", any(regexpr(rex::rex(start, any_spaces, "d/dt(", anything, ")", any_spaces, or("=", "<-")), x) != -1), this.env)
+      .assign("rxode", any(regexpr(rex::rex(start, any_spaces, "d/dt(", anything, ")", any_spaces, or("=", "<-")), x) != -1), this.env)
     }
     x <- c("function(){", .bodyDewrap(x), "}")
     x <- eval(parse(text = paste(x, collapse = "\n")))
@@ -2003,13 +2007,13 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         w <- min(w) - 1
         if (w > 0) {
           .env <- new.env(parent = emptyenv())
-          assign("extra", NULL, .env)
+          .assign("extra", NULL, .env)
           .subs <- function(x) {
             if (is.atomic(x)) {
               x
             } else if (is.name(x)) {
               if (any(as.character(x) == ini$name)) {
-                assign("extra", unique(c(.env$extra, as.character(x))), .env)
+                .assign("extra", unique(c(.env$extra, as.character(x))), .env)
                 return(eval(parse(text = sprintf("quote(nlmixr_%s_par)", as.character(x)))))
               } else {
                 return(x)
@@ -2054,8 +2058,11 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   fun.all <- eval(parse(text = paste(c("function()({", .tmp, "})"), collapse = "\n")))
   all.covs <- character()
   do.pred <- 1
+  .noAssign <- FALSE
   pred.txt <- .deparse(f(body(fun)))
+  .noAssign <- TRUE
   pred.txt.all <- .deparse(f(body(fun)))
+  .noAssign <- FALSE
   .reg <- rex::rex(or(
     group(any_spaces, "(", any_spaces, "{", any_spaces),
     group(any_spaces, "}", any_spaces, ")", any_spaces),
@@ -2072,13 +2079,19 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   pred <- new.fn(pred.txt)
   do.pred <- 0
   err <- new.fn(.deparse(f(body(fun))))
+  .noAssign <- TRUE
   pred.all <- new.fn(pred.txt.all)
   err.all <- new.fn(.deparse(f(body(fun.all))))
+  .noAssign <- FALSE
   do.pred <- 2
   rest.txt <- .deparse(f(body(fun)))
+  .noAssign <- TRUE
   rest.txt.all <- .deparse(f(body(fun.all)))
+  .noAssign <- FALSE
   rest <- new.fn(rest.txt)
+  .noAssign <- TRUE
   rest0 <- new.fn(rest.txt.all)
+  .noAssign <- FALSE
   rest.funs <- allCalls(body(rest))
   rest.vars <- allVars(body(rest))
   all.covs <- setdiff(rest.vars, paste0(bounds$name))
