@@ -2750,6 +2750,50 @@ nlmixrUI.rxode.pred <- function(object) {
     return(paste(c(object$rxode, tmp), collapse = "\n"))
   }
 }
+
+##' Return RxODE model with predictions appended
+##'
+##' @param object UI object
+##' @return Combined focei model text for RxODE
+##' @author Matthew L. Fidler
+nlmixrUI.focei.rx1 <- function(object) {
+  .prd <- .deparse1(body(object$pred))
+  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
+    .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
+  }
+  paste(c(.deparse1(body(object$focei.fun1)),
+          .prd), collapse="\n")
+}
+
+##' Return RxODE model with predictions appended
+##'
+##' @param object UI object
+##' @return Combined focei model text for RxODE
+##' @author Matthew L. Fidler
+nlmixrUI.saem.rx1 <- function(object) {
+  .prd <- .deparse1(body(object$pred))
+  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
+    .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
+  }
+  paste(c(.deparse1(body(object$saem.fun1)),
+          .prd), collapse="\n")
+}
+
+##' Return RxODE model with predictions appended
+##'
+##' @param object UI object
+##' @return String or NULL if RxODE is not specified by UI.
+##' @author Matthew L. Fidler
+nlmixrUI.focei.rx1 <- function(object) {
+  .prd <- .deparse1(body(object$pred))
+  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
+    .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
+  }
+  paste(c(.deparse1(body(object$focei.fun1)),
+          .prd), collapse="\n")
+}
+
+
 ##' Get the Parameter  function with THETA/ETAs defined
 ##'
 ##' @param obj UI object
@@ -3484,6 +3528,10 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.logitThetasListHi(obj))
   } else if (arg == "logitThetasList") {
     return(nlmixrUI.logitThetasList(obj))
+  } else if (arg == "focei.rx1") {
+    return(nlmixrUI.focei.rx1(obj))
+  } else if (arg == "saem.rx1") {
+    return(nlmixrUI.saem.rx1(obj))
   } else if (arg == ".clean.dll") {
     if (exists(".clean.dll", envir = x$meta)) {
       clean <- x$meta$.clean.dll
