@@ -2340,8 +2340,8 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
     .extra <- paste(.predDf$cond[.w])
     .extra <- .extra[regexpr("[()+-]", .extra) == -1]
     if (length(.extra) > 0) {
-      .extra <- paste(c(paste0("cmt(", .extra, ");\n"))
-      rxode <- paste0(rxode, ";\n", .extra, collapse = ""))
+      .extra <- paste(paste0("cmt(", .extra, ");\n"), collapse="\n")
+      rxode <- paste0(rxode, ";\n", .extra)
     } else {
       .extra <- ""
     }
@@ -2788,7 +2788,7 @@ nlmixrUI.saem.rx1 <- function(object) {
     .prd[.w] <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd[.w])
   }
   .ret <- paste(c(.deparse1(body(object$saem.fun1)),
-                  .prd), collapse="\n")
+                  .prd, object$extra), collapse="\n")
   if (any(regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1)) {
     .ret <- RxODE::rxNorm(RxODE::rxGetLin(.ret))
   }
@@ -2813,7 +2813,7 @@ nlmixrUI.focei.rx1 <- function(obj) {
     .prd[.w] <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd[.w])
   }
   .ret <- paste(c(.unfixed, .eta, .deparse1(body(obj$focei.fun1)),
-                  .prd), collapse="\n")
+                  .prd, obj$extra), collapse="\n")
   if (any(regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1)){
     .ret <- RxODE::rxNorm(RxODE::rxGetLin(.ret))
   }
