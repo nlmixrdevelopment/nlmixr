@@ -2756,6 +2756,20 @@ nlmixrUI.rxode.pred <- function(object) {
 ##' @param object UI object
 ##' @return Combined focei model text for RxODE
 ##' @author Matthew L. Fidler
+nlmixrUI.saem.rx1 <- function(object) {
+  .prd <- .deparse1(body(object$pred))
+  if (regexpr("\\bnlmixr_lincmt_pred\\b", .prd) != -1){
+    .prd <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd)
+  }
+  paste(c(.deparse1(body(object$saem.fun1)),
+          .prd), collapse="\n")
+}
+
+##' Return RxODE model with predictions appended
+##'
+##' @param object UI object
+##' @return Combined focei model text for RxODE
+##' @author Matthew L. Fidler
 nlmixrUI.focei.rx1 <- function(obj) {
   .df <- .as.data.frame(obj$ini)
   .dft <- .df[!is.na(.df$ntheta), ]

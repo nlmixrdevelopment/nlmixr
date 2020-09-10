@@ -62,7 +62,7 @@ one.cmt <- function() {
     ka <- exp(tka + eta.ka)
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
-    linCmt() ~ logitNorm(add.sd, -0.5, 12)
+    linCmt() ~ add(add.sd)
   })
 }
 
