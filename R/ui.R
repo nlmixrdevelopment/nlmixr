@@ -1655,7 +1655,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         find.logit(x[[2]])
         if (length(x[[2]]) == 1 && any.theta.names(as.character(x[[2]]), theta.names)) {
           tmp <- as.character(x[[2]])
-          .oneThetaLogit <<- unique(c(.oneThetaLogit, tmp))
+          .assign(".oneThetaLogit",unique(c(.oneThetaLogit, tmp)),this.env)
         }
         return(as.call(lapply(x, f)))
       } else if (identical(x[[1]], quote(`exp`)) && any(do.pred == c(4, 5))) {
@@ -1682,7 +1682,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         find.log(x[[2]])
         if (length(x[[2]]) == 1 && any.theta.names(as.character(x[[2]]), theta.names)) {
           tmp <- as.character(x[[2]])
-          .oneTheta <<- unique(c(.oneTheta, tmp))
+          .assign(".oneTheta",unique(c(.oneTheta, tmp)),this.env)
         }
         return(as.call(lapply(x, f)))
       } else if (identical(x[[1]], quote(`+`)) ||
@@ -1752,9 +1752,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
               tmp <- .mu.ref
               tmp[[as.character(x[[2]])]] <- as.character(x[[3]])
               ## .assign("mu.ref", tmp, this.env);
-              .mu.ref <<- tmp
+              .assign(".mu.ref",tmp,this.env)
               tmp <- as.character(x[[3]])
-              .oneTheta <<- unique(c(.oneTheta, tmp))
+              .assign(".oneTheta",unique(c(.oneTheta, tmp)),this.env)
               ## Collapse to THETA
               return(x[[3]])
             } else if (any.theta.names(as.character(x[[3]]), eta.names) &&
@@ -1763,9 +1763,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
               tmp <- .mu.ref
               tmp[[as.character(x[[3]])]] <- as.character(x[[2]])
               ## .assign(".mu.ref", tmp, this.env)
-              .mu.ref <<- tmp
+              .assign(".mu.ref",tmp,this.env)
               tmp <- as.character(x[[2]])
-              .oneTheta <<- unique(c(.oneTheta, tmp))
+              .assign(".oneTheta",unique(c(.oneTheta, tmp)),this.env)
               ## Collapse to THETA
               ## model$omega=diag(c(1,1,0))
               ## 0 is not estimated.
@@ -1797,9 +1797,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
                 tmp <- .mu.ref
                 tmp[[eta]] <- th
                 ## .assign("tmp", .mu.ref, this.env)
-                .mu.ref <<- tmp
+                .assign(".mu.ref",tmp,this.env)
                 tmp <- as.character(th)
-                .oneTheta <<- unique(c(.oneTheta, tmp))
+                .assign(".oneTheta",unique(c(.oneTheta, tmp)),this.env)
                 return(f(as.call(x[[2]])))
               }
             } else if (length(x) < 3) {
@@ -1818,7 +1818,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
                 } else if (is.call(x)) {
                   if (identical(x[[1]], quote(`+`)) &&
                     any.theta.names(as.character(x[[3]]), eta.names)) {
-                    .etas <<- c(.etas, as.character(x[[3]]))
+                    .assign(".etas",c(.etas, as.character(x[[3]])),this.env)
                     return(x[[2]])
                   }
                   return(as.call(lapply(x, find.etas)))
@@ -1833,9 +1833,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
                 tmp <- .mu.ref
                 tmp[[.etas]] <- theta
                 ## .assign("tmp", .mu.ref, this.env);
-                .mu.ref <<- tmp
+                .assign(".mu.ref",tmp,this.env)
                 tmp <- as.character(theta)
-                .oneTheta <<- unique(c(.oneTheta, tmp))
+                assign(".oneTheta", unique(c(.oneTheta, tmp)), this.env)
                 x[[2]] <- new
               }
             }
