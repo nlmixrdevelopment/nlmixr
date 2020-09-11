@@ -735,7 +735,7 @@ double likInner0(double *eta, int id){
       }
     }
     if (op->neq > 0 && (ISNA(ind->solve[0]) || std::isnan(ind->solve[0]))){
-      REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
+      REprintf("bad solve id: %d\n", ind->id);
       REprintf("eta: ");
       for (j = 0; j < op_focei.neta; ++j){
 	REprintf("%f ",eta[j]);

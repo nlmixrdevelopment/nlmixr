@@ -3615,9 +3615,11 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     class(x) <- .cls
     return(.nmMuTable(x))
   } else if (arg == "single.inner.1") {
-    nlmixrUI.inner.model(obj, TRUE, "combined1")
+    return(nlmixrUI.inner.model(obj, TRUE, "combined1"))
   } else if (arg == "single.inner.2") {
-    nlmixrUI.inner.model(obj, TRUE, "combined2")
+    return(nlmixrUI.inner.model(obj, TRUE, "combined2"))
+  } else if (arg == "inner.par0") {
+    return(nlmixrUI.par0(obj))
   }
   m <- x$ini
   ret <- `$.nlmixrBounds`(m, arg, exact = exact)
@@ -3723,6 +3725,14 @@ nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "co
                                     grad=FALSE, pred.minus.dv = TRUE, sum.prod = FALSE,
                                     interaction=TRUE, only.numeric=FALSE, run.internal=TRUE,
                                     addProp=addProp)
+}
+
+nlmixrUI.par0 <- function(obj){
+  .ini <- as.data.frame(obj$ini)
+  .maxEta <- max(.ini$neta1, na.rm=TRUE)
+  .theta <- .ini[!is.na(.ini$ntheta), ]
+  setNames(c(.theta$est, rep(0.0, .maxEta)),
+           c(paste0("THETA[", .theta$ntheta, "]"), paste0("ETA[", seq(1, .maxEta), "]")))
 }
 
 
