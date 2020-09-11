@@ -2974,7 +2974,7 @@ nlmixrUI.saem.lambda <- function(obj) {
   }
   predDf <- obj$predDf
   .ini <- .as.data.frame(obj$ini)
-  .ini <- .ini[!is.na(.ini$err), ]r
+  .ini <- .ini[!is.na(.ini$err), ]
 }
 ##' Get the SAEM model$res.mod code
 ##'
