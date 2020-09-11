@@ -580,7 +580,7 @@ configsaem <- function(model, data, inits,
   cfg$addProp <- c("combined1" = 1L, "combined2" = 2L)[match.arg(addProp)]
 
   cfg$DEBUG <- cfg$opt$DEBUG <- cfg$optM$DEBUG <- DEBUG
-  cfg$phiMFile <- tempfile()
+  cfg$phiMFile <- tempfile("phi-", RxODE::rxTempDir(), ".phi")
   cfg
 }
 
