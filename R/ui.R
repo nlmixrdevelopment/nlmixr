@@ -3615,9 +3615,9 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     class(x) <- .cls
     return(.nmMuTable(x))
   } else if (arg == "single.inner.1") {
-    nlmixrUI.inner.model(x, TRUE, "combined1")
+    nlmixrUI.inner.model(obj, TRUE, "combined1")
   } else if (arg == "single.inner.2") {
-    nlmixrUI.inner.model(x, TRUE, "combined2")
+    nlmixrUI.inner.model(obj, TRUE, "combined2")
   }
   m <- x$ini
   ret <- `$.nlmixrBounds`(m, arg, exact = exact)

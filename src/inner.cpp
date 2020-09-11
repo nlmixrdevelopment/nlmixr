@@ -767,12 +767,8 @@ double likInner0(double *eta, int id){
 	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
 	} else if (ind->evid[j] == 0) {
 	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
-	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated 
+	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated
 	  dv = tbs(ind->dv[j]);
-	  // REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
-	  // if (ISNA(f) || std::isnan(f) || f == 0) {
-	  //   REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
-	  // }
 	  if (ISNA(f) || std::isnan(f)) {
 	    REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
 	    REprintf("eta: ");
@@ -801,6 +797,7 @@ double likInner0(double *eta, int id){
 	  if (ISNA(ind->lhs[op_focei.neta + 1]))
 	    throw std::runtime_error("bad solve");
 	  r = ind->lhs[op_focei.neta + 1];
+	  if (r == 0.0) r = 1.0;
 	  if (op_focei.neta == 0) {
 	    lnr =_safe_log(r);
 	    //llik <- -0.5 * sum(err ^ 2 / R + log(R));
@@ -854,13 +851,13 @@ double likInner0(double *eta, int id){
 	    // lhs 1-eta = df/deta
 	    // FIXME faster initialization via copy or elm
 	    // RSprintf("id: %d k: %d j: %d\n", id, k, j);
-	    B(k, 0) = 2.0/_safe_zero(r);
+	    B(k, 0) = 2.0/r;
 	    if (op_focei.interaction == 1) {
 	      for (i = op_focei.neta; i--; ) {
 		if (op_focei.etaFD[i]==0) {
 		  fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
 		  rp  = ind->lhs[i + op_focei.neta + 2];
-		  c(k, i) = rp/_safe_zero(r);
+		  c(k, i) = rp/r;
 		}
 	      }
 	      // Cannot combine for loop with for loop above because
@@ -881,7 +878,7 @@ double likInner0(double *eta, int id){
 		    a(k, i) = fpm = (ind->lhs[0]-f)/op_focei.eventFD;
 		    // LHS #1 =  r
 		    rp  = (ind->lhs[1]-r)/op_focei.eventFD;
-		    c(k, i) = rp/_safe_zero(r);
+		    c(k, i) = rp/r;
 		  } else {
 		    // Central difference
 		    fpm = ind->lhs[0];
@@ -893,13 +890,13 @@ double likInner0(double *eta, int id){
 				    ind->lhs); // nlhs is smaller
 		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
 		    rp = (rp-ind->lhs[1])/(2*op_focei.eventFD);
-		    c(k, i) = rp/_safe_zero(r);
+		    c(k, i) = rp/r;
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  }
 		} else {
 		  fpm = a(k, i);
 		  rp  = ind->lhs[i + op_focei.neta + 2];
-		  rp = c(k, i)*_safe_zero(r);
+		  rp = c(k, i)*r;
 		}
 		// This is calculated at the end; That way it is
 		// correct for finite difference and sensitivity.
@@ -1025,7 +1022,7 @@ double likInner0(double *eta, int id){
 	      // Eq #10
 	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
 	      if (cens == 0){
-		fInd->llik += err * err/_safe_zero(r) + lnr;
+		fInd->llik += err * err/r + lnr;
 		likM2(fInd, limit, f, r);
 	      } else {
 		likCens(fInd, cens, limit, f, dv, r);
