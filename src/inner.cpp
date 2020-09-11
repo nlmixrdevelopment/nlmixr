@@ -768,7 +768,7 @@ double likInner0(double *eta, int id){
 	} else if (ind->evid[j] == 0) {
 	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
-	  if (ISNA(f))
+	  if (ISNA(f) || std::isnan(f))
 	    throw std::runtime_error("bad solve");
 	  // fInd->f(k, 0) = ind->lhs[0];
 	  dv = tbs(ind->dv[j]);
