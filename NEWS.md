@@ -30,7 +30,7 @@
 - `focei` now supports 2 combined additive + proportional error
   models; 
   - `combined1`: `trans(y) = trans(f) + (a+b*f^c)*err`
-  - `combined2`: `trans(y) = trans(f) + (a^2+b^2*f^(2c))*err`
+  - `combined2`: `trans(y) = trans(f) + sqrt(a^2+b^2*f^(2c))*err`
   
 - `focei` proportional and power models are more tolerant of 0 
   predictions in your data
@@ -40,17 +40,32 @@
 
  - `saem` fits now gracefully fall back to the `focei` likelihood when
    they support files are no longer on the loaded disk
+ 
+ - `saem` phi pile is now saved in the `RxODE::rxTempDir()` which can
+   be customized to allow the `phi` file to remain after R has exited 
+   
  - `saem` fits now can add in `fo`, `foce` and `focei` likelihood
+ 
  - `saem` fits now use `liblsoda` by default and are multi-threaded when
    running (controlled by `RxODE`)
+   
  - `saem` now supports time-varying covariates (like clock-time)
+ 
  - `saem` now supports 2 combined additive + proportional error models:
     - `combined1`: `trans(y) = trans(f) + (a+b*f^c)*err`
-	- `combined2`: `trans(y) = trans(f) + (a^2+b^2*f^(2c))*err`
+	- `combined2`: `trans(y) = trans(f) + sqrt(a^2+b^2*f^(2c))*err`
+	
  - `saem` proportional and power models are more tolerant of 0 
     predictions in your data
+	
  - `saem` now supports censoring a similar way as `monolix` does, with
   `cens` and `limit` columns
+  
+ - Added the low-discrepancy "vandercorput" normal sequence from
+   SITMO/`RxODE`; In theory this will cover the domain quickly and evenly
+   possibly allowing a better solution.  This can be called with
+   `saemControl(normal="vandercorput")`.
+ 
  - The default of `saem` additive + proportional error has been
    switched to `combined2`, which was the `focei` default, but you can
    change this back with `saemControl(addProp="combined2")`.  The

@@ -953,6 +953,18 @@ nlmixr_fit <- function(uif, data, est = NULL, control = list(), ...,
 ##'     should be adjusted to be closer to NONMEM's default objective
 ##'     function.  By default this is \code{TRUE}
 ##'
+##' @param normal The type of random normal generator used for SAEM:
+##'
+##' \itemize{
+##'
+##' \item "\code{rnorm}" R's random number generator (default)
+##'
+##' \item "\code{vandercorput}" low-discrepancy sequence transformed
+##' to a normal random variable to cover the domain better (may be
+##' better than a truly random sequence)
+##'
+##' }
+##'
 ##' @param ... Other arguments to control SAEM.
 ##'
 ##' @inheritParams RxODE::rxSolve
@@ -983,7 +995,9 @@ saemControl <- function(seed = 99,
                         sum.prod=FALSE,
                         addProp=c("combined2","combined1"),
                         singleOde=TRUE,
+                        normal=c("rnorm", "vandercorput"),
                         ...) {
+  normal <- match.arg(normal)
   .xtra <- list(...)
   .rm <- c()
   if (missing(transitAbs) && !is.null(.xtra$transit_abs)) {
@@ -1014,6 +1028,7 @@ saemControl <- function(seed = 99,
     adjObf = adjObf,
     addProp=match.arg(addProp),
     singleOde=singleOde,
+    normal=normal,
     ...)
   if (length(.rm) > 0) {
     .ret <- .ret[!(names(.ret) %in% .rm)]

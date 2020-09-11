@@ -160,7 +160,9 @@ configsaem <- function(model, data, inits,
                        ODEopt = list(atol = 1e-6, rtol = 1e-4, method = "lsoda", transitAbs = FALSE, maxeval = 100000),
                        distribution = c("normal", "poisson", "binomial"),
                        addProp=c("combined2","combined1"),
-                       seed = 99, fixed = NULL, DEBUG = 0) {
+                       seed = 99, fixed = NULL, DEBUG = 0,
+                       normal=c("rnorm", "vandercorput")) {
+  normal <- match.arg(normal)
   names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt))
   ODEopt <- do.call(RxODE::rxControl, ODEopt)
   # mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
@@ -422,7 +424,12 @@ configsaem <- function(model, data, inits,
   phiM <- phiM[rep(1:N, nmc), , drop = FALSE]
   .tmp <- diag(sqrt(inits$omega))
   if (model$N.eta == 1) .tmp <- matrix(sqrt(inits$omega))
-  phiM <- phiM + matrix(rnorm(phiM), dim(phiM)) %*% .tmp
+  if (normal == "vandercorput") {
+    .mat2 <- matrix(RxODE::rxnormV(n=length(phiM)), dim(phiM))
+  } else {
+    .mat2 <- matrix(rnorm(phiM), dim(phiM))
+  }
+  phiM <- phiM + .mat2 %*% .tmp
 
 
   mc.idx <- rep(1:N, nmc)
@@ -446,8 +453,7 @@ configsaem <- function(model, data, inits,
   vna <- mcmc$niter
   na <- length(va)
   pas <- 1 / (1:vna[1])^va[1]
-  for (ia in 2:na)
-  {
+  for (ia in 2:na) {
     end <- length(pas)
     k1 <- pas[end]^(-1 / va[ia])
     pas <- c(pas, 1 / ((k1 + 1):(k1 + vna[ia]))^va[ia])
