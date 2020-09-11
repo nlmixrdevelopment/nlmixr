@@ -56,7 +56,7 @@
   .thetaN <- names(.params)
   .newMod <- paste0(
     .repSim(.mod, theta = .thetaN, eta = .etaN, c(.lhs, "rx_pred_", "rx_r_")),
-    "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);"
+    "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_, rx_low_, rx_hi_);"
   )
   ## paste0(gsub("\n\n+", "\n", gsub(rex::rex(capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),one_of("\n;")), "",
   ##                                 gsub(rex::rex(capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
@@ -91,7 +91,7 @@
   .mat <- .mat[.w, .w, drop = FALSE]
   .sigma <- .mat
   .sigmaNames <- dimnames(.mat)[[1]]
-  .newMod <- paste0(.newMod, .sim, ", rx_lambda_, rx_yj_);\n")
+  .newMod <- paste0(.newMod, .sim, ", rx_lambda_, rx_yj_, rx_low_, rx_hi_);\n")
   .newMod <- strsplit(.newMod, "\n")[[1]]
   .w <- which(regexpr("rx_r_~", .newMod) != -1)
   .subs <- function(x, .what, .with) {

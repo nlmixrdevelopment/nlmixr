@@ -584,7 +584,6 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     }
     uif$env$singleOde <- control$singleOde
     if (control$singleOde) {
-      message("singleOde")
       .mod <- uif$focei.rx1
       .pars <- NULL
     } else {
