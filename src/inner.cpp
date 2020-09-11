@@ -773,8 +773,15 @@ double likInner0(double *eta, int id){
 	  // if (ISNA(f) || std::isnan(f) || f == 0) {
 	  //   REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
 	  // }
-	  if (ISNA(f) || std::isnan(f))
+	  if (ISNA(f) || std::isnan(f)) {
+	    REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
+	    REprintf("eta: ");
+	    for (j = 0; j < op_focei.neta; ++j){
+	      REprintf("%f ",eta[j]);
+	    }
+	    REprintf("\n");
 	    throw std::runtime_error("bad solve");
+	  }
 	  // fInd->f(k, 0) = ind->lhs[0];
 	  // REprintf("f: %f: dv: %f tbs(dv): %f\n", f, ind->dv[j], dv);
 	  err = f - dv;
@@ -1454,7 +1461,6 @@ static inline void innerOpt1(int id, int likId) {
   std::fill_n(&fInd->var[0], fop->neta, 0.1);
 
   int npar = fop->neta+1;
-
   std::copy(&fInd->eta[0], &fInd->eta[0]+fop->neta, fInd->x);
   double f, epsilon = max2(fop->epsilon, sqrt(DOUBLE_EPS));
 
