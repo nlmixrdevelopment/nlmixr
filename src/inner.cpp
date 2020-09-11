@@ -734,7 +734,14 @@ double likInner0(double *eta, int id){
 	op_focei.stickyTol=1;
       }
     }
-    if (op->neq > 0 && ISNA(ind->solve[0])){
+    if (op->neq > 0 && (ISNA(ind->solve[0]) || std::isnan(ind->solve[0]))){
+      REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
+      REprintf("eta: ");
+      for (j = 0; j < op_focei.neta; ++j){
+	REprintf("%f ",eta[j]);
+      }
+      REprintf("\n");
+      throw std::runtime_error("bad solve");
       return 1e300;
     } else {
       // Update eta.
@@ -904,8 +911,10 @@ double likInner0(double *eta, int id){
 		//lp is eq 12 in Almquist 2015
 		// .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
 		if (cens == 0) {
+		  // REprintf("t: %f: err: %f; fpm: %f; B(k, 0): %f; c(k, i): %f; rp: %f", ind->all_times[j], err, fpm, B(k, 0), c(k, i), rp);
 		  lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) -
 		    0.5 * c(k, i) - 0.5 * err * fpm * B(k, 0);
+		  // REprintf("lp(i,0): %f\n", lp(i,0));
 		} else {
 		  if (R_FINITE(limit)){
 		    // M3 method
@@ -1066,6 +1075,8 @@ double likInner0(double *eta, int id){
 	// Now finalize lp
 	mat etam = arma::mat(op_focei.neta, 1);
 	std::copy(&eta[0], &eta[0] + op_focei.neta, etam.begin()); // fill in etam
+	// print(wrap(lp));
+	// print(wrap(etam));
 	// Finalize eq. #12
 	lp = -(lp - op_focei.omegaInv * etam);
 	// Partially finalize #10
