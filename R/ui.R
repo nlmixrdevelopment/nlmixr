@@ -3614,6 +3614,10 @@ nlmixrUI.poped.ff_fun <- function(obj) {
   } else if (arg == "muRefTable") {
     class(x) <- .cls
     return(.nmMuTable(x))
+  } else if (arg == "single.inner.1") {
+    nlmixrUI.inner.model(x, TRUE, "combined1")
+  } else if (arg == "single.inner.2") {
+    nlmixrUI.inner.model(x, TRUE, "combined2")
   }
   m <- x$ini
   ret <- `$.nlmixrBounds`(m, arg, exact = exact)
@@ -3702,6 +3706,23 @@ str.nlmixrUI <- function(object, ...) {
   class(.ini) <- c("nlmixrBounds", "data.frame")
   uif$ini <- .ini
   return(uif)
+}
+
+nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "combined2")) {
+  addProp <- match.arg(addProp)
+  .mod <- obj$focei.rx1
+  .pars <- NULL
+  if (singleOde) {
+    .mod <- obj$focei.rx1
+    .pars <- NULL
+  } else {
+    .mod <- obj$rxode.pred
+    .pars <- objf$theta.pars
+  }
+  RxODE::rxSymPySetupPred(.mod, function() { return(nlmixr_pred) }, .pars, obj$error,
+                                    grad=FALSE, pred.minus.dv = TRUE, sum.prod = FALSE,
+                                    interaction=TRUE, only.numeric=FALSE, run.internal=TRUE,
+                                    addProp=addProp)
 }
 
 

@@ -767,11 +767,15 @@ double likInner0(double *eta, int id){
 	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
 	} else if (ind->evid[j] == 0) {
 	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
-	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propigated
+	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated 
+	  dv = tbs(ind->dv[j]);
+	  // REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
+	  // if (ISNA(f) || std::isnan(f) || f == 0) {
+	  //   REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
+	  // }
 	  if (ISNA(f) || std::isnan(f))
 	    throw std::runtime_error("bad solve");
 	  // fInd->f(k, 0) = ind->lhs[0];
-	  dv = tbs(ind->dv[j]);
 	  // REprintf("f: %f: dv: %f tbs(dv): %f\n", f, ind->dv[j], dv);
 	  err = f - dv;
 	  limit = R_NegInf;
@@ -1678,65 +1682,65 @@ void innerOpt(){
 // #endif
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
-      try {
+      // try {
         innerOpt1(id, 0);
-      } catch (...){
-      	// First try resetting ETA
-      	std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      	try {
-      	  innerOpt1(id, 0);
-        } catch (...) {
-      	  // Now try resetting Hessian, and ETA
-      	  // RSprintf("Hessian Reset for ID: %d\n", id+1);
-          indF->mode = 1;
-          indF->uzm = 1;
-	  op_focei.didHessianReset=1;
-          std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      	  try {
-            // RSprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
-            innerOpt1(id, 0);
-          } catch (...){
-            indF->mode = 1;
-            indF->uzm = 1;
-	    op_focei.didHessianReset=1;
-            std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-            if(!op_focei.noabort){
-              stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
-      	    } else if (indF->doChol == 1){
-      	      indF->doChol = 0; // Use generalized cholesky decomposition
-              indF->mode = 1;
-              indF->uzm = 1;
-	      op_focei.didHessianReset=1;
-              std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      	      try {
-      		innerOpt1(id, 0);
-      		indF->doChol = 1; // Use cholesky again.
-      	      } catch (...){
-      		// Just use ETA=0
-                std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-                try{
-                  innerEval(id);
-                } catch(...){
-		  // Not thread safe
-      		  warning("Bad solve during optimization.");
-      		  // ("Cannot correct.");
-                }
-              }
-      	    } else {
-              // Just use ETA=0
-              std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-              try{
-                innerEval(id);
-              } catch(...){
-		// Not thread safe
-                warning("Bad solve during optimization.");
-                // ("Cannot correct.");
-              }
-            }
-            //
-          }
-        }
-      }
+      // } catch (...){
+      // 	// First try resetting ETA
+      // 	std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      // 	try {
+      // 	  innerOpt1(id, 0);
+      //   } catch (...) {
+      // 	  // Now try resetting Hessian, and ETA
+      // 	  // RSprintf("Hessian Reset for ID: %d\n", id+1);
+      //     indF->mode = 1;
+      //     indF->uzm = 1;
+      // 	  op_focei.didHessianReset=1;
+      //     std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      // 	  try {
+      //       // RSprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
+      //       innerOpt1(id, 0);
+      //     } catch (...){
+      //       indF->mode = 1;
+      //       indF->uzm = 1;
+      // 	    op_focei.didHessianReset=1;
+      //       std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      //       if(!op_focei.noabort){
+      //         stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
+      // 	    } else if (indF->doChol == 1){
+      // 	      indF->doChol = 0; // Use generalized cholesky decomposition
+      //         indF->mode = 1;
+      //         indF->uzm = 1;
+      // 	      op_focei.didHessianReset=1;
+      //         std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      // 	      try {
+      // 		innerOpt1(id, 0);
+      // 		indF->doChol = 1; // Use cholesky again.
+      // 	      } catch (...){
+      // 		// Just use ETA=0
+      //           std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      //           try{
+      //             innerEval(id);
+      //           } catch(...){
+      // 		  // Not thread safe
+      // 		  warning("Bad solve during optimization.");
+      // 		  // ("Cannot correct.");
+      //           }
+      //         }
+      // 	    } else {
+      //         // Just use ETA=0
+      //         std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+      //         try{
+      //           innerEval(id);
+      //         } catch(...){
+      // 		// Not thread safe
+      //           warning("Bad solve during optimization.");
+      //           // ("Cannot correct.");
+      //         }
+      //       }
+      //       //
+      //     }
+      //   }
+      // }
     }
     // Reset ETA variances for next step
     if (op_focei.neta > 0){
