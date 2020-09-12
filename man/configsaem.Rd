@@ -11,10 +11,12 @@ configsaem(
   mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-06, rtol = 1e-04, method = "lsoda", transitAbs = FALSE,
     maxeval = 1e+05),
-  distribution = c("normal", "poisson", "binomial", "lnorm"),
+  distribution = c("normal", "poisson", "binomial"),
+  addProp = c("combined2", "combined1"),
   seed = 99,
   fixed = NULL,
-  DEBUG = 0
+  DEBUG = 0,
+  normal = c("rnorm", "vandercorput")
 )
 }
 \arguments{
@@ -28,7 +30,15 @@ configsaem(
 
 \item{ODEopt}{optional ODE solving options}
 
-\item{distribution}{one of c("normal","poisson","binomial", "lnorm")}
+\item{distribution}{one of c("normal","poisson","binomial")}
+
+\item{addProp}{one of "combined1" and "combined2"; These are the
+  two forms of additive+proportional errors supported by
+  monolix/nonmem:
+
+combined1: transform(y)=transform(f)+(a+b*abs(f)^c)*eps
+
+combined2: transform(y)=transform(f)+(a^2+b^2*abs(f)^(2c))*eps}
 
 \item{seed}{seed for random number generator}
 
@@ -87,5 +97,5 @@ fit
 }
 }
 \author{
-Wenping Wang
+Wenping Wang & Matthew Fidler
 }

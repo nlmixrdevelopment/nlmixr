@@ -25,6 +25,9 @@ saemControl(
   maxsteps = 100000L,
   adjObf = TRUE,
   sum.prod = FALSE,
+  addProp = c("combined2", "combined1"),
+  singleOde = TRUE,
+  normal = c("rnorm", "vandercorput"),
   ...
 )
 }
@@ -132,6 +135,30 @@ during one call to the solver. (5000 by default)}
 \item{adjObf}{is a boolean to indicate if the objective function
 should be adjusted to be closer to NONMEM's default objective
 function.  By default this is \code{TRUE}}
+
+\item{addProp}{one of "combined1" and "combined2"; These are the
+  two forms of additive+proportional errors supported by
+  monolix/nonmem:
+
+combined1: transform(y)=transform(f)+(a+b*abs(f)^c)*eps
+
+combined2: transform(y)=transform(f)+(a^2+b^2*abs(f)^(2c))*eps}
+
+\item{singleOde}{This option allows a single ode model to include
+the PK parameter information instead of splitting it into a
+function and a RxODE model}
+
+\item{normal}{The type of random normal generator used for SAEM:
+
+\itemize{
+
+\item "\code{rnorm}" R's random number generator (default)
+
+\item "\code{vandercorput}" low-discrepancy sequence transformed
+to a normal random variable to cover the domain better (may be
+better than a truly random sequence)
+
+}}
 
 \item{...}{Other arguments to control SAEM.}
 }

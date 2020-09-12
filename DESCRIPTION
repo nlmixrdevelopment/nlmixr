@@ -3,7 +3,7 @@ Type: Package
 Title: Nonlinear Mixed Effects Models in Population Pharmacokinetics
         and Pharmacodynamics
 Depends: R (>= 3.5)
-Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs,
+Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs, lbfgsb3c,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
  	n1qn1 (>= 6.0.1-9), fastGHQuad, crayon, cli (>= 2.0),
 	RcppArmadillo (>= 0.5.600.2.0),

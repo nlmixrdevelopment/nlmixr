@@ -115,7 +115,9 @@ foceiControl(
   etaMat = NULL,
   repeatGillMax = 3,
   stickyRecalcN = 5,
-  gradProgressOfvTime = 10
+  gradProgressOfvTime = 10,
+  addProp = c("combined2", "combined1"),
+  singleOde = TRUE
 )
 }
 \arguments{
@@ -722,8 +724,7 @@ done on the first ETA optimization.}
 estimates, randomly sample new parameter estimates and restart
 the problem.  This is similar to 'PsN' resampling.}
 
-\item{seed}{an object specifying if and how the random number
-generator should be initialized}
+\item{seed}{seed for random number generator}
 
 \item{resetThetaCheckPer}{represents objective function
 \% percentage below which resetThetaP is checked.}
@@ -741,6 +742,18 @@ the atol/rtol for the rest of the problem.}
 
 \item{gradProgressOfvTime}{This is the time for a single objective
 function evaluation (in seconds) to start progress bars on gradient evaluations}
+
+\item{addProp}{one of "combined1" and "combined2"; These are the
+  two forms of additive+proportional errors supported by
+  monolix/nonmem:
+
+combined1: transform(y)=transform(f)+(a+b*abs(f)^c)*eps
+
+combined2: transform(y)=transform(f)+(a^2+b^2*abs(f)^(2c))*eps}
+
+\item{singleOde}{This option allows a single ode model to include
+the PK parameter information instead of splitting it into a
+function and a RxODE model}
 }
 \description{
 Control Options for FOCEi
