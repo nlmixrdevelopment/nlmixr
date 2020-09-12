@@ -1432,7 +1432,7 @@ static inline void innerOpt1(int id, int likId) {
   }
   fInd->nInnerF=0;
   fInd->nInnerG=0;
-  bool n1qn1Inner = false;
+  bool n1qn1Inner = true;
   // Use eta
   // Convert Zm to Hessian, if applicable.
   mat etaMat(fop->neta, 1);
