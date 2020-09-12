@@ -3710,7 +3710,7 @@ str.nlmixrUI <- function(object, ...) {
   return(uif)
 }
 
-nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "combined2")) {
+nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "combined2"), optExpression=FALSE) {
   addProp <- match.arg(addProp)
   .mod <- obj$focei.rx1
   .pars <- NULL
@@ -3724,7 +3724,7 @@ nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "co
   RxODE::rxSymPySetupPred(.mod, function() { return(nlmixr_pred) }, .pars, obj$error,
                                     grad=FALSE, pred.minus.dv = TRUE, sum.prod = FALSE,
                                     interaction=TRUE, only.numeric=FALSE, run.internal=TRUE,
-                                    addProp=addProp)
+                                    addProp=addProp, optExpression=optExpression)
 }
 
 nlmixrUI.par0 <- function(obj){
