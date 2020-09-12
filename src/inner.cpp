@@ -1370,6 +1370,21 @@ double LikInner2(double *eta, int likId, int id){
   return lik;
 }
 
+extern "C" double innerOptimF(int n, double *x, void *ex){
+  int *id = (int*)ex;
+  focei_ind *fInd = &(inds_focei[*id]);
+  double f = likInner0(x, *id);
+  fInd->nInnerF++;
+  return f;
+}
+
+extern "C" void innerOptimG(int n, double *x, double *g, void *ex) {
+  int *id = (int*)ex;
+  focei_ind *fInd = &(inds_focei[*id]);
+  lpInner(x, g, *id);
+  fInd->nInnerG++;
+}
+
 // Scli-lab style cost function for inner
 void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float *tr, double *td, int *id){
   rx = getRx();
