@@ -2855,7 +2855,9 @@ NumericVector foceiSetup_(const RObject &obj,
   params.attr("row.names") = IntegerVector::create(NA_INTEGER,-nsub);
   // Now pre-fill parameters.
   if (!Rf_isNull(obj)) {
-    RxODE::rxSolve_(obj, odeO["rxControl"],
+    List rxControl = odeO["rxControl"];
+    rxControl[Rxc_cores] = IntegerVector::create(1); // #Force one core; parallelization needs to be taken care of here in inner.cpp
+    RxODE::rxSolve_(obj, rxControl,
 		    R_NilValue,//const Nullable<CharacterVector> &specParams =
 		    R_NilValue,//const Nullable<List> &extraArgs =
 		    as<RObject>(params),//const RObject &params =
