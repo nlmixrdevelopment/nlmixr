@@ -2968,13 +2968,33 @@ nlmixrUI.saem.model.omega <- function(obj) {
   }
   return(mat)
 }
+
+nlmixrUI.saem.low <- function(obj) {
+}
+
+nlmixrUI.saem.hi <- function(obj) {
+}
+
+##' Get the TBS yj for SAEM
+nlmixrUI.saem.yj <- function(obj) {
+}
+
+##' Get the lambda estimates for SAEM
 nlmixrUI.saem.lambda <- function(obj) {
   if (any(obj$saem.distribution == c("poisson", "binomial"))) {
-    return(1)
+    return(1.0)
   }
   predDf <- obj$predDf
   .ini <- .as.data.frame(obj$ini)
   .ini <- .ini[!is.na(.ini$err), ]
+  return(sapply(.predDf$cond, function(x) {
+    .tmp <- .ini[which(.ini$condition == x), ]
+    .boxCox <- which(.tmp$err == "boxCox")
+    if (length(.boxCox) == 1L) return(.tmp$est[.boxCox])
+    .yeoJohnson <- which(.tmp$err == "yeoJohnson")
+    if (length(.yeoJohnson) == 1L) return(.tmp$est[.yeoJohnson])
+    return(1.0);
+  }))
 }
 ##' Get the SAEM model$res.mod code
 ##'
