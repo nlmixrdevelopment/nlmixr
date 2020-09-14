@@ -805,11 +805,9 @@ double likInner0(double *eta, int id){
 	  // fInd->err(k, 0) = ind->lhs[0] - ind->dv[k]; // pred-dv
 	  if (ISNA(ind->lhs[op_focei.neta + 1]))
 	    throw std::runtime_error("bad solve");
-	  bool zeroR =false;
 	  r = ind->lhs[op_focei.neta + 1];
 	  if (r == 0.0) {
-	    zeroR = true;
-	    r=1;
+	    r = 1.0;
 	  }
 	  if (op_focei.neta == 0) {
 	    lnr =log(r);
@@ -869,13 +867,8 @@ double likInner0(double *eta, int id){
 	      for (i = op_focei.neta; i--; ) {
 		if (op_focei.etaFD[i]==0) {
 		  fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
-		  if (zeroR){
-		    rp= 0.0;
-		    c(k, i) = 0.0;
-		  } else {
-		    rp  = ind->lhs[i + op_focei.neta + 2];
-		    c(k, i) = rp/r;
-		  }
+		  rp  = ind->lhs[i + op_focei.neta + 2];
+		  c(k, i) = rp/r;
 		}
 	      }
 	      // Cannot combine for loop with for loop above because
@@ -913,12 +906,8 @@ double likInner0(double *eta, int id){
 		  }
 		} else {
 		  fpm = a(k, i);
-		  if (zeroR){
-		    rp  = 0.0;
-		  } else {
-		    rp  = ind->lhs[i + op_focei.neta + 2];
-		    rp = c(k, i)*r;
-		  }
+		  rp  = ind->lhs[i + op_focei.neta + 2];
+		  rp = c(k, i)*r;
 		}
 		// This is calculated at the end; That way it is
 		// correct for finite difference and sensitivity.
