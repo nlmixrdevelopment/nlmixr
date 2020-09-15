@@ -3015,16 +3015,20 @@ nlmixrUI.saem.res.mod <- function(obj) {
       any(.tmp$err == "dlogn")
     .hasLogit <- any(.tmp$err == "logitNorm")
     .hasProbit <- any(.tmp$err == "probitNorm")
-    .hasAdd <- .hasAdd0 | .hasLog | .hasLog | .hasLogit | .hasProbit
+    .hasAdd <- .hasAdd0 | .hasLog | .hasLogit | .hasProbit
     .hasProp <- any(.tmp$err == "prop")
     .hasPow <- any(.tmp$err == "pow")
     .boxCox <- which(.tmp$err == "boxCox")
     .hasLambda <- FALSE
-    if (length(.boxCox) == 1L & !.tmp$fix[.boxCox]) .hasLambda <- TRUE
+    if (length(.boxCox) == 1L){
+      if(!.tmp$fix[.boxCox]) .hasLambda <- TRUE
+    }
     .yeoJohnson <- which(.tmp$err == "yeoJohnson")
-    if (length(.yeoJohnson) == 1L & !.tmp$fix[.yeoJohnson]){
-      if (.hasLambda) stop("cannot use both Yeo-Johnson and Box-Cox transformations", call.=FALSE)
-      .hasLambda <- TRUE
+    if (length(.yeoJohnson) == 1L){
+      if (!.tmp$fix[.yeoJohnson]) {
+        if (.hasLambda) stop("cannot use both Yeo-Johnson and Box-Cox transformations", call.=FALSE)
+        .hasLambda <- TRUE
+      }
     }
     ## mod$res.mod = 10 = additive + pow + lambda
     if (.hasPow & .hasLambda & .hasAdd & !.hasProp) {
