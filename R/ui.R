@@ -3055,11 +3055,11 @@ nlmixrUI.saem.res.mod <- function(obj) {
       return(5L)
     }
     ## mod$res.mod = 4 = additive + power
-    if (.hasAdd & .hasPow & !.hasLambda & !hasProp) {
+    if (.hasAdd & .hasPow & !.hasLambda & !.hasProp) {
       return(4L)
     }
     ## mod$res.mod = 3 = additive + proportional
-    if (.hasAdd & .hasProp & !.hasLambda & !hasPow) {
+    if (.hasAdd & .hasProp & !.hasLambda & !.hasPow) {
       return(3L)
     }
     ## mod$res.mod = 2 = proportional
