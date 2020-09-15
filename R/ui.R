@@ -3015,7 +3015,7 @@ nlmixrUI.saem.res.mod <- function(obj) {
       any(.tmp$err == "dlogn")
     .hasLogit <- any(.tmp$err == "logitNorm")
     .hasProbit <- any(.tmp$err == "probitNorm")
-    .hasAdd <- .asAdd0 | .hasLog | .hasLog | .hasLogit | .hasProbit
+    .hasAdd <- .hasAdd0 | .hasLog | .hasLog | .hasLogit | .hasProbit
     .hasProp <- any(.tmp$err == "prop")
     .hasPow <- any(.tmp$err == "pow")
     .boxCox <- which(.tmp$err == "boxCox")
