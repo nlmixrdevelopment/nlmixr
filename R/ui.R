@@ -3642,6 +3642,8 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.inner.model(obj, TRUE, "combined1"))
   } else if (arg == "single.inner.2") {
     return(nlmixrUI.inner.model(obj, TRUE, "combined2"))
+  } else if (arg == "inner"){
+    return(nlmixrUI.inner.model(obj, TRUE, "combined2"))
   } else if (arg == "inner.par0") {
     return(nlmixrUI.par0(obj))
   }
@@ -3734,7 +3736,7 @@ str.nlmixrUI <- function(object, ...) {
   return(uif)
 }
 
-nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "combined2"), optExpression=FALSE) {
+nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "combined2"), optExpression=TRUE) {
   addProp <- match.arg(addProp)
   .mod <- obj$focei.rx1
   .pars <- NULL
@@ -3745,9 +3747,10 @@ nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "co
     .mod <- obj$rxode.pred
     .pars <- objf$theta.pars
   }
+  .onlyNumeric <- all(is.na(obj$ini$neta1))
   RxODE::rxSymPySetupPred(.mod, function() { return(nlmixr_pred) }, .pars, obj$error,
                                     grad=FALSE, pred.minus.dv = TRUE, sum.prod = FALSE,
-                                    interaction=TRUE, only.numeric=FALSE, run.internal=TRUE,
+                                    interaction=TRUE, only.numeric=.onlyNumeric, run.internal=TRUE,
                                     addProp=addProp, optExpression=optExpression)
 }
 
