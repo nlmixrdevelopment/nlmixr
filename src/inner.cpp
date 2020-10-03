@@ -3042,7 +3042,9 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.cholSEOpt=as<double>(odeO["cholSEOpt"]);
   op_focei.cholSECov=as<double>(odeO["cholSECov"]);
   op_focei.fo=as<int>(odeO["fo"]);
+  if (op_focei.neta == 0) op_focei.fo = 0;
   if (op_focei.fo) op_focei.maxInnerIterations=0;
+
   op_focei.covTryHarder=as<int>(odeO["covTryHarder"]);
   op_focei.resetHessianAndEta=as<int>(odeO["resetHessianAndEta"]);
   op_focei.gillK = as<int>(odeO["gillK"]);
