@@ -3214,6 +3214,9 @@ nlmixrUI.saem.fit <- function(obj) {
       inPars <- unique(c(inPars, .curTv))
     }
     ## saem.fit <- gen_saem_user_fn(model = ode, obj$saem.pars, pred = obj$predSaem, inPars = inPars)
+    if (!exists("singleOde", obj$env)) {
+      obj$env$singleOde <- TRUE
+    }
     if (obj$env$singleOde) {
       saem.fit <- gen_saem_user_fn(obj$saem.rx1, NULL, obj$predSaem, inPars = inPars)
     } else {
