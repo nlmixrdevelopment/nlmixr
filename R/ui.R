@@ -2852,7 +2852,7 @@ nlmixrUI.saem.distribution <- function(obj) {
     return("normal")
   }
   if (any(.df %in% c("dlnorm", "lnorm", "logn", "dlogn"))) {
-    return("lnorm")
+    return("normal")
   }
   stop("Distribution unsupported by SAEM")
 }
@@ -2978,6 +2978,39 @@ nlmixrUI.saem.hi <- function(obj) {
 
 ##' Get the TBS yj for SAEM
 nlmixrUI.saem.yj <- function(obj) {
+  ## yj is for the number of endpoints in the nlmir model
+  ## yj = 7 Yeo Johnson and  probit()
+  ## yj = 6 probit()
+  ## yj = 5 Yeo Johnson and logit()
+  ## yj = 4 logitNorm
+  ## yj = 3 logNorm
+  ## yj = 2 norm()
+  ## yj = 0 boxCox + Norm
+  ## yj = 1 yeoJohnson + Norm
+  if (any(obj$saem.distribution == c("poisson", "binomial"))) {
+    return(2L)
+  }
+  predDf <- obj$predDf
+  .ini <- .as.data.frame(obj$ini)
+  .ini <- .ini[!is.na(.ini$err), ]
+  return(sapply(.predDf$cond, function(x) {
+    .tmp <- .ini[which(.ini$condition == x), ]
+    .boxCox <- which(.tmp$err == "boxCox")
+    .yeoJohnson <- which(.tmp$err == "yeoJohnson")
+    .hasAdd0 <- any(.tmp$err == "add") | any(.tmp$err == "norm") | any(.tmp$err == "dnorm")
+    .hasLog <- any(.tmp$err == "dlnorm") | any(.tmp$err == "lnorm") | any(.tmp$err == "logn") |
+      any(.tmp$err == "dlogn")
+    .hasLogit <- any(.tmp$err == "logitNorm")
+    .hasProbit <- any(.tmp$err == "probitNorm")
+    if (.hasLog) return(3L)
+    if (.hasLogit & .yeoJohnson) return(5L)
+    if (.hasLogit) return(4L)
+    if (.hasProbit & .yeoJohnson) return(7L)
+    if (.hasProbit) return(6L)
+    if (.boxCox) return(0L)
+    if (.yeoJohnson) return(1L)
+    return(2L);
+  }))
 }
 
 ##' Get the lambda estimates for SAEM
@@ -3247,6 +3280,7 @@ nlmixrUI.saem.model <- function(obj) {
   }
   mod$res.mod <- obj$saem.res.mod
   mod$log.eta <- obj$saem.log.eta
+  mod$yj <- obj$saem.yj
   ## if (FALSE){
   ## FIXME option/warning
   mod$ares <- obj$saem.ares
@@ -3586,6 +3620,10 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.saem.bres(obj))
   } else if (arg == "saem.log.eta") {
     return(nlmixrUI.saem.log.eta(obj))
+  } else if (arg == "saem.yj") {
+    return(nlmixrUI.saem.yj(obj))
+  } else if (arg == "saem.lambda") {
+    return(nlmixrUI.saem.lambda(obj))
   } else if (arg == "saem.fit") {
     return(nlmixrUI.saem.fit(obj))
   } else if (arg == "saem.model") {
