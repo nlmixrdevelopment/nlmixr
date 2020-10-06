@@ -2545,9 +2545,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   if (length(.predDf$cond) == 1) {
     .w <- which(bounds$condition == "")
     bounds$condition[.w] <- paste(.predDf$cond)
+    saem.theta.trans <- setdiff(saem.theta.trans, bounds$ntheta[which(!is.na(bounds$err) & !is.na(bounds$ntheta))])
   }
   ## Take out error terms (if present)
-  saem.theta.trans <- setdiff(saem.theta.trans, bounds$ntheta[which(!is.na(bounds$err) & !is.na(bounds$ntheta))])
   ret <- list(
     ini = bounds, model = bigmodel,
     nmodel = list(
@@ -2948,6 +2948,7 @@ nlmixrUI.saem.eta.trans <- function(obj) {
       }
     }
   }
+  ## Take out error terms
   if (any(is.na(trans))) {
     stop("Could not figure out the mu-referencing for this model.")
   }
@@ -3254,7 +3255,7 @@ nlmixrUI.saem.model <- function(obj) {
   mod$omega <- obj$saem.model.omega
   return(mod)
 }
-.saemThetaTrans <- function(uif) {
+.saemThetaTrans <- function(uif, muOnly=FALSE) {
   .tv <- uif$env$.curTv
   if (is.null(.tv)) {
     .trans <- uif$saem.theta.trans
@@ -3269,6 +3270,9 @@ nlmixrUI.saem.model <- function(obj) {
       if (length(.w) == 1) return(.w)
       return(NA_integer_)
     }), NULL)
+  }
+  if (muOnly){
+    .trans <- setdiff(.trans, uif$ini$ntheta[which(!is.na(uif$ini$err) & !is.na(uif$ini$ntheta))])
   }
   return(.trans)
 }
