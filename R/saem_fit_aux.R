@@ -93,6 +93,7 @@ calc.2LL <- function(fit, nnodes.gq = 8, nsd.gq = 4) {
     message(sprintf("Calculating -2LL by Gaussian quadrature (nnodes=%s,nsd=%s)", nnodes.gq, nsd.gq))
   }
   RxODE::rxProgress(nx)
+  ysave <- yobs
   yobs <- .Call(`_nlmixr_powerD`, yobs, lambda, as.integer(yj), as.double(low), as.double(hi))
   on.exit(RxODE::rxProgressAbort("Error calculating likelihood"))
   for (j in 1:nx) {
@@ -112,7 +113,8 @@ calc.2LL <- function(fit, nnodes.gq = 8, nsd.gq = 4) {
   }
   RxODE::rxProgressStop()
   # - 2 * saem.cfg$extraLL
-  ll2 <- 2 * sum(log(Q) + rowSums(log(b))) - N * log(det(Omega)) - (N * nphi1 + ntotal) * log(2 * pi)
+  ll2 <- 2 * sum(log(Q) + rowSums(log(b))) - N * log(det(Omega)) - (N * nphi1 + ntotal) * log(2 * pi) -
+    2 * .Call(`_nlmixr_powerL`, ysave, lambda, as.integer(yj), as.double(low), as.double(hi))
   -ll2
 }
 
