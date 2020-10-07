@@ -27,8 +27,13 @@ calc.2LL <- function(fit, nnodes.gq = 8, nsd.gq = 4) {
   .evtM <- saem.cfg$evtM
   dopred <- attr(fit, "dopred")
   resMat <- fit$resMat
+  transMat <- fit$transMat
   ares <- resMat[, 1]
   bres <- resMat[, 2]
+  lambda <- transMat[, 1]
+  yj <- transMat[, 2]
+  low <- transMat[, 3]
+  hi <- transMat[, 4]
   i1 <- saem.cfg$i1 + 1
   nphi1 <- saem.cfg$nphi1
   nphi0 <- saem.cfg$nphi0
@@ -38,11 +43,16 @@ calc.2LL <- function(fit, nnodes.gq = 8, nsd.gq = 4) {
   ix_endpnt <- saem.cfg$ix_endpnt[1:ntotal] + 1
   ares <- ares[ix_endpnt]
   bres <- bres[ix_endpnt]
+  lambda <- lambda[ix_endpnt]
+  yj <- yj[ix_endpnt]
+  low <- low[ix_endpnt]
+  hi <- hi[ix_endpnt]
+  i1 <- saem.cfg$i1 + 1
 
   phi <- fit$mpost_phi
   IOmega.phi1 <- solve(fit$Gamma2_phi1)
   Omega <- fit$Gamma2_phi1
-  yobs <- saem.cfg$y
+  yobs <- yobss <- saem.cfg$y
   evt <- saem.cfg$evt
   id <- evt[evt[, "EVID"] == 0, "ID"]
   nb_measures <- table(id)
@@ -83,11 +93,13 @@ calc.2LL <- function(fit, nnodes.gq = 8, nsd.gq = 4) {
     message(sprintf("Calculating -2LL by Gaussian quadrature (nnodes=%s,nsd=%s)", nnodes.gq, nsd.gq))
   }
   RxODE::rxProgress(nx)
+  yobs <- .Call(`_nlmixr_powerD`, yobs, lambda, as.integer(yj), as.double(low), as.double(hi))
   on.exit(RxODE::rxProgressAbort("Error calculating likelihood"))
   for (j in 1:nx) {
     phi[, i1] <- a + b * matrix(rep(x[j, ], N), ncol = nphi1, byrow = TRUE)
-    f <- as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt))
-    g <- ares + bres * abs(f)
+    f <- fsave <- as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt))
+    f <- .Call(`_nlmixr_powerD`, f, lambda, as.integer(yj), as.double(low), as.double(hi))
+    g <- ares + bres * abs(fsave)
     g[g < 1.0e-200] <- 1.0e-200
     DYF[ind.io] <- -0.5 * ((yobs - f) / g)^2 - log(g)
     ly <- colSums(DYF)
@@ -99,7 +111,8 @@ calc.2LL <- function(fit, nnodes.gq = 8, nsd.gq = 4) {
     RxODE::rxTick()
   }
   RxODE::rxProgressStop()
-  ll2 <- 2 * sum(log(Q) + rowSums(log(b))) - N * log(det(Omega)) - (N * nphi1 + ntotal) * log(2 * pi) - 2 * saem.cfg$extraLL
+  # - 2 * saem.cfg$extraLL
+  ll2 <- 2 * sum(log(Q) + rowSums(log(b))) - N * log(det(Omega)) - (N * nphi1 + ntotal) * log(2 * pi)
   -ll2
 }
 
@@ -350,6 +363,13 @@ calc.COV <- function(fit0) {
   resMat <- fit$resMat
   ares <- resMat[, 1]
   bres <- resMat[, 2]
+  transMat <- fit$transMat
+  ares <- resMat[, 1]
+  bres <- resMat[, 2]
+  lambda <- transMat[, 1]
+  yj <- transMat[, 2]
+  low <- transMat[, 3]
+  hi <- transMat[, 4]
   i1 <- saem.cfg$i1 + 1
   nphi1 <- saem.cfg$nphi1
   nphi0 <- saem.cfg$nphi0
@@ -362,6 +382,10 @@ calc.COV <- function(fit0) {
   ix_endpnt <- saem.cfg$ix_endpnt[1:ntotal] + 1
   ares <- ares[ix_endpnt]
   bres <- bres[ix_endpnt]
+  lambda <- lambda[ix_endpnt]
+  yj <- yj[ix_endpnt]
+  low <- low[ix_endpnt]
+  hi <- hi[ix_endpnt]
   if (is.null(names(saem.cfg$inits$theta))) {
     names(saem.cfg$inits$theta) <- rep("", length(saem.cfg$inits$theta))
   }
@@ -379,13 +403,15 @@ calc.COV <- function(fit0) {
   dphi <- cutoff(abs(phi) * 1e-4, 1e-10)
   f1 <- sapply(1:nphi, function(j) {
     phi[, j] <- hat.phi[, j] + dphi[, j]
-    ret <- as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt))
+    ret <- .Call(`_nlmixr_powerD`, as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt)),
+                 lambda, as.integer(yj), as.double(low), as.double(hi))
     RxODE::rxTick()
     return(ret)
   })
-  f0 <- as.vector(dopred(hat.phi, saem.cfg$evt, saem.cfg$opt))
+  f0 <- f0s <- as.vector(dopred(hat.phi, saem.cfg$evt, saem.cfg$opt))
+  f0 <-  .Call(`_nlmixr_powerD`, f0, lambda, as.integer(yj), as.double(low), as.double(hi))
   DF <- (f1 - f0) / dphi[id, ]
-  g <- ares + bres * abs(f0)
+  g <- ares + bres * abs(f0s)
 
   # spectral decom for invVi, idea from saemix
   Xi <- lapply(1:N, function(i) {

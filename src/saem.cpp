@@ -139,10 +139,8 @@ SEXP saem_do_pred(SEXP in_phi, SEXP in_evt, SEXP in_opt) {
   saem_inis = getUpdateInis();
   mat phi = as<mat>(in_phi);
   mat evt = as<mat>(in_evt);
-  int distribution = as<int>(opt["distribution"]);
   mat gMat = user_function(phi, evt, opt);
   vec g = gMat.col(0);
-  if (distribution == 4) g = log(g);
   return wrap(g);
 }
 
@@ -165,6 +163,7 @@ SEXP saem_fit(SEXP xSEXP) {
 
   List out = List::create(
     Named("resMat") = saem.get_resMat(),
+    Named("transMat") = saem.get_trans(),
     Named("mprior_phi") = saem.get_mprior_phi(),
     Named("mpost_phi") = saem.get_mpost_phi(),
     Named("Gamma2_phi1") = saem.get_Gamma2_phi1(),

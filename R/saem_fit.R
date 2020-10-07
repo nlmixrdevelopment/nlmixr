@@ -170,12 +170,6 @@ configsaem <- function(model, data, inits,
   distribution.idx <- c("normal" = 1, "poisson" = 2, "binomial" = 3, "lnorm" = 4)
   distribution <- match.arg(distribution)
   distribution <- distribution.idx[distribution]
-  .extraLL <- 0
-  if (distribution == 4) {
-    data$DV[data$EVID == 0] <- log(data$DV[data$EVID == 0])
-    if (any(is.na(data$DV[data$EVID == 0]))) stop("Data must be positive for log-normally distributed data.")
-    .extraLL <- sum(data$DV[data$EVID == 0])
-  }
   .data <- data
   ## RxODE::rxTrans(data, model)
   data <- list(nmdat = data)
@@ -546,7 +540,6 @@ configsaem <- function(model, data, inits,
     fixed.i0 = fixed.i0,
     ilambda1 = as.integer(ilambda1),
     ilambda0 = as.integer(ilambda0),
-    extraLL = .extraLL,
     nobs = .nobs
   )
 

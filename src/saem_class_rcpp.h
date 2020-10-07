@@ -267,6 +267,15 @@ public:
     m.col(1) = bres;
     return m;
   }
+
+  mat get_trans() {
+    mat m(nendpnt, 4);
+    m.col(0) = lambda; 
+    m.col(1) = yj;
+    m.col(2) = low;
+    m.col(3) = hi;
+    return m;
+  }
   
   mat get_mprior_phi() {
     mat m = mpost_phi;
