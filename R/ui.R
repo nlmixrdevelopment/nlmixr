@@ -2990,7 +2990,7 @@ nlmixrUI.saem.yj <- function(obj) {
   if (any(obj$saem.distribution == c("poisson", "binomial"))) {
     return(2L)
   }
-  predDf <- obj$predDf
+  .predDf <- obj$predDf
   .ini <- .as.data.frame(obj$ini)
   .ini <- .ini[!is.na(.ini$err), ]
   return(sapply(.predDf$cond, function(x) {
