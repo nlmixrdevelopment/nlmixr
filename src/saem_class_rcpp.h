@@ -492,9 +492,9 @@ public:
       }
 
       vec f = fsave;
-
-      //fsave = f;
+      fsave = f;
       if (distribution == 1){
+	// REprintf("dist=1\n");
 	vec ft = f;
 	vec yt = yM;
 	for (int i = ft.size(); i--;) {
@@ -1038,7 +1038,7 @@ private:
 	       vec &U_y,
 	       vec &U_phi) {
     mat fcMat;
-    vec fc, Uc_y, Uc_phi, deltu;
+    vec fc, fs, Uc_y, Uc_phi, deltu;
     uvec ind;
     vec gc;
     uvec i=mphi.i;
@@ -1057,16 +1057,17 @@ private:
 
 	fcMat = user_fn(phiMc, mx.evtM, mx.optM);
 	fc = fcMat.col(0);
+	fs = fc;
 	vec yt(fc.size());
 	for (int i = fc.size(); i--;) {
 	  int cur = ix_endpnt(i);
 	  fc(i) = _powerD(fc(i), lambda(cur), yj(cur), low(cur), hi(cur));
 	  yt(i) = _powerD(mx.yM(i), lambda(cur), yj(cur), low(cur), hi(cur));
 	}
-	gc = vecares + vecbres % abs(fc);                            //make sure gc > 0
+	gc = vecares + vecbres % abs(fs);                            //make sure gc > 0
 	gc.elem( find( gc == 0.0) ).fill(1);
 	gc.elem( find( gc < double_xmin) ).fill(double_xmin);
-	if (distribution == 1 || distribution == 4) DYF(mx.indioM)=0.5*(((yt-fc)/gc)%((yt-fc)/gc))+log(gc);
+	if (distribution == 1) DYF(mx.indioM)=0.5*(((yt-fc)/gc)%((yt-fc)/gc))+log(gc);
 	else if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
 	else if (distribution == 3) DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
 	doCens(DYF, cens, limit, fc, gc, mx.yM, distribution);
@@ -1084,7 +1085,7 @@ private:
 	U_y(ind)=Uc_y(ind);
 	if (method>1) U_phi(ind)=Uc_phi(ind);
 	ind = getObsIdx(ix_idM.rows(ind));
-	fsave(ind)=fc(ind);
+	fsave(ind)=fs(ind);
 	if (method<3) break;
       }
   }

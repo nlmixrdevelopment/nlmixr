@@ -3280,7 +3280,6 @@ nlmixrUI.saem.model <- function(obj) {
   }
   mod$res.mod <- obj$saem.res.mod
   mod$log.eta <- obj$saem.log.eta
-  mod$yj <- obj$saem.yj
   ## if (FALSE){
   ## FIXME option/warning
   mod$ares <- obj$saem.ares
