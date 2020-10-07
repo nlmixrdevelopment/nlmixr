@@ -2995,8 +2995,8 @@ nlmixrUI.saem.yj <- function(obj) {
   .ini <- .ini[!is.na(.ini$err), ]
   return(sapply(.predDf$cond, function(x) {
     .tmp <- .ini[which(.ini$condition == x), ]
-    .boxCox <- which(.tmp$err == "boxCox")
-    .yeoJohnson <- which(.tmp$err == "yeoJohnson")
+    .boxCox <- any(.tmp$err == "boxCox")
+    .yeoJohnson <- any(.tmp$err == "yeoJohnson")
     .hasAdd0 <- any(.tmp$err == "add") | any(.tmp$err == "norm") | any(.tmp$err == "dnorm")
     .hasLog <- any(.tmp$err == "dlnorm") | any(.tmp$err == "lnorm") | any(.tmp$err == "logn") |
       any(.tmp$err == "dlogn")
