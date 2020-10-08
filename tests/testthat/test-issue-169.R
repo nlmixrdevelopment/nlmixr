@@ -1,6 +1,7 @@
 nlmixrTest({
-    context("Make sure SAEM/nlme throws an error with time varying covariates")
+    context("Make sure nlme throws an error with time varying covariates, but SAEM/FOCEi run")
     test_that("Error w/time-varying covariates", {
+
       d <- theo_sd
       ## Make this time-varying
       d$WT[d$TIME > 12] <- d$WT[d$TIME > 12] + 0.01
@@ -27,9 +28,8 @@ nlmixrTest({
         f <- nlmixr(one.cmt, d, "nlme")
       })
 
-      expect_error({
-        f <- nlmixr(one.cmt, d, "saem")
-      })
+      f <- suppressWarnings(nlmixr(one.cmt, d, "saem", control=list(print=0, nEm=4, nBurn=4)))
+      expect_true(inherits(f, "nlmixrSaem"))
 
       f <- suppressWarnings(nlmixr(one.cmt, d, "focei", control = list(sigdig = 2, print = 0)))
 
