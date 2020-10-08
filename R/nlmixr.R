@@ -455,7 +455,6 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     if (is(.print, "numeric")) {
       .cfg$print <- as.integer(.print)
     }
-    .cfg$yj <- uif$saem.yj
     .fit <- model$saem_mod(.cfg)
     .ret <-
       try(

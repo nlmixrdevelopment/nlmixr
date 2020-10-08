@@ -71,7 +71,7 @@ void objC(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
   double xmin = 1.0e-200;
   for (i=0, sum=0; i<len; ++i) {
     // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft = _powerD(fptr[i], lambda, yj, low, hi);
+    ft  = _powerD(fptr[i], lambda, yj, low, hi);
     ytr = _powerD(yptr[i], lambda, yj, low, hi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
@@ -151,7 +151,7 @@ void objG(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
     ft = _powerD(fptr[i],  ab[2], yj, low, hi);
     ytr = _powerD(yptr[i], ab[2], yj, low, hi);
     g = ab[0]*ab[0]*pow(fabs(fptr[i]), ab[1]);
-    if (g == 0) g = 1;
+    if (g == 0) g = 1.0;
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
@@ -405,11 +405,15 @@ public:
     ysM=as<vec>(x["ysM"]);
     y_offset=as<uvec>(x["y_offset"]);
     res_mod = as<vec>(x["res.mod"]);
+    // REprintf("res.mod\n");
+    // Rcpp::print(Rcpp::wrap(res_mod));
     ares = as<vec>(x["ares"]);
     bres = as<vec>(x["bres"]);
     cres = as<vec>(x["cres"]);
     lres = as<vec>(x["lres"]);
     yj = as<vec>(x["yj"]);
+    // REprintf("yj\n");
+    // Rcpp::print(Rcpp::wrap(yj));
     lambda = as<vec>(x["lambda"]);
     low = as<vec>(x["low"]);
     hi = as<vec>(x["hi"]);
@@ -744,16 +748,19 @@ public:
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
 	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
-	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), cres(b)};                  //force are & bres to be positive
+
+	  // REprintf("ares: %f bres: %f cres: %f\n", ares(b), bres(b), cres(b));
+	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), cres(b)}; //force are & bres to be positive
 	  double step[3]={-.2, -.2, -.2}, ynewlo;
 	  nelder_fn(objC, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
 		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
 		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
 		    (int)yj(b), lambda(b), low(b), hi(b));
-	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
-	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
-	  cres(b) = cres(b) + pas(kiter)*(pxmin[2] - cres(b));            //force are & bres to be positive
-	} else if (res_mod(b) == 5) { // power 
+	  // REprintf("\tares: %f bres: %f cres: %f\n", pxmin[0], pxmin[1], pxmin[2]);
+	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b)); //force ares & bres to be positive
+	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b)); //force ares & bres to be positive
+	  cres(b) = cres(b) + pas(kiter)*(pxmin[2] - cres(b));
+	} else if (res_mod(b) == 5) { // power
 	  uvec idx;
 	  idx = find(ix_endpnt==b);
 	  vec ysb, fsb;
@@ -903,11 +910,50 @@ public:
       //FIXME: chg according to multiple endpnts; need to chg dim(par_hist)
       for (int b=0; b<nendpnt; ++b) {
 	int offset = res_offset[b];
-	if (res_mod(b)==1) vcsig2[offset] = sigma2[b];
-	if (res_mod(b)==2) vcsig2[offset] = bres(b);
-	if (res_mod(b)==3) {
+	switch (res_mod(b)) {
+	case 1:
+	  vcsig2[offset] = sigma2[b];
+	  break;
+	case 2:
+	  vcsig2[offset] = bres(b);
+	  break;
+	case 3:
 	  vcsig2[offset]   = ares(b);
 	  vcsig2[offset+1] = bres(b);
+	  break;
+	case 4:
+	  vcsig2[offset]   = ares(b);
+	  vcsig2[offset+1] = bres(b);
+	  vcsig2[offset+2] = cres(b);
+	  break;
+	case 5:
+	  vcsig2[offset]   = ares(b);
+	  vcsig2[offset+1] = cres(b);
+	  break;
+	case 6:
+	  vcsig2[offset]   = ares(b);
+	  vcsig2[offset+1] = lres(b);
+	  break;
+	case 7:
+	  vcsig2[offset]   = bres(b);
+	  vcsig2[offset+1] = lres(b);
+	  break;
+	case 8:
+	  vcsig2[offset]   = bres(b);
+	  vcsig2[offset+1] = cres(b);
+	  vcsig2[offset+2] = lres(b);
+	  break;
+	case 9:
+	  vcsig2[offset]   = ares(b);
+	  vcsig2[offset+1] = bres(b);
+	  vcsig2[offset+2] = lres(b);
+	  break;
+	case 10:
+	  vcsig2[offset]   = ares(b);
+	  vcsig2[offset+1] = bres(b);
+	  vcsig2[offset+2] = cres(b);
+	  vcsig2[offset+3] = lres(b);
+	  break;
 	}
       }
 

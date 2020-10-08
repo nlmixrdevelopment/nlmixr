@@ -3165,6 +3165,31 @@ nlmixrUI.saem.bres <- function(obj) {
     if (length(.w) == 1) {
       return(.tmp$est[.w])
     } else {
+      .w <- which(sapply(.tmp$err, function(x) any(x == "pow")))
+      if (length(.w) == 1) {
+        return(.tmp$est[.w])
+      } else {
+        return(1)
+      }
+    }
+  }))
+}
+
+##' Get initial estimate for bres SAEM.
+##'
+##' @param obj UI model
+##' @return SAEM model$ares spec
+##' @author Matthew L. Fidler
+nlmixrUI.saem.cres <- function(obj) {
+  .predDf <- obj$predDf
+  .ini <- .as.data.frame(obj$ini)
+  .ini <- .ini[!is.na(.ini$err), ]
+  return(sapply(.predDf$cond, function(x) {
+    .tmp <- .ini[which(.ini$condition == x), ]
+    .w <- which(sapply(.tmp$err, function(x) any(x == "pow2")))
+    if (length(.w) == 1) {
+      return(.tmp$est[.w])
+    } else {
       return(1)
     }
   }))
@@ -3284,6 +3309,10 @@ nlmixrUI.saem.model <- function(obj) {
   ## FIXME option/warning
   mod$ares <- obj$saem.ares
   mod$bres <- obj$saem.bres
+  mod$cres <- obj$saem.cres
+  mod$yj   <- obj$saem.yj
+  mod$lres <- obj$saem.lambda
+  ## return(nlmixrUI.saem.bres(obj))
   ## }
   mod$omega <- obj$saem.model.omega
   return(mod)
@@ -3617,6 +3646,8 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.saem.ares(obj))
   } else if (arg == "saem.bres") {
     return(nlmixrUI.saem.bres(obj))
+  } else if (arg == "saem.cres") {
+    return(nlmixrUI.saem.cres(obj))
   } else if (arg == "saem.log.eta") {
     return(nlmixrUI.saem.log.eta(obj))
   } else if (arg == "saem.yj") {
