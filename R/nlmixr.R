@@ -229,6 +229,88 @@ nlmixrData.default <- function(data, model = NULL) {
   }
   return(dat)
 }
+
+#' Correct data structure with IDs having original labels re-assigned
+#' 
+#' @param x Data to fix
+#' @param IDLabel Original ID labels
+#' @return Corrected data structure
+#' @noRd
+nlmixr_fit0FixDat <- function(x, IDLabel, origData) {
+  .cls <- class(x)
+  class(x) <- "data.frame"
+  x$ID <- factor(as.integer(x$ID), labels=IDLabel)
+  class(x) <- .cls
+  .etaO <- x$etaObf
+  .etaO$ID <- factor(as.integer(.etaO$ID), labels=IDLabel)
+  .eta <- x$eta
+  .eta$ID <- factor(as.integer(.eta$ID), labels=IDLabel)
+  .ranef <- x$ranef
+  .ranef$ID <- factor(as.integer(.ranef$ID), labels=IDLabel)
+  .uif <- x$uif
+  .thetas <- x$theta
+  for (.n in names(.thetas)) {
+    .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n]
+  }
+  .omega <- x$omega
+  for (.i in seq_along(.uif$ini$neta1)) {
+    if (!is.na(.uif$ini$neta1[.i])) {
+      .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]]
+    }
+  }
+  .env <- x$env
+  .env$etaObf <- .etaO
+  .env$eta <- .eta
+  .env$origData <- origData
+  .env$uif <- .uif
+  .env$ranef <- .ranef
+  .predDf <- .uif$predDf
+  if (any(.predDf$cond != "") & any(names(x) == "CMT")) {
+    .cls <- class(x)
+    class(x) <- "data.frame"
+    x$CMT <- factor(x$CMT, levels = .predDf$cmt, labels = .predDf$cond)
+    class(x) <- .cls
+  }
+  return(x)
+}
+
+#' Add NPDE to a fit, if requested
+#' 
+#' @param x the fit
+#' @param table the control table
+#' @return the fit with NPDE added, if requested
+#' @noRd
+nlmixr_fit0AddNpde <- function(x, table) {
+  .doIt <- table$npde
+  if (is.null(.doIt)) {
+    if (est == "saem") {
+      .doIt <- table$saemNPDE
+    } else if (est == "focei") {
+      .doIt <- table$foceiNPDE
+    } else if (est == "foce") {
+      .doIt <- table$foceNPDE
+    } else if (est == "nlme") {
+      .doIt <- table$nlmeNPDE
+    } else {
+      .doIt <- FALSE
+    }
+  }
+  if (!is.logical(.doIt)) {
+    return(x)
+  }
+  if (is.na(.doIt)) {
+    return(x)
+  }
+  if (!.doIt) {
+    return(x)
+  }
+  .ret <- try(addNpde(x, nsim = table$nsim, ties = table$ties, seed = table$seed, updateObject = FALSE), silent = TRUE)
+  if (inherits(.ret, "try-error")) {
+    return(x)
+  }
+  return(.ret)
+}
+
 nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
                         sum.prod = FALSE, table = tableControl(),
                         envir = parent.frame()) {
@@ -295,85 +377,10 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
   ## backSort2 <- attr(dat, "backSort2")
   ## attr(dat, "backSort") <- NULL
   ## attr(dat, "backSort2") <- NULL
-  if (!is.null(uif$nmodel$lin.solved) == 1L) {
+  if (!is.null(uif$nmodel$lin.solved)) {
     uif$env$infusion <- max(dat$EVID) > 10000
   }
   bad.focei <- "Problem calculating residuals, returning fit without residuals."
-  fix.dat <- function(x) {
-    .cls <- class(x)
-    class(x) <- "data.frame"
-    x$ID <- as.integer(x$ID)
-    attr(x$ID, "levels") <- .lab
-    class(x$ID) <- "factor"
-    class(x) <- .cls
-    .etaO <- x$etaObf
-    .etaO$ID <- as.integer(.etaO$ID)
-    attr(.etaO$ID, "levels") <- .lab
-    class(.etaO$ID) <- "factor"
-    .eta <- x$eta
-    .eta$ID <- as.integer(.eta$ID)
-    attr(.eta$ID, "levels") <- .lab
-    class(.eta$ID) <- "factor"
-    .ranef <- x$ranef
-    .ranef$ID <- as.integer(.ranef$ID)
-    attr(.ranef$ID, "levels") <- .lab
-    class(.ranef$ID) <- "factor"
-    .uif <- x$uif
-    .thetas <- x$theta
-    for (.n in names(.thetas)) {
-      .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n]
-    }
-    .omega <- x$omega
-    for (.i in seq_along(.uif$ini$neta1)) {
-      if (!is.na(.uif$ini$neta1[.i])) {
-        .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]]
-      }
-    }
-    .env <- x$env
-    .env$etaObf <- .etaO
-    .env$eta <- .eta
-    .env$origData <- .origData
-    .env$uif <- .uif
-    .env$ranef <- .ranef
-    .predDf <- .uif$predDf
-    if (any(.predDf$cond != "") & any(names(x) == "CMT")) {
-      .cls <- class(x)
-      class(x) <- "data.frame"
-      x$CMT <- factor(x$CMT, levels = .predDf$cmt, labels = .predDf$cond)
-      class(x) <- .cls
-    }
-    return(x)
-  }
-  .addNpde <- function(x) {
-    .doIt <- table$npde
-    if (is.null(.doIt)) {
-      if (est == "saem") {
-        .doIt <- table$saemNPDE
-      } else if (est == "focei") {
-        .doIt <- table$foceiNPDE
-      } else if (est == "foce") {
-        .doIt <- table$foceNPDE
-      } else if (est == "nlme") {
-        .doIt <- table$nlmeNPDE
-      } else {
-        .doIt <- FALSE
-      }
-    }
-    if (!is.logical(.doIt)) {
-      return(x)
-    }
-    if (is.na(.doIt)) {
-      return(x)
-    }
-    if (!.doIt) {
-      return(x)
-    }
-    .ret <- try(addNpde(x, nsim = table$nsim, ties = table$ties, seed = table$seed, updateObject = FALSE), silent = TRUE)
-    if (inherits(.ret, "try-error")) {
-      return(x)
-    }
-    return(.ret)
-  }
   calc.resid <- table$cwres
   if (is.null(calc.resid)) {
     if (est == "saem") {
@@ -474,8 +481,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       return(.fit)
     }
     if (inherits(.ret, "nlmixrFitData")) {
-      .ret <- fix.dat(.ret)
-      .ret <- .addNpde(.ret)
+      .ret <- nlmixr_fit0FixDat(.ret, IDLabel=.lab, origData=.origData)
+      .ret <- nlmixr_fit0AddNpde(.ret, table=table)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -561,8 +568,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       return(fit)
     }
     if (inherits(.ret, "nlmixrFitData")) {
-      .ret <- fix.dat(.ret)
-      .ret <- .addNpde(.ret)
+      .ret <- nlmixr_fit0FixDat(.ret, IDLabel=.lab, origData=.origData)
+      .ret <- nlmixr_fit0AddNpde(.ret, table=table)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -694,8 +701,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
         setOfv(env, "fo")
       }
     }
-    fit <- .addNpde(fit)
-    fit <- fix.dat(fit)
+    fit <- nlmixr_fit0AddNpde(fit, table=table)
+    fit <- nlmixr_fit0FixDat(fit, IDLabel=.lab, origData=.origData)
     assign("start.time", start.time, env)
     assign("est", est, env)
     assign("stop.time", Sys.time(), env)
@@ -740,7 +747,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       class(fit) <- .cls
     }
     assign("uif", .syncUif(fit, fit$popDf, fit$omega), fit$env)
-    fit <- fix.dat(fit)
+    fit <- nlmixr_fit0FixDat(fit, IDLabel=.lab, origData=.origData)
     assign("origControl", control, fit$env)
     assign("modelId", .modelId, fit$env)
     return(fit)
@@ -781,7 +788,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       )
     assign("origData", .origData, fit$env)
     assign(".fit", fit, envir = .GlobalEnv)
-    fit <- fix.dat(fit)
+    fit <- nlmixr_fit0FixDat(fit, IDLabel=.lab, origData=.origData)
     return(fit)
   }
   else {
