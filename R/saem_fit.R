@@ -573,7 +573,7 @@ configsaem <- function(model, data, inits,
   cfg$ares[cfg$res.mod == 2] <- 0
   cfg$bres[cfg$res.mod == 1] <- 0
 
-  nres <- (1:3)[(cfg$res.mod == 4) * 2 + (cfg$res.mod == 3) + 1]
+  nres <- (1:3)[(cfg$res.mod == 10L) * 3 + (cfg$res.mod %in% c(4L, 8L, 9L)) * 2 + (cfg$res.mod %in% c(3L, 5L, 6L, 7L)) + 1]
   cfg$res_offset <- cumsum(c(0, nres))
   cfg$par.hist <- matrix(0, cfg$niter, nlambda1 + nlambda0 + nphi1 + sum(nres))
   cfg$addProp <- c("combined1" = 1L, "combined2" = 2L)[match.arg(addProp)]
@@ -772,9 +772,13 @@ focei.theta.saemFit <- function(object, uif, ...) {
   sapply(seq_along(.predDf$cond), function(i) {
     x <- paste(.predDf$cond[i])
     .tmp <- .ini[which(.ini$condition == x), ]
-    .w <- which(sapply(.tmp$err, function(x) any(x == "prop")))
+    .w <- which(sapply(.tmp$err, function(x) any(x == c("prop", "pow"))))
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 2]
+    }
+    .w <- which(sapply(.tmp$err, function(x) any(x == c("pow2"))))
+    if (length(.w) == 1) {
+      thetas[paste(.tmp$name[.w])] <- .resMat[i, 3]
     }
     .w <- which(sapply(.tmp$err, function(x) {
       any(x == c(
@@ -784,6 +788,13 @@ focei.theta.saemFit <- function(object, uif, ...) {
     }))
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 1]
+    }
+
+    .w <- which(sapply(.tmp$err, function(x) {
+      any(x == c("boxCox", "yeoJohnson"))
+    }))
+    if (length(.w) == 1) {
+      thetas[paste(.tmp$name[.w])] <- .resMat[i, 4]
     }
     assign("thetas", thetas, this.env)
   })

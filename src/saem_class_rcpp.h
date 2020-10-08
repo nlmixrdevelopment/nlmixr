@@ -262,9 +262,11 @@ public:
   }
 
   mat get_resMat() {
-    mat m(nendpnt,2);
+    mat m(nendpnt,4);
     m.col(0) = ares;
     m.col(1) = bres;
+    m.col(2) = cres;
+    m.col(3) = lres;
     return m;
   }
 
@@ -306,11 +308,11 @@ public:
   List get_resInfo() {
     vec sig2(bres.size());
     std::copy(sigma2, sigma2+bres.size(), &sig2[0]);
-    return List::create(_("sigma2") = wrap(sig2),
-			_("ares") = wrap(ares),
-			_("bres") = wrap(bres),
-			_("cres") = wrap(cres),
-			_("lres") = wrap(lres),
+    return List::create(_("sigma2")  = wrap(sig2),
+			_("ares")    = wrap(ares),
+			_("bres")    = wrap(bres),
+			_("cres")    = wrap(cres),
+			_("lres")    = wrap(lres),
 			_("res_mod") = wrap(res_mod));
   }
   
@@ -405,15 +407,15 @@ public:
     ysM=as<vec>(x["ysM"]);
     y_offset=as<uvec>(x["y_offset"]);
     res_mod = as<vec>(x["res.mod"]);
-    // REprintf("res.mod\n");
-    // Rcpp::print(Rcpp::wrap(res_mod));
+    REprintf("res.mod\n");
+    Rcpp::print(Rcpp::wrap(res_mod));
     ares = as<vec>(x["ares"]);
     bres = as<vec>(x["bres"]);
     cres = as<vec>(x["cres"]);
     lres = as<vec>(x["lres"]);
     yj = as<vec>(x["yj"]);
-    // REprintf("yj\n");
-    // Rcpp::print(Rcpp::wrap(yj));
+    REprintf("yj\n");
+    Rcpp::print(Rcpp::wrap(yj));
     lambda = as<vec>(x["lambda"]);
     low = as<vec>(x["low"]);
     hi = as<vec>(x["hi"]);
@@ -910,7 +912,7 @@ public:
       //FIXME: chg according to multiple endpnts; need to chg dim(par_hist)
       for (int b=0; b<nendpnt; ++b) {
 	int offset = res_offset[b];
-	switch (res_mod(b)) {
+	switch ((int)(res_mod(b))) {
 	case 1:
 	  vcsig2[offset] = sigma2[b];
 	  break;
@@ -968,7 +970,6 @@ public:
       Rcpp::checkUserInterrupt();
     }//kiter
     phiFile.close();
-
   }
 
 

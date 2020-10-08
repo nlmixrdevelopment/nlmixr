@@ -3018,7 +3018,7 @@ nlmixrUI.saem.lambda <- function(obj) {
   if (any(obj$saem.distribution == c("poisson", "binomial"))) {
     return(1.0)
   }
-  predDf <- obj$predDf
+  .predDf <- obj$predDf
   .ini <- .as.data.frame(obj$ini)
   .ini <- .ini[!is.na(.ini$err), ]
   return(sapply(.predDf$cond, function(x) {
@@ -3309,9 +3309,6 @@ nlmixrUI.saem.model <- function(obj) {
   ## FIXME option/warning
   mod$ares <- obj$saem.ares
   mod$bres <- obj$saem.bres
-  mod$cres <- obj$saem.cres
-  mod$yj   <- obj$saem.yj
-  mod$lres <- obj$saem.lambda
   ## return(nlmixrUI.saem.bres(obj))
   ## }
   mod$omega <- obj$saem.model.omega
