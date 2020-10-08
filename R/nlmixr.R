@@ -231,7 +231,7 @@ nlmixrData.default <- function(data, model = NULL) {
 }
 
 #' Correct data structure with IDs having original labels re-assigned
-#' 
+#'
 #' @param x Data to fix
 #' @param IDLabel Original ID labels
 #' @return Corrected data structure
@@ -275,12 +275,13 @@ nlmixr_fit0FixDat <- function(x, IDLabel, origData) {
 }
 
 #' Add NPDE to a fit, if requested
-#' 
+#'
 #' @param x the fit
 #' @param table the control table
+#' @inheritParams nlmixr
 #' @return the fit with NPDE added, if requested
 #' @noRd
-nlmixr_fit0AddNpde <- function(x, table) {
+nlmixr_fit0AddNpde <- function(x, table, est) {
   .doIt <- table$npde
   if (is.null(.doIt)) {
     if (est == "saem") {
@@ -482,7 +483,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     }
     if (inherits(.ret, "nlmixrFitData")) {
       .ret <- nlmixr_fit0FixDat(.ret, IDLabel=.lab, origData=.origData)
-      .ret <- nlmixr_fit0AddNpde(.ret, table=table)
+      .ret <- nlmixr_fit0AddNpde(.ret, table=table, est=est)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -569,7 +570,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     }
     if (inherits(.ret, "nlmixrFitData")) {
       .ret <- nlmixr_fit0FixDat(.ret, IDLabel=.lab, origData=.origData)
-      .ret <- nlmixr_fit0AddNpde(.ret, table=table)
+      .ret <- nlmixr_fit0AddNpde(.ret, table=table, est=est)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -701,7 +702,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
         setOfv(env, "fo")
       }
     }
-    fit <- nlmixr_fit0AddNpde(fit, table=table)
+    fit <- nlmixr_fit0AddNpde(fit, table=table, est=est)
     fit <- nlmixr_fit0FixDat(fit, IDLabel=.lab, origData=.origData)
     assign("start.time", start.time, env)
     assign("est", est, env)
