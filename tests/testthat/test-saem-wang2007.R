@@ -1,4 +1,4 @@
-nlmixrTest({
+ctnlmixrTest({
 
   context("Test SAEM functions")
   test_that("saem objective function tests", {
@@ -32,7 +32,7 @@ nlmixrTest({
     dat <- Wang2007
     dat$DV <- dat$Y
 
-    ctl <- saemControl(nEm=5, nBurn = 5, logLik=TRUE)
+    ctl <- saemControl(nEm=5, nBurn = 5, logLik=TRUE, print=0)
 
     f <- suppressWarnings(nlmixr(mod, dat, "saem", control=ctl))
     expect_equal(round(f$objective, 3), -6.192)
