@@ -2779,8 +2779,12 @@ nlmixrUI.saem.rx1 <- function(object) {
   if (length(.w) == 1){
     .prd[.w] <- paste0("nlmixr_lincmt_pred <- linCmt()\n", .prd[.w])
   }
-  .ret <- paste(c(.deparse1(body(object$saem.fun1)),
-                  .prd, object$extra), collapse="\n")
+  if (exists(".sf1", object$env)) {
+    .bf <- .deparse1(body(object$env$.sf1))
+  } else {
+    .bf <- .deparse1(body(object$saem.fun1))
+  }
+  .ret <- paste(c(.bf, .prd, object$extra), collapse="\n")
   if (any(regexpr("\\blinCmt[(]", .prd, perl=TRUE) != -1)) {
     .ret <- RxODE::rxNorm(RxODE::rxGetLin(.ret))
   }
@@ -3260,17 +3264,25 @@ nlmixrUI.saem.fit <- function(obj) {
         }
       }
       .bpars <- body(pars)
+      .sf1 <- obj$saem.fun1
+      .bfun1 <- body(.sf1)
+      .extra <- c()
       for (.var in .curTv) {
         .lst <- .covRef[[.var]]
+        .extra <- c(.extra, names(.lst))
         .estPar <- paste0(.var, "*", names(.lst))
         .thetaPar <- setNames(.lst, NULL)
         for (i in seq_along(.estPar)) {
           .bpars <- .f(.bpars, .thetaPar[i], .estPar[i])
+          .bfun1 <- .f(.bfun1, .thetaPar[i], .estPar[i])
         }
       }
       body(pars) <- .bpars
+      body(.sf1) <- .bfun1
       obj$env$.bpars <- pars
       inPars <- unique(c(inPars, .curTv))
+      ## Also modify saem.rx1
+      obj$env$.sf1 <- .sf1
     }
     ## saem.fit <- gen_saem_user_fn(model = ode, obj$saem.pars, pred = obj$predSaem, inPars = inPars)
     if (!exists("singleOde", obj$env)) {
@@ -3326,7 +3338,9 @@ nlmixrUI.saem.model <- function(obj) {
     .pars <- setdiff(.pars, uif$all.covs)
     .trans <- setNames(sapply(.thetaNames, function(x){
       .w <- which(x == .pars)
-      if (length(.w) == 1) return(.w)
+      if (length(.w) == 1) {
+        return(.w)
+      }
       return(NA_integer_)
     }), NULL)
   }
