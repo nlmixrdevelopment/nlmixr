@@ -1407,7 +1407,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       }
     } else {
       stop(sprintf(
-        "The %s and %s distributions cannot be combined\nCurrently can combine: %s",
+        "the %s and %s distributions cannot be combined\ncurrently can combine: %s",
         as.character(x3[[2]][[1]]), as.character(x3[[3]][[1]]),
         paste(add.dists, collapse = ", ")
       ))
@@ -1471,7 +1471,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       }
     } else {
       stop(sprintf(
-        "The %s, %s and %s distributions cannot be combined\nCurrently can combine: %s",
+        "the %s, %s and %s distributions cannot be combined\ncurrently can combine: %s",
         err1, err2, err3, paste(add.dists, collapse = ", ")
       ))
     }
@@ -1564,7 +1564,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         identical(x[[3]][[2]][[2]][[1]], quote(`+`)) &&
         any(as.character(x[[3]][[2]][[2]][[2]][[1]]) == c(names(dists), unsupported.dists))) {
         stop(sprintf(
-          "Only 3 distributions can be combined.\nCurrently can combine: %s",
+          "only 3 distributions can be combined.\ncurrently can combine: %s",
           paste(add.dists, collapse = ", ")
         ))
       } else if (identical(x[[1]], quote(`~`)) &&
@@ -2400,7 +2400,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
     }
   }
   if (length(misplaced.dists) > 0) {
-    stop(sprintf("Distributions need to be on residual model lines (like f ~ add(add.err)).\nMisplaced Distribution(s): %s", paste(misplaced.dists, collapse = ", ")))
+    stop(sprintf("distributions need to be on residual model lines (like f ~ add(add.err)).\nmisplaced distribution(s): %s", paste(misplaced.dists, collapse = ", ")))
   }
   tmp <- gsub(rex::rex("linCmt(", any_spaces, ")"), "nlmixr_lincmt_pred", .deparse(pred))
   pred <- eval(parse(text = paste(tmp, collapse = "\n")))
