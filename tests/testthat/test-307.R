@@ -1,4 +1,5 @@
 test_that("saem issue #307", {
+
   model_onecmt <- function(){
     ini({
       tvka <- c(-10, -2, 10) # log(Absorption rate (1/hr))
@@ -23,4 +24,5 @@ test_that("saem issue #307", {
   fit <- nlmixr(model_onecmt)
 
   expect_equal(fit$saem.theta.trans, c(2L, 1L, 3L, 4L))
+
 })

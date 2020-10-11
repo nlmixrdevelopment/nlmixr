@@ -3836,7 +3836,7 @@ nlmixrUI.inner.model <- function(obj, singleOde=TRUE, addProp=c("combined1", "co
     .mod <- obj$rxode.pred
     .pars <- objf$theta.pars
   }
-  if (mising(only.numeric)) .onlyNumeric <- all(is.na(obj$ini$neta1))
+  if (missing(only.numeric)) .onlyNumeric <- all(is.na(obj$ini$neta1))
   else .onlyNumeric <- only.numeric
   RxODE::rxSymPySetupPred(.mod, function() { return(nlmixr_pred) }, .pars, obj$error,
                                     grad=FALSE, pred.minus.dv = TRUE, sum.prod = FALSE,

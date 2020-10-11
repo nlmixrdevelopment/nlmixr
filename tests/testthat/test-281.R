@@ -49,9 +49,10 @@ nlmixrTest({
       })
     }
 
-
     tmp <- nlmixr(Lesion7)
+
     expect_error(tmp$saem.model, NA)
+
   })
 
 }, test="saem")
