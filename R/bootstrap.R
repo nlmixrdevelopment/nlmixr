@@ -669,7 +669,7 @@ modelBootstrap <- function(fit,
   # get control settings for the 'fit' object and save computation effort by not computing the tables
   .ctl <- fit$origControl
   .ctl$print <- 0
-  .ctl$covMethod <- ""
+  .ctl$covMethod <- 0
   .ctl$calcTables <- FALSE
 
   modelsEnsemble <-
