@@ -5,13 +5,14 @@ nlmixrTest(
     samp_dat <- theo_sd
 
     test_that("sampling should return different datasets at each call", {
-      a <- digest::digest(nlmixr::sampling(samp_dat))
-      b <- digest::digest(nlmixr::sampling(samp_dat))
+      a <- digest::digest(nlmixr:::sampling(samp_dat))
+      b <- digest::digest(nlmixr:::sampling(samp_dat))
       testthat::expect_false(isTRUE(all.equal(a, b)))
     })
 
 
     test_that("resuming the fit should not return the same datasets as before", {
+
       one.cmt <- function() {
         ini({
           ## You may label each parameter with a comment
@@ -51,7 +52,7 @@ nlmixrTest(
         paste0("nlmixrBootstrapCache_", "fit", "_", fit$bootstrapMd5)
 
       fnameBootDataPattern <- paste0("boot_data",
-        "_", "[0-9]+", ".RData",
+        "_", "[0-9]+", ".rds",
         sep = ""
       )
       fileExists <- list.files(paste0("./", output_dir), pattern = fnameBootDataPattern)
@@ -74,6 +75,7 @@ nlmixrTest(
     })
 
     testthat::test_that("different confidence levels should result in different bands", {
+
       one.cmt <- function() {
         ini({
           ## You may label each parameter with a comment
@@ -117,9 +119,11 @@ nlmixrTest(
       a <- digest::digest(bootSummary1$parFixedDf$confUpper)
       b <- digest::digest(bootSummary2$parFixedDf$confUpper)
       testthat::expect_false(isTRUE(all.equal(a, b)))
+
     })
 
     testthat::test_that("expected columns in fit$parFixedDf object should match", {
+
       one.cmt <- function() {
         ini({
           ## You may label each parameter with a comment
@@ -159,6 +163,12 @@ nlmixrTest(
       colsAfter <- colnames(fit$parFixedDf)
 
       testthat::expect_equal(colsAfter, colsBefore)
+
+      lapply(list.files("./", pattern = "nlmixrBootstrapCache_.*"),
+             function(x){
+               unlink(x, recursive = TRUE, force = TRUE)
+             })
+
     })
   },
   silent = TRUE,

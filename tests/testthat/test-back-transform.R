@@ -3,6 +3,7 @@ nlmixrTest({
   context("Back Transformation tests")
 
   test_that("PK106 mixed mu-referenced and non mu-referenced covariates", {
+
     PK106 <- function() {
       ini({
         ## Where initial conditions/variables are specified
@@ -35,9 +36,11 @@ nlmixrTest({
     }
     nm <- nlmixr(PK106)
     expect_equal(nm$logThetasList, list(1:6, c(1, 2, 3)))
+
   })
 
   test_that("PK106 with non mu-referenced exp(lktr)", {
+
     PK106 <- function() {
       ini({
         ## Where initial conditions/variables are specified
@@ -69,10 +72,12 @@ nlmixrTest({
     }
     nm <- nlmixr(PK106)
     expect_equal(nm$logThetasList, list(1:6, 1:3))
+
   })
 
 
   test_that("PK106 with non mu-referenced lktr", {
+
     PK106 <- function() {
       ini({
         # Where initial conditions/variables are specified
@@ -104,6 +109,7 @@ nlmixrTest({
     }
     nm <- nlmixr(PK106)
     expect_equal(nm$logThetasList, list(2:6, 2:3))
+
   })
 
 }, test="cran")
