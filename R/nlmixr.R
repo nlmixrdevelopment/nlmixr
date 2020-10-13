@@ -239,14 +239,24 @@ nlmixrData.default <- function(data, model = NULL) {
 nlmixr_fit0FixDat <- function(x, IDLabel, origData) {
   .cls <- class(x)
   class(x) <- "data.frame"
-  x$ID <- factor(as.integer(x$ID), labels=IDLabel)
+  ## don't use factor(as.integer(x$ID), labels=IDLabel) because the
+  ## number of labels may not match the number of IDs
+  x$ID <- as.integer(x$ID)
+  attr(x$ID, "levels") <- IDLabel
+  class(x$ID) <- "factor"
   class(x) <- .cls
   .etaO <- x$etaObf
-  .etaO$ID <- factor(as.integer(.etaO$ID), labels=IDLabel)
+  .etaO$ID <- as.integer(.etaO$ID)
+  attr(.etaO$ID, "levels") <- IDLabel
+  class(.etaO$ID) <- "factor"
   .eta <- x$eta
-  .eta$ID <- factor(as.integer(.eta$ID), labels=IDLabel)
+  .eta$ID <- as.integer(.eta$ID)
+  attr(.eta$ID, "levels") <- IDLabel
+  class(.eta$ID) <- "factor"
   .ranef <- x$ranef
-  .ranef$ID <- factor(as.integer(.ranef$ID), labels=IDLabel)
+  .ranef$ID <- as.integer(.ranef$ID)
+  attr(.ranef$ID, "levels") <- IDLabel
+  class(.ranef$ID) <- "factor"
   .uif <- x$uif
   .thetas <- x$theta
   for (.n in names(.thetas)) {
