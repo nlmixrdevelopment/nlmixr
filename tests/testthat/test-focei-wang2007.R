@@ -136,7 +136,7 @@ nlmixrTest({
 
   testErr("prop", function(){
     prop(.1)
-  }, c(39.458, 39.458, 39.276, 39.207, 39.213, 39.207))
+  }, c(39.458, 39.458, 39.275, 39.207, 39.213, 39.207))
 
   testErr("add", function(){
     add(.1)
@@ -144,11 +144,11 @@ nlmixrTest({
 
   testErr("add+prop", function(){
     add(.1) + prop(.1)
-  }, c(39.735, 39.735, 39.563, 39.499, 39.505, 39.499), addProp=2)
+  }, c(39.735, 39.735, 39.562, 39.499, 39.505, 39.499), addProp=2)
 
   testErr("add+prop", function(){
     add(.1) + prop(.1)
-  }, c(43.554, 43.554, 43.415, 43.394, 43.398, 43.394), addProp=1)
+  }, c(43.554, 43.554, 43.416, 43.394, 43.398, 43.394), addProp=1)
 
   testErr("add+pow", function(){
     add(.1) + pow(.1, 0.5)
@@ -180,7 +180,7 @@ nlmixrTest({
 
   testErr("lnorm+pow", function(){
     lnorm(0.1) + pow(0.1, 0.5)
-  }, c(102.899, 102.899, 102.85, 102.865, 102.865, 102.865), addProp=1)
+  }, c(102.899, 102.899, 102.855, 102.865, 102.865, 102.865), addProp=1)
 
   testErr("lnorm+pow", function(){
     lnorm(0.1) + pow(0.1, 0.5)
@@ -193,7 +193,7 @@ nlmixrTest({
 
   testErr("prop+boxCox", function() {
     return(prop(.1) + boxCox(.5))
-  }, c(61.473, 61.473, 61.296, 61.324, 61.325, 61.324))
+  }, c(61.473, 61.473, 61.298, 61.324, 61.325, 61.324))
 
   testErr("pow+boxCox", function() {
     return(pow(.1, 0.5) + boxCox(.5))
@@ -201,11 +201,11 @@ nlmixrTest({
 
   testErr("add+prop+boxCox", function() {
     return(add(0.1) + prop(.1) + boxCox(.5))
-  }, c(66.075, 66.075, 65.948, 65.973, 65.974, 65.973), addProp=1)
+  }, c(66.075, 66.075, 65.949, 65.973, 65.974, 65.973), addProp=1)
 
   testErr("add+prop+boxCox", function() {
     return(add(0.1) + prop(.1) + boxCox(.5))
-  }, c(61.802, 61.802, 61.634, 61.661, 61.662, 61.661), addProp=2)
+  }, c(61.802, 61.802, 61.636, 61.661, 61.662, 61.661), addProp=2)
 
   testErr("add+pow+boxCox", function() {
     return(add(0.1) + pow(.1, 0.5) + boxCox(.5))
@@ -234,7 +234,7 @@ nlmixrTest({
 
   testErr("add+prop+yeoJohnson", function() {
     return(add(0.1) + prop(.1) + yeoJohnson(.5))
-  }, c(63.152, 63.152, 62.987, 63.016, 63.017, 63.016), addProp=2)
+  }, c(63.152, 63.152, 62.988, 63.016, 63.017, 63.016), addProp=2)
 
   testErr("add+pow+yeoJohnson", function() {
     return(add(0.1) + pow(.1, 0.5) + yeoJohnson(.5))
@@ -255,7 +255,7 @@ nlmixrTest({
 
   testErr("logitNorm(NA)+pow", function() {
     return(logitNorm(NA, 0, 12) + pow(0.1, 0.5))
-  }, c(44.632, 44.632, 44.534, 44.556, 44.556, 44.556))
+  }, c(44.632, 44.632, 44.542, 44.556, 44.556, 44.556))
 
   testErr("logitNorm+prop", function() {
     return(logitNorm(.1, 0, 12) + prop(0.1))
@@ -267,11 +267,11 @@ nlmixrTest({
 
   testErr("logitNorm+pow", function() {
     return(logitNorm(.1, 0, 12) + pow(0.1, 0.5))
-  }, c(52.641, 52.641, 52.581, 52.6, 52.6, 52.6), addProp=1)
+  }, c(52.641, 52.641, 52.589, 52.6, 52.6, 52.6), addProp=1)
 
   testErr("logitNorm+pow", function() {
     return(logitNorm(.1, 0, 12) + pow(0.1, 0.5))
-  }, c(45.668, 45.668, 45.583, 45.603, 45.603, 45.603), addProp=2)
+  }, c(45.668, 45.668, 45.59, 45.603, 45.603, 45.603), addProp=2)
 
   ## logitNorm + yeoJohnson
   testErr("logitNorm+yeoJohnson", function() {
@@ -284,7 +284,7 @@ nlmixrTest({
 
   testErr("logitNorm(NA)+pow+yeoJohnson", function() {
     return(logitNorm(NA, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
-  }, c(50.631, 50.631, 50.532, 50.551, 50.552, 50.551))
+  }, c(50.631, 50.631, 50.54, 50.551, 50.552, 50.551))
 
   testErr("logitNorm+prop+yeoJohnson", function() {
     return(logitNorm(.1, 0, 12) + prop(0.1) + yeoJohnson(0.5))
@@ -296,11 +296,11 @@ nlmixrTest({
 
   testErr("logitNorm+pow+yeoJohnson", function() {
     return(logitNorm(.1, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
-  }, c(58.628, 58.628, 58.568, 58.586, 58.586, 58.586), addProp=1)
+  }, c(58.628, 58.628, 58.575, 58.586, 58.586, 58.586), addProp=1)
 
   testErr("logitNorm+pow+yeoJohnson", function() {
     return(logitNorm(.1, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
-  }, c(51.662, 51.662, 51.578, 51.595, 51.595, 51.595), addProp=2)
+  }, c(51.662, 51.662, 51.584, 51.595, 51.595, 51.595), addProp=2)
 
   ## probitNorm
   testErr("probitNorm", function() {
@@ -325,11 +325,11 @@ nlmixrTest({
 
   testErr("probitNorm+pow", function() {
     return(probitNorm(0.1, 0, 12) + pow(0.1, 0.5))
-  }, c(73.405, 73.405, 73.348, 73.37, 73.37, 73.37), addProp=1)
+  }, c(73.405, 73.405, 73.359, 73.37, 73.37, 73.37), addProp=1)
 
   testErr("probitNorm+pow", function() {
     return(probitNorm(0.1, 0, 12) + pow(0.1, 0.5))
-  }, c(66.187, 66.187, 66.118, 66.135, 66.135, 66.135), addProp=2)
+  }, c(66.187, 66.187, 66.12, 66.135, 66.135, 66.135), addProp=2)
 
   ## probitNorm + yeoJohnson
 
@@ -355,11 +355,11 @@ nlmixrTest({
 
   testErr("probitNorm(0.1)+pow+yeoJohnson", function() {
     return(probitNorm(0.1, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
-  }, c(77.599, 77.599, 77.542, 77.564, 77.564, 77.564), addProp=1)
+  }, c(77.599, 77.599, 77.553, 77.564, 77.564, 77.564), addProp=1)
 
   testErr("probitNorm(0.1)+pow+yeoJohnson", function() {
     return(probitNorm(0.1, 0, 12) + pow(0.1, 0.5) + yeoJohnson(0.5))
-  }, c(70.383, 70.383, 70.314, 70.331, 70.331, 70.331), addProp=2) %>% setNames(., NULL) %>% round(., 3) -> ret
+  }, c(70.383, 70.383, 70.316, 70.331, 70.331, 70.331), addProp=2)
 
   ## lognormal -- equivalent to add on log-space and back-transformed.
 

@@ -1,6 +1,8 @@
 nlmixrTest({
   context("Focei Inner")
+
   test_that("Inner test", {
+
     ev <- eventTable() %>%
       add.sampling(c(
         95.99, 119.99, 143.99, 144.25, 144.5, 144.75,

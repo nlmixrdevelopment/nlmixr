@@ -43,7 +43,6 @@ nlmixrTest({
 
   expect_false(isTRUE(all.equal(f.focei2$objf, f.focei3$objf)))
 
-
   f.focei4 <- .nlmixr(f, dat4, "posthoc")
 
   f.foce <- .nlmixr(f, dat, "posthoc", control = list(interaction = FALSE))
@@ -101,5 +100,6 @@ nlmixrTest({
   f.foceL4 <- .nlmixr(f, datL4, "posthoc", control = list(interaction = FALSE))
   expect_false(isTRUE(all.equal(f.foce$objf, f.foceL4$objf)))
   expect_false(isTRUE(all.equal(f.foceL$objf, f.foceL4$objf)))
+
 },
 test="focei")

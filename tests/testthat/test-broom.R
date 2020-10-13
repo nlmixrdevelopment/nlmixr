@@ -17,7 +17,6 @@ nlmixrTest({
   #' check the output of a tidy function
   check_tidy <- function(o, exp.row = NULL, exp.col = NULL, exp.names = NULL) {
     check_tidiness(o)
-
     if (!is.null(exp.row)) {
       testthat::expect_equal(nrow(o), exp.row)
     }
@@ -31,7 +30,7 @@ nlmixrTest({
 
    options(
      nlmixr.save = TRUE,
-     nlmixr.save.dir = system.file(package = "nlmixr")
+     nlmixr.save.dir = "."
    )
 
   one.compartment <- function() {
@@ -142,8 +141,10 @@ nlmixrTest({
   })
 
   for (f in c("focei", "foce")) {
+
     context(sprintf("broom tidy nlmixr %s", f))
     fitF <- .nlmixr(one.compartment, theo_sd, est = f)
+
     test_that(sprintf("tidy works on nlmixr fit %s fits", f), {
       td <- tidy(fitF, exponentiate = NA)
       check_tidy(td, 7, 7, c("effect", "group", "term", "estimate", "std.error", "statistic", "p.value"))
@@ -447,7 +448,6 @@ nlmixrTest({
     check_tidy(td)
     expect_equal(td$estimate, c(0.45, 1, 3.45,
                                 0.774596669241483, 0.547722557505166, 0.316227766016838, 0.7), tolerance = tol)
-    print(td$std.error)
     expect_equal(setNames(td$std.error, NULL),
                  c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_, NA_real_),
                  tolerance = tol)
