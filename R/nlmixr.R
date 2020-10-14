@@ -403,6 +403,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
   if (est == "saem") {
     if (.nid <= 1) stop("SAEM is for mixed effects models, try 'focei', which downgrades to nonlinear regression")
     pt <- proc.time()
+    uif$env <- new.env(parent = emptyenv())
     .tv <- NULL
     if (.nTv != 0) {
       .tv <- names(data)[-seq(1,6)]
