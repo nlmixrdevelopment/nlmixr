@@ -578,8 +578,7 @@ configsaem <- function(model, data, inits,
   cfg$hi <- rep(1.0, cfg$nendpnt)
   cfg$ares[cfg$res.mod == 2] <- 0
   cfg$bres[cfg$res.mod == 1] <- 0
-
-  nres <- (1:3)[(cfg$res.mod == 10L) * 3 + (cfg$res.mod %in% c(4L, 8L, 9L)) * 2 + (cfg$res.mod %in% c(3L, 5L, 6L, 7L)) + 1]
+  nres <- (1:4)[(cfg$res.mod == 10L) * 3 + (cfg$res.mod %in% c(4L, 8L, 9L)) * 2 + (cfg$res.mod %in% c(3L, 5L, 6L, 7L)) + 1]
   cfg$res_offset <- cumsum(c(0, nres))
   cfg$par.hist <- matrix(0, cfg$niter, nlambda1 + nlambda0 + nphi1 + sum(nres))
   cfg$addProp <- c("combined1" = 1L, "combined2" = 2L)[match.arg(addProp)]
