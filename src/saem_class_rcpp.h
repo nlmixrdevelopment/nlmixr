@@ -29,32 +29,37 @@ using namespace Rcpp;
 
 int addProp;
 
-typedef void (*fn_ptr) (double *, double *, double *yptr, double *fptr, int len,
-			int yj, double lambda, double low, double hi);
+typedef void (*fn_ptr) (double *, double *);
 
 extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
 			  int itmax, double ftol_rel, double rcoef, double ecoef, double ccoef,
 			  int *iconv, int *it, int *nfcall, double *ynewlo, double *xmin,
-			  int *iprint, double *yptr, double *fptr, int len, int yt, double lambda,
-			  double low, double hi);
+			  int *iprint);
 
+double *_saemYptr;
+double *_saemFptr;
+int _saemLen;
+int _saemYj;
+double _saemLambda;
+double _saemLow;
+double _saemHi;
 // add+prop
-void obj(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+void obj(double *ab, double *fx) {
   int i;
   double g, sum, cur;
   double xmin = 1.0e-200, ft, ytr;
-  for (i=0, sum=0; i<len; ++i) {
-    // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft = _powerD(fptr[i],  lambda, yj, low, hi);
-    ytr = _powerD(yptr[i], lambda, yj, low, hi);
+  for (i=0, sum=0; i<_saemLen; ++i) {
+    // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
+    ft = _powerD(_saemFptr[i],  _saemLambda, _saemYj, _saemLow, _saemHi);
+    ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
     if (addProp == 1) {
-      g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
+      g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(_saemFptr[i]);
     } else {
       double ab02 = ab[0]*ab[0];
       double ab12 = ab[1]*ab[1];
-      double fa = fabs(fptr[i]);
+      double fa = fabs(_saemFptr[i]);
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
@@ -65,22 +70,22 @@ void obj(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, do
 }
 
 // add + pow
-void objC(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+void objC(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr;
   double xmin = 1.0e-200;
-  for (i=0, sum=0; i<len; ++i) {
-    // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft  = _powerD(fptr[i], lambda, yj, low, hi);
-    ytr = _powerD(yptr[i], lambda, yj, low, hi);
+  for (i=0, sum=0; i<_saemLen; ++i) {
+    // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
+    ft  = _powerD(_saemFptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
+    ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
     if (addProp == 1){
-      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fabs(fptr[i]), ab[2]);
+      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fabs(_saemFptr[i]), ab[2]);
     } else {
       double ab02 = ab[0]*ab[0];
       double ab12 = ab[1]*ab[1];
-      g = ab02*ab02 + ab12*ab12*pow(fabs(fptr[i]), 2*ab[2]);
+      g = ab02*ab02 + ab12*ab12*pow(fabs(_saemFptr[i]), 2*ab[2]);
     }
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
@@ -90,15 +95,15 @@ void objC(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
 }
 
 // Power only
-void objD(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+void objD(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr;
   double xmin = 1.0e-200;
-  for (i=0, sum=0; i<len; ++i) {
-    // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft = _powerD(fptr[i],  lambda, yj, low, hi);
-    ytr = _powerD(yptr[i], lambda, yj, low, hi);
-    g = ab[0]*ab[0]*pow(fabs(fptr[i]), ab[1]);
+  for (i=0, sum=0; i<_saemLen; ++i) {
+    // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
+    ft = _powerD(_saemFptr[i],  _saemLambda, _saemYj, _saemLow, _saemHi);
+    ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
+    g = ab[0]*ab[0]*pow(fabs(_saemFptr[i]), ab[1]);
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
@@ -106,15 +111,15 @@ void objD(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
   *fx = sum;
 }
 
-// add+lambda only
-void objE(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+// add+_saemLambda only
+void objE(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr;
   double xmin = 1.0e-200;
-  for (i=0, sum=0; i<len; ++i) {
-    // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft = _powerD(fptr[i],  ab[1], yj, low, hi);
-    ytr = _powerD(yptr[i], ab[1], yj, low, hi);
+  for (i=0, sum=0; i<_saemLen; ++i) {
+    // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
+    ft = _powerD(_saemFptr[i],  ab[1], _saemYj, _saemLow, _saemHi);
+    ytr = _powerD(_saemYptr[i], ab[1], _saemYj, _saemLow, _saemHi);
     g = ab[0]*ab[0];
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
@@ -123,16 +128,16 @@ void objE(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
   *fx = sum;
 }
 
-// prop+lambda only
-void objF(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+// prop+_saemLambda only
+void objF(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr;
   double xmin = 1.0e-200;
-  for (i=0, sum=0; i<len; ++i) {
-    // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft = _powerD(fptr[i],  ab[1], yj, low, hi);
-    ytr = _powerD(yptr[i], ab[1], yj, low, hi);
-    g = ab[0]*ab[0]*fabs(fptr[i]);
+  for (i=0, sum=0; i<_saemLen; ++i) {
+    // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
+    ft = _powerD(_saemFptr[i],  ab[1], _saemYj, _saemLow, _saemHi);
+    ytr = _powerD(_saemYptr[i], ab[1], _saemYj, _saemLow, _saemHi);
+    g = ab[0]*ab[0]*fabs(_saemFptr[i]);
     if (g == 0) g = 1;
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
@@ -141,16 +146,16 @@ void objF(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
   *fx = sum;
 }
 
-// pow+lambda only
-void objG(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+// pow+_saemLambda only
+void objG(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr;
   double xmin = 1.0e-200;
-  for (i=0, sum=0; i<len; ++i) {
-    // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft = _powerD(fptr[i],  ab[2], yj, low, hi);
-    ytr = _powerD(yptr[i], ab[2], yj, low, hi);
-    g = ab[0]*ab[0]*pow(fabs(fptr[i]), ab[1]);
+  for (i=0, sum=0; i<_saemLen; ++i) {
+    // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
+    ft = _powerD(_saemFptr[i],  ab[2], _saemYj, _saemLow, _saemHi);
+    ytr = _powerD(_saemYptr[i], ab[2], _saemYj, _saemLow, _saemHi);
+    g = ab[0]*ab[0]*pow(fabs(_saemFptr[i]), ab[1]);
     if (g == 0) g = 1.0;
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
@@ -159,23 +164,23 @@ void objG(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
   *fx = sum;
 }
 
-// add + prop + lambda
-void objH(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+// add + prop + _saemLambda
+void objH(double *ab, double *fx) {
   int i;
   double g, sum, cur;
   double xmin = 1.0e-200, ft, ytr;
-  for (i=0, sum=0; i<len; ++i) {
-    // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft = _powerD(fptr[i],  ab[2], yj, low, hi);
-    ytr = _powerD(yptr[i], ab[2], yj, low, hi);
+  for (i=0, sum=0; i<_saemLen; ++i) {
+    // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
+    ft = _powerD(_saemFptr[i],  ab[2], _saemYj, _saemLow, _saemHi);
+    ytr = _powerD(_saemYptr[i], ab[2], _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
     if (addProp == 1) {
-      g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(fptr[i]);
+      g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(_saemFptr[i]);
     } else {
       double ab02 = ab[0]*ab[0];
       double ab12 = ab[1]*ab[1];
-      double fa = fabs(fptr[i]);
+      double fa = fabs(_saemFptr[i]);
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
@@ -185,23 +190,23 @@ void objH(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, d
   *fx = sum;
 }
 
-// add + pow + lambda
-void objI(double *ab, double *fx, double *yptr, double *fptr, int len, int yj, double lambda, double low, double hi) {
+// add + pow + _saemLambda
+void objI(double *ab, double *fx) {
   int i;
   double g, sum, cur;
   double xmin = 1.0e-200, ft, ytr;
-  for (i=0, sum=0; i<len; ++i) {
-    // nelder_() does not allow lower bounds; we force ab[] be positive here
-    ft = _powerD(fptr[i],  ab[3], yj, low, hi);
-    ytr = _powerD(yptr[i], ab[3], yj, low, hi);
+  for (i=0, sum=0; i<_saemLen; ++i) {
+    // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
+    ft = _powerD(_saemFptr[i],  ab[3], _saemYj, _saemLow, _saemHi);
+    ytr = _powerD(_saemYptr[i], ab[3], _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
     if (addProp == 1) {
-      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fabs(fptr[i]),ab[2]);
+      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fabs(_saemFptr[i]),ab[2]);
     } else {
       double ab02 = ab[0]*ab[0];
       double ab12 = ab[1]*ab[1];
-      double fa = pow(fabs(fptr[i]), ab[2]);
+      double fa = pow(fabs(_saemFptr[i]), ab[2]);
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
@@ -730,10 +735,15 @@ public:
 	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
 	  double start[2]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b)))};                  //force are & bres to be positive
 	  double step[2]={-.2, -.2}, ynewlo;
+	  _saemYptr = ysb.memptr();
+	  _saemFptr = fsb.memptr();
+	  _saemLen  = ysb.n_elem;
+	  _saemYj   = yj(b);
+	  _saemLambda = lambda(b);
+	  _saemLow = low(b);
+	  _saemHi = hi(b);
 	  nelder_fn(obj, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
-		    (int)yj(b), lambda(b), low(b), hi(b));
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
 	} else if (res_mod(b) == 4) { // add + pow
@@ -754,10 +764,15 @@ public:
 	  // REprintf("ares: %f bres: %f cres: %f\n", ares(b), bres(b), cres(b));
 	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), cres(b)}; //force are & bres to be positive
 	  double step[3]={-.2, -.2, -.2}, ynewlo;
+	  _saemYptr = ysb.memptr();
+	  _saemFptr = fsb.memptr();
+	  _saemLen  = ysb.n_elem;
+	  _saemYj   = yj(b);
+	  _saemLambda = lambda(b);
+	  _saemLow = low(b);
+	  _saemHi = hi(b);
 	  nelder_fn(objC, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
-		    (int)yj(b), lambda(b), low(b), hi(b));
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	  // REprintf("\tares: %f bres: %f cres: %f\n", pxmin[0], pxmin[1], pxmin[2]);
 	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b)); //force ares & bres to be positive
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b)); //force ares & bres to be positive
@@ -776,10 +791,15 @@ public:
 	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
 	  double start[2]={sqrt(fabs(bres(b))), cres(b)};                  //force are & bres to be positive
 	  double step[2]={ -.2, -.2}, ynewlo;
+	  _saemYptr = ysb.memptr();
+	  _saemFptr = fsb.memptr();
+	  _saemLen  = ysb.n_elem;
+	  _saemYj   = yj(b);
+	  _saemLambda = lambda(b);
+	  _saemLow = low(b);
+	  _saemHi = hi(b);
 	  nelder_fn(objD, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
-		    (int)yj(b), lambda(b), low(b), hi(b));
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[0]*pxmin[1] - bres(b));    //force are & bres to be positive
 	  cres(b) = cres(b) + pas(kiter)*(pxmin[1] - cres(b));            //force are & bres to be positive
 	} else if (res_mod(b) == 6) { // additive + lambda
@@ -796,10 +816,15 @@ public:
 	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
 	  double start[2]={sqrt(fabs(ares(b))), lres(b)};                  //force are & bres to be positive
 	  double step[2]={ -.2, -.2}, ynewlo;
+	  _saemYptr = ysb.memptr();
+	  _saemFptr = fsb.memptr();
+	  _saemLen  = ysb.n_elem;
+	  _saemYj   = yj(b);
+	  _saemLambda = lambda(b);
+	  _saemLow = low(b);
+	  _saemHi = hi(b);
 	  nelder_fn(objE, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
-		    (int)yj(b), lambda(b), low(b), hi(b));
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
 	  lres(b) = lres(b) + pas(kiter)*(pxmin[1] - lres(b));            //force are & bres to be positive
 	} else if (res_mod(b) == 7) { // prop + lambda
@@ -816,10 +841,15 @@ public:
 	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
 	  double start[2]={sqrt(fabs(bres(b))), lres(b)};                  //force are & bres to be positive
 	  double step[2]={ -.2, -.2}, ynewlo;
+	  _saemYptr = ysb.memptr();
+	  _saemFptr = fsb.memptr();
+	  _saemLen  = ysb.n_elem;
+	  _saemYj   = yj(b);
+	  _saemLambda = lambda(b);
+	  _saemLow = low(b);
+	  _saemHi = hi(b);
 	  nelder_fn(objF, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
-		    (int)yj(b), lambda(b), low(b), hi(b));
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[0]*pxmin[0] - bres(b));    //force are & bres to be positive
 	  lres(b) = lres(b) + pas(kiter)*(pxmin[1] - lres(b));            //force are & bres to be positive
 	} else if (res_mod(b) == 8) { // pow + lambda
@@ -836,10 +866,15 @@ public:
 	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
 	  double start[3]={sqrt(fabs(bres(b))), cres(b), lres(b)};                  //force are & bres to be positive
 	  double step[3]={ -.2, -.2, -.2}, ynewlo;
+	  _saemYptr = ysb.memptr();
+	  _saemFptr = fsb.memptr();
+	  _saemLen  = ysb.n_elem;
+	  _saemYj   = yj(b);
+	  _saemLambda = lambda(b);
+	  _saemLow = low(b);
+	  _saemHi = hi(b);
 	  nelder_fn(objG, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
-		    (int)yj(b), lambda(b), low(b), hi(b));
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[0]*pxmin[0] - bres(b));    //force are & bres to be positive
 	  cres(b) = cres(b) + pas(kiter)*(pxmin[1] - cres(b));    //force are & bres to be positive
 	  lres(b) = lres(b) + pas(kiter)*(pxmin[2] - lres(b));            //force are & bres to be positive
@@ -857,10 +892,15 @@ public:
 	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
 	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), lres(b)};                  //force are & bres to be positive
 	  double step[3]={ -.2, -.2, -.2}, ynewlo;
+	  _saemYptr = ysb.memptr();
+	  _saemFptr = fsb.memptr();
+	  _saemLen  = ysb.n_elem;
+	  _saemYj   = yj(b);
+	  _saemLambda = lambda(b);
+	  _saemLow = low(b);
+	  _saemHi = hi(b);
 	  nelder_fn(objH, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
-		    (int)yj(b), lambda(b), low(b), hi(b));
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
 	  lres(b) = lres(b) + pas(kiter)*(pxmin[2] - lres(b));            //force are & bres to be positive
@@ -878,10 +918,15 @@ public:
 	  int n=4, itmax=50, iconv, it, nfcall, iprint=0;
 	  double start[4]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), cres(b), lres(b)};                  //force are & bres to be positive
 	  double step[4]={ -.2, -.2, -.2, -.2}, ynewlo;
+	  _saemYptr = ysb.memptr();
+	  _saemFptr = fsb.memptr();
+	  _saemLen  = ysb.n_elem;
+	  _saemYj   = yj(b);
+	  _saemLambda = lambda(b);
+	  _saemLow = low(b);
+	  _saemHi = hi(b);
 	  nelder_fn(objI, n, start, step, itmax, 1.0e-4, 1.0, 2.0, .5,        //CHG hard-coded tol
-		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint,
-		    ysb.memptr(), fsb.memptr(), ysb.n_elem,
-		    (int)yj(b), lambda(b), low(b), hi(b));
+		    &iconv, &it, &nfcall, &ynewlo, pxmin, &iprint);
 	  ares(b) = ares(b) + pas(kiter)*(pxmin[0]*pxmin[0] - ares(b));    //force are & bres to be positive
 	  bres(b) = bres(b) + pas(kiter)*(pxmin[1]*pxmin[1] - bres(b));    //force are & bres to be positive
 	  cres(b) = cres(b) + pas(kiter)*(pxmin[2] - cres(b));    //force are & bres to be positive
