@@ -63,12 +63,28 @@ ctnlmixrTest({
     
     expect_equal(round(f$objective, 3), 127.313)
 
+
+    mod %>%
+      model(ipre ~ pow(prop.sd, pw)) %>%
+      ini(prop.sd=0.1, pw=1) %>%
+      nlmixr(dat, "saem", control=ctl2) -> f
+    
+    expect_equal(round(f$objective, 3), 565.674)
+
     mod %>%
       model(ipre ~ add(add.sd) + prop(prop.sd)) %>%
       ini(c(prop.sd=0.1, add.sd=0.1)) %>%
       nlmixr(dat, "saem", control=ctl1) -> f
     
     expect_equal(round(f$objective, 3), 473.996)
+
+
+    mod %>%
+      model(ipre ~ add(add.sd) + pow(prop.sd, pw)) %>%
+      ini(prop.sd=0.1, add.sd=1, pw=1) %>%
+      nlmixr(dat, "saem", control=ctl2) -> f
+    
+    expect_equal(round(f$objective, 3), 475.736)
 
     mod %>%
       model(ipre ~ add(add.sd) + prop(prop.sd)) %>%
@@ -89,6 +105,20 @@ ctnlmixrTest({
       ini(c(prop.sd=0.1, add.sd=0.1, lambda=1)) %>%
       nlmixr(dat, "saem", control=ctl2) -> f
     
+    expect_equal(round(f$objective, 3), 490.495)
+
+    mod %>%
+      model(ipre ~ add(add.sd) + prop(prop.sd) + yeoJohnson(lambda)) %>%
+      ini(c(prop.sd=0.1, add.sd=0.1, lambda=1)) %>%
+      nlmixr(dat, "saem", control=ctl1) -> f
+
+    expect_equal(round(f$objective, 3), 478.526)
+
+    mod %>%
+      model(ipre ~ add(add.sd) + prop(prop.sd) + yeoJohnson(lambda)) %>%
+      ini(c(prop.sd=0.1, add.sd=0.1, lambda=1)) %>%
+      nlmixr(dat, "saem", control=ctl2) -> f
+
     expect_equal(round(f$objective, 3), 490.495)
     
     mod %>%
