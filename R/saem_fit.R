@@ -107,6 +107,7 @@ gen_saem_user_fn <- genSaemUserFunction
 #' @param fixed a character vector of fixed effect only parameters (no random effects attached) to be fixed
 #' @param DEBUG Integer determining if debugging is enabled.
 #' @inheritParams RxODE::rxSEinner
+#' @inheritParams saemControl
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by he Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
@@ -161,7 +162,12 @@ configsaem <- function(model, data, inits,
                        distribution = c("normal", "poisson", "binomial"),
                        addProp=c("combined2","combined1"),
                        seed = 99, fixed = NULL, DEBUG = 0,
-                       normal=c("rnorm", "vandercorput")) {
+                       normal=c("rnorm", "vandercorput"),
+                       tol=1e-4, itmax=100L, type=c("nelder–mead", "newuoa"),
+                       lambdaRange=3, powRange=10) {
+  type.idx <- c("nelder–mead" = 1L, "newuoa" = 2L)
+  type <- match.arg(type)
+  type <- type.idx[type]
   normal <- match.arg(normal)
   names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt))
   ODEopt <- do.call(RxODE::rxControl, ODEopt)
@@ -580,6 +586,11 @@ configsaem <- function(model, data, inits,
 
   cfg$DEBUG <- cfg$opt$DEBUG <- cfg$optM$DEBUG <- DEBUG
   cfg$phiMFile <- tempfile("phi-", RxODE::rxTempDir(), ".phi")
+  cfg$tol <- tol
+  cfg$itmax <- itmax
+  cfg$type <- type
+  cfg$lambdaRange <- lambdaRange
+  cfg$powRange <- powRange
   cfg
 }
 
@@ -1241,6 +1252,28 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
   assign("uif", .syncUif(fit.f$uif, fit.f$popDf, fit.f$omega), fit.f$env)
   return(fit.f)
 }
+
+.saemResidF <- function(x) {
+  .Call(`_saemResidF`, x)
+}
+
+.newuoa <- function(par, fn, gr, lower = -Inf, upper = Inf, control = list(), ...) {
+  .ctl <- control
+  if (is.null(.ctl$npt)) .ctl$npt <- length(par) * 2 + 1
+  if (is.null(.ctl$rhobeg)) .ctl$rhobeg <- 0.2
+  if (is.null(.ctl$rhoend)) .ctl$rhoend <- 1e-4
+  .ctl$iprint <- 0L
+  .ctl <- .ctl[names(.ctl) %in% c("npt", "rhobeg", "rhoend", "iprint", "maxfun")]
+  .ret <- minqa::newuoa(par, fn,
+    control = .ctl
+  )
+  .ret$x <- .ret$par
+  .ret$message <- .ret$msg
+  .ret$convergence <- .ret$ierr
+  .ret$value <- .ret$fval
+  return(.ret)
+}
+
 
 ## FIXME: coef_phi0, rmcmc, coef_sa
 ## FIXME: Klog, rho, sa, nmc

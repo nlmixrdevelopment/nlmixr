@@ -428,7 +428,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       "logLik", "nnodes.gq",
       "nsd.gq", "nsd.gq", "adjObf",
       "optExpression", "addProp",
-      "singleOde"
+      "singleOde", "type", "tol", "itmax",
+      "lambdaRange", "powRange"
     )) {
       .getOpt(a)
     }
@@ -468,7 +469,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       model = model, data = dat, inits = inits,
       mcmc = .mcmc, ODEopt = .ODEopt, seed = .seed,
       distribution = .dist, DEBUG = .DEBUG,
-      addProp=.addProp
+      addProp=.addProp, tol=.tol, itmax=.itmax, type=.type,
+      powRange=.powRange, lambdaRange=.lambdaRange
     )
     if (is(.print, "numeric")) {
       .cfg$print <- as.integer(.print)
@@ -987,6 +989,13 @@ nlmixr_fit <- function(uif, data, est = NULL, control = list(), ...,
 ##'
 ##' }
 ##'
+##' @param tol This is the tolerance for the regression models used
+##'   for complex residual errors (ie add+prop etc)
+##'
+##' @param itmax This is the maximum number of iterations for the
+##'   regression models used for complex residual errors.  The number
+##'   of iterations is itmax*number of parameters
+##'
 ##' @param ... Other arguments to control SAEM.
 ##'
 ##' @inheritParams RxODE::rxSolve
@@ -1018,7 +1027,13 @@ saemControl <- function(seed = 99,
                         addProp=c("combined2","combined1"),
                         singleOde=TRUE,
                         normal=c("rnorm", "vandercorput"),
+                        tol=1e-6,
+                        itmax=30,
+                        type=c("nelder–mead", "newuoa"),
+                        powRange=10,
+                        lambdaRange=3,
                         ...) {
+  type <- match.arg(type)
   normal <- match.arg(normal)
   .xtra <- list(...)
   .rm <- c()
@@ -1051,6 +1066,11 @@ saemControl <- function(seed = 99,
     addProp=match.arg(addProp),
     singleOde=singleOde,
     normal=normal,
+    itmax=itmax,
+    tol=tol,
+    type=type,
+    powRange=powRange,
+    lambdaRange=lambdaRange,
     ...)
   if (length(.rm) > 0) {
     .ret <- .ret[!(names(.ret) %in% .rm)]

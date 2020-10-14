@@ -84,6 +84,8 @@ static const R_CMethodDef CEntries[] = {
 SEXP _nlmixr_powerD(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP _nlmixr_powerL(SEXP, SEXP, SEXP, SEXP, SEXP);
 
+SEXP _saemResidF(SEXP v);
+
 static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_freeFocei", (DL_FUNC) &_nlmixr_freeFocei, 0},
   {"neldermead_wrap",      (DL_FUNC) &neldermead_wrap,      11},
@@ -133,6 +135,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_nlmixrResid0", (DL_FUNC) &_nlmixr_nlmixrResid0, 9},
   {"_nlmixr_powerD", (DL_FUNC) &_nlmixr_powerD, 5},
   {"_nlmixr_powerL", (DL_FUNC) &_nlmixr_powerL, 5},
+  {"_saemResidF", (DL_FUNC) &_saemResidF, 1},
   {NULL, NULL, 0}
 };
 
