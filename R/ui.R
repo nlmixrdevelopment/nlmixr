@@ -3115,10 +3115,27 @@ nlmixrUI.saem.res.mod <- function(obj) {
   return(sapply(.predDf$cond, function(x) {
     .tmp <- .ini[which(.ini$condition == x), ]
     .hasAdd0 <- any(.tmp$err == "add") | any(.tmp$err == "norm") | any(.tmp$err == "dnorm")
-    .hasLog <- any(.tmp$err == "dlnorm") | any(.tmp$err == "lnorm") | any(.tmp$err == "logn") |
-      any(.tmp$err == "dlogn")
-    .hasLogit <- any(.tmp$err == "logitNorm")
-    .hasProbit <- any(.tmp$err == "probitNorm")
+    .hasLog <- FALSE
+    .w <- c(which(.tmp$err == "dlnorm"), which(.tmp$err == "lnorm"), which(.tmp$err == "logn"), which(.tmp$err == "dlogn"))
+    if (length(.w) == 1) {
+      if (!is.na(.tmp$est[.w])) {
+        .hasLog <- TRUE
+      }
+    }
+    .w <- which(.tmp$err == "logitNorm")
+    .hasLogit <- FALSE
+    if (length(.w) == 1) {
+      if (!is.na(.tmp$est[.w])) {
+        .hasLogit <- TRUE
+      }
+    }
+    .hasProbit <- FALSE
+    .w <- which(.tmp$err == "probitNorm")
+    if (length(.w) == 1) {
+      if (!is.na(.tmp$est[.w])) {
+        .hasProbit <- TRUE
+      }
+    }
     .hasAdd <- .hasAdd0 | .hasLog | .hasLogit | .hasProbit
     .hasProp <- any(.tmp$err == "prop")
     .hasPow <- any(.tmp$err == "pow")
