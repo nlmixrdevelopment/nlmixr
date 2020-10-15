@@ -3202,7 +3202,9 @@ nlmixrUI.saem.res.name <- function(obj) {
   w <- which(sapply(obj$err, function(x) any(x == c("add", "norm", "dnorm", "dlnorm", "lnorm", "logn", "dlogn"))))
   ret <- c()
   if (length(w) == 1) {
-    ret[length(ret) + 1] <- paste(obj$name[w])
+    if (!is.na(obj$est[w])) {
+      ret[length(ret) + 1] <- paste(obj$name[w])
+    }
   }
   w <- which(obj$err == "prop")
   if (length(w) == 1) {

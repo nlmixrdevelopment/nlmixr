@@ -790,11 +790,16 @@ focei.theta.saemFit <- function(object, uif, ...) {
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 3]
     }
-    .w <- which(sapply(.tmp$err, function(x) {
-      any(x == c(
+    .w <- which(sapply(seq_along(.tmp$err), function(.x) {
+      x <- .tmp$err[.x]
+      if (any(x == c(
         "add", "norm", "dnorm", "lnorm", "dlnorm",
-        "dlogn", "logn"
-      ))
+        "dlogn", "logn"))) {
+        if (!is.na(.tmp$est[.x])) {
+          return(TRUE)
+        }
+      }
+      return(FALSE)
     }))
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 1]
