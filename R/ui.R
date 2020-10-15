@@ -666,8 +666,10 @@ update.function <- .nlmixrUpdate
   ns <- fun2$name[is.na(fun2$est)]
   if (length(ns) > 0) {
     ## Now handled by bounds (in theory), keeping here just in case.
-    stop(sprintf("the following parameters initial estimates are NA: %s", paste(ns, collapse = ", ")),
-         call.=FALSE) #nocov
+    if (!all(is.na(ns))) {
+      stop(sprintf("the following parameters initial estimates are NA: %s", paste(ns, collapse = ", ")),
+           call.=FALSE) #nocov
+    }
   }
   fun2$meta <- list2env(meta, parent = emptyenv())
   .mv <- RxODE::rxModelVars(fun2$rxode)
@@ -1279,12 +1281,21 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       }
       distArgs <- distArgs[1]
     }
+    .est0 <- -Inf;
+    if (length(distArgs) >= 1) {
+      if (distArgs[1] == "NA") {
+        if (distName %in% c("dlnorm", "lnorm", "logitNorm", "probitNorm", "dlogn")) {
+          distArgs <- c()
+          .est0 <- NA_real_
+        }
+      }
+    }
     if (length(distArgs) == 0L) {
       .tmp <- .as.data.frame(bounds)
       .tmp1 <- .tmp[1, ]
       .tmp1[1, ] <- NA
       .tmp1[, "err"] <- distName
-      .tmp1[, "est"] <- -Inf
+      .tmp1[, "est"] <- NA
       if (!is.null(curCond)) {
         .tmp1[, "condition"] <- .deparse(curCond)
       } else {
@@ -1302,11 +1313,11 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       errn <- errn + 1
       if (!is.na(.tmp)) {
         ## FIXME: allow numeric estimates...?
-        stop("Distribution parameters cannot be numeric, but need to be estimated")
+        stop("distribution parameters cannot be numeric, but need to be estimated")
       }
       .w <- which(bounds$name == distArgs[.i])
       if (length(.w) == 0) {
-        stop("Residual distribution parameter(s) estimates were not found in ini block")
+        stop("residual distribution parameter(s) estimates were not found in ini block")
       }
       .tmp <- .as.data.frame(bounds)
       .tmp$err[.w] <- ifelse(.i == 1, distName, paste0(distName, .i))
