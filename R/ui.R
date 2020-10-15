@@ -916,11 +916,12 @@ dists <- list(
   "logn" = 1,
   "dlogn" = 1,
   "logitNorm"=1:3,
+  "probitNorm"=1:3,
   "lnorm" = 1,
   "dlnorm" = 1
 )
 
-distsPositive <- c("add", "norm", "dnorm", "prop", "pow", "logn", "dlogn", "lnorm", "dlnorm", "logitNorm")
+distsPositive <- c("add", "norm", "dnorm", "prop", "pow", "logn", "dlogn", "lnorm", "dlnorm", "logitNorm", "probitNorm")
 
 allVars <- function(x) {
   defined <- character()
