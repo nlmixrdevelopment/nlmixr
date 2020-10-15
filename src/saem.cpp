@@ -6,6 +6,15 @@
 #include <RcppArmadillo.h>
 #include <RxODE.h>
 
+#ifdef ENABLE_NLS
+#include <libintl.h>
+#define _(String) dgettext ("nlmixr", String)
+/* replace pkg as appropriate */
+#else
+#define _(String) (String)
+#endif
+
+
 #ifndef __SAEM_CLASS_RCPP_HPP__
 #define __SAEM_CLASS_RCPP_HPP__
 #define MAXENDPNT 40
@@ -358,12 +367,12 @@ public:
   List get_resInfo() {
     vec sig2(bres.size());
     std::copy(sigma2, sigma2+bres.size(), &sig2[0]);
-    return List::create(_("sigma2")  = wrap(sig2),
-			_("ares")    = wrap(ares),
-			_("bres")    = wrap(bres),
-			_("cres")    = wrap(cres),
-			_("lres")    = wrap(lres),
-			_("res_mod") = wrap(res_mod));
+    return List::create(_["sigma2"]  = wrap(sig2),
+			_["ares"]    = wrap(ares),
+			_["bres"]    = wrap(bres),
+			_["cres"]    = wrap(cres),
+			_["lres"]    = wrap(lres),
+			_["res_mod"] = wrap(res_mod));
   }
   
   mat get_par_hist() {
