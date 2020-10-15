@@ -1,4 +1,4 @@
-ctnlmixrTest({
+nlmixrTest({
 
   context("Test SAEM functions")
   test_that("saem objective function tests", {
@@ -24,7 +24,6 @@ ctnlmixrTest({
       })
     }
 
-
     mod2 <- function() {
       ini({
         tka <- 0.45 # Log Ka
@@ -48,79 +47,114 @@ ctnlmixrTest({
 
     dat <- theo_sd
     dat <- dat[!(dat$TIME == 0 & dat$EVID == 0),]
-    
+
+    estVal <- function(i, n=tot) {
+      .cur <- unlist(ops[i, ])
+      .est <- c()
+      .mod <- c()
+      .doIt <- FALSE
+      .addProp <- 0
+      .lnorm <- FALSE
+      .logitNorm <- FALSE
+      .probitNorm <- FALSE
+      if (.cur["add"] == "add") {
+        .mod <- c(.mod, "add(add.sd)")
+        .est <- c(.est, c(add.sd=0.1))
+        .doIt <- TRUE
+        .addProp <- 1
+      }
+      if (.cur["add"] == "lnorm") {
+        .mod <- c(.mod, "lnorm(lnorm.sd)")
+        .est <- c(.est, c(lnorm.sd=0.1))
+        .doIt <- TRUE
+        .addProp <- 1
+        .lnorm <- TRUE
+      }
+      if (.cur["add"] == "logitNorm") {
+        .mod <- c(.mod, "logitNorm(logit.sd, -0.5, 14)")
+        .est <- c(.est, c(logit.sd=0.1))
+        .doIt <- TRUE
+        .addProp <- 1
+        .logitNorm <- TRUE
+      }
+      if (.cur["add"] == "probitNorm") {
+        .mod <- c(.mod, "probitNorm(probit.sd, -0.5, 14)")
+        .est <- c(.est, c(probit.sd=0.1))
+        .doIt <- TRUE
+        .addProp <- 1
+        .probitNorm <- TRUE
+      }
+      if (.cur["prop"] == "prop") {
+        .mod <- c(.mod, "prop(prop.sd)")
+        .est <- c(.est, c(prop.sd=0.1))
+        .doIt <- TRUE
+        if (.addProp == 1) .addProp <- 2
+      }
+      if (.cur["prop"] == "pow") {
+        .mod <- c(.mod, "pow(pow.sd, pw)")
+        .est <- c(.est, c(pow.sd=0.1, pw=1))
+        .doIt <- TRUE
+        if (.addProp == 1) .addProp <- 2
+      }
+      if (.cur["tbs"] != "") {
+        .mod <- c(.mod, paste0(.cur["tbs"], "(lambda)"))
+        .est <- c(.est, c(lambda=1))
+        if (.lnorm){
+          .doIt <- FALSE
+        }
+        if (.logitNorm & .cur["tbs"] == "boxCox") {
+          .doIt <- FALSE
+        }
+      }
+      if (.addProp <= 1 & .cur["addProp"] == "combined1") {
+        .doIt <- FALSE
+      }
+      if (.doIt) {
+        ctl1 <- saemControl(nEm=n, nBurn = n, logLik=TRUE, print=0, addProp=.cur["addProp"])
+        mod2 <- eval(parse(text=paste0("mod %>% model(ipre~", paste(.mod, collapse="+"), ") %>% ",
+                                       gsub("c[(]", "ini(", deparse1(.est)))))
+        v <- nlmixr(mod2, dat, est="saem", control=ctl1)
+        assign("mod2", mod2, globalenv())
+        if (!inherits(v, "nlmixrFitCore"))  {
+          message(sprintf("bad model at %d", i))
+          print(mod2)
+        }
+        #saveRDS(v, paste0("test-saem-theo_sd-", i, "-", n, ".rds"))
+        .sum <- c(objf=v$objective, v$theta)
+        return(setNames(sapply(.nm, function(x){.sum[x]}), .nm))
+      }
+      return(sapply(.nm, function(x){NA_real_}))
+    }
 
     ctl1 <- saemControl(nEm=5, nBurn = 5, logLik=TRUE, print=0, addProp="combined1")
     ctl2 <- saemControl(nEm=5, nBurn = 5, logLik=TRUE, print=0, addProp="combined2")
 
-    f <- suppressWarnings(nlmixr(mod, dat, "saem", control=ctl2))
-    expect_equal(round(f$objective, 3), 114.124)
 
-    mod %>%
-      model(ipre ~ prop(prop.sd)) %>%
-      ini(prop.sd=0.1) %>%
-      nlmixr(dat, "saem", control=ctl2) -> f
-    
-    expect_equal(round(f$objective, 3), 127.313)
+    ## tot <- 250
+    tot <- 15
 
+    ops <- expand.grid(add=c("", "add", "lnorm", "logitNorm", "probitNorm"), prop=c("", "prop", "pow"),
+                       tbs=c("", "yeoJohnson", "boxCox"), addProp=c("combined1", "combined2"),
+                       stringsAsFactors = FALSE)
+    ops$id <- seq_along(ops$add)
 
-    mod %>%
-      model(ipre ~ pow(prop.sd, pw)) %>%
-      ini(prop.sd=0.1, pw=1) %>%
-      nlmixr(dat, "saem", control=ctl2) -> f
-    
-    expect_equal(round(f$objective, 3), 565.674)
+    .nm <- c("objf", "tka", "tcl", "tv", "lnorm.sd", "logit.sd","probit.sd", "add.sd", "pow.sd", "pw", "lambda")
 
-    mod %>%
-      model(ipre ~ add(add.sd) + prop(prop.sd)) %>%
-      ini(c(prop.sd=0.1, add.sd=0.1)) %>%
-      nlmixr(dat, "saem", control=ctl1) -> f
-    
-    expect_equal(round(f$objective, 3), 473.996)
+    v <- suppressWarnings(lapply(seq_along(ops$add), estVal))
 
+    m <- t(matrix(unlist(v),length(.nm),length(v)))
+    dimnames(m) <- list(NULL, .nm)
+    val <- cbind(ops, m)
+    val <- val[!is.na(val$objf), ]
 
-    mod %>%
-      model(ipre ~ add(add.sd) + pow(prop.sd, pw)) %>%
-      ini(prop.sd=0.1, add.sd=1, pw=1) %>%
-      nlmixr(dat, "saem", control=ctl2) -> f
-    
-    expect_equal(round(f$objective, 3), 475.736)
+    for (.n in .nm) {
+      val[, .n] <- round(val[[.n]], 2)
+    }
 
-    mod %>%
-      model(ipre ~ add(add.sd) + prop(prop.sd)) %>%
-      ini(c(prop.sd=0.1, add.sd=0.1)) %>%
-      nlmixr(dat, "saem", control=ctl2) -> f
-    
-    expect_equal(round(f$objective, 3), 473.276)
+    saveRDS(val, file="test-saem-theo_sd.rds")
 
-    mod %>%
-      model(ipre ~ add(add.sd) + prop(prop.sd) + boxCox(lambda)) %>%
-      ini(c(prop.sd=0.1, add.sd=0.1, lambda=1)) %>%
-      nlmixr(dat, "saem", control=ctl1) -> f
-    
-    expect_equal(round(f$objective, 3), 476.715)
+    expect_equal(val, readRDS("test-saem-theo_sd.rds"))
 
-    mod %>%
-      model(ipre ~ add(add.sd) + prop(prop.sd) + boxCox(lambda)) %>%
-      ini(c(prop.sd=0.1, add.sd=0.1, lambda=1)) %>%
-      nlmixr(dat, "saem", control=ctl2) -> f
-    
-    expect_equal(round(f$objective, 3), 490.495)
-
-    mod %>%
-      model(ipre ~ add(add.sd) + prop(prop.sd) + yeoJohnson(lambda)) %>%
-      ini(c(prop.sd=0.1, add.sd=0.1, lambda=1)) %>%
-      nlmixr(dat, "saem", control=ctl1) -> f
-
-    expect_equal(round(f$objective, 3), 478.526)
-
-    mod %>%
-      model(ipre ~ add(add.sd) + prop(prop.sd) + yeoJohnson(lambda)) %>%
-      ini(c(prop.sd=0.1, add.sd=0.1, lambda=1)) %>%
-      nlmixr(dat, "saem", control=ctl2) -> f
-
-    expect_equal(round(f$objective, 3), 490.495)
-    
     mod %>%
       model(ipre ~ lnorm(lnorm.sd)) %>%
       ini(lnorm.sd=0.1) %>%
