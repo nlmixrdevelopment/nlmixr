@@ -570,8 +570,8 @@ public:
 	vec yt = yM;
 	for (int i = ft.size(); i--;) {
 	  int cur = ix_endpnt(i);
-	  ft(i) = _powerD(f(i), lambda(cur), yj(cur), low(cur), hi(cur));
-	  yt(i) = _powerD(yM(i), lambda(cur), yj(cur), low(cur), hi(cur));
+	  ft(i) = _powerD(f(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
+	  yt(i) = _powerD(yM(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
 	}
 	// focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
 	// focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
@@ -660,7 +660,11 @@ public:
 	  vec resid(y_cur.size());
 	  for (int i = y_cur.size(); i--;){
 	    // lambda(cur), yj(cur), low(cur), hi(cur)
-	    resid(i) = _powerD(y_cur[i], lambda(b), yj(b), low(b), hi(b)) - _powerD(f_cur[i], lambda(b), yj(b), low(b), hi(b));
+	    resid(i) = _powerD(y_cur[i], lambda(b), (int)yj(b), low(b), hi(b));
+	    if (isnan(resid(i))) {
+	      Rcpp::stop(_("NaN in data or transformed data; please check transformation/data"));
+	    }
+	    resid(i) -=  _powerD(f_cur[i], lambda(b), (int)yj(b), low(b), hi(b));
 	  }
 	  if (res_mod(b)==2) {
 	    //double epsilon = std::numeric_limits<double>::epsilon();
@@ -791,7 +795,7 @@ public:
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
-	  _saemYj   = yj(b);
+	  _saemYj   = (int)yj(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -826,7 +830,7 @@ public:
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
-	  _saemYj   = yj(b);
+	  _saemYj   = (int)yj(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -855,7 +859,7 @@ public:
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
-	  _saemYj   = yj(b);
+	  _saemYj   = (int)yj(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -882,7 +886,7 @@ public:
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
-	  _saemYj   = yj(b);
+	  _saemYj   = (int)yj(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -909,7 +913,7 @@ public:
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
-	  _saemYj   = yj(b);
+	  _saemYj   = (int)yj(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -936,7 +940,7 @@ public:
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
-	  _saemYj   = yj(b);
+	  _saemYj   = (int)yj(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -964,7 +968,7 @@ public:
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
-	  _saemYj   = yj(b);
+	  _saemYj   = (int)yj(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -992,7 +996,7 @@ public:
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
-	  _saemYj   = yj(b);
+	  _saemYj   = (int)yj(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -1235,8 +1239,8 @@ private:
 	vec yt(fc.size());
 	for (int i = fc.size(); i--;) {
 	  int cur = ix_endpnt(i);
-	  fc(i) = _powerD(fc(i), lambda(cur), yj(cur), low(cur), hi(cur));
-	  yt(i) = _powerD(mx.yM(i), lambda(cur), yj(cur), low(cur), hi(cur));
+	  fc(i) = _powerD(fc(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
+	  yt(i) = _powerD(mx.yM(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
 	}
 	gc = vecares + vecbres % abs(fs);                            //make sure gc > 0
 	gc.elem( find( gc == 0.0) ).fill(1);
