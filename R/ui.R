@@ -1051,7 +1051,7 @@ unsupported.dists <- c(
   ## for testing...
   "nlmixrDist"
 )
-add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj", "boxCox", "yeoJohnson")
+add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj", "boxCox", "yeoJohnson", "logitNorm", "probitNorm")
 nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   .md5 <- digest::digest(list(
     .deparse1(body(fun)), .deparse(ini), .deparse(bigmodel),
@@ -1246,14 +1246,33 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         stop(sprintf("the %s distribution requires %s-%s arguments", distName, min(.nargs), max(.nargs)))
       }
     }
+    .trLow <- -Inf
+    .trHi <- Inf
     if (distName == "logitNorm") {
       if (length(distArgs) >= 2) {
-        if (is.na(suppressWarnings(as.numeric(distArgs[2])))) {
+        .trLow <- suppressWarnings(as.numeric(distArgs[2]))
+        if (is.na(.trLow)) {
           stop("logitNorm lower bound must be numeric")
         }
+        .trHi <- suppressWarnings(as.numeric(distArgs[3]))
         if (length(distArgs) == 3) {
-          if (is.na(suppressWarnings(as.numeric(distArgs[3])))) {
+          if (is.na(suppressWarnings(.trHi))) {
             stop("logitNorm upper bound must be numeric")
+          }
+        }
+      }
+      distArgs <- distArgs[1]
+    }
+    if (distName == "probitNorm") {
+      if (length(distArgs) >= 2) {
+        .trLow <- suppressWarnings(as.numeric(distArgs[2]))
+        if (is.na(.trLow)) {
+          stop("probitNorm lower bound must be numeric")
+        }
+        .trHi <- suppressWarnings(as.numeric(distArgs[3]))
+        if (length(distArgs) == 3) {
+          if (is.na(.trHi)) {
+            stop("probitNorm upper bound must be numeric")
           }
         }
       }
@@ -1270,6 +1289,8 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       } else {
         .tmp1[, "condition"] <- ""
       }
+      .tmp1[, "trHi"] <- .trHi
+      .tmp1[, "trLow"] <- .trLow
       .tmp <- rbind(.tmp, .tmp1)
       class(.tmp) <- c("nlmixrBounds", "data.frame")
       .assign("bounds", .tmp, this.env)
@@ -1301,6 +1322,8 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       } else {
         .tmp$condition[.w] <- ""
       }
+      .tmp$trHi[.w] <- .trHi
+      .tmp$trLow[.w] <- .trLow
       class(.tmp) <- c("nlmixrBounds", "data.frame")
       .assign("bounds", .tmp, this.env)
     }
@@ -2852,7 +2875,7 @@ nlmixrUI.saem.distribution <- function(obj) {
     }
     return("binomial")
   }
-  if (any(.df %in% c("dlnorm", "lnorm", "logn", "dlogn"))) {
+  if (any(.df %in% c("dlnorm", "lnorm", "logn", "dlogn", "logitNorm", "probitNorm"))) {
     return("normal")
   }
   if (any(.df %in% c("dnorm", "norm", "prop", "add", "pow", "pow2"))) {
@@ -2976,9 +2999,39 @@ nlmixrUI.saem.model.omega <- function(obj) {
 }
 
 nlmixrUI.saem.low <- function(obj) {
+  .predDf <- obj$predDf
+  .ini <- .as.data.frame(obj$ini)
+  .ini <- .ini[!is.na(.ini$err), ]
+  return(sapply(.predDf$cond, function(x) {
+    .tmp <- .ini[which(.ini$condition == x), ]
+    .w <- which(.tmp$err == "logitNorm")
+    if (length(.w) == 1L) {
+      return(.tmp$trLow[.w])
+    }
+    .w <- which(.tmp$err == "probitNorm")
+    if (length(.w) == 1L) {
+      return(.tmp$trLow[.w])
+    }
+    return(-Inf);
+  }))
 }
 
 nlmixrUI.saem.hi <- function(obj) {
+  .predDf <- obj$predDf
+  .ini <- .as.data.frame(obj$ini)
+  .ini <- .ini[!is.na(.ini$err), ]
+  return(sapply(.predDf$cond, function(x) {
+    .tmp <- .ini[which(.ini$condition == x), ]
+    .w <- which(.tmp$err == "logitNorm")
+    if (length(.w) == 1L) {
+      return(.tmp$trHi[.w])
+    }
+    .w <- which(.tmp$err == "probitNorm")
+    if (length(.w) == 1L) {
+      return(.tmp$trHi[.w])
+    }
+    return(Inf);
+  }))
 }
 
 ##' Get the TBS yj for SAEM
@@ -3664,6 +3717,10 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.saem.log.eta(obj))
   } else if (arg == "saem.yj") {
     return(nlmixrUI.saem.yj(obj))
+  } else if (arg == "saem.hi") {
+    return(nlmixrUI.saem.hi(obj))
+  } else if (arg == "saem.low") {
+    return(nlmixrUI.saem.low(obj))
   } else if (arg == "saem.lambda") {
     return(nlmixrUI.saem.lambda(obj))
   } else if (arg == "saem.fit") {

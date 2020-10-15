@@ -28,6 +28,8 @@ nlmixrBoundsTemplate <-
     label = NA_character_,
     backTransform = "",
     condition = NA_character_,
+    trLow= -Inf,
+    trHi=Inf,
     stringsAsFactors = FALSE
   )
 

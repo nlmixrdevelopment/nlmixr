@@ -479,6 +479,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     .cfg$cres <- uif$saem.cres
     .cfg$yj   <- uif$saem.yj
     .cfg$lres <- uif$saem.lambda
+    .cfg$low  <- uif$saem.low
+    .cfg$hi   <- uif$saem.hi
     .fit <- model$saem_mod(.cfg)
     .ret <-
       try(
