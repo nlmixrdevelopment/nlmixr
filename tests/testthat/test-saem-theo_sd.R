@@ -57,6 +57,9 @@ nlmixrTest({
       .lnorm <- FALSE
       .logitNorm <- FALSE
       .probitNorm <- FALSE
+      .trans <- FALSE
+      .propT <- FALSE
+      .powT <- FALSE
       if (.cur["add"] == "add") {
         .mod <- c(.mod, "add(add.sd)")
         .est <- c(.est, c(add.sd=0.1))
@@ -68,11 +71,13 @@ nlmixrTest({
         .est <- c(.est, c(lnorm.sd=0.1))
         .doIt <- TRUE
         .addProp <- 1
+        .trans <- TRUE
         .lnorm <- TRUE
       }
       if (.cur["add"] == "logitNorm") {
         .mod <- c(.mod, "logitNorm(logit.sd, -0.5, 14)")
         .est <- c(.est, c(logit.sd=0.1))
+        .trans <- TRUE
         .doIt <- TRUE
         .addProp <- 1
         .logitNorm <- TRUE
@@ -81,6 +86,7 @@ nlmixrTest({
         .mod <- c(.mod, "probitNorm(probit.sd, -0.5, 14)")
         .est <- c(.est, c(probit.sd=0.1))
         .doIt <- TRUE
+        .trans <- TRUE
         .addProp <- 1
         .probitNorm <- TRUE
       }
@@ -90,10 +96,24 @@ nlmixrTest({
         .doIt <- TRUE
         if (.addProp == 1) .addProp <- 2
       }
+      if (.cur["prop"] == "propT") {
+        .mod <- c(.mod, "propT(prop.sd)")
+        .est <- c(.est, c(prop.sd=0.1))
+        .doIt <- TRUE
+        .propT <- TRUE
+        if (.addProp == 1) .addProp <- 2
+      }
       if (.cur["prop"] == "pow") {
         .mod <- c(.mod, "pow(pow.sd, pw)")
         .est <- c(.est, c(pow.sd=0.1, pw=1))
         .doIt <- TRUE
+        if (.addProp == 1) .addProp <- 2
+      }
+      if (.cur["prop"] == "powT") {
+        .mod <- c(.mod, "powT(pow.sd, pw)")
+        .est <- c(.est, c(pow.sd=0.1, pw=1))
+        .doIt <- TRUE
+        .powT <- TRUE
         if (.addProp == 1) .addProp <- 2
       }
       if (.cur["tbs"] != "") {
@@ -101,12 +121,15 @@ nlmixrTest({
         .est <- c(.est, c(lambda=1))
         if (.lnorm){
           .doIt <- FALSE
-        }
-        if (.logitNorm & .cur["tbs"] == "boxCox") {
+        } else if ((.logitNorm | .probitNorm) & .cur["tbs"] == "boxCox") {
           .doIt <- FALSE
         }
+        .trans <- TRUE
       }
       if (.addProp <= 1 & .cur["addProp"] == "combined1") {
+        .doIt <- FALSE
+      }
+      if (.doIt && !(.trans) && (.propT || .powT)) {
         .doIt <- FALSE
       }
       if (.doIt) {
@@ -133,12 +156,15 @@ nlmixrTest({
     ## tot <- 250
     tot <- 15
 
-    ops <- expand.grid(add=c("", "add", "lnorm", "logitNorm", "probitNorm"), prop=c("", "prop", "pow"),
+    ops <- expand.grid(add=c("", "add", "lnorm", "logitNorm", "probitNorm"), prop=c("", "prop", "pow", "powT", "propT"),
                        tbs=c("", "yeoJohnson", "boxCox"), addProp=c("combined1", "combined2"),
                        stringsAsFactors = FALSE)
     ops$id <- seq_along(ops$add)
 
     .nm <- c("objf", "tka", "tcl", "tv", "lnorm.sd", "logit.sd","probit.sd", "add.sd", "pow.sd", "pw", "lambda")
+
+    ## estVal(117)
+
 
     v <- suppressWarnings(lapply(seq_along(ops$add), estVal))
 
@@ -151,7 +177,7 @@ nlmixrTest({
       val[, .n] <- round(val[[.n]], 2)
     }
 
-    saveRDS(val, file="test-saem-theo_sd.rds")
+    ## saveRDS(val, file="test-saem-theo_sd.rds")
 
     expect_equal(val, readRDS("test-saem-theo_sd.rds"))
 

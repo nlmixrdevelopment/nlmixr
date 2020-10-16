@@ -764,7 +764,7 @@ double likInner0(double *eta, int id){
       int k = 0;//ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
       fInd->llik=0.0;
       fInd->tbsLik=0.0;
-      double f, err, r, fpm, rp = 0,lnr, limit, dv;
+      double f, err, r, fpm, rp = 0,lnr, limit, dv, w;
       int cens;
       int oldNeq = op->neq;
       iniSubjectI(op->neq, 1, ind, op, rx, rxInner.update_inis);
@@ -808,6 +808,9 @@ double likInner0(double *eta, int id){
 	  r = ind->lhs[op_focei.neta + 1];
 	  if (r == 0.0) {
 	    r = 1.0;
+	  }
+	  if (r > 1e300) {
+	    r = 1e300;
 	  }
 	  if (op_focei.neta == 0) {
 	    lnr =log(r);

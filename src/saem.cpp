@@ -57,7 +57,7 @@ int _saemPropT=0;
 void obj(double *ab, double *fx) {
   int i;
   double g, sum, cur, fa;
-  double xmin = 1.0e-200, ft, ytr;
+  double xmin = 1.0e-200, xmax=1e300, ft, ytr;
   double ab02 = ab[0];
   double ab12 = ab[1];
   ab02 = ab02*ab02;
@@ -75,6 +75,7 @@ void obj(double *ab, double *fx) {
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
+    if (g > xmax) g = xmax;
     cur = (ytr-ft)/g;
     sum += cur*cur + 2*log(g);
   }
@@ -85,7 +86,7 @@ void obj(double *ab, double *fx) {
 void objC(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr, fa;
-  double xmin = 1.0e-200;
+  double xmin = 1.0e-200, xmax = 1e300;
   double pw = toPow(ab[2]);
   for (i=0, sum=0; i<_saemLen; ++i) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
@@ -102,6 +103,7 @@ void objC(double *ab, double *fx) {
       g = ab02*ab02 + ab12*ab12*pow(fa, 2*pw);
     }
     if (g < xmin) g = xmin;
+    if (g > xmax) g = xmax;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
   }
@@ -112,7 +114,7 @@ void objC(double *ab, double *fx) {
 void objD(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr;
-  double xmin = 1.0e-200;
+  double xmin = 1.0e-200, xmax = 1e300;
   double pw = toPow(ab[1]);
   double fa;
   for (i=0, sum=0; i<_saemLen; ++i) {
@@ -122,6 +124,7 @@ void objD(double *ab, double *fx) {
     fa = (_saemPropT ? ft : _saemFptr[i]) ;
     g = ab[0]*ab[0]*pow(fa, pw);
     if (g < xmin) g = xmin;
+    if (g > xmax) g = xmax;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
   }
@@ -132,7 +135,7 @@ void objD(double *ab, double *fx) {
 void objE(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr;
-  double xmin = 1.0e-200;
+  double xmin = 1.0e-200, xmax = 1e300;
   double lambda = toLambda(ab[1]);
   for (i=0, sum=0; i<_saemLen; ++i) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
@@ -140,6 +143,7 @@ void objE(double *ab, double *fx) {
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
     g = ab[0]*ab[0];
     if (g < xmin) g = xmin;
+    if (g > xmax) g = xmax;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
   }
@@ -150,7 +154,7 @@ void objE(double *ab, double *fx) {
 void objF(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr, fa;
-  double xmin = 1.0e-200;
+  double xmin = 1.0e-200, xmax = 1e300;
   double lambda = toLambda(ab[1]);
   for (i=0, sum=0; i<_saemLen; ++i) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
@@ -160,6 +164,7 @@ void objF(double *ab, double *fx) {
     g = ab[0]*ab[0]*fa;
     if (g == 0) g = 1;
     if (g < xmin) g = xmin;
+    if (g > xmax) g = xmax;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
   }
@@ -170,7 +175,7 @@ void objF(double *ab, double *fx) {
 void objG(double *ab, double *fx) {
   int i;
   double g, sum, cur, ft, ytr, fa;
-  double xmin = 1.0e-200;
+  double xmin = 1.0e-200, xmax = 1e300;
   double lambda = toLambda(ab[2]);
   double pw = toPow(ab[1]);
   for (i=0, sum=0; i<_saemLen; ++i) {
@@ -181,6 +186,7 @@ void objG(double *ab, double *fx) {
     g = ab[0]*ab[0]*pow(fa, pw);
     if (g == 0) g = 1.0;
     if (g < xmin) g = xmin;
+    if (g > xmax) g = xmax;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
   }
@@ -191,7 +197,7 @@ void objG(double *ab, double *fx) {
 void objH(double *ab, double *fx) {
   int i;
   double g, sum, cur, fa;
-  double xmin = 1.0e-200, ft, ytr;
+  double xmin = 1.0e-200, xmax = 1e300, ft, ytr;
   double lambda = toLambda(ab[2]);
   for (i=0, sum=0; i<_saemLen; ++i) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
@@ -208,6 +214,7 @@ void objH(double *ab, double *fx) {
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
+    if (g > xmax) g = xmax;
     cur = (ytr-ft)/g;
     sum += cur*cur + 2*log(g);
   }
@@ -218,7 +225,7 @@ void objH(double *ab, double *fx) {
 void objI(double *ab, double *fx) {
   int i;
   double g, sum, cur, fa;
-  double xmin = 1.0e-200, ft, ytr;
+  double xmin = 1.0e-200, xmax = 1e300, ft, ytr;
   double lambda = toLambda(ab[3]);
   double pw = toPow(ab[2]);
   for (i=0, sum=0; i<_saemLen; ++i) {
@@ -226,9 +233,6 @@ void objI(double *ab, double *fx) {
     ft = _powerD(_saemFptr[i],  lambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
     fa = (_saemPropT ? ft : _saemFptr[i]) ;
-
-    // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
-    // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
     if (addProp == 1) {
       g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fa, pw);
     } else {
@@ -238,6 +242,7 @@ void objI(double *ab, double *fx) {
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
+    if (g > xmax) g = xmax;
     cur = (ytr-ft)/g;
     sum += cur*cur + 2*log(g);
   }
@@ -543,6 +548,7 @@ public:
   void saem_fit() {
     //arma_rng::set_seed(99);
     double double_xmin = 1.0e-200;                               //FIXME hard-coded xmin, also in neldermean.hpp
+    double xmax = 1e300;
     ofstream phiFile;
     phiFile.open(phiMFile[0].c_str());
 
@@ -597,6 +603,7 @@ public:
 	vec g = vecares + vecbres % abs(f);                          //make sure g > 0
 	g.elem( find( g == 0.0) ).fill(1.0); // like Uppusla IWRES allows prop when f=0
 	g.elem( find( g < double_xmin) ).fill(double_xmin);
+	g.elem( find(g > xmax)).fill(xmax);
 
 	DYF(indioM)=0.5*(((yt-ft)/g)%((yt-ft)/g)) + log(g);
       } else if (distribution == 2){
@@ -688,6 +695,7 @@ public:
 	      fa = (propT(b) == 0.0 ? f_cur[i] : ft);
 	      if (fa == 0.0) fa = 1.0;
 	      if (fa < double_xmin) fa = double_xmin;
+	      if (fa > xmax) fa = xmax;
 	      resid(i) = resid(i)/fa;
 	    }
 	  }
@@ -1255,7 +1263,7 @@ private:
     vec gc;
     uvec i=mphi.i;
     double double_xmin = 1.0e-200;                               //FIXME hard-coded xmin, also in neldermean.hpp
-
+    double xmax = 1e300;
     for (int u=0; u<nu; u++)
       for (int k1=0; k1<mphi.nphi; k1++) {
 	mat phiMc=phiM;
@@ -1279,6 +1287,7 @@ private:
 	gc = vecares + vecbres % abs(fs);                            //make sure gc > 0
 	gc.elem( find( gc == 0.0) ).fill(1);
 	gc.elem( find( gc < double_xmin) ).fill(double_xmin);
+	gc.elem( find( gc > xmax) ).fill(xmax);
 	if (distribution == 1) DYF(mx.indioM)=0.5*(((yt-fc)/gc)%((yt-fc)/gc))+log(gc);
 	else if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
 	else if (distribution == 3) DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
