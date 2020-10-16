@@ -1680,9 +1680,9 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
             }
             return(x)
           } else if (is.pairlist(x)) {
-            return(lapply(x, find.log))
+            return(lapply(x, find.logit))
           } else if (is.call(x)) {
-            return(lapply(x, find.log))
+            return(lapply(x, find.logit))
           } else {
             stop("Don't know how to handle type ", typeof(x),
               call. = FALSE
