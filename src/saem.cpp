@@ -686,7 +686,7 @@ public:
 	  for (int i = y_cur.size(); i--;){
 	    // lambda(cur), yj(cur), low(cur), hi(cur)
 	    resid(i) = _powerD(y_cur[i], lambda(b), (int)yj(b), low(b), hi(b));
-	    if (isnan(resid(i))) {
+	    if (std::isnan(resid(i))) {
 	      Rcpp::stop(_("NaN in data or transformed data; please check transformation/data"));
 	    }
 	    ft = _powerD(f_cur[i], lambda(b), (int)yj(b), low(b), hi(b));
@@ -1053,7 +1053,7 @@ public:
 	}
 	sigma2[b] = sig2;                                          //CHK: sigma2[] use
 	if (sigma2[b]>1.0e99) sigma2[b] = 1.0e99;
-	if (isnan(sigma2[b])) sigma2[b] = 1.0e99;
+	if (std::isnan(sigma2[b])) sigma2[b] = 1.0e99;
       }
       vecares = ares(ix_endpnt);
       vecbres = bres(ix_endpnt);
