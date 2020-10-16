@@ -787,7 +787,7 @@ focei.theta.saemFit <- function(object, uif, ...) {
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 2]
     }
-    .w <- which(sapply(.tmp$err, function(x) any(x == c("pow2", "pow2T"))))
+    .w <- which(sapply(.tmp$err, function(x) any(x == c("pow2", "powT2"))))
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 3]
     }
