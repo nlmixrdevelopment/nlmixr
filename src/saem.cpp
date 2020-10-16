@@ -44,6 +44,7 @@ double *_saemStart;
 double *_saemStep;
 double _saemLambdaR;
 double _saemPowR;
+int _saemPropT=0;
 
 #define toLambda(x) _powerDi(x, 1.0, 4, -_saemLambdaR, _saemLambdaR)
 #define toLambdaEst(x) _powerD((x < -0.99*_saemLambdaR ? -0.99*_saemLambdaR : (x > 0.99*_saemLambdaR ? 0.99*_saemLambdaR : x)), 1.0, 4, -_saemLambdaR, _saemLambdaR)
@@ -55,7 +56,7 @@ double _saemPowR;
 // add+prop
 void obj(double *ab, double *fx) {
   int i;
-  double g, sum, cur;
+  double g, sum, cur, fa;
   double xmin = 1.0e-200, ft, ytr;
   double ab02 = ab[0];
   double ab12 = ab[1];
@@ -67,10 +68,10 @@ void obj(double *ab, double *fx) {
     ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
+    fa = (_saemPropT ? ft : _saemFptr[i]) ;
     if (addProp == 1) {
-      g = ab02 + ab12*fabs(_saemFptr[i]);
+      g = ab02 + ab12*fa;
     } else {
-      double fa = fabs(_saemFptr[i]);
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
@@ -83,7 +84,7 @@ void obj(double *ab, double *fx) {
 // add + pow
 void objC(double *ab, double *fx) {
   int i;
-  double g, sum, cur, ft, ytr;
+  double g, sum, cur, ft, ytr, fa;
   double xmin = 1.0e-200;
   double pw = toPow(ab[2]);
   for (i=0, sum=0; i<_saemLen; ++i) {
@@ -92,12 +93,13 @@ void objC(double *ab, double *fx) {
     ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
+    fa = (_saemPropT ? ft : _saemFptr[i]) ;
     if (addProp == 1){
-      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fabs(_saemFptr[i]), pw);
+      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fa, pw);
     } else {
       double ab02 = ab[0]*ab[0];
       double ab12 = ab[1]*ab[1];
-      g = ab02*ab02 + ab12*ab12*pow(fabs(_saemFptr[i]), 2*pw);
+      g = ab02*ab02 + ab12*ab12*pow(fa, 2*pw);
     }
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
@@ -112,11 +114,13 @@ void objD(double *ab, double *fx) {
   double g, sum, cur, ft, ytr;
   double xmin = 1.0e-200;
   double pw = toPow(ab[1]);
+  double fa;
   for (i=0, sum=0; i<_saemLen; ++i) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
     ft = _powerD(_saemFptr[i],  _saemLambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
-    g = ab[0]*ab[0]*pow(fabs(_saemFptr[i]), pw);
+    fa = (_saemPropT ? ft : _saemFptr[i]) ;
+    g = ab[0]*ab[0]*pow(fa, pw);
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
     sum += cur * cur + 2*log(g);
@@ -145,14 +149,15 @@ void objE(double *ab, double *fx) {
 // prop+_saemLambda only
 void objF(double *ab, double *fx) {
   int i;
-  double g, sum, cur, ft, ytr;
+  double g, sum, cur, ft, ytr, fa;
   double xmin = 1.0e-200;
   double lambda = toLambda(ab[1]);
   for (i=0, sum=0; i<_saemLen; ++i) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
     ft = _powerD(_saemFptr[i],  lambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
-    g = ab[0]*ab[0]*fabs(_saemFptr[i]);
+    fa = (_saemPropT ? ft : _saemFptr[i]) ;
+    g = ab[0]*ab[0]*fa;
     if (g == 0) g = 1;
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
@@ -164,7 +169,7 @@ void objF(double *ab, double *fx) {
 // pow+_saemLambda only
 void objG(double *ab, double *fx) {
   int i;
-  double g, sum, cur, ft, ytr;
+  double g, sum, cur, ft, ytr, fa;
   double xmin = 1.0e-200;
   double lambda = toLambda(ab[2]);
   double pw = toPow(ab[1]);
@@ -172,7 +177,8 @@ void objG(double *ab, double *fx) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
     ft = _powerD(_saemFptr[i],  lambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
-    g = ab[0]*ab[0]*pow(fabs(_saemFptr[i]), pw);
+    fa = (_saemPropT ? ft : _saemFptr[i]) ;
+    g = ab[0]*ab[0]*pow(fa, pw);
     if (g == 0) g = 1.0;
     if (g < xmin) g = xmin;
     cur = (ytr-ft)/g;
@@ -184,7 +190,7 @@ void objG(double *ab, double *fx) {
 // add + prop + _saemLambda
 void objH(double *ab, double *fx) {
   int i;
-  double g, sum, cur;
+  double g, sum, cur, fa;
   double xmin = 1.0e-200, ft, ytr;
   double lambda = toLambda(ab[2]);
   for (i=0, sum=0; i<_saemLen; ++i) {
@@ -193,12 +199,12 @@ void objH(double *ab, double *fx) {
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
+    fa = (_saemPropT ? ft : _saemFptr[i]) ;
     if (addProp == 1) {
-      g = ab[0]*ab[0] + ab[1]*ab[1]*fabs(_saemFptr[i]);
+      g = ab[0]*ab[0] + ab[1]*ab[1]*fa;
     } else {
       double ab02 = ab[0]*ab[0];
       double ab12 = ab[1]*ab[1];
-      double fa = fabs(_saemFptr[i]);
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
@@ -211,7 +217,7 @@ void objH(double *ab, double *fx) {
 // add + pow + _saemLambda
 void objI(double *ab, double *fx) {
   int i;
-  double g, sum, cur;
+  double g, sum, cur, fa;
   double xmin = 1.0e-200, ft, ytr;
   double lambda = toLambda(ab[3]);
   double pw = toPow(ab[2]);
@@ -219,14 +225,16 @@ void objI(double *ab, double *fx) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
     ft = _powerD(_saemFptr[i],  lambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
+    fa = (_saemPropT ? ft : _saemFptr[i]) ;
+
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
     if (addProp == 1) {
-      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fabs(_saemFptr[i]), pw);
+      g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fa, pw);
     } else {
       double ab02 = ab[0]*ab[0];
       double ab12 = ab[1]*ab[1];
-      double fa = pow(fabs(_saemFptr[i]), pw);
+      double fa = pow(fa, pw);
       g = sqrt(ab02*ab02 + ab12*ab12*fa*fa);
     }
     if (g < xmin) g = xmin;
@@ -479,6 +487,7 @@ public:
     cres = as<vec>(x["cres"]);
     lres = as<vec>(x["lres"]);
     yj = as<vec>(x["yj"]);
+    propT=as<vec>(x["propT"]);
     // REprintf("yj\n");
     // Rcpp::print(Rcpp::wrap(yj));
     lambda = as<vec>(x["lambda"]);
@@ -661,7 +670,7 @@ public:
 	fsM = join_cols(fsM, fk);
 	// vec resid_all(ys.size());// = ys - fk;
 	vec gk, y_cur, f_cur;
-
+	double ft, fa;
 	//loop thru endpoints here
 	for(int b=0; b<nendpnt; ++b) {
 	  y_cur = ys(span(y_offset(b), y_offset(b+1)-1));
@@ -673,15 +682,23 @@ public:
 	    if (isnan(resid(i))) {
 	      Rcpp::stop(_("NaN in data or transformed data; please check transformation/data"));
 	    }
-	    resid(i) -=  _powerD(f_cur[i], lambda(b), (int)yj(b), low(b), hi(b));
+	    ft = _powerD(f_cur[i], lambda(b), (int)yj(b), low(b), hi(b));
+	    resid(i) -=  ft;
+	    if (res_mod(b) == 2) {
+	      fa = (propT(b) == 0.0 ? f_cur[i] : ft);
+	      if (fa == 0.0) fa = 1.0;
+	      if (fa < double_xmin) fa = double_xmin;
+	      resid(i) = resid(i)/fa;
+	    }
 	  }
-	  if (res_mod(b)==2) {
-	    //double epsilon = std::numeric_limits<double>::epsilon();
-	    gk = abs(f_cur);            //CHK: range & chk resize & .memptr()
-	    gk.elem( find( gk == 0.0) ).fill(1.0);
-	    gk.elem( find( gk < double_xmin) ).fill(double_xmin);
-	    resid = resid/gk;
-	  }
+	  // if (res_mod(b)==2) {
+	  //   //double epsilon = std::numeric_limits<double>::epsilon();
+	  //   // Here could be transformed f
+	  //   gk = abs(f_cur);            //CHK: range & chk resize & .memptr()
+	  //   gk.elem( find( gk == 0.0) ).fill(1.0);
+	  //   gk.elem( find( gk < double_xmin) ).fill(double_xmin);
+	  //   resid = resid/gk;
+	  // }
 #if 0
 	  uvec iix = find(resid>1e9);
 	  Rcout << b << " " <<iix;
@@ -805,6 +822,7 @@ public:
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
 	  _saemYj   = (int)yj(b);
+	  _saemPropT = (int)propT(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -840,6 +858,7 @@ public:
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
 	  _saemYj   = (int)yj(b);
+	  _saemPropT = (int)propT(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -869,6 +888,7 @@ public:
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
 	  _saemYj   = (int)yj(b);
+	  _saemPropT = (int)propT(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -896,6 +916,7 @@ public:
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
 	  _saemYj   = (int)yj(b);
+	  _saemPropT = (int)propT(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -923,6 +944,7 @@ public:
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
 	  _saemYj   = (int)yj(b);
+	  _saemPropT = (int)propT(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -950,6 +972,7 @@ public:
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
 	  _saemYj   = (int)yj(b);
+	  _saemPropT = (int)propT(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -978,6 +1001,7 @@ public:
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
 	  _saemYj   = (int)yj(b);
+	  _saemPropT = (int)propT(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -1006,6 +1030,7 @@ public:
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
 	  _saemYj   = (int)yj(b);
+	  _saemPropT = (int)propT(b);
 	  _saemLambda = lambda(b);
 	  _saemLow = low(b);
 	  _saemHi = hi(b);
@@ -1149,7 +1174,7 @@ private:
   mat statphi01, statphi02, statphi11, statphi12;
   double statrese[MAXENDPNT];
   double sigma2[MAXENDPNT];
-  vec ares, bres, cres, lres, yj, lambda, low, hi;
+  vec ares, bres, cres, lres, yj, lambda, low, hi, propT;
   vec vecares, vecbres, veccres, veclres;
   vec res_mod;
 

@@ -573,6 +573,7 @@ configsaem <- function(model, data, inits,
   cfg$cres <- rep(1, cfg$nendpnt)
   cfg$lres <- rep(1, cfg$nendpnt)
   cfg$yj <- rep(2L, cfg$nendpnt)
+  cfg$propT <- rep(0L, cfg$nendpnt)
   cfg$lambda <- rep(1.0, cfg$nendpnt)
   cfg$low <- rep(0.0, cfg$nendpnt)
   cfg$hi <- rep(1.0, cfg$nendpnt)
@@ -782,11 +783,11 @@ focei.theta.saemFit <- function(object, uif, ...) {
   sapply(seq_along(.predDf$cond), function(i) {
     x <- paste(.predDf$cond[i])
     .tmp <- .ini[which(.ini$condition == x), ]
-    .w <- which(sapply(.tmp$err, function(x) any(x == c("prop", "pow"))))
+    .w <- which(sapply(.tmp$err, function(x) any(x == c("prop", "propT", "pow", "powT"))))
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 2]
     }
-    .w <- which(sapply(.tmp$err, function(x) any(x == c("pow2"))))
+    .w <- which(sapply(.tmp$err, function(x) any(x == c("pow2", "pow2T"))))
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 3]
     }
@@ -804,7 +805,6 @@ focei.theta.saemFit <- function(object, uif, ...) {
     if (length(.w) == 1) {
       thetas[paste(.tmp$name[.w])] <- .resMat[i, 1]
     }
-
     .w <- which(sapply(.tmp$err, function(x) {
       any(x == c("boxCox", "yeoJohnson"))
     }))

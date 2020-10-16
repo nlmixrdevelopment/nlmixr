@@ -910,7 +910,9 @@ dists <- list(
   "norm" = 1,
   "dnorm" = 1,
   "prop" = 1,
+  "propT" = 1,
   "pow" = 2,
+  "powT" = 2,
   "tbs" = 1,
   "boxCox" = 1,
   "tbsYj" = 1,
@@ -923,7 +925,7 @@ dists <- list(
   "dlnorm" = 1
 )
 
-distsPositive <- c("add", "norm", "dnorm", "prop", "pow", "logn", "dlogn", "lnorm", "dlnorm", "logitNorm", "probitNorm")
+distsPositive <- c("add", "norm", "dnorm", "prop", "propT", "pow", "powT", "logn", "dlogn", "lnorm", "dlnorm", "logitNorm", "probitNorm")
 
 allVars <- function(x) {
   defined <- character()
@@ -1054,7 +1056,7 @@ unsupported.dists <- c(
   ## for testing...
   "nlmixrDist"
 )
-add.dists <- c("add", "prop", "norm", "pow", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj", "boxCox", "yeoJohnson", "logitNorm", "probitNorm")
+add.dists <- c("add", "prop", "propT", "norm", "pow", "powT", "dnorm", "logn", "lnorm", "dlnorm", "tbs", "tbsYj", "boxCox", "yeoJohnson", "logitNorm", "probitNorm")
 nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   .md5 <- digest::digest(list(
     .deparse1(body(fun)), .deparse(ini), .deparse(bigmodel),
@@ -1369,13 +1371,13 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       if ((any(paste(tmp$err) == "add") || any(paste(tmp$err) == "norm") || any(paste(tmp$err) == "dnorm") ||
         any(paste(tmp$err) == "lnorm") || any(paste(tmp$err) == "dlnorm") || any(paste(tmp$err) == "logn") ||
         any(paste(tmp$err) == "dlogn")) &&
-        any(paste(tmp$err) == "prop")) {
+        (any(paste(tmp$err) == "prop") || any(paste(tmp$err) == "propT"))) {
         .assign("errn", errn + 1, this.env)
         .assign("add.prop.errs", rbind(
           add.prop.errs,
           .data.frame(y = sprintf("Y%02d", errn), add = TRUE, prop = TRUE)
         ), this.env)
-      } else if (any(paste(tmp$err) == "prop")) {
+      } else if ((any(paste(tmp$err) == "prop") || any(paste(tmp$err) == "propT"))) {
         .assign("errn", errn + 1, this.env)
         .assign("add.prop.errs", rbind(
           add.prop.errs,
@@ -1427,7 +1429,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
           any(paste(tmp$err) == "dlnorm") ||
           any(paste(tmp$err) == "logn") ||
           any(paste(tmp$err) == "dlogn")
-        ) && any(paste(tmp$err) == "prop")) {
+        ) && (any(paste(tmp$err) == "prop") || any(paste(tmp$err) == "propT"))) {
           .assign("errn", errn + 1, this.env)
           .assign("add.prop.errs", rbind(
             add.prop.errs,
@@ -1491,7 +1493,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
           any(paste(tmp$err) == "dlnorm") ||
           any(paste(tmp$err) == "logn") ||
           any(paste(tmp$err) == "dlogn")
-        ) && any(paste(tmp$err) == "prop")) {
+        ) && (any(paste(tmp$err) == "prop") || any(paste(tmp$err) == "propT"))) {
           .assign("errn", errn + 1, this.env)
           .assign("add.prop.errs", rbind(
             add.prop.errs,
@@ -2890,7 +2892,7 @@ nlmixrUI.saem.distribution <- function(obj) {
   if (any(.df %in% c("dlnorm", "lnorm", "logn", "dlogn", "logitNorm", "probitNorm"))) {
     return("normal")
   }
-  if (any(.df %in% c("dnorm", "norm", "prop", "add", "pow", "pow2"))) {
+  if (any(.df %in% c("dnorm", "norm", "prop", "propT", "add", "pow", "powT", "pow2", "powT2"))) {
     return("normal")
   }
 
@@ -3046,6 +3048,23 @@ nlmixrUI.saem.hi <- function(obj) {
   }))
 }
 
+nlmixrUI.saem.propT <- function(obj) {
+  if (any(obj$saem.distribution == c("poisson", "binomial"))) {
+    return(0L)
+  }
+  .predDf <- obj$predDf
+  .ini <- .as.data.frame(obj$ini)
+  .ini <- .ini[!is.na(.ini$err), ]
+  return(sapply(.predDf$cond, function(x) {
+    .tmp <- .ini[which(.ini$condition == x), ]
+    if (any(.tmp$err == "propT") | any(.tmp$err == "powT")) {
+      return(1L)
+    } else {
+      return(0L)
+    }
+  }))
+}
+
 ##' Get the TBS yj for SAEM
 nlmixrUI.saem.yj <- function(obj) {
   ## yj is for the number of endpoints in the nlmir model
@@ -3137,8 +3156,8 @@ nlmixrUI.saem.res.mod <- function(obj) {
       }
     }
     .hasAdd <- .hasAdd0 | .hasLog | .hasLogit | .hasProbit
-    .hasProp <- any(.tmp$err == "prop")
-    .hasPow <- any(.tmp$err == "pow")
+    .hasProp <- any(.tmp$err == "prop") | any(.tmp$err == "propT")
+    .hasPow <- any(.tmp$err == "pow") | any(.tmp$err == "powT")
     .boxCox <- which(.tmp$err == "boxCox")
     .hasLambda <- FALSE
     if (length(.boxCox) == 1L){
@@ -3206,7 +3225,7 @@ nlmixrUI.saem.res.name <- function(obj) {
       ret[length(ret) + 1] <- paste(obj$name[w])
     }
   }
-  w <- which(obj$err == "prop")
+  w <- c(which(obj$err == "prop"), which(obj$err == "propT"))
   if (length(w) == 1) {
     ret[length(ret) + 1] <- paste(obj$name[w])
   }
@@ -3250,11 +3269,11 @@ nlmixrUI.saem.bres <- function(obj) {
   .ini <- .ini[!is.na(.ini$err), ]
   return(sapply(.predDf$cond, function(x) {
     .tmp <- .ini[which(.ini$condition == x), ]
-    .w <- which(sapply(.tmp$err, function(x) any(x == "prop")))
+    .w <- which(sapply(.tmp$err, function(x) (any(x == "prop") || any(x == "propT"))))
     if (length(.w) == 1) {
       return(.tmp$est[.w])
     } else {
-      .w <- which(sapply(.tmp$err, function(x) any(x == "pow")))
+      .w <- which(sapply(.tmp$err, function(x) (any(x == "pow") || any(x == "powT")) ))
       if (length(.w) == 1) {
         return(.tmp$est[.w])
       } else {
@@ -3275,7 +3294,7 @@ nlmixrUI.saem.cres <- function(obj) {
   .ini <- .ini[!is.na(.ini$err), ]
   return(sapply(.predDf$cond, function(x) {
     .tmp <- .ini[which(.ini$condition == x), ]
-    .w <- which(sapply(.tmp$err, function(x) any(x == "pow2")))
+    .w <- which(sapply(.tmp$err, function(x) (any(x == "pow2") || any(x == "powT2"))))
     if (length(.w) == 1) {
       return(.tmp$est[.w])
     } else {
@@ -3748,6 +3767,8 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.saem.log.eta(obj))
   } else if (arg == "saem.yj") {
     return(nlmixrUI.saem.yj(obj))
+  } else if (arg == "saem.propT"){
+    return(nlmixrUI.saem.propT(obj))
   } else if (arg == "saem.hi") {
     return(nlmixrUI.saem.hi(obj))
   } else if (arg == "saem.low") {
