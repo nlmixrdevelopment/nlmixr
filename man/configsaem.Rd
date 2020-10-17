@@ -16,7 +16,12 @@ configsaem(
   seed = 99,
   fixed = NULL,
   DEBUG = 0,
-  normal = c("rnorm", "vandercorput")
+  normal = c("rnorm", "vandercorput"),
+  tol = 1e-04,
+  itmax = 100L,
+  type = c("nelder–mead", "newuoa"),
+  lambdaRange = 3,
+  powRange = 10
 )
 }
 \arguments{
@@ -36,15 +41,34 @@ configsaem(
   two forms of additive+proportional errors supported by
   monolix/nonmem:
 
-combined1: transform(y)=transform(f)+(a+b*abs(f)^c)*eps
+combined1: transform(y)=transform(f)+(a+b*f^c)*eps
 
-combined2: transform(y)=transform(f)+(a^2+b^2*abs(f)^(2c))*eps}
+combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
 
 \item{seed}{seed for random number generator}
 
 \item{fixed}{a character vector of fixed effect only parameters (no random effects attached) to be fixed}
 
 \item{DEBUG}{Integer determining if debugging is enabled.}
+
+\item{normal}{The type of random normal generator used for SAEM:
+
+\itemize{
+
+\item "\code{rnorm}" R's random number generator (default)
+
+\item "\code{vandercorput}" low-discrepancy sequence transformed
+to a normal random variable to cover the domain better (may be
+better than a truly random sequence)
+
+}}
+
+\item{tol}{This is the tolerance for the regression models used
+for complex residual errors (ie add+prop etc)}
+
+\item{itmax}{This is the maximum number of iterations for the
+regression models used for complex residual errors.  The number
+of iterations is itmax*number of parameters}
 }
 \description{
 Configure an SAEM model by generating an input list to the SAEM model function

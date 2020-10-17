@@ -15,6 +15,16 @@ RxODE::logit
 ##' @export
 RxODE::expit
 
+
+##' @importFrom RxODE probit
+##' @export
+RxODE::probit
+
+##' @importFrom RxODE probitInv
+##' @export
+RxODE::probitInv
+
+
 ##' @importFrom RxODE rxSolve
 ##' @export
 RxODE::rxSolve

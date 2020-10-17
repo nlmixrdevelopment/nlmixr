@@ -1178,10 +1178,16 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   logit.theta <- c()
   logit.theta.low <- c()
   logit.theta.hi <- c()
+  probit.theta <- c()
+  probit.theta.low <- c()
+  probit.theta.hi <- c()
   log.eta <- c()
   logit.eta <- c()
   logit.eta.low <- c()
   logit.eta.hi <- c()
+  probit.eta <- c()
+  probit.eta.low <- c()
+  probit.eta.hi <- c()
   this.env <- environment()
   if (!is.null(ini)) {
     unnamed.thetas <- ini$ntheta[(!is.na(ini$ntheta) & is.na(ini$name))]
@@ -1638,6 +1644,61 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       } else if (identical(x[[1]], quote(`<-`)) && do.pred == 4) {
         ## SAEM requires = instead of <-
         x[[1]] <- quote(`=`)
+        return(as.call(lapply(x, f)))
+      } else if (identical(x[[1]], quote(`probitInv`)) && any(do.pred == c(4, 5))) {
+        .low <- 0
+        .hi <- 1
+        if (length(x) >= 3) {
+          .tmp <- try(eval(x[[3]]), silent=TRUE)
+          if (inherits(.tmp, "numeric")) {
+            .low <- .tmp
+          } else {
+            .low <- NA_real_
+          }
+          if (length(x) >= 4) {
+            .tmp <- try(eval(x[[4]]), silent=TRUE)
+            if (inherits(.tmp, "numeric")) {
+              .hi <- .tmp
+            } else {
+              .hi <- NA_real_
+            }
+          }
+        }
+        find.probit <- function(x) {
+          if (is.atomic(x) || is.name(x)) {
+            if (any.theta.names(as.character(x), theta.names)) {
+              .assign("probit.theta", unique(c(probit.theta, as.character(x))), this.env)
+              if (!(as.character(x) %in% names(probit.theta.hi))) {
+                .assign("probit.theta.hi", c(probit.theta.hi, setNames(.hi, as.character(x))), this.env)
+              }
+              if (!(as.character(x) %in% names(probit.theta.low))) {
+                .assign("probit.theta.low", c(probit.theta.low, setNames(.low, as.character(x))), this.env)
+              }
+            } else if (any.theta.names(as.character(x), eta.names)) {
+              .assign("probit.eta", unique(c(probit.eta, as.character(x))), this.env)
+              if (!(as.character(x) %in% names(probit.eta.hi))) {
+                .assign("probit.eta.hi", c(probit.eta.hi, setNames(.hi, as.character(x))), this.env)
+              }
+              if (!(as.character(x) %in% names(probit.eta.low))) {
+                .assign("probit.eta.low", c(probit.eta.low, setNames(.low, as.character(x))), this.env)
+              }
+            }
+            return(x)
+          } else if (is.pairlist(x)) {
+            return(lapply(x, find.probit))
+          } else if (is.call(x)) {
+            return(lapply(x, find.probit))
+          } else {
+            stop("Don't know how to handle type ", typeof(x),
+                 call. = FALSE
+                 )
+          }
+        }
+        find.probit(x[[2]])
+        if (length(x[[2]]) == 1 && any.theta.names(as.character(x[[2]]), theta.names)) {
+          tmp <- as.character(x[[2]])
+          .assign(".oneTheta",unique(c(.oneTheta, tmp)),this.env)
+        }
         return(as.call(lapply(x, f)))
       } else if (identical(x[[1]], quote(`expit`)) && any(do.pred == c(4, 5))) {
         .low <- 0
@@ -2603,6 +2664,8 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       oneTheta = .oneTheta, extra = .extra,
       logit.theta=logit.theta, logit.theta.hi=logit.theta.hi, logit.theta.low=logit.theta.low,
       logit.eta=logit.eta, logit.eta.hi=logit.eta.hi, logit.eta.low=logit.eta.low,
+      probit.theta=probit.theta, probit.theta.hi=probit.theta.hi, probit.theta.low=probit.theta.low,
+      probit.eta=probit.eta, probit.eta.hi=probit.eta.hi, probit.eta.low=probit.eta.low,
       saem.fun1=saem.fun0, focei.fun1=rest0, extra=paste0(.extra, ifelse(.extra == "", "", ";\n"), .dvid, ifelse(.dvid == "", "", ";\n")))
   )
   if (.linCmt) {
@@ -3689,6 +3752,32 @@ nlmixrUI.logitThetasListLow <- function(obj) {
        .low[.names[.thetaList[[2]]]])
 }
 
+
+nlmixrUI.probitThetasList <- function(obj) {
+  .ini <- .as.data.frame(obj$ini)
+  .probitThetas <- as.integer(which(setNames(sapply(obj$focei.names, function(x) any(x == obj$probit.theta)), NULL)))
+  .thetas <- .ini[!is.na(.ini$ntheta), ]
+  .one <- obj$oneTheta
+  .probitThetasF <- .thetas[.thetas$name %in% .one, "ntheta"]
+  .probitThetasF <- intersect(.probitThetas, .probitThetasF)
+  list(.probitThetas, .probitThetasF)
+}
+
+nlmixrUI.probitThetasListHi <- function(obj) {
+  .thetaList <- nlmixrUI.probitThetasList(obj)
+  .names <- obj$focei.names
+  .hi <- obj$probit.theta.hi
+  list(.hi[.names[.thetaList[[1]]]],
+       .hi[.names[.thetaList[[2]]]])
+}
+nlmixrUI.probitThetasListLow <- function(obj) {
+  .thetaList <- nlmixrUI.probitThetasList(obj)
+  .names <- obj$focei.names
+  .low <- obj$probit.theta.low
+  list(.low[.names[.thetaList[[1]]]],
+       .low[.names[.thetaList[[2]]]])
+}
+
 nlmixrUI.poped.ff_fun <- function(obj) {
   if (!is.null(obj$lin.solved)) {
     stop("Solved system not supported yet.")
@@ -3812,6 +3901,12 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.logitThetasListHi(obj))
   } else if (arg == "logitThetasList") {
     return(nlmixrUI.logitThetasList(obj))
+  } else if (arg == "probitThetasListLow") {
+    return(nlmixrUI.probitThetasListLow(obj))
+  } else if (arg == "probitThetasListHi") {
+    return(nlmixrUI.probitThetasListHi(obj))
+  } else if (arg == "probitThetasList") {
+    return(nlmixrUI.probitThetasList(obj))
   } else if (arg == "focei.rx1") {
     return(nlmixrUI.focei.rx1(obj))
   } else if (arg == "saem.rx1") {

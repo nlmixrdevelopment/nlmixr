@@ -28,6 +28,11 @@ saemControl(
   addProp = c("combined2", "combined1"),
   singleOde = TRUE,
   normal = c("rnorm", "vandercorput"),
+  tol = 1e-06,
+  itmax = 30,
+  type = c("nelder–mead", "newuoa"),
+  powRange = 10,
+  lambdaRange = 3,
   ...
 )
 }
@@ -136,14 +141,6 @@ during one call to the solver. (5000 by default)}
 should be adjusted to be closer to NONMEM's default objective
 function.  By default this is \code{TRUE}}
 
-\item{addProp}{one of "combined1" and "combined2"; These are the
-  two forms of additive+proportional errors supported by
-  monolix/nonmem:
-
-combined1: transform(y)=transform(f)+(a+b*abs(f)^c)*eps
-
-combined2: transform(y)=transform(f)+(a^2+b^2*abs(f)^(2c))*eps}
-
 \item{singleOde}{This option allows a single ode model to include
 the PK parameter information instead of splitting it into a
 function and a RxODE model}
@@ -159,6 +156,13 @@ to a normal random variable to cover the domain better (may be
 better than a truly random sequence)
 
 }}
+
+\item{tol}{This is the tolerance for the regression models used
+for complex residual errors (ie add+prop etc)}
+
+\item{itmax}{This is the maximum number of iterations for the
+regression models used for complex residual errors.  The number
+of iterations is itmax*number of parameters}
 
 \item{...}{Other arguments to control SAEM.}
 }

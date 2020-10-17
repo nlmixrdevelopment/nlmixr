@@ -49,10 +49,8 @@
 using namespace Rcpp;
 using namespace arma;
 
-double expit(double alpha, double low, double high) {
-  double p = 1/(1+exp(-alpha));
-  return (high-low)*p+low;
-}
+#define expit(alpha, low, high) _powerDi(alpha, 1.0, 4, low, high)
+#define probitInv(alpha, low, high) _powerDi(alpha, 1.0, 6, low, high)
 
 extern "C"{
   void RSprintf(const char *format, ...);
@@ -5167,7 +5165,7 @@ void foceiFinalizeTables(Environment e){
   NumericVector cv(theta.size());
   std::fill_n(&se[0], theta.size(), NA_REAL);
   std::fill_n(&cv[0], theta.size(), NA_REAL);
-  int j=0, k=0;
+  int j=0, k=0, l=0;
   if (covExists){
     for (int k = 0; k < se.size(); k++){
       if (k >= skipCov.size()) break;
@@ -5262,6 +5260,9 @@ void foceiFinalizeTables(Environment e){
   IntegerVector logitTheta;
   NumericVector logitThetaHi;
   NumericVector logitThetaLow;
+  IntegerVector probitTheta;
+  NumericVector probitThetaHi;
+  NumericVector probitThetaLow;
   if (e.exists("logThetasF")){
     logTheta =  as<IntegerVector>(e["logThetasF"]);
   } else if (e.exists("model")){
@@ -5275,8 +5276,16 @@ void foceiFinalizeTables(Environment e){
       logitThetaLow = as<NumericVector>(e["logitThetasLowF"]);
     }
   }
+  if (e.exists("probitThetasF")) {
+    probitTheta = as<IntegerVector>(e["probitThetasF"]);
+    if (probitTheta.size() != 0) {
+      probitThetaHi = as<NumericVector>(e["probitThetasHiF"]);
+      probitThetaLow = as<NumericVector>(e["probitThetasLowF"]);
+    }
+  }
   j = logTheta.size()-1;
   k = logitTheta.size()-1;
+  l = probitTheta.size()-1;
   double qn= Rf_qnorm5(1.0-(1-op_focei.ci)/2, 0.0, 1.0, 1, 0);
   std::string cur;
   char buff[100];
@@ -5312,7 +5321,7 @@ void foceiFinalizeTables(Environment e){
       }
       btCi[i] = cur;
       j--;
-    } else if (logitTheta.size() > 0 && k >= 0 && logitTheta[k]-1==i){
+    } else if (logitTheta.size() > 0 && k >= 0 && logitTheta[k]-1==i) {
       EstBT[i] = expit(Estimate[i], logitThetaLow[k], logitThetaHi[k]);
       snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, EstBT[i]);
       cur = buff;
@@ -5340,6 +5349,34 @@ void foceiFinalizeTables(Environment e){
       }
       btCi[i] = cur;
       k--;
+    } else if (probitTheta.size() > 0 && l >= 0 && probitTheta[l]-1==i) {
+      EstBT[i] = probitInv(Estimate[i], probitThetaLow[l], probitThetaHi[l]);
+      snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, EstBT[i]);
+      cur = buff;
+      if (ISNA(SE[i])){
+        EstLower[i] = NA_REAL;
+        EstUpper[i] = NA_REAL;
+	if (thetaFixed[i]){
+          SeS[i]  = "FIXED";
+          rseS[i] = "FIXED";
+	} else {
+          SeS[i] = "";
+          rseS[i]="";
+        }
+      } else {
+        EstLower[i] = probitInv(Estimate[i]-SE[i]*qn, probitThetaLow[l], probitThetaHi[l]);
+        EstUpper[i] = probitInv(Estimate[i]+SE[i]*qn, probitThetaLow[l], probitThetaHi[l]);
+	snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, SE[i]);
+        SeS[i]=buff;
+	snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, RSE[i]);
+        rseS[i]=buff;
+        snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, EstLower[i]);
+	cur = cur + " (" + buff + ", ";
+        snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, EstUpper[i]);
+	cur = cur + buff + ")";
+      }
+      btCi[i] = cur;
+      l--;
     } else {
       EstBT[i]= Estimate[i];
       snprintf(buff, sizeof(buff), "%.*g", (int)op_focei.sigdig, Estimate[i]);
