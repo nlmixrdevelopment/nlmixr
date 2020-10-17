@@ -1,4 +1,5 @@
 .onLoad <- function(libname, pkgname) {
+  backports::import(deparse1)
 }
 
 orig.onAttach <- function(libname, pkgname) {

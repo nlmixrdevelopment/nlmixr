@@ -8,7 +8,7 @@ Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgs, lbfgsb3c,
  	n1qn1 (>= 6.0.1-9), fastGHQuad, crayon, cli (>= 2.0),
 	RcppArmadillo (>= 0.5.600.2.0),
 	RxODE(>= 0.9.1-9), nlme, magrittr, tidyr, sys, generics,
- 	digest, flextable, stringr, yaml
+ 	digest, flextable, stringr, yaml, backports
 Suggests: 
     knitr,
     rmarkdown,
