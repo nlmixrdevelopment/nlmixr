@@ -1172,7 +1172,6 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   eta.names <- c()
   .mu.ref <- list()
   .oneTheta <- c()
-  .oneThetaLogit <- c()
   cov.ref <- list()
   cov.theta <- c()
   log.theta <- c()
@@ -1692,7 +1691,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         find.logit(x[[2]])
         if (length(x[[2]]) == 1 && any.theta.names(as.character(x[[2]]), theta.names)) {
           tmp <- as.character(x[[2]])
-          .assign(".oneThetaLogit",unique(c(.oneThetaLogit, tmp)),this.env)
+          .assign(".oneTheta",unique(c(.oneTheta, tmp)),this.env)
         }
         return(as.call(lapply(x, f)))
       } else if (identical(x[[1]], quote(`exp`)) && any(do.pred == c(4, 5))) {
@@ -2601,7 +2600,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       predDf = .predDf, predSaem = .predSaem, env = env, predSys = .pred,
       noMuEtas = .no.mu.etas,
       saemErr = .saemErr, cmtEndpoints = .cmtEndpoints,
-      oneTheta = .oneTheta, oneThetaLogit=.oneThetaLogit, extra = .extra,
+      oneTheta = .oneTheta, extra = .extra,
       logit.theta=logit.theta, logit.theta.hi=logit.theta.hi, logit.theta.low=logit.theta.low,
       logit.eta=logit.eta, logit.eta.hi=logit.eta.hi, logit.eta.low=logit.eta.low,
       saem.fun1=saem.fun0, focei.fun1=rest0, extra=paste0(.extra, ifelse(.extra == "", "", ";\n"), .dvid, ifelse(.dvid == "", "", ";\n")))
@@ -3669,7 +3668,7 @@ nlmixrUI.logitThetasList <- function(obj) {
   .ini <- .as.data.frame(obj$ini)
   .logitThetas <- as.integer(which(setNames(sapply(obj$focei.names, function(x) any(x == obj$logit.theta)), NULL)))
   .thetas <- .ini[!is.na(.ini$ntheta), ]
-  .one <- obj$oneThetaLogit
+  .one <- obj$oneTheta
   .logitThetasF <- .thetas[.thetas$name %in% .one, "ntheta"]
   .logitThetasF <- intersect(.logitThetas, .logitThetasF)
   list(.logitThetas, .logitThetasF)

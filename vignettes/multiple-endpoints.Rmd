@@ -56,7 +56,7 @@ pk.turnover.emax <- function() {
     prop.err <- 0.1
     pkadd.err <- 0.1
     ##
-    poplogit <- 2
+    temax <- logit(0.8)
     #temax <- 7.5
     tec50 <- log(0.5)
     tkout <- log(0.05)
@@ -76,9 +76,8 @@ pk.turnover.emax <- function() {
     v <- exp(tv + eta.v)
     ##
     #poplogit = log(temax/(1-temax))
-    logit=exp(poplogit+eta.emax)
+    emax=expit(temax+eta.emax)
     #logit=temax+eta.emax
-    emax = logit/(1+logit)
     ec50 =  exp(tec50 + eta.ec50)
     kout = exp(tkout + eta.kout)
     e0 = exp(te0 + eta.e0)
@@ -171,8 +170,7 @@ pk.turnover.emax2 <- function() {
     prop.err <- 0.1
     pkadd.err <- 0.1
     ##
-    poplogit <- 2
-    #temax <- 7.5
+    temax <- logit(0.8)
     tec50 <- log(0.5)
     tkout <- log(0.05)
     te0 <- log(100)
@@ -190,10 +188,7 @@ pk.turnover.emax2 <- function() {
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
     ##
-    #poplogit = log(temax/(1-temax))
-    logit=exp(poplogit+eta.emax)
-    #logit=temax+eta.emax
-    emax = logit/(1+logit)
+    emax=expit(temax+eta.emax)
     ec50 =  exp(tec50 + eta.ec50)
     kout = exp(tkout + eta.kout)
     e0 = exp(te0 + eta.e0)
@@ -282,8 +277,7 @@ pk.turnover.emax3 <- function() {
     prop.err <- 0.1
     pkadd.err <- 0.1
     ##
-    poplogit <- 2
-    #temax <- 7.5
+    temax <- logit(0.8)
     tec50 <- log(0.5)
     tkout <- log(0.05)
     te0 <- log(100)
@@ -300,11 +294,7 @@ pk.turnover.emax3 <- function() {
     ka <- exp(tka + eta.ka)
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
-    ##
-    #poplogit = log(temax/(1-temax))
-    logit=exp(poplogit+eta.emax)
-    #logit=temax+eta.emax
-    emax = logit/(1+logit)
+    emax = expit(temax+eta.emax)
     ec50 =  exp(tec50 + eta.ec50)
     kout = exp(tkout + eta.kout)
     e0 = exp(te0 + eta.e0)
@@ -325,12 +315,14 @@ pk.turnover.emax3 <- function() {
     effect ~ add(pdadd.err) | pca
   })
 }
+
 ```
 ## Run the models with SAEM
 ```{r}
 fit.TOS <- nlmixr(pk.turnover.emax3, warfarin, "saem", control=list(print=0),
-                  table=list(cwres=TRUE, npde=TRUE));
-print(fit.TOS);
+                  table=list(cwres=TRUE, npde=TRUE))
+
+print(fit.TOS)
 ```
 ### SAEM Diagnostic plots
 ```{r}
