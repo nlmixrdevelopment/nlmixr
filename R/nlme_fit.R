@@ -405,7 +405,6 @@ prepEv <- function(dati, theta) {
 ##' d/dt(depot) =-KA*depot;
 ##' d/dt(centr) = KA*depot - KE*centr;
 ##' "
-##' dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
 ##' mypar <- function(lKA, lKE, lCL)
 ##' {
 ##'     KA=exp(lKA)
@@ -419,7 +418,6 @@ prepEv <- function(dati, theta) {
 ##'
 ##' fit <- nlme_ode(theo_md, model=ode, par_model=specs, par_trans=mypar,
 ##'      response="centr", response.scaler="V",control=nlmeControl(pnlsTol=0.1))
-##'
 ##' }
 ##' @export
 nlme_ode <- function(dat.o, model, parModel, parTrans,
