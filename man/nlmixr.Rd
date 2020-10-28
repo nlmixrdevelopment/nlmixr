@@ -595,6 +595,66 @@ function.
 }
 }
 
+\examples{
+\dontrun{
+f_ode <- function(){
+    ini({
+        lCl <- 1.6      #log Cl (L/hr)
+        lVc <- log(90)   #log Vc (L)
+        lKA <- 0.1      #log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        eta.Cl ~ 0.1 ## BSV Cl
+        eta.Vc ~ 0.1 ## BSV Vc
+        eta.KA ~ 0.1 ## BSV Ka
+    })
+    model({
+        ## First parameters are defined in terms of the initial estimates
+        ## parameter names.
+        Cl <- exp(lCl + eta.Cl)
+        Vc = exp(lVc + eta.Vc)
+        KA <- exp(lKA + eta.KA)
+        ## After the differential equations are defined
+        kel <- Cl / Vc;
+        d/dt(depot)    = -KA*depot;
+        d/dt(centr)  =  KA*depot-kel*centr;
+        ## And the concentration is then calculated
+        cp = centr / Vc;
+        ## Last, nlmixr is told that the plasma concentration follows
+        ## a proportional error (estimated by the parameter prop.err)
+        cp ~ prop(prop.err)
+    })
+}
+f_linCmt <- function(){
+    ini({
+        lCl <- 1.6      #log Cl (L/hr)
+        lVc <- log(90)   #log Vc (L)
+        lKA <- 0.1      #log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        eta.Cl ~ 0.1 ## BSV Cl
+        eta.Vc ~ 0.1 ## BSV Vc
+        eta.KA ~ 0.1 ## BSV Ka
+    })
+    model({
+        Cl <- exp(lCl + eta.Cl)
+        Vc = exp(lVc + eta.Vc)
+        KA <- exp(lKA + eta.KA)
+        ## Instead of specifying the ODEs, you can use
+        ## the linCmt() function to use the solved system.
+        ##
+        ## This function determines the type of PK solved system
+        ## to use by the parameters that are defined.  In this case
+        ## it knows that this is a one-compartment model with first-order
+        ## absorption.
+        linCmt() ~ add(add.err) + prop(prop.err)
+    })
+}
+fit_linCmt_nlme <- nlmixr(f_linCmt, Oral_1CPT, est="nlme")
+print(fit_linCmt_nlme)
+# The ODE model can be fitted using the saem algorithm, more iterations should be used for real applications
+fit_ode_saem <- nlmixr(f_ode, Oral_1CPT, est = "saem", control = saemControl(n.burn = 50, n.em = 100, print = 50))
+print(fit_ode_saem)
+}
+}
 \author{
 Matthew L. Fidler, Rik Schoemaker
 }
