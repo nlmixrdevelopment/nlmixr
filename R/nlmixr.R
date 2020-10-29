@@ -169,7 +169,7 @@ armaVersion <- function() {
 ##'         ## to use by the parameters that are defined.  In this case
 ##'         ## it knows that this is a one-compartment model with first-order
 ##'         ## absorption.
-##'         linCmt() ~ add(add.err) + prop(prop.err)
+##'         linCmt() ~ prop(prop.err)
 ##'     })
 ##' }
 ##'
