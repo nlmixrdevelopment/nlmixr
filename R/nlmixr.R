@@ -624,6 +624,10 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
         })
       }))
     dat$nlmixr.num <- seq_along(dat$nlmixr.grp)
+    .addProp <- "combined2"
+    if (!is.null(control$addProp)) .addProp <- control$addProp
+    if (!any(.addProp == c("combined2", "combined1"))) stop("addProp needs to either be 'combined1' and 'combined2'")
+    uif$env$.addProp <- .addProp
     weight <- uif$nlme.var
     if (sum.prod) {
       rxode <- RxODE::rxSumProdModel(uif$rxode.pred)

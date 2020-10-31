@@ -2841,7 +2841,22 @@ nlmixrUI.nlme.var <- function(object) {
     power <- sprintf(", fixed=list(%s)", paste(paste0(add.prop.errs$y, "=", ifelse(add.prop.errs$prop, 1, 0)), collapse = ", "))
     powera <- sprintf(", fixed=list(power=list(%s))", paste(paste0(add.prop.errs$y, "=", ifelse(add.prop.errs$prop, 1, 0)), collapse = ", "))
   }
-  tmp <- sprintf("varConstPower(form=~fitted(.)%s%s)", grp, powera)
+  ## nlme_3.1-149 doesn't support varConstProp need to see if it exists
+  .nlme <- loadNamespace("nlme")
+  .varConstProp <- FALSE
+  if (length(ls(pattern="^varConstProp$", env=.nlme)) == 1L) {
+    .varConstProp <- TRUE
+  }
+  .addProp <- object$env$.addProp
+  if (.addProp == "combined2" && !.varConstProp) {
+    warning("this version of nlme does not support combined2 add+prop, degrading to combined1")
+    object$env$.addProp <- .addProp <- "combined1"
+  }
+  if (.addProp == "combined1") {
+    tmp <- sprintf("varConstPower(form=~fitted(.)%s%s)", grp, powera)
+  } else if (.addProp == "combined1") {
+    tmp <- sprintf("varConstProp(form=~fitted(.)%s%s)", grp, powera)
+  }
   if (all(!add.prop.errs$prop)) {
     tmp <- sprintf("varIdent(form = ~ 1%s)", grp)
     if (tmp == "varIdent(form = ~ 1)") {
@@ -2851,6 +2866,7 @@ nlmixrUI.nlme.var <- function(object) {
   } else if (all(!add.prop.errs$add)) {
     tmp <- sprintf("varPower(form = ~ fitted(.)%s%s)", grp, power)
   }
+  message(tmp)
   return(eval(parse(text = tmp)))
 }
 ##' Return RxODE model with predictions appended
