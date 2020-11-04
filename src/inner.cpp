@@ -84,6 +84,8 @@ extern "C"{
   typedef int (*isRstudio_t)();
   isRstudio_t isRstudio;
   getRxSolve_t getRx;
+  typedef const char *(*rxGetId_t)(int id);
+  rxGetId_t rxGetId;
 }
 
 typedef int (*iniSubjectI_t)(int solveid, int inLhs, rx_solving_options_ind *ind, rx_solving_options *op, rx_solve *rx,
@@ -1838,9 +1840,16 @@ static inline double foceiLik0(double *theta){
   updateTheta(theta);
   innerOpt();
   double lik = 0.0;
+  double cur;
   for (int id=rx->nsub; id--;){
     focei_ind *fInd = &(inds_focei[id]);
-    lik += fInd->lik[0];
+    cur = fInd->lik[0];
+    if (std::isnan(cur)) {
+      REprintf(_("likelihood of id: %s is NaN\n"), rxGetId(id));
+    } else if (std::isinf(cur)) {
+      REprintf(_("likelihood of id: %s is infinite\n"), rxGetId(id));
+    }
+    lik += cur;
   }
   // Now reset the saved ETAs
   if (op_focei.neta !=0) std::fill_n(&op_focei.goldEta[0], op_focei.gEtaGTransN, -42.0); // All etas = -42;  Unlikely if normal
@@ -1870,7 +1879,7 @@ static inline double foceiOfv0(double *theta){
     op_focei.initObj=1;
     op_focei.initObjective=std::fabs(ret);
     if (std::isnan(ret) || std::isinf(ret)){
-      stop("Infinite/NaN while evaluating initial objective function");
+      stop(_("infinite/NaN while evaluating initial objective function"));
     }
     if (op_focei.scaleObjective == 1) op_focei.scaleObjective=2;
   } else {
@@ -5597,6 +5606,7 @@ Environment foceiFitCpp_(Environment e){
     getRx = (getRxSolve_t) R_GetCCallable("RxODE", "getRxSolve_");
     isRstudio = (isRstudio_t) R_GetCCallable("RxODE", "isRstudio");
     ind_solve=(ind_solve_t) R_GetCCallable("RxODE", "ind_solve");
+    rxGetId = (rxGetId_t) R_GetCCallable("RxODE", "rxGetId");
     assignFn_=true;
   }
   clock_t t0 = clock();
