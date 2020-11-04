@@ -1844,11 +1844,11 @@ static inline double foceiLik0(double *theta){
   for (int id=rx->nsub; id--;){
     focei_ind *fInd = &(inds_focei[id]);
     cur = fInd->lik[0];
-    if (std::isnan(cur)) {
-      REprintf(_("likelihood of id: %s is NaN\n"), rxGetId(id));
-    } else if (std::isinf(cur)) {
-      REprintf(_("likelihood of id: %s is infinite\n"), rxGetId(id));
-    }
+    // if (std::isnan(cur)) {
+    //   REprintf(_("likelihood of id: %s is NaN\n"), rxGetId(id));
+    // } else if (std::isinf(cur)) {
+    //   REprintf(_("likelihood of id: %s is infinite\n"), rxGetId(id));
+    // }
     lik += cur;
   }
   // Now reset the saved ETAs
@@ -1878,8 +1878,10 @@ static inline double foceiOfv0(double *theta){
   if (!op_focei.initObj){
     op_focei.initObj=1;
     op_focei.initObjective=std::fabs(ret);
-    if (std::isnan(ret) || std::isinf(ret)){
-      stop(_("infinite/NaN while evaluating initial objective function"));
+    if (std::isnan(ret)){
+      stop(_("NaN while evaluating initial objective function"));
+    } else if (std::isinf(ret)) {
+      stop(_("infinite while evaluating initial objective function"));
     }
     if (op_focei.scaleObjective == 1) op_focei.scaleObjective=2;
   } else {
