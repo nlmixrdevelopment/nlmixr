@@ -126,7 +126,7 @@ nmsimplex <- function(start, fr, rho = NULL, control = list()) {
   if (is.null(rho)) rho <- environment(fr)
   step <- -.2 * start
 
-  con <- list(maxeval = 999, reltol = 1e-6, rcoeff = 1., ecoeff = 2., ccoeff = .5, trace = F)
+  con <- list(maxeval = 999, reltol = 1e-6, rcoeff = 1., ecoeff = 2., ccoeff = .5, trace = FALSE)
   nmsC <- names(con)
   con[(namc <- names(control))] <- control
   if (length(noNms <- namc[!namc %in% nmsC])) {
@@ -144,7 +144,7 @@ mymin <- function(start, fr, rho = NULL, control = list()) {
   if (is.null(rho)) rho <- environment(fr)
   step <- -.2 * start
 
-  con <- list(maxeval = 999, ftol_rel = 1e-6, rcoeff = 1., ecoeff = 2., ccoeff = .5, trace = F)
+  con <- list(maxeval = 999, ftol_rel = 1e-6, rcoeff = 1., ecoeff = 2., ccoeff = .5, trace = FALSE)
   nmsC <- names(con)
   con[(namc <- names(control))] <- control
   # if (length(noNms <- namc[!namc %in% nmsC]))
@@ -318,7 +318,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
     c(1:sum(
       as.data.frame(
         .nlmixrObject$ini
-      )$fix == F &
+      )$fix == FALSE &
         is.na(as.data.frame(.nlmixrObject$ini)$err)
     ))
   .temp.replacements <- .dynmodelObject$res[.theta.index, 1]
@@ -1764,7 +1764,7 @@ genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
   ## ---------------- ##
 
   # Objective Function ------------------------------------------------------
-  obj <- function(th, do.ode.solving = T, negation = F) {
+  obj <- function(th, do.ode.solving = TRUE, negation = FALSE) {
     .ixpar <- npar
     theta <- th[1:npar]
     names(theta) <- names(inits)[1:npar]

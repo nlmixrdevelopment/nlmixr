@@ -41,7 +41,7 @@ vpc_saemFit <- function(fit, dat, nsim = 100, by = NULL, ...) {
     }
   }
   else {
-    dat$grp <- T
+    dat$grp <- TRUE
   }
 
   xd <- subset(dat, EVID == 0)

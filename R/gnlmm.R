@@ -204,7 +204,7 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
     list2env(data.obs[sel, ], envir = ep)
 
     #-- inner optim: empirical bayesian
-    ..g.fn <- function(ETA, dolog = T) {
+    ..g.fn <- function(ETA, dolog = TRUE) {
       if (!is.null(syspar)) {
         eval(bpar)
         pars <- as.list(environment())
@@ -446,7 +446,7 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
       list2env(data.obs[sel, ], envir = ep)
 
       #-- inner optim: empirical bayesian
-      ..g.fn <- function(ETA, dolog = T) {
+      ..g.fn <- function(ETA, dolog = TRUE) {
         if (!is.null(syspar)) {
           eval(bpar)
           pars <- as.list(environment())
@@ -520,12 +520,12 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
 
         pvd <- NULL
         nfcall <- 0
-        ..fit.inner <- lbfgs::lbfgs(f, g, starts[.wh, ], invisible = T, epsilon = 10000 * con$reltol.inner)
+        ..fit.inner <- lbfgs::lbfgs(f, g, starts[.wh, ], invisible = TRUE, epsilon = 10000 * con$reltol.inner)
         ..fit.inner$hessian <- optimHess(..fit.inner$par, f, g)
       } else {
         ..fit.inner <- optim(
           par = starts[.wh, ], ..g.fn, method = con$optim.inner,
-          control = list(reltol = con$reltol.inner), hessian = T
+          control = list(reltol = con$reltol.inner), hessian = TRUE
         )
       }
 
@@ -554,7 +554,7 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
         w <- nw$weights[ij]
         z <- nw$nodes[ij]
         a <- ..fit.inner$par + sqrt(2) * Ginv.5 %*% z
-        f1 <- ..g.fn(a, dolog = F)
+        f1 <- ..g.fn(a, dolog = FALSE)
         f2 <- prod(w * exp(z^2))
         f1 * f2
       }, mc.cores = 1)
@@ -563,7 +563,7 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
       c(-2 * log(..lik), .wh, ..fit.inner$par)
     }, mc.cores = con$mc.cores)
 
-    m <- matrix(unlist(..lik.sub), ncol = 2 + nETA, byrow = T)
+    m <- matrix(unlist(..lik.sub), ncol = 2 + nETA, byrow = TRUE)
 
     if (update_starts) starts[m[, 2], ] <<- m[, 3:(2 + nETA)]
     r <- sum(m[, 1])
@@ -586,7 +586,7 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
 }
 
 
-linesearch_secant <- function(f, d, x, maxIter = 5, trace = F) {
+linesearch_secant <- function(f, d, x, maxIter = 5, trace = FALSE) {
   # Line search using secant method
   # Note: I'm not checking for alpha > 0.
 
@@ -646,7 +646,7 @@ calcCov <- function(fit, method = 1, trace = FALSE) {
     if (identical(par, pvd[[1]])) {
       return(pvd)
     }
-    ym <- fit$obj(par, noomga = T)
+    ym <- fit$obj(par, noomga = TRUE)
     pvd <<- list(par, ym)
   }
   f <- function(x) fg(x)[[2]]

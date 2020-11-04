@@ -863,7 +863,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     # Error Model ---
     .model <- .dynNlmixr$model
     # Optional Control ---
-    control$nlmixrOutput <- T
+    control$nlmixrOutput <- TRUE
     control$fixPars <- if (!is.null(.dynNlmixr$fixPars)) .dynNlmixr$fixPars else NULL
     control$lower <- if (!is.null(.dynNlmixr$lower)) .dynNlmixr$lower else NULL
     control$upper <- if (!is.null(.dynNlmixr$upper)) .dynNlmixr$upper else NULL

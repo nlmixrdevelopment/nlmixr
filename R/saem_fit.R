@@ -215,10 +215,10 @@ configsaem <- function(model, data, inits,
   if (is.null(names(inits$theta))) names(inits$theta) <- rep("", length(inits$theta))
   inits.save <- inits
   inits$theta.fix <- matrix(names(inits$theta),
-    byrow = T,
+    byrow = TRUE,
     ncol = model$N.eta
   )
-  inits$theta <- matrix(inits$theta, byrow = T, ncol = model$N.eta)
+  inits$theta <- matrix(inits$theta, byrow = TRUE, ncol = model$N.eta)
   model$cov.mod <- 1 - is.na(inits$theta)
   data$N.covar <- nrow(inits$theta) - 1
   inits$theta[is.na(inits$theta)] <- 0
@@ -363,8 +363,8 @@ configsaem <- function(model, data, inits,
   len <- length(wh)
   fixed.i0 <- (1:len)[wh] - 1
 
-  jlog1 <- grep(T, model$log.eta)
-  jcov <- grep(T, apply(mcov, 1, sum) > 0)
+  jlog1 <- grep(TRUE, model$log.eta)
+  jcov <- grep(TRUE, apply(mcov, 1, sum) > 0)
   covstruct1 <- covstruct[i1, i1]
   dim(covstruct1) <- c(nphi1, nphi1)
   ind_cov <- grep(1, mcov[mcov > 0])
@@ -623,7 +623,7 @@ summary.saemFit <- function(object, ...) {
   se <- sqrt(diag(H))
 
   m <- cbind(exp(th), th, se) # FIXME
-  ## lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
+  ## lhsVars = scan("LHS_VARS.txt", what="", quiet=TRUE)
   ## if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
   dimnames(m)[[2]] <- c("th", "log(th)", "se(log_th)")
   cat("THETA:\n")
@@ -658,7 +658,7 @@ print.saemFit <- function(x, ...) {
   se <- sqrt(diag(H))
 
   m <- cbind(exp(th), th, se) # FIXME
-  ## lhsVars = scan("LHS_VARS.txt", what="", quiet=T)
+  ## lhsVars = scan("LHS_VARS.txt", what="", quiet=TRUE)
   ## if (length(lhsVars)==nth) dimnames(m)[[1]] = lhsVars
   dimnames(m)[[2]] <- c("th", "log(th)", "se(log_th)")
   cat("THETA:\n")

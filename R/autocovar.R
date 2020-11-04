@@ -1334,7 +1334,7 @@ backwardSearch <- function(covInfo, fitorig, fitupdated, pVal = 0.01, reFitCovar
 
 
 # fitDapto <- readRDS("daptomycin.Rds")
-# covarSearchAuto(fitDapto, c("v1"), c("SEX"), catCovariates = "SEX", restart = T, pVal = list(fwd = 1, bck = 1))
+# covarSearchAuto(fitDapto, c("v1"), c("SEX"), catCovariates = "SEX", restart = TRUE, pVal = list(fwd = 1, bck = 1))
 
 # covarSearchAuto(fitDapto, c('v1', 'v2'), c('WT', 'SEX'), catCovariates = 'SEX', restart = FALSE, pVal=list(fwd=1, bck=1))
 

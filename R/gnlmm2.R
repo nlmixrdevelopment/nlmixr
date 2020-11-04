@@ -48,7 +48,7 @@ getModelVars <- function(blik, bpar, m1) {
   blik.txt <- deparse(blik)
   len <- length(blik.txt)
 
-  s <- gsub("\\s+", "", blik.txt[len - 1], perl = T) # FIXME
+  s <- gsub("\\s+", "", blik.txt[len - 1], perl = TRUE) # FIXME
   lp <- regexpr("\\(", s)
   dist <- substr(s, 1, lp - 1)
   s <- strsplit(substr(s, lp + 1, 200), ",")[[1]]
@@ -79,7 +79,7 @@ getModelVars <- function(blik, bpar, m1) {
   rhs <- setdiff(s, s[ix])
 
   ixLlik <- len - 1
-  ss <- sub("^\\s*\\w+\\(", "", deparse(blik)[len - 1], perl = T) # FIXME
+  ss <- sub("^\\s*\\w+\\(", "", deparse(blik)[len - 1], perl = TRUE) # FIXME
   prob <- strsplit(ss, ",")[[1]][3] # FIXME
 
   states <- m1$get.modelVars()$state
@@ -144,8 +144,8 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
     transit_abs = FALSE,
     cov = FALSE,
     eps = c(1e-8, 1e-3), # finite difference step
-    NOTRUN = F,
-    DEBUG.INNER = F,
+    NOTRUN = FALSE,
+    DEBUG.INNER = FALSE,
     rhobeg = .2,
     rhoend = 1e-3,
     iprint = 2,
@@ -217,7 +217,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
       npar <- length(pars)
       s <- deparse(bpar)
       for (i in 1:nETA) {
-        s <- gsub(sprintf("\\bETA\\[%d\\]", i), sprintf("ETA%d", i), s, perl = T)
+        s <- gsub(sprintf("\\bETA\\[%d\\]", i), sprintf("ETA%d", i), s, perl = TRUE)
       }
       s <- gsub("initCondition", "#initCondition", s)
       len <- length(s)
@@ -232,7 +232,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
         e <- eval(parse(text = a))
         s <- if (class(e) == "call") {
           s <- deparse(e)
-          gsub(sprintf("\\bETA%d\\b", j), sprintf("ETA[%d]", j), s, perl = T)
+          gsub(sprintf("\\bETA%d\\b", j), sprintf("ETA[%d]", j), s, perl = TRUE)
         } else {
           "0"
         }
@@ -490,7 +490,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
       .wh <- ID.ord[as.character(ix)]
       ETA.val <- starts[.wh, ]
       ..fit.inner <- nlminb(ETA.val, f, g, control = list(trace = FALSE, rel.tol = 1e-4))
-      # ..fit.inner = lbfgs(f, g, ETA.val, invisible=T, ftol=1e-4) # epsilon=1e-3)
+      # ..fit.inner = lbfgs(f, g, ETA.val, invisible=TRUE, ftol=1e-4) # epsilon=1e-3)
       if (con$do.optimHess) {
         ..fit.inner$hessian <- optimHess(..fit.inner$par, f, g)
       }
@@ -537,7 +537,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
       c(-2 * log(..lik), .wh, ..fit.inner$par)
     }
     s <- mclapply(ID.all, llik2.subj, mc.cores = con$mc.cores) # FIXME
-    m <- matrix(unlist(s), ncol = 2 + nETA, byrow = T)
+    m <- matrix(unlist(s), ncol = 2 + nETA, byrow = TRUE)
 
     if (update_starts) starts[m[, 2], ] <<- m[, 3:(2 + nETA)]
     m[, 1]

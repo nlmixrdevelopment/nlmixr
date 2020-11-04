@@ -391,9 +391,9 @@ calc.COV <- function(fit0) {
   if (is.null(names(saem.cfg$inits$theta))) {
     names(saem.cfg$inits$theta) <- rep("", length(saem.cfg$inits$theta))
   }
-  s <- matrix(names(saem.cfg$inits$theta), ncol = nphi, byrow = T)
+  s <- matrix(names(saem.cfg$inits$theta), ncol = nphi, byrow = TRUE)
   fix.ix <- c(s) == "FIXED"
-  s <- matrix(saem.cfg$inits$theta, ncol = nphi, byrow = T)
+  s <- matrix(saem.cfg$inits$theta, ncol = nphi, byrow = TRUE)
   cov.ix <- !is.na(c(s))
   cov.est.ix <- !fix.ix & cov.ix
 
