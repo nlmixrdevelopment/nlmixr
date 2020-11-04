@@ -694,8 +694,8 @@ foceiControl <- function(sigdig = 3, ...,
                          repeatGillMax = 3,
                          stickyRecalcN = 5,
                          gradProgressOfvTime = 10,
-                         addProp=c("combined2","combined1"),
-                         singleOde=TRUE) {
+                         addProp = c("combined2", "combined1"),
+                         singleOde = TRUE) {
   if (is.null(boundTol)) {
     boundTol <- 5 * 10^(-sigdig + 1)
   }
@@ -992,8 +992,8 @@ foceiControl <- function(sigdig = 3, ...,
     eventFD = eventFD,
     eventCentral = as.integer(eventCentral),
     gradProgressOfvTime = gradProgressOfvTime,
-    addProp=match.arg(addProp),
-    singleOde=singleOde,
+    addProp = match.arg(addProp),
+    singleOde = singleOde,
     ...
   )
   if (!missing(etaMat) && missing(maxInnerIterations)) {
@@ -1757,7 +1757,8 @@ foceiFit.data.frame0 <- function(data,
       pred.minus.dv = TRUE, sum.prod = control$sumProd,
       theta.derivs = FALSE, optExpression = control$optExpression,
       interaction = (control$interaction == 1L),
-      only.numeric=!.mixed, run.internal = TRUE, addProp=control$addProp)
+      only.numeric = !.mixed, run.internal = TRUE, addProp = control$addProp
+    )
     if (!is.null(.ret$model$inner)) {
       .atol <- c(.atol, rep(
         control$atolSens,
@@ -1816,7 +1817,8 @@ foceiFit.data.frame0 <- function(data,
       .ret$model <- RxODE::rxSymPySetupPred(model, pred, PKpars, err,
         grad = FALSE, pred.minus.dv = TRUE, sum.prod = control$sumProd,
         theta.derivs = FALSE, optExpression = control$optExpression, run.internal = TRUE,
-        only.numeric = TRUE, addProp=control$addProp)
+        only.numeric = TRUE, addProp = control$addProp
+      )
       if (!is.null(.ret$model$inner)) {
         .atol <- c(.atol, rep(
           control$atolSens,
@@ -2041,8 +2043,9 @@ foceiFit.data.frame0 <- function(data,
       .b <- .ret$logitThetasLow[.i]
       .c <- .ret$logitThetasHi[.i]
       .a <- .ini$est[.i]
-      if (is.na(.ret$scaleC[.i]))
-        .ret$scaleC[.i] <- 1.0*(-.b + .c)*exp(-.a)/((1.0 + exp(-.a))^2*(.b + 1.0*(-.b + .c)/(1.0 + exp(-.a))))
+      if (is.na(.ret$scaleC[.i])) {
+        .ret$scaleC[.i] <- 1.0 * (-.b + .c) * exp(-.a) / ((1.0 + exp(-.a))^2 * (.b + 1.0 * (-.b + .c) / (1.0 + exp(-.a))))
+      }
     }
     ## for (.i in .ini$model$extraProp$logit) {
     ##   ## logit(a,b,c) ->
@@ -2279,12 +2282,13 @@ foceiFit.data.frame0 <- function(data,
     .vars <- .ret$fixef
     names(.vars) <- paste0("THETA[", seq_along(.vars), "]")
     .ipred <- .solve(.ret$model$pred.only, .vars, .ret$dataSav,
-                     returnType = "data.frame.TBS",
-                     atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
-                     hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                     transitAbs = .ret$control$TransitAbs,
-                     maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                     method = .ret$control$method)
+      returnType = "data.frame.TBS",
+      atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
+      hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+      transitAbs = .ret$control$TransitAbs,
+      maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+      method = .ret$control$method
+    )
     if (!is.null(.censName)) {
       .cens <- data[, .censName]
     } else {
@@ -2295,8 +2299,10 @@ foceiFit.data.frame0 <- function(data,
     } else {
       .limit <- rep(-Inf, length(data$DV))
     }
-    .df <- .Call(`_nlmixr_nlmixrResid0`, .ipred, data$DV, data$EVID, .ipred$rxLambda, .ipred$rxYj,
-                 .ipred$rxLow, .ipred$rxHi, .cens, .limit)
+    .df <- .Call(
+      `_nlmixr_nlmixrResid0`, .ipred, data$DV, data$EVID, .ipred$rxLambda, .ipred$rxYj,
+      .ipred$rxLow, .ipred$rxHi, .cens, .limit
+    )
     .ret$tableTime <- (proc.time() - .pt)["elapsed"]
     .ret$time <- data.frame(.ret$time, table = .ret$tableTime)
     .isDplyr <- requireNamespace("dplyr", quietly = TRUE)
@@ -2325,13 +2331,13 @@ foceiFit.data.frame0 <- function(data,
         .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
         .preds <- list(
           ipred = .solve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,
-                         returnType = "data.frame.TBS",
-                         atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
-                         hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                         transitAbs = .ret$control$TransitAbs,
-                         maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                         method = .ret$control$method
-                         ),
+            returnType = "data.frame.TBS",
+            atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
+            hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+            transitAbs = .ret$control$TransitAbs,
+            maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+            method = .ret$control$method
+          ),
           pred = .solvePred(),
           cwres = FALSE
         )
@@ -2362,13 +2368,13 @@ foceiFit.data.frame0 <- function(data,
       .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
       .preds <- list(
         ipred = .solve(.ret$model$inner, .pars$ipred, .ret$dataSav,
-                       returnType = "data.frame.TBS",
-                       atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
-                       hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
-                       transitAbs = .ret$control$TransitAbs,
-                       maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                       method = .ret$control$method
-                       ),
+          returnType = "data.frame.TBS",
+          atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
+          hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
+          transitAbs = .ret$control$TransitAbs,
+          maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+          method = .ret$control$method
+        ),
         pred = .solvePred()
       )
     }
@@ -2388,12 +2394,12 @@ foceiFit.data.frame0 <- function(data,
     )
     if (is.null(.preds$cwres)) {
       .df <- RxODE::rxSolve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,
-                            returnType = "data.frame",
-                            hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
-                            maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-                            method = .ret$control$method,
-                            warnIdSort = FALSE
-                            )[, -(1:4)]
+        returnType = "data.frame",
+        hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
+        maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
+        method = .ret$control$method,
+        warnIdSort = FALSE
+      )[, -(1:4)]
     } else {
       .df <- .preds$ipred[, -c(1:4, length(names(.preds$ipred)) - 0:1), drop = FALSE]
     }
@@ -2438,7 +2444,7 @@ foceiFit.data.frame0 <- function(data,
 ##' @export
 `$.nlmixrFitCore` <- function(obj, arg, exact = FALSE) {
   .env <- obj
-  if (arg == "md5"){
+  if (arg == "md5") {
     return(.nlmixrMd5(obj))
   } else if (arg == "posthoc") {
     return(nlmixrPosthoc(obj))
@@ -2462,9 +2468,9 @@ foceiFit.data.frame0 <- function(data,
           .nsd <- .env$nsd.gq
         }
         if (.nnodes == 1) {
-          .tmp <- try(setOfv(obj, paste0("laplace", .nsd)), silent=TRUE)
+          .tmp <- try(setOfv(obj, paste0("laplace", .nsd)), silent = TRUE)
         } else {
-          .tmp <- try(setOfv(obj, paste0("gauss", .nnodes, "_", .nsd)), silent=TRUE)
+          .tmp <- try(setOfv(obj, paste0("gauss", .nnodes, "_", .nsd)), silent = TRUE)
         }
         if (inherits(.tmp, "try-error")) {
           message("gaussian quadrature failed, changed to focei")
@@ -2524,7 +2530,7 @@ foceiFit.data.frame0 <- function(data,
 ##' @export
 `$.nlmixrFitData` <- function(obj, arg, exact = FALSE) {
   .ret <- obj[[arg]]
-  if (arg == "md5"){
+  if (arg == "md5") {
     return(.nlmixrMd5(obj))
   } else if (is.null(.ret)) {
     if (arg == "posthoc") {

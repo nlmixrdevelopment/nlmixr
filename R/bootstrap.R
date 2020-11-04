@@ -79,7 +79,8 @@ addConfboundsToVar <-
 #' bootstrapFit(fit)
 #' bootstrapFit(fit, nboot = 5, restart = TRUE) # overwrites any of the existing data or model files
 #' bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
-# }
+#' #
+#' }
 bootstrapFit <- function(fit,
                          nboot = 200,
                          nSampIndiv,
@@ -89,7 +90,7 @@ bootstrapFit <- function(fit,
                          pvalues = NULL,
                          restart = FALSE,
                          plotHist = FALSE,
-                         fitName=as.character(substitute(fit))) {
+                         fitName = as.character(substitute(fit))) {
   stdErrType <- match.arg(stdErrType)
   if (missing(stdErrType)) {
     stdErrType <- "perc"
@@ -127,8 +128,8 @@ bootstrapFit <- function(fit,
         fitName = fitName
       ) # multiple models
 
-    modelsList = resBootstrap[[1]]
-    fitList = resBootstrap[[2]]
+    modelsList <- resBootstrap[[1]]
+    fitList <- resBootstrap[[2]]
   }
   else {
     resBootstrap <-
@@ -140,8 +141,8 @@ bootstrapFit <- function(fit,
         restart = restart,
         fitName = fitName
       ) # multiple models
-    modelsList = resBootstrap[[1]]
-    fitList = resBootstrap[[2]]
+    modelsList <- resBootstrap[[1]]
+    fitList <- resBootstrap[[2]]
   }
 
 
@@ -192,10 +193,10 @@ bootstrapFit <- function(fit,
     backTransformed
 
   # compute bias
-  bootParams = bootSummary$parFixedDf$mean
-  origParams = data.frame(list('Estimate'=fit$parFixedDf$Estimate, 'Back-transformed'=fit$parFixedDf$`Back-transformed`))
-  bootstrapBiasParfixed = abs(origParams - bootParams)
-  bootstrapBiasOmega = abs(fit$omega - bootSummary$omega$mean)
+  bootParams <- bootSummary$parFixedDf$mean
+  origParams <- data.frame(list("Estimate" = fit$parFixedDf$Estimate, "Back-transformed" = fit$parFixedDf$`Back-transformed`))
+  bootstrapBiasParfixed <- abs(origParams - bootParams)
+  bootstrapBiasOmega <- abs(fit$omega - bootSummary$omega$mean)
 
   assign("bootBiasParfixed", bootstrapBiasParfixed, envir = fit$env)
   assign("bootBiasOmega", bootstrapBiasOmega, envir = fit$env)
@@ -205,13 +206,13 @@ bootstrapFit <- function(fit,
   assign("parFixedDf", newParFixedDf, envir = fit$env)
   assign("parFixed", newParFixed, envir = fit$env)
   assign("bootOmegaSummary", bootSummary$omega, envir = fit$env)
-  assign("bootSummary", bootSummary, envir=fit$env)
+  assign("bootSummary", bootSummary, envir = fit$env)
 
   # plot histogram
   if (plotHist) {
 
     # compute delta objf values for each of the models
-    origData = getData(fit)
+    origData <- getData(fit)
 
     if (is.null(fit$bootstrapMd5)) {
       bootstrapMd5 <- fit$md5
@@ -221,15 +222,15 @@ bootstrapFit <- function(fit,
     # already exists
     output_dir <- paste0("nlmixrBootstrapCache_", fitName, "_", fit$bootstrapMd5)
 
-    deltOBJFloaded = NULL
-    deltOBJF = NULL
+    deltOBJFloaded <- NULL
+    deltOBJF <- NULL
     RxODE::rxProgress(length(fitList))
     cli::cli_h1("Loading/Calculating \u0394 Objective function")
     setOfv(fit, "focei") # Make sure we are using focei objective function
     deltOBJF <- lapply(seq_along(fitList), function(i) {
       x <- readRDS(file.path(output_dir, paste0("fitEnsemble_", i, ".rds")))
       .path <- file.path(output_dir, paste0("posthoc_", i, ".rds"))
-      if (file.exists(.path)){
+      if (file.exists(.path)) {
         xPosthoc <- readRDS(.path)
         RxODE::rxTick()
       } else {
@@ -238,8 +239,10 @@ bootstrapFit <- function(fit,
         ## Don't calculate the tables
         .msg <- paste0(gettext("Running bootstrap estimates on original data for model index: "), i)
         cli::cli_h1(.msg)
-        xPosthoc = nlmixr(x, data=origData, est='posthoc',
-                          control=list(calcTables=FALSE, print=1))
+        xPosthoc <- nlmixr(x,
+          data = origData, est = "posthoc",
+          control = list(calcTables = FALSE, print = 1)
+        )
         saveRDS(xPosthoc, .path)
       }
       xPosthoc$objf - fit$objf
@@ -252,39 +255,51 @@ bootstrapFit <- function(fit,
 
     .df <- length(fit$ini$est)
 
-    .chisq <- rbind(data.frame(deltaofv=qchisq(seq(0,0.99,0.01),df=.df),
-                               quantiles=seq(0,0.99,0.01),
-                               Distribution=1L,
-                               stringsAsFactors = FALSE),
-                    data.frame(deltaofv=.deltaO,
-                               quantiles=seq(.deltaN) / .deltaN,
-                               Distribution=2L,
-                               stringsAsFactors = FALSE))
+    .chisq <- rbind(
+      data.frame(
+        deltaofv = qchisq(seq(0, 0.99, 0.01), df = .df),
+        quantiles = seq(0, 0.99, 0.01),
+        Distribution = 1L,
+        stringsAsFactors = FALSE
+      ),
+      data.frame(
+        deltaofv = .deltaO,
+        quantiles = seq(.deltaN) / .deltaN,
+        Distribution = 2L,
+        stringsAsFactors = FALSE
+      )
+    )
 
     .fdelta <- approxfun(seq(.deltaN) / .deltaN, .deltaO)
 
-    .df2 <- round(mean(.deltaO, na.rm=TRUE))
+    .df2 <- round(mean(.deltaO, na.rm = TRUE))
 
-    .dfD <- data.frame(label=paste(c("df\u2248", "df="), c(.df2, .df)),
-                       Distribution=c(2L, 1L),
-                       quantiles=0.7,
-                       deltaofv=c(.fdelta(0.7), qchisq(0.7, df=.df))
-                       )
+    .dfD <- data.frame(
+      label = paste(c("df\u2248", "df="), c(.df2, .df)),
+      Distribution = c(2L, 1L),
+      quantiles = 0.7,
+      deltaofv = c(.fdelta(0.7), qchisq(0.7, df = .df))
+    )
 
-    .dfD$Distribution <- factor(.dfD$Distribution, c(1L, 2L),
-                                c("Reference distribution", "\u0394 objective function"))
+    .dfD$Distribution <- factor(
+      .dfD$Distribution, c(1L, 2L),
+      c("Reference distribution", "\u0394 objective function")
+    )
 
-    .chisq$Distribution <- factor(.chisq$Distribution, c(1L, 2L),
-                                  c("Reference distribution", "\u0394 objective function"))
-    .dataList <- list(dfD=.dfD, chisq=.chisq,
-                      deltaN=.deltaN, df2=.df2)
-    assign(".bootPlotData", .dataList, envir=fit$env)
-
+    .chisq$Distribution <- factor(
+      .chisq$Distribution, c(1L, 2L),
+      c("Reference distribution", "\u0394 objective function")
+    )
+    .dataList <- list(
+      dfD = .dfD, chisq = .chisq,
+      deltaN = .deltaN, df2 = .df2
+    )
+    assign(".bootPlotData", .dataList, envir = fit$env)
   }
   ## Update covariance estimate
   .nm <- names(fit$theta)[!fit$skipCov[seq_along(fit$theta)]]
   .cov <- fit$bootSummary$omega$covMatrixCombined[.nm, .nm]
-  .setCov(fit, covMethod=.cov)
+  .setCov(fit, covMethod = .cov)
   assign("covMethod", paste0("boot", fit$bootSummary$nboot), fit$env)
   invisible(fit)
 }
@@ -595,8 +610,8 @@ modelBootstrap <- function(fit,
 
   fnameFitEnsemblePattern <-
     paste0("fitEnsemble_", "[0-9]+",
-           ".rds",
-           sep = ""
+      ".rds",
+      sep = ""
     )
   fitFileExists <- list.files(paste0("./", output_dir), pattern = fnameFitEnsemblePattern)
 
@@ -616,7 +631,7 @@ modelBootstrap <- function(fit,
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
 
-      fitEnsembleLoaded <- lapply(fitFileExists, function(x){
+      fitEnsembleLoaded <- lapply(fitFileExists, function(x) {
         readRDS(paste0("./", output_dir, "/", x, sep = ""))
       })
 
@@ -881,7 +896,7 @@ getBootstrapSummary <-
       # }
       if (id == "omega") {
         # omega estimates
-        omegaMatlist = extractVars(fitList, id)
+        omegaMatlist <- extractVars(fitList, id)
         varVec <- simplify2array(omegaMatlist)
         mn <- apply(varVec, 1:2, mean)
         sd <- apply(varVec, 1:2, sd)
@@ -900,50 +915,52 @@ getBootstrapSummary <-
 
         # computing the covariance and correlation matrices
         # =======================================================
-        parFixedOmegaBootVec = list()
+        parFixedOmegaBootVec <- list()
 
-        parFixedlist = extractVars(fitList, id='parFixedDf')
-        parFixedlistVec = lapply(parFixedlist, function(x){
+        parFixedlist <- extractVars(fitList, id = "parFixedDf")
+        parFixedlistVec <- lapply(parFixedlist, function(x) {
           x$Estimate
         })
-        parFixedlistVec = do.call('rbind', parFixedlistVec)
+        parFixedlistVec <- do.call("rbind", parFixedlistVec)
 
-        omgVecBoot = list()
-        omegaIdx = seq(length(omegaMatlist))
+        omgVecBoot <- list()
+        omegaIdx <- seq(length(omegaMatlist))
 
-        omgVecBoot = lapply(omegaIdx, function(idx){
-          omgMat = omegaMatlist[[idx]]
-          omgVec = omgMat[lower.tri(omgMat, TRUE)]
-          omgVecBoot[[idx]] = omgVec
+        omgVecBoot <- lapply(omegaIdx, function(idx) {
+          omgMat <- omegaMatlist[[idx]]
+          omgVec <- omgMat[lower.tri(omgMat, TRUE)]
+          omgVecBoot[[idx]] <- omgVec
         })
-        omgVecBoot = do.call('rbind', omgVecBoot)
+        omgVecBoot <- do.call("rbind", omgVecBoot)
 
-        idxName=1
-        namesList=list()
-        for (nam1 in colnames(omegaMatlist[[1]])){
-          for (nam2 in colnames(omegaMatlist[[1]])){
-            if (nam1 == nam2){
-              if (!(nam1 %in% namesList) ){
-                namesList[idxName]= nam1
-                idxName = idxName+1
+        idxName <- 1
+        namesList <- list()
+        for (nam1 in colnames(omegaMatlist[[1]])) {
+          for (nam2 in colnames(omegaMatlist[[1]])) {
+            if (nam1 == nam2) {
+              if (!(nam1 %in% namesList)) {
+                namesList[idxName] <- nam1
+                idxName <- idxName + 1
               }
             } else {
-              nam = paste0("(", nam1, ",", nam2, ")")
-              namRev = paste0("(", nam2, ",", nam1, ")")
-              if (!(nam %in% namesList | namRev %in% namesList) ){
-                namesList[idxName]= nam
-                idxName = idxName+1
+              nam <- paste0("(", nam1, ",", nam2, ")")
+              namRev <- paste0("(", nam2, ",", nam1, ")")
+              if (!(nam %in% namesList | namRev %in% namesList)) {
+                namesList[idxName] <- nam
+                idxName <- idxName + 1
               }
             }
           }
         }
-        colnames(omgVecBoot) = namesList
+        colnames(omgVecBoot) <- namesList
 
-        .w <- which(sapply(namesList, function(x){!all(omgVecBoot[, x] == 0)}))
+        .w <- which(sapply(namesList, function(x) {
+          !all(omgVecBoot[, x] == 0)
+        }))
         omgVecBoot <- omgVecBoot[, .w]
 
 
-        parFixedOmegaCombined = cbind(parFixedlistVec, omgVecBoot)
+        parFixedOmegaCombined <- cbind(parFixedlistVec, omgVecBoot)
 
         covMatrix <- cov(parFixedOmegaCombined)
         corMatrix <- cov2cor(covMatrix)

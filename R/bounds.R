@@ -28,8 +28,8 @@ nlmixrBoundsTemplate <-
     label = NA_character_,
     backTransform = "",
     condition = NA_character_,
-    trLow= -Inf,
-    trHi=Inf,
+    trLow = -Inf,
+    trHi = Inf,
     stringsAsFactors = FALSE
   )
 
@@ -159,9 +159,9 @@ nlmixrBoundsSuggest <- function(varname, lower, est, upper, fixed) {
   maskDupVarname <- duplicated(varnameC)
   if (any(maskDupVarname)) {
     stop(
-        "duplicated parameter names: '",
-        paste(unique(varnameC[maskDupVarname]), collapse = "', '"),
-        "'",
+      "duplicated parameter names: '",
+      paste(unique(varnameC[maskDupVarname]), collapse = "', '"),
+      "'",
       call. = FALSE
     )
   }
@@ -343,9 +343,13 @@ as.nlmixrBounds <- function(df, addMissingCols = FALSE) {
     varname = df$name, lower = df$lower, est = df$est, upper = df$upper, fixed = df$fix
   )
   .w <- which(!is.finite(df$est))
-  if (length(.w) > 0) stop("infinite/NA initial parameters: '",
-                           paste(df$name[.w], collapse="', '"),
-                           "'", call.=FALSE)
+  if (length(.w) > 0) {
+    stop("infinite/NA initial parameters: '",
+      paste(df$name[.w], collapse = "', '"),
+      "'",
+      call. = FALSE
+    )
+  }
   w <- which(df$lower == 0)
   if (length(w) > 0) df$lower[w] <- sqrt(.Machine$double.eps)
   w <- which(df$upper == 0)
@@ -701,11 +705,11 @@ nlmixrBoundsParserAttribute <- function(x, currentData) {
 #'   \code{\link{nlmixrBoundsValueCor}}
 #' @author Bill Denney, Matthew Fidler
 #' @noRd
-nlmixrBoundsValueFixed <- function(x, varName="") {
+nlmixrBoundsValueFixed <- function(x, varName = "") {
   valueFixed <- nlmixrBoundsReplaceFixed(x, replacementName = NULL)
   # determine the numeric value after removing 'fixed' names and using 'fixed()'
   # like 'c()'
-  value <- try(eval(valueFixed$call, list(fixed = c)), silent=TRUE)
+  value <- try(eval(valueFixed$call, list(fixed = c)), silent = TRUE)
   if (inherits(value, "try-error")) {
     stop(
       "error parsing initial condition '", deparse(x), "'",
@@ -722,8 +726,10 @@ nlmixrBoundsValueFixed <- function(x, varName="") {
     )
   } else if (any(is.nan(value))) {
     stop("NaN values in initial condition",
-         ifelse(varName == "", "", paste0(" for '", varName, "'")),
-         ": ", deparse(x), call. = FALSE)
+      ifelse(varName == "", "", paste0(" for '", varName, "'")),
+      ": ", deparse(x),
+      call. = FALSE
+    )
   }
   isFixed <- valueFixed$fixed
   if (length(isFixed) != 1) {

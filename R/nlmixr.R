@@ -476,7 +476,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     uif$env <- new.env(parent = emptyenv())
     .tv <- NULL
     if (.nTv != 0) {
-      .tv <- names(data)[-seq(1,6)]
+      .tv <- names(data)[-seq(1, 6)]
     }
     uif$env$.curTv <- .tv
     if (length(uif$noMuEtas) > 0) {
@@ -520,7 +520,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     .up <- uif$ini$upper
     .up <- .up[!is.na(.up) & is.na(.err)]
     if (any(.low != -Inf) | any(.up != Inf)) {
-      warning("Bounds are ignored in SAEM", call.=FALSE)
+      warning("Bounds are ignored in SAEM", call. = FALSE)
     }
     uif$env$mcmc <- .mcmc
     uif$env$ODEopt <- .ODEopt
@@ -540,17 +540,17 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       model = model, data = dat, inits = inits,
       mcmc = .mcmc, ODEopt = .ODEopt, seed = .seed,
       distribution = .dist, DEBUG = .DEBUG,
-      addProp=.addProp, tol=.tol, itmax=.itmax, type=.type,
-      powRange=.powRange, lambdaRange=.lambdaRange
+      addProp = .addProp, tol = .tol, itmax = .itmax, type = .type,
+      powRange = .powRange, lambdaRange = .lambdaRange
     )
     if (is(.print, "numeric")) {
       .cfg$print <- as.integer(.print)
     }
-    .cfg$cres  <- uif$saem.cres
-    .cfg$yj    <- uif$saem.yj
-    .cfg$lres  <- uif$saem.lambda
-    .cfg$low   <- uif$saem.low
-    .cfg$hi    <- uif$saem.hi
+    .cfg$cres <- uif$saem.cres
+    .cfg$yj <- uif$saem.yj
+    .cfg$lres <- uif$saem.lambda
+    .cfg$low <- uif$saem.low
+    .cfg$hi <- uif$saem.hi
     .cfg$propT <- uif$saem.propT
     .fit <- model$saem_mod(.cfg)
     .ret <-
@@ -568,8 +568,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       return(.fit)
     }
     if (inherits(.ret, "nlmixrFitData")) {
-      .ret <- nlmixr_fit0FixDat(.ret, IDLabel=.lab, origData=.origData)
-      .ret <- nlmixr_fit0AddNpde(.ret, table=table, est=est)
+      .ret <- nlmixr_fit0FixDat(.ret, IDLabel = .lab, origData = .origData)
+      .ret <- nlmixr_fit0AddNpde(.ret, table = table, est = est)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -659,8 +659,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       return(fit)
     }
     if (inherits(.ret, "nlmixrFitData")) {
-      .ret <- nlmixr_fit0FixDat(.ret, IDLabel=.lab, origData=.origData)
-      .ret <- nlmixr_fit0AddNpde(.ret, table=table, est=est)
+      .ret <- nlmixr_fit0FixDat(.ret, IDLabel = .lab, origData = .origData)
+      .ret <- nlmixr_fit0AddNpde(.ret, table = table, est = est)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -792,8 +792,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
         setOfv(env, "fo")
       }
     }
-    fit <- nlmixr_fit0AddNpde(fit, table=table, est=est)
-    fit <- nlmixr_fit0FixDat(fit, IDLabel=.lab, origData=.origData)
+    fit <- nlmixr_fit0AddNpde(fit, table = table, est = est)
+    fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
     assign("start.time", start.time, env)
     assign("est", est, env)
     assign("stop.time", Sys.time(), env)
@@ -838,7 +838,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       class(fit) <- .cls
     }
     assign("uif", .syncUif(fit, fit$popDf, fit$omega), fit$env)
-    fit <- nlmixr_fit0FixDat(fit, IDLabel=.lab, origData=.origData)
+    fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
     assign("origControl", control, fit$env)
     assign("modelId", .modelId, fit$env)
     return(fit)
@@ -878,8 +878,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
         control = control
       )
     assign("origData", .origData, fit$env)
-    assign(".fit", fit, envir = .GlobalEnv)
-    fit <- nlmixr_fit0FixDat(fit, IDLabel=.lab, origData=.origData)
+    fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
     return(fit)
   }
   else {
@@ -1101,15 +1100,15 @@ saemControl <- function(seed = 99,
                         optExpression = TRUE,
                         maxsteps = 100000L,
                         adjObf = TRUE,
-                        sum.prod=FALSE,
-                        addProp=c("combined2","combined1"),
-                        singleOde=TRUE,
-                        normal=c("rnorm", "vandercorput"),
-                        tol=1e-6,
-                        itmax=30,
-                        type=c("nelder–mead", "newuoa"),
-                        powRange=10,
-                        lambdaRange=3,
+                        sum.prod = FALSE,
+                        addProp = c("combined2", "combined1"),
+                        singleOde = TRUE,
+                        normal = c("rnorm", "vandercorput"),
+                        tol = 1e-6,
+                        itmax = 30,
+                        type = c("nelder–mead", "newuoa"),
+                        powRange = 10,
+                        lambdaRange = 3,
                         ...) {
   type <- match.arg(type)
   normal <- match.arg(normal)
@@ -1137,19 +1136,20 @@ saemControl <- function(seed = 99,
     print = print,
     DEBUG = trace,
     optExpression = optExpression,
-    sum.prod=sum.prod,
+    sum.prod = sum.prod,
     nnodes.gq = nnodes.gq,
     nsd.gq = nsd.gq,
     adjObf = adjObf,
-    addProp=match.arg(addProp),
-    singleOde=singleOde,
-    normal=normal,
-    itmax=itmax,
-    tol=tol,
-    type=type,
-    powRange=powRange,
-    lambdaRange=lambdaRange,
-    ...)
+    addProp = match.arg(addProp),
+    singleOde = singleOde,
+    normal = normal,
+    itmax = itmax,
+    tol = tol,
+    type = type,
+    powRange = powRange,
+    lambdaRange = lambdaRange,
+    ...
+  )
   if (length(.rm) > 0) {
     .ret <- .ret[!(names(.ret) %in% .rm)]
   }

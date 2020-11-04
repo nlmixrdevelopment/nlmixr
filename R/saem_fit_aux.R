@@ -405,13 +405,15 @@ calc.COV <- function(fit0) {
   dphi <- cutoff(abs(phi) * 1e-4, 1e-10)
   f1 <- sapply(1:nphi, function(j) {
     phi[, j] <- hat.phi[, j] + dphi[, j]
-    ret <- .Call(`_nlmixr_powerD`, as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt)),
-                 lambda, as.integer(yj), as.double(low), as.double(hi))
+    ret <- .Call(
+      `_nlmixr_powerD`, as.vector(dopred(phi, saem.cfg$evt, saem.cfg$opt)),
+      lambda, as.integer(yj), as.double(low), as.double(hi)
+    )
     RxODE::rxTick()
     return(ret)
   })
   f0 <- f0s <- as.vector(dopred(hat.phi, saem.cfg$evt, saem.cfg$opt))
-  f0 <-  .Call(`_nlmixr_powerD`, f0, lambda, as.integer(yj), as.double(low), as.double(hi))
+  f0 <- .Call(`_nlmixr_powerD`, f0, lambda, as.integer(yj), as.double(low), as.double(hi))
   DF <- (f1 - f0) / dphi[id, ]
   g <- ares + bres * abs(f0s)
 

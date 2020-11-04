@@ -265,17 +265,18 @@ print.nlmixrFitCore <- function(x, ...) {
         print(x$omega)
         cat(paste0("\n  Not all variables are ", ifelse(use.utf(), "\u03bc", "mu"), "-referenced.\n  Can also see BSV Correlation (", crayon::yellow(.bound), crayon::bold$blue("$omegaR"), "; diagonals=SDs)\n"))
       }
-
     }
     ## Correlations
     cat(paste0(
       "  Covariance Type (", crayon::yellow(.bound), crayon::bold$blue("$covMethod"), "): ",
       crayon::bold(x$covMethod), "\n"
     ))
-    if (exists("covList", x$env)){
+    if (exists("covList", x$env)) {
       cat("    other calculated covs (", crayon::bold$blue("setCov()"), "): ",
-          paste(crayon::bold(names(x$env$covList)), collapse=", "),
-          "\n", sep="")
+        paste(crayon::bold(names(x$env$covList)), collapse = ", "),
+        "\n",
+        sep = ""
+      )
     }
     if (exists("cor", x$env)) {
       .tmp <- .getR(x$cor)

@@ -1,4 +1,5 @@
-nlmixrTest({
+nlmixrTest(
+  {
     context("Bad UI models should raise errors")
 
     test_that("Duplicate parameters raise errors", {
@@ -252,5 +253,5 @@ nlmixrTest({
       expect_error(nlmixr(uif), "There must be at least one prediction")
     })
   },
- test="cran"
+  test = "cran"
 )

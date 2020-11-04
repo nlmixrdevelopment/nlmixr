@@ -159,7 +159,6 @@ nlme_lin_cmpt <- function(dat, parModel,
 
   ## a new env with a ref in .GlobalEnv, holding model components
   ## a hack due to non-std call by nlme
-  ## assign("..ModList", new.env(parent=emptyenv()), envir=.GlobalEnv)
 
   ## master par list
   pm <- list(
@@ -449,10 +448,6 @@ nlme_ode <- function(dat.o, model, parModel, parTrans,
     mcCores <- .xtra$mc.cores
     .rm <- c(.rm, "mc.cores")
   }
-  ## a new env with a ref in .GlobalEnv, holding model components
-  ## a hack due to non-std call by nlme
-  ## assign("..ModList", new.env(), envir=.GlobalEnv)
-
   # prep ode
   if (class(model) == "RxODE") {
     nlmixr::nlmeModList("m1", model)

@@ -31,9 +31,10 @@ addCwres <- function(fit, updateObject = TRUE, envir = parent.frame(1)) {
         assign("saem", .saem, fit$env)
       })
       .newFit <- as.focei.saemFit(.saem, .uif,
-                                  data = .nmGetData(fit), calcResid = TRUE, obf = NA,
-                                  calcCov = fit$cov, covMethod = fit$covMethod,
-                                  calcCovTime = as.vector(fit$time[["covariance"]]))
+        data = .nmGetData(fit), calcResid = TRUE, obf = NA,
+        calcCov = fit$cov, covMethod = fit$covMethod,
+        calcCovTime = as.vector(fit$time[["covariance"]])
+      )
       assign("saem", .saem, fit$env)
       assign("adjObj", fit$env$adjObj, .newFit$env)
       .df <- .newFit[, c("WRES", "CRES", "CWRES", "CPRED")]
@@ -41,9 +42,12 @@ addCwres <- function(fit, updateObject = TRUE, envir = parent.frame(1)) {
       .new <- cbind(fit, .df)
     } else {
       .newFit <- nlmixr(fit, getData(fit), "focei",
-                        control=foceiControl(maxOuterIterations = 0L, maxInnerIterations = 0L,
-                                             etaMat = as.matrix(fit$eta[,-1]), calcResid=FALSE,
-                                             covMethod = ""))
+        control = foceiControl(
+          maxOuterIterations = 0L, maxInnerIterations = 0L,
+          etaMat = as.matrix(fit$eta[, -1]), calcResid = FALSE,
+          covMethod = ""
+        )
+      )
     }
     .ob1 <- .newFit$objDf
     .ob2 <- fit$objDf
@@ -100,15 +104,15 @@ addCwres <- function(fit, updateObject = TRUE, envir = parent.frame(1)) {
   return(.new)
 }
 
-.setOfvFo <- function(fit, type=c("focei", "foce", "fo")) {
+.setOfvFo <- function(fit, type = c("focei", "foce", "fo")) {
   RxODE::.setWarnIdSort(FALSE)
   on.exit(RxODE::.setWarnIdSort(TRUE))
   .pt <- proc.time()
   .type <- match.arg(type)
   .oTime <- fit$env$time
-  .etaMat <- as.matrix(fit$eta[,-1]) ## with fo should be NULL
+  .etaMat <- as.matrix(fit$eta[, -1]) ## with fo should be NULL
   .fo <- FALSE
-  if (.type == "focei"){
+  if (.type == "focei") {
     .interaction <- TRUE
     .rn <- "FOCEi"
   } else if (.type == "foce") {
@@ -121,14 +125,17 @@ addCwres <- function(fit, updateObject = TRUE, envir = parent.frame(1)) {
     .rn <- "FO"
   }
   .inObjDf <- fit$objDf
-  if (any(rownames(.inObjDf) == .rn)){
+  if (any(rownames(.inObjDf) == .rn)) {
     return(fit)
   }
   .newFit <- nlmixr(fit, getData(fit), "focei",
-                    control=foceiControl(maxOuterIterations = 0L, maxInnerIterations = 0L,
-                                         interaction=.interaction, fo=.fo,
-                                         etaMat = .etaMat, calcResid=FALSE,
-                                         covMethod = ""))
+    control = foceiControl(
+      maxOuterIterations = 0L, maxInnerIterations = 0L,
+      interaction = .interaction, fo = .fo,
+      etaMat = .etaMat, calcResid = FALSE,
+      covMethod = ""
+    )
+  )
   .env <- fit$env
   .ob1 <- .newFit$objDf
   if (any(names(.inObjDf) == "Condition Number")) {
@@ -196,7 +203,7 @@ setOfv <- function(x, type) {
           .nnode <- as.numeric(sub(.regG, "\\1", type, perl = TRUE))
           .nsd <- as.numeric(sub(.regG, "\\2", type, perl = TRUE))
         } else {
-          stop("cannot switch objective function to '", type, "' type", call.=FALSEr)
+          stop("cannot switch objective function to '", type, "' type", call. = FALSEr)
         }
         .likTime <- proc.time()
         .saemObf <- calc.2LL(x$saem, nnodes.gq = .nnode, nsd.gq = .nsd)
@@ -239,16 +246,18 @@ setOfv <- function(x, type) {
         return(setOfv(x, type))
       }
       stop("cannot switch objective function to '", type, "' type",
-           call.=FALSE)
+        call. = FALSE
+      )
     }
   } else {
     stop("wrong type of object",
-         call.=FALSE)
+      call. = FALSE
+    )
   }
 }
 
-##'@rdname setOfv
-##'@export
+##' @rdname setOfv
+##' @export
 getOfvType <- function(x) {
   return(x$ofvType)
 }

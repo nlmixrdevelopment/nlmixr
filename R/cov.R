@@ -21,7 +21,7 @@
     assign("covList", .covList, .env)
   }
   .control <- .env$control
-  .control$maxInnerIterations <- 0L;
+  .control$maxInnerIterations <- 0L
   .control$maxOuterIterations <- 0L
   .control$boundTol <- 0 # turn off boundary
   .control$calcTables <- FALSE
@@ -35,7 +35,7 @@
       .lst$covMethod <- match.arg(.lst$covMethod, c("r,s", "r", "s"))
       .covMethodIdx <- c("r,s" = 1L, "r" = 2L, "s" = 3L)
       .control$covMethod <- .covMethodIdx[.lst$covMethod]
-    } else if (inherits(.lst$covMethod, "matrix")){
+    } else if (inherits(.lst$covMethod, "matrix")) {
       .env2$cov <- as.matrix(.lst$covMethod)
       .env2$uif <- obj$uif
       .control$covMethod <- 0L
@@ -105,7 +105,7 @@
     etaMat = .mat,
     skipCov = .skipCov,
     control = .control,
-    env=.env2
+    env = .env2
   )
   .env$cov <- .fit2$cov
   .env$popDf <- .fit2$popDf
@@ -145,20 +145,23 @@ setCov <- function(fit, method) {
   }
   if (method == .env$covMethod) {
     stop("no need to switch covariance methods, already set to '",
-         method,
-         "'", call.=FALSE)
+      method,
+      "'",
+      call. = FALSE
+    )
   }
   if (exists("covList", .env)) {
     .covList <- .env$covList
     .cov <- .covList[[method]]
     if (!is.null(.cov)) {
-      .setCov(fit, covMethod=.cov)
+      .setCov(fit, covMethod = .cov)
       .env$covMethod <- method
       return(invisible(fit))
     }
   }
   stop("different covariance types have not been calculated",
-         call.=FALSE)
+    call. = FALSE
+  )
 }
 
 ##' @export

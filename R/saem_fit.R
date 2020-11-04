@@ -18,29 +18,40 @@
 ## along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
 # genSaemUserFunction(f$rxode.pred, f$saem.pars, f$pred, f$error)
-genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pred = NULL, err=NULL,
-                                control=saemControl(), inPars=NULL) {
+genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pred = NULL, err = NULL,
+                                control = saemControl(), inPars = NULL) {
   .x <- deparse(body(pred))
   .len <- length(.x)
-  .x <- if(.x[1]=="{") .x[2:(.len-1)] else .x
+  .x <- if (.x[1] == "{") .x[2:(.len - 1)] else .x
   .len <- length(.x)
   .nendpnt <- .len
-  .mod <- RxODE::RxODE(RxODE::rxGenSaem(model, function() { return(nlmixr_pred)}, PKpars,
-                                        sum.prod=control$sum.prod,
-                                        optExpression=control$optExpression))
-  .fnPred <- bquote(function(a, b, c){
+  .mod <- RxODE::RxODE(RxODE::rxGenSaem(model, function() {
+    return(nlmixr_pred)
+  }, PKpars,
+  sum.prod = control$sum.prod,
+  optExpression = control$optExpression
+  ))
+  .fnPred <- bquote(function(a, b, c) {
     RxODE::rxLoad(.(.mod))
     RxODE::rxLock(.(.mod))
     RxODE::rxAllowUnload(FALSE)
-    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE); RxODE::rxSolveFree()})
-    .Call(`_nlmixr_saem_do_pred`, a, b, c);
+    on.exit({
+      RxODE::rxUnlock(.(.mod))
+      RxODE::rxAllowUnload(TRUE)
+      RxODE::rxSolveFree()
+    })
+    .Call(`_nlmixr_saem_do_pred`, a, b, c)
   })
-  .fn <- bquote(function(a, b, c){
+  .fn <- bquote(function(a, b, c) {
     RxODE::rxLoad(.(.mod))
     RxODE::rxLock(.(.mod))
-    on.exit({RxODE::rxUnlock(.(.mod)); RxODE::rxAllowUnload(TRUE); RxODE::rxSolveFree()})
-    if (missing(b) && missing(c)){
-      .ret <- .Call(`_nlmixr_saem_fit`, a, PACKAGE="nlmixr")
+    on.exit({
+      RxODE::rxUnlock(.(.mod))
+      RxODE::rxAllowUnload(TRUE)
+      RxODE::rxSolveFree()
+    })
+    if (missing(b) && missing(c)) {
+      .ret <- .Call(`_nlmixr_saem_fit`, a, PACKAGE = "nlmixr")
       attr(.ret, "dopred") <- .(.fnPred)
       return(.ret)
     } else {
@@ -51,7 +62,7 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
   .param <- RxODE::rxParam(.mod)
   .inits <- names(RxODE::rxInits(.mod))
   .nrhs <- length(.param) - length(.inits)
-  if (any(.param == "CMT")){
+  if (any(.param == "CMT")) {
     inPars <- unique(c(inPars, "CMT"))
   }
   .parmUpdate <- sapply(.param, function(x) {
@@ -119,7 +130,7 @@ gen_saem_user_fn <- genSaemUserFunction
 #'
 #' ode <- "d/dt(depot) =-KA*depot;
 #'         d/dt(centr) = KA*depot - KE*centr;"
-#' m1 = RxODE(ode, modName="m1")
+#' m1 <- RxODE(ode, modName = "m1")
 #' # ode <- "C2 = centr/V;
 #' #      d/dt(depot) =-KA*depot;
 #' #      d/dt(centr) = KA*depot - KE*centr;"
@@ -137,7 +148,7 @@ gen_saem_user_fn <- genSaemUserFunction
 #' PRED <- function() centr / V
 #' PRED2 <- function() C2
 #'
-#'  saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
+#' saem_fit <- gen_saem_user_fn(model = m1, PKpars, pred = PRED)
 #' # saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
 #'
 #'
@@ -160,11 +171,11 @@ configsaem <- function(model, data, inits,
                        mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
                        ODEopt = list(atol = 1e-6, rtol = 1e-4, method = "lsoda", transitAbs = FALSE, maxeval = 100000),
                        distribution = c("normal", "poisson", "binomial"),
-                       addProp=c("combined2","combined1"),
+                       addProp = c("combined2", "combined1"),
                        seed = 99, fixed = NULL, DEBUG = 0,
-                       normal=c("rnorm", "vandercorput"),
-                       tol=1e-4, itmax=100L, type=c("nelder–mead", "newuoa"),
-                       lambdaRange=3, powRange=10) {
+                       normal = c("rnorm", "vandercorput"),
+                       tol = 1e-4, itmax = 100L, type = c("nelder–mead", "newuoa"),
+                       lambdaRange = 3, powRange = 10) {
   type.idx <- c("nelder–mead" = 1L, "newuoa" = 2L)
   type <- match.arg(type)
   type <- type.idx[type]
@@ -180,8 +191,8 @@ configsaem <- function(model, data, inits,
   ## RxODE::rxTrans(data, model)
   data <- list(nmdat = data)
 
-  neq    <- attr(model$saem_mod, "neq")
-  nlhs   <- attr(model$saem_mod, "nlhs")
+  neq <- attr(model$saem_mod, "neq")
+  nlhs <- attr(model$saem_mod, "nlhs")
   inPars <- attr(model$saem_mod, "inPars")
   ninputpars <- length(inPars)
   opt <- optM <- c(list(neq = neq, nlhs = nlhs, inits = numeric(neq)),
@@ -204,8 +215,9 @@ configsaem <- function(model, data, inits,
   if (is.null(names(inits$theta))) names(inits$theta) <- rep("", length(inits$theta))
   inits.save <- inits
   inits$theta.fix <- matrix(names(inits$theta),
-                            byrow = T,
-                            ncol = model$N.eta)
+    byrow = T,
+    ncol = model$N.eta
+  )
   inits$theta <- matrix(inits$theta, byrow = T, ncol = model$N.eta)
   model$cov.mod <- 1 - is.na(inits$theta)
   data$N.covar <- nrow(inits$theta) - 1
@@ -425,7 +437,7 @@ configsaem <- function(model, data, inits,
   .tmp <- diag(sqrt(inits$omega))
   if (model$N.eta == 1) .tmp <- matrix(sqrt(inits$omega))
   if (normal == "vandercorput") {
-    .mat2 <- matrix(RxODE::rxnormV(n=length(phiM)), dim(phiM))
+    .mat2 <- matrix(RxODE::rxnormV(n = length(phiM)), dim(phiM))
   } else {
     .mat2 <- matrix(rnorm(phiM), dim(phiM))
   }
@@ -476,7 +488,7 @@ configsaem <- function(model, data, inits,
   opt$ODEopt <- ODEopt
   optM$ODEopt <- ODEopt
   cfg <- list(
-    ODEopt=ODEopt,
+    ODEopt = ODEopt,
     inits = inits.save,
     nu = mcmc$nu,
     niter = niter,
@@ -795,7 +807,8 @@ focei.theta.saemFit <- function(object, uif, ...) {
       x <- .tmp$err[.x]
       if (any(x == c(
         "add", "norm", "dnorm", "lnorm", "dlnorm",
-        "dlogn", "logn"))) {
+        "dlogn", "logn"
+      ))) {
         if (!is.na(.tmp$est[.x])) {
           return(TRUE)
         }

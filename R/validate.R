@@ -20,8 +20,10 @@ nlmixrValidate <- function(type = NULL, check = FALSE) {
     else {
       if (any(type == .tests)) {
         if (check) {
-          devtools::check(env_vars = c(NOT_CRAN = "true",
-                                       nmCran = type))
+          devtools::check(env_vars = c(
+            NOT_CRAN = "true",
+            nmCran = type
+          ))
         }
         else {
           old.wd <- getwd()
@@ -30,8 +32,10 @@ nlmixrValidate <- function(type = NULL, check = FALSE) {
             Sys.unsetenv("nmCran")
           })
           Sys.setenv(nmCran = type)
-          path <- file.path(system.file("tests", package = "nlmixr"),
-                            "testthat")
+          path <- file.path(
+            system.file("tests", package = "nlmixr"),
+            "testthat"
+          )
           setwd(path)
           pt <- proc.time()
           testthat::test_dir(path)
@@ -47,8 +51,10 @@ nlmixrValidate <- function(type = NULL, check = FALSE) {
           Sys.unsetenv("nmCran")
         })
         Sys.setenv(nmCran = "true")
-        path <- file.path(system.file("tests", package = "nlmixr"),
-                          "testthat")
+        path <- file.path(
+          system.file("tests", package = "nlmixr"),
+          "testthat"
+        )
         setwd(path)
         pt <- proc.time()
         testthat::test_dir(path, filter = type)
@@ -64,8 +70,10 @@ nlmixrValidate <- function(type = NULL, check = FALSE) {
       setwd(old.wd)
       Sys.unsetenv("nmCran")
     })
-    path <- file.path(system.file("tests", package = "nlmixr"),
-                      "testthat")
+    path <- file.path(
+      system.file("tests", package = "nlmixr"),
+      "testthat"
+    )
     setwd(path)
     for (t in .tests) {
       Sys.setenv(nmCran = t)

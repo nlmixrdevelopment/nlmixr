@@ -780,9 +780,6 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
       data <- res[[2]]
       covNames <- res[[3]]
 
-      # assign('fitobject', fitobject, envir = .GlobalEnv)
-      # assign('updatedMod', updatedMod, envir = .GlobalEnv)
-
       reassignVars <- rownames(fitobject$parFixedDf)[fitobject$parFixedDf$Estimate != fitobject$parFixedDf[, "Back-transformed"] & fitobject$parFixedDf[, "Back-transformed"] == 0]
       if (length(reassignVars) > 0) {
         ini2 <- as.data.frame(updatedMod$ini)

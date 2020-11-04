@@ -128,7 +128,7 @@ if (FALSE) {
     # dynmodel ----------------------------------------------------------------
     control <- dynmodelControl(method = method, nlmixrOutput = nlmixrOutput, covMethod = covMethod) # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                                              (fit <- dynmodel(system = model, model = error.model, data = et, inits = inits, control = control))
+    (fit <- dynmodel(system = model, model = error.model, data = et, inits = inits, control = control))
 
     # Testing ---
     test.fit.pars <- fit$res[, 1]
@@ -143,9 +143,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
+    )
     # yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
@@ -305,7 +305,7 @@ if (FALSE) {
     control <- dynmodelControl(method = "Nelder-Mead") # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
     # control = dynmodelControl(method = "Nelder-Mead", normType = "constant", scaleType = "norm")
 
-                               (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
+    (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
 
     # Testing ---
     test.fit.pars <- fit$res[, 1]
@@ -320,9 +320,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
+    )
     # yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
@@ -490,7 +490,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = "bobyqa") # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                              (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
+    (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
 
     # Simulation and Estimation Plot ---
     errorless.data <- data.frame(Time = .sim.output$time, Y = .sim.output$C1, Type = rep("Errorless  Sim", length(.sim.output$time)))
@@ -500,9 +500,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g")
-                 ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g")
+    ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
     residual.data <- data.frame(Time = .sim.output$time, RES = .sim.output$C1 - .output$PRED)
@@ -688,7 +688,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = "bobyqa") # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                                (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
+    (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
 
     # Simulation and Estimation Plot ---
     errorless.data <- data.frame(Time = .sim.output$time, Y = .sim.output$C1, Type = rep("Errorless  Sim", length(.sim.output$time)))
@@ -698,9 +698,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g")
-                 ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g")
+    ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
     residual.data <- data.frame(Time = .sim.output$time, RES = .sim.output$C1 - .output$PRED)
@@ -862,7 +862,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = "Nelder-Mead") # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                              (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
+    (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
 
     # Testing ---
 
@@ -881,10 +881,10 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10)),
-                 yscale.components = yscale.components.log10ticks
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10)),
+      yscale.components = yscale.components.log10ticks
+    )
 
     # Residual Plot ---
     residual.data <- data.frame(Time = output$time, RES = output$C1 - .output$PRED)
@@ -1033,7 +1033,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = "Nelder-Mead") # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                               (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
+    (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
 
     # Testing ---
 
@@ -1052,10 +1052,10 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10)),
-                 yscale.components = yscale.components.log10ticks
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10)),
+      yscale.components = yscale.components.log10ticks
+    )
 
     # Residual Plot ---
     residual.data <- data.frame(Time = output$time, RES = output$C1 - .output$PRED)
@@ -1209,7 +1209,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = method, nlmixrOutput = nlmixrOutput) # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                                                          (fit <- dynmodel(system = model, model = error.model, data = et, inits = inits, control = control))
+    (fit <- dynmodel(system = model, model = error.model, data = et, inits = inits, control = control))
 
     # Testing ---
     test.fit.pars <- fit$res[, 1]
@@ -1224,9 +1224,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
+    )
     # yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
@@ -1423,9 +1423,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g")
-                 ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g")
+    ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
     residual.data <- data.frame(Time = .sim.output$time, RES = .sim.output$C1 - .output$PRED)
@@ -1638,7 +1638,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = "bobyqa") # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                             (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
+    (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
 
     # Simulation and Estimation Plot ---
     errorless.data <- data.frame(Time = .sim.output$time, Y = .sim.output$C1, Type = rep("Errorless  Sim", length(.sim.output$time)))
@@ -1648,9 +1648,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g")
-                 ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g")
+    ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
     residual.data <- data.frame(Time = .sim.output$time, RES = .sim.output$C1 - .output$PRED)
@@ -1830,7 +1830,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = method, lower = .lower, upper = .upper) # bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                                     (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
+    (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
 
     # Testing ---
     test.fit.pars <- fit$res[, 1]
@@ -1845,10 +1845,10 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10)),
-                 yscale.components = yscale.components.log10ticks
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10)),
+      yscale.components = yscale.components.log10ticks
+    )
 
     # Residual Plot ---
     residual.data <- data.frame(Time = output$time, RES = output$C1 - .output$PRED)
@@ -2007,7 +2007,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = "Nelder-Mead") # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                                               (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
+    (fit <- dynmodel(system = model, model = error.model, evTable = et, inits = inits, data = data, control = control))
 
     # Testing ---
     test.fit.pars <- fit$res[, 1]
@@ -2022,10 +2022,10 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10)),
-                 yscale.components = yscale.components.log10ticks
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10)),
+      yscale.components = yscale.components.log10ticks
+    )
 
     # Residual Plot ---
     residual.data <- data.frame(Time = output$time, RES = output$C1 - .output$PRED)
@@ -2181,7 +2181,7 @@ if (FALSE) {
     control$method <- method
     control$nlmixrOutput <- nlmixrOutput
     assign("data", et, envir = .GlobalEnv)
-                            (fit <- dynmodel(system = model, model = error.model, data = et, inits = inits, control = control))
+    (fit <- dynmodel(system = model, model = error.model, data = et, inits = inits, control = control))
 
     # Testing ---
     test.fit.pars <- fit$res[, 1]
@@ -2196,9 +2196,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
+    )
     # yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
@@ -2439,9 +2439,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g")
-                 ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g")
+    ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
     residual.data <- data.frame(Time = .sim.output$time, RES = .sim.output$eff - .output$PRED)
@@ -2663,9 +2663,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g")
-                 ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g")
+    ) # , scales = list(y = list(log = 10)), yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---
     residual.data <- data.frame(Time = .sim.output$time, RES = .sim.output$eff - .output$PRED)
@@ -2861,7 +2861,7 @@ if (FALSE) {
 
     control <- dynmodelControl(method = method, nlmixrOutput = nlmixrOutput, covMethod = covMethod) # , lower=c(0,0,0), upper = c(5,100,1)) #bobyqa, Nelder-Mead, lbfgsb3c, PORT
 
-                                              (fit <- dynmodel(system = model, model = error.model, data = et, inits = inits, control = control))
+    (fit <- dynmodel(system = model, model = error.model, data = et, inits = inits, control = control))
 
     # Testing ---
     test.fit.pars <- fit$res[, 1]
@@ -2876,9 +2876,9 @@ if (FALSE) {
     plot1.data <- rbind(errorless.data, error.data, fit.data)
 
     p1 <- xyplot(Y ~ Time,
-                 data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
-                 pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
-                 )
+      data = plot1.data, groups = factor(Type, labels = c("Errorless", "Error", "Fit")), main = "Simulated and Estimation",
+      pch = 20, auto.key = list(columns = 3), type = c("p", "g"), scales = list(y = list(log = 10))
+    )
     # yscale.components = yscale.components.log10ticks)
 
     # Residual Plot ---

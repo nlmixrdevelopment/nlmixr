@@ -65,7 +65,8 @@ addNpde <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject 
   .evid[is.na(object$RES) & !is.na(object$PRED)] <- 2L
   .new <- cbind(object, .Call(
     `_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj,
-    .sim$rxLow, .sim$rxHi, ties, cholSEtol))
+    .sim$rxLow, .sim$rxHi, ties, cholSEtol
+  ))
   class(.new) <- .cls
   if (updateObject) {
     .parent <- parent.frame(2)

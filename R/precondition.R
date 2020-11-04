@@ -8,19 +8,20 @@
 #' @param ntry number of tries before giving up on a pre-conditioned
 #'   covariance estimate
 #'
-#'@export
+#' @export
 preconditionFit <- function(fit, estType = c("full", "posthoc", "none"),
-                            ntry=10L) {
+                            ntry = 10L) {
   RxODE::.setWarnIdSort(FALSE)
   on.exit(RxODE::.setWarnIdSort(TRUE))
   if (!exists("R", fit$env)) {
     stop("this assumes a covariance matrix with a R matrix",
-         call.=FALSE)
+      call. = FALSE
+    )
   }
   .R <- fit$R
   .covMethod <- ""
   .i <- 1
-  while(.i < ntry & .covMethod != "r,s"){
+  while (.i < ntry & .covMethod != "r,s") {
     .i <- .i + 1
     pre <- preCondInv(.R)
     P <- symengine::Matrix(pre)
@@ -69,12 +70,13 @@ preconditionFit <- function(fit, estType = c("full", "posthoc", "none"),
   }
   if (.covMethod != "r,s") {
     stop("preconditioning failed after ", ntry, "tries",
-         call.=FALSE)
+      call. = FALSE
+    )
   }
   cov <- pre %*% newFit$cov %*% t(pre)
   dimnames(cov) <- dimnames(pre)
-  assign("precondition", cov, env=fit$env)
-  .setCov(fit, covMethod=cov)
+  assign("precondition", cov, env = fit$env)
+  .setCov(fit, covMethod = cov)
   assign("covMethod", "precondition", fit$env)
   return(invisible(fit$env$precondition))
 }
