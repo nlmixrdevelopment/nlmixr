@@ -358,7 +358,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
 
         pars <- system$get.modelVars()$params
         po <- unlist(as.list(env)[pars])
-        x <- system$run(po, ev, initCondition)
+        x <- system$run(po, ev)
         if (any(is.na(x))) {
           print(ID[1])
           print(po)

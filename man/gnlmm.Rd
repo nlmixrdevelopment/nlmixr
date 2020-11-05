@@ -59,7 +59,9 @@ llik <- function() {
 inits <- list(THTA = c(1, 1, 1), OMGA = list(ETA[1] ~ 1))
 
 gnlmm(llik, rats, inits, control = list(nAQD = 3))
-\dontrun{
+
+\donttest{
+
 llik <- function() {
   if (group == 1) {
     lp <- THETA[1] + THETA[2] * logtstd + ETA[1]
@@ -99,16 +101,21 @@ llik <- function() {
   dnorm(DV, pred, sd = sqrt(sig2), log = TRUE)
 }
 inits <- list(THTA = c(-3.22, 0.47, -2.45, 0))
-inits$OMGA <- list(ETA[1] ~ .027, ETA[2] ~ .37)
-# inits$OMGA=list(ETA[1]+ETA[2]~c(.027, .01, .37))
-theo <- read.table("theo_md.txt", head = TRUE)
+inits$OMGA <- list(ETA[1]+ETA[2]~c(.027, .01, .37))
+
+theo <- theo_md
 
 fit <- gnlmm(llik, theo, inits, pars, sys1,
   control = list(trace = TRUE, nAQD = 5)
 )
 
+fit2 <- gnlmm2(llik, theo, inits, pars, sys1,
+  control = list(trace = TRUE, nAQD = 5)
+)
+
 cv <- calcCov(fit)
 cbind(fit$par[fit$nsplt == 1], sqrt(diag(cv)))
+
 }
 }
 \author{
