@@ -43,9 +43,15 @@ llik <- function() {
 }
 inits <- list(THTA = c(-3.22, 0.47, -2.45, 0))
 inits$OMGA <- list(ETA[1] ~ .027, ETA[2] ~ .37)
-theo <- read.table("theo_md.txt", head = TRUE)
+theo <- theo_md
 
 fit <- gnlmm(llik, theo, inits, pars, sys1,
+  control = list(trace = TRUE, nAQD = 5)
+)
+
+# This uses stan AD for derivatives
+
+fit2 <-gnlmm2(llik, theo, inits, pars, sys1,
   control = list(trace = TRUE, nAQD = 5)
 )
 
