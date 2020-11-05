@@ -1258,7 +1258,9 @@ foceiControl <- function(sigdig = 3, ...,
 ##' @return FOCEi fit object
 ##' @export
 ##' @examples
-##' \dontrun{
+##'
+##' \donttest{
+##'
 ##' ## Comparison to Wang2007 objective functions
 ##'
 ##' mypar2 = function ()
@@ -1511,13 +1513,13 @@ foceiControl <- function(sigdig = 3, ...,
 ##'
 ##' one.cmt <- function() {
 ##'   ini({
-##'       tka <- .5   # log Ka
-##'       tcl <- -3.2 # log Cl
-##'       tv <- -1    # log V
-##'       eta.ka ~ 1
-##'       eta.cl ~ 2
-##'       eta.v ~ 1
-##'       add.err <- 0.1
+##'       tka <- .44   # log Ka
+##'       tcl <- log(c(0, 2.7, 100)) # log Cl
+##'       tv <- 3.45    # log V
+##'       eta.ka ~ 0.6
+##'       eta.cl ~ 0.3
+##'       eta.v ~ 0.1
+##'       add.err <- 0.7
 ##'   })
 ##'   model({
 ##'       ka <- exp(tka + eta.ka)
