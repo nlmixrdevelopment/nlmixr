@@ -92,25 +92,23 @@ vpc_nlmixr_nlme <- function(fit, nsim = 100, condition = NULL, ...) {
   })
   ..ModList <- nlmeModList()
 
-  options(warn = -1)
+  suppressMessages({
+    s <- sapply(1:nsim, sim.one, x = fit)
 
-  s <- sapply(1:nsim, sim.one, x = fit)
+    cond.var <- if (is.null(condition)) rep(1, dim(..ModList$dat.g)[1]) else ..ModList$dat.g[, condition]
+    levels <- sort(unique(cond.var))
+    for (k in 1:length(levels)) {
+      sel <- cond.var == levels[k]
+      xs <- s[sel, ]
+      xd <- ..ModList$dat.g[sel, ]
+      matplot(xd$TIME, xs, col = "#33FF66", pch = 19, xlab = "TIME", ylab = "DV")
+      points(xd$TIME, xd$DV, col = "#000066")
 
-  cond.var <- if (is.null(condition)) rep(1, dim(..ModList$dat.g)[1]) else ..ModList$dat.g[, condition]
-  levels <- sort(unique(cond.var))
-  for (k in 1:length(levels)) {
-    sel <- cond.var == levels[k]
-    xs <- s[sel, ]
-    xd <- ..ModList$dat.g[sel, ]
-    matplot(xd$TIME, xs, col = "#33FF66", pch = 19, xlab = "TIME", ylab = "DV")
-    points(xd$TIME, xd$DV, col = "#000066")
-
-    if (!is.null(condition)) {
-      title(paste0(condition, ": ", levels[k]))
+      if (!is.null(condition)) {
+        title(paste0(condition, ": ", levels[k]))
+      }
     }
-  }
-
-  options(warn = 0)
+  })
   invisible(NULL)
 }
 
