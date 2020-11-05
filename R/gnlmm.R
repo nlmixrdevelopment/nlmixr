@@ -22,6 +22,7 @@
 parseOM <- function(OMGA) {
   re <- "\\bETA\\[(\\d+)\\]\\b"
   .offset <- as.integer(0)
+  .env <- environment()
   lapply(1:length(OMGA), function(k) {
     s <- OMGA[[k]]
     f <- eval(parse(text = (sprintf("y~%s", deparse(s[[2]])))))
@@ -33,7 +34,7 @@ parseOM <- function(OMGA) {
 
     ix <- as.integer(sub(re, "\\1", r))
     if (any(ix - (.offset + 1:nr))) stop("invalid OMGA specs")
-    .offset <<- .offset + nr
+    assign(".offset", .offset + nr, .env)
     eval(s[[3]])
   })
 }
@@ -43,12 +44,15 @@ genOM <- function(s) {
   nr <- sum(sapply(s, getNR))
   .mat <- matrix(0, nr, nr)
   .offset <- as.integer(0)
+  .env <- environment()
   j <- lapply(1:length(s), function(k) {
     a <- s[[k]]
     p <- getNR(a)
     starts <- row(.mat) > .offset & col(.mat) > .offset
-    .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset + p & starts] <<- a
-    .offset <<- .offset + p
+    .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset + p & starts] <- a
+    .offset <- .offset + p
+    assign(".mat", .mat, .env)
+    assign(".offset", .offset, .env)
   })
   a <- .mat[col(.mat) >= row(.mat)]
   .mat <- t(.mat)
@@ -61,12 +65,15 @@ genOMinv.5 <- function(s) {
   nr <- sum(sapply(s, getNR))
   .mat <- matrix(0, nr, nr)
   .offset <- as.integer(0)
+  .env <- environment()
   j <- lapply(1:length(s), function(k) {
     a <- s[[k]]
     p <- getNR(a)
     starts <- row(.mat) > .offset & col(.mat) > .offset
-    .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset + p & starts] <<- a
-    .offset <<- .offset + p
+    .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset + p & starts] <- a
+    .offset <- .offset + p
+    assign(".mat", .mat, .env)
+    assign(".offset", .offset, .env)
   })
   .mat
 }
@@ -113,7 +120,8 @@ multi2 <- function(mu, vmat, n) {
 #' @param mc.cores number of cores (for Linux only)
 #' @return observed and predicted
 #' @examples
-#' \dontrun{
+#'
+#' \donttest{
 #'
 #' ode <- "
 #' d/dt(depot) =-KA*depot;
@@ -132,9 +140,12 @@ multi2 <- function(mu, vmat, n) {
 #'   pred <- centr / V
 #'   dnorm(DV, pred, sd = sqrt(sig2), log = TRUE)
 #' }
+#'
 #' inits <- list(THTA = c(-3.22, 0.47, -2.45, 0))
-#' inits$OMGA <- list(ETA[1] ~ .027, ETA[2] ~ .37)
-#' theo <- read.table("theo_md.txt", head = TRUE)
+#'
+#' inits$OMGA <- list(ETA[1]+ETA[2]~c(.027, .01, .37))
+#'
+#' theo <- theo_md
 #'
 #' fit <- gnlmm(llik, theo, inits, pars, sys1,
 #'   control = list(trace = TRUE, nAQD = 5)
@@ -147,7 +158,9 @@ multi2 <- function(mu, vmat, n) {
 #' s <- prediction(fit, pred)
 #' plot(s$p, s$dv)
 #' abline(0, 1, col = "red")
+#'
 #' }
+#'
 #' @export
 # new prediction function with new data
 prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
@@ -428,8 +441,10 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
   }
   blik <- body(llik)
   starts <- matrix(0.1, nSUB, nETA)
+  .startsEnv <- .env <- environment()
   omga_save <- NULL
   update_starts <- TRUE
+  pvd <- NULL
 
   obj <- function(th, noomga = FALSE) {
     if (noomga) th <- c(th, omga_save)
@@ -511,7 +526,7 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
             return(pvd)
           }
           ym <- ..g.fn(par)
-          pvd <<- list(par, ym)
+          assign("pvd", list(par, ym), .env)
         }
         f <- function(x) fg(x)[[2]]
         g <- function(x) {
@@ -572,7 +587,10 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
 
     m <- matrix(unlist(..lik.sub), ncol = 2 + nETA, byrow = TRUE)
 
-    if (update_starts) starts[m[, 2], ] <<- m[, 3:(2 + nETA)]
+    if (update_starts) {
+      starts[m[, 2], ] <- m[, 3:(2 + nETA)]
+      assign("starts", starts, .startsEnv)
+    }
     r <- sum(m[, 1])
     attr(r, "subj") <- m[, 1]
     r

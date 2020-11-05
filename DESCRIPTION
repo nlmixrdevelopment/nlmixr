@@ -42,7 +42,8 @@ Suggests:
     dparser,
     vpc (>= 1.0.0),
     ggtext,
-    xgxr
+    xgxr,
+    Deriv
 Version: 1.1.1-9
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",

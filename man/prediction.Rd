@@ -22,7 +22,8 @@ observed and predicted
 Generate predictions after a generalized non-linear mixed effect model fit
 }
 \examples{
-\dontrun{
+
+\donttest{
 
 ode <- "
 d/dt(depot) =-KA*depot;
@@ -41,9 +42,12 @@ llik <- function() {
   pred <- centr / V
   dnorm(DV, pred, sd = sqrt(sig2), log = TRUE)
 }
+
 inits <- list(THTA = c(-3.22, 0.47, -2.45, 0))
-inits$OMGA <- list(ETA[1] ~ .027, ETA[2] ~ .37)
-theo <- read.table("theo_md.txt", head = TRUE)
+
+inits$OMGA <- list(ETA[1]+ETA[2]~c(.027, .01, .37))
+
+theo <- theo_md
 
 fit <- gnlmm(llik, theo, inits, pars, sys1,
   control = list(trace = TRUE, nAQD = 5)
@@ -56,5 +60,7 @@ pred <- function() {
 s <- prediction(fit, pred)
 plot(s$p, s$dv)
 abline(0, 1, col = "red")
+
 }
+
 }
