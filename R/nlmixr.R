@@ -877,7 +877,9 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
         nlmixrObject = .nmf,
         control = control
       )
-    assign("origData", .origData, fit$env)
+    print(fit)
+    .env <- fit$env
+    assign("origData", .origData, .env)
     fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
     return(fit)
   }

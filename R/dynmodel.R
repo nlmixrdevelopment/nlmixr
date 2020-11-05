@@ -21,71 +21,6 @@ as.dynmodel <- function(x) {
   return(.ret)
 }
 
-#' @export
-#' @importFrom ggplot2 aes_string facet_wrap geom_abline geom_line geom_point ggplot ggtitle
-plot.nlmixrDynmodel <- function(x, y, ...) {
-  .lst <- list()
-  .tp <- traceplot(x)
-  if (!is.null(.tp)) .lst[[length(.lst) + 1]] <- .tp
-  .dat <- as.data.frame(x)
-  .p1 <-
-    ggplot2::ggplot(.dat, ggplot2::aes_string("PRED", "DV")) +
-    ggplot2::geom_abline(slope = 1, intercept = 0, col = "red", size = 1.2) +
-    ggplot2::geom_point() +
-    xlab("Predictions") +
-    ggplot2::ggtitle("DV vs PRED")
-  .lst[[length(.lst) + 1]] <- .p1
-
-  .p0 <-
-    ggplot2::ggplot(.dat, ggplot2::aes_string(x = "PRED", y = "RES")) +
-    ggplot2::geom_point() +
-    ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-    ggplot2::ggtitle("PRED vs RES")
-  .lst[[length(.lst) + 1]] <- .p0
-  .p0 <-
-    ggplot2::ggplot(.dat, ggplot2::aes_string(x = "PRED", y = "WRES")) +
-    ggplot2::geom_point() +
-    ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-    ggplot2::ggtitle("PRED vs WRES")
-  .lst[[length(.lst) + 1]] <- .p0
-  .p0 <-
-    ggplot2::ggplot(.dat, ggplot2::aes_string(x = "TIME", y = "RES")) +
-    ggplot2::geom_point() +
-    ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-    ggplot2::ggtitle("TIME vs RES")
-  .lst[[length(.lst) + 1]] <- .p0
-  .p0 <-
-    ggplot2::ggplot(.dat, ggplot2::aes_string(x = "TIME", y = "WRES")) +
-    ggplot2::geom_point() +
-    ggplot2::geom_abline(slope = 0, intercept = 0, col = "red") +
-    ggplot2::ggtitle("TIME vs WRES")
-  .lst[[length(.lst) + 1]] <- .p0
-  .ids <- unique(.dat$ID)
-  .s <- seq(1, length(.ids), by = 16)
-  .j <- 0
-  for (i in .s) {
-    .j <- .j + 1
-    .tmp <- .ids[seq(i, i + 15)]
-    .tmp <- .tmp[!is.na(.tmp)]
-    .d1 <- .dat[.dat$ID %in% .tmp, ]
-
-    .p3 <-
-      ggplot2::ggplot(.d1, aes(x = TIME, y = DV)) +
-      ggplot2::geom_point() +
-      ggplot2::geom_line(aes(x = TIME, y = PRED), col = "red", size = 1.2) +
-      ggplot2::facet_wrap(~ID) +
-      ggplot2::ggtitle(sprintf("Individual Plots (%s of %s)", .j, length(.s)))
-    .lst[[length(.lst) + 1]] <- .p3
-  }
-  class(.lst) <- "nlmixrPlotList"
-  return(.lst)
-}
-
-#' @export
-#' @rdname gof
-plot.dyn.ID <- gof
-# #########################################################################
-
 # plot.dyn.ID() -----------------------------------------------------------
 #' Plot of a non-population dynamic model fit
 #'
@@ -130,6 +65,11 @@ gof <- function(x, ...) {
     abline(h = 0, col = "red", lty = 2)
   }
 }
+
+#' @export
+#' @rdname gof
+plot.dyn.ID <- gof
+# #########################################################################
 
 # print.dyn.ID() ----------------------------------------------------------
 #' Print a non-population dynamic model fit object
@@ -239,9 +179,7 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
                               .cov, .sgy, .dynmodelControl, .nobs2 = 0,
                               .pt = proc.time(),
                               .rxControl = RxODE::rxControl()) {
-
-  # setup ----
-  .env <- new.env(parent = emptyenv()) # store information for attaching to fit
+  .Estimates <- .dynmodelObject$res[, 1]
   .model <- RxODE::rxSymPySetupPred(.nlmixrObject$rxode.pred,
     function() {
       return(nlmixr_pred)
@@ -253,15 +191,8 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
     theta.derivs = FALSE, optExpression = TRUE, # control$optExpression,
     run.internal = TRUE, only.numeric = TRUE
   )
-
-  # all caps for data ----
-  names(.data) <- toupper(names(.data))
-
-  # nlmixr data frame ----
-  .nlmixrObject.df <- as.data.frame(.nlmixrObject$ini)
-
-  ## .parFixedDf ----
   .temp.model <- .model
+  .nlmixrObject.df <- as.data.frame(.nlmixrObject$ini)
   # assign fixed terms
   .fix.index <-
     if (length(which(.nlmixrObject.df$fix == TRUE)) == 0) {
@@ -270,7 +201,6 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
       which(.nlmixrObject.df$fix == TRUE)
     } # obtain row location for fixed terms
   .ref.fix <- substring(.nlmixrObject.df$name[.fix.index], 2)
-
   .temp.log.fixPars.index <- intersect(.fix.index, .temp.model$log.etas)
   .temp.log.fixPars <- .nlmixrObject.df$est[.temp.log.fixPars.index]
   names(.temp.log.fixPars) <- substring(.nlmixrObject.df$name[.temp.log.fixPars.index], 2)
@@ -290,83 +220,6 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
       which(!is.na(.nlmixrObject.df$ntheta) & is.na(.nlmixrObject.df$err), TRUE)[-which(.nlmixrObject.df$fix == TRUE)]
     }
 
-  .ci <- .dynmodelControl$ci
-  .Estimates <- .dynmodelObject$res[, 1]
-
-  .Back.Transformed.Y.N <- (names(.Estimates) %in% names(.Estimates[.model$log.thetas]))
-  .Back.Transformed <- ifelse(.Back.Transformed.Y.N, exp(.Estimates), .Estimates)
-  .SE <- .dynmodelObject$res[, 2]
-  .RSE <- .dynmodelObject$res[, 3]
-  .z.score <- qnorm((1 - .ci) / 2, lower.tail = FALSE)
-  .ci.lower <-
-    ifelse(
-      .Back.Transformed.Y.N,
-      exp(.dynmodelObject$res[, 1] - .z.score * .dynmodelObject$res[, 2]),
-      .dynmodelObject$res[, 1] - .z.score * .dynmodelObject$res[, 2]
-    )
-  .ci.upper <-
-    ifelse(
-      .Back.Transformed.Y.N,
-      exp(.dynmodelObject$res[, 1] + .z.score * .dynmodelObject$res[, 2]),
-      .dynmodelObject$res[, 1] + .z.score * .dynmodelObject$res[, 2]
-    )
-
-  .parFixedDf <-
-    data.frame(
-      Estimate = .Estimates,
-      SE = .SE,
-      RSE = .RSE,
-      Back.Transformed = .Back.Transformed,
-      ci.lower = .ci.lower,
-      ci.upper = .ci.upper
-    )
-
-  .env$parFixedDf <- .parFixedDf
-
-  ## .parFixed ----
-  .digs <- .dynmodelControl$digs
-
-  .Back.Transformed.label <- paste0("Back-Transformed(", .ci * 100, "%CI)")
-  .Back.Transformed.df <- paste0(
-    formatC(signif(.Back.Transformed, digits = .digs), digits = .digs, format = "fg", flag = "#"),
-    rep(" (", length(.Back.Transformed)),
-    formatC(signif(.ci.lower, digits = .digs), digits = .digs, format = "fg", flag = "#"),
-    rep(", ", length(.Back.Transformed)),
-    formatC(signif(.ci.upper, digits = .digs), digits = .digs, format = "fg", flag = "#"),
-    rep(")", length(.Back.Transformed))
-  )
-
-  # assign labels to parFixed
-  .parameters.df <- .nlmixrObject.df$label[.theta.index]
-  if (any(is.na(.parameters.df))) {
-    .parameters.df[is.na(.parameters.df)] <- ""
-  } else {
-    .parameters.df <- .nlmixrObject.df$label[.theta.index]
-  }
-  if (length(.parameters.df) < length(.Estimates)) {
-    .parameters.df <- c(.parameters.df, rep("", sum(!is.na(.nlmixrObject.df$err))))
-  }
-
-  .parFixed <- data.frame(
-    .parameters.df,
-    formatC(signif(.Estimates, digits = .digs), digits = .digs, format = "fg", flag = "#"),
-    formatC(signif(.SE, digits = .digs), digits = .digs, format = "fg", flag = "#"),
-    formatC(signif(.RSE, digits = .digs), digits = .digs, format = "fg", flag = "#"),
-    .Back.Transformed.df
-  )
-
-  names(.parFixed) <- c("Parameter", "Est.", "SE", "%RSE", .Back.Transformed.label)
-
-  .env$parFixed <- .parFixed
-
-  ## $covMethod ----
-  .covMethod <- .dynmodelControl$covMethod
-  .env$covMethod <- .covMethod
-
-  ## $fixef ----
-  .fixef <- .dynmodelObject$res[, 1]
-  .env$fixef <- .fixef
-
   ## $nlmixrObject ----
   .temp.theta.index <-
     c(1:sum(
@@ -380,119 +233,54 @@ as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
   ini$est[.temp.theta.index] <- c(.temp.replacements)
   class(ini) <- c("nlmixrBounds", "data.frame")
   .nlmixrObject$ini <- ini
+  uif <- .nlmixrObject
 
-  .env$uif <- .nlmixrObject
-
-  ## $dynmodelObject ----
-  .env$dynmodelObject <- .dynmodelObject
-
-  ## $cov ----
+  ## now use focei to get the same estimates
+  .env <- new.env(parent = emptyenv())
+  ## put in covariance information
   labels <- names(.Estimates)
   dimnames(.cov) <- list(labels, labels)
   .env$cov <- .cov
-
-  ## $nobs ----
   .env$nobs <- .dynmodelObject$nobs
-
-  ## $model ----
-  .env$model <- .model
-
-  ## $objf ----
-  .objf <- .dynmodelObject$value - 0.5 * .dynmodelObject$nobs * log(2 * pi)
-  .env$objf <- .objf
-  .env$objective <- .objf
-
-  ## $logLik ----
-  ## returns value = -ll
-  logLik <- -.dynmodelObject$value
-  attr(logLik, "df") <- .dynmodelObject$npar
-  attr(logLik, "nobs") <- .dynmodelObject$nobs
-  class(logLik) <- "logLik"
-  .env$logLik <- logLik
-
-  ## $objDf ----
-  .aic <- AIC(logLik)
-  .bic <- BIC(logLik)
-
-  .objDf <- data.frame(
-    OBJF = .objf, AIC = .aic, BIC = .bic, "Log-likelihood" = .dynmodelObject$value,
-    check.names = FALSE
-  )
-  .env$objDf <- .objDf
-
-  ## Required checks
-  ## plot(obj)
-  ## setOfv(obj) ## fail
-  ## ranef(obj) ## fail
-
-  ## omega ----
-  .env$omega <- matrix(numeric(0), 0, 0)
-  .env$omegaR <- matrix(numeric(0), 0, 0)
-
-  ## sigma ----
-  .sigma <- .inits.err
-  .env$sigma <- if (length(.sigma) > 1) diag(.sigma) else .sigma
-
-  ## message ----
-  .env$message <- .message
-
-  ## method ----
-  .env$method <- "dynmodel"
-
-  ## extra ----
-  .estimation.method <- .dynmodelControl$method
-  .env$extra <- paste0(" (Estimation with ", crayon::bold$yellow(.estimation.method), ")")
-
-  ## fit ----
-  .env$fit <- .fit
-
-  ## Additional output ----
-  .temp <- nlmixrDynmodelConvert(.nlmixrObject)
-  .temp.inits <- .nlmixrObject$dynmodel.fun(.temp$inits)
-  .parameters <- c(.temp.inits, .temp$fixPars)
-  .system <- .temp$system
-  .rxControl$returnType <- "data.frame"
-  .rxControl$addDosing <- TRUE
-  # .data$..num <- seq_along(.data[,1])
-
-  .nlmixr.sim <- do.call(RxODE::rxSolve, c(list(object = .system, params = .parameters, events = .data), .rxControl))
-
-  names(.nlmixr.sim) <- sub("^time$", "TIME", sub("^evid$", "EVID", sub("^id$", "ID", sub("^nlmixr_pred$", "PRED", names(.nlmixr.sim)))))
-
-  .nlmixr.sim$DV <- NA
-  .nlmixr.sim$DV[.nlmixr.sim$EVID == 0] <- .data$DV[.data$EVID == 0]
-
-  # .sgy <- rep(.sgy[1],length(.nlmixr.sim$TIME))
-
-  W <- NA
-  W[.nlmixr.sim$EVID == 0] <- .sgy
-
-  if (is.null(.nlmixr.sim$ID)) {
-    .nlmixr.sim$ID <- 1L
+  .env$covMethod <- .dynmodelControl$covMethod
+  .ctl <- .dynmodelControl
+  class(.ctl) <- NULL
+  .ctl$maxOuterIterations <- 0
+  .ctl$maxInnerIterations <- 0
+  .ctl$covMethod <- ""
+  .ctl$sumProd <- uif$env$sum.prod
+  .ctl$optExpression <- uif$env$optExpression
+  .ctl$scaleTo <- 0
+  .ctl$calcTables
+  .ctl$method <-  "liblsoda"
+  .ctl <- do.call(foceiControl, .ctl)
+  if (.ctl$singleOde) {
+    .mod <- uif$focei.rx1
+    .pars <- NULL
+  } else {
+    .mod <- uif$rxode.pred
+    .pars <- uif$theta.pars
   }
-
-  .nlmixr.sim$RES <- .nlmixr.sim$DV - .nlmixr.sim$PRED
-  .nlmixr.sim$WRES <- (1 / sqrt(W)) * .nlmixr.sim$RES
-
-  .nlmixr.pred <- .nlmixr.sim
-  class(.env) <- "nlmixrFitCoreSilent"
-  .nlmixr.pred.temp <- c("nlmixrDynmodel", "nlmixrFitData", "nlmixrFitCore", "tbl_df", "tbl", "data.frame")
-  attr(.nlmixr.pred.temp, ".foceiEnv") <- .env
-  class(.nlmixr.pred) <- .nlmixr.pred.temp
-
-  ## $time ----
-  .time$tableTime <- (proc.time() - .pt)["elapsed"]
-  .time <- .time[-5]
-  names(.time) <- c("setup", "scaling", "optimization", "Hessian", "table")
-  .env$time <- .time
-
-  ## return ---
-  return(.nlmixr.pred)
-
-  ## optional
-  ## $seed for mcmc
-  ## $parHist
-  ## $parHistStacked
+  fit.f <- try(foceiFit.data.frame(
+      data = .data, inits = uif$focei.inits, PKpars = .pars,
+      model = .mod, pred = function() {
+        return(nlmixr_pred)
+      }, err = uif$error,
+      lower = uif$focei.lower,
+      upper = uif$focei.upper,
+      thetaNames = uif$focei.names,
+      etaNames = uif$eta.names,
+      fixed = uif$focei.fixed,
+      env = .env,
+      control = .ctl
+  ), silent = FALSE)
+  assign("method", "dynmodel", .env)
+  assign("extra", sprintf("(method: %s)",  .dynmodelControl$method), .env)
+  assign("dynmodelObject",  .dynmodelObject, .env)
+  .cls <- c("nlmixrDynmodel", class(fit.f))
+  attr(.cls, ".foceiEnv") <- .env
+  class(fit.f) <- .cls
+  return(fit.f)
 }
 
 # nlmixrDynmodelConvert() #################################################
@@ -945,9 +733,11 @@ dynmodelControl <- function(...,
 #'   details. Default is NULL.
 #' @param control Control options for dynmodel
 #'   \code{\link[nlmixr]{dynmodelControl}} .
-#' @return NULL
 #' @author Wenping Wang, Mason McComb and Matt Fidler
 #' @examples
+#'
+#' \donttest{
+#'
 #' # dynmodel example --------------------------------------------------------
 #' ode <- "
 #'       kel = CL/V;
@@ -968,7 +758,7 @@ dynmodelControl <- function(...,
 #'     control = control
 #'   )
 #'
-#' # nlmixr example ----------------------------------------------------------
+#' # nlmixr model example ----------------------------------------------------------
 #' model_onecmt_bolus <- function() {
 #'   ini({
 #'     CL <- c(0, 5, 10) # Clearance (L/hr)
@@ -984,6 +774,14 @@ dynmodelControl <- function(...,
 #' }
 #'
 #' fit <- nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "dynmodel")
+#'
+#' as.dynmodel(fit)
+#'
+#' # method = "focei" is slightly more flexible and well tested
+#'
+#' fit <- nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "focei")
+#'
+#' }
 #' @export
 dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = NULL, control = list(), ...) {
   # Timing and environment --------------------------------------------------
@@ -1010,6 +808,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       model
     }
   inits.err <- NULL
+  .env <- environment()
 
   modelParsed <-
     lapply(modelList, function(.model) {
@@ -1055,35 +854,35 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         }
       .sigma.norm <-
         if ("norm" %in% .model) {
+          assign(".norm", TRUE, .env)
           as.numeric(.model[which(.model == "norm") + 1])
-          .norm <<- TRUE
         } else {
+          assign(".norm", NULL, .env)
           NULL
-          .norm <<- NULL
         }
       .sigma.dnorm <-
         if ("dnorm" %in% .model) {
+          assign(".dnorm", TRUE, .env)
           as.numeric(.model[which(.model == "dnorm") + 1])
-          .dnorm <<- TRUE
         } else {
+          assign(".dnorm", NULL, .env)
           NULL
-          .dnorm <<- NULL
         }
       .sigma.logn <-
         if ("logn" %in% .model) {
+          assign(".logn", TRUE, .env)
           as.numeric(.model[which(.model == "logn") + 1])
-          .logn <<- TRUE
         } else {
+          assign(".logn", NULL, .env)
           NULL
-          .logn <<- NULL
         }
       .sigma.dlnorm <-
         if ("dlnorm" %in% .model) {
+          assign(".dlnorm", TRUE, .env)
           as.numeric(.model[which(.model == "dlnorm") + 1])
-          .dlnorm <<- TRUE
         } else {
+          assign(".dlnorm", NULL, .env)
           NULL
-          .dlnorm <<- NULL
         }
       .sigma.tbs <-
         if ("tbs" %in% .model) {
@@ -1112,7 +911,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
           tbsYj = .sigma.tbsYj
         )
       inits.err <- inits.err[which(names(inits.err) %in% intersect(names(inits.err), .model))]
-      inits.err <<- inits.err
+      assign("inits.err", inits.err, .env)
       .model <- c("dv" = .model[2], "pred" = .model[3], inits.err)
     })
 
@@ -1126,7 +925,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   # NOTES: Check to make sure all there is consistency between error model, data. inits, and ODE model
 
   # data handling
-  data <- RxODE::etTrans(data, system, addCmt = TRUE, dropUnits = TRUE, allTimeVar = TRUE)
+  ## data <- RxODE::etTrans(data, system, addCmt = TRUE, dropUnits = TRUE, allTimeVar = TRUE)
   .original.data <- data
 
   # warn DV must be in data
@@ -1145,12 +944,14 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     data[[.dv.name]] <- data$DV
   }
   if (any(data$EVID %in% 2)) {
-    warning("Removing EVID==2 rows from the data; they are not supported in dynmodel.")
+    ## warning("Removing EVID==2 rows from the data; they are not supported in dynmodel.")
     data <- data[data$EVID != 2, ]
     if (nrow(data) == 0) {
       stop("Zero rows of data remain after removing EVID == 2.")
     }
   }
+  data0 <- data[data$EVID == 0, ]
+  nobst <- length(data0$DV)
 
   # Error "model" contains "data" variables?
   # check to see if there is a discrepency between error model names and data
@@ -1236,7 +1037,6 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
           .rxControl
         )
       )
-
     i <- 1
     i.max <- 10
     while (any(is.na(s$nlmixr_pred)) & i < i.max) {
@@ -1251,7 +1051,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
             .rxControl
           )
         )
-      reducedTol <<- TRUE
+      assign("reducedTol", TRUE, .env)
       i <- i + 1
     }
 
@@ -1298,9 +1098,14 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       if (!is.null(tbsYj)) lambda <- tbsYj
 
       # predicted and observed values from RxODE
-      yo <- data[data$EVID == 0, rows]$DV
-      yp <- s[rows, x["pred"]]
-      nobs <<- length(yo)
+      yo <- data0[, "DV"]
+      yp <- s[, x["pred"]]
+      assign("nobs", length(yo), .env)
+      if (length(yo) != length(yp)) {
+        assign("x", x, globalenv())
+        assign("s", s, globalenv())
+        stop("length mismatch ", length(yo), "!=", length(yp))
+      }
 
       # log normal transformation ----
       if (!is.null(.logn) | !is.null(.dlnorm)) {
@@ -1315,7 +1120,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         .logn.n2ll <- log(.h.y.var) + ((.h.x - .h.y)^2) / .h.y.var
         # back-transformed  -2 log-likelihood function, with penalty added
         .n2ll <- .logn.n2ll - 2 * (0 - 1) * log(yo) - 2 * log(2 * pi) # lambda is zero here
-        sgy <<- .h.y.var
+        assign("sgy", .h.y.var, .env)
         # negative log-likelihood function for output
         ll <- .5 * (.n2ll)
       }
@@ -1332,7 +1137,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         .boxCox.n2ll <- log(.h.y.var) + ((.h.x - .h.y)^2) / .h.y.var
         # back-transformed  -2 log-likelihood function, with penalty added
         .n2ll <- .boxCox.n2ll - 2 * (lambda - 1) * log(yo) - 2 * log(2 * pi)
-        sgy <<- .h.y.var
+        assign("sgy", .h.y.var, .env)
         # negative log-likelihood function for output
         ll <- .5 * (.n2ll)
       }
@@ -1354,7 +1159,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
             .yeoJohnson.n2ll - 2 * (lambda - 1) * log(yo + 1) - 2 * log(2 * pi),
             .yeoJohnson.n2ll - 2 * (1 - lambda) * log(-yo + 1) - 2 * log(2 * pi)
           )
-        sgy <<- .h.y.var
+        assign("sgy", .h.y.var, .env)
         # negative log-likelihood function for output
         ll <- .5 * (.n2ll)
       }
@@ -1362,7 +1167,6 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       else if ("pow2" %in% names(modelParsed[[1]])) {
         sgy <- thresh(add) + thresh(pow) * yp^(pow2)
         assign("sgy", sgy, envir = .dynmodel.env)
-        sgy <<- sgy
         ll <- .5 * ((yo - yp)^2 / (sgy^2) + log(sgy^2) + log(2 * pi))
       }
       # all other error models ----
@@ -1370,18 +1174,16 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
         #  if (identical(c("dv","pred"),names(model[[1]]))){
         if (length(names(modelParsed[[1]])) == 2) {
           sgy <- 1
-          sgy <<- sgy
+          assign("sgy", sgy, envir = .dynmodel.env)
         } else {
           sgy <- thresh(add) + thresh(prop) * yp
           assign("sgy", sgy, envir = .dynmodel.env)
-          sgy <<- sgy
         }
         ll <- .5 * ((yo - yp)^2 / (sgy^2) + log(sgy^2) + log(2 * pi))
       }
       sum(ll, na.rm = TRUE)
     })
-
-    sgy <<- sgy
+    assign("sgy", sgy, envir = .dynmodel.env)
     do.call("sum", l) # same as return(as.numeric(l)), l is a list for each value in the model?
   }
 
@@ -1726,17 +1528,16 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       .dynmodelObject = res, .nlmixrObject = nlmixrObject, .data = .original.data, .time = .time, .fit = fit, .message = .message, .inits.err = inits.err, .cov = cov.matrix, .sgy = sgy,
       .dynmodelControl = control, .nobs2 = 0, .pt = proc.time(), .rxControl = rxControl
     )
-    .hist <- .funs$hist()
-    assign("parHistData", .hist, nlmixr.ouptut$env)
-    .tmp <- .hist
-    .tmp <- .tmp[.tmp$type == "Unscaled", names(.tmp) != "type"]
-    .iter <- .tmp$iter
-    .tmp <- .tmp[, names(.tmp) != "iter"]
-    .ret <- nlmixr.ouptut$env
-    .ret$parHistStacked <- data.frame(stack(.tmp), iter = .iter)
-    names(.ret$parHistStacked) <- c("val", "par", "iter")
-    .ret$parHist <- data.frame(iter = .iter, .tmp)
-
+    ## .hist <- .funs$hist()
+    ## assign("parHistData", .hist, nlmixr.ouptut$env)
+    ## .tmp <- .hist
+    ## .tmp <- .tmp[.tmp$type == "Unscaled", names(.tmp) != "type"]
+    ## .iter <- .tmp$iter
+    ## .tmp <- .tmp[, names(.tmp) != "iter"]
+    ## .ret <- nlmixr.ouptut$env
+    ## .ret$parHistStacked <- data.frame(stack(.tmp), iter = .iter)
+    ## names(.ret$parHistStacked) <- c("val", "par", "iter")
+    ## .ret$parHist <- data.frame(iter = .iter, .tmp)
     return(nlmixr.ouptut)
   }
   else {

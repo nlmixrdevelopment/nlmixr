@@ -1141,6 +1141,7 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
     } else {
       .ctl$addProp <- "combined2"
     }
+    .ctl$method <- "liblsoda"
     .ctl <- do.call(foceiControl, .ctl)
     if (.ctl$singleOde) {
       .pars <- NULL
