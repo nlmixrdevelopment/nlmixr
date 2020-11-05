@@ -79,7 +79,21 @@ bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model f
 
 bootstrapFit(fit, nboot=50)
 
-#
+# Note the boostrap standard error and variance/covariance matrix is retained.
+# If you wish to switch back you can change the covariance matrix by
+
+setCov(fit,"r,s")
+
+# And change it back again
+
+setCov(fit,"boot50")
+
+# This change will affect any simulations with uncertainty in their parameters
+
+# You may also do a chi-square diagnostic plot check for the bootstrap with
+
+bootplot(fit)
+
 }
 }
 \author{

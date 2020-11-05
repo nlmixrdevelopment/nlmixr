@@ -126,11 +126,11 @@ armaVersion <- function() {
 ##' f_ode <- function(){
 ##'     ini({
 ##'         lCl <- 1.6      #log Cl (L/hr)
-##'         lVc <- log(90)   #log Vc (L)
-##'         lKA <- 0.1      #log Ka (1/hr)
+##'         lVc <- log(80)   #log Vc (L)
+##'         lKA <- 0.3      #log Ka (1/hr)
 ##'         prop.err <- c(0, 0.2, 1)
-##'         eta.Cl ~ 0.1 ## BSV Cl
-##'         eta.Vc ~ 0.1 ## BSV Vc
+##'         eta.Cl ~ 0.3 ## BSV Cl
+##'         eta.Vc ~ 0.2 ## BSV Vc
 ##'         eta.KA ~ 0.1 ## BSV Ka
 ##'     })
 ##'     model({
@@ -156,6 +156,7 @@ armaVersion <- function() {
 ##'         lVc <- log(90)   #log Vc (L)
 ##'         lKA <- 0.1      #log Ka (1/hr)
 ##'         prop.err <- c(0, 0.2, 1)
+##'         add.err <- c(0, 0.01)
 ##'         eta.Cl ~ 0.1 ## BSV Cl
 ##'         eta.Vc ~ 0.1 ## BSV Vc
 ##'         eta.KA ~ 0.1 ## BSV Ka
@@ -176,7 +177,7 @@ armaVersion <- function() {
 ##' }
 ##'
 ##' # Use nlme algorithm
-##' fit_linCmt_nlme <- nlmixr(f_ode, Oral_1CPT, est="nlme")
+##' fit_linCmt_nlme <- nlmixr(f_ode, Oral_1CPT, est="nlme",control=nlmeControl(maxstepsOde = 50000, pnlsTol=0.4))
 ##' print(fit_linCmt_nlme)
 ##'
 ##' # Use Focei algorithm
@@ -638,6 +639,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     if (!is.null(control$atol)) .atol <- control$atol
     .rtol <- 1e-8
     if (!is.null(control$rtol)) .rtol <- control$rtol
+    .maxsteps <- 5000
+    if (!is.null(control$maxstepsOde)) .maxsteps <- control$maxstepsOde
     fit <- nlme_ode(dat,
       model = rxode,
       par_model = specs,
@@ -648,6 +651,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       control = control,
       atol = .atol,
       rtol = .rtol,
+      maxsteps = .maxsteps,
       ...
     )
     class(fit) <- c(est.type, class(fit))
