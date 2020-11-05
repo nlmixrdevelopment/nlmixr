@@ -172,7 +172,6 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
   }
   .eta <- x$eta
   .noMuRef <- c()
-  .thisEnv <- environment()
   .x <- setNames(
     data.frame(lapply(names(.eta), function(n) {
       if (any(n == names(.muRef))) {
@@ -187,7 +186,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
         .ret <- .eta[[n]]
         if (n != "ID") {
           warning(sprintf("The parameter '%s' is not mu-referenced and the coef will not be returned", n))
-          assign(.noMuRef, c(.noMuRef, n), .thisEnv)
+          .noMuRef <<- c(.noMuRef, n)
         }
       }
       return(.ret)

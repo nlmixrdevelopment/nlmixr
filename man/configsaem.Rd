@@ -83,7 +83,7 @@ library(nlmixr)
 
 ode <- "d/dt(depot) =-KA*depot;
         d/dt(centr) = KA*depot - KE*centr;"
-m1 <- RxODE(ode, modName = "m1")
+m1 = RxODE(ode, modName="m1")
 # ode <- "C2 = centr/V;
 #      d/dt(depot) =-KA*depot;
 #      d/dt(centr) = KA*depot - KE*centr;"
@@ -101,7 +101,7 @@ PKpars <- function() {
 PRED <- function() centr / V
 PRED2 <- function() C2
 
-saem_fit <- gen_saem_user_fn(model = m1, PKpars, pred = PRED)
+ saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
 # saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
 
 

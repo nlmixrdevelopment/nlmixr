@@ -1196,7 +1196,6 @@ foceiControl <- function(sigdig = 3, ...,
 .parseOM <- function(OMGA) {
   .re <- "\\bETA\\[(\\d+)\\]\\b"
   .offset <- as.integer(0)
-  .thisEnv <- environment()
   lapply(1:length(OMGA), function(.k) {
     .s <- OMGA[[.k]]
     .f <- eval(parse(text = (sprintf("y~%s", deparse(.s[[2]])))))
@@ -1208,7 +1207,7 @@ foceiControl <- function(sigdig = 3, ...,
 
     .ix <- as.integer(sub(.re, "\\1", .r))
     if (any(.ix - (.offset + 1:.nr))) stop("invalid OMGA specs")
-    assign(".offset", .offset + .nr, .thisEnv)
+    .offset <<- .offset + .nr
     eval(.s[[3]])
   })
 }
@@ -1218,15 +1217,12 @@ foceiControl <- function(sigdig = 3, ...,
   .nr <- sum(sapply(s, .getNR))
   .mat <- matrix(0, .nr, .nr)
   .offset <- as.integer(0)
-  .thisEnv <- environment()
   j <- lapply(1:length(s), function(k) {
     .a <- s[[k]]
     .p <- .getNR(.a)
     .starts <- row(.mat) > .offset & col(.mat) > .offset
-    .matc <- .mat
-    .matc[col(.matc) >= row(.matc) & col(.matc) <= .offset + .p & .starts] <- .a
-    assign(".matc", .matc, .thisEnv)
-    assign(".offset", .offset + .p, .thisEnv)
+    .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset + .p & .starts] <<- .a
+    .offset <<- .offset + .p
   })
   .a <- .mat[col(.mat) >= row(.mat)]
   .mat <- t(.mat)
@@ -1596,7 +1592,6 @@ foceiFit.data.frame <- function(data, ...) {
       .digs <- .ret$control$sigdig
       .cvOnly <- TRUE
       .sdOnly <- TRUE
-      .thisEnv <- environment()
       .cvp <- lapply(row.names(.ret$popDfSig), function(x) {
         .y <- .muRef[x]
         if (is.na(.y)) {
@@ -1604,7 +1599,7 @@ foceiFit.data.frame <- function(data, ...) {
         }
         .v <- .ome[.y, .y]
         if (any(.y == .logEta)) {
-          assign(".sdOnly", FALSE, .thisEnv)
+          .sdOnly <<- FALSE
           return(data.frame(
             ch = paste0(
               ifelse(.omegaFix[.y], "fix(", ""),
@@ -1616,7 +1611,7 @@ foceiFit.data.frame <- function(data, ...) {
             v = sqrt(exp(.v) - 1) * 100
           ))
         } else {
-          assign(".cvOnly", FALSE, .thisEnv)
+          .cvOnly <<- FALSE
           return(data.frame(
             ch = paste0(
               ifelse(.omegaFix[.y], "fix(", ""),

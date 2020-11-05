@@ -117,9 +117,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
   names(data) <- tolower(names(data)) # needed in ev
 
   # model
-  if (is.null(system)) {
-    stop("currently requires a RxODE model for 'system'")
-  }
+  if (is.null(system)) {}
   else if (class(system) == "RxODE") {
     system <- RxODE(system, calcSens = TRUE)
   }
@@ -320,7 +318,6 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
   starts <- matrix(0., nSUB, nETA)
   omga_save <- NULL
   update_starts <- TRUE
-  .envStarts <- environment()
 
 
   # algo starts
@@ -361,7 +358,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
 
         pars <- system$get.modelVars()$params
         po <- unlist(as.list(env)[pars])
-        x <- system$run(po, ev)
+        x <- system$run(po, ev, initCondition)
         if (any(is.na(x))) {
           print(ID[1])
           print(po)
@@ -478,18 +475,17 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
         attr(r, "dvdx") <- s[-1] + c(llik.eta.dvd)
         r
       }
-      pvd <- NULL
-      .env2 <- environment()
       fg <- function(par) {
         if (identical(par, pvd[[1]])) {
           return(pvd)
         }
         ym <- ..g.fn(par)
-        assign("pvd", list(par, ym), .env2)
+        pvd <<- list(par, ym)
       }
       f <- function(ETA) -as.vector(fg(ETA)[[2]])
       g <- function(ETA) -as.vector(attr(fg(ETA)[[2]], "dvdx"))
 
+      pvd <- NULL
 
       .wh <- ID.ord[as.character(ix)]
       ETA.val <- starts[.wh, ]
@@ -543,18 +539,13 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
     s <- mclapply(ID.all, llik2.subj, mc.cores = con$mc.cores) # FIXME
     m <- matrix(unlist(s), ncol = 2 + nETA, byrow = TRUE)
 
-    if (update_starts) {
-      .starts <- starts
-      .starts[m[, 2], ] <- m[, 3:(2 + nETA)]
-      assign("starts", .starts, .envStarts)
-    }
+    if (update_starts) starts[m[, 2], ] <<- m[, 3:(2 + nETA)]
     m[, 1]
   }
 
   nobjcall <- 0
-  .nobjcallEnv <- environment()
   obj <- function(th, noomga = FALSE) {
-    assign("nobjcall", nobjcall + 1, .nobjcallEnv)
+    nobjcall <<- nobjcall + 1
     s <- obj.vec(th, noomga)
     r <- sum(s)
     if (con$DEBUG.INNER) {

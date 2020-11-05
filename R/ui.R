@@ -73,7 +73,6 @@ nlmixrfindLhs <- function(x) {
   if (inherits(.mat, "matrix")) {
     .d <- dimnames(.mat)[[1]]
     .ini2 <- .as.data.frame(.uif$ini)
-    .env <- environment()
     .ini1 <- .ini2[is.na(.ini2$neta1), ]
     .ini2 <- .ini2[!is.na(.ini2$neta1), ]
     .ini4 <- .ini2[!is.na(.ini2$err), ]
@@ -107,16 +106,12 @@ nlmixrfindLhs <- function(x) {
       .name2 <- paste(.df$name2[i])
       .w <- which(.name1 == .ini2$name)
       if (length(.w) == 1) {
-        .ini2. <- .ini2
-        .ini2.$est[.w] <- .df$val[i]
-        assign(".ini2", .ini2., .env)
+        .ini2$est[.w] <<- .df$val[i]
         return(NULL)
       }
       .w <- which(.ini2$name == .name2)
       if (length(.w) == 1) {
-        .ini2. <- .ini2
-        .ini2.$est[.w] <- .df$val[i]
-        assign(".ini2", .ini2., .env)
+        .ini2$est[.w] <<- .df$val[i]
         return(NULL)
       }
       if (.df$neta1[i] < .df$neta2[i]) {

@@ -842,7 +842,46 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     assign("origControl", control, fit$env)
     assign("modelId", .modelId, fit$env)
     return(fit)
-  } else {
+  } else if (est == "dynmodel") {
+    if (class(control) != "dynmodelControl") control <- do.call(dynmodelControl, control)
+    env <- new.env(parent = emptyenv())
+
+    env$uif <- NULL
+
+    # update data to merge for origData and data. first add zeros or whatever is filled in for DV when there is no observations
+    # to match the lengths, then merge observed data for both origData and data, and send to RxODE.
+
+    # .dynmodelData <- data
+    # nlmixr Object ---
+    .nmf <- uif
+    # Conversion ---
+    .dynNlmixr <- nlmixrDynmodelConvert(.nmf)
+    # Model ---
+    .system <- .dynNlmixr$system
+    # Initial Estimates ---
+    .inits <- .dynNlmixr$inits
+    # Error Model ---
+    .model <- .dynNlmixr$model
+    # Optional Control ---
+    control$nlmixrOutput <- TRUE
+    control$fixPars <- if (!is.null(.dynNlmixr$fixPars)) .dynNlmixr$fixPars else NULL
+    control$lower <- if (!is.null(.dynNlmixr$lower)) .dynNlmixr$lower else NULL
+    control$upper <- if (!is.null(.dynNlmixr$upper)) .dynNlmixr$upper else NULL
+
+    fit <-
+      dynmodel(
+        system = .system,
+        model = .model,
+        inits = .inits,
+        data = .origData,
+        nlmixrObject = .nmf,
+        control = control
+      )
+    assign("origData", .origData, fit$env)
+    fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
+    return(fit)
+  }
+  else {
     stop(sprintf("Unknown estimation method est=\"%s\"", est))
   }
 }

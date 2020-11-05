@@ -22,7 +22,6 @@
 parseOM <- function(OMGA) {
   re <- "\\bETA\\[(\\d+)\\]\\b"
   .offset <- as.integer(0)
-  .env <- environment()
   lapply(1:length(OMGA), function(k) {
     s <- OMGA[[k]]
     f <- eval(parse(text = (sprintf("y~%s", deparse(s[[2]])))))
@@ -34,7 +33,7 @@ parseOM <- function(OMGA) {
 
     ix <- as.integer(sub(re, "\\1", r))
     if (any(ix - (.offset + 1:nr))) stop("invalid OMGA specs")
-    assign(".offset", .offset + nr, .env)
+    .offset <<- .offset + nr
     eval(s[[3]])
   })
 }
@@ -44,15 +43,12 @@ genOM <- function(s) {
   nr <- sum(sapply(s, getNR))
   .mat <- matrix(0, nr, nr)
   .offset <- as.integer(0)
-  .env <- environment()
   j <- lapply(1:length(s), function(k) {
     a <- s[[k]]
     p <- getNR(a)
     starts <- row(.mat) > .offset & col(.mat) > .offset
-    .mat0 <- .mat
-    .mat0[col(.mat0) >= row(.mat0) & col(.mat0) <= .offset + p & starts] <- a
-    assign(".mat", .mat0, .env)
-    assign(".offset", .offset + p, .env)
+    .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset + p & starts] <<- a
+    .offset <<- .offset + p
   })
   a <- .mat[col(.mat) >= row(.mat)]
   .mat <- t(.mat)
@@ -65,15 +61,12 @@ genOMinv.5 <- function(s) {
   nr <- sum(sapply(s, getNR))
   .mat <- matrix(0, nr, nr)
   .offset <- as.integer(0)
-  .env <- environment()
   j <- lapply(1:length(s), function(k) {
     a <- s[[k]]
     p <- getNR(a)
     starts <- row(.mat) > .offset & col(.mat) > .offset
-    .mat0 <- .mat
-    .mat0[col(.mat0) >= row(.mat0) & col(.mat0) <= .offset + p & starts] <- a
-    assign(".mat", .mat0, .env)
-    assign(".offset", .offset + p, .env)
+    .mat[col(.mat) >= row(.mat) & col(.mat) <= .offset + p & starts] <<- a
+    .offset <<- .offset + p
   })
   .mat
 }
@@ -141,15 +134,9 @@ multi2 <- function(mu, vmat, n) {
 #' }
 #' inits <- list(THTA = c(-3.22, 0.47, -2.45, 0))
 #' inits$OMGA <- list(ETA[1] ~ .027, ETA[2] ~ .37)
-#' theo <- theo_md
+#' theo <- read.table("theo_md.txt", head = TRUE)
 #'
 #' fit <- gnlmm(llik, theo, inits, pars, sys1,
-#'   control = list(trace = TRUE, nAQD = 5)
-#' )
-#'
-#' # This uses stan AD for derivatives
-#'
-#' fit2 <-gnlmm2(llik, theo, inits, pars, sys1,
 #'   control = list(trace = TRUE, nAQD = 5)
 #' )
 #'
@@ -434,7 +421,6 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
   }
   blik <- body(llik)
   starts <- matrix(0.1, nSUB, nETA)
-  .startsEnv <- environment()
   omga_save <- NULL
   update_starts <- TRUE
 
@@ -512,16 +498,13 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
       }
 
       .wh <- ID.ord[as.character(ix)]
-      pvd <- NULL
-      .pvdEnv <- environment()
-
       if (con$optim.inner == "lbfgs" || nETA == 1) {
         fg <- function(par) {
           if (identical(par, pvd[[1]])) {
             return(pvd)
           }
           ym <- ..g.fn(par)
-          assign("pvd", list(par, ym), .pvdEnv)
+          pvd <<- list(par, ym)
         }
         f <- function(x) fg(x)[[2]]
         g <- function(x) {
@@ -535,6 +518,7 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
           })
         }
 
+        pvd <- NULL
         nfcall <- 0
         ..fit.inner <- lbfgs::lbfgs(f, g, starts[.wh, ], invisible = TRUE, epsilon = 10000 * con$reltol.inner)
         ..fit.inner$hessian <- optimHess(..fit.inner$par, f, g)
@@ -581,11 +565,7 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
 
     m <- matrix(unlist(..lik.sub), ncol = 2 + nETA, byrow = TRUE)
 
-    if (update_starts) {
-      .starts <- starts
-      .starts[m[, 2], ] <- m[, 3:(2 + nETA)]
-      assign("starts", .starts, .startsEnv)
-    }
+    if (update_starts) starts[m[, 2], ] <<- m[, 3:(2 + nETA)]
     r <- sum(m[, 1])
     attr(r, "subj") <- m[, 1]
     r
@@ -661,14 +641,13 @@ calcCov <- function(fit, method = 1, trace = FALSE) {
   # e1$starts = .1+0*e1$starts
 
   pvd <- NULL
-  .pvdEnv <- environment()
   nfcall <- 0 ## CHECKME
   fg <- function(par) {
     if (identical(par, pvd[[1]])) {
       return(pvd)
     }
     ym <- fit$obj(par, noomga = TRUE)
-    assign("pvd", list(par, ym), .pvdEnv)
+    pvd <<- list(par, ym)
   }
   f <- function(x) fg(x)[[2]]
   g <- function(x) {
@@ -693,7 +672,7 @@ calcCov <- function(fit, method = 1, trace = FALSE) {
   }
 
   FuncGrad <- function(x) {
-    assign("pvd", NULL, .pvdEnv)
+    pvd <<- NULL
     nfcall <- 0
     list(y = f(x), grad = g(x))
   }

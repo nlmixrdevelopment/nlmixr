@@ -4,7 +4,16 @@
 \alias{dynmodel}
 \title{Fit a non-population dynamic model}
 \usage{
-dynmodel(system, model, inits, data, fixPars = NULL, control = list(), ...)
+dynmodel(
+  system,
+  model,
+  inits,
+  data,
+  fixPars = NULL,
+  nlmixrObject = NULL,
+  control = list(),
+  ...
+)
 }
 \arguments{
 \item{system}{RxODE object. See \code{\link[RxODE]{RxODE}} for more details.}
@@ -16,6 +25,9 @@ dynmodel(system, model, inits, data, fixPars = NULL, control = list(), ...)
 \item{data}{Dataset to estimate. Needs to be RxODE compatible in EVIDs.}
 
 \item{fixPars}{Fixed system parameters. Default is NULL.}
+
+\item{nlmixrObject}{nlmixr object. See \code{\link[nlmixr]{nlmixr}} for more
+details. Default is NULL.}
 
 \item{control}{Control options for dynmodel
 \code{\link[nlmixr]{dynmodelControl}} .}
@@ -44,6 +56,22 @@ fit <-
     control = control
   )
 
+# nlmixr example ----------------------------------------------------------
+model_onecmt_bolus <- function() {
+  ini({
+    CL <- c(0, 5, 10) # Clearance (L/hr)
+    V <- c(0, 50, 100) # Volume of Distribution
+    prop.err <- c(0, 0.01, 1)
+  })
+  model({
+    kel <- CL / V
+    d / dt(X) <- -kel * X
+    cp <- X / V
+    cp ~ prop(prop.err)
+  })
+}
+
+fit <- nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "dynmodel")
 }
 \author{
 Wenping Wang, Mason McComb and Matt Fidler

@@ -84,7 +84,6 @@ vpc_ui <- function(fit, data = NULL, n = 100, bins = "jenks",
     } else {
       dat <- data
     }
-    .datEnv <- environment()
     ## Get stratify columns
     if (!is.null(stratify)) {
       cols <- c(stratify, "dv")
@@ -106,19 +105,15 @@ vpc_ui <- function(fit, data = NULL, n = 100, bins = "jenks",
         return(NULL)
       }
       .w <- which(tolower(.nd) == tolower(x))
-      .dat <- dat
       if (length(.w) == 1L) {
         if (tolower(x) == "cmt") {
-          names(.dat)[.w] <- paste0("nlmixr_", tolower(.nd[.w]))
-          assign("dat", .dat, .datEnv)
+          names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]))
           return(paste0("cmt0=0+nlmixr_", tolower(.nd[.w])))
         } else if (tolower(x) == "dvid") {
-          names(.dat)[.w] <- paste0("nlmixr_", tolower(.nd[.w]))
-          assign("dat", .dat, .datEnv)
+          names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]))
           return(paste0("dvid0=0+nlmixr_", tolower(.nd[.w])))
         } else {
-          names(.dat)[.w] <- paste0("nlmixr_", tolower(.nd[.w]))
-          assign("dat", .dat, .datEnv)
+          names(dat)[.w] <<- paste0("nlmixr_", tolower(.nd[.w]))
           return(paste0(.nd[.w], "=0+nlmixr_", tolower(.nd[.w])))
         }
       }
