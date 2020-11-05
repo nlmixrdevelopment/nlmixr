@@ -597,7 +597,9 @@ function.
 }
 
 \examples{
-\dontrun{
+
+\donttest{
+
 f_ode <- function(){
     ini({
         lCl <- 1.6      #log Cl (L/hr)
@@ -661,8 +663,6 @@ print(fit_linCmt_focei)
 # The ODE model can be fitted using the saem algorithm, more iterations should be used for real applications
 fit_ode_saem <- nlmixr(f_ode, Oral_1CPT, est = "saem", control = saemControl(n.burn = 50, n.em = 100, print = 50))
 print(fit_ode_saem)
-
-
 
 }
 }

@@ -50,7 +50,8 @@ addConfboundsToVar <-
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#'
 #' one.cmt <- function() {
 #'   ini({
 #'     ## You may label each parameter with a comment
@@ -76,10 +77,28 @@ addConfboundsToVar <-
 #'
 #' fit <- nlmixr(one.cmt, theo_sd, "focei")
 #'
-#' bootstrapFit(fit)
 #' bootstrapFit(fit, nboot = 5, restart = TRUE) # overwrites any of the existing data or model files
 #' bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
-#' #
+#'
+#' # Note this resumes because the total number of bootstrap samples is not 50
+#'
+#' bootstrapFit(fit, nboot=50)
+#'
+#' # Note the boostrap standard error and variance/covariance matrix is retained.
+#' # If you wish to switch back you can change the covariance matrix by
+#'
+#' setCov(fit,"r,s")
+#'
+#' # And change it back again
+#'
+#' setCov(fit,"boot50")
+#'
+#' # This change will affect any simulations with uncertainty in their parameters
+#'
+#' # You may also do a chi-square diagnostic plot check for the bootstrap with
+#'
+#' bootplot(fit)
+#'
 #' }
 bootstrapFit <- function(fit,
                          nboot = 200,
