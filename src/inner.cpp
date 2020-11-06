@@ -39,8 +39,8 @@
 #define tbsL(x) _powerL(x,   ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
 #define tbsDL(x) _powerDL(x, ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
 #define tbsD(x) _powerDD(x,  ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
-//#define _safe_log(a) (((a) <= DOUBLE_EPS) ? log(DOUBLE_EPS) : log(a))
-#define _safe_log(a) log(a)
+#define _safe_log(a) (((a) <= DOUBLE_EPS) ? log(DOUBLE_EPS) : log(a))
+//#define _safe_log(a) log(a)
 //#define _safe_zero(a) ((a) <= DOUBLE_EPS ? DOUBLE_EPS : (a))
 #define _safe_zero(a) (a)
 // #define _safe_sqrt(a) ((a) <= DOUBLE_EPS ? sqrt(DOUBLE_EPS) : sqrt(a))
@@ -736,7 +736,8 @@ double likInner0(double *eta, int id){
 	op_focei.stickyTol=1;
       }
     }
-    if (op->neq > 0 && (ISNA(ind->solve[0]) || std::isnan(ind->solve[0]))){
+    if (op->neq > 0 && (ISNA(ind->solve[0]) || std::isnan(ind->solve[0]) ||
+			std::isinf(ind->solve[0]))){
       // REprintf("bad solve id: %d\n", ind->id);
       // REprintf("eta: ");
       // for (j = 0; j < op_focei.neta; ++j){
@@ -813,7 +814,7 @@ double likInner0(double *eta, int id){
 	    r = 1e300;
 	  }
 	  if (op_focei.neta == 0) {
-	    lnr =log(r);
+	    lnr =_safe_log(r);
 	    //llik <- -0.5 * sum(err ^ 2 / R + log(R));
 	    if (cens == 0){
 	      fInd->llik += err * err/r + lnr;
@@ -874,7 +875,7 @@ double likInner0(double *eta, int id){
 	    op->neq = oldNeq;
 	    // Ci = fpm %*% omega %*% t(fpm) + Vi; Vi=diag(r)
 	  } else {
-	    lnr =log(ind->lhs[op_focei.neta + 1]);
+	    lnr =_safe_log(ind->lhs[op_focei.neta + 1]);
 	    // fInd->r(k, 0) = ind->lhs[op_focei.neta+1];
 	    // B(k, 0) = 2.0/ind->lhs[op_focei.neta+1];
 	    // lhs 0 = F
@@ -1080,7 +1081,7 @@ double likInner0(double *eta, int id){
       }
       if (op_focei.neta == 0) {
 	fInd->llik = -0.5*fInd->llik;
-      } else if (op_focei.fo == 1){
+      } else if (op_focei.fo == 1) {
 	if (cens != 0) stop("FO censoring not supported.");
 	mat Ci = a * op_focei.omega * trans(a) + Vid;
 	mat cholCi = cholSE__(Ci, op_focei.cholSEtol);
@@ -1340,6 +1341,7 @@ double LikInner2(double *eta, int likId, int id){
     // Already almost completely calculated.
     lik = fInd->llik;
   } else {
+    // print(wrap(op_focei.logDetOmegaInv5));
     lik = -likInner0(eta, id) + op_focei.logDetOmegaInv5;
     // print(wrap(lik));
     rx = getRx();
