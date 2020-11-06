@@ -43,8 +43,8 @@
 //#define _safe_log(a) log(a)
 //#define _safe_zero(a) ((a) <= DOUBLE_EPS ? DOUBLE_EPS : (a))
 #define _safe_zero(a) (a)
-// #define _safe_sqrt(a) ((a) <= DOUBLE_EPS ? sqrt(DOUBLE_EPS) : sqrt(a))
-#define _safe_sqrt(a) sqrt(a)
+#define _safe_sqrt(a) ((a) <= DOUBLE_EPS ? sqrt(DOUBLE_EPS) : sqrt(a))
+//#define _safe_sqrt(a) sqrt(a)
 
 using namespace Rcpp;
 using namespace arma;
@@ -400,7 +400,7 @@ SEXP preCondInv(SEXP Rin){
   if (success){
     // Now calculate the norm
     arma::mat eignorm = normalise(eigvec);
-    arma::mat v12 = diagmat(1/sqrt(abs(eigval)));
+    arma::mat v12 = diagmat(1/(abs(eigval)));
     R = eignorm*v12;
     SEXP out = wrap(R);
     Rf_setAttrib(out, R_DimNamesSymbol, Rf_getAttrib(Rin, R_DimNamesSymbol));
@@ -673,14 +673,14 @@ static inline void likM2(focei_ind *fInd, double& limit, double&f, double &r) {
   if (R_FINITE(limit) && !ISNA(limit)) {
     // When limit < f, this is M2
     // When limit >=f, the limit is an upper limit (instead of lower limit)
-    fInd->llik += -log(1-0.5*(1+erf(((limit<f)*2-1)*(limit-f)/sqrt(r)/M_SQRT2)));
+    fInd->llik += -log(1-0.5*(1+erf(((limit<f)*2-1)*(limit-f)/_safe_sqrt(r)/M_SQRT2)));
   }
 }
 
 static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, double& dv, double &r) {
-  fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/sqrt(r)/M_SQRT2)));
+  fInd->llik += log(0.5*(1+erf(((double)(cens)*(dv-f))/_safe_sqrt(r)/M_SQRT2)));
   if (R_FINITE(limit)  && !ISNA(limit)){
-    fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/sqrt(r)/M_SQRT2)));
+    fInd->llik += -log(1-0.5*(1+erf((double)(cens)*(limit-f)/_safe_sqrt(r)/M_SQRT2)));
   }
 }
 
@@ -817,7 +817,7 @@ double likInner0(double *eta, int id){
 	    lnr =_safe_log(r);
 	    //llik <- -0.5 * sum(err ^ 2 / R + log(R));
 	    if (cens == 0){
-	      fInd->llik += err * err/r + lnr;
+	      fInd->llik += err * err/_safe_zero(r) + lnr;
 	      likM2(fInd, limit, f, r);
 	    } else if (cens != 0) {
 	      likCens(fInd, cens, limit, f, dv, r);
@@ -882,13 +882,13 @@ double likInner0(double *eta, int id){
 	    // lhs 1-eta = df/deta
 	    // FIXME faster initialization via copy or elm
 	    // RSprintf("id: %d k: %d j: %d\n", id, k, j);
-	    B(k, 0) = 2.0/r;
+	    B(k, 0) = 2.0/_safe_zero(r);
 	    if (op_focei.interaction == 1) {
 	      for (i = op_focei.neta; i--; ) {
 		if (op_focei.etaFD[i]==0) {
 		  fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
 		  rp  = ind->lhs[i + op_focei.neta + 2];
-		  c(k, i) = rp/r;
+		  c(k, i) = rp/_safe_zero(r);
 		}
 	      }
 	      // Cannot combine for loop with for loop above because
@@ -916,7 +916,7 @@ double likInner0(double *eta, int id){
 		    if (rp == 0.0) {
 		      rp = sqrt(DOUBLE_EPS);
 		    }
-		    c(k, i) = rp/r;
+		    c(k, i) = rp/_safe_zero(r);
 		  } else {
 		    // Central difference
 		    fpm = ind->lhs[0];
@@ -934,7 +934,7 @@ double likInner0(double *eta, int id){
 		    if (rp == 0.0) {
 		      rp = sqrt(DOUBLE_EPS);
 		    }
-		    c(k, i) = rp/r;
+		    c(k, i) = rp/_safe_zero(r);
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  }
 		} else {
@@ -961,10 +961,10 @@ double likInner0(double *eta, int id){
 		    // (Mul) 2*exp(-(dv - f(x))^2*cens^2/(g(x)*M_SQRT2^2))*(-Derivative(f(x), x)*cens/(sqrt(g(x))*M_SQRT2) + (-1/2)*Derivative(g(x), x)*(dv - f(x))*cens/(g(x)^(3/2)*M_SQRT2))/(sqrt(pi)*(1 + erf((dv - f(x))*cens/(sqrt(g(x))*M_SQRT2))))
 		    // 2*exp(-(dv - f)^2*cens^2/(r*M_SQRT2^2))*(-fpm*cens/(sqrt(r)*M_SQRT2) + (-0.5)*rp*(dv - f)*cens/(r^(1.5)*M_SQRT2))/(sqrt(pi)*(1 + erf((dv - f)*cens/(sqrt(r)*M_SQRT2))))
 		    double rx_expr_0=dv-f;
-		    double rx_expr_1=sqrt(r);
+		    double rx_expr_1=_safe_sqrt(r);
 		    double rx_expr_2=rx_expr_1*M_SQRT2;
-		    lp(i, 0) += 2*exp(-(rx_expr_0*rx_expr_0)/(r*2))*
-		      (-fpm*(double)(cens)/(rx_expr_2)-0.5*rp*rx_expr_0*(double)(cens)/(R_pow(r,1.5)*M_SQRT2))/(M_SQRT_PI*(1+erf(rx_expr_0*cens/rx_expr_2)));
+		    lp(i, 0) += 2*exp(-(rx_expr_0*rx_expr_0)/_safe_zero(r*2))*
+		      (-fpm*(double)(cens)/_safe_zero(rx_expr_2)-0.5*rp*rx_expr_0*(double)(cens)/_safe_zero(R_pow(r,1.5)*M_SQRT2))/(M_SQRT_PI*(1+erf(rx_expr_0*cens/_safe_zero(rx_expr_2))));
 		  } else {
 		    // M4 method
 		    // dv = lloq
@@ -975,7 +975,7 @@ double likInner0(double *eta, int id){
 		    // 2.0*exp(-(dv - f)^2/(r*2))*(-fpm/(sqrt(r)*M_SQRT2) + (-0.5)*rp*(dv - f)/(r^(1.5)*M_SQRT2))/(M_SQRT_PI*(1 + erf((dv - f)/(sqrt(r)*M_SQRT2)))) + 1.0*exp(-(limit - f)^2/(r*2))*(-fpm/(sqrt(r)*M_SQRT2) + (-0.5)*rp*(limit - f)/(r^(1.5)*M_SQRT2))/(M_SQRT_PI*(1 - 0.5*(1 + erf((limit - f)/(sqrt(r)*M_SQRT2))))) + 2.0*exp(-(limit - f)^2/(r*2))*(-fpm/(sqrt(r)*M_SQRT2) + (-0.5)*rp*(limit - f)/(r^(1.5)*M_SQRT2))/(M_SQRT_PI*(1 + erf((limit - f)/(sqrt(r)*M_SQRT2))))
 		    double rx_expr_0=r*2;
 		    double rx_expr_1=dv-f;
-		    double rx_expr_2=sqrt(r);
+		    double rx_expr_2=_safe_sqrt(r);
 		    double rx_expr_3=R_pow(r,1.5);
 		    double rx_expr_4=limit-f;
 		    double rx_expr_5=-0.5*rp;
@@ -983,12 +983,12 @@ double likInner0(double *eta, int id){
 		    double rx_expr_7=rx_expr_2*M_SQRT2;
 		    double rx_expr_8=rx_expr_3*M_SQRT2;
 		    double rx_expr_9=rx_expr_5*rx_expr_4;
-		    double rx_expr_10=exp(-rx_expr_6/rx_expr_0);
-		    double rx_expr_11=(rx_expr_4)/(rx_expr_7);
+		    double rx_expr_10=exp(-rx_expr_6/_safe_zero(rx_expr_0));
+		    double rx_expr_11=(rx_expr_4)/_safe_zero(rx_expr_7);
 		    double rx_expr_12=erf(rx_expr_11);
 		    double rx_expr_13=1+rx_expr_12;
-		    double rx_expr_14=rx_expr_9/(rx_expr_8);
-		    lp(i, 0)=2*exp(-(rx_expr_1*rx_expr_1)/(rx_expr_0))*(-fpm/(rx_expr_7)+rx_expr_5*(rx_expr_1)/(rx_expr_8))/(M_SQRT_PI*(1+erf((rx_expr_1)/(rx_expr_7))))+1*rx_expr_10*(-fpm/(rx_expr_7)+rx_expr_14)/(M_SQRT_PI*(1-0.5*(rx_expr_13)))+2*rx_expr_10*(-fpm/(rx_expr_7)+rx_expr_14)/(M_SQRT_PI*(rx_expr_13));
+		    double rx_expr_14=rx_expr_9/_safe_zero(rx_expr_8);
+		    lp(i, 0)=2*exp(-(rx_expr_1*rx_expr_1)/_safe_zero(rx_expr_0))*(-fpm/_safe_zero(rx_expr_7)+rx_expr_5*(rx_expr_1)/_safe_zero(rx_expr_8))/(M_SQRT_PI*(1+erf((rx_expr_1)/_safe_zero(rx_expr_7))))+1*rx_expr_10*(-fpm/_safe_zero(rx_expr_7)+rx_expr_14)/_safe_zero(M_SQRT_PI*(1-0.5*(rx_expr_13)))+2*rx_expr_10*(-fpm/_safe_zero(rx_expr_7)+rx_expr_14)/_safe_zero(M_SQRT_PI*(rx_expr_13));
 		  }
 		}
 	      }
@@ -996,7 +996,7 @@ double likInner0(double *eta, int id){
 	      // Eq #10
 	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
 	      if (cens == 0){
-		fInd->llik += err * err/r + lnr;
+		fInd->llik += err * err/_safe_zero(r) + lnr;
 		likM2(fInd, limit, f, r);
 	      } else if (cens != 0) {
 		likCens(fInd, cens, limit, f, dv, r);
@@ -1041,16 +1041,16 @@ double likInner0(double *eta, int id){
 		    // > D(S("log(1/2*(1+erf((cens*(dv-f(x)))/sqrt(g)/M_SQRT2)))"),"x")
 		    // -2*exp(-0.5*(dv - f)^2/(g))*fpm*cens/(sqrt(g)*M_SQRT_PI*M_SQRT2*(1 + erf((dv - f)*cens/(sqrt(g)*M_SQRT2))))
 		    double rx_expr_0=dv-f;
-		    double rx_expr_1=sqrt(r);
-		    lp(i, 0) -= 2*exp(-0.5*rx_expr_0*rx_expr_0/r)*fpm*(double)(cens)/
-		      (rx_expr_1*M_SQRT_PI*M_SQRT2*(1+erf((rx_expr_0)*cens/(rx_expr_1*M_SQRT2))));
+		    double rx_expr_1=_safe_sqrt(r);
+		    lp(i, 0) -= 2*exp(-0.5*rx_expr_0*rx_expr_0/_safe_zero(r))*fpm*(double)(cens)/
+		      _safe_zero(rx_expr_1*M_SQRT_PI*M_SQRT2*(1+erf((rx_expr_0)*cens/(rx_expr_1*M_SQRT2))));
 		  } else {
 		    // M4
 		    // > D(S("log(0.5*(1+erf((dv-f(x))/sqrt(r) /M_SQRT2)))+log(0.5*(1+erf( (limit-f(x))/sqrt(r)/M_SQRT2)))-log(1-0.5*(1+erf( (limit-f(x))/sqrt(r)/M_SQRT2)))"),"x")
 		    // -2.0*exp(-0.5*(dv - f)^2/r)*fpm/(sqrt(r)*M_SQRT_PI*M_SQRT2*(1 + erf((dv - f)/(sqrt(r)*M_SQRT2)))) - 1.0*exp(-(limit - f)^2/(r*2))*fpm/(sqrt(r)*M_SQRT_PI*M_SQRT2*(1 - 0.5*(1 + erf((limit - f)/(sqrt(r)*M_SQRT2))))) - 2.0*exp(-(limit - f)^2/(r*2))*fpm/(sqrt(r)*M_SQRT_PI*M_SQRT2*(1 + erf((limit - f)/(sqrt(r)*M_SQRT2))))
 		    double rx_expr_0=r*2;
 		    double rx_expr_1=dv-f;
-		    double rx_expr_2=sqrt(r);
+		    double rx_expr_2=_safe_sqrt(r);
 		    double rx_expr_3=limit-f;
 		    double rx_expr_4=rx_expr_3*rx_expr_3;
 		    double rx_expr_5=rx_expr_2*M_SQRT2;
@@ -1060,7 +1060,7 @@ double likInner0(double *eta, int id){
 		    double rx_expr_9=rx_expr_3/rx_expr_5;
 		    double rx_expr_10=erf(rx_expr_9);
 		    double rx_expr_11=1+rx_expr_10;
-		    lp(i, 0)-=2*exp(-0.5*(rx_expr_1*rx_expr_1)/r)*fpm/(rx_expr_8*(1+erf(rx_expr_1/(rx_expr_5))))-1*rx_expr_7*fpm/(rx_expr_8*(1-0.5*(rx_expr_11)))-2*rx_expr_7*fpm/(rx_expr_8*(rx_expr_11));
+		    lp(i, 0)-=2*exp(-0.5*(rx_expr_1*rx_expr_1)/_safe_zero(r))*fpm/(rx_expr_8*(1+erf(rx_expr_1/(rx_expr_5))))-1*rx_expr_7*fpm/(rx_expr_8*(1-0.5*(rx_expr_11)))-2*rx_expr_7*fpm/(rx_expr_8*(rx_expr_11));
 		  }
 		}
 	      }
@@ -1068,7 +1068,7 @@ double likInner0(double *eta, int id){
 	      // Eq #10
 	      //llik <- -0.5 * sum(err ^ 2 / R + log(R));
 	      if (cens == 0){
-		fInd->llik += err * err/r + lnr;
+		fInd->llik += err * err/_safe_zero(r) + lnr;
 		likM2(fInd, limit, f, r);
 	      } else {
 		likCens(fInd, cens, limit, f, dv, r);
