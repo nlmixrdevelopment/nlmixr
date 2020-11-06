@@ -1,0 +1,43 @@
+Error model,Functional Form,Transformation,code,addProp ,Likelihood on 
+constant,,None,add(add.sd),,untransformed data
+proportional,,None,prop(prop.sd),,untransformed data
+power,,None,"pow(pow.sd, exponent)",,untransformed data
+additive+proportional,combined1,None,add(add.sd) + prop(prop.sd),addProp=1,untransformed data
+additive+proportional,combined2,None,add(add.sd) + prop(prop.sd),addProp=2,untransformed data
+additive+power,combined1,None,"add(add.sd) + pow(pow.sd, exponent)",addProp=1,untransformed data
+additive+power,combined2,None,"add(add.sd) + pow(pow.sd, exponent)",addProp=2,
+constant,,log,lnorm(add.sd),,
+proportional,,log,lnorm(NA) + prop(prop.sd),,
+power,,log,"lnorm(NA) + pow(pow.sd, exponent)",,
+additive+proportional,combined1,log,lnorm(add.sd) + prop(prop.sd),addProp=1,
+additive+proportional,combined2,log,lnorm(add.sd) + prop(prop.sd),addProp=2,
+additive+power,combined1,log,"lnorm(add.sd) + pow(pow.sd, exponent)",addProp=1,
+additive+power,combined2,log,"lnorm(add.sd) + pow(pow.sd, exponent)",addProp=2,
+constant,,boxCox,boxCox(lambda) + add(add.sd),,
+proportional,,boxCox,boxCox(lambda) + prop(prop.sd),,
+power,,boxCox,"boxCox(lambda) + pow(pow.sd, exponent)",,
+additive+proportional,combined1,boxCox,boxCox(lambda) + add(add.sd) + prop(prop.sd),addProp=1,
+additive+proportional,combined2,boxCox,boxCox(lambda) + add(add.sd) + prop(prop.sd),addProp=2,
+additive+power,combined1,boxCox,"boxCox(lambda) + add(add.sd) + pow(pop.sd, exponent)",addProp=1,
+additive+power,combined2,boxCox,"boxCox(lambda) + add(add.sd) + pow(pop.sd, exponent)",addProp=2,
+constant,,yeoJohnson,yeoJohnson(lambda) + add(add.sd),,
+proportional,,yeoJohnson,yeoJohnson(lambda) + prop(prop.sd),,
+power,,yeoJohnson,"yeoJohnson(lambda) + pow(pow.sd, exponent)",,
+additive+proportional,combined1,yeoJohnson,yeoJohnson(lambda) + add(add.sd) + prop(prop.sd),addProp=1,
+additive+proportional,combined2,yeoJohnson,yeoJohnson(lambda) + add(add.sd) + prop(prop.sd),addProp=2,
+additive+power,combined1,yeoJohnson,"yeoJohnson(lambda) + add(add.sd) + pow(pop.sd, exponent)",addProp=1,
+additive+power,combined2,yeoJohnson,"yeoJohnson(lambda) + add(add.sd) + pow(pop.sd, exponent)",addProp=2,
+constant,,logit,logitNorm(logit.sd),,
+proportional,,logit,logitNorm(NA) + prop(prop.sd),,
+power,,logit,"logitNorm(NA) + pow(pow.sd, exponent)",,
+additive+proportional,combined1,logit,logitNorm(logit.sd) + prop(prop.sd),addProp=1,
+additive+proportional,combined2,logit,logitNorm(logit.sd) + prop(prop.sd),addProp=2,
+additive+power,combined1,logit,"logitNorm(logit.sd) + pow(pow.sd, exponent)",addProp=1,
+additive+power,combined2,logit,"logitNorm(logit.sd) + pow(pow.sd, exponent)",addProp=2,
+additive ,,yeoJohnson(logit()),yeoJohnson(lambda) + logitNorm(logit.sd),,x
+proportional,,yeoJohnson(logit()),yeoJohnson(lambda) + logitNorm(NA) + prop(prop.sd),,x
+power,,yeoJohnson(logit()),"yeoJohnson(lambda) + logitNorm(NA) + pow(pow.sd, exponent)",,x
+additive+proportional,combined1,yeoJohnson(logit()),yeoJohnson(lambda) + logitNorm(logit.sd) + prop(prop.sd),addProp=1,x
+additive+proportional,combined2,yeoJohnson(logit()),yeoJohnson(lambda) + logitNorm(logit.sd) + prop(prop.sd),addProp=2,x
+additive+power,combined1,yeoJohnson(logit()),"yeoJohnson(lambda) + logitNorm(logit.sd) + pow(pow.sd, exponent)",addProp=1,x
+additive+power,combined2,yeoJohnson(logit()),"yeoJohnson(lambda) + logitNorm(logit.sd) + pow(pow.sd, exponent)",addProp=2,x
