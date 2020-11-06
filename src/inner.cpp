@@ -843,6 +843,19 @@ double likInner0(double *eta, int id){
 		  // Forward difference
 		  // LHS #0 =  f
 		  a(k, i) = (ind->lhs[0]-f)/op_focei.eventFD;
+		  if (a(k, i) == 0.0) {
+		    // Now try central difference
+		    fpm = ind->lhs[0];
+		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
+		    predOde(id); // Assumes same order of parameters
+		    rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
+				    ind->lhs);
+		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
+		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
+		    if (fpm == 0.0) {
+		      a(k, i) = fpm = sqrt(DOUBLE_EPS);
+		    }
+		  }
 		} else {
 		  // Central Difference
 		  fpm = ind->lhs[0];
@@ -852,6 +865,9 @@ double likInner0(double *eta, int id){
 				  ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
+		  if (fpm == 0.0) {
+		    a(k, i) = fpm = sqrt(DOUBLE_EPS);
+		  }
 		}
 	      }
 	    }
@@ -890,8 +906,15 @@ double likInner0(double *eta, int id){
 		    // Forward difference
 		    // LHS #0 =  f
 		    a(k, i) = fpm = (ind->lhs[0]-f)/op_focei.eventFD;
+		    if (fpm == 0.0) {
+		      //
+		      a(k, i) = fpm = sqrt(DOUBLE_EPS);
+		    }
 		    // LHS #1 =  r
 		    rp  = (ind->lhs[1]-r)/op_focei.eventFD;
+		    if (rp == 0.0) {
+		      rp = sqrt(DOUBLE_EPS);
+		    }
 		    c(k, i) = rp/r;
 		  } else {
 		    // Central difference
@@ -903,7 +926,13 @@ double likInner0(double *eta, int id){
 		    rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
 				    ind->lhs); // nlhs is smaller
 		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
+		    if (fpm == 0.0) {
+		      a(k, i) = fpm = sqrt(DOUBLE_EPS);
+		    }
 		    rp = (rp-ind->lhs[1])/(2*op_focei.eventFD);
+		    if (rp == 0.0) {
+		      rp = sqrt(DOUBLE_EPS);
+		    }
 		    c(k, i) = rp/r;
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  }
