@@ -194,7 +194,7 @@ typedef struct {
   int stickyRecalcN1;
   int stickyRecalcN2;
   int stickyRecalcN;
-  int stickyTol;
+  int stickyTol=0;
 
   int nsim;
   int nzm;
@@ -256,7 +256,7 @@ typedef struct {
   double cholAccept;
   double resetEtaSize;
   int didEtaReset;
-  double resetThetaSize;
+  double resetThetaSize = R_PosInf;
   double resetThetaFinalSize;
   int checkTheta;
   int *muRef;
@@ -1683,7 +1683,7 @@ static inline void innerOpt1(int id, int likId) {
 void thetaReset(double size){
   mat etaRes =  op_focei.eta1SD % op_focei.etaM; //op_focei.cholOmegaInv * etaMat;
   for (unsigned int j = etaRes.n_rows; j--;){
-    if (std::fabs(etaRes(j, 0)) >= size){ // Says reset
+    if (std::fabs(etaRes(j, 0)) >= size){ // Says reset;
       NumericVector thetaIni(op_focei.ntheta);
       for (int ii = op_focei.ntheta; ii--;){
 	thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
