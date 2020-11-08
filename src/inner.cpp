@@ -263,7 +263,7 @@ typedef struct {
   int muRefN;
   int resetHessianAndEta;
   int didHessianReset;
-  int cholSEOpt;
+  int cholSEOpt=0;
   int cholSECov;
   int fo;
   int covTryHarder;
