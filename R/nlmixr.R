@@ -2,9 +2,14 @@
   backports::import(pkgname)
 }
 
+compiled.RxODE.md5 <- RxODE::rxMd5()
+
 orig.onAttach <- function(libname, pkgname) {
   ## nocov start
   ## Setup RxODE.prefer.tbl
+  if (compiled.RxODE.md5 != RxODE::rxMd5()) {
+    stop("nlmixr compiled against different version of RxODE, cannot run nlmixr", call.=FALSE)
+  }
   nlmixrSetupMemoize()
   options(keep.source = TRUE)
   ## nocov end
@@ -22,7 +27,6 @@ nmDataConvert <- function(data) {
   warning("nmDataConvert is depreciated and no longer needed.")
   data
 }
-
 nlmixrSetupMemoize <- function() {
   reSlow <- rex::rex(".slow", end)
   f <- sys.function(-1)
@@ -194,6 +198,7 @@ nlmixr <- function(object, data, est = NULL, control = list(),
                    table = tableControl(), ..., save = NULL,
                    envir = parent.frame()) {
   assignInMyNamespace(".nlmixrTime", proc.time())
+  RxODE::rxSolveFree()
   RxODE::.setWarnIdSort(FALSE)
   on.exit(RxODE::.setWarnIdSort(TRUE))
   force(est)
