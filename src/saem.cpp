@@ -404,7 +404,6 @@ public:
     _saemType = as<int>(x["type"]);
     _saemLambdaR = fabs(as<double>(x["lambdaRange"]));
     _saemPowR = fabs(as<double>(x["powRange"]));
-    int _saemType = 1;
     nmc = as<int>(x["nmc"]);
     nu = as<uvec>(x["nu"]);
     niter = as<int>(x["niter"]);
@@ -821,7 +820,7 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=2, itmax=200, iconv, it, nfcall, iprint=0;
+	  int n=2;
 	  double start[2]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b)))};                  //force are & bres to be positive
 	  double step[2]={-.2, -.2};
 	  
@@ -857,11 +856,11 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
+	  int n=3;
 
 	  // REprintf("ares: %f bres: %f cres: %f\n", ares(b), bres(b), cres(b));
 	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), toPowEst(cres(b))}; //force are & bres to be positive
-	  double step[3]={-.2, -.2, -.2}, ynewlo;
+	  double step[3]={-.2, -.2, -.2};
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
@@ -889,9 +888,9 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
+	  int n=2;
 	  double start[2]={sqrt(fabs(bres(b))), toPowEst(cres(b))};                  //force are & bres to be positive
-	  double step[2]={ -.2, -.2}, ynewlo;
+	  double step[2]={ -.2, -.2};
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
@@ -917,9 +916,9 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
+	  int n=2;
 	  double start[2]={sqrt(fabs(ares(b))), toLambdaEst(lres(b))};                  //force are & bres to be positive
-	  double step[2]={ -.2, -.2}, ynewlo;
+	  double step[2]={ -.2, -.2};
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
@@ -945,9 +944,9 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=2, itmax=50, iconv, it, nfcall, iprint=0;
+	  int n=2;
 	  double start[2]={sqrt(fabs(bres(b))), toLambdaEst(lres(b))};                  //force are & bres to be positive
-	  double step[2]={ -.2, -.2}, ynewlo;
+	  double step[2]={ -.2, -.2};
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
@@ -973,9 +972,9 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
+	  int n=3;
 	  double start[3]={sqrt(fabs(bres(b))), toPowEst(cres(b)), toLambdaEst(lres(b))};                  //force are & bres to be positive
-	  double step[3]={ -.2, -.2, -.2}, ynewlo;
+	  double step[3]={ -.2, -.2, -.2};
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
@@ -1002,9 +1001,9 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=3, itmax=50, iconv, it, nfcall, iprint=0;
+	  int n=3;
 	  double start[3]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), toLambdaEst(lres(b))};                  //force are & bres to be positive
-	  double step[3]={ -.2, -.2, -.2}, ynewlo;
+	  double step[3]={ -.2, -.2, -.2};
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
@@ -1031,9 +1030,9 @@ public:
 	  //len = ysb.n_elem;                                        //CHK: needed by nelder
 	  vec xmin(2);
 	  double *pxmin = xmin.memptr();
-	  int n=4, itmax=50, iconv, it, nfcall, iprint=0;
+	  int n=4;
 	  double start[4]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b))), toPowEst(cres(b)), toLambdaEst(lres(b))};                  //force are & bres to be positive
-	  double step[4]={ -.2, -.2, -.2, -.2}, ynewlo;
+	  double step[4]={ -.2, -.2, -.2, -.2};
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
 	  _saemLen  = ysb.n_elem;
