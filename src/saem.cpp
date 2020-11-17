@@ -85,7 +85,7 @@ void obj(double *ab, double *fx) {
 // add + pow
 void objC(double *ab, double *fx) {
   int i;
-  double g, sum, cur, ft, ytr, fa;
+  double g, sum, cur, ft, ytr, fa=1.0;
   double xmin = 1.0e-200, xmax = 1e300;
   double pw = toPow(ab[2]);
   for (i=0, sum=0; i<_saemLen; ++i) {
@@ -224,7 +224,7 @@ void objH(double *ab, double *fx) {
 // add + pow + _saemLambda
 void objI(double *ab, double *fx) {
   int i;
-  double g, sum, cur, fa;
+  double g, sum, cur, fa=1.0;
   double xmin = 1.0e-200, xmax = 1e300, ft, ytr;
   double lambda = toLambda(ab[3]);
   double pw = toPow(ab[2]);

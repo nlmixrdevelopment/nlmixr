@@ -322,7 +322,7 @@
 ##' @author Matthew Fidler
 ##'
 ##' @examples
-##' \dontrun{
+##' \donttest{
 ##'  library(nlmixr)
 ##' pheno <- function() {
 ##'     # Pheno with covariance

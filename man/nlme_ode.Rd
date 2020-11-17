@@ -174,7 +174,7 @@ The ODE-based model specification may be coded inside a character
 }
 
 \examples{
-\dontrun{
+\donttest{
 library(nlmixr)
 ode <- "
 d/dt(depot) =-KA*depot;

@@ -766,7 +766,7 @@ double likInner0(double *eta, int id){
       fInd->llik=0.0;
       fInd->tbsLik=0.0;
       double f, err, r, fpm, rp = 0,lnr, limit, dv;
-      int cens;
+      int cens = 0;
       int oldNeq = op->neq;
       iniSubjectI(op->neq, 1, ind, op, rx, rxInner.update_inis);
       for (j = 0; j < ind->n_all_times; ++j){

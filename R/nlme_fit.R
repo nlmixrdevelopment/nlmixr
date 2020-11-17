@@ -398,7 +398,7 @@ prepEv <- function(dati, theta) {
 ##'    the open source tool \emph{DParser}, Plevyak (2015).
 ##' @author Wenping Wang, Mathew Fidler
 ##' @examples
-##' \dontrun{
+##' \donttest{
 ##' library(nlmixr)
 ##' ode <- "
 ##' d/dt(depot) =-KA*depot;

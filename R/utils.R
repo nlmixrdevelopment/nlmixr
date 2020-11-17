@@ -163,6 +163,13 @@ cholSE <- function(matrix, tol = (.Machine$double.eps)^(1 / 3)) {
   return(regexpr("/tests/testthat/", getwd(), fixed = TRUE) != -1)
 }
 
+##' nlmixTest function for testing
+##'
+##' @param expr  Expression for testing
+##' @param silent Boolean for testing
+##' @param test this represents the test group of the test
+##' @author Matthew Fidler
+##' @export
 nlmixrTest <- function(expr, silent = .isTestthat(), test = "cran") {
   .Call(`_nlmixr_setSilentErr`, 1L, PACKAGE = "nlmixr")
   RxODE::rxSetSilentErr(1L)

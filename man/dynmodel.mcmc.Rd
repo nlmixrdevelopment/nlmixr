@@ -39,7 +39,7 @@ dynmodel.mcmc(
 Fit a non-population dynamic model using mcmc
 }
 \examples{
-\dontrun{
+\donttest{
 
 ode <- "
    dose=200;
@@ -60,7 +60,7 @@ sys1 <- RxODE(model = ode)
 
 
 ## ------------------------------------------------------------------------
-dat <- read.table("invgaussian.txt", header = TRUE)
+dat <- invgaussian
 mod <- cp ~ C2 + prop(.1)
 inits <- c(MIT = 190, CVI2 = .65, F = .92)
 fixPars <- c(CL = .0793, V2 = .64, Q = .292, V3 = 9.63)
