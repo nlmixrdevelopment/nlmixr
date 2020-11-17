@@ -1,4 +1,4 @@
-nmTest(
+nlmixrTest(
   {
     context("autocovar")
 

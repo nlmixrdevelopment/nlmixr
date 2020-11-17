@@ -248,7 +248,7 @@ nlmixrTest(
       expect_error(nlmixr:::nlmixrUIModel(fn30), "the dnorm distribution requires 1 argument")
       expect_error(nlmixr:::nlmixrUIModel(fn31), "the nlmixrDist distribution is currently unsupported")
       expect_error(nlmixr:::nlmixr(fn32))
-      expect_error(nlmixr:::nlmixrUIModel(fn33), "the add and pois distributions cannot be combined\ncurrently can combine: add, prop, norm, pow, dnorm, logn, lnorm, dlnorm, tbs, tbsYj, boxCox, yeoJohnson")
+      expect_error(nlmixr:::nlmixrUIModel(fn33), "the add and pois distributions cannot be combined")
     })
 
     context("Proper Variances")

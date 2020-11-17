@@ -62,5 +62,5 @@ nlmixrTest(
       expect_equal(418.9354, round(fitPi$objective, 4))
     })
   },
-  test = "cran"
+  test = "focei"
 )

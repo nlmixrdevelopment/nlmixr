@@ -45,7 +45,7 @@ Suggests:
     vpc (>= 1.0.0),
     xgxr,
     yaml,
-    xpose,
+    xpose
 Version: 1.1.1-9
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",

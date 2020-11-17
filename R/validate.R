@@ -8,6 +8,9 @@
 ##' @export
 nlmixrValidate <- function(type = NULL, check = FALSE) {
   .tests <- c("cran", "saem", "bootstrap", "broom", "focei")
+  .op <- options()
+  on.exit(options(.op))
+  options(testthat.progress.max_fails=10000000000)
   if (is.character(type)) {
     if (type == "covr") {
       Sys.setenv(NOT_CRAN = "true", covr = "true")
@@ -38,7 +41,7 @@ nlmixrValidate <- function(type = NULL, check = FALSE) {
           )
           setwd(path)
           pt <- proc.time()
-          testthat::test_dir(path)
+          try(testthat::test_dir(path))
           message("================================================================================")
           print(proc.time() - pt)
           message("================================================================================")
@@ -57,7 +60,7 @@ nlmixrValidate <- function(type = NULL, check = FALSE) {
         )
         setwd(path)
         pt <- proc.time()
-        testthat::test_dir(path, filter = type)
+        try(testthat::test_dir(path, filter = type))
         message("================================================================================")
         print(proc.time() - pt)
         message("================================================================================")
@@ -80,7 +83,7 @@ nlmixrValidate <- function(type = NULL, check = FALSE) {
       message(sprintf("%s only tests", t))
       message("================================================================================")
       pt <- proc.time()
-      testthat::test_dir(path)
+      try(testthat::test_dir(path))
       message("================================================================================")
       print(proc.time() - pt)
       message("================================================================================")

@@ -227,7 +227,7 @@ nlmixrTest(
         })
       }
 
-      expect_error(nlmixr(uif), rex::rex("Residual distribution parameter(s) estimates were not found in ini block"))
+      expect_error(nlmixr(uif), rex::rex("residual distribution parameter(s) estimates were not found in ini block"))
     })
 
     test_that("There must be at least one prediction", {
@@ -243,6 +243,7 @@ nlmixrTest(
         model({
           ka <- tka + eta.ka
           cl <- tcl + eta.cl
+
           v <- tv
           d / dt(depot) <- -ka * depot
           d / dt(center) <- ka * depot - cl / v * center
