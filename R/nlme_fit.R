@@ -787,7 +787,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...) {
       thetas[prop] <- object$sigma
     } else {
       .const <- coef(object$modelStruct$varStruct, unconstrained = FALSE)
-      thetas[prop] <- .const["prop"]
+      thetas[prop] <- abs(.const["prop"])
       thetas[add] <- .const["const"]
     }
   } else {
