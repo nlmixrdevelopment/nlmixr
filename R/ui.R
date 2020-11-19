@@ -2861,7 +2861,7 @@ nlmixrUI.nlme.var <- function(object) {
     tmp <- sprintf("varConstPower(form=~fitted(.)%s%s)", grp, powera)
   } else if (.addProp == "combined2") {
     if (powera != ", fixed=list(power=1)") {
-      stop("add+prop combined2 does not support power for nlme currently")
+      stop("add+prop combined2 does not support nlme power currently")
     }
     tmp <- sprintf("nlme::varConstProp(%s)", grp)
   }
