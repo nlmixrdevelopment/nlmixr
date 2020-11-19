@@ -32,19 +32,31 @@ This is useful to distinguish between sparse and full sampling
 and other features you may wish to keep distinct in your
 bootstrap}
 
+\item{stdErrType}{This gives the standard error type for the updated standard errors; The current possibilities
+are: \code{"perc"} which gives the standard errors by percentiles (default) or \code{"se"} which gives the standard errors by the traditional formula.}
+
+\item{ci}{Confidence interval level to calculate.  Default is 0.95
+for a 95\% confidence interval}
+
 \item{pvalues}{a vector of pvalues indicating the probability of
 each subject to get selected; default value is NULL implying that
 probability of each subject is the same}
 
-\item{restart}{a boolean that indicates if a previous session has
-to be restarted; default value is FALSE}
+\item{restart}{A boolean to try to restart an interrupted or
+incomplete boostrap.  By default this is \code{FALSE}}
 
-\item{fitName}{Name of fit to be saved (by default the variable name supplied to fit)}
+\item{plotHist}{A boolean indicating if a histogram plot to assess
+how well the bootstrap is doing.  By default this is turned off (\code{FALSE})}
+
+\item{fitName}{is the fit name that is used for the name of the
+boostrap files.  By default it is the fit provided though it
+could be something else.}
 }
 \description{
 Bootstrap input dataset and rerun the model to get confidence bounds and aggregated parameters
 }
 \examples{
+
 \donttest{
 
 one.cmt <- function() {

@@ -45,11 +45,33 @@ addConfboundsToVar <-
 #'
 #' @param fitName Name of fit to be saved (by default the variable name supplied to fit)
 #'
+#' @param stdErrType This gives the standard error type for the updated standard errors; The current possibilities
+#'    are: \code{"perc"} which gives the standard errors by percentiles (default) or \code{"se"} which gives the standard errors by the traditional formula.
+#'
+#'
+#' @param ci Confidence interval level to calculate.  Default is 0.95
+#'   for a 95\% confidence interval
+#'
+#' @param plotHist A boolean indicating if a histogram plot to assess
+#'   how well the bootstrap is doing.  By default this is turned off (\code{FALSE})
+#'
+#' @param pvalues a vector of pvalues indicating the probability of
+#'   each subject to get selected; default value is NULL implying that
+#'   probability of each subject is the same
+#'
+#' @param restart A boolean to try to restart an interrupted or
+#'   incomplete boostrap.  By default this is \code{FALSE}
+#'
+#' @param fitName is the fit name that is used for the name of the
+#'   boostrap files.  By default it is the fit provided though it
+#'   could be something else.
+#'
 #'
 #' @author Vipul Mann, Matthew Fidler
 #' @export
 #'
 #' @examples
+#'
 #' \donttest{
 #'
 #' one.cmt <- function() {
@@ -327,9 +349,17 @@ bootstrapFit <- function(fit,
 #' Perform bootstrap-sampling from a given dataframe
 #'
 #' @param data the original dataframe object to sample from for bootstrapping
-#' @param nsamp an integer specifying the number of samples in each bootstrapped sample; default is the number of unique subjects in the original dataset
-#' @param uid_colname a string representing the unique ID of each subject in the data; default values is 'ID'
-#' @param pvalues a vector of pvalues indicating the probability of each subject to get selected; default value is NULL implying that probability of each subject is the same
+#'
+#' @param nsamp an integer specifying the number of samples in each
+#'   bootstrapped sample; default is the number of unique subjects in
+#'   the original dataset
+#'
+#' @param uid_colname a string representing the unique ID of each
+#'   subject in the data; default values is 'ID'
+#'
+#' @param pvalues a vector of pvalues indicating the probability of
+#'   each subject to get selected; default value is NULL implying that
+#'   probability of each subject is the same
 #'
 #' @return returns a bootstrap sampled dataframe object
 #' @author Vipul Mann, Matthew Fidler
