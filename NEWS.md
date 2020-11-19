@@ -76,8 +76,8 @@
 ## nlme changes
 
 - `nlme` will now support 2 combined additive + proportional error models (if the patched version of nlme is used)
-    - `combined1`: `y = f + (a+b*f^c)*err`
-	- `combined2`: `y = f + sqrt(a^2+b^2*f^(2c))*err`
+    - `combined1`: `y = f + (a+b*f)*err`
+	- `combined2`: `y = f + sqrt(a^2+b^2*f^2)*err`
 	- See https://github.com/nlmixrdevelopment/nlmixr/issues/428
 	- Thanks to @jranke for the nlme patch and the catch
 
