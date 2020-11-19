@@ -144,7 +144,7 @@ mymin <- function(start, fr, rho = NULL, control = list()) {
   #    warning("unknown names in control: ", paste(noNms, collapse = ", "))
 
   .Call(neldermead_wrap, fr, rho, length(start), start, step,
-    as.integer(con$maxeval), con$ftol_rel, con$rcoeff, con$ecoeff, con$ccoeff,
+    as.integer(con$maxeval), con$reltol, con$rcoeff, con$ecoeff, con$ccoeff,
     as.integer(con$trace),
     PACKAGE = "nlmixr"
   )
@@ -439,7 +439,7 @@ nlmixrDynmodelConvert <- function(.nmf) {
 #' @inheritParams RxODE::rxSolve
 #' @inheritParams foceiControl
 #'
-#' @param nlmixrOuput Option to change output style to nlmixr output. By default
+#' @param nlmixrOutput Option to change output style to nlmixr output. By default
 #'   this is FALSE.
 #' @param digs Option for the number of significant digits of the output. By
 #'   default this is 3.
@@ -509,6 +509,8 @@ nlmixrDynmodelConvert <- function(.nmf) {
 #'   specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for
 #'   more details. By default this is NULL.
 #'
+#' @inheritParams RxODE::rxSolve
+#'
 #' @author Mason McComb and Matthew L. Fidler
 #' @export
 dynmodelControl <- function(...,
@@ -524,7 +526,6 @@ dynmodelControl <- function(...,
                               "bobyqa", "Nelder-Mead", "lbfgsb3c", "L-BFGS-B", "PORT",
                               "mma", "lbfgsbLG", "slsqp", "Rvmmin"
                             ),
-                            ftol_rel = 1e-6,
                             maxeval = 999,
                             scaleTo = 1.0,
                             scaleObjective = 0,
@@ -537,8 +538,8 @@ dynmodelControl <- function(...,
                             # RxODE
                             atol = NULL,
                             rtol = NULL,
-                            atolSS = NULL,
-                            rtolSS = NULL,
+                            ssAtol = NULL,
+                            ssRtol = NULL,
                             # bobyqaControl
                             npt = NULL,
                             rhobeg = 0.2,
@@ -608,11 +609,11 @@ dynmodelControl <- function(...,
   if (is.null(rtol)) {
     rtol <- 0.5 * 10^(-sigdig - 2)
   }
-  if (is.null(atolSS)) {
-    atolSS <- 0.5 * 10^(-sigdig - 1.5)
+  if (is.null(ssAtol)) {
+    ssAtol <- 0.5 * 10^(-sigdig - 1.5)
   }
-  if (is.null(rtolSS)) {
-    rtolSS <- 0.5 * 10^(-sigdig - 1.5)
+  if (is.null(ssRtol)) {
+    ssRtol <- 0.5 * 10^(-sigdig - 1.5)
   }
   if (is.null(rel.tol)) {
     rel.tol <- 10^(-sigdig - 1)
@@ -630,19 +631,19 @@ dynmodelControl <- function(...,
     if (!any(names(rxControl) == "rtol")) {
       rxControl$rtol <- 0.5 * 10^(-sigdig - 2)
     }
-    if (!any(names(rxControl) == "atolSS")) {
-      rxControl$atolSS <- 0.5 * 10^(-sigdig - 1.5)
+    if (!any(names(rxControl) == "ssAtol")) {
+      rxControl$ssAtol <- 0.5 * 10^(-sigdig - 1.5)
     }
-    if (!any(names(rxControl) == "rtolSS")) {
-      rxControl$rtolSS <- 0.5 * 10^(-sigdig - 1.5)
+    if (!any(names(rxControl) == "ssRtol")) {
+      rxControl$ssRtol <- 0.5 * 10^(-sigdig - 1.5)
     }
     rxControl <- do.call(RxODE::rxControl, rxControl)
   } else {
     atol <- 0.5 * 10^(-sigdig - 2)
     rtol <- 0.5 * 10^(-sigdig - 2)
-    atolSS <- 0.5 * 10^(-sigdig - 1.5)
-    rtolSS <- 0.5 * 10^(-sigdig - 1.5)
-    rxControl <- RxODE::rxControl(atol = atol, rtol = rtol, atolSS = atolSS, rtolSS = rtolSS)
+    ssAtol <- 0.5 * 10^(-sigdig - 1.5)
+    ssRtol <- 0.5 * 10^(-sigdig - 1.5)
+    rxControl <- RxODE::rxControl(atol = atol, rtol = rtol, ssAtol = ssAtol, ssRtol = ssRtol)
   }
 
   if (missing(method)) {
@@ -662,7 +663,6 @@ dynmodelControl <- function(...,
     lower = lower,
     upper = upper,
     method = method,
-    ftol_rel = ftol_rel,
     maxeval = maxeval,
     scaleTo = scaleTo,
     scaleObjective = scaleObjective,
@@ -733,6 +733,7 @@ dynmodelControl <- function(...,
 #'   details. Default is NULL.
 #' @param control Control options for dynmodel
 #'   \code{\link[nlmixr]{dynmodelControl}} .
+#' @param ... Other parameters (ignored)
 #' @author Wenping Wang, Mason McComb and Matt Fidler
 #' @examples
 #'

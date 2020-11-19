@@ -2918,6 +2918,7 @@ nlmixrUI.saem.rx1 <- function(object) {
 ##' @param object UI object
 ##' @return Combined focei model text for RxODE
 ##' @author Matthew L. Fidler
+##' @noRd
 nlmixrUI.focei.rx1 <- function(obj) {
   .df <- .as.data.frame(obj$ini)
   .dft <- .df[!is.na(.df$ntheta), ]
@@ -3152,7 +3153,7 @@ nlmixrUI.saem.propT <- function(obj) {
   }))
 }
 
-##' Get the TBS yj for SAEM
+# Get the TBS yj for SAEM
 nlmixrUI.saem.yj <- function(obj) {
   ## yj is for the number of endpoints in the nlmir model
   ## yj = 7 Yeo Johnson and  probit()
@@ -3203,7 +3204,7 @@ nlmixrUI.saem.yj <- function(obj) {
   }))
 }
 
-##' Get the lambda estimates for SAEM
+# Get the lambda estimates for SAEM
 nlmixrUI.saem.lambda <- function(obj) {
   if (any(obj$saem.distribution == c("poisson", "binomial"))) {
     return(1.0)

@@ -485,18 +485,18 @@ nlmixrBoundsParser.integer <- function(x) {
 }
 
 # Convert a parsed theta assignment to data.frame form.
-#' Forms of fixed that are allowed are:
-#'
-#' * \code{fixed(1)}
-#' * \code{fixed(1, 2)}
-#' * \code{fixed(1, 2, 3)}
-#' * \code{c(1, fixed)}
-#' * \code{c(1, 2, fixed)}
-#' * \code{c(1, 2, 3, fixed)}
-#' * \code{c(1, fixed(2))}
-#' * \code{c(1, fixed(2), 3)}
-#'
-#' Where 'fixed' can be 'FIX', 'FIXED', 'fix', or 'fixed'.
+# Forms of fixed that are allowed are:
+#
+# * \code{fixed(1)}
+# * \code{fixed(1, 2)}
+# * \code{fixed(1, 2, 3)}
+# * \code{c(1, fixed)}
+# * \code{c(1, 2, fixed)}
+# * \code{c(1, 2, 3, fixed)}
+# * \code{c(1, fixed(2))}
+# * \code{c(1, fixed(2), 3)}
+#
+# Where 'fixed' can be 'FIX', 'FIXED', 'fix', or 'fixed'.
 nlmixrBoundsParserTheta <- function(x, currentData) {
   currentData$name <- x$varname
   valueFix <- nlmixrBoundsValueFixed(x$value, x$varname)

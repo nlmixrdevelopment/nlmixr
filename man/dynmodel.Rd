@@ -31,6 +31,8 @@ details. Default is NULL.}
 
 \item{control}{Control options for dynmodel
 \code{\link[nlmixr]{dynmodelControl}} .}
+
+\item{...}{Other parameters (ignored)}
 }
 \description{
 Fit a non-population dynamic model

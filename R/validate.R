@@ -2,8 +2,8 @@
 ##'
 ##' This allows easy vaildation/qualification of nlmixr by running the
 ##' testing suite on your system.
-##' @param full Should a full validation be performed?  (By default
-##'     \code{FALSE})
+##' @param type of test to be run
+##' @param check Use devtools::check to run checks
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixrValidate <- function(type = NULL, check = FALSE) {

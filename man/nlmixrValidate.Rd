@@ -10,8 +10,9 @@ nlmixrValidate(type = NULL, check = FALSE)
 nmTest(type = NULL, check = FALSE)
 }
 \arguments{
-\item{full}{Should a full validation be performed?  (By default
-\code{FALSE})}
+\item{type}{of test to be run}
+
+\item{check}{Use devtools::check to run checks}
 }
 \description{
 This allows easy vaildation/qualification of nlmixr by running the

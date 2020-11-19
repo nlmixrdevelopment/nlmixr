@@ -13,7 +13,6 @@ dynmodelControl(
   upper = Inf,
   method = c("bobyqa", "Nelder-Mead", "lbfgsb3c", "L-BFGS-B", "PORT", "mma",
     "lbfgsbLG", "slsqp", "Rvmmin"),
-  ftol_rel = 1e-06,
   maxeval = 999,
   scaleTo = 1,
   scaleObjective = 0,
@@ -25,8 +24,8 @@ dynmodelControl(
   scaleC0 = 1e+05,
   atol = NULL,
   rtol = NULL,
-  atolSS = NULL,
-  rtolSS = NULL,
+  ssAtol = NULL,
+  ssRtol = NULL,
   npt = NULL,
   rhobeg = 0.2,
   rhoend = NULL,
@@ -74,6 +73,9 @@ like NONMEM.}
 
 \item{ci}{Confidence level for some tables.  By default this is
 0.95 or 95\% confidence.}
+
+\item{nlmixrOutput}{Option to change output style to nlmixr output. By default
+this is FALSE.}
 
 \item{digs}{Option for the number of significant digits of the output. By
 default this is 3.}
@@ -266,6 +268,12 @@ by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
  if prior doses do not add anything to the solution.}
 
+\item{ssAtol}{Steady state atol convergence factor.  Can be
+a vector based on each state.}
+
+\item{ssRtol}{Steady state rtol convergence factor.  Can be a
+vector based on each state.}
+
 \item{npt}{The number of points used to approximate the objective
 function via a quadratic approximation for bobyqa. The value
 of npt must be in the interval [n+2,(n+1)(n+2)/2] where n is
@@ -432,9 +440,6 @@ gradient estimates during the covariance step.}
 \item{rxControl}{This uses RxODE family of objects, file, or model
 specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for
 more details. By default this is NULL.}
-
-\item{nlmixrOuput}{Option to change output style to nlmixr output. By default
-this is FALSE.}
 }
 \description{
 Control Options for dynmodel
