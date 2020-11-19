@@ -79,7 +79,7 @@
     - `combined1`: `y = f + (a+b*f)*err`
 	- `combined2`: `y = f + sqrt(a^2+b^2*f^2)*err`
 	- See https://github.com/nlmixrdevelopment/nlmixr/issues/428
-	- Thanks to @jranke for the nlme patch and the catch
+	- Thanks to Johannes Ranke (@jranke) for the nlme patch and the catch
 
 - Can switch with `nlmeControl(addProp="combined1")` to use the combined1 type of error model
 
