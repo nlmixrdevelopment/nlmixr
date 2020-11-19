@@ -186,7 +186,7 @@ configsaem <- function(model, data, inits,
   ODEopt <- do.call(RxODE::rxControl, ODEopt)
   # mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
   set.seed(seed)
-  distribution.idx <- c("normal" = 1, "poisson" = 2, "binomial" = 3, "lnorm" = 4)
+  distribution.idx <- c("normal" = 1, "poisson" = 2, "binomial" = 3)
   distribution <- match.arg(distribution)
   distribution <- distribution.idx[distribution]
   .data <- data

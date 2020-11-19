@@ -189,27 +189,6 @@ nlmixrTest(
 
       expect_equal(val, readRDS("test-saem-theo_sd.rds"))
 
-      mod %>%
-        model(ipre ~ lnorm(lnorm.sd)) %>%
-        ini(lnorm.sd = 0.1) %>%
-        nlmixr(dat, "saem", control = ctl2) -> f
-
-      dat2 <- dat
-      dat2$Y <- dat2$DV
-      dat2$DV <- log(dat2$Y)
-
-      nlmixr(mod2, dat2, est = "saem", control = ctl2) -> f2
-
-      expect_equal(f$theta, f2$theta)
-      expect_equal(f$omega, f2$omega)
-
-      expect_equal(f$PRED, exp(f2$PRED))
-      expect_equal(f$IPRED, exp(f2$IPRED))
-      expect_equal(f$IWRES, f2$IWRES)
-      expect_equal(f$cov, f2$cov)
-
-      expect_equal(f$objective, f2$objective - 2 * sum(dat2$DV[dat2$EVID == 0]))
-      expect_equal(round(f$objective, 3), -606.185)
     })
   },
   test = "saem"

@@ -508,7 +508,7 @@ public:
     veccres = cres(ix_endpnt);
     veclres = lres(ix_endpnt);
     for (int b=0; b<nendpnt; ++b) {
-      sigma2[b] = 10.0;
+      sigma2[b] = 10;
       if (res_mod(b)==1)
 	sigma2[b] = max(ares(b)*ares(b), 10.0);
       if (res_mod(b)==2)
@@ -553,10 +553,6 @@ public:
     if (DEBUG>0) Rcout << "initialization successful\n";
     fsaveMat = user_fn(phiM, evtM, optM);
     fsave = fsaveMat.col(0);
-    // if (distribution == 4){
-    //   fsave.elem(find( fsave < double_xmin)).fill(double_xmin);
-    //   fsave = log(fsave);
-    // }
     if (DEBUG>0) Rcout << "initial user_fn successful\n";
     for (unsigned int kiter=0; kiter<(unsigned int)(niter); kiter++) {
       gamma2_phi1=Gamma2_phi1.diag();
@@ -598,7 +594,12 @@ public:
 	// focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
 	// focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
 	// This does not match focei's definition of add+prop
-	vec g = vecares + vecbres % abs(f);                          //make sure g > 0
+	vec g;
+	if (_saemPropT) {
+	  g = vecares + vecbres % abs(ft); //make sure g > 0
+	} else {
+	  g = vecares + vecbres % abs(f); //make sure g > 0
+	}
 	g.elem( find( g == 0.0) ).fill(1.0); // like Uppusla IWRES allows prop when f=0
 	g.elem( find( g < double_xmin) ).fill(double_xmin);
 	g.elem( find(g > xmax)).fill(xmax);
@@ -697,14 +698,6 @@ public:
 	      resid(i) = resid(i)/fa;
 	    }
 	  }
-	  // if (res_mod(b)==2) {
-	  //   //double epsilon = std::numeric_limits<double>::epsilon();
-	  //   // Here could be transformed f
-	  //   gk = abs(f_cur);            //CHK: range & chk resize & .memptr()
-	  //   gk.elem( find( gk == 0.0) ).fill(1.0);
-	  //   gk.elem( find( gk < double_xmin) ).fill(double_xmin);
-	  //   resid = resid/gk;
-	  // }
 #if 0
 	  uvec iix = find(resid>1e9);
 	  Rcout << b << " " <<iix;
@@ -1266,12 +1259,17 @@ private:
       for (int k1=0; k1<mphi.nphi; k1++) {
 	mat phiMc=phiM;
 
-	if (method==1)
+	switch (method) {
+	case 1:
 	  phiMc.cols(i)=randn<mat>(mx.nM,mphi.nphi)*mphi.Gamma_phi+mphi.mprior_phiM;
-	if (method==2)
+	  break;
+	case 2:
 	  phiMc.cols(i)=phiM.cols(i)+randn<mat>(mx.nM,mphi.nphi)*mphi.Gdiag_phi;
-	if (method==3)
-	  phiMc.col(i(k1))=phiM.col(i(k1))+randn<mat>(mx.nM,1)*mphi.Gdiag_phi(k1,k1);
+	  break;
+	case 3:
+	  phiMc.col(i(k1))=phiM.col(i(k1))+randn<vec>(mx.nM)*mphi.Gdiag_phi(k1,k1);
+	  break;
+	}
 
 	fcMat = user_fn(phiMc, mx.evtM, mx.optM);
 	fc = fcMat.col(0);
@@ -1282,13 +1280,26 @@ private:
 	  fc(i) = _powerD(fc(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
 	  yt(i) = _powerD(mx.yM(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
 	}
-	gc = vecares + vecbres % abs(fs);                            //make sure gc > 0
+	if (_saemPropT) {
+	  gc = vecares + vecbres % abs(fc); //make sure gc > 0
+	} else {
+	  gc = vecares + vecbres % abs(fs); //make sure gc > 0
+	}
 	gc.elem( find( gc == 0.0) ).fill(1);
 	gc.elem( find( gc < double_xmin) ).fill(double_xmin);
 	gc.elem( find( gc > xmax) ).fill(xmax);
-	if (distribution == 1) DYF(mx.indioM)=0.5*(((yt-fc)/gc)%((yt-fc)/gc))+log(gc);
-	else if (distribution == 2) DYF(mx.indioM)=-mx.yM%log(fc)+fc;
-	else if (distribution == 3) DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
+
+	switch (distribution) {
+	case 1:
+	  DYF(mx.indioM)=0.5*(((yt-fc)/gc)%((yt-fc)/gc))+log(gc);
+	  break;
+	case 2:
+	  DYF(mx.indioM)=-mx.yM%log(fc)+fc;
+	  break;
+	case 3:
+	  DYF(indioM)=-mx.yM%log(fc)-(1-mx.yM)%log(1-fc);
+	  break;
+	}
 	doCens(DYF, cens, limit, fc, gc, mx.yM, distribution);
 
 	Uc_y=sum(DYF,0).t();
