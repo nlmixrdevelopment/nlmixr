@@ -72,6 +72,16 @@
    table results will likely be different because in the last release
    the `saem` calculated `combined1` and then used these coefficients
    in the `combined2` focei problem.
+   
+## nlme changes
+
+- `nlme` will now support 2 combined additive + proportional error models (if the patched version of nlme is used)
+    - `combined1`: `y = f + (a+b*f^c)*err`
+	- `combined2`: `y = f + sqrt(a^2+b^2*f^(2c))*err`
+	- See https://github.com/nlmixrdevelopment/nlmixr/issues/428
+	- Thanks to @jranke for the nlme patch and the catch
+
+- Can switch with `nlmeControl(addProp="combined1")` to use the combined1 type of error model
 
 ## New Utilities
 
