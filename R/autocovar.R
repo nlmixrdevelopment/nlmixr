@@ -8,7 +8,6 @@
 #' @return returns the modified string with the covariate added to function string
 #' @author Vipul Mann, Matthew Fidler
 #' @export
-#' @noRd
 addCovariate <-
   function(funstring,
            varName,
@@ -92,7 +91,6 @@ addCovariate <-
 #'
 #' @author Vipul Mann, Matthew Fidler
 #' @export
-#' @noRd
 #'
 removeCovariate <- function(funstring, varName, covariate, theta) {
   covariate <-
@@ -207,7 +205,6 @@ removeCovariate <- function(funstring, varName, covariate, theta) {
 #' @return a list with the updated model expression and data with columns corresponding to normalized covaraite(s) appended
 #' @author Vipul Mann, Matthew Fidler
 #' @export
-#' @noRd
 #'
 addCovVar <- function(fitobject,
                       varName,
@@ -402,7 +399,6 @@ addCovVar <- function(fitobject,
 #' @author Vipul Mann, Matthew Fidler
 #'
 #' @export
-#' @noRd
 removeCovVar <- function(fitobject,
                          varName,
                          covariate,
@@ -499,7 +495,6 @@ removeCovVar <- function(fitobject,
 #' @return a list comprising the update dataframe, the expression for covariate, and a list of covariate names
 #' @export
 #' @author Vipul Mann, Matthew Fidler
-#' @noRd
 performNorm <- function(data,
                         covariate,
                         varName,
@@ -606,7 +601,6 @@ performNorm <- function(data,
 #' @return updated model object with the modified initial values
 #' @export
 #' @author Vipul Mann, Matthew Fidler
-#' @noRd
 #'
 initializeCovars <- function(fitobject,
                              fstring,
@@ -639,7 +633,6 @@ initializeCovars <- function(fitobject,
 #' @return a list of updated data with covariates added, an expression that needs to be added to the model expression, the list of covariate names, and the column names corresponding to the hockey-stick covariates
 #' @export
 #' @author Vipul Mann, Matthew Fidler
-#' @noRd
 makeHockeyStick <- function(data, covariate, varName) {
   v <- unlist(data[, covariate])
 
@@ -671,7 +664,6 @@ makeHockeyStick <- function(data, covariate, varName) {
 #' @export
 #' @author Vipul Mann, Matthew Fidler
 #'
-#' @noRd
 makeDummies <- function(data, covariate, varName) {
   v <- unlist(data[, covariate])
 
@@ -699,7 +691,6 @@ makeDummies <- function(data, covariate, varName) {
 #'
 #' @return a list with the updated fit object, the variable-covariate pair string, and the parameter names for the corresponding covaraites removed
 #' @export
-#' @noRd
 #'
 #' @author Vipul Mann, Matthew Fidler
 #'
@@ -764,7 +755,6 @@ removeCovMultiple <- function(covInfo, fitobject) {
 #'
 #' @export
 #' @author Vipul Mann, Matthew Fidler
-#' @noRd
 #'
 addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
   covSearchRes <- list() # list to store fitobjects during the search
@@ -896,7 +886,7 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 #' @param covarsVec a list of candidate covariates that need to be tested
 #' @param pVal a named list with names 'fwd' and 'bck' for specifying the p-values for the forward and backward searches, respectively
 #' @param covInformation a list containing additionl information on the variables-covariates pairs that should be passed on to addCovMultiple function
-#' @param catCovaraites a list of covariates that should be treated as categorical
+#' @param catCovariates a list of covariates that should be treated as categorical
 #' @param searchType one of 'scm', 'forward' and 'backward' to specify the covariate search method; default is 'scm'
 #' @param restart a boolean that controls if the search should be restarted; default is FALSE
 #'
@@ -1060,7 +1050,6 @@ covarSearchAuto <- # unsuccessful runs info store; check for covInformation befo
 #' @return returns the updated 'fit' object at the end of the forward search and a table of information for all the covaraites tested
 #' @export
 #' @author Vipul Mann, Matthew Fidler
-#' @noRd
 #'
 forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE) {
   if (missing(outputDir)) {

@@ -116,7 +116,10 @@ gen_saem_user_fn <- genSaemUserFunction
 #' @param seed seed for random number generator
 #' @param distribution one of c("normal","poisson","binomial")
 #' @param fixed a character vector of fixed effect only parameters (no random effects attached) to be fixed
-#' @param DEBUG Integer determining if debugging is enabled.
+#' @param DEBUG Integer determining if debugging is enabled
+#' @param type indicates the type of optimization for the residuals; Can be one of c("nelder–mead", "newuoa")
+#' @param lambdaRange This indicates the range that Box-Cox and Yeo-Johnson parameters are constrained to be;  The default is 3 indicating the range (-3,3)
+#' @param powRange This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)
 #' @inheritParams RxODE::rxSEinner
 #' @inheritParams saemControl
 #' @details

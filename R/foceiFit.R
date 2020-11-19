@@ -2805,7 +2805,13 @@ vcov.nlmixrFitCoreSilent <- vcov.nlmixrFitCore
   return(.ret)
 }
 
+##' Get a posthoc estimate of x
+##'
+##' @param x nlmixr object
+##' @param ... other arguments
+##'
 ##' @export
+##' @keywords internal
 nlmixrPosthoc <- function(x, ...) {
   UseMethod("nlmixrPosthoc")
 }

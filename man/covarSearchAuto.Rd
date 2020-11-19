@@ -26,11 +26,11 @@ covarSearchAuto(
 
 \item{covInformation}{a list containing additionl information on the variables-covariates pairs that should be passed on to addCovMultiple function}
 
+\item{catCovariates}{a list of covariates that should be treated as categorical}
+
 \item{searchType}{one of 'scm', 'forward' and 'backward' to specify the covariate search method; default is 'scm'}
 
 \item{restart}{a boolean that controls if the search should be restarted; default is FALSE}
-
-\item{catCovaraites}{a list of covariates that should be treated as categorical}
 }
 \description{
 Stepwise Covariate Model-selection (SCM) method
