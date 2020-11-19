@@ -907,7 +907,8 @@ as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcRe
         covMethod = "",
         cores = 1,
         ## transitAbs=transitAbs,
-        sumProd = uif$env$sum.prod
+        sumProd = uif$env$sum.prod,
+        addProp=uif$env$.addProp
       )
     ))
     if (inherits(fit.f, "try-error")) {
