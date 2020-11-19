@@ -1,5 +1,13 @@
+
+
 .onLoad <- function(libname, pkgname) {
   backports::import(pkgname)
+  .s3register("generics::tidy", "nlmixrFitCore")
+  .s3register("generics::tidy", "nlmixrFitCoreSilent")
+  .s3register("generics::glance", "nlmixrFitCore")
+  .s3register("generics::glance", "nlmixrFitCoreSilent")
+  .s3register("generics::augment", "nlmixrFitCore")
+  .s3register("generics::augment", "nlmixrFitCoreSilent")
 }
 
 compiled.RxODE.md5 <- RxODE::rxMd5()

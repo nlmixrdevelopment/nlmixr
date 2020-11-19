@@ -5,8 +5,7 @@ Depends: R (>= 3.5)
 Imports: Rcpp (>= 0.12.3), brew, lattice, parallel, lbfgsb3c,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
  	n1qn1 (>= 6.0.1-10), fastGHQuad, RcppArmadillo (>= 0.5.600.2.0),
-	RxODE(>= 0.9.1-9), nlme, magrittr, sys, generics, tibble,
- 	digest, backports
+	RxODE(>= 0.9.1-9), nlme, magrittr, sys, digest, backports
 Suggests: 
     Deriv,
     Rvmmin,
@@ -45,7 +44,9 @@ Suggests:
     vpc (>= 1.0.0),
     xgxr,
     yaml,
-    xpose
+    xpose,
+    generics,
+    tibble
 Version: 1.1.1-9
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",

@@ -36,8 +36,8 @@ confint.nlmixrFitCore <- function(object, parm, level = 0.95, ...) {
 ##' @export
 confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 
-#' @importFrom tibble as_tibble
 .nlmixrTidyFixed <- function(x, ..., .ranpar = FALSE) {
+  RxODE::rxReq("tibble")
   .extra <- list(...)
   .conf.int <- ifelse(any(names(.extra) == "conf.int"), .extra$conf.int, ifelse(any(names(.extra) == "conf.level"), TRUE, FALSE))
   .conf.level <- ifelse(any(names(.extra) == "conf.level"), .extra$conf.level, 0.95)
@@ -99,6 +99,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 
 #' @importFrom tibble as_tibble
 .nlmixrTidyRandom <- function(x, ...) {
+  RxODE::rxReq("tibble")
   .d <- dim(x$omegaR)
   if (.d[1] > 0) {
     .tmp <- stack(x$eta[, -1])
@@ -111,6 +112,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 
 #' @importFrom tibble as_tibble
 .nlmixrTidyRandomPar <- function(x, ...) {
+  RxODE::rxReq("tibble")
   .pars <- .getR(x$omegaR, TRUE)
   if (length(.pars) > 0) {
     .p1 <- data.frame(
@@ -156,6 +158,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 
 #' @importFrom tibble as_tibble
 .coefPar <- function(x, exponentiate = FALSE, ...) {
+  RxODE::rxReq("tibble")
   .d <- dim(x$omegaR)
   if (.d[1] == 0) {
     return(NULL)
@@ -206,6 +209,7 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
 #' @export
 #' @importFrom tibble as_tibble
 tidy.nlmixrFitCore <- function(x, ...) {
+  RxODE::rxReq("tibble")
   .extra <- list(...)
   if (any(names(.extra) == "effects")) {
     .effects <- .extra$effects
@@ -246,6 +250,7 @@ tidy.nlmixrFitCoreSilent <- tidy.nlmixrFitCore
 #' @export
 #' @importFrom tibble as_tibble
 glance.nlmixrFitCore <- function(x, ...) {
+  RxODE::rxReq("tibble")
   .lst <- list(...)
   if (any(names(.lst) == "type")) {
     setOfv(x, type = .lst$type)

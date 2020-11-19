@@ -95,6 +95,7 @@
 
 
 .nmHuxHeader <- function(x, bound) {
+  RxODE::rxReq("tibble")
   .cor <- x$omega
   diag(.cor) <- 0
   .tab <- tibble::tribble(
