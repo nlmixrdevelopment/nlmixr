@@ -8,6 +8,11 @@
  - The function as.nlmixrBounds() now supports adding the columns that are
    missing into the input data.frame.
  - omega definitions can be correlation matrices (#338)
+ 
+ - Can specify `keep=` and `drop=` in the nlmixr function to keep and
+   drop columns in nlmixr output.  Can also specify
+   `control=list(keep=,drop=)` or `nlmixr(...,keep=,drop=)` to
+   keep/drop columns (#260)
 
 ## `focei` changes:
  - Uses RxODE to re-arrange the problem so it does not include
