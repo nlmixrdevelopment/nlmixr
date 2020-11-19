@@ -2874,7 +2874,6 @@ nlmixrUI.nlme.var <- function(object) {
   } else if (all(!add.prop.errs$add)) {
     tmp <- sprintf("varPower(form = ~ fitted(.)%s%s)", grp, power)
   }
-  message(tmp)
   return(eval(parse(text = tmp)))
 }
 ##' Return RxODE model with predictions appended
