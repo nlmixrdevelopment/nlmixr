@@ -7,7 +7,17 @@
 \usage{
 as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
 
-\method{as.focei}{nlmixrNlme}(object, uif, pt = proc.time(), ..., data, calcResid = TRUE, nobs2 = 0)
+\method{as.focei}{nlmixrNlme}(
+  object,
+  uif,
+  pt = proc.time(),
+  ...,
+  data,
+  calcResid = TRUE,
+  nobs2 = 0,
+  keep = NULL,
+  drop = NULL
+)
 }
 \arguments{
 \item{object}{Fit object to convert to FOCEi-style fit.}
@@ -24,6 +34,12 @@ as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
 should be calculated}
 
 \item{nobs2}{Number of observations without EVID=2}
+
+\item{keep}{Columns to keep from either the input dataset. For the
+input dataset, if any records are added to the data LOCF (Last
+Observation Carried forward) imputation is performed.}
+
+\item{drop}{Columns to drop from the output}
 }
 \value{
 A FOCEi fit style object.

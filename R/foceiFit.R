@@ -2943,6 +2943,7 @@ focei.eta.nlmixrFitCoreSilent <- focei.eta.nlmixrFitCore
 ##' @param calcResid A boolean to indicate if the CWRES residuals
 ##'     should be calculated
 ##' @param nobs2 Number of observations without EVID=2
+##' @inheritParams foceiFit
 ##' @return A FOCEi fit style object.
 ##' @author Matthew L. Fidler
 as.focei <- function(object, uif, pt = proc.time(), ..., data, calcResid = TRUE) {

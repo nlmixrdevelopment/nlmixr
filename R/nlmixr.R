@@ -371,6 +371,7 @@ nlmixr_fit0AddNpde <- function(x, table, est) {
 }
 
 nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
+                        keep=NULL, drop=NULL,
                         sum.prod = FALSE, table = tableControl(),
                         envir = parent.frame()) {
   if (is.null(est)) {
@@ -383,6 +384,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
   .meta <- uif$meta
   .drop <- NULL
   .keep <- NULL
+  args <- as.list(match.call(expand.dots = TRUE))[-1]
   if (exists("drop", envir = .meta)) {
     .drop <- .meta$drop
     checkmate::assertCharacter(.drop, min.len=1, min.chars=1, .var.name="drop")
@@ -390,6 +392,35 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
   if (exists("keep", envir = .meta)) {
     .keep <- .meta$keep
     checkmate::assertCharacter(.keep, min.len=1, min.chars=1, .var.name="keep")
+  }
+  if (!is.null(control$keep)) {
+    if (inherits(.keep, "character")) {
+      warning("control(keep=) overwrites keep in model")
+    }
+    .keep <- control$keep
+    checkmate::assertCharacter(.keep, min.len=1, min.chars=1, .var.name="keep")
+  }
+  if (!is.null(control$drop)) {
+    if (inherits(.drop, "character")) {
+      warning("control(drop=) overwrites drop in model")
+    }
+    .drop <- control$drop
+    checkmate::assertCharacter(.drop, min.len=1, min.chars=1, .var.name="drop")
+  }
+  if (!is.null(keep)) {
+    if (inherits(.keep, "character")) {
+      warning("keep= overwrites other ways of specifying keep")
+    }
+    .keep <- keep
+    checkmate::assertCharacter(.keep, min.len=1, min.chars=1, .var.name="keep")
+  }
+  if (!is.null(drop)) {
+    if (inherits(.drop, "character")) {
+      warning("drop= overwrites other ways of specifying drop")
+    }
+    .drop <- drop
+    checkmate::assertCharacter(.drop, min.len=1, min.chars=1, .var.name="drop")
+
   }
   .extra <- ""
   if (inherits(.keep, "character")) {
@@ -464,7 +495,6 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       calc.resid <- table$nlmeCWRES
     }
   }
-  args <- as.list(match.call(expand.dots = TRUE))[-1]
   .cur <- environment()
   class(.cur) <- c(est, "nlmixrEst")
   .ret <- nlmixrEst(.cur, ...)
@@ -491,11 +521,13 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
 ##'   if already run.  If NULL, get the option from
 ##'   \code{options("nlmixr.save")};
 ##' @param envir Environment that nlmixr is evaluated in.
+##' @inheritParams foceiFit
 ##' @return nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixr_fit <- function(uif, data, est = NULL, control = list(), ...,
                        sum.prod = FALSE, table = tableControl(),
+                       keep=NULL, drop=NULL,
                        save = NULL, envir = parent.frame()) {
   RxODE::.setWarnIdSort(FALSE)
   on.exit(RxODE::.setWarnIdSort(TRUE))
@@ -539,7 +571,8 @@ nlmixr_fit <- function(uif, data, est = NULL, control = list(), ...,
     .collectWarnings(
       nlmixr_fit0(
         uif = uif, data = data, est = est, control = control, ...,
-        sum.prod = sum.prod, table = table, envir = envir
+        sum.prod = sum.prod, table = table, envir = envir,
+        keep=keep, drop=drop
       ),
       TRUE
     )

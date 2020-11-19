@@ -29,12 +29,14 @@ focei.fit(data, ...)
   etaNames = NULL,
   etaMat = NULL,
   ...,
-  env = NULL
+  env = NULL,
+  keep = NULL,
+  drop = NULL
 )
 }
 \arguments{
-\item{data}{Data to fit; Needs to be RxODE compatible and have \code{DV},
-\code{AMT}, \code{EVID} in the dataset.}
+\item{data}{Data to fit; Needs to be RxODE compatible and have
+\code{DV}, \code{AMT}, \code{EVID} in the dataset.}
 
 \item{...}{Ignored parameters}
 
@@ -69,7 +71,14 @@ object.}
 \item{etaMat}{Eta matrix for initial estimates or final estimates
 of the ETAs.}
 
-\item{env}{An environment used to build the FOCEi or nlmixr object.}
+\item{env}{An environment used to build the FOCEi or nlmixr
+object.}
+
+\item{keep}{Columns to keep from either the input dataset. For the
+input dataset, if any records are added to the data LOCF (Last
+Observation Carried forward) imputation is performed.}
+
+\item{drop}{Columns to drop from the output}
 }
 \value{
 A focei fit or nlmixr fit object

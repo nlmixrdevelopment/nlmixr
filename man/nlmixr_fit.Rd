@@ -12,6 +12,8 @@ nlmixr_fit(
   ...,
   sum.prod = FALSE,
   table = tableControl(),
+  keep = NULL,
+  drop = NULL,
   save = NULL,
   envir = parent.frame()
 )
@@ -36,6 +38,12 @@ Increases solving accuracy and solving time.}
 
 \item{table}{A list controlling the table options (i.e. CWRES, NPDE etc).
 See \code{\link{tableControl}}.}
+
+\item{keep}{Columns to keep from either the input dataset. For the
+input dataset, if any records are added to the data LOCF (Last
+Observation Carried forward) imputation is performed.}
+
+\item{drop}{Columns to drop from the output}
 
 \item{save}{This option determines if the fit will be saved to be reloaded
 if already run.  If NULL, get the option from

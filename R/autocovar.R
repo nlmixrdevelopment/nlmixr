@@ -1193,22 +1193,6 @@ forwardSearch <- function(covInfo, fit, pVal = 0.05, outputDir, restart = FALSE)
   list(fit, resTableComplete)
 }
 
-
-#' Forward covariate search
-#'
-#' @param covInfo a list containing information about each variable-covariate pair
-#' @param fit  an nlmixr 'fit' object
-#' @param pVal p-value that should be used for selecting covariates in the forward search
-#' @param outputDir the name of the output directory that stores the covariate search result
-#' @param restart a boolean that controls if the search should be restarted; default is FALSE
-#'
-#' @return returns the updated 'fit' object at the end of the forward search and a table of information for all the covaraites tested
-#' @export
-#' @author Vipul Mann, Matthew Fidler
-#' @noRd
-#'
-#'
-#'
 #' Backward covariate search
 #'
 #' @param covInfo a list containing information about each variable-covariate pair

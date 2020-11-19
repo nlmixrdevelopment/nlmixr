@@ -2,7 +2,7 @@
 % Please edit documentation in R/autocovar.R
 \name{backwardSearch}
 \alias{backwardSearch}
-\title{Forward covariate search}
+\title{Backward covariate search}
 \usage{
 backwardSearch(
   covInfo,
@@ -28,19 +28,13 @@ backwardSearch(
 \item{outputDir}{the name of the output directory that stores the covariate search result}
 
 \item{restart}{a boolean that controls if the search should be restarted; default is FALSE}
-
-\item{fit}{an nlmixr 'fit' object}
 }
 \value{
-returns the updated 'fit' object at the end of the forward search and a table of information for all the covaraites tested
-
 returns the updated 'fit' object at the end of the backward search and a table of information for all the covariates tested
 }
 \description{
-Forward covariate search
+Backward covariate search
 }
 \author{
-Vipul Mann, Matthew Fidler
-
 Vipul Mann, Matthew Fidler
 }

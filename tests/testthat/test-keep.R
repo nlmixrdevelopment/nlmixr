@@ -23,17 +23,37 @@ nlmixrTest({
     drop = c("depot")
   }
 
+  d <- theo_sd
+  d$WT2 <- d$WT + 0.5
+  d$WT3 <- d$WT + 0.4
+
   for (est in c("fo", "foi", "foce", "focei", "saem", "nlme", "posthoc")) {
     test_that(paste0("keep/drop in ", est), {
       if (est == "nlme") {
-        fitF <- nlmixr(one.compartment, theo_sd, est="nlme", control=nlmeControl(pnlsTol=0.5))
+        fitF <- nlmixr(one.compartment, d, est="nlme", control=nlmeControl(pnlsTol=0.5))
+        fitF2 <- expect_warning(nlmixr(one.compartment, d, est="nlme", control=nlmeControl(pnlsTol=0.5, keep="WT2", drop="center")))
       } else {
-        fitF <- nlmixr(one.compartment, theo_sd, est=est)
+        fitF <- nlmixr(one.compartment, d, est=est)
+        fitF2 <- expect_warning(nlmixr(one.compartment, d, est=est, control=list(keep="WT2", drop="center")))
       }
       expect_true(any(names(fitF) == "WT"))
+      expect_true(!any(names(fitF) == "WT2"))
+      expect_true(!any(names(fitF) == "WT3"))
       expect_true(!any(names(fitF) == "depot"))
+      expect_true(any(names(fitF) == "center"))
+      expect_true(any(names(fitF) == "dosenum"))
       expect_true(!any(names(fitF) == "rxLambda"))
       expect_true(!any(names(fitF) == "rxYj"))
+
+      expect_true(!any(names(fitF2) == "WT"))
+      expect_true(any(names(fitF2) == "WT2"))
+      expect_true(!any(names(fitF) == "WT3"))
+      expect_true(any(names(fitF2) == "depot"))
+      expect_true(!any(names(fitF2) == "center"))
+      expect_true(any(names(fitF2) == "dosenum"))
+      expect_true(!any(names(fitF2) == "rxLambda"))
+      expect_true(!any(names(fitF2) == "rxYj"))
+
     })
   }
 
