@@ -585,21 +585,19 @@ public:
       if (distribution == 1){
 	// REprintf("dist=1\n");
 	vec ft = f;
+	vec ftT(ft.size());
 	vec yt = yM;
 	for (int i = ft.size(); i--;) {
 	  int cur = ix_endpnt(i);
 	  ft(i) = _powerD(f(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
 	  yt(i) = _powerD(yM(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
+	  ftT(i) = (propT(cur) == 0.0 ? f(cur) : ft(cur));
 	}
 	// focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
 	// focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
 	// This does not match focei's definition of add+prop
 	vec g;
-	if (_saemPropT) {
-	  g = vecares + vecbres % abs(ft); //make sure g > 0
-	} else {
-	  g = vecares + vecbres % abs(f); //make sure g > 0
-	}
+	g = vecares + vecbres % abs(ftT); //make sure g > 0
 	g.elem( find( g == 0.0) ).fill(1.0); // like Uppusla IWRES allows prop when f=0
 	g.elem( find( g < double_xmin) ).fill(double_xmin);
 	g.elem( find(g > xmax)).fill(xmax);
@@ -1273,18 +1271,16 @@ private:
 
 	fcMat = user_fn(phiMc, mx.evtM, mx.optM);
 	fc = fcMat.col(0);
+	vec fcT(fc.size());
 	fs = fc;
 	vec yt(fc.size());
 	for (int i = fc.size(); i--;) {
 	  int cur = ix_endpnt(i);
-	  fc(i) = _powerD(fc(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
-	  yt(i) = _powerD(mx.yM(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
+	  fc(i)  = _powerD(fc(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
+	  yt(i)  = _powerD(mx.yM(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
+	  fcT(i) = (propT(cur) == 0.0 ? fs(cur) : fc(cur));
 	}
-	if (_saemPropT) {
-	  gc = vecares + vecbres % abs(fc); //make sure gc > 0
-	} else {
-	  gc = vecares + vecbres % abs(fs); //make sure gc > 0
-	}
+	gc = vecares + vecbres % abs(fcT); //make sure gc > 0
 	gc.elem( find( gc == 0.0) ).fill(1);
 	gc.elem( find( gc < double_xmin) ).fill(double_xmin);
 	gc.elem( find( gc > xmax) ).fill(xmax);
