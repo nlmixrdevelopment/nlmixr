@@ -695,7 +695,9 @@ nlmixr_fit <- function(uif, data, est = NULL, control = list(), ...,
 ##'
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams foceiControl
-##'
+##' @inheritParams configsaem
+##' @inheritParams nlmixr_fit
+##' @inheritParams RxODE::rxSEinner
 ##' @return List of options to be used in \code{\link{nlmixr}} fit for
 ##'     SAEM.
 ##' @author Wenping Wang & Matthew L. Fidler

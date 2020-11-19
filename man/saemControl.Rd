@@ -141,6 +141,17 @@ during one call to the solver. (5000 by default)}
 should be adjusted to be closer to NONMEM's default objective
 function.  By default this is \code{TRUE}}
 
+\item{sum.prod}{Take the RxODE model and use more precise products/sums.
+Increases solving accuracy and solving time.}
+
+\item{addProp}{one of "combined1" and "combined2"; These are the
+  two forms of additive+proportional errors supported by
+  monolix/nonmem:
+
+combined1: transform(y)=transform(f)+(a+b*f^c)*eps
+
+combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
+
 \item{singleOde}{This option allows a single ode model to include
 the PK parameter information instead of splitting it into a
 function and a RxODE model}
@@ -163,6 +174,12 @@ for complex residual errors (ie add+prop etc)}
 \item{itmax}{This is the maximum number of iterations for the
 regression models used for complex residual errors.  The number
 of iterations is itmax*number of parameters}
+
+\item{type}{indicates the type of optimization for the residuals; Can be one of c("nelder–mead", "newuoa")}
+
+\item{powRange}{This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)}
+
+\item{lambdaRange}{This indicates the range that Box-Cox and Yeo-Johnson parameters are constrained to be;  The default is 3 indicating the range (-3,3)}
 
 \item{...}{Other arguments to control SAEM.}
 }
