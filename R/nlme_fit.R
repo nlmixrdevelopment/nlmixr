@@ -800,7 +800,8 @@ focei.theta.nlmixrNlme <- function(object, uif, ...) {
 
 
 ##' @rdname as.focei
-as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcResid = TRUE, nobs2 = 0) {
+as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcResid = TRUE, nobs2 = 0,
+                                keep=NULL, drop=NULL) {
   .nlmeTime <- proc.time() - pt
   if (class(uif) == "function") {
     uif <- nlmixr(uif)
@@ -919,7 +920,9 @@ as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcRe
         ## transitAbs=transitAbs,
         sumProd = uif$env$sum.prod,
         addProp=uif$env$.addProp
-      )
+      ),
+      keep=keep,
+      drop=drop
     ))
     if (inherits(fit.f, "try-error")) {
       if (is.na(calcResid)) {

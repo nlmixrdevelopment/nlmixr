@@ -7,7 +7,7 @@
 ##' @author Matthew L. Fidler
 ##' @export
 nlmixrValidate <- function(type = NULL, check = FALSE) {
-  .tests <- c("cran", "saem", "bootstrap", "broom", "focei")
+  .tests <- c("cran", "lvl2", "saem", "bootstrap", "broom", "focei")
   .op <- options()
   on.exit(options(.op))
   options(testthat.progress.max_fails=10000000000)

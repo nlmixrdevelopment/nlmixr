@@ -891,7 +891,7 @@ focei.eta.saemFit <- function(object, uif, ...) {
 as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid = TRUE, obf = NULL,
                              nnodes.gq = 1, nsd.gq = 3, adjObf = TRUE,
                              calcCov = TRUE, covMethod = NULL,
-                             calcCovTime = NULL, calcTables = TRUE) {
+                             calcCovTime = NULL, calcTables = TRUE, keep=NULL, drop=NULL) {
   .saemCfg <- attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt
   if (class(uif) == "function") {
@@ -1177,7 +1177,8 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
       env = .env,
       fixed = .fixed,
       skipCov = .skipCov,
-      control = .ctl
+      control = .ctl,
+      keep=keep, drop=drop
     ), silent = FALSE)
     if (inherits(fit.f, "try-error")) {
       if (is.na(calcResid)) {

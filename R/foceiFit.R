@@ -1231,8 +1231,8 @@ foceiControl <- function(sigdig = 3, ...,
 }
 ##' FOCEi fit
 ##'
-##' @param data Data to fit; Needs to be RxODE compatible and have \code{DV},
-##'     \code{AMT}, \code{EVID} in the dataset.
+##' @param data Data to fit; Needs to be RxODE compatible and have
+##'   \code{DV}, \code{AMT}, \code{EVID} in the dataset.
 ##' @param inits Initialization list
 ##' @param PKpars Pk Parameters function
 ##' @param model The RxODE model to use
@@ -1241,18 +1241,23 @@ foceiControl <- function(sigdig = 3, ...,
 ##' @param lower Lower bounds
 ##' @param upper Upper Bounds
 ##' @param fixed Boolean vector indicating what parameters should be
-##'     fixed.
+##'   fixed.
 ##' @param skipCov Boolean vector indicating what parameters should be
-##'     fixed when calculating covariances
+##'   fixed when calculating covariances
 ##' @param control FOCEi options Control list.  See
-##'     \code{\link{foceiControl}}
+##'   \code{\link{foceiControl}}
 ##' @param thetaNames Names of the thetas to be used in the final
-##'     object.
+##'   object.
 ##' @param etaNames Eta names to be used in the final object.
 ##' @param etaMat Eta matrix for initial estimates or final estimates
-##'     of the ETAs.
+##'   of the ETAs.
 ##' @param ... Ignored parameters
-##' @param env An environment used to build the FOCEi or nlmixr object.
+##' @param env An environment used to build the FOCEi or nlmixr
+##'   object.
+##' @param keep Columns to keep from either the input dataset. For the
+##'   input dataset, if any records are added to the data LOCF (Last
+##'   Observation Carried forward) imputation is performed.
+##' @param drop Columns to drop from the output
 ##' @return A focei fit or nlmixr fit object
 ##' @author Matthew L. Fidler and Wenping Wang
 ##' @return FOCEi fit object
@@ -1713,7 +1718,9 @@ foceiFit.data.frame0 <- function(data,
                                  etaNames = NULL,
                                  etaMat = NULL,
                                  ...,
-                                 env = NULL) {
+                                 env = NULL,
+                                 keep=NULL,
+                                 drop=NULL) {
   set.seed(control$seed)
   .pt <- proc.time()
   loadNamespace("n1qn1")
@@ -1951,7 +1958,7 @@ foceiFit.data.frame0 <- function(data,
     c("ID", "TIME", "DV", "EVID", .covNames, .limitName, .censName)
   ]
   ## keep the covariate names the same as in the model
-  .w <- which(!(names(.ret$dataSav) %in% .covNames))
+  .w <- which(!(names(.ret$dataSav) %in% c(.covNames, keep)))
   names(.ret$dataSav)[.w] <- tolower(names(.ret$dataSav[.w])) # needed in ev
 
   if (.mixed) {
@@ -2245,7 +2252,8 @@ foceiFit.data.frame0 <- function(data,
       maxsteps = .ret$control$maxstepsOde,
       hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
       transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
-      maxords = .ret$control$maxords, method = .ret$control$method
+      maxords = .ret$control$maxords, method = .ret$control$method,
+      keep=keep
     )
     if (any(is.na(.res$rx_pred_)) && .ret$control$method == 2L) {
       .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav,
@@ -2254,7 +2262,8 @@ foceiFit.data.frame0 <- function(data,
         maxsteps = .ret$control$maxstepsOde * 2,
         hmin = .ret$control$hmin, hmax = .ret$control$hmax / 2, hini = .ret$control$hini,
         transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
-        maxords = .ret$control$maxords, method = "lsoda"
+        maxords = .ret$control$maxords, method = "lsoda",
+        keep=keep
       )
       if (any(is.na(.res$rx_pred_))) {
         .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav,
@@ -2263,7 +2272,8 @@ foceiFit.data.frame0 <- function(data,
           maxsteps = .ret$control$maxstepsOde * 2,
           hmin = .ret$control$hmin, hmax = .ret$control$hmax / 2, hini = .ret$control$hini,
           transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
-          maxords = .ret$control$maxords, method = "dop853"
+          maxords = .ret$control$maxords, method = "dop853",
+          keep=keep
         )
         if (any(is.na(.res$rx_pred_))) {
           warning("Problems solving pred/wres liblsoda, lsoda and dop853")
@@ -2289,7 +2299,8 @@ foceiFit.data.frame0 <- function(data,
       hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
       transitAbs = .ret$control$TransitAbs,
       maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-      method = .ret$control$method
+      method = .ret$control$method,
+      keep=keep
     )
     if (!is.null(.censName)) {
       .cens <- data[, .censName]
@@ -2316,6 +2327,8 @@ foceiFit.data.frame0 <- function(data,
     } else {
       .df <- tibble::as_tibble(.df)
     }
+    drop <- c(drop, "rxLambda", "rxYj")
+    .df <- .df[, -which(names(.df) %in% drop), drop = FALSE]
     .cls <- class(.df)
     .cls <- c("nlmixrPop", "nlmixrFitData", "nlmixrFitCore", .cls)
     class(.ret) <- "nlmixrFitCoreSilent"
@@ -2338,7 +2351,8 @@ foceiFit.data.frame0 <- function(data,
             hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini,
             transitAbs = .ret$control$TransitAbs,
             maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-            method = .ret$control$method
+            method = .ret$control$method,
+            keep=keep
           ),
           pred = .solvePred(),
           cwres = FALSE
@@ -2399,8 +2413,8 @@ foceiFit.data.frame0 <- function(data,
         returnType = "data.frame",
         hmin = .ret$control$hmin, hmax = .ret$control$hmax, hini = .ret$control$hini, transitAbs = .ret$control$transitAbs,
         maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
-        method = .ret$control$method,
-        warnIdSort = FALSE
+        method = .ret$control$method, keep=keep,
+        warnIdSort = FALSE,
       )[, -(1:4)]
     } else {
       .df <- .preds$ipred[, -c(1:4, length(names(.preds$ipred)) - 0:1), drop = FALSE]
@@ -2421,6 +2435,8 @@ foceiFit.data.frame0 <- function(data,
     .ret$tableTime <- (proc.time() - .pt)["elapsed"]
     .ret$time <- data.frame(.ret$time, table = .ret$tableTime)
     .isDplyr <- requireNamespace("dplyr", quietly = TRUE)
+    drop <- c(drop, "rxLambda", "rxYj")
+    .df <- .df[, -which(names(.df) %in% drop), drop=FALSE]
     if (!.isDplyr) {
       .isDataTable <- requireNamespace("data.table", quietly = TRUE)
       if (.isDataTable) {
@@ -2429,6 +2445,7 @@ foceiFit.data.frame0 <- function(data,
     } else {
       .df <- tibble::as_tibble(.df)
     }
+
     .cls <- class(.df)
     if (control$interaction) {
       .cls <- c(paste0("nlmixr", .ret$method, "i"), "nlmixrFitData", "nlmixrFitCore", .cls)
@@ -2737,11 +2754,12 @@ vcov.nlmixrFitCore <- function(object, ...) {
 ##'
 ##' @author Matthew L. Fidler
 ##' @keywords internal
-.nmGetData <- function(object) {
+.nmGetData <- function(object, keep=NULL) {
+  if (is.null(keep)) keep <- character(0)
   .uif <- object$uif
   .tmp <- deparse(body(.uif$theta.pars))[-1]
   .tmp <- .tmp[-length(.tmp)]
-  return(RxODE::etTrans(object$origData, paste(paste(.tmp, collapse = "\n"), "\n", .uif$rxode), TRUE, TRUE, TRUE))
+  return(RxODE::etTrans(object$origData, paste(paste(.tmp, collapse = "\n"), "\n", .uif$rxode), TRUE, TRUE, TRUE, keep=keep))
 }
 
 ##' @export

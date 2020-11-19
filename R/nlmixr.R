@@ -246,30 +246,32 @@ nlmixr.nlmixrUI <- function(object, data, est = NULL, control = list(), ...,
 ##'     as well.
 ##' @param model This is the RxODE model to use to translate against
 ##'     when parsing the data.
+##' @param keep data to keep when running etTrans
 ##' @return Appropriately formatted data
 ##' @author Matthew L. Fidler
 ##' @keywords internal
 ##' @export
-nlmixrData <- function(data, model = NULL) {
+nlmixrData <- function(data, model = NULL, keep=NULL) {
   UseMethod("nlmixrData")
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.character <- function(data, model = NULL) {
+nlmixrData.character <- function(data, model = NULL, keep=NULL) {
   if (!file.exists(data)) {
     stop(sprintf("%s does not exist.", data))
   }
   if (regexpr(rex::rex(".csv", end), data) != -1) {
-    return(nlmixrData.default(utils::read.csv(data, na.strings = c(".", "NA", "na", ""))))
+    return(nlmixrData.default(utils::read.csv(data, na.strings = c(".", "NA", "na", "")), keep=keep))
   } else {
     stop(sprintf("Do not know how to read in %s", data))
   }
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.default <- function(data, model = NULL) {
+nlmixrData.default <- function(data, model = NULL, keep=NULL) {
+  if (is.null(keep)) keep <- character(0)
   if (!is.null(model)) {
-    dat <- RxODE::etTrans(data, model, addCmt = TRUE, dropUnits = TRUE, allTimeVar = TRUE)
+    dat <- RxODE::etTrans(data, model, addCmt = TRUE, dropUnits = TRUE, allTimeVar = TRUE, keep=keep)
   } else {
     dat <- .as.data.frame(data)
   }
@@ -378,7 +380,23 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
   .tmp <- deparse(body(uif$theta.pars))[-1]
   .tmp <- .tmp[-length(.tmp)]
   .origData <- data
-  data <- RxODE::etTrans(data, paste(paste(.tmp, collapse = "\n"), "\n", uif$rxode), TRUE, TRUE, TRUE)
+  .meta <- uif$meta
+  .drop <- NULL
+  .keep <- NULL
+  if (exists("drop", envir = .meta)) {
+    .drop <- .meta$drop
+    checkmate::assertCharacter(.drop, min.len=1, min.chars=1, .var.name="drop")
+  }
+  if (exists("keep", envir = .meta)) {
+    .keep <- .meta$keep
+    checkmate::assertCharacter(.keep, min.len=1, min.chars=1, .var.name="keep")
+  }
+  .extra <- ""
+  if (inherits(.keep, "character")) {
+    .extra <- paste("nlmixrExtra~", paste(.keep, collapse="+"), "\n")
+  }
+  data <- RxODE::etTrans(inData=data, obj=paste(paste(.tmp, collapse = "\n"), "\n", uif$rxode, "\n", .extra),
+                         addCmt=TRUE, dropUnits=TRUE, allTimeVar=TRUE, keepDosingOnly=FALSE)
 
   .nTv <- attr(class(data), ".RxODE.lst")$nTv
   .lab <- attr(class(data), ".RxODE.lst")$idLvl
@@ -390,7 +408,6 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
         uif, data, est, control, sum.prod, table, ...
       )
     )
-  .meta <- uif$meta
   .missingEst <- is.null(est)
   if (.missingEst & exists("est", envir = .meta)) {
     est <- .meta$est
@@ -420,7 +437,8 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
       table <- tableControl()
     }
   }
-  dat <- nlmixrData(data)
+
+  dat <- nlmixrData(data, keep=.keep)
   nobs2 <- sum(dat$EVID == 0)
   up.covs <- toupper(uif$all.covs)
   up.names <- toupper(names(dat))
@@ -450,9 +468,6 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
   .cur <- environment()
   class(.cur) <- c(est, "nlmixrEst")
   .ret <- nlmixrEst(.cur, ...)
-  if (inherits(.ret, "nlmixrFitData")) {
-
-  }
   return(.ret)
 }
 
@@ -839,7 +854,8 @@ nlmixrEst.saem <- function(env, ...) {
           .fit, uif, pt,
           data = dat, calcResid = calc.resid, obf = .logLik,
           nnodes.gq = .nnodes.gq, nsd.gq = .nsd.gq, adjObf = .adjObf,
-          calcCov = .addCov, calcTables = .calcTables
+          calcCov = .addCov, calcTables = .calcTables,
+          keep=.keep, drop=.drop
         ),
         silent = TRUE
       )
@@ -945,7 +961,8 @@ nlmixrEst.nlme <- function(env, ...) {
                     )
     class(fit) <- c(est.type, class(fit))
     .ret <- try({
-      as.focei.nlmixrNlme(fit, uif, pt, data = dat, calcResid = calc.resid, nobs2 = nobs2)
+      as.focei.nlmixrNlme(fit, uif, pt, data = dat, calcResid = calc.resid, nobs2 = nobs2,
+                          keep=.keep, drop=.drop)
     })
     if (inherits(.ret, "try-error")) {
       warning("Error converting to nlmixr UI object, returning nlme object")
@@ -1019,6 +1036,8 @@ nlmixrEst.posthoc <- function(env, ...) {
       etaNames = uif$eta.names,
       control = control,
       env = env,
+      keep=.keep,
+      drop=.drop,
       ...
     )
     if (any(est == c("fo", "foi"))) {
@@ -1078,6 +1097,8 @@ nlmixrEst.posthoc <- function(env, ...) {
             etaNames = .uif$eta.names,
             control = control,
             env = env,
+            keep=.keep,
+            drop=.drop,
             ...
           ),
           silent = TRUE
@@ -1154,6 +1175,8 @@ nlmixrEst.focei <- function(env, ...){
                     etaNames = uif$eta.names,
                     control = control,
                     env = env,
+                    keep=.keep,
+                    drop=.drop,
                     ...
                     )
     if (any(est == c("fo", "foi"))) {
@@ -1213,6 +1236,8 @@ nlmixrEst.focei <- function(env, ...){
             etaNames = .uif$eta.names,
             control = control,
             env = env,
+            keep=.keep,
+            drop=.drop,
             ...
           ),
           silent = TRUE
@@ -1294,6 +1319,8 @@ nlmixrEst.posthoc <- function(env, ...){
                     etaNames = uif$eta.names,
                     control = control,
                     env = .env,
+                    keep=.keep,
+                    drop=.drop,
                     ...
                     )
     if (inherits(fit, "nlmixrFitData")) {
