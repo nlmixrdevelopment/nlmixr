@@ -177,13 +177,11 @@ configsaem <- function(model, data, inits,
                        distribution = c("normal", "poisson", "binomial"),
                        addProp = c("combined2", "combined1"),
                        seed = 99, fixed = NULL, DEBUG = 0,
-                       normal = c("rnorm", "vandercorput"),
                        tol = 1e-4, itmax = 100L, type = c("nelder–mead", "newuoa"),
                        lambdaRange = 3, powRange = 10) {
   type.idx <- c("nelder–mead" = 1L, "newuoa" = 2L)
   type <- match.arg(type)
   type <- type.idx[type]
-  normal <- match.arg(normal)
   names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt))
   ODEopt <- do.call(RxODE::rxControl, ODEopt)
   # mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
@@ -440,11 +438,7 @@ configsaem <- function(model, data, inits,
   phiM <- phiM[rep(1:N, nmc), , drop = FALSE]
   .tmp <- diag(sqrt(inits$omega))
   if (model$N.eta == 1) .tmp <- matrix(sqrt(inits$omega))
-  if (normal == "vandercorput") {
-    .mat2 <- matrix(RxODE::rxnormV(n = length(phiM)), dim(phiM))
-  } else {
-    .mat2 <- matrix(rnorm(phiM), dim(phiM))
-  }
+  .mat2 <- matrix(rnorm(phiM), dim(phiM))
   phiM <- phiM + .mat2 %*% .tmp
 
 
@@ -562,8 +556,7 @@ configsaem <- function(model, data, inits,
     fixed.i0 = fixed.i0,
     ilambda1 = as.integer(ilambda1),
     ilambda0 = as.integer(ilambda0),
-    nobs = .nobs
-  )
+    nobs = .nobs)
 
 
   ## CHECKME

@@ -52,7 +52,6 @@ int _saemPropT=0;
 #define toPow(x) _powerDi(x, 1.0, 4, -_saemPowR, _saemPowR)
 #define toPowEst(x) _powerD((x < -0.99*_saemPowR ? -0.99*_saemPowR : (x > 0.99*_saemPowR ? 0.99*_saemPowR : x)), 1.0, 4, -_saemPowR, _saemPowR)
 
-
 // add+prop
 void obj(double *ab, double *fx) {
   int i;
@@ -1272,7 +1271,7 @@ private:
 	if (method==2)
 	  phiMc.cols(i)=phiM.cols(i)+randn<mat>(mx.nM,mphi.nphi)*mphi.Gdiag_phi;
 	if (method==3)
-	  phiMc.col(i(k1))=phiM.col(i(k1))+randn<vec>(mx.nM)*mphi.Gdiag_phi(k1,k1);
+	  phiMc.col(i(k1))=phiM.col(i(k1))+randn<mat>(mx.nM,1)*mphi.Gdiag_phi(k1,k1);
 
 	fcMat = user_fn(phiMc, mx.evtM, mx.optM);
 	fc = fcMat.col(0);
@@ -1300,7 +1299,7 @@ private:
 	  deltu=Uc_y-U_y+Uc_phi-U_phi;
 	}
 
-	ind=find( deltu<-log(randu<vec>(mx.nM)) );
+	ind=find( deltu < -log(randu<vec>(mx.nM)) );
 	phiM(ind,i)=phiMc(ind,i);
 	U_y(ind)=Uc_y(ind);
 	if (method>1) U_phi(ind)=Uc_phi(ind);
