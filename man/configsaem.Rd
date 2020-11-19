@@ -16,7 +16,6 @@ configsaem(
   seed = 99,
   fixed = NULL,
   DEBUG = 0,
-  normal = c("rnorm", "vandercorput"),
   tol = 1e-04,
   itmax = 100L,
   type = c("nelder–mead", "newuoa"),
@@ -50,18 +49,6 @@ combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
 \item{fixed}{a character vector of fixed effect only parameters (no random effects attached) to be fixed}
 
 \item{DEBUG}{Integer determining if debugging is enabled.}
-
-\item{normal}{The type of random normal generator used for SAEM:
-
-\itemize{
-
-\item "\code{rnorm}" R's random number generator (default)
-
-\item "\code{vandercorput}" low-discrepancy sequence transformed
-to a normal random variable to cover the domain better (may be
-better than a truly random sequence)
-
-}}
 
 \item{tol}{This is the tolerance for the regression models used
 for complex residual errors (ie add+prop etc)}
@@ -110,16 +97,30 @@ saem_fit <- gen_saem_user_fn(model = m1, PKpars, pred = PRED)
 saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
 
 
-#--- saem cfg
-nmdat <- theo_sd
-model <- list(saem_mod = saem_fit, covars = "WT")
-inits <- list(theta = c(.05, .5, 2))
-cfg <- configsaem(model, nmdat, inits)
-cfg$print <- 50
+# You can also use the nlmixr UI to run this model and call the lower level functions
 
-fit <- saem_fit(cfg)
-df <- simple.gof(fit)
-xyplot(DV ~ TIME | ID, df, type = c("p", "l"), lwd = c(NA, 1), pch = c(1, NA), groups = grp)
+one.compartment <- function() {
+ini({
+  tka <- 0.45 # Log Ka
+  tcl <- 1 # Log Cl
+  tv <- 3.45    # Log V
+  eta.ka ~ 0.6
+  eta.cl ~ 0.3
+  eta.v ~ 0.1
+  add.sd <- 0.7
+  wt.est <- 0.0
+})
+model({
+  ka <- exp(tka + eta.ka)
+  cl <- exp(tcl + eta.cl)
+  v <- exp(tv + eta.v + wt.est * WT)
+  d/dt(depot) = -ka * depot
+  d/dt(center) = ka * depot - cl / v * center
+  cp = center / v
+  cp ~ add(add.sd)
+})
+}
+fit  <- nlmixr(one.compartment, theo_sd, "saem")
 fit
 
 }

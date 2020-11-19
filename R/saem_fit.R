@@ -157,16 +157,30 @@ gen_saem_user_fn <- genSaemUserFunction
 #' saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
 #'
 #'
-#' #--- saem cfg
-#' nmdat <- theo_sd
-#' model <- list(saem_mod = saem_fit, covars = "WT")
-#' inits <- list(theta = c(.05, .5, 2))
-#' cfg <- configsaem(model, nmdat, inits)
-#' cfg$print <- 50
+#' # You can also use the nlmixr UI to run this model and call the lower level functions
 #'
-#' fit <- saem_fit(cfg)
-#' df <- simple.gof(fit)
-#' xyplot(DV ~ TIME | ID, df, type = c("p", "l"), lwd = c(NA, 1), pch = c(1, NA), groups = grp)
+#' one.compartment <- function() {
+#' ini({
+#'   tka <- 0.45 # Log Ka
+#'   tcl <- 1 # Log Cl
+#'   tv <- 3.45    # Log V
+#'   eta.ka ~ 0.6
+#'   eta.cl ~ 0.3
+#'   eta.v ~ 0.1
+#'   add.sd <- 0.7
+#'   wt.est <- 0.0
+#' })
+#' model({
+#'   ka <- exp(tka + eta.ka)
+#'   cl <- exp(tcl + eta.cl)
+#'   v <- exp(tv + eta.v + wt.est * WT)
+#'   d/dt(depot) = -ka * depot
+#'   d/dt(center) = ka * depot - cl / v * center
+#'   cp = center / v
+#'   cp ~ add(add.sd)
+#' })
+#' }
+#' fit  <- nlmixr(one.compartment, theo_sd, "saem")
 #' fit
 #'
 #' }
@@ -214,6 +228,9 @@ configsaem <- function(model, data, inits,
   if (is.null(inits$cres)) inits$cres <- 1
   if (is.null(inits$lres)) inits$lres <- 1
   if (is.null(mcmc$print)) mcmc$print <- 1
+  if (model$N.eta - length(inits$theta) > 0) {
+    inits$theta <- c(inits$theta, rep(NA_real_, model$N.eta - length(inits$theta)))
+  }
   if (is.null(names(inits$theta))) names(inits$theta) <- rep("", length(inits$theta))
   inits.save <- inits
   inits$theta.fix <- matrix(names(inits$theta),
