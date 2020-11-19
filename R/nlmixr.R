@@ -927,6 +927,9 @@ nlmixrEst.nlme <- function(env, ...) {
     if (!is.null(control$rtol)) .rtol <- control$rtol
     .maxsteps <- 5000
     if (!is.null(control$maxstepsOde)) .maxsteps <- control$maxstepsOde
+    if (is(weight, "varConstProp")) {
+      control$sigma <- 1
+    }
     fit <- nlme_ode(dat,
                     model = rxode,
                     par_model = specs,
