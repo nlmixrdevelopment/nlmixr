@@ -772,7 +772,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...) {
     if (length(add) == 0) {
       thetas[prop] <- object$sigma
     } else {
-      .const <- coef(object$modelStruct$varStruct, uncons = FALSE)
+      .const <- coef(object$modelStruct$varStruct, unconstrained = FALSE)
       thetas[prop] <- object$sigma
       thetas[add] <- .const
     }
@@ -780,6 +780,16 @@ focei.theta.nlmixrNlme <- function(object, uif, ...) {
     ## Proportional
     prop <- which(err.type == "prop")
     thetas[prop] <- object$sigma
+  } else if (is(err, "varConstProp")){
+    add <- which(sapply(err.type, function(x) any(x == c("add", "norm", "dnorm"))))
+    prop <- which(err.type == "prop")
+    if (length(add) == 0) {
+      thetas[prop] <- object$sigma
+    } else {
+      .const <- coef(object$modelStruct$varStruct, unconstrained = FALSE)
+      thetas[prop] <- .const["prop"]
+      thetas[add] <- .const["const"]
+    }
   } else {
     ## Additive.
     add <- which(sapply(err.type, function(x) any(x == c("add", "norm", "dnorm"))))
