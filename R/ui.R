@@ -2854,7 +2854,7 @@ nlmixrUI.nlme.var <- function(object) {
   ## nlme_3.1-149 doesn't support varConstProp need to see if it exists
   .nlme <- loadNamespace("nlme")
   .varConstProp <- FALSE
-  if (length(ls(pattern = "^varConstProp$", env = .nlme)) == 1L) {
+  if (length(ls(pattern = "^varConstProp$", envir = .nlme)) == 1L) {
     .varConstProp <- TRUE
   }
   .addProp <- object$env$.addProp

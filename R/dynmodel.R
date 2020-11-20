@@ -788,6 +788,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
   # Timing and environment --------------------------------------------------
   .pt <- proc.time()
   .time <- c()
+  .norm <- .dnorm <- .logn <- .dlnorm <- NULL
 
   .dynmodel.env <- new.env(parent = emptyenv())
 
@@ -1413,7 +1414,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
     .upper <- upper
     .time$scalingTime <- (proc.time() - .st)["elapsed"]
   }
-
+  method <- control$method
   # Optimization -----------------------------------------------------------------------
   if (method == "bobyqa") {
     .optFun <- .bobyqa
@@ -1563,6 +1564,7 @@ genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
     model <- list(model)
   }
   inits.err <- NULL
+  .env <- environment()
   model <- lapply(model, function(f) {
     s <- unlist(lapply(attr(terms(f), "variables"), as.list))
     s <- sapply(s, deparse)
@@ -1574,7 +1576,7 @@ genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
     sig.add <- if (ix.add > 0) as.numeric(s[ix.add + 1]) else NULL
     sig.pro <- if (ix.pro > 0) as.numeric(s[ix.pro + 1]) else NULL
 
-    inits.err <<- c(inits.err, sig.add, sig.pro)
+    assign("inits.err", c(inits.err, sig.add, sig.pro), envir=.env)
 
     if (any(is.na(inits.err) | inits.err <= 0)) {
       stop("error model misspecification")
@@ -1617,6 +1619,8 @@ genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
   have_zero <- min(data$time) <= 0
   rows <- if (have_zero) TRUE else -1 # used in line 304 in obj()
   ## ---------------- ##
+  s.save <- NULL
+  .env <- environment()
 
   # Objective Function ------------------------------------------------------
   obj <- function(th, do.ode.solving = TRUE, negation = FALSE) {
@@ -1626,7 +1630,7 @@ genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
     theta <- c(theta, fixPars)
     if (do.ode.solving) {
       s <- system$solve(theta, evTable, atol = 1e-06, rtol = 1e-06)
-      s.save <<- s
+      assign("s.save", s, .env)
     } else {
       s <- s.save
     }

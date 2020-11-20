@@ -75,7 +75,7 @@ preconditionFit <- function(fit, estType = c("full", "posthoc", "none"),
   }
   cov <- pre %*% newFit$cov %*% t(pre)
   dimnames(cov) <- dimnames(pre)
-  assign("precondition", cov, env = fit$env)
+  assign("precondition", cov, envir = fit$env)
   .setCov(fit, covMethod = cov)
   assign("covMethod", "precondition", fit$env)
   return(invisible(fit$env$precondition))

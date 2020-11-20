@@ -126,7 +126,8 @@ bootplot <- function(x, ...) {
 ##' @rdname traceplot
 ##' @export
 bootplot.nlmixrFitCore <- function(x, ...) {
-  .fitName <- as.character(substitute(fit))
+  .fitName <- as.character(substitute(x))
+  quantiles <- deltaofv <- Distribution <- label <- NULL # rcheck hack
   if (inherits(x, "nlmixrFitCore")) {
     if (exists("bootSummary", x$env) & (!exists(".bootPlotData", x$env))) {
       bootstrapFit(x, x$bootSummary$nboot, plotHist = TRUE, fitName = .fitName)

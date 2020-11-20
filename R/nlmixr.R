@@ -735,7 +735,7 @@ saemControl <- function(seed = 99,
                         normal = c("rnorm", "vandercorput"),
                         tol = 1e-6,
                         itmax = 30,
-                        type = c("nelder–mead", "newuoa"),
+                        type = c("nelder-mead", "newuoa"),
                         powRange = 10,
                         lambdaRange = 3,
                         ...) {

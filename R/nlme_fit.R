@@ -413,7 +413,8 @@ prepEv <- function(dati, theta) {
 ##'     V = CL/KE
 ##' }
 ##'
-##' specs <- list(fixed=lKA+lKE+lCL~1, random = pdDiag(lKA+lCL~1),
+##' specs <- list(fixed=lKA+lKE+lCL~1,
+##'      random = pdDiag(lKA+lCL~1),
 ##'      start=c(lKA=0.5, lKE=-2.5, lCL=-3.2))
 ##'
 ##' fit <- nlme_ode(theo_md, model=ode, par_model=specs, par_trans=mypar,

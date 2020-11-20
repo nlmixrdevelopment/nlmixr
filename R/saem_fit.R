@@ -117,7 +117,7 @@ gen_saem_user_fn <- genSaemUserFunction
 #' @param distribution one of c("normal","poisson","binomial")
 #' @param fixed a character vector of fixed effect only parameters (no random effects attached) to be fixed
 #' @param DEBUG Integer determining if debugging is enabled
-#' @param type indicates the type of optimization for the residuals; Can be one of c("nelder–mead", "newuoa")
+#' @param type indicates the type of optimization for the residuals; Can be one of c("nelder-mead", "newuoa")
 #' @param lambdaRange This indicates the range that Box-Cox and Yeo-Johnson parameters are constrained to be;  The default is 3 indicating the range (-3,3)
 #' @param powRange This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)
 #' @inheritParams RxODE::rxSEinner
@@ -194,9 +194,9 @@ configsaem <- function(model, data, inits,
                        distribution = c("normal", "poisson", "binomial"),
                        addProp = c("combined2", "combined1"),
                        seed = 99, fixed = NULL, DEBUG = 0,
-                       tol = 1e-4, itmax = 100L, type = c("nelder–mead", "newuoa"),
+                       tol = 1e-4, itmax = 100L, type = c("nelder-mead", "newuoa"),
                        lambdaRange = 3, powRange = 10) {
-  type.idx <- c("nelder–mead" = 1L, "newuoa" = 2L)
+  type.idx <- c("nelder-mead" = 1L, "newuoa" = 2L)
   type <- match.arg(type)
   type <- type.idx[type]
   names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt))
