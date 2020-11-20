@@ -30,7 +30,7 @@ saemControl(
   normal = c("rnorm", "vandercorput"),
   tol = 1e-06,
   itmax = 30,
-  type = c("nelder–mead", "newuoa"),
+  type = c("nelder-mead", "newuoa"),
   powRange = 10,
   lambdaRange = 3,
   ...
@@ -175,7 +175,7 @@ for complex residual errors (ie add+prop etc)}
 regression models used for complex residual errors.  The number
 of iterations is itmax*number of parameters}
 
-\item{type}{indicates the type of optimization for the residuals; Can be one of c("nelder–mead", "newuoa")}
+\item{type}{indicates the type of optimization for the residuals; Can be one of c("nelder-mead", "newuoa")}
 
 \item{powRange}{This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)}
 

@@ -18,7 +18,7 @@ configsaem(
   DEBUG = 0,
   tol = 1e-04,
   itmax = 100L,
-  type = c("nelder–mead", "newuoa"),
+  type = c("nelder-mead", "newuoa"),
   lambdaRange = 3,
   powRange = 10
 )
@@ -57,7 +57,7 @@ for complex residual errors (ie add+prop etc)}
 regression models used for complex residual errors.  The number
 of iterations is itmax*number of parameters}
 
-\item{type}{indicates the type of optimization for the residuals; Can be one of c("nelder–mead", "newuoa")}
+\item{type}{indicates the type of optimization for the residuals; Can be one of c("nelder-mead", "newuoa")}
 
 \item{lambdaRange}{This indicates the range that Box-Cox and Yeo-Johnson parameters are constrained to be;  The default is 3 indicating the range (-3,3)}
 
