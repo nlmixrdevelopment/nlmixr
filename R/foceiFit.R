@@ -2328,8 +2328,8 @@ foceiFit.data.frame0 <- function(data,
       .df <- tibble::as_tibble(.df)
     }
     drop <- c(drop, "rxLambda", "rxYj")
-    .df <- .df[, -which(names(.df) %in% drop), drop = FALSE]
-    .cls <- class(.df)
+    .w <- -which(names(.df) %in% drop)
+    if (length(.w) > 0) .df <- .df[, .w, drop=FALSE]
     .cls <- c("nlmixrPop", "nlmixrFitData", "nlmixrFitCore", .cls)
     class(.ret) <- "nlmixrFitCoreSilent"
     attr(.cls, ".foceiEnv") <- .ret
@@ -2436,7 +2436,8 @@ foceiFit.data.frame0 <- function(data,
     .ret$time <- data.frame(.ret$time, table = .ret$tableTime)
     .isDplyr <- requireNamespace("dplyr", quietly = TRUE)
     drop <- c(drop, "rxLambda", "rxYj")
-    .df <- .df[, -which(names(.df) %in% drop), drop=FALSE]
+    .w <- -which(names(.df) %in% drop)
+    if (length(.w) > 0) .df <- .df[, .w, drop=FALSE]
     if (!.isDplyr) {
       .isDataTable <- requireNamespace("data.table", quietly = TRUE)
       if (.isDataTable) {

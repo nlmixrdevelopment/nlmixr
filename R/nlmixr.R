@@ -254,32 +254,30 @@ nlmixr.nlmixrUI <- function(object, data, est = NULL, control = list(), ...,
 ##'     as well.
 ##' @param model This is the RxODE model to use to translate against
 ##'     when parsing the data.
-##' @param keep data to keep when running etTrans
 ##' @return Appropriately formatted data
 ##' @author Matthew L. Fidler
 ##' @keywords internal
 ##' @export
-nlmixrData <- function(data, model = NULL, keep=NULL) {
+nlmixrData <- function(data, model = NULL) {
   UseMethod("nlmixrData")
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.character <- function(data, model = NULL, keep=NULL) {
+nlmixrData.character <- function(data, model = NULL) {
   if (!file.exists(data)) {
     stop(sprintf("%s does not exist.", data))
   }
   if (regexpr(rex::rex(".csv", end), data) != -1) {
-    return(nlmixrData.default(utils::read.csv(data, na.strings = c(".", "NA", "na", "")), keep=keep))
+    return(nlmixrData.default(utils::read.csv(data, na.strings = c(".", "NA", "na", ""))))
   } else {
     stop(sprintf("Do not know how to read in %s", data))
   }
 }
 ##' @export
 ##' @rdname nlmixrData
-nlmixrData.default <- function(data, model = NULL, keep=NULL) {
-  if (is.null(keep)) keep <- character(0)
+nlmixrData.default <- function(data, model = NULL) {
   if (!is.null(model)) {
-    dat <- RxODE::etTrans(data, model, addCmt = TRUE, dropUnits = TRUE, allTimeVar = TRUE, keep=keep)
+    dat <- RxODE::etTrans(data, model, addCmt = TRUE, dropUnits = TRUE, allTimeVar = TRUE)
   } else {
     dat <- .as.data.frame(data)
   }
@@ -477,7 +475,7 @@ nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
     }
   }
 
-  dat <- nlmixrData(data, keep=.keep)
+  dat <- nlmixrData(data)
   nobs2 <- sum(dat$EVID == 0)
   up.covs <- toupper(uif$all.covs)
   up.names <- toupper(names(dat))
@@ -1012,6 +1010,7 @@ nlmixrEst.nlme <- function(env, ...) {
       return(fit)
     }
     if (inherits(.ret, "nlmixrFitData")) {
+      print(head(.origData))
       .ret <- nlmixr_fit0FixDat(.ret, IDLabel = .lab, origData = .origData)
       .ret <- nlmixr_fit0AddNpde(.ret, table = table, est = est)
     }
@@ -1180,7 +1179,7 @@ nlmixrEst.posthoc <- function(env, ...) {
 
 ##'@rdname nlmixrEst
 ##'@export
-nlmixrEst.focei <- function(env, ...){
+nlmixrEst.focei <- function(env, ...) {
   with(env, {
     if (class(control) != "foceiControl") control <- do.call(nlmixr::foceiControl, control)
     if (any(est == c("foce", "fo"))) {
@@ -1222,6 +1221,7 @@ nlmixrEst.focei <- function(env, ...){
                     drop=.drop,
                     ...
                     )
+    print(fit)
     if (any(est == c("fo", "foi"))) {
       ## Add posthoc.
       .default <- foceiControl()
@@ -1307,6 +1307,7 @@ nlmixrEst.focei <- function(env, ...){
       }
     }
     fit <- nlmixr_fit0AddNpde(fit, table = table, est = est)
+    print(head(.origData))
     fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
     assign("start.time", start.time, env)
     assign("est", est, env)
