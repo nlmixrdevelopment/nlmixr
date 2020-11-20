@@ -654,15 +654,19 @@ f_linCmt <- function(){
 }
 
 # Use nlme algorithm
-fit_linCmt_nlme <- nlmixr(f_ode, Oral_1CPT, est="nlme",control=nlmeControl(maxstepsOde = 50000, pnlsTol=0.4))
+fit_linCmt_nlme <- nlmixr(f_ode, Oral_1CPT, est="nlme",
+               control=nlmeControl(maxstepsOde = 50000, pnlsTol=0.4))
 print(fit_linCmt_nlme)
 
 # Use Focei algorithm
 fit_linCmt_focei <- nlmixr(f_linCmt, Oral_1CPT, est="focei")
 print(fit_linCmt_focei)
 
-# The ODE model can be fitted using the saem algorithm, more iterations should be used for real applications
-fit_ode_saem <- nlmixr(f_ode, Oral_1CPT, est = "saem", control = saemControl(n.burn = 50, n.em = 100, print = 50))
+# The ODE model can be fitted using the saem algorithm, more
+# iterations should be used for real applications
+
+fit_ode_saem <- nlmixr(f_ode, Oral_1CPT, est = "saem",
+        control = saemControl(n.burn = 50, n.em = 100, print = 50))
 print(fit_ode_saem)
 
 }

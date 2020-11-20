@@ -62,7 +62,8 @@ one.cmt <- function() {
 }
 
 fit <- nlmixr(one.cmt, theo_sd,"focei")
-covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"))
+covarSearchAuto(fit, varsVec = c("ka", "cl"),
+    covarsVec = c("WT", "SEX"), catCovariates = c("SEX"))
 
 ## Note that this didn't include sex, add it to dataset and restart model
 
@@ -73,9 +74,12 @@ d$SEX[d$ID<=6] <-1
 fit <- nlmixr(one.cmt, d, "focei")
 
 # This would restart if for some reason the search crashed:
-covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"), restart = TRUE)
+covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
+                catCovariates = c("SEX"), restart = TRUE)
 
-covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"), restart = TRUE, searchType = "forward")
+covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
+                catCovariates = c("SEX"), restart = TRUE,
+                searchType = "forward")
 }
 
 }

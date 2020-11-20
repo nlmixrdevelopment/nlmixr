@@ -920,7 +920,8 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 #' }
 #'
 #' fit <- nlmixr(one.cmt, theo_sd,"focei")
-#' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"))
+#' covarSearchAuto(fit, varsVec = c("ka", "cl"),
+#'     covarsVec = c("WT", "SEX"), catCovariates = c("SEX"))
 #'
 #' ## Note that this didn't include sex, add it to dataset and restart model
 #'
@@ -931,9 +932,12 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 #' fit <- nlmixr(one.cmt, d, "focei")
 #'
 #' # This would restart if for some reason the search crashed:
-#' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"), restart = TRUE)
+#' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
+#'                 catCovariates = c("SEX"), restart = TRUE)
 #'
-#' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"), catCovariates = c("SEX"), restart = TRUE, searchType = "forward")
+#' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
+#'                 catCovariates = c("SEX"), restart = TRUE,
+#'                 searchType = "forward")
 #' }
 #'
 covarSearchAuto <- # unsuccessful runs info store; check for covInformation before resuming
@@ -1206,7 +1210,7 @@ backwardSearch <- function(covInfo, fitorig, fitupdated, pVal = 0.01, reFitCovar
   stepIdx <- 1
 
   if (!missing(fitupdated)) {
-    if (names(fitupdated$ini$theta) %in% all(names(fitorig$ini$theta))) {
+    if (all(names(fitupdated$ini$theta) %in% names(fitorig$ini$theta))) {
       cli::cli_alert_warning("no covariates added in the forward search, skipping backward search")
       return(list(fitorig, NULL))
     }

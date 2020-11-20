@@ -729,16 +729,16 @@ nlmixrUI <- function(fun) {
     assign("fun", fun, env)
     fun2 <- attr(fun, "srcref")
     if (is.null(fun2)) {
-      fun <- (parse(text=paste(deparse(fun), collapse="\n"), keep.source=TRUE))
+      fun2 <- deparse(fun)
       assign("fun", fun, env)
-      fun2 <- attr(fun, "srcref")
       cli::cli_alert_info("parameter labels from comments are typically ignored in non-interactive mode")
       cli::cli_alert_info("Need to run with the source intact to parse comments")
       ## message(sprintf("Cannot run this way in non-interactive mode.\nTry running:\n\nR -e 'source(\"script\", keep.source=TRUE)'\n\nFor Batch-mode type of running, you can use:\n\nR -e \"source('script.R', keep.source=TRUE, echo=TRUE)\" %s> script.Rout 2>&1", ifelse((.Platform$OS.type == "unix"), "", "1")))
       ## stop("option \"keep.source\" must be TRUE for nlmixr models.")
       ## return(eval(fun(), parent.frame(1)))
+    } else {
+      fun2 <- as.character(fun2, useSource = TRUE)
     }
-    fun2 <- as.character(fun2, useSource = TRUE)
     rg <- rex::rex("function", any_spaces, "(", anything, ")")
     w <- which(regexpr(rg, fun2) != -1)
     if (length(w) > 0) {
@@ -3731,23 +3731,6 @@ nlmixrUI.model.desc <- function(obj) {
   }
 }
 
-nlmixrUI.lincmt.dvdx <- function(obj) {
-  if (is.null(obj$rxode.pred)) {
-    .df <- .as.data.frame(obj$ini)
-    .dft <- .df[!is.na(.df$ntheta), ]
-    .unfixed <- with(.dft, sprintf("%s=THETA[%d]", name, seq_along(.dft$name)))
-    .eta <- .df[!is.na(.df$neta1), ]
-    .eta <- .eta[.eta$neta1 == .eta$neta2, ]
-    .eta <- with(.eta, sprintf("%s=ETA[%d]", name, .eta$neta1))
-    .txt <- .deparse1(body(obj$rest))
-    .txt[length(.txt) + 1] <- obj$lin.solved$extra.lines
-    .txt <- paste(c(.unfixed, .eta, .txt), collapse = "\n")
-    .txt <- substring(.txt, 0, nchar(.txt) - 1)
-    return(RxODE::rxSymPyLincmtDvdx(.txt, obj$lin.solved$ncmt, obj$lin.solved$parameterization))
-  }
-  return(NULL)
-}
-
 nlmixrUI.poped.notfixed_bpop <- function(obj) {
   .df <- .as.data.frame(obj$ini)
   .tmp <- .df[!is.na(.df$ntheta) & is.na(.df$err), ]
@@ -3940,8 +3923,6 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(x$meta)
   } else if (arg == "saem.distribution") {
     return(nlmixrUI.saem.distribution(obj))
-  } else if (arg == "lincmt.dvdx") {
-    return(nlmixrUI.lincmt.dvdx(obj))
   } else if (arg == "notfixed_bpop" || arg == "poped.notfixed_bpop") {
     return(nlmixrUI.poped.notfixed_bpop(obj))
   } else if (arg == "poped.ff_fun") {
