@@ -159,7 +159,7 @@ bootplot.nlmixrFitCore <- function(x, ...) {
             title = paste0(
               'Bootstrap <span style="color:blue; opacity: 0.2;">\u0394 objective function (', .deltaN,
               " models, df\u2248", .df2, ')</span> vs <span style="color:red; opacity: 0.2;">reference \u03C7\u00B2(df=',
-              length(fit$ini$est), ")</style>"
+              length(x$ini$est), ")</style>"
             ),
             caption = "\u0394 objective function curve should be on or below the reference distribution curve"
           )
@@ -290,6 +290,7 @@ plot.nlmixrFitData <- function(x, ...) {
         ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s))) +
         RxODE::rxTheme()
       if (any(names(.d1) == "lowerLim")) {
+        lowerLim <- upperLim <- NULL
         .p3 <- .p3 + geom_cens(aes(lower = lowerLim, upper = upperLim), fill = "purple")
       }
       .lst[[length(.lst) + 1]] <- .p3

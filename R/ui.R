@@ -310,7 +310,7 @@ ini <- function(ini, ...) {
             }
           }
         } else {
-          warning("the model does not have a parameter named '", .n., "', modification ignored")
+          warning("the model does not have a parameter named '", .n, "', modification ignored")
         }
       }
     } else if (length(.call) == 1) {
@@ -4076,7 +4076,7 @@ nlmixrUI.inner.model <- function(obj, singleOde = TRUE, addProp = c("combined1",
     .pars <- NULL
   } else {
     .mod <- obj$rxode.pred
-    .pars <- objf$theta.pars
+    .pars <- obj$theta.pars
   }
   if (missing(only.numeric)) {
     .onlyNumeric <- all(is.na(obj$ini$neta1))

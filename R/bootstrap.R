@@ -423,7 +423,7 @@ sampling <- function(data,
 
     names(dataSubsets) <- stratLevels
 
-    tab <- table(theo_sd[stratVar])
+    tab <- table(data[stratVar])
     nTab <- sum(tab)
 
     sampledDataSubsets <- lapply(names(dataSubsets), function(x) {
