@@ -1103,8 +1103,6 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
       yp <- s[, x["pred"]]
       assign("nobs", length(yo), .env)
       if (length(yo) != length(yp)) {
-        assign("x", x, globalenv())
-        assign("s", s, globalenv())
         stop("length mismatch ", length(yo), "!=", length(yp))
       }
 

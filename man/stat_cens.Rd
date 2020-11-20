@@ -69,7 +69,7 @@ often aesthetics, used to set an aesthetic to a fixed value, like
 to the paired geom/stat.}
 }
 \description{
-Censoring geom/stat
+This is a censoring geom that shows the left or right censoring specified in the nlmixr input data-set or fit
 }
 \details{
 Requires the following aesthetics:

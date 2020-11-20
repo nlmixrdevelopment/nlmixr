@@ -50,9 +50,6 @@
 \alias{getData}
 \alias{rxSymPySetupPred}
 \alias{et}
-\alias{tidy}
-\alias{glance}
-\alias{augment}
 \alias{rxParams}
 \alias{rxParam}
 \title{Objects exported from other packages}
@@ -62,8 +59,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{generics}{\code{\link[generics]{augment}}, \code{\link[generics]{glance}}, \code{\link[generics]{glance}}, \code{\link[generics]{tidy}}}
-
   \item{magrittr}{\code{\link[magrittr:pipe]{\%>\%}}}
 
   \item{nlme}{\code{\link[nlme]{ACF}}, \code{\link[nlme]{VarCorr}}, \code{\link[nlme]{augPred}}, \code{\link[nlme]{fixed.effects}}, \code{\link[nlme:fixed.effects]{fixef}}, \code{\link[nlme]{getData}}, \code{\link[nlme]{getVarCov}}, \code{\link[nlme]{groupedData}}, \code{\link[nlme]{nlme}}, \code{\link[nlme]{nlmeControl}}, \code{\link[nlme]{pdBlocked}}, \code{\link[nlme]{pdCompSymm}}, \code{\link[nlme]{pdConstruct}}, \code{\link[nlme]{pdDiag}}, \code{\link[nlme]{pdFactor}}, \code{\link[nlme]{pdIdent}}, \code{\link[nlme]{pdLogChol}}, \code{\link[nlme]{pdMat}}, \code{\link[nlme]{pdMatrix}}, \code{\link[nlme]{pdNatural}}, \code{\link[nlme]{pdSymm}}, \code{\link[nlme]{random.effects}}, \code{\link[nlme:random.effects]{ranef}}, \code{\link[nlme]{reStruct}}, \code{\link[nlme]{varComb}}, \code{\link[nlme]{varConstPower}}, \code{\link[nlme]{varExp}}, \code{\link[nlme]{varFixed}}, \code{\link[nlme]{varFunc}}, \code{\link[nlme]{varIdent}}, \code{\link[nlme]{varPower}}, \code{\link[nlme]{varWeights}}}

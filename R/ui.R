@@ -729,9 +729,14 @@ nlmixrUI <- function(fun) {
     assign("fun", fun, env)
     fun2 <- attr(fun, "srcref")
     if (is.null(fun2)) {
-      message(sprintf("Cannot run this way in non-interactive mode.\nTry running:\n\nR -e 'source(\"script\", keep.source=TRUE)'\n\nFor Batch-mode type of running, you can use:\n\nR -e \"source('script.R', keep.source=TRUE, echo=TRUE)\" %s> script.Rout 2>&1", ifelse((.Platform$OS.type == "unix"), "", "1")))
-      stop("option \"keep.source\" must be TRUE for nlmixr models.")
-      return(eval(fun(), parent.frame(1)))
+      fun <- (parse(text=paste(deparse(fun), collapse="\n"), keep.source=TRUE))
+      assign("fun", fun, env)
+      fun2 <- attr(fun, "srcref")
+      cli::cli_alert_info("parameter labels from comments are typically ignored in non-interactive mode")
+      cli::cli_alert_info("Need to run with the source intact to parse comments")
+      ## message(sprintf("Cannot run this way in non-interactive mode.\nTry running:\n\nR -e 'source(\"script\", keep.source=TRUE)'\n\nFor Batch-mode type of running, you can use:\n\nR -e \"source('script.R', keep.source=TRUE, echo=TRUE)\" %s> script.Rout 2>&1", ifelse((.Platform$OS.type == "unix"), "", "1")))
+      ## stop("option \"keep.source\" must be TRUE for nlmixr models.")
+      ## return(eval(fun(), parent.frame(1)))
     }
     fun2 <- as.character(fun2, useSource = TRUE)
     rg <- rex::rex("function", any_spaces, "(", anything, ")")

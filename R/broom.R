@@ -97,7 +97,6 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
   tibble::as_tibble(.df)
 }
 
-#' @importFrom tibble as_tibble
 .nlmixrTidyRandom <- function(x, ...) {
   RxODE::rxReq("tibble")
   .d <- dim(x$omegaR)
@@ -110,7 +109,6 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
   }
 }
 
-#' @importFrom tibble as_tibble
 .nlmixrTidyRandomPar <- function(x, ...) {
   RxODE::rxReq("tibble")
   .pars <- .getR(x$omegaR, TRUE)
@@ -156,7 +154,6 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
   return(x[, intersect(allCols, names(x))])
 }
 
-#' @importFrom tibble as_tibble
 .coefPar <- function(x, exponentiate = FALSE, ...) {
   RxODE::rxReq("tibble")
   .d <- dim(x$omegaR)
@@ -206,8 +203,6 @@ confint.nlmixrFitCoreSilent <- confint.nlmixrFitCore
   return(tibble::as_tibble(.df))
 }
 
-#' @export
-#' @importFrom tibble as_tibble
 tidy.nlmixrFitCore <- function(x, ...) {
   RxODE::rxReq("tibble")
   .extra <- list(...)
@@ -244,11 +239,8 @@ tidy.nlmixrFitCore <- function(x, ...) {
     .reorderCols())
 }
 
-##' @export
 tidy.nlmixrFitCoreSilent <- tidy.nlmixrFitCore
 
-#' @export
-#' @importFrom tibble as_tibble
 glance.nlmixrFitCore <- function(x, ...) {
   RxODE::rxReq("tibble")
   .lst <- list(...)
@@ -262,13 +254,10 @@ glance.nlmixrFitCore <- function(x, ...) {
   tibble::as_tibble(.df)
 }
 
-##' @export
 glance.nlmixrFitCoreSilent <- glance.nlmixrFitCore
 
-##' @export
 augment.nlmixrFitCore <- function(x, ...) {
   stop("augment is not yet implemented for nlmixr models")
 }
 
-##' @export
 augment.nlmixrFitCoreSilent <- augment.nlmixrFitCore

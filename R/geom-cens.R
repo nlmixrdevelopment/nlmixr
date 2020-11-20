@@ -97,7 +97,7 @@ StatCens <- ggplot2::ggproto("StatCens", ggplot2::Stat,
 
 ##' Censoring geom/stat
 ##'
-##'
+##' This is a censoring geom that shows the left or right censoring specified in the nlmixr input data-set or fit
 ##'
 ##' Requires the following aesthetics:
 ##'

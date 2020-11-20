@@ -10,7 +10,7 @@ nmDataConvert(data)
 \item{data}{Data to "convert"}
 }
 \value{
-Exact same data as was input
+Exact same data as was inputRxODE::
 }
 \description{
 Convert data to RxODE format (depreciated)

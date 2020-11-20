@@ -1,11 +1,11 @@
 .onLoad <- function(libname, pkgname) {
   backports::import(pkgname)
-  .s3register("generics::tidy", "nlmixrFitCore")
-  .s3register("generics::tidy", "nlmixrFitCoreSilent")
-  .s3register("generics::glance", "nlmixrFitCore")
-  .s3register("generics::glance", "nlmixrFitCoreSilent")
-  .s3register("generics::augment", "nlmixrFitCore")
-  .s3register("generics::augment", "nlmixrFitCoreSilent")
+  RxODE::.s3register("generics::tidy", "nlmixrFitCore")
+  RxODE::.s3register("generics::tidy", "nlmixrFitCoreSilent")
+  RxODE::.s3register("generics::glance", "nlmixrFitCore")
+  RxODE::.s3register("generics::glance", "nlmixrFitCoreSilent")
+  RxODE::.s3register("generics::augment", "nlmixrFitCore")
+  RxODE::.s3register("generics::augment", "nlmixrFitCoreSilent")
 }
 
 compiled.RxODE.md5 <- RxODE::rxMd5()
@@ -25,7 +25,7 @@ compiled.RxODE.md5 <- RxODE::rxMd5()
 ##'
 ##' @param data Data to "convert"
 ##'
-##' @return Exact same data as was input
+##' @return Exact same data as was inputRxODE::
 ##'
 ##' @keywords internal
 ##' @export
@@ -34,7 +34,8 @@ nmDataConvert <- function(data) {
   data
 }
 
-##' @importFrom stats predict logLik na.fail pchisq
+
+##' @importFrom stats predict logLik na.fail pchisq approxfun cov cov2cor dlnorm median na.omit qchisq
 ##' @importFrom n1qn1 n1qn1
 ##' @importFrom brew brew
 ##' @importFrom nlme nlme fixed.effects random.effects
@@ -44,7 +45,7 @@ nmDataConvert <- function(data) {
 ##' @importFrom RxODE RxODE
 ##' @importFrom graphics abline lines matplot plot points title
 ##' @importFrom stats as.formula nlminb optimHess rnorm terms predict anova optim sd var AIC BIC asOneSidedFormula coef end fitted resid setNames start simulate nobs qnorm quantile time
-##' @importFrom utils assignInMyNamespace getFromNamespace head stack sessionInfo tail str
+##' @importFrom utils assignInMyNamespace getFromNamespace head stack sessionInfo tail str getParseData
 ##' @importFrom parallel mclapply
 ##' @importFrom methods is
 ##' @importFrom Rcpp evalCpp

@@ -237,7 +237,7 @@ setOfv <- function(x, type) {
           .nnode <- as.numeric(sub(.regG, "\\1", type, perl = TRUE))
           .nsd <- as.numeric(sub(.regG, "\\2", type, perl = TRUE))
         } else {
-          stop("cannot switch objective function to '", type, "' type", call. = FALSEr)
+          stop("cannot switch objective function to '", type, "' type", call. = FALSE)
         }
         .likTime <- proc.time()
         .saemObf <- calc.2LL(x$saem, nnodes.gq = .nnode, nsd.gq = .nsd)
