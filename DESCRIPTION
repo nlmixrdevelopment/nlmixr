@@ -44,7 +44,9 @@ Suggests:
     checkmate,
     cli,
     symengine,
-    covr
+    covr,
+    forecast,
+    latticeExtra
 Version: 2.0.0-0
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",
