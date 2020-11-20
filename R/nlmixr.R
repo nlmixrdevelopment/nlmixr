@@ -1,5 +1,3 @@
-
-
 .onLoad <- function(libname, pkgname) {
   backports::import(pkgname)
   .s3register("generics::tidy", "nlmixrFitCore")
@@ -1010,7 +1008,6 @@ nlmixrEst.nlme <- function(env, ...) {
       return(fit)
     }
     if (inherits(.ret, "nlmixrFitData")) {
-      print(head(.origData))
       .ret <- nlmixr_fit0FixDat(.ret, IDLabel = .lab, origData = .origData)
       .ret <- nlmixr_fit0AddNpde(.ret, table = table, est = est)
     }
@@ -1221,7 +1218,6 @@ nlmixrEst.focei <- function(env, ...) {
                     drop=.drop,
                     ...
                     )
-    print(fit)
     if (any(est == c("fo", "foi"))) {
       ## Add posthoc.
       .default <- foceiControl()
@@ -1307,7 +1303,6 @@ nlmixrEst.focei <- function(env, ...) {
       }
     }
     fit <- nlmixr_fit0AddNpde(fit, table = table, est = est)
-    print(head(.origData))
     fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
     assign("start.time", start.time, env)
     assign("est", est, env)
