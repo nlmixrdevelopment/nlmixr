@@ -625,7 +625,7 @@ model <- function(model, ..., .lines = NULL) {
         }
       } else if (is.name(.x)) {
         .cur <- 1
-        .tmp <- eval(.x, sys.parent(1))
+        .tmp <- eval(.x, parent.frame(1))
         if (is(.tmp, "list") || is(.tmp, "numeric") || is(.tmp, "integer")) {
           .uif <- eval(bquote(ini(.(.uif), .(.tmp))))
         } else {
