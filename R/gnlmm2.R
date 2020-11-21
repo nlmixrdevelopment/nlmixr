@@ -362,7 +362,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
 
         pars <- system$get.modelVars()$params
         po <- unlist(as.list(env)[pars])
-        x <- system$run(po, ev)
+        x <- rxSolve(system, po, ev, returnType = "matrix")
         if (any(is.na(x))) {
           print(ID[1])
           print(po)
@@ -373,6 +373,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
         # d(State)/d(ETA)
         whState <- modVars$state.llik
         senState <- paste0("rx__sens_", whState, "_BY_", pars[madIx], "__")
+        print(head(x))
         fxJ <- list(fx = x[, whState], J = x[, senState]) # FIXME, t()
 
         dvdx <- sapply(expr.dpde.ode, eval, envir = env) # FIXME

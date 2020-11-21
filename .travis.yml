@@ -8,8 +8,8 @@ env:
 cache: packages
 
 r:
-  - 3.5
   - 3.6
+  - 4.0
   - devel
   
 os:
@@ -23,24 +23,22 @@ matrix:
     os: linux
   - r: devel
     os: osx
-  - r: 3.5
-    os: osx
   - r: 3.6
     os: linux
   - r: 3.6
     os: osx
     
 
-addons:
-  apt:
-    packages:
-      - libudunits2-dev
-      - python
-      - python-sympy
+apt_packages:
+  - cmake
+  - libgmp-dev
+  - libmpfr-dev
+  - libmpc-dev
+  - devscripts
+  - libudunits2-dev
 
 r_github_packages:
   - jimhester/covr
-  - nlmixrdevelopment/dparser-R
   - nlmixrdevelopment/RxODE
   
 script: 

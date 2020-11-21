@@ -1419,7 +1419,6 @@ nlmixrEst.dynmodel <- function(env, ...) {
         nlmixrObject = .nmf,
         control = control
       )
-    print(fit)
     .env <- fit$env
     assign("origData", .origData, .env)
     fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)

@@ -2331,6 +2331,7 @@ foceiFit.data.frame0 <- function(data,
     .w <- -which(names(.df) %in% drop)
     if (length(.w) > 0) .df <- .df[, .w, drop=FALSE]
     .cls <- class(.df)
+    .cls <- c("nlmixrPop", "nlmixrFitData", "nlmixrFitCore", .cls)
     class(.ret) <- "nlmixrFitCoreSilent"
     attr(.cls, ".foceiEnv") <- .ret
     class(.df) <- .cls

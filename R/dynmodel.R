@@ -137,7 +137,7 @@ mymin <- function(start, fr, rho = NULL, control = list()) {
   if (is.null(rho)) rho <- environment(fr)
   step <- -.2 * start
 
-  con <- list(maxeval = 999, ftol_rel = 1e-6, rcoeff = 1., ecoeff = 2., ccoeff = .5, trace = FALSE)
+  con <- list(maxeval = 999, reltol = 1e-6, rcoeff = 1., ecoeff = 2., ccoeff = .5, trace = FALSE)
   nmsC <- names(con)
   con[(namc <- names(control))] <- control
   # if (length(noNms <- namc[!namc %in% nmsC]))
