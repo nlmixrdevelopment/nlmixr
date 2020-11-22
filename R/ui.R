@@ -1,3 +1,27 @@
+nlmixrfindRhs <- function(x) {
+  ## Modified from http://adv-r.had.co.nz/Expressions.html find_assign4
+  if (is.atomic(x)) {
+    character()
+  } else if (is.name(x)) {
+    return(as.character(x))
+  } else if (is.call(x)) {
+    if ((identical(x[[1]], quote(`<-`)) ||
+      identical(x[[1]], quote(`=`))) &&
+        is.name(x[[2]])) {
+      unique(c(unlist(nlmixrfindRhs(x[[3]]))))
+    } else {
+      x1 <- x[-1]
+      unique(unlist(lapply(x1, nlmixrfindRhs)))
+    }
+  } else if (is.pairlist(x)) {
+    unique(unlist(lapply(x, nlmixrfindRhs)))
+  } else {
+    stop("Don't know how to handle type ", typeof(x),
+         call. = FALSE
+         )
+  }
+}
+
 nlmixrfindLhs <- function(x) {
   ## Modified from http://adv-r.had.co.nz/Expressions.html find_assign4
   if (is.atomic(x) || is.name(x)) {
@@ -18,6 +42,13 @@ nlmixrfindLhs <- function(x) {
       call. = FALSE
     )
   }
+}
+
+nlmixrfindRhsLhs <- function(x) {
+  .lhs <- nlmixrfindLhs(x)
+  .rhs <- nlmixrfindRhs(x)
+  .rhs <- setdiff(.rhs, .lhs)
+  list(lhs=.lhs, rhs=.rhs)
 }
 
 .deparse <- function(expr) {

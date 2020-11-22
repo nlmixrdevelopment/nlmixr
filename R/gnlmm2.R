@@ -69,35 +69,16 @@ getModelVars <- function(blik, bpar, m1) {
 
   #----------------------------
   f <- deparse(blik)
-  len <- length(f)
-  f <- parse(text = f[c(-1, -len)])
-  out <- utils::getParseData(f)
-  s <- out$text[out$token %in% c("SYMBOL", "LEFT_ASSIGN", "EQ_ASSIGN")]
-  ix <- s %in% c("=", "<-")
-  lhs <- (1:length(ix))[ix] - 1
-  ix[lhs] <- TRUE
-  rhs <- setdiff(s, s[ix])
-
-  ixLlik <- len - 1
-  ss <- sub("^\\s*\\w+\\(", "", deparse(blik)[len - 1], perl = TRUE) # FIXME
-  prob <- strsplit(ss, ",")[[1]][3] # FIXME
+  .lhsrhs <- nlmixrfindRhsLhs(blik)
 
   states <- m1$get.modelVars()$state
-  state.llik <- intersect(states, s[!ix]) # state used in llik
 
-  f <- deparse(bpar)
-  len <- length(f)
-  f <- parse(text = f[c(-1, -len)])
-  out <- utils::getParseData(f)
-  s <- out$text[out$token %in% c("SYMBOL", "LEFT_ASSIGN", "EQ_ASSIGN")]
-  ix <- s %in% c("=", "<-")
-  lhs <- (1:length(ix))[ix] - 1
-  pars.llik <- intersect(s[lhs], rhs) # pars used in llik
-  vars.par <- s[lhs] # vars def'ed in pars
+  state.llik <- intersect(states, .lhsrhs$rhs) # state used in llik
 
   list(
-    state.llik = state.llik, pars.llik = pars.llik,
-    vars.par = vars.par, # prob=prob, ixLlik=ixLlik,
+    state.llik = state.llik,
+    pars.llik = .lhsrhs$rhs,
+    vars.par = .lhsrhs$lhs, # vars defined in pars
     dist = dist, dist.df = dist.df,
     blik.new = blik.new, blik.new.text = blik.new.text,
     args.dvdx = args.dvdx
@@ -373,7 +354,6 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
         # d(State)/d(ETA)
         whState <- modVars$state.llik
         senState <- paste0("rx__sens_", whState, "_BY_", pars[madIx], "__")
-        print(head(x))
         fxJ <- list(fx = x[, whState], J = x[, senState]) # FIXME, t()
 
         dvdx <- sapply(expr.dpde.ode, eval, envir = env) # FIXME
