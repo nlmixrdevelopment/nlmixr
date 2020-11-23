@@ -16,6 +16,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// preCondInv
+SEXP preCondInv(SEXP Rin);
+RcppExport SEXP _nlmixr_preCondInv(SEXP RinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type Rin(RinSEXP);
+    rcpp_result_gen = Rcpp::wrap(preCondInv(Rin));
+    return rcpp_result_gen;
+END_RCPP
+}
 // foceiInnerLp
 NumericVector foceiInnerLp(NumericVector eta, int id);
 RcppExport SEXP _nlmixr_foceiInnerLp(SEXP etaSEXP, SEXP idSEXP) {
@@ -176,6 +187,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< std::string >::type md5(md5SEXP);
     rcpp_result_gen = Rcpp::wrap(nlmixrEval_(theta, md5));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nlmixrUnscaled_
+RObject nlmixrUnscaled_(NumericVector theta, std::string md5);
+RcppExport SEXP _nlmixr_nlmixrUnscaled_(SEXP thetaSEXP, SEXP md5SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< std::string >::type md5(md5SEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrUnscaled_(theta, md5));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -405,27 +428,50 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nlmixrResid0
+List nlmixrResid0(DataFrame& cipred, NumericVector& cdv, IntegerVector& evid, NumericVector& lambda, NumericVector& yj, NumericVector& low, NumericVector& hi, IntegerVector& cens, NumericVector& limit);
+RcppExport SEXP _nlmixr_nlmixrResid0(SEXP cipredSEXP, SEXP cdvSEXP, SEXP evidSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP lowSEXP, SEXP hiSEXP, SEXP censSEXP, SEXP limitSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DataFrame& >::type cipred(cipredSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type cdv(cdvSEXP);
+    Rcpp::traits::input_parameter< IntegerVector& >::type evid(evidSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type yj(yjSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type low(lowSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type hi(hiSEXP);
+    Rcpp::traits::input_parameter< IntegerVector& >::type cens(censSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type limit(limitSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrResid0(cipred, cdv, evid, lambda, yj, low, hi, cens, limit));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nlmixrResid
-List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& dv, IntegerVector& evid, NumericVector& lambda, NumericVector& yj, DataFrame etasDf, List etaLst);
-RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP dvSEXP, SEXP evidSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
+List nlmixrResid(List& innerList, NumericMatrix& omegaMat, NumericVector& cdv, IntegerVector& evid, NumericVector& lambda, NumericVector& yj, NumericVector& low, NumericVector& hi, IntegerVector& cens, NumericVector& limit, DataFrame etasDf, List etaLst);
+RcppExport SEXP _nlmixr_nlmixrResid(SEXP innerListSEXP, SEXP omegaMatSEXP, SEXP cdvSEXP, SEXP evidSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP lowSEXP, SEXP hiSEXP, SEXP censSEXP, SEXP limitSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List& >::type innerList(innerListSEXP);
     Rcpp::traits::input_parameter< NumericMatrix& >::type omegaMat(omegaMatSEXP);
-    Rcpp::traits::input_parameter< NumericVector& >::type dv(dvSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type cdv(cdvSEXP);
     Rcpp::traits::input_parameter< IntegerVector& >::type evid(evidSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type yj(yjSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type low(lowSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type hi(hiSEXP);
+    Rcpp::traits::input_parameter< IntegerVector& >::type cens(censSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type limit(limitSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type etasDf(etasDfSEXP);
     Rcpp::traits::input_parameter< List >::type etaLst(etaLstSEXP);
-    rcpp_result_gen = Rcpp::wrap(nlmixrResid(innerList, omegaMat, dv, evid, lambda, yj, etasDf, etaLst));
+    rcpp_result_gen = Rcpp::wrap(nlmixrResid(innerList, omegaMat, cdv, evid, lambda, yj, low, hi, cens, limit, etasDf, etaLst));
     return rcpp_result_gen;
 END_RCPP
 }
 // npde
-List npde(IntegerVector id, NumericVector dv, IntegerVector evid, NumericVector sim, NumericVector lambda, NumericVector yj, bool ties, double tolChol);
-RcppExport SEXP _nlmixr_npde(SEXP idSEXP, SEXP dvSEXP, SEXP evidSEXP, SEXP simSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP tiesSEXP, SEXP tolCholSEXP) {
+List npde(IntegerVector id, NumericVector dv, IntegerVector evid, NumericVector sim, NumericVector lambda, NumericVector yj, NumericVector low, NumericVector hi, bool ties, double tolChol);
+RcppExport SEXP _nlmixr_npde(SEXP idSEXP, SEXP dvSEXP, SEXP evidSEXP, SEXP simSEXP, SEXP lambdaSEXP, SEXP yjSEXP, SEXP lowSEXP, SEXP hiSEXP, SEXP tiesSEXP, SEXP tolCholSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -435,15 +481,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type sim(simSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type yj(yjSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type low(lowSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type hi(hiSEXP);
     Rcpp::traits::input_parameter< bool >::type ties(tiesSEXP);
     Rcpp::traits::input_parameter< double >::type tolChol(tolCholSEXP);
-    rcpp_result_gen = Rcpp::wrap(npde(id, dv, evid, sim, lambda, yj, ties, tolChol));
+    rcpp_result_gen = Rcpp::wrap(npde(id, dv, evid, sim, lambda, yj, low, hi, ties, tolChol));
     return rcpp_result_gen;
 END_RCPP
 }
 // augPredTrans
-RObject augPredTrans(NumericVector& pred, NumericVector& ipred, NumericVector& lambda, RObject& yjIn);
-RcppExport SEXP _nlmixr_augPredTrans(SEXP predSEXP, SEXP ipredSEXP, SEXP lambdaSEXP, SEXP yjInSEXP) {
+RObject augPredTrans(NumericVector& pred, NumericVector& ipred, NumericVector& lambda, RObject& yjIn, NumericVector& low, NumericVector& hi);
+RcppExport SEXP _nlmixr_augPredTrans(SEXP predSEXP, SEXP ipredSEXP, SEXP lambdaSEXP, SEXP yjInSEXP, SEXP lowSEXP, SEXP hiSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -451,37 +499,33 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector& >::type ipred(ipredSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< RObject& >::type yjIn(yjInSEXP);
-    rcpp_result_gen = Rcpp::wrap(augPredTrans(pred, ipred, lambda, yjIn));
+    Rcpp::traits::input_parameter< NumericVector& >::type low(lowSEXP);
+    Rcpp::traits::input_parameter< NumericVector& >::type hi(hiSEXP);
+    rcpp_result_gen = Rcpp::wrap(augPredTrans(pred, ipred, lambda, yjIn, low, hi));
     return rcpp_result_gen;
 END_RCPP
 }
-// saemDoPred
-RObject saemDoPred(RObject in_phi, RObject in_evt, RObject in_opt, CharacterVector cur, RObject model, std::string dll);
-RcppExport SEXP _nlmixr_saemDoPred(SEXP in_phiSEXP, SEXP in_evtSEXP, SEXP in_optSEXP, SEXP curSEXP, SEXP modelSEXP, SEXP dllSEXP) {
+// saem_do_pred
+SEXP saem_do_pred(SEXP in_phi, SEXP in_evt, SEXP in_opt);
+RcppExport SEXP _nlmixr_saem_do_pred(SEXP in_phiSEXP, SEXP in_evtSEXP, SEXP in_optSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RObject >::type in_phi(in_phiSEXP);
-    Rcpp::traits::input_parameter< RObject >::type in_evt(in_evtSEXP);
-    Rcpp::traits::input_parameter< RObject >::type in_opt(in_optSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type cur(curSEXP);
-    Rcpp::traits::input_parameter< RObject >::type model(modelSEXP);
-    Rcpp::traits::input_parameter< std::string >::type dll(dllSEXP);
-    rcpp_result_gen = Rcpp::wrap(saemDoPred(in_phi, in_evt, in_opt, cur, model, dll));
+    Rcpp::traits::input_parameter< SEXP >::type in_phi(in_phiSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type in_evt(in_evtSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type in_opt(in_optSEXP);
+    rcpp_result_gen = Rcpp::wrap(saem_do_pred(in_phi, in_evt, in_opt));
     return rcpp_result_gen;
 END_RCPP
 }
-// saemFit
-RObject saemFit(RObject xSEXP, CharacterVector cur, RObject model, std::string dll);
-RcppExport SEXP _nlmixr_saemFit(SEXP xSEXPSEXP, SEXP curSEXP, SEXP modelSEXP, SEXP dllSEXP) {
+// saem_fit
+SEXP saem_fit(SEXP xSEXP);
+RcppExport SEXP _nlmixr_saem_fit(SEXP xSEXPSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RObject >::type xSEXP(xSEXPSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type cur(curSEXP);
-    Rcpp::traits::input_parameter< RObject >::type model(modelSEXP);
-    Rcpp::traits::input_parameter< std::string >::type dll(dllSEXP);
-    rcpp_result_gen = Rcpp::wrap(saemFit(xSEXP, cur, model, dll));
+    Rcpp::traits::input_parameter< SEXP >::type xSEXP(xSEXPSEXP);
+    rcpp_result_gen = Rcpp::wrap(saem_fit(xSEXP));
     return rcpp_result_gen;
 END_RCPP
 }

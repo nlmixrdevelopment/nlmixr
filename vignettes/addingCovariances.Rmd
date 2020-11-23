@@ -1,5 +1,5 @@
 ---
-title: "Example Model: Phenobarbatol with correlations"
+title: "Example Model: Phenobarbitol with correlations"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -31,10 +31,10 @@ the effects together in the model specification block, that is
 `eta.cl+eta.v ~`.  After that statement, you specify the lower
 triangular matrix of the fit with `c()`.
 
-An example of this is the Phenobarbital data:
+An example of this is the phenobarbitol data:
 
 ```{r}
-## Load Phenobarb data
+## Load phenobarbitol data
 library(nlmixr)
 
 ```

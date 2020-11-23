@@ -47,6 +47,8 @@ foceiControl(
   covDerivMethod = c("central", "forward"),
   covMethod = c("r,s", "r", "s", ""),
   hessEps = (.Machine$double.eps)^(1/3),
+  eventFD = sqrt(.Machine$double.eps),
+  eventCentral = TRUE,
   centralDerivEps = rep(20 * sqrt(.Machine$double.eps), 2),
   lbfgsLmm = 7L,
   lbfgsPgtol = 0,
@@ -113,7 +115,9 @@ foceiControl(
   etaMat = NULL,
   repeatGillMax = 3,
   stickyRecalcN = 5,
-  gradProgressOfvTime = 10
+  gradProgressOfvTime = 10,
+  addProp = c("combined2", "combined1"),
+  singleOde = TRUE
 )
 }
 \arguments{
@@ -155,6 +159,8 @@ optimization.}
       solving, but allows user Jacobian specification.
 \item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
         solving nor user Jacobain specification
+\item \code{"indLin"} -- Solving through inductive linearization.  The RxODE dll
+        must be setup specially to use this solving routine.
 }}
 
 \item{transitAbs}{boolean indicating if this is a transit
@@ -214,9 +220,7 @@ default value is determined by the solver (when hini = 0)}
 method.  The default value is 5.  This can be between 1 and 5.}
 
 \item{cores}{Number of cores used in parallel ODE solving.  This
-defaults to the number or system cores determined by
-\code{\link[RxODE]{rxCores}} for methods that support parallel
-solving (ie thread-safe methods like "liblsoda").}
+is equivalent to calling \code{\link[RxODE]{setRxThreads}}}
 
 \item{covsInterpolation}{specifies the interpolation method for
     time-varying covariates. When solving ODEs it often samples
@@ -250,7 +254,7 @@ By default this is 1.  When zero or below, no scaling is performed.}
 value.  By default this is 1.}
 
 \item{normType}{This is the type of parameter
-    normalization/scaling used to get the scaled initial valuse
+    normalization/scaling used to get the scaled initial values
     for nlmixr.  These are used with \code{scaleType} of.
 
     With the exception of \code{rescale2}, these come
@@ -284,7 +288,7 @@ value.  By default this is 1.}
 
 
 \item \code{rescale} or min-max normalization. This rescales all
-    parmeters from (0 to 1).  As in the \code{rescale2} the
+    parameters from (0 to 1).  As in the \code{rescale2} the
     relative differences are preserved.  In this approach:
 
     C_{1} = min(all unscaled values)
@@ -339,7 +343,7 @@ and the scales are specified by \code{scaleC}.
 
 \item \code{mult} This approach does not use the data
 normalization provided by \code{normType}, but rather uses
-multiplicitve scaling to a constant provided by the \code{scaleTo}
+multiplicative scaling to a constant provided by the \code{scaleTo}
 argument.
 
   In this case:
@@ -348,7 +352,7 @@ argument.
 
 \item \code{multAdd} This approach changes the scaling based on
 the parameter being specified.  If a parameter is defined in an
-exponenital block (ie exp(theta)), then it is scaled on a
+exponential block (ie exp(theta)), then it is scaled on a
 linearly, that is:
 
   v_{scaled} = (v_{current}-v_{init}) + scaleTo
@@ -441,6 +445,12 @@ derivatives while calculating the covariance components
 }}
 
 \item{hessEps}{is a double value representing the epsilon for the Hessian calculation.}
+
+\item{eventFD}{Finite difference step for forward or central
+difference estimation of event-based gradients}
+
+\item{eventCentral}{Use the central difference approximation when
+estimating event-based gradients}
 
 \item{centralDerivEps}{Central difference tolerances.  This is a
     numeric vector of relative difference and absolute difference.
@@ -619,7 +629,7 @@ initial estimate by.  So each iteration the new step size =
 (prior step size)*gillStep}
 
 \item{gillFtol}{The gillFtol is the gradient error tolerance that
-is accepable before issuing a warning/error about the gradient estimates.}
+is acceptable before issuing a warning/error about the gradient estimates.}
 
 \item{gillRtol}{The relative tolerance used for Gill 1983
 determination of optimal step size.}
@@ -714,8 +724,7 @@ done on the first ETA optimization.}
 estimates, randomly sample new parameter estimates and restart
 the problem.  This is similar to 'PsN' resampling.}
 
-\item{seed}{an object specifying if and how the random number
-generator should be initialized}
+\item{seed}{seed for random number generator}
 
 \item{resetThetaCheckPer}{represents objective function
 \% percentage below which resetThetaP is checked.}
@@ -733,6 +742,18 @@ the atol/rtol for the rest of the problem.}
 
 \item{gradProgressOfvTime}{This is the time for a single objective
 function evaluation (in seconds) to start progress bars on gradient evaluations}
+
+\item{addProp}{one of "combined1" and "combined2"; These are the
+  two forms of additive+proportional errors supported by
+  monolix/nonmem:
+
+combined1: transform(y)=transform(f)+(a+b*f^c)*eps
+
+combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
+
+\item{singleOde}{This option allows a single ode model to include
+the PK parameter information instead of splitting it into a
+function and a RxODE model}
 }
 \description{
 Control Options for FOCEi

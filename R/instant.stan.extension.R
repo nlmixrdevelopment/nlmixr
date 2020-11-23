@@ -20,35 +20,35 @@
 #' instant.stan.extension.
 #'
 #' instant.stan.extension
-#' 
+#'
 #' @param ode_str ODE equations in a string
 #' @param covar a character vector of covariates
 #' @return NULL
-instant.stan.extension <- function(ode_str=NULL, covar=NULL)
-{
-    if (is.null(ode_str)) {
-      stop("please provide ODE string")
-    }
-    
-    if (is.null(covar)) {
-		.tmpl <- system.file("include/generic_ode_interface_template.txt", package = "nlmixr")
-		cat(ode_str, file="model.txt")
-		nvar <- 0
-	} else {
-		.tmpl <- system.file("include/generic_ode_interface_template_cov.txt", package = "nlmixr")
-		covar <- strsplit(covar, "[,| \t]+")[[1]]
-		nvar <- length(covar)
-		if (prod(nchar(covar))*nvar == 0)
-			stop("unrecoganized covar string")
-		paste(covar, "= 9999.999 + -9999.999;")
-		cat(paste(covar, "= 9999.999 + -9999.999;"), file="model.txt", sep="\n")
-		cat(ode_str, file="model.txt", append=TRUE)
-	}
-	.extn <- system.file("include/stan/math/PMXStan", package = "StanHeaders")
-	x <- .C("parse_ode", .tmpl, "model.txt", sprintf("%s/generic_ode_interface.hpp", .extn), as.character(nvar))
+instant.stan.extension <- function(ode_str = NULL, covar = NULL) {
+  if (is.null(ode_str)) {
+    stop("please provide ODE string")
+  }
 
-    pars <- scan("ODE_PARS.txt", what="", quiet=TRUE)
-    cat("A new ODE extension for Stan has been created.\n")
-    cat(sprintf("System parameters are: %s\n", paste(pars, collapse = " ")))
-    invisible()
+  if (is.null(covar)) {
+    .tmpl <- system.file("include/generic_ode_interface_template.txt", package = "nlmixr")
+    cat(ode_str, file = "model.txt")
+    nvar <- 0
+  } else {
+    .tmpl <- system.file("include/generic_ode_interface_template_cov.txt", package = "nlmixr")
+    covar <- strsplit(covar, "[,| \t]+")[[1]]
+    nvar <- length(covar)
+    if (prod(nchar(covar)) * nvar == 0) {
+      stop("unrecoganized covar string")
+    }
+    paste(covar, "= 9999.999 + -9999.999;")
+    cat(paste(covar, "= 9999.999 + -9999.999;"), file = "model.txt", sep = "\n")
+    cat(ode_str, file = "model.txt", append = TRUE)
+  }
+  .extn <- system.file("include/stan/math/PMXStan", package = "StanHeaders")
+  x <- .C("parse_ode", .tmpl, "model.txt", sprintf("%s/generic_ode_interface.hpp", .extn), as.character(nvar))
+
+  pars <- scan("ODE_PARS.txt", what = "", quiet = TRUE)
+  cat("A new ODE extension for Stan has been created.\n")
+  cat(sprintf("System parameters are: %s\n", paste(pars, collapse = " ")))
+  invisible()
 }

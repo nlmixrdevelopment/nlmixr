@@ -1,6 +1,6 @@
-Sys.setenv("R_TESTS" = "")
-Sys.setenv("nlmixr_silent"="TRUE")
 library(testthat)
+library(RxODE)
 library(nlmixr)
+verbose_minimization <- FALSE
 
 test_check("nlmixr")

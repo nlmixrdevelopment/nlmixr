@@ -53,8 +53,9 @@ nlmixr(
 \arguments{
 \item{object}{Fitted object or function specifying the model.}
 
-\item{data}{Dataset to estimate.  Needs to be RxODE compatible in
-EVIDs.}
+\item{data}{Dataset to estimate.  Needs to be RxODE compatible (see
+\url{https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-types.html}
+for detailed dataset requirements).}
 
 \item{est}{Estimation method}
 
@@ -62,8 +63,8 @@ EVIDs.}
 \code{\link[nlme]{nlmeControl}}, \code{\link{saemControl}} or
 \code{\link{foceiControl}}}
 
-\item{table}{A list controlling the table options (i.e. CWRES,
-NPDE etc).  See \code{\link{tableControl}}.}
+\item{table}{A list controlling the table options (i.e. CWRES, NPDE etc).
+See \code{\link{tableControl}}.}
 
 \item{...}{Other parameters}
 
@@ -595,6 +596,81 @@ function.
 }
 }
 
+\examples{
+
+\donttest{
+
+f_ode <- function(){
+    ini({
+        lCl <- 1.6      #log Cl (L/hr)
+        lVc <- log(80)   #log Vc (L)
+        lKA <- 0.3      #log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        eta.Cl ~ 0.3 ## BSV Cl
+        eta.Vc ~ 0.2 ## BSV Vc
+        eta.KA ~ 0.1 ## BSV Ka
+    })
+    model({
+        ## First parameters are defined in terms of the initial estimates
+        ## parameter names.
+        Cl <- exp(lCl + eta.Cl)
+        Vc = exp(lVc + eta.Vc)
+        KA <- exp(lKA + eta.KA)
+        ## After the differential equations are defined
+        kel <- Cl / Vc;
+        d/dt(depot)    = -KA*depot;
+        d/dt(centr)  =  KA*depot-kel*centr;
+        ## And the concentration is then calculated
+        cp = centr / Vc;
+        ## Last, nlmixr is told that the plasma concentration follows
+        ## a proportional error (estimated by the parameter prop.err)
+        cp ~ prop(prop.err)
+    })
+}
+f_linCmt <- function(){
+    ini({
+        lCl <- 1.6      #log Cl (L/hr)
+        lVc <- log(90)   #log Vc (L)
+        lKA <- 0.1      #log Ka (1/hr)
+        prop.err <- c(0, 0.2, 1)
+        add.err <- c(0, 0.01)
+        eta.Cl ~ 0.1 ## BSV Cl
+        eta.Vc ~ 0.1 ## BSV Vc
+        eta.KA ~ 0.1 ## BSV Ka
+    })
+    model({
+        Cl <- exp(lCl + eta.Cl)
+        Vc = exp(lVc + eta.Vc)
+        KA <- exp(lKA + eta.KA)
+        ## Instead of specifying the ODEs, you can use
+        ## the linCmt() function to use the solved system.
+        ##
+        ## This function determines the type of PK solved system
+        ## to use by the parameters that are defined.  In this case
+        ## it knows that this is a one-compartment model with first-order
+        ## absorption.
+        linCmt() ~ add(add.err) + prop(prop.err)
+    })
+}
+
+# Use nlme algorithm
+fit_linCmt_nlme <- nlmixr(f_ode, Oral_1CPT, est="nlme",
+               control=nlmeControl(maxstepsOde = 50000, pnlsTol=0.4))
+print(fit_linCmt_nlme)
+
+# Use Focei algorithm
+fit_linCmt_focei <- nlmixr(f_linCmt, Oral_1CPT, est="focei")
+print(fit_linCmt_focei)
+
+# The ODE model can be fitted using the saem algorithm, more
+# iterations should be used for real applications
+
+fit_ode_saem <- nlmixr(f_ode, Oral_1CPT, est = "saem",
+        control = saemControl(n.burn = 50, n.em = 100, print = 50))
+print(fit_ode_saem)
+
+}
+}
 \author{
 Matthew L. Fidler, Rik Schoemaker
 }

@@ -3,10 +3,6 @@
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
 
-/* .C calls */
-extern void parse_ode(void *, void *, void *, void *);
-extern void parse_pars(void *, void *, void *, void *, void *, void *, void *);
-
 /* Internal C calls, should not be called outside of C code. */
 typedef void (*S_fp) (double *, double *);
 extern void nelder_fn(S_fp func, int n, double *start, double *step,
@@ -22,7 +18,7 @@ extern SEXP _nlmixr_llik_binomial_c(SEXP, SEXP, SEXP);
 extern SEXP slice_wrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 extern SEXP _nlmixr_npde(SEXP, SEXP, SEXP, SEXP, SEXP, 
-			 SEXP, SEXP, SEXP);
+			 SEXP, SEXP, SEXP, SEXP, SEXP);
 
 extern SEXP _nlmixr_llik_poisson(SEXP, SEXP);
 extern SEXP _nlmixr_llik_normal(SEXP, SEXP);
@@ -35,7 +31,8 @@ extern SEXP _nlmixr_llik_neg_binomial(SEXP, SEXP);
 // FOCEi
 extern SEXP _nlmixr_nlmixrParameters(SEXP, SEXP);
 extern SEXP _nlmixr_nlmixrResid(SEXP, SEXP, SEXP, SEXP, SEXP, 
-				SEXP, SEXP, SEXP);
+				SEXP, SEXP, SEXP, SEXP, SEXP,
+				SEXP, SEXP);
 extern SEXP _nlmixr_nlmixrShrink(SEXP, SEXP, SEXP);
 
 SEXP _nlmixr_foceiInnerLp(SEXP, SEXP);
@@ -68,16 +65,26 @@ SEXP _nlmixr_nlmixrGrad_(SEXP, SEXP);
 SEXP _nlmixr_nlmixrEval_(SEXP, SEXP);
 SEXP _nlmixr_nlmixrParHist_(SEXP);
 SEXP _nlmixr_nlmixrHess_(SEXP, SEXP, SEXP, SEXP);
+SEXP _nlmixr_nlmixrUnscaled_(SEXP, SEXP);
 
-SEXP _nlmixr_saemDoPred(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP _nlmixr_saemFit(SEXP, SEXP, SEXP, SEXP);
-SEXP _nlmixr_augPredTrans(SEXP, SEXP, SEXP, SEXP);
+SEXP _nlmixr_saem_fit(SEXP);
+SEXP _nlmixr_saem_do_pred(SEXP, SEXP, SEXP);
+
+SEXP _nlmixr_augPredTrans(SEXP, SEXP, SEXP, SEXP, SEXP,
+			  SEXP);
+SEXP _nlmixr_preCondInv(SEXP);
+SEXP _nlmixr_setSilentErr(SEXP);
+SEXP _nlmixr_nlmixrResid0(SEXP, SEXP, SEXP, SEXP, SEXP,
+			  SEXP, SEXP, SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
-    {"parse_ode",               (DL_FUNC) &parse_ode,                4},
-    {"parse_pars",              (DL_FUNC) &parse_pars,               7},
     {NULL, NULL, 0}
 };
+
+SEXP _nlmixr_powerD(SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP _nlmixr_powerL(SEXP, SEXP, SEXP, SEXP, SEXP);
+
+SEXP _saemResidF(SEXP v);
 
 static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_freeFocei", (DL_FUNC) &_nlmixr_freeFocei, 0},
@@ -94,9 +101,9 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_llik_neg_binomial", (DL_FUNC) &_nlmixr_llik_neg_binomial, 2},
   {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
   {"_nlmixr_nlmixrParameters", (DL_FUNC) &_nlmixr_nlmixrParameters, 2},
-  {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 8},
+  {"_nlmixr_nlmixrResid", (DL_FUNC) &_nlmixr_nlmixrResid, 12},
   {"_nlmixr_nlmixrShrink", (DL_FUNC) &_nlmixr_nlmixrShrink, 3},
-  {"_nlmixr_npde", (DL_FUNC) &_nlmixr_npde, 8},
+  {"_nlmixr_npde", (DL_FUNC) &_nlmixr_npde, 10},
   // FOCEi
   {"_nlmixr_foceiInnerLp", (DL_FUNC) &_nlmixr_foceiInnerLp, 2},
   {"_nlmixr_cholSE_", (DL_FUNC) &_nlmixr_cholSE_, 2},
@@ -119,9 +126,16 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_nlmixrEval_", (DL_FUNC) &_nlmixr_nlmixrEval_, 2},
   {"_nlmixr_nlmixrParHist_", (DL_FUNC) &_nlmixr_nlmixrParHist_, 1},
   {"_nlmixr_nlmixrHess_", (DL_FUNC) &_nlmixr_nlmixrHess_, 4},
-  {"_nlmixr_saemDoPred", (DL_FUNC) &_nlmixr_saemDoPred, 6},
-  {"_nlmixr_saemFit", (DL_FUNC) &_nlmixr_saemFit, 4},
-  {"_nlmixr_augPredTrans", (DL_FUNC) &_nlmixr_augPredTrans, 4},
+  {"_nlmixr_augPredTrans", (DL_FUNC) &_nlmixr_augPredTrans, 6},
+  {"_nlmixr_nlmixrUnscaled_", (DL_FUNC) &_nlmixr_nlmixrUnscaled_, 2},
+  {"_nlmixr_preCondInv", (DL_FUNC) &_nlmixr_preCondInv, 1},
+  {"_nlmixr_setSilentErr", (DL_FUNC) &_nlmixr_setSilentErr, 1},
+  {"_nlmixr_saem_fit", (DL_FUNC) &_nlmixr_saem_fit, 1},
+  {"_nlmixr_saem_do_pred", (DL_FUNC) &_nlmixr_saem_do_pred, 3},
+  {"_nlmixr_nlmixrResid0", (DL_FUNC) &_nlmixr_nlmixrResid0, 9},
+  {"_nlmixr_powerD", (DL_FUNC) &_nlmixr_powerD, 5},
+  {"_nlmixr_powerL", (DL_FUNC) &_nlmixr_powerL, 5},
+  {"_saemResidF", (DL_FUNC) &_saemResidF, 1},
   {NULL, NULL, 0}
 };
 

@@ -35,6 +35,10 @@ BinaryFiles$
 ^\.Rproj\.user$
 ^/?docs/*$
 ^pkgdown$
+^vignettes/residualErrors.Rmd$
+^vignettes/residualErrors.csv$
+^vignettes/residualErrors.html$
+^vignettes/residualErrors_files$
 ^vignettes/running_nlmixr.Rmd$
 ^vignettes/running_nlmixr.html$
 ^vignettes/running_nlmixr_files$

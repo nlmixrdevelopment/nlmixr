@@ -2,12 +2,15 @@
 % Please edit documentation in R/RcppExports.R, R/nlmixrGrad.R
 \name{nlmixrEval_}
 \alias{nlmixrEval_}
+\alias{nlmixrUnscaled_}
 \alias{nlmixrGrad_}
 \alias{nlmixrParHist_}
 \alias{nlmixrGradFun}
 \title{Create a gradient function based on gill numerical differences}
 \usage{
 nlmixrEval_(theta, md5)
+
+nlmixrUnscaled_(theta, md5)
 
 nlmixrGrad_(theta, md5)
 
@@ -61,7 +64,7 @@ initial estimate by.  So each iteration the new step size =
 (prior step size)*gillStep}
 
 \item{gillFtol}{The gillFtol is the gradient error tolerance that
-is accepable before issuing a warning/error about the gradient estimates.}
+is acceptable before issuing a warning/error about the gradient estimates.}
 
 \item{useColor}{Boolean indicating if focei can use ASCII color codes}
 

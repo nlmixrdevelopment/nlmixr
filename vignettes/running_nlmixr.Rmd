@@ -48,7 +48,7 @@ one.cmt <- function() {
   ini({
     ## You may label each parameter with a comment
     tka <- 0.45 # Log Ka
-    tcl <- 1 # Log Cl
+    tcl <- log(c(0, 2.7, 100)) # Log Cl
     ## This works with interactive models
     ## You may also label the preceding line with label("label text")
     tv <- 3.45; label("log V")
@@ -65,11 +65,14 @@ one.cmt <- function() {
     linCmt() ~ add(add.sd)
   })
 }
+
+f <- nlmixr(one.cmt)
 ```
 We can now run the model...
 
 ```{r}
-fit <- nlmixr(one.cmt, theo_sd, est="nlme")
+fit <- nlmixr(one.cmt, theo_sd, est="focei")
+
 print(fit)
 ```
 
@@ -102,15 +105,15 @@ one.compartment <- function() {
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```{r}
-fit2 <- nlmixr(one.compartment, theo_sd, est="saem", control=list(print=0))
-print(fit2)
+fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
+## print(fit2)
 ```
 
 And if we wanted to, we could even apply the First-Order Conditional
 Estimation (FOCEi) method to this model:
 
 ```{r}
-fitF <- nlmixr(one.compartment, theo_sd, est="focei", control=list(print=0))
+fitF <- nlmixr(one.compartment, theo_sd, est="focei")
 print(fitF)
 ```
 
@@ -238,9 +241,9 @@ comprehensive site [here](https://uupharmacometrics.github.io/xpose/).
 # The UI
 
 The nlmixr modeling dialect, inspired by R and NONMEM, can be used to
-fit models using all current and future estimation alogorithms within
+fit models using all current and future estimation algorithms within
 nlmixr. Using these widely-used tools as inspiration has the advantage
-of delivering a model specification syntax that is instantly familira
+of delivering a model specification syntax that is instantly familiar
 to the majority of analysts working in pharmacometrics and related
 fields.
 

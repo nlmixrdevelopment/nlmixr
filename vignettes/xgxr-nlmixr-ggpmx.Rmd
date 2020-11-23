@@ -35,7 +35,6 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(ggPMX)
-
 ```
 
 # Load the data
@@ -130,9 +129,7 @@ as well:
 ```{r}
 ggplot(data = pk_data_cycle1, aes(x = TIME, y = LIDV)) +
   geom_line(aes(group = ID), color = "grey50", size = 1, alpha = 0.3) +
-  geom_point(aes(color = factor(CENS), shape = factor(CENS))) + 
-  scale_shape_manual(values = c(1, 8)) +
-  scale_color_manual(values = c("grey50", "red")) +
+  geom_cens(aes(cens=CENS)) + 
   xgx_geom_ci(aes(x = NOMTIME, color = NULL, group = NULL, shape = NULL), conf_level = 0.95) +
   xgx_scale_y_log10() +
   xgx_scale_x_time_units(units_dataset = time_units_dataset, units_plot = time_units_plot) +
@@ -222,7 +219,6 @@ dat <- case1_pkpd %>%
     rename(DV=LIDV) %>%
     filter(CMT %in% 1:2) %>%
     # Filter (for now) since CENS supprot in nlmixr is in development
-    filter(CENS == 0) %>%
     filter(TRTACT != "Placebo")
 ```
 
@@ -262,8 +258,8 @@ print(cmt2m)
 ```{r}
 ## First try log-normal (since the variabilitiy seemed proportional to concentration)
 cmt2fit.logn <- nlmixr(cmt2m, dat, "saem",
-                       control=list(print=0), 
-                       table=tableControl(npde=TRUE,cwres=TRUE))
+                       #control=list(print=0), 
+                       table=tableControl(cwres=TRUE))
 
 
 ## Now try proportional
@@ -360,7 +356,7 @@ if (file.exists("nlmixr_report.Rmd"))
     unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
 ```
 
-This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editting the default template to include project specificities (change labels, stratifications, filtering, etc.).
+This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editing the default template to include project specificities (change labels, stratifications, filtering, etc.).
 
 
 # Simulation of a new scenario with RxODE

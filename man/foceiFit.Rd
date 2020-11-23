@@ -29,12 +29,14 @@ focei.fit(data, ...)
   etaNames = NULL,
   etaMat = NULL,
   ...,
-  env = NULL
+  env = NULL,
+  keep = NULL,
+  drop = NULL
 )
 }
 \arguments{
-\item{data}{Data to fit; Needs to be RxODE compatible and have \code{DV},
-\code{AMT}, \code{EVID} in the dataset.}
+\item{data}{Data to fit; Needs to be RxODE compatible and have
+\code{DV}, \code{AMT}, \code{EVID} in the dataset.}
 
 \item{...}{Ignored parameters}
 
@@ -69,7 +71,14 @@ object.}
 \item{etaMat}{Eta matrix for initial estimates or final estimates
 of the ETAs.}
 
-\item{env}{An environment used to build the FOCEi or nlmixr object.}
+\item{env}{An environment used to build the FOCEi or nlmixr
+object.}
+
+\item{keep}{Columns to keep from either the input dataset. For the
+input dataset, if any records are added to the data LOCF (Last
+Observation Carried forward) imputation is performed.}
+
+\item{drop}{Columns to drop from the output}
 }
 \value{
 A focei fit or nlmixr fit object
@@ -80,7 +89,9 @@ FOCEi fit object
 FOCEi fit
 }
 \examples{
-\dontrun{
+
+\donttest{
+
 ## Comparison to Wang2007 objective functions
 
 mypar2 = function ()
@@ -333,13 +344,13 @@ fitIVyj <- nlmixr(one.compartment.IV.model, datr, "focei")
 
 one.cmt <- function() {
   ini({
-      tka <- .5   # log Ka
-      tcl <- -3.2 # log Cl
-      tv <- -1    # log V
-      eta.ka ~ 1
-      eta.cl ~ 2
-      eta.v ~ 1
-      add.err <- 0.1
+      tka <- .44   # log Ka
+      tcl <- log(c(0, 2.7, 100)) # log Cl
+      tv <- 3.45    # log V
+      eta.ka ~ 0.6
+      eta.cl ~ 0.3
+      eta.v ~ 0.1
+      add.err <- 0.7
   })
   model({
       ka <- exp(tka + eta.ka)

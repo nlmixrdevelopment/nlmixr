@@ -11,10 +11,16 @@ configsaem(
   mcmc = list(niter = c(200, 300), nmc = 3, nu = c(2, 2, 2)),
   ODEopt = list(atol = 1e-06, rtol = 1e-04, method = "lsoda", transitAbs = FALSE,
     maxeval = 1e+05),
-  distribution = c("normal", "poisson", "binomial", "lnorm"),
+  distribution = c("normal", "poisson", "binomial"),
+  addProp = c("combined2", "combined1"),
   seed = 99,
   fixed = NULL,
-  DEBUG = 0
+  DEBUG = 0,
+  tol = 1e-04,
+  itmax = 100L,
+  type = c("nelder-mead", "newuoa"),
+  lambdaRange = 3,
+  powRange = 10
 )
 }
 \arguments{
@@ -28,13 +34,34 @@ configsaem(
 
 \item{ODEopt}{optional ODE solving options}
 
-\item{distribution}{one of c("normal","poisson","binomial", "lnorm")}
+\item{distribution}{one of c("normal","poisson","binomial")}
+
+\item{addProp}{one of "combined1" and "combined2"; These are the
+  two forms of additive+proportional errors supported by
+  monolix/nonmem:
+
+combined1: transform(y)=transform(f)+(a+b*f^c)*eps
+
+combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
 
 \item{seed}{seed for random number generator}
 
 \item{fixed}{a character vector of fixed effect only parameters (no random effects attached) to be fixed}
 
-\item{DEBUG}{Integer determining if debugging is enabled.}
+\item{DEBUG}{Integer determining if debugging is enabled}
+
+\item{tol}{This is the tolerance for the regression models used
+for complex residual errors (ie add+prop etc)}
+
+\item{itmax}{This is the maximum number of iterations for the
+regression models used for complex residual errors.  The number
+of iterations is itmax*number of parameters}
+
+\item{type}{indicates the type of optimization for the residuals; Can be one of c("nelder-mead", "newuoa")}
+
+\item{lambdaRange}{This indicates the range that Box-Cox and Yeo-Johnson parameters are constrained to be;  The default is 3 indicating the range (-3,3)}
+
+\item{powRange}{This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)}
 }
 \description{
 Configure an SAEM model by generating an input list to the SAEM model function
@@ -44,50 +71,66 @@ Fit a generalized nonlinear mixed-effect model by he Stochastic
    Approximation Expectation-Maximization (SAEM) algorithm
 }
 \examples{
-\dontrun{
-library(nlmixr)
+\donttest{
 
-#ode <- "d/dt(depot) =-KA*depot;
-#        d/dt(centr) = KA*depot - KE*centr;"
-#m1 = RxODE(ode, modName="m1")
-#ode <- "C2 = centr/V;
-#      d/dt(depot) =-KA*depot;
-#      d/dt(centr) = KA*depot - KE*centr;"
-#m2 = RxODE(ode, modName="m2")
+# In this ODE system we simply specify the ODEs
 
-#Note: only use the '=' assignment, not the '<-' at this point
+ode <- "d/dt(depot) =-KA*depot;
+        d/dt(centr) = KA*depot - KE*centr;"
+m1 <- RxODE(ode, modName = "m1")
 
-PKpars = function()
-{
-  CL = exp(lCL)
-  V  = exp(lV)
-  KA = exp(lKA)
-  KE = CL / V
-  #initCondition = c(0, KE - CL/V)
+
+# In this ode System, we also specify the concentration as C2 = centr/V
+
+ode <- "C2 = centr/V;
+      d/dt(depot) =-KA*depot;
+      d/dt(centr) = KA*depot - KE*centr;"
+m2 = RxODE(ode, modName="m2")
+
+PKpars <- function() {
+  CL <- exp(lCL)
+  V <- exp(lV)
+  KA <- exp(lKA)
+  KE <- CL / V
 }
-PRED = function() centr / V
-PRED2 = function() C2
 
-saem_fit <- gen_saem_user_fn(model=lincmt(ncmt=1, oral=T))
-#saem_fit <- gen_saem_user_fn(model=m1, PKpars, pred=PRED)
-#saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
+PRED <- function() centr / V
+PRED2 <- function() C2
+
+saem_fit <- gen_saem_user_fn(model = m1, PKpars, pred = PRED)
+
+# Can also use PRED2
+saem_fit <- gen_saem_user_fn(model=m2, PKpars, pred=PRED2)
 
 
-#--- saem cfg
-nmdat = theo_sd
-model = list(saem_mod=saem_fit, covars="WT")
-inits = list(theta=c(.05, .5, 2))
-cfg   = configsaem(model, nmdat, inits)
-cfg$print = 50
+# You can also use the nlmixr UI to run this model and call the lower level functions
 
-#cfg$Rfn = nlmixr:::Ruser_function_cmt
-#dyn.load("m1.d/m1.so");cfg$Rfn = nlmixr:::Ruser_function_ode
-fit = saem_fit(cfg)
-df = simple.gof(fit)
-xyplot(DV~TIME|ID, df, type=c("p","l"), lwd=c(NA,1), pch=c(1,NA), groups=grp)
+one.compartment <- function() {
+ini({
+  tka <- 0.45 # Log Ka
+  tcl <- 1 # Log Cl
+  tv <- 3.45    # Log V
+  eta.ka ~ 0.6
+  eta.cl ~ 0.3
+  eta.v ~ 0.1
+  add.sd <- 0.7
+  wt.est <- 0.0
+})
+model({
+  ka <- exp(tka + eta.ka)
+  cl <- exp(tcl + eta.cl)
+  v <- exp(tv + eta.v + wt.est * WT)
+  d/dt(depot) = -ka * depot
+  d/dt(center) = ka * depot - cl / v * center
+  cp = center / v
+  cp ~ add(add.sd)
+})
+}
+fit  <- nlmixr(one.compartment, theo_sd, "saem")
 fit
+
 }
 }
 \author{
-Wenping Wang
+Wenping Wang & Matthew Fidler
 }

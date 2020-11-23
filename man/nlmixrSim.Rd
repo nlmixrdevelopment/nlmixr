@@ -15,36 +15,50 @@ nlmixrSim(object, ...)
   events = NULL,
   inits = NULL,
   scale = NULL,
-  method = c("liblsoda", "lsoda", "dop853"),
+  method = c("liblsoda", "lsoda", "dop853", "indLin"),
   transitAbs = NULL,
-  atol = 1e-06,
-  rtol = 1e-04,
-  maxsteps = 5000L,
-  hmin = 0L,
-  hmax = NULL,
-  hini = 0L,
+  atol = 1e-08,
+  rtol = 1e-06,
+  maxsteps = 70000L,
+  hmin = 0,
+  hmax = NA_real_,
+  hmaxSd = 0,
+  hini = 0,
   maxordn = 12L,
   maxords = 5L,
   ...,
   cores,
-  covsInterpolation = c("linear", "locf", "nocb", "midpoint"),
+  covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
   addCov = FALSE,
   matrix = FALSE,
   sigma = NULL,
   sigmaDf = NULL,
+  sigmaLower = -Inf,
+  sigmaUpper = Inf,
   nCoresRV = 1L,
   sigmaIsChol = FALSE,
+  sigmaSeparation = c("auto", "lkj", "separation"),
+  sigmaXform = c("identity", "variance", "log", "nlmixrSqrt", "nlmixrLog",
+    "nlmixrIdentity"),
   nDisplayProgress = 10000L,
   amountUnits = NA_character_,
   timeUnits = "hours",
   stiff,
   theta = NULL,
+  thetaLower = -Inf,
+  thetaUpper = Inf,
   eta = NULL,
   addDosing = FALSE,
+  stateTrim = Inf,
   updateObject = FALSE,
   omega = NULL,
   omegaDf = NULL,
   omegaIsChol = FALSE,
+  omegaSeparation = c("auto", "lkj", "separation"),
+  omegaXform = c("variance", "identity", "log", "nlmixrSqrt", "nlmixrLog",
+    "nlmixrIdentity"),
+  omegaLower = -Inf,
+  omegaUpper = Inf,
   nSub = 1L,
   thetaMat = NULL,
   thetaDf = NULL,
@@ -52,9 +66,46 @@ nlmixrSim(object, ...)
   nStud = 1L,
   dfSub = 0,
   dfObs = 0,
-  returnType = c("rxSolve", "matrix", "data.frame"),
+  returnType = c("rxSolve", "matrix", "data.frame", "data.frame.TBS", "data.table",
+    "tbl", "tibble"),
   seed = NULL,
-  nsim = NULL
+  nsim = NULL,
+  minSS = 10L,
+  maxSS = 1000L,
+  infSSstep = 12,
+  strictSS = TRUE,
+  istateReset = TRUE,
+  subsetNonmem = TRUE,
+  maxAtolRtolFactor = 0.1,
+  from = NULL,
+  to = NULL,
+  by = NULL,
+  length.out = NULL,
+  iCov = NULL,
+  keep = NULL,
+  indLinPhiTol = 1e-07,
+  indLinPhiM = 0L,
+  indLinMatExpType = c("expokit", "Al-Mohy", "arma"),
+  indLinMatExpOrder = 6L,
+  drop = NULL,
+  idFactor = TRUE,
+  mxhnil = 0,
+  hmxi = 0,
+  warnIdSort = TRUE,
+  warnDrop = TRUE,
+  ssAtol = 1e-08,
+  ssRtol = 1e-06,
+  safeZero = TRUE,
+  cacheEvent = TRUE,
+  sumType = c("pairwise", "fsum", "kahan", "neumaier", "c"),
+  prodType = c("long double", "double", "logify"),
+  sensType = c("advan", "autodiff", "forward", "central"),
+  linDiff = c(tlag = 1.5e-05, f = 1.5e-05, rate = 1.5e-05, dur = 1.5e-05, tlag2 =
+    1.5e-05, f2 = 1.5e-05, rate2 = 1.5e-05, dur2 = 1.5e-05),
+  linDiffCentral = c(tlag = TRUE, f = TRUE, rate = TRUE, dur = TRUE, tlag2 = TRUE, f2 =
+    TRUE, rate2 = TRUE, dur2 = TRUE),
+  resample = NULL,
+  resampleID = TRUE
 )
 
 \method{simulate}{nlmixrFitData}(object, nsim = 1, seed = NULL, ...)
@@ -95,6 +146,8 @@ variable by 2.}
       solving, but allows user Jacobian specification.
 \item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
         solving nor user Jacobain specification
+\item \code{"indLin"} -- Solving through inductive linearization.  The RxODE dll
+        must be setup specially to use this solving routine.
 }}
 
 \item{transitAbs}{boolean indicating if this is a transit
@@ -122,6 +175,9 @@ and sampling events. When \code{hmax=NULL} RxODE uses the
 maximum difference in times in your sampling and events.  The
 value 0 is equivalent to infinite maximum absolute step size.}
 
+\item{hmaxSd}{The number of standard deviations of the time
+difference to add to hmax. The default is 0}
+
 \item{hini}{The step size to be attempted on the first step. The
 default value is determined by the solver (when hini = 0)}
 
@@ -133,9 +189,7 @@ default value is determined by the solver (when hini = 0)}
 method.  The default value is 5.  This can be between 1 and 5.}
 
 \item{cores}{Number of cores used in parallel ODE solving.  This
-defaults to the number or system cores determined by
-\code{\link[RxODE]{rxCores}} for methods that support parallel
-solving (ie thread-safe methods like "liblsoda").}
+is equivalent to calling \code{\link[RxODE]{setRxThreads}}}
 
 \item{covsInterpolation}{specifies the interpolation method for
     time-varying covariates. When solving ODEs it often samples
@@ -169,16 +223,22 @@ observation in the solved system.}
 \item{sigmaDf}{Degrees of freedom of the sigma t-distribution.  By
 default it is equivalent to \code{Inf}, or a normal distribution.}
 
+\item{sigmaLower}{Lower bounds for simulated unexplained variability (by default -Inf)}
+
+\item{sigmaUpper}{Upper bounds for simulated unexplained variability (by default Inf)}
+
 \item{nCoresRV}{Number of cores used for the simulation of the
-sigma variables.  By default this is 1. This uses the package
-\code{\link[mvnfast]{rmvn}} and \code{\link[mvnfast]{rmvt}}.
-To reproduce the results you need to run on the same platform
-with the same number of cores. This is the reason this is set
-to be one, regardless of what the number of cores are used in
-threaded ODE solving.}
+sigma variables.  By default this is 1. To reproduce the results
+you need to run on the same platform with the same number of
+cores. This is the reason this is set to be one, regardless of
+what the number of cores are used in threaded ODE solving.}
 
 \item{sigmaIsChol}{Boolean indicating if the sigma is in the
 Cholesky decomposition instead of a symmetric covariance}
+
+\item{sigmaSeparation}{@template separation}
+
+\item{sigmaXform}{When taking \code{sigma} values from the @template Xform}
 
 \item{nDisplayProgress}{An integer indicating the minimum number
 of c-based solves before a progress bar is shown.  By default
@@ -208,6 +268,10 @@ data as an RxODE event table.}
 
 \item{theta}{A vector of parameters that will be named THETA[#] and
 added to parameters}
+
+\item{thetaLower}{Lower bounds for simulated population parameter variability (by default -Inf)}
+
+\item{thetaUpper}{Upper bounds for simulated population unexplained variability (by default Inf)}
 
 \item{eta}{A vector of parameters that will be named ETA[#] and
 added to parameters}
@@ -243,6 +307,14 @@ first model time, 102 is the second etc.
 
 }}
 
+\item{stateTrim}{When amounts/concentrations in one of the states
+are above this value, trim them to be this value. By default
+Inf.  Also trims to -stateTrim for large negative
+amounts/concentrations.  If you want to trim between a range
+say `c(0, 2000000)` you may specify 2 values with a lower and
+upper range to make sure all state values are in the
+reasonable range.}
+
 \item{updateObject}{This is an internally used flag to update the
 RxODE solved object (when supplying an RxODE solved object) as
 well as returning a new object.  You probably should not
@@ -262,7 +334,15 @@ distribution instead of a t-distribution.}
 Cholesky decomposed matrix instead of the traditional
 symmetric matrix.}
 
-\item{nSub}{Number between subject variabilities (ETAs) simulated for every 
+\item{omegaSeparation}{@template separation}
+
+\item{omegaXform}{When taking \code{omega} values from the @template Xform}
+
+\item{omegaLower}{Lower bounds for simulated ETAs (by default -Inf)}
+
+\item{omegaUpper}{Upper bounds for simulated ETAs (by default Inf)}
+
+\item{nSub}{Number between subject variabilities (ETAs) simulated for every
 realization of the parameters.}
 
 \item{thetaMat}{Named theta matrix.}
@@ -276,13 +356,13 @@ distribution instead of a t-distribution.}
 Cholesky decomposed matrix instead of the traditional
 symmetric matrix.}
 
-\item{nStud}{Number virtual studies to characterize uncertainty in estimated 
+\item{nStud}{Number virtual studies to characterize uncertainty in estimated
 parameters.}
 
-\item{dfSub}{Degrees of freedom to sample the between subject variability matrix from the 
+\item{dfSub}{Degrees of freedom to sample the between subject variability matrix from the
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
 
-\item{dfObs}{Degrees of freedom to sample the unexplained variability matrix from the 
+\item{dfObs}{Degrees of freedom to sample the unexplained variability matrix from the
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
 
 \item{returnType}{This tells what type of object is returned.  The currently supported types are:
@@ -306,6 +386,184 @@ generator should be initialized}
 \item{nsim}{represents the number of simulations.  For RxODE, if
 you supply single subject event tables (created with
 eventTable)}
+
+\item{minSS}{Minimum number of iterations for a steady-state dose}
+
+\item{maxSS}{Maximum number of iterations for a steady-state dose}
+
+\item{infSSstep}{Step size for determining if a constant infusion
+has reached steady state.  By default this is large value,
+420.}
+
+\item{strictSS}{Boolean indicating if a strict steady-state is
+required. If a strict steady-state is (\code{TRUE}) required
+then at least \code{minSS} doses are administered and the
+total number of steady states doses will continue until
+\code{maxSS} is reached, or \code{atol} and \code{rtol} for
+every compartment have been reached.  However, if ODE solving
+problems occur after the \code{minSS} has been reached the
+whole subject is considered an invalid solve. If
+\code{strictSS} is \code{FALSE} then as long as \code{minSS}
+has been reached the last good solve before ODE solving
+problems occur is considered the steady state, even though
+either \code{atol}, \code{rtol} or \code{maxSS} have not
+been achieved.}
+
+\item{istateReset}{When \code{TRUE}, reset the \code{ISTATE} variable to 1 for
+lsoda and liblsoda with doses, like \code{deSolve}; When \code{FALSE}, do
+not reset the \code{ISTATE} variable with doses.}
+
+\item{subsetNonmem}{subset to NONMEM compatible EVIDs only.  By default TRUE.}
+
+\item{maxAtolRtolFactor}{The maximum \code{atol}/\code{rtol} that
+FOCEi and other routines may adjust to.  By default 0.1}
+
+\item{from}{When there is no observations in the event table,
+start observations at this value. By default this is zero.}
+
+\item{to}{When there is no observations in the event table, end
+observations at this value. By default this is 24 + maximum
+dose time.}
+
+\item{by}{When there are no observations in the event table, this
+is the amount to increment for the observations between \code{from}
+and \code{to}.}
+
+\item{length.out}{The number of observations to create if there
+isn't any observations in the event table. By default this is 200.}
+
+\item{iCov}{A data frame of individual non-time varying covariates
+to combine with the \code{params} to form a parameter
+data.frame.}
+
+\item{keep}{Columns to keep from either the input dataset or the
+\code{iCov} dataset.  With the \code{iCov} dataset, the column
+is kept once per line.  For the input dataset, if any records
+are added to the data LOCF (Last Observation Carried forward)
+imputation is performed.}
+
+\item{indLinPhiTol}{the requested accuracy tolerance on
+exponential matrix.}
+
+\item{indLinPhiM}{the maximum size for the Krylov basis}
+
+\item{indLinMatExpType}{This is them matrix exponential type that
+    is use for RxODE.  Currently the following are supported:
+
+\itemize{
+
+\item{Al-Mohy} Uses the exponential matrix method of Al-Mohy Higham (2009)
+
+\item{arma} Use the exponential matrix from RcppArmadillo
+
+\item{expokit} Use the exponential matrix from Roger B. Sidje (1998)
+
+}}
+
+\item{indLinMatExpOrder}{an integer, the order of approximation to
+be used, for the \code{Al-Mohy} and \code{expokit} values.
+The best value for this depends on machine precision (and
+slightly on the matrix). We use \code{6} as a default.}
+
+\item{drop}{Columns to drop from the output}
+
+\item{idFactor}{This boolean indicates if original ID values
+should be maintained. This changes the default sequentially
+ordered ID to a factor with the original ID values in the
+original dataset.  By default this is enabled.}
+
+\item{mxhnil}{maximum number of messages printed (per problem)
+warning that T + H = T on a step (H = step size).  This must
+be positive to result in a non-default value.  The default
+value is 0 (or infinite).}
+
+\item{hmxi}{inverse of the maximum absolute value of H to be used.
+hmxi = 0.0 is allowed and corresponds to an infinite hmax
+(default).  hmin and hmxi may be changed at any time, but will
+not take effect until the next change of H is considered.
+This option is only considered with method=liblsoda.}
+
+\item{warnIdSort}{Warn if the ID is not present and RxODE assumes
+the order of the parameters/iCov are the same as the order of
+the parameters in the input dataset.}
+
+\item{warnDrop}{Warn if column(s) were supposed to be dropped, but
+were not present.}
+
+\item{ssAtol}{Steady state atol convergence factor.  Can be
+a vector based on each state.}
+
+\item{ssRtol}{Steady state rtol convergence factor.  Can be a
+vector based on each state.}
+
+\item{safeZero}{Use safe zero divide and log routines.  By default
+this is turned on but you may turn it off if you wish.}
+
+\item{cacheEvent}{is a boolean.  If `TRUE` (default), events are cached in
+memory to speed up solving.}
+
+\item{sumType}{Sum type to use for \code{sum()} in
+    RxODE code blocks.
+
+\code{pairwise} uses the pairwise sum (fast, default)
+
+\code{fsum} uses Python's fsum function (most accurate)
+
+\code{kahan} uses Kahan correction
+
+\code{neumaier} uses Neumaier correction
+
+\code{c} uses no correction: default/native summing}
+
+\item{prodType}{Product to use for \code{prod()} in RxODE blocks
+
+\code{long double} converts to long double, performs the
+multiplication and then converts back.
+
+\code{double} uses the standard double scale for multiplication.}
+
+\item{sensType}{Sensitivity type for `linCmt()` model:
+
+\code{advan} Use the direct advan solutions
+
+\code{autodiff} Use the autodiff advan solutions
+
+\code{forward} Use forward difference solutions
+
+\code{central} Use central differences}
+
+\item{linDiff}{This gives the linear difference amount for all the
+  types of linear compartment model parameters where sensitivities
+  are not calculated. The named components of this numeric vector are:
+
+\itemize{
+\item \code{"lag"} Central compartment lag
+\item \code{"f"} Central compartment bioavailability
+\item \code{"rate"} Central compartment modeled rate
+\item \code{"dur"} Central compartment modeled duration
+\item \code{"lag2"} Depot compartment lag
+\item \code{"f2"} Depot compartment bioavailability
+\item \code{"rate2"} Depot compartment modeled rate
+\item \code{"dur2"} Depot compartment modeled duration
+}}
+
+\item{linDiffCentral}{This gives the which parameters use central
+differences for the linear compartment model parameters.  The
+are the same components as \code{linDiff}}
+
+\item{resample}{A character vector of model variables to resample
+from the input dataset; This sampling is done with replacement.
+When \code{NULL} or \code{FALSE} no resampling is done.  When
+\code{TRUE} resampling is done on all covariates in the input
+dataset}
+
+\item{resampleID}{boolean representing if the resampling should be
+done on an individual basis \code{TRUE} (ie. a whole patient is
+selected) or each covariate is resampled independent of the
+subject identifier \code{FALSE}.  When \code{resampleID=TRUE}
+correlations of parameters are retained, where as when
+\code{resampleID=FALSE} ignores patient covariate correaltions.
+Hecne the default is \code{resampleID=TRUE}.}
 
 \item{a}{when using \code{solve}, this is equivalent to the
 \code{object} argument.  If you specify \code{object} later in

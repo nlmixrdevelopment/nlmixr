@@ -12,17 +12,27 @@ saemControl(
   nu = c(2, 2, 2),
   atol = 1e-06,
   rtol = 1e-04,
-  method = "lsoda",
+  method = "liblsoda",
   transitAbs = FALSE,
   print = 1,
   trace = 0,
-  covMethod = c("linFim", "fim", "r,s", "r", "s"),
+  covMethod = c("linFim", "fim", "r,s", "r", "s", ""),
+  calcTables = TRUE,
   logLik = FALSE,
   nnodes.gq = 3,
   nsd.gq = 1.6,
   optExpression = TRUE,
   maxsteps = 100000L,
   adjObf = TRUE,
+  sum.prod = FALSE,
+  addProp = c("combined2", "combined1"),
+  singleOde = TRUE,
+  normal = c("rnorm", "vandercorput"),
+  tol = 1e-06,
+  itmax = 30,
+  type = c("nelder-mead", "newuoa"),
+  powRange = 10,
+  lambdaRange = 3,
   ...
 )
 }
@@ -75,6 +85,8 @@ achieved. This is also used in the solved linear model to check
       solving, but allows user Jacobian specification.
 \item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
         solving nor user Jacobain specification
+\item \code{"indLin"} -- Solving through inductive linearization.  The RxODE dll
+        must be setup specially to use this solving routine.
 }}
 
 \item{transitAbs}{boolean indicating if this is a transit
@@ -105,6 +117,9 @@ typical fitting.}
 
  "" Does not calculate the covariance step.}
 
+\item{calcTables}{This boolean is to determine if the foceiFit
+will calculate tables. By default this is \code{TRUE}}
+
 \item{logLik}{boolean indicating that log-likelihood should be
 calculate by Gaussian quadrature.}
 
@@ -125,6 +140,46 @@ during one call to the solver. (5000 by default)}
 \item{adjObf}{is a boolean to indicate if the objective function
 should be adjusted to be closer to NONMEM's default objective
 function.  By default this is \code{TRUE}}
+
+\item{sum.prod}{Take the RxODE model and use more precise products/sums.
+Increases solving accuracy and solving time.}
+
+\item{addProp}{one of "combined1" and "combined2"; These are the
+  two forms of additive+proportional errors supported by
+  monolix/nonmem:
+
+combined1: transform(y)=transform(f)+(a+b*f^c)*eps
+
+combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
+
+\item{singleOde}{This option allows a single ode model to include
+the PK parameter information instead of splitting it into a
+function and a RxODE model}
+
+\item{normal}{The type of random normal generator used for SAEM:
+
+\itemize{
+
+\item "\code{rnorm}" R's random number generator (default)
+
+\item "\code{vandercorput}" low-discrepancy sequence transformed
+to a normal random variable to cover the domain better (may be
+better than a truly random sequence)
+
+}}
+
+\item{tol}{This is the tolerance for the regression models used
+for complex residual errors (ie add+prop etc)}
+
+\item{itmax}{This is the maximum number of iterations for the
+regression models used for complex residual errors.  The number
+of iterations is itmax*number of parameters}
+
+\item{type}{indicates the type of optimization for the residuals; Can be one of c("nelder-mead", "newuoa")}
+
+\item{powRange}{This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)}
+
+\item{lambdaRange}{This indicates the range that Box-Cox and Yeo-Johnson parameters are constrained to be;  The default is 3 indicating the range (-3,3)}
 
 \item{...}{Other arguments to control SAEM.}
 }

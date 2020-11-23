@@ -82,7 +82,7 @@ An officer docx object
 Create a run summary word document
 }
 \examples{
-\dontrun{
+\donttest{
  library(nlmixr)
 pheno <- function() {
     # Pheno with covariance

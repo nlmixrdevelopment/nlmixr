@@ -35,9 +35,9 @@
 #' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
 #' @return calculated concentrations
 #' @export lin_cmt
-lin_cmt <- function(obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization) {
-    .Call(nlmixr_lin_cmt, PACKAGE = 'nlmixr', obs_time,dose_time,dose,Tinf,params,oral,infusion,ncmt,parameterization)
+lin_cmt <- function(obs_time, dose_time, dose, Tinf, params, oral, infusion, ncmt, parameterization) {
+  .Call(nlmixr_lin_cmt, PACKAGE = "nlmixr", obs_time, dose_time, dose, Tinf, params, oral, infusion, ncmt, parameterization)
 }
 
-#require(nlmixr)
-#lin_cmt(0:72*1.0, 0:2*24*1.0, rep(10.0,3), 0, c(.1, 1, .2, 0), 1, 0, 1, 2)
+# require(nlmixr)
+# lin_cmt(0:72*1.0, 0:2*24*1.0, rep(10.0,3), 0, c(.1, 1, .2, 0), 1, 0, 1, 2)

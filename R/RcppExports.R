@@ -5,6 +5,14 @@ freeFocei <- function() {
     invisible(.Call(`_nlmixr_freeFocei`))
 }
 
+#' Calculate the inverse preconditioning matrix
+#'
+#' @param Rin The R matrix input
+#'
+preCondInv <- function(Rin) {
+    .Call(`_nlmixr_preCondInv`, Rin)
+}
+
 foceiInnerLp <- function(eta, id = 1L) {
     .Call(`_nlmixr_foceiInnerLp`, eta, id)
 }
@@ -61,6 +69,12 @@ nlmixrEval_ <- function(theta, md5) {
 
 #' @rdname nlmixrGradFun
 #' @export
+nlmixrUnscaled_ <- function(theta, md5) {
+    .Call(`_nlmixr_nlmixrUnscaled_`, theta, md5)
+}
+
+#' @rdname nlmixrGradFun
+#' @export
 nlmixrGrad_ <- function(theta, md5) {
     .Call(`_nlmixr_nlmixrGrad_`, theta, md5)
 }
@@ -87,11 +101,11 @@ foceiCalcCov <- function(e) {
     .Call(`_nlmixr_foceiCalcCov`, e)
 }
 
-#' Fit/Evaulate FOCEi 
+#' Fit/Evaulate FOCEi
 #'
 #' This shouldn't be called directly.
 #'
-#' @param e Enviornment 
+#' @param e Enviornment
 #'
 #' @keywords internal
 #' @export
@@ -147,23 +161,27 @@ nlmixrShrink <- function(omegaMat, etasDf, etaLst) {
     .Call(`_nlmixr_nlmixrShrink`, omegaMat, etasDf, etaLst)
 }
 
-nlmixrResid <- function(innerList, omegaMat, dv, evid, lambda, yj, etasDf, etaLst) {
-    .Call(`_nlmixr_nlmixrResid`, innerList, omegaMat, dv, evid, lambda, yj, etasDf, etaLst)
+nlmixrResid0 <- function(cipred, cdv, evid, lambda, yj, low, hi, cens, limit) {
+    .Call(`_nlmixr_nlmixrResid0`, cipred, cdv, evid, lambda, yj, low, hi, cens, limit)
 }
 
-npde <- function(id, dv, evid, sim, lambda, yj, ties, tolChol) {
-    .Call(`_nlmixr_npde`, id, dv, evid, sim, lambda, yj, ties, tolChol)
+nlmixrResid <- function(innerList, omegaMat, cdv, evid, lambda, yj, low, hi, cens, limit, etasDf, etaLst) {
+    .Call(`_nlmixr_nlmixrResid`, innerList, omegaMat, cdv, evid, lambda, yj, low, hi, cens, limit, etasDf, etaLst)
 }
 
-augPredTrans <- function(pred, ipred, lambda, yjIn) {
-    .Call(`_nlmixr_augPredTrans`, pred, ipred, lambda, yjIn)
+npde <- function(id, dv, evid, sim, lambda, yj, low, hi, ties, tolChol) {
+    .Call(`_nlmixr_npde`, id, dv, evid, sim, lambda, yj, low, hi, ties, tolChol)
 }
 
-saemDoPred <- function(in_phi, in_evt, in_opt, cur, model, dll) {
-    .Call(`_nlmixr_saemDoPred`, in_phi, in_evt, in_opt, cur, model, dll)
+augPredTrans <- function(pred, ipred, lambda, yjIn, low, hi) {
+    .Call(`_nlmixr_augPredTrans`, pred, ipred, lambda, yjIn, low, hi)
 }
 
-saemFit <- function(xSEXP, cur, model, dll) {
-    .Call(`_nlmixr_saemFit`, xSEXP, cur, model, dll)
+saem_do_pred <- function(in_phi, in_evt, in_opt) {
+    .Call(`_nlmixr_saem_do_pred`, in_phi, in_evt, in_opt)
+}
+
+saem_fit <- function(xSEXP) {
+    .Call(`_nlmixr_saem_fit`, xSEXP)
 }
 

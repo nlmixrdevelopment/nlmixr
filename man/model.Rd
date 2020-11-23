@@ -11,7 +11,7 @@ model(model, ..., .lines = NULL)
 
 \item{...}{Other arguments to model object parsed by nlmixr}
 
-\item{.lines}{This is an interal argument when code{model} is
+\item{.lines}{This is an internal argument when code{model} is
 being called recursively and should not be used.}
 }
 \value{

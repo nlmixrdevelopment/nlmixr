@@ -104,7 +104,7 @@ method.  The default value is 5.  This can be between 1 and 5.}
 \description{
 'nlme_ode' fits a mixed-effect model described using ordinary differential
 equation (ODEs). The ODE-definition follows RxODE syntax.
-Specification of fixed effects, random effects and intial values follows
+Specification of fixed effects, random effects and initial values follows
 the standard nlme notations.
 }
 \details{
@@ -174,13 +174,12 @@ The ODE-based model specification may be coded inside a character
 }
 
 \examples{
-\dontrun{
+\donttest{
 library(nlmixr)
 ode <- "
 d/dt(depot) =-KA*depot;
 d/dt(centr) = KA*depot - KE*centr;
 "
-dat <- read.table(system.file("examples/theo_md.txt", package = "nlmixr"), head=TRUE)
 mypar <- function(lKA, lKE, lCL)
 {
     KA=exp(lKA)
@@ -189,12 +188,12 @@ mypar <- function(lKA, lKE, lCL)
     V = CL/KE
 }
 
-specs <- list(fixed=lKA+lKE+lCL~1, random = pdDiag(lKA+lCL~1),
+specs <- list(fixed=lKA+lKE+lCL~1,
+     random = pdDiag(lKA+lCL~1),
      start=c(lKA=0.5, lKE=-2.5, lCL=-3.2))
 
 fit <- nlme_ode(theo_md, model=ode, par_model=specs, par_trans=mypar,
-     response="centr", response.scaler="V",control=nlmeControl(pnlsTol=0.1))
-
+     response="centr", response.scaler="V",control=nlmeControl(pnlsTol=0.3))
 }
 }
 \author{

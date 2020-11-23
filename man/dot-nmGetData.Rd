@@ -4,7 +4,7 @@
 \alias{.nmGetData}
 \title{This gets the parsed data in the lower-level manner that nlmixr expects.}
 \usage{
-.nmGetData(object)
+.nmGetData(object, keep = NULL)
 }
 \arguments{
 \item{object}{nlmixr Object}
