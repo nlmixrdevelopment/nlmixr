@@ -349,40 +349,45 @@ plot.nlmixrSim <- function(x, y, ...) {
   return(.ret)
 }
 
+.predOnlyRxDsl <- function(x) {
+  if (is.atomic(x)) {
+    return(x)
+  } else if (is.name(x)) {
+    return(x)
+  } else if (is.pairlist(x)) {
+    return(x)
+  } else if (is.call(x)) {
+    if (length(x) >= 2) {
+      if (length(x[[2]]) == 1 &&
+            ((identical(x[[1]], quote(`=`))) ||
+               (identical(x[[1]], quote(`~`))))) {
+        x[[1]] <- quote(`~`)
+        return(as.call(lapply(x, .predOnlyRxDsl)))
+      } else {
+        if (length(x) >= 2) {
+          if (((identical(x[[1]], quote(`=`))) ||
+                 (identical(x[[1]], quote(`~`)))) &&
+                length(x[[2]] == 3)) {
+            if (identical(x[[2]][[1]], quote(`/`))) {
+              x[[1]] <- quote(`~`)
+              return(as.call(lapply(x, .predOnlyRxDsl)))
+            }
+          }
+        }
+      }
+    }
+    return(as.call(lapply(x, .predOnlyRxDsl)))
+  } else {
+    stop("Don't know how to handle type ", typeof(x),
+         call. = FALSE
+         )
+  }
+}
+
 ## Mini DSL to fix pred-only models
 .predOnlyRx <- function(object) {
   .ret <- eval(parse(text = sprintf("quote({%s})", RxODE::rxNorm(object$model$pred.only))))
-  f <- function(x) {
-    if (is.atomic(x)) {
-      return(x)
-    } else if (is.name(x)) {
-      return(x)
-    } else if (is.pairlist(x)) {
-      return(x)
-    } else if (is.call(x)) {
-      if (length(x[[2]]) == 1 &&
-        ((identical(x[[1]], quote(`=`))) ||
-          (identical(x[[1]], quote(`~`))))) {
-        x[[1]] <- quote(`~`)
-        return(as.call(lapply(x, f)))
-      } else {
-        if (((identical(x[[1]], quote(`=`))) ||
-          (identical(x[[1]], quote(`~`)))) &&
-          length(x[[2]] == 3)) {
-          if (identical(x[[2]][[1]], quote(`/`))) {
-            x[[1]] <- quote(`~`)
-            return(as.call(lapply(x, f)))
-          }
-        }
-        return(as.call(lapply(x, f)))
-      }
-    } else {
-      stop("Don't know how to handle type ", typeof(x),
-        call. = FALSE
-      )
-    }
-  }
-  .ret <- deparse(f(.ret))[-1]
+  .ret <- deparse(.predOnlyRxDsl(.ret))[-1]
   .ret <- .ret[regexpr("^ *NULL$", .ret) == -1]
   .ret <- .ret[-length(.ret)]
   .w <- rev(which(regexpr("^ *cmt[(].*[)] *$", .ret) != -1))
@@ -658,7 +663,7 @@ nlmixrAugPred <- function(object, ..., covsInterpolation = c("locf", "linear", "
     `_nlmixr_augPredTrans`, dat.new$pred, dat.new$ipred,
     dat.new$rxLambda, dat.new$rxYj, dat.new$rxLow, dat.new$rxHi
   )
-  dat.new <- dat.new[, !(names(dat.new) %in% c("rxLambda", "rxYj"))]
+  dat.new <- dat.new[, !(names(dat.new) %in% c("rxLambda", "rxYj", "rxLow", "rxHi"))]
   dat.new$id <- factor(dat.new$id)
   levels(dat.new$id) <- levels(object$ID)
   if (.isMulti) {
@@ -759,7 +764,7 @@ plot.nlmixrAugPred <- function(x, y, ...) {
       p3 <- ggplot(d1, aes(time, values, col = ind)) +
         geom_line(data = dpred, size = 1.2) +
         geom_point(data = dobs) +
-        facet_wrap(~id)
+        facet_wrap(~id) + RxODE::rxTheme()
       print(p3)
     }
   }
