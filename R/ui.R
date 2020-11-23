@@ -582,6 +582,7 @@ model <- function(model, ..., .lines = NULL) {
                 .d2$lower <- -Inf
                 .d2$upper <- Inf
                 .d2$fix <- FALSE
+                .d2$name <- .new
                 .d2$condition <- "ID"
                 .ini <- rbind(.ini, .d2)
               } else if (regexpr(.thetaModelReg, .new) != -1) {
