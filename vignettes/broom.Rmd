@@ -38,6 +38,7 @@ To explore this, first we run the model:
 
 ```{r}
 library(nlmixr)
+library(broom.mixed)
 
 pheno <- function() {
     # Pheno with covariance
