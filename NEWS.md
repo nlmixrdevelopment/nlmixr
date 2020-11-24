@@ -65,11 +65,6 @@
 	
  - `saem` now supports censoring a similar way as `monolix` does, with
   `cens` and `limit` columns
-  
- - Added the low-discrepancy "vandercorput" normal sequence from
-   SITMO/`RxODE`; In theory this will cover the domain quickly and evenly
-   possibly allowing a better solution.  This can be called with
-   `saemControl(normal="vandercorput")`.
  
  - The default of `saem` additive + proportional error has been
    switched to `combined2`, which was the `focei` default, but you can
