@@ -4008,6 +4008,10 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.par0(obj))
   } else if (arg == "inner.numeric") {
     return(nlmixrUI.inner.model(obj, TRUE, "combined2", only.numeric = TRUE))
+  } else if (arg == "single.saem") {
+    return(nlmixrUI.saem.1(obj))
+  } else if (arg == "single.saem.params"){
+    return(nlmixrUI.saem.1.params(obj))
   }
   m <- x$ini
   ret <- `$.nlmixrBounds`(m, arg, exact = exact)
@@ -4124,6 +4128,33 @@ nlmixrUI.inner.model <- function(obj, singleOde = TRUE, addProp = c("combined1",
   )
 }
 
+##'@export
+nlmixrUI.saem.1 <- function(obj, optExpression=FALSE) {
+  .mod <- RxODE::RxODE(RxODE::rxGenSaem(f$saem.rx1, function() {
+    return(nlmixr_pred)
+  }, NULL,
+  optExpression = optExpression
+  ))
+  .mod
+}
+
+nlmixrUI.saem.1.params <- function(obj) {
+  .m <- nlmixrUI.saem.1(obj)
+  .df <- as.data.frame(obj$ini)
+  .tmp <- sapply(.m$params, function(x){
+    .w <- which(.df$name == x)
+    if (length(.w) == 1) return(.df$est[.w])
+    return(NA_real_)
+  })
+  .tmp <- .tmp[!is.na(.tmp)]
+  .tmp
+}
+
+
+
+nlmixrUI.saem.1
+
+##'@export
 nlmixrUI.par0 <- function(obj) {
   .ini <- as.data.frame(obj$ini)
   .maxEta <- max(.ini$neta1, na.rm = TRUE)

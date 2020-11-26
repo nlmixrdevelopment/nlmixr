@@ -563,7 +563,7 @@ selected) or each covariate is resampled independent of the
 subject identifier \code{FALSE}.  When \code{resampleID=TRUE}
 correlations of parameters are retained, where as when
 \code{resampleID=FALSE} ignores patient covariate correaltions.
-Hecne the default is \code{resampleID=TRUE}.}
+Hence the default is \code{resampleID=TRUE}.}
 
 \item{a}{when using \code{solve}, this is equivalent to the
 \code{object} argument.  If you specify \code{object} later in

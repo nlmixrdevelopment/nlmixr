@@ -25,7 +25,8 @@
     "saem.omega.name", "saem.res.name", "model.desc", "meta", "saem.distribution",
     "lincmt.dvdx", "notfixed_bpop", "poped.notfixed_bpop",
     "poped.ff_fun", "poped.d", "poped.sigma", "logThetasList", "random.mu",
-    "bpop", "multipleEndpoint", "muRefTable",
+    "bpop", "multipleEndpoint", "muRefTable", "single.inner.1", "single.inner.2",
+    "inner", "inner.par0", "single.saem", "single.saem.params",
     ## bounds
     .DollarNames.nlmixrBounds(x$ini, ""),
     names(x$nmodel),
