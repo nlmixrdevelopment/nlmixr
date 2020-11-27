@@ -1388,6 +1388,7 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   saem_solve(_rx); // Solve the complete system (possibly in parallel)
   mat g(_rx->nobs2, 3); // nobs EXCLUDING EVID=2
   int elt=0;
+  bool hasNan=false;
   for (int id = 0; id < _N; ++id) {
     ind = &(_rx->subjects[id]);
     iniSubjectE(op->neq, 1, ind, op, _rx, saem_inis);
@@ -1401,7 +1402,12 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
       } else if (ind->evid[j] == 0) {
 	saem_lhs((int)id, ind->all_times[j],
 		 getSolve(j), ind->lhs);
-	g(elt, 0) = ind->lhs[0];
+	double cur = ind->lhs[0];
+	if (std::isnan(cur)) {
+	  cur = 1.0e99;
+	  hasNan = true;
+	}
+	g(elt, 0) = cur;
 	if (_rx->cens) {
 	  g(elt, 1) = ind->cens[j];
 	} else {
@@ -1420,6 +1426,9 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     // Order by the overall solve time
     // Should it be done every time? Every x times?
     sortIds(_rx, 0);
+  }
+  if (hasNan) {
+    Rcout << "NaN in prediction. Consider to: relax atol & rtol; change initials; change seed; change structure model." << endl;
   }
   return g;
 }
