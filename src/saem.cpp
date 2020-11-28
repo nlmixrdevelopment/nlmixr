@@ -1412,12 +1412,12 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 	}
 	g(elt, 0) = cur;
 	if (_rx->cens) {
-	  g(elt, 1) = ind->cens[j];
+	  g(elt, 1) = ind->cens[ind->ix[ind->idx]];
 	} else {
 	  g(elt, 1) = 0;
 	}
 	if (_rx->limit) {
-	  g(elt, 2) = ind->limit[j];
+	  g(elt, 2) = ind->limit[ind->ix[ind->idx]];
 	} else {
 	  g(elt, 2) = R_NegInf;
 	}

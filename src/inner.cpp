@@ -775,28 +775,28 @@ double likInner0(double *eta, int id){
 	ind->idx=j;
 	double curT = getTimeF(ind->ix[ind->idx], ind);
 	if (isDose(ind->evid[ind->ix[ind->idx]])) {
-	  // ind->tlast = ind->all_times[j];
+	  // ind->tlast = ind->all_times[ind->ix[ind->idx]];
 	  // Need to calculate for advan sensitivities
 	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
-	} else if (ind->evid[j] == 0) {
+	} else if (ind->evid[ind->ix[ind->idx]] == 0) {
 	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated
-	  dv = tbs(ind->dv[j]);
+	  dv = tbs(ind->dv[ind->ix[ind->idx]]);
 	  if (ISNA(f) || std::isnan(f)) {
-	    // REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[j], dv);
+	    // REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[ind->ix[ind->idx]], dv);
 	    // REprintf("eta: ");
 	    // for (j = 0; j < op_focei.neta; ++j){
-	    //   REprintf("%f ",eta[j]);
+	    //   REprintf("%f ",eta[ind->ix[ind->idx]]);
 	    // }
 	    // REprintf("\n");
 	    throw std::runtime_error("bad solve");
 	  }
 	  // fInd->f(k, 0) = ind->lhs[0];
-	  // REprintf("f: %f: dv: %f tbs(dv): %f\n", f, ind->dv[j], dv);
+	  // REprintf("f: %f: dv: %f tbs(dv): %f\n", f, ind->dv[ind->ix[ind->idx]], dv);
 	  err = f - dv;
 	  limit = R_NegInf;
 	  if (rx->limit) {
-	    limit = ind->limit[j];
+	    limit = ind->limit[ind->ix[ind->idx]];
 	    if (ISNA(limit)) {
 	      limit = R_NegInf;
 	    } else if (R_FINITE(limit)) {
@@ -804,8 +804,8 @@ double likInner0(double *eta, int id){
 	    }
 	  }
 	  cens = 0;
-	  if (rx->cens) cens = ind->cens[j];
-	  fInd->tbsLik+=tbsL(ind->dv[j]);
+	  if (rx->cens) cens = ind->cens[ind->ix[ind->idx]];
+	  fInd->tbsLik+=tbsL(ind->dv[ind->ix[ind->idx]]);
 	  // fInd->err(k, 0) = ind->lhs[0] - ind->dv[k]; // pred-dv
 	  if (ISNA(ind->lhs[op_focei.neta + 1]))
 	    throw std::runtime_error("bad solve");
@@ -951,7 +951,7 @@ double likInner0(double *eta, int id){
 		//lp is eq 12 in Almquist 2015
 		// .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
 		if (cens == 0) {
-		  // REprintf("t: %f: err: %f; fpm: %f; B(k, 0): %f; c(k, i): %f; rp: %f", ind->all_times[j], err, fpm, B(k, 0), c(k, i), rp);
+		  // REprintf("t: %f: err: %f; fpm: %f; B(k, 0): %f; c(k, i): %f; rp: %f", ind->all_times[ind->ix[ind->idx]], err, fpm, B(k, 0), c(k, i), rp);
 		  lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) -
 		    0.5 * c(k, i) - 0.5 * err * fpm * B(k, 0);
 		  // REprintf("lp(i,0): %f\n", lp(i,0));
