@@ -4010,6 +4010,8 @@ nlmixrUI.poped.ff_fun <- function(obj) {
     return(nlmixrUI.inner.model(obj, TRUE, "combined2", only.numeric = TRUE))
   } else if (arg == "single.saem") {
     return(nlmixrUI.saem.1(obj))
+  } else if (arg == "pars.saem") {
+    return(nlmixrUI.saem.2(obj))
   } else if (arg == "single.saem.params"){
     return(nlmixrUI.saem.1.params(obj))
   }
@@ -4128,13 +4130,19 @@ nlmixrUI.inner.model <- function(obj, singleOde = TRUE, addProp = c("combined1",
   )
 }
 
-##'@export
-nlmixrUI.saem.1 <- function(obj, optExpression=FALSE) {
-  .mod <- RxODE::RxODE(RxODE::rxGenSaem(f$saem.rx1, function() {
+nlmixrUI.saem.1 <- function(obj, optExpression=FALSE, loadSymengine=FALSE) {
+  .mod <- RxODE::RxODE(RxODE::rxGenSaem(obj$saem.rx1, function() {
     return(nlmixr_pred)
   }, NULL,
-  optExpression = optExpression
-  ))
+  optExpression = optExpression,
+  loadSymengine=loadSymengine))
+  .mod
+}
+
+nlmixrUI.saem.2 <- function(obj, optExpression=FALSE, loadSymengine=FALSE) {
+  .mod <- RxODE::RxODE(RxODE::rxGenSaem(obj$rxode.pred, function() {
+    return(nlmixr_pred)
+  }, obj$saem.pars, optExpression = optExpression, loadSymengine=loadSymengine))
   .mod
 }
 
@@ -4150,11 +4158,6 @@ nlmixrUI.saem.1.params <- function(obj) {
   .tmp
 }
 
-
-
-nlmixrUI.saem.1
-
-##'@export
 nlmixrUI.par0 <- function(obj) {
   .ini <- as.data.frame(obj$ini)
   .maxEta <- max(.ini$neta1, na.rm = TRUE)

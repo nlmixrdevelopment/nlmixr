@@ -21,18 +21,18 @@ saemControl(
   logLik = FALSE,
   nnodes.gq = 3,
   nsd.gq = 1.6,
-  optExpression = TRUE,
+  optExpression = FALSE,
   maxsteps = 100000L,
   adjObf = TRUE,
   sum.prod = FALSE,
   addProp = c("combined2", "combined1"),
   singleOde = TRUE,
-  normal = c("rnorm", "vandercorput"),
   tol = 1e-06,
   itmax = 30,
   type = c("nelder-mead", "newuoa"),
   powRange = 10,
   lambdaRange = 3,
+  loadSymengine = FALSE,
   ...
 )
 }
@@ -156,18 +156,6 @@ combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
 the PK parameter information instead of splitting it into a
 function and a RxODE model}
 
-\item{normal}{The type of random normal generator used for SAEM:
-
-\itemize{
-
-\item "\code{rnorm}" R's random number generator (default)
-
-\item "\code{vandercorput}" low-discrepancy sequence transformed
-to a normal random variable to cover the domain better (may be
-better than a truly random sequence)
-
-}}
-
 \item{tol}{This is the tolerance for the regression models used
 for complex residual errors (ie add+prop etc)}
 
@@ -180,6 +168,11 @@ of iterations is itmax*number of parameters}
 \item{powRange}{This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)}
 
 \item{lambdaRange}{This indicates the range that Box-Cox and Yeo-Johnson parameters are constrained to be;  The default is 3 indicating the range (-3,3)}
+
+\item{loadSymengine}{Boolean indicating if the model should be
+loaded into symengine.  This cause all the ODEs to be collapsed
+into one expression that is eventually optimized if
+\code{optExpression} is \code{TRUE}.}
 
 \item{...}{Other arguments to control SAEM.}
 }

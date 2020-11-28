@@ -26,7 +26,7 @@
     "lincmt.dvdx", "notfixed_bpop", "poped.notfixed_bpop",
     "poped.ff_fun", "poped.d", "poped.sigma", "logThetasList", "random.mu",
     "bpop", "multipleEndpoint", "muRefTable", "single.inner.1", "single.inner.2",
-    "inner", "inner.par0", "single.saem", "single.saem.params",
+    "inner", "inner.par0", "single.saem", "single.saem.params", "pars.saem",
     ## bounds
     .DollarNames.nlmixrBounds(x$ini, ""),
     names(x$nmodel),

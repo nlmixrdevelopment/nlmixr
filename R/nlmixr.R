@@ -681,18 +681,6 @@ nlmixr_fit <- function(uif, data, est = NULL, control = list(), ...,
 ##'     should be adjusted to be closer to NONMEM's default objective
 ##'     function.  By default this is \code{TRUE}
 ##'
-##' @param normal The type of random normal generator used for SAEM:
-##'
-##' \itemize{
-##'
-##' \item "\code{rnorm}" R's random number generator (default)
-##'
-##' \item "\code{vandercorput}" low-discrepancy sequence transformed
-##' to a normal random variable to cover the domain better (may be
-##' better than a truly random sequence)
-##'
-##' }
-##'
 ##' @param tol This is the tolerance for the regression models used
 ##'   for complex residual errors (ie add+prop etc)
 ##'
@@ -707,6 +695,7 @@ nlmixr_fit <- function(uif, data, est = NULL, control = list(), ...,
 ##' @inheritParams configsaem
 ##' @inheritParams nlmixr_fit
 ##' @inheritParams RxODE::rxSEinner
+##' @inheritParams RxODE::rxGenSaem
 ##' @return List of options to be used in \code{\link{nlmixr}} fit for
 ##'     SAEM.
 ##' @author Wenping Wang & Matthew L. Fidler
@@ -726,21 +715,20 @@ saemControl <- function(seed = 99,
                         logLik = FALSE,
                         nnodes.gq = 3,
                         nsd.gq = 1.6,
-                        optExpression = TRUE,
+                        optExpression = FALSE,
                         maxsteps = 100000L,
                         adjObf = TRUE,
                         sum.prod = FALSE,
                         addProp = c("combined2", "combined1"),
                         singleOde = TRUE,
-                        normal = c("rnorm", "vandercorput"),
                         tol = 1e-6,
                         itmax = 30,
                         type = c("nelder-mead", "newuoa"),
                         powRange = 10,
                         lambdaRange = 3,
+                        loadSymengine=FALSE,
                         ...) {
   type <- match.arg(type)
-  normal <- match.arg(normal)
   .xtra <- list(...)
   .rm <- c()
   if (missing(transitAbs) && !is.null(.xtra$transit_abs)) {
@@ -771,12 +759,12 @@ saemControl <- function(seed = 99,
     adjObf = adjObf,
     addProp = match.arg(addProp),
     singleOde = singleOde,
-    normal = normal,
     itmax = itmax,
     tol = tol,
     type = type,
     powRange = powRange,
     lambdaRange = lambdaRange,
+    loadSymengine=loadSymengine,
     ...
   )
   if (length(.rm) > 0) {
@@ -839,7 +827,7 @@ nlmixrEst.saem <- function(env, ...) {
       "nsd.gq", "nsd.gq", "adjObf",
       "optExpression", "addProp",
       "singleOde", "type", "tol", "itmax",
-      "lambdaRange", "powRange"
+      "lambdaRange", "powRange", "loadSymengine"
     )) {
       .getOpt(a)
     }

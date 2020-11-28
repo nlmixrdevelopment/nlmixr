@@ -29,7 +29,8 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
     return(nlmixr_pred)
   }, PKpars,
   sum.prod = control$sum.prod,
-  optExpression = control$optExpression
+  optExpression = control$optExpression,
+  loadSymengine=control$loadSymengine
   ))
   .fnPred <- bquote(function(a, b, c) {
     RxODE::rxLoad(.(.mod))
