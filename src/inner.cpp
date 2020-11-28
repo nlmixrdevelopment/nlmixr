@@ -86,6 +86,8 @@ extern "C"{
   getRxSolve_t getRx;
   typedef const char *(*rxGetId_t)(int id);
   rxGetId_t rxGetId;
+  typedef double (*getTime_t)(int idx, rx_solving_options_ind *ind);
+  getTime_t getTimeF = (getTime_t) R_GetCCallable("RxODE", "getTime");
 }
 
 typedef int (*iniSubjectI_t)(int solveid, int inLhs, rx_solving_options_ind *ind, rx_solving_options *op, rx_solve *rx,
@@ -771,12 +773,13 @@ double likInner0(double *eta, int id){
       iniSubjectI(op->neq, 1, ind, op, rx, rxInner.update_inis);
       for (j = 0; j < ind->n_all_times; ++j){
 	ind->idx=j;
-	if (isDose(ind->evid[j])) {
+	double curT = getTimeF(ind->ix[ind->idx], ind);
+	if (isDose(ind->evid[ind->ix[ind->idx]])) {
 	  // ind->tlast = ind->all_times[j];
 	  // Need to calculate for advan sensitivities
-	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
+	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
 	} else if (ind->evid[j] == 0) {
-	  rxInner.calc_lhs(id, ind->all_times[j], getSolve(j), ind->lhs);
+	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated
 	  dv = tbs(ind->dv[j]);
 	  if (ISNA(f) || std::isnan(f)) {
@@ -837,7 +840,7 @@ double likInner0(double *eta, int id){
 		// Calculate derivatives by finite difference
 		ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		predOde(id); // Assumes same order of parameters
-		rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
 				ind->lhs);
 		ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		if (!op_focei.eventCentral) {
@@ -849,7 +852,7 @@ double likInner0(double *eta, int id){
 		    fpm = ind->lhs[0];
 		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		    rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
 				    ind->lhs);
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
@@ -862,7 +865,7 @@ double likInner0(double *eta, int id){
 		  fpm = ind->lhs[0];
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		  rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
 				  ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
@@ -900,7 +903,7 @@ double likInner0(double *eta, int id){
 		  // Calculate derivatives by finite difference
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		  rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
 				ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  if (!op_focei.eventCentral) {
@@ -924,7 +927,7 @@ double likInner0(double *eta, int id){
 		    // LHS #1 =  r
 		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		    rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
 				    ind->lhs); // nlhs is smaller
 		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
 		    if (fpm == 0.0) {
@@ -1012,7 +1015,7 @@ double likInner0(double *eta, int id){
 		if (op_focei.etaFD[i]==1){
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
+		  rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
 				ind->lhs);
 		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		  if (!op_focei.eventCentral) {
@@ -1023,8 +1026,8 @@ double likInner0(double *eta, int id){
 		    fpm = f;
 		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
 		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs(id, ind->all_times[j], getSolve(j), // Solve space is smaller
-				ind->lhs);
+		    rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
+				    ind->lhs);
 		    fpm = a(k, i) = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
 		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  }

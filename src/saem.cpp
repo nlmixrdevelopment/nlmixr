@@ -1335,6 +1335,9 @@ getRxSolve_t getRx_ = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
 
 typedef t_calc_lhs (*getRxLhs_t)();
 
+typedef double (*getTime_t)(int idx, rx_solving_options_ind *ind);
+getTime_t getTimeS = (getTime_t) R_GetCCallable("RxODE", "getTime");
+
 getRxLhs_t getRxLhs = (getRxLhs_t) R_GetCCallable("RxODE","getRxLhs");
 
 typedef void (*sortIds_t)(rx_solve* rx, int ini);
@@ -1394,13 +1397,13 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     iniSubjectE(op->neq, 1, ind, op, _rx, saem_inis);
     for (int j = 0; j < ind->n_all_times; ++j){
       ind->idx=j;
-      if (isDose(ind->evid[j])){
-	ind->tlast = ind->all_times[j];
+      double curT = getTimeS(ind->ix[ind->idx], ind);
+      if (isDose(ind->evid[ind->ix[ind->idx]])){
 	// Need to calculate for advan sensitivities
-	saem_lhs((int)id, ind->all_times[j],
+	saem_lhs((int)id, curT,
 		 getSolve(j), ind->lhs);
-      } else if (ind->evid[j] == 0) {
-	saem_lhs((int)id, ind->all_times[j],
+      } else if (ind->evid[ind->ix[ind->idx]] == 0) {
+	saem_lhs((int)id, curT,
 		 getSolve(j), ind->lhs);
 	double cur = ind->lhs[0];
 	if (std::isnan(cur)) {
