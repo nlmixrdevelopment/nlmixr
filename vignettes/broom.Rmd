@@ -41,14 +41,14 @@ library(nlmixr)
 library(broom.mixed)
 
 pheno <- function() {
-    # Pheno with covariance
+  # Pheno with covariance
   ini({
     tcl <- log(0.008) # typical value of clearance
     tv <-  log(0.6)   # typical value of volume
     ## var(eta.cl)
     eta.cl + eta.v ~ c(1, 
                        0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
-                      # interindividual variability on clearance and volume
+    # interindividual variability on clearance and volume
     add.err <- 0.1    # residual variability
   })
   model({

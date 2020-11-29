@@ -330,13 +330,15 @@ plot(fit.TOS);
 
 
 v1s <- nlmixr::vpc(fit.TOS, show=list(obs_dv=T), scales="free_y") +
-    ylab("Warfarin Cp [mg/L] or PCA") +
-    xlab("Time [h]");
-v2s <- nlmixr::vpc(fit.TOS, show=list(obs_dv=T), pred_corr = TRUE) +
-    ylab("Prediction Corrected Warfarin Cp [mg/L] or PCA") +
-    xlab("Time [h]");
+  ylab("Warfarin Cp [mg/L] or PCA") +
+  xlab("Time [h]")
 
-gridExtra::grid.arrange(v1s, v2s)
+v2s <- nlmixr::vpc(fit.TOS, show=list(obs_dv=T), pred_corr = TRUE) +
+  ylab("Prediction Corrected Warfarin Cp [mg/L] or PCA") +
+  xlab("Time [h]")
+
+library(patchwork)
+v1s / v2s
 ```
 
 ## FOCEi fits
@@ -354,11 +356,12 @@ print(fit.TOF)
 plot(fit.TOF)
 
 v1f <- nlmixr::vpc(fit.TOF, show=list(obs_dv=T), scales="free_y") +
-    ylab("Warfarin Cp [mg/L] or PCA") +
-    xlab("Time [h]");
-v2f <- nlmixr::vpc(fit.TOF, show=list(obs_dv=T), pred_corr = TRUE) +
-        ylab("Prediction Corrected Warfarin Cp [mg/L] or PCA") +
-    xlab("Time [h]")
+  ylab("Warfarin Cp [mg/L] or PCA") +
+  xlab("Time [h]")
 
-gridExtra::grid.arrange(v1f, v2f)
+v2f <- nlmixr::vpc(fit.TOF, show=list(obs_dv=T), pred_corr = TRUE) +
+  ylab("Prediction Corrected Warfarin Cp [mg/L] or PCA") +
+  xlab("Time [h]")
+
+v1f / v2f
 ```

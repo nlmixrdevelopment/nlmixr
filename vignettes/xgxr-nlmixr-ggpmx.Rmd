@@ -258,7 +258,7 @@ print(cmt2m)
 ```{r}
 ## First try log-normal (since the variabilitiy seemed proportional to concentration)
 cmt2fit.logn <- nlmixr(cmt2m, dat, "saem",
-                       #control=list(print=0), 
+                       control=list(print=0), 
                        table=tableControl(cwres=TRUE))
 
 

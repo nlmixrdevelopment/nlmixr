@@ -20,7 +20,7 @@ Suggests:
     expm,
     flextable,
     ggtext,
-    gridExtra,
+    patchwork,
     huxtable,
     lattice,
     lbfgs,

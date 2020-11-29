@@ -151,11 +151,11 @@ navbar:
           href: articles/addingCovariances.html
         - text: "--------------------------"
         - text: "Nonlinear PK/PD -- Nimotuzumab"
-          href: https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html
+          href: https://nlmixrdevelopment.github.io/nlmixr/articles/nimo.html
         - text: "PBPK -- Mavoglurant"
-          href: https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html
+          href: https://nlmixrdevelopment.github.io/nlmixr/articles/mavoglurant.html
         - text: "PKPD -- Myelosuppression model"
-          href: https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html
+          href: https://nlmixrdevelopment.github.io/nlmixr/articles/wbc.html
   - text: "Cheat Sheet"
     icon: fa-scroll fa-lg
     href: https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf
