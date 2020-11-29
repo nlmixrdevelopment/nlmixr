@@ -54,7 +54,7 @@ AC_SUBST(ISYSTEM)
 AC_CONFIG_FILES([src/Makevars])
 AC_OUTPUT
 
- 
+${R_HOME}/bin/R CMD BATCH  inst/tools/r-stripper/stripper.R 
 
 echo --------[[begin src/Makevars]]--------
 cat src/Makevars

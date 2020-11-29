@@ -21,6 +21,7 @@ Suggests:
     flextable,
     ggtext,
     patchwork,
+    gridExtra,
     huxtable,
     lattice,
     lbfgs,
