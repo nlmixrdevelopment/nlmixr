@@ -344,7 +344,7 @@ configsaem <- function(model, data, inits,
   ## CHECKME
   form <- attr(model$saem_mod, "form")
   .nobs <- 0
-  dat <- RxODE::etTrans(data$nmdat, attr(model$saem_mod, "rx"), TRUE, TRUE)
+  dat <- RxODE::etTrans(data$nmdat, attr(model$saem_mod, "rx"), addCmt=TRUE, dropUnits=TRUE, allTimeVar=TRUE)
   .nobs <- attr(class(dat), ".RxODE.lst")$nobs
   ## if(length(dat) !=7) stop("SAEM doesn't support time varying covariates yet.");
   .rx <- attr(model$saem_mod, "rx")

@@ -1367,6 +1367,11 @@ RObject mat2NumMat(const mat &m) {
   return x;
 }
 
+typedef const char *(*rxGetId_t)(int id);
+rxGetId_t rxGetIdS = (rxGetId_t) R_GetCCallable("RxODE", "rxGetId");
+
+CharacterVector parNames;
+
 mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   // yp has all the observations in the dataset
   rx_solving_options_ind *ind;
@@ -1391,7 +1396,7 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   saem_solve(_rx); // Solve the complete system (possibly in parallel)
   mat g(_rx->nobs2, 3); // nobs EXCLUDING EVID=2
   int elt=0;
-  bool hasNan=false;
+  bool hasNan = false;
   for (int id = 0; id < _N; ++id) {
     ind = &(_rx->subjects[id]);
     iniSubjectE(op->neq, 1, ind, op, _rx, saem_inis);
@@ -1409,6 +1414,12 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 	if (std::isnan(cur)) {
 	  cur = 1.0e99;
 	  hasNan = true;
+	  // NumericVector par(nPar);
+	  // for (int _j = 0; _j < nPar; _j++){
+	  //   par[_j] = ind->par_ptr[_j];
+	  // }
+	  // par.names() = parNames;
+	  // Rcpp::print(par);
 	}
 	g(elt, 0) = cur;
 	if (_rx->cens) {
@@ -1431,13 +1442,19 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     sortIds(_rx, 0);
   }
   if (hasNan) {
-    Rcout << "NaN in prediction. Consider to: relax atol & rtol; change initials; change seed; change structure model." << endl;
+    REprintf("NaN in prediction; Consider: relax atol & rtol; change initials; change seed; change structure model\n");
   }
   return g;
 }
 
+typedef SEXP(*mv_t)(SEXP);
+
+mv_t rxModelVarsS = (mv_t)R_GetCCallable("RxODE", "_RxODE_rxModelVars_");
+
 void setupRx(List &opt, SEXP evt, SEXP evtM) {
   RObject obj = opt[".rx"];
+  List mv = rxModelVarsS(obj);
+  parNames = mv[RxMv_params];
   if (!Rf_isNull(obj)){
     // Now need to get the largest item to setup the solving space
     // foceiSetupEta_(etaMat0);
