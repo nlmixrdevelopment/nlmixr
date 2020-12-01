@@ -1,0 +1,3 @@
+#RxODE Makevars
+PKG_CFLAGS=-O3  -I"/home/matt/R/x86_64-pc-linux-gnu-library/4.0/RxODE/include"
+PKG_LIBS=$(BLAS_LIBS) $(LAPACK_LIBS) $(FLIBS)

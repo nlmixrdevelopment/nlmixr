@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -50,7 +54,6 @@ parameter estimates.  In addition the omega and sigma matrices are
 simulated from the uncertainty in the Omega/Sigma matrices based
 on the number of subjects and observations the model was based on." />
 <meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -68,7 +71,7 @@ on the number of subjects and observations the model was based on." />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -82,7 +85,7 @@ on the number of subjects and observations the model was based on." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0-0</span>
       </span>
     </div>
 
@@ -133,13 +136,13 @@ on the number of subjects and observations the model was based on." />
     </li>
     <li class="divider"></li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+      <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+      <a href="../articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+      <a href="../articles/wbc.html">PKPD -- Myelosuppression model</a>
     </li>
   </ul>
 </li>
@@ -205,62 +208,113 @@ simulated from the uncertainty in the Omega/Sigma matrices based
 on the number of subjects and observations the model was based on.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nlmixrSim</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>nlmixrSim</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for nlmixrFitData</span>
-<span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html'>rxSolve</a></span>(
-  <span class='no'>object</span>,
-  <span class='kw'>params</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>events</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>inits</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>scale</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"liblsoda"</span>, <span class='st'>"lsoda"</span>, <span class='st'>"dop853"</span>),
-  <span class='kw'>transitAbs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>atol</span> <span class='kw'>=</span> <span class='fl'>1e-06</span>,
-  <span class='kw'>rtol</span> <span class='kw'>=</span> <span class='fl'>1e-04</span>,
-  <span class='kw'>maxsteps</span> <span class='kw'>=</span> <span class='fl'>5000L</span>,
-  <span class='kw'>hmin</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
-  <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>hini</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
-  <span class='kw'>maxordn</span> <span class='kw'>=</span> <span class='fl'>12L</span>,
-  <span class='kw'>maxords</span> <span class='kw'>=</span> <span class='fl'>5L</span>,
-  <span class='no'>...</span>,
-  <span class='no'>cores</span>,
-  <span class='kw'>covsInterpolation</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"linear"</span>, <span class='st'>"locf"</span>, <span class='st'>"nocb"</span>, <span class='st'>"midpoint"</span>),
-  <span class='kw'>addCov</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>matrix</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>sigmaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>nCoresRV</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
-  <span class='kw'>sigmaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>nDisplayProgress</span> <span class='kw'>=</span> <span class='fl'>10000L</span>,
-  <span class='kw'>amountUnits</span> <span class='kw'>=</span> <span class='fl'>NA_character_</span>,
-  <span class='kw'>timeUnits</span> <span class='kw'>=</span> <span class='st'>"hours"</span>,
-  <span class='no'>stiff</span>,
-  <span class='kw'>theta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>eta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>addDosing</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>updateObject</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>omega</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>omegaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>omegaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>nSub</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
-  <span class='kw'>thetaMat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>thetaDf</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>thetaIsChol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>nStud</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
-  <span class='kw'>dfSub</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>dfObs</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>returnType</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"rxSolve"</span>, <span class='st'>"matrix"</span>, <span class='st'>"data.frame"</span>),
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)
+<span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html'>rxSolve</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  params <span class='op'>=</span> <span class='cn'>NULL</span>,
+  events <span class='op'>=</span> <span class='cn'>NULL</span>,
+  inits <span class='op'>=</span> <span class='cn'>NULL</span>,
+  scale <span class='op'>=</span> <span class='cn'>NULL</span>,
+  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"liblsoda"</span>, <span class='st'>"lsoda"</span>, <span class='st'>"dop853"</span>, <span class='st'>"indLin"</span><span class='op'>)</span>,
+  transitAbs <span class='op'>=</span> <span class='cn'>NULL</span>,
+  atol <span class='op'>=</span> <span class='fl'>1e-08</span>,
+  rtol <span class='op'>=</span> <span class='fl'>1e-06</span>,
+  maxsteps <span class='op'>=</span> <span class='fl'>70000L</span>,
+  hmin <span class='op'>=</span> <span class='fl'>0</span>,
+  hmax <span class='op'>=</span> <span class='cn'>NA_real_</span>,
+  hmaxSd <span class='op'>=</span> <span class='fl'>0</span>,
+  hini <span class='op'>=</span> <span class='fl'>0</span>,
+  maxordn <span class='op'>=</span> <span class='fl'>12L</span>,
+  maxords <span class='op'>=</span> <span class='fl'>5L</span>,
+  <span class='va'>...</span>,
+  <span class='va'>cores</span>,
+  covsInterpolation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"locf"</span>, <span class='st'>"linear"</span>, <span class='st'>"nocb"</span>, <span class='st'>"midpoint"</span><span class='op'>)</span>,
+  addCov <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  matrix <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  sigma <span class='op'>=</span> <span class='cn'>NULL</span>,
+  sigmaDf <span class='op'>=</span> <span class='cn'>NULL</span>,
+  sigmaLower <span class='op'>=</span> <span class='op'>-</span><span class='cn'>Inf</span>,
+  sigmaUpper <span class='op'>=</span> <span class='cn'>Inf</span>,
+  nCoresRV <span class='op'>=</span> <span class='fl'>1L</span>,
+  sigmaIsChol <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  sigmaSeparation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"auto"</span>, <span class='st'>"lkj"</span>, <span class='st'>"separation"</span><span class='op'>)</span>,
+  sigmaXform <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"identity"</span>, <span class='st'>"variance"</span>, <span class='st'>"log"</span>, <span class='st'>"nlmixrSqrt"</span>, <span class='st'>"nlmixrLog"</span>,
+    <span class='st'>"nlmixrIdentity"</span><span class='op'>)</span>,
+  nDisplayProgress <span class='op'>=</span> <span class='fl'>10000L</span>,
+  amountUnits <span class='op'>=</span> <span class='cn'>NA_character_</span>,
+  timeUnits <span class='op'>=</span> <span class='st'>"hours"</span>,
+  <span class='va'>stiff</span>,
+  theta <span class='op'>=</span> <span class='cn'>NULL</span>,
+  thetaLower <span class='op'>=</span> <span class='op'>-</span><span class='cn'>Inf</span>,
+  thetaUpper <span class='op'>=</span> <span class='cn'>Inf</span>,
+  eta <span class='op'>=</span> <span class='cn'>NULL</span>,
+  addDosing <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  stateTrim <span class='op'>=</span> <span class='cn'>Inf</span>,
+  updateObject <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  omega <span class='op'>=</span> <span class='cn'>NULL</span>,
+  omegaDf <span class='op'>=</span> <span class='cn'>NULL</span>,
+  omegaIsChol <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  omegaSeparation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"auto"</span>, <span class='st'>"lkj"</span>, <span class='st'>"separation"</span><span class='op'>)</span>,
+  omegaXform <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"variance"</span>, <span class='st'>"identity"</span>, <span class='st'>"log"</span>, <span class='st'>"nlmixrSqrt"</span>, <span class='st'>"nlmixrLog"</span>,
+    <span class='st'>"nlmixrIdentity"</span><span class='op'>)</span>,
+  omegaLower <span class='op'>=</span> <span class='op'>-</span><span class='cn'>Inf</span>,
+  omegaUpper <span class='op'>=</span> <span class='cn'>Inf</span>,
+  nSub <span class='op'>=</span> <span class='fl'>1L</span>,
+  thetaMat <span class='op'>=</span> <span class='cn'>NULL</span>,
+  thetaDf <span class='op'>=</span> <span class='cn'>NULL</span>,
+  thetaIsChol <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  nStud <span class='op'>=</span> <span class='fl'>1L</span>,
+  dfSub <span class='op'>=</span> <span class='fl'>0</span>,
+  dfObs <span class='op'>=</span> <span class='fl'>0</span>,
+  returnType <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"rxSolve"</span>, <span class='st'>"matrix"</span>, <span class='st'>"data.frame"</span>, <span class='st'>"data.frame.TBS"</span>, <span class='st'>"data.table"</span>,
+    <span class='st'>"tbl"</span>, <span class='st'>"tibble"</span><span class='op'>)</span>,
+  seed <span class='op'>=</span> <span class='cn'>NULL</span>,
+  nsim <span class='op'>=</span> <span class='cn'>NULL</span>,
+  minSS <span class='op'>=</span> <span class='fl'>10L</span>,
+  maxSS <span class='op'>=</span> <span class='fl'>1000L</span>,
+  infSSstep <span class='op'>=</span> <span class='fl'>12</span>,
+  strictSS <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  istateReset <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  subsetNonmem <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  maxAtolRtolFactor <span class='op'>=</span> <span class='fl'>0.1</span>,
+  from <span class='op'>=</span> <span class='cn'>NULL</span>,
+  to <span class='op'>=</span> <span class='cn'>NULL</span>,
+  by <span class='op'>=</span> <span class='cn'>NULL</span>,
+  length.out <span class='op'>=</span> <span class='cn'>NULL</span>,
+  iCov <span class='op'>=</span> <span class='cn'>NULL</span>,
+  keep <span class='op'>=</span> <span class='cn'>NULL</span>,
+  indLinPhiTol <span class='op'>=</span> <span class='fl'>1e-07</span>,
+  indLinPhiM <span class='op'>=</span> <span class='fl'>0L</span>,
+  indLinMatExpType <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"expokit"</span>, <span class='st'>"Al-Mohy"</span>, <span class='st'>"arma"</span><span class='op'>)</span>,
+  indLinMatExpOrder <span class='op'>=</span> <span class='fl'>6L</span>,
+  drop <span class='op'>=</span> <span class='cn'>NULL</span>,
+  idFactor <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  mxhnil <span class='op'>=</span> <span class='fl'>0</span>,
+  hmxi <span class='op'>=</span> <span class='fl'>0</span>,
+  warnIdSort <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  warnDrop <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  ssAtol <span class='op'>=</span> <span class='fl'>1e-08</span>,
+  ssRtol <span class='op'>=</span> <span class='fl'>1e-06</span>,
+  safeZero <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  cacheEvent <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  sumType <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"pairwise"</span>, <span class='st'>"fsum"</span>, <span class='st'>"kahan"</span>, <span class='st'>"neumaier"</span>, <span class='st'>"c"</span><span class='op'>)</span>,
+  prodType <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"long double"</span>, <span class='st'>"double"</span>, <span class='st'>"logify"</span><span class='op'>)</span>,
+  sensType <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"advan"</span>, <span class='st'>"autodiff"</span>, <span class='st'>"forward"</span>, <span class='st'>"central"</span><span class='op'>)</span>,
+  linDiff <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>tlag <span class='op'>=</span> <span class='fl'>1.5e-05</span>, f <span class='op'>=</span> <span class='fl'>1.5e-05</span>, rate <span class='op'>=</span> <span class='fl'>1.5e-05</span>, dur <span class='op'>=</span> <span class='fl'>1.5e-05</span>, tlag2 <span class='op'>=</span>
+    <span class='fl'>1.5e-05</span>, f2 <span class='op'>=</span> <span class='fl'>1.5e-05</span>, rate2 <span class='op'>=</span> <span class='fl'>1.5e-05</span>, dur2 <span class='op'>=</span> <span class='fl'>1.5e-05</span><span class='op'>)</span>,
+  linDiffCentral <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>tlag <span class='op'>=</span> <span class='cn'>TRUE</span>, f <span class='op'>=</span> <span class='cn'>TRUE</span>, rate <span class='op'>=</span> <span class='cn'>TRUE</span>, dur <span class='op'>=</span> <span class='cn'>TRUE</span>, tlag2 <span class='op'>=</span> <span class='cn'>TRUE</span>, f2 <span class='op'>=</span>
+    <span class='cn'>TRUE</span>, rate2 <span class='op'>=</span> <span class='cn'>TRUE</span>, dur2 <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>,
+  resample <span class='op'>=</span> <span class='cn'>NULL</span>,
+  resampleID <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for nlmixrFitData</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span>(<span class='no'>object</span>, <span class='kw'>nsim</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span><span class='op'>(</span><span class='va'>object</span>, nsim <span class='op'>=</span> <span class='fl'>1</span>, seed <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for nlmixrFitData</span>
-<span class='fu'><a href='https://rdrr.io/r/base/solve.html'>solve</a></span>(<span class='no'>a</span>, <span class='no'>b</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/base/solve.html'>solve</a></span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -311,6 +365,8 @@ variable by 2.</p></td>
       solving, but allows user Jacobian specification.</p></li>
 <li><p><code>"dop853"</code> -- DOP853 solver.  Does not support parallel thread-based
         solving nor user Jacobain specification</p></li>
+<li><p><code>"indLin"</code> -- Solving through inductive linearization.  The RxODE dll
+        must be setup specially to use this solving routine.</p></li>
 </ul></td>
     </tr>
     <tr>
@@ -351,6 +407,11 @@ maximum difference in times in your sampling and events.  The
 value 0 is equivalent to infinite maximum absolute step size.</p></td>
     </tr>
     <tr>
+      <th>hmaxSd</th>
+      <td><p>The number of standard deviations of the time
+difference to add to hmax. The default is 0</p></td>
+    </tr>
+    <tr>
       <th>hini</th>
       <td><p>The step size to be attempted on the first step. The
 default value is determined by the solver (when hini = 0)</p></td>
@@ -369,9 +430,7 @@ method.  The default value is 5.  This can be between 1 and 5.</p></td>
     <tr>
       <th>cores</th>
       <td><p>Number of cores used in parallel ODE solving.  This
-defaults to the number or system cores determined by
-<code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxCores.html'>rxCores</a></code> for methods that support parallel
-solving (ie thread-safe methods like "liblsoda").</p></td>
+is equivalent to calling <code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/getRxThreads.html'>setRxThreads</a></code></p></td>
     </tr>
     <tr>
       <th>covsInterpolation</th>
@@ -415,19 +474,33 @@ observation in the solved system.</p></td>
 default it is equivalent to <code>Inf</code>, or a normal distribution.</p></td>
     </tr>
     <tr>
+      <th>sigmaLower</th>
+      <td><p>Lower bounds for simulated unexplained variability (by default -Inf)</p></td>
+    </tr>
+    <tr>
+      <th>sigmaUpper</th>
+      <td><p>Upper bounds for simulated unexplained variability (by default Inf)</p></td>
+    </tr>
+    <tr>
       <th>nCoresRV</th>
       <td><p>Number of cores used for the simulation of the
-sigma variables.  By default this is 1. This uses the package
-<code><a href='https://rdrr.io/pkg/mvnfast/man/rmvn.html'>rmvn</a></code> and <code><a href='https://rdrr.io/pkg/mvnfast/man/rmvt.html'>rmvt</a></code>.
-To reproduce the results you need to run on the same platform
-with the same number of cores. This is the reason this is set
-to be one, regardless of what the number of cores are used in
-threaded ODE solving.</p></td>
+sigma variables.  By default this is 1. To reproduce the results
+you need to run on the same platform with the same number of
+cores. This is the reason this is set to be one, regardless of
+what the number of cores are used in threaded ODE solving.</p></td>
     </tr>
     <tr>
       <th>sigmaIsChol</th>
       <td><p>Boolean indicating if the sigma is in the
 Cholesky decomposition instead of a symmetric covariance</p></td>
+    </tr>
+    <tr>
+      <th>sigmaSeparation</th>
+      <td><p>@template separation</p></td>
+    </tr>
+    <tr>
+      <th>sigmaXform</th>
+      <td><p>When taking <code>sigma</code> values from the @template Xform</p></td>
     </tr>
     <tr>
       <th>nDisplayProgress</th>
@@ -467,6 +540,14 @@ data as an RxODE event table.</p></td>
 added to parameters</p></td>
     </tr>
     <tr>
+      <th>thetaLower</th>
+      <td><p>Lower bounds for simulated population parameter variability (by default -Inf)</p></td>
+    </tr>
+    <tr>
+      <th>thetaUpper</th>
+      <td><p>Upper bounds for simulated population unexplained variability (by default Inf)</p></td>
+    </tr>
+    <tr>
       <th>eta</th>
       <td><p>A vector of parameters that will be named ETA[#] and
 added to parameters</p></td>
@@ -498,6 +579,16 @@ first model time, 102 is the second etc.</p></li>
 </ul></td>
     </tr>
     <tr>
+      <th>stateTrim</th>
+      <td><p>When amounts/concentrations in one of the states
+are above this value, trim them to be this value. By default
+Inf.  Also trims to -stateTrim for large negative
+amounts/concentrations.  If you want to trim between a range
+say `c(0, 2000000)` you may specify 2 values with a lower and
+upper range to make sure all state values are in the
+reasonable range.</p></td>
+    </tr>
+    <tr>
       <th>updateObject</th>
       <td><p>This is an internally used flag to update the
 RxODE solved object (when supplying an RxODE solved object) as
@@ -525,8 +616,24 @@ Cholesky decomposed matrix instead of the traditional
 symmetric matrix.</p></td>
     </tr>
     <tr>
+      <th>omegaSeparation</th>
+      <td><p>@template separation</p></td>
+    </tr>
+    <tr>
+      <th>omegaXform</th>
+      <td><p>When taking <code>omega</code> values from the @template Xform</p></td>
+    </tr>
+    <tr>
+      <th>omegaLower</th>
+      <td><p>Lower bounds for simulated ETAs (by default -Inf)</p></td>
+    </tr>
+    <tr>
+      <th>omegaUpper</th>
+      <td><p>Upper bounds for simulated ETAs (by default Inf)</p></td>
+    </tr>
+    <tr>
       <th>nSub</th>
-      <td><p>Number between subject variabilities (ETAs) simulated for every 
+      <td><p>Number between subject variabilities (ETAs) simulated for every
 realization of the parameters.</p></td>
     </tr>
     <tr>
@@ -548,17 +655,17 @@ symmetric matrix.</p></td>
     </tr>
     <tr>
       <th>nStud</th>
-      <td><p>Number virtual studies to characterize uncertainty in estimated 
+      <td><p>Number virtual studies to characterize uncertainty in estimated
 parameters.</p></td>
     </tr>
     <tr>
       <th>dfSub</th>
-      <td><p>Degrees of freedom to sample the between subject variability matrix from the 
+      <td><p>Degrees of freedom to sample the between subject variability matrix from the
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.</p></td>
     </tr>
     <tr>
       <th>dfObs</th>
-      <td><p>Degrees of freedom to sample the unexplained variability matrix from the 
+      <td><p>Degrees of freedom to sample the unexplained variability matrix from the
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.</p></td>
     </tr>
     <tr>
@@ -589,6 +696,235 @@ you supply single subject event tables (created with
 eventTable)</p></td>
     </tr>
     <tr>
+      <th>minSS</th>
+      <td><p>Minimum number of iterations for a steady-state dose</p></td>
+    </tr>
+    <tr>
+      <th>maxSS</th>
+      <td><p>Maximum number of iterations for a steady-state dose</p></td>
+    </tr>
+    <tr>
+      <th>infSSstep</th>
+      <td><p>Step size for determining if a constant infusion
+has reached steady state.  By default this is large value,
+420.</p></td>
+    </tr>
+    <tr>
+      <th>strictSS</th>
+      <td><p>Boolean indicating if a strict steady-state is
+required. If a strict steady-state is (<code>TRUE</code>) required
+then at least <code>minSS</code> doses are administered and the
+total number of steady states doses will continue until
+<code>maxSS</code> is reached, or <code>atol</code> and <code>rtol</code> for
+every compartment have been reached.  However, if ODE solving
+problems occur after the <code>minSS</code> has been reached the
+whole subject is considered an invalid solve. If
+<code>strictSS</code> is <code>FALSE</code> then as long as <code>minSS</code>
+has been reached the last good solve before ODE solving
+problems occur is considered the steady state, even though
+either <code>atol</code>, <code>rtol</code> or <code>maxSS</code> have not
+been achieved.</p></td>
+    </tr>
+    <tr>
+      <th>istateReset</th>
+      <td><p>When <code>TRUE</code>, reset the <code>ISTATE</code> variable to 1 for
+lsoda and liblsoda with doses, like <code>deSolve</code>; When <code>FALSE</code>, do
+not reset the <code>ISTATE</code> variable with doses.</p></td>
+    </tr>
+    <tr>
+      <th>subsetNonmem</th>
+      <td><p>subset to NONMEM compatible EVIDs only.  By default TRUE.</p></td>
+    </tr>
+    <tr>
+      <th>maxAtolRtolFactor</th>
+      <td><p>The maximum <code>atol</code>/<code>rtol</code> that
+FOCEi and other routines may adjust to.  By default 0.1</p></td>
+    </tr>
+    <tr>
+      <th>from</th>
+      <td><p>When there is no observations in the event table,
+start observations at this value. By default this is zero.</p></td>
+    </tr>
+    <tr>
+      <th>to</th>
+      <td><p>When there is no observations in the event table, end
+observations at this value. By default this is 24 + maximum
+dose time.</p></td>
+    </tr>
+    <tr>
+      <th>by</th>
+      <td><p>When there are no observations in the event table, this
+is the amount to increment for the observations between <code>from</code>
+and <code>to</code>.</p></td>
+    </tr>
+    <tr>
+      <th>length.out</th>
+      <td><p>The number of observations to create if there
+isn't any observations in the event table. By default this is 200.</p></td>
+    </tr>
+    <tr>
+      <th>iCov</th>
+      <td><p>A data frame of individual non-time varying covariates
+to combine with the <code>params</code> to form a parameter
+data.frame.</p></td>
+    </tr>
+    <tr>
+      <th>keep</th>
+      <td><p>Columns to keep from either the input dataset or the
+<code>iCov</code> dataset.  With the <code>iCov</code> dataset, the column
+is kept once per line.  For the input dataset, if any records
+are added to the data LOCF (Last Observation Carried forward)
+imputation is performed.</p></td>
+    </tr>
+    <tr>
+      <th>indLinPhiTol</th>
+      <td><p>the requested accuracy tolerance on
+exponential matrix.</p></td>
+    </tr>
+    <tr>
+      <th>indLinPhiM</th>
+      <td><p>the maximum size for the Krylov basis</p></td>
+    </tr>
+    <tr>
+      <th>indLinMatExpType</th>
+      <td><p>This is them matrix exponential type that
+    is use for RxODE.  Currently the following are supported:</p>
+<ul>
+<li><p>Al-Mohy Uses the exponential matrix method of Al-Mohy Higham (2009)</p></li>
+<li><p>arma Use the exponential matrix from RcppArmadillo</p></li>
+<li><p>expokit Use the exponential matrix from Roger B. Sidje (1998)</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>indLinMatExpOrder</th>
+      <td><p>an integer, the order of approximation to
+be used, for the <code>Al-Mohy</code> and <code>expokit</code> values.
+The best value for this depends on machine precision (and
+slightly on the matrix). We use <code>6</code> as a default.</p></td>
+    </tr>
+    <tr>
+      <th>drop</th>
+      <td><p>Columns to drop from the output</p></td>
+    </tr>
+    <tr>
+      <th>idFactor</th>
+      <td><p>This boolean indicates if original ID values
+should be maintained. This changes the default sequentially
+ordered ID to a factor with the original ID values in the
+original dataset.  By default this is enabled.</p></td>
+    </tr>
+    <tr>
+      <th>mxhnil</th>
+      <td><p>maximum number of messages printed (per problem)
+warning that T + H = T on a step (H = step size).  This must
+be positive to result in a non-default value.  The default
+value is 0 (or infinite).</p></td>
+    </tr>
+    <tr>
+      <th>hmxi</th>
+      <td><p>inverse of the maximum absolute value of H to be used.
+hmxi = 0.0 is allowed and corresponds to an infinite hmax
+(default).  hmin and hmxi may be changed at any time, but will
+not take effect until the next change of H is considered.
+This option is only considered with method=liblsoda.</p></td>
+    </tr>
+    <tr>
+      <th>warnIdSort</th>
+      <td><p>Warn if the ID is not present and RxODE assumes
+the order of the parameters/iCov are the same as the order of
+the parameters in the input dataset.</p></td>
+    </tr>
+    <tr>
+      <th>warnDrop</th>
+      <td><p>Warn if column(s) were supposed to be dropped, but
+were not present.</p></td>
+    </tr>
+    <tr>
+      <th>ssAtol</th>
+      <td><p>Steady state atol convergence factor.  Can be
+a vector based on each state.</p></td>
+    </tr>
+    <tr>
+      <th>ssRtol</th>
+      <td><p>Steady state rtol convergence factor.  Can be a
+vector based on each state.</p></td>
+    </tr>
+    <tr>
+      <th>safeZero</th>
+      <td><p>Use safe zero divide and log routines.  By default
+this is turned on but you may turn it off if you wish.</p></td>
+    </tr>
+    <tr>
+      <th>cacheEvent</th>
+      <td><p>is a boolean.  If `TRUE` (default), events are cached in
+memory to speed up solving.</p></td>
+    </tr>
+    <tr>
+      <th>sumType</th>
+      <td><p>Sum type to use for <code><a href='https://rdrr.io/r/base/sum.html'>sum()</a></code> in
+    RxODE code blocks.</p>
+<p><code>pairwise</code> uses the pairwise sum (fast, default)</p>
+<p><code>fsum</code> uses Python's fsum function (most accurate)</p>
+<p><code>kahan</code> uses Kahan correction</p>
+<p><code>neumaier</code> uses Neumaier correction</p>
+<p><code>c</code> uses no correction: default/native summing</p></td>
+    </tr>
+    <tr>
+      <th>prodType</th>
+      <td><p>Product to use for <code><a href='https://rdrr.io/r/base/prod.html'>prod()</a></code> in RxODE blocks</p>
+<p><code>long double</code> converts to long double, performs the
+multiplication and then converts back.</p>
+<p><code>double</code> uses the standard double scale for multiplication.</p></td>
+    </tr>
+    <tr>
+      <th>sensType</th>
+      <td><p>Sensitivity type for `linCmt()` model:</p>
+<p><code>advan</code> Use the direct advan solutions</p>
+<p><code>autodiff</code> Use the autodiff advan solutions</p>
+<p><code>forward</code> Use forward difference solutions</p>
+<p><code>central</code> Use central differences</p></td>
+    </tr>
+    <tr>
+      <th>linDiff</th>
+      <td><p>This gives the linear difference amount for all the
+  types of linear compartment model parameters where sensitivities
+  are not calculated. The named components of this numeric vector are:</p>
+<ul>
+<li><p><code>"lag"</code> Central compartment lag</p></li>
+<li><p><code>"f"</code> Central compartment bioavailability</p></li>
+<li><p><code>"rate"</code> Central compartment modeled rate</p></li>
+<li><p><code>"dur"</code> Central compartment modeled duration</p></li>
+<li><p><code>"lag2"</code> Depot compartment lag</p></li>
+<li><p><code>"f2"</code> Depot compartment bioavailability</p></li>
+<li><p><code>"rate2"</code> Depot compartment modeled rate</p></li>
+<li><p><code>"dur2"</code> Depot compartment modeled duration</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>linDiffCentral</th>
+      <td><p>This gives the which parameters use central
+differences for the linear compartment model parameters.  The
+are the same components as <code>linDiff</code></p></td>
+    </tr>
+    <tr>
+      <th>resample</th>
+      <td><p>A character vector of model variables to resample
+from the input dataset; This sampling is done with replacement.
+When <code>NULL</code> or <code>FALSE</code> no resampling is done.  When
+<code>TRUE</code> resampling is done on all covariates in the input
+dataset</p></td>
+    </tr>
+    <tr>
+      <th>resampleID</th>
+      <td><p>boolean representing if the resampling should be
+done on an individual basis <code>TRUE</code> (ie. a whole patient is
+selected) or each covariate is resampled independent of the
+subject identifier <code>FALSE</code>.  When <code>resampleID=TRUE</code>
+correlations of parameters are retained, where as when
+<code>resampleID=FALSE</code> ignores patient covariate correaltions.
+Hence the default is <code>resampleID=TRUE</code>.</p></td>
+    </tr>
+    <tr>
       <th>a</th>
       <td><p>when using <code>solve</code>, this is equivalent to the
 <code>object</code> argument.  If you specify <code>object</code> later in
@@ -604,23 +940,21 @@ named argument, this overwrites the output</p></td>
 
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang, Mason McComb.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

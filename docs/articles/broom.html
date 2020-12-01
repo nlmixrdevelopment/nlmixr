@@ -12,20 +12,20 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Using Broom with nlmixr">
-<meta property="og:description" content="">
+<meta property="og:description" content="nlmixr">
 <meta property="og:image" content="/logo.png">
-<meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0-0</span>
       </span>
     </div>
 
@@ -89,13 +89,13 @@
     </li>
     <li class="divider">
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+      <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+      <a href="../articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+      <a href="../articles/wbc.html">PKPD -- Myelosuppression model</a>
     </li>
   </ul>
 </li>
@@ -144,12 +144,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="broom_files/header-attrs-2.5/header-attrs.js"></script><script src="broom_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="broom_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="broom_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Using Broom with nlmixr</h1>
+      <h1 data-toc-skip>Using Broom with nlmixr</h1>
             
-            <h4 class="date">2020-03-07</h4>
+            <h4 class="date">2020-12-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/broom.Rmd"><code>vignettes/broom.Rmd</code></a></small>
       <div class="hidden name"><code>broom.Rmd</code></div>
@@ -159,7 +160,7 @@
     
     
 <div class="figure">
-<img src="logo.png" alt="nlmixr"><p class="caption">nlmixr</p>
+<img src="logo.png" alt=""><p class="caption">nlmixr</p>
 </div>
 <div id="the-broom-and-broom-mixed-packages" class="section level2">
 <h2 class="hasAnchor">
@@ -167,145 +168,85 @@
 <p><code>broom</code> and <code>broom.mixed</code> are packages that attempt to put standard model outputs into data frames. nlmixr supports the <code>tidy</code> and <code>glance</code> methods but does not support <code>augment</code> at this time.</p>
 <p>Using a model with a covariance term, the <a href="addingCovariances.html">Phenobarbital model</a>, we can explore the different types of output that is used in the tidy functions.</p>
 <p>To explore this, first we run the model:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(nlmixr)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr">nlmixr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/bbolker/broom.mixed">broom.mixed</a></span><span class="op">)</span>
 
-pheno &lt;-<span class="st"> </span><span class="cf">function</span>() {
-    <span class="co"># Pheno with covariance</span>
-  <span class="kw"><a href="../reference/ini.html">ini</a></span>({
-    tcl &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fl">0.008</span>) <span class="co"># typical value of clearance</span>
-    tv &lt;-<span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fl">0.6</span>)   <span class="co"># typical value of volume</span>
-    ## var(eta.cl)
-    eta.cl <span class="op">+</span><span class="st"> </span>eta.v <span class="op">~</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, 
-                       <span class="fl">0.01</span>, <span class="dv">1</span>) ## cov(eta.cl, eta.v), var(eta.v)
-                      <span class="co"># interindividual variability on clearance and volume</span>
-    add.err &lt;-<span class="st"> </span><span class="fl">0.1</span>    <span class="co"># residual variability</span>
-  })
-  <span class="kw"><a href="../reference/model.html">model</a></span>({
-    cl &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(tcl <span class="op">+</span><span class="st"> </span>eta.cl) <span class="co"># individual value of clearance</span>
-    v &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(tv <span class="op">+</span><span class="st"> </span>eta.v)    <span class="co"># individual value of volume</span>
-    ke &lt;-<span class="st"> </span>cl <span class="op">/</span><span class="st"> </span>v            <span class="co"># elimination rate constant</span>
-    d<span class="op">/</span><span class="kw"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span>(A1) =<span class="st"> </span><span class="op">-</span><span class="st"> </span>ke <span class="op">*</span><span class="st"> </span>A1    <span class="co"># model differential equation</span>
-    cp =<span class="st"> </span>A1 <span class="op">/</span><span class="st"> </span>v             <span class="co"># concentration in plasma</span>
-    cp <span class="op">~</span><span class="st"> </span><span class="kw">add</span>(add.err)       <span class="co"># define error model</span>
-  })
-}
+<span class="va">pheno</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
+  <span class="co"># Pheno with covariance</span>
+  <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
+    <span class="va">tcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.008</span><span class="op">)</span> <span class="co"># typical value of clearance</span>
+    <span class="va">tv</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.6</span><span class="op">)</span>   <span class="co"># typical value of volume</span>
+    <span class="co">## var(eta.cl)</span>
+    <span class="va">eta.cl</span> <span class="op">+</span> <span class="va">eta.v</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, 
+                       <span class="fl">0.01</span>, <span class="fl">1</span><span class="op">)</span> <span class="co">## cov(eta.cl, eta.v), var(eta.v)</span>
+    <span class="co"># interindividual variability on clearance and volume</span>
+    <span class="va">add.err</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>    <span class="co"># residual variability</span>
+  <span class="op">}</span><span class="op">)</span>
+  <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span>
+    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span> <span class="co"># individual value of clearance</span>
+    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>    <span class="co"># individual value of volume</span>
+    <span class="va">ke</span> <span class="op">&lt;-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span>            <span class="co"># elimination rate constant</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">A1</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span> <span class="va">ke</span> <span class="op">*</span> <span class="va">A1</span>    <span class="co"># model differential equation</span>
+    <span class="va">cp</span> <span class="op">=</span> <span class="va">A1</span> <span class="op">/</span> <span class="va">v</span>             <span class="co"># concentration in plasma</span>
+    <span class="va">cp</span> <span class="op">~</span> <span class="fu">add</span><span class="op">(</span><span class="va">add.err</span><span class="op">)</span>       <span class="co"># define error model</span>
+  <span class="op">}</span><span class="op">)</span>
+<span class="op">}</span>
 
-## We will run it two ways to allow comparisons
-fit.s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pheno, pheno_sd, <span class="st">"saem"</span>, <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">logLik=</span><span class="ot">TRUE</span>, <span class="dt">print=</span><span class="dv">0</span>),
-                <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
+<span class="co">## We will run it two ways to allow comparisons</span>
+<span class="va">fit.s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pheno</span>, <span class="va">pheno_sd</span>, <span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>logLik<span class="op">=</span><span class="cn">TRUE</span>, print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+                table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01</span>
-fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmixr.html">nlmixr</a></span>(pheno, pheno_sd, <span class="st">"focei"</span>,
-                <span class="dt">control=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">print=</span><span class="dv">0</span>), 
-                <span class="dt">table=</span><span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))
-<span class="co">#&gt; Calculating covariance matrix</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span>
+<span class="va">fit.f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pheno</span>, <span class="va">pheno_sd</span>, <span class="st">"focei"</span>,
+                control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
+                table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; calculating covariance matrix</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01</span></code></pre></div>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span></code></pre></div>
 </div>
 <div id="glancing-at-the-goodness-of-fit-metrics" class="section level1">
 <h1 class="hasAnchor">
 <a href="#glancing-at-the-goodness-of-fit-metrics" class="anchor"></a>Glancing at the goodness of fit metrics</h1>
 <p>Often in fitting data, you would want to <code>glance</code> at the fit to see how well it fits. In <code>broom</code>, <code>glance</code> will give a summary of the fit metrics of goodness of fit:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span>(fit.s)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">OBJF</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">AIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">BIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">logLik</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">conditionNumber</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">689</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">986</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1e+03</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-487</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">7.54</td>
-</tr>
-</table>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 5493. 5790. 5808. -2889.            6.32</span></code></pre></div>
 <p>Note in nlmixr it is possible to have more than one fit metric (based on different quadratures, FOCEi approximation etc). However, the <code>glance</code> only returns the fit metrics that are current.</p>
 <p>If you wish you can set the objective function to the focei objective function (which was already calculated with CWRES).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/setOfv.html">setOfv</a></span>(fit.s,<span class="st">"FOCEi"</span>)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/setOfv.html">setOfv</a></span><span class="op">(</span><span class="va">fit.s</span>,<span class="st">"FOCEi"</span><span class="op">)</span></code></pre></div>
 <p>Now the glance gives the <code>FOCEi</code> values.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span>(fit.s)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">OBJF</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">AIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">BIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">logLik</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">conditionNumber</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">689</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">986</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1e+03</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-487</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">7.54</td>
-</tr>
-</table>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 5493. 5790. 5808. -2889.            6.32</span></code></pre></div>
 <p>Of course you can always change the type of objective function that nlmixr uses:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/setOfv.html">setOfv</a></span>(fit.s,<span class="st">"gauss3_1.6"</span>) <span class="co"># Setting objective function to gauss3_1.6</span></code></pre></div>
-<p>By setting it back to the SAEM default objective function of <code>gauss3_1.6</code>, the <code><a href="https://rdrr.io/pkg/generics/man/glance.html">glance(fit.s)</a></code> has the same values again:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span>(fit.s)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">OBJF</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">AIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">BIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">logLik</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">conditionNumber</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">720</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1.02e+03</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1.03e+03</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-502</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">7.54</td>
-</tr>
-</table>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/setOfv.html">setOfv</a></span><span class="op">(</span><span class="va">fit.s</span>,<span class="st">"gauss3_1.6"</span><span class="op">)</span> <span class="co"># Setting objective function to gauss3_1.6</span></code></pre></div>
+<p>By setting it back to the SAEM default objective function of <code>gauss3_1.6</code>, the <code><a href="https://generics.r-lib.org/reference/glance.html">glance(fit.s)</a></code> has the same values again:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
+<span class="co">#&gt; 1  707. 1004. 1022.  -496.            6.32</span></code></pre></div>
 <p>For convenience, you can do this while you <code>glance</code> at the objects:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/glance.html">glance</a></span>(fit.s, <span class="dt">type=</span><span class="st">"FOCEi"</span>)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">OBJF</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">AIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">BIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">logLik</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">conditionNumber</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">689</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">986</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1e+03</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-487</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">7.54</td>
-</tr>
-</table>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html">glance</a></span><span class="op">(</span><span class="va">fit.s</span>, type<span class="op">=</span><span class="st">"FOCEi"</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
+<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 5493. 5790. 5808. -2889.            6.32</span></code></pre></div>
 </div>
 <div id="tidying-the-model-parameters" class="section level1">
 <h1 class="hasAnchor">
@@ -315,630 +256,113 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <a href="#tidying-of-overall-fit-parameters" class="anchor"></a>Tidying of overall fit parameters</h2>
 <p>You can also tidy the model estimates into a data frame with broom for processing. This can be useful when integrating into 3rd parting modeling packages. With a consistent parameter format, tasks for multiple types of models can be automated and applied.</p>
 <p>The default function for this is <code>tidy</code>, which when applied to the <code>fit</code> object provides the overall parameter information in a tidy dataset:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">std.error</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">statistic</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">p.value</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0752</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-66.4 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.346</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.0537</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">6.44</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">7.82e-10</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.498</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.393</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">cor__eta.v.eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.985</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Residual(add)</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.83 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 7</span>
+<span class="co">#&gt;   effect   group         term              estimate std.error statistic  p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl                 -4.99     0.0729    -68.5   1.00e+0</span>
+<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                   0.341    0.0550      6.21  2.52e-9</span>
+<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl           0.476   NA          NA    NA      </span>
+<span class="co">#&gt; 4 ran_pars ID            sd__eta.v            0.403   NA          NA    NA      </span>
+<span class="co">#&gt; 5 ran_pars ID            cor__eta.v.eta.cl    0.959   NA          NA    NA      </span>
+<span class="co">#&gt; 6 ran_pars Residual(add) add.err              2.79    NA          NA    NA</span></code></pre></div>
 <p>Note by default these are the parameters that are <em>actually</em> estimated in nlmixr, not the back-transformed values in the table from the printout. Of course, with mu-referenced models, you may want to exponentiate some of the terms. The broom package allows you to apply exponentiation on <em>all</em> the parameters, that is:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Transformation applied on every parameter
-<span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">TRUE</span>) </code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">std.error</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">statistic</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">p.value</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00677</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.000509</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">13.3</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.07e-27</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">1.41   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.0758  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">18.6</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">4.62e-41</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.498  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.393  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">cor__eta.v.eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.985  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Residual(add)</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.83   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## Transformation applied on every parameter</span>
+<span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, exponentiate<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> 
+<span class="co">#&gt; # A tibble: 6 x 7</span>
+<span class="co">#&gt;   effect   group         term             estimate std.error statistic   p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl               0.00681  0.000496      13.7  1.60e-28</span>
+<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                1.41     0.0773        18.2  5.41e-40</span>
+<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl        0.476   NA             NA   NA       </span>
+<span class="co">#&gt; 4 ran_pars ID            sd__eta.v         0.403   NA             NA   NA       </span>
+<span class="co">#&gt; 5 ran_pars ID            cor__eta.v.eta.…  0.959   NA             NA   NA       </span>
+<span class="co">#&gt; 6 ran_pars Residual(add) add.err           2.79    NA             NA   NA</span></code></pre></div>
 <p><strong>Note:</strong>, in accordance with the rest of the broom package, when the parameters with the exponentiated, the standard errors are transformed to an approximate standard error by the formula: <span class="math inline">\(\textrm{se}(\exp(x)) \approx \exp(\textrm{model estimate}_x)\times \textrm{se}_x\)</span>. This can be confusing because the confidence intervals (described later) are using the actual standard error and back-transforming to the exponentiated scale. This is the reason why the default for nlmixr’s <code>broom</code> interface is <code>exponentiate=FALSE</code>, that is:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">FALSE</span>) ## No transformation applied</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">std.error</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">statistic</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">p.value</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0752</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-66.4 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.346</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.0537</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">6.44</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">7.82e-10</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.498</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.393</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">cor__eta.v.eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.985</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Residual(add)</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.83 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, exponentiate<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## No transformation applied</span>
+<span class="co">#&gt; # A tibble: 6 x 7</span>
+<span class="co">#&gt;   effect   group         term              estimate std.error statistic  p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl                 -4.99     0.0729    -68.5   1.00e+0</span>
+<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                   0.341    0.0550      6.21  2.52e-9</span>
+<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl           0.476   NA          NA    NA      </span>
+<span class="co">#&gt; 4 ran_pars ID            sd__eta.v            0.403   NA          NA    NA      </span>
+<span class="co">#&gt; 5 ran_pars ID            cor__eta.v.eta.cl    0.959   NA          NA    NA      </span>
+<span class="co">#&gt; 6 ran_pars Residual(add) add.err              2.79    NA          NA    NA</span></code></pre></div>
 <p>If you want, you can also use the parsed back-transformation that is used in nlmixr tables (ie <code>fit$parFixedDf</code>). <strong>Please note that this uses the approximate back-transformation for standard errors on the log-scaled back-transformed values</strong>.</p>
 <p>This is done by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Transformation applied to log-scaled population parameters
-<span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">NA</span>) </code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">std.error</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">statistic</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">p.value</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00677</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.000509</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">13.3</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.07e-27</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">1.41   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.0758  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">18.6</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">4.62e-41</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.498  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.393  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">cor__eta.v.eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.985  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Residual(add)</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.83   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## Transformation applied to log-scaled population parameters</span>
+<span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> 
+<span class="co">#&gt; # A tibble: 6 x 7</span>
+<span class="co">#&gt;   effect   group         term             estimate std.error statistic   p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl               0.00681  0.000496      13.7  1.60e-28</span>
+<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                1.41     0.0773        18.2  5.41e-40</span>
+<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl        0.476   NA             NA   NA       </span>
+<span class="co">#&gt; 4 ran_pars ID            sd__eta.v         0.403   NA             NA   NA       </span>
+<span class="co">#&gt; 5 ran_pars ID            cor__eta.v.eta.…  0.959   NA             NA   NA       </span>
+<span class="co">#&gt; 6 ran_pars Residual(add) add.err           2.79    NA             NA   NA</span></code></pre></div>
 <p>Also note, at the time of this writing the default separator between variables is <code>.</code>, which doesn’t work well with this model giving <code>cor__eta.v.eta.cl</code>. You can easily change this by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">broom.mixed.sep2=</span><span class="st">".."</span>)
-<span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">std.error</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">statistic</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">p.value</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0752</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-66.4 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.346</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.0537</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">6.44</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">7.82e-10</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.498</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.393</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">cor__eta.v..eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.985</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Residual(add)</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.83 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>broom.mixed.sep2<span class="op">=</span><span class="st">".."</span><span class="op">)</span>
+<span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 7</span>
+<span class="co">#&gt;   effect   group         term              estimate std.error statistic  p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl                 -4.99     0.0729    -68.5   1.00e+0</span>
+<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                   0.341    0.0550      6.21  2.52e-9</span>
+<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl           0.476   NA          NA    NA      </span>
+<span class="co">#&gt; 4 ran_pars ID            sd__eta.v            0.403   NA          NA    NA      </span>
+<span class="co">#&gt; 5 ran_pars ID            cor__eta.v..eta.…    0.959   NA          NA    NA      </span>
+<span class="co">#&gt; 6 ran_pars Residual(add) add.err              2.79    NA          NA    NA</span></code></pre></div>
 <p>This gives an easier way to parse value: <code>cor__eta.v..eta.cl</code></p>
 </div>
 <div id="adding-a-confidence-interval-to-the-parameters" class="section level2">
 <h2 class="hasAnchor">
 <a href="#adding-a-confidence-interval-to-the-parameters" class="anchor"></a>Adding a confidence interval to the parameters</h2>
 <p>The default R method <code>confint</code> works with nlmixr fit objects:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/stats/confint.html">confint</a></span>(fit.s)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">model.est</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">2.5 %</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">97.5 %</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00677</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5.14</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-4.85 </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">0.346</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">1.41   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.24</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.451</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.83 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.83   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">    </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/confint.html">confint</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
+<span class="co">#&gt;          model.est    estimate      2.5 %     97.5 %</span>
+<span class="co">#&gt; tcl     -4.9889415 0.006812872 -5.1317729 -4.8461102</span>
+<span class="co">#&gt; tv       0.3412029 1.406638665  0.2334961  0.4489098</span>
+<span class="co">#&gt; add.err  2.7915933 2.791593287         NA         NA</span></code></pre></div>
 <p>This transforms the variables as described above. You can still use the <code>exponentiate</code> parameter to control the display of the confidence interval:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/stats/confint.html">confint</a></span>(fit.s, <span class="dt">exponentiate=</span><span class="ot">FALSE</span>)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">model.est</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">2.5 %</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">97.5 %</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00677</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5.14</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-4.85 </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">0.346</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">1.41   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.24</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.451</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.83 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.83   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">    </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/confint.html">confint</a></span><span class="op">(</span><span class="va">fit.s</span>, exponentiate<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
+<span class="co">#&gt;          model.est    estimate      2.5 %     97.5 %</span>
+<span class="co">#&gt; tcl     -4.9889415 0.006812872 -5.1317729 -4.8461102</span>
+<span class="co">#&gt; tv       0.3412029 1.406638665  0.2334961  0.4489098</span>
+<span class="co">#&gt; add.err  2.7915933 2.791593287         NA         NA</span></code></pre></div>
 <p>However, broom has also implemented it own way to make these data a tidy dataset. The easiest way to get these values in a nlmixr dataset is to use:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">conf.level=</span><span class="fl">0.9</span>)</code></pre></div>
-<p></p>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">std.error</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">statistic</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">p.value</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">conf.low</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">conf.high</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0752</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-66.4 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5.12 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-4.87 </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.346</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.0537</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">6.44</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">7.82e-10</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.257</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.434</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.498</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.393</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">cor__eta.v..eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.985</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Residual(add)</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.83 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">     </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">    </td>
-</tr>
-</table>
- The confidence interval is on the scale specified by <code>exponentiate</code>, by default the estimated scale.
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, conf.level<span class="op">=</span><span class="fl">0.9</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 9</span>
+<span class="co">#&gt;   effect  group  term   estimate std.error statistic  p.value conf.low conf.high</span>
+<span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fixed   &lt;NA&gt;   tcl      -4.99     0.0729    -68.5   1.00e+0   -5.11     -4.87 </span>
+<span class="co">#&gt; 2 fixed   &lt;NA&gt;   tv        0.341    0.0550      6.21  2.52e-9    0.251     0.432</span>
+<span class="co">#&gt; 3 ran_pa… ID     sd__e…    0.476   NA          NA    NA         NA        NA    </span>
+<span class="co">#&gt; 4 ran_pa… ID     sd__e…    0.403   NA          NA    NA         NA        NA    </span>
+<span class="co">#&gt; 5 ran_pa… ID     cor__…    0.959   NA          NA    NA         NA        NA    </span>
+<span class="co">#&gt; 6 ran_pa… Resid… add.e…    2.79    NA          NA    NA         NA        NA</span></code></pre></div>
+<p>The confidence interval is on the scale specified by <code>exponentiate</code>, by default the estimated scale.</p>
 <p>If you want to have the confidence on the adaptive back-transformed scale, you would simply use the following:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">conf.level=</span><span class="fl">0.9</span>, <span class="dt">exponentiate=</span><span class="ot">NA</span>)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">std.error</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">statistic</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">p.value</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">conf.low</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">conf.high</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00677</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.000509</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">13.3</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">2.07e-27</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00598</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00766</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">1.41   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.0758  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">18.6</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">4.62e-41</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">1.29   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">1.54   </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.498  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">      </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">      </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">0.393  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt;">      </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">      </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">cor__eta.v..eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.985  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">      </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">      </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Residual(add)</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.83   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">  </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">       </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">      </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">      </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, conf.level<span class="op">=</span><span class="fl">0.9</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 9</span>
+<span class="co">#&gt;   effect  group term   estimate std.error statistic   p.value conf.low conf.high</span>
+<span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fixed   &lt;NA&gt;  tcl     0.00681  0.000496      13.7  1.60e-28  0.00604   0.00768</span>
+<span class="co">#&gt; 2 fixed   &lt;NA&gt;  tv      1.41     0.0773        18.2  5.41e-40  1.29      1.54   </span>
+<span class="co">#&gt; 3 ran_pa… ID    sd__e…  0.476   NA             NA   NA        NA        NA      </span>
+<span class="co">#&gt; 4 ran_pa… ID    sd__e…  0.403   NA             NA   NA        NA        NA      </span>
+<span class="co">#&gt; 5 ran_pa… ID    cor__…  0.959   NA             NA   NA        NA        NA      </span>
+<span class="co">#&gt; 6 ran_pa… Resi… add.e…  2.79    NA             NA   NA        NA        NA</span></code></pre></div>
 </div>
 </div>
 <div id="extracting-other-model-information-with-tidy" class="section level1">
@@ -950,143 +374,43 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <h2 class="hasAnchor">
 <a href="#extracting-only-fixed-effect-parameters" class="anchor"></a>Extracting only fixed effect parameters</h2>
 <p>The fixed effect parameters can be extracted by <code>effects="fixed"</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"fixed"</span>)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">std.error</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">statistic</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">p.value</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.0752</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-66.4 </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1       </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">fixed</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.346</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.0537</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">6.44</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">7.82e-10</td>
-</tr>
-</table>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"fixed"</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 2 x 6</span>
+<span class="co">#&gt;   effect term  estimate std.error statistic       p.value</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 fixed  tcl     -4.99     0.0729    -68.5  1            </span>
+<span class="co">#&gt; 2 fixed  tv       0.341    0.0550      6.21 0.00000000252</span></code></pre></div>
 </div>
 <div id="extracting-only-random-parameters" class="section level2">
 <h2 class="hasAnchor">
 <a href="#extracting-only-random-parameters" class="anchor"></a>Extracting only random parameters</h2>
 <p>The random standard deviations can be extracted by <code>effects="ran_pars"</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"ran_pars"</span>)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.498</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.393</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">cor__eta.v..eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.985</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_pars</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Residual(add)</td>
-<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">2.83 </td>
-</tr>
-</table>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_pars"</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 4 x 4</span>
+<span class="co">#&gt;   effect   group         term               estimate</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;                 &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_pars ID            sd__eta.cl            0.476</span>
+<span class="co">#&gt; 2 ran_pars ID            sd__eta.v             0.403</span>
+<span class="co">#&gt; 3 ran_pars ID            cor__eta.v..eta.cl    0.959</span>
+<span class="co">#&gt; 4 ran_pars Residual(add) add.err               2.79</span></code></pre></div>
 </div>
 <div id="extracting-random-values-also-called-etas" class="section level2">
 <h2 class="hasAnchor">
 <a href="#extracting-random-values-also-called-etas" class="anchor"></a>Extracting random values (also called ETAs)</h2>
 <p>The random values, or in NONMEM the ETAs, can be extracted by <code>effects="ran_vals"</code> or <code>effects="random"</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"ran_vals"</span>))</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">level</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_vals</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-0.077</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_vals</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">-0.222</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_vals</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">3</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.26 </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_vals</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">-0.543</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_vals</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">5</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.322</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_vals</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">6</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">-0.128</td>
-</tr>
-</table>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_vals"</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt;   effect   group level term   estimate</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;fct&gt; &lt;fct&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_vals ID    1     eta.cl  -0.0991</span>
+<span class="co">#&gt; 2 ran_vals ID    2     eta.cl  -0.229 </span>
+<span class="co">#&gt; 3 ran_vals ID    3     eta.cl   0.239 </span>
+<span class="co">#&gt; 4 ran_vals ID    4     eta.cl  -0.510 </span>
+<span class="co">#&gt; 5 ran_vals ID    5     eta.cl   0.318 </span>
+<span class="co">#&gt; 6 ran_vals ID    6     eta.cl  -0.150</span></code></pre></div>
 <p>This duplicate method of running <code>effects</code> is because the <code>broom</code> package supports <code>effects="random"</code> while the <code>broom.mixed</code> package supports <code>effects="ran_vals"</code>.</p>
 </div>
 <div id="extracting-random-coefficients" class="section level2">
@@ -1094,179 +418,39 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <a href="#extracting-random-coefficients" class="anchor"></a>Extracting random coefficients</h2>
 <p>Random coefficients are the population fixed effect parameter + the random effect parameter, possibly transformed to the correct scale.</p>
 <p>In this case we can extract this information from a nlmixr fit object by:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"ran_coef"</span>))</code></pre></div>
-<p></p>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">level</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-5.07</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">-5.22</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">3</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-4.74</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">-5.54</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">5</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">-4.67</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">6</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">-5.12</td>
-</tr>
-</table>
- This can also be changed by the <code>exponentiate</code> argument:
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"ran_coef"</span>, <span class="dt">exponentiate=</span><span class="ot">NA</span>))</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">level</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00627</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00542</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">3</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00878</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00393</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">5</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00934</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">6</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00596</td>
-</tr>
-</table>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(fit.s, <span class="dt">effects=</span><span class="st">"ran_coef"</span>, <span class="dt">exponentiate=</span><span class="ot">TRUE</span>))</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<col>
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">effect</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">group</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">level</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">term</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt; font-weight: bold;">estimate</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">1</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00627</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00542</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">3</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00878</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">4</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00393</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">5</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242);">0.00934</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt; padding: 4pt 4pt 4pt 4pt;">ran_coef</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">ID</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">6</td>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">0.00596</td>
-</tr>
-</table>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt;   effect   group level term  estimate</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;fct&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_coef ID    1     tcl      -5.09</span>
+<span class="co">#&gt; 2 ran_coef ID    2     tcl      -5.22</span>
+<span class="co">#&gt; 3 ran_coef ID    3     tcl      -4.75</span>
+<span class="co">#&gt; 4 ran_coef ID    4     tcl      -5.50</span>
+<span class="co">#&gt; 5 ran_coef ID    5     tcl      -4.67</span>
+<span class="co">#&gt; 6 ran_coef ID    6     tcl      -5.14</span></code></pre></div>
+<p>This can also be changed by the <code>exponentiate</code> argument:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt;   effect   group level term  estimate</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;fct&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_coef ID    1     tcl    0.00617</span>
+<span class="co">#&gt; 2 ran_coef ID    2     tcl    0.00542</span>
+<span class="co">#&gt; 3 ran_coef ID    3     tcl    0.00865</span>
+<span class="co">#&gt; 4 ran_coef ID    4     tcl    0.00409</span>
+<span class="co">#&gt; 5 ran_coef ID    5     tcl    0.00936</span>
+<span class="co">#&gt; 6 ran_coef ID    6     tcl    0.00586</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span>, exponentiate<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt;   effect   group level term  estimate</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;fct&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_coef ID    1     tcl    0.00617</span>
+<span class="co">#&gt; 2 ran_coef ID    2     tcl    0.00542</span>
+<span class="co">#&gt; 3 ran_coef ID    3     tcl    0.00865</span>
+<span class="co">#&gt; 4 ran_coef ID    4     tcl    0.00409</span>
+<span class="co">#&gt; 5 ran_coef ID    5     tcl    0.00936</span>
+<span class="co">#&gt; 6 ran_coef ID    6     tcl    0.00586</span></code></pre></div>
 </div>
 </div>
 <div id="example-of-using-a-tidy-model-estimates-for-other-packages" class="section level1">
@@ -1276,17 +460,19 @@ fit.f &lt;-<span class="st"> </span><span class="kw"><a href="../reference/nlmix
 <h2 class="hasAnchor">
 <a href="#dotwhisker" class="anchor"></a>Dotwhisker</h2>
 <p>As explained above, this standard format makes it easier for tidyverse packages to interact with model information. An example of this is piping the tidy information to dplyr to filter the effects and then to the <code>dotwhisker</code> package to plot the model parameter confidence intervals.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">broom.mixed.sep2=</span><span class="st">": "</span>, <span class="dt">broom.mixed.sep2=</span><span class="st">", "</span>)
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ggplot2)
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dotwhisker)
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)
-fit.s <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(<span class="dt">exponentiate=</span><span class="ot">NA</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(effect<span class="op">==</span><span class="st">"fixed"</span>) <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html">dwplot</a></span>()</code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>broom.mixed.sep2<span class="op">=</span><span class="st">": "</span>, broom.mixed.sep2<span class="op">=</span><span class="st">", "</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">dotwhisker</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="va">fit.s</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span>exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">effect</span><span class="op">==</span><span class="st">"fixed"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html">dwplot</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="broom_files/figure-html/unnamed-chunk-23-1.png" width="100%"></p>
 <p>You may also compare models easily by using the <code>dotwhisker</code> package</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html">dwplot</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"SAEM"</span>=fit.s, <span class="st">"FOCEi"</span>=fit.f), <span class="dt">exponentiate=</span><span class="ot">NA</span>)</code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html">dwplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"SAEM"</span><span class="op">=</span><span class="va">fit.s</span>, <span class="st">"FOCEi"</span><span class="op">=</span><span class="va">fit.f</span><span class="op">)</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span></code></pre></div>
 <p><img src="broom_files/figure-html/unnamed-chunk-24-1.png" width="100%"></p>
 </div>
 <div id="huxtable" class="section level2">
@@ -1294,274 +480,201 @@ fit.s <span class="op">%&gt;%</span>
 <a href="#huxtable" class="anchor"></a>Huxtable</h2>
 <p>This allows easy creation of report ready tables in many formats including word.</p>
 <p>Huxtable relies on the <code>broom</code> implementation</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(huxtable)
-tbl &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/huxtable/man/huxreg.html">huxreg</a></span>(<span class="st">'Phenobarbitol'</span>=fit.s)
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://hughjonesd.github.io/huxtable/">huxtable</a></span><span class="op">)</span>
+<span class="va">tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/huxtable/man/huxreg.html">huxreg</a></span><span class="op">(</span><span class="st">'Phenobarbitol'</span><span class="op">=</span><span class="va">fit.s</span><span class="op">)</span>
 
-tbl</code></pre></div>
+<span class="va">tbl</span></code></pre></div>
 <table class="table huxtable">
 <col>
 <col>
 <tr>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Phenobarbitol</td>
+<th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Phenobarbitol</th>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-4.995    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">tcl</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-4.989    </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.075)   </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.073)   </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.346 ***</td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">tv</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.341 ***</td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.054)   </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.055)   </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">sd__eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.498    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">sd__eta.cl</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.476    </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(NA)        </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)        </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">sd__eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.393    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">sd__eta.v</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.403    </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(NA)        </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)        </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">cor__eta.v, eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.985    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">cor__eta.v, eta.cl</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.959    </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(NA)        </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)        </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.831    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">add.err</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.792    </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">(NA)        </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)        </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">N</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">155        </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">N</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">155        </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">logLik</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-486.752    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">logLik</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-2888.999    </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">AIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">985.504    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">AIC</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5789.998    </td>
 </tr>
-<tr>
-<td colspan="2" style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</td>
-</tr>
-</table>
-<p>You may notice warnings and <code>(NA)</code> in the table. <code>nlmixr</code> allows you to convert the tables to <code>huxtables</code> without these distracting elements by using <code>huxtable</code>’s generic <code>as_hux</code> or <code>as_huxtable</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/huxtable/man/as_huxtable.html">as_hux</a></span>(<span class="st">'Phenobarbitol'</span>=fit.s)</code></pre></div>
-<table class="table huxtable">
-<col>
-<col>
-<tr>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">Phenobarbitol</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-4.995    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.075)   </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.346 ***</td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.054)   </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">sd: eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.498    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">sd: eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.393    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">cor: eta.v, eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.985    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.831    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">N</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">155        </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">Objective Function</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">688.633    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">logLik</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-486.752    </td>
-</tr>
-<tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">AIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">985.504    </td>
-</tr>
-<tr>
-<td colspan="2" style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</td>
-</tr>
+<tr><th colspan="2" style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</th></tr>
 </table>
 <p>Like <code>dwplot</code>, you can also use <code>huxtable</code> to compare runs:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/pkg/huxtable/man/as_huxtable.html">as_hux</a></span>(<span class="st">'SAEM'</span>=fit.s, <span class="st">'FOCEi'</span>=fit.f)</code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/huxtable/man/huxreg.html">huxreg</a></span><span class="op">(</span><span class="st">'SAEM'</span><span class="op">=</span><span class="va">fit.s</span>, <span class="st">'FOCEi'</span><span class="op">=</span><span class="va">fit.f</span><span class="op">)</span></code></pre></div>
 <table class="table huxtable">
 <col>
 <col>
 <col>
 <tr>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">SAEM</td>
-<td style="vertical-align: top; text-align: center; white-space: nowrap; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt; padding: 4pt 4pt 4pt 4pt;">FOCEi</td>
+<th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">SAEM</th>
+<th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">FOCEi</th>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tcl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-4.995    </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-5.005    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">tcl</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-4.989    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-5.168 </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.075)   </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.079)   </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.073)   </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.000)</td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">tv</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.346 ***</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.331 ***</td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">tv</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.341 ***</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-0.503 </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;"></td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.054)   </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">(0.058)   </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.055)   </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.000)</td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">sd: eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.498    </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.501    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">sd__eta.cl</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.476    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.249 </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">sd: eta.v</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.393    </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.391    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)        </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)     </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">cor: eta.v, eta.cl</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.985    </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">0.980    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">sd__eta.v</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.403    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.236 </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">add.err</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.831    </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">2.859    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)        </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)     </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">N</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">155        </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">155        </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">cor__eta.v, eta.cl</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.959    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.109 </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">Objective Function</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">688.633    </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">688.740    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)        </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)     </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">logLik</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-486.752    </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; padding: 4pt 4pt 4pt 4pt;">-486.805    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">add.err</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.792    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.137 </td>
 </tr>
 <tr>
-<td style="vertical-align: top; text-align: left; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">AIC</td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">985.504    </td>
-<td style="vertical-align: top; text-align: right; white-space: nowrap; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt; padding: 4pt 4pt 4pt 4pt;">985.611    </td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)        </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(NA)     </td>
 </tr>
 <tr>
-<td colspan="3" style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 4pt;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</td>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">N</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">155        </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">155     </td>
 </tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">logLik</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-2888.999    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-116496.963 </td>
+</tr>
+<tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">AIC</th>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">5789.998    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">233005.926 </td>
+</tr>
+<tr><th colspan="3" style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</th></tr>
 </table>
 <p>A word-based table can also be easily created with the tool:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(officer)
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(flextable)
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ardata-fr.github.io/officeverse/">officer</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://davidgohel.github.io/flextable/">flextable</a></span><span class="op">)</span>
 
-ft  &lt;-<span class="st"> </span>huxtable<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/huxtable/man/as_flextable.html">as_flextable</a></span>(tbl);
+<span class="va">ft</span>  <span class="op">&lt;-</span> <span class="fu">huxtable</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/huxtable/man/as_flextable.html">as_flextable</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span>;
     
-<span class="kw"><a href="https://rdrr.io/pkg/officer/man/read_docx.html">read_docx</a></span>() <span class="op">%&gt;%</span>
-<span class="st">    </span>flextable<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/flextable/man/body_add_flextable.html">body_add_flextable</a></span>(ft)  <span class="op">%&gt;%</span>
-<span class="st">    </span><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="dt">target=</span><span class="st">"pheno.docx"</span>)</code></pre></div>
+<span class="fu"><a href="https://davidgohel.github.io/officer/reference/read_docx.html">read_docx</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/body_add_flextable.html">body_add_flextable</a></span><span class="op">(</span><span class="va">ft</span><span class="op">)</span>  <span class="op">%&gt;%</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span>target<span class="op">=</span><span class="st">"pheno.docx"</span><span class="op">)</span></code></pre></div>
 <p>Which produces the following <a href="pheno.docx">word document</a>.</p>
 <p>Happy tidying!</p>
 </div>
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <div id="tocnav">
-      <h2 class="hasAnchor">
-<a href="#tocnav" class="anchor"></a>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-<li><a href="#the-broom-and-broom-mixed-packages">The broom and broom.mixed packages</a></li>
-      <li><a href="#glancing-at-the-goodness-of-fit-metrics">Glancing at the goodness of fit metrics</a></li>
-      <li>
-<a href="#tidying-the-model-parameters">Tidying the model parameters</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#tidying-of-overall-fit-parameters">Tidying of overall fit parameters</a></li>
-      <li><a href="#adding-a-confidence-interval-to-the-parameters">Adding a confidence interval to the parameters</a></li>
-      </ul>
-</li>
-      <li>
-<a href="#extracting-other-model-information-with-tidy">Extracting other model information with <code>tidy</code></a><ul class="nav nav-pills nav-stacked">
-<li><a href="#extracting-only-fixed-effect-parameters">Extracting only fixed effect parameters</a></li>
-      <li><a href="#extracting-only-random-parameters">Extracting only random parameters</a></li>
-      <li><a href="#extracting-random-values-also-called-etas">Extracting random values (also called ETAs)</a></li>
-      <li><a href="#extracting-random-coefficients">Extracting random coefficients</a></li>
-      </ul>
-</li>
-      <li>
-<a href="#example-of-using-a-tidy-model-estimates-for-other-packages">Example of using a tidy model estimates for other packages</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#dotwhisker">Dotwhisker</a></li>
-      <li><a href="#huxtable">Huxtable</a></li>
-      </ul>
-</li>
-      </ul>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
 </div>
-      </div>
 
 </div>
 
 
 
       <footer><div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang, Mason McComb.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -44,7 +48,6 @@
 
 <meta property="og:title" content="Function reference" />
 <meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -62,7 +65,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-index">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -76,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0-0</span>
       </span>
     </div>
 
@@ -127,13 +130,13 @@
     </li>
     <li class="divider"></li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+      <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+      <a href="../articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+      <a href="../articles/wbc.html">PKPD -- Myelosuppression model</a>
     </li>
   </ul>
 </li>
@@ -203,6 +206,11 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -217,6 +225,11 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -243,6 +256,11 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -252,7 +270,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="traceplot.html">traceplot()</a></code> </p>
+          <p><code><a href="traceplot.html">bootplot(<i>&lt;nlmixrFitCore&gt;</i>)</a></code> <code><a href="traceplot.html">traceplot()</a></code> </p>
         </td>
         <td><p>Produce trace-plot for fit if applicable</p></td>
       </tr>
@@ -263,12 +281,17 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
           <p><code><a href="Bolus_1CPTMM.html">Bolus_1CPTMM</a></code> </p>
         </td>
-        <td><p>1 Compartment Model w/ Michelis Menton Elimination</p></td>
+        <td><p>1 Compartment Model w/ Michaelis-Menten Elimination</p></td>
       </tr><tr>
         
         <td>
@@ -280,7 +303,7 @@
         <td>
           <p><code><a href="Bolus_2CPTMM.html">Bolus_2CPTMM</a></code> </p>
         </td>
-        <td><p>2 Compartment Model with Michelis Menton Clearance</p></td>
+        <td><p>2 Compartment Model with Michaelis-Menten Clearance</p></td>
       </tr><tr>
         
         <td>
@@ -325,6 +348,11 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -363,6 +391,11 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -413,6 +446,11 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -427,6 +465,11 @@
           <p class="section-desc"></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
         
         <td>
@@ -492,7 +535,7 @@
         <td>
           <p><code><a href="gauss.quad.html">gauss.quad()</a></code> </p>
         </td>
-        <td><p>Sets nodes and weigts of Gauss-Hermite quadrature</p></td>
+        <td><p>Sets nodes and weights of Gauss-Hermite quadrature</p></td>
       </tr><tr>
         
         <td>
@@ -529,12 +572,6 @@
           <p><code><a href="lin_cmt.html">lin_cmt()</a></code> </p>
         </td>
         <td><p>concentrations from a linear compartment model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="lincmt.html">lincmt()</a></code> </p>
-        </td>
-        <td><p>Parameters for a linear compartment model for SAEM</p></td>
       </tr><tr>
         
         <td>
@@ -720,7 +757,7 @@
         <td>
           <p><code><a href="nlmixrVersion.html">nlmixrVersion()</a></code> </p>
         </td>
-        <td><p>Dispaly nlmixr's version</p></td>
+        <td><p>Display nlmixr's version</p></td>
       </tr><tr>
         
         <td>
@@ -732,7 +769,7 @@
         <td>
           <p><code><a href="nmsimplex.html">nmsimplex()</a></code> </p>
         </td>
-        <td><p>Nelder-Mead of simplex search</p></td>
+        <td><p>Nelder-Mead simplex search</p></td>
       </tr><tr>
         
         <td>
@@ -742,7 +779,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="plot.dyn.ID.html">plot(<i>&lt;dyn.ID&gt;</i>)</a></code> </p>
+          <p><code><a href="gof.html">gof()</a></code> <code><a href="gof.html">plot(<i>&lt;dyn.ID&gt;</i>)</a></code> </p>
         </td>
         <td><p>Plot of a non-population dynamic model fit</p></td>
       </tr><tr>
@@ -778,9 +815,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="print.dyn.mcmc.html">print(<i>&lt;dyn.mcmc&gt;</i>)</a></code> </p>
+          <p><code><a href="print.dyn.mcmc.html">summary(<i>&lt;dyn.mcmc&gt;</i>)</a></code> <code><a href="print.dyn.mcmc.html">print(<i>&lt;dyn.mcmc&gt;</i>)</a></code> </p>
         </td>
-        <td><p>Summary of a non-population dynamic model fit using mcmc</p></td>
+        <td><p>Print summary of a non-population dynamic model fit using mcmc</p></td>
       </tr><tr>
         
         <td>
@@ -808,15 +845,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="saem.cleanup.html">saem(<i>&lt;cleanup&gt;</i>)</a></code> </p>
+          <p><code><a href="setOfv.html">setOfv()</a></code> <code><a href="setOfv.html">getOfvType()</a></code> </p>
         </td>
-        <td><p>Cleanup saem_fit environment by removing dll after the object is no logner used by R.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="setOfv.html">setOfv()</a></code> </p>
-        </td>
-        <td><p>Set Objective function type for a nlmixr object</p></td>
+        <td><p>Set/get Objective function type for a nlmixr object</p></td>
       </tr><tr>
         
         <td>
@@ -832,12 +863,6 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="summary.dyn.mcmc.html">summary(<i>&lt;dyn.mcmc&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Summary of a non-population dynamic model fit using mcmc</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="summary.saemFit.html">summary(<i>&lt;saemFit&gt;</i>)</a></code> </p>
         </td>
         <td><p>Print an SAEM model fit summary</p></td>
@@ -846,13 +871,13 @@
         <td>
           <p><code><a href="theo_md.html">theo_md</a></code> </p>
         </td>
-        <td><p>Multiple dose Theophilline PK data</p></td>
+        <td><p>Multiple dose theophylline PK data</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="theo_sd.html">theo_sd</a></code> </p>
         </td>
-        <td><p>Multiple dose Theophilline PK data</p></td>
+        <td><p>Multiple dose theophylline PK data</p></td>
       </tr><tr>
         
         <td>
@@ -882,29 +907,21 @@
     </table>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-interfacing-nlmixr-models">Interfacing nlmixr models</a></li>
-      <li><a href="#section-adding-residuals-covariance-to-fit-object">Adding residuals &amp; covariance to fit object</a></li>
-      <li><a href="#section-model-diagnostics">Model diagnostics</a></li>
-      <li><a href="#section-datasets">Datasets</a></li>
-      <li><a href="#section-options-for-fitting-and-output">Options for fitting and output</a></li>
-      <li><a href="#section-low-level-estimation-routines">Low level estimation routines</a></li>
-      <li><a href="#section-unit-tests-and-validation-functions">Unit tests and validation functions</a></li>
-      <li><a href="#section-internal-functions">Internal functions</a></li>
-    </ul>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang, Mason McComb.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

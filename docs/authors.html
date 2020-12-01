@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="pkgdown.css" rel="stylesheet">
@@ -44,7 +48,6 @@
 
 <meta property="og:title" content="Citation and Authors" />
 <meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -62,7 +65,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-citation-authors">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -76,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0-0</span>
       </span>
     </div>
 
@@ -127,13 +130,13 @@
     </li>
     <li class="divider"></li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+      <a href="articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+      <a href="articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+      <a href="articles/wbc.html">PKPD -- Myelosuppression model</a>
     </li>
   </ul>
 </li>
@@ -189,22 +192,15 @@
       <small class="dont-index">Source: <a href='https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/CITATION'><code>inst/CITATION</code></a></small>
     </div>
 
-    <p>Fidler M, Xiong Y, Schoemaker R, Wilkins J, Trame M, Hooijmaijers R, Post T, Wang W (2020).
-<em>nlmixr: Nonlinear Mixed Effects Models in Population Pharmacokinetics and Pharmacodynamics</em>.
-R package version 1.1.1-6, <a href="https://CRAN.R-project.org/package=nlmixr">https://CRAN.R-project.org/package=nlmixr</a>. 
-</p>
+    <p></p>
     <pre>@Manual{,
   title = {{nlmixr}: Nonlinear Mixed Effects Models in Population Pharmacokinetics and Pharmacodynamics},
   author = {Matthew Fidler and Yuan Xiong and Rik Schoemaker and Justin Wilkins and Mirjam Trame and Richard Hooijmaijers and Teun Post and Wenping Wang},
   year = {2020},
-  note = {R package version 1.1.1-6},
+  note = {R package version 2.0.0-0},
   url = {https://CRAN.R-project.org/package=nlmixr},
 }</pre>
-    <p>Fidler M, Wilkins J, Hooijmaijers R, Post T, Schoemaker R, Trame M, Xiong Y, Wang W (2019).
-&ldquo;Nonlinear Mixed-Effects Model Development and Simulation Using nlmixr and Related R Open-Sourc Packages.&rdquo;
-<em>CPT: Pharmacometrics \&amp; Systems Pharmacology</em>, <b>8</b>(9), 621&ndash;633.
-<a href="https://doi.org/10.1002/psp4.12445">https://doi.org/10.1002/psp4.12445</a>. 
-</p>
+    <p></p>
     <pre>@Article{,
   title = {Nonlinear Mixed-Effects Model Development and Simulation Using nlmixr and Related R Open-Sourc Packages},
   author = {Matthew Fidler and Justin Wilkins and Richard Hooijmaijers and Teun Post and Rik Schoemaker and Mirjam Trame and Yuan Xiong and Wenping Wang},
@@ -226,7 +222,7 @@ R package version 1.1.1-6, <a href="https://CRAN.R-project.org/package=nlmixr">h
 
     <ul class="list-unstyled">
       <li>
-        <p><strong>Matthew Fidler</strong>. Author. <a href='https://orcid.org/0000-0001-8538-6691' target='orcid.widget'><img src='https://members.orcid.org/sites/default/files/vector_iD_icon.svg' class='orcid' alt='ORCID'></a>
+        <p><strong>Matthew Fidler</strong>. Author. <a href='https://orcid.org/0000-0001-8538-6691' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
@@ -234,11 +230,11 @@ R package version 1.1.1-6, <a href="https://CRAN.R-project.org/package=nlmixr">h
         </p>
       </li>
       <li>
-        <p><strong>Rik Schoemaker</strong>. Author. <a href='https://orcid.org/0000-0002-7538-3005' target='orcid.widget'><img src='https://members.orcid.org/sites/default/files/vector_iD_icon.svg' class='orcid' alt='ORCID'></a>
+        <p><strong>Rik Schoemaker</strong>. Author. <a href='https://orcid.org/0000-0002-7538-3005' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
-        <p><strong>Justin Wilkins</strong>. Author. <a href='https://orcid.org/0000-0002-7099-9396' target='orcid.widget'><img src='https://members.orcid.org/sites/default/files/vector_iD_icon.svg' class='orcid' alt='ORCID'></a>
+        <p><strong>Justin Wilkins</strong>. Author. <a href='https://orcid.org/0000-0002-7099-9396' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
@@ -250,11 +246,15 @@ R package version 1.1.1-6, <a href="https://CRAN.R-project.org/package=nlmixr">h
         </p>
       </li>
       <li>
+        <p><strong>Wenping Wang</strong>. Author, maintainer. 
+        </p>
+      </li>
+      <li>
         <p><strong>Robert Leary</strong>. Contributor. 
         </p>
       </li>
       <li>
-        <p><strong>Wenping Wang</strong>. Author, maintainer. 
+        <p><strong>Mirjam Trame</strong>. Contributor. 
         </p>
       </li>
       <li>
@@ -263,6 +263,10 @@ R package version 1.1.1-6, <a href="https://CRAN.R-project.org/package=nlmixr">h
       </li>
       <li>
         <p><strong>Dirk Eddelbuettel</strong>. Copyright holder. 
+        </p>
+      </li>
+      <li>
+        <p><strong>Mason McComb</strong>. Author. <a href='https://orcid.org/0000-0001-9871-8616' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
@@ -294,7 +298,7 @@ R package version 1.1.1-6, <a href="https://CRAN.R-project.org/package=nlmixr">h
         </p>
       </li>
       <li>
-        <p><strong>Bill Denney</strong>. Contributor. <a href='https://orcid.org/0000-0002-5759-428X' target='orcid.widget'><img src='https://members.orcid.org/sites/default/files/vector_iD_icon.svg' class='orcid' alt='ORCID'></a>
+        <p><strong>Bill Denney</strong>. Contributor. <a href='https://orcid.org/0000-0002-5759-428X' target='orcid.widget' aria-label='ORCID'><span class='fab fa-orcid orcid' aria-hidden='true'></span></a>
         </p>
       </li>
       <li>
@@ -319,11 +323,11 @@ R package version 1.1.1-6, <a href="https://CRAN.R-project.org/package=nlmixr">h
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang, Mason McComb.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -73,7 +73,7 @@ f <- nlmixr(one.cmt)
 We can now run the model...
 
 ```{r}
-fit <- nlmixr(one.cmt, theo_sd, control(print=0), est="focei")
+fit <- nlmixr(one.cmt, theo_sd, list(print=0), est="focei")
 print(fit)
 ```
 
@@ -117,7 +117,6 @@ method to this model:
 fitN <- nlmixr(one.compartment, theo_sd, list(pnlsTol=0.5), est="nlme")
 print(fitN)
 ```
-
 
 This example delivers a complete model fit as the `fit`
 object, including parameter history, a set of fixed effect estimates,

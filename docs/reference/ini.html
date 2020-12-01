@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -43,9 +47,9 @@
 
 
 <meta property="og:title" content="nlmixr ini block handling — ini" />
-<meta property="og:description" content="nlmixr ini block handling" />
+<meta property="og:description" content="The ini block controls initial conditions for 'theta' (fixed effects),
+'omega' (random effects), and 'sigma' (residual error) elements of the model." />
 <meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -63,7 +67,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -77,7 +81,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0-0</span>
       </span>
     </div>
 
@@ -128,13 +132,13 @@
     </li>
     <li class="divider"></li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+      <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+      <a href="../articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+      <a href="../articles/wbc.html">PKPD -- Myelosuppression model</a>
     </li>
   </ul>
 </li>
@@ -192,10 +196,11 @@
     </div>
 
     <div class="ref-description">
-    <p>nlmixr ini block handling</p>
+    <p>The ini block controls initial conditions for 'theta' (fixed effects),
+'omega' (random effects), and 'sigma' (residual error) elements of the model.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ini</span>(<span class='no'>ini</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>ini</span><span class='op'>(</span><span class='va'>ini</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -213,28 +218,86 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>bounds expression or parsed ui object</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>'theta' and 'sigma' can be set using either <code>&lt;-</code> or <code><a href='https://rdrr.io/r/base/assignOps.html'>=</a></code> such as
+<code>tvCL &lt;- 1</code> or equivalently <code>tvCL = 1</code>.  'omega' can be set with a
+<code><a href='https://rdrr.io/r/base/tilde.html'>~</a></code>.</p>
+<p>Parameters can be named or unnamed (though named parameters are preferred).
+A named parameter is set using the name on the left of the assignment while
+unnamed parameters are set without an assignment operator.  <code>tvCL &lt;- 1</code>
+would set a named parameter of <code>tvCL</code> to <code>1</code>.  Unnamed parameters
+are set using just the value, such as <code>1</code>.</p>
+<p>For some estimation methods, lower and upper bounds can be set for 'theta'
+and 'sigma' values.  To set a lower and/or upper bound, use a vector of
+values.  The vector is <code><a href='https://rdrr.io/r/base/c.html'>c(lower, estimate, upper)</a></code>.  The vector may be
+given with just the estimate (<code><a href='https://rdrr.io/r/base/c.html'>c(estimate)</a></code>), the lower bound and
+estimate (<code><a href='https://rdrr.io/r/base/c.html'>c(lower, estimate)</a></code>), or all three (<code><a href='https://rdrr.io/r/base/c.html'>c(lower, estimate,
+upper)</a></code>).  To set an estimate and upper bound without a lower bound, set the
+lower bound to <code>-Inf</code>, <code><a href='https://rdrr.io/r/base/c.html'>c(-Inf, estimate, upper)</a></code>.  When an
+estimation method does not support bounds, the bounds will be ignored with a
+warning.</p>
+<p>'omega' values can be set as a single value or as the values of a
+lower-triangular matrix.  The values may be set as either a
+variance-covariance matrix (the default) or as a correlation matrix for the
+off-diagonals with the standard deviations on the diagonals.  Names may be
+set on the left side of the <code><a href='https://rdrr.io/r/base/tilde.html'>~</a></code>.  To set a variance-covariance matrix
+with variance values of 2 and 3 and a covariance of -2.5 use <code>~c(2, 2.5,
+3)</code>.  To set the same matrix with names of <code>iivKa</code> and <code>iivCL</code>, use
+<code>iivKa + iivCL~c(2, 2.5, 3)</code>.  To set a correlation matrix with standard
+deviations on the diagonal, use <code><a href='https://rdrr.io/r/stats/cor.html'>cor()</a></code> like <code>iivKa + iivCL~cor(2,
+-0.5, 3)</code>.</p>
+<p>Values may be fixed (and therefore not estimated) using either the name
+<code>fixed</code> at the end of the assignment or by calling <code>fixed()</code> as a
+function for the value to fix.  For 'theta' and 'sigma', either the estimate
+or the full definition (including lower and upper bounds) may be included in
+the fixed setting.  For example, the following are all effectively equivalent
+to set a 'theta' or 'sigma' to a fixed value (because the lower and upper
+bounds are ignored for a fixed value): <code>tvCL &lt;- fixed(1)</code>, <code>tvCL &lt;-
+fixed(0, 1)</code>, <code>tvCL &lt;- fixed(0, 1, 2)</code>, <code>tvCL &lt;- c(0, fixed(1),
+2)</code>, or <code>tvCL &lt;- c(0, 1, fixed)</code>.  For 'omega' assignment, the full
+block or none of the block must be set as <code>fixed</code>.  Examples of setting
+an 'omega' value as fixed are: <code>iivKa~fixed(1)</code>, <code>iivKa +
+iivCL~fixed(1, 2, 3)</code>, or <code>iivKa + iivCL~c(1, 2, 3, fixed)</code>.  Anywhere
+that <code>fixed</code> is used, <code>FIX</code>, <code>FIXED</code>, or <code>fix</code> may be
+used equivalently.</p>
+<p>For any value, standard mathematical operators or functions may be used to
+define the value.  For example, <code><a href='https://rdrr.io/r/base/Log.html'>exp(2)</a></code> and <code>24*30</code> may be used to
+define a value anywhere that a number can be used (e.g. lower bound,
+estimate, upper bound, variance, etc.).</p>
+<p>Values may be labeled using the <code>label()</code> function after the assignment.
+Labels are are used to make reporting easier by giving a human-readable
+description of the parameter, but the labels do not have any effect on
+estimation.  The typical way to set a label so that the parameter <code>tvCL</code>
+has a label of "Typical Value of Clearance (L/hr)" is <code>tvCL &lt;- 1;
+label("Typical Value of Clearance (L/hr)")</code>.</p>
+<p><code>nlmixr</code> will attempt to determine some back-transformations for the
+user.  For example, <code>CL &lt;- exp(tvCL)</code> will detect that <code>tvCL</code> must
+be back-transformed by <code><a href='https://rdrr.io/r/base/Log.html'>exp()</a></code> for easier interpretation.  When you want
+to control the back-transformation, you can specify the back-transformation
+using <code>backTransform()</code> after the assignment.  For example, to set the
+back-transformation to <code><a href='https://rdrr.io/r/base/Log.html'>exp()</a></code>, you can use <code>tvCL &lt;- 1;
+backTransform(exp())</code>.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Matthew L. Fidler</p>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>Matthew L. Fidler</p>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang, Mason McComb.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -45,7 +49,6 @@
 <meta property="og:title" content="Create a run summary word document — nmDocx" />
 <meta property="og:description" content="Create a run summary word document" />
 <meta property="og:image" content="/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -63,7 +66,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -77,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0-0</span>
       </span>
     </div>
 
@@ -128,13 +131,13 @@
     </li>
     <li class="divider"></li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
+      <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/mavoglurant.html">PBPK -- Mavoglurant</a>
+      <a href="../articles/mavoglurant.html">PBPK -- Mavoglurant</a>
     </li>
     <li>
-      <a href="https://nlmixrdevelopment.github.io/nlmixr.examples/articles/wbc.html">PKPD -- Myelosuppression model</a>
+      <a href="../articles/wbc.html">PKPD -- Myelosuppression model</a>
     </li>
   </ul>
 </li>
@@ -195,22 +198,22 @@
     <p>Create a run summary word document</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nmDocx</span>(
-  <span class='no'>x</span>,
-  <span class='kw'>docxOut</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>docxTemplate</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>titleStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.title"</span>, <span class='st'>"Title"</span>),
-  <span class='kw'>subtitleStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.subtitle"</span>, <span class='st'>"Subtitle"</span>),
-  <span class='kw'>normalStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.normal"</span>, <span class='st'>"Normal"</span>),
-  <span class='kw'>headerStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.heading1"</span>, <span class='st'>"Heading 1"</span>),
-  <span class='kw'>centeredStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.centered"</span>, <span class='st'>"centered"</span>),
-  <span class='kw'>preformattedStyle</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.preformatted"</span>, <span class='st'>"HTML Preformatted"</span>),
-  <span class='kw'>width</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"nlmixr.docx.width"</span>, <span class='fl'>69</span>),
-  <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)
+    <pre class="usage"><span class='fu'>nmDocx</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  docxOut <span class='op'>=</span> <span class='cn'>NULL</span>,
+  docxTemplate <span class='op'>=</span> <span class='cn'>NULL</span>,
+  plot <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  titleStyle <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"nlmixr.docx.title"</span>, <span class='st'>"Title"</span><span class='op'>)</span>,
+  subtitleStyle <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"nlmixr.docx.subtitle"</span>, <span class='st'>"Subtitle"</span><span class='op'>)</span>,
+  normalStyle <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"nlmixr.docx.normal"</span>, <span class='st'>"Normal"</span><span class='op'>)</span>,
+  headerStyle <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"nlmixr.docx.heading1"</span>, <span class='st'>"Heading 1"</span><span class='op'>)</span>,
+  centeredStyle <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"nlmixr.docx.centered"</span>, <span class='st'>"centered"</span><span class='op'>)</span>,
+  preformattedStyle <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"nlmixr.docx.preformatted"</span>, <span class='st'>"HTML Preformatted"</span><span class='op'>)</span>,
+  width <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"nlmixr.docx.width"</span>, <span class='fl'>69</span><span class='op'>)</span>,
+  save <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
 
-<span class='fu'>nmSave</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+<span class='fu'>nmSave</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, save <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -298,59 +301,557 @@ data object for the fit?  By default this is <code>FALSE</code> with
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An officer docx object</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Matthew Fidler</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
- <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>nlmixr</span>)
-<span class='no'>pheno</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>() {
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+ <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/nlmixrdevelopment/nlmixr'>nlmixr</a></span><span class='op'>)</span>
+<span class='va'>pheno</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
     <span class='co'># Pheno with covariance</span>
-  <span class='fu'><a href='ini.html'>ini</a></span>({
-    <span class='no'>tcl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='fl'>0.008</span>) <span class='co'># typical value of clearance</span>
-    <span class='no'>tv</span> <span class='kw'>&lt;-</span>  <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='fl'>0.6</span>)   <span class='co'># typical value of volume</span>
+  <span class='fu'><a href='ini.html'>ini</a></span><span class='op'>(</span><span class='op'>{</span>
+    <span class='va'>tcl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='fl'>0.008</span><span class='op'>)</span> <span class='co'># typical value of clearance</span>
+    <span class='va'>tv</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='fl'>0.6</span><span class='op'>)</span>   <span class='co'># typical value of volume</span>
     <span class='co'>## var(eta.cl)</span>
-    <span class='no'>eta.cl</span> + <span class='no'>eta.v</span> ~ <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>,
-                       <span class='fl'>0.01</span>, <span class='fl'>1</span>) <span class='co'>## cov(eta.cl, eta.v), var(eta.v)</span>
+    <span class='va'>eta.cl</span> <span class='op'>+</span> <span class='va'>eta.v</span> <span class='op'>~</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,
+                       <span class='fl'>0.01</span>, <span class='fl'>1</span><span class='op'>)</span> <span class='co'>## cov(eta.cl, eta.v), var(eta.v)</span>
                       <span class='co'># interindividual variability on clearance and volume</span>
-    <span class='no'>add.err</span> <span class='kw'>&lt;-</span> <span class='fl'>0.1</span>    <span class='co'># residual variability</span>
-  })
-  <span class='fu'><a href='model.html'>model</a></span>({
-    <span class='no'>cl</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='no'>tcl</span> + <span class='no'>eta.cl</span>) <span class='co'># individual value of clearance</span>
-    <span class='no'>v</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span>(<span class='no'>tv</span> + <span class='no'>eta.v</span>)    <span class='co'># individual value of volume</span>
-    <span class='no'>ke</span> <span class='kw'>&lt;-</span> <span class='no'>cl</span> / <span class='no'>v</span>            <span class='co'># elimination rate constant</span>
-    <span class='no'>d</span>/<span class='fu'><a href='https://rdrr.io/r/stats/TDist.html'>dt</a></span>(<span class='no'>A1</span>) <span class='kw'>=</span> - <span class='no'>ke</span> * <span class='no'>A1</span>    <span class='co'># model differential equation</span>
-    <span class='no'>cp</span> <span class='kw'>=</span> <span class='no'>A1</span> / <span class='no'>v</span>             <span class='co'># concentration in plasma</span>
-    <span class='no'>cp</span> ~ <span class='fu'>add</span>(<span class='no'>add.err</span>)       <span class='co'># define error model</span>
-  })
-}
+    <span class='va'>add.err</span> <span class='op'>&lt;-</span> <span class='fl'>0.1</span>    <span class='co'># residual variability</span>
+  <span class='op'>}</span><span class='op'>)</span>
+  <span class='fu'><a href='model.html'>model</a></span><span class='op'>(</span><span class='op'>{</span>
+    <span class='va'>cl</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>tcl</span> <span class='op'>+</span> <span class='va'>eta.cl</span><span class='op'>)</span> <span class='co'># individual value of clearance</span>
+    <span class='va'>v</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>tv</span> <span class='op'>+</span> <span class='va'>eta.v</span><span class='op'>)</span>    <span class='co'># individual value of volume</span>
+    <span class='va'>ke</span> <span class='op'>&lt;-</span> <span class='va'>cl</span> <span class='op'>/</span> <span class='va'>v</span>            <span class='co'># elimination rate constant</span>
+    <span class='va'>d</span><span class='op'>/</span><span class='fu'><a href='https://rdrr.io/r/stats/TDist.html'>dt</a></span><span class='op'>(</span><span class='va'>A1</span><span class='op'>)</span> <span class='op'>=</span> <span class='op'>-</span> <span class='va'>ke</span> <span class='op'>*</span> <span class='va'>A1</span>    <span class='co'># model differential equation</span>
+    <span class='va'>cp</span> <span class='op'>=</span> <span class='va'>A1</span> <span class='op'>/</span> <span class='va'>v</span>             <span class='co'># concentration in plasma</span>
+    <span class='va'>cp</span> <span class='op'>~</span> <span class='fu'>add</span><span class='op'>(</span><span class='va'>add.err</span><span class='op'>)</span>       <span class='co'># define error model</span>
+  <span class='op'>}</span><span class='op'>)</span>
+<span class='op'>}</span>
 
-<span class='no'>fit.s</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='nlmixr.html'>nlmixr</a></span>(<span class='no'>pheno</span>, <span class='no'>pheno_sd</span>, <span class='st'>"saem"</span>)
-
+<span class='va'>fit.s</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span><span class='va'>pheno</span>, <span class='va'>pheno_sd</span>, <span class='st'>"saem"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'><span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; 1:    -5.0291    0.3072    0.9500    0.9500   48.9703
+#&gt; 2:    -5.2433    0.4160    0.9025    0.9025   35.3695
+#&gt; 3:    -5.3098    0.4083    0.8574    0.8574   28.6168
+#&gt; 4:    -5.2258    0.4097    0.8145    0.8145   20.7094
+#&gt; 5:    -5.3692    0.4151    0.7738    0.7738   15.1982
+#&gt; 6:    -5.3717    0.4020    0.7351    0.7351   14.3494
+#&gt; 7:    -5.4502    0.4072    0.6983    0.6983   13.8786
+#&gt; 8:    -5.4442    0.4049    0.6634    0.6634   11.8095
+#&gt; 9:    -5.4412    0.4224    0.6302    0.6302   11.7183
+#&gt; 10:    -5.4357    0.4189    0.5987    0.5987   10.5331
+#&gt; 11:   -5.4387   0.4130   0.5688   0.5688   9.9596
+#&gt; 12:   -5.3992   0.4213   0.5404   0.5404   9.7780
+#&gt; 13:   -5.3780   0.3927   0.5133   0.5133   8.8849
+#&gt; 14:   -5.3147   0.3969   0.4877   0.4877   8.4676
+#&gt; 15:   -5.2833   0.3830   0.4633   0.4633   8.3323
+#&gt; 16:   -5.2463   0.3693   0.4401   0.4401   8.9229
+#&gt; 17:   -5.2625   0.3818   0.4181   0.4181   8.5852
+#&gt; 18:   -5.2887   0.3871   0.3972   0.3972   8.6668
+#&gt; 19:   -5.3051   0.3884   0.3901   0.3774   8.5482
+#&gt; 20:   -5.2904   0.3845   0.3706   0.3585   7.3884
+#&gt; 21:   -5.2935   0.3938   0.3520   0.3406   8.0038
+#&gt; 22:   -5.2675   0.3932   0.3344   0.3235   7.7837
+#&gt; 23:   -5.3130   0.3845   0.3177   0.3074   8.1175
+#&gt; 24:   -5.3315   0.3793   0.3018   0.2920   8.0285
+#&gt; 25:   -5.3119   0.3816   0.3132   0.2774   7.7967
+#&gt; 26:   -5.2868   0.3744   0.2975   0.2635   7.5603
+#&gt; 27:   -5.2479   0.3607   0.2827   0.2503   7.4744
+#&gt; 28:   -5.2161   0.3768   0.2685   0.2378   7.6398
+#&gt; 29:   -5.1784   0.3631   0.2551   0.2259   7.9388
+#&gt; 30:   -5.1952   0.3743   0.2423   0.2146   7.5540
+#&gt; 31:   -5.1893   0.3860   0.2302   0.2105   7.5663
+#&gt; 32:   -5.1727   0.3725   0.2187   0.1999   8.0642
+#&gt; 33:   -5.1536   0.3653   0.2078   0.1899   7.8833
+#&gt; 34:   -5.1499   0.3547   0.1974   0.1816   8.7784
+#&gt; 35:   -5.1443   0.3526   0.1888   0.1949   7.8128
+#&gt; 36:   -5.1484   0.3700   0.1866   0.1934   7.8751
+#&gt; 37:   -5.1704   0.3707   0.1861   0.1999   7.4828
+#&gt; 38:   -5.1723   0.3765   0.1943   0.1954   7.7152
+#&gt; 39:   -5.1895   0.3764   0.1846   0.1896   7.8676
+#&gt; 40:   -5.1985   0.3657   0.1754   0.1994   8.7156
+#&gt; 41:   -5.2174   0.3768   0.1835   0.1975   8.7542
+#&gt; 42:   -5.2226   0.3759   0.1848   0.1962   8.2115
+#&gt; 43:   -5.2213   0.3770   0.1990   0.2134   7.5348
+#&gt; 44:   -5.2216   0.3747   0.2023   0.2037   7.5869
+#&gt; 45:   -5.2176   0.3733   0.2079   0.2050   7.4939
+#&gt; 46:   -5.1979   0.3611   0.2394   0.2041   8.6764
+#&gt; 47:   -5.1792   0.3710   0.2275   0.1988   7.7848
+#&gt; 48:   -5.1773   0.3822   0.2161   0.1924   7.5352
+#&gt; 49:   -5.2191   0.3746   0.2451   0.1886   7.5657
+#&gt; 50:   -5.2112   0.3782   0.2329   0.2072   7.7895
+#&gt; 51:   -5.1737   0.3839   0.2310   0.2044   7.7725
+#&gt; 52:   -5.1848   0.3718   0.2362   0.2016   8.2852
+#&gt; 53:   -5.1689   0.3620   0.2244   0.1971   8.0756
+#&gt; 54:   -5.1891   0.3710   0.2132   0.1999   7.9614
+#&gt; 55:   -5.1902   0.3688   0.2371   0.2055   7.3423
+#&gt; 56:   -5.2138   0.3703   0.2252   0.2035   7.6047
+#&gt; 57:   -5.2305   0.3773   0.2284   0.2015   7.7806
+#&gt; 58:   -5.1973   0.3857   0.2170   0.1965   7.8035
+#&gt; 59:   -5.2139   0.3783   0.2061   0.2015   7.4595
+#&gt; 60:   -5.1585   0.3648   0.2038   0.1988   7.8403
+#&gt; 61:   -5.1271   0.3616   0.1937   0.1889   8.7702
+#&gt; 62:   -5.1641   0.3740   0.1905   0.1926   8.8303
+#&gt; 63:   -5.1722   0.3689   0.1809   0.1927   7.8135
+#&gt; 64:   -5.1545   0.3693   0.1746   0.1906   7.5553
+#&gt; 65:   -5.1545   0.3696   0.1658   0.2027   7.6928
+#&gt; 66:   -5.1699   0.3719   0.1777   0.1968   7.7913
+#&gt; 67:   -5.1314   0.3543   0.1793   0.2128   7.6497
+#&gt; 68:   -5.1414   0.3640   0.1755   0.2093   7.8481
+#&gt; 69:   -5.1403   0.3538   0.1916   0.2128   7.2280
+#&gt; 70:   -5.1164   0.3519   0.1936   0.2204   7.5472
+#&gt; 71:   -5.1177   0.3549   0.2247   0.2094   7.6385
+#&gt; 72:   -5.1360   0.3718   0.2300   0.2010   7.5984
+#&gt; 73:   -5.1549   0.3764   0.2532   0.2067   8.0542
+#&gt; 74:   -5.1996   0.3812   0.2405   0.1963   8.3610
+#&gt; 75:   -5.2216   0.3744   0.2416   0.1947   8.1660
+#&gt; 76:   -5.1943   0.3687   0.2295   0.2066   7.8590
+#&gt; 77:   -5.2077   0.3864   0.2485   0.1981   7.6854
+#&gt; 78:   -5.1985   0.3669   0.2360   0.1974   7.7991
+#&gt; 79:   -5.1689   0.3526   0.2392   0.1882   7.9555
+#&gt; 80:   -5.1357   0.3433   0.2326   0.2105   7.7788
+#&gt; 81:   -5.1786   0.3643   0.2582   0.2089   7.2538
+#&gt; 82:   -5.1813   0.3615   0.2839   0.2171   7.3611
+#&gt; 83:   -5.2266   0.3586   0.2999   0.2063   7.6686
+#&gt; 84:   -5.2580   0.3706   0.3084   0.1984   7.1080
+#&gt; 85:   -5.2359   0.3757   0.3172   0.2123   6.6866
+#&gt; 86:   -5.2463   0.3779   0.3013   0.2046   7.1987
+#&gt; 87:   -5.2530   0.3774   0.3130   0.2059   7.3428
+#&gt; 88:   -5.2608   0.3722   0.2973   0.2073   7.6319
+#&gt; 89:   -5.2964   0.3882   0.2825   0.2049   8.1477
+#&gt; 90:   -5.2539   0.3752   0.2683   0.1990   7.9117
+#&gt; 91:   -5.2239   0.3746   0.2549   0.1891   8.0982
+#&gt; 92:   -5.2436   0.3708   0.2422   0.2078   7.7482
+#&gt; 93:   -5.2546   0.3782   0.2402   0.2034   8.3008
+#&gt; 94:   -5.2646   0.3829   0.2282   0.2091   7.7145
+#&gt; 95:   -5.2358   0.3793   0.2168   0.1987   8.0901
+#&gt; 96:   -5.2085   0.3771   0.2215   0.1951   8.2256
+#&gt; 97:   -5.1635   0.3751   0.2255   0.1898   7.8817
+#&gt; 98:   -5.1685   0.3411   0.2283   0.1939   7.8104
+#&gt; 99:   -5.1678   0.3739   0.2297   0.1893   7.4245
+#&gt; 100:   -5.2076   0.3776   0.2182   0.1925   7.8016
+#&gt; 101:   -5.2059   0.3917   0.2397   0.2024   7.5258
+#&gt; 102:   -5.1646   0.3675   0.2311   0.2035   7.6778
+#&gt; 103:   -5.1566   0.3662   0.2195   0.2123   7.2122
+#&gt; 104:   -5.1673   0.3562   0.2085   0.2122   7.6793
+#&gt; 105:   -5.2141   0.3733   0.1990   0.2227   7.9370
+#&gt; 106:   -5.2086   0.3665   0.2147   0.2156   8.4855
+#&gt; 107:   -5.1789   0.3680   0.2258   0.2110   8.3803
+#&gt; 108:   -5.1967   0.3626   0.2145   0.2177   7.4993
+#&gt; 109:   -5.1818   0.3657   0.2101   0.2068   7.7468
+#&gt; 110:   -5.1548   0.3504   0.1996   0.2057   7.9319
+#&gt; 111:   -5.1753   0.3699   0.2052   0.2167   7.7360
+#&gt; 112:   -5.1994   0.3666   0.2061   0.2067   8.1470
+#&gt; 113:   -5.2161   0.3794   0.2065   0.2125   9.1963
+#&gt; 114:   -5.2350   0.3903   0.2306   0.2142   9.6083
+#&gt; 115:   -5.1965   0.3874   0.2191   0.2087   9.5566
+#&gt; 116:   -5.1766   0.3727   0.2121   0.1983   9.7453
+#&gt; 117:   -5.1904   0.3739   0.2046   0.1984   7.8011
+#&gt; 118:   -5.1816   0.3593   0.2158   0.1996   7.9573
+#&gt; 119:   -5.1553   0.3787   0.2340   0.1896   8.4937
+#&gt; 120:   -5.1962   0.3678   0.2223   0.1987   8.3731
+#&gt; 121:   -5.2000   0.3838   0.2112   0.2079   8.3018
+#&gt; 122:   -5.1859   0.3696   0.2116   0.1975   8.2665
+#&gt; 123:   -5.1754   0.3555   0.2280   0.1895   8.0263
+#&gt; 124:   -5.1534   0.3682   0.2187   0.1942   7.6140
+#&gt; 125:   -5.1550   0.3475   0.2203   0.2013   7.7355
+#&gt; 126:   -5.1491   0.3586   0.2230   0.2060   8.0627
+#&gt; 127:   -5.1308   0.3535   0.2180   0.2028   7.5166
+#&gt; 128:   -5.1719   0.3602   0.2071   0.2134   7.4905
+#&gt; 129:   -5.1502   0.3668   0.1967   0.2263   7.7876
+#&gt; 130:   -5.1410   0.3733   0.1969   0.2150   7.0607
+#&gt; 131:   -5.1631   0.3521   0.2029   0.2082   7.5408
+#&gt; 132:   -5.2195   0.3640   0.2092   0.1978   7.7984
+#&gt; 133:   -5.1888   0.3654   0.2220   0.1938   7.8156
+#&gt; 134:   -5.1792   0.3614   0.2220   0.1841   7.8660
+#&gt; 135:   -5.1693   0.3712   0.2464   0.1890   8.2850
+#&gt; 136:   -5.1557   0.3644   0.2341   0.1897   8.0031
+#&gt; 137:   -5.1094   0.3585   0.2224   0.1953   8.4764
+#&gt; 138:   -5.1144   0.3655   0.2113   0.2019   8.1143
+#&gt; 139:   -5.1153   0.3773   0.2007   0.1992   7.8767
+#&gt; 140:   -5.1242   0.3642   0.2062   0.2007   7.4680
+#&gt; 141:   -5.1361   0.3615   0.1993   0.1906   7.7565
+#&gt; 142:   -5.1669   0.3640   0.1893   0.1848   8.2869
+#&gt; 143:   -5.1448   0.3624   0.1838   0.1941   8.1977
+#&gt; 144:   -5.1446   0.3605   0.1812   0.2021   7.8406
+#&gt; 145:   -5.1481   0.3697   0.1734   0.2002   7.8350
+#&gt; 146:   -5.1403   0.3636   0.2100   0.1981   8.2244
+#&gt; 147:   -5.1681   0.3643   0.2041   0.1939   8.1512
+#&gt; 148:   -5.1340   0.3613   0.2332   0.2126   8.0400
+#&gt; 149:   -5.1318   0.3573   0.2372   0.2141   8.1685
+#&gt; 150:   -5.1260   0.3655   0.2456   0.2034   8.1706
+#&gt; 151:   -5.1491   0.3556   0.2333   0.1932   8.1026
+#&gt; 152:   -5.1385   0.3641   0.2183   0.1846   8.0423
+#&gt; 153:   -5.1303   0.3575   0.2206   0.1906   7.7099
+#&gt; 154:   -5.1228   0.3494   0.2081   0.2047   7.4754
+#&gt; 155:   -5.0818   0.3478   0.2028   0.1933   7.0254
+#&gt; 156:   -5.0716   0.3614   0.2185   0.1912   7.3739
+#&gt; 157:   -5.0887   0.3474   0.2105   0.1889   6.7839
+#&gt; 158:   -5.0851   0.3559   0.1862   0.1822   7.0051
+#&gt; 159:   -5.0907   0.3589   0.1964   0.1927   7.2163
+#&gt; 160:   -5.0994   0.3507   0.1762   0.1961   7.8787
+#&gt; 161:   -5.0876   0.3633   0.1688   0.1768   8.5014
+#&gt; 162:   -5.1175   0.3776   0.1803   0.1798   8.2123
+#&gt; 163:   -5.0964   0.3715   0.1854   0.1836   7.9704
+#&gt; 164:   -5.0752   0.3613   0.2064   0.1829   7.6085
+#&gt; 165:   -5.1005   0.3533   0.2012   0.1766   7.8037
+#&gt; 166:   -5.0492   0.3623   0.2274   0.1824   7.4546
+#&gt; 167:   -5.0664   0.3405   0.2258   0.1752   7.0702
+#&gt; 168:   -5.0176   0.3310   0.2361   0.1774   7.2620
+#&gt; 169:   -5.0181   0.3421   0.2239   0.1724   7.0909
+#&gt; 170:   -5.0261   0.3438   0.2286   0.1616   7.2371
+#&gt; 171:   -4.9990   0.3561   0.2416   0.1710   7.3433
+#&gt; 172:   -5.0137   0.3512   0.2621   0.1685   7.0674
+#&gt; 173:   -5.0011   0.3438   0.2453   0.1600   6.7459
+#&gt; 174:   -4.9993   0.3438   0.2295   0.1652   7.2015
+#&gt; 175:   -5.0075   0.3385   0.2370   0.1648   7.7517
+#&gt; 176:   -4.9949   0.3455   0.2327   0.1579   7.7655
+#&gt; 177:   -5.0323   0.3442   0.2406   0.1757   7.4591
+#&gt; 178:   -5.0516   0.3403   0.2331   0.1614   8.1646
+#&gt; 179:   -5.0291   0.3525   0.2410   0.1671   8.4938
+#&gt; 180:   -5.0179   0.3569   0.2381   0.1619   8.2040
+#&gt; 181:   -5.0182   0.3588   0.2488   0.1728   8.0362
+#&gt; 182:   -5.0321   0.3447   0.2309   0.1658   7.2938
+#&gt; 183:   -5.0072   0.3511   0.2407   0.1621   7.0601
+#&gt; 184:   -5.0149   0.3443   0.2428   0.1612   7.1304
+#&gt; 185:   -5.0312   0.3472   0.2477   0.1623   7.1187
+#&gt; 186:   -5.0228   0.3365   0.2273   0.1648   7.2542
+#&gt; 187:   -5.0092   0.3462   0.2195   0.1615   7.3446
+#&gt; 188:   -5.0214   0.3473   0.2125   0.1689   7.2965
+#&gt; 189:   -5.0155   0.3569   0.1968   0.1685   7.0958
+#&gt; 190:   -5.0047   0.3500   0.1966   0.1702   7.3148
+#&gt; 191:   -5.0122   0.3587   0.1923   0.1643   7.6069
+#&gt; 192:   -5.0229   0.3530   0.2072   0.1705   7.8221
+#&gt; 193:   -5.0160   0.3471   0.2179   0.1654   6.9632
+#&gt; 194:   -5.0106   0.3470   0.2251   0.1639   6.7881
+#&gt; 195:   -5.0046   0.3546   0.2220   0.1674   7.3579
+#&gt; 196:   -5.0072   0.3434   0.2210   0.1738   7.8418
+#&gt; 197:   -5.0033   0.3445   0.2211   0.1664   7.7098
+#&gt; 198:   -4.9788   0.3387   0.2059   0.1594   7.5045
+#&gt; 199:   -4.9705   0.3456   0.2080   0.1550   7.6665
+#&gt; 200:   -4.9782   0.3438   0.2071   0.1596   7.8374
+#&gt; 201:   -4.9796   0.3445   0.2099   0.1607   8.0919
+#&gt; 202:   -4.9813   0.3459   0.2120   0.1608   8.1763
+#&gt; 203:   -4.9859   0.3456   0.2125   0.1630   8.1155
+#&gt; 204:   -4.9850   0.3471   0.2163   0.1644   8.1365
+#&gt; 205:   -4.9860   0.3480   0.2186   0.1649   8.1302
+#&gt; 206:   -4.9854   0.3468   0.2181   0.1648   8.1689
+#&gt; 207:   -4.9867   0.3466   0.2171   0.1638   8.1752
+#&gt; 208:   -4.9857   0.3465   0.2171   0.1633   8.1692
+#&gt; 209:   -4.9852   0.3467   0.2167   0.1620   8.1279
+#&gt; 210:   -4.9853   0.3474   0.2170   0.1617   8.1129
+#&gt; 211:   -4.9843   0.3473   0.2175   0.1618   8.0992
+#&gt; 212:   -4.9841   0.3475   0.2186   0.1621   8.0727
+#&gt; 213:   -4.9851   0.3470   0.2197   0.1627   8.0909
+#&gt; 214:   -4.9844   0.3467   0.2201   0.1633   8.1028
+#&gt; 215:   -4.9852   0.3457   0.2212   0.1636   8.0885
+#&gt; 216:   -4.9861   0.3449   0.2218   0.1642   8.0620
+#&gt; 217:   -4.9863   0.3449   0.2232   0.1646   8.0393
+#&gt; 218:   -4.9859   0.3448   0.2234   0.1647   7.9712
+#&gt; 219:   -4.9863   0.3448   0.2237   0.1650   7.9362
+#&gt; 220:   -4.9872   0.3443   0.2241   0.1650   7.9338
+#&gt; 221:   -4.9884   0.3442   0.2244   0.1649   7.9366
+#&gt; 222:   -4.9888   0.3441   0.2250   0.1650   7.9334
+#&gt; 223:   -4.9892   0.3437   0.2247   0.1649   7.9518
+#&gt; 224:   -4.9883   0.3434   0.2246   0.1646   7.9341
+#&gt; 225:   -4.9883   0.3434   0.2248   0.1645   7.9258
+#&gt; 226:   -4.9877   0.3437   0.2249   0.1644   7.9401
+#&gt; 227:   -4.9873   0.3439   0.2240   0.1641   7.9310
+#&gt; 228:   -4.9870   0.3438   0.2234   0.1640   7.9385
+#&gt; 229:   -4.9872   0.3438   0.2237   0.1644   7.9402
+#&gt; 230:   -4.9872   0.3440   0.2238   0.1644   7.9352
+#&gt; 231:   -4.9873   0.3443   0.2239   0.1645   7.9376
+#&gt; 232:   -4.9870   0.3445   0.2241   0.1646   7.9375
+#&gt; 233:   -4.9870   0.3444   0.2243   0.1646   7.9621
+#&gt; 234:   -4.9869   0.3445   0.2241   0.1644   7.9654
+#&gt; 235:   -4.9868   0.3445   0.2238   0.1642   7.9531
+#&gt; 236:   -4.9869   0.3443   0.2237   0.1643   7.9486
+#&gt; 237:   -4.9872   0.3443   0.2240   0.1641   7.9712
+#&gt; 238:   -4.9870   0.3443   0.2240   0.1640   7.9645
+#&gt; 239:   -4.9871   0.3441   0.2238   0.1638   7.9670
+#&gt; 240:   -4.9872   0.3439   0.2240   0.1638   7.9609
+#&gt; 241:   -4.9870   0.3439   0.2241   0.1638   7.9646
+#&gt; 242:   -4.9871   0.3441   0.2242   0.1637   7.9679
+#&gt; 243:   -4.9869   0.3443   0.2237   0.1634   7.9727
+#&gt; 244:   -4.9867   0.3443   0.2233   0.1632   7.9707
+#&gt; 245:   -4.9868   0.3443   0.2234   0.1632   7.9703
+#&gt; 246:   -4.9869   0.3441   0.2235   0.1633   7.9614
+#&gt; 247:   -4.9870   0.3440   0.2234   0.1634   7.9359
+#&gt; 248:   -4.9870   0.3439   0.2233   0.1633   7.9296
+#&gt; 249:   -4.9870   0.3439   0.2229   0.1632   7.9360
+#&gt; 250:   -4.9869   0.3440   0.2227   0.1630   7.9380
+#&gt; 251:   -4.9868   0.3440   0.2227   0.1631   7.9380
+#&gt; 252:   -4.9869   0.3441   0.2228   0.1631   7.9254
+#&gt; 253:   -4.9871   0.3440   0.2229   0.1631   7.9212
+#&gt; 254:   -4.9872   0.3441   0.2231   0.1630   7.9184
+#&gt; 255:   -4.9872   0.3441   0.2233   0.1629   7.9192
+#&gt; 256:   -4.9869   0.3439   0.2234   0.1630   7.9181
+#&gt; 257:   -4.9869   0.3440   0.2236   0.1631   7.9124
+#&gt; 258:   -4.9866   0.3441   0.2238   0.1630   7.9158
+#&gt; 259:   -4.9866   0.3441   0.2238   0.1629   7.9218
+#&gt; 260:   -4.9864   0.3440   0.2239   0.1629   7.9133
+#&gt; 261:   -4.9866   0.3440   0.2240   0.1629   7.9098
+#&gt; 262:   -4.9868   0.3439   0.2240   0.1628   7.9120
+#&gt; 263:   -4.9868   0.3438   0.2239   0.1628   7.9082
+#&gt; 264:   -4.9868   0.3437   0.2240   0.1629   7.9142
+#&gt; 265:   -4.9869   0.3436   0.2242   0.1629   7.9091
+#&gt; 266:   -4.9868   0.3436   0.2242   0.1629   7.9046
+#&gt; 267:   -4.9870   0.3436   0.2242   0.1629   7.9072
+#&gt; 268:   -4.9871   0.3436   0.2242   0.1629   7.8987
+#&gt; 269:   -4.9870   0.3436   0.2244   0.1628   7.9034
+#&gt; 270:   -4.9868   0.3436   0.2245   0.1628   7.9030
+#&gt; 271:   -4.9869   0.3435   0.2246   0.1629   7.9095
+#&gt; 272:   -4.9871   0.3435   0.2246   0.1628   7.9160
+#&gt; 273:   -4.9872   0.3434   0.2244   0.1627   7.9198
+#&gt; 274:   -4.9875   0.3433   0.2242   0.1627   7.9213
+#&gt; 275:   -4.9877   0.3432   0.2244   0.1627   7.9202
+#&gt; 276:   -4.9877   0.3431   0.2244   0.1627   7.9152
+#&gt; 277:   -4.9876   0.3430   0.2243   0.1627   7.9115
+#&gt; 278:   -4.9874   0.3430   0.2244   0.1626   7.9052
+#&gt; 279:   -4.9874   0.3430   0.2245   0.1627   7.8969
+#&gt; 280:   -4.9873   0.3429   0.2244   0.1628   7.8890
+#&gt; 281:   -4.9873   0.3429   0.2246   0.1628   7.8866
+#&gt; 282:   -4.9871   0.3429   0.2246   0.1627   7.8825
+#&gt; 283:   -4.9870   0.3430   0.2247   0.1627   7.8858
+#&gt; 284:   -4.9873   0.3429   0.2248   0.1628   7.8878
+#&gt; 285:   -4.9877   0.3426   0.2249   0.1628   7.8877
+#&gt; 286:   -4.9877   0.3427   0.2249   0.1628   7.8849
+#&gt; 287:   -4.9877   0.3426   0.2247   0.1628   7.8805
+#&gt; 288:   -4.9879   0.3425   0.2247   0.1628   7.8776
+#&gt; 289:   -4.9881   0.3424   0.2249   0.1629   7.8734
+#&gt; 290:   -4.9880   0.3423   0.2250   0.1629   7.8729
+#&gt; 291:   -4.9879   0.3424   0.2250   0.1628   7.8822
+#&gt; 292:   -4.9878   0.3423   0.2250   0.1628   7.8858
+#&gt; 293:   -4.9877   0.3422   0.2249   0.1628   7.8832
+#&gt; 294:   -4.9879   0.3422   0.2249   0.1628   7.8821
+#&gt; 295:   -4.9879   0.3422   0.2248   0.1627   7.8848
+#&gt; 296:   -4.9878   0.3422   0.2246   0.1627   7.8851
+#&gt; 297:   -4.9878   0.3422   0.2244   0.1627   7.8844
+#&gt; 298:   -4.9879   0.3423   0.2244   0.1626   7.8881
+#&gt; 299:   -4.9879   0.3422   0.2244   0.1626   7.8876
+#&gt; 300:   -4.9880   0.3422   0.2243   0.1627   7.8821
+#&gt; 301:   -4.9882   0.3421   0.2243   0.1627   7.8770
+#&gt; 302:   -4.9883   0.3420   0.2244   0.1628   7.8745
+#&gt; 303:   -4.9885   0.3419   0.2246   0.1628   7.8691
+#&gt; 304:   -4.9886   0.3420   0.2246   0.1627   7.8684
+#&gt; 305:   -4.9885   0.3420   0.2246   0.1627   7.8738
+#&gt; 306:   -4.9886   0.3419   0.2245   0.1627   7.8689
+#&gt; 307:   -4.9888   0.3419   0.2246   0.1626   7.8649
+#&gt; 308:   -4.9888   0.3419   0.2246   0.1627   7.8656
+#&gt; 309:   -4.9889   0.3418   0.2245   0.1627   7.8683
+#&gt; 310:   -4.9890   0.3418   0.2245   0.1627   7.8643
+#&gt; 311:   -4.9892   0.3418   0.2246   0.1628   7.8644
+#&gt; 312:   -4.9893   0.3418   0.2247   0.1628   7.8627
+#&gt; 313:   -4.9893   0.3417   0.2248   0.1629   7.8606
+#&gt; 314:   -4.9894   0.3417   0.2249   0.1629   7.8565
+#&gt; 315:   -4.9894   0.3417   0.2250   0.1629   7.8555
+#&gt; 316:   -4.9893   0.3417   0.2251   0.1630   7.8562
+#&gt; 317:   -4.9891   0.3418   0.2251   0.1630   7.8547
+#&gt; 318:   -4.9891   0.3418   0.2250   0.1630   7.8470
+#&gt; 319:   -4.9890   0.3417   0.2251   0.1630   7.8406
+#&gt; 320:   -4.9890   0.3418   0.2252   0.1630   7.8370
+#&gt; 321:   -4.9891   0.3418   0.2253   0.1631   7.8366
+#&gt; 322:   -4.9890   0.3418   0.2254   0.1631   7.8324
+#&gt; 323:   -4.9889   0.3418   0.2254   0.1631   7.8373
+#&gt; 324:   -4.9888   0.3419   0.2254   0.1630   7.8377
+#&gt; 325:   -4.9887   0.3419   0.2255   0.1630   7.8354
+#&gt; 326:   -4.9888   0.3418   0.2256   0.1630   7.8346
+#&gt; 327:   -4.9888   0.3418   0.2255   0.1631   7.8379
+#&gt; 328:   -4.9888   0.3417   0.2254   0.1631   7.8399
+#&gt; 329:   -4.9889   0.3417   0.2255   0.1631   7.8368
+#&gt; 330:   -4.9891   0.3416   0.2256   0.1631   7.8371
+#&gt; 331:   -4.9892   0.3416   0.2257   0.1632   7.8376
+#&gt; 332:   -4.9893   0.3417   0.2257   0.1632   7.8404
+#&gt; 333:   -4.9894   0.3416   0.2257   0.1632   7.8401
+#&gt; 334:   -4.9894   0.3417   0.2258   0.1632   7.8403
+#&gt; 335:   -4.9894   0.3417   0.2259   0.1633   7.8382
+#&gt; 336:   -4.9894   0.3417   0.2259   0.1633   7.8348
+#&gt; 337:   -4.9894   0.3418   0.2260   0.1633   7.8347
+#&gt; 338:   -4.9894   0.3417   0.2260   0.1633   7.8383
+#&gt; 339:   -4.9894   0.3417   0.2261   0.1633   7.8332
+#&gt; 340:   -4.9893   0.3417   0.2262   0.1633   7.8299
+#&gt; 341:   -4.9893   0.3416   0.2263   0.1633   7.8272
+#&gt; 342:   -4.9891   0.3416   0.2264   0.1633   7.8263
+#&gt; 343:   -4.9892   0.3415   0.2265   0.1633   7.8230
+#&gt; 344:   -4.9891   0.3415   0.2264   0.1633   7.8291
+#&gt; 345:   -4.9892   0.3416   0.2264   0.1633   7.8311
+#&gt; 346:   -4.9892   0.3416   0.2264   0.1633   7.8309
+#&gt; 347:   -4.9891   0.3416   0.2265   0.1633   7.8285
+#&gt; 348:   -4.9892   0.3416   0.2266   0.1633   7.8264
+#&gt; 349:   -4.9892   0.3416   0.2266   0.1633   7.8249
+#&gt; 350:   -4.9893   0.3416   0.2267   0.1633   7.8219
+#&gt; 351:   -4.9894   0.3415   0.2267   0.1632   7.8154
+#&gt; 352:   -4.9894   0.3415   0.2267   0.1632   7.8124
+#&gt; 353:   -4.9895   0.3415   0.2267   0.1631   7.8117
+#&gt; 354:   -4.9895   0.3415   0.2268   0.1632   7.8096
+#&gt; 355:   -4.9895   0.3415   0.2268   0.1632   7.8081
+#&gt; 356:   -4.9894   0.3415   0.2269   0.1632   7.8063
+#&gt; 357:   -4.9893   0.3415   0.2269   0.1633   7.8006
+#&gt; 358:   -4.9894   0.3415   0.2270   0.1634   7.8019
+#&gt; 359:   -4.9893   0.3414   0.2271   0.1635   7.7990
+#&gt; 360:   -4.9893   0.3414   0.2272   0.1636   7.8012
+#&gt; 361:   -4.9893   0.3414   0.2273   0.1637   7.8027
+#&gt; 362:   -4.9892   0.3415   0.2273   0.1637   7.8033
+#&gt; 363:   -4.9892   0.3415   0.2273   0.1637   7.8034
+#&gt; 364:   -4.9892   0.3414   0.2273   0.1638   7.8016
+#&gt; 365:   -4.9893   0.3414   0.2273   0.1639   7.7971
+#&gt; 366:   -4.9893   0.3414   0.2274   0.1639   7.7969
+#&gt; 367:   -4.9892   0.3414   0.2274   0.1639   7.7994
+#&gt; 368:   -4.9892   0.3414   0.2273   0.1639   7.8004
+#&gt; 369:   -4.9892   0.3414   0.2273   0.1638   7.7994
+#&gt; 370:   -4.9892   0.3414   0.2273   0.1639   7.7986
+#&gt; 371:   -4.9892   0.3414   0.2273   0.1639   7.7985
+#&gt; 372:   -4.9892   0.3414   0.2272   0.1638   7.8004
+#&gt; 373:   -4.9892   0.3414   0.2272   0.1638   7.8027
+#&gt; 374:   -4.9892   0.3414   0.2272   0.1637   7.8022
+#&gt; 375:   -4.9892   0.3414   0.2272   0.1637   7.8022
+#&gt; 376:   -4.9893   0.3414   0.2271   0.1637   7.8032
+#&gt; 377:   -4.9892   0.3413   0.2272   0.1636   7.8049
+#&gt; 378:   -4.9892   0.3413   0.2271   0.1636   7.8079
+#&gt; 379:   -4.9892   0.3413   0.2271   0.1636   7.8085
+#&gt; 380:   -4.9891   0.3414   0.2271   0.1636   7.8096
+#&gt; 381:   -4.9890   0.3415   0.2271   0.1636   7.8130
+#&gt; 382:   -4.9889   0.3415   0.2271   0.1636   7.8142
+#&gt; 383:   -4.9889   0.3415   0.2270   0.1636   7.8144
+#&gt; 384:   -4.9888   0.3414   0.2270   0.1636   7.8154
+#&gt; 385:   -4.9889   0.3414   0.2271   0.1636   7.8179
+#&gt; 386:   -4.9889   0.3414   0.2271   0.1636   7.8187
+#&gt; 387:   -4.9890   0.3414   0.2270   0.1635   7.8176
+#&gt; 388:   -4.9889   0.3414   0.2270   0.1634   7.8182
+#&gt; 389:   -4.9889   0.3413   0.2270   0.1634   7.8190
+#&gt; 390:   -4.9888   0.3414   0.2270   0.1634   7.8177
+#&gt; 391:   -4.9888   0.3414   0.2269   0.1634   7.8142
+#&gt; 392:   -4.9888   0.3414   0.2269   0.1634   7.8120
+#&gt; 393:   -4.9889   0.3413   0.2269   0.1634   7.8103
+#&gt; 394:   -4.9889   0.3414   0.2270   0.1635   7.8110
+#&gt; 395:   -4.9888   0.3414   0.2271   0.1635   7.8110
+#&gt; 396:   -4.9888   0.3414   0.2271   0.1635   7.8109
+#&gt; 397:   -4.9888   0.3414   0.2271   0.1635   7.8066
+#&gt; 398:   -4.9888   0.3414   0.2271   0.1635   7.8060
+#&gt; 399:   -4.9888   0.3414   0.2271   0.1635   7.8061
+#&gt; 400:   -4.9889   0.3414   0.2271   0.1635   7.8075
+#&gt; 401:   -4.9888   0.3414   0.2271   0.1635   7.8071
+#&gt; 402:   -4.9889   0.3414   0.2271   0.1635   7.8097
+#&gt; 403:   -4.9889   0.3414   0.2271   0.1634   7.8095
+#&gt; 404:   -4.9888   0.3414   0.2270   0.1634   7.8089
+#&gt; 405:   -4.9888   0.3413   0.2270   0.1633   7.8089
+#&gt; 406:   -4.9889   0.3414   0.2269   0.1633   7.8103
+#&gt; 407:   -4.9889   0.3414   0.2269   0.1633   7.8094
+#&gt; 408:   -4.9889   0.3414   0.2269   0.1633   7.8089
+#&gt; 409:   -4.9889   0.3414   0.2269   0.1632   7.8095
+#&gt; 410:   -4.9889   0.3413   0.2269   0.1632   7.8114
+#&gt; 411:   -4.9889   0.3414   0.2269   0.1632   7.8129
+#&gt; 412:   -4.9889   0.3414   0.2269   0.1633   7.8117
+#&gt; 413:   -4.9889   0.3414   0.2269   0.1633   7.8089
+#&gt; 414:   -4.9889   0.3414   0.2269   0.1632   7.8052
+#&gt; 415:   -4.9889   0.3414   0.2270   0.1632   7.8039
+#&gt; 416:   -4.9889   0.3414   0.2271   0.1632   7.8041
+#&gt; 417:   -4.9889   0.3414   0.2271   0.1632   7.8009
+#&gt; 418:   -4.9888   0.3414   0.2271   0.1632   7.8023
+#&gt; 419:   -4.9888   0.3414   0.2271   0.1631   7.8003
+#&gt; 420:   -4.9889   0.3413   0.2270   0.1631   7.7981
+#&gt; 421:   -4.9889   0.3413   0.2270   0.1632   7.7988
+#&gt; 422:   -4.9889   0.3413   0.2270   0.1631   7.7990
+#&gt; 423:   -4.9889   0.3413   0.2270   0.1632   7.7975
+#&gt; 424:   -4.9890   0.3413   0.2270   0.1632   7.7974
+#&gt; 425:   -4.9890   0.3413   0.2270   0.1632   7.7959
+#&gt; 426:   -4.9890   0.3413   0.2270   0.1632   7.7946
+#&gt; 427:   -4.9890   0.3413   0.2270   0.1632   7.7966
+#&gt; 428:   -4.9890   0.3413   0.2270   0.1632   7.7944
+#&gt; 429:   -4.9889   0.3413   0.2271   0.1632   7.7955
+#&gt; 430:   -4.9889   0.3413   0.2271   0.1632   7.7993
+#&gt; 431:   -4.9889   0.3414   0.2271   0.1632   7.8013
+#&gt; 432:   -4.9889   0.3413   0.2271   0.1632   7.8005
+#&gt; 433:   -4.9889   0.3413   0.2271   0.1632   7.7999
+#&gt; 434:   -4.9889   0.3413   0.2271   0.1632   7.8001
+#&gt; 435:   -4.9889   0.3413   0.2270   0.1631   7.8045
+#&gt; 436:   -4.9889   0.3413   0.2270   0.1631   7.8075
+#&gt; 437:   -4.9889   0.3413   0.2269   0.1630   7.8071
+#&gt; 438:   -4.9889   0.3413   0.2269   0.1630   7.8042
+#&gt; 439:   -4.9888   0.3414   0.2269   0.1630   7.8037
+#&gt; 440:   -4.9888   0.3414   0.2269   0.1630   7.8023
+#&gt; 441:   -4.9888   0.3413   0.2269   0.1630   7.8012
+#&gt; 442:   -4.9889   0.3414   0.2269   0.1630   7.7987
+#&gt; 443:   -4.9889   0.3414   0.2269   0.1630   7.7981
+#&gt; 444:   -4.9889   0.3414   0.2269   0.1630   7.7987
+#&gt; 445:   -4.9889   0.3414   0.2269   0.1630   7.7974
+#&gt; 446:   -4.9889   0.3415   0.2269   0.1629   7.7995
+#&gt; 447:   -4.9888   0.3415   0.2269   0.1629   7.8008
+#&gt; 448:   -4.9888   0.3415   0.2270   0.1629   7.8015
+#&gt; 449:   -4.9889   0.3415   0.2269   0.1629   7.8009
+#&gt; 450:   -4.9888   0.3415   0.2269   0.1629   7.8003
+#&gt; 451:   -4.9888   0.3415   0.2268   0.1629   7.8015
+#&gt; 452:   -4.9888   0.3415   0.2268   0.1629   7.8009
+#&gt; 453:   -4.9888   0.3415   0.2268   0.1629   7.7994
+#&gt; 454:   -4.9888   0.3415   0.2268   0.1629   7.7997
+#&gt; 455:   -4.9888   0.3414   0.2268   0.1629   7.8012
+#&gt; 456:   -4.9887   0.3415   0.2268   0.1629   7.8014
+#&gt; 457:   -4.9886   0.3415   0.2269   0.1629   7.8004
+#&gt; 458:   -4.9886   0.3415   0.2269   0.1629   7.8004
+#&gt; 459:   -4.9886   0.3415   0.2269   0.1629   7.8011
+#&gt; 460:   -4.9886   0.3415   0.2269   0.1630   7.7995
+#&gt; 461:   -4.9887   0.3414   0.2270   0.1629   7.7964
+#&gt; 462:   -4.9887   0.3415   0.2269   0.1630   7.7966
+#&gt; 463:   -4.9886   0.3415   0.2269   0.1629   7.7952
+#&gt; 464:   -4.9886   0.3415   0.2269   0.1630   7.7956
+#&gt; 465:   -4.9886   0.3415   0.2269   0.1630   7.7937
+#&gt; 466:   -4.9886   0.3415   0.2269   0.1630   7.7933
+#&gt; 467:   -4.9886   0.3415   0.2268   0.1629   7.7937
+#&gt; 468:   -4.9887   0.3415   0.2269   0.1629   7.7956
+#&gt; 469:   -4.9887   0.3415   0.2270   0.1629   7.7965
+#&gt; 470:   -4.9887   0.3414   0.2270   0.1629   7.7956
+#&gt; 471:   -4.9886   0.3414   0.2270   0.1629   7.7957
+#&gt; 472:   -4.9886   0.3414   0.2270   0.1629   7.7944
+#&gt; 473:   -4.9885   0.3414   0.2270   0.1629   7.7939
+#&gt; 474:   -4.9886   0.3414   0.2270   0.1629   7.7939
+#&gt; 475:   -4.9887   0.3414   0.2269   0.1628   7.7944
+#&gt; 476:   -4.9887   0.3414   0.2269   0.1628   7.7949
+#&gt; 477:   -4.9888   0.3414   0.2269   0.1628   7.7933
+#&gt; 478:   -4.9888   0.3414   0.2269   0.1628   7.7921
+#&gt; 479:   -4.9888   0.3414   0.2270   0.1629   7.7926
+#&gt; 480:   -4.9888   0.3414   0.2270   0.1629   7.7917
+#&gt; 481:   -4.9889   0.3414   0.2270   0.1629   7.7923
+#&gt; 482:   -4.9888   0.3414   0.2270   0.1629   7.7919
+#&gt; 483:   -4.9889   0.3414   0.2270   0.1629   7.7919
+#&gt; 484:   -4.9889   0.3414   0.2270   0.1629   7.7923
+#&gt; 485:   -4.9889   0.3413   0.2270   0.1629   7.7935
+#&gt; 486:   -4.9889   0.3413   0.2270   0.1629   7.7926
+#&gt; 487:   -4.9889   0.3413   0.2269   0.1629   7.7936
+#&gt; 488:   -4.9888   0.3413   0.2269   0.1629   7.7939
+#&gt; 489:   -4.9888   0.3413   0.2270   0.1628   7.7935
+#&gt; 490:   -4.9888   0.3413   0.2270   0.1628   7.7929
+#&gt; 491:   -4.9889   0.3412   0.2270   0.1628   7.7924
+#&gt; 492:   -4.9889   0.3412   0.2270   0.1628   7.7915
+#&gt; 493:   -4.9889   0.3412   0.2270   0.1628   7.7923
+#&gt; 494:   -4.9888   0.3412   0.2269   0.1627   7.7920
+#&gt; 495:   -4.9888   0.3412   0.2270   0.1627   7.7915
+#&gt; 496:   -4.9889   0.3412   0.2270   0.1627   7.7927
+#&gt; 497:   -4.9889   0.3412   0.2270   0.1627   7.7939
+#&gt; 498:   -4.9890   0.3412   0.2269   0.1627   7.7939
+#&gt; 499:   -4.9889   0.3412   0.2270   0.1627   7.7937
+#&gt; 500:   -4.9889   0.3412   0.2270   0.1626   7.7930</div><div class='output co'>#&gt; <span class='message'>Calculating covariance matrix</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>Calculating residuals/tables</span></div><div class='output co'>#&gt; <span class='message'>done.</span></div><div class='input'>
 <span class='co'>## Save output information into a word document</span>
-<span class='fu'>nmDocx</span>(<span class='no'>fit.s</span>)
-
-}</div></pre>
+<span class='fu'>nmDocx</span><span class='op'>(</span><span class='va'>fit.s</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Calculating -2LL by Gaussian quadrature (nnodes=3,nsd=1.6)</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='warning'>Warning: Unrecognized statistics: r.squared</span>
+#&gt; <span class='warning'>Try setting `statistics` explicitly in the call to `huxreg()`</span></div><div class='output co'>#&gt; <span class='error'>Error in read_xml.raw(charToRaw(enc2utf8(x)), "UTF-8", ..., as_html = as_html,     options = options): PCDATA invalid Char value 27 [9]</span></div><div class='input'>
+<span class='co'># }</span>
+</div></span></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>Matthew Fidler</p>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
 
       <footer>
       <div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang, Mason McComb.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
