@@ -50,7 +50,7 @@ inits$OMGA <- list(ETA[1]+ETA[2]~c(.027, .01, .37))
 theo <- theo_md
 
 fit <- gnlmm(llik, theo, inits, pars, sys1,
-  control = list(trace = TRUE, nAQD = 5)
+  control = list(trace = TRUE, nAQD = 1)
 )
 
 pred <- function() {

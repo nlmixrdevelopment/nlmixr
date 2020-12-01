@@ -225,7 +225,6 @@ dat <- case1_pkpd %>%
 Next create a 2 compartment model:
 
 ```{r}
-
 ## Use 2 compartment model
 cmt2 <- function(){
     ini({
@@ -279,7 +278,7 @@ Now that we have run 3 different estimation methods, we can compare the results 
 ```{r}
 library(huxtable)
 
-as_hux("lognormal"=cmt2fit.logn, "proportional"=cmt2fit.prop, "add+prop"=cmt2fit.add.prop)
+huxreg("lognormal"=cmt2fit.logn, "proportional"=cmt2fit.prop, "add+prop"=cmt2fit.add.prop)
 ```
 
 Note that the additive and proportional model has the additive
@@ -372,9 +371,10 @@ In this case we wish to simulate with some variability and see what
 happens at steady state:
 
 ```{r}
+# Start a new simulation
 (ev <- et(amt=100, ii=8, ss=1))
 
-ev$add.sampling(seq(0, 8, length.out=100))
+ev$add.sampling(seq(0, 8, length.out=50))
 print(ev)
 ```
 

@@ -36,7 +36,9 @@ library(ggplot2)
 library(nlmixr)
 str(theo_sd)
 
-ggplot(theo_sd, aes(TIME, DV)) + geom_line(aes(group=ID), col="red") + scale_x_continuous("Time (h)") + scale_y_continuous("Concentration") + labs(title="Theophylline single-dose", subtitle="Concentration vs. time by individual")
+ggplot(theo_sd, aes(TIME, DV)) + geom_line(aes(group=ID), col="red") +
+  scale_x_continuous("Time (h)") + scale_y_continuous("Concentration") +
+  labs(title="Theophylline single-dose", subtitle="Concentration vs. time by individual")
 
 ```
 
@@ -71,8 +73,7 @@ f <- nlmixr(one.cmt)
 We can now run the model...
 
 ```{r}
-fit <- nlmixr(one.cmt, theo_sd, est="focei")
-
+fit <- nlmixr(one.cmt, theo_sd, control(print=0), est="focei")
 print(fit)
 ```
 
@@ -105,16 +106,16 @@ one.compartment <- function() {
 We can try the Stochastic Approximation EM (SAEM) method to this model:
 
 ```{r}
-fit2 <- nlmixr(one.compartment, theo_sd, est="saem")
-## print(fit2)
+fit2 <- nlmixr(one.compartment, theo_sd, list(print=0), est="saem")
+print(fit2)
 ```
 
-And if we wanted to, we could even apply the First-Order Conditional
-Estimation (FOCEi) method to this model:
+And if we wanted to, we could even apply the traditional R method nlme
+method to this model:
 
 ```{r}
-fitF <- nlmixr(one.compartment, theo_sd, est="focei")
-print(fitF)
+fitN <- nlmixr(one.compartment, theo_sd, list(pnlsTol=0.5), est="nlme")
+print(fitN)
 ```
 
 
@@ -211,7 +212,7 @@ Now install the extension for nlmixr:
  
 ```{r}
 library(xpose.nlmixr)
-xp <- xpose_data_nlmixr(fit2);
+xp <- xpose_data_nlmixr(fit2)
 ```
 
 ```{r}
@@ -229,12 +230,6 @@ dv_vs_pred(xp)
 ```{r}
 absval_res_vs_pred(xp, res="IWRES")
 ```
-We can also replicate some of nlmixr's internal plots...
-
-```{r}
-ind_plots(xp, res="IWRES")
-```
-
 For more information about using xpose, see the Uppsala pharmacometrics group's 
 comprehensive site [here](https://uupharmacometrics.github.io/xpose/).
 
@@ -257,12 +252,12 @@ one-compartment model with no covariates.
 
 ```r
 f <- function() {
-    ini({   # Initial conditions/variables
-            # are specified here
-    })
-    model({ # The model is specified
-            # here
-    })
+  ini({   # Initial conditions/variables
+    # are specified here
+  })
+  model({ # The model is specified
+    # here
+  })
 }
 ```
 
@@ -276,29 +271,29 @@ other similar packages. In the NONMEM world, the `ini` block is
 analogous to `$THETA`, `$OMEGA` and `$SIGMA` blocks.
 
 ```r
-f <- function(){ # Note that arguments to the function are currently
-                 # ignored by nlmixr
-    ini({
-        # Initial conditions for population parameters (sometimes
-        # called THETA parameters) are defined by either '<-' or '='
-        lCl <- 1.6      # log Cl (L/hr)
-        
-        # Note that simple expressions that evaluate to a number are
-        # OK for defining initial conditions (like in R)
-        lVc = log(90)  # log V (L)
-        
-        ## Also, note that a comment on a parameter is captured as a parameter label
-        lKa <- 1       # log Ka (1/hr)
-        
-        # Bounds may be specified by c(lower, est, upper), like NONMEM:
-        # Residuals errors are assumed to be population parameters
-        prop.err <- c(0, 0.2, 1)
-        
-        # IIV terms will be discussed in the next example
-    })
+f <- function() { # Note that arguments to the function are currently
+  # ignored by nlmixr
+  ini({
+    # Initial conditions for population parameters (sometimes
+    # called THETA parameters) are defined by either '<-' or '='
+    lCl <- 1.6      # log Cl (L/hr)
     
-    # The model block will be discussed later
-    model({})
+    # Note that simple expressions that evaluate to a number are
+    # OK for defining initial conditions (like in R)
+    lVc = log(90)  # log V (L)
+    
+    ## Also, note that a comment on a parameter is captured as a parameter label
+    lKa <- 1       # log Ka (1/hr)
+    
+    # Bounds may be specified by c(lower, est, upper), like NONMEM:
+    # Residuals errors are assumed to be population parameters
+    prop.err <- c(0, 0.2, 1)
+    
+    # IIV terms will be discussed in the next example
+  })
+  
+  # The model block will be discussed later
+  model({})
 }
 
 ```
@@ -339,31 +334,31 @@ Continuing from the prior example, we can annotate the estimates for
 the between-subject error distribution...
 
 ```r
-f <- function(){
-    ini({
-        lCl <- 1.6      # log Cl (L/hr)
-        lVc = log(90)   # log V (L)
-        lKa <- 1        # log Ka (1/hr)
-        prop.err <- c(0, 0.2, 1)
-        
-        # Initial estimate for ka IIV variance
-        # Labels work for single parameters
-        eta.ka ~ 0.1    ## BSV Ka
-
-        # For correlated parameters, you specify the names of each
-        # correlated parameter separated by a addition operator `+`
-        # and the left handed side specifies the lower triangular
-        # matrix initial of the covariance matrix.
-        eta.cl + eta.vc ~ c(0.1,
-                            0.005, 0.1)
-                            
-        # Note that labels do not currently work for correlated
-        # parameters.  Also, do not put comments inside the lower
-        # triangular matrix as this will currently break the model.
-    })
+f <- function() {
+  ini({
+    lCl <- 1.6      # log Cl (L/hr)
+    lVc = log(90)   # log V (L)
+    lKa <- 1        # log Ka (1/hr)
+    prop.err <- c(0, 0.2, 1)
     
-    # The model block will be discussed later
-    model({})
+    # Initial estimate for ka IIV variance
+    # Labels work for single parameters
+    eta.ka ~ 0.1    ## BSV Ka
+
+    # For correlated parameters, you specify the names of each
+    # correlated parameter separated by a addition operator `+`
+    # and the left handed side specifies the lower triangular
+    # matrix initial of the covariance matrix.
+    eta.cl + eta.vc ~ c(0.1,
+                        0.005, 0.1)
+    
+    # Note that labels do not currently work for correlated
+    # parameters.  Also, do not put comments inside the lower
+    # triangular matrix as this will currently break the model.
+  })
+  
+  # The model block will be discussed later
+  model({})
 }
 ```
 As shown in the above example: 
@@ -397,37 +392,37 @@ annotated example:
 
 
 ```r
-f <- function(){
-    ini({
-        lCl <- 1.6       # log Cl (L/hr)
-        lVc <- log(90)   # log Vc (L)
-        lKA <- 0.1       # log Ka (1/hr)
-        prop.err <- c(0, 0.2, 1)
-        
-        eta.Cl ~ 0.1     # BSV Cl
-        eta.Vc ~ 0.1     # BSV Vc
-        eta.KA ~ 0.1     # BSV Ka
-    })
-    model({
-        # Parameters are defined in terms of the previously-defined
-        # parameter names:
-        Cl <- exp(lCl + eta.Cl)
-        Vc =  exp(lVc + eta.Vc)
-        KA <- exp(lKA + eta.KA)
-        
-        # Next, the differential equations are defined:
-        kel <- Cl / Vc;
-        
-        d/dt(depot)  = -KA*depot;
-        d/dt(centr)  =  KA*depot-kel*centr;
-        
-        # And the concentration is then calculated
-        cp = centr / Vc;
-        # Finally, we specify that the plasma concentration follows
-        # a proportional error distribution (estimated by the parameter 
-        # prop.err)
-        cp ~ prop(prop.err)
-    })
+f <- function() {
+  ini({
+    lCl <- 1.6       # log Cl (L/hr)
+    lVc <- log(90)   # log Vc (L)
+    lKA <- 0.1       # log Ka (1/hr)
+    prop.err <- c(0, 0.2, 1)
+    
+    eta.Cl ~ 0.1     # BSV Cl
+    eta.Vc ~ 0.1     # BSV Vc
+    eta.KA ~ 0.1     # BSV Ka
+  })
+  model({
+    # Parameters are defined in terms of the previously-defined
+    # parameter names:
+    Cl <- exp(lCl + eta.Cl)
+    Vc =  exp(lVc + eta.Vc)
+    KA <- exp(lKA + eta.KA)
+    
+    # Next, the differential equations are defined:
+    kel <- Cl / Vc;
+    
+    d/dt(depot)  = -KA*depot;
+    d/dt(centr)  =  KA*depot-kel*centr;
+    
+    # And the concentration is then calculated
+    cp = centr / Vc;
+    # Finally, we specify that the plasma concentration follows
+    # a proportional error distribution (estimated by the parameter 
+    # prop.err)
+    cp ~ prop(prop.err)
+  })
 
 }
 
@@ -501,28 +496,28 @@ below:
 
 ```{r}
 f <- function(){
-    ini({
-        lCl <- 1.6      #log Cl (L/hr)
-        lVc <- log(90)  #log Vc (L)
-        lKA <- 0.1      #log Ka (1/hr)
-        prop.err <- c(0, 0.2, 1)
-        eta.Cl ~ 0.1   # BSV Cl
-        eta.Vc ~ 0.1   # BSV Vc
-        eta.KA ~ 0.1   # BSV Ka
-    })
-    model({
-        Cl <- exp(lCl + eta.Cl)
-        Vc = exp(lVc + eta.Vc)
-        KA <- exp(lKA + eta.KA)
-        ## Instead of specifying the ODEs, you can use
-        ## the linCmt() function to use the solved system.
-        ##
-        ## This function determines the type of PK solved system
-        ## to use by the parameters that are defined.  In this case
-        ## it knows that this is a one-compartment model with first-order
-        ## absorption.
-        linCmt() ~ prop(prop.err)
-    })
+  ini({
+    lCl <- 1.6      #log Cl (L/hr)
+    lVc <- log(90)  #log Vc (L)
+    lKA <- 0.1      #log Ka (1/hr)
+    prop.err <- c(0, 0.2, 1)
+    eta.Cl ~ 0.1   # BSV Cl
+    eta.Vc ~ 0.1   # BSV Vc
+    eta.KA ~ 0.1   # BSV Ka
+  })
+  model({
+    Cl <- exp(lCl + eta.Cl)
+    Vc = exp(lVc + eta.Vc)
+    KA <- exp(lKA + eta.KA)
+    ## Instead of specifying the ODEs, you can use
+    ## the linCmt() function to use the solved system.
+    ##
+    ## This function determines the type of PK solved system
+    ## to use by the parameters that are defined.  In this case
+    ## it knows that this is a one-compartment model with first-order
+    ## absorption.
+    linCmt() ~ prop(prop.err)
+  })
 }
 ```
 A few things to keep in mind: 

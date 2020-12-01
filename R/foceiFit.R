@@ -1723,6 +1723,8 @@ foceiFit.data.frame0 <- function(data,
                                  drop=NULL) {
   set.seed(control$seed)
   .pt <- proc.time()
+  RxODE::.setWarnIdSort(FALSE)
+  on.exit(RxODE::.setWarnIdSort(TRUE))
   loadNamespace("n1qn1")
   if (!RxODE::rxIs(control, "foceiControl")) {
     control <- do.call(foceiControl, control)
@@ -2254,7 +2256,8 @@ foceiFit.data.frame0 <- function(data,
       transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
       maxords = .ret$control$maxords, method = .ret$control$method,
       keep=keep
-    )
+      )
+    RxODE::rxSolveFree()
     if (any(is.na(.res$rx_pred_)) && .ret$control$method == 2L) {
       .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav,
         returnType = "data.frame",
@@ -2263,8 +2266,8 @@ foceiFit.data.frame0 <- function(data,
         hmin = .ret$control$hmin, hmax = .ret$control$hmax / 2, hini = .ret$control$hini,
         transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
         maxords = .ret$control$maxords, method = "lsoda",
-        keep=keep
-      )
+        keep=keep)
+      RxODE::rxSolveFree()
       if (any(is.na(.res$rx_pred_))) {
         .res <- .solve(.ret$model$pred.only, .pars$pred, .ret$dataSav,
           returnType = "data.frame",
@@ -2273,8 +2276,8 @@ foceiFit.data.frame0 <- function(data,
           hmin = .ret$control$hmin, hmax = .ret$control$hmax / 2, hini = .ret$control$hini,
           transitAbs = .ret$control$transitAbs, maxordn = .ret$control$maxordn,
           maxords = .ret$control$maxords, method = "dop853",
-          keep=keep
-        )
+          keep=keep)
+        RxODE::rxSolveFree()
         if (any(is.na(.res$rx_pred_))) {
           warning("Problems solving pred/wres liblsoda, lsoda and dop853")
         } else {
@@ -2293,6 +2296,7 @@ foceiFit.data.frame0 <- function(data,
 
     .vars <- .ret$fixef
     names(.vars) <- paste0("THETA[", seq_along(.vars), "]")
+    RxODE::rxSolveFree()
     .ipred <- .solve(.ret$model$pred.only, .vars, .ret$dataSav,
       returnType = "data.frame.TBS",
       atol = .ret$control$atol[1], rtol = .ret$control$rtol[1], maxsteps = .ret$control$maxstepsOde,
@@ -2300,8 +2304,8 @@ foceiFit.data.frame0 <- function(data,
       transitAbs = .ret$control$TransitAbs,
       maxordn = .ret$control$maxordn, maxords = .ret$control$maxords,
       method = .ret$control$method,
-      keep=keep
-    )
+      keep=keep)
+    RxODE::rxSolveFree()
     if (!is.null(.censName)) {
       .cens <- data[, .censName]
     } else {
@@ -2345,6 +2349,7 @@ foceiFit.data.frame0 <- function(data,
         .etas <- .ret$ranef
         .thetas <- .ret$fixef
         .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
+        RxODE::rxSolveFree()
         .preds <- list(
           ipred = .solve(.ret$model$pred.only, .pars$ipred, .ret$dataSav,
             returnType = "data.frame.TBS",
@@ -2356,8 +2361,8 @@ foceiFit.data.frame0 <- function(data,
             keep=keep
           ),
           pred = .solvePred(),
-          cwres = FALSE
-        )
+          cwres = FALSE)
+        RxODE::rxSolveFree()
       } else {
         .pt <- proc.time()
         .etas <- .ret$ranef
@@ -2383,6 +2388,7 @@ foceiFit.data.frame0 <- function(data,
       .etas <- .ret$ranef
       .thetas <- .ret$fixef
       .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
+      RxODE::rxSolveFree()
       .preds <- list(
         ipred = .solve(.ret$model$inner, .pars$ipred, .ret$dataSav,
           returnType = "data.frame.TBS",
@@ -2394,6 +2400,7 @@ foceiFit.data.frame0 <- function(data,
         ),
         pred = .solvePred()
       )
+      RxODE::rxSolveFree()
     }
     if (!is.null(.censName)) {
       .cens <- data[, .censName]
@@ -2899,9 +2906,6 @@ nlmixrPosthoc.default <- function(x, ...) {
 }
 
 ## FIXME fitted?
-
-
-
 focei.eta.nlmixrFitCore <- function(object, ...) {
   .uif <- object$uif
   ## Reorder based on translation

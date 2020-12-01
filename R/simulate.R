@@ -158,6 +158,7 @@
 ##' @inheritParams RxODE::rxSolve
 ##' @export
 nlmixrSim <- function(object, ...) {
+  RxODE::rxSolveFree()
   RxODE::.setWarnIdSort(FALSE)
   on.exit({
     RxODE::.setWarnIdSort(TRUE)

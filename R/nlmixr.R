@@ -1,11 +1,13 @@
 .onLoad <- function(libname, pkgname) {
   backports::import(pkgname)
-  RxODE::.s3register("generics::tidy", "nlmixrFitCore")
-  RxODE::.s3register("generics::tidy", "nlmixrFitCoreSilent")
-  RxODE::.s3register("generics::glance", "nlmixrFitCore")
-  RxODE::.s3register("generics::glance", "nlmixrFitCoreSilent")
-  RxODE::.s3register("generics::augment", "nlmixrFitCore")
-  RxODE::.s3register("generics::augment", "nlmixrFitCoreSilent")
+  if (requireNamespace("generics", quietly = TRUE)) {
+    RxODE::.s3register("generics::tidy", "nlmixrFitCore")
+    RxODE::.s3register("generics::tidy", "nlmixrFitCoreSilent")
+    RxODE::.s3register("generics::glance", "nlmixrFitCore")
+    RxODE::.s3register("generics::glance", "nlmixrFitCoreSilent")
+    RxODE::.s3register("generics::augment", "nlmixrFitCore")
+    RxODE::.s3register("generics::augment", "nlmixrFitCoreSilent")
+  }
 }
 
 compiled.RxODE.md5 <- RxODE::rxMd5()

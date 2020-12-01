@@ -148,7 +148,7 @@ multi2 <- function(mu, vmat, n) {
 #' theo <- theo_md
 #'
 #' fit <- gnlmm(llik, theo, inits, pars, sys1,
-#'   control = list(trace = TRUE, nAQD = 5)
+#'   control = list(trace = TRUE, nAQD = 1)
 #' )
 #'
 #' pred <- function() {
@@ -276,7 +276,7 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
 #' }
 #' inits <- list(THTA = c(1, 1, 1), OMGA = list(ETA[1] ~ 1))
 #'
-#' gnlmm(llik, rats, inits, control = list(nAQD = 3))
+#' gnlmm(llik, rats, inits, control = list(nAQD = 1))
 #'
 #' llik <- function() {
 #'   if (group == 1) {
@@ -322,11 +322,11 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
 #' theo <- theo_md
 #'
 #' fit <- gnlmm(llik, theo, inits, pars, sys1,
-#'   control = list(trace = TRUE, nAQD = 5)
+#'   control = list(trace = TRUE, nAQD = 1)
 #' )
 #'
 #' fit2 <- gnlmm2(llik, theo, inits, pars, sys1,
-#'   control = list(trace = TRUE, nAQD = 5)
+#'   control = list(trace = TRUE, nAQD = 1)
 #' )
 #'
 #' cv <- calcCov(fit)

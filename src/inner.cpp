@@ -764,24 +764,26 @@ double likInner0(double *eta, int id){
 
       // RSprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
       // Calculate matricies
-      int k = 0;//ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
+      int k = 0, kk=0;//ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
       fInd->llik=0.0;
       fInd->tbsLik=0.0;
-      double f, err, r, fpm, rp = 0,lnr, limit, dv;
+      double f, err, r, fpm, rp = 0,lnr, limit, dv,dv0, curT;
       int cens = 0;
       int oldNeq = op->neq;
       iniSubjectI(op->neq, 1, ind, op, rx, rxInner.update_inis);
       for (j = 0; j < ind->n_all_times; ++j){
 	ind->idx=j;
-	double curT = getTimeF(ind->ix[ind->idx], ind);
-	if (isDose(ind->evid[ind->ix[ind->idx]])) {
+	kk = ind->ix[j];
+	curT = getTimeF(kk, ind);
+	dv0 = ind->dv[kk];
+	dv = tbs(dv0);
+	if (isDose(ind->evid[kk])) {
 	  // ind->tlast = ind->all_times[ind->ix[ind->idx]];
 	  // Need to calculate for advan sensitivities
 	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
-	} else if (ind->evid[ind->ix[ind->idx]] == 0) {
+	} else if (ind->evid[kk] == 0) {
 	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated
-	  dv = tbs(ind->dv[ind->ix[ind->idx]]);
 	  if (ISNA(f) || std::isnan(f)) {
 	    // REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[ind->ix[ind->idx]], dv);
 	    // REprintf("eta: ");
@@ -792,11 +794,10 @@ double likInner0(double *eta, int id){
 	    throw std::runtime_error("bad solve");
 	  }
 	  // fInd->f(k, 0) = ind->lhs[0];
-	  // REprintf("f: %f: dv: %f tbs(dv): %f\n", f, ind->dv[ind->ix[ind->idx]], dv);
 	  err = f - dv;
 	  limit = R_NegInf;
 	  if (rx->limit) {
-	    limit = ind->limit[ind->ix[ind->idx]];
+	    limit = ind->limit[kk];
 	    if (ISNA(limit)) {
 	      limit = R_NegInf;
 	    } else if (R_FINITE(limit)) {
@@ -804,8 +805,8 @@ double likInner0(double *eta, int id){
 	    }
 	  }
 	  cens = 0;
-	  if (rx->cens) cens = ind->cens[ind->ix[ind->idx]];
-	  fInd->tbsLik+=tbsL(ind->dv[ind->ix[ind->idx]]);
+	  if (rx->cens) cens = ind->cens[kk];
+	  fInd->tbsLik+=tbsL(dv0);
 	  // fInd->err(k, 0) = ind->lhs[0] - ind->dv[k]; // pred-dv
 	  if (ISNA(ind->lhs[op_focei.neta + 1]))
 	    throw std::runtime_error("bad solve");
@@ -951,7 +952,7 @@ double likInner0(double *eta, int id){
 		//lp is eq 12 in Almquist 2015
 		// .5*apply(eps*fp*B + .5*eps^2*B*c - c, 2, sum) - OMGAinv %*% ETA
 		if (cens == 0) {
-		  // REprintf("t: %f: err: %f; fpm: %f; B(k, 0): %f; c(k, i): %f; rp: %f", ind->all_times[ind->ix[ind->idx]], err, fpm, B(k, 0), c(k, i), rp);
+		  // REprintf("t: %f: err: %f; fpm: %f; B(k, 0): %f; c(k, i): %f; rp: %f", ind->all_times[kk], err, fpm, B(k, 0), c(k, i), rp);
 		  lp(i, 0)  += 0.25 * err * err * B(k, 0) * c(k, i) -
 		    0.5 * c(k, i) - 0.5 * err * fpm * B(k, 0);
 		  // REprintf("lp(i,0): %f\n", lp(i,0));
@@ -3913,7 +3914,7 @@ double nlmixrEval_(NumericVector theta, std::string md5){
       iterType.push_back(6);
     } else {
       doUnscaled=true;
-      iterType.push_back(5);    
+      iterType.push_back(5);
     }
   } else {
     // Actually unscaled
@@ -3964,7 +3965,7 @@ double nlmixrEval_(NumericVector theta, std::string md5){
     if (printN != 0 && cn % printN == 0){
       if (useColor && isRstudio)
 	RSprintf("|    U|%#14.8g |", f0);
-      else 
+      else
 	RSprintf("|    U|%#14.8g |", f0);
       for (i = 0; i < n; i++){
 	RSprintf("%#10.4g |", thetaU[i]);
@@ -3990,7 +3991,7 @@ double nlmixrEval_(NumericVector theta, std::string md5){
       } else {
 	RSprintf("\n");
       }
-    }  
+    }
   }
   return f0;
 }
@@ -5236,7 +5237,7 @@ void foceiFinalizeTables(Environment e){
     IntegerVector idx = seq_len(etas.length())-1;
     etas = etas[idx != etas.length()-1];
     e["ranef"]=etas;
-    
+
     // Now put names on the objects
     ////////////////////////////////////////////////////////////////////////////////
     // Eta Names
@@ -5244,7 +5245,7 @@ void foceiFinalizeTables(Environment e){
     tmpNM = getOmega();
     tmpNM.attr("dimnames") = List::create(etaNames, etaNames);
     e["omega"] = tmpNM;
-    
+
     tmpNM = as<NumericMatrix>(e["omegaR"]);
     tmpNM.attr("dimnames") = List::create(etaNames, etaNames);
     e["omegaR"] = tmpNM;
