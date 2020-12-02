@@ -1331,33 +1331,33 @@ private:
 using namespace Rcpp;
 
 typedef rx_solve *(*getRxSolve_t)();
-getRxSolve_t getRx_ = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+getRxSolve_t getRx_ = NULL;
 
 typedef t_calc_lhs (*getRxLhs_t)();
 
 typedef double (*getTime_t)(int idx, rx_solving_options_ind *ind);
-getTime_t getTimeS = (getTime_t) R_GetCCallable("RxODE", "getTime");
+getTime_t getTimeS;
 
-getRxLhs_t getRxLhs = (getRxLhs_t) R_GetCCallable("RxODE","getRxLhs");
+getRxLhs_t getRxLhs;
 
 typedef void (*sortIds_t)(rx_solve* rx, int ini);
 
-sortIds_t sortIds = (sortIds_t) R_GetCCallable("RxODE", "sortIds");
+sortIds_t sortIds;
 
 typedef t_update_inis (*getUpdateInis_t)();
-getUpdateInis_t getUpdateInis = (getUpdateInis_t) R_GetCCallable("RxODE", "getUpdateInis");
+getUpdateInis_t getUpdateInis;
 
 t_calc_lhs saem_lhs = NULL;
 t_update_inis saem_inis = NULL;
 
 typedef void (*par_solve_t)(rx_solve *rx);
 
-par_solve_t saem_solve = (par_solve_t) R_GetCCallable("RxODE","par_solve");
+par_solve_t saem_solve;
 
 typedef int (*iniSubjectE_t)(int solveid, int inLhs, rx_solving_options_ind *ind, rx_solving_options *op, rx_solve *rx,
 			     t_update_inis u_inis);
 
-iniSubjectE_t iniSubjectE = (iniSubjectE_t) R_GetCCallable("RxODE","iniSubjectE");
+iniSubjectE_t iniSubjectE;
 
 rx_solve* _rx = NULL;
 
@@ -1368,7 +1368,7 @@ RObject mat2NumMat(const mat &m) {
 }
 
 typedef const char *(*rxGetId_t)(int id);
-rxGetId_t rxGetIdS = (rxGetId_t) R_GetCCallable("RxODE", "rxGetId");
+rxGetId_t rxGetIdS;
 
 CharacterVector parNames;
 
@@ -1449,7 +1449,7 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
 
 typedef SEXP(*mv_t)(SEXP);
 
-mv_t rxModelVarsS = (mv_t)R_GetCCallable("RxODE", "_RxODE_rxModelVars_");
+mv_t rxModelVarsS;
 
 void setupRx(List &opt, SEXP evt, SEXP evtM) {
   RObject obj = opt[".rx"];
@@ -1498,7 +1498,17 @@ SEXP saem_do_pred(SEXP in_phi, SEXP in_evt, SEXP in_opt) {
 
 //[[Rcpp::export]]
 SEXP saem_fit(SEXP xSEXP) {
-  if (getRx_ == NULL) getRx_ = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+  if (getRx_ == NULL) {
+    getRx_ = (getRxSolve_t) R_GetCCallable("RxODE","getRxSolve_");
+    getTimeS = (getTime_t) R_GetCCallable("RxODE", "getTime");
+    getRxLhs = (getRxLhs_t) R_GetCCallable("RxODE","getRxLhs");
+    sortIds = (sortIds_t) R_GetCCallable("RxODE", "sortIds");
+    getUpdateInis = (getUpdateInis_t) R_GetCCallable("RxODE", "getUpdateInis");
+    saem_solve = (par_solve_t) R_GetCCallable("RxODE","par_solve");
+    iniSubjectE = (iniSubjectE_t) R_GetCCallable("RxODE","iniSubjectE");
+    rxGetIdS = (rxGetId_t) R_GetCCallable("RxODE", "rxGetId");
+    rxModelVarsS = (mv_t)R_GetCCallable("RxODE", "_RxODE_rxModelVars_");
+  }
   List x(xSEXP);
   List opt = x["opt"];
   setupRx(opt,x["evt"],x["evtM"]);

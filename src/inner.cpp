@@ -87,13 +87,13 @@ extern "C"{
   typedef const char *(*rxGetId_t)(int id);
   rxGetId_t rxGetId;
   typedef double (*getTime_t)(int idx, rx_solving_options_ind *ind);
-  getTime_t getTimeF = (getTime_t) R_GetCCallable("RxODE", "getTime");
+  getTime_t getTimeF;
 }
 
 typedef int (*iniSubjectI_t)(int solveid, int inLhs, rx_solving_options_ind *ind, rx_solving_options *op, rx_solve *rx,
 			     t_update_inis u_inis);
 
-iniSubjectI_t iniSubjectI = (iniSubjectI_t) R_GetCCallable("RxODE","iniSubjectE");
+iniSubjectI_t iniSubjectI;
 
 
 bool assignFn_ = false;
@@ -5644,6 +5644,8 @@ Environment foceiFitCpp_(Environment e){
     isRstudio = (isRstudio_t) R_GetCCallable("RxODE", "isRstudio");
     ind_solve=(ind_solve_t) R_GetCCallable("RxODE", "ind_solve");
     rxGetId = (rxGetId_t) R_GetCCallable("RxODE", "rxGetId");
+    getTimeF = (getTime_t) R_GetCCallable("RxODE", "getTime");
+    iniSubjectI = (iniSubjectI_t) R_GetCCallable("RxODE","iniSubjectE")
     assignFn_=true;
   }
   clock_t t0 = clock();
