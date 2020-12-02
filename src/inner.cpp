@@ -5645,7 +5645,7 @@ Environment foceiFitCpp_(Environment e){
     ind_solve=(ind_solve_t) R_GetCCallable("RxODE", "ind_solve");
     rxGetId = (rxGetId_t) R_GetCCallable("RxODE", "rxGetId");
     getTimeF = (getTime_t) R_GetCCallable("RxODE", "getTime");
-    iniSubjectI = (iniSubjectI_t) R_GetCCallable("RxODE","iniSubjectE")
+    iniSubjectI = (iniSubjectI_t) R_GetCCallable("RxODE","iniSubjectE");
     assignFn_=true;
   }
   clock_t t0 = clock();
