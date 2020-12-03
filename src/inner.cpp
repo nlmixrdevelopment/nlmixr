@@ -1662,7 +1662,7 @@ static inline void innerOpt1(int id, int likId) {
 		if (!tryAgain){
 		  tryAgain = true;
 		  for (int i = fop->neta; i--;){
-		    if (fInd->x[i] != -op_focei.etaNudge){
+		    if (fInd->x[i] != 0.0){
 		      tryAgain=false;
 		      break;
 		    }
