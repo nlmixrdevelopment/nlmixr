@@ -3859,6 +3859,7 @@ fi
 
 
 ${R_HOME}/bin/R CMD BATCH  inst/tools/r-stripper/stripper.R
+rm stripper.Rout
 
 echo --------[begin src/Makevars]--------
 cat src/Makevars
