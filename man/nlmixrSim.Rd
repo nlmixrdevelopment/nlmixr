@@ -170,10 +170,12 @@ during one call to the solver. (5000 by default)}
 value is 0.}
 
 \item{hmax}{The maximum absolute step size allowed.  When
-\code{hmax=NA} (default), uses the average difference (+hmaxSd*sd) in times
-and sampling events. When \code{hmax=NULL} RxODE uses the
-maximum difference in times in your sampling and events.  The
-value 0 is equivalent to infinite maximum absolute step size.}
+\code{hmax=NA} (default), uses the average difference +
+hmaxSd*sd in times and sampling events. The \code{hmaxSd} is a user
+specified parameter and which defaults to zero.  When
+\code{hmax=NULL} RxODE uses the maximum difference in times in
+your sampling and events.  The value 0 is equivalent to infinite
+maximum absolute step size.}
 
 \item{hmaxSd}{The number of standard deviations of the time
 difference to add to hmax. The default is 0}
@@ -198,10 +200,10 @@ is equivalent to calling \code{\link[RxODE]{setRxThreads}}}
     interpolated.  Currently this can be:
 
 \itemize{
-\item \code{"linear"} interpolation (the default), which interpolates the covariate
+\item \code{"linear"} interpolation, which interpolates the covariate
     by solving the line between the observed covariates and extrapolating the new
     covariate value.
-\item \code{"constant"} -- Last observation carried forward.
+\item \code{"constant"} -- Last observation carried forward (the default).
 \item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
       that NONMEM uses.
 \item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
@@ -236,7 +238,7 @@ what the number of cores are used in threaded ODE solving.}
 \item{sigmaIsChol}{Boolean indicating if the sigma is in the
 Cholesky decomposition instead of a symmetric covariance}
 
-\item{sigmaSeparation}{@template separation}
+\item{sigmaSeparation}{separation strategy for sigma;}
 
 \item{sigmaXform}{When taking \code{sigma} values from the @template Xform}
 
@@ -283,9 +285,9 @@ added to parameters}
     \code{FALSE}). When \code{addDosing} is \code{NULL}, only
     include \code{EVID=0} on solve and exclude any model-times or
     \code{EVID=2}. If \code{addDosing} is \code{NA} the classic
-    \code{RxODE} EVID events. When \code{addDosing} is \code{TRUE}
+    \code{RxODE} EVID events are returned. When \code{addDosing} is \code{TRUE}
     add the event information in NONMEM-style format; If
-    \code{subsetNonmem=FALSE} RxODE will also extra event types
+    \code{subsetNonmem=FALSE} RxODE will also include extra event types
     (\code{EVID}) for ending infusion and modeled times:
 
 \itemize{

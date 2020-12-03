@@ -288,6 +288,7 @@ typedef struct {
   double gradCalcCentralSmall;
   double gradCalcCentralLarge;
   double etaNudge;
+  double etaNudge2;
   int didEtaNudge;
   int reducedTol;
   int reducedTol2;
@@ -1606,29 +1607,74 @@ static inline void innerOpt1(int id, int likId) {
 	    }
 	  }
 	  if (tryAgain){
-	    std::fill_n(fInd->x, fop->neta, 0);
-	    std::fill_n(&fInd->var[0], fop->neta, 0.2);
+	    fInd->mode = 1;
+	    fInd->uzm = 1;
+	    op_focei.didHessianReset=1;
+	    std::fill_n(fInd->x, fop->neta, -op_focei.etaNudge2);
 	    nF = fInd->nInnerF;
 	    n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 		   fInd->var, &epsilon,
 		   &mode, &maxInnerIterations, &nsim,
-		   &imp, fInd->zm,
-		   &izs, &rzs, &dzs, &id);
-	    //nF = fInd->nInnerF-nF;
+		   &imp, fInd->zm, &izs, &rzs, &dzs, &id);
+	    // nF = fInd->nInnerF - nF;
 	    // if (nF > 3) tryAgain = false;
 	    if (!tryAgain){
 	      tryAgain = true;
 	      for (int i = fop->neta; i--;){
-		if (fInd->x[i] != -op_focei.etaNudge){
+		if (fInd->x[i] != -op_focei.etaNudge2){
 		  tryAgain=false;
 		  break;
 		}
 	      }
 	    }
 	    if (tryAgain) {
-	      std::fill_n(fInd->x, fop->neta, 0);
+	      fInd->mode = 1;
+	      fInd->uzm = 1;
+	      op_focei.didHessianReset=1;
+	      std::fill_n(fInd->x, fop->neta, +op_focei.etaNudge2);
+	      nF = fInd->nInnerF;
+	      n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
+		     fInd->var, &epsilon,
+		     &mode, &maxInnerIterations, &nsim,
+		     &imp, fInd->zm, &izs, &rzs, &dzs, &id);
+	      // nF = fInd->nInnerF - nF;
+	      // if (nF > 3) tryAgain = false;
+	      if (!tryAgain){
+		tryAgain = true;
+		for (int i = fop->neta; i--;){
+		  if (fInd->x[i] != +op_focei.etaNudge2){
+		    tryAgain=false;
+		    break;
+		  }
+		}
+	      }
+	      if (tryAgain) {
+		std::fill_n(fInd->x, fop->neta, 0);
+		std::fill_n(&fInd->var[0], fop->neta, 0.2);
+		nF = fInd->nInnerF;
+		n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
+		       fInd->var, &epsilon,
+		       &mode, &maxInnerIterations, &nsim,
+		       &imp, fInd->zm,
+		       &izs, &rzs, &dzs, &id);
+		//nF = fInd->nInnerF-nF;
+		// if (nF > 3) tryAgain = false;
+		if (!tryAgain){
+		  tryAgain = true;
+		  for (int i = fop->neta; i--;){
+		    if (fInd->x[i] != -op_focei.etaNudge){
+		      tryAgain=false;
+		      break;
+		    }
+		  }
+		}
+		if (tryAgain) {
+		  std::fill_n(fInd->x, fop->neta, 0);
+		}	    
+		std::fill_n(&fInd->var[0], fop->neta, 0.1);
+	      }
 	    }
-	    std::fill_n(&fInd->var[0], fop->neta, 0.1);
+	    
 	  }
 	}
       }
@@ -3120,6 +3166,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.gradCalcCentralLarge = as<double>(odeO["gradCalcCentralLarge"]);
   op_focei.gradCalcCentralSmall = as<double>(odeO["gradCalcCentralSmall"]);
   op_focei.etaNudge = as<double>(odeO["etaNudge"]);
+  op_focei.etaNudge2 = as<double>(odeO["etaNudge2"]);
   op_focei.eventFD = as<double>(odeO["eventFD"]);
   op_focei.eventCentral = as<double>(odeO["eventCentral"]);
   op_focei.predNeq = as<int>(odeO["predNeq"]);
@@ -5832,7 +5879,7 @@ Environment foceiFitCpp_(Environment e){
       warning(_("Hessian reset during optimization; (can control by foceiControl(resetHessianAndEta=.))"));
     }
     if (op_focei.didEtaNudge==1){
-      warning(_("initial ETAs were nudged; (can control by foceiControl(etaNudge=.))"));
+      warning(_("initial ETAs were nudged; (can control by foceiControl(etaNudge=., etaNudge2=))"));
     }
     if (op_focei.didEtaReset==1){
       warning(_("ETAs were reset to zero during optimization; (Can control by foceiControl(resetEtaP=.))"));

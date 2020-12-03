@@ -37,10 +37,10 @@ nlmixrAugPred(
     interpolated.  Currently this can be:
 
 \itemize{
-\item \code{"linear"} interpolation (the default), which interpolates the covariate
+\item \code{"linear"} interpolation, which interpolates the covariate
     by solving the line between the observed covariates and extrapolating the new
     covariate value.
-\item \code{"constant"} -- Last observation carried forward.
+\item \code{"constant"} -- Last observation carried forward (the default).
 \item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
       that NONMEM uses.
 \item \code{"midpoint"} Last observation carried forward to midpoint; Next observation

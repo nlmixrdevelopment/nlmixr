@@ -107,7 +107,8 @@ foceiControl(
   odeRecalcFactor = 10^(0.5),
   gradCalcCentralSmall = 1e-04,
   gradCalcCentralLarge = 10000,
-  etaNudge = 0.01,
+  etaNudge = 1/sqrt(3),
+  etaNudge2 = sqrt(3/5),
   stiff,
   nRetries = 3,
   seed = 42,
@@ -204,10 +205,12 @@ calculating if steady state has been achieved for sensitivity compartments.}
 value is 0.}
 
 \item{hmax}{The maximum absolute step size allowed.  When
-\code{hmax=NA} (default), uses the average difference (+hmaxSd*sd) in times
-and sampling events. When \code{hmax=NULL} RxODE uses the
-maximum difference in times in your sampling and events.  The
-value 0 is equivalent to infinite maximum absolute step size.}
+\code{hmax=NA} (default), uses the average difference +
+hmaxSd*sd in times and sampling events. The \code{hmaxSd} is a user
+specified parameter and which defaults to zero.  When
+\code{hmax=NULL} RxODE uses the maximum difference in times in
+your sampling and events.  The value 0 is equivalent to infinite
+maximum absolute step size.}
 
 \item{hini}{The step size to be attempted on the first step. The
 default value is determined by the solver (when hini = 0)}
@@ -229,10 +232,10 @@ is equivalent to calling \code{\link[RxODE]{setRxThreads}}}
     interpolated.  Currently this can be:
 
 \itemize{
-\item \code{"linear"} interpolation (the default), which interpolates the covariate
+\item \code{"linear"} interpolation, which interpolates the covariate
     by solving the line between the observed covariates and extrapolating the new
     covariate value.
-\item \code{"constant"} -- Last observation carried forward.
+\item \code{"constant"} -- Last observation carried forward (the default).
 \item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
       that NONMEM uses.
 \item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
@@ -698,13 +701,17 @@ where |grad| > gradCalcCentralLarge where forward differences
 switch to central differences.}
 
 \item{etaNudge}{By default initial ETA estimates start at zero;
-Sometimes this doesn't optimize appropriately.  If this value
-is non-zero, when the n1qn1 optimization didn't perform
+Sometimes this doesn't optimize appropriately.  If this value is
+non-zero, when the n1qn1 optimization didn't perform
 appropriately, reset the Hessian, and nudge the ETA up by this
-value; If the ETA still doesn't move, nudge the ETA down by
-this value.  Finally if it doesn't move, reset it to zero and
-do not perform the optimization again.  This ETA nudge is only
-done on the first ETA optimization.}
+value; If the ETA still doesn't move, nudge the ETA down by this
+value. By default this value is 1/sqrt(3), the first of the
+Gauss Quadrature numbers. If this is not successful try the
+second eta nudge number (below).  If +-etaNudge2 is not
+successful, then assign to zero and do not optimize any longer}
+
+\item{etaNudge2}{This is the second eta nudge.  By default it is
+sqrt(3/5), which is the n=3 quadrature point (excluding zero)}
 
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
     the ODE system is stiff or not.
