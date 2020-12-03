@@ -39,11 +39,11 @@
 #define tbsL(x) _powerL(x,   ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
 #define tbsDL(x) _powerDL(x, ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
 #define tbsD(x) _powerDD(x,  ind->lambda, (int)(ind->yj), ind->logitLow, ind->logitHi)
-#define _safe_log(a) (((a) <= DOUBLE_EPS) ? log(DOUBLE_EPS) : log(a))
-//#define _safe_log(a) log(a)
-//#define _safe_zero(a) ((a) <= DOUBLE_EPS ? DOUBLE_EPS : (a))
-#define _safe_zero(a) (a)
-#define _safe_sqrt(a) ((a) <= DOUBLE_EPS ? sqrt(DOUBLE_EPS) : sqrt(a))
+#define _safe_log(a) (((a) <= 0.0) ? log(DOUBLE_EPS) : log(a))
+// #define _safe_log(a) log(a)
+#define _safe_zero(a) ((a) == 0 ? DOUBLE_EPS : (a))
+//#define _safe_zero(a) (a)
+#define _safe_sqrt(a) ((a) <= 0 ? sqrt(DOUBLE_EPS) : sqrt(a))
 //#define _safe_sqrt(a) sqrt(a)
 
 using namespace Rcpp;
@@ -1567,15 +1567,15 @@ static inline void innerOpt1(int id, int likId) {
 	fInd->uzm = 1;
 	op_focei.didHessianReset=1;
 	std::fill_n(fInd->x, fop->neta, op_focei.etaNudge);
-	nF = fInd->nInnerF;
+	//nF = fInd->nInnerF;
 	n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 	       fInd->var, &epsilon,
 	       &mode, &maxInnerIterations, &nsim,
 	       &imp, fInd->zm,
 	       &izs, &rzs, &dzs, &id);
-	nF = fInd->nInnerF - nF;
+	// nF = fInd->nInnerF - nF;
 	// if (nF > 3) tryAgain = false;
-	if (!tryAgain){
+	if (!tryAgain) {
 	  tryAgain = true;
 	  for (int i = fop->neta; i--;){
 	    if (fInd->x[i] != op_focei.etaNudge){
@@ -1584,7 +1584,7 @@ static inline void innerOpt1(int id, int likId) {
 	    }
 	  }
 	}
-	if (tryAgain){
+	if (tryAgain) {
 	  fInd->mode = 1;
 	  fInd->uzm = 1;
 	  op_focei.didHessianReset=1;
@@ -1594,7 +1594,7 @@ static inline void innerOpt1(int id, int likId) {
 		 fInd->var, &epsilon,
 		 &mode, &maxInnerIterations, &nsim,
 		 &imp, fInd->zm, &izs, &rzs, &dzs, &id);
-	  nF = fInd->nInnerF - nF;
+	  // nF = fInd->nInnerF - nF;
 	  // if (nF > 3) tryAgain = false;
 	  if (!tryAgain){
 	    tryAgain = true;
@@ -1614,8 +1614,7 @@ static inline void innerOpt1(int id, int likId) {
 		   &mode, &maxInnerIterations, &nsim,
 		   &imp, fInd->zm,
 		   &izs, &rzs, &dzs, &id);
-	    std::fill_n(&fInd->var[0], fop->neta, 0.1);
-	    nF = fInd->nInnerF-nF;
+	    //nF = fInd->nInnerF-nF;
 	    // if (nF > 3) tryAgain = false;
 	    if (!tryAgain){
 	      tryAgain = true;
@@ -1625,8 +1624,11 @@ static inline void innerOpt1(int id, int likId) {
 		  break;
 		}
 	      }
+	    }
+	    if (tryAgain) {
 	      std::fill_n(fInd->x, fop->neta, 0);
 	    }
+	    std::fill_n(&fInd->var[0], fop->neta, 0.1);
 	  }
 	}
       }
