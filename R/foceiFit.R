@@ -528,13 +528,15 @@ is.latex <- function() {
 ##'   non-zero, when the n1qn1 optimization didn't perform
 ##'   appropriately, reset the Hessian, and nudge the ETA up by this
 ##'   value; If the ETA still doesn't move, nudge the ETA down by this
-##'   value. By default this value is 1/sqrt(3), the first of the
-##'   Gauss Quadrature numbers. If this is not successful try the
-##'   second eta nudge number (below).  If +-etaNudge2 is not
-##'   successful, then assign to zero and do not optimize any longer
+##'   value. By default this value is qnorm(1-0.05/2)*1/sqrt(3), the
+##'   first of the Gauss Quadrature numbers times by the 0.95\% normal
+##'   region. If this is not successful try the second eta nudge
+##'   number (below).  If +-etaNudge2 is not successful, then assign
+##'   to zero and do not optimize any longer
 ##'
 ##' @param etaNudge2 This is the second eta nudge.  By default it is
-##'   sqrt(3/5), which is the n=3 quadrature point (excluding zero)
+##'   qnorm(1-0.05/2)*sqrt(3/5), which is the n=3 quadrature point
+##'   (excluding zero) times by the 0.95\% normal region
 ##'
 ##' @param maxOdeRecalc Maximum number of times to reduce the ODE
 ##'     tolerances and try to resolve the system if there was a bad
@@ -690,8 +692,8 @@ foceiControl <- function(sigdig = 3, ...,
                          odeRecalcFactor = 10^(0.5),
                          gradCalcCentralSmall = 1e-4,
                          gradCalcCentralLarge = 1e4,
-                         etaNudge = 1/sqrt(3),
-                         etaNudge2=sqrt(3/5),
+                         etaNudge = qnorm(1-0.05/2)/sqrt(3),
+                         etaNudge2=qnorm(1-0.05/2) * sqrt(3/5),
                          stiff,
                          nRetries = 3,
                          seed = 42,

@@ -88,6 +88,8 @@ extern "C"{
   rxGetId_t rxGetId;
   typedef double (*getTime_t)(int idx, rx_solving_options_ind *ind);
   getTime_t getTimeF;
+  typedef void (*sortIds_t)(rx_solve* rx, int ini);
+  sortIds_t sortIdsF;
 }
 
 typedef int (*iniSubjectI_t)(int solveid, int inLhs, rx_solving_options_ind *ind, rx_solving_options *op, rx_solve *rx,
@@ -815,9 +817,9 @@ double likInner0(double *eta, int id){
 	  if (r == 0.0) {
 	    r = 1.0;
 	  }
-	  if (r > 1e300) {
-	    r = 1e300;
-	  }
+	  // if (r > 1e300) {
+	  //   r = 1e300;
+	  // }
 	  if (op_focei.neta == 0) {
 	    lnr =_safe_log(r);
 	    //llik <- -0.5 * sum(err ^ 2 / R + log(R));
@@ -1731,82 +1733,91 @@ static inline void innerOpt1(int id, int likId) {
   LikInner2(fInd->eta, likId, id);
 }
 
+void thetaReset0() {
+  NumericVector thetaIni(op_focei.ntheta);
+  for (int ii = op_focei.ntheta; ii--;){
+    thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
+  }
+  for (int ii = op_focei.muRefN; ii--;){
+    if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < (int)op_focei.ntheta){
+      thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
+    }
+  }
+  arma::mat etaMat(rx->nsub, op_focei.neta);
+  for (int ii = rx->nsub; ii--;){
+    focei_ind *fInd = &(inds_focei[ii]);
+    for (int jj = op_focei.neta; jj--; ){
+      if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < (int)op_focei.ntheta){
+	etaMat(ii, jj) = fInd->eta[jj]-op_focei.etaM(jj,0);
+      } else {
+	etaMat(ii, jj) = fInd->eta[jj];
+      }
+    }
+  }
+  // Update omega estimates
+  NumericVector omegaTheta(op_focei.omegan);
+
+  std::copy(&op_focei.fullTheta[0] + op_focei.ntheta,
+	    &op_focei.fullTheta[0] + op_focei.ntheta + op_focei.omegan,
+	    omegaTheta.begin());
+  Function loadNamespace("loadNamespace", R_BaseNamespace);
+  Environment nlmixr = loadNamespace("nlmixr");
+  Environment thetaReset = nlmixr[".thetaReset"];
+  focei_options *fop = &op_focei;
+  thetaReset["maxInnerIterations"]=fop->maxInnerIterations;
+  thetaReset["etaMat"] = wrap(etaMat);
+  thetaReset["thetaIni"]= thetaIni;
+  thetaReset["omegaTheta"] = omegaTheta;
+  thetaReset["nF"] = op_focei.nF+op_focei.nF2;
+  // Save gill info to skip recalc.
+  IntegerVector gillRetC(op_focei.npars);
+  std::copy(&op_focei.gillRetC[0], &op_focei.gillRetC[0]+op_focei.npars, gillRetC.begin());
+  thetaReset["gillRetC"] = gillRetC;
+  IntegerVector gillRet(op_focei.npars);
+  std::copy(&op_focei.gillRet[0], &op_focei.gillRet[0]+op_focei.npars, gillRet.begin());
+  thetaReset["gillRet"] = gillRet;
+  NumericVector gillDf(op_focei.npars);
+  std::copy(&op_focei.gillDf[0], &op_focei.gillDf[0]+op_focei.npars, gillDf.begin());
+  thetaReset["gillDf"] = gillDf;
+  NumericVector gillDf2(op_focei.npars);
+  std::copy(&op_focei.gillDf2[0], &op_focei.gillDf2[0]+op_focei.npars, gillDf2.begin());
+  thetaReset["gillDf2"] = gillDf2;
+  NumericVector gillErr(op_focei.npars);
+  std::copy(&op_focei.gillErr[0], &op_focei.gillErr[0]+op_focei.npars, gillErr.begin());
+  thetaReset["gillErr"] = gillErr;
+  NumericVector rEps(op_focei.npars);
+  std::copy(&op_focei.rEps[0], &op_focei.rEps[0]+op_focei.npars, rEps.begin());
+  thetaReset["rEps"] = rEps;
+  NumericVector aEps(op_focei.npars);
+  std::copy(&op_focei.aEps[0], &op_focei.aEps[0]+op_focei.npars, aEps.begin());
+  thetaReset["aEps"] = aEps;
+  NumericVector rEpsC(op_focei.npars);
+  std::copy(&op_focei.rEpsC[0], &op_focei.rEpsC[0]+op_focei.npars, rEpsC.begin());
+  thetaReset["rEpsC"] = rEpsC;
+  NumericVector aEpsC(op_focei.npars);
+  std::copy(&op_focei.aEpsC[0], &op_focei.aEpsC[0]+op_focei.npars, aEpsC.begin());
+  thetaReset["aEpsC"] = aEpsC;
+  thetaReset["c1"] = op_focei.c1;
+  thetaReset["c2"] = op_focei.c2;
+}
 
 void thetaReset(double size){
   mat etaRes =  op_focei.eta1SD % op_focei.etaM; //op_focei.cholOmegaInv * etaMat;
   for (unsigned int j = etaRes.n_rows; j--;){
     if (std::fabs(etaRes(j, 0)) >= size){ // Says reset;
-      NumericVector thetaIni(op_focei.ntheta);
-      for (int ii = op_focei.ntheta; ii--;){
-	thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
-      }
-      for (int ii = op_focei.muRefN; ii--;){
-	if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < (int)op_focei.ntheta){
-	  thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
-	}
-      }
-      arma::mat etaMat(rx->nsub, op_focei.neta);
-      for (int ii = rx->nsub; ii--;){
-	focei_ind *fInd = &(inds_focei[ii]);
-	for (int jj = op_focei.neta; jj--; ){
-	  if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < (int)op_focei.ntheta){
-	    etaMat(ii, jj) = fInd->eta[jj]-op_focei.etaM(jj,0);
-	  } else {
-	    etaMat(ii, jj) = fInd->eta[jj];
-	  }
-	}
-      }
-      // Update omega estimates
-      NumericVector omegaTheta(op_focei.omegan);
-
-      std::copy(&op_focei.fullTheta[0] + op_focei.ntheta,
-		&op_focei.fullTheta[0] + op_focei.ntheta + op_focei.omegan,
-		omegaTheta.begin());
-      Function loadNamespace("loadNamespace", R_BaseNamespace);
-      Environment nlmixr = loadNamespace("nlmixr");
-      Environment thetaReset = nlmixr[".thetaReset"];
-      focei_options *fop = &op_focei;
-      thetaReset["maxInnerIterations"]=fop->maxInnerIterations;
-      thetaReset["etaMat"] = wrap(etaMat);
-      thetaReset["thetaIni"]= thetaIni;
-      thetaReset["omegaTheta"] = omegaTheta;
-      thetaReset["nF"] = op_focei.nF+op_focei.nF2;
-      // Save gill info to skip recalc.
-      IntegerVector gillRetC(op_focei.npars);
-      std::copy(&op_focei.gillRetC[0], &op_focei.gillRetC[0]+op_focei.npars, gillRetC.begin());
-      thetaReset["gillRetC"] = gillRetC;
-      IntegerVector gillRet(op_focei.npars);
-      std::copy(&op_focei.gillRet[0], &op_focei.gillRet[0]+op_focei.npars, gillRet.begin());
-      thetaReset["gillRet"] = gillRet;
-      NumericVector gillDf(op_focei.npars);
-      std::copy(&op_focei.gillDf[0], &op_focei.gillDf[0]+op_focei.npars, gillDf.begin());
-      thetaReset["gillDf"] = gillDf;
-      NumericVector gillDf2(op_focei.npars);
-      std::copy(&op_focei.gillDf2[0], &op_focei.gillDf2[0]+op_focei.npars, gillDf2.begin());
-      thetaReset["gillDf2"] = gillDf2;
-      NumericVector gillErr(op_focei.npars);
-      std::copy(&op_focei.gillErr[0], &op_focei.gillErr[0]+op_focei.npars, gillErr.begin());
-      thetaReset["gillErr"] = gillErr;
-      NumericVector rEps(op_focei.npars);
-      std::copy(&op_focei.rEps[0], &op_focei.rEps[0]+op_focei.npars, rEps.begin());
-      thetaReset["rEps"] = rEps;
-      NumericVector aEps(op_focei.npars);
-      std::copy(&op_focei.aEps[0], &op_focei.aEps[0]+op_focei.npars, aEps.begin());
-      thetaReset["aEps"] = aEps;
-      NumericVector rEpsC(op_focei.npars);
-      std::copy(&op_focei.rEpsC[0], &op_focei.rEpsC[0]+op_focei.npars, rEpsC.begin());
-      thetaReset["rEpsC"] = rEpsC;
-      NumericVector aEpsC(op_focei.npars);
-      std::copy(&op_focei.aEpsC[0], &op_focei.aEpsC[0]+op_focei.npars, aEpsC.begin());
-      thetaReset["aEpsC"] = aEpsC;
-      thetaReset["c1"] = op_focei.c1;
-      thetaReset["c2"] = op_focei.c2;
-      if (op_focei.didEtaReset==1){
-	warning("mu-referenced Thetas were reset during optimization; (Can control by foceiControl(resetThetaP=.,resetThetaCheckPer=.,resetThetaFinalP=.))");
+      thetaReset0();
+      if (op_focei.didEtaReset==1) {
+	warning(_("mu-referenced Thetas were reset during optimization; (Can control by foceiControl(resetThetaP=.,resetThetaCheckPer=.,resetThetaFinalP=.))"));
       }
       stop("theta reset");
     }
   }
+}
+
+void thetaResetZero(){
+  thetaReset0();
+  warning(_("thetas were reset during optimization because of a zero gradient"));
+  stop("theta reset");
 }
 
 void innerOpt(){
@@ -1904,6 +1915,9 @@ void innerOpt(){
     }
     // Reset ETA variances for next step
     if (op_focei.neta > 0){
+      if (op_focei.zeroGrad) {
+	thetaResetZero();
+      }
       op_focei.eta1SD = 1/sqrt(op_focei.etaS);
       if (!op_focei.calcGrad && op_focei.maxOuterIterations > 0 &&
 	  (!op_focei.initObj || op_focei.checkTheta==1) &&
@@ -2436,7 +2450,7 @@ void numericGrad(double *theta, double *g){
 	doForward=true;
       }
     }
-    for (cpar = npars; cpar--;){
+    for (cpar = npars; cpar--;) {
       if (doForward){
 	delta = (std::fabs(theta[cpar])*op_focei.rEps[cpar] + op_focei.aEps[cpar]);
       } else {
@@ -2488,6 +2502,41 @@ void numericGrad(double *theta, double *g){
 	    // Forward
 	    g[cpar] = (tmp0-f)/delta;
 	  }
+	  if (g[cpar] == 0.0)  {
+	    double hf, hphif, err;
+	    // Add a a Gill difference with zero gradient
+	    op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+					    theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+	    err = 1/(std::fabs(theta[cpar])+1);
+	    if (op_focei.gillDf[cpar] == 0){
+	      op_focei.scaleC[cpar]=op_focei.scaleC0;
+	      op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+					      theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+	      if (op_focei.gillDf[cpar] == 0){
+		op_focei.scaleC[cpar]=1/op_focei.scaleC0;
+		op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+						theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+	      }
+	    }
+	    // h=aEps*(|x|+1)/sqrt(1+fabs(f));
+	    // h*sqrt(1+fabs(f))/(|x|+1) = aEps
+	    // let err=2*sqrt(epsA/(1+f))
+	    // err*(aEps+|x|rEps) = h
+	    // Let aEps = rEps (could be a different ratio)
+	    // h/err = aEps(1+|x|)
+	    // aEps=h/err/(1+|x|)
+	    //
+	    op_focei.aEps[cpar]  = hf*err;
+	    op_focei.rEps[cpar]  = hf*err;
+	    if(op_focei.optGillF){
+	      op_focei.aEpsC[cpar] = hf*err;
+	      op_focei.rEpsC[cpar] = hf*err;
+	    } else {
+	      op_focei.aEpsC[cpar] = hphif*err;
+	      op_focei.rEpsC[cpar] = hphif*err;
+	    }
+	    g[cpar] = op_focei.gillDf[cpar];
+	  }
 	  if (R_FINITE(op_focei.gradTrim)){
 	    if (g[cpar] > op_focei.gradTrim){
 	      g[cpar]=op_focei.gradTrim;
@@ -2538,6 +2587,43 @@ void numericGrad(double *theta, double *g){
 	if(op_focei.slow) op_focei.curTick = par_progress(op_focei.cur++, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
       }
       theta[cpar] = cur;
+      // Now for zero gradients try Gill differences
+      if (g[cpar] == 0.0)  {
+	op_focei.mixDeriv=1;
+	double hf, hphif, err;
+	// Add a a Gill difference with zero gradient
+	op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+					theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+	err = 1/(std::fabs(theta[cpar])+1);
+	if (op_focei.gillDf[cpar] == 0){
+	  op_focei.scaleC[cpar]=op_focei.scaleC0;
+	  op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+					  theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+	  if (op_focei.gillDf[cpar] == 0){
+	    op_focei.scaleC[cpar]=1/op_focei.scaleC0;
+	    op_focei.gillRet[cpar] = gill83(&hf, &hphif, &op_focei.gillDf[cpar], &op_focei.gillDf2[cpar], &op_focei.gillErr[cpar],
+					    theta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol);
+	  }
+	}
+	// h=aEps*(|x|+1)/sqrt(1+fabs(f));
+	// h*sqrt(1+fabs(f))/(|x|+1) = aEps
+	// let err=2*sqrt(epsA/(1+f))
+	// err*(aEps+|x|rEps) = h
+	// Let aEps = rEps (could be a different ratio)
+	// h/err = aEps(1+|x|)
+	// aEps=h/err/(1+|x|)
+	//
+	op_focei.aEps[cpar]  = hf*err;
+	op_focei.rEps[cpar]  = hf*err;
+	if(op_focei.optGillF){
+	  op_focei.aEpsC[cpar] = hf*err;
+	  op_focei.rEpsC[cpar] = hf*err;
+	} else {
+	  op_focei.aEpsC[cpar] = hphif*err;
+	  op_focei.rEpsC[cpar] = hphif*err;
+	}
+	g[cpar] = op_focei.gillDf[cpar];
+      }
     }
     if(op_focei.slow) {
       op_focei.cur=op_focei.totTick;
@@ -5695,6 +5781,7 @@ Environment foceiFitCpp_(Environment e){
     rxGetId = (rxGetId_t) R_GetCCallable("RxODE", "rxGetId");
     getTimeF = (getTime_t) R_GetCCallable("RxODE", "getTime");
     iniSubjectI = (iniSubjectI_t) R_GetCCallable("RxODE","iniSubjectE");
+    sortIdsF = (sortIds_t) R_GetCCallable("RxODE", "sortIds");
     assignFn_=true;
   }
   clock_t t0 = clock();
