@@ -605,7 +605,7 @@ foceiControl <- function(sigdig = 3, ...,
                          atolSens = NULL, rtolSens = NULL,
                          ssAtol = NULL, ssRtol = NULL, ssAtolSens = NULL, ssRtolSens = NULL,
                          minSS = 10L, maxSS = 1000L,
-                         maxstepsOde = 50000L, hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
+                         maxstepsOde = 500000L, hmin = 0L, hmax = NA_real_, hini = 0, maxordn = 12L, maxords = 5L, cores,
                          covsInterpolation = c("locf", "linear", "nocb", "midpoint"),
                          print = 1L,
                          printNcol = floor((getOption("width") - 23) / 12),
@@ -1006,7 +1006,7 @@ foceiControl <- function(sigdig = 3, ...,
     ...
   )
   if (!missing(etaMat) && missing(maxInnerIterations)) {
-    warning("By supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0")
+    warning("by supplying etaMat, assume you wish to evaluate at ETAs, so setting maxInnerIterations=0")
     .ret$maxInnerIterations <- 0L
     .ret$etaMat
   }
@@ -1922,6 +1922,7 @@ foceiFit.data.frame0 <- function(data,
     .nms <- thetaNames
   }
   .ret$thetaNames <- .nms
+  .thetaReset$thetaNames <- .nms
   if (length(lower) == 1) {
     lower <- rep(lower, length(inits$THTA))
   } else if (length(lower) != length(inits$THTA)) {
@@ -2164,6 +2165,13 @@ foceiFit.data.frame0 <- function(data,
         },
         error = function(e) {
           if (regexpr("theta reset", e$message) != -1) {
+            assign("zeroOuter", FALSE, this.env)
+            assign("zeroGrad", FALSE, this.env)
+            if (regexpr("theta reset0", e$message) != -1) {
+              assign("zeroGrad", TRUE, this.env)
+            }  else if (regexpr("theta resetZ", e$message) != -1) {
+              assign("zeroOuter", TRUE, this.env)
+            }
             assign("err", "theta reset", this.env)
           } else {
             assign("err", e$message, this.env)
@@ -2191,7 +2199,17 @@ foceiFit.data.frame0 <- function(data,
         .ret$control$aEpsC <- .thetaReset$aEpsC
         .ret$control$c1 <- .thetaReset$c1
         .ret$control$c2 <- .thetaReset$c2
-        message("Theta reset")
+        if (this.env$zeroOuter) {
+          message("Posthoc reset")
+          .ret$control$maxOuterIterations <- 0L
+        } else if (this.env$zeroGrad) {
+          message("Theta reset (zero gradient values); Switch to bobyqa")
+          RxODE::rxReq("minqa")
+          .ret$control$outerOptFun <- .bobyqa
+          .ret$control$outerOpt <- -1L
+        } else {
+          message("Theta reset (ETA drift)")
+        }
       }
     }
     if (this.env$err != "") {

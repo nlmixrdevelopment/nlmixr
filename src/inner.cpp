@@ -1733,33 +1733,9 @@ static inline void innerOpt1(int id, int likId) {
   LikInner2(fInd->eta, likId, id);
 }
 
-void thetaReset0() {
-  NumericVector thetaIni(op_focei.ntheta);
-  for (int ii = op_focei.ntheta; ii--;){
-    thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
-  }
-  for (int ii = op_focei.muRefN; ii--;){
-    if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < (int)op_focei.ntheta){
-      thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
-    }
-  }
-  arma::mat etaMat(rx->nsub, op_focei.neta);
-  for (int ii = rx->nsub; ii--;){
-    focei_ind *fInd = &(inds_focei[ii]);
-    for (int jj = op_focei.neta; jj--; ){
-      if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < (int)op_focei.ntheta){
-	etaMat(ii, jj) = fInd->eta[jj]-op_focei.etaM(jj,0);
-      } else {
-	etaMat(ii, jj) = fInd->eta[jj];
-      }
-    }
-  }
-  // Update omega estimates
-  NumericVector omegaTheta(op_focei.omegan);
+void parHistData(Environment e, bool focei);
 
-  std::copy(&op_focei.fullTheta[0] + op_focei.ntheta,
-	    &op_focei.fullTheta[0] + op_focei.ntheta + op_focei.omegan,
-	    omegaTheta.begin());
+static inline void thetaReset00(NumericVector &thetaIni, NumericVector &omegaTheta, arma::mat &etaMat) {
   Function loadNamespace("loadNamespace", R_BaseNamespace);
   Environment nlmixr = loadNamespace("nlmixr");
   Environment thetaReset = nlmixr[".thetaReset"];
@@ -1799,6 +1775,37 @@ void thetaReset0() {
   thetaReset["aEpsC"] = aEpsC;
   thetaReset["c1"] = op_focei.c1;
   thetaReset["c2"] = op_focei.c2;
+  parHistData(thetaReset, true);
+}
+
+static inline void thetaReset0() {
+  NumericVector thetaIni(op_focei.ntheta);
+  for (int ii = op_focei.ntheta; ii--;){
+    thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
+  }
+  for (int ii = op_focei.muRefN; ii--;){
+    if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < (int)op_focei.ntheta){
+      thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
+    }
+  }
+  arma::mat etaMat(rx->nsub, op_focei.neta);
+  for (int ii = rx->nsub; ii--;){
+    focei_ind *fInd = &(inds_focei[ii]);
+    for (int jj = op_focei.neta; jj--; ){
+      if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < (int)op_focei.ntheta){
+	etaMat(ii, jj) = fInd->eta[jj]-op_focei.etaM(jj,0);
+      } else {
+	etaMat(ii, jj) = fInd->eta[jj];
+      }
+    }
+  }
+  // Update omega estimates
+  NumericVector omegaTheta(op_focei.omegan);
+
+  std::copy(&op_focei.fullTheta[0] + op_focei.ntheta,
+	    &op_focei.fullTheta[0] + op_focei.ntheta + op_focei.omegan,
+	    omegaTheta.begin());
+  thetaReset00(thetaIni, omegaTheta, etaMat);
 }
 
 void thetaReset(double size){
@@ -1817,7 +1824,56 @@ void thetaReset(double size){
 void thetaResetZero(){
   thetaReset0();
   warning(_("thetas were reset during optimization because of a zero gradient"));
-  stop("theta reset");
+  stop("theta reset0");
+}
+
+void thetaResetObj(Environment e) {
+  // Check to see if the last objective function is the lowest, otherwise reset to the lowest thetaResetObj
+  if (op_focei.maxOuterIterations > 0) {
+    parHistData(e, true);
+    if (e.exists("parHistData")) {
+      if (TYPEOF(e["parHistData"]) == VECSXP) {
+	List parHistData = e["parHistData"];
+	IntegerVector iter = parHistData["iter"];
+	IntegerVector type = parHistData["type"];
+	NumericVector obj = parHistData["objf"];
+	int maxiter=-1, minObjId=-1;
+	double minObj = R_PosInf;
+	for (int i = obj.size(); i--;) {
+	  if (type[i] == 5) {
+	    if (!ISNA(obj[i])) {
+	      if (obj[i] < minObj) {
+		minObj = obj[i];
+		minObjId = i;
+	      }
+	    }
+	    maxiter = max2(maxiter, iter[i]);
+	  }
+	}
+	if (iter[minObjId] != maxiter) {
+	  // Min objective function is not at the last value
+	  // REprintf("not at minimum objective function seen\n");
+	  // NumericVector thetaIni(op_focei.ntheta);
+	  // NumericVector omegaTheta(op_focei.omegan);
+	  // for (int j = op_focei.ntheta; j--;){
+	  //   NumericVector cur = parHistData[3+j];
+	  //   thetaIni[j] = cur[minObjId];
+	  // }
+	  // for (int j = op_focei.omegan; j--;) {
+	  //   NumericVector cur = parHistData[3+op_focei.ntheta+j];
+	  //   omegaTheta[j] = cur[minObjId];
+	  // }
+	  // print(wrap(thetaIni));
+	  // print(wrap(omegaTheta));
+	  // arma::mat etaMat(rx->nsub, op_focei.neta, arma::fill::zeros);
+	  // thetaReset00(thetaIni, omegaTheta, etaMat);
+	  warning(_("last objective function was not at minimum, likely problems in optimization\nskip covariance"));
+	  op_focei.covMethod=0;
+	  // stop("theta resetZ");
+	}
+      }
+    }
+  }
 }
 
 void innerOpt(){
@@ -1893,7 +1949,7 @@ void innerOpt(){
                   innerEval(id);
                 } catch(...){
       		  // Not thread safe
-      		  warning("Bad solve during optimization.");
+      		  warning("bad solve during optimization");
       		  // ("Cannot correct.");
                 }
               }
@@ -1904,7 +1960,7 @@ void innerOpt(){
                 innerEval(id);
               } catch(...){
       		// Not thread safe
-                warning("Bad solve during optimization.");
+                warning("bad solve during optimization");
                 // ("Cannot correct.");
               }
             }
@@ -4374,7 +4430,6 @@ NumericVector nlmixrGrad_(NumericVector theta, std::string md5){
 		  printNcol, printN, isRstudio);
   return g;
 }
-void parHistData(Environment e, bool focei);
 //' @rdname nlmixrGradFun
 //' @export
 //[[Rcpp::export]]
@@ -4741,7 +4796,7 @@ NumericMatrix sqrtm(NumericMatrix m){
 //[[Rcpp::export]]
 NumericMatrix foceiCalcCov(Environment e){
   try {
-    if (op_focei.covMethod){
+    if (op_focei.covMethod) {
       op_focei.derivMethodSwitch=0;
       // Check boundaries
       unsigned int j, k;
@@ -5210,7 +5265,7 @@ NumericMatrix foceiCalcCov(Environment e){
 }
 
 void parHistData(Environment e, bool focei){
-  if (!e.exists("method") && iterType.size() > 0){
+  if (!e.exists("method") && iterType.size() > 0) {
     CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
     CharacterVector dfNames;
     if (focei){
@@ -5277,7 +5332,7 @@ void parHistData(Environment e, bool focei){
       vals = cPar;
     }
     if (focei){
-      for (i = 0; i < op_focei.npars; i++){
+      for (i = 0; i < min2(op_focei.npars+1, vals.n_cols); i++){
 	ret[i+2]= vals.col(i);
       }
     } else {
@@ -5294,6 +5349,32 @@ void parHistData(Environment e, bool focei){
     ret.attr("names")=dfNames;
     ret.attr("class") = "data.frame";
     ret.attr("row.names")=IntegerVector::create(NA_INTEGER, -sz);
+    Function loadNamespace("loadNamespace", R_BaseNamespace);
+    Environment nlmixr = loadNamespace("nlmixr");
+    Environment thetaReset = nlmixr[".thetaReset"];
+    if (thetaReset.exists("parHistData")) {
+      // rbind  data.
+      if (TYPEOF(thetaReset["parHistData"]) == VECSXP) {
+	Function rbind = baseEnv["rbind"];
+	// List parHistPrior = thetaReset["parHistData"];
+	// IntegerVector parHistPriorRN = parHistPrior.attr("row.names");
+	// int extra = parHistPriorRN[1];
+	// List ret2 = List(ret.size());
+	// for (int j = ret.size(); j--;) {
+	//   NumericVector newNv(sz+extra);
+	//   NumericVector last = parHistPrior[j];
+	//   NumericVector cur = ret[j];
+	//   std::copy(last.begin(), last.end(), newNv.begin());
+	//   std::copy(cur.begin(), cur.end(), newNv.begin() + last.size());
+	//   ret2[j] = newNv;
+	// }
+	// ret2.names() = ret.names();
+	// ret2.attr("class") = "data.frame";
+	// ret2.attr("row.names")=IntegerVector::create(NA_INTEGER, -sz-extra);
+	ret = rbind(thetaReset["parHistData"], ret);
+      }
+      thetaReset.remove("parHistData");
+    }
     e["parHistData"] = ret;
   }
 }
@@ -5998,6 +6079,7 @@ Environment foceiFitCpp_(Environment e){
   }
   e["scaleC"] = scaleSave;
   parHistData(e, true); // Need to calculate before the parameter translations are mangled
+  thetaResetObj(e);
   IntegerVector gillRet(op_focei.ntheta+op_focei.omegan);
   NumericVector gillAEps(op_focei.ntheta+op_focei.omegan,NA_REAL);
   NumericVector gillREps(op_focei.ntheta+op_focei.omegan,NA_REAL);

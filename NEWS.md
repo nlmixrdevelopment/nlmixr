@@ -5,8 +5,10 @@
    in the initial conditions (#322). The most important user-facing change is
    that now arbitrary R expressions can be used when setting initial conditions
    such as `tvCL <- log(c(2,3,4))` (#253) instead of simply `tvCL <- log(3)`
+
  - The function as.nlmixrBounds() now supports adding the columns that are
    missing into the input data.frame.
+
  - omega definitions can be correlation matrices (#338)
 
  - Can specify `keep=` and `drop=` in the nlmixr function to keep and
@@ -44,7 +46,11 @@
   a non-zero gradient.
 
 - Now when running if a zero gradient is detected, reset the problem
-  (theta reset) and re-estimate.
+  (theta reset) and re-estimated with `outerOpt="bobyqa"`
+
+- Now when running a model where the last objective function is not
+  the minimum objective function, issue a warning and skip the
+  covariance step. (See Issue #403)
 
 - `focei` proportional and power models are more tolerant of 0
   predictions in your data
