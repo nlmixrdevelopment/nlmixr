@@ -1867,8 +1867,7 @@ void thetaResetObj(Environment e) {
 	  // print(wrap(omegaTheta));
 	  // arma::mat etaMat(rx->nsub, op_focei.neta, arma::fill::zeros);
 	  // thetaReset00(thetaIni, omegaTheta, etaMat);
-	  warning(_("last objective function was not at minimum, likely problems in optimization\nskip covariance"));
-	  op_focei.covMethod=0;
+	  warning(_("last objective function was not at minimum, possible problems in optimization"));
 	  // stop("theta resetZ");
 	}
       }
@@ -1899,7 +1898,7 @@ void innerOpt(){
 	indF->doChol = 0; // Use generalized cholesky decomposition
         innerEval(id);
 	// Not thread safe
-	warning("Non-positive definite individual Hessian at solution(ID=%d); FOCEi objective functions may not be comparable.",id);
+	warning(_("non-positive definite individual Hessian at solution(ID=%d); FOCEi objective functions may not be comparable"),id);
         indF->doChol = 1; // Cholesky again.
       }
     }
@@ -1949,7 +1948,7 @@ void innerOpt(){
                   innerEval(id);
                 } catch(...){
       		  // Not thread safe
-      		  warning("bad solve during optimization");
+      		  warning(_("bad solve during optimization"));
       		  // ("Cannot correct.");
                 }
               }
@@ -1960,7 +1959,7 @@ void innerOpt(){
                 innerEval(id);
               } catch(...){
       		// Not thread safe
-                warning("bad solve during optimization");
+                warning(_("bad solve during optimization"));
                 // ("Cannot correct.");
               }
             }
@@ -3223,7 +3222,7 @@ NumericVector foceiSetup_(const RObject &obj,
       std::copy(lower1.begin(), lower1.end(), lowerIn.begin());
       std::fill_n(lowerIn.begin()+lower1.size(), totN - lower1.size(), R_NegInf);
     } else if (lower1.size() > totN){
-      warning("Lower bound is larger than the number of parameters being estimated.");
+      warning(_("lower bound is larger than the number of parameters being estimated"));
       std::copy(lower1.begin(), lower1.begin()+totN, lowerIn.begin());
     } else {
       lowerIn = lower1;
@@ -3239,7 +3238,7 @@ NumericVector foceiSetup_(const RObject &obj,
       std::copy(upper1.begin(), upper1.end(), upperIn.begin());
       std::fill_n(upperIn.begin()+upper1.size(), totN - upper1.size(), R_PosInf);
     } else if (upper1.size() > totN){
-      warning("Upper bound is larger than the number of parameters being estimated.");
+      warning(_("upper bound is larger than the number of parameters being estimated"));
       std::copy(upper1.begin(), upper1.begin()+totN, upperIn.begin());
     } else {
       upperIn = upper1;
@@ -4984,7 +4983,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	    op_focei.cur += op_focei.npars*2;
 	    op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	    if (!isPd){
-	      warning("R matrix non-positive definite");
+	      warning(_("R matrix non-positive definite"));
 	      e["R"] = wrap(e["R.0"]);
 	      op_focei.covMethod = 3;
 	      op_focei.cur += op_focei.npars*2;
@@ -4995,7 +4994,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	      if (!e.exists("Rinv")){
 		bool success  = inv(Rinv, trimatu(cholR));
 		if (!success){
-		  warning("Hessian (R) matrix seems singular; Using pseudo-inverse");
+		  warning(_("Hessian (R) matrix seems singular; Using pseudo-inverse"));
 		  Rinv = pinv(trimatu(cholR));
 		  checkSandwich = true;
 		}
@@ -5073,12 +5072,12 @@ NumericMatrix foceiCalcCov(Environment e){
 	      }
 	    }
 	    if (!isPd){
-	      warning("S matrix non-positive definite");
+	      warning(_("S matrix non-positive definite"));
 	      if (op_focei.covMethod == 1){
 		e["cov"] = as<NumericMatrix>(e["covR"]);
 		op_focei.covMethod = 2;
 	      } else {
-		warning("Cannot calculate covariance");
+		warning(_("cannot calculate covariance"));
 	      }
 	      op_focei.cur += op_focei.npars*2;
 	      op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
@@ -5099,7 +5098,7 @@ NumericMatrix foceiCalcCov(Environment e){
 		  bool success;
 		  success = inv(Sinv, trimatu(cholS));
 		  if (!success){
-		    warning("S matrix seems singular; Using pseudo-inverse");
+		    warning(_("S matrix seems singular; Using pseudo-inverse"));
 		    Sinv = pinv(trimatu(cholS));
 		  }
 		  Sinv = Sinv * Sinv.t();
@@ -5155,7 +5154,7 @@ NumericMatrix foceiCalcCov(Environment e){
 		bool success;
 		success = inv(Sinv, trimatu(cholS));
 		if (!success){
-		  warning("S matrix seems singular; Using pseudo-inverse.");
+		  warning(_("S matrix seems singular; Using pseudo-inverse"));
 		  Sinv = pinv(trimatu(cholS));
 		}
 		Sinv = Sinv * Sinv.t();
@@ -5199,45 +5198,45 @@ NumericMatrix foceiCalcCov(Environment e){
 	  if (op_focei.covMethod == 1){
 	    bool doWarn=false;
 	    if (rstr == "|r|"){
-	      warning("R matrix non-positive definite but corrected by R = sqrtm(R%%*%%R)");
+	      warning(_("R matrix non-positive definite but corrected by R = sqrtm(R%%*%%R)"));
 	      doWarn=true;
 	    } else if (rstr == "r+"){
-	      warning("R matrix non-positive definite but corrected (because of cholAccept)");
+	      warning(_("R matrix non-positive definite but corrected (because of cholAccept)"));
 	      doWarn=true;
 	    }
 	    if (sstr == "|s|"){
-	      warning("S matrix non-positive definite but corrected by S = sqrtm(S%%*%%S)");
+	      warning(_("S matrix non-positive definite but corrected by S = sqrtm(S%%*%%S)"));
 	      doWarn=true;
 	    } else if (sstr == "s+"){
-	      warning("S matrix non-positive definite but corrected (because of cholAccept)");
+	      warning(_("S matrix non-positive definite but corrected (because of cholAccept)"));
 	      doWarn=true;
 	    }
 	    if (doWarn){
-	      warning("Since sandwich matrix is corrected, you may compare to $covR or $covS if you wish.");
+	      warning(_("since sandwich matrix is corrected, you may compare to $covR or $covS if you wish"));
 	    }
 	    rstr =  rstr + "," + sstr;
 	    e["covMethod"] = wrap(rstr);
 	  } else if (op_focei.covMethod == 2){
 	    if (rstr == "|r|"){
-	      warning("R matrix non-positive definite but corrected by R = sqrtm(R%%*%%R)");
+	      warning(_("R matrix non-positive definite but corrected by R = sqrtm(R%%*%%R)"));
 	    } else if (rstr == "r+"){
-	      warning("R matrix non-positive definite but corrected (because of cholAccept)");
+	      warning(_("R matrix non-positive definite but corrected (because of cholAccept)"));
 	    }
 	    e["covMethod"] = wrap(rstr);
 	    if (origCov != 2){
 	      if (checkSandwich){
-		warning("Using R matrix to calculate covariance, can check sandwich or S matrix with $covRS and $covS");
+		warning(_("using R matrix to calculate covariance, can check sandwich or S matrix with $covRS and $covS"));
 	      } else {
-		warning("Using R matrix to calculate covariance");
+		warning(_("using R matrix to calculate covariance"));
 	      }
 	    }
 	  } else if (op_focei.covMethod == 3){
 	    e["covMethod"] = wrap(sstr);
 	    if (origCov != 2){
 	      if (checkSandwich){
-		warning("Using S matrix to calculate covariance, can check sandwich or R matrix with $covRS and $covR");
+		warning(_("using S matrix to calculate covariance, can check sandwich or R matrix with $covRS and $covR"));
 	      } else {
-		warning("Using S matrix to calculate covariance");
+		warning(_("using S matrix to calculate covariance"));
 	      }
 	    }
 	  }
@@ -5245,7 +5244,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	}
       } else {
 	if (boundary){
-	  warning("parameter estimate near boundary; covariance not calculated\n use 'getVarCov' to calculate anyway");
+	  warning(_("parameter estimate near boundary; covariance not calculated\n use 'getVarCov' to calculate anyway"));
 	  e["covMethod"] = "Boundary issue; Get SEs with getVarCov";
 	}
 	op_focei.cur=op_focei.totTick;
