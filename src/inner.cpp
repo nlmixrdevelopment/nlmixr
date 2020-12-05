@@ -743,14 +743,7 @@ double likInner0(double *eta, int id){
     }
     if (op->neq > 0 && (ISNA(ind->solve[0]) || std::isnan(ind->solve[0]) ||
 			std::isinf(ind->solve[0]))){
-      // REprintf("bad solve id: %d\n", ind->id);
-      // REprintf("eta: ");
-      // for (j = 0; j < op_focei.neta; ++j){
-      // 	REprintf("%f ",eta[j]);
-      // }
-      // REprintf("\n");
-      // throw std::runtime_error("bad solve");
-      return 1e300;
+      throw std::runtime_error("bad solve");
     } else {
       // Update eta.
       arma::mat lp(fInd->lp, op_focei.neta, 1, false, true);
@@ -787,13 +780,7 @@ double likInner0(double *eta, int id){
 	} else if (ind->evid[kk] == 0) {
 	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated
-	  if (ISNA(f) || std::isnan(f)) {
-	    // REprintf("id: %d f: %f: dv: %f tbs(dv): %f\n", ind->id, f, ind->dv[ind->ix[ind->idx]], dv);
-	    // REprintf("eta: ");
-	    // for (j = 0; j < op_focei.neta; ++j){
-	    //   REprintf("%f ",eta[ind->ix[ind->idx]]);
-	    // }
-	    // REprintf("\n");
+	  if (ISNA(f) || std::isnan(f) || std::isinf(f)) {
 	    throw std::runtime_error("bad solve");
 	  }
 	  // fInd->f(k, 0) = ind->lhs[0];
@@ -817,9 +804,6 @@ double likInner0(double *eta, int id){
 	  if (r == 0.0) {
 	    r = 1.0;
 	  }
-	  // if (r > 1e300) {
-	  //   r = 1e300;
-	  // }
 	  if (op_focei.neta == 0) {
 	    lnr =_safe_log(r);
 	    //llik <- -0.5 * sum(err ^ 2 / R + log(R));
