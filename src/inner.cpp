@@ -5165,13 +5165,19 @@ NumericMatrix foceiCalcCov(Environment e){
 	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
 	if (e.exists("cov")){
 	  arma::mat cov = as<arma::mat>(e["cov"]);
-	  arma::mat Dcov(cov.n_rows,cov.n_rows,fill::zeros);
-	  Dcov.diag() = (sqrt(cov.diag()));
-	  arma::vec sd2=Dcov.diag();
-	  Dcov = inv_sympd(Dcov);
-	  arma::mat cor2 = Dcov * cov * Dcov;
-	  cor2.diag()= sd2;
-	  e["cor"] = cor2;
+	  if (all(cov.diag() < 1e-7)){
+	    warning(_("The variance of all elements are unreasonably small, <1e-7"));
+	    op_focei.covMethod=0;
+	    e.remove("cov");
+	  } else {
+	    arma::mat Dcov(cov.n_rows,cov.n_rows,fill::zeros);
+	    Dcov.diag() = (sqrt(cov.diag()));
+	    arma::vec sd2=Dcov.diag();
+	    Dcov = inv_sympd(Dcov);
+	    arma::mat cor2 = Dcov * cov * Dcov;
+	    cor2.diag()= sd2;
+	    e["cor"] = cor2;
+	  }
 	}
 	if (op_focei.covMethod==0){
 	  warning(_("covariance step failed"));
