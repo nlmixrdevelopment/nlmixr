@@ -5,6 +5,8 @@
 
 ##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Teun Post, Richard Hooijmaijers, Wenping Wang
 
+[![R build status](https://github.com/nlmixrdevelopment/nlmixr/workflows/R-CMD-check/badge.svg)](https://github.com/nlmixrdevelopment/nlmixr/actions)
+
 ***
 
 `nlmixr` is an R package for fitting general dynamic models,
