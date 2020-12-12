@@ -1,0 +1,58 @@
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+name: test-coverage
+
+jobs:
+  test-coverage:
+    runs-on: macOS-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v1
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Install packages from cran (source)
+        run: |
+          install.packages('remotes')
+          install.packages("jsonlite", type="source")
+          install.packages("usethis", type="source")
+          install.packages("symengine", type="source")
+          install.packages("dparser", type="source")
+          remotes::install_cran("covr")
+        shell: Rscript {0}
+
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+
+      - name: Install dependencies
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+
+      - name: Test coverage
+        run: |
+           options(covr.flags = c(CFLAGS = "-O0 --coverage", CXXFLAGS = "-O0 --coverage", LDFLAGS = "--coverage"))
+           pkgbuild::with_build_tools(covr::codecov(token="f14028b3-4b64-4207-8ae2-36ab43056172", quiet=FALSE))
+        shell: Rscript {0}
