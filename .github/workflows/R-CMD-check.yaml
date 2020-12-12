@@ -63,7 +63,7 @@ jobs:
           install.packages("usethis", type="source")
           install.packages("symengine", type="source")
           install.packages("dparser", type="source")
-	  remotes::install_github('nlmixrdevelopent/RxODE')
+          remotes::install_github('nlmixrdevelopent/RxODE')
         shell: Rscript {0}
 
       - name: Query dependencies
