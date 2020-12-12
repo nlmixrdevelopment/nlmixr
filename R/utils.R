@@ -183,10 +183,7 @@ nlmixrTest <- function(expr, silent = .isTestthat(), test = "cran") {
     RxODE::rxSetSilentErr(0L)
   })
   if (.test == "true") {
-    do.it <- FALSE
-    if (any(test == c("cran", "lvl2"))) {
-      do.it <- TRUE
-    }
+    do.it <- TRUE
   } else if (any(.test == c("false", "", "cran"))) {
     if (any(test == c("false", "", "cran"))) {
       do.it <- TRUE
