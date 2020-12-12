@@ -44,7 +44,7 @@ jobs:
 
       - name: install libgit2-dev
         if: runner.os == 'Linux'
-        run: sudo add-apt-repository ppa:cran/libgit2 && sudo apt-get update && sudo apt-get install libssh2-1-dev libgit2-dev -y
+        run: sudo add-apt-repository ppa:cran/libgit2 && sudo apt-get update && sudo apt-get install libssh2-1-dev libgit2-dev libudunits2-dev -y
         shell: bash
 
       - uses: actions/checkout@v2
