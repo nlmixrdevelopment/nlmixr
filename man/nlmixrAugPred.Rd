@@ -31,20 +31,19 @@ nlmixrAugPred(
    arguments.}
 
 \item{covsInterpolation}{specifies the interpolation method for
-    time-varying covariates. When solving ODEs it often samples
-    times outside the sampling time specified in \code{events}.
-    When this happens, the time varying covariates are
-    interpolated.  Currently this can be:
-
+time-varying covariates. When solving ODEs it often samples
+times outside the sampling time specified in \code{events}.
+When this happens, the time varying covariates are
+interpolated.  Currently this can be:
 \itemize{
 \item \code{"linear"} interpolation, which interpolates the covariate
-    by solving the line between the observed covariates and extrapolating the new
-    covariate value.
+by solving the line between the observed covariates and extrapolating the new
+covariate value.
 \item \code{"constant"} -- Last observation carried forward (the default).
 \item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
-      that NONMEM uses.
+that NONMEM uses.
 \item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
-  carried backward to midpoint.
+carried backward to midpoint.
 }}
 
 \item{primary}{an optional one-sided formula specifying the primary

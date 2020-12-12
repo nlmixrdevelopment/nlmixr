@@ -23,7 +23,7 @@ foceiControl(
   ssRtolSens = NULL,
   minSS = 10L,
   maxSS = 1000L,
-  maxstepsOde = 50000L,
+  maxstepsOde = 500000L,
   hmin = 0L,
   hmax = NA_real_,
   hini = 0,
@@ -152,16 +152,15 @@ for outer problem.}
 optimization.}
 
 \item{method}{The method for solving ODEs.  Currently this supports:
-
 \itemize{
 \item \code{"liblsoda"} thread safe lsoda.  This supports parallel
-           thread-based solving, and ignores user Jacobian specification.
+thread-based solving, and ignores user Jacobian specification.
 \item \code{"lsoda"} -- LSODA solver.  Does not support parallel thread-based
-      solving, but allows user Jacobian specification.
+solving, but allows user Jacobian specification.
 \item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
-        solving nor user Jacobain specification
+solving nor user Jacobain specification
 \item \code{"indLin"} -- Solving through inductive linearization.  The RxODE dll
-        must be setup specially to use this solving routine.
+must be setup specially to use this solving routine.
 }}
 
 \item{transitAbs}{boolean indicating if this is a transit
@@ -175,7 +174,7 @@ if prior doses do not add anything to the solution.}
 \item{rtol}{a numeric relative tolerance (1e-6 by default) used
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
- if prior doses do not add anything to the solution.}
+if prior doses do not add anything to the solution.}
 
 \item{atolSens}{Sensitivity atol, can be different than atol with
 liblsoda.  This allows a less accurate solve for gradients (if desired)}
@@ -223,23 +222,22 @@ default value is determined by the solver (when hini = 0)}
 method.  The default value is 5.  This can be between 1 and 5.}
 
 \item{cores}{Number of cores used in parallel ODE solving.  This
-is equivalent to calling \code{\link[RxODE]{setRxThreads}}}
+is equivalent to calling \code{\link[RxODE:getRxThreads]{setRxThreads()}}}
 
 \item{covsInterpolation}{specifies the interpolation method for
-    time-varying covariates. When solving ODEs it often samples
-    times outside the sampling time specified in \code{events}.
-    When this happens, the time varying covariates are
-    interpolated.  Currently this can be:
-
+time-varying covariates. When solving ODEs it often samples
+times outside the sampling time specified in \code{events}.
+When this happens, the time varying covariates are
+interpolated.  Currently this can be:
 \itemize{
 \item \code{"linear"} interpolation, which interpolates the covariate
-    by solving the line between the observed covariates and extrapolating the new
-    covariate value.
+by solving the line between the observed covariates and extrapolating the new
+covariate value.
 \item \code{"constant"} -- Last observation carried forward (the default).
 \item \code{"NOCB"} -- Next Observation Carried Backward.  This is the same method
-      that NONMEM uses.
+that NONMEM uses.
 \item \code{"midpoint"} Last observation carried forward to midpoint; Next observation
-  carried backward to midpoint.
+carried backward to midpoint.
 }}
 
 \item{print}{Integer representing when the outer step is
@@ -716,18 +714,17 @@ qnorm(1-0.05/2)*sqrt(3/5), which is the n=3 quadrature point
 (excluding zero) times by the 0.95\% normal region}
 
 \item{stiff}{a logical (\code{TRUE} by default) indicating whether
-    the ODE system is stiff or not.
+the ODE system is stiff or not.\preformatted{For stiff ODE systems (`stiff = TRUE`), `RxODE` uses the
+LSODA (Livermore Solver for Ordinary Differential Equations)
+Fortran package, which implements an automatic method switching
+for stiff and non-stiff problems along the integration
+interval, authored by Hindmarsh and Petzold (2003).
 
-    For stiff ODE systems (\code{stiff = TRUE}), \code{RxODE} uses the
-    LSODA (Livermore Solver for Ordinary Differential Equations)
-    Fortran package, which implements an automatic method switching
-    for stiff and non-stiff problems along the integration
-    interval, authored by Hindmarsh and Petzold (2003).
-
-    For non-stiff systems (\code{stiff = FALSE}), \code{RxODE} uses
-    DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
-    Dormand and Prince as implemented in C by Hairer and Wanner
-    (1993).}
+For non-stiff systems (`stiff = FALSE`), `RxODE` uses
+DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
+Dormand and Prince as implemented in C by Hairer and Wanner
+(1993).
+}}
 
 \item{nRetries}{If FOCEi doesn't fit with the current parameter
 estimates, randomly sample new parameter estimates and restart
@@ -753,8 +750,8 @@ the atol/rtol for the rest of the problem.}
 function evaluation (in seconds) to start progress bars on gradient evaluations}
 
 \item{addProp}{one of "combined1" and "combined2"; These are the
-  two forms of additive+proportional errors supported by
-  monolix/nonmem:
+two forms of additive+proportional errors supported by
+monolix/nonmem:
 
 combined1: transform(y)=transform(f)+(a+b*f^c)*eps
 

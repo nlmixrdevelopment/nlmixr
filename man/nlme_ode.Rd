@@ -71,7 +71,7 @@ if prior doses do not add anything to the solution.}
 \item{rtol}{a numeric relative tolerance (1e-6 by default) used
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
- if prior doses do not add anything to the solution.}
+if prior doses do not add anything to the solution.}
 
 \item{maxsteps}{maximum number of (internally defined) steps allowed
 during one call to the solver. (5000 by default)}

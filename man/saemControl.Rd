@@ -74,19 +74,18 @@ if prior doses do not add anything to the solution.}
 \item{rtol}{a numeric relative tolerance (1e-6 by default) used
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
- if prior doses do not add anything to the solution.}
+if prior doses do not add anything to the solution.}
 
 \item{method}{The method for solving ODEs.  Currently this supports:
-
 \itemize{
 \item \code{"liblsoda"} thread safe lsoda.  This supports parallel
-           thread-based solving, and ignores user Jacobian specification.
+thread-based solving, and ignores user Jacobian specification.
 \item \code{"lsoda"} -- LSODA solver.  Does not support parallel thread-based
-      solving, but allows user Jacobian specification.
+solving, but allows user Jacobian specification.
 \item \code{"dop853"} -- DOP853 solver.  Does not support parallel thread-based
-        solving nor user Jacobain specification
+solving nor user Jacobain specification
 \item \code{"indLin"} -- Solving through inductive linearization.  The RxODE dll
-        must be setup specially to use this solving routine.
+must be setup specially to use this solving routine.
 }}
 
 \item{transitAbs}{boolean indicating if this is a transit
@@ -145,8 +144,8 @@ function.  By default this is \code{TRUE}}
 Increases solving accuracy and solving time.}
 
 \item{addProp}{one of "combined1" and "combined2"; These are the
-  two forms of additive+proportional errors supported by
-  monolix/nonmem:
+two forms of additive+proportional errors supported by
+monolix/nonmem:
 
 combined1: transform(y)=transform(f)+(a+b*f^c)*eps
 
