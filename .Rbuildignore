@@ -80,3 +80,4 @@ BinaryFiles$
 ^vignettes/*.pdf
 ^inst/1.1.1.3/*.*
 
+^codecov\.yml$

@@ -6,6 +6,7 @@
 ##### Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Teun Post, Richard Hooijmaijers, Wenping Wang
 
 [![R build status](https://github.com/nlmixrdevelopment/nlmixr/workflows/R-CMD-check/badge.svg)](https://github.com/nlmixrdevelopment/nlmixr/actions)
+[![Codecov test coverage](https://codecov.io/gh/nlmixrdevelopment/nlmixr/branch/master/graph/badge.svg)](https://codecov.io/gh/nlmixrdevelopment/nlmixr?branch=master)
 
 ***
 
