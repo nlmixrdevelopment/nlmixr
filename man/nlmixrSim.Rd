@@ -236,9 +236,51 @@ what the number of cores are used in threaded ODE solving.}
 \item{sigmaIsChol}{Boolean indicating if the sigma is in the
 Cholesky decomposition instead of a symmetric covariance}
 
-\item{sigmaSeparation}{separation strategy for sigma;}
+\item{sigmaSeparation}{separation strategy for sigma;
 
-\item{sigmaXform}{When taking \code{sigma} values from the @template Xform}
+Tells the type of separation strategy when
+simulating covariance with parameter uncertainty with standard
+deviations modeled in the \code{thetaMat} matrix.
+
+\code{"lkj"} simulates the correlation matrix from the
+\code{rLKJ1} matrix with the distribution parameter \code{eta}
+equal to the degrees of freedom \code{nu} by \code{(nu-1)/2}
+
+\code{"separation"} simulates from the identity inverse Wishart
+covariance matrix with \code{nu} degrees of freedom.  This is then
+converted to a covariance matrix and augmented with the modeled
+standard deviations.  While computationally more complex than the
+\code{"lkj"} prior, it performs better when the covariance matrix
+size is greater or equal to 10
+
+\code{"auto"} chooses \code{"lkj"} when the dimension of the
+matrix is less than 10 and \code{"separation"} when greater
+than equal to 10.}
+
+\item{sigmaXform}{When taking \code{sigma} values from the \code{thetaMat}
+simulations (using the separation strategy for covariance
+simulation), how should the \code{thetaMat} values be turned int
+standard deviation values:
+\itemize{
+\item \code{identity} This is when standard deviation values are
+directly modeled by the \code{params} and \code{thetaMat} matrix
+\item \code{variance} This is when the \code{params} and \code{thetaMat}
+simulates the variance that are directly modeled by the
+\code{thetaMat} matrix
+\item \code{log} This is when the \code{params} and \code{thetaMat}
+simulates \code{log(sd)}
+\item \code{nlmixrSqrt} This is when the \code{params} and
+\code{thetaMat} simulates the inverse cholesky decomposed matrix
+with the \code{x^2} modeled along the diagonal.  This only works
+with a diagonal matrix.
+\item \code{nlmixrLog} This is when the \code{params} and
+\code{thetaMat} simulates the inverse cholesky decomposed matrix
+with the \code{exp(x^2)} along the diagonal.  This only works
+with a diagonal matrix.
+\item \code{nlmixrIdentity} This is when the \code{params} and
+\code{thetaMat} simulates the inverse cholesky decomposed matrrix.
+This only works with a diagonal matrix.
+}}
 
 \item{nDisplayProgress}{An integer indicating the minimum number
 of c-based solves before a progress bar is shown.  By default
@@ -326,9 +368,51 @@ distribution instead of a t-distribution.}
 Cholesky decomposed matrix instead of the traditional
 symmetric matrix.}
 
-\item{omegaSeparation}{@template separation}
+\item{omegaSeparation}{Omega separation strategy
 
-\item{omegaXform}{When taking \code{omega} values from the @template Xform}
+Tells the type of separation strategy when
+simulating covariance with parameter uncertainty with standard
+deviations modeled in the \code{thetaMat} matrix.
+
+\code{"lkj"} simulates the correlation matrix from the
+\code{rLKJ1} matrix with the distribution parameter \code{eta}
+equal to the degrees of freedom \code{nu} by \code{(nu-1)/2}
+
+\code{"separation"} simulates from the identity inverse Wishart
+covariance matrix with \code{nu} degrees of freedom.  This is then
+converted to a covariance matrix and augmented with the modeled
+standard deviations.  While computationally more complex than the
+\code{"lkj"} prior, it performs better when the covariance matrix
+size is greater or equal to 10
+
+\code{"auto"} chooses \code{"lkj"} when the dimension of the
+matrix is less than 10 and \code{"separation"} when greater
+than equal to 10.}
+
+\item{omegaXform}{When taking \code{omega} values from the \code{thetaMat}
+simulations (using the separation strategy for covariance
+simulation), how should the \code{thetaMat} values be turned int
+standard deviation values:
+\itemize{
+\item \code{identity} This is when standard deviation values are
+directly modeled by the \code{params} and \code{thetaMat} matrix
+\item \code{variance} This is when the \code{params} and \code{thetaMat}
+simulates the variance that are directly modeled by the
+\code{thetaMat} matrix
+\item \code{log} This is when the \code{params} and \code{thetaMat}
+simulates \code{log(sd)}
+\item \code{nlmixrSqrt} This is when the \code{params} and
+\code{thetaMat} simulates the inverse cholesky decomposed matrix
+with the \code{x^2} modeled along the diagonal.  This only works
+with a diagonal matrix.
+\item \code{nlmixrLog} This is when the \code{params} and
+\code{thetaMat} simulates the inverse cholesky decomposed matrix
+with the \code{exp(x^2)} along the diagonal.  This only works
+with a diagonal matrix.
+\item \code{nlmixrIdentity} This is when the \code{params} and
+\code{thetaMat} simulates the inverse cholesky decomposed matrrix.
+This only works with a diagonal matrix.
+}}
 
 \item{omegaLower}{Lower bounds for simulated ETAs (by default -Inf)}
 
