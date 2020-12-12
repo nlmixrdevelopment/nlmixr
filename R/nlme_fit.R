@@ -418,7 +418,7 @@ prepEv <- function(dati, theta) {
 ##'      start=c(lKA=0.5, lKE=-2.5, lCL=-3.2))
 ##'
 ##' fit <- nlme_ode(theo_md, model=ode, par_model=specs, par_trans=mypar,
-##'      response="centr", response.scaler="V",control=nlmeControl(pnlsTol=0.3))
+##'      response="centr", response.scaler="V",control=nlmeControl(pnlsTol=0.9))
 ##' }
 ##' @export
 nlme_ode <- function(dat.o, model, parModel, parTrans,
