@@ -30,10 +30,11 @@ nlmixrTest(
         testthat::expect_true(all(exp.names %in% colnames(o)))
       }
     }
-
+  tmpDir <- tempdir()
+  if (!dir.exists(tmpDir)) dir.create(tmpDir)
     options(
       nlmixr.save = TRUE,
-      nlmixr.save.dir = "."
+      nlmixr.save.dir = tmpDir
     )
 
     one.compartment <- function() {
