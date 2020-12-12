@@ -16,10 +16,10 @@ knitr::opts_chunk$set(
   )
 
 nlmixrVersion <- as.character(packageVersion("nlmixr"));
-options(nlmixr.save=TRUE,
-        nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion));
-if (!dir.exists(getOption("nlmixr.save.dir")))
-    dir.create(getOption("nlmixr.save.dir"))
+## options(nlmixr.save=TRUE,
+##         nlmixr.save.dir=file.path(system.file(package="nlmixr"), nlmixrVersion));
+## if (!dir.exists(getOption("nlmixr.save.dir")))
+##     dir.create(getOption("nlmixr.save.dir"))
 ```
 
 ![nlmixr](logo.png)
