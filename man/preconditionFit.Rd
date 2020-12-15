@@ -20,3 +20,9 @@ covariance estimate}
 \description{
 Linearly re-parameterize the model to be less sensitive to rounding errors
 }
+\references{
+Aoki Y, Nordgren R, Hooker AC. Preconditioning of
+  Nonlinear Mixed Effects Models for Stabilisation of
+  Variance-Covariance Matrix Computations. AAPS
+  J. 2016;18(2):505-518. doi:10.1208/s12248-016-9866-5
+}

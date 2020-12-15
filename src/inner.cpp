@@ -406,6 +406,7 @@ SEXP preCondInv(SEXP Rin){
     // Now calculate the norm
     arma::mat eignorm = normalise(eigvec);
     arma::mat v12 = diagmat(1/(abs(eigval)));
+    // This is equation 15 in the Aoki 2016 paper
     R = eignorm*v12;
     SEXP out = wrap(R);
     Rf_setAttrib(out, R_DimNamesSymbol, Rf_getAttrib(Rin, R_DimNamesSymbol));
