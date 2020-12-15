@@ -2718,6 +2718,7 @@ nlmixrTest(
     # nlmixrBoundsReplaceCor ####
 
     test_that("", {
+      skip_if(Sys.getenv("R_ARCH") == "/i386", "windows32")
       expect_equal(
         nlmixr:::nlmixrBoundsValueCor(x = (~ cor(1, 2, 3))[[2]]),
         list(
