@@ -47,11 +47,10 @@ jobs:
         run: sudo add-apt-repository ppa:cran/libgit2 && sudo apt-get update && sudo apt-get install libssh2-1-dev libgit2-dev libudunits2-dev -y
         shell: bash
 
-     - name: Install X11 dependencies on MacOS
-       if: runner.os == 'macOS'
-       run: |
-         brew cask install xquartz
-       shell: bash
+      - name: Install X11 dependencies on MacOS
+        if: runner.os == 'macOS'
+        run: brew cask install xquartz
+        shell: bash
 
       - uses: actions/checkout@v2
 
