@@ -31,6 +31,7 @@ jobs:
 
       - name: Install packages from cran (source)
         run: |
+          install.packages("magrittr", type="source")
           install.packages('remotes')
           install.packages("jsonlite", type="source")
           install.packages("usethis", type="source")
