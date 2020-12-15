@@ -76,7 +76,7 @@ reference:
   - '`stat_cens`'
 - title: Internal functions
   contents:
-  - '`VarCorr.nlmixrNlme'`
+  - '`VarCorr.nlmixrNlme`'
   - '`as.focei`'
   - '`bootdata`'
   - '`calc.2LL`'
