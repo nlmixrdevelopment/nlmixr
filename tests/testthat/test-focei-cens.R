@@ -56,51 +56,56 @@ nlmixrTest(
 
     expect_false(isTRUE(all.equal(f.foce2$objf, f.foce3$objf)))
 
-    context("M3/M4 -- Missing, assume LLOQ=3 at t=1.5")
+    test_that("M3/M4 -- Missing, assume LLOQ=3 at t=1.5", {
+      context("M3/M4 -- Missing, assume LLOQ=3 at t=1.5")
+      skip_if(Sys.getenv("R_ARCH") == "/i386", "windows32")
+      datL <- rbind(dat[, names(dat) != "Y"], data.frame(ID = 1:10, Time = 1.5, DV = 3))
+      datL$cens <- ifelse(datL$Time == 1.5, 1, 0)
+      datL <- datL[order(datL$ID, datL$Time), ]
 
-    datL <- rbind(dat[, names(dat) != "Y"], data.frame(ID = 1:10, Time = 1.5, DV = 3))
-    datL$cens <- ifelse(datL$Time == 1.5, 1, 0)
-    datL <- datL[order(datL$ID, datL$Time), ]
+      datL4 <- datL
+      datL4$limit <- 0
 
-    datL4 <- datL
-    datL4$limit <- 0
+      f.foceiL <- .nlmixr(f, datL, "posthoc")
+      expect_false(isTRUE(all.equal(f.focei$objf, f.foceiL$objf)))
 
-    f.foceiL <- .nlmixr(f, datL, "posthoc")
-    expect_false(isTRUE(all.equal(f.focei$objf, f.foceiL$objf)))
+      f.foceiL4 <- .nlmixr(f, datL4, "posthoc")
+      expect_false(isTRUE(all.equal(f.focei$objf, f.foceiL4$objf)))
+      expect_false(isTRUE(all.equal(f.foceiL$objf, f.foceiL4$objf)))
 
-    f.foceiL4 <- .nlmixr(f, datL4, "posthoc")
-    expect_false(isTRUE(all.equal(f.focei$objf, f.foceiL4$objf)))
-    expect_false(isTRUE(all.equal(f.foceiL$objf, f.foceiL4$objf)))
+      datL <- rbind(dat[, names(dat) != "Y"], data.frame(ID = 1:10, Time = 1.5, DV = 3))
+      datL$cens <- ifelse(datL$Time == 1.5, 1, 0)
+      datL <- datL[order(datL$ID, datL$Time), ]
 
-    datL <- rbind(dat[, names(dat) != "Y"], data.frame(ID = 1:10, Time = 1.5, DV = 3))
-    datL$cens <- ifelse(datL$Time == 1.5, 1, 0)
-    datL <- datL[order(datL$ID, datL$Time), ]
+      datL4 <- datL
+      datL4$limit <- 0
 
-    datL4 <- datL
-    datL4$limit <- 0
+      f.foceiL <- .nlmixr(f, datL, "posthoc")
+      expect_false(isTRUE(all.equal(f.focei$objf, f.foceiL$objf)))
 
-    f.foceiL <- .nlmixr(f, datL, "posthoc")
-    expect_false(isTRUE(all.equal(f.focei$objf, f.foceiL$objf)))
+      f.foceiL4 <- .nlmixr(f, datL4, "posthoc")
+      expect_false(isTRUE(all.equal(f.focei$objf, f.foceiL4$objf)))
+      expect_false(isTRUE(all.equal(f.foceiL$objf, f.foceiL4$objf)))
 
-    f.foceiL4 <- .nlmixr(f, datL4, "posthoc")
-    expect_false(isTRUE(all.equal(f.focei$objf, f.foceiL4$objf)))
-    expect_false(isTRUE(all.equal(f.foceiL$objf, f.foceiL4$objf)))
+      ## foce
 
-    ## foce
+      datL <- rbind(dat[, names(dat) != "Y"], data.frame(ID = 1:10, Time = 1.5, DV = 3))
+      datL$cens <- ifelse(datL$Time == 1.5, 1, 0)
+      datL <- datL[order(datL$ID, datL$Time), ]
 
-    datL <- rbind(dat[, names(dat) != "Y"], data.frame(ID = 1:10, Time = 1.5, DV = 3))
-    datL$cens <- ifelse(datL$Time == 1.5, 1, 0)
-    datL <- datL[order(datL$ID, datL$Time), ]
+      datL4 <- datL
+      datL4$limit <- 0
 
-    datL4 <- datL
-    datL4$limit <- 0
+      f.foceL <- .nlmixr(f, datL, "posthoc", control = list(interaction = FALSE))
+      expect_false(isTRUE(all.equal(f.foce$objf, f.foceL$objf)))
 
-    f.foceL <- .nlmixr(f, datL, "posthoc", control = list(interaction = FALSE))
-    expect_false(isTRUE(all.equal(f.foce$objf, f.foceL$objf)))
+      f.foceL4 <- .nlmixr(f, datL4, "posthoc", control = list(interaction = FALSE))
+      expect_false(isTRUE(all.equal(f.foce$objf, f.foceL4$objf)))
+      expect_false(isTRUE(all.equal(f.foceL$objf, f.foceL4$objf)))
 
-    f.foceL4 <- .nlmixr(f, datL4, "posthoc", control = list(interaction = FALSE))
-    expect_false(isTRUE(all.equal(f.foce$objf, f.foceL4$objf)))
-    expect_false(isTRUE(all.equal(f.foceL$objf, f.foceL4$objf)))
+    })
+
+
   },
   test = "focei"
 )
