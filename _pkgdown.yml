@@ -33,7 +33,6 @@ reference:
   - '`foceiControl`'
   - '`nlmeControl`'
   - '`tableControl`'
-
 - title: Low level estimation routines
   contents:
   - '`gnlmm`'
@@ -43,9 +42,36 @@ reference:
   - '`dynmodel.mcmc`'
   - '`nlme_lin_cmpt`'
   - '`nlme_ode`'
+  - '`as.dynmodel`'
+  - '`as.focei.dynmodel`'
 - title: Unit tests and validation functions
   contents:
   - '`nlmixrValidate`'
+- title: Utilities
+  contents:
+  - '`bootplot`'
+  - '`bootstrapFit`'
+  - '`preCondInv`'
+  - '`preconditionFit`'
+- title: Covariate Search Functions
+  contents:
+  - '`addCovMultiple`'
+  - '`addCovVar`'
+  - '`addCovariate`'
+  - '`backwardSearch`'
+  - '`covarSearchAuto`'
+  - '`forwardSearch`'
+  - '`initializeCovars`'
+  - '`makeDummies`'
+  - '`makeHockeyStick`'
+  - '`performNorm`'
+  - '`removeCovMultiple`'
+  - '`removeCovVar`'
+  - '`removeCovariate`'
+- title: ggplot2 functions
+  contents:
+  - '`stat_amt`'
+  - '`stat_cens`'
 - title: Internal functions
   contents:
   - '`as.focei`'
@@ -124,6 +150,22 @@ reference:
   - '`vpc_saemFit`'
   - '`vpc_ui`'
   - '`yeoJohnson`'
+  - '`nlmixrBounds`'
+  - '`nlmixrBoundsParser`'
+  - '`nlmixrDynmodelConvert`'
+  - '`nlmixrEst`'
+  - '`nlmixrGill83`'
+  - '`nlmixrEval_`'
+  - '`nlmixrHess`'
+  - '`nlmixrTest`'
+  - '`nlmixrUI.dynmodelfun`'
+  - '`nlmixrUI.dynmodelfun2`'
+  - '`nlmixrUI.saem.cres`'
+  - '`nlmixrUI.saem.rx1`'
+  - '`nmLst`'
+  - '`pheno_sd`'
+  - '`setCov`'
+  - '`warfarin `'
 navbar:
   left:
   - text: Articles
