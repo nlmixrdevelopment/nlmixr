@@ -3,7 +3,7 @@ nlmixrTest(
     context("M2 -- all observations")
 
     .nlmixr <- function(...) {
-      suppressWarnings(nlmixr(...))
+      try(suppressWarnings(nlmixr(...)))
     }
 
     dat <- Wang2007
