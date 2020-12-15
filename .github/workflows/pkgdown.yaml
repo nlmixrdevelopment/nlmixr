@@ -67,6 +67,11 @@ jobs:
       - name: Install package
         run: R CMD INSTALL .
 
+      - name: Install post-nlmixr install packages
+        run: |
+          remotes::install_github("nlmixrdevelopment/xpose.nlmixr")
+        shell: Rscript {0}
+
       - name: Deploy package
         run: |
           git config --local user.email "actions@github.com"
