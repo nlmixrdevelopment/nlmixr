@@ -772,7 +772,6 @@ double likInner0(double *eta, int id){
 	kk = ind->ix[j];
 	curT = getTimeF(kk, ind);
 	dv0 = ind->dv[kk];
-	dv = tbs(dv0);
 	if (isDose(ind->evid[kk])) {
 	  // ind->tlast = ind->all_times[ind->ix[ind->idx]];
 	  // Need to calculate for advan sensitivities
@@ -780,6 +779,7 @@ double likInner0(double *eta, int id){
 	} else if (ind->evid[kk] == 0) {
 	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated
+	  dv = tbs(dv0);
 	  if (ISNA(f) || std::isnan(f) || std::isinf(f)) {
 	    throw std::runtime_error("bad solve");
 	  }
