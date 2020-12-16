@@ -32,3 +32,4 @@ config.log
 config.status
 inst/1.1.1.3/
 vignettes/ggpmx_GOF/
+/.RData
