@@ -4,7 +4,7 @@ Title: Nonlinear Mixed Effects Models in Population PK/PD
 Depends: R (>= 3.5)
 Imports: Rcpp (>= 0.12.3), brew, parallel, lbfgsb3c,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
- 	n1qn1 (>= 6.0.1-10), fastGHQuad, RcppArmadillo (>= 0.5.600.2.0),
+ 	n1qn1 (>= 6.0.1-10), fastGHQuad,
 	RxODE(>= 1.0.0-0), nlme, magrittr, sys, backports
 Suggests: 
     Deriv,
@@ -97,7 +97,7 @@ Description: Fit and compare nonlinear mixed-effects models in differential
 License: GPL (>=2)
 NeedsCompilation: yes
 LinkingTo: dparser(>= 0.1.8), RxODE(>= 1.0.0-0), RcppEigen (>= 0.3.3.3.0),
-    lbfgsb3c, Rcpp, BH, StanHeaders(>= 2.18.0)
+    lbfgsb3c, Rcpp, BH, StanHeaders(>= 2.18.0), RcppArmadillo (>= 0.5.600.2.0)
 URL: https://github.com/nlmixrdevelopment/nlmixr
 LazyData: true
 RoxygenNote: 7.1.1
