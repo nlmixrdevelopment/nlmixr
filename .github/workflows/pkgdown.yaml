@@ -70,6 +70,7 @@ jobs:
       - name: Install post-nlmixr install packages
         run: |
           remotes::install_github("nlmixrdevelopment/xpose.nlmixr")
+	  remotes::install_github("ggPMXdevelopment/ggPMX")
         shell: Rscript {0}
 
       - name: Deploy package
