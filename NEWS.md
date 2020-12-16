@@ -1,4 +1,4 @@
-# Development nlmixr version
+# nlmixr 2.0.1
 
 ## User interface changes
  - Detection of initial conditions was rewritten to enable additional features
