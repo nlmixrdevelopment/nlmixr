@@ -278,7 +278,7 @@ with a diagonal matrix.
 with the \code{exp(x^2)} along the diagonal.  This only works
 with a diagonal matrix.
 \item \code{nlmixrIdentity} This is when the \code{params} and
-\code{thetaMat} simulates the inverse cholesky decomposed matrrix.
+\code{thetaMat} simulates the inverse cholesky decomposed matrix.
 This only works with a diagonal matrix.
 }}
 
