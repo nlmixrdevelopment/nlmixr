@@ -157,7 +157,7 @@ by the ODE solver to determine if a good solution has been
 achieved;  This is also used in the solved linear model to check
 if prior doses do not add anything to the solution.}
 
-\item{rtol}{a numeric relative tolerance (1e-6 by default) used
+\item{rtol}{a numeric relative tolerance (\code{1e-6} by default) used
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
 if prior doses do not add anything to the solution.}
@@ -180,7 +180,7 @@ maximum absolute step size.}
 difference to add to hmax. The default is 0}
 
 \item{hini}{The step size to be attempted on the first step. The
-default value is determined by the solver (when hini = 0)}
+default value is determined by the solver (when \code{hini = 0})}
 
 \item{maxordn}{The maximum order to be allowed for the nonstiff
 (Adams) method.  The default is 12.  It can be between 1 and
@@ -241,21 +241,20 @@ Cholesky decomposition instead of a symmetric covariance}
 Tells the type of separation strategy when
 simulating covariance with parameter uncertainty with standard
 deviations modeled in the \code{thetaMat} matrix.
-
-\code{"lkj"} simulates the correlation matrix from the
+\itemize{
+\item \code{"lkj"} simulates the correlation matrix from the
 \code{rLKJ1} matrix with the distribution parameter \code{eta}
 equal to the degrees of freedom \code{nu} by \code{(nu-1)/2}
-
-\code{"separation"} simulates from the identity inverse Wishart
+\item \code{"separation"} simulates from the identity inverse Wishart
 covariance matrix with \code{nu} degrees of freedom.  This is then
 converted to a covariance matrix and augmented with the modeled
 standard deviations.  While computationally more complex than the
 \code{"lkj"} prior, it performs better when the covariance matrix
 size is greater or equal to 10
-
-\code{"auto"} chooses \code{"lkj"} when the dimension of the
+\item \code{"auto"} chooses \code{"lkj"} when the dimension of the
 matrix is less than 10 and \code{"separation"} when greater
-than equal to 10.}
+than equal to 10.
+}}
 
 \item{sigmaXform}{When taking \code{sigma} values from the \code{thetaMat}
 simulations (using the separation strategy for covariance
@@ -305,14 +304,18 @@ For non-stiff systems (`stiff = FALSE`), `RxODE` uses
 DOP853, an explicit Runge-Kutta method of order 8(5, 3) of
 Dormand and Prince as implemented in C by Hairer and Wanner
 (1993).
+
+If stiff is not specified, the `method` argument is used instead.
 }}
 
 \item{theta}{A vector of parameters that will be named \verb{THETA\\[#\\]} and
 added to parameters}
 
-\item{thetaLower}{Lower bounds for simulated population parameter variability (by default -Inf)}
+\item{thetaLower}{Lower bounds for simulated population parameter
+variability (by default \code{-Inf})}
 
-\item{thetaUpper}{Upper bounds for simulated population unexplained variability (by default Inf)}
+\item{thetaUpper}{Upper bounds for simulated population unexplained
+variability (by default \code{Inf})}
 
 \item{eta}{A vector of parameters that will be named \verb{ETA\\[#\\]} and
 added to parameters}
@@ -373,21 +376,20 @@ symmetric matrix.}
 Tells the type of separation strategy when
 simulating covariance with parameter uncertainty with standard
 deviations modeled in the \code{thetaMat} matrix.
-
-\code{"lkj"} simulates the correlation matrix from the
+\itemize{
+\item \code{"lkj"} simulates the correlation matrix from the
 \code{rLKJ1} matrix with the distribution parameter \code{eta}
 equal to the degrees of freedom \code{nu} by \code{(nu-1)/2}
-
-\code{"separation"} simulates from the identity inverse Wishart
+\item \code{"separation"} simulates from the identity inverse Wishart
 covariance matrix with \code{nu} degrees of freedom.  This is then
 converted to a covariance matrix and augmented with the modeled
 standard deviations.  While computationally more complex than the
 \code{"lkj"} prior, it performs better when the covariance matrix
 size is greater or equal to 10
-
-\code{"auto"} chooses \code{"lkj"} when the dimension of the
+\item \code{"auto"} chooses \code{"lkj"} when the dimension of the
 matrix is less than 10 and \code{"separation"} when greater
-than equal to 10.}
+than equal to 10.
+}}
 
 \item{omegaXform}{When taking \code{omega} values from the \code{thetaMat}
 simulations (using the separation strategy for covariance
@@ -410,7 +412,7 @@ with a diagonal matrix.
 with the \code{exp(x^2)} along the diagonal.  This only works
 with a diagonal matrix.
 \item \code{nlmixrIdentity} This is when the \code{params} and
-\code{thetaMat} simulates the inverse cholesky decomposed matrrix.
+\code{thetaMat} simulates the inverse cholesky decomposed matrix.
 This only works with a diagonal matrix.
 }}
 
@@ -418,7 +420,7 @@ This only works with a diagonal matrix.
 
 \item{omegaUpper}{Upper bounds for simulated ETAs (by default Inf)}
 
-\item{nSub}{Number between subject variabilities (ETAs) simulated for every
+\item{nSub}{Number between subject variabilities (\code{ETAs}) simulated for every
 realization of the parameters.}
 
 \item{thetaMat}{Named theta matrix.}
@@ -426,7 +428,7 @@ realization of the parameters.}
 \item{thetaDf}{The degrees of freedom of a t-distribution for
 simulation.  By default this is \code{NULL} which is
 equivalent to \code{Inf} degrees, or to simulate from a normal
-distribution instead of a t-distribution.}
+distribution instead of a \code{t}-distribution.}
 
 \item{thetaIsChol}{Indicates if the \code{theta} supplied is a
 Cholesky decomposed matrix instead of the traditional
@@ -441,7 +443,8 @@ inverse Wishart distribution (scaled) or scaled inverse chi squared distribution
 \item{dfObs}{Degrees of freedom to sample the unexplained variability matrix from the
 inverse Wishart distribution (scaled) or scaled inverse chi squared distribution.}
 
-\item{returnType}{This tells what type of object is returned.  The currently supported types are:
+\item{returnType}{This tells what type of object is returned.  The
+currently supported types are:
 \itemize{
 \item \code{"rxSolve"} (default) will return a reactive data frame
 that can change easily change different pieces of the solve and
@@ -461,7 +464,7 @@ generator should be initialized}
 
 \item{nsim}{represents the number of simulations.  For RxODE, if
 you supply single subject event tables (created with
-eventTable)}
+\verb{[eventTable()]})}
 
 \item{minSS}{Minimum number of iterations for a steady-state dose}
 
@@ -489,7 +492,8 @@ been achieved.}
 lsoda and liblsoda with doses, like \code{deSolve}; When \code{FALSE}, do
 not reset the \code{ISTATE} variable with doses.}
 
-\item{subsetNonmem}{subset to NONMEM compatible EVIDs only.  By default TRUE.}
+\item{subsetNonmem}{subset to NONMEM compatible EVIDs only.  By
+default \code{TRUE}.}
 
 \item{maxAtolRtolFactor}{The maximum \code{atol}/\code{rtol} that
 FOCEi and other routines may adjust to.  By default 0.1}
@@ -544,15 +548,12 @@ ordered ID to a factor with the original ID values in the
 original dataset.  By default this is enabled.}
 
 \item{mxhnil}{maximum number of messages printed (per problem)
-warning that T + H = T on a step (H = step size).  This must
+warning that \code{T + H = T} on a step (\code{H} = step size).  This must
 be positive to result in a non-default value.  The default
 value is 0 (or infinite).}
 
-\item{hmxi}{inverse of the maximum absolute value of H to be used.
-hmxi = 0.0 is allowed and corresponds to an infinite hmax
-(default).  hmin and hmxi may be changed at any time, but will
-not take effect until the next change of H is considered.
-This option is only considered with method=liblsoda.}
+\item{hmxi}{inverse of the maximum absolute value of \code{H} to are used.
+hmxi = 0.0 is allowed and corresponds to an infinite \verb{hmax1 (default).  }hmin\code{and}hmxi\verb{may be changed at any time, but will not take effect until the next change of}H\verb{is considered. This option is only considered with}method="liblsoda"`.}
 
 \item{warnIdSort}{Warn if the ID is not present and RxODE assumes
 the order of the parameters/iCov are the same as the order of
@@ -569,9 +570,6 @@ vector based on each state.}
 
 \item{safeZero}{Use safe zero divide and log routines.  By default
 this is turned on but you may turn it off if you wish.}
-
-\item{cacheEvent}{is a boolean.  If \code{TRUE} (default), events are cached in
-memory to speed up solving.}
 
 \item{sumType}{Sum type to use for \code{sum()} in
 RxODE code blocks.
@@ -635,11 +633,11 @@ correlations of parameters are retained, where as when
 \code{resampleID=FALSE} ignores patient covariate correaltions.
 Hence the default is \code{resampleID=TRUE}.}
 
-\item{a}{when using \code{solve}, this is equivalent to the
+\item{a}{when using \code{solve()}, this is equivalent to the
 \code{object} argument.  If you specify \code{object} later in
 the argument list it overwrites this parameter.}
 
-\item{b}{when using \code{solve}, this is equivalent to the
+\item{b}{when using \code{solve()}, this is equivalent to the
 \code{params} argument.  If you specify \code{params} as a
 named argument, this overwrites the output}
 }

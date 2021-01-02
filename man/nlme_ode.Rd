@@ -68,7 +68,7 @@ by the ODE solver to determine if a good solution has been
 achieved;  This is also used in the solved linear model to check
 if prior doses do not add anything to the solution.}
 
-\item{rtol}{a numeric relative tolerance (1e-6 by default) used
+\item{rtol}{a numeric relative tolerance (\code{1e-6} by default) used
 by the ODE solver to determine if a good solution has been
 achieved. This is also used in the solved linear model to check
 if prior doses do not add anything to the solution.}
@@ -88,7 +88,7 @@ your sampling and events.  The value 0 is equivalent to infinite
 maximum absolute step size.}
 
 \item{hini}{The step size to be attempted on the first step. The
-default value is determined by the solver (when hini = 0)}
+default value is determined by the solver (when \code{hini = 0})}
 
 \item{maxordn}{The maximum order to be allowed for the nonstiff
 (Adams) method.  The default is 12.  It can be between 1 and

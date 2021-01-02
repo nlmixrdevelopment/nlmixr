@@ -92,10 +92,6 @@ RxODE::add.dosing
 ##' @export
 RxODE::add.sampling
 
-##' @importFrom RxODE rxPermissive
-##' @export
-RxODE::rxPermissive
-
 ##' @importFrom nlme pdDiag
 ##' @export
 nlme::pdDiag
