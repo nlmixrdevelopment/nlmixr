@@ -11,7 +11,7 @@ reference:
   - '`addNpde`'
   - '`getVarCov`'
 - title: Model diagnostics
-  contents: 
+  contents:
   - '`vpc`'
   - '`traceplot`'
 - title: Datasets
@@ -214,4 +214,3 @@ navbar:
     href: https://github.com/nlmixrdevelopment/nlmixr
   - icon: fa-download
     href: https://github.com/nlmixrdevelopment/nlmixr/releases
-    
