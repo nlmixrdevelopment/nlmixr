@@ -38,6 +38,7 @@ jobs:
           install.packages("symengine", type="source")
           install.packages("dparser", type="source")
           remotes::install_github("ronkeizer/vpc")
+	  remotes::install_github("ggPMXdevelopment/ggPMX")
           remotes::install_github("nlmixrdevelopment/RxODE")
         shell: Rscript {0}
 
