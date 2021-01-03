@@ -823,7 +823,6 @@ rxSolve.nlmixrFitData <- function(object, params = NULL, events = NULL, inits = 
                                   ssAtol = 1.0e-8,
                                   ssRtol = 1.0e-6,
                                   safeZero = TRUE,
-                                  cacheEvent = TRUE,
                                   sumType = c("pairwise", "fsum", "kahan", "neumaier", "c"),
                                   prodType = c("long double", "double", "logify"),
                                   sensType = c("advan", "autodiff", "forward", "central"),

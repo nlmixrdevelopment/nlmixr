@@ -96,7 +96,6 @@ nlmixrSim(object, ...)
   ssAtol = 1e-08,
   ssRtol = 1e-06,
   safeZero = TRUE,
-  cacheEvent = TRUE,
   sumType = c("pairwise", "fsum", "kahan", "neumaier", "c"),
   prodType = c("long double", "double", "logify"),
   sensType = c("advan", "autodiff", "forward", "central"),
