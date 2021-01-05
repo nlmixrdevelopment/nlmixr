@@ -8,7 +8,7 @@
 \usage{
 addNpde(
   object,
-  nsim = 1000,
+  nsim = 300,
   ties = TRUE,
   seed = 1009,
   updateObject = TRUE,
@@ -18,7 +18,7 @@ addNpde(
 
 .npdeCalc(
   object,
-  nsim = 1000,
+  nsim = 300,
   ties = TRUE,
   seed = 1009,
   updateObject = TRUE,
@@ -29,7 +29,7 @@ addNpde(
 
 .npdeSim(
   object,
-  nsim = 1000,
+  nsim = 300,
   ties = TRUE,
   seed = 1009,
   updateObject = TRUE,

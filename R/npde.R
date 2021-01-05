@@ -58,7 +58,7 @@
 ##'
 #' }
 ##' @export
-addNpde <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject = TRUE,
+addNpde <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject = TRUE,
                     cholSEtol = (.Machine$double.eps)^(1 / 3), ...) {
   .pt <- proc.time()
   .objName <- substitute(object)
@@ -71,7 +71,7 @@ addNpde <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject 
   .cls <- class(object)
   .sim <- .npdeSim(object, nsim, ties, seed, updateObject, ...)
 
-  .new <- cbind(object, .npdeCalc(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject = TRUE,
+  .new <- cbind(object, .npdeCalc(object, nsim = 300, ties = TRUE, seed = 1009, updateObject = TRUE,
                                   cholSEtol = (.Machine$double.eps)^(1 / 3), ..., sim=.sim))
   class(.new) <- .cls
   if (updateObject) {
@@ -95,7 +95,7 @@ addNpde <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject 
 
 ##' @rdname addNpde
 ##'@export
-.npdeCalc <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject = TRUE,
+.npdeCalc <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject = TRUE,
                     cholSEtol = (.Machine$double.eps)^(1 / 3), ..., sim) {
   .dv <- object$DV
   .dvl <- length(.dv)
@@ -108,7 +108,7 @@ addNpde <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject 
 
 ##' @rdname addNpde
 ##'@export
-.npdeSim <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject = TRUE,
+.npdeSim <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject = TRUE,
                     cholSEtol = (.Machine$double.eps)^(1 / 3), ...) {
   set.seed(seed)
   .si <- object$simInfo
