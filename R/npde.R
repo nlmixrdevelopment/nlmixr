@@ -9,6 +9,19 @@
 ##' @param updateObject Boolean indicating if original object should be updated.  By default this is TRUE.
 ##' @inheritParams foceiControl
 ##' @param ... Other ignored parameters.
+##'
+##' @param sim With `.ndpeCalc` the RxODE simulated values to
+##'   calculate `npde`
+##'
+##' @details
+##'
+##' `addNpde` is the user-facing function to add the NPDE
+##'
+##' `.npdeSim` is the internal function that simulates everything for
+##' the npde calculation
+##'
+##' `.npdeCalc` calculates the extra npde items based in the `sim` parameter
+##'
 ##' @return New nlmixr fit object
 ##' @author Matthew L. Fidler
 ##' @examples
@@ -47,14 +60,56 @@
 ##' @export
 addNpde <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject = TRUE,
                     cholSEtol = (.Machine$double.eps)^(1 / 3), ...) {
-  RxODE::.setWarnIdSort(FALSE)
-  on.exit(RxODE::.setWarnIdSort(TRUE))
   .pt <- proc.time()
   .objName <- substitute(object)
+  RxODE::.setWarnIdSort(FALSE)
+  on.exit(RxODE::.setWarnIdSort(TRUE))
   if (any(names(object) == "NPDE")) {
     warning("Already contains NPDE")
     return(object)
   }
+  .cls <- class(object)
+  .sim <- .npdeSim(object, nsim, ties, seed, updateObject, ...)
+
+  .new <- cbind(object, .npdeCalc(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject = TRUE,
+                                  cholSEtol = (.Machine$double.eps)^(1 / 3), ..., sim=.sim))
+  class(.new) <- .cls
+  if (updateObject) {
+    .parent <- parent.frame(2)
+    .bound <- do.call("c", lapply(ls(.parent, all.names = TRUE), function(.cur) {
+      if (.cur == .objName && identical(.parent[[.cur]], object)) {
+        return(.cur)
+      }
+      return(NULL)
+    }))
+    if (length(.bound) == 1) {
+      if (exists(.bound, envir = .parent)) {
+        assign(.bound, .new, envir = .parent)
+      }
+    }
+  }
+  .env <- .new$env
+  .env$time <- .data.frame(.env$time, npde = (proc.time() - .pt)["elapsed"], check.names = FALSE)
+  return(.new)
+}
+
+##' @rdname addNpde
+##'@export
+.npdeCalc <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject = TRUE,
+                    cholSEtol = (.Machine$double.eps)^(1 / 3), ..., sim) {
+  .dv <- object$DV
+  .dvl <- length(.dv)
+  .evid <- rep(0L, .dvl)
+  .evid[is.na(object$RES) & !is.na(object$PRED)] <- 2L
+  .Call(
+    `_nlmixr_npde`, object$ID, .dv, .evid, sim$sim, sim$rxLambda, sim$rxYj,
+    sim$rxLow, sim$rxHi, ties, cholSEtol)
+}
+
+##' @rdname addNpde
+##'@export
+.npdeSim <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject = TRUE,
+                    cholSEtol = (.Machine$double.eps)^(1 / 3), ...) {
   set.seed(seed)
   .si <- object$simInfo
   .rx <- .si$rx
@@ -90,35 +145,9 @@ addNpde <- function(object, nsim = 1000, ties = TRUE, seed = 1009, updateObject 
   if (length(.keep) > 0) {
     .si$keep <- .keep
   }
-  .sim <- do.call("nlmixrSim", .si)
-  .dv <- object$DV
-  .dvl <- length(.dv)
-  .cls <- class(object)
-  .evid <- rep(0L, .dvl)
-  .evid[is.na(object$RES) & !is.na(object$PRED)] <- 2L
-  .new <- cbind(object, .Call(
-    `_nlmixr_npde`, object$ID, .dv, .evid, .sim$sim, .sim$rxLambda, .sim$rxYj,
-    .sim$rxLow, .sim$rxHi, ties, cholSEtol
-  ))
-  class(.new) <- .cls
-  if (updateObject) {
-    .parent <- parent.frame(2)
-    .bound <- do.call("c", lapply(ls(.parent, all.names = TRUE), function(.cur) {
-      if (.cur == .objName && identical(.parent[[.cur]], object)) {
-        return(.cur)
-      }
-      return(NULL)
-    }))
-    if (length(.bound) == 1) {
-      if (exists(.bound, envir = .parent)) {
-        assign(.bound, .new, envir = .parent)
-      }
-    }
-  }
-  .env <- .new$env
-  .env$time <- .data.frame(.env$time, npde = (proc.time() - .pt)["elapsed"], check.names = FALSE)
-  return(.new)
+  do.call("nlmixrSim", .si)
 }
+
 ##' Output table/data.frame options
 ##'
 ##' @param npde When TRUE, request npde regardless of the algorithm used.

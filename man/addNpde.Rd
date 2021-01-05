@@ -2,9 +2,32 @@
 % Please edit documentation in R/npde.R
 \name{addNpde}
 \alias{addNpde}
+\alias{.npdeCalc}
+\alias{.npdeSim}
 \title{NPDE calculation for nlmixr}
 \usage{
 addNpde(
+  object,
+  nsim = 1000,
+  ties = TRUE,
+  seed = 1009,
+  updateObject = TRUE,
+  cholSEtol = (.Machine$double.eps)^(1/3),
+  ...
+)
+
+.npdeCalc(
+  object,
+  nsim = 1000,
+  ties = TRUE,
+  seed = 1009,
+  updateObject = TRUE,
+  cholSEtol = (.Machine$double.eps)^(1/3),
+  ...,
+  sim
+)
+
+.npdeSim(
   object,
   nsim = 1000,
   ties = TRUE,
@@ -31,12 +54,23 @@ prevent ties.}
 Decomposition.  Defaults to suggested (.Machine$double.eps)^(1/3)}
 
 \item{...}{Other ignored parameters.}
+
+\item{sim}{With `.ndpeCalc` the RxODE simulated values to
+calculate `npde`}
 }
 \value{
 New nlmixr fit object
 }
 \description{
 NPDE calculation for nlmixr
+}
+\details{
+`addNpde` is the user-facing function to add the NPDE
+
+`.npdeSim` is the internal function that simulates everything for
+the npde calculation
+
+`.npdeCalc` calculates the extra npde items based in the `sim` parameter
 }
 \examples{
 

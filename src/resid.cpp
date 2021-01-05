@@ -627,7 +627,7 @@ arma::mat cholSE__(arma::mat A, double tol);
 List npde(IntegerVector id, NumericVector dv, IntegerVector evid,
 	  NumericVector sim, NumericVector lambda, NumericVector yj,
 	  NumericVector low, NumericVector hi,
-	  bool ties, double tolChol){
+	  bool ties, double tolChol) {
   bool warn1 = false;
   bool warn2 = false;
   bool warn3=false;
