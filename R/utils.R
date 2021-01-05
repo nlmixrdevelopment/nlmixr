@@ -173,50 +173,12 @@ cholSE <- function(matrix, tol = (.Machine$double.eps)^(1 / 3)) {
 nlmixrTest <- function(expr, silent = .isTestthat(), test = "cran") {
   .Call(`_nlmixr_setSilentErr`, 1L, PACKAGE = "nlmixr")
   RxODE::rxSetSilentErr(1L)
-  do.it <- TRUE
   .test <- .test0 <- Sys.getenv("NOT_CRAN")
-  if (Sys.getenv("nmCran") != "") {
-    .test <- .test0 <- Sys.getenv("nmCran")
-  }
   on.exit({
     .Call(`_nlmixr_setSilentErr`, 0L, PACKAGE = "nlmixr")
     RxODE::rxSetSilentErr(0L)
   })
   if (.test == "true") {
-    do.it <- TRUE
-  } else if (any(.test == c("false", "", "cran"))) {
-    if (any(test == c("false", "", "cran"))) {
-      do.it <- TRUE
-    }
-    else {
-      do.it <- FALSE
-    }
-  } else {
-    if (test == .test) {
-      do.it <- TRUE
-    }
-    else {
-      do.it <- FALSE
-    }
-  }
-  if (do.it) {
-    .lastCran <- Sys.getenv("NOT_CRAN")
-    Sys.setenv(NOT_CRAN = "true")
-    on.exit(
-      {
-        Sys.setenv(NOT_CRAN = .lastCran)
-      },
-      add = TRUE
-    )
-    if (is(substitute(expr), "{")) {
-      if (silent) {
-        return(suppressMessages(eval(substitute(expr),
-          envir = parent.frame(1)
-        )))
-      }
-      else {
-        return(eval(substitute(expr), envir = parent.frame(1)))
-      }
-    }
+    force(expr)
   }
 }
