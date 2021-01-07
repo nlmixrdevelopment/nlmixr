@@ -7,6 +7,18 @@
 
 using namespace Rcpp;
 
+// cholSE_
+NumericMatrix cholSE_(NumericMatrix A, double tol);
+RcppExport SEXP _nlmixr_cholSE_(SEXP ASEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type A(ASEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(cholSE_(A, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // freeFocei
 void freeFocei();
 RcppExport SEXP _nlmixr_freeFocei() {
@@ -48,18 +60,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type eta(etaSEXP);
     Rcpp::traits::input_parameter< int >::type id(idSEXP);
     rcpp_result_gen = Rcpp::wrap(likInner(eta, id));
-    return rcpp_result_gen;
-END_RCPP
-}
-// cholSE_
-NumericMatrix cholSE_(NumericMatrix A, double tol);
-RcppExport SEXP _nlmixr_cholSE_(SEXP ASEXP, SEXP tolSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type A(ASEXP);
-    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(cholSE_(A, tol));
     return rcpp_result_gen;
 END_RCPP
 }

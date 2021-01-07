@@ -1,15 +1,5 @@
-#include <stdarg.h>
-#define ARMA_DONT_PRINT_ERRORS
-#define ARMA_DONT_USE_OPENMP // Known to cause speed problems
-#include <RcppArmadillo.h>
-#include <R.h>
-#include <Rmath.h>
-#include "nlmixr_types.h"
-#include <RxODE.h>
-
-using namespace Rcpp;
+#include "armahead.h"
 using namespace R;
-using namespace arma;
 
 
 //[[Rcpp::export]]
@@ -620,8 +610,6 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
   }
   return ret;
 }
-
-arma::mat cholSE__(arma::mat A, double tol);
 
 // [[Rcpp::export]]
 List npde(IntegerVector id, NumericVector dv, IntegerVector evid,
