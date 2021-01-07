@@ -48,7 +48,7 @@ typedef struct {
   arma::mat yobst;
   arma::mat ydobs;
   arma::mat tcomp;
-  arma::mat pde;
+  arma::mat pd;
   arma::mat npde;
   unsigned int warn = 0;
 } calcNpdeInfoId;
@@ -86,11 +86,13 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
 calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
 			  arma::vec &dvt,
 			  unsigned int& id,
-			  unsigned int& K, double &tolChol) {
+			  unsigned int& K, double &tolChol,
+			  bool &ties, arma::vec &ruIn) {
   calcNpdeInfoId ret;
   ret.matsim = getSimMatById(idLoc, sim, id, K);
   // transformed y observations
   ret.yobst = dvt(span(idLoc[id], idLoc[id+1]-1));
+  arma::vec ru = ruIn(span(idLoc[id], idLoc[id+1]-1));
   ret.epredt = mean(ret.matsim, 1);
   ret.varsim = cov(trans(ret.matsim));
   ret.ymat = decorrelateNpdeMat(ret.varsim, ret.warn, id, tolChol);
@@ -106,10 +108,30 @@ calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
       ret.tcomp(i, j) = ret.tcomp(i, j) < ret.ydobs[i];
     }
   }
-  ret.pde = mean(ret.tcomp, 1);
-  ret.npde = ret.pde;
-  for (unsigned int j = ret.npde.size(); j--;) {
-    ret.npde[j] = Rf_qnorm5(ret.npde[j], 0.0, 1.0, 1, 0);
+  ret.pd = mean(ret.tcomp, 1);
+  ret.npde = arma::mat(ret.pd.n_rows, 1);
+  if (ties){
+    // Ties are allowed
+    for (unsigned int j = ret.pd.n_rows; j--;) {
+      if (fabs(ret.pd[j]) < DOUBLE_EPS){
+	pd[j] = 1 / (2.0 * K);
+      } else if (fabs(1-ret.pd[i]) < DOUBLE_EPS){
+	pd[j] = 1 - 1 / (2.0 * K);
+      }
+      ret.npde[j] = Rf_qnorm5(ret.npd[j], 0.0, 1.0, 1, 0);
+    }
+  } else {
+    // Ties are discouraged with jitter
+    for (unsigned int j = ret.pd.n_rows; j--;) {
+      if (fabs(ret.pd[j]) < DOUBLE_EPS){
+	pd[j] = ru[j] / K;
+      } else if (fabs(1-ret.pd[i]) < DOUBLE_EPS){
+	pd[j] = 1.0 - ru[j] / K;
+      } else  {
+	pj[j] += ru[j]/K;
+      }
+      ret.npde[j] = Rf_qnorm5(ret.npd[j], 0.0, 1.0, 1, 0);
+    }
   }
   //
   return ret;
@@ -124,6 +146,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP id, SEXP simId, SEXP idVec, SEXP simIn, SE
   arma::uvec idLoc = getSimIdLoc(aIdVec, aSimIdVec, nid, K);
   arma::vec sim = as<arma::vec>(simIn);
   arma::vec dv  = as<arma::vec>(dvIn);
+  arma::vec ru = randu(dv.size()); // Pre-fill uniform random numbers to make sure independent
 
   double tolChol = 6.055454e-06;
 
