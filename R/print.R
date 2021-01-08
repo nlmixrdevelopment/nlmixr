@@ -105,7 +105,7 @@ print.nlmixrPlotList <- function(x, ...) {
   .x <- x
   class(.x) <- NULL
   for (.i in seq_along(.x)) {
-    print(.x[[.i]])
+    try(print(.x[[.i]]))
   }
 }
 
