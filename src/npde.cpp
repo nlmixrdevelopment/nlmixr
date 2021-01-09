@@ -83,16 +83,49 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
   return vYi;
 }
 
+
+static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, unsigned int i, arma::vec &ru2,  arma::vec &ru3, unsigned int& K, bool &ties) {
+  // For left censoring NPDE the probability is already calculated with the current pd
+  // 1. Replace value with lloq
+  // 2. The current pd represents the probability being below the limit of quantitation;
+  //    If it is right censored 1-pde[i] represents the probability of being above the limit of quantitation
+  // 3. For now `limit` is ignored
+  // 4. For blq the pd is replaced with runif(0, p(bloq) or p(paloq))
+  // 5. The epred is then replaced with back-calculated uniform value based on sorted tcomp of row
+  arma::vec curRow;
+  unsigned int j;
+  double low, hi;
+  switch (cens[i]) {
+  case 1:
+    ret.pd[i] = ru2[i]*ret.pd[i];
+    break;
+  case -1:
+    ret.pd[i] = 1-ru2[i]*ret.pd[i];
+    break;
+  default:
+    return;
+  }
+  curRow = sort(ret.matsim.row(i));
+  j = trunc(ret.pd[i]*K);
+  low = curRow[j];
+  if (j+1 == K) hi = 2*low - curRow[j-1];
+  else hi = curRow[j+1];
+  if (ties) ret.yobst[i] = hi;
+  else ret.yobst[i] = low + (hi - low)*ru3[i];
+}
+
 calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
-			  arma::vec &dvt,
-			  unsigned int& id,
-			  unsigned int& K, double &tolChol,
-			  bool &ties, arma::vec &ruIn) {
+			  arma::vec &dvt, arma::ivec &censIn, unsigned int& id,
+			  unsigned int& K, double &tolChol, bool &ties,
+			  arma::vec &ruIn, arma::vec &ru2In, arma::vec &ru3In) {
   calcNpdeInfoId ret;
   ret.matsim = getSimMatById(idLoc, sim, id, K);
   // transformed y observations
   ret.yobst = dvt(span(idLoc[id], idLoc[id+1]-1));
   arma::vec ru = ruIn(span(idLoc[id], idLoc[id+1]-1));
+  arma::vec ru2 = ru2In(span(idLoc[id], idLoc[id+1]-1));
+  arma::vec ru3 = ru3In(span(idLoc[id], idLoc[id+1]-1));
+  arma::ivec cens = censIn(span(idLoc[id], idLoc[id+1]-1));
   ret.epredt = mean(ret.matsim, 1);
   ret.varsim = cov(trans(ret.matsim));
   ret.ymat = decorrelateNpdeMat(ret.varsim, ret.warn, id, tolChol);
@@ -113,31 +146,33 @@ calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
   if (ties){
     // Ties are allowed
     for (unsigned int j = ret.pd.n_rows; j--;) {
+      handleCensNpdeCdf(ret, cens, j, ru2, ru3, K, ties);
       if (fabs(ret.pd[j]) < DOUBLE_EPS){
-	pd[j] = 1 / (2.0 * K);
-      } else if (fabs(1-ret.pd[i]) < DOUBLE_EPS){
-	pd[j] = 1 - 1 / (2.0 * K);
+	ret.pd[j] = 1 / (2.0 * K);
+      } else if (fabs(1-ret.pd[j]) < DOUBLE_EPS){
+	ret.pd[j] = 1 - 1 / (2.0 * K);
       }
-      ret.npde[j] = Rf_qnorm5(ret.npd[j], 0.0, 1.0, 1, 0);
+      ret.npde[j] = Rf_qnorm5(ret.pd[j], 0.0, 1.0, 1, 0);
     }
   } else {
     // Ties are discouraged with jitter
     for (unsigned int j = ret.pd.n_rows; j--;) {
+      handleCensNpdeCdf(ret, cens, j, ru2, ru3, K, ties);
       if (fabs(ret.pd[j]) < DOUBLE_EPS){
-	pd[j] = ru[j] / K;
-      } else if (fabs(1-ret.pd[i]) < DOUBLE_EPS){
-	pd[j] = 1.0 - ru[j] / K;
+	ret.pd[j] = ru[j] / K;
+      } else if (fabs(1-ret.pd[j]) < DOUBLE_EPS){
+	ret.pd[j] = 1.0 - ru[j] / K;
       } else  {
-	pj[j] += ru[j]/K;
+	ret.pd[j] += ru[j]/K;
       }
-      ret.npde[j] = Rf_qnorm5(ret.npd[j], 0.0, 1.0, 1, 0);
+      ret.npde[j] = Rf_qnorm5(ret.pd[j], 0.0, 1.0, 1, 0);
     }
   }
   //
   return ret;
 }
 
-extern "C" SEXP _nlmixr_npdeCalc(SEXP id, SEXP simId, SEXP idVec, SEXP simIn, SEXP dvIn) {
+extern "C" SEXP _nlmixr_npdeCalc(SEXP id, SEXP simId, SEXP idVec, SEXP simIn, SEXP dvIn, SEXP censIn) {
   unsigned int curid = INTEGER(id)[0];
   arma::uvec aIdVec = as<arma::uvec>(idVec);
   arma::uvec aSimIdVec = as<arma::uvec>(simId);
@@ -146,11 +181,15 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP id, SEXP simId, SEXP idVec, SEXP simIn, SE
   arma::uvec idLoc = getSimIdLoc(aIdVec, aSimIdVec, nid, K);
   arma::vec sim = as<arma::vec>(simIn);
   arma::vec dv  = as<arma::vec>(dvIn);
+  arma::ivec cens = as<arma::ivec>(censIn);
   arma::vec ru = randu(dv.size()); // Pre-fill uniform random numbers to make sure independent
+  arma::vec ru2 = randu(dv.size());
+  arma::vec ru3 = randu(dv.size());
 
   double tolChol = 6.055454e-06;
+  bool ties = false;
 
-  calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dv, curid, K, tolChol);
+  calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dv, cens, curid, K, tolChol, ties, ru, ru2, ru3);
   
   List ret(7);
   ret[0] = wrap(idInfo.epredt);
@@ -158,7 +197,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP id, SEXP simId, SEXP idVec, SEXP simIn, SE
   ret[2] = wrap(idInfo.ydsim);
   ret[3] = wrap(idInfo.ydobs);
   ret[4] = wrap(idInfo.tcomp);
-  ret[5] = wrap(idInfo.pde);
+  ret[5] = wrap(idInfo.pd);
   ret[6] = wrap(idInfo.npde);
   return ret;
 }
