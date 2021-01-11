@@ -5,7 +5,7 @@ Depends: R (>= 3.5)
 Imports: Rcpp (>= 0.12.3), brew, parallel, lbfgsb3c,
         dparser, methods, ggplot2, memoise, rex, minqa, Matrix,
  	n1qn1 (>= 6.0.1-10), fastGHQuad,
-	RxODE(>= 1.0.0-0), nlme, magrittr, sys, backports
+	RxODE(>= 1.0.0-0), nlme, magrittr, sys, backports, symengine
 Suggests: 
     Deriv,
     Rvmmin,
@@ -44,7 +44,6 @@ Suggests:
     tibble,
     checkmate,
     cli,
-    symengine,
     covr,
     forecast,
     latticeExtra
