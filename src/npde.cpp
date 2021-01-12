@@ -1,4 +1,4 @@
-#include "armahead.h"
+#include "npde.h"
 
 arma::ivec getSimIdLoc(arma::ivec& id, arma::ivec& simId,
 		      unsigned int &nid, unsigned int &K) {
@@ -39,22 +39,6 @@ arma::mat getSimMatById(arma::ivec& idLoc, arma::vec &sim, unsigned int& id,
   return ret;
 }
 
-typedef struct {
-  arma::mat matsim;
-  arma::mat epredt;
-  arma::mat epred;
-  arma::mat varsim;
-  arma::mat ymat;
-  arma::mat ydsim;
-  arma::mat yobst;
-  arma::mat yobs;
-  arma::mat ydobs;
-  arma::mat tcomp;
-  arma::mat pd;
-  arma::mat npde;
-  arma::mat eres;
-  unsigned int warn = 0;
-} calcNpdeInfoId;
 
 arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int &id, double &tolChol) {
   arma::mat ch, vYi;
@@ -86,33 +70,53 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
   return vYi;
 }
 
-
-
 // This is similar to a truncated normal BUT the truncated normal handles the range (low,hi)
 // so instead of updating the DV based on cdf method, simply use the truncated normal
 // we also don't need to back-calculate the simulated DV value
-static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, unsigned int i, arma::vec &ru2,  arma::vec &ru3, unsigned int& K, bool &ties) {
+static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma::vec &limit, unsigned int &censMethod, bool &doLimit,
+				     unsigned int i, arma::vec &ru2,  arma::vec &ru3, unsigned int& K, bool &ties) {
+  if (censMethod != CENS_CDF) return;
   // For left censoring NPDE the probability is already calculated with the current pd
   // 1. Replace value with lloq
   // 2. The current pd represents the probability being below the limit of quantitation;
   //    If it is right censored 1-pde[i] represents the probability of being above the limit of quantitation
   // 3. For now `limit` is ignored
-  // 4. For blq the pd is replaced with runif(0, p(bloq) or p(paloq))
+  // 4. For blq the pd is replaced with runif(0, p(bloq)) or runif(p(paloq), 1)
   // 5. The epred is then replaced with back-calculated uniform value based on sorted tcomp of row
   arma::vec curRow;
   unsigned int j;
+  unsigned int nlimit = 0;
   double low, hi;
   switch (cens[i]) {
   case 1:
-    ret.pd[i] = ru2[i]*ret.pd[i];
+    // Sort up here to reduce the calculation burden for the p(lloq)
+    curRow = sort(ret.matsim.row(i));
+    if (doLimit && R_FINITE(limit[i])) {
+      //  in this case (limit, dv) simulate pd between these two probabilities
+      while (nlimit < curRow.size() && curRow[nlimit] < limit[i]) nlimit++;
+      low = nlimit/curRow.size();
+      // Simulate between (limit, dv)
+      ret.pd[i] = low +  ru2[i]*(ret.pd[i]-low);
+    } else {
+      ret.pd[i] = ru2[i]*ret.pd[i];
+    }
     break;
   case -1:
-    ret.pd[i] = 1-ru2[i]*ret.pd[i];
+    curRow = sort(ret.matsim.row(i));
+    if (doLimit && R_FINITE(limit[i])) {
+      // In this case (dv, limit) simulate pd between these two probabilities
+      while (nlimit < curRow.size() && curRow[curRow.size()-nlimit-1] > limit[i]) nlimit++;
+      hi = nlimit/curRow.size();
+      low =  1-ret.pd[i];
+      ret.pd = low + ru2[i]*(hi-low);
+    } else {
+      ret.pd[i] = 1-ru2[i]*ret.pd[i];
+    }
     break;
   default:
     return;
   }
-  curRow = sort(ret.matsim.row(i));
+  // Now back-calculate the EPRED
   j = trunc(ret.pd[i]*K);
   low = curRow[j];
   if (j+1 == K) hi = 2*low - curRow[j-1];
@@ -121,20 +125,26 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, unsi
   else ret.yobst[i] = low + (hi - low)*ru3[i];
 }
 
-calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
-			  arma::vec &dvt, arma::ivec &censIn, unsigned int& id,
-			  unsigned int& K, double &tolChol, bool &ties,
-			  arma::vec &ruIn, arma::vec &ru2In, arma::vec &ru3In,
-			  arma::vec &lambda, arma::vec &yj, arma::vec &hi, arma::vec &low) {
-  calcNpdeInfoId ret;
-  ret.matsim = getSimMatById(idLoc, sim, id, K);
-  // transformed y observations
-  ret.yobst = dvt(span(idLoc[id], idLoc[id+1]-1));
-  arma::vec ru = ruIn(span(idLoc[id], idLoc[id+1]-1));
-  arma::vec ru2 = ru2In(span(idLoc[id], idLoc[id+1]-1));
-  arma::vec ru3 = ru3In(span(idLoc[id], idLoc[id+1]-1));
-  arma::ivec cens = censIn(span(idLoc[id], idLoc[id+1]-1));
-  ret.epredt = mean(ret.matsim, 1);
+static inline void handleNpdeNAandCalculateEpred(calcNpdeInfoId& ret, unsigned int& K) {
+  ret.namat = umat(ret.matsim.n_rows, ret.matsim.n_cols);
+  // Replace NA with zeros
+  for (unsigned int j = ret.namat.size(); j--;) {
+    ret.namat[j] = ISNA(ret.matsim[j]);
+    if (ret.namat[j]) ret.matsim[j] = 0.0;
+  }
+  // mean = X/K * K/(K-sum(isNa))
+  ret.epredt = mean(ret.matsim, 1) % (K/(K-mean(ret.namat, 1)));
+  // Now replace NA with epredt for further calculations
+  for (unsigned int i =ret.namat.n_rows; i--;) {
+    for (unsigned int j = ret.namat.n_cols; j--;) {
+      if (ret.namat(i,j)) {
+	ret.matsim(i,j) = ret.epredt[j];
+      }
+    }
+  }
+}
+
+static inline void calculatePD(calcNpdeInfoId& ret, unsigned int& id, unsigned int &K, double &tolChol) {
   ret.varsim = cov(trans(ret.matsim));
   ret.ymat = decorrelateNpdeMat(ret.varsim, ret.warn, id, tolChol);
   arma::mat ymatt = trans(ret.ymat);
@@ -150,11 +160,15 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
     }
   }
   ret.pd = mean(ret.tcomp, 1);
+}
+
+static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, arma::vec &limit, unsigned int &censMethod, bool &doLimit,
+				       unsigned int &K, bool &ties, arma::vec &ru, arma::vec &ru2, arma::vec& ru3) {
   ret.npde = arma::mat(ret.pd.n_rows, 1);
   if (ties){
     // Ties are allowed
     for (unsigned int j = ret.pd.n_rows; j--;) {
-      // handleCensNpdeCdf(ret, cens, j, ru2, ru3, K, ties);
+      handleCensNpdeCdf(ret, cens, limit, censMethod, doLimit, j, ru2, ru3, K, ties);
       if (fabs(ret.pd[j]) < DOUBLE_EPS){
 	ret.pd[j] = 1 / (2.0 * K);
       } else if (fabs(1-ret.pd[j]) < DOUBLE_EPS){
@@ -165,7 +179,7 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
   } else {
     // Ties are discouraged with jitter
     for (unsigned int j = ret.pd.n_rows; j--;) {
-      // handleCensNpdeCdf(ret, cens, j, ru2, ru3, K, ties);
+      handleCensNpdeCdf(ret, cens, limit, censMethod, doLimit, j, ru2, ru3, K, ties);
       if (fabs(ret.pd[j]) < DOUBLE_EPS){
 	ret.pd[j] = ru[j] / K;
       } else if (fabs(1-ret.pd[j]) < DOUBLE_EPS){
@@ -176,13 +190,34 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
       ret.npde[j] = Rf_qnorm5(ret.pd[j], 0.0, 1.0, 1, 0);
     }
   }
+}
+
+calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
+			  arma::vec &dvt, arma::ivec &censIn, arma::vec &limitIn,
+			  unsigned int &censMethod, bool &doLimit,
+			  unsigned int& id,
+			  unsigned int& K, double &tolChol, bool &ties,
+			  arma::vec &ruIn, arma::vec &ru2In, arma::vec &ru3In,
+			  arma::vec &lambda, arma::vec &yj, arma::vec &hi, arma::vec &low) {
+  calcNpdeInfoId ret;
+  ret.matsim = getSimMatById(idLoc, sim, id, K);
+  // transformed y observations
+  ret.yobst = dvt(span(idLoc[id], idLoc[id+1]-1));
+  arma::vec ru = ruIn(span(idLoc[id], idLoc[id+1]-1));
+  arma::vec ru2 = ru2In(span(idLoc[id], idLoc[id+1]-1));
+  arma::vec ru3 = ru3In(span(idLoc[id], idLoc[id+1]-1));
+  arma::ivec cens = censIn(span(idLoc[id], idLoc[id+1]-1));
+  arma::vec limit = limitIn(span(idLoc[id], idLoc[id+1]-1));
+  handleNpdeNAandCalculateEpred(ret, K);
+  calculatePD(ret, id, K, tolChol);
+  calculateNPDEfromPD(ret, cens, limit, censMethod, doLimit, K, ties, ru, ru2, ru3);
   ret.epred = arma::vec(ret.yobst.size());
   ret.yobs = arma::vec(ret.yobst.size());
   ret.eres = arma::vec(ret.yobst.size());
   for (unsigned int j = ret.yobst.size(); j--; ) {
-    // Transfer back to original scale ie exp(x) -> log(exp(x))
-    ret.yobs[j] = _powerD(ret.yobst[j], lambda[j], (int) yj[j], low[j], hi[j]);
-    ret.epred[j] = _powerD(ret.epredt[j], lambda[j], (int) yj[j], low[j], hi[j]);
+    // Transfer back to original scale ie log(x) -> exp(log(x))
+    ret.yobs[j] = _powerDi(ret.yobst[j], lambda[j], (int) yj[j], low[j], hi[j]);
+    ret.epred[j] = _powerDi(ret.epredt[j], lambda[j], (int) yj[j], low[j], hi[j]);
     ret.eres[j] = ret.yobs[j] - ret.epred[j];
   }
   return ret;
@@ -210,8 +245,8 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   arma::vec dvt(dvLen);
   // dv -> dv transform
   for (unsigned int i = dvLen; i--; ) {
-    // powerDi for log-normal transfers dv = exp(dv)
-    dvt[i] = _powerDi(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
+    // powerDi for log-normal transfers dv = log(dv)
+    dvt[i] = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
   }
   arma::ivec cens;
   if (Rf_isNull(censIn)) {
@@ -226,11 +261,18 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
     evid = as<arma::ivec>(evidIn);
   }
   bool doLimit = false;
+  arma::vec limit;
+  if (Rf_isNull(limitIn)) {
+    limit = arma::vec(dvLen);
+  } else {
+    limit = as<arma::vec>(limitIn);
+  }
   arma::vec ru = randu(dvLen); // Pre-fill uniform random numbers to make sure independent
   arma::vec ru2 = randu(dvLen);
   arma::vec ru3 = randu(dvLen);
   double tolChol = 6.055454e-06;
   bool ties = false;
+  unsigned int censMethod = CENS_CDF;
 
   SEXP npdeSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
   SEXP epredSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
@@ -241,7 +283,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   arma::vec dvf(REAL(dvSEXP), dvLen, false, true);
   arma::vec eres(REAL(eresSEXP), dvLen, false, true);
   for (unsigned int curid = 0; curid < idLoc.size()-1; ++curid) {
-    calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dvt, cens, curid, K, tolChol, ties, ru, ru2, ru3,
+    calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dvt, cens, limit, censMethod, doLimit, curid, K, tolChol, ties, ru, ru2, ru3,
 				       lambda, yj, hi, low);
     npde(span(idLoc[curid],idLoc[curid+1]-1)) = idInfo.npde;
     epred(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.epred;
