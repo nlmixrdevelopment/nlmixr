@@ -54,14 +54,11 @@
   .etaN <- dimnames(.omega)[[1]]
   .params <- nlme::fixed.effects(object)
   .thetaN <- names(.params)
+  ## since PRED is calculated with tbs that is pred=rxTBS(...), to get individual use rxTBSi(...)
   .newMod <- paste0(
     .repSim(.mod, theta = .thetaN, eta = .etaN, c(.lhs, "rx_pred_", "rx_r_")),
     "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_, rx_low_, rx_hi_);"
   )
-  ## paste0(gsub("\n\n+", "\n", gsub(rex::rex(capture(or(.lhs)), or("=", "~"), except_any_of("\n;"),one_of("\n;")), "",
-  ##                                 gsub(rex::rex(capture(or("rx_pred_", "rx_r_")), or("=", "~")), "\\1~",
-  ##                                      .repThetaEta(.mod, theta=.thetaN, eta=.etaN)))),
-  ##        "ipred=rxTBSi(rx_pred_, rx_lambda_, rx_yj_);"));
   .sim <- "\nsim=rxTBSi(rx_pred_+rx_r_"
   .err <- object$uif$err
   .w <- which(!is.na(object$uif$err))

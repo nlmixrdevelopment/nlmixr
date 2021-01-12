@@ -238,15 +238,19 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   unsigned int nid, K;
   arma::ivec idLoc = getSimIdLoc(aIdVec, aSimIdVec, nid, K);
   arma::vec sim(REAL(VECTOR_ELT(npdeSim, 3)), simLen, false, true);
-  arma::vec lambda(REAL(VECTOR_ELT(npdeSim, 4)), dvLen, false, true);
-  arma::vec yj(REAL(VECTOR_ELT(npdeSim, 5)), dvLen, false, true);
-  arma::vec low(REAL(VECTOR_ELT(npdeSim, 6)), dvLen, false, true);
-  arma::vec hi(REAL(VECTOR_ELT(npdeSim, 7)), dvLen, false, true);
+  arma::vec lambda(REAL(VECTOR_ELT(npdeSim, 4)), simLen, false, true);
+  arma::vec yj(REAL(VECTOR_ELT(npdeSim, 5)), simLen, false, true);
+  arma::vec low(REAL(VECTOR_ELT(npdeSim, 6)), simLen, false, true);
+  arma::vec hi(REAL(VECTOR_ELT(npdeSim, 7)), simLen, false, true);
   arma::vec dvt(dvLen);
   // dv -> dv transform
   for (unsigned int i = dvLen; i--; ) {
     // powerDi for log-normal transfers dv = log(dv)
     dvt[i] = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
+  }
+  // sim -> sim transform; simulation is on untransformed scale
+  for (unsigned int i = simLen; i--;) {
+    sim[i] = _powerD(sim[i], lambda[i], (int) yj[i], low[i], hi[i]);
   }
   arma::ivec cens;
   if (Rf_isNull(censIn)) {
