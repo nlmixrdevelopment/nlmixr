@@ -23,4 +23,11 @@ static inline double truncnorm(double mean, double sd, double low, double hi){
   return REAL(ret)[0];
 }
 
+bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
+					     arma::vec& ipred, arma::vec &ipredt, 
+					     arma::ivec &cens, arma::vec &limit,
+					     arma::vec& lambda, arma::vec &yj, arma::vec& low, arma::vec& hi, 
+					     arma::vec &lowerLim, arma::vec &upperLim, arma::vec &ri,
+					     bool &doSim);
+
 #endif

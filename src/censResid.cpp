@@ -4,7 +4,8 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 					     arma::vec& ipred, arma::vec &ipredt, 
 					     arma::ivec &cens, arma::vec &limit,
 					     arma::vec& lambda, arma::vec &yj, arma::vec& low, arma::vec& hi, 
-					     arma::vec &lowerLim, arma::vec &upperLim, arma::vec &ri) {
+					     arma::vec &lowerLim, arma::vec &upperLim, arma::vec &ri,
+					     bool &doSim) {
   bool interestingLim = false;
   for (int i = dv.size(); i--;) {
     // ipredt is the transformation information
@@ -19,8 +20,12 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 	interestingLim=true;
 	lowerLim[i] = limit[i];
 	upperLim[i] = dv[i];
-	dvt[i] = truncnorm(ipredt[i], sd, lim0TBS, lim1TBS);
-	dv[i] =_powerDi(dvt[i], lambda[i], (int) yj[i], low[i], hi[i]);
+	if (doSim) {
+	  dvt[i] = truncnorm(ipredt[i], sd, lim0TBS, lim1TBS);
+	  dv[i] =_powerDi(dvt[i], lambda[i], (int) yj[i], low[i], hi[i]);
+	} else {
+	  dvt[i] = _powerD(dv[i], lambda[i], (int)yj[i], low[i], hi[i]);
+	}
       } else {
 	// (-Inf, dv)
 	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
@@ -28,8 +33,12 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 	interestingLim=true;
 	lowerLim[i] = R_NegInf;
 	upperLim[i] = dv[i];
-	dvt[i] = truncnorm(ipredt[i], sd, R_NegInf, lim1TBS);
-	dv[i] = _powerDi(dvt[i], lambda[i], (int) yj[i], low[i], hi[i]);
+	if (doSim) {
+	  dvt[i] = truncnorm(ipredt[i], sd, R_NegInf, lim1TBS);
+	  dv[i] = _powerDi(dvt[i], lambda[i], (int) yj[i], low[i], hi[i]);
+	} else {
+	  dvt[i] = _powerD(dv[i], lambda[i], (int)yj[i], low[i], hi[i]);
+	}
       }
       break;
     case -1:
@@ -42,8 +51,12 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 	interestingLim=true;
 	lowerLim[i] = dv[i];
 	upperLim[i] = limit[i];
-	dvt[i] = truncnorm(ipredt[i], sd, lim0TBS, lim1TBS);
-	dv[i] = _powerDi(dvt[i], lambda[i], (int) yj[i], low[i], hi[i]);
+	if (doSim) {
+	  dvt[i] = truncnorm(ipredt[i], sd, lim0TBS, lim1TBS);
+	  dv[i] = _powerDi(dvt[i], lambda[i], (int) yj[i], low[i], hi[i]);
+	} else {
+	  dvt[i] = _powerD(dv[i], lambda[i], (int)yj[i], low[i], hi[i]);
+	}
       } else {
 	// (dv, Inf)
 	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
@@ -51,8 +64,12 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 	interestingLim=true;
 	lowerLim[i] = dv[i];
 	upperLim[i] = R_PosInf;
-	dvt[i] = truncnorm(ipredt[i], sd, lim1TBS, R_PosInf);
-	dv[i] = _powerDi(dvt[i], lambda[i], (int) yj[i], low[i], hi[i]);
+	if (doSim) {
+	  dvt[i] = truncnorm(ipredt[i], sd, lim1TBS, R_PosInf);
+	  dv[i] = _powerDi(dvt[i], lambda[i], (int) yj[i], low[i], hi[i]);
+	} else {
+	  dvt[i] = _powerD(dv[i], lambda[i], (int)yj[i], low[i], hi[i]);
+	}
       }
       break;
     case 0:

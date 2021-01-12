@@ -1,6 +1,6 @@
 #include "armahead.h"
+#include "censResid.h"
 using namespace R;
-
 
 //[[Rcpp::export]]
 List nlmixrParameters(NumericVector theta, DataFrame eta){
@@ -79,24 +79,6 @@ List nlmixrShrink(NumericMatrix &omegaMat,DataFrame etasDf, List etaLst){
   return etaLst;
 }
 
-static inline double truncnorm(double mean, double sd, double low, double hi){
-  NumericMatrix sigma(1,1);
-  sigma(0,0)=sd;
-  SEXP ret =RxODE::rxRmvnSEXP(wrap(IntegerVector::create(1)),
-			      wrap(NumericVector::create(mean)),
-			      wrap(sigma),
-			      wrap(NumericVector::create(low)),
-			      wrap(NumericVector::create(hi)),
-			      wrap(IntegerVector::create(1)),
-			      wrap(LogicalVector::create(false)),
-			      wrap(LogicalVector::create(false)),
-			      wrap(NumericVector::create(0.4)),
-			      wrap(NumericVector::create(2.05)),
-			      wrap(NumericVector::create(1e-10)),
-			      wrap(IntegerVector::create(100)));
-  return REAL(ret)[0];
-}
-
 //[[Rcpp::export]]
 List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
 		  NumericVector &lambda, NumericVector &yj, NumericVector &low, NumericVector &hi,
@@ -110,67 +92,30 @@ List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
   NumericVector iprednvI(iprednv.size());
   NumericVector lowerLim(iprednv.size());
   NumericVector upperLim(iprednv.size());
-  bool interestingLim=false;
   // ipred.erase(0);
   NumericVector ri = ipred[3];
   // ipred.erase(0);
   ipred.erase(0,5);
   NumericVector dvTBS(dv.size());
-  for (int i = dv.size(); i--;){
-    iprednvI[i]= _powerDi(iprednv[i], lambda[i], (int)yj[i], low[i], hi[i]);
-    switch (cens[i]){
-    case 1:
-      // (limit, dv) ; limit could be -inf
-      if (R_FINITE(limit[i])){
-	double lim0TBS = _powerD(limit[i], lambda[i], (int)yj[i], low[i], hi[i]);
-	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
-	double sd = sqrt(ri[i]);
-	interestingLim=true;
-	lowerLim[i] = limit[i];
-	upperLim[i] = dv[i];
-	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
-	dv[i] =_powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
-      } else {
-	// (-Inf, dv)
-	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
-	double sd = sqrt(ri[i]);
-	interestingLim=true;
-	lowerLim[i] = R_NegInf;
-	upperLim[i] = dv[i];
-	dvTBS[i] = truncnorm(iprednv[i], sd, R_NegInf, lim1TBS);
-	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
-      }
-      break;
-    case -1:
-      // (dv, limit); limit could be +inf
-      if (R_FINITE(limit[i])){
-	//(dv, limit)
-	double lim1TBS = _powerD(limit[i], lambda[i], (int)yj[i], low[i], hi[i]);
-	double lim0TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
-	double sd = sqrt(ri[i]);
-	interestingLim=true;
-	lowerLim[i] = dv[i];
-	upperLim[i] = limit[i];
-	dvTBS[i] = truncnorm(iprednv[i], sd, lim0TBS, lim1TBS);
-	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
-      } else {
-	// (dv, Inf)
-	double lim1TBS = _powerD(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
-	double sd = sqrt(ri[i]);
-	interestingLim=true;
-	lowerLim[i] = dv[i];
-	upperLim[i] = R_PosInf;
-	dvTBS[i] = truncnorm(iprednv[i], sd, lim1TBS, R_PosInf);
-	dv[i] = _powerDi(dvTBS[i], lambda[i], (int) yj[i], low[i], hi[i]);
-      }
-      break;
-    case 0:
-      lowerLim[i] = NA_REAL;
-      upperLim[i] = NA_REAL;
-      dvTBS[i] = _powerD(dv[i], lambda[i], (int)yj[i], low[i], hi[i]);
-      break;
-    }
-  }
+
+  arma::vec dvA(dv.begin(), dv.size(), false, true);
+  arma::vec dvtA(dvTBS.begin(), dv.size(), false, true);
+  arma::vec ipredA(iprednvI.begin(), dv.size(), false, true);
+  arma::ivec censA(cens.begin(), cens.size(), false, true);
+  arma::vec lambdaA(lambda.begin(), lambda.size(), false, true);
+  arma::vec yjA(yj.begin(), yj.size(), false, true);
+  arma::vec lowA(low.begin(), low.size(), false, true);
+  arma::vec hiA(hi.begin(), hi.size(), false, true);
+  arma::vec lowerLimA(lowerLim.begin(), lowerLim.size(), false, true);
+  arma::vec upperLimA(upperLim.begin(), upperLim.size(), false, true);
+  arma::vec riA(ri.begin(), ri.size(), false, true);
+  arma::vec ipredtA(iprednv.begin(), iprednv.size(), false, true);
+  arma::vec limitA(limit.begin(), limit.size(), false, true);
+  bool doSim = true;
+  // if doSim is false, keep the prior interpolation (perhaps from cdf npde)
+  bool interestingLim = censTruncatedMvnReturnInterestingLimits(dvA, dvtA, ipredA, ipredtA, 
+								censA, limitA, lambdaA, yjA, lowA, hiA, 
+								lowerLimA, upperLimA, riA, doSim);
   int warn1 = 0;
   int warn2 = 0;
   for (unsigned int j = ri.size(); j--;){
