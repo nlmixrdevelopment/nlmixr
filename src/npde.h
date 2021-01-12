@@ -4,9 +4,7 @@
 #include "armahead.h"
 #define CENS_OMIT 1
 #define CENS_EPRED 2
-#define CENS_IPRED 3
-#define CENS_CDF 4
-#define CENS_TRUNCN 5
+#define CENS_CDF 3
 
 typedef struct {
   arma::mat matsim;

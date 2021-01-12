@@ -222,6 +222,11 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
     ret.yobs[j] = _powerDi(ret.yobst[j], lambda[j], (int) yj[j], low[j], hi[j]);
     ret.epred[j] = _powerDi(ret.epredt[j], lambda[j], (int) yj[j], low[j], hi[j]);
     ret.eres[j] = ret.yobs[j] - ret.epred[j];
+    if (cencMethod == CENS_OMIT && cens[j] != 0) {
+      ret.yobs[j] = NA_REAL;
+      ret.epred[j] = NA_REAL;
+      ret.eres[j] = NA_REAL;
+    }
   }
   return ret;
 }
@@ -230,6 +235,10 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   if (TYPEOF(npdeSim) != VECSXP) {
     Rf_errorcall(R_NilValue, "npdeSim needs to be a data.frame");
   }
+  double tolChol = 6.055454e-06;
+  bool ties = false;
+  unsigned int censMethod = CENS_CDF;
+
   int dvLen = Rf_length(dvIn);
   arma::vec dv  = arma::vec(REAL(dvIn), dvLen, false, true);
   //arma::vec npde(REAL(npdeSEXP), dv.size(), false, true);
@@ -277,9 +286,6 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   arma::vec ru = randu(dvLen); // Pre-fill uniform random numbers to make sure independent
   arma::vec ru2 = randu(dvLen);
   arma::vec ru3 = randu(dvLen);
-  double tolChol = 6.055454e-06;
-  bool ties = false;
-  unsigned int censMethod = CENS_CDF;
 
   SEXP npdeSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
   SEXP epredSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
