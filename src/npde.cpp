@@ -42,14 +42,17 @@ arma::mat getSimMatById(arma::uvec& idLoc, arma::vec &sim, unsigned int& id,
 typedef struct {
   arma::mat matsim;
   arma::mat epredt;
+  arma::mat epred;
   arma::mat varsim;
   arma::mat ymat;
   arma::mat ydsim;
   arma::mat yobst;
+  arma::mat yobs;
   arma::mat ydobs;
   arma::mat tcomp;
   arma::mat pd;
   arma::mat npde;
+  arma::mat eres;
   unsigned int warn = 0;
 } calcNpdeInfoId;
 
@@ -84,6 +87,10 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
 }
 
 
+
+// This is similar to a truncated normal BUT the truncated normal handles the range (low,hi)
+// so instead of updating the DV based on cdf method, simply use the truncated normal
+// we also don't need to back-calculate the simulated DV value
 static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, unsigned int i, arma::vec &ru2,  arma::vec &ru3, unsigned int& K, bool &ties) {
   // For left censoring NPDE the probability is already calculated with the current pd
   // 1. Replace value with lloq
@@ -117,7 +124,8 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, unsi
 calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
 			  arma::vec &dvt, arma::ivec &censIn, unsigned int& id,
 			  unsigned int& K, double &tolChol, bool &ties,
-			  arma::vec &ruIn, arma::vec &ru2In, arma::vec &ru3In) {
+			  arma::vec &ruIn, arma::vec &ru2In, arma::vec &ru3In,
+			  arma::vec &lambda, arma::vec &yj, arma::vec &hi, arma::vec &low) {
   calcNpdeInfoId ret;
   ret.matsim = getSimMatById(idLoc, sim, id, K);
   // transformed y observations
@@ -146,7 +154,7 @@ calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
   if (ties){
     // Ties are allowed
     for (unsigned int j = ret.pd.n_rows; j--;) {
-      handleCensNpdeCdf(ret, cens, j, ru2, ru3, K, ties);
+      // handleCensNpdeCdf(ret, cens, j, ru2, ru3, K, ties);
       if (fabs(ret.pd[j]) < DOUBLE_EPS){
 	ret.pd[j] = 1 / (2.0 * K);
       } else if (fabs(1-ret.pd[j]) < DOUBLE_EPS){
@@ -157,7 +165,7 @@ calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
   } else {
     // Ties are discouraged with jitter
     for (unsigned int j = ret.pd.n_rows; j--;) {
-      handleCensNpdeCdf(ret, cens, j, ru2, ru3, K, ties);
+      // handleCensNpdeCdf(ret, cens, j, ru2, ru3, K, ties);
       if (fabs(ret.pd[j]) < DOUBLE_EPS){
 	ret.pd[j] = ru[j] / K;
       } else if (fabs(1-ret.pd[j]) < DOUBLE_EPS){
@@ -168,36 +176,84 @@ calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
       ret.npde[j] = Rf_qnorm5(ret.pd[j], 0.0, 1.0, 1, 0);
     }
   }
-  //
+  ret.epred = arma::vec(ret.yobst.size());
+  ret.yobs = arma::vec(ret.yobst.size());
+  ret.eres = arma::vec(ret.yobst.size());
+  for (unsigned int j = ret.yobst.size(); j--; ) {
+    // Transfer back to original scale ie exp(x) -> log(exp(x))
+    ret.yobs[j] = _powerD(ret.yobst[j], lambda[j], (int) yj[j], low[j], hi[j]);
+    ret.epred[j] = _powerD(ret.epredt[j], lambda[j], (int) yj[j], low[j], hi[j]);
+    ret.eres[j] = ret.yobs[j] - ret.epred[j];
+  }
   return ret;
 }
 
-extern "C" SEXP _nlmixr_npdeCalc(SEXP id, SEXP simId, SEXP idVec, SEXP simIn, SEXP dvIn, SEXP censIn) {
-  unsigned int curid = INTEGER(id)[0];
-  arma::uvec aIdVec = as<arma::uvec>(idVec);
-  arma::uvec aSimIdVec = as<arma::uvec>(simId);
-
+extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn, SEXP npdeOpt) {
+  if (TYPEOF(npdeSim) != VECSXP) {
+    Rf_errorcall(R_NilValue, "npdeSim needs to be a data.frame");
+  }
+  arma::uvec aSimIdVec = as<arma::uvec>(VECTOR_ELT(npdeSim, 0));
+  arma::uvec aIdVec = as<arma::uvec>(VECTOR_ELT(npdeSim, 1));
   unsigned int nid, K;
   arma::uvec idLoc = getSimIdLoc(aIdVec, aSimIdVec, nid, K);
-  arma::vec sim = as<arma::vec>(simIn);
+  arma::vec sim = as<arma::vec>(VECTOR_ELT(npdeSim, 3));
+  arma::vec lambda = as<arma::vec>(VECTOR_ELT(npdeSim, 4));
+  arma::vec yj = as<arma::vec>(VECTOR_ELT(npdeSim, 5));
+  arma::vec low = as<arma::vec>(VECTOR_ELT(npdeSim, 6));
+  arma::vec hi = as<arma::vec>(VECTOR_ELT(npdeSim, 7));
   arma::vec dv  = as<arma::vec>(dvIn);
-  arma::ivec cens = as<arma::ivec>(censIn);
+  arma::vec dvt(dv.size());
+  // dv -> dv transform
+  for (unsigned int i = dv.size(); i--; ) {
+    // powerDi for log-normal transfers dv = exp(dv)
+    dvt[i] = _powerDi(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
+  }
+  arma::ivec cens;
+  if (Rf_isNull(censIn)) {
+    cens = arma::ivec(dv.size(), fill::zeros);
+  } else {
+    cens = as<arma::ivec>(censIn);
+  }
+  arma::ivec evid;
+  if (Rf_isNull(evidIn)) {
+    evid = arma::ivec(dv.size(), fill::zeros);
+  } else {
+    evid = as<arma::ivec>(evidIn);
+  }
+  bool doLimit = false;
   arma::vec ru = randu(dv.size()); // Pre-fill uniform random numbers to make sure independent
   arma::vec ru2 = randu(dv.size());
   arma::vec ru3 = randu(dv.size());
-
   double tolChol = 6.055454e-06;
   bool ties = false;
 
-  calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dv, cens, curid, K, tolChol, ties, ru, ru2, ru3);
-  
-  List ret(7);
-  ret[0] = wrap(idInfo.epredt);
-  ret[1] = wrap(idInfo.ymat);
-  ret[2] = wrap(idInfo.ydsim);
-  ret[3] = wrap(idInfo.ydobs);
-  ret[4] = wrap(idInfo.tcomp);
-  ret[5] = wrap(idInfo.pd);
-  ret[6] = wrap(idInfo.npde);
+  int pro = 0;
+  SEXP npdeSEXP = PROTECT(Rf_allocVector(REALSXP, dv.size())); pro++;
+  SEXP epredSEXP = PROTECT(Rf_allocVector(REALSXP, dv.size())); pro++;
+  SEXP dvSEXP = PROTECT(Rf_allocVector(REALSXP, dv.size())); pro++;
+  SEXP eresSEXP = PROTECT(Rf_allocVector(REALSXP, dv.size())); pro++;
+  arma::vec npde(REAL(npdeSEXP), dv.size(), false, true);
+  arma::vec epred(REAL(epredSEXP), dv.size(), false, true);
+  arma::vec dvf(REAL(dvSEXP), dv.size(), false, true);
+  arma::vec eres(REAL(eresSEXP), dv.size(), false, true);
+  for (unsigned int curid = 0; curid < idLoc.size()-1; ++curid) {
+    calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dvt, cens, curid, K, tolChol, ties, ru, ru2, ru3,
+				       lambda, yj, hi, low);
+    npde(span(idLoc[curid],idLoc[curid+1]-1)) = idInfo.npde;
+    epred(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.epred;
+    dvf(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.yobs;
+    eres(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.eres;
+  }
+  List ret(4);
+  // epred, eres, npde, dv
+  ret[0] = epred;
+  ret[1] = eres;
+  ret[2] = npde;
+  ret[3] = dvf;
+  Rf_setAttrib(ret, R_ClassSymbol, wrap("data.frame"));
+  Rf_setAttrib(ret, R_RowNamesSymbol,
+	       IntegerVector::create(NA_INTEGER, -dv.size()));
+  Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("EPRED", "ERES", "NPDE",  "DV"));
+  UNPROTECT(pro);
   return ret;
 }

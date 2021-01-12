@@ -86,8 +86,8 @@ SEXP _nlmixr_powerL(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 SEXP _saemResidF(SEXP v);
 
-SEXP _nlmixr_npdeCalc(SEXP id, SEXP simId, SEXP idVec, SEXP simIn,
-		      SEXP dvIn, SEXP censIn);
+SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
+		      SEXP npdeOpt);
 
 static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_freeFocei", (DL_FUNC) &_nlmixr_freeFocei, 0},
