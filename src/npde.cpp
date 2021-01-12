@@ -125,7 +125,7 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma
   else ret.yobst[i] = low + (hi - low)*ru3[i];
 }
 
-static inline void handleNpdeNAandCalculateEpred(calcNpdeInfoId& ret, unsigned int& K, unsigned int& censMethod) {
+static inline void handleNpdeNAandCalculateEpred(calcNpdeInfoId& ret, unsigned int& K) {
   ret.namat = umat(ret.matsim.n_rows, ret.matsim.n_cols);
   // Replace NA with zeros
   for (unsigned int j = ret.namat.size(); j--;) {
@@ -140,9 +140,6 @@ static inline void handleNpdeNAandCalculateEpred(calcNpdeInfoId& ret, unsigned i
       if (ret.namat(i,j)) {
 	ret.matsim(i,j) = ret.epredt[i];
       }
-    }
-    if (censMethod == CENS_EPRED) {
-      ret.yobs[i] = ret.epredt[i];
     }
   }
 }
@@ -212,7 +209,7 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
   arma::ivec cens = censIn(span(idLoc[id], idLoc[id+1]-1));
   arma::vec limit = limitIn(span(idLoc[id], idLoc[id+1]-1));
   arma::ivec evid = evidIn(span(idLoc[id]), idLoc[id+1]-1);
-  handleNpdeNAandCalculateEpred(ret, K, censMethod);
+  handleNpdeNAandCalculateEpred(ret, K);
   calculatePD(ret, id, K, tolChol);
   calculateNPDEfromPD(ret, cens, limit, censMethod, doLimit, K, ties, ru, ru2, ru3);
   ret.epred = arma::vec(ret.yobst.size());

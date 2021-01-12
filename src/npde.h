@@ -2,9 +2,7 @@
 #define __NPDE_H__
 
 #include "armahead.h"
-#define CENS_OMIT 1
-#define CENS_EPRED 2
-#define CENS_CDF 3
+#include "censResid.h"
 
 typedef struct {
   arma::mat matsim;
