@@ -196,7 +196,7 @@ static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, ar
 }
 
 calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
-			  arma::vec &dvt, arma::ivec &censIn, arma::vec &limitIn,
+			  arma::vec &dvt, arma::ivec &evidIn, arma::ivec &censIn, arma::vec &limitIn,
 			  unsigned int &censMethod, bool &doLimit,
 			  unsigned int& id,
 			  unsigned int& K, double &tolChol, bool &ties,
@@ -211,6 +211,7 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
   arma::vec ru3 = ru3In(span(idLoc[id], idLoc[id+1]-1));
   arma::ivec cens = censIn(span(idLoc[id], idLoc[id+1]-1));
   arma::vec limit = limitIn(span(idLoc[id], idLoc[id+1]-1));
+  arma::ivec evid = evidIn(span(idLoc[id]), idLoc[id+1]-1);
   handleNpdeNAandCalculateEpred(ret, K, censMethod);
   calculatePD(ret, id, K, tolChol);
   calculateNPDEfromPD(ret, cens, limit, censMethod, doLimit, K, ties, ru, ru2, ru3);
@@ -222,9 +223,12 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
     ret.yobs[j] = _powerDi(ret.yobst[j], lambda[j], (int) yj[j], low[j], hi[j]);
     ret.epred[j] = _powerDi(ret.epredt[j], lambda[j], (int) yj[j], low[j], hi[j]);
     ret.eres[j] = ret.yobs[j] - ret.epred[j];
-    if (cencMethod == CENS_OMIT && cens[j] != 0) {
+    if (censMethod == CENS_OMIT && cens[j] != 0) {
       ret.yobs[j] = NA_REAL;
       ret.epred[j] = NA_REAL;
+      ret.eres[j] = NA_REAL;
+    } else if (evid[j] != 0) {
+      ret.yobs[j] = NA_REAL;
       ret.eres[j] = NA_REAL;
     }
   }
@@ -296,7 +300,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   arma::vec dvf(REAL(dvSEXP), dvLen, false, true);
   arma::vec eres(REAL(eresSEXP), dvLen, false, true);
   for (unsigned int curid = 0; curid < idLoc.size()-1; ++curid) {
-    calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dvt, cens, limit, censMethod, doLimit, curid, K, tolChol, ties, ru, ru2, ru3,
+    calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dvt, evid, cens, limit, censMethod, doLimit, curid, K, tolChol, ties, ru, ru2, ru3,
 				       lambda, yj, hi, low);
     npde(span(idLoc[curid],idLoc[curid+1]-1)) = idInfo.npde;
     epred(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.epred;
