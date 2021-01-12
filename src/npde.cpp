@@ -1,11 +1,11 @@
 #include "armahead.h"
 
-arma::uvec getSimIdLoc(arma::uvec& id, arma::uvec& simId,
+arma::ivec getSimIdLoc(arma::ivec& id, arma::ivec& simId,
 		      unsigned int &nid, unsigned int &K) {
-  unsigned int i = 0;
-  unsigned int lastId=id[0];
-  unsigned int lastSimId = simId[0];
-  unsigned int totNobs = 0;
+  int i = 0;
+  int lastId=id[0];
+  int lastSimId = simId[0];
+  int totNobs = 0;
   nid = 1;
   while (simId[i] == lastSimId) {
     if (lastId != id[i]) {
@@ -16,7 +16,7 @@ arma::uvec getSimIdLoc(arma::uvec& id, arma::uvec& simId,
   }
   K =   id.size() /  totNobs;
 
-  arma::uvec idLoc(nid+1);
+  arma::ivec idLoc(nid+1);
   unsigned int j = 0;
   for (i = 0; i < totNobs; i++) {
     if (lastId != id[i]){
@@ -28,7 +28,7 @@ arma::uvec getSimIdLoc(arma::uvec& id, arma::uvec& simId,
   return idLoc;
 }
 
-arma::mat getSimMatById(arma::uvec& idLoc, arma::vec &sim, unsigned int& id,
+arma::mat getSimMatById(arma::ivec& idLoc, arma::vec &sim, unsigned int& id,
 			unsigned int& K) {
   int nobs = idLoc[id+1]-idLoc[id];
   int totNobs = idLoc[idLoc.size()-1];
@@ -121,7 +121,7 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, unsi
   else ret.yobst[i] = low + (hi - low)*ru3[i];
 }
 
-calcNpdeInfoId calcNpdeId(arma::uvec& idLoc, arma::vec &sim,
+calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
 			  arma::vec &dvt, arma::ivec &censIn, unsigned int& id,
 			  unsigned int& K, double &tolChol, bool &ties,
 			  arma::vec &ruIn, arma::vec &ru2In, arma::vec &ru3In,
@@ -192,50 +192,54 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   if (TYPEOF(npdeSim) != VECSXP) {
     Rf_errorcall(R_NilValue, "npdeSim needs to be a data.frame");
   }
-  arma::uvec aSimIdVec = as<arma::uvec>(VECTOR_ELT(npdeSim, 0));
-  arma::uvec aIdVec = as<arma::uvec>(VECTOR_ELT(npdeSim, 1));
+  int dvLen = Rf_length(dvIn);
+  arma::vec dv  = arma::vec(REAL(dvIn), dvLen, false, true);
+  //arma::vec npde(REAL(npdeSEXP), dv.size(), false, true);
+  int pro = 0;
+  SEXP s0 = PROTECT(VECTOR_ELT(npdeSim, 0)); pro++;
+  int simLen = Rf_length(s0);
+  arma::ivec aSimIdVec(INTEGER(s0), simLen, false, true);
+  arma::ivec aIdVec(INTEGER(VECTOR_ELT(npdeSim, 1)), simLen, false, true);
   unsigned int nid, K;
-  arma::uvec idLoc = getSimIdLoc(aIdVec, aSimIdVec, nid, K);
-  arma::vec sim = as<arma::vec>(VECTOR_ELT(npdeSim, 3));
-  arma::vec lambda = as<arma::vec>(VECTOR_ELT(npdeSim, 4));
-  arma::vec yj = as<arma::vec>(VECTOR_ELT(npdeSim, 5));
-  arma::vec low = as<arma::vec>(VECTOR_ELT(npdeSim, 6));
-  arma::vec hi = as<arma::vec>(VECTOR_ELT(npdeSim, 7));
-  arma::vec dv  = as<arma::vec>(dvIn);
-  arma::vec dvt(dv.size());
+  arma::ivec idLoc = getSimIdLoc(aIdVec, aSimIdVec, nid, K);
+  arma::vec sim(REAL(VECTOR_ELT(npdeSim, 3)), simLen, false, true);
+  arma::vec lambda(REAL(VECTOR_ELT(npdeSim, 4)), dvLen, false, true);
+  arma::vec yj(REAL(VECTOR_ELT(npdeSim, 5)), dvLen, false, true);
+  arma::vec low(REAL(VECTOR_ELT(npdeSim, 6)), dvLen, false, true);
+  arma::vec hi(REAL(VECTOR_ELT(npdeSim, 7)), dvLen, false, true);
+  arma::vec dvt(dvLen);
   // dv -> dv transform
-  for (unsigned int i = dv.size(); i--; ) {
+  for (unsigned int i = dvLen; i--; ) {
     // powerDi for log-normal transfers dv = exp(dv)
     dvt[i] = _powerDi(dv[i], lambda[i], (int) yj[i], low[i], hi[i]);
   }
   arma::ivec cens;
   if (Rf_isNull(censIn)) {
-    cens = arma::ivec(dv.size(), fill::zeros);
+    cens = arma::ivec(dvLen, fill::zeros);
   } else {
     cens = as<arma::ivec>(censIn);
   }
   arma::ivec evid;
   if (Rf_isNull(evidIn)) {
-    evid = arma::ivec(dv.size(), fill::zeros);
+    evid = arma::ivec(dvLen, fill::zeros);
   } else {
     evid = as<arma::ivec>(evidIn);
   }
   bool doLimit = false;
-  arma::vec ru = randu(dv.size()); // Pre-fill uniform random numbers to make sure independent
-  arma::vec ru2 = randu(dv.size());
-  arma::vec ru3 = randu(dv.size());
+  arma::vec ru = randu(dvLen); // Pre-fill uniform random numbers to make sure independent
+  arma::vec ru2 = randu(dvLen);
+  arma::vec ru3 = randu(dvLen);
   double tolChol = 6.055454e-06;
   bool ties = false;
 
-  int pro = 0;
-  SEXP npdeSEXP = PROTECT(Rf_allocVector(REALSXP, dv.size())); pro++;
-  SEXP epredSEXP = PROTECT(Rf_allocVector(REALSXP, dv.size())); pro++;
-  SEXP dvSEXP = PROTECT(Rf_allocVector(REALSXP, dv.size())); pro++;
-  SEXP eresSEXP = PROTECT(Rf_allocVector(REALSXP, dv.size())); pro++;
-  arma::vec npde(REAL(npdeSEXP), dv.size(), false, true);
-  arma::vec epred(REAL(epredSEXP), dv.size(), false, true);
-  arma::vec dvf(REAL(dvSEXP), dv.size(), false, true);
-  arma::vec eres(REAL(eresSEXP), dv.size(), false, true);
+  SEXP npdeSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
+  SEXP epredSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
+  SEXP dvSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
+  SEXP eresSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
+  arma::vec npde(REAL(npdeSEXP), dvLen, false, true);
+  arma::vec epred(REAL(epredSEXP), dvLen, false, true);
+  arma::vec dvf(REAL(dvSEXP), dvLen, false, true);
+  arma::vec eres(REAL(eresSEXP), dvLen, false, true);
   for (unsigned int curid = 0; curid < idLoc.size()-1; ++curid) {
     calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dvt, cens, curid, K, tolChol, ties, ru, ru2, ru3,
 				       lambda, yj, hi, low);
@@ -252,7 +256,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   ret[3] = dvf;
   Rf_setAttrib(ret, R_ClassSymbol, wrap("data.frame"));
   Rf_setAttrib(ret, R_RowNamesSymbol,
-	       IntegerVector::create(NA_INTEGER, -dv.size()));
+	       IntegerVector::create(NA_INTEGER, -dvLen));
   Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("EPRED", "ERES", "NPDE",  "DV"));
   UNPROTECT(pro);
   return ret;
