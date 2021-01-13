@@ -236,10 +236,29 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   if (TYPEOF(npdeSim) != VECSXP) {
     Rf_errorcall(R_NilValue, "npdeSim needs to be a data.frame");
   }
+  List opt = as<List>(npdeOpt);
   double tolChol = 6.055454e-06;
+  if (opt.containsElementNamed("tolChol")) {
+    RObject tmp = opt["tolChol"];
+    if (TYPEOF(tmp) == REALSXP) {
+      tolChol = as<double>(tmp);
+    }
+  }
   bool ties = false;
-  unsigned int censMethod = CENS_CDF;
-
+  if (opt.containsElementNamed("ties")) {
+    RObject tmp = opt["ties"];
+    if (TYPEOF(tmp) == LGLSXP) {
+      ties = as<bool>(tmp);
+    }
+  }
+  unsigned int censMethod = CENS_TNORM;
+  if (opt.containsElementNamed("censMethod")) {
+    RObject tmp = opt["censMethod"];
+    if (TYPEOF(tmp) == INTSXP) {
+       censMethod = as<unsigned int>(tmp);
+    }
+  }
+  
   int dvLen = Rf_length(dvIn);
   arma::vec dv  = arma::vec(REAL(dvIn), dvLen, false, true);
   //arma::vec npde(REAL(npdeSEXP), dv.size(), false, true);

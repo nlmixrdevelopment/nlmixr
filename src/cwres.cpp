@@ -94,19 +94,19 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   arma::vec rpv(REAL(predL[3+neta]), ncalc, false, true);
   arma::vec riv(REAL(ipredL[3+neta]), ncalc, false, true);
 
-  bool doSim = false;
+  bool doSim = true;
   List opt = as<List>(cwresOpt);
   if (opt.containsElementNamed("doSim")) {
-    RObject tmp = cwresOpt["doSim"];
+    RObject tmp = opt["doSim"];
     if (TYPEOF(tmp) == LGLSXP) {
-      doSim = as<bool>(cwresOpt["doSim"]);
+      doSim = as<bool>(tmp);
     }
   }
   int censMethod = CENS_TNORM;
   if (opt.containsElementNamed("censMethod")) {
-    RObject tmp = cwresOpt["censMethod"];
+    RObject tmp = opt["censMethod"];
     if (TYPEOF(tmp) == INTSXP) {
-      censMethod = as<int>(cwresOpt["censMethod"]);
+      censMethod = as<int>(opt["censMethod"]);
     }
   }
 
