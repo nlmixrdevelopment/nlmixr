@@ -3,6 +3,11 @@
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
 
+#include "npde.h"
+#include "cwres.h"
+#include "res.h"
+#include "ires.h"
+
 /* Internal C calls, should not be called outside of C code. */
 typedef void (*S_fp) (double *, double *);
 extern void nelder_fn(S_fp func, int n, double *start, double *step,
@@ -86,9 +91,6 @@ SEXP _nlmixr_powerL(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 SEXP _saemResidF(SEXP v);
 
-SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-		      SEXP npdeOpt);
-
 static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_freeFocei", (DL_FUNC) &_nlmixr_freeFocei, 0},
   {"neldermead_wrap",      (DL_FUNC) &neldermead_wrap,      11},
@@ -140,6 +142,9 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_powerL", (DL_FUNC) &_nlmixr_powerL, 5},
   {"_saemResidF", (DL_FUNC) &_saemResidF, 1},
   {"_nlmixr_npdeCalc", (DL_FUNC) &_nlmixr_npdeCalc, 6},
+  {"_nlmixr_cwresCalc",  (DL_FUNC) &_nlmixr_cwresCalc, 8},
+  {"_nlmixr_resCalc",  (DL_FUNC) &_nlmixr_resCalc, 8},
+  {"_nlmixr_iresCalc", (DL_FUNC) &_nlmixr_iresCalc, 6},
   {NULL, NULL, 0}
 };
 

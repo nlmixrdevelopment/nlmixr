@@ -1,6 +1,4 @@
-#include "armahead.h"
-#include "censResid.h"
-
+#include "cwres.h"
 static inline void calculateCwresDerr(arma::mat& fppm, arma::mat& fpim,
 				      arma::ivec& ID, arma::mat &etas,
 				      arma::vec &dErr_dEta_i, arma::vec &dErr_dEta_p,

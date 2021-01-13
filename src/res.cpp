@@ -32,7 +32,7 @@ void calculateDfFull(arma::ivec& ID, arma::mat &etas,
 
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-				SEXP cwresOpt) {
+				SEXP resOpt) {
   List ipredPredList = as<List>(ipredPredListSEXP);
   if (ipredPredList.size() !=2) stop("malformed cwres calc");
   List ipredL = ipredPredList[0];
@@ -83,7 +83,7 @@ extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   unsigned int neta = omegaMat.n_rows;
 
   bool doSim = true;
-  List opt = as<List>(cwresOpt);
+  List opt = as<List>(resOpt);
   if (opt.containsElementNamed("doSim")) {
     RObject tmp = opt["doSim"];
     if (TYPEOF(tmp) == LGLSXP) {

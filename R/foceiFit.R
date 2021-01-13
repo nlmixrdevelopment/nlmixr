@@ -2578,6 +2578,11 @@ foceiFit.data.frame0 <- function(data,
       return(get(arg, envir = .env2))
     }
   }
+  if (is.null(.ret)) {
+    if (arg == "simInfo") {
+      return(.simInfo(obj))
+    }
+  }
 }
 
 ##' @export
@@ -2595,11 +2600,6 @@ foceiFit.data.frame0 <- function(data,
     .cls <- class(obj)
     .env <- attr(.cls, ".foceiEnv")
     .ret <- `$.nlmixrFitCore`(.env, arg, exact)
-    if (is.null(.ret)) {
-      if (arg == "simInfo") {
-        return(.simInfo(obj))
-      }
-    }
   }
   return(.ret)
 }

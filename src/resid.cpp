@@ -2,60 +2,6 @@
 #include "censResid.h"
 using namespace R;
 
-//[[Rcpp::export]]
-List nlmixrParameters(NumericVector theta, DataFrame eta){
-  DataFrame eta2 = eta;
-  eta2.erase(0);
-  NumericVector pred(theta.size()+eta2.ncol());
-  CharacterVector predn(pred.size());
-  NumericMatrix ipred(eta.nrow(),pred.size());
-  unsigned int j;
-  for (j=theta.size(); j--;){
-    pred[j] = theta[j];
-    std::fill_n(ipred.begin()+eta.nrow()*j,eta.nrow(),theta[j]);
-    predn[j] = "THETA[" + std::to_string(j+1) + "]";
-  }
-  unsigned int k = theta.size();
-  unsigned int n, n1;
-  double M1, M2, M3, M4, delta, delta_n, delta_n2, term1;
-  // Create data frame for ETA/EPS mean, sd, variance, kurtosis and skewness
-  List etadf(eta2.ncol()+1);
-  NumericVector cur1(9);
-  etadf[eta2.ncol()]=cur1;
-  for (j=eta2.ncol();j--;){
-    pred[k+j]=0;
-    predn[k+j] = "ETA[" + std::to_string(j+1) + "]";
-    NumericVector cur = as<NumericVector>(eta2[j]);
-    std::copy(cur.begin(),cur.end(),ipred.begin()+(j+k)*eta.nrow());
-    // This uses welford's method as described by
-    // https://www.johndcook.com/blog/skewness_kurtosis/ adapted to
-    // this problem.
-    n =0; n1 = 0;
-    M1 =  M2 = M3 = M4 =0;
-    NumericVector stat(9);
-    for (unsigned int i = eta.nrow(); i--;){
-      n1=n; n++;
-      delta = cur[i] - M1;
-      delta_n = delta / n;
-      delta_n2 = delta_n * delta_n;
-      term1 = delta * delta_n * n1;
-      M1 += delta_n;
-      M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
-      M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
-      M2 += term1;
-    }
-    stat[0] = M1;
-    stat[1] = M2/((double)n1);
-    stat[2] = sqrt((double)stat[1]);
-    stat[3] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
-    stat[4] = (double)(n)*M4 / (M2*M2) - 3.0;
-    etadf[j] = stat;
-  }
-  pred.names() = predn;
-  ipred.attr("dimnames") = List::create(R_NilValue,predn);
-  return List::create(_["pred"]=pred, _["ipred"]=ipred,_["eta.lst"]=etadf);
-}
-
 // [[Rcpp::export]]
 List nlmixrShrink(NumericMatrix &omegaMat,DataFrame etasDf, List etaLst){
   unsigned int nid=etasDf.nrows();
@@ -485,7 +431,7 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
   stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
   List ret(4);
   // Now do inverse TBS to backtransform
-  if (doCwres){
+  if (doCwres) {
     NumericVector ires = dv-iprednvI;
     for (i = cwres.size(); i--;){
       if (evid[i] != 0){

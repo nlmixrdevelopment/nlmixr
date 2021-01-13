@@ -13,6 +13,8 @@
 #include <RcppArmadillo.h>
 #include <RxODE.h>
 
+
+
 arma::mat cholSE__(arma::mat A, double tol);
 bool cholSE0(arma::mat &Ao, arma::mat &E, arma::mat A, double tol);
 

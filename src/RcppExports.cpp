@@ -403,18 +403,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// nlmixrParameters
-List nlmixrParameters(NumericVector theta, DataFrame eta);
-RcppExport SEXP _nlmixr_nlmixrParameters(SEXP thetaSEXP, SEXP etaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
-    Rcpp::traits::input_parameter< DataFrame >::type eta(etaSEXP);
-    rcpp_result_gen = Rcpp::wrap(nlmixrParameters(theta, eta));
-    return rcpp_result_gen;
-END_RCPP
-}
 // nlmixrShrink
 List nlmixrShrink(NumericMatrix& omegaMat, DataFrame etasDf, List etaLst);
 RcppExport SEXP _nlmixr_nlmixrShrink(SEXP omegaMatSEXP, SEXP etasDfSEXP, SEXP etaLstSEXP) {
@@ -526,6 +514,18 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type xSEXP(xSEXPSEXP);
     rcpp_result_gen = Rcpp::wrap(saem_fit(xSEXP));
+    return rcpp_result_gen;
+END_RCPP
+}
+// nlmixrParameters
+List nlmixrParameters(NumericVector theta, DataFrame eta);
+RcppExport SEXP _nlmixr_nlmixrParameters(SEXP thetaSEXP, SEXP etaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type eta(etaSEXP);
+    rcpp_result_gen = Rcpp::wrap(nlmixrParameters(theta, eta));
     return rcpp_result_gen;
 END_RCPP
 }

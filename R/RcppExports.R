@@ -153,10 +153,6 @@ llik_neg_binomial <- function(y, params) {
     .Call(`_nlmixr_llik_neg_binomial`, y, params)
 }
 
-nlmixrParameters <- function(theta, eta) {
-    .Call(`_nlmixr_nlmixrParameters`, theta, eta)
-}
-
 nlmixrShrink <- function(omegaMat, etasDf, etaLst) {
     .Call(`_nlmixr_nlmixrShrink`, omegaMat, etasDf, etaLst)
 }
@@ -183,5 +179,9 @@ saem_do_pred <- function(in_phi, in_evt, in_opt) {
 
 saem_fit <- function(xSEXP) {
     .Call(`_nlmixr_saem_fit`, xSEXP)
+}
+
+nlmixrParameters <- function(theta, eta) {
+    .Call(`_nlmixr_nlmixrParameters`, theta, eta)
 }
 

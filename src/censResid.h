@@ -5,6 +5,8 @@
 #define CENS_CDF 2
 #define CENS_TNORM 3
 
+#if defined(__cplusplus)
+
 static inline double truncnorm(double mean, double sd, double low, double hi){
   NumericMatrix sigma(1,1);
   sigma(0,0)=sd;
@@ -29,5 +31,7 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 					     arma::vec& lambda, arma::vec &yj, arma::vec& low, arma::vec& hi, 
 					     arma::vec &lowerLim, arma::vec &upperLim, arma::vec &ri,
 					     bool &doSim);
+
+#endif
 
 #endif

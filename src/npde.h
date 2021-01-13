@@ -1,6 +1,8 @@
 #ifndef __NPDE_H__
 #define __NPDE_H__
 
+
+#if defined(__cplusplus)
 #include "armahead.h"
 #include "censResid.h"
 
@@ -22,5 +24,13 @@ typedef struct {
   unsigned int warn = 0;
 } calcNpdeInfoId;
 
+extern "C" {
 #endif
 
+  SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn, SEXP npdeOpt);
+
+#if defined(__cplusplus)
+}
+#endif
+
+#endif
