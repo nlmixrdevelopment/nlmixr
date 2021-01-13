@@ -204,8 +204,6 @@ List nlmixrResid(List &innerList, NumericMatrix &omegaMat, NumericVector &cdv,
   unsigned int neta = omegaMat.nrow();
   NumericMatrix fpp(iprednv.size(),neta);
   NumericMatrix fpi(iprednv.size(),neta);
-  NumericMatrix rpp(iprednv.size(),neta);
-  NumericMatrix rpi(iprednv.size(),neta);
   unsigned int i, j;
   double om;
   unsigned int nid=etasDf.nrows();
