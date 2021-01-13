@@ -101,12 +101,10 @@ StatCens <- ggplot2::ggproto("StatCens", ggplot2::Stat,
 ##'
 ##' Requires the following aesthetics:
 ##'
-##' \itemize{
-##' \item x representing the x values, usually time
-##' \item y representing the y values, often concentration
-##' \item lower represents the lower bound of the censoring (could be \code{-Inf})
-##' \item upper represents the upper bound of the censoring (cound be \code{Inf})
-##' }
+##'  - `x` Represents the independent variable, often the time scale
+##'  - `y` represents the dependent variable
+##'  - `CENS` for the censoring information; (`-1` right censored, `0` no censoring or `1` left censoring)
+##'  - `LIMIT` which represents the corresponding limit ()
 ##'
 ##' Will add boxes representing the areas of the fit that were censored.
 ##'
