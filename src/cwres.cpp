@@ -45,7 +45,7 @@ static inline void calculateCwresDerr(arma::mat& fppm, arma::mat& fpim,
 
 extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				  SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-				  SEXP doSimSEXP) {
+				  SEXP cwresOpt) {
   List ipredPredList = as<List>(ipredPredListSEXP);
   if (ipredPredList.size() !=2) stop("malformed cwres calc");
   List ipredL = ipredPredList[0];
@@ -95,7 +95,20 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   arma::vec riv(REAL(ipredL[3+neta]), ncalc, false, true);
 
   bool doSim = false;
-  if (INTEGER(doSimSEXP)[0]) doSim=true;
+  List opt = as<List>(cwresOpt);
+  if (opt.containsElementNamed("doSim")) {
+    RObject tmp = cwresOpt["doSim"];
+    if (TYPEOF(tmp) == LGLSXP) {
+      doSim = as<bool>(cwresOpt["doSim"]);
+    }
+  }
+  int censMethod = CENS_TNORM;
+  if (opt.containsElementNamed("censMethod")) {
+    RObject tmp = cwresOpt["censMethod"];
+    if (TYPEOF(tmp) == INTSXP) {
+      censMethod = as<int>(cwresOpt["censMethod"]);
+    }
+  }
 
   bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, cens, limit,
   								   lambda, yj, low, hi, lowerLim, upperLim,
@@ -172,6 +185,28 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   arma::vec iwres=(dvt-ipredt)/sqrt(riv);
   arma::vec ires = dv - ipred;
 
+  for (unsigned int j = ires.size(); j--; ) {
+    if (censMethod == CENS_OMIT && cens[j] != 0) {
+      dv[j]	= NA_REAL;
+      pred[j]	= NA_REAL;
+      res[j]	= NA_REAL;
+      wres[j]	= NA_REAL;
+      ipred[j]	= NA_REAL;
+      ires[j]	= NA_REAL;
+      iwres[j]	= NA_REAL;
+      cpred[j]	= NA_REAL;
+      cres[j]	= NA_REAL;
+      cwres[j]	= NA_REAL;
+    } else if (evid[j] != 0) {
+      dv[j]	= NA_REAL;
+      res[j]	= NA_REAL;
+      wres[j]	= NA_REAL;
+      ires[j]	= NA_REAL;
+      iwres[j]	= NA_REAL;
+      cres[j]	= NA_REAL;
+      cwres[j]	= NA_REAL;
+    }
+  }
   DataFrame retDF;
 
   if (interestingLimits) {
@@ -197,6 +232,8 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["CRES"]=wrap(cres),
 			      _["CWRES"]=wrap(cwres));
   }
-    
+  // ret[1] = etaLst;
+  // ret[2] = etasDfFull;
+  // ret[3] = dv;
   return wrap(retDF);
 }
