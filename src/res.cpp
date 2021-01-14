@@ -153,6 +153,7 @@ extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["IPRED"]=wrap(ipred),
 			      _["IRES"]=wrap(ires),
 			      _["IWRES"]=wrap(iwres),
+			      _["DV"]=wrap(dv),
 			      _["lowerLim"] = wrap(lowerLim),
 			      _["upperLim"] = wrap(upperLim));
   } else {
@@ -160,12 +161,12 @@ extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["RES"]=wrap(res),
 			      _["IPRED"]=wrap(ipred),
 			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres));
+			      _["IWRES"]=wrap(iwres),
+			      _["DV"]=wrap(dv));
   }
-  List ret(3);
+  List ret(2);
   ret[0] = retDF;
-  ret[1] = dv;
-  ret[2] = etasDfFull;
+  ret[1] = etasDfFull;
   // ret[1] = etaLst;
   // ret[2] = etasDfFull;
   // ret[3] = dv;

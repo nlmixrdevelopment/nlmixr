@@ -83,15 +83,14 @@ extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDf, SEXP dvIn, SEXP evidIn, SEXP cens
     retDF = DataFrame::create(_["IPRED"]=wrap(ipred),
 			      _["IRES"]=wrap(ires),
 			      _["IWRES"]=wrap(iwres),
+			      _["DV"]=wrap(dv),
 			      _["lowerLim"] = wrap(lowerLim),
 			      _["upperLim"] = wrap(upperLim));
   } else {
     retDF = DataFrame::create(_["IPRED"]=wrap(ipred),
 			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres));
+			      _["IWRES"]=wrap(iwres),
+			      _["DV"]=wrap(dv));
   }
-  List ret(2);
-  ret[0] = retDF;
-  ret[1] = dv;
-  return ret;
+  return wrap(retDF);
 }

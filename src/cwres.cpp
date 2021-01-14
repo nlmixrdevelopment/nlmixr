@@ -217,7 +217,8 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["CRES"]=wrap(cres),
 			      _["CWRES"]=wrap(cwres),
 			      _["lowerLim"] = wrap(lowerLim),
-			      _["upperLim"] = wrap(upperLim));
+			      _["upperLim"] = wrap(upperLim),
+			      _["DV"]=wrap(dv));
   } else {
     retDF = DataFrame::create(_["PRED"]=wrap(pred),
 			      _["RES"]=wrap(res),
@@ -227,12 +228,12 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["IWRES"]=wrap(iwres),
 			      _["CPRED"]=wrap(cpred),
 			      _["CRES"]=wrap(cres),
-			      _["CWRES"]=wrap(cwres));
+			      _["CWRES"]=wrap(cwres),
+			      _["DV"]=wrap(dv));
   }
-  List ret(3);
+  List ret(2);
   ret[0] = retDF;
-  ret[1] = dv;
-  ret[2] = etasDfFull;
+  ret[1] = etasDfFull;
   // calcShrinkFinalize(omegaMat, nid, List& etaLst, arma::vec &iwres, arma::ivec &evid, CharacterVector &etaNames);
   // FIXME etasLst
   return wrap(ret);
