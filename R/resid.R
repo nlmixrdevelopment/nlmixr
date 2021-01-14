@@ -107,7 +107,7 @@
 }
 
 .calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
-                       table=tableControl()) {
+                       table=tableControl(), dv=NULL, predOnly=FALSE) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
   .keep <- NULL
   .names <- names(data)
@@ -117,11 +117,53 @@
     if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
   }
 
-  .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=FALSE)
+  .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly)
+  if (!inherits(dv, "numeric")) {
+    dv <- .prdLst$ipred$dv
+    table$doSim <- FALSE
+  } else {
+    table$doSim <- TRUE
+  }
+  if (predOnly){
+    .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
+          fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
+          .prdLst$ipred$limit, table)
+  } else {
+    .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
+          fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
+          .prdLst$ipred$limit, table)
+  }
+}
 
-  .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
-        fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-        .prdLst$ipred$limit, table)
+.calcRes <- function(..., predOnly=TRUE) {
+  .calcCwres(..., predOnly=predOnly)
+}
+
+.calcIres <- function(fit, data=fit$dataSav, table=tableControl(), dv=NULL) {
+  if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
+  .keep <- NULL
+  .names <- names(data)
+  .lowerNames <- tolower(.names)
+  for (.n in c("dv", "cens", "limit")) {
+    .w <- which(.lowerNames == .n)
+    if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
+  }
+  .thetas <- fit$fixef
+  names(.thetas) <- paste0("THETA[", seq_along(.thetas), "]")
+  .eta <- fit$eta
+  if (inherits(.eta, "data.frame")) {
+    .n <- length(.eta) - 1
+    .thetas <- c(.thetas, setNames(rep(0, .n), paste0("ETA[", seq_len(.n), "]")))
+  }
+  .ipred <- .foceiSolvePars(fit, fit$model$pred.only, .thetas,
+                            returnType="data.frame.TBS", keep=.keep, what="ipred")
+  if (!inherits(dv, "numeric")) {
+    dv <- .ipred$dv
+    table$doSim <- FALSE
+  } else {
+    table$doSim <- TRUE
+  }
+  .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit, table)
 }
 
 
@@ -198,8 +240,4 @@ tableControl <- function(npde = NULL,
   )
   class(.ret) <- "tableControl"
   return(.ret)
-}
-
-addTable <- function(fit, table=tableControl(), updateObject = TRUE, envir = parent.frame(1)) {
-
 }

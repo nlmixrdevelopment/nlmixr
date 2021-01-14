@@ -42,7 +42,7 @@ extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   int nid = Rf_length(etasDf[0]);
 
   arma::vec ipredt(REAL(ipredL[2]), ncalc, false, true);
-  arma::vec ipred(ipred.size());
+  arma::vec ipred(ipredt.size());
 
   arma::vec predt(REAL(predL[2]), ncalc, false, true);
 
@@ -105,7 +105,7 @@ extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 
   arma::ivec ID(INTEGER(predL[0]), ncalc, false, true);
 
-  arma::vec etas(nid, neta);
+  arma::mat etas(nid, neta);
   List etasDfFull(neta);
   //etasDfFull.names()=etasDf1.names();
   CharacterVector etaN1 = etasDf.names();

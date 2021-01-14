@@ -6,7 +6,7 @@ extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDf, SEXP dvIn, SEXP evidIn, SEXP cens
   int ncalc = Rf_length(ipredL[0]);
 
   arma::vec ipredt(REAL(ipredL[2]), ncalc, false, true);
-  arma::vec ipred(ipred.size());
+  arma::vec ipred(ipredt.size());
 
   arma::vec dv(REAL(dvIn), ncalc, false, true);
   arma::vec dvt(ncalc);
