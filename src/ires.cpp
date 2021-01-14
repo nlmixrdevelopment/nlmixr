@@ -90,8 +90,8 @@ extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDf, SEXP dvIn, SEXP evidIn, SEXP cens
 			      _["IRES"]=wrap(ires),
 			      _["IWRES"]=wrap(iwres));
   }
-  // ret[1] = etaLst;
-  // ret[2] = etasDfFull;
-  // ret[3] = dv;
-  return wrap(retDF);
+  List ret(2);
+  ret[0] = retDF;
+  ret[1] = dv;
+  return ret;
 }

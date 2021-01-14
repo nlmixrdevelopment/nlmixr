@@ -55,7 +55,7 @@ List nlmixrParameters(NumericVector theta, DataFrame eta) {
 }
 
 void calcShrinkFinalize(arma::mat &omegaMat, unsigned int &nid, List& etaLst, arma::vec &iwres, arma::ivec &evid,
-			CharacterVector &etaNames) {
+			CharacterVector &etaNames, int doIwres) {
   double tc = sqrt((double)nid);
   double om;
   int j;
@@ -72,32 +72,45 @@ void calcShrinkFinalize(arma::mat &omegaMat, unsigned int &nid, List& etaLst, ar
   unsigned int n =0, n1 = 0;
   double M1 =  0, M2 = 0, M3 = 0, M4 =0, term1, delta, delta_n, delta_n2;
   CharacterVector dimN2(etaNames.size()+1);
-  dimN2[etaNames.size()] = "IWRES";
   std::copy(etaNames.begin(),etaNames.end(),dimN2.begin());
-  etaLst.attr("names") = dimN2;
-  NumericVector stat=etaLst[neta];
-  for (unsigned int i = iwres.size(); i--;){
-    if (evid[i] == 0 && !ISNA(iwres[i])){
-      n1=n; n++;
-      delta = iwres[i] - M1;
-      delta_n = delta / n;
-      delta_n2 = delta_n * delta_n;
-      term1 = delta * delta_n * n1;
-      M1 += delta_n;
-      M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
-      M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
-      M2 += term1;
+  dimN2[etaNames.size()] = "IWRES";
+  if (doIwres) {
+    NumericVector stat=etaLst[neta];
+    for (unsigned int i = iwres.size(); i--;){
+      if (evid[i] == 0 && !ISNA(iwres[i])){
+	n1=n; n++;
+	delta = iwres[i] - M1;
+	delta_n = delta / n;
+	delta_n2 = delta_n * delta_n;
+	term1 = delta * delta_n * n1;
+	M1 += delta_n;
+	M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
+	M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
+	M2 += term1;
+      }
     }
+    stat[0] = M1;
+    stat[1] = M2/((double)n1);
+    stat[2] = sqrt(stat[1]);
+    stat[3] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
+    stat[4] = (double)(n)*M4 / (M2*M2) - 3.0;
+    stat[5] = (1-stat[1])*100;
+    stat[6] = (1-stat[2])*100;
+    stat[7] = M1*sqrt((double)n)/stat[2];
+    stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
+  } else {
+    NumericVector stat=etaLst[neta];
+    stat[0] =NA_REAL;
+    stat[1] =NA_REAL;
+    stat[2] =NA_REAL;
+    stat[3] =NA_REAL;
+    stat[4] =NA_REAL;
+    stat[5] =NA_REAL;
+    stat[6] =NA_REAL;
+    stat[7] =NA_REAL;
+    stat[8] = NA_REAL;
   }
-  stat[0] = M1;
-  stat[1] = M2/((double)n1);
-  stat[2] = sqrt(stat[1]);
-  stat[3] = sqrt((double)(n)) * M3/ pow(M2, 1.5);
-  stat[4] = (double)(n)*M4 / (M2*M2) - 3.0;
-  stat[5] = (1-stat[1])*100;
-  stat[6] = (1-stat[2])*100;
-  stat[7] = M1*sqrt((double)n)/stat[2];
-  stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
+  etaLst.attr("names") = dimN2;
   etaLst.attr("row.names") = CharacterVector::create("mean","var","sd","skewness", "kurtosis","var shrinkage (%)", "sd shrinkage (%)","t statistic","p-value");
   etaLst.attr("class") = "data.frame";
 }

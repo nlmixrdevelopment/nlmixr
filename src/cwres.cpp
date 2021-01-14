@@ -229,8 +229,11 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["CRES"]=wrap(cres),
 			      _["CWRES"]=wrap(cwres));
   }
-  // ret[1] = etaLst;
-  // ret[2] = etasDfFull;
-  // ret[3] = dv;
-  return wrap(retDF);
+  List ret(3);
+  ret[0] = retDF;
+  ret[1] = dv;
+  ret[2] = etasDfFull;
+  // calcShrinkFinalize(omegaMat, nid, List& etaLst, arma::vec &iwres, arma::ivec &evid, CharacterVector &etaNames);
+  // FIXME etasLst
+  return wrap(ret);
 }

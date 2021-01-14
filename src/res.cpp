@@ -162,8 +162,12 @@ extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["IRES"]=wrap(ires),
 			      _["IWRES"]=wrap(iwres));
   }
+  List ret(3);
+  ret[0] = retDF;
+  ret[1] = dv;
+  ret[2] = etasDfFull;
   // ret[1] = etaLst;
   // ret[2] = etasDfFull;
   // ret[3] = dv;
-  return wrap(retDF);
+  return wrap(ret);
 }
