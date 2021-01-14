@@ -163,11 +163,8 @@
   } else {
     table$doSim <- FALSE
   }
-  print(table$doSim)
   .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit, table)
 }
-
-
 
 ##' Output table/data.frame options
 ##'
