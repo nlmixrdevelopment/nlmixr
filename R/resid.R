@@ -120,9 +120,9 @@
   .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly)
   if (!inherits(dv, "numeric")) {
     dv <- .prdLst$ipred$dv
-    table$doSim <- FALSE
-  } else {
     table$doSim <- TRUE
+  } else {
+    table$doSim <- FALSE
   }
   if (predOnly){
     .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
@@ -159,10 +159,11 @@
                             returnType="data.frame.TBS", keep=.keep, what="ipred")
   if (!inherits(dv, "numeric")) {
     dv <- .ipred$dv
-    table$doSim <- FALSE
-  } else {
     table$doSim <- TRUE
+  } else {
+    table$doSim <- FALSE
   }
+  print(table$doSim)
   .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit, table)
 }
 
