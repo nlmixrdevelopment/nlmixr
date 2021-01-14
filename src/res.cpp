@@ -148,21 +148,21 @@ extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   DataFrame retDF;
 
   if (interestingLimits) {
-    retDF = DataFrame::create(_["PRED"]=wrap(pred),
+    retDF = DataFrame::create(_["DV"]=wrap(dv),
+			      _["PRED"]=wrap(pred),
 			      _["RES"]=wrap(res),
 			      _["IPRED"]=wrap(ipred),
 			      _["IRES"]=wrap(ires),
 			      _["IWRES"]=wrap(iwres),
-			      _["DV"]=wrap(dv),
 			      _["lowerLim"] = wrap(lowerLim),
 			      _["upperLim"] = wrap(upperLim));
   } else {
-    retDF = DataFrame::create(_["PRED"]=wrap(pred),
+    retDF = DataFrame::create(_["DV"]=wrap(dv),
+			      _["PRED"]=wrap(pred),
 			      _["RES"]=wrap(res),
 			      _["IPRED"]=wrap(ipred),
 			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres),
-			      _["DV"]=wrap(dv));
+			      _["IWRES"]=wrap(iwres));
   }
   List ret(2);
   ret[0] = retDF;

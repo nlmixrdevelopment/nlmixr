@@ -207,7 +207,8 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   DataFrame retDF;
 
   if (interestingLimits) {
-    retDF = DataFrame::create(_["PRED"]=wrap(pred),
+    retDF = DataFrame::create(_["DV"]=wrap(dv),
+			      _["PRED"]=wrap(pred),
 			      _["RES"]=wrap(res),
 			      _["WRES"]=wrap(wres),
 			      _["IPRED"]=wrap(ipred),
@@ -217,10 +218,10 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["CRES"]=wrap(cres),
 			      _["CWRES"]=wrap(cwres),
 			      _["lowerLim"] = wrap(lowerLim),
-			      _["upperLim"] = wrap(upperLim),
-			      _["DV"]=wrap(dv));
+			      _["upperLim"] = wrap(upperLim));
   } else {
-    retDF = DataFrame::create(_["PRED"]=wrap(pred),
+    retDF = DataFrame::create(_["DV"]=wrap(dv),
+			      _["PRED"]=wrap(pred),
 			      _["RES"]=wrap(res),
 			      _["WRES"]=wrap(wres),
 			      _["IPRED"]=wrap(ipred),
@@ -228,8 +229,7 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["IWRES"]=wrap(iwres),
 			      _["CPRED"]=wrap(cpred),
 			      _["CRES"]=wrap(cres),
-			      _["CWRES"]=wrap(cwres),
-			      _["DV"]=wrap(dv));
+			      _["CWRES"]=wrap(cwres));
   }
   List ret(2);
   ret[0] = retDF;

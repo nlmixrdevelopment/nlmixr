@@ -80,17 +80,17 @@ extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDf, SEXP dvIn, SEXP evidIn, SEXP cens
   DataFrame retDF;
 
   if (interestingLimits) {
-    retDF = DataFrame::create(_["IPRED"]=wrap(ipred),
+    retDF = DataFrame::create(_["DV"]=wrap(dv),
+			      _["IPRED"]=wrap(ipred),
 			      _["IRES"]=wrap(ires),
 			      _["IWRES"]=wrap(iwres),
-			      _["DV"]=wrap(dv),
 			      _["lowerLim"] = wrap(lowerLim),
 			      _["upperLim"] = wrap(upperLim));
   } else {
-    retDF = DataFrame::create(_["IPRED"]=wrap(ipred),
+    retDF = DataFrame::create(_["DV"]=wrap(dv),
+			      _["IPRED"]=wrap(ipred),
 			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres),
-			      _["DV"]=wrap(dv));
+			      _["IWRES"]=wrap(iwres));
   }
   return wrap(retDF);
 }

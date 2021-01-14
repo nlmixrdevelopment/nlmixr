@@ -325,14 +325,14 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   }
   List ret(4);
   // epred, eres, npde, dv
-  ret[0] = epred;
-  ret[1] = eres;
-  ret[2] = npde;
-  ret[3] = dvf;
+  ret[0] = dvf;
+  ret[1] = epred;
+  ret[2] = eres;
+  ret[3] = npde;
   Rf_setAttrib(ret, R_ClassSymbol, wrap("data.frame"));
   Rf_setAttrib(ret, R_RowNamesSymbol,
 	       IntegerVector::create(NA_INTEGER, -dvLen));
-  Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("EPRED", "ERES", "NPDE",  "DV"));
+  Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("DV", "EPRED", "ERES", "NPDE"));
   UNPROTECT(pro);
   return ret;
 }
