@@ -45,7 +45,7 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				  SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
 				  SEXP cwresOpt) {
   List ipredPredList = as<List>(ipredPredListSEXP);
-  if (ipredPredList.size() !=2) stop("malformed cwres calc");
+  if (ipredPredList.size() != 2) Rcpp::stop("malformed cwres calc");
   List ipredL = ipredPredList[0];
   List predL = ipredPredList[1];
   int ncalc = Rf_length(ipredL[0]);
@@ -53,7 +53,7 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   int nid = Rf_length(etasDf[0]);
 
   arma::vec ipredt(REAL(ipredL[2]), ncalc, false, true);
-  arma::vec ipred(ipred.size());
+  arma::vec ipred(ipredt.size());
 
   arma::vec predt(REAL(predL[2]), ncalc, false, true);
 
@@ -118,8 +118,7 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
   arma::mat fppm(ncalc,neta);
   arma::mat fpim(ncalc,neta);
 
-
-  arma::vec etas(nid, neta);
+  arma::mat etas(nid, neta);
   List etasDfFull(neta);
   //etasDfFull.names()=etasDf1.names();
   CharacterVector etaN1 = etasDf.names();

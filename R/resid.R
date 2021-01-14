@@ -105,3 +105,101 @@
                                returnType="data.frame.TBS", keep=keep, what="ipred"),
         pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred"))
 }
+
+.calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
+                       table=tableControl()) {
+  if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
+  .keep <- NULL
+  .names <- names(data)
+  .lowerNames <- tolower(.names)
+  for (.n in c("dv", "cens", "limit")) {
+    .w <- which(.lowerNames == .n)
+    if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
+  }
+
+  .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=FALSE)
+
+  .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
+        fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
+        .prdLst$ipred$limit, table)
+}
+
+
+
+##' Output table/data.frame options
+##'
+##' @param npde When TRUE, request npde regardless of the algorithm used.
+##'
+##' @param cwres When TRUE, request CWRES and FOCEi likelihood
+##'     regardless of the algorithm used.
+##'
+##' @param saemNPDE When TRUE and estimating with SAEM, adds NPDE
+##'     metrics to fit including EPRED, ERES, and NPDE. (default
+##'     TRUE);
+##'
+##' @param saemCWRES When TRUE and estimating with SAEM, adds CWRES
+##'     metrics to the fit including CPRED, CRES and CWRES.  It also
+##'     evaluates the function with the FOCEi objective function to
+##'     allow comparison between estimation methods. (default FALSE)
+##'
+##' @param nlmeNPDE When TRUE and estimating with nlme, adds NPDE
+##'     metrics to fit including EPRED, ERES, and NPDE. (default
+##'     TRUE);
+##'
+##' @param nlmeCWRES When TRUE and estimating with nlme, adds CWRES
+##'     metrics to the fit including CPRED, CRES and CWRES.  It also
+##'     evaluates the function with the FOCEi objective function to
+##'     allow comparison between estimation methods. (default FALSE)
+##'
+##' @param foceiNPDE When TRUE and estimating with FOCEi, adds NPDE
+##'     metrics to fit including EPRED, ERES, and NPDE. (default
+##'     TRUE);
+##'
+##' @param foceNPDE When TRUE and estimating with FOCEi, adds NPDE
+##'     metrics to fit including EPRED, ERES, and NPDE. (default
+##'     TRUE);
+##'
+##' @param censMethod Handle censoring method:
+##'
+##'  - `"truncated-normal"` Simulates from a truncated normal distribution under the assumption of the model and censoring.
+##'
+##'  - `"cdf"` Use the cdf-method for censoring with npde and use this for any other residuals (`cwres` etc)
+##'
+##'  - `"omit"` omit the residuals for censoring
+##'
+##' @inheritParams addNpde
+##'
+##' @details
+##'
+##' If you ever want to add CWRES/FOCEi objective function you can use the \code{\link{addCwres}}
+##'
+##' If you ever want to add NPDE/EPRED columns you can use the \code{\link{addNpde}}
+##'
+##' @return A list of table options for nlmixr
+##' @author Matthew L. Fidler
+##' @export
+tableControl <- function(npde = NULL,
+                         cwres = NULL,
+                         saemNPDE = FALSE,
+                         saemCWRES = FALSE,
+                         nlmeNPDE = FALSE,
+                         nlmeCWRES = FALSE,
+                         foceiNPDE = FALSE,
+                         foceNPDE = FALSE,
+                         nsim = 300, ties = TRUE,
+                         censMethod=c("truncated-normal", "cdf", "omit"),
+                         seed = 1009) {
+  .ret <- list(
+    npde = npde, cwres = cwres, saemNPDE = saemNPDE,
+    saemCWRES = saemCWRES, nlmeNPDE = nlmeNPDE,
+    nlmeCWRES = nlmeCWRES, foceiNPDE = foceiNPDE,
+    foceNPDE = foceNPDE, nsim = nsim, ties = ties, seed = seed,
+    censMethod=setNames(c("truncated-normal"=3L, "cdf"=2L, "omit"=1L)[match.arg(censMethod)], NULL)
+  )
+  class(.ret) <- "tableControl"
+  return(.ret)
+}
+
+addTable <- function(fit, table=tableControl(), updateObject = TRUE, envir = parent.frame(1)) {
+
+}
