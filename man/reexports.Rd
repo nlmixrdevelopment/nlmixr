@@ -51,6 +51,10 @@
 \alias{et}
 \alias{rxParams}
 \alias{rxParam}
+\alias{geom_cens}
+\alias{geom_amt}
+\alias{stat_cens}
+\alias{stat_amt}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -62,6 +66,6 @@ below to see their documentation.
 
   \item{nlme}{\code{\link[nlme]{ACF}}, \code{\link[nlme]{VarCorr}}, \code{\link[nlme]{augPred}}, \code{\link[nlme]{fixed.effects}}, \code{\link[nlme:fixed.effects]{fixef}}, \code{\link[nlme]{getData}}, \code{\link[nlme]{getVarCov}}, \code{\link[nlme]{groupedData}}, \code{\link[nlme]{nlme}}, \code{\link[nlme]{nlmeControl}}, \code{\link[nlme]{pdBlocked}}, \code{\link[nlme]{pdCompSymm}}, \code{\link[nlme]{pdConstruct}}, \code{\link[nlme]{pdDiag}}, \code{\link[nlme]{pdFactor}}, \code{\link[nlme]{pdIdent}}, \code{\link[nlme]{pdLogChol}}, \code{\link[nlme]{pdMat}}, \code{\link[nlme]{pdMatrix}}, \code{\link[nlme]{pdNatural}}, \code{\link[nlme]{pdSymm}}, \code{\link[nlme]{random.effects}}, \code{\link[nlme:random.effects]{ranef}}, \code{\link[nlme]{reStruct}}, \code{\link[nlme]{varComb}}, \code{\link[nlme]{varConstPower}}, \code{\link[nlme]{varExp}}, \code{\link[nlme]{varFixed}}, \code{\link[nlme]{varFunc}}, \code{\link[nlme]{varIdent}}, \code{\link[nlme]{varPower}}, \code{\link[nlme]{varWeights}}}
 
-  \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{add.dosing}}, \code{\link[RxODE]{add.sampling}}, \code{\link[RxODE]{et}}, \code{\link[RxODE]{et}}, \code{\link[RxODE]{eventTable}}, \code{\link[RxODE:logit]{expit}}, \code{\link[RxODE]{logit}}, \code{\link[RxODE]{probit}}, \code{\link[RxODE:probit]{probitInv}}, \code{\link[RxODE]{rxCat}}, \code{\link[RxODE]{rxClean}}, \code{\link[RxODE:rxParams]{rxParam}}, \code{\link[RxODE]{rxParams}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE:rxSEinner]{rxSymPySetupPred}}}
+  \item{RxODE}{\code{\link[RxODE]{RxODE}}, \code{\link[RxODE]{add.dosing}}, \code{\link[RxODE]{add.sampling}}, \code{\link[RxODE]{et}}, \code{\link[RxODE]{et}}, \code{\link[RxODE]{eventTable}}, \code{\link[RxODE:logit]{expit}}, \code{\link[RxODE:stat_amt]{geom_amt}}, \code{\link[RxODE:stat_cens]{geom_cens}}, \code{\link[RxODE]{logit}}, \code{\link[RxODE]{probit}}, \code{\link[RxODE:probit]{probitInv}}, \code{\link[RxODE]{rxCat}}, \code{\link[RxODE]{rxClean}}, \code{\link[RxODE:rxParams]{rxParam}}, \code{\link[RxODE]{rxParams}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE]{rxSolve}}, \code{\link[RxODE:rxSEinner]{rxSymPySetupPred}}, \code{\link[RxODE]{stat_amt}}, \code{\link[RxODE]{stat_cens}}}
 }}
 

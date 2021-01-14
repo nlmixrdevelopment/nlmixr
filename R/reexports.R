@@ -200,3 +200,20 @@ RxODE::rxParam
 ##' @importFrom RxODE et
 ##' @export
 RxODE::et
+
+##' @importFrom RxODE geom_cens
+##' @export
+RxODE::geom_cens
+
+##' @importFrom RxODE geom_amt
+##' @export
+RxODE::geom_amt
+
+
+##' @importFrom RxODE stat_cens
+##' @export
+RxODE::stat_cens
+
+##' @importFrom RxODE stat_amt
+##' @export
+RxODE::stat_amt
