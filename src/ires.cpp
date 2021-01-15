@@ -1,8 +1,9 @@
 #include "ires.h"
 
-extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDf, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
+extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDfLstSXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
 				 SEXP iresOpt) {
-  List ipredL = as<List>(ipredDf);
+BEGIN_RCPP
+  List ipredL = as<List>(ipredDfLstSXP);
   int ncalc = Rf_length(ipredL[0]);
 
   arma::vec ipredt(REAL(ipredL[2]), ncalc, false, true);
@@ -93,4 +94,5 @@ extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDf, SEXP dvIn, SEXP evidIn, SEXP cens
 			      _["IWRES"]=wrap(iwres));
   }
   return wrap(retDF);
+END_RCPP
 }

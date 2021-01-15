@@ -4,6 +4,7 @@
 #if defined(__cplusplus)
 #include "armahead.h"
 #include "censResid.h"
+#include "shrink.h"
 
 extern "C" {
 #endif

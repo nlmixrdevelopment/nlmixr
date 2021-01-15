@@ -54,7 +54,7 @@ List nlmixrParameters(NumericVector theta, DataFrame eta) {
   return List::create(_["pred"]=pred, _["ipred"]=ipred,_["eta.lst"]=etadf);
 }
 
-void calcShrinkFinalize(arma::mat &omegaMat, unsigned int &nid, List& etaLst, arma::vec &iwres, arma::ivec &evid,
+void calcShrinkFinalize(arma::mat &omegaMat, int &nid, List& etaLst, arma::vec &iwres, arma::ivec &evid,
 			CharacterVector &etaNames, int doIwres) {
   double tc = sqrt((double)nid);
   double om;
@@ -100,17 +100,31 @@ void calcShrinkFinalize(arma::mat &omegaMat, unsigned int &nid, List& etaLst, ar
     stat[8] = 2*Rf_pt(stat[7],(double)n1,1,0);
   } else {
     NumericVector stat=etaLst[neta];
-    stat[0] =NA_REAL;
-    stat[1] =NA_REAL;
-    stat[2] =NA_REAL;
-    stat[3] =NA_REAL;
-    stat[4] =NA_REAL;
-    stat[5] =NA_REAL;
-    stat[6] =NA_REAL;
-    stat[7] =NA_REAL;
+    stat[0] = NA_REAL;
+    stat[1] = NA_REAL;
+    stat[2] = NA_REAL;
+    stat[3] = NA_REAL;
+    stat[4] = NA_REAL;
+    stat[5] = NA_REAL;
+    stat[6] = NA_REAL;
+    stat[7] = NA_REAL;
     stat[8] = NA_REAL;
   }
   etaLst.attr("names") = dimN2;
   etaLst.attr("row.names") = CharacterVector::create("mean","var","sd","skewness", "kurtosis","var shrinkage (%)", "sd shrinkage (%)","t statistic","p-value");
   etaLst.attr("class") = "data.frame";
+}
+
+extern "C" SEXP _nlmixr_calcShrinkOnly(SEXP omegaMatSEXP, SEXP etaLstSEXP, SEXP idSEXP) {
+BEGIN_RCPP
+  // These are not needed because IWRES shrinkage isn't calculated
+ arma::vec iwres;
+ arma::ivec evid;
+ arma::mat omegaMat = as<arma::mat>(omegaMatSEXP);
+ int nid = INTEGER(idSEXP)[0];
+ CharacterVector etaNames = VECTOR_ELT(Rf_getAttrib(omegaMatSEXP, R_DimNamesSymbol), 1);
+ List etaLst = as<List>(etaLstSEXP);
+ calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid,  etaNames, 0);
+ return wrap(etaLst);
+END_RCPP
 }

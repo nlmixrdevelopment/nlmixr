@@ -103,7 +103,8 @@
   if (predOnly) .ipredModel <- fit$model$pred.only
   list(ipred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$ipred,
                                returnType="data.frame.TBS", keep=keep, what="ipred"),
-        pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred"))
+       pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred"),
+       etaLst=thetaEtaParameters$eta.lst)
 }
 
 .calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
@@ -116,7 +117,6 @@
     .w <- which(.lowerNames == .n)
     if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
   }
-
   .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly)
   if (!inherits(dv, "numeric")) {
     dv <- .prdLst$ipred$dv
@@ -164,6 +164,12 @@
     table$doSim <- FALSE
   }
   .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit, table)
+}
+
+.calcShrinkOnly <- function(fit, thetaEtaParameters=.foceiThetaEtaParameters(fit)) {
+  .omega <- fit$omega
+  .ret <- .Call(`_nlmixr_calcShrinkOnly`, .omega, thetaEtaParameters$eta.lst, length(fit$eta[,1]))
+  .ret[, -dim(.omega)[1] - 1]
 }
 
 ##' Output table/data.frame options

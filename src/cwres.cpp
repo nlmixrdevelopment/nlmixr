@@ -44,10 +44,12 @@ static inline void calculateCwresDerr(arma::mat& fppm, arma::mat& fpim,
 extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				  SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
 				  SEXP cwresOpt) {
+BEGIN_RCPP
   List ipredPredList = as<List>(ipredPredListSEXP);
-  if (ipredPredList.size() != 2) Rcpp::stop("malformed cwres calc");
+  if (ipredPredList.size() != 3) return R_NilValue; //Rcpp::stop("malformed cwres calc");
   List ipredL = ipredPredList[0];
   List predL = ipredPredList[1];
+  List etaLst = ipredPredList[2];
   int ncalc = Rf_length(ipredL[0]);
   List etasDf = as<List>(etasDfSEXP);
   int nid = Rf_length(etasDf[0]);
@@ -231,10 +233,13 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["CRES"]=wrap(cres),
 			      _["CWRES"]=wrap(cwres));
   }
-  List ret(2);
+  calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
+  List ret(3);
   ret[0] = retDF;
   ret[1] = etasDfFull;
+  ret[2] = etaLst;
   // calcShrinkFinalize(omegaMat, nid, List& etaLst, arma::vec &iwres, arma::ivec &evid, CharacterVector &etaNames);
   // FIXME etasLst
   return wrap(ret);
+END_RCPP
 }

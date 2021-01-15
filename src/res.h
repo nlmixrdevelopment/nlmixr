@@ -4,6 +4,7 @@
 #if defined(__cplusplus)
 #include "armahead.h"
 #include "censResid.h"
+#include "shrink.h"
 void calculateDfFull(arma::ivec& ID, arma::mat &etas,
 		     List &etasDfFull, int &nid, unsigned int &neta);
 

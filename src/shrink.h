@@ -1,11 +1,14 @@
 #ifndef __SHRINK_H__
 #define __SHRINK_H__
-#include "armahead.h"
 
 #if defined(__cplusplus)
+#include "armahead.h"
 
-void calcShrinkFinalize(arma::mat &omegaMat, unsigned int &nid, List& etaLst, arma::vec &iwres, arma::ivec &evid, CharacterVector &etaNames);
+void calcShrinkFinalize(arma::mat &omegaMat, int &nid, List& etaLst, arma::vec &iwres, arma::ivec &evid,
+			CharacterVector &etaNames, int doIwres);
 
 #endif
+
+SEXP _nlmixr_calcShrinkOnly(SEXP omegaMatSEXP, SEXP etaLstSEXP);
 
 #endif

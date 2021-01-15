@@ -33,10 +33,12 @@ void calculateDfFull(arma::ivec& ID, arma::mat &etas,
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
 				SEXP resOpt) {
+BEGIN_RCPP
   List ipredPredList = as<List>(ipredPredListSEXP);
-  if (ipredPredList.size() !=2) stop("malformed cwres calc");
+  if (ipredPredList.size() !=3) return R_NilValue;
   List ipredL = ipredPredList[0];
   List predL = ipredPredList[1];
+  List etaLst = ipredPredList[2];
   int ncalc = Rf_length(ipredL[0]);
   List etasDf = as<List>(etasDfSEXP);
   int nid = Rf_length(etasDf[0]);
@@ -164,11 +166,14 @@ extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			      _["IRES"]=wrap(ires),
 			      _["IWRES"]=wrap(iwres));
   }
-  List ret(2);
+  calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
+  List ret(3);
   ret[0] = retDF;
   ret[1] = etasDfFull;
+  ret[2] = etaLst;
   // ret[1] = etaLst;
   // ret[2] = etasDfFull;
   // ret[3] = dv;
   return wrap(ret);
+END_RCPP
 }
