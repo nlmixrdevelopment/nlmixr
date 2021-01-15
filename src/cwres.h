@@ -5,6 +5,7 @@
 #include "armahead.h"
 #include "censResid.h"
 #include "shrink.h"
+#include "res.h"
 
 extern "C" {
 #endif

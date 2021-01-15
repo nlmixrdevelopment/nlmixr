@@ -80,7 +80,6 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma
   // 1. Replace value with lloq
   // 2. The current pd represents the probability being below the limit of quantitation;
   //    If it is right censored 1-pde[i] represents the probability of being above the limit of quantitation
-  // 3. For now `limit` is ignored
   // 4. For blq the pd is replaced with runif(0, p(bloq)) or runif(p(paloq), 1)
   // 5. The epred is then replaced with back-calculated uniform value based on sorted tcomp of row
   arma::vec curRow;
@@ -258,7 +257,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
        censMethod = as<unsigned int>(tmp);
     }
   }
-  
+
   int dvLen = Rf_length(dvIn);
   arma::vec dv  = arma::vec(REAL(dvIn), dvLen, false, true);
   //arma::vec npde(REAL(npdeSEXP), dv.size(), false, true);
@@ -297,12 +296,11 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
     evid = as<arma::ivec>(evidIn);
   }
   bool doLimit = false;
+
   arma::vec limit;
-  if (Rf_isNull(limitIn)) {
-    limit = arma::vec(dvLen);
-  } else {
-    limit = as<arma::vec>(limitIn);
-  }
+  int hasLimit=0;
+  getLimitFromInput(limitIn, dvLen, limit, hasLimit);
+
   arma::vec ru = randu(dvLen); // Pre-fill uniform random numbers to make sure independent
   arma::vec ru2 = randu(dvLen);
   arma::vec ru3 = randu(dvLen);

@@ -6,13 +6,15 @@ BEGIN_RCPP
   List ipredL = as<List>(ipredDfLstSXP);
   int ncalc = Rf_length(ipredL[0]);
 
-  arma::vec ipredt(REAL(ipredL[2]), ncalc, false, true);
+  int npred = getPredIndex(ipredL);
+
+  arma::vec ipredt(REAL(ipredL[npred]), ncalc, false, true);
   arma::vec ipred(ipredt.size());
 
   arma::vec dv(REAL(dvIn), ncalc, false, true);
   arma::vec dvt(ncalc);
 
-  arma::vec riv(REAL(ipredL[3]), ncalc, false, true);
+  arma::vec riv(REAL(ipredL[npred+1]), ncalc, false, true);
 
 
   arma::ivec cens;
@@ -27,12 +29,10 @@ BEGIN_RCPP
   } else {
     evid = as<arma::ivec>(evidIn);
   }
+
   arma::vec limit;
-  if (Rf_isNull(limitIn)) {
-    limit = arma::vec(ncalc);
-  } else {
-    limit = as<arma::vec>(limitIn);
-  }
+  int hasLimit=0;
+  getLimitFromInput(limitIn, ncalc, limit, hasLimit);
 
   arma::vec     hi(REAL(ipredL[ipredL.size()-1]), ncalc, false, true);
   arma::vec    low(REAL(ipredL[ipredL.size()-2]), ncalc, false, true);

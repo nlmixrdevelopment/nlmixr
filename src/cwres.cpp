@@ -53,11 +53,12 @@ BEGIN_RCPP
   int ncalc = Rf_length(ipredL[0]);
   List etasDf = as<List>(etasDfSEXP);
   int nid = Rf_length(etasDf[0]);
+  int npred = getPredIndex(ipredL);
 
-  arma::vec ipredt(REAL(ipredL[2]), ncalc, false, true);
+  arma::vec ipredt(REAL(ipredL[npred]), ncalc, false, true);
   arma::vec ipred(ipredt.size());
 
-  arma::vec predt(REAL(predL[2]), ncalc, false, true);
+  arma::vec predt(REAL(predL[npred]), ncalc, false, true);
 
   arma::vec dv(REAL(dvIn), ncalc, false, true);
   arma::vec dvt(ncalc);
@@ -74,12 +75,10 @@ BEGIN_RCPP
   } else {
     evid = as<arma::ivec>(evidIn);
   }
+
   arma::vec limit;
-  if (Rf_isNull(limitIn)) {
-    limit = arma::vec(ncalc);
-  } else {
-    limit = as<arma::vec>(limitIn);
-  }
+  int hasLimit=0;
+  getLimitFromInput(limitIn, ncalc, limit, hasLimit);
 
   arma::vec     hi(REAL(ipredL[ipredL.size()-1]), ncalc, false, true);
   arma::vec    low(REAL(ipredL[ipredL.size()-2]), ncalc, false, true);
@@ -87,12 +86,12 @@ BEGIN_RCPP
   arma::vec lambda(REAL(ipredL[ipredL.size()-4]), ncalc, false, true);
   arma::vec lowerLim(ncalc);
   arma::vec upperLim(ncalc);
-  
+
   arma::mat omegaMat = as<arma::mat>(omegaMatSEXP);
   unsigned int neta = omegaMat.n_rows;
 
-  arma::vec rpv(REAL(predL[3+neta]), ncalc, false, true);
-  arma::vec riv(REAL(ipredL[3+neta]), ncalc, false, true);
+  arma::vec rpv(REAL(predL[npred+1+neta]), ncalc, false, true);
+  arma::vec riv(REAL(ipredL[npred+1+neta]), ncalc, false, true);
 
   bool doSim = true;
   List opt = as<List>(cwresOpt);
@@ -113,10 +112,10 @@ BEGIN_RCPP
   bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, cens, limit,
   								   lambda, yj, low, hi, lowerLim, upperLim,
   								   riv, doSim);
-    
+
 
   arma::ivec ID(INTEGER(predL[0]), ncalc, false, true);
-  
+
   arma::mat fppm(ncalc,neta);
   arma::mat fpim(ncalc,neta);
 
@@ -126,8 +125,8 @@ BEGIN_RCPP
   CharacterVector etaN1 = etasDf.names();
   CharacterVector etaN2(neta);
   for (unsigned int j = neta; j--;) {
-    fppm.col(j) = arma::vec(REAL(predL[j + 3]), ncalc, false, true);
-    fpim.col(j) = arma::vec(REAL(ipredL[j + 3]), ncalc, false, true);
+    fppm.col(j) = arma::vec(REAL(predL[j + 1 + npred]), ncalc, false, true);
+    fpim.col(j) = arma::vec(REAL(ipredL[j + 1 + npred]), ncalc, false, true);
     etas.col(j) = arma::vec(REAL(etasDf[j+1]), nid, false, true);
     etaN2[j] = etaN1[j+1];
     etasDfFull[j] = NumericVector(ncalc);
@@ -135,7 +134,7 @@ BEGIN_RCPP
   etasDfFull.names() = etaN2;
   etasDfFull.attr("row.names")=IntegerVector::create(NA_INTEGER,-ncalc);
   etasDfFull.attr("class") = "data.frame";
-  
+
   arma::mat V_fo_p = (fppm * omegaMat * fppm.t()); // From Mentre 2006 p. 352
   arma::mat V_fo_i = (fpim * omegaMat * fpim.t()); // From Mentre 2006 p. 352
   // There seems to be a difference between how NONMEM and R/S types
@@ -157,14 +156,14 @@ BEGIN_RCPP
   // the FOCE condition for the Vfo and the FO conditions for
   // dh/deta
   //
-  
+
   arma::vec Vfop = V_fo_p.diag();
   arma::vec Vfoi = V_fo_i.diag();
 
   arma::vec dErr_dEta_i(ncalc);
   arma::vec dErr_dEta_p(ncalc);
   calculateCwresDerr(fppm, fpim, ID, etas, dErr_dEta_i, dErr_dEta_p, etasDfFull, nid, neta);
-  
+
   arma::vec rest = dvt - predt;
   arma::vec wres = rest/sqrt(abs(Vfop+rpv));
 
@@ -206,40 +205,39 @@ BEGIN_RCPP
       cwres[j]	= NA_REAL;
     }
   }
-  DataFrame retDF;
-
+  int ncol = 10;
   if (interestingLimits) {
-    retDF = DataFrame::create(_["DV"]=wrap(dv),
-			      _["PRED"]=wrap(pred),
-			      _["RES"]=wrap(res),
-			      _["WRES"]=wrap(wres),
-			      _["IPRED"]=wrap(ipred),
-			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres),
-			      _["CPRED"]=wrap(cpred),
-			      _["CRES"]=wrap(cres),
-			      _["CWRES"]=wrap(cwres),
-			      _["lowerLim"] = wrap(lowerLim),
-			      _["upperLim"] = wrap(upperLim));
-  } else {
-    retDF = DataFrame::create(_["DV"]=wrap(dv),
-			      _["PRED"]=wrap(pred),
-			      _["RES"]=wrap(res),
-			      _["WRES"]=wrap(wres),
-			      _["IPRED"]=wrap(ipred),
-			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres),
-			      _["CPRED"]=wrap(cpred),
-			      _["CRES"]=wrap(cres),
-			      _["CWRES"]=wrap(cwres));
+    ncol += 3 + hasLimit;
   }
+  List retDF(ncol);
+  CharacterVector nm(ncol);
+  int i=0;
+  nm[i] = "DV"; retDF[i++] = wrap(dv);
+  nm[i] = "PRED"; retDF[i++] = wrap(pred);
+  nm[i] = "RES"; retDF[i++] = wrap(res);
+  nm[i] = "WRES"; retDF[i++] = wrap(wres);
+  nm[i] = "IPRED"; retDF[i++] = wrap(ipred);
+  nm[i] = "IRES"; retDF[i++] = wrap(ires);
+  nm[i] = "IWRES"; retDF[i++] = wrap(iwres);
+  nm[i] = "CPRED"; retDF[i++] = wrap(cpred);
+  nm[i] = "CRES"; retDF[i++] = wrap(cres);
+  nm[i] = "CWRES"; retDF[i++] = wrap(cwres);
+  if (interestingLimits) {
+    nm[i] = "CENS"; retDF[i++] = wrap(cens);
+    if (hasLimit){
+      nm[i] = "LIMIT"; retDF[i++] = wrap(limit);
+    }
+    nm[i] = "lowerLim"; retDF[i++] = wrap(lowerLim);
+    nm[i] = "upperLim"; retDF[i++] = wrap(upperLim);
+  }
+  retDF.names() = nm;
+  retDF.attr("row.names") = IntegerVector::create(NA_INTEGER,-ncalc);
+  retDF.attr("class") = "data.frame";
   calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
   List ret(3);
   ret[0] = retDF;
   ret[1] = etasDfFull;
   ret[2] = etaLst;
-  // calcShrinkFinalize(omegaMat, nid, List& etaLst, arma::vec &iwres, arma::ivec &evid, CharacterVector &etaNames);
-  // FIXME etasLst
   return wrap(ret);
 END_RCPP
 }

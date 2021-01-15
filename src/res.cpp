@@ -30,6 +30,25 @@ void calculateDfFull(arma::ivec& ID, arma::mat &etas,
   }
 }
 
+int getPredIndex(List &ipredL) {
+  CharacterVector names= ipredL.attr("names");
+  for (int i = 0; i < names.size(); ++i) {
+    if (names[i] == "time") return (i+1);
+  }
+  return -1;
+}
+
+void getLimitFromInput(SEXP limitIn, int& ncalc, arma::vec& limit, int &hasLimit) {
+  hasLimit=0;
+  if (Rf_isNull(limitIn)) {
+    limit = arma::vec(ncalc);
+    std::fill_n(limit.begin(), ncalc, R_NegInf);
+  } else {
+    limit = as<arma::vec>(limitIn);
+    hasLimit=1;
+  }
+}
+
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
 				SEXP resOpt) {
@@ -42,17 +61,19 @@ BEGIN_RCPP
   int ncalc = Rf_length(ipredL[0]);
   List etasDf = as<List>(etasDfSEXP);
   int nid = Rf_length(etasDf[0]);
+  int npred = getPredIndex(ipredL);
+  if (npred == -1) stop("malformed dataframes");
 
-  arma::vec ipredt(REAL(ipredL[2]), ncalc, false, true);
+  arma::vec ipredt(REAL(ipredL[npred]), ncalc, false, true);
   arma::vec ipred(ipredt.size());
 
-  arma::vec predt(REAL(predL[2]), ncalc, false, true);
+  arma::vec predt(REAL(predL[npred]), ncalc, false, true);
 
   arma::vec dv(REAL(dvIn), ncalc, false, true);
   arma::vec dvt(ncalc);
 
-  arma::vec rpv(REAL(predL[3]), ncalc, false, true);
-  arma::vec riv(REAL(ipredL[3]), ncalc, false, true);
+  arma::vec rpv(REAL(predL[npred+1]), ncalc, false, true);
+  arma::vec riv(REAL(ipredL[npred+1]), ncalc, false, true);
 
 
   arma::ivec cens;
@@ -68,12 +89,9 @@ BEGIN_RCPP
     evid = as<arma::ivec>(evidIn);
   }
   arma::vec limit;
-  if (Rf_isNull(limitIn)) {
-    limit = arma::vec(ncalc);
-  } else {
-    limit = as<arma::vec>(limitIn);
-  }
-
+  int hasLimit=0;
+  getLimitFromInput(limitIn, ncalc, limit, hasLimit);
+  
   arma::vec     hi(REAL(ipredL[ipredL.size()-1]), ncalc, false, true);
   arma::vec    low(REAL(ipredL[ipredL.size()-2]), ncalc, false, true);
   arma::vec     yj(REAL(ipredL[ipredL.size()-3]), ncalc, false, true);

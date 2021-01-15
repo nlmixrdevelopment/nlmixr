@@ -8,6 +8,11 @@
 void calculateDfFull(arma::ivec& ID, arma::mat &etas,
 		     List &etasDfFull, int &nid, unsigned int &neta);
 
+int getPredIndex(List &ipredL);
+
+void getLimitFromInput(SEXP limitIn, int& ncalc, arma::vec& limit, int &hasLimit);
+
+
 extern "C" {
 #endif
   SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
