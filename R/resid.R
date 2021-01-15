@@ -46,7 +46,8 @@
 #' @return Solved RxODE data
 #' @author Matthew Fidler
 #' @noRd
-.foceiSolvePars <- function(fit, model, pars=NULL, returnType="data.frame", keep=NULL, what="pred") {
+.foceiSolvePars <- function(fit, model, pars=NULL, returnType="data.frame", keep=NULL, what="pred",
+                            addDosing=FALSE, subsetNonmem=TRUE) {
   .res <- .foceiSolveWithId(model, pars, fit$dataSav,
                             returnType = returnType,
                             atol = fit$control$atol[1], rtol = fit$control$rtol[1],
@@ -54,7 +55,7 @@
                             hmin = fit$control$hmin, hmax = fit$control$hmax, hini = fit$control$hini,
                             transitAbs = fit$control$transitAbs, maxordn = fit$control$maxordn,
                             maxords = fit$control$maxords, method = fit$control$method,
-                            keep=keep
+                            keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem
                             )
   RxODE::rxSolveFree()
   if (any(is.na(.res$rx_pred_)) && fit$control$method == 2L) {
@@ -65,7 +66,7 @@
                               hmin = fit$control$hmin, hmax = fit$control$hmax / 2, hini = fit$control$hini,
                               transitAbs = fit$control$transitAbs, maxordn = fit$control$maxordn,
                               maxords = fit$control$maxords, method = "lsoda",
-                              keep=keep)
+                              keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem)
     RxODE::rxSolveFree()
     if (any(is.na(.res$rx_pred_))) {
       .res <- .foceiSolveWithId(model, pars, fit$dataSav,
@@ -75,7 +76,7 @@
                                 hmin = fit$control$hmin, hmax = fit$control$hmax / 2, hini = fit$control$hini,
                                 transitAbs = fit$control$transitAbs, maxordn = fit$control$maxordn,
                                 maxords = fit$control$maxords, method = "dop853",
-                                keep=keep)
+                                keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem)
       RxODE::rxSolveFree()
       if (any(is.na(.res$rx_pred_))) {
         warning("Problems solving ", what, " liblsoda, lsoda and dop853")
@@ -98,17 +99,21 @@
 #' @return list with ipred and pred datasets
 #' @author Matthew Fidler
 #' @noRd
-.foceiPredIpredList <- function(fit, thetaEtaParameters=.foceiThetaEtaParameters(fit), keep=NULL, predOnly=!is.null(fit$model$inner)) {
+.foceiPredIpredList <- function(fit, thetaEtaParameters=.foceiThetaEtaParameters(fit), keep=NULL, predOnly=!is.null(fit$model$inner),
+                                addDosing=FALSE, subsetNonmem=TRUE) {
   .ipredModel <- fit$model$inner
   if (predOnly) .ipredModel <- fit$model$pred.only
   list(ipred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$ipred,
-                               returnType="data.frame.TBS", keep=keep, what="ipred"),
-       pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred"),
+                               returnType="data.frame.TBS", keep=keep, what="ipred",
+                               addDosing=addDosing, subsetNonmem=subsetNonmem),
+       pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred",
+                              addDosing=addDosing, subsetNonmem=subsetNonmem),
        etaLst=thetaEtaParameters$eta.lst)
 }
 
 .calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
-                       table=tableControl(), dv=NULL, predOnly=FALSE) {
+                       table=tableControl(), dv=NULL, predOnly=FALSE,
+                       addDosing=FALSE, subsetNonmem=TRUE) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
   .keep <- NULL
   .names <- names(data)
@@ -117,7 +122,8 @@
     .w <- which(.lowerNames == .n)
     if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
   }
-  .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly)
+  .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly,
+                                 addDosing=addDosing, subsetNonmem=subsetNonmem)
   if (!inherits(dv, "numeric")) {
     dv <- .prdLst$ipred$dv
     table$doSim <- TRUE
@@ -139,7 +145,8 @@
   .calcCwres(..., predOnly=predOnly)
 }
 
-.calcIres <- function(fit, data=fit$dataSav, table=tableControl(), dv=NULL) {
+.calcIres <- function(fit, data=fit$dataSav, table=tableControl(), dv=NULL,
+                      addDosing=FALSE, subsetNonmem=TRUE) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
   .keep <- NULL
   .names <- names(data)
@@ -156,7 +163,8 @@
     .thetas <- c(.thetas, setNames(rep(0, .n), paste0("ETA[", seq_len(.n), "]")))
   }
   .ipred <- .foceiSolvePars(fit, fit$model$pred.only, .thetas,
-                            returnType="data.frame.TBS", keep=.keep, what="ipred")
+                            returnType="data.frame.TBS", keep=.keep, what="ipred",
+                            addDosing=addDosing, subsetNonmem=subsetNonmem)
   if (!inherits(dv, "numeric")) {
     dv <- .ipred$dv
     table$doSim <- TRUE
