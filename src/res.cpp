@@ -91,14 +91,14 @@ BEGIN_RCPP
   arma::vec limit;
   int hasLimit=0;
   getLimitFromInput(limitIn, ncalc, limit, hasLimit);
-  
+
   arma::vec     hi(REAL(ipredL[ipredL.size()-1]), ncalc, false, true);
   arma::vec    low(REAL(ipredL[ipredL.size()-2]), ncalc, false, true);
   arma::vec     yj(REAL(ipredL[ipredL.size()-3]), ncalc, false, true);
   arma::vec lambda(REAL(ipredL[ipredL.size()-4]), ncalc, false, true);
   arma::vec lowerLim(ncalc);
   arma::vec upperLim(ncalc);
-  
+
   arma::mat omegaMat = as<arma::mat>(omegaMatSEXP);
   unsigned int neta = omegaMat.n_rows;
 
@@ -121,7 +121,7 @@ BEGIN_RCPP
   bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, cens, limit,
   								   lambda, yj, low, hi, lowerLim, upperLim,
   								   riv, doSim);
-    
+
 
   arma::ivec ID(INTEGER(predL[0]), ncalc, false, true);
 
@@ -138,18 +138,18 @@ BEGIN_RCPP
   etasDfFull.names() = etaN2;
   etasDfFull.attr("row.names")=IntegerVector::create(NA_INTEGER,-ncalc);
   etasDfFull.attr("class") = "data.frame";
-  
+
   calculateDfFull(ID, etas, etasDfFull, nid, neta);
 
   arma::vec pred(predt.size());
   for (unsigned int i = pred.size(); i--;){
     pred[i] = _powerDi(predt[i], lambda[i], (int)yj[i], low[i], hi[i]);
   }
-  
+
   arma::vec res = dv - pred;
   arma::vec iwres=(dvt-ipredt)/sqrt(riv);
   arma::vec ires = dv - ipred;
-  
+
   for (unsigned int j = ires.size(); j--; ) {
     if (censMethod == CENS_OMIT && cens[j] != 0) {
       dv[j]	= NA_REAL;
@@ -165,33 +165,36 @@ BEGIN_RCPP
       iwres[j]	= NA_REAL;
     }
   }
-  DataFrame retDF;
-
+  int ncol = 6;
   if (interestingLimits) {
-    retDF = DataFrame::create(_["DV"]=wrap(dv),
-			      _["PRED"]=wrap(pred),
-			      _["RES"]=wrap(res),
-			      _["IPRED"]=wrap(ipred),
-			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres),
-			      _["lowerLim"] = wrap(lowerLim),
-			      _["upperLim"] = wrap(upperLim));
-  } else {
-    retDF = DataFrame::create(_["DV"]=wrap(dv),
-			      _["PRED"]=wrap(pred),
-			      _["RES"]=wrap(res),
-			      _["IPRED"]=wrap(ipred),
-			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres));
+    ncol += 3 + hasLimit;
   }
+  List retDF(ncol);
+  CharacterVector nm(ncol);
+  int i=0;
+  nm[i] = "DV"; retDF[i++] = wrap(dv);
+  nm[i] = "PRED"; retDF[i++] = wrap(pred);
+  nm[i] = "RES"; retDF[i++] = wrap(res);
+  nm[i] = "IPRED"; retDF[i++] = wrap(ipred);
+  nm[i] = "IRES"; retDF[i++] = wrap(ires);
+  nm[i] = "IWRES"; retDF[i++] = wrap(iwres);
+  if (interestingLimits) {
+    nm[i] = "CENS"; retDF[i++] = wrap(cens);
+    if (hasLimit){
+      nm[i] = "LIMIT"; retDF[i++] = wrap(limit);
+    }
+    nm[i] = "lowerLim"; retDF[i++] = wrap(lowerLim);
+    nm[i] = "upperLim"; retDF[i++] = wrap(upperLim);
+  }
+  retDF.names() = nm;
+  retDF.attr("row.names") = IntegerVector::create(NA_INTEGER,-ncalc);
+  retDF.attr("class") = "data.frame";
   calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
+
   List ret(3);
   ret[0] = retDF;
   ret[1] = etasDfFull;
   ret[2] = etaLst;
-  // ret[1] = etaLst;
-  // ret[2] = etasDfFull;
-  // ret[3] = dv;
   return wrap(ret);
 END_RCPP
 }

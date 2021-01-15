@@ -5,6 +5,7 @@
 #if defined(__cplusplus)
 #include "armahead.h"
 #include "censResid.h"
+#include "res.h"
 
 typedef struct {
   arma::mat matsim;

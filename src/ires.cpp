@@ -78,21 +78,28 @@ BEGIN_RCPP
       iwres[j]	= NA_REAL;
     }
   }
-  DataFrame retDF;
-
+  int ncol = 4;
   if (interestingLimits) {
-    retDF = DataFrame::create(_["DV"]=wrap(dv),
-			      _["IPRED"]=wrap(ipred),
-			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres),
-			      _["lowerLim"] = wrap(lowerLim),
-			      _["upperLim"] = wrap(upperLim));
-  } else {
-    retDF = DataFrame::create(_["DV"]=wrap(dv),
-			      _["IPRED"]=wrap(ipred),
-			      _["IRES"]=wrap(ires),
-			      _["IWRES"]=wrap(iwres));
+    ncol += 3 + hasLimit;
   }
+  List retDF(ncol);
+  CharacterVector nm(ncol);
+  int i=0;
+  nm[i] = "DV"; retDF[i++] = wrap(dv);
+  nm[i] = "IPRED"; retDF[i++] = wrap(ipred);
+  nm[i] = "IRES"; retDF[i++] = wrap(ires);
+  nm[i] = "IWRES"; retDF[i++] = wrap(iwres);
+  if (interestingLimits) {
+    nm[i] = "CENS"; retDF[i++] = wrap(cens);
+    if (hasLimit){
+      nm[i] = "LIMIT"; retDF[i++] = wrap(limit);
+    }
+    nm[i] = "lowerLim"; retDF[i++] = wrap(lowerLim);
+    nm[i] = "upperLim"; retDF[i++] = wrap(upperLim);
+  }
+  retDF.names() = nm;
+  retDF.attr("row.names") = IntegerVector::create(NA_INTEGER,-ncalc);
+  retDF.attr("class") = "data.frame";
   return wrap(retDF);
 END_RCPP
 }
