@@ -103,7 +103,8 @@
   if (predOnly) .ipredModel <- fit$model$pred.only
   list(ipred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$ipred,
                                returnType="data.frame.TBS", keep=keep, what="ipred"),
-        pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred"))
+       pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred"),
+       etaLst=thetaEtaParameters$etaLst)
 }
 
 .calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
