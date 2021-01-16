@@ -1,5 +1,6 @@
 // [[Rcpp::plugins(openmp)]]
 #include "armahead.h"
+#include "utilc.h"
 #include <lbfgsb3c.h>
 
 #ifdef ENABLE_NLS
@@ -42,7 +43,6 @@
 #define probitInv(alpha, low, high) _powerDi(alpha, 1.0, 6, low, high)
 
 extern "C"{
-  void RSprintf(const char *format, ...);
   typedef void (*S2_fp) (int *, int *, double *, double *, double *, int *, float *,
 			 double *, int *);
   typedef void (*n1qn1_fp)(S2_fp simul, int n[], double x[], double f[], double g[],

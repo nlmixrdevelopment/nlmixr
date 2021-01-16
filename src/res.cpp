@@ -1,4 +1,6 @@
 #include "res.h"
+#include <boost/algorithm/string.hpp>
+#include <string>
 
 void calculateDfFull(arma::ivec& ID, arma::mat &etas,
 		     List &etasDfFull, int &nid, unsigned int &neta) {
@@ -49,8 +51,23 @@ void getLimitFromInput(SEXP limitIn, int& ncalc, arma::vec& limit, int &hasLimit
   }
 }
 
+List getDfIdentifierCols(List &ipred, int &npred) {
+  List ret(npred);
+  CharacterVector nm(npred);
+  CharacterVector nmIn = ipred.names();
+  for (int i = 0; i < npred; ++i) {
+    nm[i] = boost::to_upper_copy<std::string>(as<std::string>(nmIn[i]));
+    ret[i] = ipred[i];
+  }
+  ret.names()=nm;
+  ret.attr("row.names") = ipred.attr("row.names");
+  ret.attr("class") = "data.frame";
+  return ret;
+}
+
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
+				SEXP relevantLHSSEXP, SEXP stateSXP, 
 				SEXP resOpt) {
 BEGIN_RCPP
   List ipredPredList = as<List>(ipredPredListSEXP);
@@ -191,10 +208,11 @@ BEGIN_RCPP
   retDF.attr("class") = "data.frame";
   calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
 
-  List ret(3);
-  ret[0] = retDF;
-  ret[1] = etasDfFull;
-  ret[2] = etaLst;
+  List ret(4);
+  ret[0] = getDfIdentifierCols(ipredL, npred);
+  ret[1] = retDF;
+  ret[2] = etasDfFull;
+  ret[3] = etaLst;
   return wrap(ret);
 END_RCPP
 }

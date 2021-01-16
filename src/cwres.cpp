@@ -43,7 +43,7 @@ static inline void calculateCwresDerr(arma::mat& fppm, arma::mat& fpim,
 
 extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				  SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-				  SEXP cwresOpt) {
+				  SEXP relevantLHSSEXP, SEXP stateSXP, SEXP cwresOpt) {
 BEGIN_RCPP
   List ipredPredList = as<List>(ipredPredListSEXP);
   if (ipredPredList.size() != 3) return R_NilValue; //Rcpp::stop("malformed cwres calc");
@@ -234,10 +234,13 @@ BEGIN_RCPP
   retDF.attr("row.names") = IntegerVector::create(NA_INTEGER,-ncalc);
   retDF.attr("class") = "data.frame";
   calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
-  List ret(3);
-  ret[0] = retDF;
-  ret[1] = etasDfFull;
-  ret[2] = etaLst;
+  List ret(6);
+  ret[0] = getDfIdentifierCols(ipredL, npred);
+  ret[1] = retDF;
+  ret[2] = etasDfFull;
+  ret[3] = getDfSubsetVars(ipredL, relevantLHSSEXP);
+  ret[4] = getDfSubsetVars(ipredL, stateSXP);
+  ret[5] = etaLst;
   return wrap(ret);
 END_RCPP
 }

@@ -1,8 +1,8 @@
 #ifndef __IRES_H__
 #define __IRES_H__
-
 #if defined(__cplusplus)
 #include "res.h"
+#include "utilc.h"
 extern "C" {
 #endif
 

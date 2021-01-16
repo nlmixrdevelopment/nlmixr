@@ -18,6 +18,8 @@
 #define _(String) (String)
 #endif
 
+#include "utilc.h"
+
 int _setSilentErr=0;
 extern void setSilentErr(int silent){
   _setSilentErr = silent;
@@ -72,7 +74,7 @@ SEXP _nlmixr_setSilentErr(SEXP in) {
   return ret;
 }
 
-extern void RSprintf(const char *format, ...) {
+void RSprintf(const char *format, ...) {
   if (_setSilentErr == 0) {
     va_list args;
     va_start(args, format);
@@ -189,4 +191,42 @@ SEXP _nlmixr_powerL(SEXP xS, SEXP lambdaS, SEXP yjS, SEXP lowS, SEXP hiS) {
   }
   UNPROTECT(1);
   return retS;
+}
+
+SEXP getDfSubsetVars(SEXP ipred, SEXP lhs) {
+  int type = TYPEOF(lhs);
+  if (type != STRSXP) return R_NilValue;
+  int pro = 0;
+  SEXP ipredNames = PROTECT(Rf_getAttrib(ipred, R_NamesSymbol)); pro++;
+  int *keepVals = Calloc(Rf_length(ipredNames), int);
+  int k = 0;
+  for (int i = 0; i < Rf_length(ipredNames); ++i) {
+    for (int j = 0; j < Rf_length(lhs); ++j) {
+      if (!strcmp(CHAR(STRING_ELT(ipredNames, i)), CHAR(STRING_ELT(lhs, j)))) {
+	keepVals[k++] = i;
+	break;
+      }
+    }
+  }
+  if (k == 0) {
+    UNPROTECT(pro);
+    return R_NilValue;
+  }
+  SEXP ret = PROTECT(Rf_allocVector(VECSXP, k)); pro++;
+  SEXP nm = PROTECT(Rf_allocVector(STRSXP, k)); pro++;
+  for (int i = 0; i < k; ++i) {
+    SET_VECTOR_ELT(ret,i,VECTOR_ELT(ipred, keepVals[i]));
+    SET_STRING_ELT(nm,i,STRING_ELT(ipredNames, keepVals[i]));
+  }
+  Rf_setAttrib(ret, R_NamesSymbol, nm);
+  SEXP cls = PROTECT(allocVector(STRSXP, 1)); pro++;
+  SET_STRING_ELT(cls, 0, mkChar("data.frame"));
+  Rf_setAttrib(ret, R_ClassSymbol, cls);
+  SEXP rn = PROTECT(Rf_allocVector(INTSXP, 2));
+  int *rni =INTEGER(rn);
+  rni[0] = NA_INTEGER;
+  rni[1] = -k;
+  Rf_setAttrib(ret, R_RowNamesSymbol, rn);
+  UNPROTECT(pro);
+  return ret;
 }

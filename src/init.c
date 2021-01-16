@@ -8,6 +8,7 @@
 #include "res.h"
 #include "ires.h"
 #include "shrink.h"
+#include "utilc.h"
 
 /* Internal C calls, should not be called outside of C code. */
 typedef void (*S_fp) (double *, double *);
@@ -79,7 +80,6 @@ SEXP _nlmixr_saem_do_pred(SEXP, SEXP, SEXP);
 SEXP _nlmixr_augPredTrans(SEXP, SEXP, SEXP, SEXP, SEXP,
 			  SEXP);
 SEXP _nlmixr_preCondInv(SEXP);
-SEXP _nlmixr_setSilentErr(SEXP);
 SEXP _nlmixr_nlmixrResid0(SEXP, SEXP, SEXP, SEXP, SEXP,
 			  SEXP, SEXP, SEXP, SEXP);
 
@@ -88,7 +88,6 @@ static const R_CMethodDef CEntries[] = {
 };
 
 SEXP _nlmixr_powerD(SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP _nlmixr_powerL(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 SEXP _saemResidF(SEXP v);
 
@@ -143,8 +142,8 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_powerL", (DL_FUNC) &_nlmixr_powerL, 5},
   {"_saemResidF", (DL_FUNC) &_saemResidF, 1},
   {"_nlmixr_npdeCalc", (DL_FUNC) &_nlmixr_npdeCalc, 6},
-  {"_nlmixr_cwresCalc",  (DL_FUNC) &_nlmixr_cwresCalc, 8},
-  {"_nlmixr_resCalc",  (DL_FUNC) &_nlmixr_resCalc, 8},
+  {"_nlmixr_cwresCalc",  (DL_FUNC) &_nlmixr_cwresCalc, 10},
+  {"_nlmixr_resCalc",  (DL_FUNC) &_nlmixr_resCalc, 10},
   {"_nlmixr_iresCalc", (DL_FUNC) &_nlmixr_iresCalc, 6},
   {"_nlmixr_calcShrinkOnly", (DL_FUNC) &_nlmixr_calcShrinkOnly, 3},
   {NULL, NULL, 0}

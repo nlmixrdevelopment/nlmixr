@@ -111,17 +111,24 @@
        etaLst=thetaEtaParameters$eta.lst)
 }
 
+.getRelevantLhs <- function(fit, keep=NULL) {
+  .ret <- setdiff(fit$model$pred.only$lhs,fit$ini$name)
+  .w <- which(regexpr("^rx", .ret) == -1)
+  unique(c(.ret[.w], keep))
+}
+
 .calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
                        table=tableControl(), dv=NULL, predOnly=FALSE,
-                       addDosing=FALSE, subsetNonmem=TRUE) {
+                       addDosing=FALSE, subsetNonmem=TRUE, keep=NULL) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
-  .keep <- NULL
+  .keep <- keep
   .names <- names(data)
   .lowerNames <- tolower(.names)
   for (.n in c("dv", "cens", "limit")) {
     .w <- which(.lowerNames == .n)
     if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
   }
+  .keep <- unique(.keep)
   .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly,
                                  addDosing=addDosing, subsetNonmem=subsetNonmem)
   if (!inherits(dv, "numeric")) {
@@ -133,11 +140,11 @@
   if (predOnly){
     .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
           fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-          .prdLst$ipred$limit, table)
+          .prdLst$ipred$limit, .getRelevantLhs(fit, keep), fit$model$pred.only$state, table)
   } else {
     .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
           fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-          .prdLst$ipred$limit, table)
+          .prdLst$ipred$limit, .getRelevantLhs(fit, keep), fit$model$pred.only$state, table)
   }
 }
 
