@@ -144,7 +144,7 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_npdeCalc", (DL_FUNC) &_nlmixr_npdeCalc, 6},
   {"_nlmixr_cwresCalc",  (DL_FUNC) &_nlmixr_cwresCalc, 10},
   {"_nlmixr_resCalc",  (DL_FUNC) &_nlmixr_resCalc, 10},
-  {"_nlmixr_iresCalc", (DL_FUNC) &_nlmixr_iresCalc, 6},
+  {"_nlmixr_iresCalc", (DL_FUNC) &_nlmixr_iresCalc, 8},
   {"_nlmixr_calcShrinkOnly", (DL_FUNC) &_nlmixr_calcShrinkOnly, 3},
   {NULL, NULL, 0}
 };

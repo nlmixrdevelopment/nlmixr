@@ -111,10 +111,16 @@
        etaLst=thetaEtaParameters$eta.lst)
 }
 
-.getRelevantLhs <- function(fit, keep=NULL) {
+.getRelevantLhs <- function(fit, keep=NULL, ipred=NULL) {
   .ret <- setdiff(fit$model$pred.only$lhs,fit$ini$name)
   .w <- which(regexpr("^rx", .ret) == -1)
-  unique(c(.ret[.w], keep))
+  .ret <- unique(c(.ret[.w], keep))
+  if (any(.ret == "tad")) {
+    if (all(is.na(ipred$tad))) {
+      .ret <- setdiff(.ret, c("tad", "dosenum"))
+    }
+  }
+  .ret
 }
 
 .calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
@@ -140,11 +146,15 @@
   if (predOnly){
     .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
           fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-          .prdLst$ipred$limit, .getRelevantLhs(fit, keep), fit$model$pred.only$state, table)
+          .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$ipred), fit$model$pred.only$state, table)
   } else {
+    .prdLst <- c(.prdLst,
+                 list(pred.only=.foceiSolvePars(fit, fit$model$pred.only, thetaEtaParameters$ipred,
+                                                returnType="data.frame", keep=.keep, what="ebe",
+                                                addDosing=addDosing, subsetNonmem=subsetNonmem)))
     .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
           fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-          .prdLst$ipred$limit, .getRelevantLhs(fit, keep), fit$model$pred.only$state, table)
+          .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$pred.only), fit$model$pred.only$state, table)
   }
 }
 
@@ -153,9 +163,9 @@
 }
 
 .calcIres <- function(fit, data=fit$dataSav, table=tableControl(), dv=NULL,
-                      addDosing=FALSE, subsetNonmem=TRUE) {
+                      addDosing=FALSE, subsetNonmem=TRUE, keep=NULL) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
-  .keep <- NULL
+  .keep <- keep
   .names <- names(data)
   .lowerNames <- tolower(.names)
   for (.n in c("dv", "cens", "limit")) {
@@ -178,7 +188,9 @@
   } else {
     table$doSim <- FALSE
   }
-  .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit, table)
+  .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit,
+        .getRelevantLhs(fit, keep, .ipred), fit$model$pred.only$state, 
+        table)
 }
 
 .calcShrinkOnly <- function(fit, thetaEtaParameters=.foceiThetaEtaParameters(fit)) {

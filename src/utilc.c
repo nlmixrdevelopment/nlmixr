@@ -222,11 +222,58 @@ SEXP getDfSubsetVars(SEXP ipred, SEXP lhs) {
   SEXP cls = PROTECT(allocVector(STRSXP, 1)); pro++;
   SET_STRING_ELT(cls, 0, mkChar("data.frame"));
   Rf_setAttrib(ret, R_ClassSymbol, cls);
-  SEXP rn = PROTECT(Rf_allocVector(INTSXP, 2));
+  SEXP rn = PROTECT(Rf_allocVector(INTSXP, 2)); pro++;
   int *rni =INTEGER(rn);
   rni[0] = NA_INTEGER;
-  rni[1] = -k;
+  rni[1] = -Rf_length(VECTOR_ELT(ret,0));
   Rf_setAttrib(ret, R_RowNamesSymbol, rn);
+  UNPROTECT(pro);
+  return ret;
+}
+
+
+SEXP dfCbindList(SEXP lst) {
+  int type = TYPEOF(lst);
+  if (type != VECSXP) return R_NilValue;
+  int totN=0;
+  int pro = 0;
+  SEXP curS;
+  SEXP curN;
+  SEXP curElt;
+  for (int i = 0; i < Rf_length(lst); ++i) {
+    curS = PROTECT(VECTOR_ELT(lst, i)); pro++;
+    if (TYPEOF(curS) == VECSXP) {
+      totN += Rf_length(curS);
+    }
+  }
+  if (totN == 0) {
+    UNPROTECT(pro);
+    return R_NilValue;
+  }
+  SEXP ret = PROTECT(Rf_allocVector(VECSXP, totN)); pro++;
+  SEXP nm  = PROTECT(Rf_allocVector(STRSXP, totN)); pro++;
+  int k=0;
+  for (int i = 0; i < Rf_length(lst); ++i) {
+    curS = PROTECT(VECTOR_ELT(lst, i)); pro++;
+    if (TYPEOF(curS) == VECSXP) {
+      curN = PROTECT(Rf_getAttrib(curS, R_NamesSymbol)); pro++;
+      for (int j = 0; j < Rf_length(curN); ++j) {
+	curElt = VECTOR_ELT(curS, j);
+	Rf_setAttrib(curElt, R_DimSymbol, R_NilValue);
+	SET_VECTOR_ELT(ret, k, curElt);
+	SET_STRING_ELT(nm, k++, STRING_ELT(curN, j));
+      }
+    }
+  }
+  Rf_setAttrib(ret, R_NamesSymbol, nm);
+  SEXP rn = PROTECT(Rf_allocVector(INTSXP, 2)); pro++;
+  int *rni = INTEGER(rn);
+  rni[0] = NA_INTEGER;
+  rni[1] = -Rf_length(VECTOR_ELT(ret, 0));
+  Rf_setAttrib(ret, R_RowNamesSymbol, rn);
+  SEXP cls = PROTECT(allocVector(STRSXP, 1)); pro++;
+  SET_STRING_ELT(cls, 0, mkChar("data.frame"));
+  Rf_setAttrib(ret, R_ClassSymbol, cls);
   UNPROTECT(pro);
   return ret;
 }

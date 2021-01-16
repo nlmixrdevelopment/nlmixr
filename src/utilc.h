@@ -11,6 +11,7 @@ extern "C" {
   SEXP _nlmixr_powerL(SEXP xS, SEXP lambdaS, SEXP yjS, SEXP lowS, SEXP hiS);
   SEXP _nlmixr_powerD(SEXP xS, SEXP lambdaS, SEXP yjS, SEXP lowS, SEXP hiS);
   SEXP getDfSubsetVars(SEXP ipred, SEXP lhs);
+  SEXP dfCbindList(SEXP lst);
 
 #if defined(__cplusplus)
 }

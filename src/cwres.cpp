@@ -46,10 +46,11 @@ extern "C" SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				  SEXP relevantLHSSEXP, SEXP stateSXP, SEXP cwresOpt) {
 BEGIN_RCPP
   List ipredPredList = as<List>(ipredPredListSEXP);
-  if (ipredPredList.size() != 3) return R_NilValue; //Rcpp::stop("malformed cwres calc");
+  if (ipredPredList.size() != 4) return R_NilValue; //Rcpp::stop("malformed cwres calc");
   List ipredL = ipredPredList[0];
   List predL = ipredPredList[1];
   List etaLst = ipredPredList[2];
+  List ebeL = ipredPredList[3];
   int ncalc = Rf_length(ipredL[0]);
   List etasDf = as<List>(etasDfSEXP);
   int nid = Rf_length(etasDf[0]);
@@ -238,7 +239,7 @@ BEGIN_RCPP
   ret[0] = getDfIdentifierCols(ipredL, npred);
   ret[1] = retDF;
   ret[2] = etasDfFull;
-  ret[3] = getDfSubsetVars(ipredL, relevantLHSSEXP);
+  ret[3] = getDfSubsetVars(ebeL, relevantLHSSEXP);
   ret[4] = getDfSubsetVars(ipredL, stateSXP);
   ret[5] = etaLst;
   return wrap(ret);

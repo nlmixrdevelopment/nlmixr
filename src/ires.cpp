@@ -1,8 +1,10 @@
 #include "ires.h"
 
 extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDfLstSXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
+				 SEXP relevantLHSSEXP, SEXP stateSXP,
 				 SEXP iresOpt) {
 BEGIN_RCPP
+
   List ipredL = as<List>(ipredDfLstSXP);
   int ncalc = Rf_length(ipredL[0]);
 
@@ -78,14 +80,13 @@ BEGIN_RCPP
       iwres[j]	= NA_REAL;
     }
   }
-  int ncol = 4;
+  int ncol = 3;
   if (interestingLimits) {
     ncol += 3 + hasLimit;
   }
   List retDF(ncol);
   CharacterVector nm(ncol);
   int i=0;
-  nm[i] = "DV"; retDF[i++] = wrap(dv);
   nm[i] = "IPRED"; retDF[i++] = wrap(ipred);
   nm[i] = "IRES"; retDF[i++] = wrap(ires);
   nm[i] = "IWRES"; retDF[i++] = wrap(iwres);
@@ -100,6 +101,14 @@ BEGIN_RCPP
   retDF.names() = nm;
   retDF.attr("row.names") = IntegerVector::create(NA_INTEGER,-ncalc);
   retDF.attr("class") = "data.frame";
-  return wrap(retDF);
+  List retC = List::create(retDF, getDfSubsetVars(ipredL, stateSXP), getDfSubsetVars(ipredL, relevantLHSSEXP));
+  dfSetStateLhsOps(retC, opt);
+  retC = dfCbindList(wrap(retC));
+  List ret(3);
+  ret[0] = getDfIdentifierCols(ipredL, npred);
+  ret[1] = List::create(_["DV"] = wrap(dv));
+  ret[2] = retC;
+  ret = dfCbindList(ret);
+  return ret;
 END_RCPP
 }

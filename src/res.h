@@ -14,6 +14,8 @@ void getLimitFromInput(SEXP limitIn, int& ncalc, arma::vec& limit, int &hasLimit
 
 List getDfIdentifierCols(List &ipred, int &npred);
 
+void dfSetStateLhsOps(List& in, List& opt);
+
 extern "C" {
 #endif
   SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,

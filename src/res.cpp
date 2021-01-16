@@ -65,6 +65,25 @@ List getDfIdentifierCols(List &ipred, int &npred) {
   return ret;
 }
 
+void dfSetStateLhsOps(List& in, List& opt) {
+  bool doState=true;
+  if (opt.containsElementNamed("state")) {
+    RObject tmp = opt["doSim"];
+    if (TYPEOF(tmp) == LGLSXP) {
+      doState = as<bool>(tmp);
+    }
+  }
+  bool doLhs = true;
+  if (opt.containsElementNamed("lhs")) {
+    RObject tmp = opt["lhs"];
+    if (TYPEOF(tmp) == INTSXP) {
+      doLhs = as<int>(opt["lhs"]);
+    }
+  }
+  if (!doState) in[1] = R_NilValue;
+  if (!doLhs) in[2] = R_NilValue;
+}
+
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
 				SEXP relevantLHSSEXP, SEXP stateSXP, 
@@ -208,11 +227,13 @@ BEGIN_RCPP
   retDF.attr("class") = "data.frame";
   calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
 
-  List ret(4);
+  List ret(6);
   ret[0] = getDfIdentifierCols(ipredL, npred);
   ret[1] = retDF;
   ret[2] = etasDfFull;
-  ret[3] = etaLst;
+  ret[3] = getDfSubsetVars(ipredL, relevantLHSSEXP);
+  ret[4] = getDfSubsetVars(ipredL, stateSXP);
+  ret[5] = etaLst;
   return wrap(ret);
 END_RCPP
 }
