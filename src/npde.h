@@ -12,6 +12,7 @@ typedef struct {
   arma::umat namat;
   arma::mat epredt;
   arma::mat epred;
+  arma::umat obs;
   arma::mat varsim;
   arma::mat ymat;
   arma::mat ydsim;

@@ -52,7 +52,7 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
     try {
       ch = cholSE__(vYi, tolChol);
     } catch (...){
-      Rcpp::stop("The simulated data covariance matrix Cholesky decomposition could not be obtained for %d.", id+1);
+      Rcpp::stop("The simulated data covariance matrix Cholesky decomposition could not be obtained for  id=%d.", id+1);
     }
   }
   try{
@@ -64,7 +64,7 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
     try {
       vYi = trans(pinv(trimatu(ch)));
     } catch (...){
-      stop("The simulated data covariance matrix Cholesky decomposition inverse or pseudo-inverse could not be obtained for %d.", id+1);
+      stop("The simulated data covariance matrix Cholesky decomposition inverse or pseudo-inverse could not be obtained for id=%d.", id+1);
     }
   }
   return vYi;
@@ -144,13 +144,13 @@ static inline void handleNpdeNAandCalculateEpred(calcNpdeInfoId& ret, unsigned i
 }
 
 static inline void calculatePD(calcNpdeInfoId& ret, unsigned int& id, unsigned int &K, double &tolChol) {
-  ret.varsim = cov(trans(ret.matsim));
+  ret.ydsim = ret.matsim.rows(ret.obs);
+  ret.varsim = cov(trans(ret.ydsim));
   ret.ymat = decorrelateNpdeMat(ret.varsim, ret.warn, id, tolChol);
   arma::mat ymatt = trans(ret.ymat);
-  ret.ydsim = ret.matsim;
-  ret.ydsim.each_col() -= ret.epredt;
+  ret.ydsim.each_col() -= ret.epredt.elem(ret.obs);
   ret.ydsim = ymatt * ret.ydsim;
-  ret.ydobs = ymatt * (ret.yobst - ret.epredt);
+  ret.ydobs = ymatt * (ret.yobst.elem(ret.obs) - ret.epredt.elem(ret.obs));
   // sim < obs
   ret.tcomp = ret.ydsim;
   for (unsigned int j = K; j--;) {
@@ -158,7 +158,9 @@ static inline void calculatePD(calcNpdeInfoId& ret, unsigned int& id, unsigned i
       ret.tcomp(i, j) = ret.tcomp(i, j) < ret.ydobs[i];
     }
   }
-  ret.pd = mean(ret.tcomp, 1);
+  arma::mat pdObs = mean(ret.tcomp, 1);
+  ret.pd = arma::mat(ret.matsim.n_rows, 1, fill::zeros);
+  ret.pd.rows(ret.obs) = pdObs;
 }
 
 static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, arma::vec &limit, int &censMethod, bool &doLimit,
@@ -209,6 +211,7 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
   arma::vec limit = limitIn(span(idLoc[id], idLoc[id+1]-1));
   arma::ivec evid = evidIn(span(idLoc[id], idLoc[id+1]-1));
   handleNpdeNAandCalculateEpred(ret, K);
+  ret.obs = find(evid == 0);
   calculatePD(ret, id, K, tolChol);
   calculateNPDEfromPD(ret, cens, limit, censMethod, doLimit, K, ties, ru, ru2, ru3);
   ret.epred = arma::vec(ret.yobst.size());
@@ -229,12 +232,14 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
     } else if (evid[j] != 0) {
       ret.yobs[j] = NA_REAL;
       ret.eres[j] = NA_REAL;
+      ret.npde[j] = NA_REAL;
     }
   }
   return ret;
 }
 
 extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn, SEXP npdeOpt) {
+  BEGIN_RCPP
   if (TYPEOF(npdeSim) != VECSXP) {
     Rf_errorcall(R_NilValue, "npdeSim needs to be a data.frame");
   }
@@ -261,6 +266,9 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
     }
   }
 
+  List npdeSimL = as<List>(npdeSim);
+  int nsim = getPredIndex(npdeSimL);
+
   int dvLen = Rf_length(dvIn);
   arma::vec dv  = arma::vec(REAL(dvIn), dvLen, false, true);
   //arma::vec npde(REAL(npdeSEXP), dv.size(), false, true);
@@ -271,11 +279,11 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   arma::ivec aIdVec(INTEGER(VECTOR_ELT(npdeSim, 1)), simLen, false, true);
   unsigned int nid, K;
   arma::ivec idLoc = getSimIdLoc(aIdVec, aSimIdVec, nid, K);
-  arma::vec sim(REAL(VECTOR_ELT(npdeSim, 3)), simLen, false, true);
-  arma::vec lambda(REAL(VECTOR_ELT(npdeSim, 4)), simLen, false, true);
-  arma::vec yj(REAL(VECTOR_ELT(npdeSim, 5)), simLen, false, true);
-  arma::vec low(REAL(VECTOR_ELT(npdeSim, 6)), simLen, false, true);
-  arma::vec hi(REAL(VECTOR_ELT(npdeSim, 7)), simLen, false, true);
+  arma::vec sim(REAL(VECTOR_ELT(npdeSim, nsim)), simLen, false, true);
+  arma::vec lambda(REAL(VECTOR_ELT(npdeSim, nsim+1)), simLen, false, true);
+  arma::vec yj(REAL(VECTOR_ELT(npdeSim, nsim+2)), simLen, false, true);
+  arma::vec low(REAL(VECTOR_ELT(npdeSim, nsim+3)), simLen, false, true);
+  arma::vec hi(REAL(VECTOR_ELT(npdeSim, nsim+4)), simLen, false, true);
   arma::vec dvt(dvLen);
   // dv -> dv transform
   for (unsigned int i = dvLen; i--; ) {
@@ -336,4 +344,5 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   UNPROTECT(pro);
   return List::create(List::create(_["DV"]=dv),
 		      ret);
+  END_RCPP
 }
