@@ -4,6 +4,9 @@
 #define CENS_OMIT 1 
 #define CENS_CDF 2
 #define CENS_TNORM 3
+#define CENS_IPRED 4
+#define CENS_PRED 5
+#define CENS_EPRED 6
 
 #if defined(__cplusplus)
 
@@ -30,7 +33,7 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 					     arma::ivec &cens, arma::vec &limit,
 					     arma::vec& lambda, arma::vec &yj, arma::vec& low, arma::vec& hi, 
 					     arma::vec &lowerLim, arma::vec &upperLim, arma::vec &ri,
-					     bool &doSim);
+					     bool &doSim, int& censMethod);
 
 #endif
 

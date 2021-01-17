@@ -103,12 +103,18 @@
                                 addDosing=FALSE, subsetNonmem=TRUE) {
   .ipredModel <- fit$model$inner
   if (predOnly) .ipredModel <- fit$model$pred.only
-  list(ipred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$ipred,
-                               returnType="data.frame.TBS", keep=keep, what="ipred",
-                               addDosing=addDosing, subsetNonmem=subsetNonmem),
-       pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred",
-                              addDosing=addDosing, subsetNonmem=subsetNonmem),
-       etaLst=thetaEtaParameters$eta.lst)
+  .ret <- list(ipred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$ipred,
+                                       returnType="data.frame.TBS", keep=keep, what="ipred",
+                                       addDosing=addDosing, subsetNonmem=subsetNonmem),
+               pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred",
+                                      addDosing=addDosing, subsetNonmem=subsetNonmem),
+               etaLst=thetaEtaParameters$eta.lst)
+  if (!predOnly) {
+    .ret <- c(.ret, list(pred.only=.foceiSolvePars(fit, fit$model$pred.only, thetaEtaParameters$ipred,
+                                   returnType="data.frame", keep=keep, what="ebe",
+                                   addDosing=addDosing, subsetNonmem=subsetNonmem)))
+  }
+  .ret
 }
 
 .getRelevantLhs <- function(fit, keep=NULL, ipred=NULL) {
@@ -125,7 +131,7 @@
 
 .calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
                        table=tableControl(), dv=NULL, predOnly=FALSE,
-                       addDosing=FALSE, subsetNonmem=TRUE, keep=NULL) {
+                       addDosing=FALSE, subsetNonmem=TRUE, keep=NULL, npde=FALSE) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
   .keep <- keep
   .names <- names(data)
@@ -143,23 +149,30 @@
   } else {
     table$doSim <- FALSE
   }
-  if (predOnly){
-    .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
-          fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-          .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$ipred), fit$model$pred.only$state, table)
+  if (npde) {
+    .sim <- .npdeSim(fit, nsim = table$nsim, ties = table$ties, seed = table$seed,
+                     cholSEtol = table$cholSEtol)
+    .Call(`_nlmixr_npdeCalc`, .sim, .prdLst$ipred$dv, .prdLst$ipred$evid,
+          .prdLst$ipred$cens, .prdLst$ipred$limit, table)
   } else {
-    .prdLst <- c(.prdLst,
-                 list(pred.only=.foceiSolvePars(fit, fit$model$pred.only, thetaEtaParameters$ipred,
-                                                returnType="data.frame", keep=.keep, what="ebe",
-                                                addDosing=addDosing, subsetNonmem=subsetNonmem)))
-    .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
-          fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-          .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$pred.only), fit$model$pred.only$state, table)
+    if (predOnly){
+      .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
+            fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
+            .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$ipred), fit$model$pred.only$state, table)
+    } else {
+      .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
+            fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
+            .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$pred.only), fit$model$pred.only$state, table)
+    }
   }
 }
 
 .calcRes <- function(..., predOnly=TRUE) {
   .calcCwres(..., predOnly=predOnly)
+}
+
+.calcNpde <- function(..., npde=TRUE) {
+  .calcCwres(..., npde=npde)
 }
 
 .calcIres <- function(fit, data=fit$dataSav, table=tableControl(), dv=NULL,
@@ -189,7 +202,7 @@
     table$doSim <- FALSE
   }
   .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit,
-        .getRelevantLhs(fit, keep, .ipred), fit$model$pred.only$state, 
+        .getRelevantLhs(fit, keep, .ipred), fit$model$pred.only$state,
         table)
 }
 
@@ -260,15 +273,19 @@ tableControl <- function(npde = NULL,
                          foceiNPDE = FALSE,
                          foceNPDE = FALSE,
                          nsim = 300, ties = TRUE,
-                         censMethod=c("truncated-normal", "cdf", "omit"),
-                         seed = 1009) {
+                         censMethod=c("truncated-normal", "cdf", "ipred", "pred", "epred", "omit"),
+                         seed = 1009,
+                         cholSEtol=(.Machine$double.eps)^(1/3),
+                         state=TRUE,
+                         lhs=TRUE,
+                         eta=TRUE) {
   .ret <- list(
     npde = npde, cwres = cwres, saemNPDE = saemNPDE,
     saemCWRES = saemCWRES, nlmeNPDE = nlmeNPDE,
     nlmeCWRES = nlmeCWRES, foceiNPDE = foceiNPDE,
     foceNPDE = foceNPDE, nsim = nsim, ties = ties, seed = seed,
-    censMethod=setNames(c("truncated-normal"=3L, "cdf"=2L, "omit"=1L)[match.arg(censMethod)], NULL)
-  )
+    censMethod=setNames(c("truncated-normal"=3L, "cdf"=2L, "omit"=1L, "pred"=5L, "ipred"=4L, "epred"=6L)[match.arg(censMethod)], NULL),
+    cholSEtol=cholSEtol, state=state, lhs=lhs, eta=eta)
   class(.ret) <- "tableControl"
   return(.ret)
 }

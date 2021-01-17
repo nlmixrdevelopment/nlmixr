@@ -59,9 +59,10 @@ List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
   arma::vec limitA(limit.begin(), limit.size(), false, true);
   bool doSim = true;
   // if doSim is false, keep the prior interpolation (perhaps from cdf npde)
+  int censMethod = 3;
   bool interestingLim = censTruncatedMvnReturnInterestingLimits(dvA, dvtA, ipredA, ipredtA, 
 								censA, limitA, lambdaA, yjA, lowA, hiA, 
-								lowerLimA, upperLimA, riA, doSim);
+								lowerLimA, upperLimA, riA, doSim, censMethod);
   int warn1 = 0;
   int warn2 = 0;
   for (unsigned int j = ri.size(); j--;){

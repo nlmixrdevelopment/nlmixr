@@ -68,7 +68,7 @@ List getDfIdentifierCols(List &ipred, int &npred) {
 void dfSetStateLhsOps(List& in, List& opt) {
   bool doState=true;
   if (opt.containsElementNamed("state")) {
-    RObject tmp = opt["doSim"];
+    RObject tmp = opt["state"];
     if (TYPEOF(tmp) == LGLSXP) {
       doState = as<bool>(tmp);
     }
@@ -77,11 +77,19 @@ void dfSetStateLhsOps(List& in, List& opt) {
   if (opt.containsElementNamed("lhs")) {
     RObject tmp = opt["lhs"];
     if (TYPEOF(tmp) == INTSXP) {
-      doLhs = as<int>(opt["lhs"]);
+      doLhs = as<bool>(tmp);
     }
   }
-  if (!doState) in[1] = R_NilValue;
-  if (!doLhs) in[2] = R_NilValue;
+  bool doEtas = true;
+  if (opt.containsElementNamed("eta")) {
+    RObject tmp = opt["eta"];
+    if (TYPEOF(tmp) == INTSXP) {
+      doEtas = as<bool>(tmp);
+    }
+  }
+  if (!doEtas) in[1] = R_NilValue;
+  if (!doState) in[2] = R_NilValue;
+  if (!doLhs) in[3] = R_NilValue;
 }
 
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
@@ -156,7 +164,7 @@ BEGIN_RCPP
 
   bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, cens, limit,
   								   lambda, yj, low, hi, lowerLim, upperLim,
-  								   riv, doSim);
+  								   riv, doSim, censMethod);
 
 
   arma::ivec ID(INTEGER(predL[0]), ncalc, false, true);
@@ -187,7 +195,13 @@ BEGIN_RCPP
   arma::vec ires = dv - ipred;
 
   for (unsigned int j = ires.size(); j--; ) {
-    if (censMethod == CENS_OMIT && cens[j] != 0) {
+    if (censMethod == CENS_PRED && cens[j] != 0) {
+      dvt[j]    = predt[j];
+      dv[j]	= pred[j];
+      res[j]	= 0.0;
+      ires[j]	= dv[j] - ipred[j];
+      iwres[j]	= (dvt[j] - ipredt[j])/riv[j];
+    } else if (censMethod == CENS_OMIT && cens[j] != 0) {
       dv[j]	= NA_REAL;
       pred[j]	= NA_REAL;
       res[j]	= NA_REAL;
@@ -201,14 +215,13 @@ BEGIN_RCPP
       iwres[j]	= NA_REAL;
     }
   }
-  int ncol = 6;
+  int ncol = 5;
   if (interestingLimits) {
     ncol += 3 + hasLimit;
   }
   List retDF(ncol);
   CharacterVector nm(ncol);
   int i=0;
-  nm[i] = "DV"; retDF[i++] = wrap(dv);
   nm[i] = "PRED"; retDF[i++] = wrap(pred);
   nm[i] = "RES"; retDF[i++] = wrap(res);
   nm[i] = "IPRED"; retDF[i++] = wrap(ipred);
@@ -227,13 +240,15 @@ BEGIN_RCPP
   retDF.attr("class") = "data.frame";
   calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
 
-  List ret(6);
+  List retC = List::create(retDF, etasDfFull, getDfSubsetVars(ipredL, stateSXP),
+			   getDfSubsetVars(ipredL, relevantLHSSEXP));
+  dfSetStateLhsOps(retC, opt);
+  retC = dfCbindList(wrap(retC));
+  List ret(4);
   ret[0] = getDfIdentifierCols(ipredL, npred);
-  ret[1] = retDF;
-  ret[2] = etasDfFull;
-  ret[3] = getDfSubsetVars(ipredL, relevantLHSSEXP);
-  ret[4] = getDfSubsetVars(ipredL, stateSXP);
-  ret[5] = etaLst;
+  ret[1] = List::create(_["DV"] = wrap(dv));
+  ret[2] = retC;
+  ret[3] = etaLst;
   return wrap(ret);
 END_RCPP
 }

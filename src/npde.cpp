@@ -73,7 +73,7 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
 // This is similar to a truncated normal BUT the truncated normal handles the range (low,hi)
 // so instead of updating the DV based on cdf method, simply use the truncated normal
 // we also don't need to back-calculate the simulated DV value
-static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma::vec &limit, unsigned int &censMethod, bool &doLimit,
+static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma::vec &limit, int &censMethod, bool &doLimit,
 				     unsigned int i, arma::vec &ru2,  arma::vec &ru3, unsigned int& K, bool &ties) {
   if (censMethod != CENS_CDF) return;
   // For left censoring NPDE the probability is already calculated with the current pd
@@ -161,7 +161,7 @@ static inline void calculatePD(calcNpdeInfoId& ret, unsigned int& id, unsigned i
   ret.pd = mean(ret.tcomp, 1);
 }
 
-static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, arma::vec &limit, unsigned int &censMethod, bool &doLimit,
+static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, arma::vec &limit, int &censMethod, bool &doLimit,
 				       unsigned int &K, bool &ties, arma::vec &ru, arma::vec &ru2, arma::vec& ru3) {
   ret.npde = arma::mat(ret.pd.n_rows, 1);
   if (ties){
@@ -193,7 +193,7 @@ static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, ar
 
 calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
 			  arma::vec &dvt, arma::ivec &evidIn, arma::ivec &censIn, arma::vec &limitIn,
-			  unsigned int &censMethod, bool &doLimit,
+			  int &censMethod, bool &doLimit,
 			  unsigned int& id,
 			  unsigned int& K, double &tolChol, bool &ties,
 			  arma::vec &ruIn, arma::vec &ru2In, arma::vec &ru3In,
@@ -207,7 +207,7 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
   arma::vec ru3 = ru3In(span(idLoc[id], idLoc[id+1]-1));
   arma::ivec cens = censIn(span(idLoc[id], idLoc[id+1]-1));
   arma::vec limit = limitIn(span(idLoc[id], idLoc[id+1]-1));
-  arma::ivec evid = evidIn(span(idLoc[id]), idLoc[id+1]-1);
+  arma::ivec evid = evidIn(span(idLoc[id], idLoc[id+1]-1));
   handleNpdeNAandCalculateEpred(ret, K);
   calculatePD(ret, id, K, tolChol);
   calculateNPDEfromPD(ret, cens, limit, censMethod, doLimit, K, ties, ru, ru2, ru3);
@@ -216,8 +216,11 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
   ret.eres = arma::vec(ret.yobst.size());
   for (unsigned int j = ret.yobst.size(); j--; ) {
     // Transfer back to original scale ie log(x) -> exp(log(x))
-    ret.yobs[j] = _powerDi(ret.yobst[j], lambda[j], (int) yj[j], low[j], hi[j]);
     ret.epred[j] = _powerDi(ret.epredt[j], lambda[j], (int) yj[j], low[j], hi[j]);
+    if (censMethod == CENS_EPRED && cens[j] != 0) {
+      ret.yobst[j] = ret.epredt[j];
+    } 
+    ret.yobs[j] = _powerDi(ret.yobst[j], lambda[j], (int) yj[j], low[j], hi[j]);
     ret.eres[j] = ret.yobs[j] - ret.epred[j];
     if (censMethod == CENS_OMIT && cens[j] != 0) {
       ret.yobs[j] = NA_REAL;
@@ -250,7 +253,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
       ties = as<bool>(tmp);
     }
   }
-  unsigned int censMethod = CENS_TNORM;
+  int censMethod = CENS_TNORM;
   if (opt.containsElementNamed("censMethod")) {
     RObject tmp = opt["censMethod"];
     if (TYPEOF(tmp) == INTSXP) {
@@ -321,16 +324,16 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
     dvf(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.yobs;
     eres(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.eres;
   }
-  List ret(4);
+  List ret(3);
   // epred, eres, npde, dv
-  ret[0] = dvf;
-  ret[1] = epred;
-  ret[2] = eres;
-  ret[3] = npde;
+  ret[0] = epred;
+  ret[1] = eres;
+  ret[2] = npde;
   Rf_setAttrib(ret, R_ClassSymbol, wrap("data.frame"));
   Rf_setAttrib(ret, R_RowNamesSymbol,
 	       IntegerVector::create(NA_INTEGER, -dvLen));
-  Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("DV", "EPRED", "ERES", "NPDE"));
+  Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("EPRED", "ERES", "NPDE"));
   UNPROTECT(pro);
-  return ret;
+  return List::create(List::create(_["DV"]=dv),
+		      ret);
 }

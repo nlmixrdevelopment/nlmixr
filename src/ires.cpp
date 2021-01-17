@@ -61,7 +61,7 @@ BEGIN_RCPP
 
   bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, cens, limit,
   								   lambda, yj, low, hi, lowerLim, upperLim,
-  								   riv, doSim);
+  								   riv, doSim, censMethod);
 
   arma::ivec ID(INTEGER(ipredL[0]), ncalc, false, true);
 
@@ -101,7 +101,7 @@ BEGIN_RCPP
   retDF.names() = nm;
   retDF.attr("row.names") = IntegerVector::create(NA_INTEGER,-ncalc);
   retDF.attr("class") = "data.frame";
-  List retC = List::create(retDF, getDfSubsetVars(ipredL, stateSXP), getDfSubsetVars(ipredL, relevantLHSSEXP));
+  List retC = List::create(retDF, R_NilValue, getDfSubsetVars(ipredL, stateSXP), getDfSubsetVars(ipredL, relevantLHSSEXP));
   dfSetStateLhsOps(retC, opt);
   retC = dfCbindList(wrap(retC));
   List ret(3);

@@ -109,7 +109,8 @@ addNpde <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject =
 ##' @rdname addNpde
 ##'@export
 .npdeSim <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject = TRUE,
-                    cholSEtol = (.Machine$double.eps)^(1 / 3), ...) {
+                     cholSEtol = (.Machine$double.eps)^(1 / 3), ...,
+                     addDosing=FALSE, subsetNonmem=TRUE) {
   set.seed(seed)
   .si <- object$simInfo
   .rx <- .si$rx
@@ -120,8 +121,7 @@ addNpde <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject =
     "sim=\\1", .rx
   )
   .si$rx <- .rx
-  .dat <- nlmixrData(.nmGetData(object))
-  .dat <- .dat[.dat$EVID == 0, ]
+  .dat <- object$dataSav
   .si$object <- object
   .si$returnType <- "data.frame.TBS"
   .si$nsim <- nsim
@@ -131,6 +131,8 @@ addNpde <- function(object, nsim = 300, ties = TRUE, seed = 1009, updateObject =
   .si$dfObs <- 0
   .si$dfSub <- 0
   .si$thetaMat <- NA
+  .si$addDosing <- addDosing
+  .si$subsetNonmem <- subsetNonmem
   ## Now we need to keep censoring information if available;
   .ndat <- names(.dat)
   .keep <- c()
