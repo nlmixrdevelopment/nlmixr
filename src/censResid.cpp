@@ -1,7 +1,8 @@
 #include "censResid.h"
 
 bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
-					     arma::vec& ipred, arma::vec &ipredt, 
+					     arma::vec& ipred, arma::vec &ipredt,
+					     arma::vec& pred, arma::vec &predt,
 					     arma::ivec &cens, arma::vec &limit,
 					     arma::vec& lambda, arma::vec &yj, arma::vec& low, arma::vec& hi, 
 					     arma::vec &lowerLim, arma::vec &upperLim, arma::vec &ri,
@@ -10,6 +11,7 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
   for (int i = dv.size(); i--;) {
     // ipredt is the transformation information
     ipred[i]= _powerDi(ipredt[i], lambda[i], (int)yj[i], low[i], hi[i]);
+    pred[i]= _powerDi(predt[i], lambda[i], (int)yj[i], low[i], hi[i]);
     switch (cens[i]){
     case 1:
       // (limit, dv) ; limit could be -inf
@@ -20,9 +22,11 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 	interestingLim=true;
 	lowerLim[i] = limit[i];
 	upperLim[i] = dv[i];
-	if (doSim && (censMethod == CENS_TNORM || censMethod == CENS_IPRED)) {
+	if (doSim && (censMethod == CENS_TNORM || censMethod == CENS_IPRED || censMethod == CENS_PRED)) {
 	  if (censMethod == CENS_TNORM) {
 	    dvt[i] = truncnorm(ipredt[i], sd, lim0TBS, lim1TBS);
+	  } else if (censMethod == CENS_PRED) {
+	    dvt[i] = predt[i];
 	  } else {
 	    dvt[i] = ipredt[i];
 	  }
@@ -37,9 +41,11 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 	interestingLim=true;
 	lowerLim[i] = R_NegInf;
 	upperLim[i] = dv[i];
-	if (doSim && (censMethod == CENS_TNORM || censMethod == CENS_IPRED)) {
+	if (doSim && (censMethod == CENS_TNORM || censMethod == CENS_IPRED || censMethod == CENS_PRED)) {
 	  if (censMethod == CENS_TNORM) {
 	    dvt[i] = truncnorm(ipredt[i], sd, R_NegInf, lim1TBS);
+	  } else if (censMethod == CENS_PRED) {
+	    dvt[i] = predt[i];
 	  } else {
 	    dvt[i] = ipredt[i];
 	  }
@@ -59,9 +65,11 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 	interestingLim=true;
 	lowerLim[i] = dv[i];
 	upperLim[i] = limit[i];
-	if (doSim && (censMethod == CENS_TNORM || censMethod == CENS_IPRED)) {
+	if (doSim && (censMethod == CENS_TNORM || censMethod == CENS_IPRED || censMethod == CENS_PRED)) {
 	  if (censMethod == CENS_TNORM) {
 	    dvt[i] = truncnorm(ipredt[i], sd, lim0TBS, lim1TBS);
+	  } else if (censMethod == CENS_PRED) {
+	    dvt[i] = predt[i];
 	  } else {
 	    dvt[i] = ipredt[i];
 	  }
@@ -76,9 +84,11 @@ bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
 	interestingLim=true;
 	lowerLim[i] = dv[i];
 	upperLim[i] = R_PosInf;
-	if (doSim && (censMethod == CENS_TNORM || censMethod == CENS_IPRED)) {
+	if (doSim && (censMethod == CENS_TNORM || censMethod == CENS_IPRED || censMethod == CENS_PRED)) {
 	  if (censMethod == CENS_TNORM) {
 	    dvt[i] = truncnorm(ipredt[i], sd, lim1TBS, R_PosInf);
+	  } else if (censMethod == CENS_PRED) {
+	    dvt[i] = predt[i];
 	  } else {
 	    dvt[i] = ipredt[i];
 	  }

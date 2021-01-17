@@ -896,6 +896,7 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
                              nnodes.gq = 1, nsd.gq = 3, adjObf = TRUE,
                              calcCov = TRUE, covMethod = NULL,
                              calcCovTime = NULL, calcTables = TRUE, keep=NULL, drop=NULL) {
+  if (is.null(calcResid)) calcResid <- FALSE
   .saemCfg <- attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt
   if (class(uif) == "function") {

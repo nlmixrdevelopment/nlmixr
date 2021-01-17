@@ -133,6 +133,9 @@
                        table=tableControl(), dv=NULL, predOnly=FALSE,
                        addDosing=FALSE, subsetNonmem=TRUE, keep=NULL, npde=FALSE) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
+  if (!predOnly & is.null(fit$model$inner)) {
+    fit$model <- fit$uif$inner
+  }
   .keep <- keep
   .names <- names(data)
   .lowerNames <- tolower(.names)
@@ -212,38 +215,39 @@
   .ret[, -dim(.omega)[1] - 1]
 }
 
+.calcTables <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
+                        table=tableControl(), predOnly=FALSE, keep=NULL, npde=FALSE) {
+  if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
+  if (is.null(table$cwres)) {
+    table$cwres <- !is.null(fit$model$inner)
+  }
+  if (table$cwres & is.null(fit$model$inner)) {
+    fit$model <- fit$uif$inner
+  }
+  if (is.null(table$npde)) {
+    table$npde <- FALSE
+  }
+  .censMethod <- table$censMethod
+  if (.censMethod %in% c(2L, 6L)) {
+    if (!table$npde) {
+      warning("censoring method requires npde", call.=FALSE)
+      table$npde <- TRUE
+    }
+    .thetaEtaParameters <- .foceiThetaEtaParameters(fit)
+    .npde <- .calcNpde(fit, )
+    if (table$cwres) {
+      .cwres <- .calcCwres(fit, fit$dataSav, .thetaEtaParameters, table=table)
+    }
+  }
+
+}
+
 ##' Output table/data.frame options
 ##'
 ##' @param npde When TRUE, request npde regardless of the algorithm used.
 ##'
 ##' @param cwres When TRUE, request CWRES and FOCEi likelihood
 ##'     regardless of the algorithm used.
-##'
-##' @param saemNPDE When TRUE and estimating with SAEM, adds NPDE
-##'     metrics to fit including EPRED, ERES, and NPDE. (default
-##'     TRUE);
-##'
-##' @param saemCWRES When TRUE and estimating with SAEM, adds CWRES
-##'     metrics to the fit including CPRED, CRES and CWRES.  It also
-##'     evaluates the function with the FOCEi objective function to
-##'     allow comparison between estimation methods. (default FALSE)
-##'
-##' @param nlmeNPDE When TRUE and estimating with nlme, adds NPDE
-##'     metrics to fit including EPRED, ERES, and NPDE. (default
-##'     TRUE);
-##'
-##' @param nlmeCWRES When TRUE and estimating with nlme, adds CWRES
-##'     metrics to the fit including CPRED, CRES and CWRES.  It also
-##'     evaluates the function with the FOCEi objective function to
-##'     allow comparison between estimation methods. (default FALSE)
-##'
-##' @param foceiNPDE When TRUE and estimating with FOCEi, adds NPDE
-##'     metrics to fit including EPRED, ERES, and NPDE. (default
-##'     TRUE);
-##'
-##' @param foceNPDE When TRUE and estimating with FOCEi, adds NPDE
-##'     metrics to fit including EPRED, ERES, and NPDE. (default
-##'     TRUE);
 ##'
 ##' @param censMethod Handle censoring method:
 ##'
@@ -266,12 +270,6 @@
 ##' @export
 tableControl <- function(npde = NULL,
                          cwres = NULL,
-                         saemNPDE = FALSE,
-                         saemCWRES = FALSE,
-                         nlmeNPDE = FALSE,
-                         nlmeCWRES = FALSE,
-                         foceiNPDE = FALSE,
-                         foceNPDE = FALSE,
                          nsim = 300, ties = TRUE,
                          censMethod=c("truncated-normal", "cdf", "ipred", "pred", "epred", "omit"),
                          seed = 1009,
@@ -280,10 +278,7 @@ tableControl <- function(npde = NULL,
                          lhs=TRUE,
                          eta=TRUE) {
   .ret <- list(
-    npde = npde, cwres = cwres, saemNPDE = saemNPDE,
-    saemCWRES = saemCWRES, nlmeNPDE = nlmeNPDE,
-    nlmeCWRES = nlmeCWRES, foceiNPDE = foceiNPDE,
-    foceNPDE = foceNPDE, nsim = nsim, ties = ties, seed = seed,
+    npde = npde, cwres = cwres, nsim = nsim, ties = ties, seed = seed,
     censMethod=setNames(c("truncated-normal"=3L, "cdf"=2L, "omit"=1L, "pred"=5L, "ipred"=4L, "epred"=6L)[match.arg(censMethod)], NULL),
     cholSEtol=cholSEtol, state=state, lhs=lhs, eta=eta)
   class(.ret) <- "tableControl"

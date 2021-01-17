@@ -59,7 +59,10 @@ BEGIN_RCPP
     }
   }
 
-  bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, cens, limit,
+  arma::vec pred(ipred.size());
+  arma::vec predt = ipredt;
+
+  bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, pred, predt, cens, limit,
   								   lambda, yj, low, hi, lowerLim, upperLim,
   								   riv, doSim, censMethod);
 

@@ -60,6 +60,8 @@ BEGIN_RCPP
   arma::vec ipred(ipredt.size());
 
   arma::vec predt(REAL(predL[npred]), ncalc, false, true);
+  arma::vec pred(predt.size());
+
 
   arma::vec dv(REAL(dvIn), ncalc, false, true);
   arma::vec dvt(ncalc);
@@ -109,7 +111,7 @@ BEGIN_RCPP
       censMethod = as<int>(opt["censMethod"]);
     }
   }
-  bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, cens, limit,
+  bool interestingLimits = censTruncatedMvnReturnInterestingLimits(dv, dvt, ipred, ipredt, pred, predt, cens, limit,
   								   lambda, yj, low, hi, lowerLim, upperLim,
   								   riv, doSim, censMethod);
 
@@ -172,7 +174,6 @@ BEGIN_RCPP
 
   arma::vec cpred(cpredt.size());
   arma::vec cres(crest.size());
-  arma::vec pred(predt.size());
   for (unsigned int i = cres.size(); i--;){
     cpred[i] = _powerDi(cpredt[i], lambda[i], (int)yj[i], low[i], hi[i]);
     cres[i]  = dv[i] - cpred[i];
@@ -184,18 +185,7 @@ BEGIN_RCPP
   arma::vec ires = dv - ipred;
 
   for (unsigned int j = ires.size(); j--; ) {
-    if (censMethod == CENS_CPRED && cens[j] != 0) {
-      // dvt[j]    = cpredt[j];
-      // dv[j]	= cpred[j];
-      // ires[j]	= dv[j] - ipred[j];
-      // iwres[j]	= (dvt[j] - ipredt[j])/riv[j];
-    } else if (censMethod == CENS_PRED && cens[j] != 0) {
-      // dvt[j]    = predt[j];
-      // dv[j]	= pred[j];
-      // res[j]	= 0.0;
-      // ires[j]	= dv[j] - ipred[j];
-      // iwres[j]	= (dvt[j] - ipredt[j])/riv[j];
-    } else if (censMethod == CENS_OMIT && cens[j] != 0) {
+    if (censMethod == CENS_OMIT && cens[j] != 0) {
       dv[j]	= NA_REAL;
       pred[j]	= NA_REAL;
       res[j]	= NA_REAL;

@@ -1,7 +1,7 @@
 #ifndef __CENSRESID_H__
 #define __CENSRESID_H__
 #include "armahead.h"
-#define CENS_OMIT 1 
+#define CENS_OMIT 1
 #define CENS_CDF 2
 #define CENS_TNORM 3
 #define CENS_IPRED 4
@@ -29,9 +29,10 @@ static inline double truncnorm(double mean, double sd, double low, double hi){
 }
 
 bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,
-					     arma::vec& ipred, arma::vec &ipredt, 
+					     arma::vec& ipred, arma::vec &ipredt,
+					     arma::vec& pred, arma::vec &predt,
 					     arma::ivec &cens, arma::vec &limit,
-					     arma::vec& lambda, arma::vec &yj, arma::vec& low, arma::vec& hi, 
+					     arma::vec& lambda, arma::vec &yj, arma::vec& low, arma::vec& hi,
 					     arma::vec &lowerLim, arma::vec &upperLim, arma::vec &ri,
 					     bool &doSim, int& censMethod);
 

@@ -60,7 +60,9 @@ List nlmixrResid0(DataFrame &cipred, NumericVector &cdv, IntegerVector &evid,
   bool doSim = true;
   // if doSim is false, keep the prior interpolation (perhaps from cdf npde)
   int censMethod = 3;
-  bool interestingLim = censTruncatedMvnReturnInterestingLimits(dvA, dvtA, ipredA, ipredtA, 
+  arma::vec pred(pred.size());
+  arma::vec predt = ipredtA;
+  bool interestingLim = censTruncatedMvnReturnInterestingLimits(dvA, dvtA, ipredA, ipredtA, pred, predt,
 								censA, limitA, lambdaA, yjA, lowA, hiA, 
 								lowerLimA, upperLimA, riA, doSim, censMethod);
   int warn1 = 0;
