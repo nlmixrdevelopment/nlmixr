@@ -179,11 +179,11 @@
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
   if (is.null(.prdLst)) {
     .prdLst <- .foceiPredIpredList(fit, data=data, keep=keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly,
-                                 addDosing=addDosing, subsetNonmem=subsetNonmem)
+                                   addDosing=addDosing, subsetNonmem=subsetNonmem)
   }
   ## Split out so that .prdLst can be shared between npde/cwres npde/res
-  .calcCwres0(fit, data, thetaEtaParameters, table, dv, predOnly,
-                        addDosing, subsetNonmem, keep, npde,.prdLst)
+  .calcCwres0(fit, data, thetaEtaParameters, table, dv=dv, predOnly,
+              addDosing, subsetNonmem, keep, npde, .prdLst=.prdLst)
 }
 
 .calcRes <- function(..., predOnly=TRUE) {
@@ -232,7 +232,7 @@
 }
 
 .calcTables <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
-                        table=tableControl(), predOnly=FALSE, keep=NULL, npde=FALSE) {
+                        table=tableControl(), keep=NULL, npde=FALSE) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
   if (is.null(table$cwres)) {
     table$cwres <- !is.null(fit$model$inner)
@@ -240,19 +240,33 @@
   if (is.null(table$npde)) {
     table$npde <- FALSE
   }
+  .predOnly <- !table$cwres
   .censMethod <- table$censMethod
+  .ret <- vector("list",2)
+  .thetaEtaParameters <- .foceiThetaEtaParameters(fit)
+  .prdLst <- .foceiPredIpredList(fit, data=fit$dataSav, keep=keep, thetaEtaParameters=.thetaEtaParameters, predOnly=.predOnly,
+                                 addDosing=table$addDosing, subsetNonmem=table$subsetNonmem)
   if (.censMethod %in% c(2L, 6L)) {
     if (!table$npde) {
-      warning("censoring method requires npde", call.=FALSE)
+      warning("censoring method requires npde, adding npde", call.=FALSE)
       table$npde <- TRUE
     }
-    .thetaEtaParameters <- .foceiThetaEtaParameters(fit)
-    .npde <- .calcNpde(fit, )
-    if (table$cwres) {
-      .cwres <- .calcCwres(fit, fit$dataSav, .thetaEtaParameters, table=table)
-    }
+    .npde1 <- TRUE
+    .npde2 <- FALSE
+  } else {
+    .npde1 <- FALSE
+    .npde2 <- TRUE
   }
+  if ((.npde1 & table$npde) | !.npde1)
+    .ret[[1]] <- .calcCwres(fit, data=fit$dataSav, thetaEtaParameters=.thetaEtaParameters, table=table,
+                            predOnly=.predOnly, addDosing=table$addDosing, subsetNonmem=table$subsetNonmem,
+                            keep=keep, .prdLst=.prdLst, npde=.npde1)
+  if ((.npde2 & table$npde) | !.npde2)
+    .ret[[2]] <- .calcCwres(fit, data=fit$dataSav, thetaEtaParameters=.thetaEtaParameters, table=table, dv=.ret[[1]][[1]],
+                            predOnly=.predOnly, addDosing=table$addDosing, subsetNonmem=table$subsetNonmem,
+                            keep=keep, .prdLst=.prdLst, npde=.npde2)
 
+  return(.ret)
 }
 
 ##' Output table/data.frame options
@@ -271,6 +285,7 @@
 ##'  - `"omit"` omit the residuals for censoring
 ##'
 ##' @inheritParams addNpde
+##' @inheritParams RxODE::rxSolve
 ##'
 ##' @details
 ##'
@@ -289,11 +304,12 @@ tableControl <- function(npde = NULL,
                          cholSEtol=(.Machine$double.eps)^(1/3),
                          state=TRUE,
                          lhs=TRUE,
-                         eta=TRUE) {
+                         eta=TRUE,
+                         addDosing=FALSE, subsetNonmem = TRUE) {
   .ret <- list(
     npde = npde, cwres = cwres, nsim = nsim, ties = ties, seed = seed,
     censMethod=setNames(c("truncated-normal"=3L, "cdf"=2L, "omit"=1L, "pred"=5L, "ipred"=4L, "epred"=6L)[match.arg(censMethod)], NULL),
-    cholSEtol=cholSEtol, state=state, lhs=lhs, eta=eta)
+    cholSEtol=cholSEtol, state=state, lhs=lhs, eta=eta, addDosing=addDosing, subsetNonmem=subsetNonmem)
   class(.ret) <- "tableControl"
   return(.ret)
 }

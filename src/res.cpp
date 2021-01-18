@@ -239,8 +239,8 @@ BEGIN_RCPP
   dfSetStateLhsOps(retC, opt);
   retC = dfCbindList(wrap(retC));
   List ret(4);
-  ret[0] = getDfIdentifierCols(ipredL, npred);
-  ret[1] = List::create(_["DV"] = wrap(dv));
+  ret[0] = List::create(_["DV"] = wrap(dv));
+  ret[1] = getDfIdentifierCols(ipredL, npred);
   ret[2] = retC;
   ret[3] = etaLst;
   return wrap(ret);
