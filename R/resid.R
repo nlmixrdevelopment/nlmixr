@@ -142,7 +142,7 @@
 
  if (npde) {
     .sim <- .npdeSim(fit, nsim = table$nsim, ties = table$ties, seed = table$seed,
-                     cholSEtol = table$cholSEtol)
+                     cholSEtol = table$cholSEtol, addDosing=addDosing, subsetNonmem=subsetNonmem)
     .Call(`_nlmixr_npdeCalc`, .sim, .prdLst$ipred$dv, .prdLst$ipred$evid,
           .prdLst$ipred$cens, .prdLst$ipred$limit, table)
   } else {
