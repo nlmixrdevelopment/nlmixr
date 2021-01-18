@@ -129,23 +129,10 @@
   .ret
 }
 
-.calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
-                       table=tableControl(), dv=NULL, predOnly=FALSE,
-                       addDosing=FALSE, subsetNonmem=TRUE, keep=NULL, npde=FALSE) {
-  if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
-  if (!predOnly & is.null(fit$model$inner)) {
-    fit$model <- fit$uif$inner
-  }
-  .keep <- keep
-  .names <- names(data)
-  .lowerNames <- tolower(.names)
-  for (.n in c("dv", "cens", "limit")) {
-    .w <- which(.lowerNames == .n)
-    if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
-  }
-  .keep <- unique(.keep)
-  .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly,
-                                 addDosing=addDosing, subsetNonmem=subsetNonmem)
+.calcCwres0 <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
+                        table=tableControl(), dv=NULL, predOnly=FALSE,
+                        addDosing=FALSE, subsetNonmem=TRUE, keep=NULL, npde=FALSE,
+                        .prdLst) {
   if (!inherits(dv, "numeric")) {
     dv <- .prdLst$ipred$dv
     table$doSim <- TRUE
@@ -169,6 +156,28 @@
             .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$pred.only), fit$model$pred.only$state, table)
     }
   }
+}
+
+.calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
+                       table=tableControl(), dv=NULL, predOnly=FALSE,
+                       addDosing=FALSE, subsetNonmem=TRUE, keep=NULL, npde=FALSE) {
+  if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
+  if (!predOnly & is.null(fit$model$inner)) {
+    fit$model <- fit$uif$inner
+  }
+  .keep <- keep
+  .names <- names(data)
+  .lowerNames <- tolower(.names)
+  for (.n in c("dv", "cens", "limit")) {
+    .w <- which(.lowerNames == .n)
+    if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
+  }
+  .keep <- unique(.keep)
+  .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly,
+                                 addDosing=addDosing, subsetNonmem=subsetNonmem)
+  ## Split out so that .prdLst can be shared between npde/cwres npde/res
+  .calcCwres0(fit, data, thetaEtaParameters, table, dv, predOnly,
+                        addDosing, subsetNonmem, keep, npde,.prdLst)
 }
 
 .calcRes <- function(..., predOnly=TRUE) {
