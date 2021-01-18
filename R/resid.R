@@ -99,19 +99,34 @@
 #' @return list with ipred and pred datasets
 #' @author Matthew Fidler
 #' @noRd
-.foceiPredIpredList <- function(fit, thetaEtaParameters=.foceiThetaEtaParameters(fit), keep=NULL, predOnly=!is.null(fit$model$inner),
+.foceiPredIpredList <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit), keep=NULL, predOnly=!is.null(fit$model$inner),
                                 addDosing=FALSE, subsetNonmem=TRUE) {
+  if (!predOnly & is.null(fit$model$inner)) {
+    # Add inner problem calculation for cwres calculation
+    assign(fit$uif$inner, "model", envir=fit$env)
+    if (is.null(fit$model$inner)) {
+      stop("problem calculating focei's inner ODEs", call.=FALSE) # nocov
+    }
+  }
+  .keep <- keep
+  .names <- names(data)
+  .lowerNames <- tolower(.names)
+  for (.n in c("dv", "cens", "limit")) {
+    .w <- which(.lowerNames == .n)
+    if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
+  }
+  .keep <- unique(.keep)
   .ipredModel <- fit$model$inner
   if (predOnly) .ipredModel <- fit$model$pred.only
   .ret <- list(ipred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$ipred,
-                                       returnType="data.frame.TBS", keep=keep, what="ipred",
+                                       returnType="data.frame.TBS", keep=.keep, what="ipred",
                                        addDosing=addDosing, subsetNonmem=subsetNonmem),
                pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred",
                                       addDosing=addDosing, subsetNonmem=subsetNonmem),
                etaLst=thetaEtaParameters$eta.lst)
   if (!predOnly) {
     .ret <- c(.ret, list(pred.only=.foceiSolvePars(fit, fit$model$pred.only, thetaEtaParameters$ipred,
-                                   returnType="data.frame", keep=keep, what="ebe",
+                                   returnType="data.frame", keep=.keep, what="ebe",
                                    addDosing=addDosing, subsetNonmem=subsetNonmem)))
   }
   .ret
@@ -139,8 +154,7 @@
   } else {
     table$doSim <- FALSE
   }
-
- if (npde) {
+  if (npde) {
     .sim <- .npdeSim(fit, nsim = table$nsim, ties = table$ties, seed = table$seed,
                      cholSEtol = table$cholSEtol, addDosing=addDosing, subsetNonmem=subsetNonmem)
     .Call(`_nlmixr_npdeCalc`, .sim, .prdLst$ipred$dv, .prdLst$ipred$evid,
@@ -160,21 +174,13 @@
 
 .calcCwres <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
                        table=tableControl(), dv=NULL, predOnly=FALSE,
-                       addDosing=FALSE, subsetNonmem=TRUE, keep=NULL, npde=FALSE) {
+                       addDosing=FALSE, subsetNonmem=TRUE, keep=NULL, npde=FALSE,
+                       .prdLst=NULL) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
-  if (!predOnly & is.null(fit$model$inner)) {
-    fit$model <- fit$uif$inner
-  }
-  .keep <- keep
-  .names <- names(data)
-  .lowerNames <- tolower(.names)
-  for (.n in c("dv", "cens", "limit")) {
-    .w <- which(.lowerNames == .n)
-    if (length(.w) == 1L) .keep <- c(.keep, .names[.w])
-  }
-  .keep <- unique(.keep)
-  .prdLst <- .foceiPredIpredList(fit, keep=.keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly,
+  if (is.null(.prdLst)) {
+    .prdLst <- .foceiPredIpredList(fit, data=data, keep=keep, thetaEtaParameters=thetaEtaParameters, predOnly=predOnly,
                                  addDosing=addDosing, subsetNonmem=subsetNonmem)
+  }
   ## Split out so that .prdLst can be shared between npde/cwres npde/res
   .calcCwres0(fit, data, thetaEtaParameters, table, dv, predOnly,
                         addDosing, subsetNonmem, keep, npde,.prdLst)
@@ -230,9 +236,6 @@
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
   if (is.null(table$cwres)) {
     table$cwres <- !is.null(fit$model$inner)
-  }
-  if (table$cwres & is.null(fit$model$inner)) {
-    fit$model <- fit$uif$inner
   }
   if (is.null(table$npde)) {
     table$npde <- FALSE
