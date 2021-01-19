@@ -88,33 +88,15 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma
   // 5. The epred is then replaced with back-calculated uniform value based on sorted tcomp of row
   arma::vec curRow;
   unsigned int j;
-  unsigned int nlimit = 0;
   double low, hi;
   switch (cens[i]) {
   case 1:
-    // Sort up here to reduce the calculation burden for the p(lloq)
     curRow = sort(trans(ret.matsim.row(i)));
-    if (doLimit && R_FINITE(limit[i])) {
-      //  in this case (limit, dv) simulate pd between these two probabilities
-      while (nlimit < curRow.size() && curRow[nlimit] < limit[i]) nlimit++;
-      low = nlimit/curRow.size();
-      // Simulate between (limit, dv)
-      ret.pd[i] = low +  ru2[i]*(ret.pd[i]-low);
-    } else {
-      ret.pd[i] = ru2[i]*ret.pd[i];
-    }
+    ret.pd[i] = ru2[i]*ret.pd[i];
     break;
   case -1:
     curRow = sort(trans(ret.matsim.row(i)));
-    if (doLimit && R_FINITE(limit[i])) {
-      // In this case (dv, limit) simulate pd between these two probabilities
-      while (nlimit < curRow.size() && curRow[curRow.size()-nlimit-1] > limit[i]) nlimit++;
-      hi = nlimit/curRow.size();
-      low =  1-ret.pd[i];
-      ret.pd = low + ru2[i]*(hi-low);
-    } else {
-      ret.pd[i] = 1-ru2[i]*ret.pd[i];
-    }
+    ret.pd[i] = 1-ru2[i]*ret.pd[i];
     break;
   default:
     return;
@@ -315,6 +297,27 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   arma::vec limit;
   int hasLimit=0;
   getLimitFromInput(limitIn, dvLen, limit, hasLimit);
+
+  if (hasLimit && censMethod == CENS_CDF) {
+    for (unsigned int i = 0; i < cens.size(); ++i) {
+      switch(cens[i]){
+      case 1:
+	if (R_FINITE(limit[i])) {
+	  warning("limits are ignored with 'cdf' method");
+	  i= cens.size();
+	}
+	break;
+      case -1:
+	if (R_FINITE(limit[i])) {
+	  warning("limits are ignored with 'cdf' method");
+	  i= cens.size();
+	}
+	break;
+      case 0:
+	break;
+      }
+    }
+  }
 
   arma::vec ru = randu(simLen); // Pre-fill uniform random numbers to make sure independent
   arma::vec ru2 = randu(simLen);
