@@ -804,6 +804,7 @@ focei.theta.nlmixrNlme <- function(object, uif, ...) {
 ##' @rdname as.focei
 as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcResid = TRUE, nobs2 = 0,
                                 keep=NULL, drop=NULL) {
+  if (is.null(calcResid)) calcResid <- TRUE
   .nlmeTime <- proc.time() - pt
   if (class(uif) == "function") {
     uif <- nlmixr(uif)
