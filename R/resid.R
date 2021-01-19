@@ -31,7 +31,7 @@
   .ret <- RxODE::rxSolve(..., warnIdSort = FALSE)
   if (names(.ret)[1] == "time") {
     ## For single subject ID is dropped.
-    .ret <- data.frame(ID = 1, .ret)
+    .ret <- data.frame(ID = 1L, .ret)
   }
   return(.ret)
 }
