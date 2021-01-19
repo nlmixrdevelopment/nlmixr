@@ -232,7 +232,7 @@
 }
 
 .calcTables <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
-                        table=tableControl(), keep=NULL, npde=FALSE) {
+                        table=tableControl(), keep=NULL) {
   if (!inherits(table, "tableControl")) table <- do.call(tableControl, table)
   if (is.null(table$cwres)) {
     table$cwres <- !is.null(fit$model$inner)
@@ -266,6 +266,40 @@
                             predOnly=.predOnly, addDosing=table$addDosing, subsetNonmem=table$subsetNonmem,
                             keep=keep, .prdLst=.prdLst, npde=.npde2)
   .Call(`_nlmixr_popResFinal`, .ret)
+}
+
+addTable <- function(object, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
+                     table=tableControl(), keep=NULL, drop=NULL) {
+  if (!inherits(object, "nlmixrFitCore")) {
+    stop("requires a nlmixr fit object")
+  }
+  .fit <- object$env
+  .control <- .fit$origControl
+  .tabs <- .calcTables(.fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
+                       table=tableControl(), keep=NULL)
+  .df <- .tabs$resid
+  drop <- c(drop, "rxLambda", "rxYj")
+  .w <- -which(names(.df) %in% drop)
+  if (length(.w) > 0) .df <- .df[, .w, drop=FALSE]
+  .isDplyr <- requireNamespace("dplyr", quietly = TRUE)
+  if (!.isDplyr) {
+    .isDataTable <- requireNamespace("data.table", quietly = TRUE)
+    if (.isDataTable) {
+      .df <- data.table::data.table(.df)
+    }
+  } else {
+    .df <- tibble::as_tibble(.df)
+  }
+  .cls <- class(.df)
+  if (.control$interaction) {
+    .cls <- c(paste0("nlmixr", .fit$method, "i"), "nlmixrFitData", "nlmixrFitCore", .cls)
+  } else {
+    .cls <- c(paste0("nlmixr", .fit$method), "nlmixrFitData", "nlmixrFitCore", .cls)
+  }
+  class(.fit) <- "nlmixrFitCoreSilent"
+  attr(.cls, ".foceiEnv") <- .fit
+  class(.df) <- .cls
+  .df
 }
 
 ##' Output table/data.frame options
