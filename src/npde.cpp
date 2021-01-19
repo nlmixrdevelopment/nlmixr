@@ -93,7 +93,7 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma
   switch (cens[i]) {
   case 1:
     // Sort up here to reduce the calculation burden for the p(lloq)
-    curRow = sort(ret.matsim.row(i));
+    curRow = sort(trans(ret.matsim.row(i)));
     if (doLimit && R_FINITE(limit[i])) {
       //  in this case (limit, dv) simulate pd between these two probabilities
       while (nlimit < curRow.size() && curRow[nlimit] < limit[i]) nlimit++;
@@ -105,7 +105,7 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma
     }
     break;
   case -1:
-    curRow = sort(ret.matsim.row(i));
+    curRow = sort(trans(ret.matsim.row(i)));
     if (doLimit && R_FINITE(limit[i])) {
       // In this case (dv, limit) simulate pd between these two probabilities
       while (nlimit < curRow.size() && curRow[curRow.size()-nlimit-1] > limit[i]) nlimit++;
@@ -316,9 +316,9 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   int hasLimit=0;
   getLimitFromInput(limitIn, dvLen, limit, hasLimit);
 
-  arma::vec ru = randu(dvLen); // Pre-fill uniform random numbers to make sure independent
-  arma::vec ru2 = randu(dvLen);
-  arma::vec ru3 = randu(dvLen);
+  arma::vec ru = randu(simLen); // Pre-fill uniform random numbers to make sure independent
+  arma::vec ru2 = randu(simLen);
+  arma::vec ru3 = randu(simLen);
 
   SEXP npdeSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
   SEXP epredSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
@@ -348,7 +348,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
 	       IntegerVector::create(NA_INTEGER, -dvLen));
   Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("EPRED", "ERES", "NPDE"));
   UNPROTECT(pro);
-  return List::create(List::create(_["DV"]=dv),
+  return List::create(List::create(_["DV"]=dvf),
 		      ret);
   END_RCPP
 }

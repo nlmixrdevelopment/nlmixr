@@ -265,8 +265,7 @@
     .ret[[2]] <- .calcCwres(fit, data=fit$dataSav, thetaEtaParameters=.thetaEtaParameters, table=table, dv=.ret[[1]][[1]],
                             predOnly=.predOnly, addDosing=table$addDosing, subsetNonmem=table$subsetNonmem,
                             keep=keep, .prdLst=.prdLst, npde=.npde2)
-
-  return(.ret)
+  .Call(`_nlmixr_popResFinal`, .ret)
 }
 
 ##' Output table/data.frame options

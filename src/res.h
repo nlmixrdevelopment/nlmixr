@@ -22,6 +22,8 @@ extern "C" {
 		       SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
 		       SEXP relevantLHSSEXP, SEXP stateSXP, 
 		       SEXP resOpt);
+
+  SEXP _nlmixr_popResFinal(SEXP inList);
 #if defined(__cplusplus)
 }
 #endif

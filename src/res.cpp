@@ -246,3 +246,43 @@ BEGIN_RCPP
   return wrap(ret);
 END_RCPP
 }
+
+
+
+extern "C" SEXP _nlmixr_popResFinal(SEXP inList) {
+BEGIN_RCPP
+ List l = as<List>(inList);
+ if (l.size() != 2) return R_NilValue;
+ if (Rf_isNull(l[1])) {
+   // Only resid in 1
+   List l1 = l[0];
+   if (l1.size() != 4) return R_NilValue;
+   List retC = List::create(l1[1],
+			    List::create(_["DV"] = l1[0]),
+			    l1[2]);
+   return(List::create(_["resid"]=dfCbindList(wrap(retC)),
+		       _["shrink"]=l1[3]));
+ }
+ List l1 = l[0];
+ List l2 = l[1];
+ List shrinkage;
+ List finalLst(3);
+ // Regardless of whcih method of CENS imputation, updated DV is in the first element
+ NumericVector dv = VECTOR_ELT(l1[0], 0);
+ List l4;
+ if (l1.size() == 2 && l2.size() == 4) {
+   l4 = l2;
+   l2 = l1;
+ } else if (l1.size() == 4 && l2.size() == 2) {
+   l4 = l1; // l2 remains the same
+ } else {
+   return R_NilValue;
+ }
+ List retC = List::create(l4[1],
+			  List::create(_["DV"] = dv),
+			  l2[1],
+			  l4[2]);
+ return List::create(_["resid"]=dfCbindList(wrap(retC)),
+		     _["shrink"]=l4[3]);
+END_RCPP  
+}
