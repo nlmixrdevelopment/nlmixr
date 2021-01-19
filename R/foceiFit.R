@@ -2353,10 +2353,8 @@ foceiFit.data.frame0 <- function(data,
       return(get(arg, envir = .env2))
     }
   }
-  if (is.null(.ret)) {
-    if (arg == "simInfo") {
-      return(.simInfo(obj))
-    }
+  if (arg == "simInfo") {
+    return(.simInfo(obj))
   }
 }
 
