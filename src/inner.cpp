@@ -1879,7 +1879,8 @@ double foceiOfv(NumericVector theta){
 }
 
 //[[Rcpp::export]]
-List foceiEtas(){
+SEXP foceiEtas() {
+  if (op_focei.neta==0) return R_NilValue;
   List ret(op_focei.neta+2);
   CharacterVector nm(op_focei.neta+2);
   rx = getRx();
@@ -1908,7 +1909,7 @@ List foceiEtas(){
   ret.attr("names") = nm;
   ret.attr("class") = "data.frame";
   ret.attr("row.names") = IntegerVector::create(NA_INTEGER,-rx->nsub);
-  return(ret);
+  return(wrap(ret));
 }
 
 

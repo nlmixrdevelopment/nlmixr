@@ -268,16 +268,31 @@
   .Call(`_nlmixr_popResFinal`, .ret)
 }
 
-addTable <- function(object, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
-                     table=tableControl(), keep=NULL, drop=NULL) {
+.cloneEnv <- function(env) {
+  .env <- new.env(parent = emptyenv())
+  for (.x in ls(env, all.names=TRUE)) {
+    assign(.x, get(.x, env), .env)
+  }
+  return(.env)
+}
+
+addTable <- function(object, updateObject = FALSE, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
+                     table=tableControl(), keep=NULL, drop=NULL,
+                     envir = parent.frame(1)) {
+  .objName <- substitute(object)
   if (!inherits(object, "nlmixrFitCore")) {
     stop("requires a nlmixr fit object")
   }
   .fit <- object$env
   .control <- .fit$origControl
-  .tabs <- .calcTables(.fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
-                       table=tableControl(), keep=NULL)
-  .df <- .tabs$resid
+  if (is.null(.fit$omega)) {
+    .df <- .calcIres(.fit, data=data, table=table, dv=NULL,
+                     addDosing=table$addDosing, subsetNonmem=table$subsetNonmem, keep=keep)
+  } else {
+    .tabs <- .calcTables(.fit, data=data, table=table, keep=keep)
+    assign("shrink", .tabs$shrink, fit)
+    .df <- .tabs$resid
+  }
   drop <- c(drop, "rxLambda", "rxYj")
   .w <- -which(names(.df) %in% drop)
   if (length(.w) > 0) .df <- .df[, .w, drop=FALSE]
@@ -296,9 +311,26 @@ addTable <- function(object, data=fit$dataSav, thetaEtaParameters=.foceiThetaEta
   } else {
     .cls <- c(paste0("nlmixr", .fit$method), "nlmixrFitData", "nlmixrFitCore", .cls)
   }
+  if (!updateObject){
+    .fit <- .cloneEnv(.fit)
+  }
   class(.fit) <- "nlmixrFitCoreSilent"
   attr(.cls, ".foceiEnv") <- .fit
   class(.df) <- .cls
+  if (updateObject) {
+    .parent <- envir
+    .bound <- do.call("c", lapply(ls(.parent, all.names = TRUE), function(.cur) {
+      if (.cur == .objName && identical(.parent[[.cur]]$env, .fit$env)) {
+        return(.cur)
+      }
+      return(NULL)
+    }))
+    if (length(.bound) == 1) {
+      if (exists(.bound, envir = .parent)) {
+        assign(.bound, .df, envir = .parent)
+      }
+    }
+  }
   .df
 }
 

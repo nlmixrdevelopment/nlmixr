@@ -86,7 +86,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // foceiEtas
-List foceiEtas();
+SEXP foceiEtas();
 RcppExport SEXP _nlmixr_foceiEtas() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

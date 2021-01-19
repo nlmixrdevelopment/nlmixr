@@ -109,8 +109,8 @@ BEGIN_RCPP
   retC = dfCbindList(wrap(retC));
   List ret(3);
   ret[0] = getDfIdentifierCols(ipredL, npred);
-  ret[1] = List::create(_["DV"] = wrap(dv));
+  ret[1] = List::create(_["DV"]=wrap(dv));
   ret[2] = retC;
-  return ret;
+  return dfCbindList(wrap(ret));
 END_RCPP
 }
