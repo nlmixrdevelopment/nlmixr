@@ -156,7 +156,7 @@
   }
   if (npde) {
     .sim <- .npdeSim(fit, nsim = table$nsim, ties = table$ties, seed = table$seed,
-                     cholSEtol = table$cholSEtol, addDosing=addDosing, subsetNonmem=subsetNonmem)
+                     cholSEtol = table$cholSEtol, addDosing=addDosing, subsetNonmem=subsetNonmem, cores=table$cores)
     .Call(`_nlmixr_npdeCalc`, .sim, .prdLst$ipred$dv, .prdLst$ipred$evid,
           .prdLst$ipred$cens, .prdLst$ipred$limit, table)
   } else {
@@ -304,11 +304,15 @@ tableControl <- function(npde = NULL,
                          state=TRUE,
                          lhs=TRUE,
                          eta=TRUE,
-                         addDosing=FALSE, subsetNonmem = TRUE) {
+                         addDosing=FALSE, subsetNonmem = TRUE,
+                         cores=NULL) {
+  if (is.null(cores)) {
+    cores = RxODE::rxCores()
+  }
   .ret <- list(
     npde = npde, cwres = cwres, nsim = nsim, ties = ties, seed = seed,
     censMethod=setNames(c("truncated-normal"=3L, "cdf"=2L, "omit"=1L, "pred"=5L, "ipred"=4L, "epred"=6L)[match.arg(censMethod)], NULL),
-    cholSEtol=cholSEtol, state=state, lhs=lhs, eta=eta, addDosing=addDosing, subsetNonmem=subsetNonmem)
+    cholSEtol=cholSEtol, state=state, lhs=lhs, eta=eta, addDosing=addDosing, subsetNonmem=subsetNonmem, cores=cores)
   class(.ret) <- "tableControl"
   return(.ret)
 }
