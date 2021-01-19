@@ -65,6 +65,28 @@ List getDfIdentifierCols(List &ipred, int &npred) {
   return ret;
 }
 
+static inline List dfProtectedNames(List in, std::string what) {
+  CharacterVector nm = in.names();
+  const char *badNames[28] = {"IPRED", "IRES", "IWRES", "CENS", "LIMIT",
+			      "lowerLim", "upperLim","PRED", "RES", "CPRED",
+			      "CRES", "CWRES", "EPRED", "ERES", "NPDE",
+			      "ID", "RESETNO", "EVID", "CMT", "SS",
+			      "RATE", "DUR", "II", "TIME", "rxLambda",
+			      "rxYj", "rxLow", "rxHi"};
+  for (unsigned int i = 0; i < nm.size(); ++i) {
+    for (unsigned int j = 0; j < 28; ++j) {
+      if (!strcmp(badNames[j], CHAR(nm[i]))) {
+	std::string cur = as<std::string>(nm[i]);
+	cur += "." + what;
+	Rf_warning("change model defined '%s' to '%s' in table (conflicts with reserved names)", CHAR(nm[i]), cur.c_str());
+	nm[i] = cur;
+      }
+    }
+  }
+  in.names() = nm;
+  return in;
+}
+
 void dfSetStateLhsOps(List& in, List& opt) {
   bool doState=true;
   if (opt.containsElementNamed("state")) {
@@ -87,9 +109,21 @@ void dfSetStateLhsOps(List& in, List& opt) {
       doEtas = as<bool>(tmp);
     }
   }
-  if (!doEtas) in[1] = R_NilValue;
-  if (!doState) in[2] = R_NilValue;
-  if (!doLhs) in[3] = R_NilValue;
+  if (!doEtas) {
+    in[1] = R_NilValue;
+  } else {
+    in[1] = dfProtectedNames(in[1], "etas");
+  }
+  if (!doState) {
+    in[2] = R_NilValue;
+  } else {
+    in[2] = dfProtectedNames(in[2], "state");
+  }
+  if (!doLhs) {
+    in[2] = R_NilValue;
+  } else {
+    in[3] = dfProtectedNames(in[3], "lhs");
+  }
 }
 
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
