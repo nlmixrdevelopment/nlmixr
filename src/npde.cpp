@@ -303,13 +303,13 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
       switch(cens[i]){
       case 1:
 	if (R_FINITE(limit[i])) {
-	  warning("limits are ignored with 'cdf' method");
+	  warning("limits are ignored for npde back-transformation with 'cdf' method");
 	  i= cens.size();
 	}
 	break;
       case -1:
 	if (R_FINITE(limit[i])) {
-	  warning("limits are ignored with 'cdf' method");
+	  warning("limits are ignored for npde back-transformation with 'cdf' method");
 	  i= cens.size();
 	}
 	break;
@@ -351,7 +351,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
 	       IntegerVector::create(NA_INTEGER, -dvLen));
   Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("EPRED", "ERES", "NPDE"));
   UNPROTECT(pro);
-  return List::create(List::create(_["DV"]=dvf),
+  return List::create(dvf,
 		      ret);
   END_RCPP
 }

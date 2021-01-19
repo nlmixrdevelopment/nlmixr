@@ -76,14 +76,14 @@ void dfSetStateLhsOps(List& in, List& opt) {
   bool doLhs = true;
   if (opt.containsElementNamed("lhs")) {
     RObject tmp = opt["lhs"];
-    if (TYPEOF(tmp) == INTSXP) {
+    if (TYPEOF(tmp) == LGLSXP) {
       doLhs = as<bool>(tmp);
     }
   }
   bool doEtas = true;
   if (opt.containsElementNamed("eta")) {
     RObject tmp = opt["eta"];
-    if (TYPEOF(tmp) == INTSXP) {
+    if (TYPEOF(tmp) == LGLSXP) {
       doEtas = as<bool>(tmp);
     }
   }
@@ -239,7 +239,7 @@ BEGIN_RCPP
   dfSetStateLhsOps(retC, opt);
   retC = dfCbindList(wrap(retC));
   List ret(4);
-  ret[0] = List::create(_["DV"] = wrap(dv));
+  ret[0] = wrap(dv);
   ret[1] = getDfIdentifierCols(ipredL, npred);
   ret[2] = retC;
   ret[3] = etaLst;
@@ -268,7 +268,7 @@ BEGIN_RCPP
  List shrinkage;
  List finalLst(3);
  // Regardless of whcih method of CENS imputation, updated DV is in the first element
- NumericVector dv = VECTOR_ELT(l1[0], 0);
+ NumericVector dv = l1[0];
  List l4;
  if (l1.size() == 2 && l2.size() == 4) {
    l4 = l2;
