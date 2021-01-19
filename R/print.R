@@ -84,7 +84,7 @@
     .df <- data.frame(Information = .df)
   }
   .cls <- c(
-    paste0(gsub(" +", "\u00A0", name), ": ", bound, access),
+    paste0(bound, access, ": ", gsub(" +", "\u00A0", name)),
     "paged_df", "data.frame"
   )
   class(.df) <- .cls

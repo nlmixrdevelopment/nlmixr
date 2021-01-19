@@ -123,6 +123,13 @@
    (`rxTheme()`).  Additionally time after dose is calculated as `tad`
    for all `nlmixr` models
 
+ - Tables generation has been refactored; `npde` uses the `arma` and
+   `RxODE` random number generators which may change results.  Also
+   the default of `ties=TRUE` has been changed to `ties=FALSE`.
+   `npde` calculations have been threaded with `OpenMP` to speed up
+   the calculation as well.  This refactoring was required to have the
+   `dv` imputation between `cwres` and `npde` use the same method
+
 ## Bug Fixes
 
  - Aligned `saem` and `focei` additive + proportional error models, so
