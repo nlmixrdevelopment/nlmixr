@@ -338,44 +338,6 @@ nlmixr_fit0FixDat <- function(x, IDLabel, origData) {
   return(x)
 }
 
-#' Add NPDE to a fit, if requested
-#'
-#' @param x the fit
-#' @param table the control table
-#' @inheritParams nlmixr
-#' @return the fit with NPDE added, if requested
-#' @noRd
-nlmixr_fit0AddNpde <- function(x, table, est) {
-  .doIt <- table$npde
-  if (is.null(.doIt)) {
-    if (est == "saem") {
-      .doIt <- table$saemNPDE
-    } else if (est == "focei") {
-      .doIt <- table$foceiNPDE
-    } else if (est == "foce") {
-      .doIt <- table$foceNPDE
-    } else if (est == "nlme") {
-      .doIt <- table$nlmeNPDE
-    } else {
-      .doIt <- FALSE
-    }
-  }
-  if (!is.logical(.doIt)) {
-    return(x)
-  }
-  if (is.na(.doIt)) {
-    return(x)
-  }
-  if (!.doIt) {
-    return(x)
-  }
-  .ret <- try(addNpde(x, nsim = table$nsim, ties = table$ties, seed = table$seed, updateObject = FALSE), silent = TRUE)
-  if (inherits(.ret, "try-error")) {
-    return(x)
-  }
-  return(.ret)
-}
-
 nlmixr_fit0 <- function(uif, data, est = NULL, control = list(), ...,
                         keep=NULL, drop=NULL,
                         sum.prod = FALSE, table = tableControl(),
@@ -884,7 +846,7 @@ nlmixrEst.saem <- function(env, ...) {
           data = dat, calcResid = calc.resid, obf = .logLik,
           nnodes.gq = .nnodes.gq, nsd.gq = .nsd.gq, adjObf = .adjObf,
           calcCov = .addCov, calcTables = .calcTables,
-          keep=.keep, drop=.drop
+          keep=.keep, drop=.drop, table=table
         ),
         silent = TRUE
       )
@@ -894,7 +856,6 @@ nlmixrEst.saem <- function(env, ...) {
     }
     if (inherits(.ret, "nlmixrFitData")) {
       .ret <- nlmixr_fit0FixDat(.ret, IDLabel = .lab, origData = .origData)
-      .ret <- nlmixr_fit0AddNpde(.ret, table = table, est = est)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -991,7 +952,7 @@ nlmixrEst.nlme <- function(env, ...) {
     class(fit) <- c(est.type, class(fit))
     .ret <- try({
       as.focei.nlmixrNlme(fit, uif, pt, data = dat, calcResid = calc.resid, nobs2 = nobs2,
-                          keep=.keep, drop=.drop)
+                          keep=.keep, drop=.drop, table=table)
     })
     if (inherits(.ret, "try-error")) {
       warning("Error converting to nlmixr UI object, returning nlme object")
@@ -999,7 +960,6 @@ nlmixrEst.nlme <- function(env, ...) {
     }
     if (inherits(.ret, "nlmixrFitData")) {
       .ret <- nlmixr_fit0FixDat(.ret, IDLabel = .lab, origData = .origData)
-      .ret <- nlmixr_fit0AddNpde(.ret, table = table, est = est)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -1153,7 +1113,6 @@ nlmixrEst.posthoc <- function(env, ...) {
         setOfv(env, "fo")
       }
     }
-    fit <- nlmixr_fit0AddNpde(fit, table = table, est = est)
     fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
     assign("start.time", start.time, env)
     assign("est", est, env)
@@ -1173,6 +1132,7 @@ nlmixrEst.focei <- function(env, ...) {
       control$interaction <- FALSE
     }
     env <- new.env(parent = emptyenv())
+    env$table <- table
     env$uif <- uif
     if (any(est == c("fo", "foi"))) {
       control$maxInnerIterations <- 0
@@ -1292,7 +1252,6 @@ nlmixrEst.focei <- function(env, ...) {
         setOfv(env, "fo")
       }
     }
-    fit <- nlmixr_fit0AddNpde(fit, table = table, est = est)
     fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
     assign("start.time", start.time, env)
     assign("est", est, env)

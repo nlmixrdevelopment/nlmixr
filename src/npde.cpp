@@ -345,15 +345,11 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   }
   List ret(3);
   // epred, eres, npde, dv
-  ret[0] = epred;
-  ret[1] = eres;
-  ret[2] = npde;
-  Rf_setAttrib(ret, R_ClassSymbol, wrap("data.frame"));
-  Rf_setAttrib(ret, R_RowNamesSymbol,
-	       IntegerVector::create(NA_INTEGER, -dvLen));
-  Rf_setAttrib(ret, R_NamesSymbol, CharacterVector::create("EPRED", "ERES", "NPDE"));
+  ret[0] = List::create(_["EPRED"]=epred);
+  ret[1] = List::create(_["ERES"]=eres);
+  ret[2] = List::create(_["NPDE"]=npde);
+  SEXP ret2 = PROTECT(dfCbindList(wrap(ret))); pro++;
   UNPROTECT(pro);
-  return List::create(dvf,
-		      ret);
+  return List::create(dvf, ret2);
   END_RCPP
 }

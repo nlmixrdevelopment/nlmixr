@@ -276,21 +276,118 @@
   return(.env)
 }
 
+#' NPDE calculation for nlmixr
+#'
+#' @param object nlmixr fit object
+#' @param updateObject Boolean indicating if original object should be updated.  By default this is TRUE.
+#' @inheritParams foceiControl
+#' @param ... Other ignored parameters.
+#'
+#' @param sim With `.ndpeCalc` the RxODE simulated values to
+#'   calculate `npde`
+#'
+#' @details
+#'
+#' `addNpde` is the user-facing function to add the NPDE
+#'
+#' @return New nlmixr fit object
+#' @author Matthew L. Fidler
+#' @examples
+#'
+#' \donttest{
+#'
+#' one.cmt <- function() {
+#'   ini({
+#'     ## You may label each parameter with a comment
+#'     tka <- 0.45 # Log Ka
+#'     tcl <- log(c(0, 2.7, 100)) # Log Cl
+#'     ## This works with interactive models
+#'     ## You may also label the preceding line with label("label text")
+#'     tv <- 3.45; label("log V")
+#'     ## the label("Label name") works with all models
+#'     eta.ka ~ 0.6
+#'     eta.cl ~ 0.3
+#'     eta.v ~ 0.1
+#'     add.sd <- 0.7
+#'   })
+#'   model({
+#'     ka <- exp(tka + eta.ka)
+#'     cl <- exp(tcl + eta.cl)
+#'     v <- exp(tv + eta.v)
+#'     linCmt() ~ add(add.sd)
+#'   })
+#' }
+#'
+#' f <- nlmixr(one.cmt, theo_sd, "saem")
+#'
+#' # even though you may have forgotten to add the NPDE, you can add it to the data.frame:
+#'
+#' f <- addNpde(f)
+#'
+#' }
+##' @export
+addNpde <- function(object, updateObject = TRUE,
+                    table = tableControl(), ...,
+                    envir=parent.frame(1)) {
+  .pt <- proc.time()
+  .objName <- substitute(object)
+  RxODE::.setWarnIdSort(FALSE)
+  on.exit(RxODE::.setWarnIdSort(TRUE))
+  if (any(names(object) == "NPDE")) {
+    warning("already contains NPDE")
+    return(object)
+  }
+  message("add npde")
+  table$npde <- TRUE
+  .npde <- .calcNpde(object, dv=object$DV)
+  .cls <- class(object)
+  .new <- cbind(object, .npde[[2]])
+  class(.new) <- .cls
+  .env <- .new$env
+  if (inherits(updateObject, "logical")) {
+    if (updateObject) {
+      .parent <- envir
+      .bound <- do.call("c", lapply(ls(.parent, all.names = TRUE), function(.cur) {
+        if (.cur == .objName && identical(.parent[[.cur]]$env, .env)) {
+          return(.cur)
+        }
+        return(NULL)
+      }))
+      if (length(.bound) == 1) {
+        if (exists(.bound, envir = .parent)) {
+          assign(.bound, .new, envir = .parent)
+        }
+      }
+    }
+  }
+  .env$time <- .data.frame(.env$time, npde = (proc.time() - .pt)["elapsed"], check.names = FALSE)
+  message("done")
+  .new
+}
+
 addTable <- function(object, updateObject = FALSE, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
                      table=tableControl(), keep=NULL, drop=NULL,
                      envir = parent.frame(1)) {
+  .pt <- proc.time()
+  message("Calculating residuals/tables")
   .objName <- substitute(object)
   if (!inherits(object, "nlmixrFitCore")) {
     stop("requires a nlmixr fit object")
   }
   .fit <- object$env
-  .control <- .fit$origControl
+  if (exists("origControl", .fit)) {
+    .control <- .fit$origControl
+  } else if (exists("control", .fit)) {
+    .control <- .fit$control
+  } else {
+    .control <- foceiControl()
+  }
   if (is.null(.fit$omega)) {
     .df <- .calcIres(.fit, data=data, table=table, dv=NULL,
                      addDosing=table$addDosing, subsetNonmem=table$subsetNonmem, keep=keep)
   } else {
     .tabs <- .calcTables(.fit, data=data, table=table, keep=keep)
-    assign("shrink", .tabs$shrink, fit)
+    assign("shrink", .tabs$shrink, .fit)
     .df <- .tabs$resid
   }
   drop <- c(drop, "rxLambda", "rxYj")
@@ -311,26 +408,32 @@ addTable <- function(object, updateObject = FALSE, data=fit$dataSav, thetaEtaPar
   } else {
     .cls <- c(paste0("nlmixr", .fit$method), "nlmixrFitData", "nlmixrFitCore", .cls)
   }
-  if (!updateObject){
-    .fit <- .cloneEnv(.fit)
+  if (inherits(updateObject, "logical")) {
+    if (!updateObject){
+      .fit <- .cloneEnv(.fit)
+    }
   }
   class(.fit) <- "nlmixrFitCoreSilent"
   attr(.cls, ".foceiEnv") <- .fit
   class(.df) <- .cls
-  if (updateObject) {
-    .parent <- envir
-    .bound <- do.call("c", lapply(ls(.parent, all.names = TRUE), function(.cur) {
-      if (.cur == .objName && identical(.parent[[.cur]]$env, .fit$env)) {
-        return(.cur)
-      }
-      return(NULL)
-    }))
-    if (length(.bound) == 1) {
-      if (exists(.bound, envir = .parent)) {
-        assign(.bound, .df, envir = .parent)
+  if (inherits(updateObject, "logical")) {
+    if (updateObject) {
+      .parent <- envir
+      .bound <- do.call("c", lapply(ls(.parent, all.names = TRUE), function(.cur) {
+        if (.cur == .objName && identical(.parent[[.cur]]$env, .fit$env)) {
+          return(.cur)
+        }
+        return(NULL)
+      }))
+      if (length(.bound) == 1) {
+        if (exists(.bound, envir = .parent)) {
+          assign(.bound, .df, envir = .parent)
+        }
       }
     }
   }
+  message("done")
+  .fit$time <- .data.frame(.fit$time, table = (proc.time() - .pt)["elapsed"], check.names = FALSE)
   .df
 }
 

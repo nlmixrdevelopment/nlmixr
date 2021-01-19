@@ -16,7 +16,8 @@ as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
   calcResid = TRUE,
   nobs2 = 0,
   keep = NULL,
-  drop = NULL
+  drop = NULL,
+  table = tableControl()
 )
 }
 \arguments{

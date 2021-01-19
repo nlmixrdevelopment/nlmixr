@@ -7,16 +7,17 @@
 tableControl(
   npde = NULL,
   cwres = NULL,
-  saemNPDE = FALSE,
-  saemCWRES = FALSE,
-  nlmeNPDE = FALSE,
-  nlmeCWRES = FALSE,
-  foceiNPDE = FALSE,
-  foceNPDE = FALSE,
   nsim = 300,
   ties = TRUE,
-  censMethod = c("truncated-normal", "cdf", "omit"),
-  seed = 1009
+  censMethod = c("truncated-normal", "cdf", "ipred", "pred", "epred", "omit"),
+  seed = 1009,
+  cholSEtol = (.Machine$double.eps)^(1/3),
+  state = TRUE,
+  lhs = TRUE,
+  eta = TRUE,
+  addDosing = FALSE,
+  subsetNonmem = TRUE,
+  cores = NULL
 )
 }
 \arguments{
@@ -25,37 +26,9 @@ tableControl(
 \item{cwres}{When TRUE, request CWRES and FOCEi likelihood
 regardless of the algorithm used.}
 
-\item{saemNPDE}{When TRUE and estimating with SAEM, adds NPDE
-metrics to fit including EPRED, ERES, and NPDE. (default
-TRUE);}
-
-\item{saemCWRES}{When TRUE and estimating with SAEM, adds CWRES
-metrics to the fit including CPRED, CRES and CWRES.  It also
-evaluates the function with the FOCEi objective function to
-allow comparison between estimation methods. (default FALSE)}
-
-\item{nlmeNPDE}{When TRUE and estimating with nlme, adds NPDE
-metrics to fit including EPRED, ERES, and NPDE. (default
-TRUE);}
-
-\item{nlmeCWRES}{When TRUE and estimating with nlme, adds CWRES
-metrics to the fit including CPRED, CRES and CWRES.  It also
-evaluates the function with the FOCEi objective function to
-allow comparison between estimation methods. (default FALSE)}
-
-\item{foceiNPDE}{When TRUE and estimating with FOCEi, adds NPDE
-metrics to fit including EPRED, ERES, and NPDE. (default
-TRUE);}
-
-\item{foceNPDE}{When TRUE and estimating with FOCEi, adds NPDE
-metrics to fit including EPRED, ERES, and NPDE. (default
-TRUE);}
-
-\item{nsim}{Number of simulations.  By default this is 300}
-
-\item{ties}{When TRUE, the npde distribution can have ties.  When
-FALSE, the npde distribution uses uniform random numbers to
-prevent ties.}
+\item{nsim}{represents the number of simulations.  For RxODE, if
+you supply single subject event tables (created with
+\verb{[eventTable()]})}
 
 \item{censMethod}{Handle censoring method:
 
@@ -65,7 +38,41 @@ prevent ties.}
 
  - `"omit"` omit the residuals for censoring}
 
-\item{seed}{Seed for running nlmixr simulation.  By default 1009}
+\item{seed}{an object specifying if and how the random number
+generator should be initialized}
+
+\item{eta}{A vector of parameters that will be named \verb{ETA\\[#\\]} and
+added to parameters}
+
+\item{addDosing}{Boolean indicating if the solve should add RxODE
+EVID and related columns.  This will also include dosing
+information and estimates at the doses.  Be default, RxODE
+only includes estimates at the observations. (default
+\code{FALSE}). When \code{addDosing} is \code{NULL}, only
+include \code{EVID=0} on solve and exclude any model-times or
+\code{EVID=2}. If \code{addDosing} is \code{NA} the classic
+\code{RxODE} EVID events are returned. When \code{addDosing} is \code{TRUE}
+add the event information in NONMEM-style format; If
+\code{subsetNonmem=FALSE} RxODE will also include extra event types
+(\code{EVID}) for ending infusion and modeled times:
+\itemize{
+\item \code{EVID=-1} when the modeled rate infusions are turned
+off (matches \code{rate=-1})
+\item \code{EVID=-2} When the modeled duration infusions are
+turned off (matches \code{rate=-2})
+\item \code{EVID=-10} When the specified \code{rate} infusions are
+turned off (matches \code{rate>0})
+\item \code{EVID=-20} When the specified \code{dur} infusions are
+turned off (matches \code{dur>0})
+\item \verb{EVID=101,102,103,...} Modeled time where 101 is the
+first model time, 102 is the second etc.
+}}
+
+\item{subsetNonmem}{subset to NONMEM compatible EVIDs only.  By
+default \code{TRUE}.}
+
+\item{cores}{Number of cores used in parallel ODE solving.  This
+is equivalent to calling \code{\link[RxODE:getRxThreads]{setRxThreads()}}}
 }
 \value{
 A list of table options for nlmixr
