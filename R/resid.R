@@ -365,7 +365,7 @@ addNpde <- function(object, updateObject = TRUE,
   .new
 }
 
-addTable <- function(object, updateObject = FALSE, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
+addTable <- function(object, updateObject = FALSE, data=object$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(object),
                      table=tableControl(), keep=NULL, drop=NULL,
                      envir = parent.frame(1)) {
   .pt <- proc.time()
