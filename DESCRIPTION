@@ -44,6 +44,7 @@ Suggests:
     tibble,
     checkmate,
     cli,
+    qs,
     covr,
     forecast,
     latticeExtra

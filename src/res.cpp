@@ -65,8 +65,14 @@ List getDfIdentifierCols(List &ipred, int &npred) {
   return ret;
 }
 
-static inline List dfProtectedNames(List in, std::string what) {
-  CharacterVector nm = in.names();
+static inline SEXP dfProtectedNames(SEXP inS, std::string what) {
+  if (TYPEOF(inS) != VECSXP) return R_NilValue;
+  SEXP nmS = PROTECT(Rf_getAttrib(inS, R_NamesSymbol));
+  if (Rf_isNull(nmS)) {
+    UNPROTECT(1);
+    return R_NilValue;
+  }
+  CharacterVector nm = as<CharacterVector>(nmS);
   const char *badNames[28] = {"IPRED", "IRES", "IWRES", "CENS", "LIMIT",
 			      "lowerLim", "upperLim","PRED", "RES", "CPRED",
 			      "CRES", "CWRES", "EPRED", "ERES", "NPDE",
@@ -83,8 +89,10 @@ static inline List dfProtectedNames(List in, std::string what) {
       }
     }
   }
-  in.names() = nm;
-  return in;
+  //in.names() = nm;
+  Rf_setAttrib(inS, R_NamesSymbol, wrap(nmS));
+  UNPROTECT(1);
+  return inS;
 }
 
 void dfSetStateLhsOps(List& in, List& opt) {
