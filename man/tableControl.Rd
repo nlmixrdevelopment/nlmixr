@@ -30,6 +30,8 @@ regardless of the algorithm used.}
 you supply single subject event tables (created with
 \verb{[eventTable()]})}
 
+\item{ties}{When `TRUE` jitter prediction-discrepancy points to discourage ties in cdf.}
+
 \item{censMethod}{Handle censoring method:
 
  - `"truncated-normal"` Simulates from a truncated normal distribution under the assumption of the model and censoring.
@@ -41,8 +43,13 @@ you supply single subject event tables (created with
 \item{seed}{an object specifying if and how the random number
 generator should be initialized}
 
-\item{eta}{A vector of parameters that will be named \verb{ETA\\[#\\]} and
-added to parameters}
+\item{cholSEtol}{The tolerance for the `RxODE::choleSE` function}
+
+\item{state}{is a Boolean indicating if `state` values will be included (default `TRUE`)}
+
+\item{lhs}{is a Boolean indicating if remaining `lhs` values will be included (default `TRUE`)}
+
+\item{eta}{is a Boolean indicating if `eta` values will be included (default `TRUE`)}
 
 \item{addDosing}{Boolean indicating if the solve should add RxODE
 EVID and related columns.  This will also include dosing

@@ -280,15 +280,11 @@
 #'
 #' @param object nlmixr fit object
 #' @param updateObject Boolean indicating if original object should be updated.  By default this is TRUE.
+#' @param table `tableControl()` list of options
 #' @inheritParams foceiControl
+#' @inheritParams addCwres
 #' @param ... Other ignored parameters.
 #'
-#' @param sim With `.ndpeCalc` the RxODE simulated values to
-#'   calculate `npde`
-#'
-#' @details
-#'
-#' `addNpde` is the user-facing function to add the NPDE
 #'
 #' @return New nlmixr fit object
 #' @author Matthew L. Fidler
@@ -451,6 +447,16 @@ addTable <- function(object, updateObject = FALSE, data=object$dataSav, thetaEta
 ##'  - `"cdf"` Use the cdf-method for censoring with npde and use this for any other residuals (`cwres` etc)
 ##'
 ##'  - `"omit"` omit the residuals for censoring
+##'
+##' @param ties When `TRUE` jitter prediction-discrepancy points to discourage ties in cdf.
+##'
+##' @param cholSEtol The tolerance for the `RxODE::choleSE` function
+##'
+##' @param eta is a Boolean indicating if `eta` values will be included (default `TRUE`)
+##'
+##' @param state is a Boolean indicating if `state` values will be included (default `TRUE`)
+##'
+##' @param lhs is a Boolean indicating if remaining `lhs` values will be included (default `TRUE`)
 ##'
 ##' @inheritParams addNpde
 ##' @inheritParams RxODE::rxSolve

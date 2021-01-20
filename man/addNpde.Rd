@@ -17,19 +17,18 @@ addNpde(
 
 \item{updateObject}{Boolean indicating if original object should be updated.  By default this is TRUE.}
 
+\item{table}{`tableControl()` list of options}
+
 \item{...}{Other ignored parameters.}
 
-\item{sim}{With `.ndpeCalc` the RxODE simulated values to
-calculate `npde`}
+\item{envir}{Environment that should be checked for object to
+update.  By default this is the global environment.}
 }
 \value{
 New nlmixr fit object
 }
 \description{
 NPDE calculation for nlmixr
-}
-\details{
-`addNpde` is the user-facing function to add the NPDE
 }
 \examples{
 

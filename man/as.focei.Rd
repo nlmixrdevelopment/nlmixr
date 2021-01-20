@@ -41,6 +41,8 @@ input dataset, if any records are added to the data LOCF (Last
 Observation Carried forward) imputation is performed.}
 
 \item{drop}{Columns to drop from the output}
+
+\item{table}{`tableControl()` list of options}
 }
 \value{
 A FOCEi fit style object.
