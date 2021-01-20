@@ -47,7 +47,7 @@
 #' @author Matthew Fidler
 #' @noRd
 .foceiSolvePars <- function(fit, model, pars=NULL, returnType="data.frame", keep=NULL, what="pred",
-                            addDosing=FALSE, subsetNonmem=TRUE) {
+                            addDosing=FALSE, subsetNonmem=TRUE, addCov=FALSE) {
   .res <- .foceiSolveWithId(model, pars, fit$dataSav,
                             returnType = returnType,
                             atol = fit$control$atol[1], rtol = fit$control$rtol[1],
@@ -55,7 +55,7 @@
                             hmin = fit$control$hmin, hmax = fit$control$hmax, hini = fit$control$hini,
                             transitAbs = fit$control$transitAbs, maxordn = fit$control$maxordn,
                             maxords = fit$control$maxords, method = fit$control$method,
-                            keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem
+                            keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem, addCov=addCov
                             )
   RxODE::rxSolveFree()
   if (any(is.na(.res$rx_pred_)) && fit$control$method == 2L) {
@@ -66,7 +66,7 @@
                               hmin = fit$control$hmin, hmax = fit$control$hmax / 2, hini = fit$control$hini,
                               transitAbs = fit$control$transitAbs, maxordn = fit$control$maxordn,
                               maxords = fit$control$maxords, method = "lsoda",
-                              keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem)
+                              keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem, addCov=addCov)
     RxODE::rxSolveFree()
     if (any(is.na(.res$rx_pred_))) {
       .res <- .foceiSolveWithId(model, pars, fit$dataSav,
@@ -76,7 +76,7 @@
                                 hmin = fit$control$hmin, hmax = fit$control$hmax / 2, hini = fit$control$hini,
                                 transitAbs = fit$control$transitAbs, maxordn = fit$control$maxordn,
                                 maxords = fit$control$maxords, method = "dop853",
-                                keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem)
+                                keep=keep, addDosing=addDosing, subsetNonmem=subsetNonmem, addCov=addCov)
       RxODE::rxSolveFree()
       if (any(is.na(.res$rx_pred_))) {
         warning("Problems solving ", what, " liblsoda, lsoda and dop853")
@@ -120,14 +120,14 @@
   if (predOnly) .ipredModel <- fit$model$pred.only
   .ret <- list(ipred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$ipred,
                                        returnType="data.frame.TBS", keep=.keep, what="ipred",
-                                       addDosing=addDosing, subsetNonmem=subsetNonmem),
+                                       addDosing=addDosing, subsetNonmem=subsetNonmem, addCov=predOnly),
                pred = .foceiSolvePars(fit, .ipredModel, thetaEtaParameters$pred,returnType="data.frame", what="pred",
                                       addDosing=addDosing, subsetNonmem=subsetNonmem),
                etaLst=thetaEtaParameters$eta.lst)
   if (!predOnly) {
     .ret <- c(.ret, list(pred.only=.foceiSolvePars(fit, fit$model$pred.only, thetaEtaParameters$ipred,
                                    returnType="data.frame", keep=.keep, what="ebe",
-                                   addDosing=addDosing, subsetNonmem=subsetNonmem)))
+                                   addDosing=addDosing, subsetNonmem=subsetNonmem, addCov=TRUE)))
   }
   .ret
 }
@@ -143,6 +143,7 @@
   }
   .ret
 }
+
 
 .calcCwres0 <- function(fit, data=fit$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(fit),
                         table=tableControl(), dv=NULL, predOnly=FALSE,
@@ -163,11 +164,15 @@
     if (predOnly){
       .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
             fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-            .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$ipred), fit$model$pred.only$state, table)
+            .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$ipred), c(fit$model$pred.only$state,
+                                                                              fit$model$pred.only$stateExtra),
+            setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt")), table)
     } else {
       .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
             fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-            .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$pred.only), fit$model$pred.only$state, table)
+            .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$pred.only), c(fit$model$pred.only$state,
+                                                                                  fit$model$pred.only$stateExtra),
+            setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt")), table)
     }
   }
 }
@@ -221,7 +226,9 @@
     table$doSim <- FALSE
   }
   .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit,
-        .getRelevantLhs(fit, keep, .ipred), fit$model$pred.only$state,
+        .getRelevantLhs(fit, keep, .ipred), c(fit$model$pred.only$state,
+                                              fit$model$pred.only$stateExtra),
+        setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt")),
         table)
 }
 
@@ -361,6 +368,58 @@ addNpde <- function(object, updateObject = TRUE,
   .new
 }
 
+#' Add table information to nlmixr fit object without tables
+#'
+#' @param object nlmixr family of objects
+#' @param updateObject Update the object (default FALSE)
+#' @param data Saved data from
+#' @param thetaEtaParameters Intenral theta/eta parameters
+#' @param table a `tableControl()` list of options
+#' @param keep Character Vector of items to keep
+#' @param drop Character Vector of items to drop or NULL
+#' @param envir ENvironment to search for updating
+#' @return Fit with table information attached
+#' @author Matthew Fidler
+#' @export
+#' @examples
+#'
+#' \donttest{
+#'
+#' one.cmt <- function() {
+#'   ini({
+#'     ## You may label each parameter with a comment
+#'     tka <- 0.45 # Log Ka
+#'     tcl <- log(c(0, 2.7, 100)) # Log Cl
+#'     ## This works with interactive models
+#'     ## You may also label the preceding line with label("label text")
+#'     tv <- 3.45; label("log V")
+#'     ## the label("Label name") works with all models
+#'     eta.ka ~ 0.6
+#'     eta.cl ~ 0.3
+#'     eta.v ~ 0.1
+#'     add.sd <- 0.7
+#'   })
+#'   model({
+#'     ka <- exp(tka + eta.ka)
+#'     cl <- exp(tcl + eta.cl)
+#'     v <- exp(tv + eta.v)
+#'     linCmt() ~ add(add.sd)
+#'   })
+#' }
+#'
+#' # run without tables step
+#' f <- nlmixr(one.cmt, theo_sd, "saem", control=list(calcTables=FALSE))
+#'
+#' print(f)
+#'
+#' # Now add the tables
+#'
+#' f <- addTable(f)
+#'
+#' print(f)
+#'
+#' }
+
 addTable <- function(object, updateObject = FALSE, data=object$dataSav, thetaEtaParameters=.foceiThetaEtaParameters(object),
                      table=tableControl(), keep=NULL, drop=NULL,
                      envir = parent.frame(1)) {
@@ -399,6 +458,9 @@ addTable <- function(object, updateObject = FALSE, data=object$dataSav, thetaEta
     .df <- tibble::as_tibble(.df)
   }
   .cls <- class(.df)
+  if (!any(names(.control) == "interaction")) {
+    .control$interaction <- FALSE
+  }
   if (.control$interaction) {
     .cls <- c(paste0("nlmixr", .fit$method, "i"), "nlmixrFitData", "nlmixrFitCore", .cls)
   } else {
@@ -458,6 +520,8 @@ addTable <- function(object, updateObject = FALSE, data=object$dataSav, thetaEta
 ##'
 ##' @param lhs is a Boolean indicating if remaining `lhs` values will be included (default `TRUE`)
 ##'
+##' @param covariates is a Boolean indicating if covariates will be included (default `TRUE`)
+##'
 ##' @inheritParams addNpde
 ##' @inheritParams RxODE::rxSolve
 ##'
@@ -479,6 +543,7 @@ tableControl <- function(npde = NULL,
                          state=TRUE,
                          lhs=TRUE,
                          eta=TRUE,
+                         covariates=TRUE,
                          addDosing=FALSE, subsetNonmem = TRUE,
                          cores=NULL) {
   if (is.null(cores)) {
@@ -487,7 +552,7 @@ tableControl <- function(npde = NULL,
   .ret <- list(
     npde = npde, cwres = cwres, nsim = nsim, ties = ties, seed = seed,
     censMethod=setNames(c("truncated-normal"=3L, "cdf"=2L, "omit"=1L, "pred"=5L, "ipred"=4L, "epred"=6L)[match.arg(censMethod)], NULL),
-    cholSEtol=cholSEtol, state=state, lhs=lhs, eta=eta, addDosing=addDosing, subsetNonmem=subsetNonmem, cores=cores)
+    cholSEtol=cholSEtol, state=state, lhs=lhs, eta=eta, covariates=covariates, addDosing=addDosing, subsetNonmem=subsetNonmem, cores=cores)
   class(.ret) <- "tableControl"
   return(.ret)
 }

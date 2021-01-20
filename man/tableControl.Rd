@@ -15,6 +15,7 @@ tableControl(
   state = TRUE,
   lhs = TRUE,
   eta = TRUE,
+  covariates = TRUE,
   addDosing = FALSE,
   subsetNonmem = TRUE,
   cores = NULL
@@ -50,6 +51,8 @@ generator should be initialized}
 \item{lhs}{is a Boolean indicating if remaining `lhs` values will be included (default `TRUE`)}
 
 \item{eta}{is a Boolean indicating if `eta` values will be included (default `TRUE`)}
+
+\item{covariates}{is a Boolean indicating if covariates will be included (default `TRUE`)}
 
 \item{addDosing}{Boolean indicating if the solve should add RxODE
 EVID and related columns.  This will also include dosing

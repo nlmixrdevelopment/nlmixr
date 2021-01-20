@@ -12,7 +12,7 @@ int getPredIndex(List &ipredL);
 
 void getLimitFromInput(SEXP limitIn, int& ncalc, arma::vec& limit, int &hasLimit);
 
-List getDfIdentifierCols(List &ipred, int &npred);
+List getDfIdentifierCols(List &ipred, int &npred, SEXP cmtNames);
 
 void dfSetStateLhsOps(List& in, List& opt);
 
@@ -20,7 +20,7 @@ extern "C" {
 #endif
   SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 		       SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-		       SEXP relevantLHSSEXP, SEXP stateSXP, 
+		       SEXP relevantLHSSEXP, SEXP stateSXP, SEXP covSXP,
 		       SEXP resOpt);
 
   SEXP _nlmixr_popResFinal(SEXP inList);

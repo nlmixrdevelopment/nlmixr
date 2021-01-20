@@ -11,7 +11,7 @@ extern "C" {
 #endif
   SEXP _nlmixr_cwresCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 			 SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-			 SEXP relevantLHSSEXP, SEXP stateSXP, SEXP cwresOpt);
+			 SEXP relevantLHSSEXP, SEXP stateSXP, SEXP covSXP, SEXP cwresOpt);
   
 #if defined(__cplusplus)
 }

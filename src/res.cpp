@@ -51,17 +51,31 @@ void getLimitFromInput(SEXP limitIn, int& ncalc, arma::vec& limit, int &hasLimit
   }
 }
 
-List getDfIdentifierCols(List &ipred, int &npred) {
-  List ret(npred);
-  CharacterVector nm(npred);
+List getDfIdentifierCols(List &ipred, int &npred, SEXP cmtNames) {
+  SEXP cmtVar = PROTECT(getDfSubsetVars(ipred,wrap(CharacterVector::create("CMT","cmt","Cmt"))));
+  int extra = 0;
+  IntegerVector cmt;
+  if (TYPEOF(cmtVar) == VECSXP) {
+    extra  = 1;
+    cmt = as<IntegerVector>(VECTOR_ELT(cmtVar, 0));
+    cmt.attr("class") = "factor";
+    cmt.attr("levels") = cmtNames;
+  }
+  List ret(npred+extra);
+  CharacterVector nm(npred+extra);
   CharacterVector nmIn = ipred.names();
   for (int i = 0; i < npred; ++i) {
     nm[i] = boost::to_upper_copy<std::string>(as<std::string>(nmIn[i]));
     ret[i] = ipred[i];
   }
+  if (extra) {
+    nm[npred] = "CMT";
+    ret[npred] = cmt;
+  }
   ret.names()=nm;
   ret.attr("row.names") = ipred.attr("row.names");
   ret.attr("class") = "data.frame";
+  UNPROTECT(1);
   return ret;
 }
 
@@ -117,6 +131,13 @@ void dfSetStateLhsOps(List& in, List& opt) {
       doEtas = as<bool>(tmp);
     }
   }
+  bool doCov = true;
+  if (opt.containsElementNamed("covariates")) {
+    RObject tmp = opt["covariates"];
+    if (TYPEOF(tmp) == LGLSXP) {
+      doCov = as<bool>(tmp);
+    }
+  }
   if (!doEtas) {
     in[1] = R_NilValue;
   } else {
@@ -128,15 +149,20 @@ void dfSetStateLhsOps(List& in, List& opt) {
     in[2] = dfProtectedNames(in[2], "state");
   }
   if (!doLhs) {
-    in[2] = R_NilValue;
+    in[3] = R_NilValue;
   } else {
     in[3] = dfProtectedNames(in[3], "lhs");
+  }
+  if (!doCov) {
+    in[4] = R_NilValue;
+  } else {
+    in[4] = dfProtectedNames(in[4], "cov");
   }
 }
 
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-				SEXP relevantLHSSEXP, SEXP stateSXP, 
+				SEXP relevantLHSSEXP,  SEXP stateSXP, SEXP covSEXP,
 				SEXP resOpt) {
 BEGIN_RCPP
   List ipredPredList = as<List>(ipredPredListSEXP);
@@ -276,13 +302,15 @@ BEGIN_RCPP
   retDF.attr("class") = "data.frame";
   calcShrinkFinalize(omegaMat, nid, etaLst, iwres, evid, etaN2, 1);
 
-  List retC = List::create(retDF, etasDfFull, getDfSubsetVars(ipredL, stateSXP),
-			   getDfSubsetVars(ipredL, relevantLHSSEXP));
+  List retC = List::create(retDF, etasDfFull,
+			   getDfSubsetVars(ipredL, stateSXP),
+			   getDfSubsetVars(ipredL, relevantLHSSEXP),
+			   getDfSubsetVars(ipredL, covSEXP));
   dfSetStateLhsOps(retC, opt);
   retC = dfCbindList(wrap(retC));
   List ret(4);
   ret[0] = wrap(dv);
-  ret[1] = getDfIdentifierCols(ipredL, npred);
+  ret[1] = getDfIdentifierCols(ipredL, npred, stateSXP);
   ret[2] = retC;
   ret[3] = etaLst;
   return wrap(ret);
