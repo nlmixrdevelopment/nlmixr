@@ -103,7 +103,7 @@
                                 addDosing=FALSE, subsetNonmem=TRUE) {
   if (!predOnly & is.null(fit$model$inner)) {
     # Add inner problem calculation for cwres calculation
-    assign(fit$uif$inner, "model", envir=fit$env)
+    assign("model", fit$uif$inner, envir=fit$env)
     if (is.null(fit$model$inner)) {
       stop("problem calculating focei's inner ODEs", call.=FALSE) # nocov
     }
@@ -190,8 +190,8 @@
   .calcCwres(..., predOnly=predOnly)
 }
 
-.calcNpde <- function(..., npde=TRUE) {
-  .calcCwres(..., npde=npde)
+.calcNpde <- function(..., npde=TRUE, predOnly=TRUE) {
+  .calcCwres(..., npde=npde, predOnly=predOnly)
 }
 
 .calcIres <- function(fit, data=fit$dataSav, table=tableControl(), dv=NULL,
