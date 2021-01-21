@@ -174,7 +174,7 @@
       .params <- setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt", .state, .lhs))
       .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
             fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-            .prdLst$ipred$limit, .lhs, .state., .params, table)
+            .prdLst$ipred$limit, .lhs, .state, .params, table)
     }
   }
 }
