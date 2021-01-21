@@ -162,17 +162,19 @@
           .prdLst$ipred$cens, .prdLst$ipred$limit, table)
   } else {
     if (predOnly){
+      .lhs <- unique(.getRelevantLhs(fit, keep, .prdLst$ipred))
+      .state <- setdiff(unique(c(fit$model$ipred$state, fit$model$ipred$stateExtra)), .lhs)
+      .params <- setdiff(intersect(names(fit$dataSav),fit$model$ipred$params),c("CMT","cmt","Cmt", .state, .lhs))
       .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
             fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-            .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$ipred), c(fit$model$pred.only$state,
-                                                                              fit$model$pred.only$stateExtra),
-            setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt")), table)
+            .prdLst$ipred$limit, .lhs, .state, .params, table)
     } else {
+      .lhs <- unique(.getRelevantLhs(fit, keep, .prdLst$pred.only))
+      .state <- setdiff(unique(c(fit$model$pred.only$state, fit$model$pred.only$stateExtra)), .lhs)
+      .params <- setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt", .state, .lhs))
       .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
             fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-            .prdLst$ipred$limit, .getRelevantLhs(fit, keep, .prdLst$pred.only), c(fit$model$pred.only$state,
-                                                                                  fit$model$pred.only$stateExtra),
-            setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt")), table)
+            .prdLst$ipred$limit, .lhs, .state., .params, table)
     }
   }
 }
@@ -187,8 +189,14 @@
                                    addDosing=addDosing, subsetNonmem=subsetNonmem)
   }
   ## Split out so that .prdLst can be shared between npde/cwres npde/res
-  .calcCwres0(fit, data, thetaEtaParameters, table, dv=dv, predOnly,
-              addDosing, subsetNonmem, keep, npde, .prdLst=.prdLst)
+  .ret <- .calcCwres0(fit, data, thetaEtaParameters, table, dv=dv, predOnly,
+                      addDosing, subsetNonmem, keep, npde, .prdLst=.prdLst)
+  .dups <- which(duplicated(names(.ret)))
+  if (length(.dups) > 0) {
+    warning("some duplicate columns were dropped", call.=FALSE)
+    .ret <- .ret[, -.dups]
+  }
+  .ret
 }
 
 .calcRes <- function(..., predOnly=TRUE) {
@@ -225,11 +233,11 @@
   } else {
     table$doSim <- FALSE
   }
+  .lhs <- unique(.getRelevantLhs(fit, keep, .ipred))
+  .state <- setdiff(unique(c(.ipred$state, .ipred$stateExtra)), .lhs)
+  .params <- setdiff(intersect(names(fit$dataSav),.ipred$params),c("CMT","cmt","Cmt", .state, .lhs))
   .ret <- .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit,
-                .getRelevantLhs(fit, keep, .ipred), c(fit$model$pred.only$state,
-                                                      fit$model$pred.only$stateExtra),
-                setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt")),
-                table)
+                .lhs, .state, .params, table)
   .dups <- which(duplicated(names(.ret)))
   if (length(.dups) > 0) {
     warning("some duplicate columns were dropped", call.=FALSE)
