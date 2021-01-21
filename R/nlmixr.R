@@ -329,6 +329,12 @@ nlmixr_fit0FixDat <- function(x, IDLabel, origData) {
   .env$uif <- .uif
   .env$ranef <- .ranef
   .predDf <- .uif$predDf
+  if (any(.predDf$cond != "") & any(names(x) == "CMT")) {
+    .cls <- class(x)
+    class(x) <- "data.frame"
+    x$CMT <- factor(x$CMT, levels = .predDf$cmt, labels = .predDf$cond)
+    class(x) <- .cls
+  }
   return(x)
 }
 

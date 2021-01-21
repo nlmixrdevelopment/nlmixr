@@ -58,8 +58,6 @@ List getDfIdentifierCols(List &ipred, int &npred, SEXP cmtNames) {
   if (TYPEOF(cmtVar) == VECSXP) {
     extra  = 1;
     cmt = as<IntegerVector>(VECTOR_ELT(cmtVar, 0));
-    cmt.attr("class") = "factor";
-    cmt.attr("levels") = cmtNames;
   }
   List ret(npred+extra);
   CharacterVector nm(npred+extra);
