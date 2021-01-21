@@ -225,11 +225,17 @@
   } else {
     table$doSim <- FALSE
   }
-  .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit,
-        .getRelevantLhs(fit, keep, .ipred), c(fit$model$pred.only$state,
-                                              fit$model$pred.only$stateExtra),
-        setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt")),
-        table)
+  .ret <- .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit,
+                .getRelevantLhs(fit, keep, .ipred), c(fit$model$pred.only$state,
+                                                      fit$model$pred.only$stateExtra),
+                setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt")),
+                table)
+  .dups <- which(duplicated(names(.ret)))
+  if (length(.dups) > 0) {
+    warning("some duplicate columns were dropped", call.=FALSE)
+    .ret <- .ret[, -.dups]
+  }
+  .ret
 }
 
 .calcShrinkOnly <- function(fit, thetaEtaParameters=.foceiThetaEtaParameters(fit)) {
@@ -272,7 +278,13 @@
     .ret[[2]] <- .calcCwres(fit, data=fit$dataSav, thetaEtaParameters=.thetaEtaParameters, table=table, dv=.ret[[1]][[1]],
                             predOnly=.predOnly, addDosing=table$addDosing, subsetNonmem=table$subsetNonmem,
                             keep=keep, .prdLst=.prdLst, npde=.npde2)
-  .Call(`_nlmixr_popResFinal`, .ret)
+  .ret <- .Call(`_nlmixr_popResFinal`, .ret)
+  .dups <- which(duplicated(names(.ret)))
+  if (length(.dups) > 0) {
+    warning("some duplicate columns were dropped", call.=FALSE)
+    .ret <- .ret[, -.dups]
+  }
+  .ret
 }
 
 .cloneEnv <- function(env) {
