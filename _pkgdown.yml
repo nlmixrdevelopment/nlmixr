@@ -8,6 +8,7 @@ reference:
 - title: Adding residuals & covariance to fit object
   contents:
   - '`addCwres`'
+  - '`addTable`'
   - '`addNpde`'
   - '`getVarCov`'
 - title: Model diagnostics
@@ -84,7 +85,6 @@ reference:
   - '`calcCov`'
   - '`cholSE`'
   - '`configsaem`'
-  - '`coxBox`'
   - '`focei.eta`'
   - '`focei.theta`'
   - '`frwd_selection`'
@@ -95,7 +95,6 @@ reference:
   - '`instant.stan.extension`'
   - '`invgaussian`'
   - '`lin_cmt`'
-  - '`lincmt`'
   - '`metabolite`'
   - '`model`'
   - '`nlme_gof`'
@@ -155,7 +154,6 @@ reference:
   - '`print.nlmixrUI`'
   - '`print.saemFit`'
   - '`residuals.nlmixrFitData`'
-  - '`saem.cleanup`'
   - '`setCov`'
   - '`setOfv`'
   - '`sqrtm`'
