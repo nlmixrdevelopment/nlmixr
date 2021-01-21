@@ -112,6 +112,28 @@ nlmixrTest({
     expect_true(all(!is.na(tab4$CMT)))
     expect_true(inherits(tab4$CMT, "factor"))
 
+    df <- data.frame(
+      ID = 123,
+      MDV = c(0,1,0),
+      CMT = c(2,1,1),
+      DV = c(9,NA,15),
+      AMT = c(NA,15,NA),
+      RATE = c(NA,0,NA),
+      ADDL = c(NA,1,NA),
+      II = c(NA,NA,NA),
+      TIME = c(0,0,1),
+      PCA = c(NA,NA,32),
+      WT = c(NA,NA,2),
+      CRPZERO = 5
+    )
+
+    expect_error(nlmixr( object = f, data = df, est='focei',
+      control = foceiControl(
+        covMethod="r,s",
+        interaction = TRUE,
+        maxOuterIterations = 0,
+        iter.max=0, calcTables=FALSE)))
+
   })
 
 },

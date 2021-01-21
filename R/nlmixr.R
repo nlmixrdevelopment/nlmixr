@@ -1142,8 +1142,14 @@ nlmixrEst.focei <- function(env, ...) {
       .mod <- uif$rxode.pred
       .pars <- uif$theta.pars
     }
+    .FoceiInits <- uif$focei.inits
+    if (.nid == 1) {
+      if (length(.FoceiInits$OMGA) > 0) {
+        stop("a mixed effect model requires more than one subject/id", call.=FALSE)
+      }
+    }
     fit <- foceiFit(dat,
-                    inits = uif$focei.inits,
+                    inits = .FoceiInits,
                     PKpars = .pars,
                     ## par_trans=fun,
                     model = .mod,
