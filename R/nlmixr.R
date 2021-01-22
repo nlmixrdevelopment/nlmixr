@@ -284,33 +284,14 @@ nlmixrData.default <- function(data, model = NULL) {
   return(dat)
 }
 
-#' Correct data structure with IDs having original labels re-assigned
+#' Update model to have final parameter estimates for piping and save orig data
 #'
 #' @param x Data to fix
 #' @param IDLabel Original ID labels
-#' @return Corrected data structure
+#' @return Updated model
 #' @noRd
-nlmixr_fit0FixDat <- function(x, IDLabel, origData) {
-  ## .cls <- class(x)
-  ## class(x) <- "data.frame"
-  ## don't use factor(as.integer(x$ID), labels=IDLabel) because the
-  ## number of labels may not match the number of IDs
-  ## x$ID <- as.integer(x$ID)
-  ## attr(x$ID, "levels") <- IDLabel
-  ## class(x$ID) <- "factor"
-  ## class(x) <- .cls
-  ## .etaO <- x$etaObf
-  ## .etaO$ID <- as.integer(.etaO$ID)
-  ## attr(.etaO$ID, "levels") <- IDLabel
-  ## class(.etaO$ID) <- "factor"
-  ## .eta <- x$eta
-  ## .eta$ID <- as.integer(.eta$ID)
-  ## attr(.eta$ID, "levels") <- IDLabel
-  ## class(.eta$ID) <- "factor"
-  ## .ranef <- x$ranef
-  ## .ranef$ID <- as.integer(.ranef$ID)
-  ## attr(.ranef$ID, "levels") <- IDLabel
-  ## class(.ranef$ID) <- "factor"
+nlmixrFitUpdateParams <- function(x, IDLabel, origData) {
+  # Update initial estimates to match current initial estimates
   .uif <- x$uif
   .thetas <- x$theta
   for (.n in names(.thetas)) {
@@ -324,10 +305,6 @@ nlmixr_fit0FixDat <- function(x, IDLabel, origData) {
   }
   .env <- x$env
   .env$origData <- origData
-  ## .env$uif <- .uif
-  ## .env$ranef <- .ranef
-  ## .predDf <- .uif$predDf
-
   return(x)
 }
 
@@ -847,8 +824,8 @@ nlmixrEst.saem <- function(env, ...) {
       warning("Error converting to nlmixr UI object, returning saem object")
       return(.fit)
     }
-    if (inherits(.ret, "nlmixrFitData")) {
-      .ret <- nlmixr_fit0FixDat(.ret, IDLabel = .lab, origData = .origData)
+    if (inherits(.ret, "nlmixrFitCore")) {
+      .ret <- nlmixrFitUpdateParams(.ret, origData = .origData)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -951,8 +928,8 @@ nlmixrEst.nlme <- function(env, ...) {
       warning("Error converting to nlmixr UI object, returning nlme object")
       return(fit)
     }
-    if (inherits(.ret, "nlmixrFitData")) {
-      .ret <- nlmixr_fit0FixDat(.ret, IDLabel = .lab, origData = .origData)
+    if (inherits(.ret, "nlmixrFitCore")) {
+      .ret <- nlmixrFitUpdateParams(.ret, origData = .origData)
     }
     if (inherits(.ret, "nlmixrFitCore")) {
       .env <- .ret$env
@@ -1110,7 +1087,7 @@ nlmixrEst.posthoc <- function(env, ...) {
         setOfv(env, "fo")
       }
     }
-    fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
+    fit <- nlmixrFitUpdateParams(fit, origData = .origData)
     assign("start.time", start.time, env)
     assign("est", est, env)
     assign("stop.time", Sys.time(), env)
@@ -1258,7 +1235,7 @@ nlmixrEst.focei <- function(env, ...) {
         setOfv(env, "fo")
       }
     }
-    fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
+    fit <- nlmixrFitUpdateParams(fit, origData = .origData)
     assign("start.time", start.time, env)
     assign("est", est, env)
     assign("stop.time", Sys.time(), env)
@@ -1326,7 +1303,7 @@ nlmixrEst.posthoc <- function(env, ...){
       class(fit) <- .cls
     }
     assign("uif", .syncUif(fit, fit$popDf, fit$omega), fit$env)
-    fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
+    fit <- nlmixrFitUpdateParams(fit, origData = .origData)
     assign("origControl", control, fit$env)
     assign("modelId", .modelId, fit$env)
     return(fit)
@@ -1374,7 +1351,7 @@ nlmixrEst.dynmodel <- function(env, ...) {
       )
     .env <- fit$env
     assign("origData", .origData, .env)
-    fit <- nlmixr_fit0FixDat(fit, IDLabel = .lab, origData = .origData)
+    fit <- nlmixrFitUpdateParams(fit, origData = .origData)
     return(fit)
   })
 }
