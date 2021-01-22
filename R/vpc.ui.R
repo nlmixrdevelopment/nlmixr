@@ -182,12 +182,16 @@ vpc_ui <- function(fit, data = NULL, n = 100, bins = "jenks",
     dat <- dat[dat$evid == 0, ]
     if (any(names(sim) == "cmt") && any(names(fit) == "CMT")) {
       if (is(fit$CMT, "factor")) {
-        sim$cmt <- factor(sim$cmt, sort(unique(sim$cmt)), labels = levels(fit$CMT))
+        sim$cmt <- as.integer(sim$cmt)
+        attr(sim$cmt, "levels") <- levels(fit$CMT)
+        class(sim$cmt) <- "factor"
       }
     }
     if (any(names(dat) == "cmt") && any(names(fit) == "CMT")) {
       if (is(fit$CMT, "factor")) {
-        dat$cmt <- factor(dat$cmt, sort(unique(dat$cmt)), labels = levels(fit$CMT))
+        dat$cmt <- as.integer(dat$cmt)
+        attr(dat$cmt, "levels") <- levels(fit$CMT)
+        class(dat$cmt) <- "factor"
       }
     }
     sim <- list(rxsim = sim0, sim = .as.data.frame(sim), obs = dat)
