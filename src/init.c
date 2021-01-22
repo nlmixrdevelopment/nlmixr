@@ -47,10 +47,8 @@ SEXP _nlmixr_likInner(SEXP, SEXP);
 SEXP _nlmixr_cholSE_(SEXP, SEXP);
 SEXP _nlmixr_foceiLik(SEXP);
 SEXP _nlmixr_foceiOfv(SEXP);
-SEXP _nlmixr_foceiEtas();
 SEXP _nlmixr_foceiLik(SEXP);
 SEXP _nlmixr_foceiOfv(SEXP);
-SEXP _nlmixr_foceiEtas();
 SEXP _nlmixr_foceiNumericGrad(SEXP);
 
 SEXP _nlmixr_foceiSetup_(SEXP, SEXP, SEXP, SEXP, SEXP,
@@ -115,7 +113,6 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_likInner", (DL_FUNC) &_nlmixr_likInner, 2},
   {"_nlmixr_foceiLik", (DL_FUNC) &_nlmixr_foceiLik, 1},
   {"_nlmixr_foceiOfv", (DL_FUNC) &_nlmixr_foceiOfv, 1},
-  {"_nlmixr_foceiEtas", (DL_FUNC) &_nlmixr_foceiEtas, 0},
   {"_nlmixr_foceiNumericGrad", (DL_FUNC) &_nlmixr_foceiNumericGrad, 1},
   {"_nlmixr_foceiSetup_", (DL_FUNC) &_nlmixr_foceiSetup_, 10},
   {"_nlmixr_foceiOuterF", (DL_FUNC) &_nlmixr_foceiOuterF, 1},
@@ -142,9 +139,9 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_powerL", (DL_FUNC) &_nlmixr_powerL, 5},
   {"_saemResidF", (DL_FUNC) &_saemResidF, 1},
   {"_nlmixr_npdeCalc", (DL_FUNC) &_nlmixr_npdeCalc, 6},
-  {"_nlmixr_cwresCalc",  (DL_FUNC) &_nlmixr_cwresCalc, 11},
-  {"_nlmixr_resCalc",  (DL_FUNC) &_nlmixr_resCalc, 11},
-  {"_nlmixr_iresCalc", (DL_FUNC) &_nlmixr_iresCalc, 9},
+  {"_nlmixr_cwresCalc",  (DL_FUNC) &_nlmixr_cwresCalc, 12},
+  {"_nlmixr_resCalc",  (DL_FUNC) &_nlmixr_resCalc, 12},
+  {"_nlmixr_iresCalc", (DL_FUNC) &_nlmixr_iresCalc, 10},
   {"_nlmixr_calcShrinkOnly", (DL_FUNC) &_nlmixr_calcShrinkOnly, 3},
   {"_nlmixr_popResFinal", (DL_FUNC) &_nlmixr_popResFinal, 1},
   {NULL, NULL, 0}

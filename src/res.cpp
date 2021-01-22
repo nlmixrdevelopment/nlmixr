@@ -51,7 +51,7 @@ void getLimitFromInput(SEXP limitIn, int& ncalc, arma::vec& limit, int &hasLimit
   }
 }
 
-List getDfIdentifierCols(List &ipred, int &npred, SEXP cmtNames) {
+List getDfIdentifierCols(List &ipred, int &npred, SEXP cmtNames, SEXP idLabels) {
   SEXP cmtVar = PROTECT(getDfSubsetVars(ipred,wrap(CharacterVector::create("CMT","cmt","Cmt"))));
   int extra = 0;
   IntegerVector cmt;
@@ -71,6 +71,14 @@ List getDfIdentifierCols(List &ipred, int &npred, SEXP cmtNames) {
   if (extra) {
     nm[npred] = "CMT";
     ret[npred] = cmt;
+  }
+  if (TYPEOF(idLabels) == STRSXP) {
+    RObject tmp = ret[0];
+    if (tmp.sexp_type() == INTSXP) {
+      tmp.attr("levels") = idLabels;
+      tmp.attr("class") = "factor";
+      ret[0] = tmp;
+    }
   }
   ret.names()=nm;
   ret.attr("row.names") = ipred.attr("row.names");
@@ -162,7 +170,7 @@ void dfSetStateLhsOps(List& in, List& opt) {
 
 extern "C" SEXP _nlmixr_resCalc(SEXP ipredPredListSEXP, SEXP omegaMatSEXP,
 				SEXP etasDfSEXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-				SEXP relevantLHSSEXP,  SEXP stateSXP, SEXP covSEXP,
+				SEXP relevantLHSSEXP,  SEXP stateSXP, SEXP covSEXP, SEXP IDlabelSEXP,
 				SEXP resOpt) {
 BEGIN_RCPP
   List ipredPredList = as<List>(ipredPredListSEXP);
@@ -310,7 +318,7 @@ BEGIN_RCPP
   retC = dfCbindList(wrap(retC));
   List ret(4);
   ret[0] = wrap(dv);
-  ret[1] = getDfIdentifierCols(ipredL, npred, stateSXP);
+  ret[1] = getDfIdentifierCols(ipredL, npred, stateSXP, IDlabelSEXP);
   ret[2] = retC;
   ret[3] = etaLst;
   return wrap(ret);

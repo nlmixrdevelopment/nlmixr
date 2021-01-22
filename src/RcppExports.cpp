@@ -85,16 +85,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// foceiEtas
-SEXP foceiEtas();
-RcppExport SEXP _nlmixr_foceiEtas() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(foceiEtas());
-    return rcpp_result_gen;
-END_RCPP
-}
 // foceiNumericGrad
 NumericVector foceiNumericGrad(NumericVector theta);
 RcppExport SEXP _nlmixr_foceiNumericGrad(SEXP thetaSEXP) {

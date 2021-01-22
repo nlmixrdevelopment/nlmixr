@@ -33,10 +33,6 @@ foceiOfv <- function(theta) {
     .Call(`_nlmixr_foceiOfv`, theta)
 }
 
-foceiEtas <- function() {
-    .Call(`_nlmixr_foceiEtas`)
-}
-
 foceiNumericGrad <- function(theta) {
     .Call(`_nlmixr_foceiNumericGrad`, theta)
 }

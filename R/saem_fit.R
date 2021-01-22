@@ -895,7 +895,8 @@ focei.eta.saemFit <- function(object, uif, ...) {
 as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid = TRUE, obf = NULL,
                              nnodes.gq = 1, nsd.gq = 3, adjObf = TRUE,
                              calcCov = TRUE, covMethod = NULL,
-                             calcCovTime = NULL, calcTables = TRUE, keep=NULL, drop=NULL, table=tableControl()) {
+                             calcCovTime = NULL, calcTables = TRUE, keep=NULL, drop=NULL, table=tableControl(),
+                             IDlabel=NULL) {
   if (is.null(calcResid)) calcResid <- FALSE
   .saemCfg <- attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt
@@ -1097,6 +1098,7 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
   while (.notCalced) {
     .env <- new.env(parent = emptyenv())
     .env$table <- table
+    .env$IDlabel <- IDlabel
     .env$nobs2 <- .saemCfg$nobs
     .env$nnodes.gq <- nnodes.gq
     .env$nsd.gq <- nsd.gq

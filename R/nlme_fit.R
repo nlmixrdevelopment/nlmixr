@@ -859,6 +859,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcRe
   while (.notCalced) {
     env <- new.env(parent = emptyenv())
     env$table <- table
+    env$IDlabel <- IDlabel
     env$nobs2 <- nobs2
     env$covMethod <- "nlme"
     env$method <- "nlme"

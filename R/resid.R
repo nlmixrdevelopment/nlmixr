@@ -167,14 +167,14 @@
       .params <- setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt", .state, .lhs))
       .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
             fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-            .prdLst$ipred$limit, .lhs, .state, .params, table)
+            .prdLst$ipred$limit, .lhs, .state, .params, fit$IDlabel, table)
     } else {
       .state <- c(fit$model$pred.only$state, fit$model$pred.only$stateExtra)
       .lhs <- setdiff(unique(.getRelevantLhs(fit, keep, .prdLst$pred.only)), .state)
       .params <- setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt", .state, .lhs))
       .Call(`_nlmixr_cwresCalc`, .prdLst, fit$omega,
             fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
-            .prdLst$ipred$limit, .lhs, .state, .params, table)
+            .prdLst$ipred$limit, .lhs, .state, .params, fit$IDlabel, table)
     }
   }
 }
@@ -237,7 +237,7 @@
   .lhs <- setdiff(unique(.getRelevantLhs(fit, keep, .ipred)), .state)
   .params <- setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt", .state, .lhs))
   .ret <- .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit,
-                .lhs, .state, .params, table)
+                .lhs, .state, .params, fit$IDlabel, table)
   .dups <- which(duplicated(names(.ret)))
   if (length(.dups) > 0) {
     warning("some duplicate columns were dropped", call.=FALSE)

@@ -1,7 +1,7 @@
 #include "ires.h"
 
 extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDfLstSXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,
-				 SEXP relevantLHSSEXP, SEXP stateSXP, SEXP covSXP,
+				 SEXP relevantLHSSEXP, SEXP stateSXP, SEXP covSXP, SEXP IDlabelSEXP,
 				 SEXP iresOpt) {
 BEGIN_RCPP
 
@@ -111,7 +111,7 @@ BEGIN_RCPP
   dfSetStateLhsOps(retC, opt);
   retC = dfCbindList(wrap(retC));
   List ret(3);
-  ret[0] = getDfIdentifierCols(ipredL, npred, stateSXP);
+  ret[0] = getDfIdentifierCols(ipredL, npred, stateSXP, IDlabelSEXP);
   ret[1] = List::create(_["DV"]=wrap(dv));
   ret[2] = retC;
   return dfCbindList(wrap(ret));

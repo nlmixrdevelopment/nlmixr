@@ -1878,8 +1878,7 @@ double foceiOfv(NumericVector theta){
   return foceiOfv0(&theta[0]);
 }
 
-//[[Rcpp::export]]
-SEXP foceiEtas() {
+SEXP foceiEtas(Environment e) {
   if (op_focei.neta==0) return R_NilValue;
   List ret(op_focei.neta+2);
   CharacterVector nm(op_focei.neta+2);
@@ -1900,6 +1899,13 @@ SEXP foceiEtas() {
       tmp = ret[eta+1];
       // Save eta is what the ETAs are saved
       tmp[j] = fInd->saveEta[eta];
+    }
+  }
+  if (e.exists("IDlabel")) {
+    RObject idl = e["IDlabel"];
+    if (idl.sexp_type() == STRSXP) {
+      ids.attr("class") = "factor";
+      ids.attr("levels") = idl;
     }
   }
   ret[0] = ids;
@@ -3316,7 +3322,7 @@ void foceiOuterFinal(double *x, Environment e){
     e["etaObf"] = R_NilValue;
   } else {
     e["omega"] = getOmega();
-    e["etaObf"] = foceiEtas();
+    e["etaObf"] = foceiEtas(e);
   }
   nlmixrEnvSetup(e, fmin);
 }

@@ -311,20 +311,18 @@ nlmixr_fit0FixDat <- function(x, IDLabel, origData) {
   ## .ranef$ID <- as.integer(.ranef$ID)
   ## attr(.ranef$ID, "levels") <- IDLabel
   ## class(.ranef$ID) <- "factor"
-  ## .uif <- x$uif
-  ## .thetas <- x$theta
-  ## for (.n in names(.thetas)) {
-  ##   .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n]
-  ## }
-  ## .omega <- x$omega
-  ## for (.i in seq_along(.uif$ini$neta1)) {
-  ##   if (!is.na(.uif$ini$neta1[.i])) {
-  ##     .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]]
-  ##   }
-  ## }
+  .uif <- x$uif
+  .thetas <- x$theta
+  for (.n in names(.thetas)) {
+    .uif$ini$est[.uif$ini$name == .n] <- .thetas[.n]
+  }
+  .omega <- x$omega
+  for (.i in seq_along(.uif$ini$neta1)) {
+    if (!is.na(.uif$ini$neta1[.i])) {
+      .uif$ini$est[.i] <- .omega[.uif$ini$neta1[.i], .uif$ini$neta2[.i]]
+    }
+  }
   .env <- x$env
-  ## .env$etaObf <- .etaO
-  ## .env$eta <- .eta
   .env$origData <- origData
   ## .env$uif <- .uif
   ## .env$ranef <- .ranef
@@ -841,7 +839,7 @@ nlmixrEst.saem <- function(env, ...) {
           data = dat, calcResid = calc.resid, obf = .logLik,
           nnodes.gq = .nnodes.gq, nsd.gq = .nsd.gq, adjObf = .adjObf,
           calcCov = .addCov, calcTables = .calcTables,
-          keep=.keep, drop=.drop, table=table
+          keep=.keep, drop=.drop, IDlabel=.lab, table=table
         ),
         silent = TRUE
       )
@@ -947,7 +945,7 @@ nlmixrEst.nlme <- function(env, ...) {
     class(fit) <- c(est.type, class(fit))
     .ret <- try({
       as.focei.nlmixrNlme(fit, uif, pt, data = dat, calcResid = calc.resid, nobs2 = nobs2,
-                          keep=.keep, drop=.drop, table=table)
+                          keep=.keep, drop=.drop, IDlabel=.lab, table=table)
     })
     if (inherits(.ret, "try-error")) {
       warning("Error converting to nlmixr UI object, returning nlme object")
@@ -989,6 +987,8 @@ nlmixrEst.posthoc <- function(env, ...) {
       control$interaction <- FALSE
     }
     env <- new.env(parent = emptyenv())
+    env$table <- table
+    env$IDlabel <- .lab
     env$uif <- uif
     if (any(est == c("fo", "foi"))) {
       control$maxInnerIterations <- 0
@@ -1047,6 +1047,8 @@ nlmixrEst.posthoc <- function(env, ...) {
       .message <- fit$env$message
       .time <- fit$time
       env <- new.env(parent = emptyenv())
+      env$table <- table
+      env$IDlabel <- IDlabel
       for (.w in c("cov", "covR", "covS", "covMethod")) {
         if (exists(.w, fit$env)) {
           assign(.w, get(.w, envir = fit$env), envir = env)
@@ -1128,6 +1130,7 @@ nlmixrEst.focei <- function(env, ...) {
     }
     env <- new.env(parent = emptyenv())
     env$table <- table
+    env$IDlabel <- .lab
     env$uif <- uif
     if (any(est == c("fo", "foi"))) {
       control$maxInnerIterations <- 0
@@ -1192,6 +1195,8 @@ nlmixrEst.focei <- function(env, ...) {
       .message <- fit$env$message
       .time <- fit$time
       env <- new.env(parent = emptyenv())
+      env$table <- table
+      env$IDlabel <- IDlabel
       for (.w in c("cov", "covR", "covS", "covMethod")) {
         if (exists(.w, fit$env)) {
           assign(.w, get(.w, envir = fit$env), envir = env)
@@ -1285,6 +1290,8 @@ nlmixrEst.posthoc <- function(env, ...){
     control$covMethod <- 0L
     control$maxOuterIterations <- 0L
     .env <- new.env(parent = emptyenv())
+    .env$table <- table
+    .env$IDlabel <- IDlabel
     .env$uif <- uif
     if (control$singleOde) {
       .mod <- uif$focei.rx1
@@ -1332,7 +1339,8 @@ nlmixrEst.dynmodel <- function(env, ...) {
   with(env, {
     if (class(control) != "dynmodelControl") control <- do.call(dynmodelControl, control)
     env <- new.env(parent = emptyenv())
-
+    env$table <- table
+    env$IDlabel <- IDlabel
     env$uif <- NULL
 
     # update data to merge for origData and data. first add zeros or whatever is filled in for DV when there is no observations
