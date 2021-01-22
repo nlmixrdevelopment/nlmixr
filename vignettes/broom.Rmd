@@ -86,10 +86,10 @@ If you wish you can set the objective function to the focei objective
 function (which was already calculated with CWRES).
 
 ```{r}
-setOfv(fit.s,"FOCEi")
+setOfv(fit.s,"gauss3_1.6")
 ```
 
-Now the glance gives the `FOCEi` values.
+Now the glance gives the `gauss3_1.6` values.
 
 ```{r}
 glance(fit.s)
@@ -99,11 +99,11 @@ Of course you can always change the type of objective function that
 nlmixr uses:
 
 ```{r}
-setOfv(fit.s,"gauss3_1.6") # Setting objective function to gauss3_1.6
+setOfv(fit.s,"FOCEi") # Setting objective function to focei
 ```
 
 By setting it back to the SAEM default objective function of
-`gauss3_1.6`, the `glance(fit.s)` has the same values again:
+`FOCEi`, the `glance(fit.s)` has the same values again:
 
 ```{r}
 glance(fit.s)
