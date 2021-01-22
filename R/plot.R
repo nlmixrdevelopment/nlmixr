@@ -1,4 +1,4 @@
-.setupPlotData <- function(data, cmt) {
+.setupPlotData <- function(data) {
   .dat <- as.data.frame(data)
   .doCmt <- FALSE
   if (any(names(.dat) == "CMT")) {
@@ -203,120 +203,122 @@ plot.nlmixrFitData <- function(x, ...) {
     .lst[[length(.lst) + 1]] <- .bp
   }
   .dat <- .setupPlotData(x)
+  .hasCwres <- any(names(.dat) == "CWRES")
+  .hasNpde <- any(names(.dat) == "NPDE")
+  .hasPred <- any(names(.dat) == "PRED")
+  .hasIpred <- any(names(.dat) == "IPRED")
   for (.cmt in levels(.dat$CMT)) {
-    .dat0 <- .dat[.dat$CMT == .cmt, ]
-    .hasCwres <- any(names(.dat0) == "CWRES")
-    .hasNpde <- any(names(.dat0) == "NPDE")
-    .hasPred <- any(names(.dat0) == "PRED")
-    .hasIpred <- any(names(.dat0) == "IPRED")
-    if (.hasPred) {
-      .p1 <- .dvPlot(.dat0, c("PRED", "IPRED")) +
-        ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
-      .lst[[length(.lst) + 1]] <- .p1
+    .dat0 <- .dat[.dat$CMT == .cmt,, drop = FALSE]
+    if (dim(.dat0)[1] > 0) {
+      if (.hasPred) {
+        .p1 <- .dvPlot(.dat0, c("PRED", "IPRED")) +
+          ggplot2::ggtitle(.cmt, "DV vs PRED/IPRED")
+        .lst[[length(.lst) + 1]] <- .p1
 
-      .p1 <- .dvPlot(.dat0, c("PRED", "IPRED"), TRUE) +
-        ggplot2::ggtitle(.cmt, "log-scale DV vs PRED/IPRED")
-      .lst[[length(.lst) + 1]] <- .p1
-    } else if (.hasIpred) {
-      .p1 <- .dvPlot(.dat0, c("IPRED")) +
-        ggplot2::ggtitle(.cmt, "DV vs IPRED")
-      .lst[[length(.lst) + 1]] <- .p1
+        .p1 <- .dvPlot(.dat0, c("PRED", "IPRED"), TRUE) +
+          ggplot2::ggtitle(.cmt, "log-scale DV vs PRED/IPRED")
+        .lst[[length(.lst) + 1]] <- .p1
+      } else if (.hasIpred) {
+        .p1 <- .dvPlot(.dat0, c("IPRED")) +
+          ggplot2::ggtitle(.cmt, "DV vs IPRED")
+        .lst[[length(.lst) + 1]] <- .p1
 
-      .p1 <- .dvPlot(.dat0, c("IPRED"), TRUE) +
-        ggplot2::ggtitle(.cmt, "log-scale DV vs IPRED")
-      .lst[[length(.lst) + 1]] <- .p1
-    }
+        .p1 <- .dvPlot(.dat0, c("IPRED"), TRUE) +
+          ggplot2::ggtitle(.cmt, "log-scale DV vs IPRED")
+        .lst[[length(.lst) + 1]] <- .p1
+      }
 
 
-    if (.hasCwres) {
-      .p1 <- .dvPlot(.dat0, c("CPRED", "IPRED")) +
-        ggplot2::ggtitle(.cmt, "DV vs CPRED/IPRED")
-      .lst[[length(.lst) + 1]] <- .p1
+      if (.hasCwres) {
+        .p1 <- .dvPlot(.dat0, c("CPRED", "IPRED")) +
+          ggplot2::ggtitle(.cmt, "DV vs CPRED/IPRED")
+        .lst[[length(.lst) + 1]] <- .p1
 
-      .p1 <- .dvPlot(.dat0, c("CPRED", "IPRED"), TRUE) +
-        ggplot2::ggtitle(.cmt, "log-scale DV vs CPRED/IPRED")
-      .lst[[length(.lst) + 1]] <- .p1
-    }
+        .p1 <- .dvPlot(.dat0, c("CPRED", "IPRED"), TRUE) +
+          ggplot2::ggtitle(.cmt, "log-scale DV vs CPRED/IPRED")
+        .lst[[length(.lst) + 1]] <- .p1
+      }
 
-    if (.hasNpde) {
-      .p1 <- .dvPlot(.dat0, c("EPRED", "IPRED")) +
-        ggplot2::ggtitle(.cmt, "DV vs EPRED/IPRED")
-      .lst[[length(.lst) + 1]] <- .p1
+      if (.hasNpde) {
+        .p1 <- .dvPlot(.dat0, c("EPRED", "IPRED")) +
+          ggplot2::ggtitle(.cmt, "DV vs EPRED/IPRED")
+        .lst[[length(.lst) + 1]] <- .p1
 
-      .p1 <- .dvPlot(.dat0, c("EPRED", "IPRED"), TRUE) +
-        ggplot2::ggtitle(.cmt, "log-scale DV vs EPRED/IPRED")
-      .lst[[length(.lst) + 1]] <- .p1
-    }
+        .p1 <- .dvPlot(.dat0, c("EPRED", "IPRED"), TRUE) +
+          ggplot2::ggtitle(.cmt, "log-scale DV vs EPRED/IPRED")
+        .lst[[length(.lst) + 1]] <- .p1
+      }
 
-    for (x in c("IPRED", "PRED", "CPRED", "EPRED", "TIME", "tad")) {
-      if (any(names(.dat0) == x)) {
-        for (y in c("IWRES", "IRES", "RES", "CWRES", "NPDE")) {
-          if (any(names(.dat0) == y)) {
-            if (y == "CWRES" && x %in% c("TIME", "CPRED")) {
-              .doIt <- TRUE
-            } else if (y == "NPDE" && x %in% c("TIME", "EPRED")) {
-              .doIt <- TRUE
-            } else if (!(y %in% c("CWRES", "NPDE"))) {
-              .doIt <- TRUE
-            }
-            if (.doIt) {
-              .p2 <- .scatterPlot(.dat0, c(x, y), .cmt, log = FALSE)
-              .lst[[length(.lst) + 1]] <- .p2
-              .p2 <- .scatterPlot(.dat0, c(x, y), .cmt, log = TRUE)
-              .lst[[length(.lst) + 1]] <- .p2
+      for (x in c("IPRED", "PRED", "CPRED", "EPRED", "TIME", "tad")) {
+        if (any(names(.dat0) == x)) {
+          for (y in c("IWRES", "IRES", "RES", "CWRES", "NPDE")) {
+            if (any(names(.dat0) == y)) {
+              if (y == "CWRES" && x %in% c("TIME", "CPRED")) {
+                .doIt <- TRUE
+              } else if (y == "NPDE" && x %in% c("TIME", "EPRED")) {
+                .doIt <- TRUE
+              } else if (!(y %in% c("CWRES", "NPDE"))) {
+                .doIt <- TRUE
+              }
+              if (.doIt) {
+                .p2 <- .scatterPlot(.dat0, c(x, y), .cmt, log = FALSE)
+                .lst[[length(.lst) + 1]] <- .p2
+                .p2 <- .scatterPlot(.dat0, c(x, y), .cmt, log = TRUE)
+                .lst[[length(.lst) + 1]] <- .p2
+              }
             }
           }
         }
       }
-    }
-    ## .idPlot <- try(plot.nlmixrAugPred(nlmixrAugPred(object)));
-    ## if (inherits(.idPlot, "try-error")){
-    .ids <- unique(.dat0$ID)
-    .s <- seq(1, length(.ids), by = 16)
-    .j <- 0
-    for (i in .s) {
-      .j <- .j + 1
-      .tmp <- .ids[seq(i, i + 15)]
-      .tmp <- .tmp[!is.na(.tmp)]
-      .d1 <- .dat0[.dat0$ID %in% .tmp, ]
+      ## .idPlot <- try(plot.nlmixrAugPred(nlmixrAugPred(object)));
+      ## if (inherits(.idPlot, "try-error")){
+      .ids <- unique(.dat0$ID)
+      .s <- seq(1, length(.ids), by = 16)
+      .j <- 0
+      for (i in .s) {
+        .j <- .j + 1
+        .tmp <- .ids[seq(i, i + 15)]
+        .tmp <- .tmp[!is.na(.tmp)]
+        .d1 <- .dat0[.dat0$ID %in% .tmp, ]
 
-      .p3 <- ggplot2::ggplot(.d1, aes(x = TIME, y = DV)) +
-        ggplot2::geom_point() +
-        ggplot2::geom_line(aes(x = TIME, y = IPRED), col = "red", size = 1.2)
-      if (any(names(.d1) == "PRED")) {
-        .p3 <- .p3 + ggplot2::geom_line(aes(x = TIME, y = PRED), col = "blue", size = 1.2)
+        .p3 <- ggplot2::ggplot(.d1, aes(x = TIME, y = DV)) +
+          ggplot2::geom_point() +
+          ggplot2::geom_line(aes(x = TIME, y = IPRED), col = "red", size = 1.2)
+        if (any(names(.d1) == "PRED")) {
+          .p3 <- .p3 + ggplot2::geom_line(aes(x = TIME, y = PRED), col = "blue", size = 1.2)
+        }
+        .p3 <- .p3 + ggplot2::facet_wrap(~ID) +
+          ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s))) +
+          RxODE::rxTheme()
+        if (any(names(.d1) == "lowerLim")) {
+          lowerLim <- upperLim <- NULL
+          .p3 <- .p3 + geom_cens(aes(lower = lowerLim, upper = upperLim), fill = "purple")
+        }
+        .lst[[length(.lst) + 1]] <- .p3
       }
-      .p3 <- .p3 + ggplot2::facet_wrap(~ID) +
-        ggplot2::ggtitle(.cmt, sprintf("Individual Plots (%s of %s)", .j, length(.s))) +
-        RxODE::rxTheme()
-      if (any(names(.d1) == "lowerLim")) {
-        lowerLim <- upperLim <- NULL
-        .p3 <- .p3 + geom_cens(aes(lower = lowerLim, upper = upperLim), fill = "purple")
-      }
-      .lst[[length(.lst) + 1]] <- .p3
-    }
-    .dat0$id2 <- factor(paste0("id: ", .dat0$ID, "; dose#: ", .dat0$dosenum))
-    .ids <- unique(.dat0$id2)
-    .s <- seq(1, length(.ids), by = 16)
-    .j <- 0
-    ## for (i in .s) {
-    ##   .j <- .j + 1
-    ##   .tmp <- .ids[seq(i, i + 15)]
-    ##   .tmp <- .tmp[!is.na(.tmp)]
-    ##   .d1 <- .dat0[.dat0$id2 %in% .tmp, ]
+      .dat0$id2 <- factor(paste0("id: ", .dat0$ID, "; dose#: ", .dat0$dosenum))
+      .ids <- unique(.dat0$id2)
+      .s <- seq(1, length(.ids), by = 16)
+      .j <- 0
+      ## for (i in .s) {
+      ##   .j <- .j + 1
+      ##   .tmp <- .ids[seq(i, i + 15)]
+      ##   .tmp <- .tmp[!is.na(.tmp)]
+      ##   .d1 <- .dat0[.dat0$id2 %in% .tmp, ]
 
-    ##   .p3 <- ggplot2::ggplot(.d1, aes(x = tad, y = DV)) +
-    ##     ggplot2::geom_point() +
-    ##     ggplot2::geom_line(aes(x = tad, y = IPRED), col = "red", size = 1.2) +
-    ##     ggplot2::geom_line(aes(x = tad, y = PRED), col = "blue", size = 1.2) +
-    ##     ggplot2::facet_wrap(~id2) +
-    ##     ggplot2::ggtitle(.cmt, sprintf("Individual TAD Plots (%s of %s)", .j, length(.s))) +
-    ##     RxODE::rxTheme()
-    ##   if (any(names(.d1) == "lowerLim")) {
-    ##     .p3 <- .p3 + geom_cens(aes(lower=lowerLim, upper=upperLim), fill="purple")
-    ##   }
-    ##   .lst[[length(.lst) + 1]] <- .p3
-    ## }
+      ##   .p3 <- ggplot2::ggplot(.d1, aes(x = tad, y = DV)) +
+      ##     ggplot2::geom_point() +
+      ##     ggplot2::geom_line(aes(x = tad, y = IPRED), col = "red", size = 1.2) +
+      ##     ggplot2::geom_line(aes(x = tad, y = PRED), col = "blue", size = 1.2) +
+      ##     ggplot2::facet_wrap(~id2) +
+      ##     ggplot2::ggtitle(.cmt, sprintf("Individual TAD Plots (%s of %s)", .j, length(.s))) +
+      ##     RxODE::rxTheme()
+      ##   if (any(names(.d1) == "lowerLim")) {
+      ##     .p3 <- .p3 + geom_cens(aes(lower=lowerLim, upper=upperLim), fill="purple")
+      ##   }
+      ##   .lst[[length(.lst) + 1]] <- .p3
+      ## }
+    }
   }
 
   ## .id <- unique(.dat0$id2)
