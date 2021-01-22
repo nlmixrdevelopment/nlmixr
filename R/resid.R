@@ -162,9 +162,9 @@
           .prdLst$ipred$cens, .prdLst$ipred$limit, table)
   } else {
     if (predOnly){
-      .state <- c(fit$model$ipred$state, fit$model$ipred$stateExtra)
+      .state <- c(fit$model$pred.only$state, fit$model$pred.only$stateExtra)
       .lhs <- setdiff(unique(.getRelevantLhs(fit, keep, .prdLst$ipred)), .state)
-      .params <- setdiff(intersect(names(fit$dataSav),fit$model$ipred$params),c("CMT","cmt","Cmt", .state, .lhs))
+      .params <- setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt", .state, .lhs))
       .Call(`_nlmixr_resCalc`, .prdLst, fit$omega,
             fit$eta, .prdLst$ipred$dv, .prdLst$ipred$evid, .prdLst$ipred$cens,
             .prdLst$ipred$limit, .lhs, .state, .params, table)
@@ -233,9 +233,9 @@
   } else {
     table$doSim <- FALSE
   }
-  .state <- c(.ipred$state, .ipred$stateExtra)
+  .state <- c(fit$model$pred.only$state, fit$model$pred.only$stateExtra)
   .lhs <- setdiff(unique(.getRelevantLhs(fit, keep, .ipred)), .state)
-  .params <- setdiff(intersect(names(fit$dataSav),.ipred$params),c("CMT","cmt","Cmt", .state, .lhs))
+  .params <- setdiff(intersect(names(fit$dataSav),fit$model$pred.only$params),c("CMT","cmt","Cmt", .state, .lhs))
   .ret <- .Call(`_nlmixr_iresCalc`, .ipred, dv, .ipred$evid, .ipred$cens, .ipred$limit,
                 .lhs, .state, .params, table)
   .dups <- which(duplicated(names(.ret)))
