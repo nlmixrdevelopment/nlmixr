@@ -1025,7 +1025,7 @@ nlmixrEst.posthoc <- function(env, ...) {
       .time <- fit$time
       env <- new.env(parent = emptyenv())
       env$table <- table
-      env$IDlabel <- IDlabel
+      env$IDlabel <- .lab
       for (.w in c("cov", "covR", "covS", "covMethod")) {
         if (exists(.w, fit$env)) {
           assign(.w, get(.w, envir = fit$env), envir = env)
@@ -1173,7 +1173,7 @@ nlmixrEst.focei <- function(env, ...) {
       .time <- fit$time
       env <- new.env(parent = emptyenv())
       env$table <- table
-      env$IDlabel <- IDlabel
+      env$IDlabel <- .lab
       for (.w in c("cov", "covR", "covS", "covMethod")) {
         if (exists(.w, fit$env)) {
           assign(.w, get(.w, envir = fit$env), envir = env)
@@ -1268,7 +1268,7 @@ nlmixrEst.posthoc <- function(env, ...){
     control$maxOuterIterations <- 0L
     .env <- new.env(parent = emptyenv())
     .env$table <- table
-    .env$IDlabel <- IDlabel
+    .env$IDlabel <- .lab
     .env$uif <- uif
     if (control$singleOde) {
       .mod <- uif$focei.rx1
@@ -1317,7 +1317,7 @@ nlmixrEst.dynmodel <- function(env, ...) {
     if (class(control) != "dynmodelControl") control <- do.call(dynmodelControl, control)
     env <- new.env(parent = emptyenv())
     env$table <- table
-    env$IDlabel <- IDlabel
+    env$IDlabel <- .lab
     env$uif <- NULL
 
     # update data to merge for origData and data. first add zeros or whatever is filled in for DV when there is no observations
