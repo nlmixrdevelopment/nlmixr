@@ -356,8 +356,8 @@ extern "C" void rxOptionsFreeFocei(){
       op_focei.etaTrans=NULL;
       if (op_focei.fullTheta != NULL) Free(op_focei.fullTheta);
       op_focei.fullTheta = NULL;
-      if (op_focei.op_focei.etaUpper != NULL) Free(op_focei.etaUpper);
-      op_focei.op_focei.etaUpper = NULL;
+      if (op_focei.etaUpper != NULL) Free(op_focei.etaUpper);
+      op_focei.etaUpper = NULL;
       if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
       op_focei.gillRet = NULL;
       if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
