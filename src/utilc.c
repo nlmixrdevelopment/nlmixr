@@ -227,6 +227,7 @@ SEXP getDfSubsetVars(SEXP ipred, SEXP lhs) {
   rni[0] = NA_INTEGER;
   rni[1] = -Rf_length(VECTOR_ELT(ret,0));
   Rf_setAttrib(ret, R_RowNamesSymbol, rn);
+  Free(keepVals);
   UNPROTECT(pro);
   return ret;
 }
