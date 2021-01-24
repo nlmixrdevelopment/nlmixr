@@ -43,32 +43,58 @@ arma::mat getSimMatById(arma::ivec& idLoc, arma::vec &sim, unsigned int& id,
   return ret;
 }
 
+arma::mat decorrelateNpdeEigenMat(arma::mat& varsim, unsigned int& warn) {
+  arma::vec eigval;
+  arma::mat eigvec;
+  arma::eig_sym(eigval, eigvec, varsim, "std");
+  eigval = sqrt(eigval);
+  arma::mat iEigVec;
+  try{
+    iEigVec = inv(eigvec);
+    warn = NPDE_DECORRELATE_EIGEN;
+  } catch(...) {
+    iEigVec = pinv(eigvec);
+    warn = NPDE_DECORRELATE_EIGEN_PINV;
+  }
+  arma::mat ret =  eigvec * diagmat(eigval) * iEigVec;
+  // Try nearPD from R/RxODE
+  return ret;
+}
+
 
 arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int &id, double &tolChol) {
   arma::mat ch, vYi;
   try {
     ch = chol(varsim);
   } catch (...){
-    // Try nearPD from R/RxODE
-    if (!(warn & 1)) {
-      warn += 1;
-    }
     try {
-      ch = cholSE__(vYi, tolChol);
+      return decorrelateNpdeEigenMat(varsim, warn);
     } catch (...){
-      Rcpp::stop("The simulated data covariance matrix Cholesky decomposition could not be obtained for  id=%d.", id+1);
+      try {
+	ch = cholSE__(varsim, tolChol);
+	warn = NPDE_CHOLSE;
+      } catch (...) {
+	warn = NPDE_PD;
+	return arma::mat(varsim.n_rows, varsim.n_cols, fill::eye);
+      }
     }
   }
   try{
     vYi = trans(inv(trimatu(ch)));
-  } catch (...) {
-    if (!(warn & 1)) {
-      warn += 2;
+    if (warn != NPDE_CHOLSE) {
+      warn = NPDE_CHOLSE;
     }
+  } catch (...) {
     try {
       vYi = trans(pinv(trimatu(ch)));
+      if (warn != NPDE_CHOLSE) {
+	warn = NPDE_CHOL_PINV;
+      } else {
+	warn = NPDE_CHOLSE_PINV;
+      }
     } catch (...){
-      stop("The simulated data covariance matrix Cholesky decomposition inverse or pseudo-inverse could not be obtained for id=%d.", id+1);
+      warn = NPDE_PD;
+      return arma::mat(varsim.n_rows, varsim.n_cols, fill::eye);
     }
   }
   return vYi;
@@ -224,8 +250,11 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
   return ret;
 }
 
+rxGetId2_t rxGetId2;
+
 extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn, SEXP npdeOpt) {
   BEGIN_RCPP
+  rxGetId2 = (rxGetId2_t) R_GetCCallable("RxODE", "rxGetId");
   if (TYPEOF(npdeSim) != VECSXP) {
     Rf_errorcall(R_NilValue, "npdeSim needs to be a data.frame");
   }
@@ -331,6 +360,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   arma::vec epred(REAL(epredSEXP), dvLen, false, true);
   arma::vec dvf(REAL(dvSEXP), dvLen, false, true);
   arma::vec eres(REAL(eresSEXP), dvLen, false, true);
+  arma::ivec warn(idLoc.size()-1);
 
   int cores = as<int>(opt["cores"]);
   
@@ -342,7 +372,97 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
     epred(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.epred;
     dvf(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.yobs;
     eres(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.eres;
+    warn[curid] = idInfo.warn;
   }
+  std::string sCholPinv = "";
+  int nCholPinv = 0;
+  std::string sEigen = "";
+  int nEigen = 0;
+  std::string sEigenPinv = "";
+  int nEigenPinv = 0;
+  std::string sCholSE = "";
+  int nCholSE = 0;
+  std::string sCholSEPinv = "";
+  int nCholSEPinv = 0;
+  std::string sPD = "";
+  int nPD = 0;
+  for (unsigned int curid = 0; curid < warn.size(); ++curid) {
+    switch(warn[curid]) {
+    case NPDE_CHOL_PINV:
+      if (sCholPinv == "") sCholPinv = rxGetId2(curid);
+      else {
+	sCholPinv += ", ";
+	sCholPinv += rxGetId2(curid);
+      }
+      nCholPinv++;
+      break;
+    case NPDE_DECORRELATE_EIGEN:
+      if (sEigen == "") sEigen = rxGetId2(curid);
+      else {
+	sEigen += ", ";
+	sEigen += rxGetId2(curid);
+      }
+      nEigen++;
+      break;
+    case NPDE_DECORRELATE_EIGEN_PINV:
+      if (sEigenPinv == "")  sEigenPinv =  rxGetId2(curid);
+      else {
+	sEigenPinv += ", ";
+	sEigenPinv += rxGetId2(curid);
+      }
+      nEigenPinv++;
+      break;
+    case NPDE_CHOLSE:
+      if (sCholSE == "") sCholSE = rxGetId2(curid);
+      else {
+	sCholSE += ", ";
+	sCholSE += rxGetId2(curid);
+      }
+      nCholSE++;
+      break;
+    case NPDE_CHOLSE_PINV:
+      if (sCholSEPinv == "") sCholSEPinv = rxGetId2(curid);
+      else {
+	sCholSEPinv += ", ";
+	sCholSEPinv += rxGetId2(curid);
+      }
+      nCholSEPinv++;
+      break;
+    case NPDE_PD:
+      if (sPD == "") sPD = rxGetId2(curid);
+      else {
+	sPD += ", ";
+	sPD += rxGetId2(curid);
+      }
+      nPD++;
+      break;
+    }
+  }
+  double rCholPinv = (double)nCholPinv / (double)warn.size(),
+    rEigen = (double)nEigen / (double)warn.size(),
+    rEigenPinv = (double)nEigenPinv / (double)warn.size(),
+    rCholSE = (double)nCholSE / (double)warn.size(),
+    rCholSEPinv = (double)nCholSEPinv / (double)warn.size(),
+    rPD = (double)nPD / (double)warn.size();
+  if (sCholPinv != "") {
+    Rf_warningcall(R_NilValue, _("npde decorrelation used Cholesky pseudo-inverse for %.1f%%, id: %s"), rCholPinv*100, sCholPinv.c_str());
+  }
+  if (sEigen != "") {
+    Rf_warningcall(R_NilValue, _("npde decorrelation used Eigen-values for %.1f%%, id: %s"), rEigen*100, sEigen.c_str());
+  }
+  if (sEigenPinv != "") {
+    Rf_warningcall(R_NilValue, _("npde decorrelation used Eigen-value pseudo-inverse for %.1f%%, id: %s"), rEigenPinv*100, sEigenPinv.c_str());
+  }
+  if (sCholSE != "") {
+    Rf_warningcall(R_NilValue, _("npde decorrelation used generalized Cholesky for %.1f%%, id: %s"), rCholSE*100, sCholSE.c_str());
+  }
+  if (sCholSEPinv != "") {
+    Rf_warningcall(R_NilValue, _("npde decorrelation used generalized Cholesky pseudo inverse for %.1f%%, id: %s"), rCholSEPinv*100, sCholSEPinv.c_str());
+  }
+  if (sPD != "") {
+    Rf_warningcall(R_NilValue, _("npde decorrelation failed (return prediction discrepancies) for %.1f%% id: %s"), rPD*100, sPD.c_str());
+  }
+  
   List ret(3);
   // epred, eres, npde, dv
   ret[0] = List::create(_["EPRED"]=epred);

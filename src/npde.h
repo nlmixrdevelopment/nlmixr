@@ -1,11 +1,30 @@
 #ifndef __NPDE_H__
 #define __NPDE_H__
 
+#ifdef ENABLE_NLS
+#include <libintl.h>
+#define _(String) dgettext ("nlmixr", String)
+/* replace pkg as appropriate */
+#else
+#define _(String) (String)
+#endif
 
 #if defined(__cplusplus)
 #include "armahead.h"
 #include "censResid.h"
 #include "res.h"
+
+#define NPDE_CHOL 0
+#define NPDE_CHOL_PINV 1
+#define NPDE_DECORRELATE_EIGEN  2
+#define NPDE_DECORRELATE_EIGEN_PINV  3
+#define NPDE_CHOLSE 4
+#define NPDE_CHOLSE_PINV 5
+#define NPDE_PD 99
+
+typedef const char *(*rxGetId2_t)(int id);
+extern rxGetId2_t rxGetId2;
+
 
 typedef struct {
   arma::mat matsim;
