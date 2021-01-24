@@ -153,18 +153,6 @@ nlmixrShrink <- function(omegaMat, etasDf, etaLst) {
     .Call(`_nlmixr_nlmixrShrink`, omegaMat, etasDf, etaLst)
 }
 
-nlmixrResid0 <- function(cipred, cdv, evid, lambda, yj, low, hi, cens, limit) {
-    .Call(`_nlmixr_nlmixrResid0`, cipred, cdv, evid, lambda, yj, low, hi, cens, limit)
-}
-
-nlmixrResid <- function(innerList, omegaMat, cdv, evid, lambda, yj, low, hi, cens, limit, etasDf, etaLst) {
-    .Call(`_nlmixr_nlmixrResid`, innerList, omegaMat, cdv, evid, lambda, yj, low, hi, cens, limit, etasDf, etaLst)
-}
-
-npde <- function(id, dv, evid, sim, lambda, yj, low, hi, ties, tolChol) {
-    .Call(`_nlmixr_npde`, id, dv, evid, sim, lambda, yj, low, hi, ties, tolChol)
-}
-
 augPredTrans <- function(pred, ipred, lambda, yjIn, low, hi) {
     .Call(`_nlmixr_augPredTrans`, pred, ipred, lambda, yjIn, low, hi)
 }
