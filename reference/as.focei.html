@@ -200,7 +200,16 @@
     <p>Convert fit to FOCEi style fit</p>
     </div>
 
-    <pre class="usage"><span class='fu'>as.focei</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>uif</span>, pt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/proc.time.html'>proc.time</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='va'>...</span>, <span class='va'>data</span>, calcResid <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>as.focei</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>uif</span>,
+  pt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/proc.time.html'>proc.time</a></span><span class='op'>(</span><span class='op'>)</span>,
+  <span class='va'>...</span>,
+  <span class='va'>data</span>,
+  calcResid <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  table <span class='op'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span><span class='op'>(</span><span class='op'>)</span>,
+  IDlabel <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for nlmixrNlme</span>
 <span class='fu'>as.focei</span><span class='op'>(</span>
@@ -213,7 +222,8 @@
   nobs2 <span class='op'>=</span> <span class='fl'>0</span>,
   keep <span class='op'>=</span> <span class='cn'>NULL</span>,
   drop <span class='op'>=</span> <span class='cn'>NULL</span>,
-  table <span class='op'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span><span class='op'>(</span><span class='op'>)</span>
+  table <span class='op'>=</span> <span class='fu'><a href='tableControl.html'>tableControl</a></span><span class='op'>(</span><span class='op'>)</span>,
+  IDlabel <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -245,6 +255,15 @@
 should be calculated</p></td>
     </tr>
     <tr>
+      <th>table</th>
+      <td><p>A list of table options</p></td>
+    </tr>
+    <tr>
+      <th>IDlabel</th>
+      <td><p>labels for the ID column; used to change the IDs
+back to their normal valuesr</p></td>
+    </tr>
+    <tr>
       <th>nobs2</th>
       <td><p>Number of observations without EVID=2</p></td>
     </tr>
@@ -257,10 +276,6 @@ Observation Carried forward) imputation is performed.</p></td>
     <tr>
       <th>drop</th>
       <td><p>Columns to drop from the output</p></td>
-    </tr>
-    <tr>
-      <th>table</th>
-      <td><p>`tableControl()` list of options</p></td>
     </tr>
     </table>
 
