@@ -103,35 +103,35 @@ typedef struct {
   // std::string obfStr;
   //
   List mvi;
-  double *etaUpper;
-  double *etaLower;
-  int *nbdInner;
-  double *geta;
-  double *goldEta;
-  double *gsaveEta;
-  double *gthetaGrad;
+  double *etaUpper = NULL;
+  double *etaLower = NULL;
+  int *nbdInner = NULL;
+  double *geta = NULL;
+  double *goldEta = NULL;
+  double *gsaveEta = NULL;
+  double *gthetaGrad = NULL;
   // n1qn1 specific vectors
-  double *gZm;
-  double *gG;
-  double *gVar;
-  double *gX;
+  double *gZm = NULL;
+  double *gG = NULL;
+  double *gVar = NULL;
+  double *gX = NULL;
 
-  double *glp;
-  double *ga;
-  double *gB;
-  double *gc;
-  double *gH;
-  double *gH0;
-  double *gVid;
+  double *glp = NULL;
+  double *ga = NULL;
+  double *gB = NULL;
+  double *gc = NULL;
+  double *gH = NULL;
+  double *gH0 = NULL;
+  double *gVid = NULL;
 
-  double *likSav;
+  double *likSav = NULL;
 
   // Integer of ETAs
   unsigned int gEtaGTransN;
   // Where likelihood is saved.
 
-  int *etaTrans;
-  int *etaFD;
+  int *etaTrans = NULL;
+  int *etaFD = NULL;
   double eventFD;
   int predNeq;
   int eventCentral;
@@ -153,21 +153,21 @@ typedef struct {
   double derivSwitchTol;
   double lastOfv;
 
-  double *fullTheta;
-  double *theta;
-  double *thetaGrad;
-  double *initPar;
-  double *scaleC;
-  double scaleC0;
-  int *xPar;
+  double *fullTheta = NULL;
+  double *theta = NULL;
+  double *thetaGrad = NULL;
+  double *initPar = NULL;
+  double *scaleC = NULL;
+  double scaleC0 = NULL;
+  int *xPar = NULL;
   NumericVector lowerIn;
-  double *lower;
+  double *lower = NULL;
   NumericVector upperIn;
-  double *upper;
-  int *nbd;
+  double *upper = NULL;
+  int *nbd = NULL;
 
-  int *fixedTrans;
-  int *thetaTrans;
+  int *fixedTrans = NULL;
+  int *thetaTrans = NULL;
 
   int scaleType;
   int normType;
@@ -206,15 +206,15 @@ typedef struct {
   double n;
   double logDetOmegaInv5;
 
-  int    *gillRetC;
-  int    *gillRet;
-  double *gillDf;
-  double *gillDf2;
-  double *gillErr;
-  double *rEps;
-  double *aEps;
-  double *rEpsC;
-  double *aEpsC;
+  int    *gillRetC = NULL;
+  int    *gillRet = NULL;
+  double *gillDf = NULL;
+  double *gillDf2 = NULL;
+  double *gillErr = NULL;
+  double *rEps = NULL;
+  double *aEps = NULL;
+  double *rEpsC = NULL;
+  double *aEpsC = NULL;
 
   //
   double factr;
@@ -222,7 +222,7 @@ typedef struct {
   double abstol;
   double reltol;
   int lmm;
-  int *skipCov;
+  int *skipCov = NULL;
   int skipCovN;
 
   int outerOpt;
@@ -252,7 +252,7 @@ typedef struct {
   double resetThetaSize = R_PosInf;
   double resetThetaFinalSize = R_PosInf;
   int checkTheta;
-  int *muRef;
+  int *muRef = NULL;
   int muRefN;
   int resetHessianAndEta;
   int didHessianReset;
@@ -352,16 +352,22 @@ std::vector<int> gradType;
 extern "C" void rxOptionsFreeFocei(){
   if (op_focei.alloc ){
     if (op_focei.neta != 0){
-      Free(op_focei.etaTrans);
-      Free(op_focei.fullTheta);
-      Free(op_focei.etaUpper);
-      Free(op_focei.gillRet);
-      Free(op_focei.gillDf);
+      if (op_focei.etaTrans != NULL) Free(op_focei.etaTrans);
+      op_focei.etaTrans=NULL;
+      if (op_focei.fullTheta != NULL) Free(op_focei.fullTheta);
+      op_focei.fullTheta = NULL;
+      if (op_focei.op_focei.etaUpper != NULL) Free(op_focei.etaUpper);
+      op_focei.op_focei.etaUpper = NULL;
+      if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
+      op_focei.gillRet = NULL;
+      if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
+      op_focei.gillDf = NULL;
     } else {
-      Free(op_focei.gthetaGrad);
+      if (op_focei.gthetaGrad != NULL) Free(op_focei.gthetaGrad);
+      op_focei.gthetaGrad = NULL;
     }
   }
-  Free(inds_focei);
+  if (inds_focei != NULL) Free(inds_focei);
   inds_focei=NULL;
 
   focei_options newf;
@@ -1477,11 +1483,11 @@ static inline void innerOpt1(int id, int likId) {
 		}
 		if (tryAgain) {
 		  std::fill_n(fInd->x, fop->neta, 0);
-		}	    
+		}
 		std::fill_n(&fInd->var[0], fop->neta, 0.1);
 	      }
 	    }
-	    
+
 	  }
 	}
       }
@@ -2519,6 +2525,7 @@ static inline void foceiSetupTrans_(CharacterVector pars){
   std::string thetaS;
   std::string etaS;
   std::string cur;
+  if (op_focei.etaTrans != NULL) Free(op_focei.etaTrans);
   op_focei.etaTrans    = Calloc(op_focei.neta*3 + 3*(op_focei.ntheta + op_focei.omegan), int); //[neta]
   op_focei.nbdInner    = op_focei.etaTrans + op_focei.neta;
   op_focei.xPar        = op_focei.nbdInner + op_focei.neta; // [ntheta+nomega]
@@ -2526,6 +2533,7 @@ static inline void foceiSetupTrans_(CharacterVector pars){
   op_focei.fixedTrans  = op_focei.thetaTrans + op_focei.ntheta + op_focei.omegan; // [ntheta + nomega]
   op_focei.etaFD       = op_focei.fixedTrans + op_focei.ntheta + op_focei.omegan; // [neta]
 
+  if (op_focei.fullTheta != NULL) Free(op_focei.fullTheta);
   op_focei.fullTheta   = Calloc(4*(op_focei.ntheta+op_focei.omegan), double); // [ntheta+omegan]
   op_focei.theta       = op_focei.fullTheta+op_focei.ntheta+op_focei.omegan; // [ntheta + omegan]
   op_focei.initPar     = op_focei.theta+op_focei.ntheta+op_focei.omegan; // [ntheta + omegan]
@@ -2631,8 +2639,12 @@ static inline void foceiSetupTheta_(List mvi,
 
 static inline void foceiSetupNoEta_(){
   rx = getRx();
+
+  if (inds_focei != NULL) Free(inds_focei);
   inds_focei =Calloc(rx->nsub, focei_ind);
   op_focei.gEtaGTransN=(op_focei.neta)*rx->nsub;
+
+  if (op_focei.gthetaGrad != NULL) Free(op_focei.gthetaGrad);
   op_focei.gthetaGrad = Calloc(op_focei.gEtaGTransN, double);
   focei_ind *fInd;
   int jj = 0;
@@ -2665,10 +2677,14 @@ static inline void foceiSetupNoEta_(){
 
 static inline void foceiSetupEta_(NumericMatrix etaMat0){
   rx = getRx();
+
+  if (inds_focei != NULL) Free(inds_focei);
   inds_focei =Calloc(rx->nsub, focei_ind);
   etaMat0 = transpose(etaMat0);
   op_focei.gEtaGTransN=(op_focei.neta+1)*rx->nsub;
   int nz = ((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub;
+
+  if (op_focei.etaUpper != NULL) Free(op_focei.etaUpper);
   op_focei.etaUpper = Calloc(op_focei.gEtaGTransN*7+ op_focei.npars*(rx->nsub + 1)+nz+
 			     2*op_focei.neta * rx->nall + rx->nall+ rx->nall*rx->nall +
 			     op_focei.neta*5 + 2*op_focei.neta*op_focei.neta*rx->nsub, double);
@@ -2967,7 +2983,7 @@ NumericVector foceiSetup_(const RObject &obj,
     op_focei.skipCovN = skipCov1.size();
   }
 
-
+  if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
   op_focei.gillRet = Calloc(2*totN+op_focei.npars+
 			    op_focei.muRefN + op_focei.skipCovN, int);
   op_focei.gillRetC= op_focei.gillRet + totN;
@@ -2978,6 +2994,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.skipCov   = op_focei.muRef + op_focei.muRefN; //[op_focei.skipCovN]
   if (op_focei.skipCovN) std::copy(skipCov1.begin(),skipCov1.end(),op_focei.skipCov); //
 
+  if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
   op_focei.gillDf = Calloc(7*totN + 2*op_focei.npars + rx->nsub, double);
   op_focei.gillDf2 = op_focei.gillDf+totN;
   op_focei.gillErr = op_focei.gillDf2+totN;
