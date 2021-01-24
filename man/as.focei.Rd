@@ -5,7 +5,16 @@
 \alias{as.focei.nlmixrNlme}
 \title{Convert fit to FOCEi style fit}
 \usage{
-as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
+as.focei(
+  object,
+  uif,
+  pt = proc.time(),
+  ...,
+  data,
+  calcResid = TRUE,
+  table = tableControl(),
+  IDlabel = NULL
+)
 
 \method{as.focei}{nlmixrNlme}(
   object,
@@ -17,7 +26,8 @@ as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
   nobs2 = 0,
   keep = NULL,
   drop = NULL,
-  table = tableControl()
+  table = tableControl(),
+  IDlabel = NULL
 )
 }
 \arguments{
@@ -34,6 +44,11 @@ as.focei(object, uif, pt = proc.time(), ..., data, calcResid = TRUE)
 \item{calcResid}{A boolean to indicate if the CWRES residuals
 should be calculated}
 
+\item{table}{A list of table options}
+
+\item{IDlabel}{labels for the ID column; used to change the IDs
+back to their normal valuesr}
+
 \item{nobs2}{Number of observations without EVID=2}
 
 \item{keep}{Columns to keep from either the input dataset. For the
@@ -41,8 +56,6 @@ input dataset, if any records are added to the data LOCF (Last
 Observation Carried forward) imputation is performed.}
 
 \item{drop}{Columns to drop from the output}
-
-\item{table}{`tableControl()` list of options}
 }
 \value{
 A FOCEi fit style object.

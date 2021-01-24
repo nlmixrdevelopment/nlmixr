@@ -250,7 +250,7 @@ typedef struct {
   double resetEtaSize;
   int didEtaReset;
   double resetThetaSize = R_PosInf;
-  double resetThetaFinalSize;
+  double resetThetaFinalSize = R_PosInf;
   int checkTheta;
   int *muRef;
   int muRefN;
@@ -289,7 +289,7 @@ typedef struct {
   int curGill;
   int printTop;
   double resetThetaCheckPer;
-  int slow;
+  int slow = 0;
   double gradProgressOfvTime;
   bool alloc=false;
   bool zeroGrad = false;
