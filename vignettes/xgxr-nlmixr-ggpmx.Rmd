@@ -142,7 +142,6 @@ ggplot(data = pk_data_cycle1, aes(x = TIME, y = LIDV)) +
 To me it appears the variability seems to be higher with higher doses
 and higher with later times.
 
-
 ## Exploring the dose linearity
 
 A common way to explore the dose linearity is to normalize by the
@@ -159,7 +158,7 @@ ggplot(data = pk_data_cycle1,
   xgx_scale_y_log10() +
   xgx_scale_x_time_units(units_dataset = time_units_dataset, units_plot = time_units_plot) +
   labs(y = concnorm_label, color = trtact_label) +
-    xgx_annotate_status(status)
+  xgx_annotate_status(status)
 ```
 
 This example seems to be dose-linear, with the exception of the
@@ -175,7 +174,7 @@ ggplot(data = pk_data_cycle1 %>% filter(CENS == 0),
   xgx_scale_y_log10() +
   xgx_scale_x_time_units(units_dataset = time_units_dataset, units_plot = time_units_plot) +
   labs(y = concnorm_label, color = trtact_label) +
-    xgx_annotate_status(status)
+  xgx_annotate_status(status)
 ```
 
 The lowest dose, with the most censoring, is the one that seems to be
@@ -216,10 +215,9 @@ First we need to subset to the PK only data and rename `LIDV` to `DV`
 
 ```{r}
 dat <- case1_pkpd %>%
-    rename(DV=LIDV) %>%
-    filter(CMT %in% 1:2) %>%
-    # Filter (for now) since CENS supprot in nlmixr is in development
-    filter(TRTACT != "Placebo")
+  rename(DV=LIDV) %>%
+  filter(CMT %in% 1:2) %>%
+  filter(TRTACT != "Placebo")
 ```
 
 Next create a 2 compartment model:
@@ -227,26 +225,26 @@ Next create a 2 compartment model:
 ```{r}
 ## Use 2 compartment model
 cmt2 <- function(){
-    ini({
-        lka <- log(0.1) # log Ka
-        lv <- log(10) # Log Vc
-        lcl <- log(4) # Log Cl
-        lq <- log(10) # log Q
-        lvp <- log(20) # Log Vp
+  ini({
+    lka <- log(0.1) # log Ka
+    lv <- log(10) # Log Vc
+    lcl <- log(4) # Log Cl
+    lq <- log(10) # log Q
+    lvp <- log(20) # Log Vp
 
-        eta.ka ~ 0.01
-        eta.v ~ 0.1
-        eta.cl ~ 0.1
-        logn.sd = 10
-    })
-    model({
-        ka <- exp(lka + eta.ka)
-        cl <- exp(lcl + eta.cl)
-        v <- exp(lv + eta.v)
-        q <- exp(lq)
-        vp <- exp(lvp)
-        linCmt() ~ lnorm(logn.sd)
-    })
+    eta.ka ~ 0.01
+    eta.v ~ 0.1
+    eta.cl ~ 0.1
+    logn.sd = 10
+  })
+  model({
+    ka <- exp(lka + eta.ka)
+    cl <- exp(lcl + eta.cl)
+    v <- exp(lv + eta.v)
+    q <- exp(lq)
+    vp <- exp(lvp)
+    linCmt() ~ lnorm(logn.sd)
+  })
 }
 
 ## Check parsing
