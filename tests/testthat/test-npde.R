@@ -30,6 +30,7 @@ nlmixrTest(
                                        )), NA)
 
   expect_error(suppressWarnings(nlmixr(one.compartment, theo_sd,
+                                       est="focei",
                                        control = list(print = 0)
                                        )) %>% addNpde(), NA)
 },

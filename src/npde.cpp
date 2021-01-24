@@ -82,7 +82,7 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
   try{
     vYi = trans(inv(trimatu(ch)));
     if (warn != NPDE_CHOLSE) {
-      warn = NPDE_CHOLSE;
+      warn = NPDE_CHOL;
     }
   } catch (...) {
     try {
