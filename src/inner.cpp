@@ -158,7 +158,7 @@ typedef struct {
   double *thetaGrad = NULL;
   double *initPar = NULL;
   double *scaleC = NULL;
-  double scaleC0 = NULL;
+  double scaleC0;
   int *xPar = NULL;
   NumericVector lowerIn;
   double *lower = NULL;
