@@ -106,8 +106,8 @@ extern SEXP m1__model_vars(){
   SEXP _mv = PROTECT(_rxGetModelLib("m1__model_vars"));pro++;
   if (!_rxIsCurrentC(_mv)){
     SEXP hash    = PROTECT(allocVector(STRSXP, 1));pro++;
-#define __doBuf__  sprintf(buf, "un]\"BAAA@QBtHACAAAAAAAv(rAAAv7#aT):ST,KACeV(ftyxTANR*5cO28nu*)S](X2juOra5QEdEGeY;~T_av<gD$/0Kwk9bvBDeM#isY|5M=tQ`$<_{WnEOBaKQ@k__g>n{SvJ6PU}(6G0}$8V},H|=C[V}NA$bL=d\"5>}\?D8of_dSiRJqCbk^oq[z;!hWGym>[v]rZ68nS]FQ:qy^oz*ITx*6CdPe2.}V,T`ogu\?mKsFe5HkhMH86!vnU\"vJX]CsIcRa9`O&.8[Pq[5gpbl<jLW|!(T#u[9L3ti!d!cLl:Rg]xDoz%%Z(Fzt}76uZa9K^lnMGU%%(~lNyPJ#ZFBxvRH^F90AH2;)kdl;.~et}`)zDua3\?Jt3Rmjf7yI=T7cz@m(=Ptm3O<N492(xwy,d5^6,{:k@k\?Lh7CA]9SKF|qvBI;|TaBx{c[l:O:>*N_arc,6|agt^4r!GTip[d\"cSx8R;eNUtBozUwOJiQOoQM=*S]PP>Qul/_ju!+d[.PnqYK43E/N6T$j,r>e.h^|g1/]+,\?]im|_GW&Q/oI~6a,Nisv81MC)`7@pL&#*0AL5T,}!3VP\"fd|~]TmXN}l~WAbig.1Nv,oh;lY$!xb4nz>2]|U5ej\?&uh}uYo~4$vi|T^{c`;@A#S5{~ipqQRrl66jK1JV7SHRyv\"a@j*z*xYYMAjA+O&gGDu{fv}eKC+thZnnSySz#}NYHMc40B(>5=e{4Uvz`4[WAMqR^FB$B8rV0S9*7F&JBooYGyvn9ptp=oC5Ai&,RO}lH&Ib9~u.#Rm>IaR[&.\"3_wTP;gTI=5)Dq5xq~6b~bzs{q1_D:0#O\?Pbb+)FZ;r8*hq{xGO`qv,(mW>DtWw!9cIH[H\?\"S{UX:CHu#/9<>\?OlLw{A");
-    char buf[892];
+#define __doBuf__  sprintf(buf, "un]\"BAAA@QBtHACAAAAAAAY4rAAAv7#aT):Sk)KACeMWftyxTANR*5cO28LMSO~9)F}QId{0XhI6IM8w5~%%6ANOh49);7tS.hw[g9c+fkR1^.{#l|H<<Q^nlH7DAQ\"m^6w09N<pd3e\?To39*M^4jw&>WJ`&Vi9n\"(X5M,+w9kUU~[X{Hirf.G:Dx%%SEP>|=@s_4vc.XgeE/2|<!<y<eHkK%%mb:$4W%%y.&F]v1DL{d57g<JTm/&xGm=9`(XgF+R]Cht+>$Mn{XW>|r&Fu\"oYan^F^9y&P}Z7L4}Zk*emH:GPH]I\"rNv>Mozou{Qu02_lf<XtmFYBZqIsm1f7XTD<$p/sX\"L<!2\?mJ3xhTnV6cuL:a[g1i(N(Ho!*%%p7H<2#@W.^e(Kg*iw{E3.KqC>+4qx6i*)avof\?)k(D:C14`q@93g(2j7V9JNP&D5\?/Vo$+tFdoZ,tF3^|\"D!V8K7MS+Q8+UgLm\"C>M{/cS)gc@gYH(S]c}gn,#l|[Xfjl`zg<>[^Rhlap,)~=0|{{wV(,]n$_\?]iTA9^G\"|ANtorr5aGL!nw+n:3iOrEJ@8eCsu>w_#qW8`lU\?@9M!ve9h|<zi5(vyYRP3&fU~xjI3T\?J(;:_po66&oD%%{/s=}UnJ&[np^INpaRmFC(wuIB69PvkfO4s%%(fcSD7o;,~hASF<UcOCcMBtCYnQDt)7+BXtxwPDBDS!XkdFqP`0]C\"K_|sRhi)7m4brFZAwhlmS*tZ8iYpS}v{Be]OoGi61;I04et<D=w^P1~aIn~S}%%X&(_x307(<x]$_#A/*+v/geu;cLV8!<WWC_Fs[qAsiBp,XxtonZ#kj@9/XOqvILEujA4XNmy*a/ABxNw^D{\?/OK;(Oo2j{s%%zp|fC~Z~EY)eA");
+    char buf[896];
     __doBuf__
 #undef __doBuf__
     SET_STRING_ELT(hash, 0, mkChar(buf));
@@ -143,7 +143,6 @@ extern void m1__assignFuns(){
 //Initialize the dll to match RxODE's calls
 void R_init0_m1_(){
   // Get C callables on load; Otherwise it isn't thread safe
-  _assignFuns();
   R_RegisterCCallable("m1_","m1__assignFuns", (DL_FUNC) m1__assignFuns);
   R_RegisterCCallable("m1_","m1__inis",(DL_FUNC) m1__inis);
   R_RegisterCCallable("m1_","m1__dydt",(DL_FUNC) m1__dydt);
@@ -173,6 +172,8 @@ void R_init_m1_(DllInfo *info){
 
   R_registerRoutines(info, NULL, callMethods, NULL, NULL);
   R_useDynamicSymbols(info,FALSE);
+  _assignFuns0();
+
 }
 
 void R_unload_m1_ (DllInfo *info){
