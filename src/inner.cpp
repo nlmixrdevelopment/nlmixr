@@ -110,6 +110,7 @@ typedef struct {
   double *goldEta = NULL;
   double *gsaveEta = NULL;
   double *gthetaGrad = NULL;
+  bool mGthetaGrad = false;
   // n1qn1 specific vectors
   double *gZm = NULL;
   double *gG = NULL;
@@ -351,27 +352,28 @@ std::vector<int> gradType;
 
 extern "C" void rxOptionsFreeFocei(){
 
-  if (op_focei.neta != 0) {
-    if (op_focei.etaTrans != NULL) Free(op_focei.etaTrans);
-    op_focei.etaTrans=NULL;
-    if (op_focei.fullTheta != NULL) Free(op_focei.fullTheta);
-    op_focei.fullTheta = NULL;
-    if (op_focei.etaUpper != NULL) Free(op_focei.etaUpper);
-    op_focei.etaUpper = NULL;
-    if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
-    op_focei.gillRet = NULL;
-    if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
-    op_focei.gillDf = NULL;
-  } else {
-    if (op_focei.gthetaGrad != NULL) Free(op_focei.gthetaGrad);
-    op_focei.gthetaGrad = NULL;
-  }
+  if (op_focei.etaTrans != NULL) Free(op_focei.etaTrans);
+  op_focei.etaTrans=NULL;
+
+  if (op_focei.fullTheta != NULL) Free(op_focei.fullTheta);
+  op_focei.fullTheta = NULL;
+
+  if (op_focei.etaUpper != NULL) Free(op_focei.etaUpper);
+  op_focei.etaUpper = NULL;
+
+  if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
+  op_focei.gillRet = NULL;
+
+  if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
+  op_focei.gillDf = NULL;
+
+  if (op_focei.gthetaGrad != NULL && op_focei.mGthetaGrad) Free(op_focei.gthetaGrad);
+  op_focei.gthetaGrad = NULL;
+  op_focei.mGthetaGrad = false;
 
   if (inds_focei != NULL) Free(inds_focei);
   inds_focei=NULL;
 
-  if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
-  op_focei.gillDf = NULL;
   op_focei.alloc = false;
 
   focei_options newf;
@@ -2648,8 +2650,9 @@ static inline void foceiSetupNoEta_(){
   inds_focei =Calloc(rx->nsub, focei_ind);
   op_focei.gEtaGTransN=(op_focei.neta)*rx->nsub;
 
-  if (op_focei.gthetaGrad != NULL) Free(op_focei.gthetaGrad);
+  if (op_focei.gthetaGrad != NULL && op_focei.mGthetaGrad) Free(op_focei.gthetaGrad);
   op_focei.gthetaGrad = Calloc(op_focei.gEtaGTransN, double);
+  op_focei.mGthetaGrad = true;
   focei_ind *fInd;
   int jj = 0;
   for (int i = rx->nsub; i--;){
