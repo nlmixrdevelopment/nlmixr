@@ -350,18 +350,23 @@ std::vector<int> niterGrad;
 std::vector<int> gradType;
 
 extern "C" void rxOptionsFreeFocei(){
-  if (op_focei.etaTrans != NULL) Free(op_focei.etaTrans);
-  op_focei.etaTrans=NULL;
-  if (op_focei.fullTheta != NULL) Free(op_focei.fullTheta);
-  op_focei.fullTheta = NULL;
-  if (op_focei.etaUpper != NULL) Free(op_focei.etaUpper);
-  op_focei.etaUpper = NULL;
-  if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
-  op_focei.gillRet = NULL;
-  if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
-  op_focei.gillDf = NULL;
-  if (op_focei.gthetaGrad != NULL) Free(op_focei.gthetaGrad);
-  op_focei.gthetaGrad = NULL;
+
+  if (op_focei.neta != 0) {
+    if (op_focei.etaTrans != NULL) Free(op_focei.etaTrans);
+    op_focei.etaTrans=NULL;
+    if (op_focei.fullTheta != NULL) Free(op_focei.fullTheta);
+    op_focei.fullTheta = NULL;
+    if (op_focei.etaUpper != NULL) Free(op_focei.etaUpper);
+    op_focei.etaUpper = NULL;
+    if (op_focei.gillRet != NULL) Free(op_focei.gillRet);
+    op_focei.gillRet = NULL;
+    if (op_focei.gillDf != NULL) Free(op_focei.gillDf);
+    op_focei.gillDf = NULL;
+  } else {
+    if (op_focei.gthetaGrad != NULL) Free(op_focei.gthetaGrad);
+    op_focei.gthetaGrad = NULL;
+  }
+
   if (inds_focei != NULL) Free(inds_focei);
   inds_focei=NULL;
 
