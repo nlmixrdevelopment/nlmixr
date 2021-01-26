@@ -209,6 +209,7 @@ SEXP getDfSubsetVars(SEXP ipred, SEXP lhs) {
     }
   }
   if (k == 0) {
+    Free(keepVals);
     UNPROTECT(pro);
     return R_NilValue;
   }
