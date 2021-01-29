@@ -149,10 +149,6 @@ llik_neg_binomial <- function(y, params) {
     .Call(`_nlmixr_llik_neg_binomial`, y, params)
 }
 
-nlmixrShrink <- function(omegaMat, etasDf, etaLst) {
-    .Call(`_nlmixr_nlmixrShrink`, omegaMat, etasDf, etaLst)
-}
-
 augPredTrans <- function(pred, ipred, lambda, yjIn, low, hi) {
     .Call(`_nlmixr_augPredTrans`, pred, ipred, lambda, yjIn, low, hi)
 }

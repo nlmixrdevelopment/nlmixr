@@ -2258,7 +2258,7 @@ foceiFit.data.frame0 <- function(data,
     .etas <- .ret$ranef
     .thetas <- .ret$fixef
     .pars <- .Call(`_nlmixr_nlmixrParameters`, .thetas, .etas)
-    .ret$shrink <- .Call(`_nlmixr_nlmixrShrink`, .ret$omega, .etas, .pars$eta.lst[-(dim(.ret$omega)[1] + 1)])
+    .ret$shrink <- .Call(`_nlmixr_calcShrinkOnly`, .ret$omega, .pars$eta.lst, length(.etas$ID))
     .updateParFixed(.ret)
   } else {
     .updateParFixed(.ret)

@@ -7,8 +7,8 @@
 #include "cwres.h"
 #include "res.h"
 #include "ires.h"
-#include "shrink.h"
 #include "utilc.h"
+#include "shrink.h"
 
 /* Internal C calls, should not be called outside of C code. */
 typedef void (*S_fp) (double *, double *);
@@ -34,7 +34,6 @@ extern SEXP _nlmixr_llik_neg_binomial(SEXP, SEXP);
 
 // FOCEi
 extern SEXP _nlmixr_nlmixrParameters(SEXP, SEXP);
-extern SEXP _nlmixr_nlmixrShrink(SEXP, SEXP, SEXP);
 
 SEXP _nlmixr_foceiInnerLp(SEXP, SEXP);
 SEXP _nlmixr_likInner(SEXP, SEXP);
@@ -96,7 +95,6 @@ static const R_CallMethodDef CallEntries[] = {
   {"_nlmixr_llik_neg_binomial", (DL_FUNC) &_nlmixr_llik_neg_binomial, 2},
   {"slice_wrap",           (DL_FUNC) &slice_wrap,            7},
   {"_nlmixr_nlmixrParameters", (DL_FUNC) &_nlmixr_nlmixrParameters, 2},
-  {"_nlmixr_nlmixrShrink", (DL_FUNC) &_nlmixr_nlmixrShrink, 3},
   // FOCEi
   {"_nlmixr_foceiInnerLp", (DL_FUNC) &_nlmixr_foceiInnerLp, 2},
   {"_nlmixr_cholSE_", (DL_FUNC) &_nlmixr_cholSE_, 2},
