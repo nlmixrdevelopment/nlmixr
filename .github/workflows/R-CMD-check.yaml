@@ -67,6 +67,13 @@ jobs:
           sudo ln -s /usr/local/gfortran-10 /usr/local/gfortran
         shell: bash
 
+      - name: Create Makevars for Fortran linking options on macOS
+        if: runner.os == 'macOS'
+        run: |
+          try(dir.create("~/.R"))
+          writeLines(c("GCCBASE:=$(shell brew --prefix gcc)","FLIBS=-L$(GCCBASE)/lib/gcc/10/lib -lm",""),"~/.R/Makevars")
+        shell: Rscript {0}
+
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-r@v1
