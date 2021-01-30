@@ -49,7 +49,22 @@ jobs:
 
       - name: Install X11 dependencies on MacOS
         if: runner.os == 'macOS'
-        run: brew cask install xquartz
+        run: brew install --cask xquartz
+        shell: bash
+
+      - name: Install deps on MacOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install cairo
+          brew install libgit2
+        shell: bash
+
+      - name: Link gfortran on MacOS
+        if: runner.os == 'macOS'
+        run: |
+          sudo ln -s /usr/local/bin/gfortran-10 /usr/local/bin/gfortran
+          sudo mkdir /usr/local/gfortran
+          sudo ln -s /usr/local/gfortran-10 /usr/local/gfortran
         shell: bash
 
       - uses: actions/checkout@v2
@@ -61,19 +76,19 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v1
 
-      - name: Install packages from cran (source)
+      - name: Install Symengine from source for MacOS
+        if: runner.os == 'macOS'
+        run: install.packages("symengine", type="source")
+        shell: Rscript {0}
+
+      - name: Install development RxODE
         run: |
           install.packages('remotes')
-          install.packages("jsonlite", type="source")
-          install.packages("usethis", type="source")
-          install.packages("symengine", type="source")
-          install.packages("dparser", type="source")
           remotes::install_github('nlmixrdevelopment/RxODE')
         shell: Rscript {0}
 
       - name: Query dependencies
         run: |
-          install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
