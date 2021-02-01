@@ -2796,7 +2796,7 @@ nlmixrTest(
     })
 
     # nlmixrBoundsPrepareFunComments ####
-    if (interactive()) {
+    if (getOption("keep.source", interactive())) {
       test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments", {
         nlmixrTestFunToChar <- function(x) {
           as.character(attr(x, "srcref"), useSource = TRUE)
