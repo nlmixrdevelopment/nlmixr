@@ -156,7 +156,9 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#nlmixr-an-r-package-for-population-pkpd-modeling" class="anchor"></a>nlmixr: an R package for population PKPD modeling</h1></div>
 <hr>
-<p><img src="logo.png" alt="nlmixr"></p>
+<div class="figure">
+<img src="logo.png" alt=""><p class="caption">nlmixr</p>
+</div>
 <div id="authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-teun-post-richard-hooijmaijers-wenping-wang" class="section level5">
 <h5 class="hasAnchor">
 <a href="#authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-teun-post-richard-hooijmaijers-wenping-wang" class="anchor"></a>Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Teun Post, Richard Hooijmaijers, Wenping Wang</h5>
@@ -164,7 +166,7 @@
 <hr>
 <p><code>nlmixr</code> is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter definition syntax and results in a fit object that can be used as input into the <code>Xpose</code> package. Running nlmixr using the UUI is described in the vignette: ihttps://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd</p>
 <p>Under the hood <code>nlmixr</code> has five main modules:</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>
 <code><a href="reference/dynmodel.html">dynmodel()</a></code> and its mcmc cousin <code><a href="reference/dynmodel.mcmc.html">dynmodel.mcmc()</a></code> for nonlinear dynamic models of individual data;</li>
 <li>
@@ -178,21 +180,21 @@
 <code>gnlmm</code> for generalized non-linear mixed-models (possibly defined by ordinary differential equations) of population data by the adaptive Gaussian quadrature algorithm.</li>
 </ol>
 <p>A few utilities to facilitate population model building are also included in <code>nlmixr</code>.</p>
-<p>For a brief vignette describing the modules, please see: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf" class="uri">https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf</a></p>
-<p>The examples in the vignette can be run using VignetteDemo.R and the associated data files available at: <a href="https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes" class="uri">https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes</a></p>
-<p>For PKPD modeling (with ODE and dosing history) with <a href="http://mc-stan.org/">Stan</a>, check out Yuan’s package PMXStan: <a href="https://github.com/yxiong1/pmxstan" class="uri">https://github.com/yxiong1/pmxstan</a>.</p>
+<p>For a brief vignette describing the modules, please see: https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf</p>
+<p>The examples in the vignette can be run using VignetteDemo.R and the associated data files available at: https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes</p>
+<p>For PKPD modeling (with ODE and dosing history) with <a href="http://mc-stan.org/">Stan</a>, check out Yuan’s package PMXStan: https://github.com/yxiong1/pmxstan.</p>
 </div>
 </div>
 <div id="using-a-docker-image-for-running-nlmixr" class="section level1">
 <h1 class="hasAnchor">
 <a href="#using-a-docker-image-for-running-nlmixr" class="anchor"></a>Using a Docker Image for running nlmixr</h1>
 <p>One of the easiest way to setup nlmixr is to docker image. For more details see:</p>
-<p><a href="https://github.com/RichardHooijmaijers/nlmixr.docker" class="uri">https://github.com/RichardHooijmaijers/nlmixr.docker</a></p>
+<p>https://github.com/RichardHooijmaijers/nlmixr.docker</p>
 </div>
 <div id="windows-installer" class="section level1">
 <h1 class="hasAnchor">
 <a href="#windows-installer" class="anchor"></a>Windows installer</h1>
-<p>For those not interested in customized installation on Windows, we <strong>recommend</strong> you download a Windows installer for your platform from the following link: <a href="https://github.com/nlmixrdevelopment/nlmixr/releases/" class="uri">https://github.com/nlmixrdevelopment/nlmixr/releases/</a></p>
+<p>For those not interested in customized installation on Windows, we <strong>recommend</strong> you download a Windows installer for your platform from the following link: https://github.com/nlmixrdevelopment/nlmixr/releases/</p>
 <p><strong>STOP AT THIS POINT IF YOU USED THE INSTALLER</strong></p>
 <p>Sometimes trying to install yourself will corrupt the installation and nlmixr will not run.</p>
 </div>
@@ -200,7 +202,7 @@
 <h1 class="hasAnchor">
 <a href="#installation-on-windows" class="anchor"></a>Installation on Windows</h1>
 <p>To replicate the environment that was used in Windows for <code>nlmixr</code> development, you will need administrator rights, and you should perform the following steps:</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>Install R 3.5.0 (or later) from the R website.
 <ul>
 <li>For best results, we suggest you use <code>C:\R\R-3.5.0</code>, but you can also use the default location (<code>C:\Program Files\R\R-3.5.0</code>) as well, if really needed.</li>
@@ -214,9 +216,15 @@
 <ul>
 <li>
 <code>RxODE</code>, a required component of <code>nlmixr</code>, checks and sets up the path based on the following:
-a. <code>Rtools</code> is in the path (fastest and recommended option)
-b. <code>Rtools</code> was installed with information saved to the Windows registry, and <code>RxODE</code> can find the installation.
-c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</code> or <code>RBuildTools</code>
+<ol style="list-style-type: lower-alpha">
+<li>
+<code>Rtools</code> is in the path (fastest and recommended option)</li>
+<li>
+<code>Rtools</code> was installed with information saved to the Windows registry, and <code>RxODE</code> can find the installation.</li>
+<li>
+<code>Rtools</code> is on a hard drive installed in either <code>Rtools</code> or <code>RBuildTools</code>
+</li>
+</ol>
 </li>
 <li>If you are on 64-bit windows, please <em>do not install</em> the R 3.3.x 32-bit toolchain. These files can interfere with some packages that compile binaries, with unpredictable consequences. Similarly, only install 32-bit Rtools on 32-bit versions of Windows.</li>
 </ul>
@@ -253,7 +261,7 @@ c. <code>Rtools</code> is on a hard drive installed in either <code>Rtools</cod
 </li>
 </ol>
 <pre class="{r}"><code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")</a></code></pre>
-<ol>
+<ol start="6" style="list-style-type: decimal">
 <li>Install <code>nlmixr</code>.
 <ul>
 <li>Load <code>devtools</code> again using <code><a href="https://devtools.r-lib.org/">library(devtools)</a></code>
@@ -275,7 +283,7 @@ CXX14FLAGS=-O2 -Wall</code></pre>
 <h1 class="hasAnchor">
 <a href="#installation-on-linux" class="anchor"></a>Installation on Linux</h1>
 <p>Instructions for Ubuntu-alike distributions are given here (specifically, <a href="http://releases.ubuntu.com/16.04/">Ubuntu 16.04 Xenial Xerus</a>), but all current Linux distributions are supported, in principle.</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>Install R 3.4.1 (or later) from an appropriate repository (Ubuntu Xenial shown below, based on instructions provided <a href="https://www.digitalocean.com/community/tutorials/how-to-install-r-on-ubuntu-16-04-2">here</a>).
 <ul>
 <li>You will need administrator privileges (i.e. access to <code>sudo</code>). Provide your admin password when asked.</li>
@@ -327,7 +335,7 @@ CXX14FLAGS=-O2 -Wall</code></pre>
 <h1 class="hasAnchor">
 <a href="#installation-on-macos" class="anchor"></a>Installation on macOS</h1>
 <p>Instructions for macOS 10.13 Mojave are provided here. They should be broadly extensible to all recent releases of macOS, however.</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>Install R 3.6.1 from the R website.
 <ul>
 <li>Download and install <code>R-3.6.1.pkg</code> (or later) from <a href="http://cran.r-project.org/bin/macosx/">CRAN</a>.</li>
@@ -366,7 +374,7 @@ CXX14FLAGS=-O2 -Wall</code></pre>
 <p>You also need to create a directory <code>~/.R</code> and then put a file <code>Makevars</code> in it; The context of the file should contain:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># ~/.R/Makevars</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="va">CXX14FLAGS=</span>-O2 <span class="ex">-march</span>=native -mtune=native -arch x86_64 -ftemplate-depth-256 -fPIC</span></code></pre></div>
-<ol>
+<ol start="4" style="list-style-type: decimal">
 <li>Install <code>devtools</code> and dependencies.
 <ul>
 <li>This package is required to install packages from Github, amongst other things.</li>
@@ -506,10 +514,9 @@ nlmixr run under saem: Yes
 <li>Yuan Xiong <br><small class="roles"> Author </small>  </li>
 <li>Rik Schoemaker <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7538-3005" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Justin Wilkins <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7099-9396" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Richard Hooijmaijers <br><small class="roles"> Author </small>  </li>
-<li>Teun Post <br><small class="roles"> Author </small>  </li>
 <li>Wenping Wang <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Mason McComb <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9871-8616" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Richard Hooijmaijers <br><small class="roles"> Author </small>  </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
 </div>
@@ -519,7 +526,7 @@ nlmixr run under saem: Yes
 
 
       <footer><div class="copyright">
-  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Richard Hooijmaijers, Teun Post, Wenping Wang, Mason McComb.</p>
+  <p>Developed by Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Wenping Wang, Mason McComb, Richard Hooijmaijers.</p>
 </div>
 
 <div class="pkgdown">
