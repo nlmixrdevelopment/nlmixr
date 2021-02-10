@@ -39,7 +39,7 @@
   .env <- x$env
   .cmp <- c(
     names(x),
-    "md5",
+    "md5", "condition",
     "posthoc", "notes",
     "logLik", "value", "obf", "ofv", "objf", "OBJF", "objective", "AIC", "BIC",
     "value", "obf", "ofv", "objf", "sigma", "coefficients", "parHist", "par.hist",

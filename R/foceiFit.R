@@ -2340,6 +2340,16 @@ foceiFit.data.frame0 <- function(data,
   if (arg == "env") {
     return(.env)
   }
+  if (arg == "condition") {
+    .objDf <- .env$objDf
+    #$objDf[,"Condition Number"]
+    if (any(names(.objDf) == "Condition Number")) {
+      .cn <- .objDf[, "Condition Number"]
+      .cn <- .cn[!is.na(.cn)]
+      return(.cn)
+    }
+    return(NULL)
+  }
   if (exists("uif", .env)) {
     .uif <- .env$uif
     if (arg == "modelName") arg <- "model.name"
