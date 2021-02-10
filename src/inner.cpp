@@ -5563,6 +5563,17 @@ void foceiFinalizeTables(Environment e){
       tmpNM = as<NumericMatrix>(e["cor"]);
       tmpNM.attr("dimnames") = thetaDim;
       e["cor"]=tmpNM;
+    } else {
+      arma::mat cov0 = as<arma::mat>(e["cov"]);
+      arma::mat Dcov(cov0.n_rows,cov0.n_rows,fill::zeros);
+      Dcov.diag() = (sqrt(cov0.diag()));
+      arma::vec sd2=Dcov.diag();
+      Dcov = inv_sympd(Dcov);
+      arma::mat cor2 = Dcov * cov0 * Dcov;
+      cor2.diag()= sd2;
+      tmpNM = wrap(cor2);
+      tmpNM.attr("dimnames") = thetaDim;
+      e["cor"] = tmpNM;
     }
     if (e.exists("Rinv") && RxODE::rxIs(e["Rinv"], "matrix")){
       tmpNM = as<NumericMatrix>(e["Rinv"]);
