@@ -149,7 +149,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Working with multiple endpoints</h1>
             
-            <h4 class="date">2021-02-04</h4>
+            <h4 class="date">2021-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/multiple-endpoints.Rmd"><code>vignettes/multiple-endpoints.Rmd</code></a></small>
       <div class="hidden name"><code>multiple-endpoints.Rmd</code></div>
@@ -597,7 +597,7 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            saem    setup table  cwres covariance    other</span>
-<span class="co">#&gt; elapsed 128.764 13.73724 4.195 18.063      0.062 0.857757</span>
+<span class="co">#&gt; elapsed 165.163 17.64412 5.446 23.264      0.085 1.130878</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -615,6 +615,21 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; pdadd.err  3.61                                 3.61                           </span>
 <span class="co">#&gt;  </span>
 <span class="co">#&gt;   Covariance Type ($covMethod): linFim</span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
+<span class="co">#&gt;        cor:tka,tktr    cor:tcl,tktr     cor:tv,tktr  cor:temax,tktr  cor:tec50,tktr </span>
+<span class="co">#&gt;         -0.237         -0.0396          0.0727          0.0654          0.0689  </span>
+<span class="co">#&gt;  cor:tkout,tktr    cor:te0,tktr     cor:tcl,tka      cor:tv,tka   cor:temax,tka </span>
+<span class="co">#&gt;        -0.0439         0.00654         -0.0174          0.0461          0.0765  </span>
+<span class="co">#&gt;   cor:tec50,tka   cor:tkout,tka     cor:te0,tka      cor:tv,tcl   cor:temax,tcl </span>
+<span class="co">#&gt;         0.0490         -0.0691         0.00413           0.117         -0.0723  </span>
+<span class="co">#&gt;   cor:tec50,tcl   cor:tkout,tcl     cor:te0,tcl    cor:temax,tv    cor:tec50,tv </span>
+<span class="co">#&gt;         -0.218         -0.0316         -0.0166           0.199           0.186  </span>
+<span class="co">#&gt;    cor:tkout,tv      cor:te0,tv cor:tec50,temax cor:tkout,temax   cor:te0,temax </span>
+<span class="co">#&gt;         0.0289          0.0257           0.739          -0.754         -0.0143  </span>
+<span class="co">#&gt; cor:tkout,tec50   cor:te0,tec50   cor:te0,tkout </span>
+<span class="co">#&gt;         -0.441         -0.0440           0.107  </span>
+<span class="co">#&gt;  </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
 <span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
 <span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
@@ -669,7 +684,7 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
 <span class="co">#&gt; </span>
@@ -679,7 +694,7 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [1] "CMT"</span>
 <span class="co">#&gt; calculating covariance matrix</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:02:05 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:02:14 </span>
 <span class="co">#&gt; done</span></code></pre></div>
 <div id="focei-diagnostic-plots" class="section level3">
 <h3 class="hasAnchor">
@@ -693,8 +708,8 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table  other</span>
-<span class="co">#&gt; elapsed 19.46441 125.1608   125.1608 3.437 489.59</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 27.71799 134.4428   134.4428 4.422 521.1393</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>

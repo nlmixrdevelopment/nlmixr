@@ -300,7 +300,7 @@
 <ul>
 <li><p>Added auto-completion of <code>nlmixr</code> object properties accessed by <code><a href="https://rdrr.io/r/base/Extract.html">$</a></code>. This works for major editors including <code>Rstudio</code>, <code>ESS</code>, and Base R itself.</p></li>
 <li><p>Changed the way that Rstudio notebooks display <code>nlmixr</code> objects; It should be more legible in Rstudio.</p></li>
-<li><p>Graphics have been revamped to show censoring (including adding ggplot stat/geom <code>geom_cens</code>) as well as use <code>RxODE</code>’s ggplot theme (<code><a href="https://nlmixrdevelopment.github.io/RxODE/reference/rxTheme.html">rxTheme()</a></code>). Additionally time after dose is calculated as <code>tad</code> for all <code>nlmixr</code> models</p></li>
+<li><p>Graphics have been revamped to show censoring (including adding ggplot stat/geom <code>geom_cens</code>) as well as use <code>RxODE</code>’s ggplot theme (<code>rxTheme()</code>). Additionally time after dose is calculated as <code>tad</code> for all <code>nlmixr</code> models</p></li>
 <li><p>Tables generation has been refactored; <code>npde</code> uses the <code>arma</code> and <code>RxODE</code> random number generators which may change results. Also the default of <code>ties=TRUE</code> has been changed to <code>ties=FALSE</code>. <code>npde</code> calculations have been threaded with <code>OpenMP</code> to speed up the calculation as well. This refactoring was required to have the <code>dv</code> imputation between <code>cwres</code> and <code>npde</code> use the same method</p></li>
 </ul>
 </div>

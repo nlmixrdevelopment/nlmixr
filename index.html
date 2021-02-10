@@ -151,20 +151,16 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-
 <div id="nlmixr-an-r-package-for-population-pkpd-modeling" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#nlmixr-an-r-package-for-population-pkpd-modeling" class="anchor"></a>nlmixr: an R package for population PKPD modeling</h1></div>
+<!-- badges: start -->
+
 <hr>
 <div class="figure">
 <img src="logo.png" alt=""><p class="caption">nlmixr</p>
 </div>
-<div id="authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-teun-post-richard-hooijmaijers-wenping-wang" class="section level5">
-<h5 class="hasAnchor">
-<a href="#authors-matthew-fidler-yuan-xiong-rik-schoemaker-justin-wilkins-teun-post-richard-hooijmaijers-wenping-wang" class="anchor"></a>Authors: Matthew Fidler, Yuan Xiong, Rik Schoemaker, Justin Wilkins, Teun Post, Richard Hooijmaijers, Wenping Wang</h5>
-<p><a href="https://github.com/nlmixrdevelopment/nlmixr/actions"><img src="https://github.com/nlmixrdevelopment/nlmixr/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="https://codecov.io/gh/nlmixrdevelopment/nlmixr?branch=master"><img src="https://codecov.io/gh/nlmixrdevelopment/nlmixr/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></p>
-<hr>
-<p><code>nlmixr</code> is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter definition syntax and results in a fit object that can be used as input into the <code>Xpose</code> package. Running nlmixr using the UUI is described in the vignette: ihttps://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd</p>
+<p><code>nlmixr</code> is an R package for fitting general dynamic models, pharmacokinetic (PK) models and pharmacokinetic-pharmacodynamic (PKPD) models in particular, with either individual data or population data. The nlme and SAEM estimation routines can be accessed using a universal user interface (UUI), that provides universal model and parameter definition syntax and results in a fit object that can be used as input into the <code>Xpose</code> package. Running nlmixr using the UUI is described in the vignette: https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd</p>
 <p>Under the hood <code>nlmixr</code> has five main modules:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -182,307 +178,23 @@
 <p>A few utilities to facilitate population model building are also included in <code>nlmixr</code>.</p>
 <p>For a brief vignette describing the modules, please see: https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf</p>
 <p>The examples in the vignette can be run using VignetteDemo.R and the associated data files available at: https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes</p>
-<p>For PKPD modeling (with ODE and dosing history) with <a href="http://mc-stan.org/">Stan</a>, check out Yuan’s package PMXStan: https://github.com/yxiong1/pmxstan.</p>
+<p>For PKPD modeling (with ODE and dosing history) with <a href="http://mc-stan.org/">Stan</a>, check out Yuan’s package PMXStan:</p>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>You can install the released version of nlmixr from <a href="https://CRAN.R-project.org">CRAN</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"nlmixr"</span><span class="op">)</span></code></pre></div>
+<p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"nlmixrdevelopment/nlmixr"</span><span class="op">)</span></code></pre></div>
+</div>
+<div id="example" class="section level2">
+<h2 class="hasAnchor">
+<a href="#example" class="anchor"></a>Example</h2>
 </div>
 </div>
-<div id="using-a-docker-image-for-running-nlmixr" class="section level1">
-<h1 class="hasAnchor">
-<a href="#using-a-docker-image-for-running-nlmixr" class="anchor"></a>Using a Docker Image for running nlmixr</h1>
-<p>One of the easiest way to setup nlmixr is to docker image. For more details see:</p>
-<p>https://github.com/RichardHooijmaijers/nlmixr.docker</p>
-</div>
-<div id="windows-installer" class="section level1">
-<h1 class="hasAnchor">
-<a href="#windows-installer" class="anchor"></a>Windows installer</h1>
-<p>For those not interested in customized installation on Windows, we <strong>recommend</strong> you download a Windows installer for your platform from the following link: https://github.com/nlmixrdevelopment/nlmixr/releases/</p>
-<p><strong>STOP AT THIS POINT IF YOU USED THE INSTALLER</strong></p>
-<p>Sometimes trying to install yourself will corrupt the installation and nlmixr will not run.</p>
-</div>
-<div id="installation-on-windows" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation-on-windows" class="anchor"></a>Installation on Windows</h1>
-<p>To replicate the environment that was used in Windows for <code>nlmixr</code> development, you will need administrator rights, and you should perform the following steps:</p>
-<ol style="list-style-type: decimal">
-<li>Install R 3.5.0 (or later) from the R website.
-<ul>
-<li>For best results, we suggest you use <code>C:\R\R-3.5.0</code>, but you can also use the default location (<code>C:\Program Files\R\R-3.5.0</code>) as well, if really needed.</li>
-<li>For 64-bit Windows, it is best practice to include <em>only</em> the 64-bit version. If you include 32-bit files, some packages may not run correctly. Additionally, both the 32- and 64-bit binaries have to be compiled for every package. Similarly, if on 32-bit Windows, install only the 32-bit version of R (and Python, and Rtools).</li>
-</ul>
-</li>
-<li>Install the appropriate version of Rtools for Windows, currently version 3.5, from <a href="https://cran.r-project.org/bin/windows/Rtools/">here</a>.
-<ul>
-<li>This is an absolute requirement, since it includes C++ and related compilers not usually available under Windows.</li>
-<li>For best results, use the default location of <code>c:\Rtools</code>
-<ul>
-<li>
-<code>RxODE</code>, a required component of <code>nlmixr</code>, checks and sets up the path based on the following:
-<ol style="list-style-type: lower-alpha">
-<li>
-<code>Rtools</code> is in the path (fastest and recommended option)</li>
-<li>
-<code>Rtools</code> was installed with information saved to the Windows registry, and <code>RxODE</code> can find the installation.</li>
-<li>
-<code>Rtools</code> is on a hard drive installed in either <code>Rtools</code> or <code>RBuildTools</code>
-</li>
-</ol>
-</li>
-<li>If you are on 64-bit windows, please <em>do not install</em> the R 3.3.x 32-bit toolchain. These files can interfere with some packages that compile binaries, with unpredictable consequences. Similarly, only install 32-bit Rtools on 32-bit versions of Windows.</li>
-</ul>
-</li>
-<li>Make sure the compilers have been added to the Windows <code>PATH</code> environment variable, or <code>RxODE</code> and <code>nlmixr</code> will not work (this should be done automatically during installation).</li>
-</ul>
-</li>
-<li>Install a version of Python for Windows.
-<ul>
-<li>This is used for its symbolic algebra package <a href="http://sympy.org/">SymPy</a>.</li>
-<li>If you already have a python installed, it is much easier to piggy-back on that system than install two different python versions.</li>
-<li>If you are new to python, a very robust Python distribution that includes <a href="http://sympy.org/">SymPy</a> and many packages that may be useful to the data scientist and/or pharmacometrician is <a href="https://www.anaconda.com/download/">Anaconda</a>. Although very straightforward and easy to install, it is quite a large download and contains much more than you will need to run <code>nlmixr</code>. When installing, use the Python 3.6 version. During the installation, Anaconda provides the option of adding itself to the <code>PATH</code> environment variable, but advises against it; please do this anyway (despite the red warning).</li>
-<li>Another option is to use <a href="http://python.org">official Python</a>, although you will need to install <a href="http://sympy.org/">SymPy</a> separately if you go this route, which is sometimes not straightforward under Windows 10 owing to folder permissions (see <a href="https://stackoverflow.com/questions/31172719/pip-install-access-denied-on-windows">here</a> for a few workarounds). Nonetheless, see <a href="http://simpy.readthedocs.io/en/latest/simpy_intro/installation.html">here</a> for instructions for installation from source or using <code>pip</code>.</li>
-<li>Regardless of the option you choose, please use like with like (64-bit Python for 64-bit Windows, for example).</li>
-<li>Once again, make sure Python has been added to the Windows <code>PATH</code> environment variable, or <code>RxODE</code> and <code>nlmixr</code> will not work, no matter what Anaconda might say.</li>
-</ul>
-</li>
-<li>Install <code>devtools</code>.
-<ul>
-<li>This package is required to install packages from Github, amongst other things.</li>
-<li>This can be done from a clean R session by <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</li>
-</ul>
-</li>
-<li>Load <code>devtools</code> using <code><a href="https://devtools.r-lib.org/">library(devtools)</a></code>.</li>
-<li>Install <code>RxODE</code>.
-<ul>
-<li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
-<li>Once installed, type <code>RxODE::rxWinPythonSetup()</code> to install the required package <code>SnakeCharmR</code>and to make sure Python and SymPy are working properly. Since <code>SnakeCharmR</code> is orphaned, it may not work without installing directly from github with the following command: <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("nlmixrdevelopment/SnakeCharmR")</a></code>
-</li>
-<li>Restart your R session.</li>
-<li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://rdrr.io/r/base/library.html">library(SnakeCharmR)</a></code>.</li>
-<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://nlmixrdevelopment.github.io/RxODE/">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.). This also requires installing <code>RxODE</code> with the tests. Devtools changed so that tests are no longer installed by default. The correct command to install the test suite is:</li>
-</ul>
-</li>
-</ol>
-<pre class="{r}"><code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")</a></code></pre>
-<ol start="6" style="list-style-type: decimal">
-<li>Install <code>nlmixr</code>.
-<ul>
-<li>Load <code>devtools</code> again using <code><a href="https://devtools.r-lib.org/">library(devtools)</a></code>
-</li>
-<li>Since <code>nlmixr</code> shares some stan headers, nlmixr now needs <code>C++14</code> support. To ease the setup you can run the command <code>RxODE::rxC14()</code> which creates the following build file in <code>~/.R/Makevars.win</code>. If there are problems you may have to edit the file manually to match your configuration.</li>
-</ul>
-</li>
-</ol>
-<pre class="{make}"><code># Makvars.win
-CXX14=$(BINPREF)g++ $(M_ARCH)
-CXX14STD=-std=c++1y
-CXX14FLAGS=-O2 -Wall</code></pre>
-<ul>
-<li>Finally, install <code>nlmixr</code> by running <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github("nlmixrdevelopment/nlmixr")</a></code>
-</li>
-</ul>
-</div>
-<div id="installation-on-linux" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation-on-linux" class="anchor"></a>Installation on Linux</h1>
-<p>Instructions for Ubuntu-alike distributions are given here (specifically, <a href="http://releases.ubuntu.com/16.04/">Ubuntu 16.04 Xenial Xerus</a>), but all current Linux distributions are supported, in principle.</p>
-<ol style="list-style-type: decimal">
-<li>Install R 3.4.1 (or later) from an appropriate repository (Ubuntu Xenial shown below, based on instructions provided <a href="https://www.digitalocean.com/community/tutorials/how-to-install-r-on-ubuntu-16-04-2">here</a>).
-<ul>
-<li>You will need administrator privileges (i.e. access to <code>sudo</code>). Provide your admin password when asked.</li>
-<li>Add the official CRAN repository for Ubuntu: <code>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9</code>
-</li>
-<li>Add the official CRAN repository for Ubuntu: <code>sudo add-apt-repository 'deb [arch=amd64,i386] https://cran.rstudio.com/bin/linux/ubuntu xenial/'</code>. If you aren’t using Ubuntu Xenial, change <code>xenial</code> to match your distribution’s codename.</li>
-<li>Now refresh the package list using <code>sudo apt-get update</code>.</li>
-<li>We can now install base R and required development libraries, and their dependencies: <code>sudo apt-get install r-base r-base-dev libssl-dev</code>
-</li>
-</ul>
-</li>
-<li>Install Python dependencies.
-<ul>
-<li>Enter this: <code>sudo apt-get install python-sympy python-pip python-setuptools python3-pip python-dev python3-dev</code>.</li>
-</ul>
-</li>
-<li>Install <code>devtools</code> and dependencies.
-<ul>
-<li>This package is required to install packages from Github, amongst other things.</li>
-<li>Some Linux distributions don’t include build tools out of the box. To be safe, check this: <code>sudo apt-get install build-essential</code>
-</li>
-<li>Install <code>devtools</code> from a clean R session by entering <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</li>
-</ul>
-</li>
-<li>In R, load <code>devtools</code> using <code><a href="https://devtools.r-lib.org/">library(devtools)</a></code>.</li>
-<li>Install <code>RxODE</code>.
-<ul>
-<li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
-<li>Install <code>SnakeCharmR</code> using <code>install_github("nlmixrdevelopment/SnakeCharmR")</code>.</li>
-<li>Restart your R session.</li>
-<li>As a quick test, you can make sure that R and Python can communicate by typing the command <code><a href="https://rdrr.io/r/base/library.html">library(SnakeCharmR)</a></code>.</li>
-<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://nlmixrdevelopment.github.io/RxODE/">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.)
-<ul>
-<li>Note this requires a special install option to make sure the tests are installed: <code><a href="https://remotes.r-lib.org/reference/install_github.html">remotes::install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")</a></code>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Install <code>nlmixr</code>.
-<ul>
-<li>This can be done by <code>install_github("nlmixrdevelopment/nlmixr")</code>
-</li>
-</ul>
-</li>
-</ol>
-</div>
-<div id="installation-on-macos" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation-on-macos" class="anchor"></a>Installation on macOS</h1>
-<p>Instructions for macOS 10.13 Mojave are provided here. They should be broadly extensible to all recent releases of macOS, however.</p>
-<ol style="list-style-type: decimal">
-<li>Install R 3.6.1 from the R website.
-<ul>
-<li>Download and install <code>R-3.6.1.pkg</code> (or later) from <a href="http://cran.r-project.org/bin/macosx/">CRAN</a>.</li>
-</ul>
-</li>
-<li>Install Python dependencies.
-<ul>
-<li>Install <code>pip</code> from the macOS terminal prompt: <code>sudo easy_install pip</code>.
-<ul>
-<li>If <code>easy_install</code> doesn’t work, you can download by <code>curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py</code> and then run <code>sudo python get-pip.py</code>
-</li>
-</ul>
-</li>
-<li>Install <code>sympy</code> using <code>pip</code>: <code>sudo -H pip install sympy</code>.</li>
-</ul>
-</li>
-<li>Install build tools.
-<ul>
-<li>Install the clang 8.0+ and gfortran 6.1+ packages from <a href="http://cran.r-project.org/bin/macosx/tools/">CRAN development tools website</a>
-</li>
-<li>Install Mac OSX command like tools by typing <code>xcode-select --install</code> and then choose <code>install</code>. This allows you to compile the package without downloading the entire (large) Xcode package. Make sure to perform this step even if the Xcode package is already installed.</li>
-<li>If you are using macOS &gt;= 10.14 you have to also type the following in the terminal to install the compiler headers:</li>
-</ul>
-</li>
-</ol>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">sudo</span> installer -pkg \</span>
-<span id="cb3-2"><a href="#cb3-2"></a>/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg \</span>
-<span id="cb3-3"><a href="#cb3-3"></a>-target /</span></code></pre></div>
-<ul>
-<li>Change <code>~/.Rprofile</code> to have the following line to adjust the paths in R to use the CRAN compilers (if not present, create the .Rprofile file):</li>
-</ul>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># make sure to adjust the version number of clang based on the downloaded version in step 3 (e.g. clang8/bin)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv</a></span><span class="op">(</span><span class="st">"PATH"</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"/usr/local/clang8/bin:/usr/local/gfortran/bin:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span><span class="op">(</span><span class="st">"PATH"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><strong>Make Sure you have an extra line at the end of this file; Otherwise R will not pick up the correct paths</strong>.</p>
-<p>You also need to create a directory <code>~/.R</code> and then put a file <code>Makevars</code> in it; The context of the file should contain:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># ~/.R/Makevars</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="va">CXX14FLAGS=</span>-O2 <span class="ex">-march</span>=native -mtune=native -arch x86_64 -ftemplate-depth-256 -fPIC</span></code></pre></div>
-<ol start="4" style="list-style-type: decimal">
-<li>Install <code>devtools</code> and dependencies.
-<ul>
-<li>This package is required to install packages from Github, amongst other things.</li>
-<li>Install <code>devtools</code> from a clean R session by entering <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</li>
-</ul>
-</li>
-<li>In R, load <code>devtools</code> using <code><a href="https://devtools.r-lib.org/">library(devtools)</a></code>.</li>
-<li>Install <code>RxODE</code>.
-<ul>
-<li>Currently the new version of <code>RxODE</code> is in the process of being uploaded to CRAN. <code>nlmixr</code> needs this newer version of <code>RxODE</code> to function correctly. To install this version, use the command: <code>install_github("nlmixrdevelopment/RxODE")</code>.</li>
-<li>Install <code>reticulate</code> using <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("reticulate")</a></code>.</li>
-<li>Restart your R session.</li>
-<li>To validate or test the installation of <code>RxODE</code> completely, you can type the following <code><a href="https://nlmixrdevelopment.github.io/RxODE/">library(RxODE); rxTest();</a></code> and it will run all of the unit tests in RxODE to make sure it is running correctly on your system. (Note that the <code>testthat</code> package is required for this, and it will take a long time.)
-<ul>
-<li>Note this requires a special install option to make sure the tests are installed: <code><a href="https://remotes.r-lib.org/reference/install_github.html">remotes::install_github("nlmixrdevelopment/RxODE", INSTALL_opts="--install-tests")</a></code>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Install <code>nlmixr</code>.
-<ul>
-<li>This can be done by <code>install_github("nlmixrdevelopment/nlmixr")</code>
-</li>
-</ul>
-</li>
-</ol>
-</div>
-<div id="notes-on-python-configuration" class="section level1">
-<h1 class="hasAnchor">
-<a href="#notes-on-python-configuration" class="anchor"></a>Notes on Python configuration</h1>
-<p>If you have multiple versions of python installed on your system, you may run into some more issues. To be more careful in your install, you can install SnakeCharmR as follows:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html">Sys.setenv</a></span><span class="op">(</span>SNAKECHARMR_PYTHON_VERSION<span class="op">=</span><span class="st">"/path/to/python/with/sympy/installed"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"nlmixrdevelopment/SnakeCharmR"</span><span class="op">)</span></code></pre></div>
-<p>You may also have to adjust the following python variables to match the version with sympy installed:</p>
-<table class="table">
-<colgroup>
-<col width="49%">
-<col width="50%">
-</colgroup>
-<thead><tr class="header">
-<th>Environmental Variable</th>
-<th>Correct value</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><code>PYTHON_EXE</code></td>
-<td>Path where the python with sympy is installed</td>
-</tr>
-<tr class="even">
-<td><code>PYTHONHOME</code></td>
-<td>Path where the python with sympy is installed</td>
-</tr>
-<tr class="odd">
-<td><code>PYTHON_INCLUDE</code></td>
-<td>Path where the python libraries are installed; In windows this is <code>PYTHONHOME\include</code>
-</td>
-</tr>
-<tr class="even">
-<td><code>PYTHON_LIB</code></td>
-<td>Path where python libraries are installed; In windows this is <code>PYTHONHOME\libs</code>
-</td>
-</tr>
-<tr class="odd">
-<td><code>PYTHONPATH</code></td>
-<td>Path where python searches. In windows this is a path-style variable including <code>PYTHONHOME\DLLs</code>, <code>PYTHONHOME\Lib</code> and <code>PYTHONHOME\Lib\site-packages</code>.</td>
-</tr>
-<tr class="even">
-<td><code>PYTHONSTARTUP</code></td>
-<td>In windows, this value is unset if present</td>
-</tr>
-</tbody>
-</table>
-<p>I believe you could also unset some of these variables and python can figure them out. Please be warned if these variables are not setup correctly a call to python will abort python. The python abort does not respect R’s way of doing things and will also abort/crash R.</p>
-<p>To test without running a model you may wish to try</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">SnakeCharmR</span><span class="op">)</span></code></pre></div>
-<p>If it doesn’t crash R, then python is likely setup correctly.</p>
-<p>After that point you can then type:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://nlmixrdevelopment.github.io/RxODE/">RxODE</a></span><span class="op">)</span>
-<span class="fu">rxSymPyVersion</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>It will show the version of sympy that you are using if SnakeCharmR is setup correctly.</p>
-</div>
-<div id="testing-the-install" class="section level1">
-<h1 class="hasAnchor">
-<a href="#testing-the-install" class="anchor"></a>Testing the install</h1>
-<p>Once nlmixr is installed, you can test if everything is working well (as well as running shinyMixR) by <a href="https://raw.githubusercontent.com/nlmixrdevelopment/nlmixr/master/build/test_install.R">running this install checker</a> by Richard Hooijmaijers &amp; Matt Fidler.</p>
-<p>Once downloaded you would source the code; If successful you should see something similar to the following:</p>
-<pre><code>&gt; source("test_install.R")
-Correct R version: Yes, R version 3.5.0 (2018-04-23)
-RxODE installed: Yes
-Python installed: Yes, Python 3.6.2
-sympy installed: Yes
-devtools package installed: Yes
-Rtools installed: Yes
-RxODE package installed: Yes
-SnakeCharmR package installed: Yes
-nlmixr package installed: Yes
-xpose.nlmixr package installed: Yes
-shinyMixR package installed: Yes
-Loading required package: nlme
-nlmixr run under nlme: Yes
-nlmixr run under saem: Yes
----- Installation test finished! ----</code></pre>
-</div>
-
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -521,7 +233,14 @@ nlmixr run under saem: Yes
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/nlmixrdevelopment/nlmixr/actions"><img src="https://github.com/nlmixrdevelopment/nlmixr/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://codecov.io/gh/nlmixrdevelopment/nlmixr?branch=master"><img src="https://codecov.io/gh/nlmixrdevelopment/nlmixr/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 
