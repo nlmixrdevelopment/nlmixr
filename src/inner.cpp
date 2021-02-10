@@ -4771,7 +4771,7 @@ NumericMatrix foceiCalcCov(Environment e){
 	bool isPd;
 	std::string rstr = "r";
 	bool checkSandwich = false;
-	if (op_focei.covMethod == 1 || op_focei.covMethod == 2){
+	if (op_focei.covMethod == 1 || op_focei.covMethod == 2) {
 	  // R matrix based covariance
 	  arma::mat cholR;
 	  try{
