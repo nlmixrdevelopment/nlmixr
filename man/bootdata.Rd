@@ -16,7 +16,7 @@ Bootstrapped data
 Bootstrap data by sampling the same number of subjects from the original dataset by sampling with replacement.
 }
 \examples{
-
+\donttest{
 specs <- list(fixed = lKA + lCL + lV ~ 1,
   random = pdDiag(lKA + lCL ~ 1),
   start = c(lKA = 0.5, lCL = -3.2, lV = -1))
@@ -33,4 +33,5 @@ for (i in 1:nboot)
 }
 dimnames(cmat)[[2]] <- names(fit$coefficients$fixed)
 print(head(cmat))
+}
 }

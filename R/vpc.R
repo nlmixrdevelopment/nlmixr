@@ -141,7 +141,7 @@ multi2 <- function(mu, vmat, n) {
 #' @param dat model data to be bootstrapped
 #' @return Bootstrapped data
 #' @examples
-#'
+#' \donttest{
 #' specs <- list(fixed = lKA + lCL + lV ~ 1,
 #'   random = pdDiag(lKA + lCL ~ 1),
 #'   start = c(lKA = 0.5, lCL = -3.2, lV = -1))
@@ -158,6 +158,7 @@ multi2 <- function(mu, vmat, n) {
 #' }
 #' dimnames(cmat)[[2]] <- names(fit$coefficients$fixed)
 #' print(head(cmat))
+#' }
 #' @export
 bootdata <- function(dat) {
   id <- unique(dat$ID)
@@ -186,6 +187,7 @@ bootdata <- function(dat) {
 #' @param cutoff significance level
 #' @return an nlme object of the final model
 #' @examples
+#' \donttest{
 #' dat <- theo_md
 #' dat$LOGWT <- log(dat$WT)
 #' dat$TG <- (dat$ID < 6) + 0 # dummy covariate
@@ -199,6 +201,7 @@ bootdata <- function(dat) {
 #' cv <- list(lCL = c("WT", "TG"), lV = c("WT"))
 #' fit <- frwd_selection(fit0, cv, dat)
 #' print(summary(fit))
+#' }
 #' @export
 frwd_selection <- function(base, cv, dat, cutoff = .05) {
   # dat = getData(base)

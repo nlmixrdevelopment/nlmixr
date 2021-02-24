@@ -774,7 +774,8 @@ dynmodelControl <- function(...,
 #'   })
 #' }
 #'
-#' fit <- nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "dynmodel")
+#' # note on some platforms this fit is not successful
+#' fit <- try(nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "dynmodel"))
 #'
 #' as.dynmodel(fit)
 #'

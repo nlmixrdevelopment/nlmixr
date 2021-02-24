@@ -22,6 +22,7 @@ an nlme object of the final model
 Implements forward covariate selection for nlme-based non-linear mixed effect models
 }
 \examples{
+\donttest{
 dat <- theo_md
 dat$LOGWT <- log(dat$WT)
 dat$TG <- (dat$ID < 6) + 0 # dummy covariate
@@ -35,4 +36,5 @@ fit0 <- nlme_lin_cmpt(dat, par_model = specs, ncmt = 1)
 cv <- list(lCL = c("WT", "TG"), lV = c("WT"))
 fit <- frwd_selection(fit0, cv, dat)
 print(summary(fit))
+}
 }
