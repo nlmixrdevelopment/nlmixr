@@ -65,9 +65,15 @@
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -245,7 +251,7 @@
 <a href="#saem-changes" class="anchor"></a>SAEM changes</h2>
 <ul>
 <li><p><code>saem</code> fits now gracefully fall back to the <code>focei</code> likelihood when they support files are no longer on the loaded disk</p></li>
-<li><p><code>saem</code> phi pile is now saved in the <code><a href="https://nlmixrdevelopment.github.io/RxODE/reference/rxTempDir.html">RxODE::rxTempDir()</a></code> which can be customized to allow the <code>phi</code> file to remain after R has exited</p></li>
+<li><p><code>saem</code> phi pile is now saved in the <code><a href="https://nlmixrdevelopment.github.io/RxODE/reference/rxTempDir.html" class="external-link">RxODE::rxTempDir()</a></code> which can be customized to allow the <code>phi</code> file to remain after R has exited</p></li>
 <li><p><code>saem</code> fits now can add in <code>fo</code>, <code>foce</code> and <code>focei</code> likelihood</p></li>
 <li><p><code>saem</code> fits now use <code>liblsoda</code> by default and are multi-threaded when running (controlled by <code>RxODE</code>)</p></li>
 <li><p><code>saem</code> now supports time-varying covariates (like clock-time)</p></li>
@@ -283,7 +289,7 @@
 <li>Thanks to Johannes Ranke (<a href='https://github.com/jranke'>@jranke</a>) for the nlme patch and the catch</li>
 </ul>
 </li>
-<li>Can switch with <code><a href="https://rdrr.io/pkg/nlme/man/nlmeControl.html">nlmeControl(addProp="combined1")</a></code> to use the combined1 type of error model</li>
+<li>Can switch with <code><a href="https://rdrr.io/pkg/nlme/man/nlmeControl.html" class="external-link">nlmeControl(addProp="combined1")</a></code> to use the combined1 type of error model</li>
 </ul>
 </div>
 <div id="new-utilities" class="section level2">
@@ -298,7 +304,7 @@
 <h2 class="hasAnchor">
 <a href="#general-changes" class="anchor"></a>General Changes</h2>
 <ul>
-<li><p>Added auto-completion of <code>nlmixr</code> object properties accessed by <code><a href="https://rdrr.io/r/base/Extract.html">$</a></code>. This works for major editors including <code>Rstudio</code>, <code>ESS</code>, and Base R itself.</p></li>
+<li><p>Added auto-completion of <code>nlmixr</code> object properties accessed by <code><a href="https://rdrr.io/r/base/Extract.html" class="external-link">$</a></code>. This works for major editors including <code>Rstudio</code>, <code>ESS</code>, and Base R itself.</p></li>
 <li><p>Changed the way that Rstudio notebooks display <code>nlmixr</code> objects; It should be more legible in Rstudio.</p></li>
 <li><p>Graphics have been revamped to show censoring (including adding ggplot stat/geom <code>geom_cens</code>) as well as use <code>RxODE</code>’s ggplot theme (<code>rxTheme()</code>). Additionally time after dose is calculated as <code>tad</code> for all <code>nlmixr</code> models</p></li>
 <li><p>Tables generation has been refactored; <code>npde</code> uses the <code>arma</code> and <code>RxODE</code> random number generators which may change results. Also the default of <code>ties=TRUE</code> has been changed to <code>ties=FALSE</code>. <code>npde</code> calculations have been threaded with <code>OpenMP</code> to speed up the calculation as well. This refactoring was required to have the <code>dv</code> imputation between <code>cwres</code> and <code>npde</code> use the same method</p></li>
@@ -330,7 +336,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -338,6 +344,8 @@
 
   
 
+
+  
 
   </body>
 </html>

@@ -66,9 +66,15 @@
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -331,7 +337,8 @@ details. Default is NULL.</p></td>
   <span class='op'>}</span><span class='op'>)</span>
 <span class='op'>}</span>
 
-<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>model_onecmt_bolus</span>, data <span class='op'>=</span> <span class='va'>Bolus_1CPT</span>, est <span class='op'>=</span> <span class='st'>"dynmodel"</span><span class='op'>)</span>
+<span class='co'># note on some platforms this fit is not successful</span>
+<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span><span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>model_onecmt_bolus</span>, data <span class='op'>=</span> <span class='va'>Bolus_1CPT</span>, est <span class='op'>=</span> <span class='st'>"dynmodel"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'><span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></div><div class='output co'>#&gt; <span class='message'>→ creating full model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ finding duplicate expressions in EBE model...</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>→ optimizing duplicate expressions in EBE model...</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>→ compiling EBE model...</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; |-----+---------------+-----------+-----------+-----------|
 #&gt; |    #| Objective Fun |        CL |         V |      prop |
 #&gt; |    1| 4.0228158e+09 |   -0.8004 |     1.000 |    -1.000 |
@@ -1311,7 +1318,7 @@ details. Default is NULL.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -1319,6 +1326,8 @@ details. Default is NULL.</p></td>
 
   
 
+
+  
 
   </body>
 </html>

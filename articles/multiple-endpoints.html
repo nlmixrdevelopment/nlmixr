@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -100,14 +102,14 @@
   </ul>
 </li>
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
     <span class="fas fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
 </li>
 <li>
-  <a href="https://doi.org/10.1002/psp4.12445">
+  <a href="https://doi.org/10.1002/psp4.12445" class="external-link">
     <span class="fas fa-life-ring"></span>
      
     Tutorial
@@ -123,13 +125,13 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
     <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr/releases">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
     <span class="fas fa-download"></span>
      
   </a>
@@ -149,9 +151,9 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Working with multiple endpoints</h1>
             
-            <h4 class="date">2021-02-10</h4>
+            <h4 data-toc-skip class="date">2021-02-24</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/multiple-endpoints.Rmd"><code>vignettes/multiple-endpoints.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/multiple-endpoints.Rmd" class="external-link"><code>vignettes/multiple-endpoints.Rmd</code></a></small>
       <div class="hidden name"><code>multiple-endpoints.Rmd</code></div>
 
     </div>
@@ -166,17 +168,17 @@
 <a href="#multiple-endpoints" class="anchor"></a>Multiple endpoints</h1>
 <p>Joint PK/PD models, or PK/PD models where you fix certain components are common in pharmacometrics. A classic example, (provided by Tomoo Funaki and Nick Holford) is Warfarin.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr">nlmixr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></code></pre></div>
 <p>In this example, we have a transit-compartment (from depot to gut to central volume) PK model and an effect compartment for the PCA measurement.</p>
 <p>Below is an illustrated example of a model that can be applied to the data:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pk.turnover.emax</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">tktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-    <span class="va">tka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-    <span class="va">tcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span>
-    <span class="va">tv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
+    <span class="va">tktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+    <span class="va">tka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+    <span class="va">tcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span>
+    <span class="va">tv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">eta.ktr</span> <span class="op">~</span> <span class="fl">1</span>
     <span class="va">eta.ka</span> <span class="op">~</span> <span class="fl">1</span>
@@ -185,11 +187,11 @@
     <span class="va">prop.err</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
     <span class="va">pkadd.err</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
     <span class="co">##</span>
-    <span class="va">temax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html">logit</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span>
+    <span class="va">temax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html" class="external-link">logit</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span>
     <span class="co">#temax &lt;- 7.5</span>
-    <span class="va">tec50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>
-    <span class="va">tkout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>
-    <span class="va">te0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
+    <span class="va">tec50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>
+    <span class="va">tkout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>
+    <span class="va">te0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">eta.emax</span> <span class="op">~</span> <span class="fl">.5</span>
     <span class="va">eta.ec50</span>  <span class="op">~</span> <span class="fl">.5</span>
@@ -199,17 +201,17 @@
     <span class="va">pdadd.err</span> <span class="op">&lt;-</span> <span class="fl">10</span>
   <span class="op">}</span><span class="op">)</span>
   <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">ktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tktr</span> <span class="op">+</span> <span class="va">eta.ktr</span><span class="op">)</span>
-    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
-    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
-    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
+    <span class="va">ktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tktr</span> <span class="op">+</span> <span class="va">eta.ktr</span><span class="op">)</span>
+    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
+    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
+    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="co">#poplogit = log(temax/(1-temax))</span>
-    <span class="va">emax</span><span class="op">=</span><span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html">expit</a></span><span class="op">(</span><span class="va">temax</span><span class="op">+</span><span class="va">eta.emax</span><span class="op">)</span>
+    <span class="va">emax</span><span class="op">=</span><span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html" class="external-link">expit</a></span><span class="op">(</span><span class="va">temax</span><span class="op">+</span><span class="va">eta.emax</span><span class="op">)</span>
     <span class="co">#logit=temax+eta.emax</span>
-    <span class="va">ec50</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tec50</span> <span class="op">+</span> <span class="va">eta.ec50</span><span class="op">)</span>
-    <span class="va">kout</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tkout</span> <span class="op">+</span> <span class="va">eta.kout</span><span class="op">)</span>
-    <span class="va">e0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">te0</span> <span class="op">+</span> <span class="va">eta.e0</span><span class="op">)</span>
+    <span class="va">ec50</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tec50</span> <span class="op">+</span> <span class="va">eta.ec50</span><span class="op">)</span>
+    <span class="va">kout</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tkout</span> <span class="op">+</span> <span class="va">eta.kout</span><span class="op">)</span>
+    <span class="va">e0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">te0</span> <span class="op">+</span> <span class="va">eta.e0</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">DCP</span> <span class="op">=</span> <span class="va">center</span><span class="op">/</span><span class="va">v</span>
     <span class="va">PD</span><span class="op">=</span><span class="fl">1</span><span class="op">-</span><span class="va">emax</span><span class="op">*</span><span class="va">DCP</span><span class="op">/</span><span class="op">(</span><span class="va">ec50</span><span class="op">+</span><span class="va">DCP</span><span class="op">)</span>
@@ -217,17 +219,17 @@
     <span class="fu">effect</span><span class="op">(</span><span class="fl">0</span><span class="op">)</span> <span class="op">=</span> <span class="va">e0</span>
     <span class="va">kin</span> <span class="op">=</span> <span class="va">e0</span><span class="op">*</span><span class="va">kout</span>
     <span class="co">##</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">depot</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">gut</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span> <span class="op">-</span><span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span> <span class="op">-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span> <span class="op">*</span> <span class="va">center</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">effect</span><span class="op">)</span> <span class="op">=</span> <span class="va">kin</span><span class="op">*</span><span class="va">PD</span> <span class="op">-</span><span class="va">kout</span><span class="op">*</span><span class="va">effect</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">depot</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">gut</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span> <span class="op">-</span><span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span> <span class="op">-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span> <span class="op">*</span> <span class="va">center</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">effect</span><span class="op">)</span> <span class="op">=</span> <span class="va">kin</span><span class="op">*</span><span class="va">PD</span> <span class="op">-</span><span class="va">kout</span><span class="op">*</span><span class="va">effect</span>
     <span class="co">##</span>
     <span class="va">cp</span> <span class="op">=</span> <span class="va">center</span> <span class="op">/</span> <span class="va">v</span>
     <span class="va">cp</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.err</span><span class="op">)</span> <span class="op">+</span> <span class="fu">add</span><span class="op">(</span><span class="va">pkadd.err</span><span class="op">)</span>
     <span class="va">effect</span> <span class="op">~</span> <span class="fu">add</span><span class="op">(</span><span class="va">pdadd.err</span><span class="op">)</span>
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>Notice there are two endpoints in the model <code>cp</code> and <code>effect</code>. Both are modeled in nlmixr using the <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code> “modeled by” specification.</p>
+<p>Notice there are two endpoints in the model <code>cp</code> and <code>effect</code>. Both are modeled in nlmixr using the <code><a href="https://rdrr.io/r/base/tilde.html" class="external-link">~</a></code> “modeled by” specification.</p>
 <p>To see more about how nlmixr will handle the multiple compartment model, it is quite informative to parse the model and print the information about that model. In this case an initial parsing would give:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pk.turnover.emax</span><span class="op">)</span>
@@ -262,6 +264,7 @@
 <span class="co">#&gt; └─────────────────────────┴─────────────────────────┴─────────────────────────┘</span>
 <span class="co">#&gt;   * If dvids are outside this range, all dvids are re-numered                  </span>
 <span class="co">#&gt;   sequentially, ie 1,7, 10 becomes 1,2,3 etc                                   </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt; ── μ-referencing ($muRefTable): ──────────────────────────────────────────────── </span>
 <span class="co">#&gt;                              ┌─────────┬──────────┐</span>
 <span class="co">#&gt;                              │ theta   │ eta      │</span>
@@ -282,6 +285,7 @@
 <span class="co">#&gt;                              ├─────────┼──────────┤</span>
 <span class="co">#&gt;                              │ te0     │ eta.e0   │</span>
 <span class="co">#&gt;                              └─────────┴──────────┘</span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt; ── Model: ────────────────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt;     ktr &lt;- exp(tktr + eta.ktr)</span>
 <span class="co">#&gt;     ka &lt;- exp(tka + eta.ka)</span>
@@ -314,7 +318,7 @@
 <p>Of course if you are interested you can directly access the information in <code>ui$multipleEndpoint</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ui</span><span class="op">$</span><span class="va">multipleEndpoint</span></code></pre></div>
-<table class="table huxtable">
+<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-5">
 <col>
 <col>
 <col>
@@ -343,7 +347,7 @@
 <p>Notice that the <code>cmt</code> and <code>dvid</code> items can use the named variables directly as either the <code>cmt</code> or <code>dvid</code> specification. This flexible notation makes it so you do not have to rename your compartments to run nlmixr model functions.</p>
 <p>The other thing to note is that the <code>cp</code> is specified by an ODE compartment above the number of compartments defined in the <code>RxODE</code> part of the <code>nlmixr</code> model. This is because <code>cp</code> is not a defined compartment, but a related variable <code>cp</code>.</p>
 <p>The last thing to notice that the <code>cmt</code> items are numbered <code>cmt=5</code> for <code>cp</code> or <code>cmt=4</code> for <code>effect</code> even though they were specified in the model first by <code>cp</code> and <code>cmt</code>. This ordering is because <code>effect</code> is a compartment in the <code>RxODE</code> system. Of course <code>cp</code> is related to the compartment <code>central</code>, and it may make more sense to pair <code>cp</code> with the <code>central</code> compartment.</p>
-<p>If this is something you want to have you can specify the compartment to relate the effect to by the <code><a href="https://rdrr.io/r/base/Logic.html">|</a></code> operator. In this case you would change</p>
+<p>If this is something you want to have you can specify the compartment to relate the effect to by the <code><a href="https://rdrr.io/r/base/Logic.html" class="external-link">|</a></code> operator. In this case you would change</p>
 <pre><code>cp ~ prop(prop.err) + add(pkadd.err)</code></pre>
 <p>to</p>
 <pre><code>cp ~ prop(prop.err) + add(pkadd.err) | central</code></pre>
@@ -351,10 +355,10 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pk.turnover.emax2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">tktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-    <span class="va">tka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-    <span class="va">tcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span>
-    <span class="va">tv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
+    <span class="va">tktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+    <span class="va">tka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+    <span class="va">tcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span>
+    <span class="va">tv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">eta.ktr</span> <span class="op">~</span> <span class="fl">1</span>
     <span class="va">eta.ka</span> <span class="op">~</span> <span class="fl">1</span>
@@ -363,10 +367,10 @@
     <span class="va">prop.err</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
     <span class="va">pkadd.err</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
     <span class="co">##</span>
-    <span class="va">temax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html">logit</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span>
-    <span class="va">tec50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>
-    <span class="va">tkout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>
-    <span class="va">te0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
+    <span class="va">temax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html" class="external-link">logit</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span>
+    <span class="va">tec50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>
+    <span class="va">tkout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>
+    <span class="va">te0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">eta.emax</span> <span class="op">~</span> <span class="fl">.5</span>
     <span class="va">eta.ec50</span>  <span class="op">~</span> <span class="fl">.5</span>
@@ -376,15 +380,15 @@
     <span class="va">pdadd.err</span> <span class="op">&lt;-</span> <span class="fl">10</span>
   <span class="op">}</span><span class="op">)</span>
   <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">ktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tktr</span> <span class="op">+</span> <span class="va">eta.ktr</span><span class="op">)</span>
-    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
-    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
-    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
+    <span class="va">ktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tktr</span> <span class="op">+</span> <span class="va">eta.ktr</span><span class="op">)</span>
+    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
+    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
+    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
     <span class="co">##</span>
-    <span class="va">emax</span><span class="op">=</span><span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html">expit</a></span><span class="op">(</span><span class="va">temax</span><span class="op">+</span><span class="va">eta.emax</span><span class="op">)</span>
-    <span class="va">ec50</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tec50</span> <span class="op">+</span> <span class="va">eta.ec50</span><span class="op">)</span>
-    <span class="va">kout</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tkout</span> <span class="op">+</span> <span class="va">eta.kout</span><span class="op">)</span>
-    <span class="va">e0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">te0</span> <span class="op">+</span> <span class="va">eta.e0</span><span class="op">)</span>
+    <span class="va">emax</span><span class="op">=</span><span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html" class="external-link">expit</a></span><span class="op">(</span><span class="va">temax</span><span class="op">+</span><span class="va">eta.emax</span><span class="op">)</span>
+    <span class="va">ec50</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tec50</span> <span class="op">+</span> <span class="va">eta.ec50</span><span class="op">)</span>
+    <span class="va">kout</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tkout</span> <span class="op">+</span> <span class="va">eta.kout</span><span class="op">)</span>
+    <span class="va">e0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">te0</span> <span class="op">+</span> <span class="va">eta.e0</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">DCP</span> <span class="op">=</span> <span class="va">center</span><span class="op">/</span><span class="va">v</span>
     <span class="va">PD</span><span class="op">=</span><span class="fl">1</span><span class="op">-</span><span class="va">emax</span><span class="op">*</span><span class="va">DCP</span><span class="op">/</span><span class="op">(</span><span class="va">ec50</span><span class="op">+</span><span class="va">DCP</span><span class="op">)</span>
@@ -392,10 +396,10 @@
     <span class="fu">effect</span><span class="op">(</span><span class="fl">0</span><span class="op">)</span> <span class="op">=</span> <span class="va">e0</span>
     <span class="va">kin</span> <span class="op">=</span> <span class="va">e0</span><span class="op">*</span><span class="va">kout</span>
     <span class="co">##</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">depot</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">gut</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span> <span class="op">-</span><span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span> <span class="op">-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span> <span class="op">*</span> <span class="va">center</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">effect</span><span class="op">)</span> <span class="op">=</span> <span class="va">kin</span><span class="op">*</span><span class="va">PD</span> <span class="op">-</span><span class="va">kout</span><span class="op">*</span><span class="va">effect</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">depot</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">gut</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span> <span class="op">-</span><span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span> <span class="op">-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span> <span class="op">*</span> <span class="va">center</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">effect</span><span class="op">)</span> <span class="op">=</span> <span class="va">kin</span><span class="op">*</span><span class="va">PD</span> <span class="op">-</span><span class="va">kout</span><span class="op">*</span><span class="va">effect</span>
     <span class="co">##</span>
     <span class="va">cp</span> <span class="op">=</span> <span class="va">center</span> <span class="op">/</span> <span class="va">v</span>
     <span class="va">cp</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.err</span><span class="op">)</span> <span class="op">+</span> <span class="fu">add</span><span class="op">(</span><span class="va">pkadd.err</span><span class="op">)</span> <span class="op">|</span> <span class="va">center</span>
@@ -404,7 +408,7 @@
 <span class="op">}</span>
 <span class="va">ui2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pk.turnover.emax2</span><span class="op">)</span>
 <span class="va">ui2</span><span class="op">$</span><span class="va">multipleEndpoint</span></code></pre></div>
-<table class="table huxtable">
+<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-6">
 <col>
 <col>
 <col>
@@ -437,9 +441,9 @@
 <p>When <code>dvid</code> and <code>cmt</code> are combined in the same dataset, the <code>cmt</code> data item is always used on the event information and the <code>dvid</code> is used on the observations. <code>nlmixr</code> expects the <code>cmt</code> data item to match the <code>dvid</code> item for observations OR to be either zero or one for the <code>dvid</code> to replace the <code>cmt</code> information.</p>
 <p>If you do not wish to use <code>dvid</code> items to define multiple endpoints in nlmixr, you can set the following option:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>RxODE.combine.dvid<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>RxODE.combine.dvid<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">ui2</span><span class="op">$</span><span class="va">multipleEndpoint</span></code></pre></div>
-<table class="table huxtable">
+<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-7">
 <col>
 <col>
 <tr>
@@ -461,9 +465,9 @@
 </table>
 <p>Then only <code>cmt</code> items are used for the multiple endpoint models. Of course you can turn it on or off for different models if you wish:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>RxODE.combine.dvid<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>RxODE.combine.dvid<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
 <span class="va">ui2</span><span class="op">$</span><span class="va">multipleEndpoint</span></code></pre></div>
-<table class="table huxtable">
+<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-8">
 <col>
 <col>
 <col>
@@ -495,7 +499,7 @@
 <a href="#running-a-multiple-endpoint-model" class="anchor"></a>Running a multiple endpoint model</h2>
 <p>With this information, we can use the built-in warfarin dataset in nlmixr:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">warfarin</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">warfarin</span><span class="op">)</span>
 <span class="co">#&gt;        id             time             amt                dv          dvid    </span>
 <span class="co">#&gt;  Min.   : 1.00   Min.   :  0.00   Min.   :  0.000   Min.   :  0.00   cp :283  </span>
 <span class="co">#&gt;  1st Qu.: 8.00   1st Qu.: 24.00   1st Qu.:  0.000   1st Qu.:  4.50   pca:232  </span>
@@ -519,10 +523,10 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pk.turnover.emax3</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">tktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-    <span class="va">tka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-    <span class="va">tcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span>
-    <span class="va">tv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
+    <span class="va">tktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+    <span class="va">tka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+    <span class="va">tcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span>
+    <span class="va">tv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">eta.ktr</span> <span class="op">~</span> <span class="fl">1</span>
     <span class="va">eta.ka</span> <span class="op">~</span> <span class="fl">1</span>
@@ -531,10 +535,10 @@ effect ~ add(pdadd.err)  | pca</code></pre>
     <span class="va">prop.err</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
     <span class="va">pkadd.err</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
     <span class="co">##</span>
-    <span class="va">temax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html">logit</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span>
-    <span class="va">tec50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>
-    <span class="va">tkout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>
-    <span class="va">te0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
+    <span class="va">temax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html" class="external-link">logit</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span>
+    <span class="va">tec50</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span>
+    <span class="va">tkout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.05</span><span class="op">)</span>
+    <span class="va">te0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">eta.emax</span> <span class="op">~</span> <span class="fl">.5</span>
     <span class="va">eta.ec50</span>  <span class="op">~</span> <span class="fl">.5</span>
@@ -544,14 +548,14 @@ effect ~ add(pdadd.err)  | pca</code></pre>
     <span class="va">pdadd.err</span> <span class="op">&lt;-</span> <span class="fl">10</span>
   <span class="op">}</span><span class="op">)</span>
   <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">ktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tktr</span> <span class="op">+</span> <span class="va">eta.ktr</span><span class="op">)</span>
-    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
-    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
-    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
-    <span class="va">emax</span> <span class="op">=</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html">expit</a></span><span class="op">(</span><span class="va">temax</span><span class="op">+</span><span class="va">eta.emax</span><span class="op">)</span>
-    <span class="va">ec50</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tec50</span> <span class="op">+</span> <span class="va">eta.ec50</span><span class="op">)</span>
-    <span class="va">kout</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tkout</span> <span class="op">+</span> <span class="va">eta.kout</span><span class="op">)</span>
-    <span class="va">e0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">te0</span> <span class="op">+</span> <span class="va">eta.e0</span><span class="op">)</span>
+    <span class="va">ktr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tktr</span> <span class="op">+</span> <span class="va">eta.ktr</span><span class="op">)</span>
+    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
+    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
+    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
+    <span class="va">emax</span> <span class="op">=</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/logit.html" class="external-link">expit</a></span><span class="op">(</span><span class="va">temax</span><span class="op">+</span><span class="va">eta.emax</span><span class="op">)</span>
+    <span class="va">ec50</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tec50</span> <span class="op">+</span> <span class="va">eta.ec50</span><span class="op">)</span>
+    <span class="va">kout</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tkout</span> <span class="op">+</span> <span class="va">eta.kout</span><span class="op">)</span>
+    <span class="va">e0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">te0</span> <span class="op">+</span> <span class="va">eta.e0</span><span class="op">)</span>
     <span class="co">##</span>
     <span class="va">DCP</span> <span class="op">=</span> <span class="va">center</span><span class="op">/</span><span class="va">v</span>
     <span class="va">PD</span><span class="op">=</span><span class="fl">1</span><span class="op">-</span><span class="va">emax</span><span class="op">*</span><span class="va">DCP</span><span class="op">/</span><span class="op">(</span><span class="va">ec50</span><span class="op">+</span><span class="va">DCP</span><span class="op">)</span>
@@ -559,10 +563,10 @@ effect ~ add(pdadd.err)  | pca</code></pre>
     <span class="fu">effect</span><span class="op">(</span><span class="fl">0</span><span class="op">)</span> <span class="op">=</span> <span class="va">e0</span>
     <span class="va">kin</span> <span class="op">=</span> <span class="va">e0</span><span class="op">*</span><span class="va">kout</span>
     <span class="co">##</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">depot</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">gut</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span> <span class="op">-</span><span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span> <span class="op">-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span> <span class="op">*</span> <span class="va">center</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">effect</span><span class="op">)</span> <span class="op">=</span> <span class="va">kin</span><span class="op">*</span><span class="va">PD</span> <span class="op">-</span><span class="va">kout</span><span class="op">*</span><span class="va">effect</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">depot</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">gut</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ktr</span> <span class="op">*</span> <span class="va">depot</span> <span class="op">-</span><span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">=</span>  <span class="va">ka</span> <span class="op">*</span> <span class="va">gut</span> <span class="op">-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span> <span class="op">*</span> <span class="va">center</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">effect</span><span class="op">)</span> <span class="op">=</span> <span class="va">kin</span><span class="op">*</span><span class="va">PD</span> <span class="op">-</span><span class="va">kout</span><span class="op">*</span><span class="va">effect</span>
     <span class="co">##</span>
     <span class="va">cp</span> <span class="op">=</span> <span class="va">center</span> <span class="op">/</span> <span class="va">v</span>
     <span class="va">cp</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.err</span><span class="op">)</span> <span class="op">+</span> <span class="fu">add</span><span class="op">(</span><span class="va">pkadd.err</span><span class="op">)</span>
@@ -574,8 +578,8 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <h2 class="hasAnchor">
 <a href="#run-the-models-with-saem" class="anchor"></a>Run the models with SAEM</h2>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit.TOS</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pk.turnover.emax3</span>, <span class="va">warfarin</span>, <span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-                  table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">fit.TOS</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pk.turnover.emax3</span>, <span class="va">warfarin</span>, <span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+                  table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -588,7 +592,7 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [1] "CMT"</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">fit.TOS</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit.TOS</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF by FOCEi approximation fit ───────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF     AIC      BIC Log-likelihood Condition Number</span>
@@ -596,8 +600,8 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            saem  setup table  cwres covariance    other</span>
-<span class="co">#&gt; elapsed 145.272 14.486 4.789 19.412      0.069 0.885998</span>
+<span class="co">#&gt;            saem    setup table  cwres covariance    other</span>
+<span class="co">#&gt; elapsed 171.706 14.28379 5.315 19.744      0.075 0.914208</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -651,20 +655,20 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <h3 class="hasAnchor">
 <a href="#saem-diagnostic-plots" class="anchor"></a>SAEM Diagnostic plots</h3>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fit.TOS</span><span class="op">)</span>;</code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.TOS</span><span class="op">)</span>;</code></pre></div>
 <p><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-1.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-2.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-3.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-4.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-5.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-6.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-7.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-8.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-9.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-10.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-11.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-12.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-13.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-14.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-15.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-16.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-17.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-18.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-19.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-20.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-21.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-22.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-23.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-24.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-25.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-26.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-27.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-28.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-29.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-30.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-31.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-32.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-33.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-34.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-35.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-36.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-37.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-38.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-39.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-40.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-41.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-42.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-43.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-44.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-45.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-46.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-47.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-48.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-49.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-50.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-51.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-52.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-53.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-54.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-55.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-56.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-57.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-58.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-59.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-60.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-61.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-62.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-63.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-64.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-65.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-66.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-67.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-68.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-69.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-70.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-71.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-72.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-73.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-74.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-75.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-76.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-77.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-78.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-79.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-80.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-81.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-82.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-83.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-84.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-85.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-86.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-87.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-88.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-89.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-90.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-91.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-92.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-93.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-94.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-95.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-96.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-97.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-98.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-99.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-100.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-101.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-102.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-103.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-104.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-105.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-106.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-107.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-108.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-109.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-110.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-111.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-112.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-113.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-114.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-115.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-116.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-117.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-118.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-119.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-120.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-121.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-122.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-123.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-124.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-125.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-126.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-127.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-128.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-129.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-130.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-131.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-132.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-133.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-134.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-135.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-136.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-137.png" width="100%"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 
-<span class="va">v1s</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit.TOS</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, scales<span class="op">=</span><span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Warfarin Cp [mg/L] or PCA"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Time [h]"</span><span class="op">)</span>
+<span class="va">v1s</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit.TOS</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, scales<span class="op">=</span><span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Warfarin Cp [mg/L] or PCA"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time [h]"</span><span class="op">)</span>
 
-<span class="va">v2s</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit.TOS</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, pred_corr <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Prediction Corrected Warfarin Cp [mg/L] or PCA"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Time [h]"</span><span class="op">)</span>
+<span class="va">v2s</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit.TOS</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, pred_corr <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Prediction Corrected Warfarin Cp [mg/L] or PCA"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time [h]"</span><span class="op">)</span>
 
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span>
 <span class="va">v1s</span> <span class="op">/</span> <span class="va">v2s</span></code></pre></div>
 <p><img src="multiple-endpoints_files/figure-html/unnamed-chunk-12-138.png" width="100%"></p>
 </div>
@@ -674,8 +678,8 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <a href="#focei-fits" class="anchor"></a>FOCEi fits</h2>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## FOCEi fit/vpcs</span>
-<span class="va">fit.TOF</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pk.turnover.emax3</span>, <span class="va">warfarin</span>, <span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-                  table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>;
+<span class="va">fit.TOF</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pk.turnover.emax3</span>, <span class="va">warfarin</span>, <span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+                  table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>;
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
@@ -694,13 +698,13 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [1] "CMT"</span>
 <span class="co">#&gt; calculating covariance matrix</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:01:50 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:02:08 </span>
 <span class="co">#&gt; done</span></code></pre></div>
 <div id="focei-diagnostic-plots" class="section level3">
 <h3 class="hasAnchor">
 <a href="#focei-diagnostic-plots" class="anchor"></a>FOCEi Diagnostic Plots</h3>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">fit.TOF</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit.TOF</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
@@ -708,8 +712,8 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 19.85269 110.5411   110.5412 4.074 423.472</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 21.59399 128.5165   128.5165 4.403 496.4731</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -778,17 +782,17 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; #   depot &lt;dbl&gt;, gut &lt;dbl&gt;, center &lt;dbl&gt;, effect &lt;dbl&gt;, ktr &lt;dbl&gt;, ka &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   cl &lt;dbl&gt;, v &lt;dbl&gt;, emax &lt;dbl&gt;, ec50 &lt;dbl&gt;, kout &lt;dbl&gt;, e0 &lt;dbl&gt;, DCP &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   PD &lt;dbl&gt;, kin &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">fit.TOF</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.TOF</span><span class="op">)</span></code></pre></div>
 <p><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-1.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-2.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-3.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-4.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-5.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-6.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-7.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-8.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-9.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-10.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-11.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-12.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-13.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-14.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-15.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-16.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-17.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-18.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-19.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-20.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-21.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-22.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-23.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-24.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-25.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-26.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-27.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-28.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-29.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-30.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-31.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-32.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-33.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-34.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-35.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-36.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-37.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-38.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-39.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-40.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-41.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-42.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-43.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-44.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-45.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-46.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-47.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-48.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-49.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-50.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-51.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-52.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-53.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-54.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-55.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-56.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-57.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-58.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-59.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-60.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-61.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-62.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-63.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-64.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-65.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-66.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-67.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-68.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-69.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-70.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-71.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-72.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-73.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-74.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-75.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-76.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-77.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-78.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-79.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-80.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-81.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-82.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-83.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-84.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-85.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-86.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-87.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-88.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-89.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-90.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-91.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-92.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-93.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-94.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-95.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-96.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-97.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-98.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-99.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-100.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-101.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-102.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-103.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-104.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-105.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-106.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-107.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-108.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-109.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-110.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-111.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-112.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-113.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-114.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-115.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-116.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-117.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-118.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-119.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-120.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-121.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-122.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-123.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-124.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-125.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-126.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-127.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-128.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-129.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-130.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-131.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-132.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-133.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-134.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-135.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-136.png" width="100%"><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-137.png" width="100%"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="va">v1f</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit.TOF</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, scales<span class="op">=</span><span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Warfarin Cp [mg/L] or PCA"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Time [h]"</span><span class="op">)</span>
+<span class="va">v1f</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit.TOF</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, scales<span class="op">=</span><span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Warfarin Cp [mg/L] or PCA"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time [h]"</span><span class="op">)</span>
 
-<span class="va">v2f</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit.TOF</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, pred_corr <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Prediction Corrected Warfarin Cp [mg/L] or PCA"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Time [h]"</span><span class="op">)</span>
+<span class="va">v2f</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit.TOF</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, pred_corr <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Prediction Corrected Warfarin Cp [mg/L] or PCA"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time [h]"</span><span class="op">)</span>
 
 <span class="va">v1f</span> <span class="op">/</span> <span class="va">v2f</span></code></pre></div>
 <p><img src="multiple-endpoints_files/figure-html/unnamed-chunk-14-138.png" width="100%"></p>
@@ -812,7 +816,7 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -820,6 +824,8 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 
   
 
+
+  
 
   </body>
 </html>

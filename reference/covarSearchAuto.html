@@ -66,9 +66,15 @@
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -1097,7 +1103,7 @@
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
 #&gt;            setup optimize covariance table    other
-#&gt; elapsed 0.454094 0.221087   0.221096 0.016 0.805723
+#&gt; elapsed 0.432908 0.214259   0.214269 0.018 1.276564
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -1120,15 +1126,15 @@
 #&gt;     relative convergence (4) 
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
-#&gt; </span><span style='color: #555555;'># A tibble: 132 x 20</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
 #&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
-#&gt; </span><span style='color: #555555;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
-#&gt; </span><span style='color: #555555;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #555555;'>e</span><span>+ 0  0.791
-#&gt; </span><span style='color: #555555;'># … with 129 more rows, and 9 more variables: CWRES </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   eta.cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, tad </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   dosenum </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #949494;'>e</span><span>+ 0  0.791
+#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   dosenum &lt;dbl&gt;</span><span>
 #&gt; 
 #&gt; $resFwd[[2]]
 #&gt;   step covar var     objf     deltObjf      AIC      BIC numParams  qchisqr
@@ -1149,7 +1155,7 @@
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
 #&gt;            setup optimize covariance table    other
-#&gt; elapsed 0.454094 0.221087   0.221096 0.016 0.805723
+#&gt; elapsed 0.432908 0.214259   0.214269 0.018 1.276564
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -1172,15 +1178,15 @@
 #&gt;     relative convergence (4) 
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
-#&gt; </span><span style='color: #555555;'># A tibble: 132 x 20</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
 #&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
-#&gt; </span><span style='color: #555555;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
-#&gt; </span><span style='color: #555555;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #555555;'>e</span><span>+ 0  0.791
-#&gt; </span><span style='color: #555555;'># … with 129 more rows, and 9 more variables: CWRES </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   eta.cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, tad </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   dosenum </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #949494;'>e</span><span>+ 0  0.791
+#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   dosenum &lt;dbl&gt;</span><span>
 #&gt; 
 #&gt; $resBck[[2]]
 #&gt; NULL
@@ -2334,8 +2340,8 @@
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
-#&gt;            setup optimize covariance table   other
-#&gt; elapsed 0.401775 0.208003   0.208012 0.015 0.72121
+#&gt;            setup optimize covariance table    other
+#&gt; elapsed 0.412759 0.220294   0.220302 0.016 0.761645
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -2358,15 +2364,15 @@
 #&gt;     relative convergence (4) 
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
-#&gt; </span><span style='color: #555555;'># A tibble: 132 x 20</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
 #&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
-#&gt; </span><span style='color: #555555;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
-#&gt; </span><span style='color: #555555;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #555555;'>e</span><span>+ 0  0.791
-#&gt; </span><span style='color: #555555;'># … with 129 more rows, and 9 more variables: CWRES </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   eta.cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, tad </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   dosenum </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #949494;'>e</span><span>+ 0  0.791
+#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   dosenum &lt;dbl&gt;</span><span>
 #&gt; 
 #&gt; $resFwd[[2]]
 #&gt;   step covar var     objf      deltObjf      AIC      BIC numParams  qchisqr
@@ -2390,8 +2396,8 @@
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
-#&gt;            setup optimize covariance table   other
-#&gt; elapsed 0.401775 0.208003   0.208012 0.015 0.72121
+#&gt;            setup optimize covariance table    other
+#&gt; elapsed 0.412759 0.220294   0.220302 0.016 0.761645
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -2414,15 +2420,15 @@
 #&gt;     relative convergence (4) 
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
-#&gt; </span><span style='color: #555555;'># A tibble: 132 x 20</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
 #&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
-#&gt; </span><span style='color: #555555;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
-#&gt; </span><span style='color: #555555;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #555555;'>e</span><span>+ 0  0.791
-#&gt; </span><span style='color: #555555;'># … with 129 more rows, and 9 more variables: CWRES </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   eta.cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, tad </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   dosenum </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #949494;'>e</span><span>+ 0  0.791
+#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   dosenum &lt;dbl&gt;</span><span>
 #&gt; 
 #&gt; $resBck[[2]]
 #&gt; NULL
@@ -3422,8 +3428,8 @@
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
-#&gt;            setup optimize covariance table   other
-#&gt; elapsed 0.401775 0.208003   0.208012 0.015 0.72121
+#&gt;            setup optimize covariance table    other
+#&gt; elapsed 0.412759 0.220294   0.220302 0.016 0.761645
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -3446,15 +3452,15 @@
 #&gt;     relative convergence (4) 
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
-#&gt; </span><span style='color: #555555;'># A tibble: 132 x 20</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
 #&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #555555;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
-#&gt; </span><span style='color: #555555;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
-#&gt; </span><span style='color: #555555;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #555555;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #555555;'>e</span><span>+ 0  0.791
-#&gt; </span><span style='color: #555555;'># … with 129 more rows, and 9 more variables: CWRES </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   eta.cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, eta.v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, tad </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   dosenum </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #949494;'>e</span><span>+ 0  0.791
+#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   dosenum &lt;dbl&gt;</span><span>
 #&gt; 
 #&gt; $resFwd[[2]]
 #&gt;   step covar var     objf      deltObjf      AIC      BIC numParams  qchisqr
@@ -3489,7 +3495,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -3497,6 +3503,8 @@
 
   
 
+
+  
 
   </body>
 </html>

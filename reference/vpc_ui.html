@@ -66,9 +66,15 @@
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -257,100 +263,8 @@ this argument.</p></td>
       <td><p>Number of VPC simulations.  By default 100</p></td>
     </tr>
     <tr>
-      <th>bins</th>
-      <td><p>either "density", "time", or "data", "none", or one of the approaches available in classInterval() such as "jenks" (default) or "pretty", or a numeric vector specifying the bin separators.</p></td>
-    </tr>
-    <tr>
-      <th>n_bins</th>
-      <td><p>when using the "auto" binning method, what number of bins to aim for</p></td>
-    </tr>
-    <tr>
-      <th>bin_mid</th>
-      <td><p>either "mean" for the mean of all timepoints (default) or "middle" to use the average of the bin boundaries.</p></td>
-    </tr>
-    <tr>
-      <th>show</th>
-      <td><p>what to show in VPC (obs_dv, obs_ci, pi, pi_as_area, pi_ci, obs_median, sim_median, sim_median_ci)</p></td>
-    </tr>
-    <tr>
-      <th>stratify</th>
-      <td><p>character vector of stratification variables. Only 1 or 2 stratification variables can be supplied.</p></td>
-    </tr>
-    <tr>
-      <th>pred_corr</th>
-      <td><p>perform prediction-correction?</p></td>
-    </tr>
-    <tr>
-      <th>pred_corr_lower_bnd</th>
-      <td><p>lower bound for the prediction-correction</p></td>
-    </tr>
-    <tr>
-      <th>pi</th>
-      <td><p>simulated prediction interval to plot. Default is c(0.05, 0.95),</p></td>
-    </tr>
-    <tr>
-      <th>ci</th>
-      <td><p>confidence interval to plot. Default is (0.05, 0.95)</p></td>
-    </tr>
-    <tr>
-      <th>uloq</th>
-      <td><p>Number or NULL indicating upper limit of quantification. Default is NULL.</p></td>
-    </tr>
-    <tr>
-      <th>lloq</th>
-      <td><p>Number or NULL indicating lower limit of quantification. Default is NULL.</p></td>
-    </tr>
-    <tr>
-      <th>log_y</th>
-      <td><p>Boolean indicting whether y-axis should be shown as logarithmic. Default is FALSE.</p></td>
-    </tr>
-    <tr>
-      <th>log_y_min</th>
-      <td><p>minimal value when using log_y argument. Default is 1e-3.</p></td>
-    </tr>
-    <tr>
-      <th>xlab</th>
-      <td><p>label for x axis</p></td>
-    </tr>
-    <tr>
-      <th>ylab</th>
-      <td><p>label for y axis</p></td>
-    </tr>
-    <tr>
-      <th>title</th>
-      <td><p>title</p></td>
-    </tr>
-    <tr>
-      <th>smooth</th>
-      <td><p>"smooth" the VPC (connect bin midpoints) or show bins as rectangular boxes. Default is TRUE.</p></td>
-    </tr>
-    <tr>
-      <th>vpc_theme</th>
-      <td><p>theme to be used in VPC. Expects list of class vpc_theme created with function vpc_theme()</p></td>
-    </tr>
-    <tr>
-      <th>facet</th>
-      <td><p>either "wrap", "columns", or "rows"</p></td>
-    </tr>
-    <tr>
-      <th>labeller</th>
-      <td><p>ggplot2 labeller function to be passed to underlying ggplot object</p></td>
-    </tr>
-    <tr>
-      <th>vpcdb</th>
-      <td><p>Boolean whether to return the underlying vpcdb rather than the plot</p></td>
-    </tr>
-    <tr>
-      <th>verbose</th>
-      <td><p>show debugging information (TRUE or FALSE)</p></td>
-    </tr>
-    <tr>
       <th>...</th>
       <td><p>Args sent to <code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html'>rxSolve</a></code></p></td>
-    </tr>
-    <tr>
-      <th>sim</th>
-      <td><p>this is usually a data.frame with observed data, containing the independent and dependent variable, a column indicating the individual, and possibly covariates. E.g. load in from NONMEM using <a href='https://rdrr.io/pkg/vpc/man/read_table_nm.html'>read_table_nm</a>.  However it can also be an object like a nlmixr or xpose object</p></td>
     </tr>
     </table>
 
@@ -376,7 +290,7 @@ this argument.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -384,6 +298,8 @@ this argument.</p></td>
 
   
 
+
+  
 
   </body>
 </html>

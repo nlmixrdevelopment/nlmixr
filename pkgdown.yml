@@ -1,6 +1,6 @@
 pandoc: 2.7.3
 pkgdown: 1.6.1.9000
-pkgdown_sha: c931fe24c135c6ca704ae9f300470e9c66d8bfe7
+pkgdown_sha: 8bb9cef2f58d6c6ceec351d2f96497af6cef485b
 articles:
   addingCovariances: addingCovariances.html
   broom: broom.html
@@ -12,5 +12,5 @@ articles:
   running_nlmixr: running_nlmixr.html
   wbc: wbc.html
   xgxr-nlmixr-ggpmx: xgxr-nlmixr-ggpmx.html
-last_built: 2021-02-10T16:16Z
+last_built: 2021-02-24T22:12Z
 

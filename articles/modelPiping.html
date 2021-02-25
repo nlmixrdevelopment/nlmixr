@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -100,14 +102,14 @@
   </ul>
 </li>
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
     <span class="fas fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
 </li>
 <li>
-  <a href="https://doi.org/10.1002/psp4.12445">
+  <a href="https://doi.org/10.1002/psp4.12445" class="external-link">
     <span class="fas fa-life-ring"></span>
      
     Tutorial
@@ -123,13 +125,13 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
     <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr/releases">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
     <span class="fas fa-download"></span>
      
   </a>
@@ -149,9 +151,9 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Modifying nlmixr models by piping</h1>
             
-            <h4 class="date">2021-02-10</h4>
+            <h4 data-toc-skip class="date">2021-02-24</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/modelPiping.Rmd"><code>vignettes/modelPiping.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/modelPiping.Rmd" class="external-link"><code>vignettes/modelPiping.Rmd</code></a></small>
       <div class="hidden name"><code>modelPiping.Rmd</code></div>
 
     </div>
@@ -167,7 +169,7 @@
 <p>As in the running nlmixr vignette, Let’s start with a very simple PK example, using the single-dose theophylline dataset generously provided by Dr. Robert A. Upton of the University of California, San Francisco:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr">nlmixr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span>
 
 <span class="va">one.compartment</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
@@ -183,11 +185,11 @@
     <span class="va">add.sd</span> <span class="op">&lt;-</span> <span class="fl">0.7</span>
   <span class="op">}</span><span class="op">)</span>
   <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
-    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
-    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">depot</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="va">ka</span> <span class="op">*</span> <span class="va">depot</span>
-    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html">dt</a></span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">=</span> <span class="va">ka</span> <span class="op">*</span> <span class="va">depot</span> <span class="op">-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span> <span class="op">*</span> <span class="va">center</span>
+    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
+    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
+    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">depot</span><span class="op">)</span> <span class="op">=</span> <span class="op">-</span><span class="va">ka</span> <span class="op">*</span> <span class="va">depot</span>
+    <span class="va">d</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/stats/TDist.html" class="external-link">dt</a></span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">=</span> <span class="va">ka</span> <span class="op">*</span> <span class="va">depot</span> <span class="op">-</span> <span class="va">cl</span> <span class="op">/</span> <span class="va">v</span> <span class="op">*</span> <span class="va">center</span>
     <span class="va">cp</span> <span class="op">=</span> <span class="va">center</span> <span class="op">/</span> <span class="va">v</span> 
     <span class="va">cp</span> <span class="op">~</span> <span class="fu">add</span><span class="op">(</span><span class="va">add.sd</span><span class="op">)</span>
   <span class="op">}</span><span class="op">)</span>
@@ -195,8 +197,8 @@
 <p>We can try the First-Order Conditional Estimation with Interaction (FOCEi) method to find a good solution:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment</span>, <span class="va">theo_sd</span>, est<span class="op">=</span><span class="st">"focei"</span>,
-              control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
-              table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>npde<span class="op">=</span><span class="cn">TRUE</span>, cwres<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+              control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
+              table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>npde<span class="op">=</span><span class="cn">TRUE</span>, cwres<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -217,7 +219,7 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
@@ -226,7 +228,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 5.390387 0.614139   0.614148 0.836 2.581326</span>
+<span class="co">#&gt; elapsed 5.737047 0.660039   0.660049 0.868 2.615865</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -274,16 +276,16 @@
 <code class="sourceCode R"><span class="co">## Example 1 -- Set inital estimate to 0.5 (shown w/posthoc)</span>
 <span class="va">one.ka.0.5</span> <span class="op">&lt;-</span> <span class="va">fit</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>tka<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"posthoc"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"posthoc"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
+           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">one.ka.0.5</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">one.ka.0.5</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Example 2 -- Fix tka to 0.5 and re-estimate.</span>
 <span class="va">one.ka.0.5</span> <span class="op">&lt;-</span> <span class="va">fit</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>tka<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/utils/fix.html">fix</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>tka<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/utils/fix.html" class="external-link">fix</a></span><span class="op">(</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -304,7 +306,7 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">one.ka.0.5</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">one.ka.0.5</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
@@ -312,8 +314,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 4.256504 0.336641    0.33665 0.499 1.977205</span>
+<span class="co">#&gt;           setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 4.58863 0.364321   0.364332  0.52 2.089717</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -359,13 +361,13 @@
 <code class="sourceCode R"><span class="co">## Example 3 -- Fix tka to model estimated value and re-estimate.</span>
 <span class="va">one.ka.0.5</span> <span class="op">&lt;-</span> <span class="va">fit</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>tka<span class="op">=</span><span class="va">fix</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; calculating covariance matrix</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">one.ka.0.5</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">one.ka.0.5</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
@@ -374,7 +376,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.373907  0.34678   0.346782 0.494 2.309531</span>
+<span class="co">#&gt; elapsed 0.374136 0.357598     0.3576 0.517 2.439666</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -415,13 +417,13 @@
 <code class="sourceCode R"><span class="co">## Example 4 -- Change tka to 0.7 in orginal model function and then estimate</span>
 <span class="va">one.ka.0.7</span> <span class="op">&lt;-</span> <span class="va">one.compartment</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>tka<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">theo_sd</span>, est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">theo_sd</span>, est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; calculating covariance matrix</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">one.ka.0.7</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">one.ka.0.7</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF     AIC      BIC Log-likelihood Condition Number</span>
@@ -429,8 +431,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 0.375766 0.605988   0.605996 0.491 1.50725</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 0.365923 0.634636   0.634646 0.515 1.610795</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -476,9 +478,9 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Remove eta.ka on ka</span>
 <span class="va">noEta</span> <span class="op">&lt;-</span> <span class="va">fit</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tka</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tka</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -499,7 +501,7 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">noEta</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">noEta</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF     AIC      BIC Log-likelihood Condition Number</span>
@@ -508,7 +510,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 4.004372 0.644893   0.644902 0.822 1.163833</span>
+<span class="co">#&gt; elapsed 4.023288 0.409412   0.409422 0.866 1.478878</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -539,10 +541,10 @@
 <p>Of course you could also add an eta on a parameter in the same way;</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">addBackKa</span> <span class="op">&lt;-</span> <span class="va">noEta</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">bsv.ka</span><span class="op">)</span><span class="op">}</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tka</span> <span class="op">+</span> <span class="va">bsv.ka</span><span class="op">)</span><span class="op">}</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>bsv.ka<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -563,7 +565,7 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">addBackKa</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">addBackKa</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
@@ -572,7 +574,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 4.099627 0.615577   0.615586  0.83 1.56521</span>
+<span class="co">#&gt; elapsed 4.343384 0.651823   0.651833 0.886 1.69296</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -633,10 +635,10 @@
 <code class="sourceCode R"><span class="co">## Note currently cov is needed as a prefix so nlmixr knows this is an</span>
 <span class="co">## estimated parameter not a parameter</span>
 <span class="va">wt70</span> <span class="op">&lt;-</span> <span class="va">fit</span> <span class="op">%&gt;%</span> <span class="co">## FIXME could be based on if it finds the covarite in the last used nlmixr data.</span>
-    <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">WT</span><span class="op">/</span><span class="fl">70</span><span class="op">)</span><span class="op">^</span><span class="va">covWtPow</span><span class="op">}</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>covWtPow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/utils/fix.html">fix</a></span><span class="op">(</span><span class="fl">0.75</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">tcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span><span class="op">*</span><span class="op">(</span><span class="va">WT</span><span class="op">/</span><span class="fl">70</span><span class="op">)</span><span class="op">^</span><span class="va">covWtPow</span><span class="op">}</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>covWtPow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/utils/fix.html" class="external-link">fix</a></span><span class="op">(</span><span class="fl">0.75</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -657,7 +659,7 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01 </span>
 <span class="co">#&gt; done</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">wt70</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wt70</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF     AIC      BIC Log-likelihood Condition Number</span>
@@ -666,7 +668,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 4.343539 1.524522   1.524527 0.923 7.316412</span>
+<span class="co">#&gt; elapsed 4.585184 1.679159   1.679162  0.99 7.880495</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -724,8 +726,8 @@
     <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="va">cp</span> <span class="op">~</span> <span class="fu">add</span><span class="op">(</span><span class="va">add.err</span><span class="op">)</span><span class="op">+</span><span class="fu">prop</span><span class="op">(</span><span class="va">prop.err</span><span class="op">)</span><span class="op">}</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span>prop.err<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">d</span>,est<span class="op">=</span><span class="st">"focei"</span>,
-           control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+           control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -746,7 +748,7 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">addPropModel</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">addPropModel</span><span class="op">)</span>
 <span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
@@ -755,7 +757,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 4.362119 0.735713   0.735717 0.849 5.910451</span>
+<span class="co">#&gt; elapsed 4.697349 0.796575   0.796579 0.946 6.395497</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -818,7 +820,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -826,6 +828,8 @@
 
   
 
+
+  
 
   </body>
 </html>

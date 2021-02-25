@@ -66,9 +66,15 @@
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -307,7 +313,7 @@ of iterations is itmax*number of parameters</p></td>
 <span class='va'>ode</span> <span class='op'>&lt;-</span> <span class='st'>"d/dt(depot) =-KA*depot;
         d/dt(centr) = KA*depot - KE*centr;"</span>
 <span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span><span class='va'>ode</span>, modName <span class='op'>=</span> <span class='st'>"m1"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'>→ remove old RxODE dir <span style='color: #0000BB;'>/tmp/RtmpNpuMuV/file643974ab23bd/reference/m1.d</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
 
 <span class='co'># In this ode System, we also specify the concentration as C2 = centr/V</span>
 
@@ -315,7 +321,7 @@ of iterations is itmax*number of parameters</p></td>
       d/dt(depot) =-KA*depot;
       d/dt(centr) = KA*depot - KE*centr;"</span>
 <span class='va'>m2</span> <span class='op'>=</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span><span class='va'>ode</span>, modName<span class='op'>=</span><span class='st'>"m2"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'>→ remove old RxODE dir </span><span style='color: #0000BB;'>/tmp/RtmpNpuMuV/file643974ab23bd/reference/m2.d</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
 <span class='va'>PKpars</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='va'>CL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>lCL</span><span class='op'>)</span>
   <span class='va'>V</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>lV</span><span class='op'>)</span>
@@ -327,7 +333,7 @@ of iterations is itmax*number of parameters</p></td>
 <span class='va'>PRED2</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='va'>C2</span>
 
 <span class='va'>saem_fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gen_saem_user_fn.html'>gen_saem_user_fn</a></span><span class='op'>(</span>model <span class='op'>=</span> <span class='va'>m1</span>, <span class='va'>PKpars</span>, pred <span class='op'>=</span> <span class='va'>PRED</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='warning'>Warning: this was not generated from nlmixr, loading into symengine</span></div><div class='output co'>#&gt; <span class='message'>→ creating SAEM model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='warning'>Warning: this was not generated from nlmixr, loading into symengine</span></div><div class='output co'>#&gt; <span class='message'>→ creating SAEM model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
 <span class='co'># Can also use PRED2</span>
 <span class='va'>saem_fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gen_saem_user_fn.html'>gen_saem_user_fn</a></span><span class='op'>(</span>model<span class='op'>=</span><span class='va'>m2</span>, <span class='va'>PKpars</span>, pred<span class='op'>=</span><span class='va'>PRED2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='warning'>Warning: this was not generated from nlmixr, loading into symengine</span></div><div class='output co'>#&gt; <span class='message'>→ creating SAEM model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
@@ -863,8 +869,8 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ──────────────────────────────────────────────────────────
 #&gt; 
-#&gt;          saem   setup table covariance   other
-#&gt; elapsed 10.04 2.12177 0.014      0.011 0.67923
+#&gt;           saem   setup table covariance   other
+#&gt; elapsed 10.603 2.16415 0.013      0.012 0.69285
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ─────────────────────────
 #&gt; 
@@ -894,14 +900,14 @@ of iterations is itmax*number of parameters</p></td>
 #&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in </span><span style='color: #BBBB00;'>x</span><span style='color: #0000BB;font-weight: bold;'>$shrink</span><span> 
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object </span><span style='color: #BBBB00;'>x</span><span> is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ───────────────────────────────────
-#&gt; </span><span style='color: #555555;'># A tibble: 132 x 20</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
 #&gt;   ID     TIME    DV  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl  eta.v    cp
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> 1     0      0.74  0     0.74   0     0.74   1.06   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  0   
-#&gt; </span><span style='color: #555555;'>2</span><span> 1     0.25   2.84  3.03 -</span><span style='color: #BB0000;'>0.190</span><span>  3.88 -</span><span style='color: #BB0000;'>1.04</span><span>  -</span><span style='color: #BB0000;'>1.50</span><span>   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  3.88
-#&gt; </span><span style='color: #555555;'>3</span><span> 1     0.570  6.57  5.44  1.13   6.80 -</span><span style='color: #BB0000;'>0.234</span><span> -</span><span style='color: #BB0000;'>0.337</span><span>  0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  6.80
-#&gt; </span><span style='color: #555555;'># … with 129 more rows, and 8 more variables: depot </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, center </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   ka </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, cl </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, v </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, tad </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, dosenum </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, WT </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   0     0.74   1.06   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  0   
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.03 -</span><span style='color: #BB0000;'>0.190</span><span>  3.88 -</span><span style='color: #BB0000;'>1.04</span><span>  -</span><span style='color: #BB0000;'>1.50</span><span>   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  3.88
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.44  1.13   6.80 -</span><span style='color: #BB0000;'>0.234</span><span> -</span><span style='color: #BB0000;'>0.337</span><span>  0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  6.80
+#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 8 more variables: depot &lt;dbl&gt;, center &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;, WT &lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># }</span>
 </div></span></pre>
   </div>
@@ -919,7 +925,7 @@ of iterations is itmax*number of parameters</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -927,6 +933,8 @@ of iterations is itmax*number of parameters</p></td>
 
   
 
+
+  
 
   </body>
 </html>

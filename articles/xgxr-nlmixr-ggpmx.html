@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -100,14 +102,14 @@
   </ul>
 </li>
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
     <span class="fas fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
 </li>
 <li>
-  <a href="https://doi.org/10.1002/psp4.12445">
+  <a href="https://doi.org/10.1002/psp4.12445" class="external-link">
     <span class="fas fa-life-ring"></span>
      
     Tutorial
@@ -123,13 +125,13 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
     <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr/releases">
+  <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
     <span class="fas fa-download"></span>
      
   </a>
@@ -150,7 +152,7 @@
       <h1 data-toc-skip>xgxr nlmixr and ggPmx integration</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/xgxr-nlmixr-ggpmx.Rmd"><code>vignettes/xgxr-nlmixr-ggpmx.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/xgxr-nlmixr-ggpmx.Rmd" class="external-link"><code>vignettes/xgxr-nlmixr-ggpmx.Rmd</code></a></small>
       <div class="hidden name"><code>xgxr-nlmixr-ggpmx.Rmd</code></div>
 
     </div>
@@ -159,30 +161,30 @@
     
 <p>This shows an example of integrated workflow between <code>xgxr</code> <code>nlmixr</code> and <code>ggPmx</code></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr">nlmixr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://opensource.nibr.com/xgx">xgxr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org">readr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ggPMXdevelopment/ggPMX">ggPMX</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://opensource.nibr.com/xgx" class="external-link">xgxr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org" class="external-link">readr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ggPMXdevelopment/ggPMX" class="external-link">ggPMX</a></span><span class="op">)</span></code></pre></div>
 <div id="load-the-data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#load-the-data" class="anchor"></a>Load the data</h1>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pkpd_data</span> <span class="op">&lt;-</span> <span class="va">case1_pkpd</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">DOSE</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">IPRED</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>TRTACT_low2high <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">TRTACT</span>, levels <span class="op">=</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span><span class="op">(</span><span class="va">TRTACT</span><span class="op">)</span><span class="op">)</span>,
-         TRTACT_high2low <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">TRTACT</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html">rev</a></span><span class="op">(</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html">unique</a></span><span class="op">(</span><span class="va">TRTACT</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
-         DAY_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Day"</span>, <span class="va">PROFDAY</span><span class="op">)</span>,
-         DAY_label <span class="op">=</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fifelse.html">ifelse</a></span><span class="op">(</span><span class="va">DAY_label</span> <span class="op">==</span> <span class="st">"Day 0"</span>,<span class="st">"Baseline"</span>,<span class="va">DAY_label</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">DOSE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">IPRED</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TRTACT_low2high <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">TRTACT</span>, levels <span class="op">=</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">TRTACT</span><span class="op">)</span><span class="op">)</span>,
+         TRTACT_high2low <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">TRTACT</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/duplicated.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">TRTACT</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,
+         DAY_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Day"</span>, <span class="va">PROFDAY</span><span class="op">)</span>,
+         DAY_label <span class="op">=</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">DAY_label</span> <span class="op">==</span> <span class="st">"Day 0"</span>,<span class="st">"Baseline"</span>,<span class="va">DAY_label</span><span class="op">)</span><span class="op">)</span>
  
 <span class="va">pk_data</span> <span class="op">&lt;-</span> <span class="va">pkpd_data</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">CMT</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">CMT</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>
 
 <span class="va">pk_data_cycle1</span> <span class="op">&lt;-</span> <span class="va">pk_data</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">CYCLE</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">CYCLE</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="exploratory-analysis-using-ggplot-and-xgx-helper-functions" class="section level1">
 <h1 class="hasAnchor">
@@ -192,14 +194,14 @@
 <a href="#use-xgxr-for-simplified-concentration-over-time-colored-by-dose-mean---95-ci" class="anchor"></a>Use xgxr for simplified concentration over time, colored by Dose, mean +/- 95% CI</h2>
 <p>Often in exploring data it is worthwhile to plot by dose by each nominal time and add the 95% confidence interval. This typical plot can be cumbersome and lack some nice features that <code>xgxr</code> can help with. Note the following helper functions:</p>
 <ul>
-<li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_theme_set.html">xgx_theme_set()</a></code> this sets the theme to black and white color theme and other best pratices in <code>xgxr</code>.</p></li>
-<li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html">xgx_geom_ci()</a></code> which creates the Confidence Interval and mean plots in a simple interface.</p></li>
-<li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html">xgx_scale_y_log10()</a></code> which creates a log-scale that includes the minor grids that immediately show the viewer that the plot is a semi-log plot without carefully examining the y axis.</p></li>
-<li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html">xgx_scale_x_time_units()</a></code> which creates an appropriate scale based on your times observed and the units you use. It also allows you to convert units easily for the right display.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_theme_set.html" class="external-link">xgx_theme_set()</a></code> this sets the theme to black and white color theme and other best pratices in <code>xgxr</code>.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html" class="external-link">xgx_geom_ci()</a></code> which creates the Confidence Interval and mean plots in a simple interface.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html" class="external-link">xgx_scale_y_log10()</a></code> which creates a log-scale that includes the minor grids that immediately show the viewer that the plot is a semi-log plot without carefully examining the y axis.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html" class="external-link">xgx_scale_x_time_units()</a></code> which creates an appropriate scale based on your times observed and the units you use. It also allows you to convert units easily for the right display.</p></li>
 <li><p><code>xgx_annote_status()</code> which adds a <code>DRAFT</code> annotation which is often considered best practice when the data or plots are draft.</p></li>
 </ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_theme_set.html">xgx_theme_set</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># This uses black and white theme based on xgxr best</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_theme_set.html" class="external-link">xgx_theme_set</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># This uses black and white theme based on xgxr best</span>
                 <span class="co"># pratices</span>
 
 <span class="co"># flag for labeling figures as draft</span>
@@ -218,18 +220,18 @@
 <span class="va">cens_label</span>         <span class="op">&lt;-</span> <span class="st">"Censored"</span>
 
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x     <span class="op">=</span> <span class="va">NOMTIME</span>,
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x     <span class="op">=</span> <span class="va">NOMTIME</span>,
                                   y     <span class="op">=</span> <span class="va">LIDV</span>,
                                   group <span class="op">=</span> <span class="va">DOSE</span>,
                                   color <span class="op">=</span> <span class="va">TRTACT_high2low</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html">xgx_geom_ci</a></span><span class="op">(</span>conf_level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">+</span> <span class="co"># Easy CI with xgxr</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="co"># semi-log plots with semi-log grid minor lines</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>,
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html" class="external-link">xgx_geom_ci</a></span><span class="op">(</span>conf_level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">+</span> <span class="co"># Easy CI with xgxr</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html" class="external-link">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="co"># semi-log plots with semi-log grid minor lines</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html" class="external-link">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>,
                            units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
     <span class="co"># The last line creates an appropriate x scale based on time-units</span>
     <span class="co"># and time unit scale</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">conc_label</span>, color <span class="op">=</span> <span class="va">trtact_label</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span> <span class="co">#  Adds draft status to plot</span></code></pre></div>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">conc_label</span>, color <span class="op">=</span> <span class="va">trtact_label</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html" class="external-link">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span> <span class="co">#  Adds draft status to plot</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-3-1.png" width="100%"></p>
 <p>With this plot you see the mean concentrations confidence intervals stratified by dose</p>
 </div>
@@ -238,16 +240,16 @@
 <a href="#concentration-over-time-faceted-by-dose-mean---95-ci-overlaid-on-gray-spaghetti-plots" class="anchor"></a>Concentration over time, faceted by Dose, mean +/- 95% CI, overlaid on gray spaghetti plots</h2>
 <p>Not only is it useful to look at the mean concentrations, it is often useful to look at the mean concentrations and their relationship between actual individual profiles. Using <code>ggplot</code> coupled with the <code>xgxr</code> helper functions used above, we can easily create these plots as well:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">TIME</span>, y <span class="op">=</span> <span class="va">LIDV</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>group <span class="op">=</span> <span class="va">ID</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"grey50"</span>, size <span class="op">=</span> <span class="fl">1</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/stat_cens.html">geom_cens</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>cens<span class="op">=</span><span class="va">CENS</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html">xgx_geom_ci</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>, color <span class="op">=</span> <span class="cn">NULL</span>, group <span class="op">=</span> <span class="cn">NULL</span>, shape <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, conf_level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>, units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">conc_label</span>, color <span class="op">=</span> <span class="va">trtact_label</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">.</span><span class="op">~</span><span class="va">TRTACT_low2high</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">TIME</span>, y <span class="op">=</span> <span class="va">LIDV</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>group <span class="op">=</span> <span class="va">ID</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"grey50"</span>, size <span class="op">=</span> <span class="fl">1</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/stat_cens.html" class="external-link">geom_cens</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>cens<span class="op">=</span><span class="va">CENS</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html" class="external-link">xgx_geom_ci</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>, color <span class="op">=</span> <span class="cn">NULL</span>, group <span class="op">=</span> <span class="cn">NULL</span>, shape <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, conf_level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html" class="external-link">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html" class="external-link">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>, units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">conc_label</span>, color <span class="op">=</span> <span class="va">trtact_label</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">.</span><span class="op">~</span><span class="va">TRTACT_low2high</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html" class="external-link">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-4-1.png" width="100%"></p>
 <p>To me it appears the variability seems to be higher with higher doses and higher with later times.</p>
 </div>
@@ -256,29 +258,29 @@
 <a href="#exploring-the-dose-linearity" class="anchor"></a>Exploring the dose linearity</h2>
 <p>A common way to explore the dose linearity is to normalize by the dose. If the confidence intervals overlap, often this is a dose linear example.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>,
-       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>,
-           y <span class="op">=</span> <span class="va">LIDV</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">DOSE</span><span class="op">)</span><span class="op">)</span>,
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>,
+       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>,
+           y <span class="op">=</span> <span class="va">LIDV</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">DOSE</span><span class="op">)</span><span class="op">)</span>,
            group <span class="op">=</span> <span class="va">DOSE</span>,
            color <span class="op">=</span> <span class="va">TRTACT_high2low</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html">xgx_geom_ci</a></span><span class="op">(</span>conf_level <span class="op">=</span> <span class="fl">0.95</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html">position_dodge</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>, units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">concnorm_label</span>, color <span class="op">=</span> <span class="va">trtact_label</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html" class="external-link">xgx_geom_ci</a></span><span class="op">(</span>conf_level <span class="op">=</span> <span class="fl">0.95</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html" class="external-link">position_dodge</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html" class="external-link">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html" class="external-link">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>, units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">concnorm_label</span>, color <span class="op">=</span> <span class="va">trtact_label</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html" class="external-link">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-5-1.png" width="100%"></p>
 <p>This example seems to be dose-linear, with the exception of the censored data. This can be made even more clear by removing the censored data for this plot:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">CENS</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>,
-       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>,
-           y <span class="op">=</span> <span class="va">LIDV</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">DOSE</span><span class="op">)</span><span class="op">)</span>,
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">CENS</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>,
+       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>,
+           y <span class="op">=</span> <span class="va">LIDV</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">DOSE</span><span class="op">)</span><span class="op">)</span>,
            group <span class="op">=</span> <span class="va">DOSE</span>,
            color <span class="op">=</span> <span class="va">TRTACT_high2low</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html">xgx_geom_ci</a></span><span class="op">(</span>conf_level <span class="op">=</span> <span class="fl">0.95</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html">position_dodge</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>, units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">concnorm_label</span>, color <span class="op">=</span> <span class="va">trtact_label</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html" class="external-link">xgx_geom_ci</a></span><span class="op">(</span>conf_level <span class="op">=</span> <span class="fl">0.95</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html" class="external-link">position_dodge</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html" class="external-link">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html" class="external-link">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>, units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">concnorm_label</span>, color <span class="op">=</span> <span class="va">trtact_label</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html" class="external-link">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-6-1.png" width="100%"></p>
 <p>The lowest dose, with the most censoring, is the one that seems to be the outlier. That is likely an artifact of censoring.</p>
 <p>Other ways to explore the data include by looking at normalized Cmax and AUC values (which we will skip in this vignette).</p>
@@ -289,16 +291,16 @@
 <a href="#exploring-covariates-in-the-dataset" class="anchor"></a>Exploring Covariates in the dataset</h1>
 <p>Using the <code>xgx</code> helper functions to <code>ggplot</code> you can explore the effect of high baseline weight. This particular plot is shown below:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>,
+<code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>,
                                   y <span class="op">=</span> <span class="va">LIDV</span>,
                                   group <span class="op">=</span> <span class="va">WEIGHTB</span> <span class="op">&gt;</span> <span class="fl">100</span>,
                                   color <span class="op">=</span> <span class="va">WEIGHTB</span> <span class="op">&gt;</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html">xgx_geom_ci</a></span><span class="op">(</span>conf_level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>, units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html">facet_grid</a></span><span class="op">(</span><span class="va">.</span><span class="op">~</span><span class="va">DOSE</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">conc_label</span>, color <span class="op">=</span> <span class="va">w100_label</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_geom_ci.html" class="external-link">xgx_geom_ci</a></span><span class="op">(</span>conf_level <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html" class="external-link">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_time_units.html" class="external-link">xgx_scale_x_time_units</a></span><span class="op">(</span>units_dataset <span class="op">=</span> <span class="va">time_units_dataset</span>, units_plot <span class="op">=</span> <span class="va">time_units_plot</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="va">.</span><span class="op">~</span><span class="va">DOSE</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">conc_label</span>, color <span class="op">=</span> <span class="va">w100_label</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html" class="external-link">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-7-1.png" width="100%"> It seems that the weight effect is not extreme for either dose group</p>
 <div id="summary-of-exploratory-analysis-findings" class="section level2">
 <h2 class="hasAnchor">
@@ -312,19 +314,19 @@
 <p>First we need to subset to the PK only data and rename <code>LIDV</code> to <code>DV</code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">case1_pkpd</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>DV<span class="op">=</span><span class="va">LIDV</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">CMT</span> <span class="op">%in%</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">TRTACT</span> <span class="op">!=</span> <span class="st">"Placebo"</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>DV<span class="op">=</span><span class="va">LIDV</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">CMT</span> <span class="op">%in%</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">TRTACT</span> <span class="op">!=</span> <span class="st">"Placebo"</span><span class="op">)</span></code></pre></div>
 <p>Next create a 2 compartment model:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Use 2 compartment model</span>
 <span class="va">cmt2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
   <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">lka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span> <span class="co"># log Ka</span>
-    <span class="va">lv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="co"># Log Vc</span>
-    <span class="va">lcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span> <span class="co"># Log Cl</span>
-    <span class="va">lq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="co"># log Q</span>
-    <span class="va">lvp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span> <span class="co"># Log Vp</span>
+    <span class="va">lka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span> <span class="co"># log Ka</span>
+    <span class="va">lv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="co"># Log Vc</span>
+    <span class="va">lcl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span> <span class="co"># Log Cl</span>
+    <span class="va">lq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="co"># log Q</span>
+    <span class="va">lvp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span> <span class="co"># Log Vp</span>
 
     <span class="va">eta.ka</span> <span class="op">~</span> <span class="fl">0.01</span>
     <span class="va">eta.v</span> <span class="op">~</span> <span class="fl">0.1</span>
@@ -332,18 +334,18 @@
     <span class="va">logn.sd</span> <span class="op">=</span> <span class="fl">10</span>
   <span class="op">}</span><span class="op">)</span>
   <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span>
-    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">lka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
-    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">lcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
-    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">lv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
-    <span class="va">q</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">lq</span><span class="op">)</span>
-    <span class="va">vp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">lvp</span><span class="op">)</span>
+    <span class="va">ka</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">lka</span> <span class="op">+</span> <span class="va">eta.ka</span><span class="op">)</span>
+    <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">lcl</span> <span class="op">+</span> <span class="va">eta.cl</span><span class="op">)</span>
+    <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">lv</span> <span class="op">+</span> <span class="va">eta.v</span><span class="op">)</span>
+    <span class="va">q</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">lq</span><span class="op">)</span>
+    <span class="va">vp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">lvp</span><span class="op">)</span>
     <span class="fu">linCmt</span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="fu">lnorm</span><span class="op">(</span><span class="va">logn.sd</span><span class="op">)</span>
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span>
 
 <span class="co">## Check parsing</span>
 <span class="va">cmt2m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">cmt2</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">cmt2m</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cmt2m</span><span class="op">)</span>
 <span class="co">#&gt; ▂▂ RxODE-based 1-compartment model with first-order absorption ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂ </span>
 <span class="co">#&gt; ── Initialization: ───────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt; Fixed Effects ($theta): </span>
@@ -365,6 +367,7 @@
 <span class="co">#&gt;                              ├─────────┼─────────┤</span>
 <span class="co">#&gt;                              │ lv      │ eta.v   │</span>
 <span class="co">#&gt;                              └─────────┴─────────┘</span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt; ── Model: ────────────────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt;     ka &lt;- exp(lka + eta.ka)</span>
 <span class="co">#&gt;     cl &lt;- exp(lcl + eta.cl)</span>
@@ -376,7 +379,7 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## First try log-normal (since the variabilitiy seemed proportional to concentration)</span>
 <span class="va">cmt2fit.logn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">cmt2m</span>, <span class="va">dat</span>, <span class="st">"saem"</span>,
-                       control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
+                       control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
                        table<span class="op">=</span><span class="fu"><a href="../reference/tableControl.html">tableControl</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
@@ -388,8 +391,8 @@
 
 <span class="co">## Now try proportional</span>
 <span class="va">cmt2fit.prop</span> <span class="op">&lt;-</span> <span class="va">cmt2fit.logn</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/update.dev.pkg.html">update</a></span><span class="op">(</span><span class="fu">linCmt</span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.sd</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
+    <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/update.dev.pkg.html" class="external-link">update</a></span><span class="op">(</span><span class="fu">linCmt</span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.sd</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
            table<span class="op">=</span><span class="fu"><a href="../reference/tableControl.html">tableControl</a></span><span class="op">(</span>npde<span class="op">=</span><span class="cn">TRUE</span>, cwres<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
@@ -400,8 +403,8 @@
 
 <span class="co">## now try add+prop</span>
 <span class="va">cmt2fit.add.prop</span> <span class="op">&lt;-</span> <span class="va">cmt2fit.prop</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/update.dev.pkg.html">update</a></span><span class="op">(</span><span class="fu">linCmt</span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.sd</span><span class="op">)</span> <span class="op">+</span> <span class="fu">add</span><span class="op">(</span><span class="va">add.sd</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
+    <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/update.dev.pkg.html" class="external-link">update</a></span><span class="op">(</span><span class="fu">linCmt</span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.sd</span><span class="op">)</span> <span class="op">+</span> <span class="fu">add</span><span class="op">(</span><span class="va">add.sd</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
            table<span class="op">=</span><span class="fu"><a href="../reference/tableControl.html">tableControl</a></span><span class="op">(</span>npde<span class="op">=</span><span class="cn">TRUE</span>, cwres<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
@@ -411,10 +414,10 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span></code></pre></div>
 <p>Now that we have run 3 different estimation methods, we can compare the results side-by-side</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://hughjonesd.github.io/huxtable/">huxtable</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://hughjonesd.github.io/huxtable/" class="external-link">huxtable</a></span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/pkg/huxtable/man/huxreg.html">huxreg</a></span><span class="op">(</span><span class="st">"lognormal"</span><span class="op">=</span><span class="va">cmt2fit.logn</span>, <span class="st">"proportional"</span><span class="op">=</span><span class="va">cmt2fit.prop</span>, <span class="st">"add+prop"</span><span class="op">=</span><span class="va">cmt2fit.add.prop</span><span class="op">)</span></code></pre></div>
-<table class="table huxtable">
+<span class="fu"><a href="https://rdrr.io/pkg/huxtable/man/huxreg.html" class="external-link">huxreg</a></span><span class="op">(</span><span class="st">"lognormal"</span><span class="op">=</span><span class="va">cmt2fit.logn</span>, <span class="st">"proportional"</span><span class="op">=</span><span class="va">cmt2fit.prop</span>, <span class="st">"add+prop"</span><span class="op">=</span><span class="va">cmt2fit.add.prop</span><span class="op">)</span></code></pre></div>
+<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-11">
 <col>
 <col>
 <col>
@@ -580,13 +583,13 @@
 <p>Note that the additive and proportional model has the additive component approach zero. When comparing the objective functions of log-normal and proportional models, the proportional model has the lowest objective function value. (Since we modeled log-normal without data transformation it is appropriate to compare the AIC/Objective function values)</p>
 <p>You may wish to see a visual comparison of the parameters:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">dotwhisker</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">dotwhisker</span><span class="op">)</span>
 <span class="co">## exponentiate=NA causes the parameters to be back-transformed</span>
-<span class="fu"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html">dwplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"lognormal"</span><span class="op">=</span><span class="va">cmt2fit.logn</span>, <span class="st">"proportional"</span><span class="op">=</span><span class="va">cmt2fit.prop</span><span class="op">)</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> <span class="op">+</span>
+<span class="fu"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html" class="external-link">dwplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"lognormal"</span><span class="op">=</span><span class="va">cmt2fit.logn</span>, <span class="st">"proportional"</span><span class="op">=</span><span class="va">cmt2fit.prop</span><span class="op">)</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> <span class="op">+</span>
     <span class="co">## Notice we can use some xgx functions post analysis as well,</span>
     <span class="co">## since they are ggplot helper functions</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_log10.html">xgx_scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Comparison between lognormal and proportional models"</span>,
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_x_log10.html" class="external-link">xgx_scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Comparison between lognormal and proportional models"</span>,
             <span class="st">"On backtransformed scales"</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-12-1.png" width="100%"></p>
 </div>
@@ -595,23 +598,23 @@
 <a href="#model-diagnostics-with-ggpmx" class="anchor"></a>Model Diagnostics with ggPMX</h1>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## The controller then can be piped into a specific plot</span>
-<span class="va">ctr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_nlmixr.html">pmx_nlmixr</a></span><span class="op">(</span><span class="va">cmt2fit.logn</span>, conts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"WEIGHTB"</span><span class="op">)</span>, cats<span class="op">=</span><span class="st">"TRTACT"</span><span class="op">)</span>
+<span class="va">ctr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_nlmixr.html" class="external-link">pmx_nlmixr</a></span><span class="op">(</span><span class="va">cmt2fit.logn</span>, conts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WEIGHTB"</span><span class="op">)</span>, cats<span class="op">=</span><span class="st">"TRTACT"</span><span class="op">)</span>
 
 <span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="va">pmx_plot_npde_pred</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co">## Modify graphical options and remove DRAFT label:</span>
-<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html">pmx_plot_npde_time</a></span><span class="op">(</span>smooth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"blue"</span><span class="op">)</span>, point <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>shape<span class="op">=</span><span class="fl">4</span><span class="op">)</span>, is.draft<span class="op">=</span><span class="cn">FALSE</span>, 
-          labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time after first dose (days)"</span>, y <span class="op">=</span> <span class="st">"Normalized PDE"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html" class="external-link">pmx_plot_npde_time</a></span><span class="op">(</span>smooth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"blue"</span><span class="op">)</span>, point <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape<span class="op">=</span><span class="fl">4</span><span class="op">)</span>, is.draft<span class="op">=</span><span class="cn">FALSE</span>, 
+          labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time after first dose (days)"</span>, y <span class="op">=</span> <span class="st">"Normalized PDE"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-2.png" width="100%"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html">pmx_plot_dv_ipred</a></span><span class="op">(</span>scale_x_log10<span class="op">=</span><span class="cn">TRUE</span>, scale_y_log10<span class="op">=</span><span class="cn">TRUE</span>,filter<span class="op">=</span><span class="va">IPRED</span><span class="op">&gt;</span><span class="fl">0.001</span><span class="op">)</span></code></pre></div>
+<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html" class="external-link">pmx_plot_dv_ipred</a></span><span class="op">(</span>scale_x_log10<span class="op">=</span><span class="cn">TRUE</span>, scale_y_log10<span class="op">=</span><span class="cn">TRUE</span>,filter<span class="op">=</span><span class="va">IPRED</span><span class="op">&gt;</span><span class="fl">0.001</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-3.png" width="100%"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html">pmx_plot_dv_pred</a></span><span class="op">(</span>scale_x_log10<span class="op">=</span><span class="cn">TRUE</span>, scale_y_log10<span class="op">=</span><span class="cn">TRUE</span>,filter<span class="op">=</span><span class="va">IPRED</span><span class="op">&gt;</span><span class="fl">0.001</span><span class="op">)</span></code></pre></div>
+<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/residual_scatter.html" class="external-link">pmx_plot_dv_pred</a></span><span class="op">(</span>scale_x_log10<span class="op">=</span><span class="cn">TRUE</span>, scale_y_log10<span class="op">=</span><span class="cn">TRUE</span>,filter<span class="op">=</span><span class="va">IPRED</span><span class="op">&gt;</span><span class="fl">0.001</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-4.png" width="100%"></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -620,8 +623,8 @@
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co">## For this display only show 1x1 individual plot for ID 110 for time &lt; 12</span>
-<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_plot_individual.html">pmx_plot_individual</a></span><span class="op">(</span><span class="fl">1</span>, filter<span class="op">=</span><span class="va">ID</span> <span class="op">==</span> <span class="fl">110</span> <span class="op">&amp;</span> <span class="va">TIME</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">TIME</span> <span class="op">&lt;</span> <span class="fl">12</span>, 
-                            facets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">1</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_plot_individual.html" class="external-link">pmx_plot_individual</a></span><span class="op">(</span><span class="fl">1</span>, filter<span class="op">=</span><span class="va">ID</span> <span class="op">==</span> <span class="fl">110</span> <span class="op">&amp;</span> <span class="va">TIME</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">TIME</span> <span class="op">&lt;</span> <span class="fl">12</span>, 
+                            facets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="fl">1</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-13-6.png" width="100%"></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -634,15 +637,15 @@
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co">## 0-12 hour VPC on semi-log scale</span>
-<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_plot_vpc.html">pmx_plot_vpc</a></span><span class="op">(</span>filter<span class="op">=</span><span class="va">TIME</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">TIME</span> <span class="op">&lt;</span> <span class="fl">12</span>,
+<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_plot_vpc.html" class="external-link">pmx_plot_vpc</a></span><span class="op">(</span>filter<span class="op">=</span><span class="va">TIME</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">TIME</span> <span class="op">&lt;</span> <span class="fl">12</span>,
                      scale_y_log10<span class="op">=</span><span class="cn">TRUE</span>, 
-                     bin<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_vpc_bin.html">pmx_vpc_bin</a></span><span class="op">(</span><span class="st">"jenks"</span>,n<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+                     bin<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_vpc_bin.html" class="external-link">pmx_vpc_bin</a></span><span class="op">(</span><span class="st">"jenks"</span>,n<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; NULL</span>
 
 <span class="co">## 0-12 hour VPC on linear scale</span>
-<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_plot_vpc.html">pmx_plot_vpc</a></span><span class="op">(</span>filter<span class="op">=</span><span class="va">TIME</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">TIME</span> <span class="op">&lt;</span> <span class="fl">12</span>,
+<span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_plot_vpc.html" class="external-link">pmx_plot_vpc</a></span><span class="op">(</span>filter<span class="op">=</span><span class="va">TIME</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">TIME</span> <span class="op">&lt;</span> <span class="fl">12</span>,
                      scale_y_log10<span class="op">=</span><span class="cn">FALSE</span>, 
-                     bin<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_vpc_bin.html">pmx_vpc_bin</a></span><span class="op">(</span><span class="st">"jenks"</span>,n<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+                     bin<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_vpc_bin.html" class="external-link">pmx_vpc_bin</a></span><span class="op">(</span><span class="st">"jenks"</span>,n<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; NULL</span>
                      
 <span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="va">pmx_plot_eta_box</span></code></pre></div>
@@ -656,22 +659,22 @@
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co">## Create a report of all the plots you generated from the controller</span>
-<span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html">file.exists</a></span><span class="op">(</span><span class="st">"nlmixr_report.docx"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
-    <span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_report.html">pmx_report</a></span><span class="op">(</span><span class="st">"nlmixr_report"</span>,<span class="st">"."</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="st">"nlmixr_report.docx"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span>
+    <span class="va">ctr</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_report.html" class="external-link">pmx_report</a></span><span class="op">(</span><span class="st">"nlmixr_report"</span>,<span class="st">"."</span><span class="op">)</span>
 <span class="op">}</span>
-<span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html">file.exists</a></span><span class="op">(</span><span class="st">"nlmixr_report.Rmd"</span><span class="op">)</span><span class="op">)</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span><span class="op">(</span><span class="st">"nlmixr_report.Rmd"</span><span class="op">)</span> <span class="co"># Remove this file so it isn't confused with vignettes</span></code></pre></div>
-<p>This creates two reports with default settings, both a <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf">pdf</a> and <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx">word</a> document. The report can be customized by editing the default template to include project specificities (change labels, stratifications, filtering, etc.).</p>
+<span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="st">"nlmixr_report.Rmd"</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"nlmixr_report.Rmd"</span><span class="op">)</span> <span class="co"># Remove this file so it isn't confused with vignettes</span></code></pre></div>
+<p>This creates two reports with default settings, both a <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf" class="external-link">pdf</a> and <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx" class="external-link">word</a> document. The report can be customized by editing the default template to include project specificities (change labels, stratifications, filtering, etc.).</p>
 </div>
 <div id="simulation-of-a-new-scenario-with-rxode" class="section level1">
 <h1 class="hasAnchor">
 <a href="#simulation-of-a-new-scenario-with-rxode" class="anchor"></a>Simulation of a new scenario with RxODE</h1>
-<p>By creating events you can simply simulate a new scenario. Perhaps your drug development team wants to explore the 100 mg dose 3 times a day dosing to see what happens with the PK. You can simply simulate from the nlmixr model using a <a href="https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html">new event table</a> created from RxODE.</p>
+<p>By creating events you can simply simulate a new scenario. Perhaps your drug development team wants to explore the 100 mg dose 3 times a day dosing to see what happens with the PK. You can simply simulate from the nlmixr model using a <a href="https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html" class="external-link">new event table</a> created from RxODE.</p>
 <p>In this case we wish to simulate with some variability and see what happens at steady state:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Start a new simulation</span>
-<span class="op">(</span><span class="va">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/et.html">et</a></span><span class="op">(</span>amt<span class="op">=</span><span class="fl">100</span>, ii<span class="op">=</span><span class="fl">8</span>, ss<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<table class="table huxtable">
+<span class="op">(</span><span class="va">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/et.html" class="external-link">et</a></span><span class="op">(</span>amt<span class="op">=</span><span class="fl">100</span>, ii<span class="op">=</span><span class="fl">8</span>, ss<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-16">
 <col>
 <col>
 <col>
@@ -694,8 +697,8 @@
 </table>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="va">ev</span><span class="op">$</span><span class="fu">add.sampling</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length.out<span class="op">=</span><span class="fl">50</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">ev</span><span class="op">)</span>
+<span class="va">ev</span><span class="op">$</span><span class="fu">add.sampling</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, length.out<span class="op">=</span><span class="fl">50</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ev</span><span class="op">)</span>
 <span class="co">#&gt; ────────────────────────── EventTable with 51 records ──────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;    1 dosing records (see $get.dosing(); add with add.dosing or et)</span>
@@ -718,10 +721,10 @@
 <p>A nlmixr model already includes information about the parameter estimates and can simulate without uncertainty in the population parameters or covariances, like what is done for a VPC.</p>
 <p>If you wish to simulate <code>100</code> patients repeated by <code>100</code> different theoretical studies where you simulate from the uncertainty in the fixed parameter estimates and covariances you can very easily with nlmixr/RxODE:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
-<span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html">simulate</a></span><span class="op">(</span><span class="va">cmt2fit.logn</span>, events<span class="op">=</span><span class="va">ev</span>, nSub<span class="op">=</span><span class="fl">100</span>, nStud<span class="op">=</span><span class="fl">100</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>
+<span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate</a></span><span class="op">(</span><span class="va">cmt2fit.logn</span>, events<span class="op">=</span><span class="va">ev</span>, nSub<span class="op">=</span><span class="fl">100</span>, nStud<span class="op">=</span><span class="fl">100</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">)</span>
 <span class="co">#&gt; ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂ Solved RxODE object ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂</span>
 <span class="co">#&gt; ── Parameters ($params): ───────────────────────────────────────────────────────</span>
 <span class="co">#&gt; # A tibble: 10,000 x 9</span>
@@ -760,7 +763,7 @@
 <span class="co">#&gt; ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂</span></code></pre></div>
 <p>You may examine the simulated study information easily, as show in the <code>RxODE</code> printout:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">$</span><span class="va">thetaMat</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">$</span><span class="va">thetaMat</span><span class="op">)</span>
 <span class="co">#&gt;               lka          lv         lcl           lq          lvp</span>
 <span class="co">#&gt; [1,] -0.113868825  0.10317394 -0.01563242 -0.095434688 -0.038695203</span>
 <span class="co">#&gt; [2,]  0.011268299  0.06310739 -0.13970970 -0.013251682 -0.008874388</span>
@@ -770,7 +773,7 @@
 <span class="co">#&gt; [6,] -0.002957781  0.19298931 -0.09050556 -0.007312570  0.023473643</span></code></pre></div>
 <p>You can also see the covariance matricies that are simulated (note they come from an inverse Wishart distribution):</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">$</span><span class="va">omegaList</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">$</span><span class="va">omegaList</span><span class="op">)</span>
 <span class="co">#&gt; [[1]]</span>
 <span class="co">#&gt;            [,1]        [,2]        [,3]</span>
 <span class="co">#&gt; [1,] 0.26324868  0.01713003  0.02234050</span>
@@ -807,7 +810,7 @@
 <span class="co">#&gt; [2,] -0.059772794  1.81453160 -0.116435740</span>
 <span class="co">#&gt; [3,]  0.007014084 -0.11643574  0.630189780</span></code></pre></div>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">$</span><span class="va">sigmaList</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">$</span><span class="va">sigmaList</span><span class="op">)</span>
 <span class="co">#&gt; [[1]]</span>
 <span class="co">#&gt;           [,1]</span>
 <span class="co">#&gt; [1,] 0.1432182</span>
@@ -834,20 +837,20 @@
 <p>It is also easy enough to create a plot to see what is going on with the simulation:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">)</span> <span class="co">## This returns a ggplot2 object</span>
+<span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim1</span><span class="op">)</span> <span class="co">## This returns a ggplot2 object</span>
 
 <span class="co">## you can tweak the plot by the standard ggplot commands</span>
-<span class="va">p1</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Time (hr)"</span><span class="op">)</span> <span class="op">+</span> 
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Simulated Concentrations of TID steady state"</span><span class="op">)</span></code></pre></div>
+<span class="va">p1</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time (hr)"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Simulated Concentrations of TID steady state"</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-21-1.png" width="100%"></p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="co"># And put the same plot on a semi-log plot</span>
-<span class="va">p1</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Time (hr)"</span><span class="op">)</span> <span class="op">+</span> 
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Simulated Concentrations of TID steady state"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="va">p1</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time (hr)"</span><span class="op">)</span> <span class="op">+</span> 
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Simulated Concentrations of TID steady state"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_scale_y_log10.html" class="external-link">xgx_scale_y_log10</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-21-2.png" width="100%"></p>
-<p>For more complex simulations with variability you can also <a href="https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html#add-doses-and-samples-within-a-sampling-window">simulate dosing windows and sampling windows</a> and use any tool you want to summarize it in the way you wish.</p>
+<p>For more complex simulations with variability you can also <a href="https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html#add-doses-and-samples-within-a-sampling-window" class="external-link">simulate dosing windows and sampling windows</a> and use any tool you want to summarize it in the way you wish.</p>
 </div>
   </div>
 
@@ -866,7 +869,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
@@ -874,6 +877,8 @@
 
   
 
+
+  
 
   </body>
 </html>
