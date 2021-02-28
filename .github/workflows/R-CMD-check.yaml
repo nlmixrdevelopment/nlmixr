@@ -27,6 +27,7 @@ jobs:
       matrix:
         config:
           - {os: macOS-latest,   r: 'release'}
+          - {os: macOS-latest,   r: 'oldrel'}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-16.04,   r: 'devel', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest", http-user-agent: "R/4.0.0 (ubuntu-16.04) R (4.0.0 x86_64-pc-linux-gnu x86_64 linux-gnu) on GitHub Actions" }
           - {os: ubuntu-16.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest"}
@@ -57,6 +58,7 @@ jobs:
         run: |
           brew install cairo
           brew install libgit2
+          brew install udunits
         shell: bash
 
       - name: Link gfortran on MacOS
@@ -85,6 +87,7 @@ jobs:
 
       - name: Query dependencies
         run: |
+          install.packages('remotes')
           saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
@@ -94,14 +97,9 @@ jobs:
         run: install.packages("symengine", type="source")
         shell: Rscript {0}
 
-      - name: Install development RxODE
-        run: |
-          remotes::install_github('nlmixrdevelopment/RxODE')
-        shell: Rscript {0}
-
       - name: Cache R packages
-        if: runner.os == 'Linux'
-        uses: actions/cache@v2
+        if: runner.os != 'Windows'
+        uses: actions/cache@v1
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
@@ -115,10 +113,16 @@ jobs:
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "16.04"))')
 
+      - name: Install remotes
+        run: install.packages('remotes')
+        shell: Rscript {0}
+
+      - name: Install development RxODE
+        run: remotes::install_github("nlmixrdevelopment/RxODE")
+        shell: Rscript {0}
+
       - name: Install dependencies
-        run: |
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
+        run: remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
 
       - name: Session info
