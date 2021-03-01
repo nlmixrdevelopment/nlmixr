@@ -1377,12 +1377,12 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   rx_solving_options_ind *ind;
   rx_solving_options *op = _rx->op;
   vec _id = _evt.col(0);
-  int _N=_id.max()+1;
+  int _Nnlmixr=(int)(_id.max()+1);
   SEXP paramUpdate = _opt["paramUpdate"];
   int *doParam = INTEGER(paramUpdate);
   int nPar = Rf_length(paramUpdate);
   // Fill in subject parameter information
-  for (int _i = 0; _i < _N; ++_i) {
+  for (int _i = 0; _i < _Nnlmixr; ++_i) {
     ind = &(_rx->subjects[_i]);
     ind->solved = -1;
     // ind->par_ptr
@@ -1397,7 +1397,7 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   mat g(_rx->nobs2, 3); // nobs EXCLUDING EVID=2
   int elt=0;
   bool hasNan = false;
-  for (int id = 0; id < _N; ++id) {
+  for (int id = 0; id < _Nnlmixr; ++id) {
     ind = &(_rx->subjects[id]);
     iniSubjectE(op->neq, 1, ind, op, _rx, saem_inis);
     for (int j = 0; j < ind->n_all_times; ++j){
