@@ -782,7 +782,12 @@ foceiControl <- function(sigdig = 3, ...,
     }
   } else {
     if (!RxODE::rxIs(method, "integer")) {
-      method <- match.arg(method)
+      if (inherits(method, "character")) {
+        method <- match.arg(method)
+      } else {
+        method <- "liblsoda"
+        warning("could not figure out method, using 'liblsoda'")
+      }
     }
   }
   ## .methodIdx <- c("lsoda"=1L, "dop853"=0L, "liblsoda"=2L);
