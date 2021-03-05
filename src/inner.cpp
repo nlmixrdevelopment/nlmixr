@@ -1217,8 +1217,8 @@ double LikInner2(double *eta, int likId, int id){
     arma::mat H0(fInd->H0, op_focei.neta, op_focei.neta, false, true);
     k=0;
     if (fInd->doChol){
-      if (!chol(H, H0)) {
-	H0=cholSE__(H, op_focei.cholSEtol);
+      if (!chol(H0, H)) {
+	return NA_REAL;
       }
     } else {
       H0=cholSE__(H, op_focei.cholSEtol);
@@ -1299,7 +1299,8 @@ static inline int innerEval(int id){
   // Use eta
   double lik0 = likInner0(fInd->eta, id);
   if (ISNA(lik0)) return 0;
-  LikInner2(fInd->eta, 0, id);
+  lik0 = LikInner2(fInd->eta, 0, id);
+  if (ISNA(lik0)) return 0;
   return 1;
 }
 
@@ -1309,7 +1310,8 @@ static inline int innerOpt1(int id, int likId) {
   if (op_focei.neta == 0) {
     double lik = likInner0(NULL, id);
     if (ISNA(lik)) return 0;
-    LikInner2(NULL, 0, id);
+    lik = LikInner2(NULL, 0, id);
+    if (ISNA(lik)) return 0;
     return 1;
   }
   fInd->nInnerF=0;
@@ -1581,7 +1583,7 @@ static inline int innerOpt1(int id, int likId) {
   // Use saved Hessian on next opimization.
   fInd->mode=2;
   fInd->uzm =0;
-  LikInner2(fInd->eta, likId, id);
+  if (ISNA(LikInner2(fInd->eta, likId, id))) return 0;
   return 1;
 }
 
