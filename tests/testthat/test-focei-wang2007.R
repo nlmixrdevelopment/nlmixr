@@ -113,48 +113,48 @@ nlmixrTest(
 
     test_that("Matches NONMEM objective proportional function; (Based on Wang2007)", {
       expect_equal(round(fit.prop$objective, 3), 39.458) # Matches Table 2 Prop FOCEI for NONMEM
-      expect_equal(round(fit.prop$`ETA[1]`, 4), round(out.focei.prop$ETA1, 4)) # match NONMEM output
+      expect_equal(round(fit.prop$`ETA[1]`, 3), round(out.focei.prop$ETA1, 3)) # match NONMEM output
       ## Individual properties
-      expect_equal(round(fit.prop$IPRED, 4), round(out.focei.prop$IPRE, 4))
-      expect_equal(round(fit.prop$IRES, 4), round(out.focei.prop$IRES, 4))
-      expect_equal(round(fit.prop$IWRES, 4), round(out.focei.prop$IWRES, 4))
+      expect_equal(round(fit.prop$IPRED, 3), round(out.focei.prop$IPRE, 3))
+      expect_equal(round(fit.prop$IRES, 3), round(out.focei.prop$IRES, 3))
+      expect_equal(round(fit.prop$IWRES, 3), round(out.focei.prop$IWRES, 3))
       ## WRES variants
-      expect_equal(round(fit.prop$PRED, 4), round(out.focei.prop$NPRED, 4)) # matches output of PRED from NONMEM
-      expect_equal(round(fit.prop$PRED, 4), round(out.focei.prop$PRED, 4)) # matches output of PRED from NONMEM
-      expect_equal(round(fit.prop$RES, 4), round(out.focei.prop$RES, 4)) # match NONMEM output
-      expect_equal(round(fit.prop$RES, 4), round(out.focei.prop$NRES, 4)) # match NONMEM output
+      expect_equal(round(fit.prop$PRED, 3), round(out.focei.prop$NPRED, 3)) # matches output of PRED from NONMEM
+      expect_equal(round(fit.prop$PRED, 3), round(out.focei.prop$PRED, 3)) # matches output of PRED from NONMEM
+      expect_equal(round(fit.prop$RES, 3), round(out.focei.prop$RES, 3)) # match NONMEM output
+      expect_equal(round(fit.prop$RES, 3), round(out.focei.prop$NRES, 3)) # match NONMEM output
       ## FOI equivalents
-      expect_equal(round(fit.prop$PRED, 4), round(out.focei.prop$PREDI, 4)) # matches output of PRED from NONMEM
+      expect_equal(round(fit.prop$PRED, 3), round(out.focei.prop$PREDI, 3)) # matches output of PRED from NONMEM
       ## CWRES variants
-      expect_equal(round(fit.prop$CRES, 4), round(out.focei.prop$CRES, 4)) # match NONMEM output
-      expect_equal(round(fit.prop$CPRED, 4), round(out.focei.prop$CPRED, 4)) # match NONMEM output
-      expect_equal(round(fit.prop$CWRES, 4), round(out.focei.prop$CWRES, 4)) # match NONMEM output
+      expect_equal(round(fit.prop$CRES, 3), round(out.focei.prop$CRES, 3)) # match NONMEM output
+      expect_equal(round(fit.prop$CPRED, 3), round(out.focei.prop$CPRED, 3)) # match NONMEM output
+      expect_equal(round(fit.prop$CWRES, 3), round(out.focei.prop$CWRES, 3)) # match NONMEM output
       ## Note that E[x] for CPRED and CPREDI are equal
-      expect_equal(round(fit.prop$CRES, 4), round(out.focei.prop$CRESI, 4)) # match NONMEM output
-      expect_equal(round(fit.prop$CPRED, 4), round(out.focei.prop$CPREDI, 4)) # match NONMEM output
+      expect_equal(round(fit.prop$CRES, 3), round(out.focei.prop$CRESI, 3)) # match NONMEM output
+      expect_equal(round(fit.prop$CPRED, 3), round(out.focei.prop$CPREDI, 3)) # match NONMEM output
     })
     test_that("Matches NONMEM objective proportional function; (Based on Wang2007; unoptimized)", {
       # Check unoptimized expression
       expect_equal(round(fit.prop2$objective, 3), 39.458) # Matches Table 2 Prop FOCEI for NONMEM
-      expect_equal(round(fit.prop2$`ETA[1]`, 4), round(out.focei.prop$ETA1, 4)) # match NONMEM output
+      expect_equal(round(fit.prop2$`ETA[1]`, 3), round(out.focei.prop$ETA1, 3)) # match NONMEM output
       ## Individual properties
-      expect_equal(round(fit.prop2$IPRED, 4), round(out.focei.prop$IPRE, 4))
-      expect_equal(round(fit.prop2$IRES, 4), round(out.focei.prop$IRES, 4))
-      expect_equal(round(fit.prop2$IWRES, 4), round(out.focei.prop$IWRES, 4))
+      expect_equal(round(fit.prop2$IPRED, 3), round(out.focei.prop$IPRE, 3))
+      expect_equal(round(fit.prop2$IRES, 3), round(out.focei.prop$IRES, 3))
+      expect_equal(round(fit.prop2$IWRES, 3), round(out.focei.prop$IWRES, 3))
       ## WRES variants
-      expect_equal(round(fit.prop2$PRED, 4), round(out.focei.prop$NPRED, 4)) # matches output of PRED from NONMEM
-      expect_equal(round(fit.prop2$PRED, 4), round(out.focei.prop$PRED, 4)) # matches output of PRED from NONMEM
-      expect_equal(round(fit.prop2$RES, 4), round(out.focei.prop$RES, 4)) # match NONMEM output
-      expect_equal(round(fit.prop2$RES, 4), round(out.focei.prop$NRES, 4)) # match NONMEM output
+      expect_equal(round(fit.prop2$PRED, 3), round(out.focei.prop$NPRED, 3)) # matches output of PRED from NONMEM
+      expect_equal(round(fit.prop2$PRED, 3), round(out.focei.prop$PRED, 3)) # matches output of PRED from NONMEM
+      expect_equal(round(fit.prop2$RES, 3), round(out.focei.prop$RES, 3)) # match NONMEM output
+      expect_equal(round(fit.prop2$RES, 3), round(out.focei.prop$NRES, 3)) # match NONMEM output
       ## FOI equivalents
-      expect_equal(round(fit.prop2$PRED, 4), round(out.focei.prop$PREDI, 4)) # matches output of PRED from NONMEM
+      expect_equal(round(fit.prop2$PRED, 3), round(out.focei.prop$PREDI, 3)) # matches output of PRED from NONMEM
       ## CWRES variants
-      expect_equal(round(fit.prop2$CRES, 4), round(out.focei.prop$CRES, 4)) # match NONMEM output
-      expect_equal(round(fit.prop2$CPRED, 4), round(out.focei.prop$CPRED, 4)) # match NONMEM output
-      expect_equal(round(fit.prop2$CWRES, 4), round(out.focei.prop$CWRES, 4)) # match NONMEM output
+      expect_equal(round(fit.prop2$CRES, 3), round(out.focei.prop$CRES, 3)) # match NONMEM output
+      expect_equal(round(fit.prop2$CPRED, 3), round(out.focei.prop$CPRED, 3)) # match NONMEM output
+      expect_equal(round(fit.prop2$CWRES, 3), round(out.focei.prop$CWRES, 3)) # match NONMEM output
       ## Note that E[x] for CPRED and CPREDI are equal
-      expect_equal(round(fit.prop2$CRES, 4), round(out.focei.prop$CRESI, 4)) # match NONMEM output
-      expect_equal(round(fit.prop2$CPRED, 4), round(out.focei.prop$CPREDI, 4)) # match NONMEM output
+      expect_equal(round(fit.prop2$CRES, 3), round(out.focei.prop$CRESI, 3)) # match NONMEM output
+      expect_equal(round(fit.prop2$CPRED, 3), round(out.focei.prop$CPREDI, 3)) # match NONMEM output
     })
 
     testErr("prop", function() {
