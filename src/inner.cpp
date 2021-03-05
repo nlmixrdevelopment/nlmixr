@@ -338,6 +338,7 @@ typedef struct {
   unsigned int uzm;
   int doChol=1;
   int doEtaNudge;
+  int badSolve=0;
 } focei_ind;
 
 focei_ind *inds_focei = NULL;
@@ -745,7 +746,8 @@ double likInner0(double *eta, int id){
     }
     if (op->neq > 0 && (ISNA(ind->solve[0]) || std::isnan(ind->solve[0]) ||
 			std::isinf(ind->solve[0]))){
-      throw std::runtime_error("bad solve");
+      return NA_REAL;
+      //throw std::runtime_error("bad solve");
     } else {
       // Update eta.
       arma::mat lp(fInd->lp, op_focei.neta, 1, false, true);
@@ -783,7 +785,8 @@ double likInner0(double *eta, int id){
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated
 	  dv = tbs(dv0);
 	  if (ISNA(f) || std::isnan(f) || std::isinf(f)) {
-	    throw std::runtime_error("bad solve");
+	    return NA_REAL;
+	    //throw std::runtime_error("bad solve");
 	  }
 	  // fInd->f(k, 0) = ind->lhs[0];
 	  err = f - dv;
@@ -800,8 +803,10 @@ double likInner0(double *eta, int id){
 	  if (rx->cens) cens = ind->cens[kk];
 	  fInd->tbsLik+=tbsL(dv0);
 	  // fInd->err(k, 0) = ind->lhs[0] - ind->dv[k]; // pred-dv
-	  if (ISNA(ind->lhs[op_focei.neta + 1]))
-	    throw std::runtime_error("bad solve");
+	  if (ISNA(ind->lhs[op_focei.neta + 1])){
+	    return NA_REAL;
+	    //throw std::runtime_error("bad solve");
+	  }
 	  r = ind->lhs[op_focei.neta + 1];
 	  if (r == 0.0) {
 	    r = 1.0;
@@ -1235,7 +1240,11 @@ double LikInner2(double *eta, int likId, int id){
 extern "C" double innerOptimF(int n, double *x, void *ex){
   int *id = (int*)ex;
   focei_ind *fInd = &(inds_focei[*id]);
+  if (fInd->badSolve == 1) return NA_REAL;
   double f = likInner0(x, *id);
+  if (ISNA(f)) {
+    fInd->badSolve = 1;
+  }
   fInd->nInnerF++;
   return f;
 }
@@ -1243,6 +1252,7 @@ extern "C" double innerOptimF(int n, double *x, void *ex){
 extern "C" void innerOptimG(int n, double *x, double *g, void *ex) {
   int *id = (int*)ex;
   focei_ind *fInd = &(inds_focei[*id]);
+  if (fInd->badSolve == 1) return;
   lpInner(x, g, *id);
   fInd->nInnerG++;
 }
@@ -1257,11 +1267,16 @@ void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float
   //   stop("Unexpected id for solving (id=%d and should be between 0 and %d)", *id, rx->nsub);
   // }
   focei_ind *fInd = &(inds_focei[*id]);
-
+  if (fInd->badSolve==1) {
+      return;
+  }
   if (*ind==2 || *ind==4) {
     // Function
     // Make sure ID remains installed
     *f = likInner0(x, *id);
+    if (ISNA(*f))  {
+      fInd->badSolve=1;
+    }
     fInd->nInnerF++;
     // if (op_focei.printInner != 0 && fInd->nInnerF % op_focei.printInner == 0){
     // RSprintf("%03d: ", *id);
@@ -1271,25 +1286,29 @@ void innerCost(int *ind, int *n, double *x, double *f, double *g, int *ti, float
   }
   if (*ind==3 || *ind==4) {
     // Gradient
+
     lpInner(x, g, *id);
     fInd->nInnerG++;
   }
 }
 
-static inline void innerEval(int id){
+static inline int innerEval(int id){
   focei_ind *fInd = &(inds_focei[id]);
   // Use eta
-  likInner0(fInd->eta, id);
+  double lik0 = likInner0(fInd->eta, id);
+  if (ISNA(lik0)) return 0;
   LikInner2(fInd->eta, 0, id);
+  return 1;
 }
 
-static inline void innerOpt1(int id, int likId) {
+static inline int innerOpt1(int id, int likId) {
   focei_ind *fInd = &(inds_focei[id]);
   focei_options *fop = &op_focei;
   if (op_focei.neta == 0) {
-    likInner0(NULL, id);
+    double lik = likInner0(NULL, id);
+    if (ISNA(lik)) return 0;
     LikInner2(NULL, 0, id);
-    return;
+    return 1;
   }
   fInd->nInnerF=0;
   fInd->nInnerG=0;
@@ -1361,11 +1380,12 @@ static inline void innerOpt1(int id, int likId) {
 
   int nF = fInd->nInnerF;
   if (n1qn1Inner) {
+    fInd->badSolve = 0;
     n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 	   fInd->var, &epsilon,
 	   &mode, &maxInnerIterations, &nsim,
-	   &imp, fInd->zm,
-	   &izs, &rzs, &dzs, &id);
+	   &imp, fInd->zm, &izs, &rzs, &dzs, &id);
+    if (ISNA(f)) return 0;
     nF = fInd->nInnerF-nF;
     // REprintf("innerCost id: %d, fInd->nInnerF: %d", id, fInd->nInnerF);
     // If stays at zero try another point?
@@ -1388,11 +1408,13 @@ static inline void innerOpt1(int id, int likId) {
 	op_focei.didHessianReset=1;
 	std::fill_n(fInd->x, fop->neta, op_focei.etaNudge);
 	//nF = fInd->nInnerF;
+	fInd->badSolve = 0;
 	n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 	       fInd->var, &epsilon,
 	       &mode, &maxInnerIterations, &nsim,
 	       &imp, fInd->zm,
 	       &izs, &rzs, &dzs, &id);
+	if (ISNA(f)) return 0;
 	// nF = fInd->nInnerF - nF;
 	// if (nF > 3) tryAgain = false;
 	if (!tryAgain) {
@@ -1410,10 +1432,12 @@ static inline void innerOpt1(int id, int likId) {
 	  op_focei.didHessianReset=1;
 	  std::fill_n(fInd->x, fop->neta, -op_focei.etaNudge);
 	  nF = fInd->nInnerF;
+	  fInd->badSolve = 0;
 	  n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 		 fInd->var, &epsilon,
 		 &mode, &maxInnerIterations, &nsim,
 		 &imp, fInd->zm, &izs, &rzs, &dzs, &id);
+	  if (ISNA(f)) return 0;
 	  // nF = fInd->nInnerF - nF;
 	  // if (nF > 3) tryAgain = false;
 	  if (!tryAgain){
@@ -1431,10 +1455,12 @@ static inline void innerOpt1(int id, int likId) {
 	    op_focei.didHessianReset=1;
 	    std::fill_n(fInd->x, fop->neta, -op_focei.etaNudge2);
 	    nF = fInd->nInnerF;
+	    fInd->badSolve = 0;
 	    n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 		   fInd->var, &epsilon,
 		   &mode, &maxInnerIterations, &nsim,
 		   &imp, fInd->zm, &izs, &rzs, &dzs, &id);
+	    if (ISNA(f)) return 0;
 	    // nF = fInd->nInnerF - nF;
 	    // if (nF > 3) tryAgain = false;
 	    if (!tryAgain){
@@ -1452,10 +1478,12 @@ static inline void innerOpt1(int id, int likId) {
 	      op_focei.didHessianReset=1;
 	      std::fill_n(fInd->x, fop->neta, +op_focei.etaNudge2);
 	      nF = fInd->nInnerF;
+	      fInd->badSolve = 0;
 	      n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 		     fInd->var, &epsilon,
 		     &mode, &maxInnerIterations, &nsim,
 		     &imp, fInd->zm, &izs, &rzs, &dzs, &id);
+	      if (ISNA(f)) return 0;
 	      // nF = fInd->nInnerF - nF;
 	      // if (nF > 3) tryAgain = false;
 	      if (!tryAgain){
@@ -1471,11 +1499,13 @@ static inline void innerOpt1(int id, int likId) {
 		std::fill_n(fInd->x, fop->neta, 0);
 		std::fill_n(&fInd->var[0], fop->neta, 0.2);
 		nF = fInd->nInnerF;
+		fInd->badSolve = 0;
 		n1qn1_(innerCost, &npar, fInd->x, &f, fInd->g,
 		       fInd->var, &epsilon,
 		       &mode, &maxInnerIterations, &nsim,
 		       &imp, fInd->zm,
 		       &izs, &rzs, &dzs, &id);
+		if (ISNA(f)) return 0;
 		//nF = fInd->nInnerF-nF;
 		// if (nF > 3) tryAgain = false;
 		if (!tryAgain){
@@ -1501,12 +1531,14 @@ static inline void innerOpt1(int id, int likId) {
   } else {
     int fail=0, fncount=0, grcount=0;
     char msg[100];
+    fInd->badSolve = 0;
     lbfgsb3C(npar, op_focei.lmm, fInd->x, op_focei.etaLower,
 	     op_focei.etaUpper, op_focei.nbdInner, &f, innerOptimF, innerOptimG,
 	     &fail, (void*)(&id), op_focei.factr,
 	     op_focei.pgtol, &fncount, &grcount,
 	     op_focei.maxInnerIterations, msg, 0, -1,
 	     op_focei.abstol, op_focei.reltol, fInd->g);
+    if (ISNA(f)) return 0;
     // if (fail != 6 && fail != 7 && fail != 8 && fail != 27){
     //   // did not converge
     //   if (fInd->doEtaNudge == 1 && op_focei.etaNudge != 0.0){
@@ -1548,6 +1580,7 @@ static inline void innerOpt1(int id, int likId) {
   fInd->mode=2;
   fInd->uzm =0;
   LikInner2(fInd->eta, likId, id);
+  return 1;
 }
 
 void parHistData(Environment e, bool focei);
@@ -1709,9 +1742,7 @@ void innerOpt(){
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
       indF->doChol = 1;
-      try{
-        innerEval(id);
-      } catch(...) {
+      if (!innerEval(id)) {
 	indF->doChol = 0; // Use generalized cholesky decomposition
         innerEval(id);
 	// Not thread safe
@@ -1725,24 +1756,17 @@ void innerOpt(){
 // #endif
     for (int id = 0; id < rx->nsub; id++){
       focei_ind *indF = &(inds_focei[id]);
-      try {
-        innerOpt1(id, 0);
-      } catch (...){
+      if (!innerOpt1(id, 0)) {
       	// First try resetting ETA
       	std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      	try {
-      	  innerOpt1(id, 0);
-        } catch (...) {
+      	if (!innerOpt1(id, 0)) {
       	  // Now try resetting Hessian, and ETA
       	  // RSprintf("Hessian Reset for ID: %d\n", id+1);
           indF->mode = 1;
           indF->uzm = 1;
       	  op_focei.didHessianReset=1;
           //std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      	  try {
-            // RSprintf("Hessian Reset & ETA reset for ID: %d\n", id+1);
-            innerOpt1(id, 0);
-          } catch (...){
+	  if (!innerOpt1(id, 0)) {
             indF->mode = 1;
             indF->uzm = 1;
       	    op_focei.didHessianReset=1;
@@ -1755,32 +1779,22 @@ void innerOpt(){
               indF->uzm = 1;
       	      op_focei.didHessianReset=1;
               std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      	      try {
-      		innerOpt1(id, 0);
+	      if (innerOpt1(id, 0)) {
       		indF->doChol = 1; // Use cholesky again.
-      	      } catch (...){
+      	      } else {
       		// Just use ETA=0
                 std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-                try{
-                  innerEval(id);
-                } catch(...){
-      		  // Not thread safe
+		if (!innerEval(id)) {
       		  warning(_("bad solve during optimization"));
-      		  // ("Cannot correct.");
-                }
+		}
               }
       	    } else {
               // Just use ETA=0
               std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-              try{
-                innerEval(id);
-              } catch(...){
-      		// Not thread safe
-                warning(_("bad solve during optimization"));
-                // ("Cannot correct.");
-              }
+	      if (!innerEval(id)) {
+		warning(_("bad solve during optimization"));
+	      }
             }
-            //
           }
         }
       }
