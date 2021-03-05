@@ -92,7 +92,7 @@ nlmixrTest(
       if (!all(is.na(val))) {
         test_that(
           type,
-          expect_equal(round(ret, 3), round(val, 3))
+          expect_equal(ret, val, tol=1e-3)
         )
       }
       return(ret)
@@ -112,49 +112,49 @@ nlmixrTest(
 
 
     test_that("Matches NONMEM objective proportional function; (Based on Wang2007)", {
-      expect_equal(round(fit.prop$objective, 3), 39.458) # Matches Table 2 Prop FOCEI for NONMEM
-      expect_equal(round(fit.prop$`ETA[1]`, 3), round(out.focei.prop$ETA1, 3)) # match NONMEM output
+      expect_equal(fit.prop$objective, 39.458, tol=1e-3) # Matches Table 2 Prop FOCEI for NONMEM
+      expect_equal(fit.prop$`ETA[1]`, out.focei.prop$ETA1, tol=1e-3) # match NONMEM output
       ## Individual properties
-      expect_equal(round(fit.prop$IPRED, 3), round(out.focei.prop$IPRE, 3))
-      expect_equal(round(fit.prop$IRES, 3), round(out.focei.prop$IRES, 3))
-      expect_equal(round(fit.prop$IWRES, 3), round(out.focei.prop$IWRES, 3))
+      expect_equal(fit.prop$IPRED, out.focei.prop$IPRE, tol=1e-3)
+      expect_equal(fit.prop$IRES, out.focei.prop$IRES, tol=1e-3)
+      expect_equal(fit.prop$IWRES, out.focei.prop$IWRES, tol=1e-3)
       ## WRES variants
-      expect_equal(round(fit.prop$PRED, 3), round(out.focei.prop$NPRED, 3)) # matches output of PRED from NONMEM
-      expect_equal(round(fit.prop$PRED, 3), round(out.focei.prop$PRED, 3)) # matches output of PRED from NONMEM
-      expect_equal(round(fit.prop$RES, 3), round(out.focei.prop$RES, 3)) # match NONMEM output
-      expect_equal(round(fit.prop$RES, 3), round(out.focei.prop$NRES, 3)) # match NONMEM output
+      expect_equal(fit.prop$PRED, out.focei.prop$NPRED, tol=1e-3) # matches output of PRED from NONMEM
+      expect_equal(fit.prop$PRED, out.focei.prop$PRED, tol=1e-3) # matches output of PRED from NONMEM
+      expect_equal(fit.prop$RES, out.focei.prop$RES, tol=1e-3) # match NONMEM output
+      expect_equal(fit.prop$RES, out.focei.prop$NRES, tol=1e-3) # match NONMEM output
       ## FOI equivalents
-      expect_equal(round(fit.prop$PRED, 3), round(out.focei.prop$PREDI, 3)) # matches output of PRED from NONMEM
+      expect_equal(fit.prop$PRED, out.focei.prop$PREDI, tol=1e-3) # matches output of PRED from NONMEM
       ## CWRES variants
-      expect_equal(round(fit.prop$CRES, 3), round(out.focei.prop$CRES, 3)) # match NONMEM output
-      expect_equal(round(fit.prop$CPRED, 3), round(out.focei.prop$CPRED, 3)) # match NONMEM output
-      expect_equal(round(fit.prop$CWRES, 3), round(out.focei.prop$CWRES, 3)) # match NONMEM output
+      expect_equal(fit.prop$CRES, out.focei.prop$CRES, tol=1e-3) # match NONMEM output
+      expect_equal(fit.prop$CPRED, out.focei.prop$CPRED, tol=1e-3) # match NONMEM output
+      expect_equal(fit.prop$CWRES, out.focei.prop$CWRES, tol=1e-3) # match NONMEM output
       ## Note that E[x] for CPRED and CPREDI are equal
-      expect_equal(round(fit.prop$CRES, 3), round(out.focei.prop$CRESI, 3)) # match NONMEM output
-      expect_equal(round(fit.prop$CPRED, 3), round(out.focei.prop$CPREDI, 3)) # match NONMEM output
+      expect_equal(fit.prop$CRES, out.focei.prop$CRESI, tol=1e-3) # match NONMEM output
+      expect_equal(fit.prop$CPRED, out.focei.prop$CPREDI, tol=1e-3) # match NONMEM output
     })
     test_that("Matches NONMEM objective proportional function; (Based on Wang2007; unoptimized)", {
       # Check unoptimized expression
-      expect_equal(round(fit.prop2$objective, 3), 39.458) # Matches Table 2 Prop FOCEI for NONMEM
-      expect_equal(round(fit.prop2$`ETA[1]`, 3), round(out.focei.prop$ETA1, 3)) # match NONMEM output
+      expect_equal(fit.prop2$objective, 39.458, tol=1e-3) # Matches Table 2 Prop FOCEI for NONMEM
+      expect_equal(fit.prop2$`ETA[1]`, out.focei.prop$ETA1, tol=1e-3) # match NONMEM output
       ## Individual properties
-      expect_equal(round(fit.prop2$IPRED, 3), round(out.focei.prop$IPRE, 3))
-      expect_equal(round(fit.prop2$IRES, 3), round(out.focei.prop$IRES, 3))
-      expect_equal(round(fit.prop2$IWRES, 3), round(out.focei.prop$IWRES, 3))
+      expect_equal(fit.prop2$IPRED, out.focei.prop$IPRE, tol=1e-3)
+      expect_equal(fit.prop2$IRES, out.focei.prop$IRES, tol=1e-3)
+      expect_equal(fit.prop2$IWRES, out.focei.prop$IWRES, tol=1e-3)
       ## WRES variants
-      expect_equal(round(fit.prop2$PRED, 3), round(out.focei.prop$NPRED, 3)) # matches output of PRED from NONMEM
-      expect_equal(round(fit.prop2$PRED, 3), round(out.focei.prop$PRED, 3)) # matches output of PRED from NONMEM
-      expect_equal(round(fit.prop2$RES, 3), round(out.focei.prop$RES, 3)) # match NONMEM output
-      expect_equal(round(fit.prop2$RES, 3), round(out.focei.prop$NRES, 3)) # match NONMEM output
+      expect_equal(fit.prop2$PRED, out.focei.prop$NPRED, tol=1e-3) # matches output of PRED from NONMEM
+      expect_equal(fit.prop2$PRED, out.focei.prop$PRED, tol=1e-3) # matches output of PRED from NONMEM
+      expect_equal(fit.prop2$RES, out.focei.prop$RES, tol=1e-3) # match NONMEM output
+      expect_equal(fit.prop2$RES, out.focei.prop$NRES, tol=1e-3) # match NONMEM output
       ## FOI equivalents
-      expect_equal(round(fit.prop2$PRED, 3), round(out.focei.prop$PREDI, 3)) # matches output of PRED from NONMEM
+      expect_equal(fit.prop2$PRED, out.focei.prop$PREDI, tol=1e-3) # matches output of PRED from NONMEM
       ## CWRES variants
-      expect_equal(round(fit.prop2$CRES, 3), round(out.focei.prop$CRES, 3)) # match NONMEM output
-      expect_equal(round(fit.prop2$CPRED, 3), round(out.focei.prop$CPRED, 3)) # match NONMEM output
-      expect_equal(round(fit.prop2$CWRES, 3), round(out.focei.prop$CWRES, 3)) # match NONMEM output
+      expect_equal(fit.prop2$CRES, out.focei.prop$CRES, tol=1e-3) # match NONMEM output
+      expect_equal(fit.prop2$CPRED, out.focei.prop$CPRED, tol=1e-3) # match NONMEM output
+      expect_equal(fit.prop2$CWRES, out.focei.prop$CWRES, tol=1e-3) # match NONMEM output
       ## Note that E[x] for CPRED and CPREDI are equal
-      expect_equal(round(fit.prop2$CRES, 3), round(out.focei.prop$CRESI, 3)) # match NONMEM output
-      expect_equal(round(fit.prop2$CPRED, 3), round(out.focei.prop$CPREDI, 3)) # match NONMEM output
+      expect_equal(fit.prop2$CRES, out.focei.prop$CRESI, tol=1e-3) # match NONMEM output
+      expect_equal(fit.prop2$CPRED, out.focei.prop$CPREDI, tol=1e-3) # match NONMEM output
     })
 
     testErr("prop", function() {
@@ -400,7 +400,7 @@ nlmixrTest(
     )
 
     test_that("Matches NONMEM objective lognormal function; (Based on Wang2007)", {
-      expect_equal(round(fit.lnorm$objective, 3), 40.039)
+      expect_equal(fit.lnorm$objective, 40.039, tol=1e-3)
     })
 
     fit.lnorm0 <- .foceiFit(datl, inits, mypar1, mod, predl, function() {
@@ -410,9 +410,9 @@ nlmixrTest(
     )
 
     test_that("Matches NONMEM objective lognormal function; (Based on Wang2007)", {
-      expect_equal(round(fit.lnorm$objective, 3), 40.039)
+      expect_equal(fit.lnorm$objective, 40.039, tol=1e-3)
       expect_equal(fit.lnorm0$objective + 2 * sum(datl$DV), fit.lnorm$objective)
-      expect_equal(round(fit.lnorm0$objective, 3), -42.106)
+      expect_equal(fit.lnorm0$objective, -42.106, tol=1e-3)
     })
 
     fit.lnorm2 <- .foceiFit(dat2, inits, mypar1, m1, pred, function() {
@@ -428,9 +428,9 @@ nlmixrTest(
     )
 
     test_that("Matches NONMEM objective lognormal function; ODE (Based on Wang2007)", {
-      expect_equal(round(fit.lnorm2$objective, 3), 40.039)
+      expect_equal(fit.lnorm2$objective, 40.039, tol=1e-3)
       expect_equal(fit.lnorm20$objective + 2 * sum(datl$DV), fit.lnorm2$objective)
-      expect_equal(round(fit.lnorm20$objective, 3), -42.106)
+      expect_equal(fit.lnorm20$objective, -42.106, tol=1e-3)
     })
 
     fit.lnorm <- .foceiFit(dat, inits, mypar1, mod, pred, function() {
@@ -446,9 +446,9 @@ nlmixrTest(
     )
 
     test_that("Matches NONMEM objective lognormal error FOCE (Based on Wang2007)", {
-      expect_equal(round(fit.lnorm$objective, 3), 40.039)
+      expect_equal(fit.lnorm$objective, 40.039, tol=1e-3)
       expect_equal(fit.lnorm0$objective + 2 * sum(datl$DV), fit.lnorm$objective)
-      expect_equal(round(fit.lnorm0$objective, 3), -42.106)
+      expect_equal(fit.lnorm0$objective, -42.106, tol=1e-3)
     })
 
     fit.lnorm2 <- .foceiFit(dat2, inits, mypar1, m1, pred, function() {
@@ -464,9 +464,9 @@ nlmixrTest(
     )
 
     test_that("Matches NONMEM objective lognormal error FOCE; ODE (Based on Wang2007)", {
-      expect_equal(round(fit.lnorm2$objective, 3), 40.039)
+      expect_equal(fit.lnorm2$objective, 40.039, tol=1e-3)
       expect_equal(fit.lnorm20$objective + 2 * sum(datl$DV), fit.lnorm2$objective)
-      expect_equal(round(fit.lnorm20$objective, 3), -42.106)
+      expect_equal(fit.lnorm20$objective, -42.106, tol=1e-3)
     })
 
     fit.lnorm <- .foceiFit(dat, inits, mypar1, mod, pred, function() {
@@ -482,9 +482,9 @@ nlmixrTest(
     )
 
     test_that("Matches NONMEM objective lognormal error FO (Based on Wang2007)", {
-      expect_equal(round(fit.lnorm$objective, 3), 40.055)
+      expect_equal(fit.lnorm$objective, 40.055, tol=1e-3)
       expect_equal(fit.lnorm0$objective + 2 * sum(datl$DV), fit.lnorm$objective)
-      expect_equal(round(fit.lnorm0$objective, 3), -42.09)
+      expect_equal(fit.lnorm0$objective, -42.09, tol=1e-3)
     })
 
     fit.lnorm2 <- .foceiFit(dat2, inits, mypar1, m1, pred, function() {
@@ -500,9 +500,9 @@ nlmixrTest(
     )
 
     test_that("Matches NONMEM objective lognormal error FO; ODE (Based on Wang2007)", {
-      expect_equal(round(fit.lnorm2$objective, 3), 40.055)
+      expect_equal(fit.lnorm2$objective, 40.055, tol=1e-3)
       expect_equal(fit.lnorm20$objective + 2 * sum(datl$DV), fit.lnorm2$objective)
-      expect_equal(round(fit.lnorm20$objective, 3), -42.09)
+      expect_equal(fit.lnorm20$objective, -42.09, tol=1e-3)
     })
   },
   test = "focei"
