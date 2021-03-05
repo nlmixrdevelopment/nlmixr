@@ -200,8 +200,9 @@ configsaem <- function(model, data, inits,
   type.idx <- c("nelder-mead" = 1L, "newuoa" = 2L)
   type <- match.arg(type)
   type <- type.idx[type]
+  force(ODEopt)
   names(ODEopt) <- gsub("transit_abs", "transitAbs", names(ODEopt))
-  ODEopt <- do.call(RxODE::rxControl, ODEopt)
+  ODEopt <- do.call(RxODE::rxSolve, c(list(object=NULL), ODEopt))
   # mcmc=list(niter=c(200,300), nmc=3, nu=c(2,2,2));ODEopt = list(atol=1e-6, rtol=1e-4, stiff=1, transit_abs=0);distribution=c("normal","poisson","binomial");seed=99;data=dat;distribution=1;fixed=NULL
   set.seed(seed)
   distribution.idx <- c("normal" = 1, "poisson" = 2, "binomial" = 3)

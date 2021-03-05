@@ -781,6 +781,9 @@ foceiControl <- function(sigdig = 3, ...,
       }
     }
   } else {
+    if (inherits(method, "numeric")) {
+      method <- as.integer(method)
+    }
     if (!RxODE::rxIs(method, "integer")) {
       if (inherits(method, "character")) {
         method <- match.arg(method)

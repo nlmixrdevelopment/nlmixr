@@ -2,7 +2,6 @@ nlmixrTest(
   {
     context("Covs in SAEM covs and model, Issue #281")
     test_that("saem building works with ", {
-      skip_on_os("solaris") # gcc compiler has to be available and working
 
       Lesion7 <- function() {
         ini({
