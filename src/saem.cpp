@@ -49,6 +49,9 @@ int _saemPropT=0;
 static inline double handleF(int powt, double &ft, double &f, bool trunc) {
   double xmin = 1.0e-200, xmax=1e300;
   double fa = powt ? ft : f;
+  if (fa == 0.0) {
+    fa = 1.0;
+  }
   if (trunc){
     if (fa < xmin) fa = xmin;
     else if (fa > xmax) fa = xmax;
