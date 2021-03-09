@@ -168,7 +168,10 @@ BEGIN_RCPP
   calculateCwresDerr(fppm, fpim, ID, etas, dErr_dEta_i, dErr_dEta_p, etasDfFull, nid, neta);
 
   arma::vec rest = dvt - predt;
-  arma::vec wres = rest/sqrt(abs(Vfop+rpv));
+  arma::vec vsum = abs(Vfop+rpv);
+  arma::vec wres = rest;
+  arma::uvec vsum0 = find(vsum != 0);
+  wres.elem(vsum0) /= sqrt(vsum.elem(vsum0));
 
   arma::vec cpredt = ipredt - dErr_dEta_i;
   arma::vec crest = dvt - cpredt;
@@ -181,8 +184,13 @@ BEGIN_RCPP
     pred[i] = _powerDi(predt[i], lambda[i], (int)yj[i], low[i], hi[i]);
   }
   arma::vec res = dv - pred;
-  arma::vec cwres = crest/sqrt(Vfoi+riv);
-  arma::vec iwres=(dvt-ipredt)/sqrt(riv);
+  vsum = Vfoi+riv;
+  vsum0 = find(vsum != 0);
+  arma::vec cwres = crest;
+  cwres.elem(vsum0) /= sqrt(vsum.elem(vsum0));
+  arma::uvec riv0 = find(riv!=0);
+  arma::vec iwres=(dvt-ipredt);
+  iwres.elem(riv0)/=sqrt(riv.elem(riv0));
   arma::vec ires = dv - ipred;
 
   for (unsigned int j = ires.size(); j--; ) {

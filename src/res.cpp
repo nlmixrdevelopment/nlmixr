@@ -265,9 +265,10 @@ BEGIN_RCPP
   for (unsigned int i = pred.size(); i--;){
     pred[i] = _powerDi(predt[i], lambda[i], (int)yj[i], low[i], hi[i]);
   }
-
   arma::vec res = dv - pred;
-  arma::vec iwres=(dvt-ipredt)/sqrt(riv);
+  arma::uvec riv0 = find(riv != 0);
+  arma::vec iwres=(dvt-ipredt);
+  iwres.elem(riv0) /= sqrt(riv.elem(riv0));
   arma::vec ires = dv - ipred;
 
   for (unsigned int j = ires.size(); j--; ) {

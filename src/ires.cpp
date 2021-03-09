@@ -68,7 +68,9 @@ BEGIN_RCPP
 
   arma::ivec ID(INTEGER(ipredL[0]), ncalc, false, true);
 
-  arma::vec iwres=(dvt-ipredt)/sqrt(riv);
+  arma::vec iwres=(dvt-ipredt);
+  uvec riv0 = find(riv!=0); 
+  iwres.elem(riv0) /= sqrt(riv.elem(riv0));
   arma::vec ires = dv - ipred;
 
   for (unsigned int j = ires.size(); j--; ) {
