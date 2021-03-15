@@ -751,13 +751,13 @@ dynmodelControl <- function(...,
 #' inits <- c(CL = 1, V = 10)
 #' control <- dynmodelControl(method = "Nelder-Mead")
 #' fit <-
-#'   dynmodel(
+#'   try(dynmodel(
 #'     system = ode_system,
 #'     model = model_error_structure,
 #'     data = Bolus_1CPT,
 #'     inits = inits,
 #'     control = control
-#'   )
+#'   ))
 #'
 #' # nlmixr model example ----------------------------------------------------------
 #' model_onecmt_bolus <- function() {
@@ -777,11 +777,13 @@ dynmodelControl <- function(...,
 #' # note on some platforms this fit is not successful
 #' fit <- try(nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "dynmodel"))
 #'
-#' as.dynmodel(fit)
+#' if (inherits(fit, "nlmixrDynmodel")) {
+#'  as.dynmodel(fit)
+#' }
 #'
 #' # method = "focei" is slightly more flexible and well tested
 #'
-#' fit <- nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "focei")
+#' fit <- try(nlmixr(object = model_onecmt_bolus, data = Bolus_1CPT, est = "focei"))
 #'
 #' }
 #' @export

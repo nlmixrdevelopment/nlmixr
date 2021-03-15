@@ -22,7 +22,6 @@ observed and predicted
 Generate predictions after a generalized non-linear mixed effect model fit
 }
 \examples{
-
 \donttest{
 
 ode <- "
@@ -49,12 +48,11 @@ inits$OMGA <- list(ETA[1]+ETA[2]~c(.027, .01, .37))
 
 theo <- theo_md
 
-if (FALSE) { # commented out because of platform differences
-
-fit <- gnlmm(llik, theo, inits, pars, sys1,
+fit <- try(gnlmm(llik, theo, inits, pars, sys1,
   control = list(trace = TRUE, nAQD = 1)
-)
+))
 
+if (! inherits(fit, "try-error")) {
 
 pred <- function() {
   pred <- centr / V
@@ -65,7 +63,6 @@ plot(s$p, s$dv)
 abline(0, 1, col = "red")
 
 }
-
 }
 
 }

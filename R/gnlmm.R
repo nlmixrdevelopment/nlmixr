@@ -120,7 +120,6 @@ multi2 <- function(mu, vmat, n) {
 #' @param mc.cores number of cores (for Linux only)
 #' @return observed and predicted
 #' @examples
-#'
 #' \donttest{
 #'
 #' ode <- "
@@ -147,12 +146,11 @@ multi2 <- function(mu, vmat, n) {
 #'
 #' theo <- theo_md
 #'
-#' if (FALSE) { # commented out because of platform differences
-#'
-#' fit <- gnlmm(llik, theo, inits, pars, sys1,
+#' fit <- try(gnlmm(llik, theo, inits, pars, sys1,
 #'   control = list(trace = TRUE, nAQD = 1)
-#' )
+#' ))
 #'
+#' if (! inherits(fit, "try-error")) {
 #'
 #' pred <- function() {
 #'   pred <- centr / V
@@ -163,7 +161,6 @@ multi2 <- function(mu, vmat, n) {
 #' abline(0, 1, col = "red")
 #'
 #' }
-#'
 #' }
 #'
 #' @export
@@ -281,7 +278,7 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
 #' }
 #' inits <- list(THTA = c(1, 1, 1), OMGA = list(ETA[1] ~ 1))
 #'
-#' gnlmm(llik, rats, inits, control = list(nAQD = 1))
+#' try(gnlmm(llik, rats, inits, control = list(nAQD = 1)))
 #'
 #' llik <- function() {
 #'   if (group == 1) {
@@ -294,13 +291,13 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
 #' }
 #' inits <- list(THTA = c(1, 1, 1, 1), OMGA = list(ETA[1] ~ 1))
 #'
-#' fit <- gnlmm(llik, pump, inits,
+#' fit <- try(gnlmm(llik, pump, inits,
 #'   control = list(
 #'     reltol.outer = 1e-4,
 #'     optim.outer = "nmsimplex",
 #'     nAQD = 5
 #'   )
-#' )
+#' ))
 #'
 #'
 #'
@@ -326,16 +323,18 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
 #'
 #' theo <- theo_md
 #'
-#' fit <- gnlmm(llik, theo, inits, pars, sys1,
+#' fit <- try(gnlmm(llik, theo, inits, pars, sys1,
 #'   control = list(trace = TRUE, nAQD = 1)
-#' )
+#' ))
 #'
-#' fit2 <- gnlmm2(llik, theo, inits, pars, sys1,
+#' fit2 <- try(gnlmm2(llik, theo, inits, pars, sys1,
 #'   control = list(trace = TRUE, nAQD = 1)
-#' )
+#' ))
 #'
-#' cv <- calcCov(fit)
-#' cbind(fit$par[fit$nsplt == 1], sqrt(diag(cv)))
+#' if (inherits(fit, "gnlmm.fit")) {
+#'  cv <- calcCov(fit)
+#'  cbind(fit$par[fit$nsplt == 1], sqrt(diag(cv)))
+#' }
 #'
 #' }
 #' @export
