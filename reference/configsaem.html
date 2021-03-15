@@ -313,7 +313,7 @@ of iterations is itmax*number of parameters</p></td>
 <span class='va'>ode</span> <span class='op'>&lt;-</span> <span class='st'>"d/dt(depot) =-KA*depot;
         d/dt(centr) = KA*depot - KE*centr;"</span>
 <span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span><span class='va'>ode</span>, modName <span class='op'>=</span> <span class='st'>"m1"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'>→ remove old RxODE dir <span style='color: #0000BB;'>/tmp/RtmpkhQ4QV/file1ccd3b7e0745/reference/m1.d</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'>
 
 <span class='co'># In this ode System, we also specify the concentration as C2 = centr/V</span>
 
@@ -321,7 +321,7 @@ of iterations is itmax*number of parameters</p></td>
       d/dt(depot) =-KA*depot;
       d/dt(centr) = KA*depot - KE*centr;"</span>
 <span class='va'>m2</span> <span class='op'>=</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span><span class='va'>ode</span>, modName<span class='op'>=</span><span class='st'>"m2"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'>→ remove old RxODE dir </span><span style='color: #0000BB;'>/tmp/RtmpkhQ4QV/file1ccd3b7e0745/reference/m2.d</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'>
 <span class='va'>PKpars</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='va'>CL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>lCL</span><span class='op'>)</span>
   <span class='va'>V</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>lV</span><span class='op'>)</span>
@@ -333,7 +333,7 @@ of iterations is itmax*number of parameters</p></td>
 <span class='va'>PRED2</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='va'>C2</span>
 
 <span class='va'>saem_fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gen_saem_user_fn.html'>gen_saem_user_fn</a></span><span class='op'>(</span>model <span class='op'>=</span> <span class='va'>m1</span>, <span class='va'>PKpars</span>, pred <span class='op'>=</span> <span class='va'>PRED</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='warning'>Warning: this was not generated from nlmixr, loading into symengine</span></div><div class='output co'>#&gt; <span class='message'>→ creating SAEM model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
+</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='warning'>Warning: this was not generated from nlmixr, loading into symengine</span></div><div class='output co'>#&gt; <span class='message'>→ creating SAEM model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
 <span class='co'># Can also use PRED2</span>
 <span class='va'>saem_fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gen_saem_user_fn.html'>gen_saem_user_fn</a></span><span class='op'>(</span>model<span class='op'>=</span><span class='va'>m2</span>, <span class='va'>PKpars</span>, pred<span class='op'>=</span><span class='va'>PRED2</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='warning'>Warning: this was not generated from nlmixr, loading into symengine</span></div><div class='output co'>#&gt; <span class='message'>→ creating SAEM model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
@@ -869,8 +869,8 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ──────────────────────────────────────────────────────────
 #&gt; 
-#&gt;           saem    setup table covariance    other
-#&gt; elapsed 10.587 2.237883 0.018      0.014 0.721117
+#&gt;          saem    setup table covariance    other
+#&gt; elapsed 10.58 2.266258 0.015      0.014 0.717742
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ─────────────────────────
 #&gt; 

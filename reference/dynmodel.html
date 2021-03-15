@@ -276,13 +276,13 @@ details. Default is NULL.</p></td>
 <span class='va'>inits</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>CL <span class='op'>=</span> <span class='fl'>1</span>, V <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
 <span class='va'>control</span> <span class='op'>&lt;-</span> <span class='fu'><a href='dynmodelControl.html'>dynmodelControl</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"Nelder-Mead"</span><span class='op'>)</span>
 <span class='va'>fit</span> <span class='op'>&lt;-</span>
-  <span class='fu'>dynmodel</span><span class='op'>(</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span><span class='fu'>dynmodel</span><span class='op'>(</span>
     system <span class='op'>=</span> <span class='va'>ode_system</span>,
     model <span class='op'>=</span> <span class='va'>model_error_structure</span>,
     data <span class='op'>=</span> <span class='va'>Bolus_1CPT</span>,
     inits <span class='op'>=</span> <span class='va'>inits</span>,
     control <span class='op'>=</span> <span class='va'>control</span>
-  <span class='op'>)</span>
+  <span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; |-----+---------------+-----------+-----------+-----------+-----------|
 #&gt; |    #| Objective Fun |        CL |         V |       add |      prop |
 #&gt; |    1|     1487008.6 |     1.000 |     10.00 |   0.01000 |   0.01000 |
@@ -1074,7 +1074,9 @@ details. Default is NULL.</p></td>
 #&gt; |  366|     45442.746 |    -9.803 |     776.9 |   -0.5274 |
 #&gt; |    U|     45442.746 |     3.199 |     65.52 |    0.4826 |
 #&gt; </div><div class='output co'>#&gt; <span class='message'>→ creating full model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ finding duplicate expressions in EBE model...</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>→ optimizing duplicate expressions in EBE model...</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>→ compiling EBE model...</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>Calculating residuals/tables</span></div><div class='output co'>#&gt; <span class='message'>done</span></div><div class='input'>
-<span class='fu'><a href='as.dynmodel.html'>as.dynmodel</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>)</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/class.html'>inherits</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='st'>"nlmixrDynmodel"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+ <span class='fu'><a href='as.dynmodel.html'>as.dynmodel</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div><div class='output co'>#&gt;             est       %cv
 #&gt; CL    3.1994401 0.5474521
 #&gt; V    65.5187671 0.7156383
@@ -1085,7 +1087,7 @@ details. Default is NULL.</p></td>
 #&gt; </div><div class='input'>
 <span class='co'># method = "focei" is slightly more flexible and well tested</span>
 
-<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>model_onecmt_bolus</span>, data <span class='op'>=</span> <span class='va'>Bolus_1CPT</span>, est <span class='op'>=</span> <span class='st'>"focei"</span><span class='op'>)</span>
+<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span><span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>model_onecmt_bolus</span>, data <span class='op'>=</span> <span class='va'>Bolus_1CPT</span>, est <span class='op'>=</span> <span class='st'>"focei"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></div><div class='output co'>#&gt; </span><span style='font-weight: bold;'>Key:</span><span> U: Unscaled Parameters; X: Back-transformed parameters; G: Gill difference gradient approximation
 #&gt; F: Forward difference gradient approximation
 #&gt; C: Central difference gradient approximation
