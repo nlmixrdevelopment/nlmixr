@@ -147,9 +147,12 @@ multi2 <- function(mu, vmat, n) {
 #'
 #' theo <- theo_md
 #'
+#' if (FALSE) { # commented out because of platform differences
+#'
 #' fit <- gnlmm(llik, theo, inits, pars, sys1,
 #'   control = list(trace = TRUE, nAQD = 1)
 #' )
+#'
 #'
 #' pred <- function() {
 #'   pred <- centr / V
@@ -158,6 +161,8 @@ multi2 <- function(mu, vmat, n) {
 #' s <- prediction(fit, pred)
 #' plot(s$p, s$dv)
 #' abline(0, 1, col = "red")
+#'
+#' }
 #'
 #' }
 #'

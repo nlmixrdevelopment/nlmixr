@@ -49,9 +49,12 @@ inits$OMGA <- list(ETA[1]+ETA[2]~c(.027, .01, .37))
 
 theo <- theo_md
 
+if (FALSE) { # commented out because of platform differences
+
 fit <- gnlmm(llik, theo, inits, pars, sys1,
   control = list(trace = TRUE, nAQD = 1)
 )
+
 
 pred <- function() {
   pred <- centr / V
@@ -60,6 +63,8 @@ pred <- function() {
 s <- prediction(fit, pred)
 plot(s$p, s$dv)
 abline(0, 1, col = "red")
+
+}
 
 }
 
