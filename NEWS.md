@@ -128,7 +128,9 @@
    the default of `ties=TRUE` has been changed to `ties=FALSE`.
    `npde` calculations have been threaded with `OpenMP` to speed up
    the calculation as well.  This refactoring was required to have the
-   `dv` imputation between `cwres` and `npde` use the same method
+   `dv` imputation between `cwres` and `npde` use the same method.
+   The `npde` option now calculates the decorrelated `npd` as well, (which is
+   the recommended weighted residual; see Nguyen 2017)
 
 ## Bug Fixes
 

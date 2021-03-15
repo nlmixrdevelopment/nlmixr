@@ -100,6 +100,15 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
   return vYi;
 }
 
+arma::mat varNpdMat(arma::mat& varsim) {
+  // No decorrelation step
+  arma::mat ret(varsim.n_rows, varsim.n_cols, fill::zeros);
+  for (unsigned int i = varsim.n_rows; i--;) {
+    ret(i,i) = 1/sqrt(varsim(i,i));
+  }
+  return ret;
+}
+
 // This is similar to a truncated normal BUT the truncated normal handles the range (low,hi)
 // so instead of updating the DV based on cdf method, simply use the truncated normal
 // we also don't need to back-calculate the simulated DV value
@@ -113,27 +122,38 @@ static inline void handleCensNpdeCdf(calcNpdeInfoId &ret, arma::ivec &cens, arma
   // 4. For blq the pd is replaced with runif(0, p(bloq)) or runif(p(paloq), 1)
   // 5. The epred is then replaced with back-calculated uniform value based on sorted tcomp of row
   arma::vec curRow;
-  unsigned int j;
-  double low, hi;
+  unsigned int j, j2;
+  double low, hi, low2, hi2;
   switch (cens[i]) {
   case 1:
     curRow = sort(trans(ret.matsim.row(i)));
     ret.pd[i] = ru2[i]*ret.pd[i];
+    ret.pd2[i] = ru2[i]*ret.pd2[i];
     break;
   case -1:
     curRow = sort(trans(ret.matsim.row(i)));
     ret.pd[i] = 1-ru2[i]*ret.pd[i];
+    ret.pd2[i] = 1-ru2[i]*ret.pd2[i];
     break;
   default:
     return;
   }
   // Now back-calculate the EPRED
   j = trunc(ret.pd[i]*K);
+  j2 = trunc(ret.pd2[i]*K);
   low = curRow[j];
+  low2 = curRow[j2];
   if (j+1 == K) hi = 2*low - curRow[j-1];
   else hi = curRow[j+1];
-  if (ties) ret.yobst[i] = hi;
-  else ret.yobst[i] = low + (hi - low)*ru3[i];
+  if (j2+1 == K) hi2 = 2*low2 - curRow[j2-1];
+  else hi2 = curRow[j2+1];
+  // check if this makes sense
+  // Use npd instead of npde as suggested by Nguyen2017
+  // Could be turned on/off by npdeControl()
+  if (ties) {
+    ret.yobst[i] = hi2;
+  }
+  else ret.yobst[i] = low2 + (hi2 - low2)*ru3[i];
 }
 
 static inline void handleNpdeNAandCalculateEpred(calcNpdeInfoId& ret, unsigned int& K) {
@@ -159,25 +179,35 @@ static inline void calculatePD(calcNpdeInfoId& ret, unsigned int& id, unsigned i
   ret.ydsim = ret.matsim.rows(ret.obs);
   ret.varsim = cov(trans(ret.ydsim));
   ret.ymat = decorrelateNpdeMat(ret.varsim, ret.warn, id, tolChol);
+  ret.ymat2 = varNpdMat(ret.varsim);
   arma::mat ymatt = trans(ret.ymat);
   ret.ydsim.each_col() -= ret.epredt.elem(ret.obs);
+  ret.ydsim2 = ret.ydsim;
   ret.ydsim = ymatt * ret.ydsim;
+  ret.ydsim2 = ret.ymat2 * ret.ydsim2; 
   ret.ydobs = ymatt * (ret.yobst.elem(ret.obs) - ret.epredt.elem(ret.obs));
+  ret.ydobs2 = ret.ymat2 * (ret.yobst.elem(ret.obs) - ret.epredt.elem(ret.obs));
   // sim < obs
   ret.tcomp = ret.ydsim;
+  ret.tcomp2 = ret.ydsim2;
   for (unsigned int j = K; j--;) {
     for (unsigned int i = ret.ydsim.n_rows; i--;) {
       ret.tcomp(i, j) = ret.tcomp(i, j) < ret.ydobs[i];
+      ret.tcomp2(i, j) = ret.tcomp2(i, j) < ret.ydobs2[i];
     }
   }
   arma::mat pdObs = mean(ret.tcomp, 1);
+  arma::mat pdObs2 = mean(ret.tcomp2, 1);
   ret.pd = arma::mat(ret.matsim.n_rows, 1, fill::zeros);
+  ret.pd2 = arma::mat(ret.matsim.n_rows, 1, fill::zeros);
   ret.pd.rows(ret.obs) = pdObs;
+  ret.pd2.rows(ret.obs) = pdObs;
 }
 
 static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, arma::vec &limit, int &censMethod, bool &doLimit,
 				       unsigned int &K, bool &ties, arma::vec &ru, arma::vec &ru2, arma::vec& ru3) {
   ret.npde = arma::mat(ret.pd.n_rows, 1);
+  ret.npd = arma::mat(ret.pd.n_rows, 1);
   if (ties){
     // Ties are allowed
     for (unsigned int j = ret.pd.n_rows; j--;) {
@@ -188,6 +218,12 @@ static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, ar
 	ret.pd[j] = 1 - 1 / (2.0 * K);
       }
       ret.npde[j] = Rf_qnorm5(ret.pd[j], 0.0, 1.0, 1, 0);
+      if (fabs(ret.pd2[j]) < DOUBLE_EPS){
+	ret.pd2[j] = 1 / (2.0 * K);
+      } else if (fabs(1-ret.pd2[j]) < DOUBLE_EPS){
+	ret.pd2[j] = 1 - 1 / (2.0 * K);
+      }
+      ret.npd[j] = Rf_qnorm5(ret.pd2[j], 0.0, 1.0, 1, 0);
     }
   } else {
     // Ties are discouraged with jitter
@@ -201,6 +237,14 @@ static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, ar
 	ret.pd[j] += ru[j]/K;
       }
       ret.npde[j] = Rf_qnorm5(ret.pd[j], 0.0, 1.0, 1, 0);
+      if (fabs(ret.pd2[j]) < DOUBLE_EPS){
+	ret.pd2[j] = ru[j] / K;
+      } else if (fabs(1-ret.pd2[j]) < DOUBLE_EPS){
+	ret.pd2[j] = 1.0 - ru[j] / K;
+      } else  {
+	ret.pd2[j] += ru2[j]/K;
+      }
+      ret.npd[j] = Rf_qnorm5(ret.pd2[j], 0.0, 1.0, 1, 0);
     }
   }
 }
@@ -245,6 +289,7 @@ calcNpdeInfoId calcNpdeId(arma::ivec& idLoc, arma::vec &sim,
       ret.yobs[j] = NA_REAL;
       ret.eres[j] = NA_REAL;
       ret.npde[j] = NA_REAL;
+      ret.npd[j] = NA_REAL;
     }
   }
   return ret;
@@ -353,10 +398,12 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
   arma::vec ru3 = randu(simLen);
 
   SEXP npdeSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
+  SEXP npdSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
   SEXP epredSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
   SEXP dvSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
   SEXP eresSEXP = PROTECT(Rf_allocVector(REALSXP, dvLen)); pro++;
   arma::vec npde(REAL(npdeSEXP), dvLen, false, true);
+  arma::vec npd(REAL(npdSEXP), dvLen, false, true);
   arma::vec epred(REAL(epredSEXP), dvLen, false, true);
   arma::vec dvf(REAL(dvSEXP), dvLen, false, true);
   arma::vec eres(REAL(eresSEXP), dvLen, false, true);
@@ -369,6 +416,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
     calcNpdeInfoId idInfo = calcNpdeId(idLoc, sim, dvt, evid, cens, limit, censMethod, doLimit, curid, K, tolChol, ties, ru, ru2, ru3,
 				       lambda, yj, hi, low);
     npde(span(idLoc[curid],idLoc[curid+1]-1)) = idInfo.npde;
+    npd(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.npd;
     epred(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.epred;
     dvf(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.yobs;
     eres(span(idLoc[curid], idLoc[curid+1]-1)) = idInfo.eres;
@@ -463,11 +511,12 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
     Rf_warningcall(R_NilValue, _("npde decorrelation failed (return prediction discrepancies) for %.1f%% id: %s"), rPD*100, sPD.c_str());
   }
   
-  List ret(3);
+  List ret(4);
   // epred, eres, npde, dv
   ret[0] = List::create(_["EPRED"]=epred);
   ret[1] = List::create(_["ERES"]=eres);
   ret[2] = List::create(_["NPDE"]=npde);
+  ret[3] = List::create(_["NPD"]=npd);
   SEXP ret2 = PROTECT(dfCbindList(wrap(ret))); pro++;
   UNPROTECT(pro);
   return List::create(dvf, ret2);

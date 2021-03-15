@@ -204,7 +204,7 @@ plot.nlmixrFitData <- function(x, ...) {
   }
   .dat <- .setupPlotData(x)
   .hasCwres <- any(names(.dat) == "CWRES")
-  .hasNpde <- any(names(.dat) == "NPDE")
+  .hasNpde <- any(names(.dat) == "NPD")
   .hasPred <- any(names(.dat) == "PRED")
   .hasIpred <- any(names(.dat) == "IPRED")
   for (.cmt in levels(.dat$CMT)) {
@@ -251,13 +251,13 @@ plot.nlmixrFitData <- function(x, ...) {
 
       for (x in c("IPRED", "PRED", "CPRED", "EPRED", "TIME", "tad")) {
         if (any(names(.dat0) == x)) {
-          for (y in c("IWRES", "IRES", "RES", "CWRES", "NPDE")) {
+          for (y in c("IWRES", "IRES", "RES", "CWRES", "NPD")) {
             if (any(names(.dat0) == y)) {
               if (y == "CWRES" && x %in% c("TIME", "CPRED")) {
                 .doIt <- TRUE
-              } else if (y == "NPDE" && x %in% c("TIME", "EPRED")) {
+              } else if (y == "NPD" && x %in% c("TIME", "EPRED")) {
                 .doIt <- TRUE
-              } else if (!(y %in% c("CWRES", "NPDE"))) {
+              } else if (!(y %in% c("CWRES", "NPD"))) {
                 .doIt <- TRUE
               }
               if (.doIt) {
