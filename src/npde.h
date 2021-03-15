@@ -20,7 +20,7 @@
 #define NPDE_DECORRELATE_EIGEN_PINV  3
 #define NPDE_CHOLSE 4
 #define NPDE_CHOLSE_PINV 5
-#define NPDE_PD 99
+#define NPDE_NPD 99
 
 typedef const char *(*rxGetId2_t)(int id);
 extern rxGetId2_t rxGetId2;

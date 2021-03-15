@@ -61,6 +61,14 @@ arma::mat decorrelateNpdeEigenMat(arma::mat& varsim, unsigned int& warn) {
   return ret;
 }
 
+arma::mat varNpdMat(arma::mat& varsim) {
+  // No decorrelation step
+  arma::mat ret(varsim.n_rows, varsim.n_cols, fill::zeros);
+  for (unsigned int i = varsim.n_rows; i--;) {
+    ret(i,i) = 1/sqrt(varsim(i,i));
+  }
+  return ret;
+}
 
 arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int &id, double &tolChol) {
   arma::mat ch, vYi;
@@ -74,8 +82,8 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
 	ch = cholSE__(varsim, tolChol);
 	warn = NPDE_CHOLSE;
       } catch (...) {
-	warn = NPDE_PD;
-	return arma::mat(varsim.n_rows, varsim.n_cols, fill::eye);
+	warn = NPDE_NPD;
+	return varNpdMat(varsim);
       }
     }
   }
@@ -93,21 +101,14 @@ arma::mat decorrelateNpdeMat(arma::mat& varsim, unsigned int& warn, unsigned int
 	warn = NPDE_CHOLSE_PINV;
       }
     } catch (...){
-      warn = NPDE_PD;
-      return arma::mat(varsim.n_rows, varsim.n_cols, fill::eye);
+      warn = NPDE_NPD;
+      return varNpdMat(varsim);
     }
   }
   return vYi;
 }
 
-arma::mat varNpdMat(arma::mat& varsim) {
-  // No decorrelation step
-  arma::mat ret(varsim.n_rows, varsim.n_cols, fill::zeros);
-  for (unsigned int i = varsim.n_rows; i--;) {
-    ret(i,i) = 1/sqrt(varsim(i,i));
-  }
-  return ret;
-}
+
 
 // This is similar to a truncated normal BUT the truncated normal handles the range (low,hi)
 // so instead of updating the DV based on cdf method, simply use the truncated normal
@@ -476,7 +477,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
       }
       nCholSEPinv++;
       break;
-    case NPDE_PD:
+    case NPDE_NPD:
       if (sPD == "") sPD = rxGetId2(curid);
       else {
 	sPD += ", ";
@@ -508,7 +509,7 @@ extern "C" SEXP _nlmixr_npdeCalc(SEXP npdeSim, SEXP dvIn, SEXP evidIn, SEXP cens
     Rf_warningcall(R_NilValue, _("npde decorrelation used generalized Cholesky pseudo inverse for %.1f%%, id: %s"), rCholSEPinv*100, sCholSEPinv.c_str());
   }
   if (sPD != "") {
-    Rf_warningcall(R_NilValue, _("npde decorrelation failed (return prediction discrepancies) for %.1f%% id: %s"), rPD*100, sPD.c_str());
+    Rf_warningcall(R_NilValue, _("npde decorrelation failed (return normalized prediction discrepancies) for %.1f%% id: %s"), rPD*100, sPD.c_str());
   }
   
   List ret(4);
