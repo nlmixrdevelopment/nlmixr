@@ -150,16 +150,17 @@ multi2 <- function(mu, vmat, n) {
 #'   control = list(trace = TRUE, nAQD = 1)
 #' ))
 #'
-#' if (! inherits(fit, "try-error")) {
+#' if (!inherits(fit, "try-error")) {
 #'
 #' pred <- function() {
 #'   pred <- centr / V
 #' }
 #'
-#' s <- prediction(fit, pred)
-#' plot(s$p, s$dv)
-#' abline(0, 1, col = "red")
-#'
+#' s <- try(prediction(fit, pred))
+#' if (!inherits(s, "try-error")) {
+#'  plot(s$p, s$dv)
+#'  abline(0, 1, col = "red")
+#' }
 #' }
 #' }
 #'
