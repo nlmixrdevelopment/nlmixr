@@ -366,8 +366,7 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
   if (is.null(system)) {}
   else if (class(system) == "RxODE") {}
   else if (class(system) == "character") {
-    obj <- basename(tempfile())
-    system <- RxODE(model = system, modName = obj)
+    system <- RxODE(model = system)
   }
   else {
     stop("invalid system input")
