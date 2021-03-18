@@ -1103,7 +1103,7 @@
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
 #&gt;            setup optimize covariance table    other
-#&gt; elapsed 0.486526 0.235686   0.235696 0.018 0.855092
+#&gt; elapsed 0.477343 0.267818   0.267827 0.022 0.875012
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -1155,7 +1155,7 @@
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
 #&gt;            setup optimize covariance table    other
-#&gt; elapsed 0.486526 0.235686   0.235696 0.018 0.855092
+#&gt; elapsed 0.477343 0.267818   0.267827 0.022 0.875012
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -1347,8 +1347,16 @@
 #&gt; calculating covariance matrix
 #&gt; done</div><div class='output co'>#&gt; <span class='message'>Calculating residuals/tables</span></div><div class='output co'>#&gt; <span class='message'>done</span></div><div class='output co'>#&gt; <span class='warning'>Warning: initial ETAs were nudged; (can control by foceiControl(etaNudge=., etaNudge2=))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: ETAs were reset to zero during optimization; (Can control by foceiControl(resetEtaP=.))</span></div><div class='output co'>#&gt; <span class='warning'>Warning: last objective function was not at minimum, possible problems in optimization</span></div><div class='output co'>#&gt; <span class='warning'>Warning: gradient problems with initial estimate and covariance; see $scaleInfo</span></div><div class='input'>
 <span class='co'># This would restart if for some reason the search crashed:</span>
+
+<span class='fu'>RxODE</span><span class='fu'>::</span><span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/dot-rxWithWd.html'>.rxWithWd</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='op'>{</span><span class='co'># with temporary directory for</span>
+
 <span class='fu'>covarSearchAuto</span><span class='op'>(</span><span class='va'>fit</span>, varsVec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"ka"</span>, <span class='st'>"cl"</span><span class='op'>)</span>, covarsVec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"WT"</span>, <span class='st'>"SEX"</span><span class='op'>)</span>,
                 catCovariates <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"SEX"</span><span class='op'>)</span>, restart <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='fu'>covarSearchAuto</span><span class='op'>(</span><span class='va'>fit</span>, varsVec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"ka"</span>, <span class='st'>"cl"</span><span class='op'>)</span>, covarsVec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"WT"</span>, <span class='st'>"SEX"</span><span class='op'>)</span>,
+                catCovariates <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"SEX"</span><span class='op'>)</span>, restart <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                searchType <span class='op'>=</span> <span class='st'>"forward"</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>──</span><span> </span><span style='font-weight: bold;'>starting forward search...</span><span> </span><span style='color: #00BBBB;'>──────────────────────────────────────────────────</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> added centered_WT*cov_WT_ka to ka's equation in the model</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> updated value: ka&lt;-exp(tka+centered_WT*cov_WT_ka+eta.ka)</span></div><div class='output co'>#&gt; </span><span style='font-weight: bold;'>Key:</span><span> U: Unscaled Parameters; X: Back-transformed parameters; G: Gill difference gradient approximation
 #&gt; F: Forward difference gradient approximation
 #&gt; C: Central difference gradient approximation
@@ -2319,125 +2327,7 @@
 #&gt; |    X|</span><span style='font-weight: bold;'>     116.72355</span><span> |     1.590 |     2.689 |     31.80 |    0.6943 |
 #&gt; |.....................|     1.047 |     1.256 |     1.954 |     2.682 |
 #&gt; calculating covariance matrix
-#&gt; done</div><div class='output co'>#&gt; <span class='message'>Calculating residuals/tables</span></div><div class='output co'>#&gt; <span class='message'>done</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>──</span><span> </span><span style='font-weight: bold;'>objf value did not improve, exiting the search ...</span><span> </span><span style='color: #00BBBB;'>──────────────────────────</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>── </span><span style='color: #BB0000;font-weight: bold;'>forward search complete</span><span> ──</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>──</span><span> </span><span style='font-weight: bold;'>starting backward search...</span><span> </span><span style='color: #00BBBB;'>─────────────────────────────────────────────────</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BBBB00;'>!</span><span> no covariates added in the forward search, skipping backward search</span></div><div class='output co'>#&gt; $summaryTable
-#&gt;   step covar var     objf      deltObjf      AIC      BIC numParams  qchisqr
-#&gt; 1    1    WT  ka 116.8038  0.0001862661 377.4036 403.3488         9 5.991465
-#&gt; 2    1    WT  cl 116.8036  0.0003408229 377.4034 403.3486         9 5.991465
-#&gt; 3    1   SEX  ka 116.8048 -0.0007896216 375.4045 398.4669         8 3.841459
-#&gt; 4    1   SEX  cl 116.7235    0.08041788 375.3233 398.3857         8 3.841459
-#&gt;     pchisqr included searchType     covNames covarEffect
-#&gt; 1         1             forward    cov_WT_ka 0.006527741
-#&gt; 2         1             forward    cov_WT_cl 0.008818391
-#&gt; 3 0.9775822             forward cov_SEX_0_ka 0.001053179
-#&gt; 4         1             forward cov_SEX_0_cl  0.04595978
-#&gt; 
-#&gt; $resFwd
-#&gt; $resFwd[[1]]
-#&gt; ── </span><span style='color: #0000BB;font-weight: bold;'>nlmix</span><span style='color: #BB0000;font-weight: bold;'>r</span><span> </span><span style='color: #BBBB00;font-weight: bold;'>FOCE</span><span style='color: #BB0000;font-weight: bold;'>i</span><span> (outer: nlminb) fit ────────────────────────────────────────────
-#&gt; 
-#&gt;          OBJF      AIC      BIC Log-likelihood Condition Number
-#&gt; FOCEi 116.804 373.4037 393.5833      -179.7019         68.47463
-#&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
-#&gt; 
-#&gt;           setup optimize covariance table    other
-#&gt; elapsed 0.49146 0.239143   0.239153 0.019 0.836244
-#&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
-#&gt; 
-#&gt;        </span><span style='font-weight: bold;'>Parameter</span><span>  </span><span style='font-weight: bold;'>Est.</span><span>     </span><span style='font-weight: bold;'>SE</span><span> </span><span style='font-weight: bold;'>%RSE</span><span> </span><span style='font-weight: bold;'>Back-transformed(95%CI)</span><span> </span><span style='font-weight: bold;'>BSV(CV%)</span><span> </span><span style='font-weight: bold;'>Shrink(SD)%</span><span>
-#&gt; </span><span style='font-weight: bold;'>tka</span><span>       Log Ka 0.466  0.195 41.9       1.59 (1.09, 2.34)     70.5      1.91% 
-#&gt; </span><span style='font-weight: bold;'>tcl</span><span>       Log Cl  1.01 0.0751 7.42       2.75 (2.37, 3.19)     26.9      4.16% 
-#&gt; </span><span style='font-weight: bold;'>tv</span><span>         log V  3.46 0.0437 1.26       31.8 (29.2, 34.7)     13.9      10.3% 
-#&gt; </span><span style='font-weight: bold;'>add.sd</span><span>           0.695                               0.695                     
-#&gt;  
-#&gt;   Covariance Type (</span><span style='color: #0000BB;font-weight: bold;'>$covMethod</span><span>): </span><span style='font-weight: bold;'>r,s</span><span>
-#&gt;   Some strong fixed parameter correlations exist (</span><span style='color: #0000BB;font-weight: bold;'>$cor</span><span>) :
-#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl 
-#&gt;      0.158        </span><span style='color: #00BB00;font-weight: bold;'>0.422 </span><span>      </span><span style='color: #BB0000;font-weight: bold;'>0.744 </span><span> 
-#&gt;  
-#&gt; 
-#&gt;   No correlations in between subject variability (BSV) matrix
-#&gt;   Full BSV covariance (</span><span style='color: #0000BB;font-weight: bold;'>$omega</span><span>) or correlation (</span><span style='color: #0000BB;font-weight: bold;'>$omegaR</span><span>; diagonals=SDs) 
-#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in </span><span style='color: #0000BB;font-weight: bold;'>$shrink</span><span> 
-#&gt;   Minimization message (</span><span style='color: #0000BB;font-weight: bold;'>$message</span><span>):  
-#&gt;     relative convergence (4) 
-#&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
-#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
-#&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #949494;'>e</span><span>+ 0  0.791
-#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   dosenum &lt;dbl&gt;</span><span>
-#&gt; 
-#&gt; $resFwd[[2]]
-#&gt;   step covar var     objf      deltObjf      AIC      BIC numParams  qchisqr
-#&gt; 1    1    WT  ka 116.8038  0.0001862661 377.4036 403.3488         9 5.991465
-#&gt; 2    1    WT  cl 116.8036  0.0003408229 377.4034 403.3486         9 5.991465
-#&gt; 3    1   SEX  ka 116.8048 -0.0007896216 375.4045 398.4669         8 3.841459
-#&gt; 4    1   SEX  cl 116.7235    0.08041788 375.3233 398.3857         8 3.841459
-#&gt;     pchisqr included searchType     covNames covarEffect
-#&gt; 1         1             forward    cov_WT_ka 0.006527741
-#&gt; 2         1             forward    cov_WT_cl 0.008818391
-#&gt; 3 0.9775822             forward cov_SEX_0_ka 0.001053179
-#&gt; 4         1             forward cov_SEX_0_cl  0.04595978
-#&gt; 
-#&gt; 
-#&gt; $resBck
-#&gt; $resBck[[1]]
-#&gt; ── </span><span style='color: #0000BB;font-weight: bold;'>nlmix</span><span style='color: #BB0000;font-weight: bold;'>r</span><span> </span><span style='color: #BBBB00;font-weight: bold;'>FOCE</span><span style='color: #BB0000;font-weight: bold;'>i</span><span> (outer: nlminb) fit ────────────────────────────────────────────
-#&gt; 
-#&gt;          OBJF      AIC      BIC Log-likelihood Condition Number
-#&gt; FOCEi 116.804 373.4037 393.5833      -179.7019         68.47463
-#&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
-#&gt; 
-#&gt;           setup optimize covariance table    other
-#&gt; elapsed 0.49146 0.239143   0.239153 0.019 0.836244
-#&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
-#&gt; 
-#&gt;        </span><span style='font-weight: bold;'>Parameter</span><span>  </span><span style='font-weight: bold;'>Est.</span><span>     </span><span style='font-weight: bold;'>SE</span><span> </span><span style='font-weight: bold;'>%RSE</span><span> </span><span style='font-weight: bold;'>Back-transformed(95%CI)</span><span> </span><span style='font-weight: bold;'>BSV(CV%)</span><span> </span><span style='font-weight: bold;'>Shrink(SD)%</span><span>
-#&gt; </span><span style='font-weight: bold;'>tka</span><span>       Log Ka 0.466  0.195 41.9       1.59 (1.09, 2.34)     70.5      1.91% 
-#&gt; </span><span style='font-weight: bold;'>tcl</span><span>       Log Cl  1.01 0.0751 7.42       2.75 (2.37, 3.19)     26.9      4.16% 
-#&gt; </span><span style='font-weight: bold;'>tv</span><span>         log V  3.46 0.0437 1.26       31.8 (29.2, 34.7)     13.9      10.3% 
-#&gt; </span><span style='font-weight: bold;'>add.sd</span><span>           0.695                               0.695                     
-#&gt;  
-#&gt;   Covariance Type (</span><span style='color: #0000BB;font-weight: bold;'>$covMethod</span><span>): </span><span style='font-weight: bold;'>r,s</span><span>
-#&gt;   Some strong fixed parameter correlations exist (</span><span style='color: #0000BB;font-weight: bold;'>$cor</span><span>) :
-#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl 
-#&gt;      0.158        </span><span style='color: #00BB00;font-weight: bold;'>0.422 </span><span>      </span><span style='color: #BB0000;font-weight: bold;'>0.744 </span><span> 
-#&gt;  
-#&gt; 
-#&gt;   No correlations in between subject variability (BSV) matrix
-#&gt;   Full BSV covariance (</span><span style='color: #0000BB;font-weight: bold;'>$omega</span><span>) or correlation (</span><span style='color: #0000BB;font-weight: bold;'>$omegaR</span><span>; diagonals=SDs) 
-#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in </span><span style='color: #0000BB;font-weight: bold;'>$shrink</span><span> 
-#&gt;   Minimization message (</span><span style='color: #0000BB;font-weight: bold;'>$message</span><span>):  
-#&gt;     relative convergence (4) 
-#&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
-#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
-#&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   1.07  -</span><span style='color: #BB0000;'>1.96</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74   1.07  -</span><span style='color: #BB0000;'>1.78</span><span style='color: #949494;'>e</span><span style='color: #BB0000;'>-15</span><span>  0.74 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.27 -</span><span style='color: #BB0000;'>0.426</span><span> -</span><span style='color: #BB0000;'>0.227</span><span>  3.85</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>1.01</span><span>  -</span><span style='color: #BB0000;'>1.45</span><span>   3.22</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.383</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.83  0.736  0.295  6.79</span><span style='color: #949494;'>e</span><span>+ 0 -</span><span style='color: #BB0000;'>0.215</span><span> -</span><span style='color: #BB0000;'>0.310</span><span>  5.78</span><span style='color: #949494;'>e</span><span>+ 0  0.791
-#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   dosenum &lt;dbl&gt;</span><span>
-#&gt; 
-#&gt; $resBck[[2]]
-#&gt; NULL
-#&gt; 
-#&gt; </div><div class='input'>
-<span class='fu'>covarSearchAuto</span><span class='op'>(</span><span class='va'>fit</span>, varsVec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"ka"</span>, <span class='st'>"cl"</span><span class='op'>)</span>, covarsVec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"WT"</span>, <span class='st'>"SEX"</span><span class='op'>)</span>,
-                catCovariates <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"SEX"</span><span class='op'>)</span>, restart <span class='op'>=</span> <span class='cn'>TRUE</span>,
-                searchType <span class='op'>=</span> <span class='st'>"forward"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>──</span><span> </span><span style='font-weight: bold;'>starting forward search...</span><span> </span><span style='color: #00BBBB;'>──────────────────────────────────────────────────</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> added centered_WT*cov_WT_ka to ka's equation in the model</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> updated value: ka&lt;-exp(tka+centered_WT*cov_WT_ka+eta.ka)</span></div><div class='output co'>#&gt; </span><span style='font-weight: bold;'>Key:</span><span> U: Unscaled Parameters; X: Back-transformed parameters; G: Gill difference gradient approximation
+#&gt; done</div><div class='output co'>#&gt; <span class='message'>Calculating residuals/tables</span></div><div class='output co'>#&gt; <span class='message'>done</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>──</span><span> </span><span style='font-weight: bold;'>objf value did not improve, exiting the search ...</span><span> </span><span style='color: #00BBBB;'>──────────────────────────</span><span></span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>── </span><span style='color: #BB0000;font-weight: bold;'>forward search complete</span><span> ──</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>──</span><span> </span><span style='font-weight: bold;'>starting backward search...</span><span> </span><span style='color: #00BBBB;'>─────────────────────────────────────────────────</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #BBBB00;'>!</span><span> no covariates added in the forward search, skipping backward search</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>──</span><span> </span><span style='font-weight: bold;'>starting forward search...</span><span> </span><span style='color: #00BBBB;'>──────────────────────────────────────────────────</span><span></span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> added centered_WT*cov_WT_ka to ka's equation in the model</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> updated value: ka&lt;-exp(tka+centered_WT*cov_WT_ka+eta.ka)</span></div><div class='output co'>#&gt; </span><span style='font-weight: bold;'>Key:</span><span> U: Unscaled Parameters; X: Back-transformed parameters; G: Gill difference gradient approximation
 #&gt; F: Forward difference gradient approximation
 #&gt; C: Central difference gradient approximation
 #&gt; M: Mixed forward and central difference gradient approximation
@@ -3428,8 +3318,8 @@
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
-#&gt;           setup optimize covariance table    other
-#&gt; elapsed 0.49146 0.239143   0.239153 0.019 0.836244
+#&gt;            setup optimize covariance table   other
+#&gt; elapsed 0.513671 0.259626   0.259633 0.019 0.88407
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -3477,7 +3367,8 @@
 #&gt; 
 #&gt; $resBck
 #&gt; NULL
-#&gt; </div><div class='input'><span class='co'># }</span>
+#&gt; </div><div class='input'>
+<span class='co'># }</span>
 
 </div></span></pre>
   </div>
