@@ -121,7 +121,7 @@ multi2 <- function(mu, vmat, n) {
 #' @return observed and predicted
 #' @examples
 #' \donttest{
-#'
+#' if (FALSE) {
 #' ode <- "
 #' d/dt(depot) =-KA*depot;
 #' d/dt(centr) = KA*depot - KE*centr;
@@ -160,6 +160,7 @@ multi2 <- function(mu, vmat, n) {
 #' if (!inherits(s, "try-error")) {
 #'  plot(s$p, s$dv)
 #'  abline(0, 1, col = "red")
+#' }
 #' }
 #' }
 #' }
@@ -269,9 +270,8 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
 #'
 #' @author Wenping Wang
 #' @examples
-#'
 #' \donttest{
-#'
+#' if (FALSE) {
 #' llik <- function() {
 #'   lp <- THETA[1] * x1 + THETA[2] * x2 + (x1 + x2 * THETA[3]) * ETA[1]
 #'   p <- pnorm(lp)
@@ -336,7 +336,7 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
 #'  cv <- calcCov(fit)
 #'  cbind(fit$par[fit$nsplt == 1], sqrt(diag(cv)))
 #' }
-#'
+#' }
 #' }
 #' @export
 # this version uses lbfgs instead of optim(); ~ 1/3+ improvement in speed

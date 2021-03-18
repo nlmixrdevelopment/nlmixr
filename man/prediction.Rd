@@ -23,7 +23,7 @@ Generate predictions after a generalized non-linear mixed effect model fit
 }
 \examples{
 \donttest{
-
+if (FALSE) {
 ode <- "
 d/dt(depot) =-KA*depot;
 d/dt(centr) = KA*depot - KE*centr;
@@ -62,6 +62,7 @@ s <- try(prediction(fit, pred))
 if (!inherits(s, "try-error")) {
  plot(s$p, s$dv)
  abline(0, 1, col = "red")
+}
 }
 }
 }

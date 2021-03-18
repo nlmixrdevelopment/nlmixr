@@ -51,9 +51,8 @@ Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (
 Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (AGQ)
 }
 \examples{
-
 \donttest{
-
+if (FALSE) {
 llik <- function() {
   lp <- THETA[1] * x1 + THETA[2] * x2 + (x1 + x2 * THETA[3]) * ETA[1]
   p <- pnorm(lp)
@@ -118,7 +117,7 @@ if (inherits(fit, "gnlmm.fit")) {
  cv <- calcCov(fit)
  cbind(fit$par[fit$nsplt == 1], sqrt(diag(cv)))
 }
-
+}
 }
 }
 \author{
