@@ -932,12 +932,17 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 #' fit <- nlmixr(one.cmt, d, "focei")
 #'
 #' # This would restart if for some reason the search crashed:
+#'
+#' RxODE::.rxWithWd(tempdir(), {# with temporary directory for
+#'
 #' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
 #'                 catCovariates = c("SEX"), restart = TRUE)
 #'
 #' covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
 #'                 catCovariates = c("SEX"), restart = TRUE,
 #'                 searchType = "forward")
+#' })
+#'
 #' }
 #'
 covarSearchAuto <- # unsuccessful runs info store; check for covInformation before resuming

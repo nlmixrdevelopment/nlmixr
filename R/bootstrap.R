@@ -99,6 +99,8 @@ addConfboundsToVar <-
 #'
 #' fit <- nlmixr(one.cmt, theo_sd, "focei")
 #'
+#' RxODE::.rxWithWd(tempdir(), { # Run example in temp dir
+#'
 #' bootstrapFit(fit, nboot = 5, restart = TRUE) # overwrites any of the existing data or model files
 #' bootstrapFit(fit, nboot = 7) # resumes fitting using the stored data and model files
 #'
@@ -120,6 +122,8 @@ addConfboundsToVar <-
 #' # You may also do a chi-square diagnostic plot check for the bootstrap with
 #'
 #' bootplot(fit)
+#'
+#' })
 #'
 #' }
 bootstrapFit <- function(fit,

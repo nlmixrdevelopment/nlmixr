@@ -74,12 +74,17 @@ d$SEX[d$ID<=6] <-1
 fit <- nlmixr(one.cmt, d, "focei")
 
 # This would restart if for some reason the search crashed:
+
+RxODE::.rxWithWd(tempdir(), {# with temporary directory for
+
 covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
                 catCovariates = c("SEX"), restart = TRUE)
 
 covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
                 catCovariates = c("SEX"), restart = TRUE,
                 searchType = "forward")
+})
+
 }
 
 }

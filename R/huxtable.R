@@ -349,7 +349,9 @@
 ##' fit.s <- nlmixr(pheno, pheno_sd, "saem")
 ##'
 ##' ## Save output information into a word document
-##' nmDocx(fit.s)
+##' RxODE::.rxWithWd(tempdir(), # Put document in temporary directory
+##'   nmDocx(fit.s)
+##' )
 ##'
 ##' }
 ##' @export
