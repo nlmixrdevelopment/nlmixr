@@ -235,13 +235,13 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>ode</span> <span class='op'>&lt;-</span> <span class='st'>"
 d/dt(depot) =-KA*depot;
 d/dt(centr) = KA*depot - KE*centr;
 "</span>
 <span class='va'>sys1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span><span class='va'>ode</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'>
+
 <span class='va'>pars</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='va'>CL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>THETA</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span> <span class='op'>+</span> <span class='va'>ETA</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span> <span class='co'># ; if (CL&gt;100) CL=100</span>
   <span class='va'>KA</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>THETA</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span> <span class='op'>+</span> <span class='va'>ETA</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>)</span> <span class='co'># ; if (KA&gt;20) KA=20</span>
@@ -263,38 +263,7 @@ d/dt(centr) = KA*depot - KE*centr;
 <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span><span class='fu'><a href='gnlmm.html'>gnlmm</a></span><span class='op'>(</span><span class='va'>llik</span>, <span class='va'>theo</span>, <span class='va'>inits</span>, <span class='va'>pars</span>, <span class='va'>sys1</span>,
   control <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>trace <span class='op'>=</span> <span class='cn'>TRUE</span>, nAQD <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 <span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   Nelder-Mead direct search function minimizer
-#&gt; function value for initial parameters = 8529.371424
-#&gt;   Scaled convergence tolerance is 8.52937
-#&gt; Stepsize computed as 0.322000
-#&gt; BUILD              8 13100.991756 7403.959830
-#&gt; EXTENSION         10 9160.779291 3161.136527
-#&gt; LO-REDUCTION      12 8655.888262 3161.136527
-#&gt; LO-REDUCTION      14 8533.261708 3161.136527
-#&gt; LO-REDUCTION      16 8529.371424 3161.136527
-#&gt; LO-REDUCTION      18 8468.021705 3161.136527
-#&gt; LO-REDUCTION      20 8441.248650 3161.136527
-#&gt; EXTENSION         22 7403.959830 1608.634285
-#&gt; LO-REDUCTION      24 5939.823389 1608.634285
-#&gt; LO-REDUCTION      26 5511.441398 1608.634285
-#&gt; EXTENSION         28 4921.854474 1011.370007
-#&gt; LO-REDUCTION      30 4195.717154 1011.370007
-#&gt; EXTENSION         32 3440.652138 938.991440
-#&gt; REFLECTION        34 3161.136527 918.584128
-#&gt; LO-REDUCTION      36 1914.925536 918.584128
-#&gt; LO-REDUCTION      38 1788.712858 918.584128
-#&gt; LO-REDUCTION      40 1608.634285 918.584128
-#&gt; LO-REDUCTION      42 1095.110182 918.584128
-#&gt; LO-REDUCTION      44 1011.370007 918.584128
-#&gt; LO-REDUCTION      46 960.624644 918.584128
-#&gt; LO-REDUCTION      48 957.943041 913.699089
-#&gt; LO-REDUCTION      50 942.390265 913.699089
-#&gt; HI-REDUCTION      52 938.991440 913.699089
-#&gt; LO-REDUCTION      54 932.938774 913.699089
-#&gt; LO-REDUCTION      56 923.347388 913.699089
-#&gt; HI-REDUCTION      58 922.884281 913.699089
-#&gt; Exiting from Nelder Mead minimizer
-#&gt;     60 function evaluations used</div><div class='input'>
+
 <span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/class.html'>inherits</a></span><span class='op'>(</span><span class='va'>fit</span>, <span class='st'>"try-error"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
 
 <span class='va'>pred</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
@@ -307,7 +276,8 @@ d/dt(centr) = KA*depot - KE*centr;
  <span class='fu'><a href='https://rdrr.io/r/graphics/abline.html'>abline</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1</span>, col <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span>
 <span class='op'>}</span>
 <span class='op'>}</span>
-</div><div class='img'><img src='prediction-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+<span class='op'>}</span>
+<span class='co'># }</span>
 
 </div></pre>
   </div>
