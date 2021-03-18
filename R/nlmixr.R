@@ -155,20 +155,20 @@ nlmixrVersion <- function() {
 ##' }
 ##'
 ##' # Use nlme algorithm
-##' fit_linCmt_nlme <- nlmixr(f_ode, Oral_1CPT, est="nlme",
-##'                control=nlmeControl(maxstepsOde = 50000, pnlsTol=0.4))
-##' print(fit_linCmt_nlme)
+##' fit_linCmt_nlme <- try(nlmixr(f_ode, Oral_1CPT, est="nlme",
+##'                control=nlmeControl(maxstepsOde = 50000, pnlsTol=0.4)))
+##' if (!inherits(fit_linCmt_nlme, "try-error")) print(fit_linCmt_nlme)
 ##'
 ##' # Use Focei algorithm
-##' fit_linCmt_focei <- nlmixr(f_linCmt, Oral_1CPT, est="focei")
-##' print(fit_linCmt_focei)
+##' fit_linCmt_focei <- try(nlmixr(f_linCmt, Oral_1CPT, est="focei"))
+##' if (!inherits(fit_linCmt_focei, "try-error")) print(fit_linCmt_focei)
 ##'
 ##' # The ODE model can be fitted using the saem algorithm, more
 ##' # iterations should be used for real applications
 ##'
-##' fit_ode_saem <- nlmixr(f_ode, Oral_1CPT, est = "saem",
-##'         control = saemControl(n.burn = 50, n.em = 100, print = 50))
-##' print(fit_ode_saem)
+##' fit_ode_saem <- try(nlmixr(f_ode, Oral_1CPT, est = "saem",
+##'         control = saemControl(n.burn = 50, n.em = 100, print = 50)))
+##' if (!inherits(fit_ode_saem, "try-error")) print(fit_ode_saem)
 ##'
 ##' }
 ##' @export
