@@ -62,8 +62,12 @@ one.cmt <- function() {
 }
 
 fit <- nlmixr(one.cmt, theo_sd,"focei")
+RxODE::.rxWithWd(tempdir(), {# with temporary directory
+
 covarSearchAuto(fit, varsVec = c("ka", "cl"),
     covarsVec = c("WT", "SEX"), catCovariates = c("SEX"))
+
+})
 
 ## Note that this didn't include sex, add it to dataset and restart model
 
@@ -75,7 +79,7 @@ fit <- nlmixr(one.cmt, d, "focei")
 
 # This would restart if for some reason the search crashed:
 
-RxODE::.rxWithWd(tempdir(), {# with temporary directory for
+RxODE::.rxWithWd(tempdir(), {# with temporary directory
 
 covarSearchAuto(fit, varsVec = c("ka", "cl"), covarsVec = c("WT", "SEX"),
                 catCovariates = c("SEX"), restart = TRUE)

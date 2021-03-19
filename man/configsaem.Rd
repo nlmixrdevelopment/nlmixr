@@ -77,7 +77,7 @@ Fit a generalized nonlinear mixed-effect model by he Stochastic
 
 ode <- "d/dt(depot) =-KA*depot;
         d/dt(centr) = KA*depot - KE*centr;"
-m1 <- RxODE(ode, modName = "m1")
+m1 <- RxODE(ode)
 
 
 # In this ode System, we also specify the concentration as C2 = centr/V
@@ -85,7 +85,7 @@ m1 <- RxODE(ode, modName = "m1")
 ode <- "C2 = centr/V;
       d/dt(depot) =-KA*depot;
       d/dt(centr) = KA*depot - KE*centr;"
-m2 = RxODE(ode, modName="m2")
+m2 = RxODE(ode)
 
 PKpars <- function() {
   CL <- exp(lCL)
