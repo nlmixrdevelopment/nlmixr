@@ -34,11 +34,16 @@
 #'   })
 #' }
 #'
-#' f <- nlmixr(one.cmt, theo_sd, "saem")
+#' f <- try(nlmixr(one.cmt, theo_sd, "saem"))
+#'
+#' print(f)
 #'
 #' # even though you may have forgotten to add the cwres, you can add it to the data.frame:
 #'
-#' f <- addCwres(f)
+#' if (!inherits(f, "try-error")) {
+#'   f <- try(addCwres(f))
+#'   print(f)
+#' }
 #'
 #' # Note this also adds the FOCEi objective function
 #' }
