@@ -68,6 +68,10 @@ addConfboundsToVar <-
 #'
 #'
 #' @author Vipul Mann, Matthew Fidler
+#'
+#' @return Nothing, called for the side effects; The original fit is
+#'   updated with the bootstrap confidence bands
+#'
 #' @export
 #'
 #' @examples

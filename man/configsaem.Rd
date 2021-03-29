@@ -63,6 +63,9 @@ of iterations is itmax*number of parameters}
 
 \item{powRange}{This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)}
 }
+\value{
+Returns a list neede for the saem fit procedure
+}
 \description{
 Configure an SAEM model by generating an input list to the SAEM model function
 }

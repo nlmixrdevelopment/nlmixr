@@ -753,7 +753,9 @@ removeCovMultiple <- function(covInfo, fitobject) {
 #' @param fitobject an nlmixr 'fit' object
 #' @param indep a boolean indicating if the covariates should be added independently, or sequentially (append to the previous model); default is TRUE
 #'
+#' @return A list of fitobject searched
 #' @export
+#' @keywords internal
 #' @author Vipul Mann, Matthew Fidler
 #'
 addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
@@ -889,6 +891,11 @@ addCovMultiple <- function(covInfo, fitobject, indep = TRUE) {
 #' @param catCovariates a list of covariates that should be treated as categorical
 #' @param searchType one of 'scm', 'forward' and 'backward' to specify the covariate search method; default is 'scm'
 #' @param restart a boolean that controls if the search should be restarted; default is FALSE
+#'
+#' @return A list summarizing the covariate selection steps and
+#'   output; This list has the "summaryTable" for the overall summary
+#'   of the covariate selection as well as "resFwd" for the forward
+#'   selection method and "resBck" for the backward selection method.
 #'
 #' @export
 #' @author Vipul Mann, Matthew Fidler

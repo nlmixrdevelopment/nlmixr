@@ -23,6 +23,9 @@ gen_saem_user_fn(
 \item{inPars}{a character vector of parameters to be read from the
 input dataset (including time varying covariates)}
 }
+\value{
+A user function based on the model to run the SAEM code
+}
 \description{
 Generate an SAEM model using either closed-form solutions or ODE-based model definitions
 }

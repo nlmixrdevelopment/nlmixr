@@ -26,7 +26,6 @@ vpc.nlme <- function(fit, nsim = 100, by = NULL, ...) {
     nlmeModList(new.env(parent = emptyenv()))
   })
   ..ModList <- nlmeModList()
-  options(warn = -1)
   s <- lapply(1:nsim, sim.one, x = fit)
   xs <- do.call("cbind", s)
 

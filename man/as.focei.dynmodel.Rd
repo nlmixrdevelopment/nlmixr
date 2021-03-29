@@ -50,9 +50,13 @@
 
 \item{.rxControl}{control options for RxODE}
 }
+\value{
+A UI version of a dynmodel object
+}
 \description{
 Convert dynmodel output to nlmixr focei style output
 }
 \author{
 Mason McComb and Matt Fidler
 }
+\keyword{internal}

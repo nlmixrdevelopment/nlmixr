@@ -32,6 +32,12 @@ covarSearchAuto(
 
 \item{restart}{a boolean that controls if the search should be restarted; default is FALSE}
 }
+\value{
+A list summarizing the covariate selection steps and
+  output; This list has the "summaryTable" for the overall summary
+  of the covariate selection as well as "resFwd" for the forward
+  selection method and "resBck" for the backward selection method.
+}
 \description{
 Stepwise Covariate Model-selection (SCM) method
 }

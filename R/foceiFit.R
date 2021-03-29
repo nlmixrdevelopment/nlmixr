@@ -591,6 +591,9 @@ is.latex <- function() {
 ##'
 ##' @author Matthew L. Fidler
 ##'
+##' @return The control object that changes the options for the FOCEi
+##'   family of estimation methods
+##'
 ##' @seealso \code{\link{optim}}
 ##' @seealso \code{\link[n1qn1]{n1qn1}}
 ##' @seealso \code{\link[RxODE]{rxSolve}}
@@ -2577,6 +2580,8 @@ vcov.nlmixrFitCore <- function(object, ...) {
 ##' This gets the parsed data in the lower-level manner that nlmixr expects.
 ##'
 ##' @param object nlmixr Object
+##'
+##' @return Gets the parsed data
 ##'
 ##' @export
 ##'

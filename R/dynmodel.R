@@ -26,7 +26,7 @@ as.dynmodel <- function(x) {
 #'
 #' @param x a dynamodel fit object
 #' @param ... additional arguments
-#' @return NULL
+#' @return nothing, displays a goodness of fit plot for dynmodely
 #' @export
 gof <- function(x, ...) {
   gof_str <- "
@@ -172,7 +172,9 @@ mymin <- function(start, fr, rho = NULL, control = list()) {
 #' @param .nobs2 -
 #' @param .pt proc.time object used in dynmodel timing
 #' @param .rxControl control options for RxODE
+#' @return A UI version of a dynmodel object
 #' @author Mason McComb and Matt Fidler
+#' @keywords internal
 #' @export
 as.focei.dynmodel <- function(.dynmodelObject, .nlmixrObject, .data,
                               .time, .theta, .fit, .message, .inits.err,
@@ -511,6 +513,8 @@ nlmixrDynmodelConvert <- function(.nmf) {
 #'
 #' @inheritParams RxODE::rxSolve
 #'
+#' @return dynmodelControl list for options during dynmodel optimization
+#'
 #' @author Mason McComb and Matthew L. Fidler
 #' @export
 dynmodelControl <- function(...,
@@ -734,6 +738,7 @@ dynmodelControl <- function(...,
 #' @param control Control options for dynmodel
 #'   \code{\link[nlmixr]{dynmodelControl}} .
 #' @param ... Other parameters (ignored)
+#' @return A dynmodel fit object
 #' @author Wenping Wang, Mason McComb and Matt Fidler
 #' @examples
 #'
@@ -1706,7 +1711,7 @@ do.slice <- function(pars, fr0) {
 #' @param squared if parameters be squared during estimation
 #' @param seed random number seed
 #' @author Wenping Wang
-#' @return NULL
+#' @return A dyn.mcmc object detailing the model fit
 #' @examples
 #' \donttest{
 #'

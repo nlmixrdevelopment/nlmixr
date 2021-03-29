@@ -100,6 +100,8 @@ genSaemUserFunction <- function(model, PKpars = attr(model, "default.pars"), pre
 #'   Stochastic Approximation Expectation-Maximization (SAEM)
 #'   algorithm
 #'
+#' @return A user function based on the model to run the SAEM code
+#'
 #' @author Matthew Fidler & Wenping Wang
 #' @keywords internal
 #' @export
@@ -123,6 +125,9 @@ gen_saem_user_fn <- genSaemUserFunction
 #' @param powRange This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)
 #' @inheritParams RxODE::rxSEinner
 #' @inheritParams saemControl
+#'
+#' @return Returns a list neede for the saem fit procedure
+#'
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by he Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm

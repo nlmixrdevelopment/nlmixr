@@ -440,6 +440,9 @@ gradient estimates during the covariance step.}
 specification to solve a ODE system. See \code{\link[RxODE]{rxControl}} for
 more details. By default this is NULL.}
 }
+\value{
+dynmodelControl list for options during dynmodel optimization
+}
 \description{
 Control Options for dynmodel
 }

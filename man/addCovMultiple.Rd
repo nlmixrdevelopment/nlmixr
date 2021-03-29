@@ -13,9 +13,13 @@ addCovMultiple(covInfo, fitobject, indep = TRUE)
 
 \item{indep}{a boolean indicating if the covariates should be added independently, or sequentially (append to the previous model); default is TRUE}
 }
+\value{
+A list of fitobject searched
+}
 \description{
 Add multiple covariates to a given model, sequentially or all at once
 }
 \author{
 Vipul Mann, Matthew Fidler
 }
+\keyword{internal}

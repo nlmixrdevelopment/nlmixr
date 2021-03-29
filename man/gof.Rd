@@ -14,6 +14,9 @@ gof(x, ...)
 
 \item{...}{additional arguments}
 }
+\value{
+nothing, displays a goodness of fit plot for dynmodely
+}
 \description{
 Plot of a non-population dynamic model fit
 }

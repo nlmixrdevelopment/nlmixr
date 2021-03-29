@@ -11,6 +11,9 @@ instant.stan.extension(ode_str = NULL, covar = NULL)
 
 \item{covar}{a character vector of covariates}
 }
+\value{
+Nothing, called for its side effects
+}
 \description{
 instant.stan.extension
 }

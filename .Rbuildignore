@@ -83,3 +83,4 @@ BinaryFiles$
 ^codecov\.yml$
 ^\.github$
 ^README\.Rmd$
+^cran-comments\.md$

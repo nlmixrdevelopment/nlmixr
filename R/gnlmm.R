@@ -268,6 +268,8 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
 #' @details
 #'    Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (AGQ)
 #'
+#' @return gnlmm fit object
+#'
 #' @author Wenping Wang
 #' @examples
 #' \donttest{

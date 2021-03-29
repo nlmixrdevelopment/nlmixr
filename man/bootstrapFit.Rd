@@ -52,6 +52,10 @@ how well the bootstrap is doing.  By default this is turned off (\code{FALSE})}
 boostrap files.  By default it is the fit provided though it
 could be something else.}
 }
+\value{
+Nothing, called for the side effects; The original fit is
+  updated with the bootstrap confidence bands
+}
 \description{
 Bootstrap input dataset and rerun the model to get confidence bounds and aggregated parameters
 }

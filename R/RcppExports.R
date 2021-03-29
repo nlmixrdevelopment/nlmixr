@@ -103,7 +103,10 @@ foceiCalcCov <- function(e) {
 #'
 #' @param e Enviornment
 #'
+#' @return A focei fit object
+#'
 #' @keywords internal
+#' @noRd
 #' @export
 foceiFitCpp_ <- function(e) {
     .Call(`_nlmixr_foceiFitCpp_`, e)

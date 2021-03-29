@@ -23,7 +23,7 @@
 #'
 #' @param ode_str ODE equations in a string
 #' @param covar a character vector of covariates
-#' @return NULL
+#' @return Nothing, called for its side effects
 instant.stan.extension <- function(ode_str = NULL, covar = NULL) {
   if (is.null(ode_str)) {
     stop("please provide ODE string")

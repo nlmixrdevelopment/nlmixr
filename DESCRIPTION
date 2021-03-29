@@ -48,7 +48,7 @@ Suggests:
     covr,
     forecast,
     latticeExtra
-Version: 2.0.2
+Version: 2.0.3
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",
       comment=c(ORCID="0000-0001-8538-6691")),

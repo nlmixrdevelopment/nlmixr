@@ -35,6 +35,9 @@ dynmodel.mcmc(
 
 \item{seed}{random number seed}
 }
+\value{
+A dyn.mcmc object detailing the model fit
+}
 \description{
 Fit a non-population dynamic model using mcmc
 }

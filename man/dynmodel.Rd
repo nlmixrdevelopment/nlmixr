@@ -34,6 +34,9 @@ details. Default is NULL.}
 
 \item{...}{Other parameters (ignored)}
 }
+\value{
+A dynmodel fit object
+}
 \description{
 Fit a non-population dynamic model
 }

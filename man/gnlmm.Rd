@@ -44,6 +44,9 @@ gnlmm2(
 
 \item{control}{additional optimization options}
 }
+\value{
+gnlmm fit object
+}
 \description{
 Fit a generalized nonlinear mixed-effect model by adaptive Gaussian quadrature (AQD)
 }

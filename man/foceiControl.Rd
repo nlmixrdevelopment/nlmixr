@@ -763,6 +763,10 @@ combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
 the PK parameter information instead of splitting it into a
 function and a RxODE model}
 }
+\value{
+The control object that changes the options for the FOCEi
+  family of estimation methods
+}
 \description{
 Control Options for FOCEi
 }
