@@ -9,6 +9,9 @@ sqrtm(m)
 \arguments{
 \item{m}{Matrix to take the square root of.}
 }
+\value{
+A square root general square matrix of m
+}
 \description{
 Return the square root of general square matrix A
 }

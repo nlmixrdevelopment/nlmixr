@@ -2643,6 +2643,8 @@ vcov.nlmixrFitCoreSilent <- vcov.nlmixrFitCore
 ##' @param x nlmixr object
 ##' @param ... other arguments
 ##'
+##' @return nlmixr fit object with possibly a new set of estimates
+##'
 ##' @export
 ##' @keywords internal
 nlmixrPosthoc <- function(x, ...) {

@@ -11,6 +11,9 @@ nlmixrLogo(str = "", version = sessionInfo()$otherPkgs$nlmixr$Version)
 
 \item{version}{Version information (by default use package version)}
 }
+\value{
+nothing; Called to display version information
+}
 \description{
 Messages the nlmixr logo...
 }

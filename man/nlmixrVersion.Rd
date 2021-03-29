@@ -6,6 +6,9 @@
 \usage{
 nlmixrVersion()
 }
+\value{
+Nothing, called for its side effects
+}
 \description{
 Display nlmixr's version
 }

@@ -17,6 +17,10 @@ updated}
 \item{ntry}{number of tries before giving up on a pre-conditioned
 covariance estimate}
 }
+\value{
+A nlmixr fit object that was preconditioned to stabilize
+  the variance/covariance calculation
+}
 \description{
 Linearly re-parameterize the model to be less sensitive to rounding errors
 }

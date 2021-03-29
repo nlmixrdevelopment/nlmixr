@@ -66,6 +66,7 @@ nlmixr.logo <- "         _             _             \n        | | %9s (_) %s\n 
 ##'
 ##' @param str String to print
 ##' @param version Version information (by default use package version)
+##' @return nothing; Called to display version information
 ##' @author Matthew L. Fidler
 nlmixrLogo <- function(str = "", version = sessionInfo()$otherPkgs$nlmixr$Version) {
   message(sprintf(nlmixr.logo, str, version))
@@ -73,6 +74,7 @@ nlmixrLogo <- function(str = "", version = sessionInfo()$otherPkgs$nlmixr$Versio
 ##' Display nlmixr's version
 ##'
 ##' @author Matthew L. Fidler
+##' @return Nothing, called for its side effects
 ##' @export
 nlmixrVersion <- function() {
   nlmixrLogo()

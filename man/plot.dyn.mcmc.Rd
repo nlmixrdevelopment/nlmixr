@@ -11,6 +11,9 @@
 
 \item{...}{additional arguments}
 }
+\value{
+nothing, called to produce goodness of fits
+}
 \description{
 Plot of a non-population dynamic model fit using mcmc
 }

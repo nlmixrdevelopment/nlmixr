@@ -49,6 +49,8 @@ sim.one <- function(zz, x) {
 ##' @param sim Observed data frame or fit object
 ##' @param ... Other parameters
 ##'
+##' @return a nlmixr composite vpc object
+##'
 ##' @export
 vpc <- function(sim, ...) {
   UseMethod("vpc")
@@ -79,7 +81,7 @@ vpc.default <- function(sim, ...) {
 ##' @param condition conditional variable
 ##' @param ... Additional arguments
 ##' @inheritParams vpc::vpc
-##' @return NULL
+##' @return Called for its side effects of creating a VPC
 ##' @examples
 ##' specs <- list(fixed=lKA+lCL+lV~1, random = pdDiag(lKA+lCL~1), start=c(lKA=0.5, lCL=-3.2, lV=-1))
 ##' fit <- nlme_lin_cmpt(theo_md, par_model=specs, ncmt=1, verbose=TRUE)

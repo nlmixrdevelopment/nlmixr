@@ -11,6 +11,9 @@
 
 \item{...}{other arguments}
 }
+\value{
+original object (invisibly)
+}
 \description{
 Print UI function
 }

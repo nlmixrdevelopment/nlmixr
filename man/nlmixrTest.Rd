@@ -13,6 +13,9 @@ nlmixrTest(expr, silent = .isTestthat(), test = "cran")
 
 \item{test}{this represents the test group of the test}
 }
+\value{
+Nothing, called for its side effects
+}
 \description{
 nlmixTest function for testing
 }

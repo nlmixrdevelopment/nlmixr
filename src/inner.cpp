@@ -397,6 +397,8 @@ void freeFocei(){
 //'
 //' @param Rin The R matrix input
 //'
+//' @return The inverse preconditioning matrix
+//'
 //[[Rcpp::export]]
 SEXP preCondInv(SEXP Rin){
   // Assumes Rin is symmetric
@@ -4644,6 +4646,9 @@ int foceiS(double *theta, Environment e){
 //' Return the square root of general square matrix A
 //'
 //' @param m Matrix to take the square root of.
+//'
+//' @return A square root general square matrix of m
+//' 
 //' @export
 //[[Rcpp::export]]
 NumericMatrix sqrtm(NumericMatrix m){

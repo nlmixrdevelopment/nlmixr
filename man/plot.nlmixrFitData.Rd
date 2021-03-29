@@ -11,6 +11,9 @@
 
 \item{...}{additional arguments}
 }
+\value{
+Nothing, called for its side effects
+}
 \description{
 Plot some standard goodness of fit plots for the focei fitted object
 }

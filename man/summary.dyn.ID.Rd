@@ -11,6 +11,9 @@
 
 \item{...}{additional arguments}
 }
+\value{
+original object (invisible)
+}
 \description{
 Summary of a non-population dynamic model fit
 }

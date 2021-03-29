@@ -25,6 +25,9 @@ When \code{ipred} is \code{FALSE}, set calculate typical population predations.
 When \code{ipred} is \code{NA}, calculate both individual and
 population predictions.}
 }
+\value{
+an RxODE solved data frame with the predictions
+}
 \description{
 Predict a nlmixr solved system
 }

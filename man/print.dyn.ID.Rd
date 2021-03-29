@@ -11,6 +11,9 @@
 
 \item{...}{additional arguments}
 }
+\value{
+the original object
+}
 \description{
 Print a non-population dynamic model fit object
 }

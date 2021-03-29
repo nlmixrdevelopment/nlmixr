@@ -122,6 +122,9 @@ saem(
 
 \item{seed}{seed for random number generator}
 }
+\value{
+saem fit object
+}
 \description{
 Fit an SAEM model using either closed-form solutions or ODE-based model definitions
 }

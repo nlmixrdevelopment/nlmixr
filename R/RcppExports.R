@@ -13,6 +13,8 @@ freeFocei <- function() {
 #'
 #' @param Rin The R matrix input
 #'
+#' @return The inverse preconditioning matrix
+#'
 preCondInv <- function(Rin) {
     .Call(`_nlmixr_preCondInv`, Rin)
 }
@@ -88,6 +90,9 @@ nlmixrHess_ <- function(thetaT, fT, e, gillInfoT) {
 #' Return the square root of general square matrix A
 #'
 #' @param m Matrix to take the square root of.
+#'
+#' @return A square root general square matrix of m
+#' 
 #' @export
 sqrtm <- function(m) {
     .Call(`_nlmixr_sqrtm`, m)

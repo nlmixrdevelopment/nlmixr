@@ -117,7 +117,7 @@ nlmeModList <- function(x, value) {
 ##' @param parTrans function: calculation of PK parameters
 ##' @param mcCores number of cores used in fitting (only for Linux)
 ##' @param ... additional nlme options
-##' @return NULL
+##' @return A nlmixr nlme fit object
 ##' @author Wenping Wang
 ##' @examples
 ##' library(nlmixr)
@@ -333,7 +333,7 @@ prepEv <- function(dati, theta) {
 ##' @param debugODE a logical if debugging is enabled
 ##' @param mcCores number of cores used in fitting (only for Linux)
 ##' @param ... additional nlme options
-##' @return NULL
+##' @return nlmixr nlme fit
 ##' @details
 ##'    The ODE-based model specification may be coded inside a character
 ##'    string or in a text file, see Section \emph{RxODE Syntax} below for
@@ -1044,6 +1044,7 @@ nlme.cleanup <- function(x) {
 ##' This returns a numeric matrix instead of character matrix
 ##' @inheritParams nlme::VarCorr
 ##' @author Matthew L. Fidler
+##' @return Extract the VarCorr from the nlmixr nlme object
 ##' @export
 VarCorr.nlmixrNlme <- function(x, sigma = NULL, ...) {
   .tmp <- x

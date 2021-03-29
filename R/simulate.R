@@ -152,6 +152,7 @@
 ##'
 ##' @param object nlmixr object
 ##' @param ... Other arguments sent to \code{rxSolve}
+##' @return A RxODE solved object
 ##' @inheritParams RxODE::rxSolve
 ##' @export
 nlmixrSim <- function(object, ...) {
@@ -421,6 +422,10 @@ plot.nlmixrSim <- function(x, y, ...) {
 ##'     population predictions.
 ##'
 ##' @inheritParams RxODE::rxSolve
+##'
+##' @return an RxODE solved data frame with the predictions
+##'
+##' @export
 ##'
 ##' @export
 nlmixrPred <- function(object, ..., ipred = FALSE) {

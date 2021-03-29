@@ -76,7 +76,7 @@ plot.dyn.ID <- gof
 #'
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
-#' @return NULL
+#' @return the original object
 #' @export
 print.dyn.ID <- function(x, ...) {
   print(x$res[, c(1, 3)])
@@ -85,6 +85,7 @@ print.dyn.ID <- function(x, ...) {
   bic <- 2 * x$value + log(x$nobs) * x$npar
   print(c("-loglik" = x$value, "AIC" = aic, "BIC" = bic))
   cat("\n")
+  invisible(x)
 }
 
 # #########################################################################
@@ -94,7 +95,7 @@ print.dyn.ID <- function(x, ...) {
 #'
 #' @param object a dynmodel fit object
 #' @param ... additional arguments
-#' @return NULL
+#' @return original object (invisible)
 #' @export
 summary.dyn.ID <- function(object, ...) {
   print(object$res)
@@ -104,6 +105,7 @@ summary.dyn.ID <- function(object, ...) {
   print(c("-loglik" = object$value, "AIC" = aic, "BIC" = bic))
   cat("\niter:", object$iter, "\n")
   cat(object$message, "\n")
+  invisible(object)
 }
 
 # nmsimplex() and mymin() -------------------------------------------------
@@ -1791,13 +1793,14 @@ summary.dyn.mcmc <- function(object, ...) {
 #'
 #' @param x,object a dynmodel fit object
 #' @param ... additional arguments
-#' @return NULL
+#' @return invisibly return original object
 #' @export
 print.dyn.mcmc <- function(x, ...) {
   s <- t(apply(x, 2, function(x) c(mean(x), sd(x), sd(x) / mean(x) * 100)))
   dimnames(s)[[2]] <- c("mean", "sd", "cv%")
   print(s)
   cat("\n# samples:", dim(x)[1], "\n")
+  invisible(s)
 }
 
 #' Plot of a non-population dynamic model fit using mcmc
@@ -1806,7 +1809,7 @@ print.dyn.mcmc <- function(x, ...) {
 #'
 #' @param x a dynmodel fit object
 #' @param ... additional arguments
-#' @return NULL
+#' @return nothing, called to produce goodness of fits
 #' @export
 plot.dyn.mcmc <- function(x, ...) {
   fit <- list(obj = attr(x, "obj"), par = apply(x, 2, mean))

@@ -17,6 +17,9 @@
 \item{...}{further optional arguments passed to other methods (none
     for the methods documented here).}
 }
+\value{
+Extract the VarCorr from the nlmixr nlme object
+}
 \description{
 This returns a numeric matrix instead of character matrix
 }

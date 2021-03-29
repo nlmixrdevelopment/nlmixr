@@ -8,6 +8,9 @@
 #' @param ntry number of tries before giving up on a pre-conditioned
 #'   covariance estimate
 #'
+#' @return A nlmixr fit object that was preconditioned to stabilize
+#'   the variance/covariance calculation
+#'
 #' @export
 #'
 #' @references Aoki Y, Nordgren R, Hooker AC. Preconditioning of

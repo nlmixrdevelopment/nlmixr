@@ -19,6 +19,9 @@ nlmixrHess(par, fn, ..., envir = parent.frame())
     will be most useful if \code{what} is a character string and
     the arguments are symbols or quoted expressions.}
 }
+\value{
+Hessian matrix based on Gill83
+}
 \description{
 Unlike `stats::optimHess` which assumes the gradient is accurate,
 nlmixrHess does not make as strong an assumption that the gradient

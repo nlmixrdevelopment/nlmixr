@@ -80,6 +80,7 @@ nsis <- function() { ## build installer...
 ##' catpureOutput was used since it is much faster than the internal
 ##' capture.output see https://www.r-bloggers.com/performance-captureoutput-is-much-faster-than-capture-output/
 ##' @param x object to print
+##' @return Nothing, called for its side effects
 ##' @param ... Other things output
 ##' @author Matthew L. Fidler
 ##' @export
@@ -169,6 +170,7 @@ cholSE <- function(matrix, tol = (.Machine$double.eps)^(1 / 3)) {
 ##' @param silent Boolean for testing
 ##' @param test this represents the test group of the test
 ##' @author Matthew Fidler
+##' @return Nothing, called for its side effects
 ##' @export
 nlmixrTest <- function(expr, silent = .isTestthat(), test = "cran") {
   .Call(`_nlmixr_setSilentErr`, 1L, PACKAGE = "nlmixr")

@@ -76,6 +76,10 @@ printed. When this is 0 or do not print the iterations.  1 is
 print every function evaluation (default), 5 is print every 5
 evaluations.}
 }
+\value{
+A list with `eval`, `grad`, `hist` and `unscaled`
+  functions.  This is an internal module used with dynmodel
+}
 \description{
 Create a gradient function based on gill numerical differences
 }
@@ -100,3 +104,4 @@ gf$grad(x2)
 gf$hist()
 
 }
+\keyword{internal}

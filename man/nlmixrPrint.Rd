@@ -11,6 +11,9 @@ nlmixrPrint(x, ...)
 
 \item{...}{Other things output}
 }
+\value{
+Nothing, called for its side effects
+}
 \description{
 This allows the suppressMessages to work on print functions.  This
 captures the output function sends it through the message routine.

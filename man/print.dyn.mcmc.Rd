@@ -14,6 +14,9 @@
 
 \item{x, object}{a dynmodel fit object}
 }
+\value{
+invisibly return original object
+}
 \description{
 Print summary of a non-population dynamic model fit using mcmc
 }

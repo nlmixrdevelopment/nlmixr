@@ -4,7 +4,7 @@
 #'
 #' @param fit nlme fit object
 #' @param ... optional additional arguments
-#' @return NULL
+#' @return nothing, displays plots
 #' @export
 nlme_gof <- function(fit, ...) {
   RxODE::rxReq("lattice")

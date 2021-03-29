@@ -11,6 +11,9 @@
 
 \item{...}{additional arguments}
 }
+\value{
+the original object (invisibly)
+}
 \description{
 Print a generalized non-linear mixed effect model fit
 }

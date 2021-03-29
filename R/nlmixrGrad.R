@@ -93,6 +93,12 @@ nlmixrGill83 <- function(what, args, envir = parent.frame(),
 ##'     values
 ##' @param md5 the md5 identifier for the internal gradient function
 ##'     information.
+##'
+##' @return A list with `eval`, `grad`, `hist` and `unscaled`
+##'   functions.  This is an internal module used with dynmodel
+##'
+##' @keywords internal
+##'
 ##' @examples
 ##'
 ##' func0 <- function(x){ sum(sin(x))  }
@@ -167,6 +173,7 @@ nlmixrGradFun <- function(what, envir = parent.frame(), which, thetaNames,
 ##' @param ... Extra arguments sent to \code{\link{nlmixrGill83}}
 ##' @inheritParams base::do.call
 ##' @author Matthew Fidler
+##' @return Hessian matrix based on Gill83
 ##' @export
 ##' @seealso \code{\link{nlmixrGill83}}, \code{\link{optimHess}}
 ##' @references

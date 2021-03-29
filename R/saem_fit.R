@@ -719,6 +719,8 @@ print.saemFit <- function(x, ...) {
 #'    Fit a generalized nonlinear mixed-effect model using the Stochastic
 #'    Approximation Expectation-Maximization (SAEM) algorithm
 #'
+#' @return saem fit object
+#'
 #' @author Matthew Fidler & Wenping Wang
 #' @export
 saem.fit <- function(model, data, inits,

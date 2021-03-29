@@ -14,6 +14,9 @@ nmTest(type = NULL, check = FALSE)
 
 \item{check}{Use devtools::check to run checks}
 }
+\value{
+Nothing, called for its side effects
+}
 \description{
 This allows easy vaildation/qualification of nlmixr by running the
 testing suite on your system.

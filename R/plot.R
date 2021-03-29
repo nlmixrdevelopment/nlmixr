@@ -189,7 +189,7 @@ bootplot.nlmixrFitCore <- function(x, ...) {
 #'
 #' @param x a focei fit object
 #' @param ... additional arguments
-#' @return NULL
+#' @return Nothing, called for its side effects
 #' @author Wenping Wang & Matthew Fidler
 #' @export
 plot.nlmixrFitData <- function(x, ...) {

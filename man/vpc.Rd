@@ -14,6 +14,9 @@ vpc(sim, ...)
 
 \item{...}{Other parameters}
 }
+\value{
+a nlmixr composite vpc object
+}
 \description{
 Vpc function for nlmixr
 }

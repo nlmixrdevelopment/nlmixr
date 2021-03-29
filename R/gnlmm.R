@@ -85,7 +85,7 @@ genOMinv.5 <- function(s) {
 #'
 #' @param x a gnlmm fit object
 #' @param ... additional arguments
-#' @return NULL
+#' @return the original object (invisibly)
 #' @export
 print.gnlmm.fit <- function(x, ...) {
   x$ETA <- NULL

@@ -103,6 +103,9 @@ method.  The default value is 5.  This can be between 1 and 5.}
 
 \item{...}{additional nlme options}
 }
+\value{
+nlmixr nlme fit
+}
 \description{
 'nlme_ode' fits a mixed-effect model described using ordinary differential
 equation (ODEs). The ODE-definition follows RxODE syntax.

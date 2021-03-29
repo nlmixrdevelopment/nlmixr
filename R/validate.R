@@ -5,6 +5,7 @@
 ##' @param type of test to be run
 ##' @param check Use devtools::check to run checks
 ##' @author Matthew L. Fidler
+##' @return Nothing, called for its side effects
 ##' @export
 nlmixrValidate <- function(type = NULL, check = FALSE) {
   pt <- proc.time()

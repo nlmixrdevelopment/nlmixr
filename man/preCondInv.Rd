@@ -9,6 +9,9 @@ preCondInv(Rin)
 \arguments{
 \item{Rin}{The R matrix input}
 }
+\value{
+The inverse preconditioning matrix
+}
 \description{
 Calculate the inverse preconditioning matrix
 }

@@ -640,6 +640,9 @@ the argument list it overwrites this parameter.}
 \code{params} argument.  If you specify \code{params} as a
 named argument, this overwrites the output}
 }
+\value{
+A RxODE solved object
+}
 \description{
 This takes the uncertainty in the model parameter estimates and to
 simulate a number of theoretical studies.  Each study simulates a

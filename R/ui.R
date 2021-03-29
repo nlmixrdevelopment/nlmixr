@@ -890,6 +890,7 @@ nlmixrUI.multipleEndpoint <- function(x) {
 ##' @param x  UI function
 ##' @param ... other arguments
 ##' @author Matthew L. Fidler
+##' @return original object (invisibly)
 ##' @export
 print.nlmixrUI <- function(x, ...) {
   cat(cli::rule(x$model.desc, line = "bar2"), "\n")
@@ -927,6 +928,7 @@ print.nlmixrUI <- function(x, ...) {
   cat(cli::rule(crayon::bold(sprintf("Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))), "\n")
   cat(x$fun.txt, "\n")
   cat(cli::rule(line = "bar2"), "\n")
+  invisible(x)
 }
 
 ## This is a list of supported distributions with the number of arguments they currently support.

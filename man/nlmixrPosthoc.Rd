@@ -11,6 +11,9 @@ nlmixrPosthoc(x, ...)
 
 \item{...}{other arguments}
 }
+\value{
+nlmixr fit object with possibly a new set of estimates
+}
 \description{
 Get a posthoc estimate of x
 }

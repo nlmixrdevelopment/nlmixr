@@ -66,6 +66,9 @@ nlmeLinCmt(
 
 \item{...}{additional nlme options}
 }
+\value{
+A nlmixr nlme fit object
+}
 \description{
 'nlme_lin_cmpt' fits a linear one to three compartment model with
 either first order absorption, or i.v. bolus, or i.v. infusion.  A
