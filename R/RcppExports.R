@@ -111,7 +111,6 @@ foceiCalcCov <- function(e) {
 #' @return A focei fit object
 #'
 #' @keywords internal
-#' @noRd
 #' @export
 foceiFitCpp_ <- function(e) {
     .Call(`_nlmixr_foceiFitCpp_`, e)

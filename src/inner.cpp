@@ -5737,7 +5737,6 @@ void foceiFinalizeTables(Environment e){
 //' @return A focei fit object
 //'
 //' @keywords internal
-//' @noRd
 //' @export
 //[[Rcpp::export]]
 Environment foceiFitCpp_(Environment e){
