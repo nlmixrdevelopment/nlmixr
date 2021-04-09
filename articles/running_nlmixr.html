@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
       </span>
     </div>
 
@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Running PK models with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-03-20</h4>
+            <h4 data-toc-skip class="date">2021-04-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd" class="external-link"><code>vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
@@ -238,8 +238,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 6.390092 0.274501    0.27451 0.024 0.869897</span>
+<span class="co">#&gt;           setup optimize covariance table   other</span>
+<span class="co">#&gt; elapsed 6.30875 0.251301   0.251309 0.023 0.84264</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -305,8 +305,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;           saem    setup table covariance    other</span>
-<span class="co">#&gt; elapsed 10.268 2.171172 0.018      0.014 0.701828</span>
+<span class="co">#&gt;          saem    setup table covariance    other</span>
+<span class="co">#&gt; elapsed 9.849 1.841093 0.016      0.012 0.652907</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -398,7 +398,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;          nlme    setup table cwres    other</span>
-<span class="co">#&gt; elapsed 3.355 4.075377 0.022 4.116 0.261623</span>
+<span class="co">#&gt; elapsed 3.432 3.693781 0.019 3.731 0.230219</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -438,8 +438,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 6.390092 0.274501    0.27451 0.024 0.869897</span>
+<span class="co">#&gt;           setup optimize covariance table   other</span>
+<span class="co">#&gt; elapsed 6.30875 0.251301   0.251309 0.023 0.84264</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -488,7 +488,7 @@
 <span class="co">#&gt; 12 12 -0.52074473 -0.12576027 -0.2017091607</span></code></pre></div>
 <p>Default trace plots can be generated using:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/bootplot.nlmixrFitCore.html">traceplot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/traceplot.html">traceplot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
 <p><img src="running_nlmixr_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
 <p>but with a little more work, we can get a nicer set of iteration trace plots (“wriggly worms”)…</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -819,7 +819,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>

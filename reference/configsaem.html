@@ -66,6 +66,9 @@
 
 
 
+<!-- dependencies from examples -->
+
+
   
 
   
@@ -88,7 +91,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
       </span>
     </div>
 
@@ -297,6 +300,9 @@ of iterations is itmax*number of parameters</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Returns a list neede for the saem fit procedure</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Fit a generalized nonlinear mixed-effect model by he Stochastic
@@ -864,15 +870,15 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; 500:    0.4447   1.0192   2.9335   0.0074   0.4218   0.0755   0.0115   0.4834</div><div class='output co'>#&gt; <span class='message'>Calculating covariance matrix</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>→ creating full model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ compiling EBE model...</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>Needed Covariates:</span></div><div class='output co'>#&gt; [1] "WT"</div><div class='output co'>#&gt; <span class='message'>Calculating residuals/tables</span></div><div class='output co'>#&gt; <span class='message'>done</span></div><div class='input'><span class='va'>fit</span>
 </div><div class='output co'>#&gt; ── </span><span style='color: #0000BB;font-weight: bold;'>nlmix</span><span style='color: #BB0000;font-weight: bold;'>r</span><span> </span><span style='color: #BBBB00;font-weight: bold;'>SAEM</span><span>(</span><span style='font-style: italic;'>ODE</span><span>); </span><span style='font-weight: 100;font-style: italic;'>OBJF not calculated</span><span> fit ───────────────────────────────────
 #&gt; 
-#&gt;  Gaussian/Laplacian Likelihoods: AIC(</span><span style='color: #BBBB00;'>x</span><span>) or </span><span style='color: #BBBB00;'>x</span><span style='color: #0000BB;font-weight: bold;'>$objf</span><span> etc. 
-#&gt;  FOCEi CWRES &amp; Likelihoods: addCwres(</span><span style='color: #BBBB00;'>x</span><span>) 
+#&gt;  Gaussian/Laplacian Likelihoods: AIC() or </span><span style='color: #0000BB;font-weight: bold;'>$objf</span><span> etc. 
+#&gt;  FOCEi CWRES &amp; Likelihoods: addCwres() 
 #&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ──────────────────────────────────────────────────────────
+#&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
 #&gt;           saem    setup table covariance    other
-#&gt; elapsed 10.747 2.389236 0.015      0.015 0.772764
+#&gt; elapsed 10.455 1.948027 0.015      0.014 0.709973
 #&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #BBBB00;font-weight: bold;'>x</span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ─────────────────────────
+#&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
 #&gt;        </span><span style='font-weight: bold;'>Parameter</span><span>    </span><span style='font-weight: bold;'>Est.</span><span>      </span><span style='font-weight: bold;'>SE</span><span> </span><span style='font-weight: bold;'>%RSE</span><span>     </span><span style='font-weight: bold;'>Back-transformed(95%CI)</span><span> </span><span style='font-weight: bold;'>BSV(CV%)</span><span>
 #&gt; </span><span style='font-weight: bold;'>tka</span><span>       Log Ka   0.445   0.198 44.5            1.56 (1.06, 2.3)     72.4
@@ -887,8 +893,8 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; </span><span style='font-weight: bold;'>add.sd</span><span>            
 #&gt; </span><span style='font-weight: bold;'>wt.est</span><span>            
 #&gt;  
-#&gt;   Covariance Type (</span><span style='color: #BBBB00;'>x</span><span style='color: #0000BB;font-weight: bold;'>$covMethod</span><span>): </span><span style='font-weight: bold;'>linFim</span><span>
-#&gt;   Some strong fixed parameter correlations exist (</span><span style='color: #BBBB00;'>x</span><span style='color: #0000BB;font-weight: bold;'>$cor</span><span>) :
+#&gt;   Covariance Type (</span><span style='color: #0000BB;font-weight: bold;'>$covMethod</span><span>): </span><span style='font-weight: bold;'>linFim</span><span>
+#&gt;   Some strong fixed parameter correlations exist (</span><span style='color: #0000BB;font-weight: bold;'>$cor</span><span>) :
 #&gt;        cor:tcl,tka     cor:tv,tka cor:wt.est,tka     cor:tv,tcl cor:wt.est,tcl 
 #&gt;       -0.0533          0.0175         0.00134         -0.0271         0.00821   
 #&gt;  cor:wt.est,tv 
@@ -896,10 +902,10 @@ of iterations is itmax*number of parameters</p></td>
 #&gt;  
 #&gt; 
 #&gt;   No correlations in between subject variability (BSV) matrix
-#&gt;   Full BSV covariance (</span><span style='color: #BBBB00;'>x</span><span style='color: #0000BB;font-weight: bold;'>$omega</span><span>) or correlation (</span><span style='color: #BBBB00;'>x</span><span style='color: #0000BB;font-weight: bold;'>$omegaR</span><span>; diagonals=SDs) 
-#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in </span><span style='color: #BBBB00;'>x</span><span style='color: #0000BB;font-weight: bold;'>$shrink</span><span> 
+#&gt;   Full BSV covariance (</span><span style='color: #0000BB;font-weight: bold;'>$omega</span><span>) or correlation (</span><span style='color: #0000BB;font-weight: bold;'>$omegaR</span><span>; diagonals=SDs) 
+#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in </span><span style='color: #0000BB;font-weight: bold;'>$shrink</span><span> 
 #&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object </span><span style='color: #BBBB00;'>x</span><span> is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ───────────────────────────────────
+#&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
 #&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
 #&gt;   ID     TIME    DV  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl  eta.v    cp
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -925,7 +931,7 @@ of iterations is itmax*number of parameters</p></td>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p></p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>

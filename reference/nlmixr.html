@@ -67,6 +67,9 @@ and pharmacokinetic-pharmacodynamic (PKPD) models." />
 
 
 
+<!-- dependencies from examples -->
+
+
   
 
   
@@ -89,7 +92,7 @@ and pharmacokinetic-pharmacodynamic (PKPD) models." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
       </span>
     </div>
 
@@ -662,7 +665,7 @@ done
 
 <p>The options for <code><a href='saem.fit.html'>saem</a></code> are controlled by <code><a href='saemControl.html'>saemControl</a></code>.
 You may wish to make sure the minimization is complete in the case
-of <code><a href='saem.fit.html'>saem</a></code>.  You can do that with <code><a href='bootplot.nlmixrFitCore.html'>traceplot</a></code> which shows the
+of <code><a href='saem.fit.html'>saem</a></code>.  You can do that with <code><a href='traceplot.html'>traceplot</a></code> which shows the
 iteration history with the divided by burn-in and EM phases.  In
 this case, the burn in seems reasonable; you may wish to increase
 the number of iterations in the EM phase of the estimation.
@@ -896,8 +899,8 @@ function.</p></li>
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
-#&gt;           nlme   setup table cwres   other
-#&gt; elapsed 67.466 5.52896  1.33 7.108 0.99504
+#&gt;           nlme    setup table cwres    other
+#&gt; elapsed 61.476 4.580862 1.055 5.832 0.767138
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -1041,7 +1044,7 @@ function.</p></li>
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
 #&gt;            setup optimize covariance table    other
-#&gt; elapsed 6.485866 11.53671   11.53672 0.678 13.30071
+#&gt; elapsed 5.159633 8.333164   8.333172 0.607 9.777031
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -1092,8 +1095,8 @@ function.</p></li>
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
-#&gt;            saem    setup table covariance    other
-#&gt; elapsed 113.921 2.245484 0.557      0.722 1.023516
+#&gt;           saem    setup table covariance    other
+#&gt; elapsed 92.798 2.063517 0.455      0.545 0.802483
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -1141,7 +1144,7 @@ function.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p></p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
