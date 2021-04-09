@@ -103,6 +103,9 @@
  - `bootstrapFit` now calculates the bootstrap confidence bands and
    (optionally) will compare with the theoretical chi-squared
    distribution to help assess their adequacy.
+   
+ - `covarSearchAuto` now allows automatic forward/backward covariate
+   selection
 
 ## General Changes
 
