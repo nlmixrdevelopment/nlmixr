@@ -1128,7 +1128,7 @@ nlmixrEst.focei <- function(env, ...) {
     .FoceiInits <- uif$focei.inits
     if (.nid == 1) {
       if (length(.FoceiInits$OMGA) > 0) {
-        stop("a mixed effect model requires more than one subject/id\nA population estimate requires no etas", call.=FALSE)
+        stop("a mixed effect model requires more than one subject/id\na population estimate requires no etas", call.=FALSE)
       }
     }
     fit <- foceiFit(dat,
