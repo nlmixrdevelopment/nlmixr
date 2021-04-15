@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Running PK models with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-04-09</h4>
+            <h4 data-toc-skip class="date">2021-04-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd" class="external-link"><code>vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
@@ -238,8 +238,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;           setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 6.30875 0.251301   0.251309 0.023 0.84264</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 6.160109 0.259375   0.259384 0.026 0.851132</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -265,9 +265,9 @@
 <span class="co">#&gt; # A tibble: 132 x 20</span>
 <span class="co">#&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74  0     0.74   1.07  -1.96e-15  0.74   1.07  -1.78e-15  0.74 </span>
-<span class="co">#&gt; 2 1     0.25   2.84  3.27 -0.426 -0.227  3.85e+ 0 -1.01  -1.45   3.22e+ 0 -0.383</span>
-<span class="co">#&gt; 3 1     0.570  6.57  5.83  0.736  0.295  6.79e+ 0 -0.215 -0.310  5.78e+ 0  0.791</span>
+<span class="co">#&gt; 1 1      0     0.74  0     0.74   1.07  -1.96e-15  0.740  1.07  -1.78e-15  0.740</span>
+<span class="co">#&gt; 2 1      0.25  2.84  3.27 -0.426 -0.227  3.85e+ 0 -1.01  -1.45   3.22e+ 0 -0.383</span>
+<span class="co">#&gt; 3 1      0.57  6.57  5.83  0.736  0.295  6.79e+ 0 -0.215 -0.310  5.78e+ 0  0.791</span>
 <span class="co">#&gt; # … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   dosenum &lt;dbl&gt;</span></code></pre></div>
@@ -306,7 +306,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;          saem    setup table covariance    other</span>
-<span class="co">#&gt; elapsed 9.849 1.841093 0.016      0.012 0.652907</span>
+<span class="co">#&gt; elapsed 9.759 2.026716 0.014      0.012 0.691284</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -326,9 +326,9 @@
 <span class="co">#&gt; # A tibble: 132 x 19</span>
 <span class="co">#&gt;   ID     TIME    DV  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl   eta.v    cp</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74  0     0.74   0     0.74   1.06  0.0982 -0.480 -0.0819  0   </span>
-<span class="co">#&gt; 2 1     0.25   2.84  3.26 -0.418  3.84 -1.00  -1.44  0.0982 -0.480 -0.0819  3.84</span>
-<span class="co">#&gt; 3 1     0.570  6.57  5.84  0.734  6.78 -0.213 -0.305 0.0982 -0.480 -0.0819  6.78</span>
+<span class="co">#&gt; 1 1      0     0.74  0     0.74   0     0.74   1.06  0.0982 -0.480 -0.0819  0   </span>
+<span class="co">#&gt; 2 1      0.25  2.84  3.26 -0.418  3.84 -1.00  -1.44  0.0982 -0.480 -0.0819  3.84</span>
+<span class="co">#&gt; 3 1      0.57  6.57  5.84  0.734  6.78 -0.213 -0.305 0.0982 -0.480 -0.0819  6.78</span>
 <span class="co">#&gt; # … with 129 more rows, and 7 more variables: depot &lt;dbl&gt;, center &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span></code></pre></div>
 <p>And if we wanted to, we could even apply the traditional R method nlme method to this model:</p>
@@ -397,8 +397,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;          nlme    setup table cwres    other</span>
-<span class="co">#&gt; elapsed 3.432 3.693781 0.019 3.731 0.230219</span>
+<span class="co">#&gt;         nlme    setup table cwres    other</span>
+<span class="co">#&gt; elapsed 3.59 3.765386  0.02 3.803 0.252614</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -418,9 +418,9 @@
 <span class="co">#&gt; # A tibble: 132 x 22</span>
 <span class="co">#&gt;   ID     TIME    DV  PRED    RES   WRES IPRED    IRES   IWRES CPRED   CRES</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74  0     0.74   1.07   0     0.74    1.07    0     0.74 </span>
-<span class="co">#&gt; 2 1     0.25   2.84  3.21 -0.371 -0.202  3.74 -0.898  -1.29    3.17 -0.334</span>
-<span class="co">#&gt; 3 1     0.570  6.57  5.75  0.820  0.335  6.63 -0.0609 -0.0878  5.70  0.869</span>
+<span class="co">#&gt; 1 1      0     0.74  0     0.74   1.07   0     0.74    1.07    0     0.74 </span>
+<span class="co">#&gt; 2 1      0.25  2.84  3.21 -0.371 -0.202  3.74 -0.898  -1.29    3.17 -0.334</span>
+<span class="co">#&gt; 3 1      0.57  6.57  5.75  0.820  0.335  6.63 -0.0609 -0.0878  5.70  0.869</span>
 <span class="co">#&gt; # … with 129 more rows, and 11 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span></code></pre></div>
@@ -438,8 +438,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;           setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 6.30875 0.251301   0.251309 0.023 0.84264</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 6.160109 0.259375   0.259384 0.026 0.851132</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -465,9 +465,9 @@
 <span class="co">#&gt; # A tibble: 132 x 20</span>
 <span class="co">#&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES</span>
 <span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1     0      0.74  0     0.74   1.07  -1.96e-15  0.74   1.07  -1.78e-15  0.74 </span>
-<span class="co">#&gt; 2 1     0.25   2.84  3.27 -0.426 -0.227  3.85e+ 0 -1.01  -1.45   3.22e+ 0 -0.383</span>
-<span class="co">#&gt; 3 1     0.570  6.57  5.83  0.736  0.295  6.79e+ 0 -0.215 -0.310  5.78e+ 0  0.791</span>
+<span class="co">#&gt; 1 1      0     0.74  0     0.74   1.07  -1.96e-15  0.740  1.07  -1.78e-15  0.740</span>
+<span class="co">#&gt; 2 1      0.25  2.84  3.27 -0.426 -0.227  3.85e+ 0 -1.01  -1.45   3.22e+ 0 -0.383</span>
+<span class="co">#&gt; 3 1      0.57  6.57  5.83  0.736  0.295  6.79e+ 0 -0.215 -0.310  5.78e+ 0  0.791</span>
 <span class="co">#&gt; # … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   dosenum &lt;dbl&gt;</span></code></pre></div>

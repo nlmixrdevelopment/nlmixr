@@ -510,7 +510,7 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; 140:    0.4767   1.0384   2.8248   0.0089   0.4923   0.0752   0.0221   0.4841
 #&gt; 141:    0.4484   1.0288   2.8346   0.0088   0.4814   0.0715   0.0210   0.4658
 #&gt; 142:    0.4909   1.0264   2.8358   0.0089   0.4699   0.0679   0.0200   0.4391
-#&gt; 143:    0.4697   1.0130   2.8215   0.0091   0.4464   0.0645   0.0190   0.4624
+#&gt; 143:    0.4697   1.0130   2.8215   0.0091   0.4464   0.0645   0.0190   0.4623
 #&gt; 144:    0.4821   1.0159   2.9147   0.0077   0.4928   0.0613   0.0180   0.4460
 #&gt; 145:    0.4752   1.0104   2.9716   0.0071   0.4682   0.0610   0.0180   0.4949
 #&gt; 146:    0.4931   1.0136   2.9738   0.0069   0.5069   0.0590   0.0171   0.4858
@@ -723,7 +723,7 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; 353:    0.4408   1.0208   2.9261   0.0074   0.4278   0.0757   0.0111   0.4828
 #&gt; 354:    0.4406   1.0207   2.9261   0.0074   0.4275   0.0757   0.0112   0.4828
 #&gt; 355:    0.4406   1.0207   2.9262   0.0074   0.4274   0.0757   0.0112   0.4829
-#&gt; 356:    0.4406   1.0208   2.9263   0.0074   0.4273   0.0757   0.0112   0.4827
+#&gt; 356:    0.4406   1.0208   2.9263   0.0074   0.4273   0.0757   0.0112   0.4828
 #&gt; 357:    0.4406   1.0208   2.9270   0.0074   0.4272   0.0757   0.0112   0.4828
 #&gt; 358:    0.4406   1.0208   2.9272   0.0074   0.4269   0.0758   0.0112   0.4829
 #&gt; 359:    0.4407   1.0207   2.9280   0.0074   0.4264   0.0758   0.0112   0.4829
@@ -876,7 +876,7 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
 #&gt; 
 #&gt;           saem    setup table covariance    other
-#&gt; elapsed 10.455 1.948027 0.015      0.014 0.709973
+#&gt; elapsed 10.332 2.299656 0.015      0.015 0.722344
 #&gt; 
 #&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
 #&gt; 
@@ -885,7 +885,7 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; </span><span style='font-weight: bold;'>tcl</span><span>       Log Cl    1.02  0.0863 8.47           2.77 (2.34, 3.28)     28.0
 #&gt; </span><span style='font-weight: bold;'>tv</span><span>         Log V    2.93   0.288 9.82             18.8 (10.7, 33)     10.7
 #&gt; </span><span style='font-weight: bold;'>add.sd</span><span>             0.695                                    0.695         
-#&gt; </span><span style='font-weight: bold;'>wt.est</span><span>           0.00735 0.00409 55.6 0.00735 (-0.000664, 0.0154)         
+#&gt; </span><span style='font-weight: bold;'>wt.est</span><span>           0.00735 0.00409 55.6 0.00735 (-0.000663, 0.0154)         
 #&gt;        </span><span style='font-weight: bold;'>Shrink(SD)%</span><span>
 #&gt; </span><span style='font-weight: bold;'>tka</span><span>       </span><span style='color: #BB0000;font-weight: bold;'>-0.577%</span><span> 
 #&gt; </span><span style='font-weight: bold;'>tcl</span><span>         4.07% 
@@ -896,7 +896,7 @@ of iterations is itmax*number of parameters</p></td>
 #&gt;   Covariance Type (</span><span style='color: #0000BB;font-weight: bold;'>$covMethod</span><span>): </span><span style='font-weight: bold;'>linFim</span><span>
 #&gt;   Some strong fixed parameter correlations exist (</span><span style='color: #0000BB;font-weight: bold;'>$cor</span><span>) :
 #&gt;        cor:tcl,tka     cor:tv,tka cor:wt.est,tka     cor:tv,tcl cor:wt.est,tcl 
-#&gt;       -0.0533          0.0175         0.00134         -0.0271         0.00821   
+#&gt;       -0.0533          0.0175         0.00136         -0.0271         0.00821   
 #&gt;  cor:wt.est,tv 
 #&gt;        </span><span style='color: #BB0000;font-weight: bold;'>-0.991 </span><span> 
 #&gt;  
@@ -909,9 +909,9 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
 #&gt;   ID     TIME    DV  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl  eta.v    cp
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1     0      0.74  0     0.74   0     0.74   1.06   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  0   
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1     0.25   2.84  3.03 -</span><span style='color: #BB0000;'>0.190</span><span>  3.88 -</span><span style='color: #BB0000;'>1.04</span><span>  -</span><span style='color: #BB0000;'>1.50</span><span>   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  3.88
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1     0.570  6.57  5.44  1.13   6.80 -</span><span style='color: #BB0000;'>0.234</span><span> -</span><span style='color: #BB0000;'>0.337</span><span>  0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  6.80
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1      0     0.74  0     0.74   0     0.74   1.06   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  0   
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1      0.25  2.84  3.03 -</span><span style='color: #BB0000;'>0.190</span><span>  3.88 -</span><span style='color: #BB0000;'>1.04</span><span>  -</span><span style='color: #BB0000;'>1.50</span><span>   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  3.88
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1      0.57  6.57  5.44  1.13   6.80 -</span><span style='color: #BB0000;'>0.234</span><span> -</span><span style='color: #BB0000;'>0.337</span><span>  0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  6.80
 #&gt; </span><span style='color: #949494;'># … with 129 more rows, and 8 more variables: depot &lt;dbl&gt;, center &lt;dbl&gt;,</span><span>
 #&gt; </span><span style='color: #949494;'>#   ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;, WT &lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># }</span>
