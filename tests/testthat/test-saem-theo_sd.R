@@ -1,6 +1,7 @@
 nlmixrTest(
   {
     context("Test SAEM functions")
+
     mod <- function() {
       ini({
         tka <- 0.45 # Log Ka
@@ -183,10 +184,12 @@ nlmixrTest(
       val[, .n] <- round(val[[.n]], 2)
     }
 
+    ##qs::qsave(val, file="test-saem-theo_sd.qs")
+
     ## saveRDS(val, file="test-saem-theo_sd.rds")
 
     ##expect_equal(val, )
-    .test <- readRDS("test-saem-theo_sd.rds")
+    .test <- qs::qread("test-saem-theo_sd.qs")
     for (i in seq_along(.test$add)) {
       test_that(with(as.list(.test[3,]), paste0("add: ", add, " prop: ", prop,
                                                 " tbs: ", tbs, " addProp: ", addProp)), {
