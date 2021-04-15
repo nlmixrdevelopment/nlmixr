@@ -187,7 +187,7 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
     /* reflection */
     for (i = 0; i < n; ++i)
       pstar[i] = pbar[i] + rcoef*(pbar[i] - p[i+ihi*n]);
-    (*func)(start, &fval);
+    (*func)(pstar, &fval);
     ystar = fval;
     ++(*nfcall);
 
@@ -195,7 +195,7 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
       if (*nfcall < kcount) {
         for (i = 0; i < n; ++i)
           p2star[i] = pbar[i] + ecoef*(pstar[i] - pbar[i]);
-        (*func)(start, &fval);
+        (*func)(p2star, &fval);
         y2star = fval;
         ++(*nfcall);
 
@@ -242,7 +242,7 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
     if (*nfcall >= kcount) break;
     for (i = 0; i < n; ++i)
       p2star[i] = pbar[i] + ccoef*(p[i+ihi*n] - pbar[i]);
-    (*func)(start, &fval);
+    (*func)(p2star, &fval);
     y2star = fval;
     ++(*nfcall);
 
@@ -258,7 +258,7 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
         p[i+j*n] = (p[i+j*n] + p[i+ilo*n])*.5;
         xmin[i] = p[i+j*n];
       }
-      (*func)(start, &fval);
+      (*func)(xmin, &fval);
       y[j] = fval;
     }
     *nfcall += nn;
@@ -271,7 +271,7 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
   for (j = 0; j < nn; ++j) {
     for (i = 0; i < n; ++i)
       xmin[i] = p[i+j*n];
-    (*func)(start, &fval);
+    (*func)(xmin, &fval);
     y[j] = fval;
   }
   *nfcall += nn;

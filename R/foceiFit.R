@@ -898,6 +898,17 @@ foceiControl <- function(sigdig = 3, ...,
   } else {
     stop("Cannot always reset THETAs")
   }
+  if (inherits(addProp, "numeric")) {
+    if (addProp == 1) {
+      addProp <- "combined1"
+    } else if (addProp == 2) {
+      addProp <- "combined2"
+    } else {
+      stop("addProp must be 1, 2, \"combined1\" or \"combined2\"", call.=FALSE)
+    }
+  } else {
+    addProp <- match.arg(addProp)
+  }
   .ret <- list(
     maxOuterIterations = as.integer(maxOuterIterations),
     maxInnerIterations = as.integer(maxInnerIterations),
@@ -1012,7 +1023,7 @@ foceiControl <- function(sigdig = 3, ...,
     eventFD = eventFD,
     eventCentral = as.integer(eventCentral),
     gradProgressOfvTime = gradProgressOfvTime,
-    addProp = match.arg(addProp),
+    addProp = addProp,
     singleOde = singleOde,
     ...
   )

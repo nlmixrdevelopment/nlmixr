@@ -1,3 +1,7 @@
+# nlmixr development version
+- Now can use the following for combinde error models:
+  `foceiControl(addProp=1)` `foceiControl(addProp=2)`
+  `saemControl(addProp=1)` `saemControl(addProp=2)`
 # nlmixr 2.0.3
 
 ## User interface changes
