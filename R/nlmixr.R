@@ -674,6 +674,17 @@ saemControl <- function(seed = 99,
     nEm <- .xtra$n.em
     .rm <- c(.rm, "n.em")
   }
+  if (inherits(addProp, "numeric")) {
+    if (addProp == 1) {
+      addProp <- "combined1"
+    } else if (addProp == 2) {
+      addProp <- "combined2"
+    } else {
+      stop("addProp must be 1, 2, \"combined1\" or \"combined2\"", call.=FALSE)
+    }
+  } else {
+    addProp <- match.arg(addProp)
+  }
   .ret <- list(
     mcmc = list(niter = c(nBurn, nEm), nmc = nmc, nu = nu),
     ODEopt = RxODE::rxControl(
@@ -688,7 +699,7 @@ saemControl <- function(seed = 99,
     nnodes.gq = nnodes.gq,
     nsd.gq = nsd.gq,
     adjObf = adjObf,
-    addProp = match.arg(addProp),
+    addProp = addProp,
     singleOde = singleOde,
     itmax = itmax,
     tol = tol,

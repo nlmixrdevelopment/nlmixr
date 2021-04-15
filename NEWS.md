@@ -1,3 +1,11 @@
+# nlmixr development version
+- Now can use the following for combinde error models:
+  `foceiControl(addProp=1)` `foceiControl(addProp=2)`
+  `saemControl(addProp=1)` `saemControl(addProp=2)`
+  
+- Bug-fix for SAEM add+prop and other error models that are optimized
+  with nelder mead simplex (#503)
+
 # nlmixr 2.0.3
 
 ## User interface changes
