@@ -46,10 +46,10 @@ double _saemLambdaR;
 double _saemPowR;
 int _saemPropT=0;
 
-static inline double handleF(int powt, double &ft, double &f, bool trunc) {
+static inline double handleF(int powt, double &ft, double &f, bool trunc, bool adjustF) {
   double xmin = 1.0e-200, xmax=1e300;
   double fa = powt ? ft : f;
-  if (fa == 0.0) {
+  if (adjustF && fa == 0.0) {
     fa = 1.0;
   }
   if (trunc){
@@ -80,7 +80,7 @@ void obj(double *ab, double *fx) {
     ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
-    fa = handleF(_saemPropT, ft, _saemFptr[i], false);
+    fa = handleF(_saemPropT, ft, _saemFptr[i], false, false);
     if (addProp == 1) {
       g = ab02 + ab12*fa;
     } else {
@@ -106,7 +106,7 @@ void objC(double *ab, double *fx) {
     ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
-    fa = handleF(_saemPropT, ft, _saemFptr[i], false);
+    fa = handleF(_saemPropT, ft, _saemFptr[i], false, false);
     if (addProp == 1){
       g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fa, pw);
     } else {
@@ -133,7 +133,7 @@ void objD(double *ab, double *fx) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
     ft = _powerD(_saemFptr[i],  _saemLambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], _saemLambda, _saemYj, _saemLow, _saemHi);
-    fa = handleF(_saemPropT, ft, _saemFptr[i], false);
+    fa = handleF(_saemPropT, ft, _saemFptr[i], false, true);
     g = ab[0]*ab[0]*pow(fa, pw);
     if (g < xmin) g = xmin;
     if (g > xmax) g = xmax;
@@ -172,7 +172,7 @@ void objF(double *ab, double *fx) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
     ft = _powerD(_saemFptr[i],  lambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
-    fa = handleF(_saemPropT, ft, _saemFptr[i], false);
+    fa = handleF(_saemPropT, ft, _saemFptr[i], false, true);
     g = ab[0]*ab[0]*fa;
     if (g == 0) g = 1;
     if (g < xmin) g = xmin;
@@ -194,7 +194,7 @@ void objG(double *ab, double *fx) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
     ft = _powerD(_saemFptr[i],  lambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
-    fa = handleF(_saemPropT, ft, _saemFptr[i], false);
+    fa = handleF(_saemPropT, ft, _saemFptr[i], false, true);
     g = ab[0]*ab[0]*pow(fa, pw);
     if (g == 0) g = 1.0;
     if (g < xmin) g = xmin;
@@ -217,7 +217,7 @@ void objH(double *ab, double *fx) {
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
     // focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
     // focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
-    fa = handleF(_saemPropT, ft, _saemFptr[i], false);
+    fa = handleF(_saemPropT, ft, _saemFptr[i], false, false);
     if (addProp == 1) {
       g = ab[0]*ab[0] + ab[1]*ab[1]*fa;
     } else {
@@ -244,7 +244,7 @@ void objI(double *ab, double *fx) {
     // nelder_() does not al_saemLow _saemLower bounds; we force ab[] be positive here
     ft = _powerD(_saemFptr[i],  lambda, _saemYj, _saemLow, _saemHi);
     ytr = _powerD(_saemYptr[i], lambda, _saemYj, _saemLow, _saemHi);
-    fa = handleF(_saemPropT, ft, _saemFptr[i], false);
+    fa = handleF(_saemPropT, ft, _saemFptr[i], false, false);
     if (addProp == 1) {
       g = ab[0]*ab[0] + ab[1]*ab[1]*pow(fa, pw);
     } else {
@@ -604,7 +604,7 @@ public:
 	  int cur = ix_endpnt(i);
 	  ft(i) = _powerD(f(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
 	  yt(i) = _powerD(yM(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
-	  ftT(i) = handleF((int)propT(cur), ft(i), f(i), false);
+	  ftT(i) = handleF((int)propT(cur), ft(i), f(i), false, true);
 	}
 	// focei: rx_r_ = eff^2 * prop.sd^2 + add_sd^2
 	// focei g = sqrt(eff^2*prop.sd^2 + add.sd^2)
@@ -702,7 +702,7 @@ public:
 	    ft = _powerD(f_cur[i], lambda(b), (int)yj(b), low(b), hi(b));
 	    resid(i) -=  ft;
 	    if (res_mod(b) == 2) {
-	      fa = handleF((int)propT(b), ft, f_cur[i], true);
+	      fa = handleF((int)propT(b), ft, f_cur[i], true, true);
 	      resid(i) = resid(i)/fa;
 	    }
 	  }
@@ -1288,7 +1288,7 @@ private:
 	  int cur = ix_endpnt(i);
 	  fc(i)  = _powerD(fc(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
 	  yt(i)  = _powerD(mx.yM(i), lambda(cur), (int)yj(cur), low(cur), hi(cur));
-	  fcT(i) = handleF(propT(cur), fs(i), fc(i), false);
+	  fcT(i) = handleF(propT(cur), fs(i), fc(i), false, true);
 	}
 	gc = vecares + vecbres % abs(fcT); //make sure gc > 0
 	gc.elem( find( gc == 0.0) ).fill(1);
