@@ -707,10 +707,12 @@ update.function <- .nlmixrUpdate
     }
   }
   fun2$meta <- list2env(meta, parent = emptyenv())
-  .mv <- RxODE::rxModelVars(fun2$rxode)
+  .mv <- RxODE::rxModelVars(paste(c(.deparse1(body(fun2$focei.fun1)),
+    .deparse1(body(fun2$pred)), fun2$extra
+  ), collapse = "\n"))
   .tmp <- paste(fun2$nmodel$predDf$var)
   .testVars <- c(.mv$lhs, .mv$state)
-  .tmp <- .tmp[!(.tmp %in% .testVars)]
+  .tmp <- .tmp[!(.tmp %in% c(.testVars, "nlmixr_lincmt_pred"))]
   if (length(.tmp > 0)) {
     .predDf <- fun2$predDf
     if (length(.predDf$var) > 1) {
