@@ -3651,8 +3651,6 @@ nlmixrUI.saem.init.theta <- function(obj) {
     cov.names <- unique(names(unlist(structure(obj$cov.ref[!(names(obj$cov.ref) %in% .tv)], .Names = NULL))))
   }
   theta.name <- theta.name[!(theta.name %in% cov.names)]
-  err.names <- obj$ini$name[which(!is.na(obj$ini$err))]
-  theta.name <- theta.name[!(theta.name %in% err.names)]
   nm <- paste(obj$ini$name)
   lt <- obj$log.theta
   i <- 0
