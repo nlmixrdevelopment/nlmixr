@@ -3129,7 +3129,7 @@ nlmixrUI.saem.eta.trans <- function(obj) {
 ##' @return SAEM model$omega spec
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.model.omega <- function(obj) {
-  dm <- sum(!is.na(.saemThetaTrans(obj)))
+  dm <- sum(!is.na(.saemThetaTrans(obj, TRUE)))
   et <- obj$saem.eta.trans
   mat <- matrix(rep(0, dm * dm), dm)
   etd <- which(!is.na(obj$neta1))
@@ -3455,7 +3455,7 @@ nlmixrUI.saem.cres <- function(obj) {
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.log.eta <- function(obj) {
   lt <- obj$log.theta
-  dm <- sum(!is.na(.saemThetaTrans(obj)))
+  dm <- sum(!is.na(.saemThetaTrans(obj, TRUE)))
   ret <- rep(FALSE, dm)
   theta.trans <- .saemThetaTrans(obj)
   theta.names <- obj$theta.names
@@ -3693,7 +3693,7 @@ nlmixrUI.saem.init.theta <- function(obj) {
 ##' @return Return initial matrix
 ##' @author Matthew L. Fidler
 nlmixrUI.saem.init.omega <- function(obj, names = FALSE) {
-  dm <- sum(!is.na(.saemThetaTrans(obj)))
+  dm <- sum(!is.na(.saemThetaTrans(obj, TRUE)))
   et <- obj$saem.eta.trans
   ret <- rep(NA, dm)
   etd <- which(obj$neta1 == obj$neta2)
