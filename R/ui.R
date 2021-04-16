@@ -712,7 +712,7 @@ update.function <- .nlmixrUpdate
   ), collapse = "\n"))
   .tmp <- paste(fun2$nmodel$predDf$var)
   .testVars <- c(.mv$lhs, .mv$state)
-  .tmp <- .tmp[!(.tmp %in% .testVars)]
+  .tmp <- .tmp[!(.tmp %in% c(.testVars, "nlmixr_lincmt_pred"))]
   if (length(.tmp > 0)) {
     .predDf <- fun2$predDf
     if (length(.predDf$var) > 1) {
