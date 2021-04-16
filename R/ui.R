@@ -1563,9 +1563,11 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
   }
   .ff <- function(x) {
     if (is.name(x)) {
-      if (any.theta.names(as.character(x), theta.names)) {
+      .x <- as.character(x)
+      .x <- sub("^nlmixr_(.*)_par$", "\\1", .x)
+      if (any.theta.names(.x, theta.names)) {
         ## print(as.character(x))
-        .assign("theta.ord", unique(c(theta.ord, as.character(x))), this.env)
+        .assign("theta.ord", unique(c(theta.ord, .x)), this.env)
       }
     } else if (is.call(x)) {
       if ((identical(x[[1]], quote(`=`)) || identical(x[[1]], quote(`<-`)))) {
