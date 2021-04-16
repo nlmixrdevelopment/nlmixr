@@ -6,8 +6,8 @@
 - Bug-fix for SAEM add+prop and other error models that are optimized
   with nelder mead simplex (#503)
   
-- Bug-fix for more complex SAEM models that were not parsing. (Issue
-  #502)
+- Bug-fix for more complex SAEM models that were not parsing and running. (Issue
+  #502, #501)
 
 # nlmixr 2.0.3
 
