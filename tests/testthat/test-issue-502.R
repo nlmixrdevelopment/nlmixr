@@ -118,7 +118,14 @@ nlmixrTest({
       object=nlmixr_threecmt_mm_no_add_wtcl_pdtg_kout_delay2,
       data=d_mask,
       est="saem",
-      control=list(print=1, nEm = 3, nBurn = 3)
+      control=saemControl(print=1, nEm = 3, nBurn = 3, singleOde=FALSE)
+    ), NA)
+
+    expect_error(nlmixr(
+      object=nlmixr_threecmt_mm_no_add_wtcl_pdtg_kout_delay2,
+      data=d_mask,
+      est="saem",
+      control=saemControl(print=1, nEm = 3, nBurn = 3, singleOde=TRUE)
     ), NA)
 
   })
