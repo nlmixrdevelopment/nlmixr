@@ -25,7 +25,8 @@ nlmixrTest(
 
       fit <- nlmixr(model_onecmt)
 
-      expect_equal(fit$saem.theta.trans, c(2L, 1L, 3L, 4L))
+      expect_equal(fit$saem.theta.trans, c(2L, 1L, 3L, 4L, NA_integer_))
+
     })
   },
   test = "cran"

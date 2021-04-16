@@ -1561,14 +1561,31 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
       ))
     }
   }
+  .ff <- function(x) {
+    if (is.name(x)) {
+      .x <- as.character(x)
+      .x <- sub("^nlmixr_(.*)_par$", "\\1", .x)
+      if (any.theta.names(.x, theta.names)) {
+        ## print(as.character(x))
+        .assign("theta.ord", unique(c(theta.ord, .x)), this.env)
+      }
+    } else if (is.call(x)) {
+      if ((identical(x[[1]], quote(`=`)) || identical(x[[1]], quote(`<-`)))) {
+        .x2 <- deparse1(x[[2]])
+        .x3 <- deparse1(x[[3]])
+        if (paste0("nlmixr_", .x3, "_par") == .x2) {
+          return(NULL)
+        }
+      }
+      lapply(x, .ff)
+    }
+  }
   f <- function(x) {
     if (is.name(x)) {
-      if (any.theta.names(as.character(x), theta.names)) {
-        .assign("theta.ord", unique(c(theta.ord, as.character(x))), this.env)
-      }
       return(x)
     } else if (is.call(x)) {
-      if (identical(x[[1]], quote(`~`)) &&
+      .isTilde <- identical(x[[1]], quote(`~`))
+      if (.isTilde &&
         as.character(x[[3]][[1]]) == "|" &&
         any(as.character(x[[3]][[2]][[1]]) == c(names(dists), unsupported.dists))) {
         ch.dist <- as.character(x[[3]][[2]])
@@ -1589,7 +1606,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
           err1.args <- as.character(x[[3]][[2]][-1])
           .doDist1(err1, err1.v, err1.args, x[[2]], x[[3]][[2]], curCond = curCond)
         }
-      } else if (identical(x[[1]], quote(`~`)) &&
+      } else if (.isTilde &&
         as.character(x[[3]][[1]]) == "|" &&
         identical(x[[3]][[2]][[1]], quote(`+`)) &&
         length(as.character(x[[3]][[2]])) == 3 &&
@@ -1608,7 +1625,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         }
         curCond <- eval(parse(text = sprintf("quote(%s)", curCond)))
         .doDist2(err1, err1.v, err1.args, err2, err2.v, err2.args, x[[2]], x[[3]][[2]], curCond = curCond)
-      } else if (identical(x[[1]], quote(`~`)) &&
+      } else if (.isTilde &&
         as.character(x[[3]][[1]]) == "|" &&
         identical(x[[3]][[2]][[1]], quote(`+`)) &&
         length(as.character(x[[3]][[2]])) == 3 &&
@@ -1629,7 +1646,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         }
         curCond <- eval(parse(text = sprintf("quote(%s)", curCond)))
         .doDist3(err1, err1.v, err1.args, err2, err2.v, err2.args, err3, err3.v, err3.args, x[[2]], x[[3]][[2]], curCond = curCond)
-      } else if (identical(x[[1]], quote(`~`)) &&
+      } else if (.isTilde &&
         any(as.character(x[[3]][[1]]) == c(names(dists), unsupported.dists))) {
         ch.dist <- as.character(x[[3]])
         if (length(ch.dist) == 1) {
@@ -1643,7 +1660,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
           err1.args <- as.character(x[[3]][-1])
           .doDist1(err1, err1.v, err1.args, x[[2]], x[[3]], curCond = NULL)
         }
-      } else if (identical(x[[1]], quote(`~`)) && ## Arg parsing 4 should be the last....
+      } else if (.isTilde && ## Arg parsing 4 should be the last....
         identical(x[[3]][[1]], quote(`+`)) &&
         identical(x[[3]][[2]][[1]], quote(`+`)) &&
         identical(x[[3]][[2]][[2]][[1]], quote(`+`)) &&
@@ -1652,7 +1669,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
           "only 3 distributions can be combined.\ncurrently can combine: %s",
           paste(add.dists, collapse = ", ")
         ))
-      } else if (identical(x[[1]], quote(`~`)) &&
+      } else if (.isTilde &&
         identical(x[[3]][[1]], quote(`+`)) &&
         identical(x[[3]][[2]][[1]], quote(`+`)) &&
         any(as.character(x[[3]][[2]][[2]][[1]]) == c(names(dists), unsupported.dists))) {
@@ -1666,7 +1683,7 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         err3.v <- as.character(x[[3]][[2]][[3]][[2]])
         err3.args <- as.character(x[[3]][[2]][[3]][-1])
         .doDist3(err1, err1.v, err1.args, err2, err2.v, err2.args, err3, err3.v, err3.args, x[[2]], x[[3]], curCond = NULL)
-      } else if (identical(x[[1]], quote(`~`)) &&
+      } else if (.isTilde &&
         identical(x[[3]][[1]], quote(`+`)) &&
         length(as.character(x[[3]])) == 3 &&
         any(as.character(x[[3]][[2]][[1]]) == c(names(dists), unsupported.dists)) &&
@@ -1678,13 +1695,16 @@ nlmixrUIModel <- function(fun, ini = NULL, bigmodel = NULL) {
         err2.v <- as.character(x[[3]][[3]][[2]])
         err2.args <- as.character(x[[3]][[3]][-1])
         .doDist2(err1, err1.v, err1.args, err2, err2.v, err2.args, x[[2]], x[[3]])
-      } else if (identical(x[[1]], quote(`~`)) && (do.pred != 2)) {
+      } else if (.isTilde && (do.pred != 2)) {
         return(quote(nlmixrIgnore()))
       } else if (identical(x[[1]], quote(`<-`)) && !any(do.pred == c(2, 4, 5))) {
+        .ff(x)
         return(quote(nlmixrIgnore()))
       } else if (identical(x[[1]], quote(`=`)) && !any(do.pred == c(2, 4, 5))) {
+        .ff(x)
         return(quote(nlmixrIgnore()))
       } else if (identical(x[[1]], quote(`<-`)) && do.pred == 4) {
+        .ff(x)
         ## SAEM requires = instead of <-
         x[[1]] <- quote(`=`)
         return(as.call(lapply(x, f)))
