@@ -1,3 +1,5 @@
+# nlmixr 2.0.4.1 (Development version)
+
 # nlmixr 2.0.4
 - Now can use the following for combinde error models:
   `foceiControl(addProp=1)` `foceiControl(addProp=2)`
