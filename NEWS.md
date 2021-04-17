@@ -1,4 +1,4 @@
-# nlmixr development version
+# nlmixr 2.0.4
 - Now can use the following for combinde error models:
   `foceiControl(addProp=1)` `foceiControl(addProp=2)`
   `saemControl(addProp=1)` `saemControl(addProp=2)`
@@ -8,6 +8,8 @@
   
 - Bug-fix for more complex SAEM models that were not parsing and running. (Issue
   #502, #501)
+
+- Issue the "NaN in prediction" once per SAEM problem (#500)
 
 # nlmixr 2.0.3
 
