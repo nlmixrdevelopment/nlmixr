@@ -1,3 +1,19 @@
+.resetCacheIfNeeded <- function() {
+  .wd <- RxODE::rxTempDir()
+  if (.wd != "") {
+    .md5File <- file.path(.wd, "nlmixr.md5")
+    if (file.exists(.md5File)) {
+      .md5 <- readLines(.md5File)
+      if (.md5 != nlmixr.md5) {
+        packageStartupMessage("detected new version of nlmixr, cleaning RxODE cache")
+        RxODE::rxClean()
+      }
+    } else {
+      writeLines(nlmixr.md5, .md5File)
+    }
+  }
+}
+
 .onLoad <- function(libname, pkgname) {
   backports::import(pkgname)
   if (requireNamespace("generics", quietly = TRUE)) {
@@ -8,6 +24,7 @@
     RxODE::.s3register("generics::augment", "nlmixrFitCore")
     RxODE::.s3register("generics::augment", "nlmixrFitCoreSilent")
   }
+  .resetCacheIfNeeded()
 }
 
 compiled.RxODE.md5 <- RxODE::rxMd5()

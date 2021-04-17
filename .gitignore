@@ -33,3 +33,4 @@ config.status
 inst/1.1.1.3/
 vignettes/ggpmx_GOF/
 /.RData
+/R/nlmixr_md5.R
