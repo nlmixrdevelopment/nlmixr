@@ -45,6 +45,8 @@ double *_saemStep;
 double _saemLambdaR;
 double _saemPowR;
 int _saemPropT=0;
+bool _warnAtolRtol=false;
+
 
 static inline double handleF(int powt, double &ft, double &f, bool trunc, bool adjustF) {
   double xmin = 1.0e-200, xmax=1e300;
@@ -561,6 +563,7 @@ public:
     double double_xmin = 1.0e-200;                               //FIXME hard-coded xmin, also in neldermean.hpp
     double xmax = 1e300;
     ofstream phiFile;
+    _warnAtolRtol = false;
     phiFile.open(phiMFile[0].c_str());
 
     if (DEBUG>0) Rcout << "initialization successful\n";
@@ -1400,6 +1403,7 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
   mat g(_rx->nobs2, 3); // nobs EXCLUDING EVID=2
   int elt=0;
   bool hasNan = false;
+  unsigned int nNanWarn=0;
   for (int id = 0; id < _Nnlmixr; ++id) {
     ind = &(_rx->subjects[id]);
     iniSubjectE(op->neq, 1, ind, op, _rx, saem_inis);
@@ -1444,8 +1448,9 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
     // Should it be done every time? Every x times?
     sortIds(_rx, 0);
   }
-  if (hasNan) {
-    REprintf("NaN in prediction; Consider: relax atol & rtol; change initials; change seed; change structure model\n");
+  if (hasNan && !_warnAtolRtol) {
+    REprintf("NaN in prediction; Consider: relax atol & rtol; change initials; change seed; change structural model\n  warning only issued once per problem\n");
+    _warnAtolRtol = true;
   }
   return g;
 }
