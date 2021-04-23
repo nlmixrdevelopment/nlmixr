@@ -27,8 +27,7 @@ data. The nlme and SAEM estimation routines can be accessed using a
 universal user interface (UUI), that provides universal model and
 parameter definition syntax and results in a fit object that can be
 used as input into the `Xpose` package. Running nlmixr using the UUI
-is described in the vignette:
-https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
+is described in [this vignette](https://nlmixrdevelopment.github.io/nlmixr/articles/running_nlmixr.html).
 
 Under the hood `nlmixr` has five main modules:  
 
@@ -47,14 +46,15 @@ Under the hood `nlmixr` has five main modules:
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-For a brief vignette describing the modules, please see:
-https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
+We recommend you have a look at [`RxODE`](https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-intro.html), the engine upon which `nlmixr` depends, as well as [`xpose.nlmixr`](https://github.com/nlmixrdevelopment/xpose.nlmixr), which provides a link to the seminal nonlinear mixed-effects model diagnostics package [`xpose`](https://uupharmacometrics.github.io/xpose/), and [`shinyMixR`], which provides a means to build a project-centric workflow around nlmixr from the R command line and from a streamlined [`shiny`](https://shiny.rstudio.com/) front-end application. 
 
-The examples in the vignette can be run using VignetteDemo.R and the associated data files available at:
-https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes
+Documentation can be found at https://nlmixrdevelopment.github.io/nlmixr/, and we maintain a comprehensive and ever-growing guide to using `nlmixr` at our [bookdown site](https://nlmixrdevelopment.github.io/nlmixr_bookdown/index.html).
+
+More examples and the associated data files are available at 
+https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes.
 
 For PKPD modeling (with ODE and dosing history) with
-[Stan](http://mc-stan.org/), check out Yuan's package PMXStan:
+[Stan](http://mc-stan.org/), check out Yuan's package PMXStan.
 
 ## Installation
 
