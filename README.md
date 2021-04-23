@@ -46,7 +46,7 @@ Under the hood `nlmixr` has five main modules:
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-We recommend you have a look at [`RxODE`](https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-intro.html), the engine upon which `nlmixr` depends, as well as [`xpose.nlmixr`](https://github.com/nlmixrdevelopment/xpose.nlmixr), which provides a link to the seminal nonlinear mixed-effects model diagnostics package [`xpose`](https://uupharmacometrics.github.io/xpose/), and [`shinyMixR`], which provides a means to build a project-centric workflow around nlmixr from the R command line and from a streamlined [`shiny`](https://shiny.rstudio.com/) front-end application. 
+We recommend you have a look at [`RxODE`](https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-intro.html), the engine upon which `nlmixr` depends, as well as [`xpose.nlmixr`](https://github.com/nlmixrdevelopment/xpose.nlmixr), which provides a link to the seminal nonlinear mixed-effects model diagnostics package [`xpose`](https://uupharmacometrics.github.io/xpose/), and [`shinyMixR`](https://github.com/RichardHooijmaijers/shinyMixR), which provides a means to build a project-centric workflow around nlmixr from the R command line and from a streamlined [`shiny`](https://shiny.rstudio.com/) front-end application. 
 
 Documentation can be found at https://nlmixrdevelopment.github.io/nlmixr/, and we maintain a comprehensive and ever-growing guide to using `nlmixr` at our [bookdown site](https://nlmixrdevelopment.github.io/nlmixr_bookdown/index.html).
 
