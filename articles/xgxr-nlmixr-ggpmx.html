@@ -162,7 +162,7 @@
 <p>This shows an example of integrated workflow between <code>xgxr</code> <code>nlmixr</code> and <code>ggPmx</code></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://opensource.nibr.com/xgx" class="external-link">xgxr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://opensource.nibr.com/xgx/" class="external-link">xgxr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org" class="external-link">readr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
@@ -170,7 +170,7 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ggPMXdevelopment/ggPMX" class="external-link">ggPMX</a></span><span class="op">)</span></code></pre></div>
 <div id="load-the-data" class="section level1">
 <h1 class="hasAnchor">
-<a href="#load-the-data" class="anchor"></a>Load the data</h1>
+<a href="#load-the-data" class="anchor" aria-hidden="true"></a>Load the data</h1>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pkpd_data</span> <span class="op">&lt;-</span> <span class="va">case1_pkpd</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">DOSE</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -188,10 +188,10 @@
 </div>
 <div id="exploratory-analysis-using-ggplot-and-xgx-helper-functions" class="section level1">
 <h1 class="hasAnchor">
-<a href="#exploratory-analysis-using-ggplot-and-xgx-helper-functions" class="anchor"></a>Exploratory analysis using ggplot and xgx helper functions</h1>
+<a href="#exploratory-analysis-using-ggplot-and-xgx-helper-functions" class="anchor" aria-hidden="true"></a>Exploratory analysis using ggplot and xgx helper functions</h1>
 <div id="use-xgxr-for-simplified-concentration-over-time-colored-by-dose-mean---95-ci" class="section level2">
 <h2 class="hasAnchor">
-<a href="#use-xgxr-for-simplified-concentration-over-time-colored-by-dose-mean---95-ci" class="anchor"></a>Use xgxr for simplified concentration over time, colored by Dose, mean +/- 95% CI</h2>
+<a href="#use-xgxr-for-simplified-concentration-over-time-colored-by-dose-mean---95-ci" class="anchor" aria-hidden="true"></a>Use xgxr for simplified concentration over time, colored by Dose, mean +/- 95% CI</h2>
 <p>Often in exploring data it is worthwhile to plot by dose by each nominal time and add the 95% confidence interval. This typical plot can be cumbersome and lack some nice features that <code>xgxr</code> can help with. Note the following helper functions:</p>
 <ul>
 <li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_theme_set.html" class="external-link">xgx_theme_set()</a></code> this sets the theme to black and white color theme and other best pratices in <code>xgxr</code>.</p></li>
@@ -237,7 +237,7 @@
 </div>
 <div id="concentration-over-time-faceted-by-dose-mean---95-ci-overlaid-on-gray-spaghetti-plots" class="section level2">
 <h2 class="hasAnchor">
-<a href="#concentration-over-time-faceted-by-dose-mean---95-ci-overlaid-on-gray-spaghetti-plots" class="anchor"></a>Concentration over time, faceted by Dose, mean +/- 95% CI, overlaid on gray spaghetti plots</h2>
+<a href="#concentration-over-time-faceted-by-dose-mean---95-ci-overlaid-on-gray-spaghetti-plots" class="anchor" aria-hidden="true"></a>Concentration over time, faceted by Dose, mean +/- 95% CI, overlaid on gray spaghetti plots</h2>
 <p>Not only is it useful to look at the mean concentrations, it is often useful to look at the mean concentrations and their relationship between actual individual profiles. Using <code>ggplot</code> coupled with the <code>xgxr</code> helper functions used above, we can easily create these plots as well:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">TIME</span>, y <span class="op">=</span> <span class="va">LIDV</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -255,7 +255,7 @@
 </div>
 <div id="exploring-the-dose-linearity" class="section level2">
 <h2 class="hasAnchor">
-<a href="#exploring-the-dose-linearity" class="anchor"></a>Exploring the dose linearity</h2>
+<a href="#exploring-the-dose-linearity" class="anchor" aria-hidden="true"></a>Exploring the dose linearity</h2>
 <p>A common way to explore the dose linearity is to normalize by the dose. If the confidence intervals overlap, often this is a dose linear example.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>,
@@ -288,7 +288,7 @@
 </div>
 <div id="exploring-covariates-in-the-dataset" class="section level1">
 <h1 class="hasAnchor">
-<a href="#exploring-covariates-in-the-dataset" class="anchor"></a>Exploring Covariates in the dataset</h1>
+<a href="#exploring-covariates-in-the-dataset" class="anchor" aria-hidden="true"></a>Exploring Covariates in the dataset</h1>
 <p>Using the <code>xgx</code> helper functions to <code>ggplot</code> you can explore the effect of high baseline weight. This particular plot is shown below:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>,
@@ -304,13 +304,13 @@
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-7-1.png" width="100%"> It seems that the weight effect is not extreme for either dose group</p>
 <div id="summary-of-exploratory-analysis-findings" class="section level2">
 <h2 class="hasAnchor">
-<a href="#summary-of-exploratory-analysis-findings" class="anchor"></a>Summary of exploratory analysis findings</h2>
+<a href="#summary-of-exploratory-analysis-findings" class="anchor" aria-hidden="true"></a>Summary of exploratory analysis findings</h2>
 <p>From the exploratory analysis we see: - The doses seem proportional - The PK seems to have a 2-compartment model - Censoring has a large effect on the PK data.</p>
 </div>
 </div>
 <div id="fitting-the-data-with-nlmixr" class="section level1">
 <h1 class="hasAnchor">
-<a href="#fitting-the-data-with-nlmixr" class="anchor"></a>Fitting the data with nlmixr</h1>
+<a href="#fitting-the-data-with-nlmixr" class="anchor" aria-hidden="true"></a>Fitting the data with nlmixr</h1>
 <p>First we need to subset to the PK only data and rename <code>LIDV</code> to <code>DV</code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">case1_pkpd</span> <span class="op">%&gt;%</span>
@@ -595,7 +595,7 @@
 </div>
 <div id="model-diagnostics-with-ggpmx" class="section level1">
 <h1 class="hasAnchor">
-<a href="#model-diagnostics-with-ggpmx" class="anchor"></a>Model Diagnostics with ggPMX</h1>
+<a href="#model-diagnostics-with-ggpmx" class="anchor" aria-hidden="true"></a>Model Diagnostics with ggPMX</h1>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## The controller then can be piped into a specific plot</span>
 <span class="va">ctr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_nlmixr.html" class="external-link">pmx_nlmixr</a></span><span class="op">(</span><span class="va">cmt2fit.logn</span>, conts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WEIGHTB"</span><span class="op">)</span>, cats<span class="op">=</span><span class="st">"TRTACT"</span><span class="op">)</span>
@@ -668,7 +668,7 @@
 </div>
 <div id="simulation-of-a-new-scenario-with-rxode" class="section level1">
 <h1 class="hasAnchor">
-<a href="#simulation-of-a-new-scenario-with-rxode" class="anchor"></a>Simulation of a new scenario with RxODE</h1>
+<a href="#simulation-of-a-new-scenario-with-rxode" class="anchor" aria-hidden="true"></a>Simulation of a new scenario with RxODE</h1>
 <p>By creating events you can simply simulate a new scenario. Perhaps your drug development team wants to explore the 100 mg dose 3 times a day dosing to see what happens with the PK. You can simply simulate from the nlmixr model using a <a href="https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html" class="external-link">new event table</a> created from RxODE.</p>
 <p>In this case we wish to simulate with some variability and see what happens at steady state:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">

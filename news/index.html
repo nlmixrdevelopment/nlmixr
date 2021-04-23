@@ -203,12 +203,12 @@
 
     <div id="nlmixr-2041-development-version" class="section level1">
 <h1 class="page-header" data-toc-text="2.0.4.1">
-<a href="#nlmixr-2041-development-version" class="anchor"></a>nlmixr 2.0.4.1 (Development version)<small> Unreleased </small>
+<a href="#nlmixr-2041-development-version" class="anchor" aria-hidden="true"></a>nlmixr 2.0.4.1 (Development version)<small> Unreleased </small>
 </h1>
 </div>
     <div id="nlmixr-204" class="section level1">
 <h1 class="page-header" data-toc-text="2.0.4">
-<a href="#nlmixr-204" class="anchor"></a>nlmixr 2.0.4<small> 2021-04-17 </small>
+<a href="#nlmixr-204" class="anchor" aria-hidden="true"></a>nlmixr 2.0.4<small> 2021-04-17 </small>
 </h1>
 <ul>
 <li><p>Now can use the following for combinde error models: <code><a href="../reference/foceiControl.html">foceiControl(addProp=1)</a></code> <code><a href="../reference/foceiControl.html">foceiControl(addProp=2)</a></code> <code><a href="../reference/saemControl.html">saemControl(addProp=1)</a></code> <code><a href="../reference/saemControl.html">saemControl(addProp=2)</a></code></p></li>
@@ -219,11 +219,11 @@
 </div>
     <div id="nlmixr-203" class="section level1">
 <h1 class="page-header" data-toc-text="2.0.3">
-<a href="#nlmixr-203" class="anchor"></a>nlmixr 2.0.3<small> 2021-04-09 </small>
+<a href="#nlmixr-203" class="anchor" aria-hidden="true"></a>nlmixr 2.0.3<small> 2021-04-09 </small>
 </h1>
 <div id="user-interface-changes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#user-interface-changes" class="anchor"></a>User interface changes</h2>
+<a href="#user-interface-changes" class="anchor" aria-hidden="true"></a>User interface changes</h2>
 <ul>
 <li><p>Detection of initial conditions was rewritten to enable additional features in the initial conditions (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/322'>#322</a>). The most important user-facing change is that now arbitrary R expressions can be used when setting initial conditions such as <code>tvCL &lt;- log(c(2,3,4))</code> (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/253'>#253</a>) instead of simply <code>tvCL &lt;- log(3)</code></p></li>
 <li><p>The function as.nlmixrBounds() now supports adding the columns that are missing into the input data.frame.</p></li>
@@ -233,7 +233,7 @@
 </div>
 <div id="focei-changes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#focei-changes" class="anchor"></a><code>focei</code> changes:</h2>
+<a href="#focei-changes" class="anchor" aria-hidden="true"></a><code>focei</code> changes:</h2>
 <ul>
 <li><p>Uses RxODE to re-arrange the problem so it does not include <code>if/else</code> in the model (ie. un-branched code). This allows sensitivities to be calculated in one pass saving time for multiple endpoint models and models with <code>if/else</code> in them.</p></li>
 <li>
@@ -265,7 +265,7 @@
 </div>
 <div id="saem-changes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#saem-changes" class="anchor"></a>SAEM changes</h2>
+<a href="#saem-changes" class="anchor" aria-hidden="true"></a>SAEM changes</h2>
 <ul>
 <li><p><code>saem</code> fits now gracefully fall back to the <code>focei</code> likelihood when they support files are no longer on the loaded disk</p></li>
 <li><p><code>saem</code> phi pile is now saved in the <code><a href="https://nlmixrdevelopment.github.io/RxODE/reference/rxTempDir.html" class="external-link">RxODE::rxTempDir()</a></code> which can be customized to allow the <code>phi</code> file to remain after R has exited</p></li>
@@ -290,7 +290,7 @@
 </div>
 <div id="nlme-changes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#nlme-changes" class="anchor"></a>nlme changes</h2>
+<a href="#nlme-changes" class="anchor" aria-hidden="true"></a>nlme changes</h2>
 <ul>
 <li>
 <code>nlme</code> will now support 2 combined additive + proportional error models (if the patched version of nlme is used)
@@ -310,7 +310,7 @@
 </div>
 <div id="new-utilities" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-utilities" class="anchor"></a>New Utilities</h2>
+<a href="#new-utilities" class="anchor" aria-hidden="true"></a>New Utilities</h2>
 <ul>
 <li><p><code>bootstrapFit</code> now calculates the bootstrap confidence bands and (optionally) will compare with the theoretical chi-squared distribution to help assess their adequacy.</p></li>
 <li><p><code>covarSearchAuto</code> now allows automatic forward/backward covariate selection</p></li>
@@ -318,7 +318,7 @@
 </div>
 <div id="general-changes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#general-changes" class="anchor"></a>General Changes</h2>
+<a href="#general-changes" class="anchor" aria-hidden="true"></a>General Changes</h2>
 <ul>
 <li><p>Added auto-completion of <code>nlmixr</code> object properties accessed by <code><a href="https://rdrr.io/r/base/Extract.html" class="external-link">$</a></code>. This works for major editors including <code>Rstudio</code>, <code>ESS</code>, and Base R itself.</p></li>
 <li><p>Changed the way that Rstudio notebooks display <code>nlmixr</code> objects; It should be more legible in Rstudio.</p></li>
@@ -328,7 +328,7 @@
 </div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>Bug Fixes</h2>
+<a href="#bug-fixes" class="anchor" aria-hidden="true"></a>Bug Fixes</h2>
 <ul>
 <li>Aligned <code>saem</code> and <code>focei</code> additive + proportional error models, so <code>saem</code> <code>additive+proportional</code> outputs will be different using the correct <code>focei</code> method</li>
 </ul>

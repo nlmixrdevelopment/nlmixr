@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Running PK models with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-04-19</h4>
+            <h4 data-toc-skip class="date">2021-04-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd" class="external-link"><code>vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
@@ -165,7 +165,7 @@
 </div>
 <div id="running-pk-models-with-nlmixr" class="section level1">
 <h1 class="hasAnchor">
-<a href="#running-pk-models-with-nlmixr" class="anchor"></a>Running PK models with nlmixr</h1>
+<a href="#running-pk-models-with-nlmixr" class="anchor" aria-hidden="true"></a>Running PK models with nlmixr</h1>
 <p>nlmixr uses a unified interface for specifying and running models. Let’s start with a very simple PK example, using the single-dose theophylline dataset generously provided by Dr. Robert A. Upton of the University of California, San Francisco:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -239,7 +239,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 6.021183 0.235809    0.23582 0.021 0.782188</span>
+<span class="co">#&gt; elapsed 6.616516 0.281079   0.281089 0.024 0.896316</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -306,7 +306,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           saem    setup table covariance    other</span>
-<span class="co">#&gt; elapsed 10.025 1.982144 0.014      0.012 0.651856</span>
+<span class="co">#&gt; elapsed 10.279 2.195167 0.017      0.015 0.743833</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -398,7 +398,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;          nlme    setup table cwres    other</span>
-<span class="co">#&gt; elapsed 3.476 3.649543 0.019 3.686 0.265457</span>
+<span class="co">#&gt; elapsed 3.575 4.108709 0.023  4.15 0.279291</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -439,7 +439,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 6.021183 0.235809    0.23582 0.021 0.782188</span>
+<span class="co">#&gt; elapsed 6.616516 0.281079   0.281089 0.024 0.896316</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -530,7 +530,7 @@
 <p><img src="running_nlmixr_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
 <div id="xpose" class="section level2">
 <h2 class="hasAnchor">
-<a href="#xpose" class="anchor"></a>xpose</h2>
+<a href="#xpose" class="anchor" aria-hidden="true"></a>xpose</h2>
 <p>This is all very nice. But what we really want is a complete suite of model diagnostic tools, like those available in <a href="https://github.com/UUPharmacometrics/xpose" class="external-link">xpose</a>, right?</p>
 <p>Restart R, and install xpose from CRAN, if you haven’t already…</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -565,11 +565,11 @@
 </div>
 <div id="the-ui" class="section level1">
 <h1 class="hasAnchor">
-<a href="#the-ui" class="anchor"></a>The UI</h1>
+<a href="#the-ui" class="anchor" aria-hidden="true"></a>The UI</h1>
 <p>The nlmixr modeling dialect, inspired by R and NONMEM, can be used to fit models using all current and future estimation algorithms within nlmixr. Using these widely-used tools as inspiration has the advantage of delivering a model specification syntax that is instantly familiar to the majority of analysts working in pharmacometrics and related fields.</p>
 <div id="overall-model-structure" class="section level2">
 <h2 class="hasAnchor">
-<a href="#overall-model-structure" class="anchor"></a>Overall model structure</h2>
+<a href="#overall-model-structure" class="anchor" aria-hidden="true"></a>Overall model structure</h2>
 <p>Model specifications for nlmixr are written using functions containing <code>ini</code> and <code>model</code> blocks. These functions can be called anything, but must contain these two components. Let’s look at a very simple one-compartment model with no covariates.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
@@ -582,7 +582,7 @@
 <span class="op">}</span></code></pre></div>
 <div id="the-ini-block" class="section level3">
 <h3 class="hasAnchor">
-<a href="#the-ini-block" class="anchor"></a>The ini block</h3>
+<a href="#the-ini-block" class="anchor" aria-hidden="true"></a>The ini block</h3>
 <p>The <code>ini</code> block specifies initial conditions, including initial estimates and boundaries for those algorithms which support them (currently, the built-in <code>nlme</code> and <code>saem</code> methods do not). Nomenclature is similar to that used in NONMEM, Monolix and other similar packages. In the NONMEM world, the <code>ini</code> block is analogous to <code>$THETA</code>, <code>$OMEGA</code> and <code>$SIGMA</code> blocks.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span> <span class="co"># Note that arguments to the function are currently</span>
@@ -663,7 +663,7 @@
 </div>
 <div id="the-model-block" class="section level3">
 <h3 class="hasAnchor">
-<a href="#the-model-block" class="anchor"></a>The model block</h3>
+<a href="#the-model-block" class="anchor" aria-hidden="true"></a>The model block</h3>
 <p>The <code>model</code> block specifies the model, and is analogous to the <code>$PK</code>, <code>$PRED</code> and <code>$ERROR</code> blocks in NONMEM.</p>
 <p>Once the initialization block has been defined, you can define a model in terms of the variables defined in the <code>ini</code> block. You can also mix RxODE blocks into the model if needed.</p>
 <p>The current method of defining a nlmixr model is to specify the parameters, and then any required RxODE lines. Continuing the annotated example:</p>
@@ -714,7 +714,7 @@
 </div>
 <div id="running-models" class="section level2">
 <h2 class="hasAnchor">
-<a href="#running-models" class="anchor"></a>Running models</h2>
+<a href="#running-models" class="anchor" aria-hidden="true"></a>Running models</h2>
 <p>Models can be fitted several ways, including via the [magrittr] forward-pipe operator.</p>
 <pre><code>fit &lt;- nlmixr(one.compartment) %&gt;% saem.fit(data=theo_sd)</code></pre>
 <pre><code>fit2 &lt;- nlmixr(one.compartment, data=theo_sd, est="saem")</code></pre>
@@ -727,7 +727,7 @@
 </div>
 <div id="model-syntax-for-solved-pk-systems" class="section level2">
 <h2 class="hasAnchor">
-<a href="#model-syntax-for-solved-pk-systems" class="anchor"></a>Model Syntax for solved PK systems</h2>
+<a href="#model-syntax-for-solved-pk-systems" class="anchor" aria-hidden="true"></a>Model Syntax for solved PK systems</h2>
 <p>Solved PK systems are also currently supported by nlmixr with the ‘linCmt()’ pseudo-function. An annotated example of a solved system is below:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
@@ -758,7 +758,7 @@
 </div>
 <div id="checking-model-syntax" class="section level2">
 <h2 class="hasAnchor">
-<a href="#checking-model-syntax" class="anchor"></a>Checking model syntax</h2>
+<a href="#checking-model-syntax" class="anchor" aria-hidden="true"></a>Checking model syntax</h2>
 <p>After specifying the model syntax you can check that nlmixr is interpreting it correctly by using the nlmixr function on it. Using the above function we can get:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span>

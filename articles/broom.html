@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using Broom with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-04-19</h4>
+            <h4 data-toc-skip class="date">2021-04-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/broom.Rmd" class="external-link"><code>vignettes/broom.Rmd</code></a></small>
       <div class="hidden name"><code>broom.Rmd</code></div>
@@ -165,7 +165,7 @@
 </div>
 <div id="the-broom-and-broom-mixed-packages" class="section level2">
 <h2 class="hasAnchor">
-<a href="#the-broom-and-broom-mixed-packages" class="anchor"></a>The broom and broom.mixed packages</h2>
+<a href="#the-broom-and-broom-mixed-packages" class="anchor" aria-hidden="true"></a>The broom and broom.mixed packages</h2>
 <p><code>broom</code> and <code>broom.mixed</code> are packages that attempt to put standard model outputs into data frames. nlmixr supports the <code>tidy</code> and <code>glance</code> methods but does not support <code>augment</code> at this time.</p>
 <p>Using a model with a covariance term, the <a href="addingCovariances.html">Phenobarbital model</a>, we can explore the different types of output that is used in the tidy functions.</p>
 <p>To explore this, first we run the model:</p>
@@ -228,7 +228,7 @@
 </div>
 <div id="glancing-at-the-goodness-of-fit-metrics" class="section level1">
 <h1 class="hasAnchor">
-<a href="#glancing-at-the-goodness-of-fit-metrics" class="anchor"></a>Glancing at the goodness of fit metrics</h1>
+<a href="#glancing-at-the-goodness-of-fit-metrics" class="anchor" aria-hidden="true"></a>Glancing at the goodness of fit metrics</h1>
 <p>Often in fitting data, you would want to <code>glance</code> at the fit to see how well it fits. In <code>broom</code>, <code>glance</code> will give a summary of the fit metrics of goodness of fit:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
@@ -267,10 +267,10 @@
 </div>
 <div id="tidying-the-model-parameters" class="section level1">
 <h1 class="hasAnchor">
-<a href="#tidying-the-model-parameters" class="anchor"></a>Tidying the model parameters</h1>
+<a href="#tidying-the-model-parameters" class="anchor" aria-hidden="true"></a>Tidying the model parameters</h1>
 <div id="tidying-of-overall-fit-parameters" class="section level2">
 <h2 class="hasAnchor">
-<a href="#tidying-of-overall-fit-parameters" class="anchor"></a>Tidying of overall fit parameters</h2>
+<a href="#tidying-of-overall-fit-parameters" class="anchor" aria-hidden="true"></a>Tidying of overall fit parameters</h2>
 <p>You can also tidy the model estimates into a data frame with broom for processing. This can be useful when integrating into 3rd parting modeling packages. With a consistent parameter format, tasks for multiple types of models can be automated and applied.</p>
 <p>The default function for this is <code>tidy</code>, which when applied to the <code>fit</code> object provides the overall parameter information in a tidy dataset:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -340,7 +340,7 @@
 </div>
 <div id="adding-a-confidence-interval-to-the-parameters" class="section level2">
 <h2 class="hasAnchor">
-<a href="#adding-a-confidence-interval-to-the-parameters" class="anchor"></a>Adding a confidence interval to the parameters</h2>
+<a href="#adding-a-confidence-interval-to-the-parameters" class="anchor" aria-hidden="true"></a>Adding a confidence interval to the parameters</h2>
 <p>The default R method <code>confint</code> works with nlmixr fit objects:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
@@ -384,12 +384,12 @@
 </div>
 <div id="extracting-other-model-information-with-tidy" class="section level1">
 <h1 class="hasAnchor">
-<a href="#extracting-other-model-information-with-tidy" class="anchor"></a>Extracting other model information with <code>tidy</code>
+<a href="#extracting-other-model-information-with-tidy" class="anchor" aria-hidden="true"></a>Extracting other model information with <code>tidy</code>
 </h1>
 <p>The type of information that is extracted can be controlled by the <code>effects</code> argument.</p>
 <div id="extracting-only-fixed-effect-parameters" class="section level2">
 <h2 class="hasAnchor">
-<a href="#extracting-only-fixed-effect-parameters" class="anchor"></a>Extracting only fixed effect parameters</h2>
+<a href="#extracting-only-fixed-effect-parameters" class="anchor" aria-hidden="true"></a>Extracting only fixed effect parameters</h2>
 <p>The fixed effect parameters can be extracted by <code>effects="fixed"</code></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"fixed"</span><span class="op">)</span>
@@ -401,7 +401,7 @@
 </div>
 <div id="extracting-only-random-parameters" class="section level2">
 <h2 class="hasAnchor">
-<a href="#extracting-only-random-parameters" class="anchor"></a>Extracting only random parameters</h2>
+<a href="#extracting-only-random-parameters" class="anchor" aria-hidden="true"></a>Extracting only random parameters</h2>
 <p>The random standard deviations can be extracted by <code>effects="ran_pars"</code>:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_pars"</span><span class="op">)</span>
@@ -415,7 +415,7 @@
 </div>
 <div id="extracting-random-values-also-called-etas" class="section level2">
 <h2 class="hasAnchor">
-<a href="#extracting-random-values-also-called-etas" class="anchor"></a>Extracting random values (also called ETAs)</h2>
+<a href="#extracting-random-values-also-called-etas" class="anchor" aria-hidden="true"></a>Extracting random values (also called ETAs)</h2>
 <p>The random values, or in NONMEM the ETAs, can be extracted by <code>effects="ran_vals"</code> or <code>effects="random"</code></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_vals"</span><span class="op">)</span><span class="op">)</span>
@@ -432,7 +432,7 @@
 </div>
 <div id="extracting-random-coefficients" class="section level2">
 <h2 class="hasAnchor">
-<a href="#extracting-random-coefficients" class="anchor"></a>Extracting random coefficients</h2>
+<a href="#extracting-random-coefficients" class="anchor" aria-hidden="true"></a>Extracting random coefficients</h2>
 <p>Random coefficients are the population fixed effect parameter + the random effect parameter, possibly transformed to the correct scale.</p>
 <p>In this case we can extract this information from a nlmixr fit object by:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -472,10 +472,10 @@
 </div>
 <div id="example-of-using-a-tidy-model-estimates-for-other-packages" class="section level1">
 <h1 class="hasAnchor">
-<a href="#example-of-using-a-tidy-model-estimates-for-other-packages" class="anchor"></a>Example of using a tidy model estimates for other packages</h1>
+<a href="#example-of-using-a-tidy-model-estimates-for-other-packages" class="anchor" aria-hidden="true"></a>Example of using a tidy model estimates for other packages</h1>
 <div id="dotwhisker" class="section level2">
 <h2 class="hasAnchor">
-<a href="#dotwhisker" class="anchor"></a>Dotwhisker</h2>
+<a href="#dotwhisker" class="anchor" aria-hidden="true"></a>Dotwhisker</h2>
 <p>As explained above, this standard format makes it easier for tidyverse packages to interact with model information. An example of this is piping the tidy information to dplyr to filter the effects and then to the <code>dotwhisker</code> package to plot the model parameter confidence intervals.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>broom.mixed.sep2<span class="op">=</span><span class="st">": "</span>, broom.mixed.sep2<span class="op">=</span><span class="st">", "</span><span class="op">)</span>
@@ -494,7 +494,7 @@
 </div>
 <div id="huxtable" class="section level2">
 <h2 class="hasAnchor">
-<a href="#huxtable" class="anchor"></a>Huxtable</h2>
+<a href="#huxtable" class="anchor" aria-hidden="true"></a>Huxtable</h2>
 <p>This allows easy creation of report ready tables in many formats including word.</p>
 <p>Huxtable relies on the <code>broom</code> implementation</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">

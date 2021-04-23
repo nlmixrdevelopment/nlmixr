@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Modifying nlmixr models by piping</h1>
             
-            <h4 data-toc-skip class="date">2021-04-19</h4>
+            <h4 data-toc-skip class="date">2021-04-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/modelPiping.Rmd" class="external-link"><code>vignettes/modelPiping.Rmd</code></a></small>
       <div class="hidden name"><code>modelPiping.Rmd</code></div>
@@ -165,7 +165,7 @@
 </div>
 <div id="changing-models-via-piping" class="section level1">
 <h1 class="hasAnchor">
-<a href="#changing-models-via-piping" class="anchor"></a>Changing models via piping</h1>
+<a href="#changing-models-via-piping" class="anchor" aria-hidden="true"></a>Changing models via piping</h1>
 <p>As in the running nlmixr vignette, Let’s start with a very simple PK example, using the single-dose theophylline dataset generously provided by Dr. Robert A. Upton of the University of California, San Francisco:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -228,7 +228,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 5.946606 0.688764   0.688774 0.928 2.926856</span>
+<span class="co">#&gt; elapsed 6.429823 0.690675   0.690685 0.933 2.979817</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -265,7 +265,7 @@
 </div>
 <div id="changing-and-fixing-parameter-values-in-models" class="section level1">
 <h1 class="hasAnchor">
-<a href="#changing-and-fixing-parameter-values-in-models" class="anchor"></a>Changing and fixing parameter values in models</h1>
+<a href="#changing-and-fixing-parameter-values-in-models" class="anchor" aria-hidden="true"></a>Changing and fixing parameter values in models</h1>
 <p>Something that you may want to do is change initial estimates with a model. It is simple to modify the model definition and change them yourself, but you may also want to change them in a specific way; For example try a range of starting values to see how the system behaves (either by full estimation or by a posthoc estimation). In these situations it can be come tedious to modify the models by hand.</p>
 <p>nlmixr provides the ability to:</p>
 <ol style="list-style-type: decimal">
@@ -315,8 +315,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 4.744145 0.365752   0.365764 0.526 2.115339</span>
+<span class="co">#&gt;            setup optimize covariance table   other</span>
+<span class="co">#&gt; elapsed 5.147272 0.379228    0.37924 0.557 2.17826</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -378,7 +378,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.389397 0.358979   0.358981 0.525 2.450643</span>
+<span class="co">#&gt; elapsed 0.461488 0.383173   0.383176 0.555 2.548163</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -435,7 +435,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 0.387401 0.636052   0.636063 0.523 1.609484</span>
+<span class="co">#&gt; elapsed 0.439514 0.683306   0.683315 0.555 1.708865</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -472,11 +472,11 @@
 </div>
 <div id="changing-model-features" class="section level1">
 <h1 class="hasAnchor">
-<a href="#changing-model-features" class="anchor"></a>Changing model features</h1>
+<a href="#changing-model-features" class="anchor" aria-hidden="true"></a>Changing model features</h1>
 <p>When developing models, often you add and remove between subject variability to parameters, add covariates to the effects, and/or change the residual errors. You can change lines in the model by piping the fit or the nlmixr model specification function to a <code>model</code></p>
 <div id="adding-or-removing-between-subject-variability" class="section level2">
 <h2 class="hasAnchor">
-<a href="#adding-or-removing-between-subject-variability" class="anchor"></a>Adding or Removing between subject variability</h2>
+<a href="#adding-or-removing-between-subject-variability" class="anchor" aria-hidden="true"></a>Adding or Removing between subject variability</h2>
 <p>Often in developing a model you add and remove between subject variability to certain model parameters. For example, you could remove the between subject variability in the ka parameter by changing that line in the model;</p>
 <p>For example to remove a eta from a prior fit or prior model specification function, simply pipe it to the model function. You can then re-estimate by piping it to the <code>nlmixr</code> function again.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -513,8 +513,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;           setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 4.19209 0.412115   0.412125 0.945 1.51267</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 4.600449 0.447636   0.447646 0.964 1.590269</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -579,7 +579,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 4.478348 0.706695   0.706705 0.937 1.773252</span>
+<span class="co">#&gt; elapsed 4.936383 0.693247   0.693257 0.923 1.798113</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -636,7 +636,7 @@
 </div>
 <div id="adding-covariate-effects" class="section level2">
 <h2 class="hasAnchor">
-<a href="#adding-covariate-effects" class="anchor"></a>Adding Covariate effects</h2>
+<a href="#adding-covariate-effects" class="anchor" aria-hidden="true"></a>Adding Covariate effects</h2>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Note currently cov is needed as a prefix so nlmixr knows this is an</span>
 <span class="co">## estimated parameter not a parameter</span>
@@ -673,8 +673,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table   other</span>
-<span class="co">#&gt; elapsed 4.674798 1.717859   1.717863 1.009 8.10448</span>
+<span class="co">#&gt;            setup optimize covariance table    other</span>
+<span class="co">#&gt; elapsed 5.178379 1.788307    1.78831 1.017 8.195004</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -721,7 +721,7 @@
 </div>
 <div id="changing-residual-errors" class="section level2">
 <h2 class="hasAnchor">
-<a href="#changing-residual-errors" class="anchor"></a>Changing residual errors</h2>
+<a href="#changing-residual-errors" class="anchor" aria-hidden="true"></a>Changing residual errors</h2>
 <p>Changing the residual errors is also just as easy, by simply specifying the error you wish to change:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Since there are 0 predictions in the data, these are changed to</span>
@@ -764,7 +764,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 4.866855 0.800267   0.800271 0.981 6.498607</span>
+<span class="co">#&gt; elapsed 5.302849 0.837183   0.837189 0.943 6.682779</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>

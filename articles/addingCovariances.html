@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Example Model: Phenobarbitol with correlations</h1>
             
-            <h4 data-toc-skip class="date">2021-04-19</h4>
+            <h4 data-toc-skip class="date">2021-04-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/addingCovariances.Rmd" class="external-link"><code>vignettes/addingCovariances.Rmd</code></a></small>
       <div class="hidden name"><code>addingCovariances.Rmd</code></div>
@@ -165,7 +165,7 @@
 </div>
 <div id="adding-covariances-between-random-effects" class="section level1">
 <h1 class="hasAnchor">
-<a href="#adding-covariances-between-random-effects" class="anchor"></a>Adding Covariances between random effects</h1>
+<a href="#adding-covariances-between-random-effects" class="anchor" aria-hidden="true"></a>Adding Covariances between random effects</h1>
 <p>You can simply add co-variances between two random effects by adding the effects together in the model specification block, that is <code>eta.cl+eta.v ~</code>. After that statement, you specify the lower triangular matrix of the fit with <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>.</p>
 <p>An example of this is the phenobarbitol data:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -173,7 +173,7 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span></code></pre></div>
 <div id="model-specification" class="section level2">
 <h2 class="hasAnchor">
-<a href="#model-specification" class="anchor"></a>Model Specification</h2>
+<a href="#model-specification" class="anchor" aria-hidden="true"></a>Model Specification</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">pheno</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
@@ -198,7 +198,7 @@
 </div>
 <div id="fit-with-saem" class="section level2">
 <h2 class="hasAnchor">
-<a href="#fit-with-saem" class="anchor"></a>Fit with SAEM</h2>
+<a href="#fit-with-saem" class="anchor" aria-hidden="true"></a>Fit with SAEM</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pheno</span>, <span class="va">pheno_sd</span>, <span class="st">"saem"</span>,
               control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
@@ -223,8 +223,8 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;           saem  setup table cwres covariance  other</span>
-<span class="co">#&gt; elapsed 14.042 3.1911 1.357 4.581      0.023 0.8959</span>
+<span class="co">#&gt;           saem    setup table cwres covariance    other</span>
+<span class="co">#&gt; elapsed 18.405 3.574063 1.405 5.018      0.029 0.985937</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -260,7 +260,7 @@
 </div>
 <div id="basic-goodness-of-fit-plots" class="section level2">
 <h2 class="hasAnchor">
-<a href="#basic-goodness-of-fit-plots" class="anchor"></a>Basic Goodness of Fit Plots</h2>
+<a href="#basic-goodness-of-fit-plots" class="anchor" aria-hidden="true"></a>Basic Goodness of Fit Plots</h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
 <p><img src="addingCovariances_files/figure-html/unnamed-chunk-5-1.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-2.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-3.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-4.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-5.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-6.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-7.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-8.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-9.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-10.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-11.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-12.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-13.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-14.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-15.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-16.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-17.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-18.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-19.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-20.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-21.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-22.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-23.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-24.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-25.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-26.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-27.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-28.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-29.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-30.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-31.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-32.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-33.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-34.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-35.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-36.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-37.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-38.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-39.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-40.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-41.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-42.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-43.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-44.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-45.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-46.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-47.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-48.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-49.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-50.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-51.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-52.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-53.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-54.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-55.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-56.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-57.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-58.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-59.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-60.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-61.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-62.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-63.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-64.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-65.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-66.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-67.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-68.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-69.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-70.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-71.png" width="100%"></p>
@@ -271,7 +271,7 @@
 </div>
 <div id="two-types-of-vpcs" class="section level2">
 <h2 class="hasAnchor">
-<a href="#two-types-of-vpcs" class="anchor"></a>Two types of VPCs</h2>
+<a href="#two-types-of-vpcs" class="anchor" aria-hidden="true"></a>Two types of VPCs</h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 <span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>;
