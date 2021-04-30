@@ -322,30 +322,30 @@ evaluations.</p></td>
 <span class='co'>## x</span>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span>;
 <span class='va'>gf</span><span class='op'>$</span><span class='fu'>eval</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; |-----+---------------+-----------+-----------+-----------+-----------|
+</div><div class='co'>#&gt; |-----+---------------+-----------+-----------+-----------+-----------|
 #&gt; |    #| Objective Fun |        t1 |        t2 |        t3 |        t4 |
 #&gt; |.....................|        t5 |        t6 |        t7 |        t8 |
-#&gt; <span style='text-decoration: underline;'>|.....................|        t9 |       t10 |       t11 |...........|</span><span>
+#&gt; <span style='text-decoration: underline;'>|.....................|        t9 |       t10 |       t11 |...........|</span>
 #&gt; |    1|-2.2916210e-08 |     0.000 |    0.6283 |     1.257 |     1.885 |
 #&gt; |.....................|     2.513 |     3.142 |     3.770 |     4.398 |
-#&gt; |.....................|     5.027 |     5.655 |     6.283 |...........|</div><div class='output co'>#&gt; [1] -2.291621e-08</div><div class='input'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>grad</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; |    G|    Gill Diff. |     1.000 |    0.8090 |    0.3090 |   -0.3090 |
+#&gt; |.....................|     5.027 |     5.655 |     6.283 |...........|</div><div class='co'>#&gt; [1] -2.291621e-08</div><div class='input'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>grad</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+</div><div class='co'>#&gt; |    G|    Gill Diff. |     1.000 |    0.8090 |    0.3090 |   -0.3090 |
 #&gt; |.....................|   -0.8090 |    -1.000 |   -0.8090 |   -0.3090 |
-#&gt; </span><span style='text-decoration: underline;'>|.....................|    0.3090 |    0.8090 |     1.000 |...........|</span><span></div><div class='output co'>#&gt;  [1]  1.0000000  0.8090168  0.3090166 -0.3090170 -0.8090170 -1.0000000
+#&gt; <span style='text-decoration: underline;'>|.....................|    0.3090 |    0.8090 |     1.000 |...........|</span></div><div class='co'>#&gt;  [1]  1.0000000  0.8090168  0.3090166 -0.3090170 -0.8090170 -1.0000000
 #&gt;  [7] -0.8090170 -0.3090170  0.3090170  0.8090170  1.0000000</div><div class='input'>
 <span class='co'>## x2</span>
 <span class='va'>x2</span> <span class='op'>&lt;-</span> <span class='va'>x</span><span class='op'>+</span><span class='fl'>0.1</span>
 <span class='va'>gf</span><span class='op'>$</span><span class='fu'>eval</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; |    2|    0.10014530 |    0.1000 |    0.7283 |     1.357 |     1.985 |
+</div><div class='co'>#&gt; |    2|    0.10014530 |    0.1000 |    0.7283 |     1.357 |     1.985 |
 #&gt; |.....................|     2.613 |     3.241 |     3.870 |     4.498 |
-#&gt; |.....................|     5.127 |     5.755 |     6.383 |...........|</div><div class='output co'>#&gt; [1] 0.1001453</div><div class='input'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>grad</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; |    F| Forward Diff. |    0.9950 |    0.7463 |    0.2125 |   -0.4024 |
+#&gt; |.....................|     5.127 |     5.755 |     6.383 |...........|</div><div class='co'>#&gt; [1] 0.1001453</div><div class='input'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>grad</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span>
+</div><div class='co'>#&gt; |    F| Forward Diff. |    0.9950 |    0.7463 |    0.2125 |   -0.4024 |
 #&gt; |.....................|   -0.8637 |   -0.9950 |   -0.7463 |   -0.2125 |
-#&gt; </span><span style='text-decoration: underline;'>|.....................|    0.4024 |    0.8637 |    0.9950 |...........|</span><span></div><div class='output co'>#&gt;  [1]  0.9950042  0.7462946  0.2125259 -0.4024205 -0.8636559 -0.9950354
+#&gt; <span style='text-decoration: underline;'>|.....................|    0.4024 |    0.8637 |    0.9950 |...........|</span></div><div class='co'>#&gt;  [1]  0.9950042  0.7462946  0.2125259 -0.4024205 -0.8636559 -0.9950354
 #&gt;  [7] -0.7462947 -0.2125260  0.4024204  0.8636559  0.9949954</div><div class='input'>
 <span class='co'>## Gives the parameter history as a data frame</span>
 <span class='va'>gf</span><span class='op'>$</span><span class='fu'>hist</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   iter               type          objf        t1        t2        t3
+</div><div class='co'>#&gt;   iter               type          objf        t1        t2        t3
 #&gt; 1    1           Unscaled -2.291621e-08 0.0000000 0.6283185 1.2566371
 #&gt; 2    2           Unscaled  1.001453e-01 0.1000000 0.7283185 1.3566371
 #&gt; 3    1    Gill83 Gradient            NA 1.0000000 0.8090168 0.3090166
@@ -360,7 +360,7 @@ evaluations.</p></td>
 #&gt; 2 6.3831853
 #&gt; 3 1.0000000
 #&gt; 4 0.9949954</div><div class='input'>
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

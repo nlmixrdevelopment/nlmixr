@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Working with multiple endpoints</h1>
             
-            <h4 data-toc-skip class="date">2021-04-23</h4>
+            <h4 data-toc-skip class="date">2021-04-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/multiple-endpoints.Rmd" class="external-link"><code>vignettes/multiple-endpoints.Rmd</code></a></small>
       <div class="hidden name"><code>multiple-endpoints.Rmd</code></div>
@@ -229,7 +229,7 @@
     <span class="va">effect</span> <span class="op">~</span> <span class="fu">add</span><span class="op">(</span><span class="va">pdadd.err</span><span class="op">)</span>
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p>Notice there are two endpoints in the model <code>cp</code> and <code>effect</code>. Both are modeled in nlmixr using the <code><a href="https://rdrr.io/r/base/tilde.html" class="external-link">~</a></code> “modeled by” specification.</p>
+<p>Notice there are two endpoints in the model <code>cp</code> and <code>effect</code>. Both are modeled in nlmixr using the <code>~</code> “modeled by” specification.</p>
 <p>To see more about how nlmixr will handle the multiple compartment model, it is quite informative to parse the model and print the information about that model. In this case an initial parsing would give:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pk.turnover.emax</span><span class="op">)</span>
@@ -347,7 +347,7 @@
 <p>Notice that the <code>cmt</code> and <code>dvid</code> items can use the named variables directly as either the <code>cmt</code> or <code>dvid</code> specification. This flexible notation makes it so you do not have to rename your compartments to run nlmixr model functions.</p>
 <p>The other thing to note is that the <code>cp</code> is specified by an ODE compartment above the number of compartments defined in the <code>RxODE</code> part of the <code>nlmixr</code> model. This is because <code>cp</code> is not a defined compartment, but a related variable <code>cp</code>.</p>
 <p>The last thing to notice that the <code>cmt</code> items are numbered <code>cmt=5</code> for <code>cp</code> or <code>cmt=4</code> for <code>effect</code> even though they were specified in the model first by <code>cp</code> and <code>cmt</code>. This ordering is because <code>effect</code> is a compartment in the <code>RxODE</code> system. Of course <code>cp</code> is related to the compartment <code>central</code>, and it may make more sense to pair <code>cp</code> with the <code>central</code> compartment.</p>
-<p>If this is something you want to have you can specify the compartment to relate the effect to by the <code><a href="https://rdrr.io/r/base/Logic.html" class="external-link">|</a></code> operator. In this case you would change</p>
+<p>If this is something you want to have you can specify the compartment to relate the effect to by the <code>|</code> operator. In this case you would change</p>
 <pre><code>cp ~ prop(prop.err) + add(pkadd.err)</code></pre>
 <p>to</p>
 <pre><code>cp ~ prop(prop.err) + add(pkadd.err) | central</code></pre>
@@ -600,8 +600,8 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;           saem    setup table cwres covariance    other</span>
-<span class="co">#&gt; elapsed 169.03 14.75822 5.377 20.28       0.08 1.067777</span>
+<span class="co">#&gt;            saem    setup table  cwres covariance    other</span>
+<span class="co">#&gt; elapsed 172.218 15.53449 5.468 21.153      0.084 1.058507</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -696,7 +696,7 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [1] "CMT"</span>
 <span class="co">#&gt; calculating covariance matrix</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:02:11 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:02:13 </span>
 <span class="co">#&gt; done</span></code></pre></div>
 <div id="focei-diagnostic-plots" class="section level3">
 <h3 class="hasAnchor">
@@ -711,7 +711,7 @@ effect ~ add(pdadd.err)  | pca</code></pre>
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 20.47601 131.1502   131.1502 4.425 509.7226</span>
+<span class="co">#&gt; elapsed 21.61873  133.285    133.285 4.479 518.2084</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>

@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using Broom with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-04-23</h4>
+            <h4 data-toc-skip class="date">2021-04-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/broom.Rmd" class="external-link"><code>vignettes/broom.Rmd</code></a></small>
       <div class="hidden name"><code>broom.Rmd</code></div>
@@ -250,7 +250,7 @@
 <p>Of course you can always change the type of objective function that nlmixr uses:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/setOfv.html">setOfv</a></span><span class="op">(</span><span class="va">fit.s</span>,<span class="st">"FOCEi"</span><span class="op">)</span> <span class="co"># Setting objective function to focei</span></code></pre></div>
-<p>By setting it back to the SAEM default objective function of <code>FOCEi</code>, the <code><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance(fit.s)</a></code> has the same values again:</p>
+<p>By setting it back to the SAEM default objective function of <code>FOCEi</code>, the <code>glance(fit.s)</code> has the same values again:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 1 x 5</span>
@@ -482,9 +482,9 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">dotwhisker</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="va">fit.s</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span>exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">effect</span><span class="op">==</span><span class="st">"fixed"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">fit.s</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+    <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span>exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">effect</span><span class="op">==</span><span class="st">"fixed"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
     <span class="fu"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html" class="external-link">dwplot</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="broom_files/figure-html/unnamed-chunk-23-1.png" width="100%"></p>
 <p>You may also compare models easily by using the <code>dotwhisker</code> package</p>
@@ -667,8 +667,8 @@
 
 <span class="va">ft</span>  <span class="op">&lt;-</span> <span class="fu">huxtable</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/huxtable/man/as_flextable.html" class="external-link">as_flextable</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span>;
     
-<span class="fu"><a href="https://davidgohel.github.io/officer/reference/read_docx.html" class="external-link">read_docx</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/body_add_flextable.html" class="external-link">body_add_flextable</a></span><span class="op">(</span><span class="va">ft</span><span class="op">)</span>  <span class="op">%&gt;%</span>
+<span class="fu"><a href="https://davidgohel.github.io/officer/reference/read_docx.html" class="external-link">read_docx</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+    <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/body_add_flextable.html" class="external-link">body_add_flextable</a></span><span class="op">(</span><span class="va">ft</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
     <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span>target<span class="op">=</span><span class="st">"pheno.docx"</span><span class="op">)</span></code></pre></div>
 <p>Which produces the following <a href="pheno.docx">word document</a>.</p>
 <p>Happy tidying!</p>

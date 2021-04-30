@@ -534,14 +534,14 @@ directly modeled by the <code>params</code> and <code>thetaMat</code> matrix</p>
 simulates the variance that are directly modeled by the
 <code>thetaMat</code> matrix</p></li>
 <li><p><code>log</code> This is when the <code>params</code> and <code>thetaMat</code>
-simulates <code><a href='https://rdrr.io/r/base/Log.html'>log(sd)</a></code></p></li>
+simulates <code>log(sd)</code></p></li>
 <li><p><code>nlmixrSqrt</code> This is when the <code>params</code> and
 <code>thetaMat</code> simulates the inverse cholesky decomposed matrix
 with the <code>x^2</code> modeled along the diagonal.  This only works
 with a diagonal matrix.</p></li>
 <li><p><code>nlmixrLog</code> This is when the <code>params</code> and
 <code>thetaMat</code> simulates the inverse cholesky decomposed matrix
-with the <code><a href='https://rdrr.io/r/base/Log.html'>exp(x^2)</a></code> along the diagonal.  This only works
+with the <code>exp(x^2)</code> along the diagonal.  This only works
 with a diagonal matrix.</p></li>
 <li><p><code>nlmixrIdentity</code> This is when the <code>params</code> and
 <code>thetaMat</code> simulates the inverse cholesky decomposed matrix.
@@ -634,7 +634,7 @@ first model time, 102 is the second etc.</p></li>
 are above this value, trim them to be this value. By default
 Inf.  Also trims to -stateTrim for large negative
 amounts/concentrations.  If you want to trim between a range
-say <code><a href='https://rdrr.io/r/base/c.html'>c(0, 2000000)</a></code> you may specify 2 values with a lower and
+say <code>c(0, 2000000)</code> you may specify 2 values with a lower and
 upper range to make sure all state values are in the
 reasonable range.</p></td>
     </tr>
@@ -697,14 +697,14 @@ directly modeled by the <code>params</code> and <code>thetaMat</code> matrix</p>
 simulates the variance that are directly modeled by the
 <code>thetaMat</code> matrix</p></li>
 <li><p><code>log</code> This is when the <code>params</code> and <code>thetaMat</code>
-simulates <code><a href='https://rdrr.io/r/base/Log.html'>log(sd)</a></code></p></li>
+simulates <code>log(sd)</code></p></li>
 <li><p><code>nlmixrSqrt</code> This is when the <code>params</code> and
 <code>thetaMat</code> simulates the inverse cholesky decomposed matrix
 with the <code>x^2</code> modeled along the diagonal.  This only works
 with a diagonal matrix.</p></li>
 <li><p><code>nlmixrLog</code> This is when the <code>params</code> and
 <code>thetaMat</code> simulates the inverse cholesky decomposed matrix
-with the <code><a href='https://rdrr.io/r/base/Log.html'>exp(x^2)</a></code> along the diagonal.  This only works
+with the <code>exp(x^2)</code> along the diagonal.  This only works
 with a diagonal matrix.</p></li>
 <li><p><code>nlmixrIdentity</code> This is when the <code>params</code> and
 <code>thetaMat</code> simulates the inverse cholesky decomposed matrix.
@@ -763,7 +763,7 @@ currently supported types are:</p><ul>
 <li><p><code>"rxSolve"</code> (default) will return a reactive data frame
 that can change easily change different pieces of the solve and
 update the data frame.  This is the currently standard solving
-method in RxODE,  is used for <code><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html'>rxSolve(object, ...)</a></code>, <code><a href='https://rdrr.io/r/base/solve.html'>solve(object,...)</a></code>,</p></li>
+method in RxODE,  is used for <code>rxSolve(object, ...)</code>, <code>solve(object,...)</code>,</p></li>
 <li><p><code>"data.frame"</code> -- returns a plain, non-reactive data
 frame; Currently very slightly faster than <code>returnType="matrix"</code></p></li>
 <li><p><code>"matrix"</code> -- returns a plain matrix with column names attached

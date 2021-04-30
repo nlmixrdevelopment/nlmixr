@@ -245,8 +245,8 @@ object is returned.</p></td>
       <th>docxTemplate</th>
       <td><p>This is the document template.  If not
 specified it defaults to
-<code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.template")</a></code>.  If
-<code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.template")</a></code> is not specified it uses
+<code>option("nlmixr.docx.template")</code>.  If
+<code>option("nlmixr.docx.template")</code> is not specified it uses
 the included nlmixr document template.  When
 <code>docxTemplate=NULL</code> it uses the <code>officer</code> blank
 document.</p></td>
@@ -260,42 +260,42 @@ plots are added to the document.  By default <code>TRUE</code></p></td>
       <th>titleStyle</th>
       <td><p>This is the word style name for the nlmixr
 title; Usually this is <code>nlmixr version (R
-object)</code>. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.title")</a></code> or
+object)</code>. Defaults to <code>option("nlmixr.docx.title")</code> or
 <code>Title</code></p></td>
     </tr>
     <tr>
       <th>subtitleStyle</th>
       <td><p>This is the word style for the subtitle which
 is <code>nlmixr model name and date</code>. Defaults to
-<code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.subtitle")</a></code> or <code>Subtitle</code></p></td>
+<code>option("nlmixr.docx.subtitle")</code> or <code>Subtitle</code></p></td>
     </tr>
     <tr>
       <th>normalStyle</th>
       <td><p>This is the word style for normal text. Defaults to
-<code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.normal")</a></code> or <code>Normal</code></p></td>
+<code>option("nlmixr.docx.normal")</code> or <code>Normal</code></p></td>
     </tr>
     <tr>
       <th>headerStyle</th>
       <td><p>This is the word style for heading text. Defaults to
-<code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.heading1")</a></code> or <code>Heading 1</code></p></td>
+<code>option("nlmixr.docx.heading1")</code> or <code>Heading 1</code></p></td>
     </tr>
     <tr>
       <th>centeredStyle</th>
       <td><p>This is the word style for centered text
 which is used for the figures. Defaults to
-<code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.centered")</a></code> or <code>centered</code></p></td>
+<code>option("nlmixr.docx.centered")</code> or <code>centered</code></p></td>
     </tr>
     <tr>
       <th>preformattedStyle</th>
       <td><p>This is the preformatted text style for R
 output lines.  Defaults to
-<code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.preformatted")</a></code> or <code>HTML Preformatted</code></p></td>
+<code>option("nlmixr.docx.preformatted")</code> or <code>HTML Preformatted</code></p></td>
     </tr>
     <tr>
       <th>width</th>
       <td><p>Is an integer representing the number of characters
 your preformatted style supports.  By default this is
-<code><a href='https://rdrr.io/r/base/options.html'>option("nlmixr.docx.width")</a></code> or <code>69</code></p></td>
+<code>option("nlmixr.docx.width")</code> or <code>69</code></p></td>
     </tr>
     <tr>
       <th>save</th>
@@ -341,7 +341,7 @@ data object for the fit?  By default this is <code>FALSE</code> with
 <span class='op'>}</span>
 
 <span class='va'>fit.s</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span><span class='va'>pheno</span>, <span class='va'>pheno_sd</span>, <span class='st'>"saem"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'><span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'>→ generate SAEM model</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; 1:    -5.0291    0.3072    0.9500    0.9500   48.9703
+</div><div class='co'>#&gt; <span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></div><div class='co'>#&gt;  </div><div class='co'>#&gt; → generate SAEM model</div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; 1:    -5.0291    0.3072    0.9500    0.9500   48.9703
 #&gt; 2:    -5.2433    0.4160    0.9025    0.9025   35.3695
 #&gt; 3:    -5.3098    0.4083    0.8574    0.8574   28.6168
 #&gt; 4:    -5.2258    0.4097    0.8145    0.8145   20.7094
@@ -840,15 +840,15 @@ data object for the fit?  By default this is <code>FALSE</code> with
 #&gt; 497:   -4.9889   0.3412   0.2270   0.1627   7.7939
 #&gt; 498:   -4.9890   0.3412   0.2269   0.1627   7.7939
 #&gt; 499:   -4.9889   0.3412   0.2270   0.1627   7.7937
-#&gt; 500:   -4.9889   0.3412   0.2270   0.1626   7.7930</div><div class='output co'>#&gt; <span class='message'>Calculating covariance matrix</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>→ creating full model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ compiling EBE model...</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>Calculating residuals/tables</span></div><div class='output co'>#&gt; <span class='message'>done</span></div><div class='input'>
+#&gt; 500:   -4.9889   0.3412   0.2270   0.1626   7.7930</div><div class='co'>#&gt; Calculating covariance matrix</div><div class='co'>#&gt; </div><div class='co'>#&gt; → creating full model...</div><div class='co'>#&gt; → pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; → loading into <span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; → compiling EBE model...</div><div class='co'>#&gt;  </div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; Calculating residuals/tables</div><div class='co'>#&gt; done</div><div class='input'>
 <span class='co'>## Save output information into a word document</span>
 <span class='fu'>RxODE</span><span class='fu'>::</span><span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/dot-rxWithWd.html'>.rxWithWd</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='co'># Put document in temporary directory</span>
   <span class='fu'>nmDocx</span><span class='op'>(</span><span class='va'>fit.s</span><span class='op'>)</span>
 <span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Calculating -2LL by Gaussian quadrature (nnodes=3,nsd=1.6)</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='warning'>Warning: Unrecognized statistics: r.squared</span>
-#&gt; <span class='warning'>Try setting `statistics` explicitly in the call to `huxreg()`</span></div><div class='output co'>#&gt; <span class='error'>Error in read_xml.raw(charToRaw(enc2utf8(x)), "UTF-8", ..., as_html = as_html,     options = options): PCDATA invalid Char value 27 [9]</span></div><div class='input'>
+</div><div class='co'>#&gt; Calculating -2LL by Gaussian quadrature (nnodes=3,nsd=1.6)</div><div class='co'>#&gt; </div><div class='co'>#&gt; <span class='warning'>Warning: </span>Unrecognized statistics: r.squared
+#&gt; Try setting `statistics` explicitly in the call to `huxreg()`</div><div class='co'>#&gt; <span class='error'>Error in read_xml.raw(charToRaw(enc2utf8(x)), "UTF-8", ..., as_html = as_html,     options = options): </span>PCDATA invalid Char value 27 [9]</div><div class='input'>
 <span class='co'># }</span>
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

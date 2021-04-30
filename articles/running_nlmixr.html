@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Running PK models with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-04-23</h4>
+            <h4 data-toc-skip class="date">2021-04-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd" class="external-link"><code>vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
@@ -239,7 +239,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 6.616516 0.281079   0.281089 0.024 0.896316</span>
+<span class="co">#&gt; elapsed 6.400073 0.272729    0.27274 0.023 0.890458</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -306,7 +306,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           saem    setup table covariance    other</span>
-<span class="co">#&gt; elapsed 10.279 2.195167 0.017      0.015 0.743833</span>
+<span class="co">#&gt; elapsed 10.345 2.146537 0.015      0.015 0.728463</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -398,7 +398,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;          nlme    setup table cwres    other</span>
-<span class="co">#&gt; elapsed 3.575 4.108709 0.023  4.15 0.279291</span>
+<span class="co">#&gt; elapsed 3.357 4.094711 0.032 4.145 0.271289</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -439,7 +439,7 @@
 <span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 6.616516 0.281079   0.281089 0.024 0.896316</span>
+<span class="co">#&gt; elapsed 6.400073 0.272729    0.27274 0.023 0.890458</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
 <span class="co">#&gt; </span>
@@ -537,7 +537,7 @@
 <code class="sourceCode R"><span class="co">## install.packages("xpose")</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/UUPharmacometrics/xpose" class="external-link">xpose</a></span><span class="op">)</span></code></pre></div>
 <p>Now install the extension for nlmixr:</p>
-<pre><code><a href="https://devtools.r-lib.org//reference/remote-reexports.html" class="external-link"> devtools::install_github("nlmixrdevelopment/xpose.nlmixr")</a></code></pre>
+<pre><code> devtools::install_github("nlmixrdevelopment/xpose.nlmixr")</code></pre>
 <p>… and convert your nlmixr fit object into an xpose fit object.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">xpose.nlmixr</span><span class="op">)</span>
@@ -612,19 +612,19 @@
 <p>As shown in the above example:</p>
 <ul>
 <li>Simple parameter values are specified using an R-compatible assignment</li>
-<li>Boundaries my be specified by <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c(lower, est, upper)</a></code>.</li>
-<li>Like NONMEM, <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c(lower,est)</a></code> is equivalent to <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c(lower,est,Inf)</a></code>
+<li>Boundaries my be specified by <code>c(lower, est, upper)</code>.</li>
+<li>Like NONMEM, <code>c(lower,est)</code> is equivalent to <code>c(lower,est,Inf)</code>
 </li>
-<li>Also like NONMEM, <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c(est)</a></code> does not specify a lower bound, and is equivalent to specifying the parameter without using R’s <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> function.</li>
+<li>Also like NONMEM, <code>c(est)</code> does not specify a lower bound, and is equivalent to specifying the parameter without using R’s <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> function.</li>
 </ul>
 <p>These parameters can be named using almost any R-compatible name. Please note that:</p>
 <ul>
-<li>Residual error estimates should be coded as population estimates (i.e. using <code><a href="https://rdrr.io/r/base/assignOps.html" class="external-link">=</a></code> or <code><a href="https://rdrr.io/r/base/assignOps.html" class="external-link">&lt;-</a></code>, not <code><a href="https://rdrr.io/r/base/tilde.html" class="external-link">~</a></code>).</li>
+<li>Residual error estimates should be coded as population estimates (i.e. using <code>=</code> or <code>&lt;-</code>, not <code>~</code>).</li>
 <li>Variable names that start with <code>_</code> are not supported. Note that R does not allow variable starting with <code>_</code> to be assigned without quoting them.</li>
 <li>Naming variables that start with <code>rx_</code> or <code>nlmixr_</code> is not allowed, since RxODE and nlmixr use these prefixes internally for certain estimation routines and for calculating residuals.</li>
 <li>Variable names are case-sensitive, just like they are in R. <code>CL</code> is not the same as <code>Cl</code>.</li>
 </ul>
-<p>In mixture models, multivariate normal individual deviations from the normal population and parameters are estimated (in NONMEM these are called “ETA” parameters). Additionally, the variance/covariance matrix of these deviations are is also estimated (in NONMEM this is the “OMEGA” matrix). These also take initial estimates. In nlmixr, these are specified by the <code><a href="https://rdrr.io/r/base/tilde.html" class="external-link">~</a></code> operator. This that is typically used in statistics R for “modeled by”, and was chosen to distinguish these estimates from the population and residual error parameters.</p>
+<p>In mixture models, multivariate normal individual deviations from the normal population and parameters are estimated (in NONMEM these are called “ETA” parameters). Additionally, the variance/covariance matrix of these deviations are is also estimated (in NONMEM this is the “OMEGA” matrix). These also take initial estimates. In nlmixr, these are specified by the <code>~</code> operator. This that is typically used in statistics R for “modeled by”, and was chosen to distinguish these estimates from the population and residual error parameters.</p>
 <p>Continuing from the prior example, we can annotate the estimates for the between-subject error distribution…</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
@@ -655,8 +655,8 @@
 <span class="op">}</span></code></pre></div>
 <p>As shown in the above example:</p>
 <ul>
-<li>Simple variances are specified by the variable name and the estimate separated by <code><a href="https://rdrr.io/r/base/tilde.html" class="external-link">~</a></code>.</li>
-<li>Correlated parameters are specified by the sum of the variable labels and then the lower triangular matrix of the covariance is specified on the left handed side of the equation. This is also separated by <code><a href="https://rdrr.io/r/base/tilde.html" class="external-link">~</a></code>.</li>
+<li>Simple variances are specified by the variable name and the estimate separated by <code>~</code>.</li>
+<li>Correlated parameters are specified by the sum of the variable labels and then the lower triangular matrix of the covariance is specified on the left handed side of the equation. This is also separated by <code>~</code>.</li>
 <li>The initial estimates are specified on the variance scale, and in analogy with NONMEM, the square roots of the diagonal elements correspond to coefficients of variation when used in the exponential IIV implementation.</li>
 </ul>
 <p>Currently, comments inside the lower triangular matrix are not allowed.</p>
@@ -706,7 +706,7 @@
 <li>Parameters are defined before the differential equations. Currently directly defining the differential equations in terms of the population parameters is not supported.</li>
 <li>The differential equations, parameters and error terms are in a single block, instead of multiple sections.</li>
 <li>Additionally state names, calculated variables, also cannot start with either <code>rx_</code> or <code>nlmixr_</code> since these are used internally in some estimation routines.</li>
-<li>Errors are specified using the tilde, <code><a href="https://rdrr.io/r/base/tilde.html" class="external-link">~</a></code>. Currently you can use either <code>add(parameter)</code> for additive error, <code>prop(parameter)</code> for proportional error or <code>add(parameter1) + prop(parameter2)</code> for combined additive and proportional error. You can also specify <code><a href="https://rdrr.io/r/base/norm.html" class="external-link">norm(parameter)</a></code> for additive error, since it follows a normal distribution.</li>
+<li>Errors are specified using the tilde, <code>~</code>. Currently you can use either <code>add(parameter)</code> for additive error, <code>prop(parameter)</code> for proportional error or <code>add(parameter1) + prop(parameter2)</code> for combined additive and proportional error. You can also specify <code>norm(parameter)</code> for additive error, since it follows a normal distribution.</li>
 <li>Some routines, like <code>saem</code>, require parameters expressed in terms of <code>Pop.Parameter + Individual.Deviation.Parameter + Covariate*Covariate.Parameter</code>. The order of these parameters does not matter. This is similar to NONMEM’s mu-referencing, though not as restrictive. This means that for <code>saem</code>, a parameterization of the form <code>Cl &lt;- Cl*exp(eta.Cl)</code> is not allowed.</li>
 <li>The type of parameter in the model is determined by the <code>ini</code> block; covariates used in the model are not included in the <code>ini</code> block. These variables need to be present in the modeling dataset for the model to run.</li>
 </ul>

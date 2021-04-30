@@ -387,8 +387,8 @@ method.  The default value is 5.  This can be between 1 and 5.</p></td>
 <p>Expressions in assignment and &#8216;<code>if</code>&#8217; statements can be
    numeric or logical (no character expressions are currently supported).
    Numeric expressions can include the following numeric operators
-   (&#8216;<code><a href='https://rdrr.io/r/base/Arithmetic.html'>+</a></code>&#8217;, &#8216;<code><a href='https://rdrr.io/r/base/Arithmetic.html'>-</a></code>&#8217;, &#8216;<code><a href='https://rdrr.io/r/base/Arithmetic.html'>*</a></code>&#8217;,
-   &#8216;<code><a href='https://rdrr.io/r/base/Arithmetic.html'>/</a></code>&#8217;, &#8216;<code><a href='https://rdrr.io/r/base/Arithmetic.html'>^</a></code>&#8217;),   and
+   (&#8216;<code>+</code>&#8217;, &#8216;<code>-</code>&#8217;, &#8216;<code>*</code>&#8217;,
+   &#8216;<code>/</code>&#8217;, &#8216;<code>^</code>&#8217;),   and
    those mathematical functions defined in the C or the
    R math libraries (e.g., <code>fabs</code>, <code>exp</code>, <code>log</code>, <code>sin</code>).
    (Note that the modulo operator &#8216;<code>%</code>&#8217; is currently
@@ -441,7 +441,7 @@ d/dt(centr) = KA*depot - KE*centr;
 
 <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'>nlme_ode</span><span class='op'>(</span><span class='va'>theo_md</span>, model<span class='op'>=</span><span class='va'>ode</span>, par_model<span class='op'>=</span><span class='va'>specs</span>, par_trans<span class='op'>=</span><span class='va'>mypar</span>,
      response<span class='op'>=</span><span class='st'>"centr"</span>, response.scaler<span class='op'>=</span><span class='st'>"V"</span>,control<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/pkg/nlme/man/nlmeControl.html'>nlmeControl</a></span><span class='op'>(</span>pnlsTol<span class='op'>=</span><span class='fl'>0.9</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'><span class='co'># }</span>
+</div><div class='co'>#&gt;  </div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

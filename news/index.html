@@ -211,7 +211,7 @@
 <a href="#nlmixr-204" class="anchor" aria-hidden="true"></a>nlmixr 2.0.4<small> 2021-04-17 </small>
 </h1>
 <ul>
-<li><p>Now can use the following for combinde error models: <code><a href="../reference/foceiControl.html">foceiControl(addProp=1)</a></code> <code><a href="../reference/foceiControl.html">foceiControl(addProp=2)</a></code> <code><a href="../reference/saemControl.html">saemControl(addProp=1)</a></code> <code><a href="../reference/saemControl.html">saemControl(addProp=2)</a></code></p></li>
+<li><p>Now can use the following for combinde error models: <code>foceiControl(addProp=1)</code> <code>foceiControl(addProp=2)</code> <code>saemControl(addProp=1)</code> <code>saemControl(addProp=2)</code></p></li>
 <li><p>Bug-fix for SAEM add+prop and other error models that are optimized with nelder mead simplex (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/503'>#503</a>)</p></li>
 <li><p>Bug-fix for more complex SAEM models that were not parsing and running. (Issue <a href='https://github.com/nlmixrdevelopment/nlmixr/issues/502'>#502</a>, <a href='https://github.com/nlmixrdevelopment/nlmixr/issues/501'>#501</a>)</p></li>
 <li><p>Issue the “NaN in prediction” once per SAEM problem (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/500'>#500</a>)</p></li>
@@ -228,7 +228,7 @@
 <li><p>Detection of initial conditions was rewritten to enable additional features in the initial conditions (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/322'>#322</a>). The most important user-facing change is that now arbitrary R expressions can be used when setting initial conditions such as <code>tvCL &lt;- log(c(2,3,4))</code> (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/253'>#253</a>) instead of simply <code>tvCL &lt;- log(3)</code></p></li>
 <li><p>The function as.nlmixrBounds() now supports adding the columns that are missing into the input data.frame.</p></li>
 <li><p>omega definitions can be correlation matrices (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/338'>#338</a>)</p></li>
-<li><p>Can specify <code>keep=</code> and <code>drop=</code> in the nlmixr function to keep and drop columns in nlmixr output. Can also specify <code>control=list(keep=,drop=)</code> or <code><a href="../reference/nlmixr.html">nlmixr(...,keep=,drop=)</a></code> to keep/drop columns (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/260'>#260</a>)</p></li>
+<li><p>Can specify <code>keep=</code> and <code>drop=</code> in the nlmixr function to keep and drop columns in nlmixr output. Can also specify <code>control=list(keep=,drop=)</code> or <code>nlmixr(...,keep=,drop=)</code> to keep/drop columns (<a href='https://github.com/nlmixrdevelopment/nlmixr/issues/260'>#260</a>)</p></li>
 </ul>
 </div>
 <div id="focei-changes" class="section level2">
@@ -285,7 +285,7 @@
 </li>
 <li><p><code>saem</code> proportional and power models are more tolerant of 0 predictions in your data</p></li>
 <li><p><code>saem</code> now supports censoring a similar way as <code>monolix</code> does, with <code>cens</code> and <code>limit</code> columns</p></li>
-<li><p>The default of <code>saem</code> additive + proportional error has been switched to <code>combined2</code>, which was the <code>focei</code> default, but you can change this back with <code><a href="../reference/saemControl.html">saemControl(addProp="combined2")</a></code>. The table results will likely be different because in the last release the <code>saem</code> calculated <code>combined1</code> and then used these coefficients in the <code>combined2</code> focei problem.</p></li>
+<li><p>The default of <code>saem</code> additive + proportional error has been switched to <code>combined2</code>, which was the <code>focei</code> default, but you can change this back with <code>saemControl(addProp="combined2")</code>. The table results will likely be different because in the last release the <code>saem</code> calculated <code>combined1</code> and then used these coefficients in the <code>combined2</code> focei problem.</p></li>
 </ul>
 </div>
 <div id="nlme-changes" class="section level2">
@@ -305,7 +305,7 @@
 <li>Thanks to Johannes Ranke (<a href='https://github.com/jranke'>@jranke</a>) for the nlme patch and the catch</li>
 </ul>
 </li>
-<li>Can switch with <code><a href="https://rdrr.io/pkg/nlme/man/nlmeControl.html" class="external-link">nlmeControl(addProp="combined1")</a></code> to use the combined1 type of error model</li>
+<li>Can switch with <code>nlmeControl(addProp="combined1")</code> to use the combined1 type of error model</li>
 </ul>
 </div>
 <div id="new-utilities" class="section level2">
@@ -320,7 +320,7 @@
 <h2 class="hasAnchor">
 <a href="#general-changes" class="anchor" aria-hidden="true"></a>General Changes</h2>
 <ul>
-<li><p>Added auto-completion of <code>nlmixr</code> object properties accessed by <code><a href="https://rdrr.io/r/base/Extract.html" class="external-link">$</a></code>. This works for major editors including <code>Rstudio</code>, <code>ESS</code>, and Base R itself.</p></li>
+<li><p>Added auto-completion of <code>nlmixr</code> object properties accessed by <code>$</code>. This works for major editors including <code>Rstudio</code>, <code>ESS</code>, and Base R itself.</p></li>
 <li><p>Changed the way that Rstudio notebooks display <code>nlmixr</code> objects; It should be more legible in Rstudio.</p></li>
 <li><p>Graphics have been revamped to show censoring (including adding ggplot stat/geom <code>geom_cens</code>) as well as use <code>RxODE</code>’s ggplot theme (<code>rxTheme()</code>). Additionally time after dose is calculated as <code>tad</code> for all <code>nlmixr</code> models</p></li>
 <li><p>Tables generation has been refactored; <code>npde</code> uses the <code>arma</code> and <code>RxODE</code> random number generators which may change results. Also the default of <code>ties=TRUE</code> has been changed to <code>ties=FALSE</code>. <code>npde</code> calculations have been threaded with <code>OpenMP</code> to speed up the calculation as well. This refactoring was required to have the <code>dv</code> imputation between <code>cwres</code> and <code>npde</code> use the same method. The <code>npde</code> option now calculates the decorrelated <code>npd</code> as well, (which is the recommended weighted residual; see Nguyen 2017)</p></li>

@@ -319,7 +319,7 @@ of iterations is itmax*number of parameters</p></td>
 <span class='va'>ode</span> <span class='op'>&lt;-</span> <span class='st'>"d/dt(depot) =-KA*depot;
         d/dt(centr) = KA*depot - KE*centr;"</span>
 <span class='va'>m1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span><span class='va'>ode</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'>
+</div><div class='co'>#&gt;  </div><div class='input'>
 
 <span class='co'># In this ode System, we also specify the concentration as C2 = centr/V</span>
 
@@ -327,7 +327,7 @@ of iterations is itmax*number of parameters</p></td>
       d/dt(depot) =-KA*depot;
       d/dt(centr) = KA*depot - KE*centr;"</span>
 <span class='va'>m2</span> <span class='op'>=</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span><span class='va'>ode</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'>
+</div><div class='co'>#&gt;  </div><div class='input'>
 <span class='va'>PKpars</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
   <span class='va'>CL</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>lCL</span><span class='op'>)</span>
   <span class='va'>V</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>lV</span><span class='op'>)</span>
@@ -339,10 +339,10 @@ of iterations is itmax*number of parameters</p></td>
 <span class='va'>PRED2</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='va'>C2</span>
 
 <span class='va'>saem_fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gen_saem_user_fn.html'>gen_saem_user_fn</a></span><span class='op'>(</span>model <span class='op'>=</span> <span class='va'>m1</span>, <span class='va'>PKpars</span>, pred <span class='op'>=</span> <span class='va'>PRED</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='warning'>Warning: this was not generated from nlmixr, loading into symengine</span></div><div class='output co'>#&gt; <span class='message'>→ creating SAEM model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
+</div><div class='co'>#&gt;  </div><div class='co'>#&gt; <span class='warning'>Warning: </span>this was not generated from nlmixr, loading into symengine</div><div class='co'>#&gt; → creating SAEM model...</div><div class='co'>#&gt; → pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; → loading into <span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
 <span class='co'># Can also use PRED2</span>
 <span class='va'>saem_fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gen_saem_user_fn.html'>gen_saem_user_fn</a></span><span class='op'>(</span>model<span class='op'>=</span><span class='va'>m2</span>, <span class='va'>PKpars</span>, pred<span class='op'>=</span><span class='va'>PRED2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='warning'>Warning: this was not generated from nlmixr, loading into symengine</span></div><div class='output co'>#&gt; <span class='message'>→ creating SAEM model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
+</div><div class='co'>#&gt;  </div><div class='co'>#&gt; <span class='warning'>Warning: </span>this was not generated from nlmixr, loading into symengine</div><div class='co'>#&gt; → creating SAEM model...</div><div class='co'>#&gt; → pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; → loading into <span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='input'>
 
 <span class='co'># You can also use the nlmixr UI to run this model and call the lower level functions</span>
 
@@ -368,7 +368,7 @@ of iterations is itmax*number of parameters</p></td>
 <span class='op'>}</span><span class='op'>)</span>
 <span class='op'>}</span>
 <span class='va'>fit</span>  <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span><span class='va'>one.compartment</span>, <span class='va'>theo_sd</span>, <span class='st'>"saem"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'>→ generate SAEM model</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; 1:    0.1675   0.9655   3.3527   0.0007   0.5700   0.2850   0.0950   5.3940
+</div><div class='co'>#&gt; <span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></div><div class='co'>#&gt;  </div><div class='co'>#&gt; → generate SAEM model</div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; 1:    0.1675   0.9655   3.3527   0.0007   0.5700   0.2850   0.0950   5.3940
 #&gt; 2:    0.2385   0.9543   3.0659   0.0057   0.5415   0.2707   0.0902   1.6774
 #&gt; 3:    0.4555   1.0337   3.3566   0.0015   0.5144   0.2572   0.0857   1.0735
 #&gt; 4:    0.4497   1.0299   2.9211   0.0078   0.4887   0.2444   0.0815   0.7586
@@ -867,55 +867,55 @@ of iterations is itmax*number of parameters</p></td>
 #&gt; 497:    0.4443   1.0195   2.9328   0.0074   0.4214   0.0756   0.0115   0.4836
 #&gt; 498:    0.4443   1.0194   2.9330   0.0074   0.4216   0.0755   0.0115   0.4836
 #&gt; 499:    0.4445   1.0193   2.9335   0.0073   0.4219   0.0755   0.0115   0.4835
-#&gt; 500:    0.4447   1.0192   2.9335   0.0074   0.4218   0.0755   0.0115   0.4834</div><div class='output co'>#&gt; <span class='message'>Calculating covariance matrix</span></div><div class='output co'>#&gt; </div><div class='output co'>#&gt; <span class='message'>→ creating full model...</span></div><div class='output co'>#&gt; <span class='message'>→ pruning branches (</span><span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ loading into </span><span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>→ compiling EBE model...</span></div><div class='output co'>#&gt; <span class='message'> </span></div><div class='output co'>#&gt; <span class='message'></span><span style='color: #00BB00;'>✔</span><span> done</span></div><div class='output co'>#&gt; <span class='message'>Needed Covariates:</span></div><div class='output co'>#&gt; [1] "WT"</div><div class='output co'>#&gt; <span class='message'>Calculating residuals/tables</span></div><div class='output co'>#&gt; <span class='message'>done</span></div><div class='input'><span class='va'>fit</span>
-</div><div class='output co'>#&gt; ── </span><span style='color: #0000BB;font-weight: bold;'>nlmix</span><span style='color: #BB0000;font-weight: bold;'>r</span><span> </span><span style='color: #BBBB00;font-weight: bold;'>SAEM</span><span>(</span><span style='font-style: italic;'>ODE</span><span>); </span><span style='font-weight: 100;font-style: italic;'>OBJF not calculated</span><span> fit ───────────────────────────────────
+#&gt; 500:    0.4447   1.0192   2.9335   0.0074   0.4218   0.0755   0.0115   0.4834</div><div class='co'>#&gt; Calculating covariance matrix</div><div class='co'>#&gt; </div><div class='co'>#&gt; → creating full model...</div><div class='co'>#&gt; → pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; → loading into <span style='color: #0000BB;'>symengine</span><span> environment...</span></div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; → compiling EBE model...</div><div class='co'>#&gt;  </div><div class='co'>#&gt; <span style='color: #00BB00;'>✔</span><span> done</span></div><div class='co'>#&gt; Needed Covariates:</div><div class='co'>#&gt; [1] "WT"</div><div class='co'>#&gt; Calculating residuals/tables</div><div class='co'>#&gt; done</div><div class='input'><span class='va'>fit</span>
+</div><div class='co'>#&gt; ── <span style='color: #0000BB;font-weight: bold;'>nlmix</span><span style='color: #BB0000;font-weight: bold;'>r</span><span> </span><span style='color: #BBBB00;font-weight: bold;'>SAEM</span><span>(</span><span style='font-style: italic;'>ODE</span><span>); </span><span style='font-weight: 100;font-style: italic;'>OBJF not calculated</span><span> fit ───────────────────────────────────</span>
 #&gt; 
-#&gt;  Gaussian/Laplacian Likelihoods: AIC() or </span><span style='color: #0000BB;font-weight: bold;'>$objf</span><span> etc. 
+#&gt;  Gaussian/Laplacian Likelihoods: AIC() or <span style='color: #0000BB;font-weight: bold;'>$objf</span><span> etc. </span>
 #&gt;  FOCEi CWRES &amp; Likelihoods: addCwres() 
 #&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────
+#&gt; ── <span style='font-weight: bold;'>Time</span><span> (sec </span><span style='color: #0000BB;font-weight: bold;'>$time</span><span>): ───────────────────────────────────────────────────────────</span>
 #&gt; 
 #&gt;           saem    setup table covariance    other
-#&gt; elapsed 10.905 2.506892 0.022      0.016 0.844108
+#&gt; elapsed 10.942 2.436842 0.015      0.014 0.777158
 #&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────
+#&gt; ── <span style='font-weight: bold;'>Population Parameters</span><span> (</span><span style='color: #0000BB;font-weight: bold;'>$parFixed</span><span> or </span><span style='color: #0000BB;font-weight: bold;'>$parFixedDf</span><span>): ───────────────────────────</span>
 #&gt; 
-#&gt;        </span><span style='font-weight: bold;'>Parameter</span><span>    </span><span style='font-weight: bold;'>Est.</span><span>      </span><span style='font-weight: bold;'>SE</span><span> </span><span style='font-weight: bold;'>%RSE</span><span>     </span><span style='font-weight: bold;'>Back-transformed(95%CI)</span><span> </span><span style='font-weight: bold;'>BSV(CV%)</span><span>
-#&gt; </span><span style='font-weight: bold;'>tka</span><span>       Log Ka   0.445   0.198 44.5            1.56 (1.06, 2.3)     72.4
-#&gt; </span><span style='font-weight: bold;'>tcl</span><span>       Log Cl    1.02  0.0863 8.47           2.77 (2.34, 3.28)     28.0
-#&gt; </span><span style='font-weight: bold;'>tv</span><span>         Log V    2.93   0.288 9.82             18.8 (10.7, 33)     10.7
-#&gt; </span><span style='font-weight: bold;'>add.sd</span><span>             0.695                                    0.695         
-#&gt; </span><span style='font-weight: bold;'>wt.est</span><span>           0.00735 0.00409 55.6 0.00735 (-0.000663, 0.0154)         
-#&gt;        </span><span style='font-weight: bold;'>Shrink(SD)%</span><span>
-#&gt; </span><span style='font-weight: bold;'>tka</span><span>       </span><span style='color: #BB0000;font-weight: bold;'>-0.577%</span><span> 
-#&gt; </span><span style='font-weight: bold;'>tcl</span><span>         4.07% 
-#&gt; </span><span style='font-weight: bold;'>tv</span><span>          13.1% 
-#&gt; </span><span style='font-weight: bold;'>add.sd</span><span>            
-#&gt; </span><span style='font-weight: bold;'>wt.est</span><span>            
+#&gt;        <span style='font-weight: bold;'>Parameter</span><span>    </span><span style='font-weight: bold;'>Est.</span><span>      </span><span style='font-weight: bold;'>SE</span><span> </span><span style='font-weight: bold;'>%RSE</span><span>     </span><span style='font-weight: bold;'>Back-transformed(95%CI)</span><span> </span><span style='font-weight: bold;'>BSV(CV%)</span>
+#&gt; <span style='font-weight: bold;'>tka</span><span>       Log Ka   0.445   0.198 44.5            1.56 (1.06, 2.3)     72.4</span>
+#&gt; <span style='font-weight: bold;'>tcl</span><span>       Log Cl    1.02  0.0863 8.47           2.77 (2.34, 3.28)     28.0</span>
+#&gt; <span style='font-weight: bold;'>tv</span><span>         Log V    2.93   0.288 9.82             18.8 (10.7, 33)     10.7</span>
+#&gt; <span style='font-weight: bold;'>add.sd</span><span>             0.695                                    0.695         </span>
+#&gt; <span style='font-weight: bold;'>wt.est</span><span>           0.00735 0.00409 55.6 0.00735 (-0.000663, 0.0154)         </span>
+#&gt;        <span style='font-weight: bold;'>Shrink(SD)%</span>
+#&gt; <span style='font-weight: bold;'>tka</span><span>       </span><span style='color: #BB0000;font-weight: bold;'>-0.577%</span><span> </span>
+#&gt; <span style='font-weight: bold;'>tcl</span><span>         4.07% </span>
+#&gt; <span style='font-weight: bold;'>tv</span><span>          13.1% </span>
+#&gt; <span style='font-weight: bold;'>add.sd</span><span>            </span>
+#&gt; <span style='font-weight: bold;'>wt.est</span><span>            </span>
 #&gt;  
-#&gt;   Covariance Type (</span><span style='color: #0000BB;font-weight: bold;'>$covMethod</span><span>): </span><span style='font-weight: bold;'>linFim</span><span>
-#&gt;   Some strong fixed parameter correlations exist (</span><span style='color: #0000BB;font-weight: bold;'>$cor</span><span>) :
+#&gt;   Covariance Type (<span style='color: #0000BB;font-weight: bold;'>$covMethod</span><span>): </span><span style='font-weight: bold;'>linFim</span>
+#&gt;   Some strong fixed parameter correlations exist (<span style='color: #0000BB;font-weight: bold;'>$cor</span><span>) :</span>
 #&gt;        cor:tcl,tka     cor:tv,tka cor:wt.est,tka     cor:tv,tcl cor:wt.est,tcl 
 #&gt;       -0.0533          0.0175         0.00136         -0.0271         0.00821   
 #&gt;  cor:wt.est,tv 
-#&gt;        </span><span style='color: #BB0000;font-weight: bold;'>-0.991 </span><span> 
+#&gt;        <span style='color: #BB0000;font-weight: bold;'>-0.991 </span><span> </span>
 #&gt;  
 #&gt; 
 #&gt;   No correlations in between subject variability (BSV) matrix
-#&gt;   Full BSV covariance (</span><span style='color: #0000BB;font-weight: bold;'>$omega</span><span>) or correlation (</span><span style='color: #0000BB;font-weight: bold;'>$omegaR</span><span>; diagonals=SDs) 
-#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in </span><span style='color: #0000BB;font-weight: bold;'>$shrink</span><span> 
+#&gt;   Full BSV covariance (<span style='color: #0000BB;font-weight: bold;'>$omega</span><span>) or correlation (</span><span style='color: #0000BB;font-weight: bold;'>$omegaR</span><span>; diagonals=SDs) </span>
+#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in <span style='color: #0000BB;font-weight: bold;'>$shrink</span><span> </span>
 #&gt; 
-#&gt; ── </span><span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────
-#&gt; </span><span style='color: #949494;'># A tibble: 132 x 20</span><span>
+#&gt; ── <span style='font-weight: bold;'>Fit Data</span><span> (object is a modified </span><span style='color: #0000BB;'>tibble</span><span>): ─────────────────────────────────────</span>
+#&gt; <span style='color: #949494;'># A tibble: 132 x 20</span>
 #&gt;   ID     TIME    DV  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl  eta.v    cp
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1      0     0.74  0     0.74   0     0.74   1.06   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  0   
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 1      0.25  2.84  3.03 -</span><span style='color: #BB0000;'>0.190</span><span>  3.88 -</span><span style='color: #BB0000;'>1.04</span><span>  -</span><span style='color: #BB0000;'>1.50</span><span>   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  3.88
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> 1      0.57  6.57  5.44  1.13   6.80 -</span><span style='color: #BB0000;'>0.234</span><span> -</span><span style='color: #BB0000;'>0.337</span><span>  0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  6.80
-#&gt; </span><span style='color: #949494;'># … with 129 more rows, and 8 more variables: depot &lt;dbl&gt;, center &lt;dbl&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;, WT &lt;dbl&gt;</span><span></div><div class='input'>
+#&gt;   <span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span> 1      0     0.74  0     0.74   0     0.74   1.06   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  0   </span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span> 1      0.25  2.84  3.03 -</span><span style='color: #BB0000;'>0.190</span><span>  3.88 -</span><span style='color: #BB0000;'>1.04</span><span>  -</span><span style='color: #BB0000;'>1.50</span><span>   0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  3.88</span>
+#&gt; <span style='color: #BCBCBC;'>3</span><span> 1      0.57  6.57  5.44  1.13   6.80 -</span><span style='color: #BB0000;'>0.234</span><span> -</span><span style='color: #BB0000;'>0.337</span><span>  0.137 -</span><span style='color: #BB0000;'>0.497</span><span> -</span><span style='color: #BB0000;'>0.134</span><span>  6.80</span>
+#&gt; <span style='color: #949494;'># … with 129 more rows, and 8 more variables: depot &lt;dbl&gt;, center &lt;dbl&gt;,</span>
+#&gt; <span style='color: #949494;'>#   ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;, WT &lt;dbl&gt;</span></div><div class='input'>
 <span class='co'># }</span>
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -250,7 +250,7 @@
 <span class='va'>fit0</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlme_lin_cmpt.html'>nlme_lin_cmpt</a></span><span class='op'>(</span><span class='va'>dat</span>, par_model <span class='op'>=</span> <span class='va'>specs</span>, ncmt <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 <span class='va'>cv</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>lCL <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"WT"</span>, <span class='st'>"TG"</span><span class='op'>)</span>, lV <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"WT"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'>frwd_selection</span><span class='op'>(</span><span class='va'>fit0</span>, <span class='va'>cv</span>, <span class='va'>dat</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; covariate selection process:
+</div><div class='co'>#&gt; covariate selection process:
 #&gt; 
 #&gt; adding WT to lCL : p-val = 0.2094953
 #&gt; adding TG to lCL : p-val = 0.3052644
@@ -263,7 +263,7 @@
 #&gt; covariate selection finished.
 #&gt; 
 #&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Nonlinear mixed-effects model fit by maximum likelihood
+</div><div class='co'>#&gt; Nonlinear mixed-effects model fit by maximum likelihood
 #&gt;   Model: DV ~ (nlmixr::nlmeModList("user_fn"))(lCL, lV, lKA, TIME, ID) 
 #&gt;        AIC      BIC    logLik
 #&gt;   853.6537 878.6853 -419.8268

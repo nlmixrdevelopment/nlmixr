@@ -288,7 +288,7 @@
    d/dt(peri)  =              Q*C2 - Q*C3;
 "</span>
 <span class='va'>sys1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span>model <span class='op'>=</span> <span class='va'>ode</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'> </span></div><div class='input'>
+</div><div class='co'>#&gt;  </div><div class='input'>
 
 <span class='co'>## ------------------------------------------------------------------------</span>
 <span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='va'>invgaussian</span>
@@ -298,7 +298,7 @@
 <span class='va'>ev</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/eventTable.html'>eventTable</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='va'>ev</span><span class='op'>$</span><span class='fu'>add.sampling</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>dat</span><span class='op'>$</span><span class='va'>time</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>(</span><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'>dynmodel.mcmc</span><span class='op'>(</span><span class='va'>sys1</span>, <span class='va'>mod</span>, <span class='va'>ev</span>, <span class='va'>inits</span>, <span class='va'>dat</span>, <span class='va'>fixPars</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </div><div class='output co'>#&gt;              mean           sd       cv%
+</div><div class='co'>#&gt; </div><div class='co'>#&gt;              mean           sd       cv%
 #&gt; MIT  4.170892e+04 6.341609e+03 15.204444
 #&gt; CVI2 5.001683e-01 9.092042e-02 18.177964
 #&gt; F    8.446273e-01 5.838073e-02  6.912011

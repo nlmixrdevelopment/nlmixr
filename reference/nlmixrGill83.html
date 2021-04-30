@@ -304,7 +304,7 @@ is acceptable before issuing a warning/error about the gradient estimates.</p></
 <span class='co'>## simple gradients are assessed with nlmixrGill83</span>
 
 <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sin</span>, <span class='va'>pi</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Gill83 Derivative/Forward Difference
+</div><div class='co'>#&gt; Gill83 Derivative/Forward Difference
 #&gt;   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)
 #&gt; 
 #&gt;              info           hf         hphi df df2          err         aEps
@@ -312,7 +312,7 @@ is acceptable before issuing a warning/error about the gradient estimates.</p></
 #&gt;           rEps        aEpsC        rEpsC            f
 #&gt; 1 5.403504e-12 5.403504e-12 5.403504e-12 1.224647e-16</div><div class='input'>
 <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sin</span>, <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Gill83 Derivative/Forward Difference
+</div><div class='co'>#&gt; Gill83 Derivative/Forward Difference
 #&gt;   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)
 #&gt; 
 #&gt;                    info           hf         hphi         df           df2
@@ -353,7 +353,7 @@ is acceptable before issuing a warning/error about the gradient estimates.</p></
 #&gt; 11 -4.583242e-08</div><div class='input'>
 <span class='va'>func0</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>  <span class='op'>}</span>
 <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func0</span> , <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Gill83 Derivative/Forward Difference
+</div><div class='co'>#&gt; Gill83 Derivative/Forward Difference
 #&gt;   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)
 #&gt; 
 #&gt;                    info           hf         hphi         df          df2
@@ -399,12 +399,12 @@ is acceptable before issuing a warning/error about the gradient estimates.</p></
 <span class='va'>numd1</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func1</span>, <span class='va'>x</span><span class='op'>)</span>
 <span class='va'>exact</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>x</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span>, <span class='va'>exact</span>, <span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span> <span class='op'>-</span> <span class='va'>exact</span><span class='op'>)</span><span class='op'>/</span><span class='va'>exact</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1]  0.332398077  0.333537144 -0.003415112</div><div class='input'>
+</div><div class='co'>#&gt; [1]  0.332398077  0.333537144 -0.003415112</div><div class='input'>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
 <span class='va'>numd1</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func1</span>, <span class='va'>x</span><span class='op'>)</span>
 <span class='va'>exact</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>x</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span>numd1<span class='op'>=</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span>, <span class='va'>exact</span>, err<span class='op'>=</span><span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span> <span class='op'>-</span> <span class='va'>exact</span><span class='op'>)</span><span class='op'>/</span><span class='va'>exact</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;           numd1     exact           err
+</div><div class='co'>#&gt;           numd1     exact           err
 #&gt;  [1,] -8.022836 -8.022836 -1.369260e-11
 #&gt;  [2,]  4.216156  4.216156 -2.839580e-11
 #&gt;  [3,]  1.592302  1.592302 -1.150871e-11
@@ -431,7 +431,7 @@ is acceptable before issuing a warning/error about the gradient estimates.</p></
 <span class='va'>g</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sc2.f</span>, <span class='va'>x0</span><span class='op'>)</span>
 
 <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>exact</span> <span class='op'>-</span> <span class='va'>g</span><span class='op'>$</span><span class='va'>df</span><span class='op'>)</span><span class='op'>/</span><span class='op'>(</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>exact</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0.0009866562</div><div class='input'>
+</div><div class='co'>#&gt; [1] 0.001073949</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
