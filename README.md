@@ -13,6 +13,7 @@ output: github_document
 [![Codecov test coverage](https://codecov.io/gh/nlmixrdevelopment/nlmixr/branch/master/graph/badge.svg)](https://codecov.io/gh/nlmixrdevelopment/nlmixr?branch=master)
 [![CRAN checks](https://cranchecks.info/badges/summary/nlmixr)](https://cran.r-project.org/web/checks/check_results_nlmixr.html)
 [![CRAN total downloads](https://cranlogs.r-pkg.org/badges/grand-total/nlmixr)](https://cran.r-project.org/package=nlmixr)
+[![CRAN monthly downloads](https://cranlogs.r-pkg.org/badges/nlmixr)](https://cran.r-project.org/package=nlmixr)
 <!-- badges: end -->
 
 ***
