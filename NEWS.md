@@ -1,6 +1,10 @@
 # nlmixr 2.0.4.1 (Development version)
 
+- Fix for `nlmixrSim` CMT to have a factor that matches the `RxODE`
+  definition (issue #501)
+
 # nlmixr 2.0.4
+
 - Now can use the following for combinde error models:
   `foceiControl(addProp=1)` `foceiControl(addProp=2)`
   `saemControl(addProp=1)` `saemControl(addProp=2)`
