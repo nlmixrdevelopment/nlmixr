@@ -299,140 +299,147 @@ is acceptable before issuing a warning/error about the gradient estimates.</p></
     <p>Matthew Fidler</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'>## These are taken from the numDeriv::grad examples to show how</span>
-<span class='co'>## simple gradients are assessed with nlmixrGill83</span>
-
-<span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sin</span>, <span class='va'>pi</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Gill83 Derivative/Forward Difference
-#&gt;   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)
-#&gt; 
-#&gt;              info           hf         hphi df df2          err         aEps
-#&gt; 1 Odd/Linear Grad 2.237911e-11 1.118956e-11 -1   0 1.630865e-13 5.403504e-12
-#&gt;           rEps        aEpsC        rEpsC            f
-#&gt; 1 5.403504e-12 5.403504e-12 5.403504e-12 1.224647e-16</div><div class='input'>
-<span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sin</span>, <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Gill83 Derivative/Forward Difference
-#&gt;   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)
-#&gt; 
-#&gt;                    info           hf         hphi         df           df2
-#&gt; 1  Grad changes quickly 1.045337e-07 5.226686e-08  1.0000000  8.796093e+12
-#&gt; 2  Grad changes quickly 1.702142e-07 8.510710e-08  0.8090170  4.254583e+19
-#&gt; 3  Grad changes quickly 2.358947e-07 1.179473e-07  0.3090168  3.584264e+19
-#&gt; 4  Grad changes quickly 3.015752e-07 1.507876e-07 -0.3090171  2.193033e+19
-#&gt; 5  Grad changes quickly 3.672556e-07 1.836278e-07 -0.8090173  9.139274e+18
-#&gt; 6  Grad changes quickly 4.329361e-07 2.164681e-07 -1.0000004  7.692125e+11
-#&gt; 7  Grad changes quickly 4.986166e-07 2.493083e-07 -0.8090174 -4.958098e+18
-#&gt; 8  Grad changes quickly 5.642971e-07 2.821485e-07 -0.3090169 -6.263551e+18
-#&gt; 9  Grad changes quickly 6.299776e-07 3.149888e-07  0.3090172 -5.025578e+18
-#&gt; 10 Grad changes quickly 6.956580e-07 3.478290e-07  0.8090169 -2.547164e+18
-#&gt; 11                 Good 2.441411e-04 7.796106e-04  1.0000000  4.583226e-08
-#&gt;             err         aEps         rEps        aEpsC        rEpsC
-#&gt; 1  4.597442e+05 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 2  3.620952e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 3  4.227544e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 4  3.306821e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 5  1.678225e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 6  1.665099e+05 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 7  1.236095e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 8  1.767252e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 9  1.583001e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 10 8.859777e+11 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07
-#&gt; 11 1.118954e-11 3.352119e-05 3.352119e-05 3.352119e-05 3.352119e-05
-#&gt;                f
-#&gt; 1  -4.583242e-08
-#&gt; 2  -4.583242e-08
-#&gt; 3  -4.583242e-08
-#&gt; 4  -4.583242e-08
-#&gt; 5  -4.583242e-08
-#&gt; 6  -4.583242e-08
-#&gt; 7  -4.583242e-08
-#&gt; 8  -4.583242e-08
-#&gt; 9  -4.583242e-08
-#&gt; 10 -4.583242e-08
-#&gt; 11 -4.583242e-08</div><div class='input'>
-<span class='va'>func0</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>  <span class='op'>}</span>
-<span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func0</span> , <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Gill83 Derivative/Forward Difference
-#&gt;   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)
-#&gt; 
-#&gt;                    info           hf         hphi         df          df2
-#&gt; 1  Grad changes quickly 7.391651e-08 3.695825e-08  1.0000000 1.203250e+17
-#&gt; 2  Grad changes quickly 1.203596e-07 6.017981e-08  0.8090168 4.538135e+16
-#&gt; 3  Grad changes quickly 1.668027e-07 8.340136e-08  0.3090166 2.362831e+16
-#&gt; 4  Grad changes quickly 2.132458e-07 1.066229e-07 -0.3090170 1.445699e+16
-#&gt; 5  Grad changes quickly 2.596889e-07 1.298445e-07 -0.8090170 9.748364e+15
-#&gt; 6       Odd/Linear Grad 3.061321e-07 1.530660e-07 -1.0000000 0.000000e+00
-#&gt; 7       High Grad Error 4.821089e-08 3.525752e-07 -0.8090170 5.876689e-01
-#&gt; 8       High Grad Error 3.788199e-08 3.990183e-07 -0.3090170 9.518254e-01
-#&gt; 9                  Good 3.789588e-08 4.454614e-07  0.3090170 9.511281e-01
-#&gt; 10                 Good 4.818847e-08 4.919045e-07  0.8090170 5.882158e-01
-#&gt; 11                 Good 1.726341e-04 5.512680e-04  1.0000000 4.583208e-08
-#&gt;             err         aEps         rEps        aEpsC        rEpsC
-#&gt; 1  4.447003e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08
-#&gt; 2  2.731041e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08
-#&gt; 3  1.970634e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08
-#&gt; 4  1.541446e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08
-#&gt; 5  1.265771e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08
-#&gt; 6  2.230920e-09 7.392210e-08 7.392210e-08 7.392210e-08 7.392210e-08
-#&gt; 7  2.833204e-08 1.010729e-08 1.010729e-08 1.010729e-08 1.010729e-08
-#&gt; 8  3.605704e-08 7.017484e-09 7.017484e-09 7.017484e-09 7.017484e-09
-#&gt; 9  3.604383e-08 6.288156e-09 6.288156e-09 6.288156e-09 6.288156e-09
-#&gt; 10 2.834522e-08 7.241087e-09 7.241087e-09 7.241087e-09 7.241087e-09
-#&gt; 11 7.912182e-12 2.370311e-05 2.370311e-05 2.370311e-05 2.370311e-05
-#&gt;                f
-#&gt; 1  -2.291621e-08
-#&gt; 2  -2.291621e-08
-#&gt; 3  -2.291621e-08
-#&gt; 4  -2.291621e-08
-#&gt; 5  -2.291621e-08
-#&gt; 6  -2.291621e-08
-#&gt; 7  -2.291621e-08
-#&gt; 8  -2.291621e-08
-#&gt; 9  -2.291621e-08
-#&gt; 10 -2.291621e-08
-#&gt; 11 -2.291621e-08</div><div class='input'>
-<span class='va'>func1</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>}</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/curve.html'>curve</a></span><span class='op'>(</span><span class='va'>func1</span>,from<span class='op'>=</span><span class='fl'>0</span>,to<span class='op'>=</span><span class='fl'>5</span><span class='op'>)</span>
-</div><div class='img'><img src='nlmixrGill83-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fl'>2.04</span>
-<span class='va'>numd1</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func1</span>, <span class='va'>x</span><span class='op'>)</span>
-<span class='va'>exact</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>x</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span>, <span class='va'>exact</span>, <span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span> <span class='op'>-</span> <span class='va'>exact</span><span class='op'>)</span><span class='op'>/</span><span class='va'>exact</span><span class='op'>)</span>
-</div><div class='co'>#&gt; [1]  0.332398077  0.333537144 -0.003415112</div><div class='input'>
-<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>
-<span class='va'>numd1</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func1</span>, <span class='va'>x</span><span class='op'>)</span>
-<span class='va'>exact</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>x</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span>numd1<span class='op'>=</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span>, <span class='va'>exact</span>, err<span class='op'>=</span><span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span> <span class='op'>-</span> <span class='va'>exact</span><span class='op'>)</span><span class='op'>/</span><span class='va'>exact</span><span class='op'>)</span>
-</div><div class='co'>#&gt;           numd1     exact           err
-#&gt;  [1,] -8.022836 -8.022836 -1.369260e-11
-#&gt;  [2,]  4.216156  4.216156 -2.839580e-11
-#&gt;  [3,]  1.592302  1.592302 -1.150871e-11
-#&gt;  [4,] -6.651065 -6.651065 -4.125002e-11
-#&gt;  [5,]  9.656398  9.656398 -5.172856e-11
-#&gt;  [6,] -9.521651 -9.521651  2.985064e-10
-#&gt;  [7,]  6.334104  6.334104 -8.697948e-11
-#&gt;  [8,] -1.103537 -1.103537 -9.731425e-11
-#&gt;  [9,] -4.480613 -4.480613 -1.320695e-10
-#&gt; [10,]  8.623852  8.623234  7.167430e-05</div><div class='input'>
-<span class='va'>sc2.f</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span>
-  <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-   <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>n</span><span class='op'>)</span> <span class='op'>*</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>-</span> <span class='va'>x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>/</span> <span class='va'>n</span>
-<span class='op'>}</span>
-
-<span class='va'>sc2.g</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span>
-  <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-  <span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>n</span><span class='op'>)</span> <span class='op'>*</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span><span class='op'>)</span> <span class='op'>/</span> <span class='va'>n</span>
-<span class='op'>}</span>
-
-<span class='va'>x0</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span>
-<span class='va'>exact</span> <span class='op'>&lt;-</span> <span class='fu'>sc2.g</span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span>
-
-<span class='va'>g</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sc2.f</span>, <span class='va'>x0</span><span class='op'>)</span>
-
-<span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>exact</span> <span class='op'>-</span> <span class='va'>g</span><span class='op'>$</span><span class='va'>df</span><span class='op'>)</span><span class='op'>/</span><span class='op'>(</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>exact</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='co'>#&gt; [1] 0.001073949</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='co'>## These are taken from the numDeriv::grad examples to show how</span></span>
+<span class='r-in'><span class='co'>## simple gradients are assessed with nlmixrGill83</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sin</span>, <span class='va'>pi</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Gill83 Derivative/Forward Difference</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>              info           hf         hphi df df2          err         aEps</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 Odd/Linear Grad 2.237911e-11 1.118956e-11 -1   0 1.630865e-13 5.403504e-12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>           rEps        aEpsC        rEpsC            f</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 5.403504e-12 5.403504e-12 5.403504e-12 1.224647e-16</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sin</span>, <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Gill83 Derivative/Forward Difference</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                    info           hf         hphi         df           df2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1  Grad changes quickly 1.045337e-07 5.226686e-08  1.0000000  8.796093e+12</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  Grad changes quickly 1.702142e-07 8.510710e-08  0.8090170  4.254583e+19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3  Grad changes quickly 2.358947e-07 1.179473e-07  0.3090168  3.584264e+19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4  Grad changes quickly 3.015752e-07 1.507876e-07 -0.3090171  2.193033e+19</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5  Grad changes quickly 3.672556e-07 1.836278e-07 -0.8090173  9.139274e+18</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6  Grad changes quickly 4.329361e-07 2.164681e-07 -1.0000004  7.692125e+11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7  Grad changes quickly 4.986166e-07 2.493083e-07 -0.8090174 -4.958098e+18</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8  Grad changes quickly 5.642971e-07 2.821485e-07 -0.3090169 -6.263551e+18</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9  Grad changes quickly 6.299776e-07 3.149888e-07  0.3090172 -5.025578e+18</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10 Grad changes quickly 6.956580e-07 3.478290e-07  0.8090169 -2.547164e+18</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11                 Good 2.441411e-04 7.796106e-04  1.0000000  4.583226e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             err         aEps         rEps        aEpsC        rEpsC</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1  4.597442e+05 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  3.620952e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3  4.227544e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4  3.306821e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5  1.678225e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6  1.665099e+05 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7  1.236095e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8  1.767252e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9  1.583001e+12 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10 8.859777e+11 1.045337e-07 1.045337e-07 1.045337e-07 1.045337e-07</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11 1.118954e-11 3.352119e-05 3.352119e-05 3.352119e-05 3.352119e-05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                f</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9  -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10 -4.583242e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11 -4.583242e-08</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>func0</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>  <span class='op'>}</span></span>
+<span class='r-in'><span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func0</span> , <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Gill83 Derivative/Forward Difference</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   (rtol=1.49011611938477e-08; K=10, step=2, ftol=0)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                    info           hf         hphi         df          df2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1  Grad changes quickly 7.391651e-08 3.695825e-08  1.0000000 1.203250e+17</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  Grad changes quickly 1.203596e-07 6.017981e-08  0.8090168 4.538135e+16</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3  Grad changes quickly 1.668027e-07 8.340136e-08  0.3090166 2.362831e+16</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4  Grad changes quickly 2.132458e-07 1.066229e-07 -0.3090170 1.445699e+16</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5  Grad changes quickly 2.596889e-07 1.298445e-07 -0.8090170 9.748364e+15</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6       Odd/Linear Grad 3.061321e-07 1.530660e-07 -1.0000000 0.000000e+00</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7       High Grad Error 4.821089e-08 3.525752e-07 -0.8090170 5.876689e-01</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8       High Grad Error 3.788199e-08 3.990183e-07 -0.3090170 9.518254e-01</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9                  Good 3.789588e-08 4.454614e-07  0.3090170 9.511281e-01</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10                 Good 4.818847e-08 4.919045e-07  0.8090170 5.882158e-01</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11                 Good 1.726341e-04 5.512680e-04  1.0000000 4.583208e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             err         aEps         rEps        aEpsC        rEpsC</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1  4.447003e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  2.731041e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3  1.970634e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4  1.541446e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5  1.265771e+09 7.391651e-08 7.391651e-08 7.391651e-08 7.391651e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6  2.230920e-09 7.392210e-08 7.392210e-08 7.392210e-08 7.392210e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7  2.833204e-08 1.010729e-08 1.010729e-08 1.010729e-08 1.010729e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8  3.605704e-08 7.017484e-09 7.017484e-09 7.017484e-09 7.017484e-09</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9  3.604383e-08 6.288156e-09 6.288156e-09 6.288156e-09 6.288156e-09</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10 2.834522e-08 7.241087e-09 7.241087e-09 7.241087e-09 7.241087e-09</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11 7.912182e-12 2.370311e-05 2.370311e-05 2.370311e-05 2.370311e-05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                f</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9  -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10 -2.291621e-08</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11 -2.291621e-08</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>func1</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>}</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/curve.html'>curve</a></span><span class='op'>(</span><span class='va'>func1</span>,from<span class='op'>=</span><span class='fl'>0</span>,to<span class='op'>=</span><span class='fl'>5</span><span class='op'>)</span></span>
+<span class='r-plt'><img src='nlmixrGill83-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fl'>2.04</span></span>
+<span class='r-in'><span class='va'>numd1</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func1</span>, <span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>exact</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span>, <span class='va'>exact</span>, <span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span> <span class='op'>-</span> <span class='va'>exact</span><span class='op'>)</span><span class='op'>/</span><span class='va'>exact</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1]  0.332398077  0.333537144 -0.003415112</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>numd1</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>func1</span>, <span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>exact</span> <span class='op'>&lt;-</span> <span class='fl'>10</span><span class='op'>*</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>cos</a></span><span class='op'>(</span><span class='fl'>10</span><span class='op'>*</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span>numd1<span class='op'>=</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span>, <span class='va'>exact</span>, err<span class='op'>=</span><span class='op'>(</span><span class='va'>numd1</span><span class='op'>$</span><span class='va'>df</span> <span class='op'>-</span> <span class='va'>exact</span><span class='op'>)</span><span class='op'>/</span><span class='va'>exact</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>           numd1     exact           err</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1,] -8.022836 -8.022836 -1.369260e-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [2,]  4.216156  4.216156 -2.839580e-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [3,]  1.592302  1.592302 -1.150871e-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [4,] -6.651065 -6.651065 -4.125002e-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [5,]  9.656398  9.656398 -5.172856e-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [6,] -9.521651 -9.521651  2.985064e-10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7,]  6.334104  6.334104 -8.697948e-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [8,] -1.103537 -1.103537 -9.731425e-11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [9,] -4.480613 -4.480613 -1.320695e-10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [10,]  8.623852  8.623234  7.167430e-05</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>sc2.f</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-in'>   <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>n</span><span class='op'>)</span> <span class='op'>*</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>-</span> <span class='va'>x</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>/</span> <span class='va'>n</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>sc2.g</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>n</span><span class='op'>)</span> <span class='op'>*</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Log.html'>exp</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>1</span><span class='op'>)</span> <span class='op'>/</span> <span class='va'>n</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>x0</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>exact</span> <span class='op'>&lt;-</span> <span class='fu'>sc2.g</span><span class='op'>(</span><span class='va'>x0</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>g</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sc2.f</span>, <span class='va'>x0</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>exact</span> <span class='op'>-</span> <span class='va'>g</span><span class='op'>$</span><span class='va'>df</span><span class='op'>)</span><span class='op'>/</span><span class='op'>(</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>exact</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.001125715</span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

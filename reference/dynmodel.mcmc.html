@@ -270,42 +270,45 @@
     <p>Wenping Wang</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-
-<span class='va'>ode</span> <span class='op'>&lt;-</span> <span class='st'>"
-   dose=200;
-   pi = 3.1415926535897931;
-
-   if (t&lt;=0) {
-      fI = 0;
-   } else {
-      fI = F*dose*sqrt(MIT/(2.0*pi*CVI2*t^3))*exp(-(t-MIT)^2/(2.0*CVI2*MIT*t));
-   }
-
-   C2 = centr/V2;
-   C3 = peri/V3;
-   d/dt(centr) = fI - CL*C2 - Q*C2 + Q*C3;
-   d/dt(peri)  =              Q*C2 - Q*C3;
-"</span>
-<span class='va'>sys1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span>model <span class='op'>=</span> <span class='va'>ode</span><span class='op'>)</span>
-</div><div class='co'>#&gt;  </div><div class='input'>
-
-<span class='co'>## ------------------------------------------------------------------------</span>
-<span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='va'>invgaussian</span>
-<span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='va'>cp</span> <span class='op'>~</span> <span class='va'>C2</span> <span class='op'>+</span> <span class='fu'>prop</span><span class='op'>(</span><span class='fl'>.1</span><span class='op'>)</span>
-<span class='va'>inits</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>MIT <span class='op'>=</span> <span class='fl'>190</span>, CVI2 <span class='op'>=</span> <span class='fl'>.65</span>, F <span class='op'>=</span> <span class='fl'>.92</span><span class='op'>)</span>
-<span class='va'>fixPars</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>CL <span class='op'>=</span> <span class='fl'>.0793</span>, V2 <span class='op'>=</span> <span class='fl'>.64</span>, Q <span class='op'>=</span> <span class='fl'>.292</span>, V3 <span class='op'>=</span> <span class='fl'>9.63</span><span class='op'>)</span>
-<span class='va'>ev</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/eventTable.html'>eventTable</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='va'>ev</span><span class='op'>$</span><span class='fu'>add.sampling</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>dat</span><span class='op'>$</span><span class='va'>time</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>(</span><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'>dynmodel.mcmc</span><span class='op'>(</span><span class='va'>sys1</span>, <span class='va'>mod</span>, <span class='va'>ev</span>, <span class='va'>inits</span>, <span class='va'>dat</span>, <span class='va'>fixPars</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='co'>#&gt; </div><div class='co'>#&gt;              mean           sd       cv%
-#&gt; MIT  4.170892e+04 6.341609e+03 15.204444
-#&gt; CVI2 5.001683e-01 9.092042e-02 18.177964
-#&gt; F    8.446273e-01 5.838073e-02  6.912011
-#&gt; err1 1.092145e-02 6.184806e-03 56.629925
-#&gt; 
-#&gt; # samples: 500 </div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>ode</span> <span class='op'>&lt;-</span> <span class='st'>"</span>
+<span class='r-in'>   dose=200;</span>
+<span class='r-in'>   pi = 3.1415926535897931;</span>
+<span class='r-in'></span>
+<span class='r-in'>   if (t&lt;=0) {</span>
+<span class='r-in'>      fI = 0;</span>
+<span class='r-in'>   } else {</span>
+<span class='r-in'>      fI = F*dose*sqrt(MIT/(2.0*pi*CVI2*t^3))*exp(-(t-MIT)^2/(2.0*CVI2*MIT*t));</span>
+<span class='r-in'>   }</span>
+<span class='r-in'></span>
+<span class='r-in'>   C2 = centr/V2;</span>
+<span class='r-in'>   C3 = peri/V3;</span>
+<span class='r-in'>   d/dt(centr) = fI - CL*C2 - Q*C2 + Q*C3;</span>
+<span class='r-in'>   d/dt(peri)  =              Q*C2 - Q*C3;</span>
+<span class='r-in'>"</span></span>
+<span class='r-in'><span class='va'>sys1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/RxODE.html'>RxODE</a></span><span class='op'>(</span>model <span class='op'>=</span> <span class='va'>ode</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  </span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ------------------------------------------------------------------------</span></span>
+<span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='va'>invgaussian</span></span>
+<span class='r-in'><span class='va'>mod</span> <span class='op'>&lt;-</span> <span class='va'>cp</span> <span class='op'>~</span> <span class='va'>C2</span> <span class='op'>+</span> <span class='fu'>prop</span><span class='op'>(</span><span class='fl'>.1</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>inits</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>MIT <span class='op'>=</span> <span class='fl'>190</span>, CVI2 <span class='op'>=</span> <span class='fl'>.65</span>, F <span class='op'>=</span> <span class='fl'>.92</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>fixPars</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>CL <span class='op'>=</span> <span class='fl'>.0793</span>, V2 <span class='op'>=</span> <span class='fl'>.64</span>, Q <span class='op'>=</span> <span class='fl'>.292</span>, V3 <span class='op'>=</span> <span class='fl'>9.63</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>ev</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/eventTable.html'>eventTable</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>ev</span><span class='op'>$</span><span class='fu'>add.sampling</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='va'>dat</span><span class='op'>$</span><span class='va'>time</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>(</span><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'>dynmodel.mcmc</span><span class='op'>(</span><span class='va'>sys1</span>, <span class='va'>mod</span>, <span class='va'>ev</span>, <span class='va'>inits</span>, <span class='va'>dat</span>, <span class='va'>fixPars</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>              mean           sd       cv%</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> MIT  4.170892e+04 6.341609e+03 15.204444</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> CVI2 5.001683e-01 9.092042e-02 18.177964</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> F    8.446273e-01 5.838073e-02  6.912011</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> err1 1.092145e-02 6.184806e-03 56.629925</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> # samples: 500 </span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

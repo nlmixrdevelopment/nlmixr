@@ -246,48 +246,50 @@
     <p>Called for its side effects of creating a VPC</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>specs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed<span class='op'>=</span><span class='va'>lKA</span><span class='op'>+</span><span class='va'>lCL</span><span class='op'>+</span><span class='va'>lV</span><span class='op'>~</span><span class='fl'>1</span>, random <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/nlme/man/pdDiag.html'>pdDiag</a></span><span class='op'>(</span><span class='va'>lKA</span><span class='op'>+</span><span class='va'>lCL</span><span class='op'>~</span><span class='fl'>1</span><span class='op'>)</span>, start<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>lKA<span class='op'>=</span><span class='fl'>0.5</span>, lCL<span class='op'>=</span><span class='op'>-</span><span class='fl'>3.2</span>, lV<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlme_lin_cmpt.html'>nlme_lin_cmpt</a></span><span class='op'>(</span><span class='va'>theo_md</span>, par_model<span class='op'>=</span><span class='va'>specs</span>, ncmt<span class='op'>=</span><span class='fl'>1</span>, verbose<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='co'>#&gt; 
-#&gt; **Iteration 1
-#&gt; LME step: Loglik: -420.4062, nlminb iterations: 1
-#&gt; reStruct  parameters:
-#&gt;      ID1      ID2 
-#&gt; 5.434250 5.693011 
-#&gt;  Beginning PNLS step: ..  completed fit_nlme() step.
-#&gt; PNLS step: RSS =  300.8155 
-#&gt;  fixed effects: 0.2384012  1.057595  3.395177  
-#&gt;  iterations: 7 
-#&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):
-#&gt;    fixed reStruct 
-#&gt; 4.025732 4.507369 
-#&gt; 
-#&gt; **Iteration 2
-#&gt; LME step: Loglik: -422.6508, nlminb iterations: 5
-#&gt; reStruct  parameters:
-#&gt;       ID1       ID2 
-#&gt; 0.9829978 1.4302117 
-#&gt;  Beginning PNLS step: ..  completed fit_nlme() step.
-#&gt; PNLS step: RSS =  300.5795 
-#&gt;  fixed effects: 0.2352729  1.058965  3.393164  
-#&gt;  iterations: 3 
-#&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):
-#&gt;       fixed    reStruct 
-#&gt; 0.013296459 0.004640789 
-#&gt; 
-#&gt; **Iteration 3
-#&gt; LME step: Loglik: -422.666, nlminb iterations: 1
-#&gt; reStruct  parameters:
-#&gt;       ID1       ID2 
-#&gt; 0.9821654 1.4298669 
-#&gt;  Beginning PNLS step: ..  completed fit_nlme() step.
-#&gt; PNLS step: RSS =  300.5795 
-#&gt;  fixed effects: 0.2352729  1.058965  3.393164  
-#&gt;  iterations: 1 
-#&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):
-#&gt;    fixed reStruct 
-#&gt;        0        0 </div><div class='input'><span class='fu'>vpc_nlmixr_nlme</span><span class='op'>(</span><span class='va'>fit</span>, nsim <span class='op'>=</span> <span class='fl'>100</span>, condition <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
-</div><div class='img'><img src='vpc_nlmixr_nlme-1.png' alt='' width='700' height='433' /></div></pre>
+    <pre class="examples"><span class='r-in'><span class='va'>specs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed<span class='op'>=</span><span class='va'>lKA</span><span class='op'>+</span><span class='va'>lCL</span><span class='op'>+</span><span class='va'>lV</span><span class='op'>~</span><span class='fl'>1</span>, random <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/nlme/man/pdDiag.html'>pdDiag</a></span><span class='op'>(</span><span class='va'>lKA</span><span class='op'>+</span><span class='va'>lCL</span><span class='op'>~</span><span class='fl'>1</span><span class='op'>)</span>, start<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>lKA<span class='op'>=</span><span class='fl'>0.5</span>, lCL<span class='op'>=</span><span class='op'>-</span><span class='fl'>3.2</span>, lV<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlme_lin_cmpt.html'>nlme_lin_cmpt</a></span><span class='op'>(</span><span class='va'>theo_md</span>, par_model<span class='op'>=</span><span class='va'>specs</span>, ncmt<span class='op'>=</span><span class='fl'>1</span>, verbose<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> **Iteration 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> LME step: Loglik: -420.4062, nlminb iterations: 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> reStruct  parameters:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      ID1      ID2 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5.434250 5.693011 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  Beginning PNLS step: ..  completed fit_nlme() step.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> PNLS step: RSS =  300.8155 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  fixed effects: 0.2384012  1.057595  3.395177  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  iterations: 7 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Convergence crit. (must all become &lt;= tolerance = 1e-05):</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    fixed reStruct </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4.025732 4.507369 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> **Iteration 2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> LME step: Loglik: -422.6508, nlminb iterations: 5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> reStruct  parameters:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       ID1       ID2 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 0.9829978 1.4302117 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  Beginning PNLS step: ..  completed fit_nlme() step.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> PNLS step: RSS =  300.5795 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  fixed effects: 0.2352729  1.058965  3.393164  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  iterations: 3 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Convergence crit. (must all become &lt;= tolerance = 1e-05):</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       fixed    reStruct </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 0.013296459 0.004640789 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> **Iteration 3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> LME step: Loglik: -422.666, nlminb iterations: 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> reStruct  parameters:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       ID1       ID2 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 0.9821654 1.4298669 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  Beginning PNLS step: ..  completed fit_nlme() step.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> PNLS step: RSS =  300.5795 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  fixed effects: 0.2352729  1.058965  3.393164  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  iterations: 1 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Convergence crit. (must all become &lt;= tolerance = 1e-05):</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    fixed reStruct </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        0        0 </span>
+<span class='r-in'><span class='fu'>vpc_nlmixr_nlme</span><span class='op'>(</span><span class='va'>fit</span>, nsim <span class='op'>=</span> <span class='fl'>100</span>, condition <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></span>
+<span class='r-plt'><img src='vpc_nlmixr_nlme-1.png' alt='' width='700' height='433' /></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

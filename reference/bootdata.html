@@ -225,30 +225,32 @@
     <p>Bootstrapped data</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='va'>specs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed <span class='op'>=</span> <span class='va'>lKA</span> <span class='op'>+</span> <span class='va'>lCL</span> <span class='op'>+</span> <span class='va'>lV</span> <span class='op'>~</span> <span class='fl'>1</span>,
-  random <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/nlme/man/pdDiag.html'>pdDiag</a></span><span class='op'>(</span><span class='va'>lKA</span> <span class='op'>+</span> <span class='va'>lCL</span> <span class='op'>~</span> <span class='fl'>1</span><span class='op'>)</span>,
-  start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>lKA <span class='op'>=</span> <span class='fl'>0.5</span>, lCL <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3.2</span>, lV <span class='op'>=</span> <span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>99</span><span class='op'>)</span>
-<span class='va'>nboot</span> <span class='op'>&lt;-</span> <span class='fl'>5</span>
-<span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"generating"</span>, <span class='va'>nboot</span>, <span class='st'>"bootstrap samples...\n"</span><span class='op'>)</span>
-</div><div class='co'>#&gt; generating 5 bootstrap samples...</div><div class='input'><span class='va'>cmat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='va'>nboot</span>, <span class='fl'>3</span><span class='op'>)</span>
-<span class='kw'>for</span> <span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='va'>nboot</span><span class='op'>)</span>
-<span class='op'>{</span>
-  <span class='co'># print(i)</span>
-  <span class='va'>bd</span> <span class='op'>&lt;-</span> <span class='fu'>bootdata</span><span class='op'>(</span><span class='va'>theo_md</span><span class='op'>)</span>
-  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlme_lin_cmpt.html'>nlme_lin_cmpt</a></span><span class='op'>(</span><span class='va'>bd</span>, par_model <span class='op'>=</span> <span class='va'>specs</span>, ncmt <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-  <span class='va'>cmat</span><span class='op'>[</span><span class='va'>i</span>, <span class='op'>]</span> <span class='op'>&lt;-</span> <span class='va'>fit</span><span class='op'>$</span><span class='va'>coefficients</span><span class='op'>$</span><span class='va'>fixed</span>
-<span class='op'>}</span>
-<span class='fu'><a href='https://rdrr.io/r/base/dimnames.html'>dimnames</a></span><span class='op'>(</span><span class='va'>cmat</span><span class='op'>)</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>$</span><span class='va'>coefficients</span><span class='op'>$</span><span class='va'>fixed</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>cmat</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='co'>#&gt;              lKA      lCL       lV
-#&gt; [1,]  0.05306154 1.075381 3.386794
-#&gt; [2,]  0.11497193 1.128515 3.420884
-#&gt; [3,] -0.12557957 1.058856 3.339239
-#&gt; [4,]  0.26477968 1.082458 3.410182
-#&gt; [5,]  0.42716266 1.191098 3.533160</div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+<span class='r-in'><span class='va'>specs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed <span class='op'>=</span> <span class='va'>lKA</span> <span class='op'>+</span> <span class='va'>lCL</span> <span class='op'>+</span> <span class='va'>lV</span> <span class='op'>~</span> <span class='fl'>1</span>,</span>
+<span class='r-in'>  random <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/nlme/man/pdDiag.html'>pdDiag</a></span><span class='op'>(</span><span class='va'>lKA</span> <span class='op'>+</span> <span class='va'>lCL</span> <span class='op'>~</span> <span class='fl'>1</span><span class='op'>)</span>,</span>
+<span class='r-in'>  start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>lKA <span class='op'>=</span> <span class='fl'>0.5</span>, lCL <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3.2</span>, lV <span class='op'>=</span> <span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>99</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>nboot</span> <span class='op'>&lt;-</span> <span class='fl'>5</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"generating"</span>, <span class='va'>nboot</span>, <span class='st'>"bootstrap samples...\n"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> generating 5 bootstrap samples...</span>
+<span class='r-in'><span class='va'>cmat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='va'>nboot</span>, <span class='fl'>3</span><span class='op'>)</span></span>
+<span class='r-in'><span class='kw'>for</span> <span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='va'>nboot</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>{</span></span>
+<span class='r-in'>  <span class='co'># print(i)</span></span>
+<span class='r-in'>  <span class='va'>bd</span> <span class='op'>&lt;-</span> <span class='fu'>bootdata</span><span class='op'>(</span><span class='va'>theo_md</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlme_lin_cmpt.html'>nlme_lin_cmpt</a></span><span class='op'>(</span><span class='va'>bd</span>, par_model <span class='op'>=</span> <span class='va'>specs</span>, ncmt <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>cmat</span><span class='op'>[</span><span class='va'>i</span>, <span class='op'>]</span> <span class='op'>&lt;-</span> <span class='va'>fit</span><span class='op'>$</span><span class='va'>coefficients</span><span class='op'>$</span><span class='va'>fixed</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/dimnames.html'>dimnames</a></span><span class='op'>(</span><span class='va'>cmat</span><span class='op'>)</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>$</span><span class='va'>coefficients</span><span class='op'>$</span><span class='va'>fixed</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>cmat</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>              lKA      lCL       lV</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,]  0.05306154 1.075381 3.386794</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,]  0.11497193 1.128515 3.420884</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3,] -0.12557957 1.058856 3.339239</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [4,]  0.26477968 1.082458 3.410182</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [5,]  0.42716266 1.191098 3.533160</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

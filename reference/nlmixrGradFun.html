@@ -313,54 +313,63 @@ evaluations.</p></td>
   functions.  This is an internal module used with dynmodel</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='va'>func0</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>  <span class='op'>}</span>
-
-<span class='co'>## This will printout every interation or when print=X</span>
-<span class='va'>gf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixrGradFun.html'>nlmixrGradFun</a></span><span class='op'>(</span><span class='va'>func0</span><span class='op'>)</span>
-
-<span class='co'>## x</span>
-<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span>;
-<span class='va'>gf</span><span class='op'>$</span><span class='fu'>eval</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-</div><div class='co'>#&gt; |-----+---------------+-----------+-----------+-----------+-----------|
-#&gt; |    #| Objective Fun |        t1 |        t2 |        t3 |        t4 |
-#&gt; |.....................|        t5 |        t6 |        t7 |        t8 |
-#&gt; <span style='text-decoration: underline;'>|.....................|        t9 |       t10 |       t11 |...........|</span>
-#&gt; |    1|-2.2916210e-08 |     0.000 |    0.6283 |     1.257 |     1.885 |
-#&gt; |.....................|     2.513 |     3.142 |     3.770 |     4.398 |
-#&gt; |.....................|     5.027 |     5.655 |     6.283 |...........|</div><div class='co'>#&gt; [1] -2.291621e-08</div><div class='input'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>grad</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-</div><div class='co'>#&gt; |    G|    Gill Diff. |     1.000 |    0.8090 |    0.3090 |   -0.3090 |
-#&gt; |.....................|   -0.8090 |    -1.000 |   -0.8090 |   -0.3090 |
-#&gt; <span style='text-decoration: underline;'>|.....................|    0.3090 |    0.8090 |     1.000 |...........|</span></div><div class='co'>#&gt;  [1]  1.0000000  0.8090168  0.3090166 -0.3090170 -0.8090170 -1.0000000
-#&gt;  [7] -0.8090170 -0.3090170  0.3090170  0.8090170  1.0000000</div><div class='input'>
-<span class='co'>## x2</span>
-<span class='va'>x2</span> <span class='op'>&lt;-</span> <span class='va'>x</span><span class='op'>+</span><span class='fl'>0.1</span>
-<span class='va'>gf</span><span class='op'>$</span><span class='fu'>eval</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span>
-</div><div class='co'>#&gt; |    2|    0.10014530 |    0.1000 |    0.7283 |     1.357 |     1.985 |
-#&gt; |.....................|     2.613 |     3.241 |     3.870 |     4.498 |
-#&gt; |.....................|     5.127 |     5.755 |     6.383 |...........|</div><div class='co'>#&gt; [1] 0.1001453</div><div class='input'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>grad</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span>
-</div><div class='co'>#&gt; |    F| Forward Diff. |    0.9950 |    0.7463 |    0.2125 |   -0.4024 |
-#&gt; |.....................|   -0.8637 |   -0.9950 |   -0.7463 |   -0.2125 |
-#&gt; <span style='text-decoration: underline;'>|.....................|    0.4024 |    0.8637 |    0.9950 |...........|</span></div><div class='co'>#&gt;  [1]  0.9950042  0.7462946  0.2125259 -0.4024205 -0.8636559 -0.9950354
-#&gt;  [7] -0.7462947 -0.2125260  0.4024204  0.8636559  0.9949954</div><div class='input'>
-<span class='co'>## Gives the parameter history as a data frame</span>
-<span class='va'>gf</span><span class='op'>$</span><span class='fu'>hist</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='co'>#&gt;   iter               type          objf        t1        t2        t3
-#&gt; 1    1           Unscaled -2.291621e-08 0.0000000 0.6283185 1.2566371
-#&gt; 2    2           Unscaled  1.001453e-01 0.1000000 0.7283185 1.3566371
-#&gt; 3    1    Gill83 Gradient            NA 1.0000000 0.8090168 0.3090166
-#&gt; 4    2 Forward Difference            NA 0.9950042 0.7462946 0.2125259
-#&gt;           t4         t5         t6         t7        t8        t9       t10
-#&gt; 1  1.8849556  2.5132741  3.1415926  3.7699112  4.398230 5.0265482 5.6548667
-#&gt; 2  1.9849556  2.6132741  3.2412792  3.8699112  4.498230 5.1265482 5.7548667
-#&gt; 3 -0.3090170 -0.8090170 -1.0000000 -0.8090170 -0.309017 0.3090170 0.8090170
-#&gt; 4 -0.4024205 -0.8636559 -0.9950354 -0.7462947 -0.212526 0.4024204 0.8636559
-#&gt;         t11
-#&gt; 1 6.2831853
-#&gt; 2 6.3831853
-#&gt; 3 1.0000000
-#&gt; 4 0.9949954</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='va'>func0</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>  <span class='op'>}</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## This will printout every interation or when print=X</span></span>
+<span class='r-in'><span class='va'>gf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixrGradFun.html'>nlmixrGradFun</a></span><span class='op'>(</span><span class='va'>func0</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## x</span></span>
+<span class='r-in'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span>;</span>
+<span class='r-in'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>eval</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |-----+---------------+-----------+-----------+-----------+-----------|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    #| Objective Fun |        t1 |        t2 |        t3 |        t4 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |.....................|        t5 |        t6 |        t7 |        t8 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='text-decoration: underline;'>|.....................|        t9 |       t10 |       t11 |...........|</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    1|-2.2916210e-08 |     0.000 |    0.6283 |     1.257 |     1.885 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |.....................|     2.513 |     3.142 |     3.770 |     4.398 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |.....................|     5.027 |     5.655 |     6.283 |...........|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] -2.291621e-08</span>
+<span class='r-in'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>grad</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    G|    Gill Diff. |     1.000 |    0.8090 |    0.3090 |   -0.3090 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |.....................|   -0.8090 |    -1.000 |   -0.8090 |   -0.3090 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='text-decoration: underline;'>|.....................|    0.3090 |    0.8090 |     1.000 |...........|</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1]  1.0000000  0.8090168  0.3090166 -0.3090170 -0.8090170 -1.0000000</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] -0.8090170 -0.3090170  0.3090170  0.8090170  1.0000000</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## x2</span></span>
+<span class='r-in'><span class='va'>x2</span> <span class='op'>&lt;-</span> <span class='va'>x</span><span class='op'>+</span><span class='fl'>0.1</span></span>
+<span class='r-in'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>eval</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    2|    0.10014530 |    0.1000 |    0.7283 |     1.357 |     1.985 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |.....................|     2.613 |     3.241 |     3.870 |     4.498 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |.....................|     5.127 |     5.755 |     6.383 |...........|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.1001453</span>
+<span class='r-in'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>grad</span><span class='op'>(</span><span class='va'>x2</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    F| Forward Diff. |    0.9950 |    0.7463 |    0.2125 |   -0.4024 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |.....................|   -0.8637 |   -0.9950 |   -0.7463 |   -0.2125 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='text-decoration: underline;'>|.....................|    0.4024 |    0.8637 |    0.9950 |...........|</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1]  0.9950042  0.7462946  0.2125259 -0.4024205 -0.8636559 -0.9950354</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] -0.7462947 -0.2125260  0.4024204  0.8636559  0.9949954</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Gives the parameter history as a data frame</span></span>
+<span class='r-in'><span class='va'>gf</span><span class='op'>$</span><span class='fu'>hist</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   iter               type          objf        t1        t2        t3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1    1           Unscaled -2.291621e-08 0.0000000 0.6283185 1.2566371</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2    2           Unscaled  1.001453e-01 0.1000000 0.7283185 1.3566371</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3    1    Gill83 Gradient            NA 1.0000000 0.8090168 0.3090166</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4    2 Forward Difference            NA 0.9950042 0.7462946 0.2125259</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>           t4         t5         t6         t7        t8        t9       t10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1  1.8849556  2.5132741  3.1415926  3.7699112  4.398230 5.0265482 5.6548667</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  1.9849556  2.6132741  3.2412792  3.8699112  4.498230 5.1265482 5.7548667</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3 -0.3090170 -0.8090170 -1.0000000 -0.8090170 -0.309017 0.3090170 0.8090170</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4 -0.4024205 -0.8636559 -0.9950354 -0.7462947 -0.212526 0.4024204 0.8636559</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>         t11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 6.2831853</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2 6.3831853</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3 1.0000000</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4 0.9949954</span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
