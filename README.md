@@ -69,4 +69,3 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("nlmixrdevelopment/nlmixr")
 ```
-

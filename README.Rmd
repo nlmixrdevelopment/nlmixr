@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/nlmixrdevelopment/nlmixr/branch/master/graph/badge.svg)](https://codecov.io/gh/nlmixrdevelopment/nlmixr?branch=master)
 [![CRAN checks](https://cranchecks.info/badges/summary/nlmixr)](https://cran.r-project.org/web/checks/check_results_nlmixr.html)
 [![CRAN total downloads](https://cranlogs.r-pkg.org/badges/grand-total/nlmixr)](https://cran.r-project.org/package=nlmixr)
+[![CRAN monthly downloads](https://cranlogs.r-pkg.org/badges/nlmixr)](https://cran.r-project.org/package=nlmixr)
 <!-- badges: end -->
 
 ***
@@ -34,8 +35,7 @@ data. The nlme and SAEM estimation routines can be accessed using a
 universal user interface (UUI), that provides universal model and
 parameter definition syntax and results in a fit object that can be
 used as input into the `Xpose` package. Running nlmixr using the UUI
-is described in the vignette:
-https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd
+is described in [this vignette](https://nlmixrdevelopment.github.io/nlmixr/articles/running_nlmixr.html).
 
 Under the hood `nlmixr` has five main modules:  
 
@@ -54,14 +54,13 @@ Under the hood `nlmixr` has five main modules:
 
 A few utilities to facilitate population model building are also included in `nlmixr`.
 
-For a brief vignette describing the modules, please see:
-https://github.com/nlmixrdevelopment/nlmixr/blob/master/inst/nlmixr-intro.pdf
+Documentation can be found at https://nlmixrdevelopment.github.io/nlmixr/, and we maintain a comprehensive and ever-growing guide to using `nlmixr` at our [bookdown site](https://nlmixrdevelopment.github.io/nlmixr_bookdown/index.html).
 
-The examples in the vignette can be run using VignetteDemo.R and the associated data files available at:
-https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes
+More examples and the associated data files are available at 
+https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes.
 
-For PKPD modeling (with ODE and dosing history) with
-[Stan](http://mc-stan.org/), check out Yuan's package PMXStan:
+We recommend you have a look at [`RxODE`](https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-intro.html), the engine upon which `nlmixr` depends, as well as [`xpose.nlmixr`](https://github.com/nlmixrdevelopment/xpose.nlmixr), which provides a link to the seminal nonlinear mixed-effects model diagnostics package [`xpose`](https://uupharmacometrics.github.io/xpose/), and [`shinyMixR`](https://github.com/RichardHooijmaijers/shinyMixR), which provides a means to build a project-centric workflow around nlmixr from the R command line and from a streamlined [`shiny`](https://shiny.rstudio.com/) front-end application. Members of the nlmixr team also contribute to the [`ggPMX`](https://github.com/ggPMXdevelopment/ggPMX), [`xgxr`](https://github.com/Novartis/xgxr) and [`pmxTools`](https://github.com/kestrel99/pmxTools) packages. For PKPD modeling (with ODE and dosing history) with
+[Stan](http://mc-stan.org/), check out Yuan Xiong's package [`PMXStan`](https://github.com/yxiong1/pmxstan).
 
 ## Installation
 
@@ -77,4 +76,3 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("nlmixrdevelopment/nlmixr")
 ```
-
