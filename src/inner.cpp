@@ -297,6 +297,7 @@ typedef struct {
   int nfixed=0;
   NumericVector logitThetaHi;
   NumericVector logitThetaLow;
+  double badSolveObjfAdj = 100;
 } focei_options;
 
 focei_options op_focei;
@@ -1179,7 +1180,8 @@ double LikInner2(double *eta, int likId, int id){
     rx_solving_options_ind *ind = &(rx->subjects[id]);
     rx_solving_options *op = rx->op;
     if (op->neq > 0 && ISNA(ind->solve[0])){
-      return 1e300;
+      //return 1e300;
+      return NA_REAL;
     }
     // Calculate lik first to calculate components for Hessian
     // Hessian
@@ -1731,6 +1733,57 @@ void thetaResetObj(Environment e) {
   }
 }
 
+static inline int didInnerResetPointFail(focei_ind *indF, int& id, double point) {
+   indF->mode = 1;
+   indF->uzm = 1;
+   op_focei.didHessianReset=1;
+   if (point == 0.0) {
+     std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, point);
+   } else {
+     // chol(omega^-1) %*% eta = point for each eta
+     //
+     //mat etaRes = op_focei.cholOmegaInv * etaMat
+     for (int j = op_focei.neta; j--; ) {
+       indF->eta[j] =  point/op_focei.cholOmegaInv(j, j);
+     }
+   }
+   return !innerOpt1(id, 0);
+}
+
+static inline int didInnerResetFail(focei_ind *indF, int& id) {
+  if (didInnerResetPointFail(indF, id, 0.0)) {
+    if (op_focei.etaNudge != 0.0) {
+      if (didInnerResetPointFail(indF, id, op_focei.etaNudge) &&
+	  didInnerResetPointFail(indF, id, -op_focei.etaNudge)) {
+	if (op_focei.etaNudge2 != 0.0) {
+	  if (didInnerResetPointFail(indF, id, op_focei.etaNudge2) &&
+	      didInnerResetPointFail(indF, id, -op_focei.etaNudge2)) {
+	    return 1; // failed
+	  } else {
+	    return 0; // reset on one of the eta nudge 
+	  }
+	} else {
+	  return 1; // failed reset
+	}
+      } else {
+	return 0; // reset
+      }
+    } else {
+      return 1; // failed reset
+    } 
+  }
+  return 0;
+}
+
+static inline void resetToZeroWithoutOpt(focei_ind *indF, int& id) {
+  // Just use ETA=0
+  std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
+  if (!innerEval(id)) {
+    indF->lik[0] = NA_REAL;
+    warning(_("bad solve during optimization"));
+  }
+}
+
 void innerOpt(){
 // #ifdef _OPENMP
 //   int cores = rx->op->cores;
@@ -1742,7 +1795,7 @@ void innerOpt(){
   }
   if (op_focei.maxInnerIterations <= 0){
     std::fill_n(&op_focei.goldEta[0], op_focei.gEtaGTransN, -42.0); // All etas = -42;  Unlikely if normal
-// #ifdef _OPENMP
+    // #ifdef _OPENMP
 // #pragma omp parallel for num_threads(cores)
 // #endif
     for (int id = 0; id < rx->nsub; id++){
@@ -1764,45 +1817,19 @@ void innerOpt(){
       focei_ind *indF = &(inds_focei[id]);
       if (!innerOpt1(id, 0)) {
       	// First try resetting ETA
-      	std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-      	if (!innerOpt1(id, 0)) {
-      	  // Now try resetting Hessian, and ETA
-      	  // RSprintf("Hessian Reset for ID: %d\n", id+1);
-          indF->mode = 1;
-          indF->uzm = 1;
-      	  op_focei.didHessianReset=1;
-          //std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-	  if (!innerOpt1(id, 0)) {
-            indF->mode = 1;
-            indF->uzm = 1;
-      	    op_focei.didHessianReset=1;
-            std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-            if(!op_focei.noabort){
+	if (didInnerResetFail(indF, id)) {
+	  if(!op_focei.noabort){
               stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
-      	    } else if (indF->doChol == 1){
-      	      indF->doChol = 0; // Use generalized cholesky decomposition
-              indF->mode = 1;
-              indF->uzm = 1;
-      	      op_focei.didHessianReset=1;
-              std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-	      if (innerOpt1(id, 0)) {
-      		indF->doChol = 1; // Use cholesky again.
-      	      } else {
-      		// Just use ETA=0
-                std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-		if (!innerEval(id)) {
-      		  warning(_("bad solve during optimization"));
-		}
-              }
-      	    } else {
-              // Just use ETA=0
-              std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
-	      if (!innerEval(id)) {
-		warning(_("bad solve during optimization"));
-	      }
-            }
-          }
-        }
+	  } else if (indF->doChol == 1){
+	    indF->doChol = 0; // Use generalized cholesky decomposition
+	    if (didInnerResetFail(indF, id)) {
+	      resetToZeroWithoutOpt(indF, id);
+	    }
+	    indF->doChol = 1; // Use cholesky again.
+	  } else {
+	    resetToZeroWithoutOpt(indF, id);
+	  }
+	}
       }
     }
     // Reset ETA variances for next step
@@ -1830,6 +1857,7 @@ static inline double foceiLik0(double *theta){
   innerOpt();
   double lik = 0.0;
   double cur;
+  
   for (int id=rx->nsub; id--;){
     focei_ind *fInd = &(inds_focei[id]);
     cur = fInd->lik[0];
@@ -1838,6 +1866,9 @@ static inline double foceiLik0(double *theta){
     // } else if (std::isinf(cur)) {
     //   REprintf(_("likelihood of id: %s is infinite\n"), rxGetId(id));
     // }
+    if (ISNA(cur) || std::isinf(cur) || std::isnan(cur)) {
+      cur = -op_focei.badSolveObjfAdj;
+    }
     lik += cur;
   }
   // Now reset the saved ETAs
@@ -1958,12 +1989,12 @@ extern "C" double outerLikOpim(int n, double *par, void *ex){
 
 // Gill 1983 Chat
 static inline double Chat(double phi, double h, double epsA){
-   if (phi == 0) return 1e+300;
-  return 2*epsA/(h*fabs(phi));
+  if (phi == 0) return 2*epsA/(h*h);
+   return 2*epsA/(h*fabs(phi));
 }
 
 static inline double ChatP(double phi, double h, double epsA){
-  if (phi == 0) return 1e+300;
+  if (phi == 0) return 4*epsA/(h*h*h);
   return 4*epsA/(h*h*fabs(phi));
 }
 
@@ -2824,6 +2855,8 @@ NumericVector foceiSetup_(const RObject &obj,
   }
   rxOptionsFreeFocei();
   op_focei.mvi = mvi;
+
+  op_focei.badSolveObjfAdj=fabs(as<double>(odeO["badSolveObjfAdj"]));
 
   op_focei.zeroGrad = false;
   op_focei.resetThetaCheckPer = as<double>(odeO["resetThetaCheckPer"]);

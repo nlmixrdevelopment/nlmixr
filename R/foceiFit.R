@@ -569,6 +569,10 @@ is.latex <- function() {
 ##'   the PK parameter information instead of splitting it into a
 ##'   function and a RxODE model
 ##'
+##' @param badSolveObjfAdj The objective function adjustment when the
+##'   ODE system cannot be solved.  It is based on each individual bad
+##'   solve.
+##'
 ##' @inheritParams configsaem
 ##' @inheritParams RxODE::rxSolve
 ##' @inheritParams minqa::bobyqa
@@ -706,7 +710,8 @@ foceiControl <- function(sigdig = 3, ...,
                          stickyRecalcN = 5,
                          gradProgressOfvTime = 10,
                          addProp = c("combined2", "combined1"),
-                         singleOde = TRUE) {
+                         singleOde = TRUE,
+                         badSolveObjfAdj=100) {
   if (is.null(boundTol)) {
     boundTol <- 5 * 10^(-sigdig + 1)
   }
@@ -1025,6 +1030,7 @@ foceiControl <- function(sigdig = 3, ...,
     gradProgressOfvTime = gradProgressOfvTime,
     addProp = addProp,
     singleOde = singleOde,
+    badSolveObjfAdj=badSolveObjfAdj,
     ...
   )
   if (!missing(etaMat) && missing(maxInnerIterations)) {

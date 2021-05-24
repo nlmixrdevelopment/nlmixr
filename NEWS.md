@@ -2,6 +2,14 @@
 
 - Fix for `nlmixrSim` CMT to have a factor that matches the `RxODE`
   definition (issue #501)
+  
+- If eta nudge is non-zero, when resetting an ETA estimate, try the
+  zero estimate first, and then the nudged locations
+  
+- When there is an ODE system for an individual that cannot be
+  optimized in the inner problem, adjust that individual's objective
+  function by 100 points.  This can be controlled by
+  `foceiControl(badSolveObjfAdj=100)`
 
 # nlmixr 2.0.4
 

@@ -118,7 +118,8 @@ foceiControl(
   stickyRecalcN = 5,
   gradProgressOfvTime = 10,
   addProp = c("combined2", "combined1"),
-  singleOde = TRUE
+  singleOde = TRUE,
+  badSolveObjfAdj = 100
 )
 }
 \arguments{
@@ -762,6 +763,10 @@ combined2: transform(y)=transform(f)+(a^2+b^2*f^(2c))*eps}
 \item{singleOde}{This option allows a single ode model to include
 the PK parameter information instead of splitting it into a
 function and a RxODE model}
+
+\item{badSolveObjfAdj}{The objective function adjustment when the
+ODE system cannot be solved.  It is based on each individual bad
+solve.}
 }
 \value{
 The control object that changes the options for the FOCEi
