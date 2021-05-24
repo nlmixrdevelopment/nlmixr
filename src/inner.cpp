@@ -298,6 +298,8 @@ typedef struct {
   NumericVector logitThetaHi;
   NumericVector logitThetaLow;
   double badSolveObjfAdj = 100;
+  bool didPredSolve = false;
+  bool canDoFD  = false;
 } focei_options;
 
 focei_options op_focei;
@@ -338,6 +340,7 @@ typedef struct {
   double *x;
   unsigned int uzm;
   int doChol=1;
+  int doFD=0;
   int doEtaNudge;
   int badSolve=0;
 } focei_ind;
@@ -377,6 +380,7 @@ extern "C" void rxOptionsFreeFocei(){
   inds_focei=NULL;
 
   op_focei.alloc = false;
+  op_focei.didPredSolve = false;
 
   focei_options newf;
   op_focei= newf;
@@ -727,25 +731,32 @@ double likInner0(double *eta, int id){
     }
     ind->solved = -1;
     // Solve ODE
-    innerOde(id);
-    j=0;
-    while (op_focei.stickyRecalcN2 <= op_focei.stickyRecalcN && op->badSolve && j < op_focei.maxOdeRecalc){
-      op_focei.stickyRecalcN2++;
-      op_focei.reducedTol=1;
-      op_focei.reducedTol2=1;
-      // Not thread safe
-      RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
-      ind->solved = -1;
+    bool predSolve = false;
+    if (fInd->doFD == 0) {
       innerOde(id);
-      j++;
-    }
-    if (j != 0) {
-      if (op_focei.stickyRecalcN2 <= op_focei.stickyRecalcN){
+      j=0;
+      while (op_focei.stickyRecalcN2 <= op_focei.stickyRecalcN && op->badSolve && j < op_focei.maxOdeRecalc){
+	op_focei.stickyRecalcN2++;
+	op_focei.reducedTol=1;
+	op_focei.reducedTol2=1;
 	// Not thread safe
-	RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -j));
-      } else {
-	op_focei.stickyTol=1;
+	RxODE::atolRtolFactor_(op_focei.odeRecalcFactor);
+	ind->solved = -1;
+	innerOde(id);
+	j++;
       }
+      if (j != 0) {
+	if (op_focei.stickyRecalcN2 <= op_focei.stickyRecalcN){
+	  // Not thread safe
+	  RxODE::atolRtolFactor_(pow(op_focei.odeRecalcFactor, -j));
+	} else {
+	  op_focei.stickyTol=1;
+	}
+      }  
+    } else {
+      predOde(id);
+      predSolve=true;
+      op_focei.didPredSolve = true;
     }
     if (op->neq > 0 && (ISNA(ind->solve[0]) || std::isnan(ind->solve[0]) ||
 			std::isinf(ind->solve[0]))){
@@ -770,7 +781,7 @@ double likInner0(double *eta, int id){
       int k = 0, kk=0;//ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
       fInd->llik=0.0;
       fInd->tbsLik=0.0;
-      double f, err, r, fpm, rp = 0,lnr, limit, dv,dv0, curT;
+      double f, err, r, fpm, fpm2, rp = 0,lnr, limit, dv,dv0, curT;
       int cens = 0;
       int oldNeq = op->neq;
       iniSubjectI(op->neq, 1, ind, op, rx, rxInner.update_inis);
@@ -782,9 +793,20 @@ double likInner0(double *eta, int id){
 	if (isDose(ind->evid[kk])) {
 	  // ind->tlast = ind->all_times[ind->ix[ind->idx]];
 	  // Need to calculate for advan sensitivities
-	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
+	  if (predSolve) {
+	    rxPred.calc_lhs(id, curT, getSolve(j), ind->lhs);
+	    ind->lhs[op_focei.neta + 1] = ind->lhs[1];
+	  }
+	  else {
+	    rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
+	  }
 	} else if (ind->evid[kk] == 0) {
-	  rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
+	  if (predSolve) {
+	    rxPred.calc_lhs(id, curT, getSolve(j), ind->lhs);
+	    ind->lhs[op_focei.neta + 1] = ind->lhs[1];
+	  } else {
+	    rxInner.calc_lhs(id, curT, getSolve(j), ind->lhs);
+	  }
 	  f = ind->lhs[0]; // TBS is performed in the RxODE rx_pred_ statement. This allows derivatives of TBS to be propagated
 	  dv = tbs(dv0);
 	  if (ISNA(f) || std::isnan(f) || std::isinf(f)) {
@@ -834,7 +856,7 @@ double likInner0(double *eta, int id){
 	    }
 	    op->neq = op_focei.predNeq;
 	    for (i = op_focei.neta; i--; ) {
-	      if (op_focei.etaFD[i]==1){
+	      if (predSolve || op_focei.etaFD[i]==1){
 		// Calculate derivatives by finite difference
 		ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		predOde(id); // Assumes same order of parameters
@@ -897,7 +919,7 @@ double likInner0(double *eta, int id){
 	      op->neq = op_focei.predNeq;
 	      for (i = op_focei.neta; i--; ) {
 		// Calculate finite difference derivatives if needed
-		if (op_focei.etaFD[i]==1){
+		if (predSolve || op_focei.etaFD[i]==1){
 		  // Calculate derivatives by finite difference
 		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
 		  predOde(id); // Assumes same order of parameters
@@ -1636,21 +1658,63 @@ static inline void thetaReset00(NumericVector &thetaIni, NumericVector &omegaThe
   parHistData(thetaReset, true);
 }
 
-static inline void thetaReset0() {
+static inline bool isFixedTheta(int m) {
+  unsigned int j;
+  for (unsigned int k = op_focei.npars; k--;){
+    j=op_focei.fixedTrans[k];
+    if (m == j) return false; // here the parameter is estimated
+  }
+  return true; // here the parameter is fixed
+}
+
+static inline bool thetaReset0() {
   NumericVector thetaIni(op_focei.ntheta);
+  NumericVector thetaUp(op_focei.ntheta);
+  NumericVector thetaDown(op_focei.ntheta);
+  LogicalVector adjustEta(op_focei.muRefN);
+  bool doAdjust = false;
   for (int ii = op_focei.ntheta; ii--;){
     thetaIni[ii] = unscalePar(op_focei.fullTheta, ii);
-  }
-  for (int ii = op_focei.muRefN; ii--;){
-    if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < (int)op_focei.ntheta){
-      thetaIni[op_focei.muRef[ii]] += op_focei.etaM(ii,0);
+    if (R_FINITE(op_focei.lower[ii])){
+      thetaDown[ii] = unscalePar(op_focei.lower, ii);
+    } else {
+      thetaDown[ii] = R_NegInf;
+    }
+    if (R_FINITE(op_focei.upper[ii])) {
+      thetaUp[ii]= unscalePar(op_focei.upper, ii);
+    } else {
+      thetaUp[ii] = R_PosInf;
     }
   }
+  double ref=0;
+  int ij = 0;
+  for (int ii = op_focei.muRefN; ii--;){
+    if (op_focei.muRef[ii] != -1 && op_focei.muRef[ii] < (int)op_focei.ntheta) {
+      ij = op_focei.muRef[ii];
+      if (isFixedTheta(ij)) {
+	adjustEta[ii] = false;
+      }  else {
+	ref = thetaIni[ij] + op_focei.etaM(ii,0);
+	if (thetaDown[ij] < ref && thetaUp[ij] > ref) {
+	  thetaIni[ij] = ref;
+	  adjustEta[ii] = true;
+	  doAdjust = true;
+	} else {
+	  adjustEta[ii] = false;
+	}	
+      }
+    } else {
+      adjustEta[ii] = false;
+    }
+  }
+  if (!doAdjust) return false;
+    
   arma::mat etaMat(rx->nsub, op_focei.neta);
   for (int ii = rx->nsub; ii--;){
     focei_ind *fInd = &(inds_focei[ii]);
     for (int jj = op_focei.neta; jj--; ){
-      if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < (int)op_focei.ntheta){
+      if (op_focei.muRef[jj] != -1  && op_focei.muRef[jj] < (int)op_focei.ntheta &&
+	  adjustEta[jj]){
 	etaMat(ii, jj) = fInd->eta[jj]-op_focei.etaM(jj,0);
       } else {
 	etaMat(ii, jj) = fInd->eta[jj];
@@ -1664,17 +1728,19 @@ static inline void thetaReset0() {
 	    &op_focei.fullTheta[0] + op_focei.ntheta + op_focei.omegan,
 	    omegaTheta.begin());
   thetaReset00(thetaIni, omegaTheta, etaMat);
+  return true;
 }
 
 void thetaReset(double size){
   mat etaRes =  op_focei.eta1SD % op_focei.etaM; //op_focei.cholOmegaInv * etaMat;
-  for (unsigned int j = etaRes.n_rows; j--;){
-    if (std::fabs(etaRes(j, 0)) >= size){ // Says reset;
-      thetaReset0();
-      if (op_focei.didEtaReset==1) {
-	warning(_("mu-referenced Thetas were reset during optimization; (Can control by foceiControl(resetThetaP=.,resetThetaCheckPer=.,resetThetaFinalP=.))"));
+  for (unsigned int j = etaRes.n_rows; j--;) {
+    if (std::fabs(etaRes(j, 0)) >= size) { // Says reset;
+      if (thetaReset0()) {
+	if (op_focei.didEtaReset==1) {
+	  warning(_("mu-referenced Thetas were reset during optimization; (Can control by foceiControl(resetThetaP=.,resetThetaCheckPer=.,resetThetaFinalP=.))"));
+	}
+	stop("theta reset");
       }
-      stop("theta reset");
     }
   }
 }
@@ -1750,7 +1816,7 @@ static inline int didInnerResetPointFail(focei_ind *indF, int& id, double point)
    return !innerOpt1(id, 0);
 }
 
-static inline int didInnerResetFail(focei_ind *indF, int& id) {
+static inline int didInnerResetFailTryOne(focei_ind *indF, int& id) {
   if (didInnerResetPointFail(indF, id, 0.0)) {
     if (op_focei.etaNudge != 0.0) {
       if (didInnerResetPointFail(indF, id, op_focei.etaNudge) &&
@@ -1775,6 +1841,24 @@ static inline int didInnerResetFail(focei_ind *indF, int& id) {
   return 0;
 }
 
+static inline int didInnerResetFail(focei_ind *indF, int& id) {
+  if (didInnerResetFailTryOne(indF, id)) {
+    if (op_focei.canDoFD) {
+      indF->doFD = 1;
+      if (didInnerResetFailTryOne(indF, id)) {
+	indF->doFD = 0;
+	return 1; // failed reset
+      } else {
+	indF->doFD = 0;
+	return 0;
+      }  
+    } else {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 static inline void resetToZeroWithoutOpt(focei_ind *indF, int& id) {
   // Just use ETA=0
   std::fill(&indF->eta[0], &indF->eta[0] + op_focei.neta, 0.0);
@@ -1783,6 +1867,28 @@ static inline void resetToZeroWithoutOpt(focei_ind *indF, int& id) {
     warning(_("bad solve during optimization"));
   }
 }
+
+static inline void innerOptId(int id) {
+  focei_ind *indF = &(inds_focei[id]);
+  if (!innerOpt1(id, 0)) {
+    // First try resetting ETA
+    if (didInnerResetFail(indF, id)) {
+      if(!op_focei.noabort){
+	stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
+      } else if (indF->doChol == 1){
+	indF->doChol = 0; // Use generalized cholesky decomposition
+	if (didInnerResetFail(indF, id)) {
+	  resetToZeroWithoutOpt(indF, id);
+	}
+	indF->doChol = 1; // Use cholesky again.
+      } else {
+	resetToZeroWithoutOpt(indF, id);
+      }
+    }
+  }
+}
+
+
 
 void innerOpt(){
 // #ifdef _OPENMP
@@ -1814,23 +1920,7 @@ void innerOpt(){
 // #pragma omp parallel for num_threads(cores)
 // #endif
     for (int id = 0; id < rx->nsub; id++){
-      focei_ind *indF = &(inds_focei[id]);
-      if (!innerOpt1(id, 0)) {
-      	// First try resetting ETA
-	if (didInnerResetFail(indF, id)) {
-	  if(!op_focei.noabort){
-              stop("Could not find the best eta even hessian reset and eta reset for ID %d.", id+1);
-	  } else if (indF->doChol == 1){
-	    indF->doChol = 0; // Use generalized cholesky decomposition
-	    if (didInnerResetFail(indF, id)) {
-	      resetToZeroWithoutOpt(indF, id);
-	    }
-	    indF->doChol = 1; // Use cholesky again.
-	  } else {
-	    resetToZeroWithoutOpt(indF, id);
-	  }
-	}
-      }
+      innerOptId(id);
     }
     // Reset ETA variances for next step
     if (op_focei.neta > 0){
@@ -2709,6 +2799,7 @@ static inline void foceiSetupNoEta_(){
   for (int i = rx->nsub; i--;){
     fInd = &(inds_focei[i]);
     fInd->doChol=!(op_focei.cholSEOpt);
+    fInd->doFD=0;
     // ETA ini
     fInd->eta = NULL;
     fInd->oldEta = NULL;
@@ -2781,6 +2872,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
     fInd = &(inds_focei[i]);
     rx_solving_options_ind *ind = &(rx->subjects[i]);
     fInd->doChol=!(op_focei.cholSEOpt);
+    fInd->doFD = 0;
     // ETA ini
     fInd->eta = &op_focei.geta[j];
     fInd->oldEta = &op_focei.goldEta[j];
@@ -4749,6 +4841,7 @@ NumericMatrix foceiCalcCov(Environment e){
       for (unsigned int j = rx->nsub; j--;){
 	focei_ind *fInd = &(inds_focei[j]);
 	fInd->doChol=!(op_focei.cholSECov);
+	fInd->doFD = 0;
       }
       op_focei.resetEtaSize = R_PosInf; // Dont reset ETAs
       op_focei.resetEtaSize=0; // Always reset ETAs.
@@ -5788,6 +5881,7 @@ Environment foceiFitCpp_(Environment e){
   clock_t t0 = clock();
   List model = e["model"];
   bool doPredOnly = false;
+  op_focei.canDoFD = false;
   if (model.containsElementNamed("inner")) {
     RObject inner = model["inner"];
     if (RxODE::rxIs(inner, "RxODE")) {
@@ -5800,6 +5894,7 @@ Environment foceiFitCpp_(Environment e){
 	if (RxODE::rxIs(noLhs, "RxODE")) {
 	  List mvp = RxODE::rxModelVars_(noLhs);
 	  rxUpdateFuns(as<SEXP>(mvp["trans"]), &rxPred);
+	  op_focei.canDoFD = true;
 	}
       }
       // Now setup which ETAs need a finite difference
@@ -6026,6 +6121,9 @@ Environment foceiFitCpp_(Environment e){
   e["gillRet"] = gillRet;
   t0 = clock();
   foceiCalcCov(e);
+  if (op_focei.didPredSolve) {
+    warning(_("numerical difficulties solving forward sensitivity inner problem, tried approximating with more inaccurate numeric differences"));
+  }
   IntegerVector gillRetC(op_focei.ntheta+op_focei.omegan);
   bool warnGillC = false;
   j = op_focei.npars;

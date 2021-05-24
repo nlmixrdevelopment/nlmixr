@@ -3,13 +3,27 @@
 - Fix for `nlmixrSim` CMT to have a factor that matches the `RxODE`
   definition (issue #501)
   
-- If eta nudge is non-zero, when resetting an ETA estimate, try the
-  zero estimate first, and then the nudged locations
+- For `focei` family estimation methods:
+
+  - If the inner problem couldn't solve the ODE using the forward
+    sensitivities, try using numerical differences to approximate the
+    derivatives needed for the focei problem.  A warning will be
+    issued when this occurs. This requires RxODE 1.1.0 that always
+    generates the finite difference prediction model. If RxODE is an
+    earlier version, only apply this when the finite differences are
+    supplied to nlmixr.  This occurs when there are ETAs on the dose
+    based events like duration, lag time, bioavaibility etc.
   
-- When there is an ODE system for an individual that cannot be
-  optimized in the inner problem, adjust that individual's objective
-  function by 100 points.  This can be controlled by
-  `foceiControl(badSolveObjfAdj=100)`
+  - If eta nudge is non-zero, when resetting an ETA estimate, try the
+    zero estimate first, and then the nudged locations.
+	
+  - When there is an ODE system for an individual that cannot be
+    optimized in the inner problem, adjust that individual's objective
+    function by 100 points.  This can be controlled by
+    `foceiControl(badSolveObjfAdj=100)`
+	
+  - Theta reset now will now make sure the parameter is estimated and
+    between the proper bounds before resetting.
 
 # nlmixr 2.0.4
 
