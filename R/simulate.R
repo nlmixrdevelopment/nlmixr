@@ -133,6 +133,10 @@
   if (exists("cov", .env)) {
     .thetaMat <- nlme::getVarCov(object)
   } else {
+    ## warning("simulation assumes thetaMat has very little varaibility in it since there is no covariance")
+    ## .theta0 <- object$uif$ini$name[which(is.na(object$uif$ini$err) & !is.na(object$uif$ini$ntheta))]
+    ## .thetaMat <- diag(length(.theta0)) * 1e-10
+    ## dimnames(.thetaMat) <- list(.theta0, .theta0)
     .thetaMat <- NULL
   }
   if (all(is.na(object$uif$ini$neta1))) {

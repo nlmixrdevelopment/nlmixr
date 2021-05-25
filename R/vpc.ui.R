@@ -180,18 +180,41 @@ vpc_ui <- function(fit, data = NULL, n = 100, bins = "jenks",
     ##
     ## Assume this is in the observed dataset. Add it to the current dataset
     dat <- dat[dat$evid == 0, ]
+    .ts <- FALSE
     if (any(names(sim) == "cmt") && any(names(fit) == "CMT")) {
       if (is(fit$CMT, "factor")) {
         sim$cmt <- as.integer(sim$cmt)
         attr(sim$cmt, "levels") <- levels(fit$CMT)
         class(sim$cmt) <- "factor"
       }
+      .ts <- try(as.character(sim$cmt), silent=TRUE)
+      if (inherits(.ts, "try-error")) {
+        class(sim$cmt) <- NULL
+        attr(sim$cmt, "levels") <- NULL
+        .ts <- FALSE
+      } else {
+        .ts <- TRUE
+      }
     }
+    .td <- FALSE
     if (any(names(dat) == "cmt") && any(names(fit) == "CMT")) {
       if (is(fit$CMT, "factor")) {
         dat$cmt <- as.integer(dat$cmt)
         attr(dat$cmt, "levels") <- levels(fit$CMT)
         class(dat$cmt) <- "factor"
+      }
+      .td <- try(as.character(dat$cmt), silent=TRUE)
+      if (inherits(.td, "try-error")) {
+        class(dat$cmt) <- NULL
+        attr(dat$cmt, "levels") <- NULL
+        .td <- FALSE
+        if (.ts) {
+          class(sim$cmt) <- NULL
+          attr(sim$cmt, "levels") <- NULL
+          .ts <- FALSE
+        }
+      } else {
+        .td <- TRUE
       }
     }
     sim <- list(rxsim = sim0, sim = .as.data.frame(sim), obs = dat)

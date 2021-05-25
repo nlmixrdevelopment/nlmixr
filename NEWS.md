@@ -29,6 +29,9 @@
    will simply have a `$simInfo$thetaMat` entry of `NULL` if the
    covariance step was unsuccessful.
 
+ - With `vpc()` if the cmt conversion isn't working correctly, fall
+   back to compartment numbers.
+
 # nlmixr 2.0.4
 
 - Now can use the following for combinde error models:
