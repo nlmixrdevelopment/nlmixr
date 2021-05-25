@@ -223,17 +223,18 @@ vpc_ui <- function(fit, data = NULL, n = 100, bins = "jenks",
     class(sim) <- "nlmixrVpc"
   }
   ns <- loadNamespace("vpc")
-  if (exists("vpc_vpc", ns)) {
-    vpcn <- "vpc_vpc"
-  } else {
-    vpcn <- "vpc"
-  }
+  vpc_fun <-
+    if (exists("vpc_vpc", ns)) {
+      getFromNamespace("vpc_vpc", "vpc")
+    } else {
+      getFromNamespace("vpc", "vpc")
+    }
   call <- as.list(match.call(expand.dots = TRUE))[-1]
-  call <- call[names(call) %in% methods::formalArgs(getFromNamespace(vpcn, "vpc"))]
+  call <- call[names(call) %in% methods::formalArgs(vpc_fun)]
   call$obs_cols <- list(id = "id", dv = "dv", idv = "time")
   call$sim_cols <- list(id = "id", dv = "dv", idv = "time")
   call$stratify <- stratify
-  p <- do.call(getFromNamespace(vpcn, "vpc"), c(sim, call), envir = parent.frame(1))
+  p <- do.call(vpc_fun, c(sim, call), envir = parent.frame(1))
   cls <- c("nlmixrVpc", class(p))
   attr(cls, "nlmixrVpc") <- sim
   class(p) <- cls
