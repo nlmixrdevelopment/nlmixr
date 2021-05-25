@@ -66,8 +66,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -209,12 +207,12 @@
     <p>Do visual predictive check (VPC) plots for nlme-based non-linear mixed effect models</p>
     </div>
 
-    <pre class="usage"><span class='fu'>vpc_nlmixr_nlme</span><span class='op'>(</span><span class='va'>fit</span>, nsim <span class='op'>=</span> <span class='fl'>100</span>, condition <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>vpc_nlmixr_nlme</span><span class='op'>(</span><span class='va'>fit</span>, nsim <span class='op'>=</span> <span class='fl'>100</span>, condition <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='fu'>vpcNlmixrNlme</span><span class='op'>(</span><span class='va'>fit</span>, nsim <span class='op'>=</span> <span class='fl'>100</span>, condition <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for nlmixrNlme</span>
-<span class='fu'><a href='vpc.html'>vpc</a></span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='vpc.html'>vpc</a></span><span class='op'>(</span><span class='va'>sim</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -246,7 +244,7 @@
     <p>Called for its side effects of creating a VPC</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='va'>specs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed<span class='op'>=</span><span class='va'>lKA</span><span class='op'>+</span><span class='va'>lCL</span><span class='op'>+</span><span class='va'>lV</span><span class='op'>~</span><span class='fl'>1</span>, random <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/nlme/man/pdDiag.html'>pdDiag</a></span><span class='op'>(</span><span class='va'>lKA</span><span class='op'>+</span><span class='va'>lCL</span><span class='op'>~</span><span class='fl'>1</span><span class='op'>)</span>, start<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>lKA<span class='op'>=</span><span class='fl'>0.5</span>, lCL<span class='op'>=</span><span class='op'>-</span><span class='fl'>3.2</span>, lV<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='va'>specs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>fixed<span class='op'>=</span><span class='va'>lKA</span><span class='op'>+</span><span class='va'>lCL</span><span class='op'>+</span><span class='va'>lV</span><span class='op'>~</span><span class='fl'>1</span>, random <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/nlme/man/pdDiag.html'>pdDiag</a></span><span class='op'>(</span><span class='va'>lKA</span><span class='op'>+</span><span class='va'>lCL</span><span class='op'>~</span><span class='fl'>1</span><span class='op'>)</span>, start<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>lKA<span class='op'>=</span><span class='fl'>0.5</span>, lCL<span class='op'>=</span><span class='op'>-</span><span class='fl'>3.2</span>, lV<span class='op'>=</span><span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-in'><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlme_lin_cmpt.html'>nlme_lin_cmpt</a></span><span class='op'>(</span><span class='va'>theo_md</span>, par_model<span class='op'>=</span><span class='va'>specs</span>, ncmt<span class='op'>=</span><span class='fl'>1</span>, verbose<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> **Iteration 1</span>
@@ -289,7 +287,7 @@
 <span class='r-out co'><span class='r-pr'>#&gt;</span>        0        0 </span>
 <span class='r-in'><span class='fu'>vpc_nlmixr_nlme</span><span class='op'>(</span><span class='va'>fit</span>, nsim <span class='op'>=</span> <span class='fl'>100</span>, condition <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></span>
 <span class='r-plt'><img src='vpc_nlmixr_nlme-1.png' alt='' width='700' height='433' /></span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

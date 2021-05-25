@@ -70,8 +70,6 @@ difference interval by nlmixrGill83" />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -217,7 +215,7 @@ Hessian.  In addition, this procedures optimizes the forward
 difference interval by <code><a href='nlmixrGill83.html'>nlmixrGill83</a></code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>nlmixrHess</span><span class='op'>(</span><span class='va'>par</span>, <span class='va'>fn</span>, <span class='va'>...</span>, envir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>nlmixrHess</span><span class='op'>(</span><span class='va'>par</span>, <span class='va'>fn</span>, <span class='va'>...</span>, envir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -262,7 +260,7 @@ difference interval by <code><a href='nlmixrGill83.html'>nlmixrGill83</a></code>
     <p>Matthew Fidler</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'> <span class='va'>func0</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>  <span class='op'>}</span></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'> <span class='va'>func0</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>  <span class='op'>}</span></span>
 <span class='r-in'> <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span></span>
 <span class='r-in'> <span class='fu'>nlmixrHess</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>func0</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
@@ -311,7 +309,7 @@ difference interval by <code><a href='nlmixrGill83.html'>nlmixrGill83</a></code>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>h3</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrHess</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.2</span>,<span class='fl'>1.2</span><span class='op'>)</span>, <span class='va'>fr</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

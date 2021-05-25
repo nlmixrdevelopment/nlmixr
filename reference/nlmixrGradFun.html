@@ -66,8 +66,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -209,15 +207,15 @@
     <p>Create a gradient function based on gill numerical differences</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='nlmixrGradFun.html'>nlmixrEval_</a></span><span class='op'>(</span><span class='va'>theta</span>, <span class='va'>md5</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>nlmixrEval_</span><span class='op'>(</span><span class='va'>theta</span>, <span class='va'>md5</span><span class='op'>)</span>
 
-<span class='fu'><a href='nlmixrGradFun.html'>nlmixrUnscaled_</a></span><span class='op'>(</span><span class='va'>theta</span>, <span class='va'>md5</span><span class='op'>)</span>
+<span class='fu'>nlmixrUnscaled_</span><span class='op'>(</span><span class='va'>theta</span>, <span class='va'>md5</span><span class='op'>)</span>
 
-<span class='fu'><a href='nlmixrGradFun.html'>nlmixrGrad_</a></span><span class='op'>(</span><span class='va'>theta</span>, <span class='va'>md5</span><span class='op'>)</span>
+<span class='fu'>nlmixrGrad_</span><span class='op'>(</span><span class='va'>theta</span>, <span class='va'>md5</span><span class='op'>)</span>
 
-<span class='fu'><a href='nlmixrGradFun.html'>nlmixrParHist_</a></span><span class='op'>(</span><span class='va'>md5</span><span class='op'>)</span>
+<span class='fu'>nlmixrParHist_</span><span class='op'>(</span><span class='va'>md5</span><span class='op'>)</span>
 
-<span class='fu'><a href='nlmixrGradFun.html'>nlmixrGradFun</a></span><span class='op'>(</span>
+<span class='fu'>nlmixrGradFun</span><span class='op'>(</span>
   <span class='va'>what</span>,
   envir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span><span class='op'>(</span><span class='op'>)</span>,
   <span class='va'>which</span>,
@@ -229,7 +227,7 @@
   useColor <span class='op'>=</span> <span class='fu'>crayon</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/crayon/man/has_color.html'>has_color</a></span><span class='op'>(</span><span class='op'>)</span>,
   printNcol <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>floor</a></span><span class='op'>(</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"width"</span><span class='op'>)</span> <span class='op'>-</span> <span class='fl'>23</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>12</span><span class='op'>)</span>,
   print <span class='op'>=</span> <span class='fl'>1</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -313,11 +311,11 @@ evaluations.</p></td>
   functions.  This is an internal module used with dynmodel</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
 <span class='r-in'><span class='va'>func0</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>{</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>  <span class='op'>}</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'>## This will printout every interation or when print=X</span></span>
-<span class='r-in'><span class='va'>gf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixrGradFun.html'>nlmixrGradFun</a></span><span class='op'>(</span><span class='va'>func0</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>gf</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGradFun</span><span class='op'>(</span><span class='va'>func0</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'>## x</span></span>
 <span class='r-in'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>*</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>/</span><span class='fl'>10</span>;</span>
@@ -369,7 +367,7 @@ evaluations.</p></td>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 3 1.0000000</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 4 0.9949954</span>
 <span class='r-in'></span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

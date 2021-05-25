@@ -66,8 +66,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -209,7 +207,7 @@
     <p>Implements forward covariate selection for nlme-based non-linear mixed effect models</p>
     </div>
 
-    <pre class="usage"><span class='fu'>frwd_selection</span><span class='op'>(</span><span class='va'>base</span>, <span class='va'>cv</span>, <span class='va'>dat</span>, cutoff <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>frwd_selection</span><span class='op'>(</span><span class='va'>base</span>, <span class='va'>cv</span>, <span class='va'>dat</span>, cutoff <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -237,7 +235,7 @@
     <p>an nlme object of the final model</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># \donttest{</span></span>
 <span class='r-in'><span class='va'>dat</span> <span class='op'>&lt;-</span> <span class='va'>theo_md</span></span>
 <span class='r-in'><span class='va'>dat</span><span class='op'>$</span><span class='va'>LOGWT</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>dat</span><span class='op'>$</span><span class='va'>WT</span><span class='op'>)</span></span>
 <span class='r-in'><span class='va'>dat</span><span class='op'>$</span><span class='va'>TG</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='va'>dat</span><span class='op'>$</span><span class='va'>ID</span> <span class='op'>&lt;</span> <span class='fl'>6</span><span class='op'>)</span> <span class='op'>+</span> <span class='fl'>0</span> <span class='co'># dummy covariate</span></span>
@@ -295,7 +293,7 @@
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Number of Observations: 264</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Number of Groups: 12 </span>
 <span class='r-in'><span class='co'># }</span></span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

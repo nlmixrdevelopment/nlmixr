@@ -217,7 +217,7 @@ simulated from the uncertainty in the Omega/Sigma matrices based
 on the number of subjects and observations the model was based on.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nlmixrSim</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>nlmixrSim</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for nlmixrFitData</span>
 <span class='fu'><a href='https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html'>rxSolve</a></span><span class='op'>(</span>
@@ -322,7 +322,7 @@ on the number of subjects and observations the model was based on.</p>
 <span class='fu'><a href='https://rdrr.io/r/stats/simulate.html'>simulate</a></span><span class='op'>(</span><span class='va'>object</span>, nsim <span class='op'>=</span> <span class='fl'>1</span>, seed <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for nlmixrFitData</span>
-<span class='fu'><a href='https://rdrr.io/r/base/solve.html'>solve</a></span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/solve.html'>solve</a></span><span class='op'>(</span><span class='va'>a</span>, <span class='va'>b</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -569,7 +569,7 @@ data as an RxODE event table.</p></td>
     <tr>
       <th>stiff</th>
       <td><p>a logical (<code>TRUE</code> by default) indicating whether
-the ODE system is stiff or not.</p><pre>For stiff ODE systems (`stiff = TRUE`), `RxODE` uses the
+the ODE system is stiff or not.</p><pre><code>For stiff ODE systems (`stiff = TRUE`), `RxODE` uses the
 LSODA (Livermore Solver for Ordinary Differential Equations)
 Fortran package, which implements an automatic method switching
 for stiff and non-stiff problems along the integration
@@ -581,7 +581,7 @@ Dormand and Prince as implemented in C by Hairer and Wanner
 (1993).
 
 If stiff is not specified, the `method` argument is used instead.
-</pre></td>
+</code></pre></td>
     </tr>
     <tr>
       <th>theta</th>

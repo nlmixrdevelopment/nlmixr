@@ -204,7 +204,16 @@
     <div id="nlmixr-2041-development-version" class="section level1">
 <h1 class="page-header" data-toc-text="2.0.4.1">
 <a href="#nlmixr-2041-development-version" class="anchor" aria-hidden="true"></a>nlmixr 2.0.4.1 (Development version)<small> Unreleased </small></h1>
-<ul><li>Fix for <code>nlmixrSim</code> CMT to have a factor that matches the <code>RxODE</code> definition (issue <a href='https://github.com/nlmixrdevelopment/nlmixr/issues/501'>#501</a>)</li>
+<ul><li><p>Fix for <code>nlmixrSim</code> CMT to have a factor that matches the <code>RxODE</code> definition (issue <a href='https://github.com/nlmixrdevelopment/nlmixr/issues/501'>#501</a>)</p></li>
+<li>
+<p>For <code>focei</code> family estimation methods:</p>
+<ul><li><p>If the inner problem couldn’t solve the ODE using the forward sensitivities, try using numerical differences to approximate the derivatives needed for the focei problem. A warning will be issued when this occurs. This requires RxODE 1.1.0 that always generates the finite difference prediction model. If RxODE is an earlier version, only apply this when the finite differences are supplied to nlmixr. This occurs when there are ETAs on the dose based events like duration, lag time, bioavaibility etc.</p></li>
+<li><p>If eta nudge is non-zero, when resetting an ETA estimate, try the zero estimate first, and then the nudged locations.</p></li>
+<li><p>When there is an ODE system for an individual that cannot be optimized in the inner problem, adjust that individual’s objective function by 100 points. This can be controlled by <code>foceiControl(badSolveObjfAdj=100)</code></p></li>
+<li><p>Theta reset now will now make sure the parameter is estimated and between the proper bounds before resetting.</p></li>
+</ul></li>
+<li><p><code>$simInfo</code> non longer tries to generate the covariance step, and will simply have a <code>$simInfo$thetaMat</code> entry of <code>NULL</code> if the covariance step was unsuccessful.</p></li>
+<li><p>With <code><a href="../reference/vpc.html">vpc()</a></code> if the cmt conversion isn’t working correctly, fall back to compartment numbers.</p></li>
 </ul></div>
     <div id="nlmixr-204" class="section level1">
 <h1 class="page-header" data-toc-text="2.0.4">

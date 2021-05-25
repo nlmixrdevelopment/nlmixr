@@ -66,8 +66,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -209,7 +207,7 @@
     <p>Get the optimal forward difference interval by Gill83 method</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nlmixrGill83</span><span class='op'>(</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>nlmixrGill83</span><span class='op'>(</span>
   <span class='va'>what</span>,
   <span class='va'>args</span>,
   envir <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span><span class='op'>(</span><span class='op'>)</span>,
@@ -218,7 +216,7 @@
   gillK <span class='op'>=</span> <span class='fl'>10L</span>,
   gillStep <span class='op'>=</span> <span class='fl'>2</span>,
   gillFtol <span class='op'>=</span> <span class='fl'>0</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -299,7 +297,7 @@ is acceptable before issuing a warning/error about the gradient estimates.</p></
     <p>Matthew Fidler</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
 <span class='r-in'><span class='co'>## These are taken from the numDeriv::grad examples to show how</span></span>
 <span class='r-in'><span class='co'>## simple gradients are assessed with nlmixrGill83</span></span>
 <span class='r-in'></span>
@@ -437,9 +435,9 @@ is acceptable before issuing a warning/error about the gradient estimates.</p></
 <span class='r-in'><span class='va'>g</span> <span class='op'>&lt;-</span> <span class='fu'>nlmixrGill83</span><span class='op'>(</span><span class='va'>sc2.f</span>, <span class='va'>x0</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>exact</span> <span class='op'>-</span> <span class='va'>g</span><span class='op'>$</span><span class='va'>df</span><span class='op'>)</span><span class='op'>/</span><span class='op'>(</span><span class='fl'>1</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>abs</a></span><span class='op'>(</span><span class='va'>exact</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.001125715</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.0009550817</span>
 <span class='r-in'></span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

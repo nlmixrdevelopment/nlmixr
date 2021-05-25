@@ -66,8 +66,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -209,7 +207,7 @@
     <p>Fit a non-population dynamic model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dynmodel</span><span class='op'>(</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>dynmodel</span><span class='op'>(</span>
   <span class='va'>system</span>,
   <span class='va'>model</span>,
   <span class='va'>inits</span>,
@@ -218,7 +216,7 @@
   nlmixrObject <span class='op'>=</span> <span class='cn'>NULL</span>,
   control <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
   <span class='va'>...</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -267,7 +265,7 @@ details. Default is NULL.</p></td>
     <p>Wenping Wang, Mason McComb and Matt Fidler</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
 <span class='r-in'><span class='co'># \donttest{</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># dynmodel example --------------------------------------------------------</span></span>
@@ -539,7 +537,8 @@ details. Default is NULL.</p></td>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |  123|     38015.489 |    -6.354 |     2.197 |  -0.01628 |    0.2092 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     38015.489 |    -6.354 |     2.197 |  -0.01628 |    0.2092 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>NaNs produced</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Error in solve.default(fit$hessian) : </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   Lapack routine dgesv: system is exactly singular: U[1,1] = 0</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># nlmixr model example ----------------------------------------------------------</span></span>
 <span class='r-in'><span class='va'>model_onecmt_bolus</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span></span>
@@ -558,19 +557,19 @@ details. Default is NULL.</p></td>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># note on some platforms this fit is not successful</span></span>
 <span class='r-in'><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span><span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>model_onecmt_bolus</span>, data <span class='op'>=</span> <span class='va'>Bolus_1CPT</span>, est <span class='op'>=</span> <span class='st'>"dynmodel"</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BBBB;'>ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → creating full model...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> → pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> → loading into <span style='color: #0000BB;'>symengine</span><span> environment...</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> → pruning branches (<span style='color: #262626; background-color: #DADADA;'>`if`</span>/<span style='color: #262626; background-color: #DADADA;'>`else`</span>)...</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> → loading into <span style='color: #0000BB;'>symengine</span> environment...</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → finding duplicate expressions in EBE model...</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → optimizing duplicate expressions in EBE model...</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → compiling EBE model...</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  </span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  </span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  </span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |-----+---------------+-----------+-----------+-----------|</span>
@@ -1309,17 +1308,17 @@ details. Default is NULL.</p></td>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     45442.746 |     3.199 |     65.52 |    0.4826 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → creating full model...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> → pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> → loading into <span style='color: #0000BB;'>symengine</span><span> environment...</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> → pruning branches (<span style='color: #262626; background-color: #DADADA;'>`if`</span>/<span style='color: #262626; background-color: #DADADA;'>`else`</span>)...</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> → loading into <span style='color: #0000BB;'>symengine</span> environment...</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → finding duplicate expressions in EBE model...</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → optimizing duplicate expressions in EBE model...</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → compiling EBE model...</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  </span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Calculating residuals/tables</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> done</span>
 <span class='r-in'></span>
@@ -1338,8 +1337,8 @@ details. Default is NULL.</p></td>
 <span class='r-in'><span class='co'># method = "focei" is slightly more flexible and well tested</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='kw'><a href='https://rdrr.io/r/base/try.html'>try</a></span><span class='op'>(</span><span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>model_onecmt_bolus</span>, data <span class='op'>=</span> <span class='va'>Bolus_1CPT</span>, est <span class='op'>=</span> <span class='st'>"focei"</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='font-weight: bold;'>Key:</span><span> U: Unscaled Parameters; X: Back-transformed parameters; G: Gill difference gradient approximation</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BBBB;'>ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='font-weight: bold;'>Key:</span> U: Unscaled Parameters; X: Back-transformed parameters; G: Gill difference gradient approximation</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> F: Forward difference gradient approximation</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> C: Central difference gradient approximation</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> M: Mixed forward and central difference gradient approximation</span>
@@ -1347,211 +1346,211 @@ details. Default is NULL.</p></td>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Diagonals are transformed, as specified by foceiControl(diagXform=)</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |-----+---------------+-----------+-----------+-----------|</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    #| Objective Fun |        CL |         V |  prop.err |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    1</span><span>| 8.0454138e+09 |   -0.8004 |     1.000 |    -1.000 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    1</span>| 8.0454138e+09 |   -0.8004 |     1.000 |    -1.000 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U| 8.0454138e+09 |     5.000 |     50.00 |   0.01000 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'> 8.0454138e+09</span><span> |     5.000 |     50.00 |   0.01000 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    G|    Gill Diff. | 1.154e+11 |-9.901e+10 |-8.044e+09 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    2</span><span>|     25787707. |    -1.558 |     1.650 |   -0.9472 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'> 8.0454138e+09</span> |     5.000 |     50.00 |   0.01000 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    G|    Gill Diff. | 1.154e+11 |-9.901e+10 |-8.044e+09 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    2</span>|     25787707. |    -1.558 |     1.650 |   -0.9472 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|      25787707 |     1.210 |     82.51 |   0.01026 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      25787707</span><span> |     1.210 |     82.51 |   0.01026 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-5.748e+07 | 1.415e+06 |-2.509e+07 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    3</span><span>|     12967373. |    -1.286 |     1.943 |   -0.6466 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      25787707</span> |     1.210 |     82.51 |   0.01026 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-5.748e+07 | 1.415e+06 |-2.509e+07 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    3</span>|     12967373. |    -1.286 |     1.943 |   -0.6466 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|      12967373 |     2.572 |     97.13 |   0.01177 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      12967373</span><span> |     2.572 |     97.13 |   0.01177 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-1.429e+07 | 7.740e+06 |-1.100e+07 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    4</span><span>|     7423175.1 |    -1.178 |     1.725 |   -0.2093 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      12967373</span> |     2.572 |     97.13 |   0.01177 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-1.429e+07 | 7.740e+06 |-1.100e+07 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    4</span>|     7423175.1 |    -1.178 |     1.725 |   -0.2093 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     7423175.1 |     3.111 |     86.27 |   0.01395 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     7423175.1</span><span> |     3.111 |     86.27 |   0.01395 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-1.180e+06 | 4.378e+06 |-5.298e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    5</span><span>|     5484755.4 |    -1.144 |     1.430 |    0.1923 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     7423175.1</span> |     3.111 |     86.27 |   0.01395 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-1.180e+06 | 4.378e+06 |-5.298e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    5</span>|     5484755.4 |    -1.144 |     1.430 |    0.1923 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     5484755.4 |     3.281 |     71.48 |   0.01596 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     5484755.4</span><span> |     3.281 |     71.48 |   0.01596 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.408e+07 |-2.824e+06 |-3.417e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    6</span><span>|     8000501.1 |    -1.609 |     1.111 |     1.018 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     5484755.4</span> |     3.281 |     71.48 |   0.01596 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.408e+07 |-2.824e+06 |-3.417e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    6</span>|     8000501.1 |    -1.609 |     1.111 |     1.018 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     8000501.1 |    0.9563 |     55.53 |   0.02009 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     8000501.1</span><span> |    0.9563 |     55.53 |   0.02009 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    7</span><span>|     6450161.2 |    -1.418 |     1.370 |    0.4573 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     8000501.1</span> |    0.9563 |     55.53 |   0.02009 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    7</span>|     6450161.2 |    -1.418 |     1.370 |    0.4573 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     6450161.2 |     1.914 |     68.48 |   0.01729 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     6450161.2</span><span> |     1.914 |     68.48 |   0.01729 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    8</span><span>|     5616884.6 |    -1.296 |     1.460 |    0.2292 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     6450161.2</span> |     1.914 |     68.48 |   0.01729 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    8</span>|     5616884.6 |    -1.296 |     1.460 |    0.2292 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     5616884.6 |     2.522 |     73.00 |   0.01615 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     5616884.6</span><span> |     2.522 |     73.00 |   0.01615 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    9</span><span>|     5075129.6 |    -1.216 |     1.444 |    0.2098 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     5616884.6</span> |     2.522 |     73.00 |   0.01615 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>    9</span>|     5075129.6 |    -1.216 |     1.444 |    0.2098 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     5075129.6 |     2.921 |     72.20 |   0.01605 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     5075129.6</span><span> |     2.921 |     72.20 |   0.01605 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-2.409e+06 | 9.218e+05 |-3.142e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   10</span><span>|     4863902.1 |    -1.192 |     1.417 |    0.2758 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     5075129.6</span> |     2.921 |     72.20 |   0.01605 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-2.409e+06 | 9.218e+05 |-3.142e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   10</span>|     4863902.1 |    -1.192 |     1.417 |    0.2758 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     4863902.1 |     3.044 |     70.86 |   0.01638 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4863902.1</span><span> |     3.044 |     70.86 |   0.01638 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 2.610e+06 |-2.612e+05 |-2.950e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   11</span><span>|     4566749.8 |    -1.247 |     1.373 |    0.4087 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4863902.1</span> |     3.044 |     70.86 |   0.01638 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 2.610e+06 |-2.612e+05 |-2.950e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   11</span>|     4566749.8 |    -1.247 |     1.373 |    0.4087 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     4566749.8 |     2.765 |     68.64 |   0.01704 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4566749.8</span><span> |     2.765 |     68.64 |   0.01704 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-4.993e+06 | 5.568e+05 |-2.659e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   12</span><span>|     4266337.6 |    -1.207 |     1.213 |    0.6609 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4566749.8</span> |     2.765 |     68.64 |   0.01704 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-4.993e+06 | 5.568e+05 |-2.659e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   12</span>|     4266337.6 |    -1.207 |     1.213 |    0.6609 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     4266337.6 |     2.967 |     60.64 |   0.01830 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4266337.6</span><span> |     2.967 |     60.64 |   0.01830 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.123e+07 |-5.104e+06 |-2.312e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   13</span><span>|     4128738.8 |    -1.335 |     1.077 |    0.8975 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4266337.6</span> |     2.967 |     60.64 |   0.01830 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.123e+07 |-5.104e+06 |-2.312e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   13</span>|     4128738.8 |    -1.335 |     1.077 |    0.8975 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     4128738.8 |     2.324 |     53.85 |   0.01949 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4128738.8</span><span> |     2.324 |     53.85 |   0.01949 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-8.655e+06 |-9.469e+05 |-2.099e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   14</span><span>|     3928525.9 |    -1.248 |     1.270 |    0.6829 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4128738.8</span> |     2.324 |     53.85 |   0.01949 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-8.655e+06 |-9.469e+05 |-2.099e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   14</span>|     3928525.9 |    -1.248 |     1.270 |    0.6829 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3928525.9 |     2.760 |     63.50 |   0.01841 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3928525.9</span><span> |     2.760 |     63.50 |   0.01841 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-2.176e+06 |-7.457e+05 |-2.114e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   15</span><span>|     4854860.6 |    -1.180 |     1.139 |    0.9455 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3928525.9</span> |     2.760 |     63.50 |   0.01841 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-2.176e+06 |-7.457e+05 |-2.114e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   15</span>|     4854860.6 |    -1.180 |     1.139 |    0.9455 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     4854860.6 |     3.103 |     56.95 |   0.01973 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4854860.6</span><span> |     3.103 |     56.95 |   0.01973 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   16</span><span>|     3876327.0 |    -1.207 |     1.284 |    0.7232 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     4854860.6</span> |     3.103 |     56.95 |   0.01973 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   16</span>|     3876327.0 |    -1.207 |     1.284 |    0.7232 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|       3876327 |     2.968 |     64.22 |   0.01862 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>       3876327</span><span> |     2.968 |     64.22 |   0.01862 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 5.070e+06 |-2.312e+06 |-2.064e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   17</span><span>|     3754785.9 |    -1.245 |     1.267 |    0.7659 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>       3876327</span> |     2.968 |     64.22 |   0.01862 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 5.070e+06 |-2.312e+06 |-2.064e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   17</span>|     3754785.9 |    -1.245 |     1.267 |    0.7659 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3754785.9 |     2.778 |     63.34 |   0.01883 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3754785.9</span><span> |     2.778 |     63.34 |   0.01883 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-1.408e+06 |-8.831e+05 |-1.975e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   18</span><span>|     3650705.3 |    -1.223 |     1.225 |    0.8756 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3754785.9</span> |     2.778 |     63.34 |   0.01883 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-1.408e+06 |-8.831e+05 |-1.975e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   18</span>|     3650705.3 |    -1.223 |     1.225 |    0.8756 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3650705.3 |     2.888 |     61.26 |   0.01938 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3650705.3</span><span> |     2.888 |     61.26 |   0.01938 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 4.818e+06 |-2.812e+06 |-1.866e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   19</span><span>|     3602499.8 |    -1.302 |     1.089 |     1.055 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3650705.3</span> |     2.888 |     61.26 |   0.01938 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 4.818e+06 |-2.812e+06 |-1.866e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   19</span>|     3602499.8 |    -1.302 |     1.089 |     1.055 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3602499.8 |     2.490 |     54.47 |   0.02028 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3602499.8</span><span> |     2.490 |     54.47 |   0.02028 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-3.795e+06 |-1.661e+06 |-1.758e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   20</span><span>|     3236491.4 |    -1.231 |     1.316 |     1.032 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3602499.8</span> |     2.490 |     54.47 |   0.02028 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-3.795e+06 |-1.661e+06 |-1.758e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   20</span>|     3236491.4 |    -1.231 |     1.316 |     1.032 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3236491.4 |     2.847 |     65.80 |   0.02016 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3236491.4</span><span> |     2.847 |     65.80 |   0.02016 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-7.476e+05 |-4.760e+05 |-1.588e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   21</span><span>|     3375170.1 |    -1.133 |     1.379 |     1.240 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3236491.4</span> |     2.847 |     65.80 |   0.02016 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-7.476e+05 |-4.760e+05 |-1.588e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   21</span>|     3375170.1 |    -1.133 |     1.379 |     1.240 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3375170.1 |     3.338 |     68.93 |   0.02120 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3375170.1</span><span> |     3.338 |     68.93 |   0.02120 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   22</span><span>|     3150224.1 |    -1.194 |     1.340 |     1.111 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3375170.1</span> |     3.338 |     68.93 |   0.02120 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   22</span>|     3150224.1 |    -1.194 |     1.340 |     1.111 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3150224.1 |     3.033 |     66.99 |   0.02055 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3150224.1</span><span> |     3.033 |     66.99 |   0.02055 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 3.903e+06 |-1.324e+06 |-1.515e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   23</span><span>|     3023016.2 |    -1.215 |     1.413 |     1.159 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3150224.1</span> |     3.033 |     66.99 |   0.02055 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 3.903e+06 |-1.324e+06 |-1.515e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   23</span>|     3023016.2 |    -1.215 |     1.413 |     1.159 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3023016.2 |     2.926 |     70.66 |   0.02079 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3023016.2</span><span> |     2.926 |     70.66 |   0.02079 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-9.123e+05 | 2.721e+05 |-1.436e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   24</span><span>|     3000246.8 |    -1.145 |     1.532 |     1.276 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3023016.2</span> |     2.926 |     70.66 |   0.02079 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-9.123e+05 | 2.721e+05 |-1.436e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   24</span>|     3000246.8 |    -1.145 |     1.532 |     1.276 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     3000246.8 |     3.277 |     76.60 |   0.02138 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3000246.8</span><span> |     3.277 |     76.60 |   0.02138 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 4.214e+06 | 1.159e+05 |-1.387e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   25</span><span>|     2706408.3 |    -1.206 |     1.411 |     1.396 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     3000246.8</span> |     3.277 |     76.60 |   0.02138 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 4.214e+06 | 1.159e+05 |-1.387e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   25</span>|     2706408.3 |    -1.206 |     1.411 |     1.396 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     2706408.3 |     2.971 |     70.53 |   0.02198 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     2706408.3</span><span> |     2.971 |     70.53 |   0.02198 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 5.628e+04 | 7.816e+04 |-1.215e+06 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   26</span><span>|     2322580.8 |    -1.223 |     1.387 |     1.756 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     2706408.3</span> |     2.971 |     70.53 |   0.02198 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 5.628e+04 | 7.816e+04 |-1.215e+06 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   26</span>|     2322580.8 |    -1.223 |     1.387 |     1.756 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     2322580.8 |     2.887 |     69.37 |   0.02378 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     2322580.8</span><span> |     2.887 |     69.37 |   0.02378 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   27</span><span>|     1649814.2 |    -1.271 |     1.321 |     2.789 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     2322580.8</span> |     2.887 |     69.37 |   0.02378 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   27</span>|     1649814.2 |    -1.271 |     1.321 |     2.789 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1649814.2 |     2.648 |     66.05 |   0.02894 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1649814.2</span><span> |     2.648 |     66.05 |   0.02894 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-2.486e+06 | 1.283e+05 |-5.554e+05 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   28</span><span>| 2.3670848e+29 |    -1.233 |   0.08498 |     3.440 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1649814.2</span> |     2.648 |     66.05 |   0.02894 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-2.486e+06 | 1.283e+05 |-5.554e+05 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   28</span>| 2.3670848e+29 |    -1.233 |   0.08498 |     3.440 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U| 2.3670848e+29 |     2.839 |     4.249 |   0.03220 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'> 2.3670848e+29</span><span> |     2.839 |     4.249 |   0.03220 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   29</span><span>|     1713126.7 |    -1.199 |     1.221 |     2.855 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'> 2.3670848e+29</span> |     2.839 |     4.249 |   0.03220 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   29</span>|     1713126.7 |    -1.199 |     1.221 |     2.855 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1713126.7 |     3.008 |     61.06 |   0.02927 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1713126.7</span><span> |     3.008 |     61.06 |   0.02927 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   30</span><span>|     1583758.2 |    -1.217 |     1.318 |     2.801 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1713126.7</span> |     3.008 |     61.06 |   0.02927 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   30</span>|     1583758.2 |    -1.217 |     1.318 |     2.801 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1583758.2 |     2.915 |     65.91 |   0.02900 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1583758.2</span><span> |     2.915 |     65.91 |   0.02900 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 5.091e+05 |-4.111e+05 |-5.319e+05 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   31</span><span>|     1565278.3 |    -1.230 |     1.365 |     2.827 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1583758.2</span> |     2.915 |     65.91 |   0.02900 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 5.091e+05 |-4.111e+05 |-5.319e+05 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   31</span>|     1565278.3 |    -1.230 |     1.365 |     2.827 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1565278.3 |     2.850 |     68.23 |   0.02913 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1565278.3</span><span> |     2.850 |     68.23 |   0.02913 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-8.564e+05 | 3.677e+04 |-5.231e+05 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   32</span><span>|     1525940.2 |    -1.191 |     1.436 |     2.899 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1565278.3</span> |     2.850 |     68.23 |   0.02913 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-8.564e+05 | 3.677e+04 |-5.231e+05 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   32</span>|     1525940.2 |    -1.191 |     1.436 |     2.899 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1525940.2 |     3.049 |     71.82 |   0.02950 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1525940.2</span><span> |     3.049 |     71.82 |   0.02950 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 6.319e+05 | 2.047e+04 |-5.036e+05 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   33</span><span>|     1470157.6 |    -1.210 |     1.401 |     3.001 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1525940.2</span> |     3.049 |     71.82 |   0.02950 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 6.319e+05 | 2.047e+04 |-5.036e+05 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   33</span>|     1470157.6 |    -1.210 |     1.401 |     3.001 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1470157.6 |     2.950 |     70.04 |   0.03000 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1470157.6</span><span> |     2.950 |     70.04 |   0.03000 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   34</span><span>|     1384039.9 |    -1.208 |     1.288 |     3.277 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1470157.6</span> |     2.950 |     70.04 |   0.03000 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   34</span>|     1384039.9 |    -1.208 |     1.288 |     3.277 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1384039.9 |     2.962 |     64.40 |   0.03139 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1384039.9</span><span> |     2.962 |     64.40 |   0.03139 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.597e+06 |-7.525e+05 |-4.276e+05 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   35</span><span>|     1209842.6 |    -1.234 |     1.291 |     3.683 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1384039.9</span> |     2.962 |     64.40 |   0.03139 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.597e+06 |-7.525e+05 |-4.276e+05 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   35</span>|     1209842.6 |    -1.234 |     1.291 |     3.683 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1209842.6 |     2.830 |     64.56 |   0.03341 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1209842.6</span><span> |     2.830 |     64.56 |   0.03341 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   36</span><span>|     1031572.3 |    -1.249 |     1.284 |     4.290 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1209842.6</span> |     2.830 |     64.56 |   0.03341 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   36</span>|     1031572.3 |    -1.249 |     1.284 |     4.290 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     1031572.3 |     2.756 |     64.21 |   0.03645 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1031572.3</span><span> |     2.756 |     64.21 |   0.03645 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-7.101e+05 |-1.302e+05 |-2.707e+05 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   37</span><span>|     799114.69 |    -1.239 |     1.302 |     5.303 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     1031572.3</span> |     2.756 |     64.21 |   0.03645 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-7.101e+05 |-1.302e+05 |-2.707e+05 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   37</span>|     799114.69 |    -1.239 |     1.302 |     5.303 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     799114.69 |     2.808 |     65.12 |   0.04152 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     799114.69</span><span> |     2.808 |     65.12 |   0.04152 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-3.514e+05 |-1.064e+05 |-1.813e+05 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   38</span><span>|     526437.70 |    -1.226 |     1.332 |     7.361 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     799114.69</span> |     2.808 |     65.12 |   0.04152 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-3.514e+05 |-1.064e+05 |-1.813e+05 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   38</span>|     526437.70 |    -1.226 |     1.332 |     7.361 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|      526437.7 |     2.872 |     66.60 |   0.05180 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      526437.7</span><span> |     2.872 |     66.60 |   0.05180 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-9.739e+04 |-6.044e+04 |-9.211e+04 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   39</span><span>|     377147.49 |    -1.217 |     1.356 |     9.482 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      526437.7</span> |     2.872 |     66.60 |   0.05180 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-9.739e+04 |-6.044e+04 |-9.211e+04 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   39</span>|     377147.49 |    -1.217 |     1.356 |     9.482 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     377147.49 |     2.918 |     67.81 |   0.06241 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     377147.49</span><span> |     2.918 |     67.81 |   0.06241 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-1.745e+04 |-3.311e+04 |-5.215e+04 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   40</span><span>|     270007.16 |    -1.208 |     1.382 |     12.24 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     377147.49</span> |     2.918 |     67.81 |   0.06241 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. |-1.745e+04 |-3.311e+04 |-5.215e+04 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   40</span>|     270007.16 |    -1.208 |     1.382 |     12.24 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     270007.16 |     2.963 |     69.11 |   0.07620 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     270007.16</span><span> |     2.963 |     69.11 |   0.07620 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.555e+04 |-1.490e+04 |-2.832e+04 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   41</span><span>|     201117.97 |    -1.199 |     1.408 |     15.49 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     270007.16</span> |     2.963 |     69.11 |   0.07620 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.555e+04 |-1.490e+04 |-2.832e+04 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   41</span>|     201117.97 |    -1.199 |     1.408 |     15.49 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     201117.97 |     3.006 |     70.40 |   0.09247 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     201117.97</span><span> |     3.006 |     70.40 |   0.09247 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 2.471e+04 |    -4757. |-1.562e+04 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   42</span><span>|     155198.10 |    -1.190 |     1.436 |     19.46 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     201117.97</span> |     3.006 |     70.40 |   0.09247 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 2.471e+04 |    -4757. |-1.562e+04 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   42</span>|     155198.10 |    -1.190 |     1.436 |     19.46 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|      155198.1 |     3.051 |     71.78 |    0.1123 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      155198.1</span><span> |     3.051 |     71.78 |    0.1123 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 2.435e+04 |     770.8 |    -8547. </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   43</span><span>|     127246.75 |    -1.182 |     1.463 |     23.79 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      155198.1</span> |     3.051 |     71.78 |    0.1123 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 2.435e+04 |     770.8 |    -8547. </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   43</span>|     127246.75 |    -1.182 |     1.463 |     23.79 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     127246.75 |     3.094 |     73.14 |    0.1339 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     127246.75</span><span> |     3.094 |     73.14 |    0.1339 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 2.069e+04 |     3320. |    -4912. </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   44</span><span>|     106714.22 |    -1.171 |     1.496 |     29.55 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     127246.75</span> |     3.094 |     73.14 |    0.1339 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 2.069e+04 |     3320. |    -4912. </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   44</span>|     106714.22 |    -1.171 |     1.496 |     29.55 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     106714.22 |     3.148 |     74.82 |    0.1628 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     106714.22</span><span> |     3.148 |     74.82 |    0.1628 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.557e+04 |     4547. |    -2629. </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   45</span><span>|     94284.677 |    -1.159 |     1.532 |     36.06 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     106714.22</span> |     3.148 |     74.82 |    0.1628 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.557e+04 |     4547. |    -2629. </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   45</span>|     94284.677 |    -1.159 |     1.532 |     36.06 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     94284.677 |     3.206 |     76.61 |    0.1953 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     94284.677</span><span> |     3.206 |     76.61 |    0.1953 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.083e+04 |     4827. |    -1438. </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   46</span><span>|     86446.913 |    -1.146 |     1.573 |     43.70 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     94284.677</span> |     3.206 |     76.61 |    0.1953 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    M|   Mixed Diff. | 1.083e+04 |     4827. |    -1438. </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   46</span>|     86446.913 |    -1.146 |     1.573 |     43.70 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     86446.913 |     3.271 |     78.64 |    0.2335 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     86446.913</span><span> |     3.271 |     78.64 |    0.2335 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |     6660. |     4657. |    -772.9 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   47</span><span>|     81819.577 |    -1.132 |     1.617 |     52.27 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     86446.913</span> |     3.271 |     78.64 |    0.2335 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |     6660. |     4657. |    -772.9 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   47</span>|     81819.577 |    -1.132 |     1.617 |     52.27 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     81819.577 |     3.342 |     80.85 |    0.2764 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     81819.577</span><span> |     3.342 |     80.85 |    0.2764 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |     3268. |     4288. |    -411.9 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   48</span><span>|     79279.580 |    -1.117 |     1.663 |     61.29 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     81819.577</span> |     3.342 |     80.85 |    0.2764 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |     3268. |     4288. |    -411.9 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   48</span>|     79279.580 |    -1.117 |     1.663 |     61.29 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|      79279.58 |     3.417 |     83.13 |    0.3215 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      79279.58</span><span> |     3.417 |     83.13 |    0.3215 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |     690.6 |     3876. |    -219.3 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   49</span><span>|     77976.485 |    -1.102 |     1.708 |     70.32 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>      79279.58</span> |     3.417 |     83.13 |    0.3215 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |     690.6 |     3876. |    -219.3 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   49</span>|     77976.485 |    -1.102 |     1.708 |     70.32 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     77976.485 |     3.490 |     85.38 |    0.3666 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77976.485</span><span> |     3.490 |     85.38 |    0.3666 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -1203. |     3496. |    -115.1 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   50</span><span>|     77350.191 |    -1.088 |     1.752 |     79.34 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77976.485</span> |     3.490 |     85.38 |    0.3666 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -1203. |     3496. |    -115.1 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   50</span>|     77350.191 |    -1.088 |     1.752 |     79.34 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     77350.191 |     3.564 |     87.59 |    0.4117 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77350.191</span><span> |     3.564 |     87.59 |    0.4117 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -2627. |     3159. |    -55.21 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   51</span><span>|     77140.054 |    -1.076 |     1.786 |     86.42 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77350.191</span> |     3.564 |     87.59 |    0.4117 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -2627. |     3159. |    -55.21 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   51</span>|     77140.054 |    -1.076 |     1.786 |     86.42 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     77140.054 |     3.621 |     89.31 |    0.4471 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77140.054</span><span> |     3.621 |     89.31 |    0.4471 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -3505. |     2922. |    -25.49 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   52</span><span>|     77091.677 |    -1.069 |     1.807 |     90.85 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77140.054</span> |     3.621 |     89.31 |    0.4471 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -3505. |     2922. |    -25.49 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   52</span>|     77091.677 |    -1.069 |     1.807 |     90.85 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     77091.677 |     3.657 |     90.36 |    0.4692 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77091.677</span><span> |     3.657 |     90.36 |    0.4692 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -3967. |     2782. |    -11.86 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   53</span><span>|     77085.259 |    -1.066 |     1.815 |     92.67 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77091.677</span> |     3.657 |     90.36 |    0.4692 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -3967. |     2782. |    -11.86 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   53</span>|     77085.259 |    -1.066 |     1.815 |     92.67 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     77085.259 |     3.671 |     90.77 |    0.4783 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77085.259</span><span> |     3.671 |     90.77 |    0.4783 |</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -4138. |     2721. |    -7.067 </span><span>|</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   54</span><span>|     77085.259 |    -1.066 |     1.815 |     92.67 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77085.259</span> |     3.671 |     90.77 |    0.4783 |</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='text-decoration: underline;'>    F| Forward Diff. |    -4138. |     2721. |    -7.067 </span>|</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |<span style='font-weight: bold;'>   54</span>|     77085.259 |    -1.066 |     1.815 |     92.67 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> |    U|     77085.259 |     3.671 |     90.77 |    0.4783 |</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77085.259</span><span> |     3.671 |     90.77 |    0.4783 |</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |    X|<span style='font-weight: bold;'>     77085.259</span> |     3.671 |     90.77 |    0.4783 |</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> calculating covariance matrix</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> done</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Calculating residuals/tables</span>
@@ -1559,7 +1558,7 @@ details. Default is NULL.</p></td>
 <span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>gradient problems with initial estimate and covariance; see $scaleInfo</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># }</span></span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

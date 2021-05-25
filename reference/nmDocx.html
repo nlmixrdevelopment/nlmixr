@@ -66,8 +66,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -209,7 +207,7 @@
     <p>Create a run summary word document</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nmDocx</span><span class='op'>(</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>nmDocx</span><span class='op'>(</span>
   <span class='va'>x</span>,
   docxOut <span class='op'>=</span> <span class='cn'>NULL</span>,
   docxTemplate <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -224,7 +222,7 @@
   save <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
-<span class='fu'>nmSave</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, save <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
+<span class='fu'>nmSave</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, save <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -317,7 +315,7 @@ data object for the fit?  By default this is <code>FALSE</code> with
     <p>Matthew Fidler</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'># \donttest{</span></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># \donttest{</span></span>
 <span class='r-in'> <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/nlmixrdevelopment/nlmixr'>nlmixr</a></span><span class='op'>)</span></span>
 <span class='r-in'><span class='va'>pheno</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span></span>
 <span class='r-in'>    <span class='co'># Pheno with covariance</span></span>
@@ -341,10 +339,10 @@ data object for the fit?  By default this is <code>FALSE</code> with
 <span class='r-in'><span class='op'>}</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='va'>fit.s</span> <span class='op'>&lt;-</span> <span class='fu'><a href='nlmixr.html'>nlmixr</a></span><span class='op'>(</span><span class='va'>pheno</span>, <span class='va'>pheno_sd</span>, <span class='st'>"saem"</span><span class='op'>)</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BBBB;'>ℹ</span><span> parameter labels from comments will be replaced by 'label()'</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BBBB;'>ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  </span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → generate SAEM model</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 1:    -5.0291    0.3072    0.9500    0.9500   48.9703</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 2:    -5.2433    0.4160    0.9025    0.9025   35.3695</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 3:    -5.3098    0.4083    0.8574    0.8574   28.6168</span>
@@ -848,13 +846,13 @@ data object for the fit?  By default this is <code>FALSE</code> with
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Calculating covariance matrix</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → creating full model...</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> → pruning branches (<span style='color: #262626;background-color: #DADADA;'>`if`</span><span>/</span><span style='color: #262626;background-color: #DADADA;'>`else`</span><span>)...</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> → loading into <span style='color: #0000BB;'>symengine</span><span> environment...</span></span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> → pruning branches (<span style='color: #262626; background-color: #DADADA;'>`if`</span>/<span style='color: #262626; background-color: #DADADA;'>`else`</span>)...</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> → loading into <span style='color: #0000BB;'>symengine</span> environment...</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> → compiling EBE model...</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  </span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span><span> done</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> <span style='color: #00BB00;'>✔</span> done</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Calculating residuals/tables</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> done</span>
 <span class='r-in'></span>
@@ -869,7 +867,7 @@ data object for the fit?  By default this is <code>FALSE</code> with
 <span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in read_xml.raw(charToRaw(enc2utf8(x)), "UTF-8", ..., as_html = as_html,     options = options)</span> PCDATA invalid Char value 27 [9]</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># }</span></span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
