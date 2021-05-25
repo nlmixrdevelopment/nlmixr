@@ -36,7 +36,7 @@ Suggests:
     testthat,
     tidyr,
     ucminf,
-    vpc (>= 1.0.0),
+    vpc (>= 1.1.0),
     xgxr,
     yaml,
     xpose,
