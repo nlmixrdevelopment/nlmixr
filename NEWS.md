@@ -25,6 +25,10 @@
   - Theta reset now will now make sure the parameter is estimated and
     between the proper bounds before resetting.
 
+ - `$simInfo` non longer tries to generate the covariance step, and
+   will simply have a `$simInfo$thetaMat` entry of `NULL` if the
+   covariance step was unsuccessful.
+
 # nlmixr 2.0.4
 
 - Now can use the following for combinde error models:

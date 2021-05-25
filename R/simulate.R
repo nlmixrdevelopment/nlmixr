@@ -129,7 +129,12 @@
   .dfObs <- object$nobs
   .nlmixrData <- nlmixr::nlmixrData(nlme::getData(object))
   .dfSub <- length(unique(.nlmixrData$ID))
-  .thetaMat <- nlme::getVarCov(object)
+  .env <- object$env
+  if (exists("cov", .env)) {
+    .thetaMat <- nlme::getVarCov(object)
+  } else {
+    .thetaMat <- NULL
+  }
   if (all(is.na(object$uif$ini$neta1))) {
     .omega <- NULL
     .dfSub <- 0
