@@ -88,7 +88,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.5</span>
       </span>
     </div>
 
@@ -201,9 +201,9 @@
       <small>Source: <a href='https://github.com/nlmixrdevelopment/nlmixr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="nlmixr-2041-development-version" class="section level1">
-<h1 class="page-header" data-toc-text="2.0.4.1">
-<a href="#nlmixr-2041-development-version" class="anchor" aria-hidden="true"></a>nlmixr 2.0.4.1 (Development version)<small> Unreleased </small></h1>
+    <div id="nlmixr-205" class="section level1">
+<h1 class="page-header" data-toc-text="2.0.5">
+<a href="#nlmixr-205" class="anchor" aria-hidden="true"></a>nlmixr 2.0.5<small> Unreleased </small></h1>
 <ul><li><p>Fix for <code>nlmixrSim</code> CMT to have a factor that matches the <code>RxODE</code> definition (issue <a href='https://github.com/nlmixrdevelopment/nlmixr/issues/501'>#501</a>)</p></li>
 <li>
 <p>For <code>focei</code> family estimation methods:</p>
@@ -214,6 +214,7 @@
 </ul></li>
 <li><p><code>$simInfo</code> non longer tries to generate the covariance step, and will simply have a <code>$simInfo$thetaMat</code> entry of <code>NULL</code> if the covariance step was unsuccessful.</p></li>
 <li><p>With <code><a href="../reference/vpc.html">vpc()</a></code> if the cmt conversion isn’t working correctly, fall back to compartment numbers.</p></li>
+<li><p>Take out symbol stripping based on CRAN policies</p></li>
 </ul></div>
     <div id="nlmixr-204" class="section level1">
 <h1 class="page-header" data-toc-text="2.0.4">

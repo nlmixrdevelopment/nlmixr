@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.5</span>
       </span>
     </div>
 
@@ -151,7 +151,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using Broom with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-05-25</h4>
+            <h4 data-toc-skip class="date">2021-06-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/broom.Rmd" class="external-link"><code>vignettes/broom.Rmd</code></a></small>
       <div class="hidden name"><code>broom.Rmd</code></div>
@@ -201,26 +201,34 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
+<span class="co">#&gt; Error in .fitFun(.ret) : </span>
+<span class="co">#&gt;   function 'rx_a166902add76549459e2fc4ff24f421d__calc_lhs' not provided by package 'rx_a166902add76549459e2fc4ff24f421d_'</span>
+<span class="co">#&gt; Error in (function (data, inits, PKpars, model = NULL, pred = NULL, err = NULL,  : </span>
+<span class="co">#&gt;   Could not fit data.</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span>
 <span class="va">fit.f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pheno</span>, <span class="va">pheno_sd</span>, <span class="st">"focei"</span>,
                 control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
                 table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
 <span class="co">#&gt; calculating covariance matrix</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
@@ -235,7 +243,7 @@
 <span class="co">#&gt; # A tibble: 1 x 5</span>
 <span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  689.  986. 1004.  -487.            6.32</span></code></pre></div>
+<span class="co">#&gt; 1  707. 1004. 1022.  -496.            6.32</span></code></pre></div>
 <p>Note in nlmixr it is possible to have more than one fit metric (based on different quadratures, FOCEi approximation etc). However, the <code>glance</code> only returns the fit metrics that are current.</p>
 <p>If you wish you can set the objective function to the focei objective function (which was already calculated with CWRES).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -421,13 +429,13 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_vals"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 5</span>
 <span class="co">#&gt;   effect   group level term   estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;fct&gt; &lt;fct&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_vals ID    1     eta.cl  -0.0991</span>
-<span class="co">#&gt; 2 ran_vals ID    2     eta.cl  -0.229 </span>
-<span class="co">#&gt; 3 ran_vals ID    3     eta.cl   0.239 </span>
-<span class="co">#&gt; 4 ran_vals ID    4     eta.cl  -0.510 </span>
-<span class="co">#&gt; 5 ran_vals ID    5     eta.cl   0.318 </span>
-<span class="co">#&gt; 6 ran_vals ID    6     eta.cl  -0.150</span></code></pre></div>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;int&gt; &lt;fct&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_vals ID        1 eta.cl  -0.0991</span>
+<span class="co">#&gt; 2 ran_vals ID        2 eta.cl  -0.229 </span>
+<span class="co">#&gt; 3 ran_vals ID        3 eta.cl   0.239 </span>
+<span class="co">#&gt; 4 ran_vals ID        4 eta.cl  -0.510 </span>
+<span class="co">#&gt; 5 ran_vals ID        5 eta.cl   0.318 </span>
+<span class="co">#&gt; 6 ran_vals ID        6 eta.cl  -0.150</span></code></pre></div>
 <p>This duplicate method of running <code>effects</code> is because the <code>broom</code> package supports <code>effects="random"</code> while the <code>broom.mixed</code> package supports <code>effects="ran_vals"</code>.</p>
 </div>
 <div id="extracting-random-coefficients" class="section level2">
@@ -439,35 +447,35 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 5</span>
 <span class="co">#&gt;   effect   group level term  estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;fct&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_coef ID    1     tcl      -5.09</span>
-<span class="co">#&gt; 2 ran_coef ID    2     tcl      -5.22</span>
-<span class="co">#&gt; 3 ran_coef ID    3     tcl      -4.75</span>
-<span class="co">#&gt; 4 ran_coef ID    4     tcl      -5.50</span>
-<span class="co">#&gt; 5 ran_coef ID    5     tcl      -4.67</span>
-<span class="co">#&gt; 6 ran_coef ID    6     tcl      -5.14</span></code></pre></div>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;int&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_coef ID        1 tcl      -5.09</span>
+<span class="co">#&gt; 2 ran_coef ID        2 tcl      -5.22</span>
+<span class="co">#&gt; 3 ran_coef ID        3 tcl      -4.75</span>
+<span class="co">#&gt; 4 ran_coef ID        4 tcl      -5.50</span>
+<span class="co">#&gt; 5 ran_coef ID        5 tcl      -4.67</span>
+<span class="co">#&gt; 6 ran_coef ID        6 tcl      -5.14</span></code></pre></div>
 <p>This can also be changed by the <code>exponentiate</code> argument:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 5</span>
 <span class="co">#&gt;   effect   group level term  estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;fct&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_coef ID    1     tcl    0.00617</span>
-<span class="co">#&gt; 2 ran_coef ID    2     tcl    0.00542</span>
-<span class="co">#&gt; 3 ran_coef ID    3     tcl    0.00865</span>
-<span class="co">#&gt; 4 ran_coef ID    4     tcl    0.00409</span>
-<span class="co">#&gt; 5 ran_coef ID    5     tcl    0.00936</span>
-<span class="co">#&gt; 6 ran_coef ID    6     tcl    0.00586</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;int&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_coef ID        1 tcl    0.00617</span>
+<span class="co">#&gt; 2 ran_coef ID        2 tcl    0.00542</span>
+<span class="co">#&gt; 3 ran_coef ID        3 tcl    0.00865</span>
+<span class="co">#&gt; 4 ran_coef ID        4 tcl    0.00409</span>
+<span class="co">#&gt; 5 ran_coef ID        5 tcl    0.00936</span>
+<span class="co">#&gt; 6 ran_coef ID        6 tcl    0.00586</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span>, exponentiate<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 5</span>
 <span class="co">#&gt;   effect   group level term  estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;fct&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_coef ID    1     tcl    0.00617</span>
-<span class="co">#&gt; 2 ran_coef ID    2     tcl    0.00542</span>
-<span class="co">#&gt; 3 ran_coef ID    3     tcl    0.00865</span>
-<span class="co">#&gt; 4 ran_coef ID    4     tcl    0.00409</span>
-<span class="co">#&gt; 5 ran_coef ID    5     tcl    0.00936</span>
-<span class="co">#&gt; 6 ran_coef ID    6     tcl    0.00586</span></code></pre></div>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;int&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 ran_coef ID        1 tcl    0.00617</span>
+<span class="co">#&gt; 2 ran_coef ID        2 tcl    0.00542</span>
+<span class="co">#&gt; 3 ran_coef ID        3 tcl    0.00865</span>
+<span class="co">#&gt; 4 ran_coef ID        4 tcl    0.00409</span>
+<span class="co">#&gt; 5 ran_coef ID        5 tcl    0.00936</span>
+<span class="co">#&gt; 6 ran_coef ID        6 tcl    0.00586</span></code></pre></div>
 </div>
 </div>
 <div id="example-of-using-a-tidy-model-estimates-for-other-packages" class="section level1">
@@ -567,7 +575,7 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">AIC</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.843    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.842    </td>
 </tr>
 <tr><th colspan="2" style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</th></tr>
 </table>
@@ -655,7 +663,7 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">AIC</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.843    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.842    </td>
 <td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.487    </td>
 </tr>
 <tr><th colspan="3" style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</th></tr>
