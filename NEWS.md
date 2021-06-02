@@ -1,4 +1,4 @@
-# nlmixr 2.0.4.1 (Development version)
+# nlmixr 2.0.5
 
 - Fix for `nlmixrSim` CMT to have a factor that matches the `RxODE`
   definition (issue #501)
@@ -31,6 +31,8 @@
 
  - With `vpc()` if the cmt conversion isn't working correctly, fall
    back to compartment numbers.
+   
+ - Take out symbol stripping based on CRAN policies
 
 # nlmixr 2.0.4
 

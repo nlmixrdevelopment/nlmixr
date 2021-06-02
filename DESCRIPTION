@@ -48,7 +48,7 @@ Suggests:
     covr,
     forecast,
     latticeExtra
-Version: 2.0.4.1
+Version: 2.0.5
 Authors@R: c(person("Matthew","Fidler",
       role = "aut", email = "matthew.fidler@gmail.com",
       comment=c(ORCID="0000-0001-8538-6691")),
@@ -83,7 +83,6 @@ Authors@R: c(person("Matthew","Fidler",
    person("Audrey", "Lavenu", role="ctb"),
    person("Marc", "Lavielle", role="ctb"),
    person("David","Ardia",role = "cph"),
-   person("Daniel C.", "Dillon", role="ctb"),
    person("Katharine","Mullen",role = "cph"),
    person("Ben", "Goodrich", role = "ctb")
    )
