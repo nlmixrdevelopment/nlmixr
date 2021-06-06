@@ -1478,6 +1478,9 @@ void setupRx(List &opt, SEXP evt, SEXP evtM) {
     } else {
       ev = evtM;
     }
+    if (Rf_isNull(pars)) {
+      stop("params must be non-nil");
+    }
     RxODE::rxSolve_(obj, odeO,
      		    R_NilValue,//const Nullable<CharacterVector> &specParams =
      		    R_NilValue,//const Nullable<List> &extraArgs =
