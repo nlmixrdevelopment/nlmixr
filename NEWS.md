@@ -33,6 +33,9 @@
    back to compartment numbers.
    
  - Take out symbol stripping based on CRAN policies
+ 
+ - Fall back gracefully when `rbind` doesn't work in parameter
+   histories.
 
 # nlmixr 2.0.4
 

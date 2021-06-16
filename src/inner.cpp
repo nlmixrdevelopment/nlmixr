@@ -5355,22 +5355,9 @@ void parHistData(Environment e, bool focei){
     if (thetaReset.exists("parHistData")) {
       // rbind  data.
       if (TYPEOF(thetaReset["parHistData"]) == VECSXP) {
-	Function rbind = baseEnv["rbind"];
-	// List parHistPrior = thetaReset["parHistData"];
-	// IntegerVector parHistPriorRN = parHistPrior.attr("row.names");
-	// int extra = parHistPriorRN[1];
-	// List ret2 = List(ret.size());
-	// for (int j = ret.size(); j--;) {
-	//   NumericVector newNv(sz+extra);
-	//   NumericVector last = parHistPrior[j];
-	//   NumericVector cur = ret[j];
-	//   std::copy(last.begin(), last.end(), newNv.begin());
-	//   std::copy(cur.begin(), cur.end(), newNv.begin() + last.size());
-	//   ret2[j] = newNv;
-	// }
-	// ret2.names() = ret.names();
-	// ret2.attr("class") = "data.frame";
-	// ret2.attr("row.names")=IntegerVector::create(NA_INTEGER, -sz-extra);
+	Function loadNamespace("loadNamespace", R_BaseNamespace);
+	Environment nlmixr = loadNamespace("nlmixr");
+	Function rbind = nlmixr[".rbindParHistory"];
 	ret = rbind(thetaReset["parHistData"], ret);
       }
       thetaReset.remove("parHistData");

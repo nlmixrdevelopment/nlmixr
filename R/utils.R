@@ -25,6 +25,15 @@
 #
 # ####################################################################### #
 
+.rbindParHistory <- function(p1, p2) {
+  .ret <- try(rbind(p1, p2), silent=TRUE)
+  if (inherits(.ret, "try-error")) {
+    warning("parameter history may be incomplete")
+    return(p2)
+  }
+  .ret
+}
+
 refresh <- function() {
   ## nocov start
   source(devtools::package_file("build/refresh.R"))
