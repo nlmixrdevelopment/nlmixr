@@ -33,6 +33,14 @@
 #' @param oral logical, whether oral absorption is true
 #' @param infusion logical, whether infusion is true
 #' @param parameterization type of parameterization, 1=clearance/volume, 2=micro-constants
+#'
+#' @details
+#'
+#' This is used by some of the internal nlmixr routines, for example
+#' the low level nlme estimation with nlmixr. With the nlmixr functions
+#' you should use `linCmt()` instead.  It is documented at
+#' \url{https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-model-types.html#solved-compartment-models}
+#'
 #' @return calculated concentrations
 #' @export lin_cmt
 lin_cmt <- function(obs_time, dose_time, dose, Tinf, params, oral, infusion, ncmt, parameterization) {

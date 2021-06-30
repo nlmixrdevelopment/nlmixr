@@ -37,6 +37,10 @@
  - Fall back gracefully when `rbind` doesn't work in parameter
    histories.
 
+ - Correctly print out the number of compartments based on the new
+   `RxODE` `linCmt()` that was updated to support solved systems in
+   focei. (Reported by Bill Denney #537). 
+
 # nlmixr 2.0.4
 
 - Now can use the following for combinde error models:

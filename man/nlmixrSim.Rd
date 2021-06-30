@@ -512,8 +512,7 @@ and \code{to}.}
 isn't any observations in the event table. By default this is 200.}
 
 \item{iCov}{A data frame of individual non-time varying covariates
-to combine with the \code{params} to form a parameter
-data.frame.}
+to combine with the \code{events} dataset by merge.}
 
 \item{keep}{Columns to keep from either the input dataset or the
 \code{iCov} dataset.  With the \code{iCov} dataset, the column

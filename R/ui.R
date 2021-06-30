@@ -3772,16 +3772,8 @@ nlmixrUI.model.desc <- function(obj) {
   } else if (.mv$extraCmt == 0) {
     return("RxODE-based ODE model")
   } else {
-    .pred <- obj$rxode.pred
-    if (regexpr(rex::rex("rx_B~0;"), .pred)) {
-      .ncmt <- 1
-    } else if (regexpr(rex::rex("rx_C~0;"), .pred)) {
-      .ncmt <- 2
-    } else {
-      .ncmt <- 3
-    }
     return(sprintf(
-      "RxODE-based %s-compartment model%s", .ncmt,
+      "RxODE-based %s-compartment model%s", .mv$flags["ncmt"],
       ifelse(.mv$extraCmt == 2, " with first-order absorption", "")
     ))
   }

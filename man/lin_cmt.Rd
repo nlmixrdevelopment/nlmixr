@@ -41,3 +41,9 @@ calculated concentrations
 \description{
 concentrations from a linear compartment model by close-form solutions
 }
+\details{
+This is used by some of the internal nlmixr routines, for example
+the low level nlme estimation with nlmixr. With the nlmixr functions
+you should use `linCmt()` instead.  It is documented at
+\url{https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-model-types.html#solved-compartment-models}
+}
