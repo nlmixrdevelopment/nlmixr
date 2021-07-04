@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "res.h"
 #include <boost/algorithm/string.hpp>
 #include <string>

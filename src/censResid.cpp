@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "censResid.h"
 
 bool censTruncatedMvnReturnInterestingLimits(arma::vec& dv, arma::vec& dvt,

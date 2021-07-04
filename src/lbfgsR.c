@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include <R_ext/Applic.h>
 // This is to avoid BLAS conflicts with arma.
 void lbfgsbRX(int n, int lmm, double *x, double *lower,

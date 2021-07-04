@@ -39,7 +39,11 @@
 
  - Correctly print out the number of compartments based on the new
    `RxODE` `linCmt()` that was updated to support solved systems in
-   focei. (Reported by Bill Denney #537). 
+   focei. (Reported by Bill Denney #537).
+
+ - Use strict headers since Rcpp now is moving toward strict headers.
+   Also changed all the `Calloc` to `R_Calloc`, `Free` to `R_Free`,
+   and `DOUBLE_EPS` to `DBL_EPSILON`.
 
 # nlmixr 2.0.4
 

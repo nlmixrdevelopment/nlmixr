@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
@@ -20,12 +21,12 @@ int F77_SUB(basout)(int *io, int *lunit, char *string,long int nbcharacters){
              if we do basout(io,lunit,'     []',7) it works ...
              temp workaround , we returns to old version with a allocation
           */
-	  char *buffer = (char *)Calloc(nbcharacters+1,char);
+	  char *buffer = (char *)R_Calloc(nbcharacters+1,char);
           if (buffer) {
               strncpy(buffer,string,nbcharacters);
               buffer[nbcharacters]='\0';
               Rprintf("%s\n",buffer);
-              Free(buffer);
+              R_Free(buffer);
 	  } else {
               Rprintf("\n");
             }

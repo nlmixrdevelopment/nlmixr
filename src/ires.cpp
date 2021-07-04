@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "ires.h"
 
 extern "C" SEXP _nlmixr_iresCalc(SEXP ipredDfLstSXP, SEXP dvIn, SEXP evidIn, SEXP censIn, SEXP limitIn,

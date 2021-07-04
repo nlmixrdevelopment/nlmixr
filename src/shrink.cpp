@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "shrink.h"
 
 //[[Rcpp::export]]

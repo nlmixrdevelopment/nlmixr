@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 // arr1: input=inf end-times
 // arr4: output=idx of inf end-times in the merged times
 // arr2: input=inf start-times, and/or bolus time & sampl

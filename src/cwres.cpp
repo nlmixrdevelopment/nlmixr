@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "cwres.h"
 static inline void calculateCwresDerr(arma::mat& fppm, arma::mat& fpim,
 				      arma::ivec& ID, arma::mat &etas,

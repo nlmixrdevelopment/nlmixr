@@ -17,6 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
+#define STRICT_R_HEADER
 
 #include <math.h>
 #include <stdlib.h>

@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include <stan/math/prim/mat/fun/Eigen.hpp> // must come before #include <RcppEigen.h>
 #include "../inst/include/nlmixr_types.h"
 #include <RcppEigen.h>

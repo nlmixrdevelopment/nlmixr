@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "armahead.h"
 
 
@@ -30,7 +31,7 @@ arma::mat gershNested(arma::mat A, int j, int n) {
 // Use tau1=sqrt(eps) instead of eps^1/3; In my tests eps^1/3 produces NaNs
 bool cholSE0(arma::mat &Ao, arma::mat &E, arma::mat A, double tol) {
   int n = A.n_rows;
-  double tau1 = tol;//pow(DOUBLE_EPS, 1/3);
+  double tau1 = tol;//
   double tau2 = tol;//tau1;
   bool phase1 = true;
   double delta = 0;

@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "../inst/include/nlmixr_types.h"
 #include "evaluate.h"
 #include "lin_cmt.h"

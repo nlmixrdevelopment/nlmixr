@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "armahead.h"
 #include "censResid.h"
 using namespace R;

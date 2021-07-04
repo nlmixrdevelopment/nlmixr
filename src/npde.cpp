@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include "npde.h"
 
 #ifdef _OPENMP
@@ -213,15 +214,15 @@ static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, ar
     // Ties are allowed
     for (unsigned int j = ret.pd.n_rows; j--;) {
       handleCensNpdeCdf(ret, cens, limit, censMethod, doLimit, j, ru2, ru3, K, ties);
-      if (fabs(ret.pd[j]) < DOUBLE_EPS){
+      if (fabs(ret.pd[j]) < DBL_EPSILON){
 	ret.pd[j] = 1 / (2.0 * K);
-      } else if (fabs(1-ret.pd[j]) < DOUBLE_EPS){
+      } else if (fabs(1-ret.pd[j]) < DBL_EPSILON){
 	ret.pd[j] = 1 - 1 / (2.0 * K);
       }
       ret.npde[j] = Rf_qnorm5(ret.pd[j], 0.0, 1.0, 1, 0);
-      if (fabs(ret.pd2[j]) < DOUBLE_EPS){
+      if (fabs(ret.pd2[j]) < DBL_EPSILON){
 	ret.pd2[j] = 1 / (2.0 * K);
-      } else if (fabs(1-ret.pd2[j]) < DOUBLE_EPS){
+      } else if (fabs(1-ret.pd2[j]) < DBL_EPSILON){
 	ret.pd2[j] = 1 - 1 / (2.0 * K);
       }
       ret.npd[j] = Rf_qnorm5(ret.pd2[j], 0.0, 1.0, 1, 0);
@@ -230,17 +231,17 @@ static inline void calculateNPDEfromPD(calcNpdeInfoId &ret, arma::ivec &cens, ar
     // Ties are discouraged with jitter
     for (unsigned int j = ret.pd.n_rows; j--;) {
       handleCensNpdeCdf(ret, cens, limit, censMethod, doLimit, j, ru2, ru3, K, ties);
-      if (fabs(ret.pd[j]) < DOUBLE_EPS){
+      if (fabs(ret.pd[j]) < DBL_EPSILON){
 	ret.pd[j] = ru[j] / K;
-      } else if (fabs(1-ret.pd[j]) < DOUBLE_EPS){
+      } else if (fabs(1-ret.pd[j]) < DBL_EPSILON){
 	ret.pd[j] = 1.0 - ru[j] / K;
       } else  {
 	ret.pd[j] += ru[j]/K;
       }
       ret.npde[j] = Rf_qnorm5(ret.pd[j], 0.0, 1.0, 1, 0);
-      if (fabs(ret.pd2[j]) < DOUBLE_EPS){
+      if (fabs(ret.pd2[j]) < DBL_EPSILON){
 	ret.pd2[j] = ru[j] / K;
-      } else if (fabs(1-ret.pd2[j]) < DOUBLE_EPS){
+      } else if (fabs(1-ret.pd2[j]) < DBL_EPSILON){
 	ret.pd2[j] = 1.0 - ru[j] / K;
       } else  {
 	ret.pd2[j] += ru2[j]/K;

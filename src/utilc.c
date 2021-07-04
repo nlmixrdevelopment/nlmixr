@@ -1,3 +1,4 @@
+#define STRICT_R_HEADER
 #include <sys/stat.h> 
 #include <fcntl.h>
 #include <stdio.h>
@@ -198,7 +199,7 @@ SEXP getDfSubsetVars(SEXP ipred, SEXP lhs) {
   if (type != STRSXP) return R_NilValue;
   int pro = 0;
   SEXP ipredNames = PROTECT(Rf_getAttrib(ipred, R_NamesSymbol)); pro++;
-  int *keepVals = Calloc(Rf_length(ipredNames), int);
+  int *keepVals = R_Calloc(Rf_length(ipredNames), int);
   int k = 0;
   for (int i = 0; i < Rf_length(ipredNames); ++i) {
     for (int j = 0; j < Rf_length(lhs); ++j) {
@@ -209,7 +210,7 @@ SEXP getDfSubsetVars(SEXP ipred, SEXP lhs) {
     }
   }
   if (k == 0) {
-    Free(keepVals);
+    R_Free(keepVals);
     UNPROTECT(pro);
     return R_NilValue;
   }
@@ -228,7 +229,7 @@ SEXP getDfSubsetVars(SEXP ipred, SEXP lhs) {
   rni[0] = NA_INTEGER;
   rni[1] = -Rf_length(VECTOR_ELT(ret,0));
   Rf_setAttrib(ret, R_RowNamesSymbol, rn);
-  Free(keepVals);
+  R_Free(keepVals);
   UNPROTECT(pro);
   return ret;
 }

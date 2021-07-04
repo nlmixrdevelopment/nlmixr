@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with nlmixr.  If not, see <http://www.gnu.org/licenses/>.
 
-
+#define STRICT_R_HEADER
 #include <cstdlib>
 #include <math.h>
 #include <R.h>
@@ -39,11 +39,11 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
   double ylo, dchk, z, dn, dabit, yoldlo=0;
 
   //FIXME: check malloc status
-  p = (double *) Calloc(n*(n+1),double);
-  pstar = (double *) Calloc(n,double);
-  p2star = (double *) Calloc(n,double);
-  pbar = (double *) Calloc(n,double);
-  y = (double *) Calloc((n+1),double);
+  p = (double *) R_Calloc(n*(n+1),double);
+  pstar = (double *) R_Calloc(n,double);
+  p2star = (double *) R_Calloc(n,double);
+  pbar = (double *) R_Calloc(n,double);
+  y = (double *) R_Calloc((n+1),double);
 
   kcount = 1000000;
   *nfcall = 0;
@@ -53,11 +53,11 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
   /* check inputs */
   if (n <= 0 || n > MXPAR) *nfcall += -10;
   if (*nfcall < 0){
-    Free(p);
-    Free(pstar);
-    Free(p2star);
-    Free(pbar);
-    Free(y);
+    R_Free(p);
+    R_Free(pstar);
+    R_Free(p2star);
+    R_Free(pbar);
+    R_Free(y);
     return;
   }
 
@@ -82,11 +82,11 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
 
     *ynewlo = fval;
     
-    Free(p);
-    Free(pstar);
-    Free(p2star);
-    Free(pbar);
-    Free(y);
+    R_Free(p);
+    R_Free(pstar);
+    R_Free(p2star);
+    R_Free(pbar);
+    R_Free(y);
     return;
   }
   else {
@@ -286,11 +286,11 @@ extern "C" void nelder_fn(fn_ptr func, int n, double *start, double *step,
   for (i = 0; i < n; ++i)
     xmin[i] = p[i+ibest*n];
   
-  Free(p);
-  Free(pstar);
-  Free(p2star);
-  Free(pbar);
-  Free(y);
+  R_Free(p);
+  R_Free(pstar);
+  R_Free(p2star);
+  R_Free(pbar);
+  R_Free(y);
   
   return;
 }

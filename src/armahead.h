@@ -21,7 +21,7 @@ bool cholSE0(arma::mat &Ao, arma::mat &E, arma::mat A, double tol);
 using namespace arma;
 using namespace Rcpp;
 
-#define _safe_sqrt(a) ((a) <= 0 ? sqrt(DOUBLE_EPS) : sqrt(a))
+#define _safe_sqrt(a) ((a) <= 0 ? sqrt(DBL_EPSILON) : sqrt(a))
 
 
 #endif
