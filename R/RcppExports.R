@@ -92,7 +92,7 @@ nlmixrHess_ <- function(thetaT, fT, e, gillInfoT) {
 #' @param m Matrix to take the square root of.
 #'
 #' @return A square root general square matrix of m
-#' 
+#'
 #' @export
 sqrtm <- function(m) {
     .Call(`_nlmixr_sqrtm`, m)

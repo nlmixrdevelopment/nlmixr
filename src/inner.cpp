@@ -108,7 +108,8 @@ typedef struct {
   double *etaLower = NULL;
   int *nbdInner = NULL;
   double *geta = NULL;
-  double *getah =NULL;
+  double *getahf =NULL;
+  double *getahr = NULL;
   double *goldEta = NULL;
   double *gsaveEta = NULL;
   double *gthetaGrad = NULL;
@@ -311,7 +312,8 @@ typedef struct {
   int nInnerG;
   double lik[3]; // lik[0] = liklihood; For central difference: lik[1] = lower lik[2] = upper
   double *eta; // Eta includes the ID number for the patient
-  double *etah;
+  double *etahf;
+  double *etahr;
   //
   double *thetaGrad; // Theta gradient; Calculated on the individual level for S matrix calculation
   double thVal[2]; // thVal[0] = lower; thVal[2] = upper
@@ -705,6 +707,101 @@ static inline void likCens(focei_ind *fInd, int &cens, double& limit, double&f, 
   }
 }
 
+
+typedef void (*gill83fn_type)(double *fp, double *theta, int id);
+
+void gill83fnF(double *fp, double *theta, int);
+int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
+	   double *theta, int cpar, double epsR, int K, double gillStep,
+	   double fTol, int cid, gill83fn_type gill83fn);
+
+gill83fn_type gill83fnG = &gill83fnF;
+
+
+void updateEta(double *eta, int cid) {
+  rx_solving_options_ind *ind =  &(rx->subjects[cid]);
+  for (int i = op_focei.neta; i--;) {
+    ind->par_ptr[op_focei.etaTrans[i]]=eta[i];
+  }
+}
+
+static inline void gill83pred(double *fp, double *eta, int cid, int w) {
+  // Calculate derivatives by finite difference
+  updateEta(eta, cid);
+  predOde(cid);
+  focei_ind *fInd = &(inds_focei[cid]);
+  rx_solving_options_ind *ind =  &(rx->subjects[cid]);
+  rxPred.calc_lhs(cid, fInd->curT, fInd->curS, // Solve space is smaller
+				ind->lhs);
+  *fp = ind->lhs[w];
+}
+
+void gill83etaR(double *fp, double *eta, int cid) {
+  gill83pred(fp, eta, cid, 1);
+}
+
+void gill83etaF(double *fp, double *eta, int cid) {
+  gill83pred(fp, eta, cid, 0);
+}
+
+static inline double calcGradForEtaGeneral(double *eta,
+					   double *aEps,
+					   int cpar, int cid, int w) {
+  // First try a gill difference
+  if (aEps[cpar] == 0) {
+    double hf, hphif, err, gillDf, gillDf2, gillErr;
+    int gillRet;
+    if (w == 0) {
+      gillRet = gill83(&hf, &hphif, &gillDf, &gillDf2, &gillErr,
+		       eta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol,
+		       cid, gill83etaF);
+    } else {
+      gillRet = gill83(&hf, &hphif, &gillDf, &gillDf2, &gillErr,
+		       eta, cpar, op_focei.gillRtol, op_focei.gillK, op_focei.gillStep, op_focei.gillFtol,
+		       cid, gill83etaR);
+    }
+    err = 1/(std::fabs(eta[cpar])+1);
+    aEps[cpar]  = hf*err;
+    return gillDf;
+  } else {
+    // now use forward
+    double delta = (std::fabs(eta[cpar])*aEps[cpar] + aEps[cpar]);
+    focei_ind *fInd = &(inds_focei[cid]);
+    rx_solving_options_ind *ind =  &(rx->subjects[cid]);
+    double fv;
+    ind->par_ptr[op_focei.etaTrans[cpar]]+=delta;
+    predOde(cid); // Assumes same order of parameters
+    rxPred.calc_lhs(cid, fInd->curT, fInd->curS, // Solve space is smaller
+				ind->lhs);
+    ind->par_ptr[op_focei.etaTrans[cpar]] -= delta;
+    double hv = ind->lhs[w];
+    double df = (hv - fInd->curF)/delta;
+    if (fabs(df) < op_focei.gradCalcCentralSmall){
+      // Switch to central in close to zero derivatives
+      ind->par_ptr[op_focei.etaTrans[cpar]] -= delta;
+      predOde(cid);
+      rxPred.calc_lhs(cid, fInd->curT, fInd->curS, // Solve space is smaller
+		      ind->lhs);
+      ind->par_ptr[op_focei.etaTrans[cpar]] += delta;
+      df = (hv-ind->lhs[w])/(2*delta);
+    }
+    return df;
+  }
+  return 0.0;
+}
+
+static inline double calcGradForEtaF(double *eta,
+		       double *aEps,
+		       int cpar, int cid) {
+  return calcGradForEtaGeneral(eta,aEps, cpar, cid, 0);
+}
+
+static inline double calcGradForEtaR(double *eta,
+		       double *aEps,
+		       int cpar, int cid) {
+  return calcGradForEtaGeneral(eta,aEps, cpar, cid, 1);
+}
+
 double likInner0(double *eta, int id){
   rx = getRx();
   rx_solving_options_ind *ind = &(rx->subjects[id]);
@@ -758,7 +855,7 @@ double likInner0(double *eta, int id){
 	} else {
 	  op_focei.stickyTol=1;
 	}
-      }  
+      }
     } else {
       predOde(id);
       predSolve=true;
@@ -861,44 +958,13 @@ double likInner0(double *eta, int id){
 	      }
 	    }
 	    op->neq = op_focei.predNeq;
+	    fInd->curT = curT;
+	    fInd->curF = f;
+	    fInd->curS = getSolve(j);
 	    for (i = op_focei.neta; i--; ) {
 	      if (predSolve || op_focei.etaFD[i]==1){
 		// Calculate derivatives by finite difference
-		ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
-		predOde(id); // Assumes same order of parameters
-		rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
-				ind->lhs);
-		ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
-		if (!op_focei.eventCentral) {
-		  // Forward difference
-		  // LHS #0 =  f
-		  a(k, i) = (ind->lhs[0]-f)/op_focei.eventFD;
-		  if (a(k, i) == 0.0) {
-		    // Now try central difference
-		    fpm = ind->lhs[0];
-		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
-		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
-				    ind->lhs);
-		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
-		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
-		    if (fpm == 0.0) {
-		      a(k, i) = fpm = sqrt(DBL_EPSILON);
-		    }
-		  }
-		} else {
-		  // Central Difference
-		  fpm = ind->lhs[0];
-		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
-		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
-				  ind->lhs);
-		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
-		  a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
-		  if (fpm == 0.0) {
-		    a(k, i) = fpm = sqrt(DBL_EPSILON);
-		  }
-		}
+		a(k, i) = fpm = calcGradForEtaF(eta, fInd->etahf, i, id);
 	      }
 	    }
 	    op->neq = oldNeq;
@@ -923,49 +989,24 @@ double likInner0(double *eta, int id){
 	      // Cannot combine for loop with for loop above because
 	      // calc_lhs overwrites the lhs memory.
 	      op->neq = op_focei.predNeq;
+	      op->neq = op_focei.predNeq;
+	      fInd->curT = curT;
+	      fInd->curS = getSolve(j);
 	      for (i = op_focei.neta; i--; ) {
 		// Calculate finite difference derivatives if needed
 		if (predSolve || op_focei.etaFD[i]==1){
 		  // Calculate derivatives by finite difference
-		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
-		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
-				ind->lhs);
-		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
-		  if (!op_focei.eventCentral) {
-		    // Forward difference
-		    // LHS #0 =  f
-		    a(k, i) = fpm = (ind->lhs[0]-f)/op_focei.eventFD;
-		    if (fpm == 0.0) {
-		      //
-		      a(k, i) = fpm = sqrt(DBL_EPSILON);
-		    }
-		    // LHS #1 =  r
-		    rp  = (ind->lhs[1]-r)/op_focei.eventFD;
-		    if (rp == 0.0) {
-		      rp = sqrt(DBL_EPSILON);
-		    }
-		    c(k, i) = rp/_safe_zero(r);
-		  } else {
-		    // Central difference
-		    fpm = ind->lhs[0];
-		    rp = ind->lhs[1];
-		    // LHS #1 =  r
-		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
-		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
-				    ind->lhs); // nlhs is smaller
-		    a(k, i) = fpm = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
-		    if (fpm == 0.0) {
-		      a(k, i) = fpm = sqrt(DBL_EPSILON);
-		    }
-		    rp = (rp-ind->lhs[1])/(2*op_focei.eventFD);
-		    if (rp == 0.0) {
-		      rp = sqrt(DBL_EPSILON);
-		    }
-		    c(k, i) = rp/_safe_zero(r);
-		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
+		  fInd->curF = f;
+		  a(k, i) = fpm = calcGradForEtaF(eta, fInd->etahf, i, id);
+		  fInd->curF = r;
+		  rp = calcGradForEtaR(eta, fInd->etahr, i, id);
+		  if (fpm == 0.0) {
+		    a(k, i) = fpm = sqrt(DBL_EPSILON);
 		  }
+		  if (rp == 0.0) {
+		    rp = sqrt(DBL_EPSILON);
+		  }
+		  c(k, i) = rp/_safe_zero(r);
 		} else {
 		  fpm = a(k, i);
 		  rp  = ind->lhs[i + op_focei.neta + 2];
@@ -1707,14 +1748,14 @@ static inline bool thetaReset0() {
 	  doAdjust = true;
 	} else {
 	  adjustEta[ii] = false;
-	}	
+	}
       }
     } else {
       adjustEta[ii] = false;
     }
   }
   if (!doAdjust) return false;
-    
+
   arma::mat etaMat(rx->nsub, op_focei.neta);
   for (int ii = rx->nsub; ii--;){
     focei_ind *fInd = &(inds_focei[ii]);
@@ -1832,7 +1873,7 @@ static inline int didInnerResetFailTryOne(focei_ind *indF, int& id) {
 	      didInnerResetPointFail(indF, id, -op_focei.etaNudge2)) {
 	    return 1; // failed
 	  } else {
-	    return 0; // reset on one of the eta nudge 
+	    return 0; // reset on one of the eta nudge
 	  }
 	} else {
 	  return 1; // failed reset
@@ -1842,7 +1883,7 @@ static inline int didInnerResetFailTryOne(focei_ind *indF, int& id) {
       }
     } else {
       return 1; // failed reset
-    } 
+    }
   }
   return 0;
 }
@@ -1857,7 +1898,7 @@ static inline int didInnerResetFail(focei_ind *indF, int& id) {
       } else {
 	indF->doFD = 0;
 	return 0;
-      }  
+      }
     } else {
       return 1;
     }
@@ -1953,7 +1994,7 @@ static inline double foceiLik0(double *theta){
   innerOpt();
   double lik = 0.0;
   double cur;
-  
+
   for (int id=rx->nsub; id--;){
     focei_ind *fInd = &(inds_focei[id]);
     cur = fInd->lik[0];
@@ -2149,36 +2190,7 @@ void gill83fnF(double *fp, double *theta, int) {
   }
 }
 
-typedef void (*gill83fn_type)(double *fp, double *theta, int id);
 
-gill83fn_type gill83fnG = &gill83fnF;
-
-
-void updateEta(double *eta, int cid) {
-  rx_solving_options_ind *ind =  &(rx->subjects[cid]);
-  for (int i = op_focei.neta; i--;) {
-    ind->par_ptr[op_focei.etaTrans[i]]=eta[i];
-  }
-}
-
-static inline void gill83pred(double *fp, double *eta, int cid, int w) {
-  // Calculate derivatives by finite difference
-  updateEta(eta, cid);
-  predOde(cid);
-  focei_ind *fInd = &(inds_focei[cid]);
-  rx_solving_options_ind *ind =  &(rx->subjects[cid]);
-  rxPred.calc_lhs(cid, fInd->curT, fInd->curS, // Solve space is smaller
-				ind->lhs);
-  *fp = ind->lhs[w];
-}
-
-void gill83etaR(double *fp, double *eta, int cid) {
-  gill83pred(fp, eta, cid, 1);
-}
-
-void gill83etaF(double *fp, double *eta, int cid) {
-  gill83pred(fp, eta, cid, 0);
-}
 
 // *hf is the forward difference final estimate
 // *hphif is central difference final estimate (when switching from forward to central differences)
@@ -2196,9 +2208,9 @@ void gill83etaF(double *fp, double *eta, int cid) {
 //         5 -- df2 increases rapidly as h decreases
 int gill83(double *hf, double *hphif, double *df, double *df2, double *ef,
 	   double *theta, int cpar, double epsR, int K, double gillStep,
-	   double fTol, int cid, gill83fn_type gill83fn){
+	   double fTol, int cid, gill83fn_type gill83fn) {
   if (foceiGill == 1) op_focei.calcGrad=1;
-  
+
   double f , x, hbar, h0, fp, fn=NA_REAL, phif, phib, phic, phicc = 0, phi, Chf, Chb,
     Ch, hs, hphi, hk, tmp, ehat, lasth, lastht=NA_REAL, lastfpt=NA_REAL, phict=NA_REAL;
   if (foceiGill == 1) {
@@ -2889,14 +2901,15 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
   int nz = ((op_focei.neta+1)*(op_focei.neta+2)/2+6*(op_focei.neta+1)+1)*rx->nsub;
 
   if (op_focei.etaUpper != NULL) R_Free(op_focei.etaUpper);
-  op_focei.etaUpper = R_Calloc(op_focei.gEtaGTransN*8+ op_focei.npars*(rx->nsub + 1)+nz+
+  op_focei.etaUpper = R_Calloc(op_focei.gEtaGTransN*9+ op_focei.npars*(rx->nsub + 1)+nz+
 			     2*op_focei.neta * rx->nall + rx->nall+ rx->nall*rx->nall +
 			     op_focei.neta*5 + 3*op_focei.neta*op_focei.neta*rx->nsub, double);
   op_focei.etaLower =  op_focei.etaUpper + op_focei.neta;
   op_focei.geta = op_focei.etaLower + op_focei.neta;
   op_focei.goldEta = op_focei.geta + op_focei.gEtaGTransN;
-  op_focei.getah = op_focei.goldEta + op_focei.gEtaGTransN;
-  op_focei.gsaveEta = op_focei.goldEta + op_focei.gEtaGTransN;
+  op_focei.getahf = op_focei.goldEta + op_focei.gEtaGTransN;
+  op_focei.getahr = op_focei.getahf + op_focei.gEtaGTransN;
+  op_focei.gsaveEta = op_focei.getahr + op_focei.gEtaGTransN;
   op_focei.gG = op_focei.gsaveEta + op_focei.gEtaGTransN;
   op_focei.gVar = op_focei.gG + op_focei.gEtaGTransN;
   op_focei.gX = op_focei.gVar + op_focei.gEtaGTransN;
@@ -2931,7 +2944,8 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
     fInd->doFD = 0;
     // ETA ini
     fInd->eta = &op_focei.geta[j];
-    fInd->etah = &op_focei.getah[j];
+    fInd->etahf = &op_focei.getahf[j];
+    fInd->etahr = &op_focei.getahr[j];
     fInd->oldEta = &op_focei.goldEta[j];
     fInd->saveEta = &op_focei.gsaveEta[j];
     fInd->g = &op_focei.gG[j];
@@ -2979,6 +2993,7 @@ static inline void foceiSetupEta_(NumericMatrix etaMat0){
 
 extern "C" double foceiOfvOptim(int n, double *x, void *ex);
 extern "C" void outerGradNumOptim(int n, double *par, double *gr, void *ex);
+
 // [[Rcpp::export]]
 NumericVector foceiSetup_(const RObject &obj,
 			  const RObject &data,
@@ -4831,7 +4846,7 @@ int foceiS(double *theta, Environment e){
 //' @param m Matrix to take the square root of.
 //'
 //' @return A square root general square matrix of m
-//' 
+//'
 //' @export
 //[[Rcpp::export]]
 NumericMatrix sqrtm(NumericMatrix m){
