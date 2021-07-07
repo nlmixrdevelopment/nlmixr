@@ -138,7 +138,7 @@ typedef struct {
   int *etaFD = NULL;
   double eventFD;
   int predNeq;
-  int eventCentral;
+  int eventType;
 
   int neta;
   unsigned int ntheta;
@@ -748,7 +748,8 @@ static inline double calcGradForEtaGeneral(double *eta,
 					   double *aEps,
 					   int cpar, int cid, int w) {
   // First try a gill difference
-  if (aEps[cpar] == 0) {
+  if (op_focei.eventType != 1) aEps[cpar] = op_focei.eventFD;  
+  if (op_focei.eventType == 1 && aEps[cpar] == 0) {
     double hf, hphif, err, gillDf, gillDf2, gillErr;
     int gillRet;
     if (w == 0) {
@@ -776,7 +777,7 @@ static inline double calcGradForEtaGeneral(double *eta,
     ind->par_ptr[op_focei.etaTrans[cpar]] -= delta;
     double hv = ind->lhs[w];
     double df = (hv - fInd->curF)/delta;
-    if (fabs(df) < op_focei.gradCalcCentralSmall){
+    if (op_focei.eventType == 2 || fabs(df) < op_focei.gradCalcCentralSmall){
       // Switch to central in close to zero derivatives
       ind->par_ptr[op_focei.etaTrans[cpar]] -= delta;
       predOde(cid);
@@ -878,7 +879,6 @@ double likInner0(double *eta, int id){
       if (op_focei.fo == 1){
 	Vid.zeros();
       }
-
       // RSprintf("ID: %d; Solve #2: %f\n", id, ind->solve[2]);
       // Calculate matricies
       int k = 0, kk=0;//ind->n_all_times - ind->ndoses - ind->nevid2 - 1;
@@ -980,7 +980,7 @@ double likInner0(double *eta, int id){
 	    B(k, 0) = 2.0/_safe_zero(r);
 	    if (op_focei.interaction == 1) {
 	      for (i = op_focei.neta; i--; ) {
-		if (op_focei.etaFD[i]==0) {
+		if (predSolve || op_focei.etaFD[i]==0) {
 		  fpm = a(k, i) = ind->lhs[i + 1]; // Almquist uses different a (see eq #15)
 		  rp  = ind->lhs[i + op_focei.neta + 2];
 		  c(k, i) = rp/_safe_zero(r);
@@ -1078,26 +1078,13 @@ double likInner0(double *eta, int id){
 		}
 	      }
 	      op->neq = op_focei.predNeq;
-	      for (i = op_focei.neta; i--;){
-		if (op_focei.etaFD[i]==1){
-		  ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
-		  predOde(id); // Assumes same order of parameters
-		  rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
-				ind->lhs);
-		  ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
-		  if (!op_focei.eventCentral) {
-		    // Forward difference
-		    fpm = a(k, i) = (ind->lhs[0]-f)/op_focei.eventFD;
-		  } else {
-		    // Central difference
-		    fpm = f;
-		    ind->par_ptr[op_focei.etaTrans[i]]-=op_focei.eventFD;
-		    predOde(id); // Assumes same order of parameters
-		    rxPred.calc_lhs(id, curT, getSolve(j), // Solve space is smaller
-				    ind->lhs);
-		    fpm = a(k, i) = (fpm - ind->lhs[0])/(2*op_focei.eventFD);
-		    ind->par_ptr[op_focei.etaTrans[i]]+=op_focei.eventFD;
-		  }
+	      fInd->curT = curT;
+	      fInd->curF = f;
+	      fInd->curS = getSolve(j);
+	      for (i = op_focei.neta; i--; ) {
+		// Calculate derivatives by finite difference
+		if (predSolve || op_focei.etaFD[i]==1) {
+		  a(k, i) = fpm = calcGradForEtaF(eta, fInd->etahf, i, id);
 		} else {
 		  fpm = a(k, i);
 		}
@@ -3362,7 +3349,7 @@ NumericVector foceiSetup_(const RObject &obj,
   op_focei.etaNudge = as<double>(odeO["etaNudge"]);
   op_focei.etaNudge2 = as<double>(odeO["etaNudge2"]);
   op_focei.eventFD = as<double>(odeO["eventFD"]);
-  op_focei.eventCentral = as<double>(odeO["eventCentral"]);
+  op_focei.eventType = as<int>(odeO["eventType"]);
   op_focei.predNeq = as<int>(odeO["predNeq"]);
   op_focei.gradProgressOfvTime = as<double>(odeO["gradProgressOfvTime"]);
   op_focei.initObj=0;
