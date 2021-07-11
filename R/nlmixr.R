@@ -675,6 +675,8 @@ saemControl <- function(seed = 99,
                         powRange = 10,
                         lambdaRange = 3,
                         loadSymengine=FALSE,
+                        odeRecalcFactor=10^(0.5),
+                        maxOdeRecalc=5L,
                         ...) {
   type <- match.arg(type)
   .xtra <- list(...)
@@ -724,6 +726,8 @@ saemControl <- function(seed = 99,
     powRange = powRange,
     lambdaRange = lambdaRange,
     loadSymengine=loadSymengine,
+    odeRecalcFactor=odeRecalcFactor,
+    maxOdeRecalc=maxOdeRecalc,
     ...
   )
   if (length(.rm) > 0) {

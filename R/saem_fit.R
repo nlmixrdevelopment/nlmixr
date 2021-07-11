@@ -201,7 +201,9 @@ configsaem <- function(model, data, inits,
                        addProp = c("combined2", "combined1"),
                        seed = 99, fixed = NULL, DEBUG = 0,
                        tol = 1e-4, itmax = 100L, type = c("nelder-mead", "newuoa"),
-                       lambdaRange = 3, powRange = 10) {
+                       lambdaRange = 3, powRange = 10,
+                       odeRecalcFactor=10^(0.5),
+                       maxOdeRecalc=5L) {
   type.idx <- c("nelder-mead" = 1L, "newuoa" = 2L)
   type <- match.arg(type)
   type <- type.idx[type]
@@ -627,6 +629,8 @@ configsaem <- function(model, data, inits,
   cfg$type <- type
   cfg$lambdaRange <- lambdaRange
   cfg$powRange <- powRange
+  cfg$odeRecalcFactor <- odeRecalcFactor
+  cfg$maxOdeRecalc <- maxOdeRecalc
   cfg
 }
 

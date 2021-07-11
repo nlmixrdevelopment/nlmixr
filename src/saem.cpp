@@ -47,7 +47,10 @@ double _saemLambdaR;
 double _saemPowR;
 int _saemPropT=0;
 bool _warnAtolRtol=false;
-
+int _saemIncreaseTol=0;
+int _saemIncreasedTol2=0;
+double _saemOdeRecalcFactor = 1.0;
+int _saemMaxOdeRecalc = 0;
 
 static inline double handleF(int powt, double &ft, double &f, bool trunc, bool adjustF) {
   double xmin = 1.0e-200, xmax=1e300;
@@ -359,35 +362,35 @@ public:
 
   mat get_trans() {
     mat m(nendpnt, 4);
-    m.col(0) = lambda; 
+    m.col(0) = lambda;
     m.col(1) = yj;
     m.col(2) = low;
     m.col(3) = hi;
     return m;
   }
-  
+
   mat get_mprior_phi() {
     mat m = mpost_phi;
     m.cols(i1) = mprior_phi1;
     return m;
   }
-  
+
   mat get_mpost_phi() {
     return mpost_phi;
   }
-  
+
   mat get_Plambda() {
     return Plambda;
   }
-  
+
   mat get_Gamma2_phi1() {
     return Gamma2_phi1;
   }
-  
+
   mat get_Ha() {
     return Ha;
   }
-  
+
   vec get_sig2() {
     return vcsig2;                                       //FIXME: regression due to multiple endpnts?
   }
@@ -402,7 +405,7 @@ public:
 			_["lres"]    = wrap(lres),
 			_["res_mod"] = wrap(res_mod));
   }
-  
+
   mat get_par_hist() {
     return par_hist;
   }
@@ -419,6 +422,11 @@ public:
     _saemType = as<int>(x["type"]);
     _saemLambdaR = fabs(as<double>(x["lambdaRange"]));
     _saemPowR = fabs(as<double>(x["powRange"]));
+    _saemIncreaseTol=0;
+    _saemIncreasedTol2=0;
+    _saemMaxOdeRecalc = abs(as<int>(x["maxOdeRecalc"]));
+    _saemOdeRecalcFactor = fabs(as<double>(x["odeRecalcFactor"]));
+
     nmc = as<int>(x["nmc"]);
     nu = as<uvec>(x["nu"]);
     niter = as<int>(x["niter"]);
@@ -512,7 +520,7 @@ public:
     lambda = as<vec>(x["lambda"]);
     low = as<vec>(x["low"]);
     hi = as<vec>(x["hi"]);
-    
+
     ix_endpnt=as<uvec>(x["ix_endpnt"]);
     ix_idM=as<umat>(x["ix_idM"]);
     res_offset=as<uvec>(x["res_offset"]);
@@ -827,7 +835,7 @@ public:
 	  int n=2;
 	  double start[2]={sqrt(fabs(ares(b))), sqrt(fabs(bres(b)))};                  //force are & bres to be positive
 	  double step[2]={-.2, -.2};
-	  
+
 	  // f = sum((ytr-ft)/g);
 	  _saemYptr = ysb.memptr();
 	  _saemFptr = fsb.memptr();
@@ -846,7 +854,7 @@ public:
 	  double ab12 = pxmin[1];
 	  ares(b) = ares(b) + pas(kiter)*(ab02*ab02 - ares(b));    //force are & bres to be positive
 	  bres(b) = bres(b) + pas(kiter)*(ab12*ab12 - bres(b));    //force are & bres to be positive
-	  
+
 	} else if (res_mod(b) == 4) { // add + pow
 	  uvec idx;
 	  idx = find(ix_endpnt==b);
@@ -1400,7 +1408,20 @@ mat user_function(const mat &_phi, const mat &_evt, const List &_opt) {
       }
     }
   }
+  _rx->op->badSolve = 0;
   saem_solve(_rx); // Solve the complete system (possibly in parallel)
+  int j=0;
+  while (_rx->op->badSolve && j < _saemMaxOdeRecalc){
+    _saemIncreaseTol=1;
+    RxODE::atolRtolFactor_(_saemOdeRecalcFactor);
+    _rx->op->badSolve = 0;
+    saem_solve(_rx);
+    j++;
+  }
+  if (j != 0) {
+    // Not thread safe
+    RxODE::atolRtolFactor_(pow(_saemOdeRecalcFactor, -j));
+  }
   mat g(_rx->nobs2, 3); // nobs EXCLUDING EVID=2
   int elt=0;
   bool hasNan = false;
@@ -1464,9 +1485,9 @@ void setupRx(List &opt, SEXP evt, SEXP evtM) {
   RObject obj = opt[".rx"];
   List mv = rxModelVarsS(obj);
   parNames = mv[RxMv_params];
+
   if (!Rf_isNull(obj)){
     // Now need to get the largest item to setup the solving space
-    // foceiSetupEta_(etaMat0);
     RObject pars = opt[".pars"];
     List odeO = opt["ODEopt"];
     // SEXP evt = x["evt"];

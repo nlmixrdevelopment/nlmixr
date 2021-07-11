@@ -7,6 +7,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // cholSE_
 NumericMatrix cholSE_(NumericMatrix A, double tol);
 RcppExport SEXP _nlmixr_cholSE_(SEXP ASEXP, SEXP tolSEXP) {

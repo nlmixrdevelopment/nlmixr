@@ -6221,9 +6221,9 @@ Environment foceiFitCpp_(Environment e){
   }
   if (op_focei.reducedTol){
     if (op_focei.stickyTol){
-      warning(_("tolerances (atol/rtol) were reduced (after %d bad solves) for some difficult ODE solving during the optimization.\ncan control with foceiControl(stickyRecalcN=)\nconsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model"), op_focei.stickyRecalcN);
+      warning(_("tolerances (atol/rtol) were increased (after %d bad solves) for some difficult ODE solving during the optimization.\ncan control with foceiControl(stickyRecalcN=)\nconsider increasing sigdig/atol/rtol changing initial estimates or changing the structural model"), op_focei.stickyRecalcN);
     } else {
-      warning(_("tolerances (atol/rtol) were temporarily reduced for some difficult ODE solving during the optimization.\nconsider reducing sigdig/atol/rtol changing initial estimates or changing the structural model"));
+      warning(_("tolerances (atol/rtol) were temporarily increased for some difficult ODE solving during the optimization.\nconsider increasing sigdig/atol/rtol changing initial estimates or changing the structural model"));
     }
   }
   if (op_focei.zeroGrad){
