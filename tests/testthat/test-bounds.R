@@ -2796,68 +2796,57 @@ nlmixrTest(
     })
 
     # nlmixrBoundsPrepareFunComments ####
-    if (getOption("keep.source", interactive())) {
-      test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments", {
-        nlmixrTestFunToChar <- function(x) {
-          as.character(attr(x, "srcref"), useSource = TRUE)
-        }
-        expect_equal(
-          nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
-            function() {
-              # hello
-            }
-          )),
-          function() {},
-          # Env and srcref attributes will not be equal
-          check.attributes = FALSE,
-          info = "comment lines without other information are dropped"
-        )
-        expect_equal(
-          nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
-            function() {
-              1 # hello
-            }
-          )),
-          function() {
-            1
-            label("hello")
-          },
-          # Env and srcref attributes will not be equal
-          check.attributes = FALSE,
-          info = "comment lines with other information are converted to label()"
-        )
-        expect_equal(
-          nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
-            function() {
-              1 | STUDY # hello
-            }
-          )),
-          function() {
-            1 | STUDY
-            label("hello")
-          },
-          # Env and srcref attributes will not be equal
-          check.attributes = FALSE,
-          info = "comment lines with other information are converted to label() (even if they are on a line with a condition)"
-        )
-        expect_equal(
-          nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
-            function() {
-              1 # label 1
-              label("# hash in a quote may try to be detected as a label, but that is wrong")
-            }
-          )),
-          function() {
-            1
-            label("label 1")
-            label("# hash in a quote may try to be detected as a label, but that is wrong")
-          },
-          # Env and srcref attributes will not be equal
-          check.attributes = FALSE,
-          info = "This is challenging to parse, and it was formerly a bug.  It is the reason that we are moving to parsing and not string extraction."
-        )
-      })
-    }
+    ## if (getOption("keep.source", interactive())) ## {
+    ##   test_that("Extraction of comments to labels with nlmixrBoundsPrepareFunComments", {
+    ##     nlmixrTestFunToChar <- function(x) {
+    ##       as.character(attr(x, "srcref"), useSource = TRUE)
+    ##     }
+    ##     expect_equal(
+    ##       nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+    ##         function() {
+    ##           1 # hello
+    ##         }
+    ##       )),
+    ##       function() {
+    ##         1
+    ##         label("hello")
+    ##       },
+    ##       # Env and srcref attributes will not be equal
+    ##       check.attributes = FALSE,
+    ##       info = "comment lines with other information are converted to label()"
+    ##     )
+    ##     expect_equal(
+    ##       nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+    ##         function() {
+    ##           1 | STUDY # hello
+    ##         }
+    ##       )),
+    ##       function() {
+    ##         1 | STUDY
+    ##         label("hello")
+    ##       },
+    ##       # Env and srcref attributes will not be equal
+    ##       check.attributes = FALSE,
+    ##       info = "comment lines with other information are converted to label() (even if they are on a line with a condition)"
+    ##     )
+    ##     expect_equal(
+    ##       nlmixr:::nlmixrBoundsPrepareFunComments(nlmixrTestFunToChar(
+    ##         function() {
+    ##           1 # label 1
+    ##           label("# hash in a quote may try to be detected as a label, but that is wrong")
+    ##         }
+    ##       )),
+    ##       function() {
+    ##         1
+    ##         label("label 1")
+    ##         label("# hash in a quote may try to be detected as a label, but that is wrong")
+    ##       },
+    ##       # Env and srcref attributes will not be equal
+    ##       check.attributes = FALSE,
+    ##       info = "This is challenging to parse, and it was formerly a bug.  It is the reason that we are moving to parsing and not string extraction."
+    ##     )
+    ##   })
+    ## }
 
     # Test call and name replacement ####
     test_that("call replacement", {
