@@ -33,6 +33,8 @@ saemControl(
   powRange = 10,
   lambdaRange = 3,
   loadSymengine = FALSE,
+  odeRecalcFactor = 10^(0.5),
+  maxOdeRecalc = 5L,
   ...
 )
 }
@@ -172,6 +174,13 @@ of iterations is itmax*number of parameters}
 loaded into symengine.  This cause all the ODEs to be collapsed
 into one expression that is eventually optimized if
 \code{optExpression} is \code{TRUE}.}
+
+\item{odeRecalcFactor}{The factor to increase the rtol/atol with
+bad ODE solving.}
+
+\item{maxOdeRecalc}{Maximum number of times to reduce the ODE
+tolerances and try to resolve the system if there was a bad
+ODE solve.}
 
 \item{...}{Other arguments to control SAEM.}
 }

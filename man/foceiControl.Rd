@@ -48,7 +48,7 @@ foceiControl(
   covMethod = c("r,s", "r", "s", ""),
   hessEps = (.Machine$double.eps)^(1/3),
   eventFD = sqrt(.Machine$double.eps),
-  eventCentral = TRUE,
+  eventType = c("gill", "central", "forward"),
   centralDerivEps = rep(20 * sqrt(.Machine$double.eps), 2),
   lbfgsLmm = 7L,
   lbfgsPgtol = 0,
@@ -451,8 +451,8 @@ derivatives while calculating the covariance components
 \item{eventFD}{Finite difference step for forward or central
 difference estimation of event-based gradients}
 
-\item{eventCentral}{Use the central difference approximation when
-estimating event-based gradients}
+\item{eventType}{Event gradient type for dosing events; Can be
+"gill", "central" or "forward"}
 
 \item{centralDerivEps}{Central difference tolerances.  This is a
     numeric vector of relative difference and absolute difference.

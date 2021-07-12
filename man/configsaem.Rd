@@ -20,7 +20,9 @@ configsaem(
   itmax = 100L,
   type = c("nelder-mead", "newuoa"),
   lambdaRange = 3,
-  powRange = 10
+  powRange = 10,
+  odeRecalcFactor = 10^(0.5),
+  maxOdeRecalc = 5L
 )
 }
 \arguments{
@@ -62,6 +64,13 @@ of iterations is itmax*number of parameters}
 \item{lambdaRange}{This indicates the range that Box-Cox and Yeo-Johnson parameters are constrained to be;  The default is 3 indicating the range (-3,3)}
 
 \item{powRange}{This indicates the range that powers can take for residual errors;  By default this is 10 indicating the range is c(1/10, 10) or c(0.1,10)}
+
+\item{odeRecalcFactor}{The factor to increase the rtol/atol with
+bad ODE solving.}
+
+\item{maxOdeRecalc}{Maximum number of times to reduce the ODE
+tolerances and try to resolve the system if there was a bad
+ODE solve.}
 }
 \value{
 Returns a list neede for the saem fit procedure
