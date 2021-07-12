@@ -7,7 +7,7 @@
   ODE solving is difficult; This can be controlled with
   `odeRecalcFactors` and `maxOdeRecalc`.  This is similar to the
   handling that `focei` already uses.
-
+  
 - For `focei` family estimation methods:
 
   - If the inner problem couldn't solve the ODE using the forward
@@ -49,6 +49,11 @@
  - Use strict headers since Rcpp now is moving toward strict headers.
    Also changed all the `Calloc` to `R_Calloc`, `Free` to `R_Free`,
    and `DOUBLE_EPS` to `DBL_EPSILON`.
+
+- `gnlmm` no longer imports the data.frame to an RxODE event table.
+  This should speed up the routine slightly and (more importantly)
+  make it easier to specify time varying covariates. 
+
 
 # nlmixr 2.0.4
 
