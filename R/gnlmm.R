@@ -210,11 +210,11 @@ prediction <- function(fit, pred, data = NULL, mc.cores = 1) {
   blik <- body(pred)
 
   ep <- environment()
+  .wid <- which(tolower(names(data)) == "id")
   ..lik.sub <- mclapply(ID.all, function(ix) {
     #-- data
     if (!is.null(system)) {
-      ev <- RxODE::eventTable()
-      ev$import.EventTable(data[data$id == ix, ])
+      ev <- data[data[, .wid] == ix, ]
     }
 
     sel <- data.obs$ID == ix
@@ -464,11 +464,12 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
     detDinv.5 <- prod(diag(Dinv.5))
 
     ep <- environment()
+
+    .wid <- which(tolower(names(data)) == "id")
     ..lik.sub <- mclapply(ID.all, function(ix) {
       #-- data
       if (!is.null(system)) {
-        ev <- RxODE::eventTable()
-        ev$import.EventTable(data[data$id == ix, ])
+        ev <- data[data[, .wid] == ix, ]
       }
 
       sel <- data.obs$ID == ix
