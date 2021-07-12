@@ -465,11 +465,10 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
 
     ep <- environment()
 
-    .wid <- which(tolower(names(data)) == "id")
     ..lik.sub <- mclapply(ID.all, function(ix) {
       #-- data
       if (!is.null(system)) {
-        ev <- data[data[, .wid] == ix, ]
+        ev <- data[data[, "id"] == ix, ]
       }
 
       sel <- data.obs$ID == ix
