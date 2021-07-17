@@ -1,0 +1,53 @@
+---
+title: "Censoring in nlmixr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{censoring}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(nlmixr)
+```
+
+## Censoring support in nlmixr
+
+In general, censoring is when there is an observation that cannot be measured but the researcher knows something about if it is below or above a certain number. In 2001, Beal introduced censoring to the pharmacometric community and described common ways to deal with missing data. The methods below, and the data structure used in nlmixr to support them are below:
+
++----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|    | Descsription                                                                                                                                                                                                                                                                                           |
++====+========================================================================================================================================================================================================================================================================================================+
+| M1 | Ignore the censored data entirely. This can be done by removing the censored observations from the dataset.                                                                                                                                                                                            |
++----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| M2 | With this method a single limit is specified and observations below that limit are considered censored. This is not directly supported in nlmixr, but can be accomplished by using the M3 method.                                                                                                      |
++----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| M3 | Estimate Likelihood where observation is above or below some censored limit.                                                                                                                                                                                                                           |
+|    |                                                                                                                                                                                                                                                                                                        |
+|    | When the concentrations are below the limit of quantition (or left censored), you can specify this in nlmixr with two columns: DV, CENS. When a value is censored, DV is the limit of quantification, and CENS is 1. For the rest of the non-censored values, DV keeps its normal value and CENS is 0. |
+|    |                                                                                                                                                                                                                                                                                                        |
+|    | When the censored value are above a limit of quantition (or right censored), the DV remains the limit of quantification and CENS is -1.                                                                                                                                                                |
++----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| M4 | This is an expansion of the M3 method. In cases, like in PK, you can also assume that the observations are actually positive. Therefore, you may want to adjust the likelihood to take into consideration this fact.                                                                                   |
+|    |                                                                                                                                                                                                                                                                                                        |
+|    | This can be accomplished in nlmixr as well by adding a LIMIT column. In the case of the left censored problem, you can specify the concentration is between the LIMIT and DV. This works for both the right and left censored values.                                                                  |
++----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| M5 | Replace all censored values with Lower Limit of Quantitation divided by 2. (ie LLOQ/2)                                                                                                                                                                                                                 |
++----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| M6 | Replace first censored value of the patient with LLOQ/2 and ignore the other censored values                                                                                                                                                                                                           |
++----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| M7 | Replace all LLOQ values with 0                                                                                                                                                                                                                                                                         |
++----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+These data columns LIMIT and CENS, are based on the Monolix method of handling of censored data.
+
+## Data output for censored data in nlmixr
+
+For censored data output, it is often useful to see how the predictions perform in the censored area. To accomplish this, a simulated value is used to show the prediction and noise. This is then used to calculate the standard residual values in nlmixr. By default, this value is simulated from a truncated normal distrubtion under the model assumptions and the censoring information specified in the data (though you can use the CDF method used in the npde package instead if you are calculating npdes as well). This simulated value replaces the original DV and then used to calculate all the residuals requested. The original limit information will be output in lowerLim and upperLim.
