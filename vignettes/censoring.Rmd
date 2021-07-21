@@ -46,8 +46,8 @@ In general, censoring is when there is an observation that cannot be measured bu
 | M7 | Replace all LLOQ values with 0                                                                                                                                                                                                                                                                         |
 +----+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-These data columns LIMIT and CENS, are based on the Monolix method of handling of censored data.
-
+These data columns `LIMIT` and `CENS`, are based on the Monolix method of handling of censored data.
+   
 ## Data output for censored data in nlmixr
 
-For censored data output, it is often useful to see how the predictions perform in the censored area. To accomplish this, a simulated value is used to show the prediction and noise. This is then used to calculate the standard residual values in nlmixr. By default, this value is simulated from a truncated normal distrubtion under the model assumptions and the censoring information specified in the data (though you can use the CDF method used in the npde package instead if you are calculating npdes as well). This simulated value replaces the original DV and then used to calculate all the residuals requested. The original limit information will be output in lowerLim and upperLim.
+For censored data output, it is often useful to see how the predictions perform in the censored area. To accomplish this, a simulated value is used to show the prediction and noise. This is then used to calculate the standard residual values in nlmixr. By default, this value is simulated from a truncated normal distribution under the model assumptions and the censoring information specified in the data (though you can use the CDF method used in the npde package instead if you are calculating npdes as well). This simulated value replaces the original DV and then used to calculate all the residuals requested. The original limit information will be output in `lowerLim` and `upperLim`.

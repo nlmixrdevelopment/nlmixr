@@ -35,6 +35,10 @@ BinaryFiles$
 ^\.Rproj\.user$
 ^/?docs/*$
 ^pkgdown$
+^vignettes/censoring.Rmd$
+^vignettes/censoring.csv$
+^vignettes/censoring.html$
+^vignettes/censoring_files$
 ^vignettes/residualErrors.Rmd$
 ^vignettes/residualErrors.csv$
 ^vignettes/residualErrors.html$
