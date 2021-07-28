@@ -300,7 +300,7 @@ As shown in the above example:
 
 * Simple parameter values are specified using an R-compatible
   assignment
-* Boundaries my be specified by `c(lower, est, upper)`.
+* Boundaries may be specified by `c(lower, est, upper)`.
 * Like NONMEM, `c(lower,est)` is equivalent to `c(lower,est,Inf)`
 * Also like NONMEM, `c(est)` does not specify a lower bound, and is
   equivalent to specifying the parameter without using R's `c()`
