@@ -65,7 +65,7 @@ jobs:
           install.packages(c("xpose.nlmixr","ggPMX"))
         shell: Rscript {0}
 
-      - name: Install package
+      - name: Install package.
         run: R CMD INSTALL .
 
       - name: Deploy package
