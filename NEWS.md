@@ -5,6 +5,8 @@
   
 - Give instructions on how to reinstall nlmixr if it is linked to a
   different version of `RxODE`. (#555)
+  
+- Now inform which parameters are near the boundary (#544)
 
 - The `saem` estimation routine will now increase the tolerance when
   ODE solving is difficult; This can be controlled with

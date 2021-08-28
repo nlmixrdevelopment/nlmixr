@@ -4848,6 +4848,8 @@ NumericMatrix sqrtm(NumericMatrix m){
 
 //[[Rcpp::export]]
 NumericMatrix foceiCalcCov(Environment e){
+  std::string boundStr = "";
+  CharacterVector thetaNames=as<CharacterVector>(e["thetaNames"]);
   try {
     if (op_focei.covMethod) {
       op_focei.derivMethodSwitch=0;
@@ -4874,25 +4876,25 @@ NumericMatrix foceiCalcCov(Environment e){
 	    cur = op_focei.fullTheta[j];
 	    if (op_focei.nbd[k] == 1){
 	      // Lower only
-	      if ((cur-op_focei.lower[k])/cur < op_focei.boundTol){
+	      if ((cur-op_focei.lower[k])/cur < op_focei.boundTol) {
 		boundary = true;
-		break;
+		boundStr += "\"" + thetaNames[j] + "\" ";
 	      }
 	    } else if (op_focei.nbd[k] == 2){
 	      // Upper and lower
-	      if ((cur-op_focei.lower[k])/cur < op_focei.boundTol){
+	      if ((cur-op_focei.lower[k])/cur < op_focei.boundTol) {
 		boundary = true;
-		break;
+		boundStr += "\"" + thetaNames[j] + "\" ";
 	      }
 	      if ((op_focei.upper[k]-cur)/cur < op_focei.boundTol){
 		boundary = true;
-		break;
+		boundStr += "\"" + thetaNames[j] + "\" ";
 	      }
 	    } else {
 	      // Upper only
 	      if ((op_focei.upper[k]-cur)/cur < op_focei.boundTol){
 		boundary = true;
-		break;
+		boundStr += "\"" + thetaNames[j] + "\" ";
 	      }
 	    }
 	  }
@@ -5306,8 +5308,8 @@ NumericMatrix foceiCalcCov(Environment e){
 	}
       } else {
 	if (boundary){
-	  warning(_("parameter estimate near boundary; covariance not calculated\n use 'getVarCov' to calculate anyway"));
-	  e["covMethod"] = "Boundary issue; Get SEs with getVarCov";
+	  warning(_("parameter estimate near boundary; covariance not calculated:\n   ") + boundStr + _("\n use 'getVarCov' to calculate anyway"));
+	  e["covMethod"] = "Boundary issue; Get SEs with `getVarCov()`: " + boundStr;
 	}
 	op_focei.cur=op_focei.totTick;
 	op_focei.curTick = par_progress(op_focei.cur, op_focei.totTick, op_focei.curTick, 1, op_focei.t0, 0);
