@@ -2,6 +2,9 @@
 
 - Fix for `nlmixrSim` CMT to have a factor that matches the `RxODE`
   definition (issue #501)
+  
+- Give instructions on how to reinstall nlmixr if it is linked to a
+  different version of `RxODE`. (#555)
 
 - The `saem` estimation routine will now increase the tolerance when
   ODE solving is difficult; This can be controlled with
