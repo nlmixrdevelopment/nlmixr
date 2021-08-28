@@ -33,7 +33,7 @@ compiled.RxODE.md5 <- RxODE::rxMd5()
   ## nocov start
   ## Setup RxODE.prefer.tbl
   if (compiled.RxODE.md5 != RxODE::rxMd5()) {
-    stop("nlmixr compiled against different version of RxODE, cannot run nlmixr", call.=FALSE)
+    stop("nlmixr compiled against different version of RxODE, cannot run nlmixr\ntry `install.packages(\"nlmixr\", type = \"source\")` to recompile", call.=FALSE)
   }
   ## nlmixrSetupMemoize()
   ## options(keep.source = TRUE)
