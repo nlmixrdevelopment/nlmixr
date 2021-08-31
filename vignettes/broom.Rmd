@@ -280,12 +280,6 @@ fit.s %>%
     dwplot()
 ```
 
-You may also compare models easily by using the `dotwhisker` package
-
-```{r}
-dwplot(list("SAEM"=fit.s, "FOCEi"=fit.f), exponentiate=NA)
-```
-
 ## Huxtable
 
 This allows easy creation of report ready tables in many formats including word.
@@ -299,7 +293,7 @@ tbl <- huxreg('Phenobarbitol'=fit.s)
 tbl
 ```
 
-Like `dwplot`, you can also use `huxtable` to compare runs:
+You can also use `huxtable` to compare runs:
 
 ```{r}
 huxreg('SAEM'=fit.s, 'FOCEi'=fit.f)
