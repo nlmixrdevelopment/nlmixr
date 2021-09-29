@@ -5,7 +5,8 @@ Depends: R (>= 4.0)
 Imports: Rcpp (>= 0.12.3), brew, parallel, lbfgsb3c,
         dparser, methods, ggplot2, rex, minqa, Matrix,
  	n1qn1 (>= 6.0.1-10), fastGHQuad,
-	RxODE(>= 1.0.6), nlme, magrittr, backports, symengine
+	RxODE(>= 1.0.6), nlme, magrittr, backports, symengine,
+    RcppParallel
 Suggests: 
     Deriv,
     Rvmmin,
