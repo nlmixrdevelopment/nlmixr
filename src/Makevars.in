@@ -5,12 +5,15 @@ RCPP=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e 'cat(file.path(find.package("Rcpp"
 EG=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e 'cat(file.path(find.package("RcppEigen"),"include"))'`
 SH=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e 'cat(file.path(find.package("StanHeaders"),"include"))'`
 RPAR=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e 'cat(file.path(find.package("RcppParallel"),"include"))'`
-
+RPAR_LIBS=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "RcppParallel::RcppParallelLibs()"`
+SH_LIBS=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "StanHeaders:::LdFlags()"`
+RPAR_CXX=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "RcppParallel::CxxFlags()"`
+SH_CXX=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "StanHeaders:::CxxFlags()"`
 CXX_STD     = CXX14
 @CXX14STD@
 
-PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CXXFLAGS) $(shell "$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "RcppParallel::RcppParallelLibs()") $(shell "$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "StanHeaders:::LdFlags()")
-PKG_CXXFLAGS = -Id -I../inst/include -DBOOST_DISABLE_ASSERTS -DBOOST_NO_CXX11_STATIC_ASSERT -@ISYSTEM@"$(BH)" -@ISYSTEM@"$(EG)" -@ISYSTEM@"$(SH)" -@ISYSTEM@"$(RCPP)" -@ISYSTEM@"$(ARMA)" -@ISYSTEM@"$(RPAR)"  $(SHLIB_OPENMP_CXXFLAGS)
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CXXFLAGS) $(RPAR_LIBS) $(SH_LIBS)
+PKG_CXXFLAGS = -Id -I../inst/include -DBOOST_DISABLE_ASSERTS -DBOOST_NO_CXX11_STATIC_ASSERT -@ISYSTEM@"$(BH)" -@ISYSTEM@"$(EG)" -@ISYSTEM@"$(SH)" -@ISYSTEM@"$(RCPP)" -@ISYSTEM@"$(ARMA)" -@ISYSTEM@"$(RPAR)"  $(SHLIB_OPENMP_CXXFLAGS) $(RPAR_CXX) $(SH_CXX)
 SHLIB_LDFLAGS = $(SHLIB_CXXLDFLAGS) 
 SHLIB_LD = $(SHLIB_CXXLD)
 SOURCES_C = init.c rprintf.c merge3.c lbfgsR.c utilc.c
