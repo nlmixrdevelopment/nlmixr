@@ -6,7 +6,8 @@ EG=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e 'cat(file.path(find.package("RcppEig
 SH=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e 'cat(file.path(find.package("StanHeaders"),"include"))'`
 RPAR=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e 'cat(file.path(find.package("RcppParallel"),"include"))'`
 RPAR_LIBS=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "RcppParallel::RcppParallelLibs()"`
-SH_LIBS=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "StanHeaders:::LdFlags()"`
+# Strip single quotes due to OSX build error
+SH_LIBS=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "cat(gsub(\"\'\",\"\",capture.output(StanHeaders:::LdFlags())))"`
 RPAR_CXX=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "RcppParallel::CxxFlags()"`
 SH_CXX=`"$(R_HOME)/bin$(R_ARCH_BIN)/Rscript" -e "StanHeaders:::CxxFlags()"`
 CXX_STD     = CXX14
