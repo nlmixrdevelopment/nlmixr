@@ -1,3 +1,7 @@
+# nlmixr 2.0.6
+
+- Fix `focei` subject initialization, see #566
+
 # nlmixr 2.0.5
 
 - Fix for `nlmixrSim` CMT to have a factor that matches the `RxODE`

@@ -43,7 +43,7 @@
 #define expit(alpha, low, high) _powerDi(alpha, 1.0, 4, low, high)
 #define probitInv(alpha, low, high) _powerDi(alpha, 1.0, 6, low, high)
 
-extern "C"{
+extern "C" {
   typedef void (*S2_fp) (int *, int *, double *, double *, double *, int *, float *,
 			 double *, int *);
   typedef void (*n1qn1_fp)(S2_fp simul, int n[], double x[], double f[], double g[],
