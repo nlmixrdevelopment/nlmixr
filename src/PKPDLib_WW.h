@@ -4,11 +4,7 @@
 
 #include <stan/math/rev/core.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#if __has_include(<stan/math/prim/err/check_greater_or_equal.hpp>)
-#  include <stan/math/prim/err/check_greater_or_equal.hpp>
-#else
-#  include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
-#endif
+#include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
 #include <vector>
 #include <utility>
 #include <cmath>
