@@ -276,7 +276,8 @@ Now that we have run 3 different estimation methods, we can compare the results 
 ```{r}
 library(huxtable)
 
-huxreg("lognormal"=cmt2fit.logn, "proportional"=cmt2fit.prop, "add+prop"=cmt2fit.add.prop)
+huxreg("lognormal"=cmt2fit.logn, "proportional"=cmt2fit.prop, "add+prop"=cmt2fit.add.prop,
+       statistics=c(N="nobs", "logLik", "AIC"))
 ```
 
 Note that the additive and proportional model has the additive
