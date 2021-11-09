@@ -199,9 +199,9 @@ wt70 <- fit %>% ## FIXME could be based on if it finds the covarite in the last 
   ini(covWtPow=fix(0.75)) %>%
   ini(tka=fix(0.5)) %>%
   nlmixr(est="focei", control=list(print=0),
-         table=list(cwres=TRUE, npde=TRUE))k
+         table=list(cwres=TRUE, npde=TRUE))
 
-kprint(wt70)
+print(wt70)
 ```
 
 ## Changing residual errors
