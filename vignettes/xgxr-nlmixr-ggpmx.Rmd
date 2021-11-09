@@ -217,7 +217,10 @@ First we need to subset to the PK only data and rename `LIDV` to `DV`
 dat <- case1_pkpd %>%
   rename(DV=LIDV) %>%
   filter(CMT %in% 1:2) %>%
-  filter(TRTACT != "Placebo")
+  filter(TRTACT != "Placebo") %>%
+  # Only work with a subset of data to speed example
+  # This isn't truely needed but subsetted for smaller run time
+  filter(ID %in% c(31:34, 61:64, 101:104, 151:154))
 ```
 
 Next create a 2 compartment model:
@@ -287,19 +290,7 @@ lowest objective function value. (Since we modeled log-normal without
 data transformation it is appropriate to compare the AIC/Objective
 function values)
 
-You may wish to see a visual comparison of the parameters:
-
-```{r}
-library(dotwhisker)
-## exponentiate=NA causes the parameters to be back-transformed
-dwplot(list("lognormal"=cmt2fit.logn, "proportional"=cmt2fit.prop), exponentiate=NA) +
-    ## Notice we can use some xgx functions post analysis as well,
-    ## since they are ggplot helper functions
-    xgx_scale_x_log10() +
-    ggtitle("Comparison between lognormal and proportional models",
-            "On backtransformed scales")
-```
-
+ 
 # Model Diagnostics with ggPMX
 
 ```{r}
