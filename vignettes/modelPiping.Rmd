@@ -33,7 +33,6 @@ provided by Dr. Robert A. Upton of the University of California, San
 Francisco:
 
 ```{r}
-
 library(nlmixr)
 
 one.compartment <- function() {
@@ -196,17 +195,19 @@ parameters:
 ## Note currently cov is needed as a prefix so nlmixr knows this is an
 ## estimated parameter not a parameter
 wt70 <- fit %>% ## FIXME could be based on if it finds the covarite in the last used nlmixr data.
-    model({cl <- exp(tcl + eta.cl)*(WT/70)^covWtPow}) %>%
-    ini(covWtPow=fix(0.75)) %>%
-    nlmixr(est="focei", control=list(print=0),
-           table=list(cwres=TRUE, npde=TRUE))
+  model({cl <- exp(tcl + eta.cl)*(WT/70)^covWtPow}) %>%
+  ini(covWtPow=fix(0.75)) %>%
+  ini(tka=fix(0.5)) %>%
+  nlmixr(est="focei", control=list(print=0),
+         table=list(cwres=TRUE, npde=TRUE))k
 
-print(wt70)
+kprint(wt70)
 ```
 
 ## Changing residual errors
 
-Changing the residual errors is also just as easy, by simply specifying the error you wish to change:
+Changing the residual errors is also just as easy, by simply
+specifying the error you wish to change:
 
 ```{r}
 ## Since there are 0 predictions in the data, these are changed to
