@@ -56,7 +56,7 @@ jobs:
           remotes::install_github("nlmixrdevelopment/RxODE")
           remotes::install_github("jeroen/curl")
           remotes::install_dev("pkgdown")
-          install.packages(c("xpose.nlmixr","ggPMX"))
+          install.packages(c("xpose.nlmixr","ggPMX", "xgxr"))
         shell: Rscript {0}
 
       - name: Install package.
