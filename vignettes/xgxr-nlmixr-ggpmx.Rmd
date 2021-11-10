@@ -1,4 +1,4 @@
----
+297---
 title: "xgxr nlmixr and ggPmx integration"
 output:
   html_document:
@@ -35,24 +35,6 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(ggPMX)
-```
-
-# Load the data
-
-```{r}
-pkpd_data <- case1_pkpd %>%
-  arrange(DOSE) %>%
-  select(-IPRED) %>%
-  mutate(TRTACT_low2high = factor(TRTACT, levels = unique(TRTACT)),
-         TRTACT_high2low = factor(TRTACT, levels = rev(unique(TRTACT))),
-         DAY_label = paste("Day", PROFDAY),
-         DAY_label = ifelse(DAY_label == "Day 0","Baseline",DAY_label))
- 
-pk_data <- pkpd_data %>%
-  filter(CMT == 2)
-
-pk_data_cycle1 <- pk_data %>%
-    filter(CYCLE == 1)
 ```
 
 # Exploratory analysis using ggplot and xgx helper functions
@@ -183,6 +165,24 @@ the outlier.  That is likely an artifact of censoring.
 Other ways to explore the data include by looking at normalized Cmax
 and AUC values (which we will skip in this vignette).
 
+# Load the data
+
+```{r}
+pkpd_data <- case1_pkpd %>%
+  arrange(DOSE) %>%
+  select(-IPRED) %>%
+  mutate(TRTACT_low2high = factor(TRTACT, levels = unique(TRTACT)),
+         TRTACT_high2low = factor(TRTACT, levels = rev(unique(TRTACT))),
+         DAY_label = paste("Day", PROFDAY),
+         DAY_label = ifelse(DAY_label == "Day 0","Baseline",DAY_label))
+ 
+pk_data <- pkpd_data %>%
+  filter(CMT == 2)
+
+pk_data_cycle1 <- pk_data %>%
+    filter(CYCLE == 1)
+```
+
 # Exploring Covariates in the dataset
 
 Using the `xgx` helper functions to `ggplot` you can explore the
@@ -295,7 +295,7 @@ function values)
 
 ```{r}
 ## The controller then can be piped into a specific plot
-ctr <- pmx_nlmixr(cmt2fit.logn, conts = c("WEIGHTB"), cats="TRTACT")
+ctr <- pmx_nlmixr(cmt2fit.logn, conts = c("WEIGHTB"), cats="TRTACT", vpc=TRUE)
 
 ctr %>% pmx_plot_npde_pred
 
@@ -310,8 +310,7 @@ ctr %>% pmx_plot_dv_pred(scale_x_log10=TRUE, scale_y_log10=TRUE,filter=IPRED>0.0
 ctr %>% pmx_plot_abs_iwres_ipred
 
 ## For this display only show 1x1 individual plot for ID 110 for time < 12
-ctr %>% pmx_plot_individual(1, filter=ID == 110 & TIME > 0 & TIME < 12, 
-                            facets = list(nrow = 1, ncol = 1))
+ctr %>% pmx_plot_individual
 
 ctr %>% pmx_plot_iwres_dens
 
@@ -322,7 +321,20 @@ ctr %>% pmx_plot_vpc(filter=TIME > 0 & TIME < 12,
                      scale_y_log10=TRUE, 
                      bin=pmx_vpc_bin("jenks",n=5))
 
+## Create a report of all the plots you generated from the controller
+if (!file.exists("nlmixr_report.docx")){
+    ctr %>% pmx_report("nlmixr_report",".")
+}
+if (file.exists("nlmixr_report.Rmd"))
+    unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
+ 
+ ```
+
+This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editing the default template to include project specificities (change labels, stratifications, filtering, etc.).
+
+
 ## 0-12 hour VPC on linear scale
+```
 ctr %>% pmx_plot_vpc(filter=TIME > 0 & TIME < 12,
                      scale_y_log10=FALSE, 
                      bin=pmx_vpc_bin("jenks",n=5))
@@ -331,10 +343,13 @@ ctr %>% pmx_plot_eta_box
 ```
 
 ```{r, fig.width=4, fig.height=8}
+
 ctr %>% pmx_plot_eta_hist
+
 ```
 
 ```{r}
+
 ctr %>% pmx_plot_eta_matrix
 
 ## Create a report of all the plots you generated from the controller
@@ -347,6 +362,11 @@ if (file.exists("nlmixr_report.Rmd"))
 
 This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editing the default template to include project specificities (change labels, stratifications, filtering, etc.).
 
+```{r}
+
+ctr %>% pmx_plot_eta_matrix
+
+```
 
 # Simulation of a new scenario with RxODE
 
@@ -361,11 +381,13 @@ In this case we wish to simulate with some variability and see what
 happens at steady state:
 
 ```{r}
+
 # Start a new simulation
 (ev <- et(amt=100, ii=8, ss=1))
 
 ev$add.sampling(seq(0, 8, length.out=50))
 print(ev)
+
 ```
 
 A nlmixr model already includes information about the parameter
@@ -378,28 +400,36 @@ fixed parameter estimates and covariances you can very easily with
 nlmixr/RxODE:
 
 ```{r}
+
 set.seed(100)
 sim1 <- simulate(cmt2fit.logn, events=ev, nSub=100, nStud=100)
 
 print(sim1)
+
 ```
 
 You may examine the simulated study information easily, as show in the
 `RxODE` printout:
 
 ```{r}
+
 head(sim1$thetaMat)
+
 ```
 
 You can also see the covariance matricies that are simulated (note
 they come from an inverse Wishart distribution):
 
 ```{r}
+
 head(sim1$omegaList)
+
 ```
 
 ```{r}
+
 head(sim1$sigmaList)
+
 ```
 
 It is also easy enough to create a plot to see what is going on with
