@@ -37,6 +37,25 @@ library(tidyr)
 library(ggPMX)
 ```
 
+# Load the data
+
+```{r}
+pkpd_data <- case1_pkpd %>%
+  arrange(DOSE) %>%
+  select(-IPRED) %>%
+  mutate(TRTACT_low2high = factor(TRTACT, levels = unique(TRTACT)),
+         TRTACT_high2low = factor(TRTACT, levels = rev(unique(TRTACT))),
+         DAY_label = paste("Day", PROFDAY),
+         DAY_label = ifelse(DAY_label == "Day 0","Baseline",DAY_label))
+ 
+pk_data <- pkpd_data %>%
+  filter(CMT == 2)
+
+pk_data_cycle1 <- pk_data %>%
+  filter(CYCLE == 1)
+
+```
+
 # Exploratory analysis using ggplot and xgx helper functions
 
 ## Use xgxr for simplified concentration over time, colored by Dose, mean +/- 95% CI
@@ -164,24 +183,6 @@ the outlier.  That is likely an artifact of censoring.
 
 Other ways to explore the data include by looking at normalized Cmax
 and AUC values (which we will skip in this vignette).
-
-# Load the data
-
-```{r}
-pkpd_data <- case1_pkpd %>%
-  arrange(DOSE) %>%
-  select(-IPRED) %>%
-  mutate(TRTACT_low2high = factor(TRTACT, levels = unique(TRTACT)),
-         TRTACT_high2low = factor(TRTACT, levels = rev(unique(TRTACT))),
-         DAY_label = paste("Day", PROFDAY),
-         DAY_label = ifelse(DAY_label == "Day 0","Baseline",DAY_label))
- 
-pk_data <- pkpd_data %>%
-  filter(CMT == 2)
-
-pk_data_cycle1 <- pk_data %>%
-    filter(CYCLE == 1)
-```
 
 # Exploring Covariates in the dataset
 
