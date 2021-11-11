@@ -218,10 +218,7 @@ First we need to subset to the PK only data and rename `LIDV` to `DV`
 dat <- case1_pkpd %>%
   rename(DV=LIDV) %>%
   filter(CMT %in% 1:2) %>%
-  filter(TRTACT != "Placebo") %>%
-  # Only work with a subset of data to speed example
-  # This isn't truely needed but subsetted for smaller run time
-  filter(ID %in% c(31:34, 61:64, 101:104, 151:154))
+  filter(TRTACT != "Placebo")
 ```
 
 Next create a 2 compartment model:
@@ -298,7 +295,7 @@ function values)
 ## The controller then can be piped into a specific plot
 ctr <- pmx_nlmixr(cmt2fit.logn, conts = c("WEIGHTB"), cats="TRTACT", vpc=TRUE)
 
-ctr %>% pmx_plot_npde_pred
+ ctr %>% pmx_plot_npde_pred
 
 ## Modify graphical options and remove DRAFT label:
 ctr %>% pmx_plot_npde_time(smooth = list(color="blue"), point = list(shape=4), is.draft=FALSE, 
@@ -310,8 +307,11 @@ ctr %>% pmx_plot_dv_pred(scale_x_log10=TRUE, scale_y_log10=TRUE,filter=IPRED>0.0
 
 ctr %>% pmx_plot_abs_iwres_ipred
 
+
 ## For this display only show 1x1 individual plot for ID 110 for time < 12
-ctr %>% pmx_plot_individual
+ctr %>% pmx_plot_individual(1, filter=ID == 110 & TIME > 0 & TIME < 12, 
+                            facets = list(nrow = 1, ncol = 1))
+
 
 ctr %>% pmx_plot_iwres_dens
 
@@ -322,25 +322,14 @@ ctr %>% pmx_plot_vpc(filter=TIME > 0 & TIME < 12,
                      scale_y_log10=TRUE, 
                      bin=pmx_vpc_bin("jenks",n=5))
 
-## Create a report of all the plots you generated from the controller
-if (!file.exists("nlmixr_report.docx")){
-    ctr %>% pmx_report("nlmixr_report",".")
-}
-if (file.exists("nlmixr_report.Rmd"))
-    unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
- 
  ```
 
 This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editing the default template to include project specificities (change labels, stratifications, filtering, etc.).
 
+```{r, fig.width=4, fig.height=8}
 
-## 0-12 hour VPC on linear scale
-```
-ctr %>% pmx_plot_vpc(filter=TIME > 0 & TIME < 12,
-                     scale_y_log10=FALSE, 
-                     bin=pmx_vpc_bin("jenks",n=5))
-                     
 ctr %>% pmx_plot_eta_box
+
 ```
 
 ```{r, fig.width=4, fig.height=8}
@@ -353,12 +342,6 @@ ctr %>% pmx_plot_eta_hist
 
 ctr %>% pmx_plot_eta_matrix
 
-## Create a report of all the plots you generated from the controller
-if (!file.exists("nlmixr_report.docx")){
-    ctr %>% pmx_report("nlmixr_report",".")
-}
-if (file.exists("nlmixr_report.Rmd"))
-    unlink("nlmixr_report.Rmd") # Remove this file so it isn't confused with vignettes
 ```
 
 This creates two reports with default settings, both a [pdf](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.pdf) and [word](https://github.com/nlmixrdevelopment/nlmixr/raw/master/vignettes/nlmixr_report.docx) document. The report can be customized by editing the default template to include project specificities (change labels, stratifications, filtering, etc.).
@@ -406,7 +389,6 @@ set.seed(100)
 sim1 <- simulate(cmt2fit.logn, events=ev, nSub=100, nStud=100)
 
 print(sim1)
-
 ```
 
 You may examine the simulated study information easily, as show in the
