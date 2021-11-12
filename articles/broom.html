@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
       </span>
     </div>
 
@@ -56,7 +56,8 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="divider">
-    <li class="dropdown-header">Getting started</li>
+    </li>
+<li class="dropdown-header">Getting started</li>
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
     </li>
@@ -64,7 +65,8 @@
       <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Going further</li>
+    </li>
+<li class="dropdown-header">Going further</li>
     <li>
       <a href="../articles/modelPiping.html">Model Piping</a>
     </li>
@@ -72,7 +74,8 @@
       <a href="../articles/broom.html">Sweeping models to tidy datasets (broom)</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/xgxr-nlmixr-ggpmx.html">Integrated development with xgxr/nlmixr/ggPMX</a>
     </li>
   </ul>
@@ -90,7 +93,8 @@
       <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
@@ -103,7 +107,7 @@
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
-    <span class="fas fa-scroll fa-lg"></span>
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
@@ -117,7 +121,7 @@
 </li>
 <li>
   <a href="../reference/index.html">
-    <span class="fas fa-file-code-o fa-lg"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -126,13 +130,13 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
-    <span class="fas fa-download"></span>
+    <span class="fa fa-download"></span>
      
   </a>
 </li>
@@ -151,9 +155,9 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using Broom with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-06-06</h4>
+            <h4 data-toc-skip class="date">2021-11-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/broom.Rmd" class="external-link"><code>vignettes/broom.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/HEAD/vignettes/broom.Rmd" class="external-link"><code>vignettes/broom.Rmd</code></a></small>
       <div class="hidden name"><code>broom.Rmd</code></div>
 
     </div>
@@ -163,15 +167,15 @@
 <div class="figure">
 <img src="logo.png" alt=""><p class="caption">nlmixr</p>
 </div>
-<div id="the-broom-and-broom-mixed-packages" class="section level2">
-<h2 class="hasAnchor">
-<a href="#the-broom-and-broom-mixed-packages" class="anchor" aria-hidden="true"></a>The broom and broom.mixed packages</h2>
+<div class="section level2">
+<h2 id="the-broom-and-broom-mixed-packages">The broom and broom.mixed packages<a class="anchor" aria-label="anchor" href="#the-broom-and-broom-mixed-packages"></a>
+</h2>
 <p><code>broom</code> and <code>broom.mixed</code> are packages that attempt to put standard model outputs into data frames. nlmixr supports the <code>tidy</code> and <code>glance</code> methods but does not support <code>augment</code> at this time.</p>
 <p>Using a model with a covariance term, the <a href="addingCovariances.html">Phenobarbital model</a>, we can explore the different types of output that is used in the tidy functions.</p>
 <p>To explore this, first we run the model:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/bbolker/broom.mixed" class="external-link">broom.mixed</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbolker/broom.mixed" class="external-link">broom.mixed</a></span><span class="op">)</span>
 
 <span class="va">pheno</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># Pheno with covariance</span>
@@ -202,7 +206,7 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Error in .fitFun(.ret) : </span>
-<span class="co">#&gt;   function 'rx_ae17520d67619efc8c6aa0c314d3ee5a__calc_lhs' not provided by package 'rx_ae17520d67619efc8c6aa0c314d3ee5a_'</span>
+<span class="co">#&gt;   function 'rx_d72874d3c1746e80531dc62ee088f303__calc_lhs' not provided by package 'rx_d72874d3c1746e80531dc62ee088f303_'</span>
 <span class="co">#&gt; Error in (function (data, inits, PKpars, model = NULL, pred = NULL, err = NULL,  : </span>
 <span class="co">#&gt;   Could not fit data.</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -234,16 +238,16 @@
 <span class="co">#&gt; done</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span></code></pre></div>
 </div>
-<div id="glancing-at-the-goodness-of-fit-metrics" class="section level1">
-<h1 class="hasAnchor">
-<a href="#glancing-at-the-goodness-of-fit-metrics" class="anchor" aria-hidden="true"></a>Glancing at the goodness of fit metrics</h1>
+<div class="section level1">
+<h1 id="glancing-at-the-goodness-of-fit-metrics">Glancing at the goodness of fit metrics<a class="anchor" aria-label="anchor" href="#glancing-at-the-goodness-of-fit-metrics"></a>
+</h1>
 <p>Often in fitting data, you would want to <code>glance</code> at the fit to see how well it fits. In <code>broom</code>, <code>glance</code> will give a summary of the fit metrics of goodness of fit:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span>
 <span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  707. 1004. 1022.  -496.            6.32</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  722. <span style="text-decoration: underline;">1</span>019. <span style="text-decoration: underline;">1</span>037.  -<span style="color: #BB0000;">503.</span>            7.85</span></code></pre></div>
 <p>Note in nlmixr it is possible to have more than one fit metric (based on different quadratures, FOCEi approximation etc). However, the <code>glance</code> only returns the fit metrics that are current.</p>
 <p>If you wish you can set the objective function to the focei objective function (which was already calculated with CWRES).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -251,239 +255,238 @@
 <p>Now the glance gives the <code>gauss3_1.6</code> values.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span>
 <span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  707. 1004. 1022.  -496.            6.32</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  722. <span style="text-decoration: underline;">1</span>019. <span style="text-decoration: underline;">1</span>037.  -<span style="color: #BB0000;">503.</span>            7.85</span></code></pre></div>
 <p>Of course you can always change the type of objective function that nlmixr uses:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/setOfv.html">setOfv</a></span><span class="op">(</span><span class="va">fit.s</span>,<span class="st">"FOCEi"</span><span class="op">)</span> <span class="co"># Setting objective function to focei</span></code></pre></div>
 <p>By setting it back to the SAEM default objective function of <code>FOCEi</code>, the <code>glance(fit.s)</code> has the same values again:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span>
 <span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  689.  986. 1004.  -487.            6.32</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  689.  986. <span style="text-decoration: underline;">1</span>004.  -<span style="color: #BB0000;">487.</span>            7.85</span></code></pre></div>
 <p>For convenience, you can do this while you <code>glance</code> at the objects:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">fit.s</span>, type<span class="op">=</span><span class="st">"FOCEi"</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span>
 <span class="co">#&gt;    OBJF   AIC   BIC logLik conditionNumber</span>
-<span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;           &lt;dbl&gt;</span>
-<span class="co">#&gt; 1  689.  986. 1004.  -487.            6.32</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  689.  986. <span style="text-decoration: underline;">1</span>004.  -<span style="color: #BB0000;">487.</span>            7.85</span></code></pre></div>
 </div>
-<div id="tidying-the-model-parameters" class="section level1">
-<h1 class="hasAnchor">
-<a href="#tidying-the-model-parameters" class="anchor" aria-hidden="true"></a>Tidying the model parameters</h1>
-<div id="tidying-of-overall-fit-parameters" class="section level2">
-<h2 class="hasAnchor">
-<a href="#tidying-of-overall-fit-parameters" class="anchor" aria-hidden="true"></a>Tidying of overall fit parameters</h2>
+<div class="section level1">
+<h1 id="tidying-the-model-parameters">Tidying the model parameters<a class="anchor" aria-label="anchor" href="#tidying-the-model-parameters"></a>
+</h1>
+<div class="section level2">
+<h2 id="tidying-of-overall-fit-parameters">Tidying of overall fit parameters<a class="anchor" aria-label="anchor" href="#tidying-of-overall-fit-parameters"></a>
+</h2>
 <p>You can also tidy the model estimates into a data frame with broom for processing. This can be useful when integrating into 3rd parting modeling packages. With a consistent parameter format, tasks for multiple types of models can be automated and applied.</p>
 <p>The default function for this is <code>tidy</code>, which when applied to the <code>fit</code> object provides the overall parameter information in a tidy dataset:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 7</span>
-<span class="co">#&gt;   effect   group         term              estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl                 -4.99     0.0729    -68.5   1   e+0</span>
-<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                   0.341    0.0550      6.21  2.52e-9</span>
-<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl           0.476   NA          NA    NA      </span>
-<span class="co">#&gt; 4 ran_pars ID            sd__eta.v            0.403   NA          NA    NA      </span>
-<span class="co">#&gt; 5 ran_pars ID            cor__eta.v.eta.cl    0.959   NA          NA    NA      </span>
-<span class="co">#&gt; 6 ran_pars Residual(add) add.err              2.79    NA          NA    NA</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span>
+<span class="co">#&gt;   effect   group         term             estimate std.error statistic   p.value</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fixed    <span style="color: #BB0000;">NA</span>            tcl                -<span style="color: #BB0000;">5.01</span>     0.077<span style="text-decoration: underline;">0</span>    -<span style="color: #BB0000;">65.1</span>   1   <span style="color: #949494;">e</span>+ 0</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fixed    <span style="color: #BB0000;">NA</span>            tv                  0.351    0.053<span style="text-decoration: underline;">0</span>      6.62  3.04<span style="color: #949494;">e</span><span style="color: #BB0000;">-10</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_pars ID            sd__eta.cl          0.511   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_pars ID            sd__eta.v           0.388   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_pars ID            cor__eta.v.eta.…    0.987   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_pars Residual(add) add.err             2.84    <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span></span></code></pre></div>
 <p>Note by default these are the parameters that are <em>actually</em> estimated in nlmixr, not the back-transformed values in the table from the printout. Of course, with mu-referenced models, you may want to exponentiate some of the terms. The broom package allows you to apply exponentiation on <em>all</em> the parameters, that is:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Transformation applied on every parameter</span>
 <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, exponentiate<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> 
-<span class="co">#&gt; # A tibble: 6 x 7</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span>
 <span class="co">#&gt;   effect   group         term             estimate std.error statistic   p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl               0.00681  0.000496      13.7  1.60e-28</span>
-<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                1.41     0.0773        18.2  5.41e-40</span>
-<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl        0.476   NA             NA   NA       </span>
-<span class="co">#&gt; 4 ran_pars ID            sd__eta.v         0.403   NA             NA   NA       </span>
-<span class="co">#&gt; 5 ran_pars ID            cor__eta.v.eta.…  0.959   NA             NA   NA       </span>
-<span class="co">#&gt; 6 ran_pars Residual(add) add.err           2.79    NA             NA   NA</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fixed    <span style="color: #BB0000;">NA</span>            tcl               0.006<span style="text-decoration: underline;">66</span>  0.000<span style="text-decoration: underline;">513</span>      13.0  1.41<span style="color: #949494;">e</span><span style="color: #BB0000;">-26</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fixed    <span style="color: #BB0000;">NA</span>            tv                1.42     0.075<span style="text-decoration: underline;">4</span>        18.9  1.36<span style="color: #949494;">e</span><span style="color: #BB0000;">-41</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_pars ID            sd__eta.cl        0.511   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_pars ID            sd__eta.v         0.388   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_pars ID            cor__eta.v.eta.…  0.987   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_pars Residual(add) add.err           2.84    <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span></span></code></pre></div>
 <p><strong>Note:</strong>, in accordance with the rest of the broom package, when the parameters with the exponentiated, the standard errors are transformed to an approximate standard error by the formula: <span class="math inline">\(\textrm{se}(\exp(x)) \approx \exp(\textrm{model estimate}_x)\times \textrm{se}_x\)</span>. This can be confusing because the confidence intervals (described later) are using the actual standard error and back-transforming to the exponentiated scale. This is the reason why the default for nlmixr’s <code>broom</code> interface is <code>exponentiate=FALSE</code>, that is:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, exponentiate<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span> <span class="co">## No transformation applied</span>
-<span class="co">#&gt; # A tibble: 6 x 7</span>
-<span class="co">#&gt;   effect   group         term              estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl                 -4.99     0.0729    -68.5   1   e+0</span>
-<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                   0.341    0.0550      6.21  2.52e-9</span>
-<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl           0.476   NA          NA    NA      </span>
-<span class="co">#&gt; 4 ran_pars ID            sd__eta.v            0.403   NA          NA    NA      </span>
-<span class="co">#&gt; 5 ran_pars ID            cor__eta.v.eta.cl    0.959   NA          NA    NA      </span>
-<span class="co">#&gt; 6 ran_pars Residual(add) add.err              2.79    NA          NA    NA</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span>
+<span class="co">#&gt;   effect   group         term             estimate std.error statistic   p.value</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fixed    <span style="color: #BB0000;">NA</span>            tcl                -<span style="color: #BB0000;">5.01</span>     0.077<span style="text-decoration: underline;">0</span>    -<span style="color: #BB0000;">65.1</span>   1   <span style="color: #949494;">e</span>+ 0</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fixed    <span style="color: #BB0000;">NA</span>            tv                  0.351    0.053<span style="text-decoration: underline;">0</span>      6.62  3.04<span style="color: #949494;">e</span><span style="color: #BB0000;">-10</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_pars ID            sd__eta.cl          0.511   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_pars ID            sd__eta.v           0.388   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_pars ID            cor__eta.v.eta.…    0.987   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_pars Residual(add) add.err             2.84    <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span></span></code></pre></div>
 <p>If you want, you can also use the parsed back-transformation that is used in nlmixr tables (ie <code>fit$parFixedDf</code>). <strong>Please note that this uses the approximate back-transformation for standard errors on the log-scaled back-transformed values</strong>.</p>
 <p>This is done by:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Transformation applied to log-scaled population parameters</span>
 <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span> 
-<span class="co">#&gt; # A tibble: 6 x 7</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span>
 <span class="co">#&gt;   effect   group         term             estimate std.error statistic   p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl               0.00681  0.000496      13.7  1.60e-28</span>
-<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                1.41     0.0773        18.2  5.41e-40</span>
-<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl        0.476   NA             NA   NA       </span>
-<span class="co">#&gt; 4 ran_pars ID            sd__eta.v         0.403   NA             NA   NA       </span>
-<span class="co">#&gt; 5 ran_pars ID            cor__eta.v.eta.…  0.959   NA             NA   NA       </span>
-<span class="co">#&gt; 6 ran_pars Residual(add) add.err           2.79    NA             NA   NA</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fixed    <span style="color: #BB0000;">NA</span>            tcl               0.006<span style="text-decoration: underline;">66</span>  0.000<span style="text-decoration: underline;">513</span>      13.0  1.41<span style="color: #949494;">e</span><span style="color: #BB0000;">-26</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fixed    <span style="color: #BB0000;">NA</span>            tv                1.42     0.075<span style="text-decoration: underline;">4</span>        18.9  1.36<span style="color: #949494;">e</span><span style="color: #BB0000;">-41</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_pars ID            sd__eta.cl        0.511   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_pars ID            sd__eta.v         0.388   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_pars ID            cor__eta.v.eta.…  0.987   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_pars Residual(add) add.err           2.84    <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span></span></code></pre></div>
 <p>Also note, at the time of this writing the default separator between variables is <code>.</code>, which doesn’t work well with this model giving <code>cor__eta.v.eta.cl</code>. You can easily change this by:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>broom.mixed.sep2<span class="op">=</span><span class="st">".."</span><span class="op">)</span>
 <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 7</span>
-<span class="co">#&gt;   effect   group         term              estimate std.error statistic  p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 fixed    &lt;NA&gt;          tcl                 -4.99     0.0729    -68.5   1   e+0</span>
-<span class="co">#&gt; 2 fixed    &lt;NA&gt;          tv                   0.341    0.0550      6.21  2.52e-9</span>
-<span class="co">#&gt; 3 ran_pars ID            sd__eta.cl           0.476   NA          NA    NA      </span>
-<span class="co">#&gt; 4 ran_pars ID            sd__eta.v            0.403   NA          NA    NA      </span>
-<span class="co">#&gt; 5 ran_pars ID            cor__eta.v..eta.…    0.959   NA          NA    NA      </span>
-<span class="co">#&gt; 6 ran_pars Residual(add) add.err              2.79    NA          NA    NA</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span>
+<span class="co">#&gt;   effect   group         term             estimate std.error statistic   p.value</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fixed    <span style="color: #BB0000;">NA</span>            tcl                -<span style="color: #BB0000;">5.01</span>     0.077<span style="text-decoration: underline;">0</span>    -<span style="color: #BB0000;">65.1</span>   1   <span style="color: #949494;">e</span>+ 0</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fixed    <span style="color: #BB0000;">NA</span>            tv                  0.351    0.053<span style="text-decoration: underline;">0</span>      6.62  3.04<span style="color: #949494;">e</span><span style="color: #BB0000;">-10</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_pars ID            sd__eta.cl          0.511   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_pars ID            sd__eta.v           0.388   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_pars ID            cor__eta.v..eta…    0.987   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_pars Residual(add) add.err             2.84    <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span></span></code></pre></div>
 <p>This gives an easier way to parse value: <code>cor__eta.v..eta.cl</code></p>
 </div>
-<div id="adding-a-confidence-interval-to-the-parameters" class="section level2">
-<h2 class="hasAnchor">
-<a href="#adding-a-confidence-interval-to-the-parameters" class="anchor" aria-hidden="true"></a>Adding a confidence interval to the parameters</h2>
+<div class="section level2">
+<h2 id="adding-a-confidence-interval-to-the-parameters">Adding a confidence interval to the parameters<a class="anchor" aria-label="anchor" href="#adding-a-confidence-interval-to-the-parameters"></a>
+</h2>
 <p>The default R method <code>confint</code> works with nlmixr fit objects:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit.s</span><span class="op">)</span>
 <span class="co">#&gt;          model.est    estimate      2.5 %     97.5 %</span>
-<span class="co">#&gt; tcl     -4.9889415 0.006812872 -5.1317729 -4.8461102</span>
-<span class="co">#&gt; tv       0.3412029 1.406638665  0.2334961  0.4489098</span>
-<span class="co">#&gt; add.err  2.7915933 2.791593287         NA         NA</span></code></pre></div>
+<span class="co">#&gt; tcl     -5.0111306 0.006663365 -5.1620308 -4.8602304</span>
+<span class="co">#&gt; tv       0.3511642 1.420720586  0.2472002  0.4551282</span>
+<span class="co">#&gt; add.err  2.8357996 2.835799581         NA         NA</span></code></pre></div>
 <p>This transforms the variables as described above. You can still use the <code>exponentiate</code> parameter to control the display of the confidence interval:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit.s</span>, exponentiate<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt;          model.est    estimate      2.5 %     97.5 %</span>
-<span class="co">#&gt; tcl     -4.9889415 0.006812872 -5.1317729 -4.8461102</span>
-<span class="co">#&gt; tv       0.3412029 1.406638665  0.2334961  0.4489098</span>
-<span class="co">#&gt; add.err  2.7915933 2.791593287         NA         NA</span></code></pre></div>
+<span class="co">#&gt; tcl     -5.0111306 0.006663365 -5.1620308 -4.8602304</span>
+<span class="co">#&gt; tv       0.3511642 1.420720586  0.2472002  0.4551282</span>
+<span class="co">#&gt; add.err  2.8357996 2.835799581         NA         NA</span></code></pre></div>
 <p>However, broom has also implemented it own way to make these data a tidy dataset. The easiest way to get these values in a nlmixr dataset is to use:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, conf.level<span class="op">=</span><span class="fl">0.9</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 9</span>
-<span class="co">#&gt;   effect  group  term   estimate std.error statistic  p.value conf.low conf.high</span>
-<span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 fixed   &lt;NA&gt;   tcl      -4.99     0.0729    -68.5   1   e+0   -5.11     -4.87 </span>
-<span class="co">#&gt; 2 fixed   &lt;NA&gt;   tv        0.341    0.0550      6.21  2.52e-9    0.251     0.432</span>
-<span class="co">#&gt; 3 ran_pa… ID     sd__e…    0.476   NA          NA    NA         NA        NA    </span>
-<span class="co">#&gt; 4 ran_pa… ID     sd__e…    0.403   NA          NA    NA         NA        NA    </span>
-<span class="co">#&gt; 5 ran_pa… ID     cor__…    0.959   NA          NA    NA         NA        NA    </span>
-<span class="co">#&gt; 6 ran_pa… Resid… add.e…    2.79    NA          NA    NA         NA        NA</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span>
+<span class="co">#&gt;   effect   group term  estimate std.error statistic   p.value conf.low conf.high</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fixed    <span style="color: #BB0000;">NA</span>    tcl     -<span style="color: #BB0000;">5.01</span>     0.077<span style="text-decoration: underline;">0</span>    -<span style="color: #BB0000;">65.1</span>   1   <span style="color: #949494;">e</span>+ 0   -<span style="color: #BB0000;">5.14</span>     -<span style="color: #BB0000;">4.88</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fixed    <span style="color: #BB0000;">NA</span>    tv       0.351    0.053<span style="text-decoration: underline;">0</span>      6.62  3.04<span style="color: #949494;">e</span><span style="color: #BB0000;">-10</span>    0.264     0.438</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_pars ID    sd__…    0.511   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>      <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_pars ID    sd__…    0.388   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>      <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_pars ID    cor_…    0.987   <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>      <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_pars Resi… add.…    2.84    <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>      <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span></span></code></pre></div>
 <p>The confidence interval is on the scale specified by <code>exponentiate</code>, by default the estimated scale.</p>
 <p>If you want to have the confidence on the adaptive back-transformed scale, you would simply use the following:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, conf.level<span class="op">=</span><span class="fl">0.9</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 9</span>
-<span class="co">#&gt;   effect  group term   estimate std.error statistic   p.value conf.low conf.high</span>
-<span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 fixed   &lt;NA&gt;  tcl     0.00681  0.000496      13.7  1.60e-28  0.00604   0.00768</span>
-<span class="co">#&gt; 2 fixed   &lt;NA&gt;  tv      1.41     0.0773        18.2  5.41e-40  1.29      1.54   </span>
-<span class="co">#&gt; 3 ran_pa… ID    sd__e…  0.476   NA             NA   NA        NA        NA      </span>
-<span class="co">#&gt; 4 ran_pa… ID    sd__e…  0.403   NA             NA   NA        NA        NA      </span>
-<span class="co">#&gt; 5 ran_pa… ID    cor__…  0.959   NA             NA   NA        NA        NA      </span>
-<span class="co">#&gt; 6 ran_pa… Resi… add.e…  2.79    NA             NA   NA        NA        NA</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 9</span></span>
+<span class="co">#&gt;   effect   group term  estimate std.error statistic   p.value conf.low conf.high</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fixed    <span style="color: #BB0000;">NA</span>    tcl    0.006<span style="text-decoration: underline;">66</span>  0.000<span style="text-decoration: underline;">513</span>      13.0  1.41<span style="color: #949494;">e</span><span style="color: #BB0000;">-26</span>  0.005<span style="text-decoration: underline;">87</span>   0.007<span style="text-decoration: underline;">56</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fixed    <span style="color: #BB0000;">NA</span>    tv     1.42     0.075<span style="text-decoration: underline;">4</span>        18.9  1.36<span style="color: #949494;">e</span><span style="color: #BB0000;">-41</span>  1.30      1.55   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_pars ID    sd__…  0.511   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_pars ID    sd__…  0.388   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_pars ID    cor_…  0.987   <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>      </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_pars Resi… add.…  2.84    <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>   <span style="color: #BB0000;">NA</span>   <span style="color: #949494;"> </span>    <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span></span></code></pre></div>
 </div>
 </div>
-<div id="extracting-other-model-information-with-tidy" class="section level1">
-<h1 class="hasAnchor">
-<a href="#extracting-other-model-information-with-tidy" class="anchor" aria-hidden="true"></a>Extracting other model information with <code>tidy</code>
+<div class="section level1">
+<h1 id="extracting-other-model-information-with-tidy">Extracting other model information with <code>tidy</code><a class="anchor" aria-label="anchor" href="#extracting-other-model-information-with-tidy"></a>
 </h1>
 <p>The type of information that is extracted can be controlled by the <code>effects</code> argument.</p>
-<div id="extracting-only-fixed-effect-parameters" class="section level2">
-<h2 class="hasAnchor">
-<a href="#extracting-only-fixed-effect-parameters" class="anchor" aria-hidden="true"></a>Extracting only fixed effect parameters</h2>
+<div class="section level2">
+<h2 id="extracting-only-fixed-effect-parameters">Extracting only fixed effect parameters<a class="anchor" aria-label="anchor" href="#extracting-only-fixed-effect-parameters"></a>
+</h2>
 <p>The fixed effect parameters can be extracted by <code>effects="fixed"</code></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"fixed"</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 2 x 6</span>
-<span class="co">#&gt;   effect term  estimate std.error statistic       p.value</span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 fixed  tcl     -4.99     0.0729    -68.5  1            </span>
-<span class="co">#&gt; 2 fixed  tv       0.341    0.0550      6.21 0.00000000252</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span>
+<span class="co">#&gt;   effect term  estimate std.error statistic  p.value</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fixed  tcl     -<span style="color: #BB0000;">5.01</span>     0.077<span style="text-decoration: underline;">0</span>    -<span style="color: #BB0000;">65.1</span>  1   <span style="color: #949494;">e</span>+ 0</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> fixed  tv       0.351    0.053<span style="text-decoration: underline;">0</span>      6.62 3.04<span style="color: #949494;">e</span><span style="color: #BB0000;">-10</span></span></code></pre></div>
 </div>
-<div id="extracting-only-random-parameters" class="section level2">
-<h2 class="hasAnchor">
-<a href="#extracting-only-random-parameters" class="anchor" aria-hidden="true"></a>Extracting only random parameters</h2>
+<div class="section level2">
+<h2 id="extracting-only-random-parameters">Extracting only random parameters<a class="anchor" aria-label="anchor" href="#extracting-only-random-parameters"></a>
+</h2>
 <p>The random standard deviations can be extracted by <code>effects="ran_pars"</code>:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_pars"</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 4 x 4</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 4</span></span>
 <span class="co">#&gt;   effect   group         term               estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt;                 &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_pars ID            sd__eta.cl            0.476</span>
-<span class="co">#&gt; 2 ran_pars ID            sd__eta.v             0.403</span>
-<span class="co">#&gt; 3 ran_pars ID            cor__eta.v..eta.cl    0.959</span>
-<span class="co">#&gt; 4 ran_pars Residual(add) add.err               2.79</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ran_pars ID            sd__eta.cl            0.511</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ran_pars ID            sd__eta.v             0.388</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_pars ID            cor__eta.v..eta.cl    0.987</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_pars Residual(add) add.err               2.84</span></code></pre></div>
 </div>
-<div id="extracting-random-values-also-called-etas" class="section level2">
-<h2 class="hasAnchor">
-<a href="#extracting-random-values-also-called-etas" class="anchor" aria-hidden="true"></a>Extracting random values (also called ETAs)</h2>
+<div class="section level2">
+<h2 id="extracting-random-values-also-called-etas">Extracting random values (also called ETAs)<a class="anchor" aria-label="anchor" href="#extracting-random-values-also-called-etas"></a>
+</h2>
 <p>The random values, or in NONMEM the ETAs, can be extracted by <code>effects="ran_vals"</code> or <code>effects="random"</code></p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_vals"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span>
 <span class="co">#&gt;   effect   group level term   estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;int&gt; &lt;fct&gt;     &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_vals ID        1 eta.cl  -0.0991</span>
-<span class="co">#&gt; 2 ran_vals ID        2 eta.cl  -0.229 </span>
-<span class="co">#&gt; 3 ran_vals ID        3 eta.cl   0.239 </span>
-<span class="co">#&gt; 4 ran_vals ID        4 eta.cl  -0.510 </span>
-<span class="co">#&gt; 5 ran_vals ID        5 eta.cl   0.318 </span>
-<span class="co">#&gt; 6 ran_vals ID        6 eta.cl  -0.150</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ran_vals ID        1 eta.cl  -<span style="color: #BB0000;">0.075</span><span style="color: #BB0000; text-decoration: underline;">8</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ran_vals ID        2 eta.cl  -<span style="color: #BB0000;">0.218</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_vals ID        3 eta.cl   0.271 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_vals ID        4 eta.cl  -<span style="color: #BB0000;">0.558</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_vals ID        5 eta.cl   0.328 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_vals ID        6 eta.cl  -<span style="color: #BB0000;">0.128</span></span></code></pre></div>
 <p>This duplicate method of running <code>effects</code> is because the <code>broom</code> package supports <code>effects="random"</code> while the <code>broom.mixed</code> package supports <code>effects="ran_vals"</code>.</p>
 </div>
-<div id="extracting-random-coefficients" class="section level2">
-<h2 class="hasAnchor">
-<a href="#extracting-random-coefficients" class="anchor" aria-hidden="true"></a>Extracting random coefficients</h2>
+<div class="section level2">
+<h2 id="extracting-random-coefficients">Extracting random coefficients<a class="anchor" aria-label="anchor" href="#extracting-random-coefficients"></a>
+</h2>
 <p>Random coefficients are the population fixed effect parameter + the random effect parameter, possibly transformed to the correct scale.</p>
 <p>In this case we can extract this information from a nlmixr fit object by:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span>
 <span class="co">#&gt;   effect   group level term  estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;int&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_coef ID        1 tcl      -5.09</span>
-<span class="co">#&gt; 2 ran_coef ID        2 tcl      -5.22</span>
-<span class="co">#&gt; 3 ran_coef ID        3 tcl      -4.75</span>
-<span class="co">#&gt; 4 ran_coef ID        4 tcl      -5.50</span>
-<span class="co">#&gt; 5 ran_coef ID        5 tcl      -4.67</span>
-<span class="co">#&gt; 6 ran_coef ID        6 tcl      -5.14</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ran_coef ID        1 tcl      -<span style="color: #BB0000;">5.09</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ran_coef ID        2 tcl      -<span style="color: #BB0000;">5.23</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_coef ID        3 tcl      -<span style="color: #BB0000;">4.74</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_coef ID        4 tcl      -<span style="color: #BB0000;">5.57</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_coef ID        5 tcl      -<span style="color: #BB0000;">4.68</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_coef ID        6 tcl      -<span style="color: #BB0000;">5.14</span></span></code></pre></div>
 <p>This can also be changed by the <code>exponentiate</code> argument:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span>
 <span class="co">#&gt;   effect   group level term  estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;int&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_coef ID        1 tcl    0.00617</span>
-<span class="co">#&gt; 2 ran_coef ID        2 tcl    0.00542</span>
-<span class="co">#&gt; 3 ran_coef ID        3 tcl    0.00865</span>
-<span class="co">#&gt; 4 ran_coef ID        4 tcl    0.00409</span>
-<span class="co">#&gt; 5 ran_coef ID        5 tcl    0.00936</span>
-<span class="co">#&gt; 6 ran_coef ID        6 tcl    0.00586</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ran_coef ID        1 tcl    0.006<span style="text-decoration: underline;">18</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ran_coef ID        2 tcl    0.005<span style="text-decoration: underline;">36</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_coef ID        3 tcl    0.008<span style="text-decoration: underline;">74</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_coef ID        4 tcl    0.003<span style="text-decoration: underline;">81</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_coef ID        5 tcl    0.009<span style="text-decoration: underline;">25</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_coef ID        6 tcl    0.005<span style="text-decoration: underline;">86</span></span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit.s</span>, effects<span class="op">=</span><span class="st">"ran_coef"</span>, exponentiate<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 5</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span>
 <span class="co">#&gt;   effect   group level term  estimate</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;int&gt; &lt;fct&gt;    &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 ran_coef ID        1 tcl    0.00617</span>
-<span class="co">#&gt; 2 ran_coef ID        2 tcl    0.00542</span>
-<span class="co">#&gt; 3 ran_coef ID        3 tcl    0.00865</span>
-<span class="co">#&gt; 4 ran_coef ID        4 tcl    0.00409</span>
-<span class="co">#&gt; 5 ran_coef ID        5 tcl    0.00936</span>
-<span class="co">#&gt; 6 ran_coef ID        6 tcl    0.00586</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ran_coef ID        1 tcl    0.006<span style="text-decoration: underline;">18</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ran_coef ID        2 tcl    0.005<span style="text-decoration: underline;">36</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ran_coef ID        3 tcl    0.008<span style="text-decoration: underline;">74</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ran_coef ID        4 tcl    0.003<span style="text-decoration: underline;">81</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ran_coef ID        5 tcl    0.009<span style="text-decoration: underline;">25</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ran_coef ID        6 tcl    0.005<span style="text-decoration: underline;">86</span></span></code></pre></div>
 </div>
 </div>
-<div id="example-of-using-a-tidy-model-estimates-for-other-packages" class="section level1">
-<h1 class="hasAnchor">
-<a href="#example-of-using-a-tidy-model-estimates-for-other-packages" class="anchor" aria-hidden="true"></a>Example of using a tidy model estimates for other packages</h1>
-<div id="dotwhisker" class="section level2">
-<h2 class="hasAnchor">
-<a href="#dotwhisker" class="anchor" aria-hidden="true"></a>Dotwhisker</h2>
+<div class="section level1">
+<h1 id="example-of-using-a-tidy-model-estimates-for-other-packages">Example of using a tidy model estimates for other packages<a class="anchor" aria-label="anchor" href="#example-of-using-a-tidy-model-estimates-for-other-packages"></a>
+</h1>
+<div class="section level2">
+<h2 id="dotwhisker">Dotwhisker<a class="anchor" aria-label="anchor" href="#dotwhisker"></a>
+</h2>
 <p>As explained above, this standard format makes it easier for tidyverse packages to interact with model information. An example of this is piping the tidy information to dplyr to filter the effects and then to the <code>dotwhisker</code> package to plot the model parameter confidence intervals.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>broom.mixed.sep2<span class="op">=</span><span class="st">": "</span>, broom.mixed.sep2<span class="op">=</span><span class="st">", "</span><span class="op">)</span>
@@ -495,22 +498,18 @@
     <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">effect</span><span class="op">==</span><span class="st">"fixed"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
     <span class="fu"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html" class="external-link">dwplot</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="broom_files/figure-html/unnamed-chunk-23-1.png" width="100%"></p>
-<p>You may also compare models easily by using the <code>dotwhisker</code> package</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/dotwhisker/man/dwplot.html" class="external-link">dwplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"SAEM"</span><span class="op">=</span><span class="va">fit.s</span>, <span class="st">"FOCEi"</span><span class="op">=</span><span class="va">fit.f</span><span class="op">)</span>, exponentiate<span class="op">=</span><span class="cn">NA</span><span class="op">)</span></code></pre></div>
-<p><img src="broom_files/figure-html/unnamed-chunk-24-1.png" width="100%"></p>
 </div>
-<div id="huxtable" class="section level2">
-<h2 class="hasAnchor">
-<a href="#huxtable" class="anchor" aria-hidden="true"></a>Huxtable</h2>
+<div class="section level2">
+<h2 id="huxtable">Huxtable<a class="anchor" aria-label="anchor" href="#huxtable"></a>
+</h2>
 <p>This allows easy creation of report ready tables in many formats including word.</p>
 <p>Huxtable relies on the <code>broom</code> implementation</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://hughjonesd.github.io/huxtable/" class="external-link">huxtable</a></span><span class="op">)</span>
 <span class="va">tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://hughjonesd.github.io/huxtable/reference/huxreg.html" class="external-link">huxreg</a></span><span class="op">(</span><span class="st">'Phenobarbitol'</span><span class="op">=</span><span class="va">fit.s</span><span class="op">)</span>
 
 <span class="va">tbl</span></code></pre></div>
-<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-25">
+<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-24">
 <col>
 <col>
 <tr>
@@ -519,23 +518,23 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">tcl</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-4.989    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-5.011    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.073)   </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.077)   </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">tv</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.341 ***</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.351 ***</td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.055)   </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.053)   </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">sd__eta.cl</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.476    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.511    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
@@ -543,7 +542,7 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">sd__eta.v</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.403    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.388    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
@@ -551,7 +550,7 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">cor__eta.v, eta.cl</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.959    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.987    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
@@ -559,7 +558,7 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">add.err</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.792    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.836    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
@@ -571,18 +570,18 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">logLik</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-486.921    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-487.073    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">AIC</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.842    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">986.147    </td>
 </tr>
 <tr><th colspan="2" style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</th></tr>
 </table>
-<p>Like <code>dwplot</code>, you can also use <code>huxtable</code> to compare runs:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<p>You can also use <code>huxtable</code> to compare runs:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://hughjonesd.github.io/huxtable/reference/huxreg.html" class="external-link">huxreg</a></span><span class="op">(</span><span class="st">'SAEM'</span><span class="op">=</span><span class="va">fit.s</span>, <span class="st">'FOCEi'</span><span class="op">=</span><span class="va">fit.f</span><span class="op">)</span></code></pre></div>
-<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-26">
+<table class="table huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:unnamed-chunk-25">
 <col>
 <col>
 <col>
@@ -593,28 +592,28 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">tcl</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-4.989    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-5.000    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-5.011    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-5.006    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.073)   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.086)   </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.077)   </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.083)   </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">tv</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.341 ***</td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.335 ***</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.351 ***</td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.330 ***</td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.055)   </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.062)   </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.053)   </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">(0.061)   </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">sd__eta.cl</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.476    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.497    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.511    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.502    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
@@ -623,7 +622,7 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">sd__eta.v</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.403    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.388    </td>
 <td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.396    </td>
 </tr>
 <tr>
@@ -633,7 +632,7 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">cor__eta.v, eta.cl</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.959    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.987    </td>
 <td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.980    </td>
 </tr>
 <tr>
@@ -643,8 +642,8 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">add.err</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.792    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.826    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.836    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">2.811    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></th>
@@ -658,18 +657,18 @@
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">logLik</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-486.921    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-486.744    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-487.073    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">-486.773    </td>
 </tr>
 <tr>
 <th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">AIC</th>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.842    </td>
-<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.487    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">986.147    </td>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.8pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">985.546    </td>
 </tr>
 <tr><th colspan="3" style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.8pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"> *** p &lt; 0.001;  ** p &lt; 0.01;  * p &lt; 0.05.</th></tr>
 </table>
 <p>A word-based table can also be easily created with the tool:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ardata-fr.github.io/officeverse/" class="external-link">officer</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ardata-fr.github.io/flextable-book/" class="external-link">flextable</a></span><span class="op">)</span>
 
@@ -701,7 +700,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
 </div>
 
       </footer>

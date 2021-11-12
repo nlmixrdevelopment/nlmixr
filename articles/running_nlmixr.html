@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
       </span>
     </div>
 
@@ -56,7 +56,8 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="divider">
-    <li class="dropdown-header">Getting started</li>
+    </li>
+<li class="dropdown-header">Getting started</li>
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
     </li>
@@ -64,7 +65,8 @@
       <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Going further</li>
+    </li>
+<li class="dropdown-header">Going further</li>
     <li>
       <a href="../articles/modelPiping.html">Model Piping</a>
     </li>
@@ -72,7 +74,8 @@
       <a href="../articles/broom.html">Sweeping models to tidy datasets (broom)</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/xgxr-nlmixr-ggpmx.html">Integrated development with xgxr/nlmixr/ggPMX</a>
     </li>
   </ul>
@@ -90,7 +93,8 @@
       <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
@@ -103,7 +107,7 @@
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
-    <span class="fas fa-scroll fa-lg"></span>
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
@@ -117,7 +121,7 @@
 </li>
 <li>
   <a href="../reference/index.html">
-    <span class="fas fa-file-code-o fa-lg"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -126,13 +130,13 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
-    <span class="fas fa-download"></span>
+    <span class="fa fa-download"></span>
      
   </a>
 </li>
@@ -151,9 +155,9 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Running PK models with nlmixr</h1>
             
-            <h4 data-toc-skip class="date">2021-06-06</h4>
+            <h4 data-toc-skip class="date">2021-11-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/running_nlmixr.Rmd" class="external-link"><code>vignettes/running_nlmixr.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/HEAD/vignettes/running_nlmixr.Rmd" class="external-link"><code>vignettes/running_nlmixr.Rmd</code></a></small>
       <div class="hidden name"><code>running_nlmixr.Rmd</code></div>
 
     </div>
@@ -163,9 +167,9 @@
 <div class="figure">
 <img src="logo.png" alt=""><p class="caption">nlmixr</p>
 </div>
-<div id="running-pk-models-with-nlmixr" class="section level1">
-<h1 class="hasAnchor">
-<a href="#running-pk-models-with-nlmixr" class="anchor" aria-hidden="true"></a>Running PK models with nlmixr</h1>
+<div class="section level1">
+<h1 id="running-pk-models-with-nlmixr">Running PK models with nlmixr<a class="anchor" aria-label="anchor" href="#running-pk-models-with-nlmixr"></a>
+</h1>
 <p>nlmixr uses a unified interface for specifying and running models. Let’s start with a very simple PK example, using the single-dose theophylline dataset generously provided by Dr. Robert A. Upton of the University of California, San Francisco:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -233,46 +237,46 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; done</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
+<span class="co">#&gt; ── <span style="color: #0000BB; font-weight: bold;">nlmix</span><span style="color: #BB0000; font-weight: bold;">r</span> <span style="color: #BBBB00; font-weight: bold;">FOCE</span><span style="color: #BB0000; font-weight: bold;">i</span> (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;          OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.804 373.4037 393.5833      -179.7019         68.47463</span>
+<span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 116.8035 373.4033 393.5829      -179.7016         68.42019</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Time</span> (sec <span style="color: #0000BB; font-weight: bold;">$time</span>): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 6.891864 0.263635   0.263644 0.024 0.846857</span>
+<span class="co">#&gt;            setup optimize covariance table  other</span>
+<span class="co">#&gt; elapsed 6.649731 0.223079    0.22309 0.026 0.7761</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Population Parameters</span> (<span style="color: #0000BB; font-weight: bold;">$parFixed</span> or <span style="color: #0000BB; font-weight: bold;">$parFixedDf</span>): ───────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
-<span class="co">#&gt; tka       Log Ka 0.466  0.195 41.9       1.59 (1.09, 2.34)     70.5      1.91% </span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.0751 7.42       2.75 (2.37, 3.19)     26.9      4.16% </span>
-<span class="co">#&gt; tv         log V  3.46 0.0437 1.26       31.8 (29.2, 34.7)     13.9      10.3% </span>
-<span class="co">#&gt; add.sd           0.695                               0.695                     </span>
+<span class="co">#&gt;        <span style="font-weight: bold;">Parameter</span>  <span style="font-weight: bold;">Est.</span>     <span style="font-weight: bold;">SE</span> <span style="font-weight: bold;">%RSE</span> <span style="font-weight: bold;">Back-transformed(95%CI)</span> <span style="font-weight: bold;">BSV(CV%)</span> <span style="font-weight: bold;">Shrink(SD)%</span></span>
+<span class="co">#&gt; <span style="font-weight: bold;">tka</span>       Log Ka 0.464  0.195 42.1       1.59 (1.08, 2.33)     70.4      1.81% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tcl</span>       Log Cl  1.01 0.0751 7.42       2.75 (2.37, 3.19)     26.8      3.87% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tv</span>         log V  3.46 0.0437 1.26       31.8 (29.2, 34.6)     13.9      10.3% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">add.sd</span>           0.695                               0.695                     </span>
 <span class="co">#&gt;  </span>
-<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
-<span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
+<span class="co">#&gt;   Covariance Type (<span style="color: #0000BB; font-weight: bold;">$covMethod</span>): <span style="font-weight: bold;">r,s</span></span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist (<span style="color: #0000BB; font-weight: bold;">$cor</span>) :</span>
 <span class="co">#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl </span>
-<span class="co">#&gt;      0.158       0.422       0.744  </span>
+<span class="co">#&gt;      0.158        <span style="color: #00BB00; font-weight: bold;">0.422 </span>      <span style="color: #BB0000; font-weight: bold;">0.744 </span> </span>
 <span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
-<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
-<span class="co">#&gt;   Minimization message ($message):  </span>
+<span class="co">#&gt;   Full BSV covariance (<span style="color: #0000BB; font-weight: bold;">$omega</span>) or correlation (<span style="color: #0000BB; font-weight: bold;">$omegaR</span>; diagonals=SDs) </span>
+<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in <span style="color: #0000BB; font-weight: bold;">$shrink</span> </span>
+<span class="co">#&gt;   Minimization message (<span style="color: #0000BB; font-weight: bold;">$message</span>):  </span>
 <span class="co">#&gt;     relative convergence (4) </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ─────────────────────────────────────</span>
-<span class="co">#&gt; # A tibble: 132 x 20</span>
-<span class="co">#&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1      0     0.74  0     0.74   1.07  -1.96e-15  0.740  1.07  -1.78e-15  0.740</span>
-<span class="co">#&gt; 2 1      0.25  2.84  3.27 -0.426 -0.227  3.85e+ 0 -1.01  -1.45   3.22e+ 0 -0.383</span>
-<span class="co">#&gt; 3 1      0.57  6.57  5.83  0.736  0.295  6.79e+ 0 -0.215 -0.310  5.78e+ 0  0.791</span>
-<span class="co">#&gt; # … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   dosenum &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Fit Data</span> (object is a modified <span style="color: #0000BB;">tibble</span>): ─────────────────────────────────────</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 132 × 20</span></span>
+<span class="co">#&gt;   ID     TIME    DV     PRED    RES   WRES IPRED   IRES  IWRES     CPRED   CRES</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1      0     0.74 1.79<span style="color: #949494;">e</span><span style="color: #BB0000;">-15</span>  0.740  1.07   0     0.74   1.07  -<span style="color: #BB0000;">5.61</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span>  0.740</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1      0.25  2.84 3.26<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">0.423</span> -<span style="color: #BB0000;">0.225</span>  3.85 -<span style="color: #BB0000;">1.01</span>  -<span style="color: #BB0000;">1.45</span>   3.22<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">0.379</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1      0.57  6.57 5.83<span style="color: #949494;">e</span>+ 0  0.740  0.297  6.78 -<span style="color: #BB0000;">0.215</span> -<span style="color: #BB0000;">0.309</span>  5.77<span style="color: #949494;">e</span>+ 0  0.795</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   dosenum &lt;dbl&gt;</span></span></code></pre></div>
 <p>We can alternatively express the same model by ordinary differential equations (ODEs):</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">one.compartment</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
@@ -300,39 +304,39 @@
 <code class="sourceCode R"><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment</span>, <span class="va">theo_sd</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, est<span class="op">=</span><span class="st">"saem"</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span>
-<span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF not calculated fit ───────────────────────────────────</span>
+<span class="co">#&gt; ── <span style="color: #0000BB; font-weight: bold;">nlmix</span><span style="color: #BB0000; font-weight: bold;">r</span> <span style="color: #BBBB00; font-weight: bold;">SAEM</span>(<span style="font-style: italic;">ODE</span>); <span style="font-weight: 100; font-style: italic;">OBJF not calculated</span> fit ───────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;  Gaussian/Laplacian Likelihoods: AIC() or $objf etc. </span>
+<span class="co">#&gt;  Gaussian/Laplacian Likelihoods: AIC() or <span style="color: #0000BB; font-weight: bold;">$objf</span> etc. </span>
 <span class="co">#&gt;  FOCEi CWRES &amp; Likelihoods: addCwres() </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Time</span> (sec <span style="color: #0000BB; font-weight: bold;">$time</span>): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;           saem    setup table covariance    other</span>
-<span class="co">#&gt; elapsed 10.249 2.097296 0.018      0.013 0.705704</span>
+<span class="co">#&gt;          saem    setup table covariance    other</span>
+<span class="co">#&gt; elapsed 6.287 1.940113 0.024      0.011 0.645887</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Population Parameters</span> (<span style="color: #0000BB; font-weight: bold;">$parFixed</span> or <span style="color: #0000BB; font-weight: bold;">$parFixedDf</span>): ───────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
-<span class="co">#&gt; tka       Log Ka  0.45  0.193 42.9       1.57 (1.07, 2.29)     70.3    -0.513% </span>
-<span class="co">#&gt; tcl       Log Cl  1.02 0.0863 8.49       2.76 (2.33, 3.27)     28.0      4.23% </span>
-<span class="co">#&gt; tv         Log V  3.45 0.0437 1.27       31.5 (28.9, 34.3)     12.6      9.93% </span>
-<span class="co">#&gt; add.sd           0.698                               0.698                     </span>
+<span class="co">#&gt;        <span style="font-weight: bold;">Parameter</span>  <span style="font-weight: bold;">Est.</span>     <span style="font-weight: bold;">SE</span> <span style="font-weight: bold;">%RSE</span> <span style="font-weight: bold;">Back-transformed(95%CI)</span> <span style="font-weight: bold;">BSV(CV%)</span> <span style="font-weight: bold;">Shrink(SD)%</span></span>
+<span class="co">#&gt; <span style="font-weight: bold;">tka</span>       Log Ka 0.452  0.197 43.5       1.57 (1.07, 2.31)     72.0     0.361% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tcl</span>       Log Cl  1.02 0.0836 8.22       2.77 (2.35, 3.26)     27.0      3.37% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tv</span>         Log V  3.45 0.0469 1.36       31.5 (28.7, 34.5)     14.0      9.96% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">add.sd</span>           0.692                               0.692                     </span>
 <span class="co">#&gt;  </span>
-<span class="co">#&gt;   Covariance Type ($covMethod): linFim</span>
-<span class="co">#&gt;   Fixed parameter correlations in $cor</span>
+<span class="co">#&gt;   Covariance Type (<span style="color: #0000BB; font-weight: bold;">$covMethod</span>): <span style="font-weight: bold;">linFim</span></span>
+<span class="co">#&gt;   Fixed parameter correlations in <span style="color: #0000BB; font-weight: bold;">$cor</span></span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
-<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
+<span class="co">#&gt;   Full BSV covariance (<span style="color: #0000BB; font-weight: bold;">$omega</span>) or correlation (<span style="color: #0000BB; font-weight: bold;">$omegaR</span>; diagonals=SDs) </span>
+<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in <span style="color: #0000BB; font-weight: bold;">$shrink</span> </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ─────────────────────────────────────</span>
-<span class="co">#&gt; # A tibble: 132 x 19</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Fit Data</span> (object is a modified <span style="color: #0000BB;">tibble</span>): ─────────────────────────────────────</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 132 × 19</span></span>
 <span class="co">#&gt;   ID     TIME    DV  PRED    RES IPRED   IRES  IWRES eta.ka eta.cl   eta.v    cp</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1      0     0.74  0     0.74   0     0.74   1.06  0.0982 -0.480 -0.0819  0   </span>
-<span class="co">#&gt; 2 1      0.25  2.84  3.26 -0.418  3.84 -1.00  -1.44  0.0982 -0.480 -0.0819  3.84</span>
-<span class="co">#&gt; 3 1      0.57  6.57  5.84  0.734  6.78 -0.213 -0.305 0.0982 -0.480 -0.0819  6.78</span>
-<span class="co">#&gt; # … with 129 more rows, and 7 more variables: depot &lt;dbl&gt;, center &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1      0     0.74  0     0.74   0     0.74   1.07   0.104 -<span style="color: #BB0000;">0.487</span> -<span style="color: #BB0000;">0.080</span><span style="color: #BB0000; text-decoration: underline;">1</span>  0   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1      0.25  2.84  3.26 -<span style="color: #BB0000;">0.425</span>  3.86 -<span style="color: #BB0000;">1.02</span>  -<span style="color: #BB0000;">1.48</span>   0.104 -<span style="color: #BB0000;">0.487</span> -<span style="color: #BB0000;">0.080</span><span style="color: #BB0000; text-decoration: underline;">1</span>  3.86</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1      0.57  6.57  5.85  0.724  6.81 -<span style="color: #BB0000;">0.235</span> -<span style="color: #BB0000;">0.340</span>  0.104 -<span style="color: #BB0000;">0.487</span> -<span style="color: #BB0000;">0.080</span><span style="color: #BB0000; text-decoration: underline;">1</span>  6.81</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 129 more rows, and 7 more variables: depot &lt;dbl&gt;, center &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span></span></code></pre></div>
 <p>And if we wanted to, we could even apply the traditional R method nlme method to this model:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fitN</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment</span>, <span class="va">theo_sd</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pnlsTol<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span>, est<span class="op">=</span><span class="st">"nlme"</span><span class="op">)</span>
@@ -343,38 +347,25 @@
 <span class="co">#&gt;      ID1      ID2      ID3 </span>
 <span class="co">#&gt; 1.271715 1.182324 2.187380 </span>
 <span class="co">#&gt;  Beginning PNLS step: ..  completed fit_nlme() step.</span>
-<span class="co">#&gt; PNLS step: RSS =  62.48845 </span>
-<span class="co">#&gt;  fixed effects: 0.4547187  1.014821  3.466463  </span>
-<span class="co">#&gt;  iterations: 7 </span>
+<span class="co">#&gt; PNLS step: RSS =  65.5344 </span>
+<span class="co">#&gt;  fixed effects: 0.4839788  0.9956147  3.475748  </span>
+<span class="co">#&gt;  iterations: 5 </span>
 <span class="co">#&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):</span>
 <span class="co">#&gt;       fixed    reStruct </span>
-<span class="co">#&gt;  0.01460463 34.73885141 </span>
+<span class="co">#&gt;  0.07020724 12.68355662 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; **Iteration 2</span>
-<span class="co">#&gt; LME step: Loglik: -179.5839, nlminb iterations: 9</span>
+<span class="co">#&gt; LME step: Loglik: -178.6729, nlminb iterations: 1</span>
 <span class="co">#&gt; reStruct  parameters:</span>
-<span class="co">#&gt;       ID1       ID2       ID3 </span>
-<span class="co">#&gt; 0.0750726 0.9325881 1.4971565 </span>
+<span class="co">#&gt;        ID1        ID2        ID3 </span>
+<span class="co">#&gt; 0.09293748 0.91437047 1.56871691 </span>
 <span class="co">#&gt;  Beginning PNLS step: ..  completed fit_nlme() step.</span>
-<span class="co">#&gt; PNLS step: RSS =  65.11331 </span>
-<span class="co">#&gt;  fixed effects: 0.4537317  1.009484  3.467487  </span>
-<span class="co">#&gt;  iterations: 6 </span>
-<span class="co">#&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):</span>
-<span class="co">#&gt;       fixed    reStruct </span>
-<span class="co">#&gt; 0.005287347 1.351596341 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; **Iteration 3</span>
-<span class="co">#&gt; LME step: Loglik: -180.5346, nlminb iterations: 1</span>
-<span class="co">#&gt; reStruct  parameters:</span>
-<span class="co">#&gt;       ID1       ID2       ID3 </span>
-<span class="co">#&gt; 0.1072051 1.0218150 1.5608104 </span>
-<span class="co">#&gt;  Beginning PNLS step: ..  completed fit_nlme() step.</span>
-<span class="co">#&gt; PNLS step: RSS =  65.11332 </span>
-<span class="co">#&gt;  fixed effects: 0.4537317  1.009484  3.467487  </span>
+<span class="co">#&gt; PNLS step: RSS =  65.53441 </span>
+<span class="co">#&gt;  fixed effects: 0.4839788  0.9956147  3.475748  </span>
 <span class="co">#&gt;  iterations: 1 </span>
 <span class="co">#&gt; Convergence crit. (must all become &lt;= tolerance = 1e-05):</span>
 <span class="co">#&gt;        fixed     reStruct </span>
-<span class="co">#&gt; 0.000000e+00 4.188028e-06 </span>
+<span class="co">#&gt; 0.000000e+00 3.717616e-06 </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
@@ -395,41 +386,41 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fitN</span><span class="op">)</span>
-<span class="co">#&gt; ── nlmixr nlme by maximum likelihood (ODE; μ-ref &amp; covs) fit ───────────────────</span>
+<span class="co">#&gt; ── <span style="color: #0000BB; font-weight: bold;">nlmix</span><span style="color: #BB0000; font-weight: bold;">r</span> <span style="color: #BBBB00; font-weight: bold;">nlme</span> by <span style="color: #BBBB00; font-weight: bold;">maximum likelihood</span> (<span style="font-style: italic;">ODE; μ-ref &amp; covs</span>) fit ───────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 118.6178 375.2175 395.3971      -180.6088         15.24891</span>
-<span class="co">#&gt; nlme  118.4695 375.0693 395.2489      -180.5346         15.24891</span>
+<span class="co">#&gt; FOCEi 122.1948 378.7946 398.9742      -182.3973         16.04255</span>
+<span class="co">#&gt; nlme  114.7459 371.3457 391.5253      -178.6729         16.04255</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Time</span> (sec <span style="color: #0000BB; font-weight: bold;">$time</span>): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;          nlme    setup table cwres    other</span>
-<span class="co">#&gt; elapsed 3.393 4.188569 0.021 4.228 0.258431</span>
+<span class="co">#&gt;           nlme    setup table cwres    other</span>
+<span class="co">#&gt; elapsed -0.883 3.745906 0.019 3.783 0.248094</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Population Parameters</span> (<span style="color: #0000BB; font-weight: bold;">$parFixed</span> or <span style="color: #0000BB; font-weight: bold;">$parFixedDf</span>): ───────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
-<span class="co">#&gt; tka       Log Ka 0.454  0.192 42.4       1.57 (1.08, 2.29)     68.9     -2.14% </span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.0805 7.98       2.74 (2.34, 3.21)     25.4      1.34% </span>
-<span class="co">#&gt; tv         Log V  3.47 0.0492 1.42       32.1 (29.1, 35.3)     14.6      5.40% </span>
-<span class="co">#&gt; add.sd           0.693                               0.693                     </span>
+<span class="co">#&gt;        <span style="font-weight: bold;">Parameter</span>  <span style="font-weight: bold;">Est.</span>     <span style="font-weight: bold;">SE</span> <span style="font-weight: bold;">%RSE</span> <span style="font-weight: bold;">Back-transformed(95%CI)</span> <span style="font-weight: bold;">BSV(CV%)</span> <span style="font-weight: bold;">Shrink(SD)%</span></span>
+<span class="co">#&gt; <span style="font-weight: bold;">tka</span>       Log Ka 0.484  0.187 38.7       1.62 (1.12, 2.34)     67.6    <span style="color: #BB0000; font-weight: bold;">-0.748%</span> </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tcl</span>       Log Cl 0.996 0.0865 8.68       2.71 (2.28, 3.21)     27.5      7.91% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tv</span>         Log V  3.48 0.0467 1.34       32.3 (29.5, 35.4)     14.1   <span style="color: #BB0000; font-weight: bold;">-0.0171%</span> </span>
+<span class="co">#&gt; <span style="font-weight: bold;">add.sd</span>           0.674                               0.674                     </span>
 <span class="co">#&gt;  </span>
-<span class="co">#&gt;   Covariance Type ($covMethod): nlme</span>
-<span class="co">#&gt;   Fixed parameter correlations in $cor</span>
+<span class="co">#&gt;   Covariance Type (<span style="color: #0000BB; font-weight: bold;">$covMethod</span>): <span style="font-weight: bold;">nlme</span></span>
+<span class="co">#&gt;   Fixed parameter correlations in <span style="color: #0000BB; font-weight: bold;">$cor</span></span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
-<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
+<span class="co">#&gt;   Full BSV covariance (<span style="color: #0000BB; font-weight: bold;">$omega</span>) or correlation (<span style="color: #0000BB; font-weight: bold;">$omegaR</span>; diagonals=SDs) </span>
+<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in <span style="color: #0000BB; font-weight: bold;">$shrink</span> </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ─────────────────────────────────────</span>
-<span class="co">#&gt; # A tibble: 132 x 22</span>
-<span class="co">#&gt;   ID     TIME    DV  PRED    RES   WRES IPRED    IRES   IWRES CPRED   CRES</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1      0     0.74  0     0.74   1.07   0     0.74    1.07    0     0.74 </span>
-<span class="co">#&gt; 2 1      0.25  2.84  3.21 -0.371 -0.202  3.74 -0.898  -1.29    3.17 -0.334</span>
-<span class="co">#&gt; 3 1      0.57  6.57  5.75  0.820  0.335  6.63 -0.0609 -0.0878  5.70  0.869</span>
-<span class="co">#&gt; # … with 129 more rows, and 11 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   v &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Fit Data</span> (object is a modified <span style="color: #0000BB;">tibble</span>): ─────────────────────────────────────</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 132 × 22</span></span>
+<span class="co">#&gt;   ID     TIME    DV  PRED    RES   WRES IPRED   IRES  IWRES CPRED   CRES  CWRES</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1      0     0.74  0     0.74   1.10   0     0.74   1.10   0     0.74   1.10 </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1      0.25  2.84  3.26 -<span style="color: #BB0000;">0.425</span> -<span style="color: #BB0000;">0.234</span>  3.94 -<span style="color: #BB0000;">1.10</span>  -<span style="color: #BB0000;">1.63</span>   3.21 -<span style="color: #BB0000;">0.367</span> -<span style="color: #BB0000;">0.175</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1      0.57  6.57  5.81  0.758  0.316  6.87 -<span style="color: #BB0000;">0.303</span> -<span style="color: #BB0000;">0.450</span>  5.75  0.823  0.310</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 129 more rows, and 10 more variables: eta.ka &lt;dbl&gt;, eta.cl &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   eta.v &lt;dbl&gt;, depot &lt;dbl&gt;, center &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span></span></code></pre></div>
 <p>This example delivers a complete model fit as the <code>fit</code> object, including parameter history, a set of fixed effect estimates, and random effects for all included subjects.</p>
 <p>Now back to the <code>saem</code> fit; Let’s look at the fit using nlmixr’s built-in diagnostics…</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -437,61 +428,61 @@
 <p><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-1.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-2.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-3.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-4.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-5.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-6.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-7.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-8.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-9.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-10.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-11.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-12.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-13.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-14.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-15.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-16.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-17.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-18.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-19.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-20.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-21.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-22.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-23.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-24.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-25.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-26.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-27.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-28.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-29.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-30.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-31.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-32.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-33.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-34.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-35.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-36.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-37.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-38.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-39.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-40.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-41.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-42.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-43.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-44.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-45.png" width="100%"><img src="running_nlmixr_files/figure-html/unnamed-chunk-8-46.png" width="100%"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
-<span class="co">#&gt; ── nlmixr FOCEi (outer: nlminb) fit ────────────────────────────────────────────</span>
+<span class="co">#&gt; ── <span style="color: #0000BB; font-weight: bold;">nlmix</span><span style="color: #BB0000; font-weight: bold;">r</span> <span style="color: #BBBB00; font-weight: bold;">FOCE</span><span style="color: #BB0000; font-weight: bold;">i</span> (outer: nlminb) fit ────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;          OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 116.804 373.4037 393.5833      -179.7019         68.47463</span>
+<span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
+<span class="co">#&gt; FOCEi 116.8035 373.4033 393.5829      -179.7016         68.42019</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Time</span> (sec <span style="color: #0000BB; font-weight: bold;">$time</span>): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;            setup optimize covariance table    other</span>
-<span class="co">#&gt; elapsed 6.891864 0.263635   0.263644 0.024 0.846857</span>
+<span class="co">#&gt;            setup optimize covariance table  other</span>
+<span class="co">#&gt; elapsed 6.649731 0.223079    0.22309 0.026 0.7761</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Population Parameters</span> (<span style="color: #0000BB; font-weight: bold;">$parFixed</span> or <span style="color: #0000BB; font-weight: bold;">$parFixedDf</span>): ───────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;        Parameter  Est.     SE %RSE Back-transformed(95%CI) BSV(CV%) Shrink(SD)%</span>
-<span class="co">#&gt; tka       Log Ka 0.466  0.195 41.9       1.59 (1.09, 2.34)     70.5      1.91% </span>
-<span class="co">#&gt; tcl       Log Cl  1.01 0.0751 7.42       2.75 (2.37, 3.19)     26.9      4.16% </span>
-<span class="co">#&gt; tv         log V  3.46 0.0437 1.26       31.8 (29.2, 34.7)     13.9      10.3% </span>
-<span class="co">#&gt; add.sd           0.695                               0.695                     </span>
+<span class="co">#&gt;        <span style="font-weight: bold;">Parameter</span>  <span style="font-weight: bold;">Est.</span>     <span style="font-weight: bold;">SE</span> <span style="font-weight: bold;">%RSE</span> <span style="font-weight: bold;">Back-transformed(95%CI)</span> <span style="font-weight: bold;">BSV(CV%)</span> <span style="font-weight: bold;">Shrink(SD)%</span></span>
+<span class="co">#&gt; <span style="font-weight: bold;">tka</span>       Log Ka 0.464  0.195 42.1       1.59 (1.08, 2.33)     70.4      1.81% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tcl</span>       Log Cl  1.01 0.0751 7.42       2.75 (2.37, 3.19)     26.8      3.87% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tv</span>         log V  3.46 0.0437 1.26       31.8 (29.2, 34.6)     13.9      10.3% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">add.sd</span>           0.695                               0.695                     </span>
 <span class="co">#&gt;  </span>
-<span class="co">#&gt;   Covariance Type ($covMethod): r,s</span>
-<span class="co">#&gt;   Some strong fixed parameter correlations exist ($cor) :</span>
+<span class="co">#&gt;   Covariance Type (<span style="color: #0000BB; font-weight: bold;">$covMethod</span>): <span style="font-weight: bold;">r,s</span></span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist (<span style="color: #0000BB; font-weight: bold;">$cor</span>) :</span>
 <span class="co">#&gt;     cor:tcl,tka  cor:tv,tka  cor:tv,tcl </span>
-<span class="co">#&gt;      0.158       0.422       0.744  </span>
+<span class="co">#&gt;      0.158        <span style="color: #00BB00; font-weight: bold;">0.422 </span>      <span style="color: #BB0000; font-weight: bold;">0.744 </span> </span>
 <span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   No correlations in between subject variability (BSV) matrix</span>
-<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
-<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
-<span class="co">#&gt;   Minimization message ($message):  </span>
+<span class="co">#&gt;   Full BSV covariance (<span style="color: #0000BB; font-weight: bold;">$omega</span>) or correlation (<span style="color: #0000BB; font-weight: bold;">$omegaR</span>; diagonals=SDs) </span>
+<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in <span style="color: #0000BB; font-weight: bold;">$shrink</span> </span>
+<span class="co">#&gt;   Minimization message (<span style="color: #0000BB; font-weight: bold;">$message</span>):  </span>
 <span class="co">#&gt;     relative convergence (4) </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ─────────────────────────────────────</span>
-<span class="co">#&gt; # A tibble: 132 x 20</span>
-<span class="co">#&gt;   ID     TIME    DV  PRED    RES   WRES     IPRED   IRES  IWRES     CPRED   CRES</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1      0     0.74  0     0.74   1.07  -1.96e-15  0.740  1.07  -1.78e-15  0.740</span>
-<span class="co">#&gt; 2 1      0.25  2.84  3.27 -0.426 -0.227  3.85e+ 0 -1.01  -1.45   3.22e+ 0 -0.383</span>
-<span class="co">#&gt; 3 1      0.57  6.57  5.83  0.736  0.295  6.79e+ 0 -0.215 -0.310  5.78e+ 0  0.791</span>
-<span class="co">#&gt; # … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   dosenum &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Fit Data</span> (object is a modified <span style="color: #0000BB;">tibble</span>): ─────────────────────────────────────</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 132 × 20</span></span>
+<span class="co">#&gt;   ID     TIME    DV     PRED    RES   WRES IPRED   IRES  IWRES     CPRED   CRES</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1      0     0.74 1.79<span style="color: #949494;">e</span><span style="color: #BB0000;">-15</span>  0.740  1.07   0     0.74   1.07  -<span style="color: #BB0000;">5.61</span><span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span>  0.740</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1      0.25  2.84 3.26<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">0.423</span> -<span style="color: #BB0000;">0.225</span>  3.85 -<span style="color: #BB0000;">1.01</span>  -<span style="color: #BB0000;">1.45</span>   3.22<span style="color: #949494;">e</span>+ 0 -<span style="color: #BB0000;">0.379</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1      0.57  6.57 5.83<span style="color: #949494;">e</span>+ 0  0.740  0.297  6.78 -<span style="color: #BB0000;">0.215</span> -<span style="color: #BB0000;">0.309</span>  5.77<span style="color: #949494;">e</span>+ 0  0.795</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 129 more rows, and 9 more variables: CWRES &lt;dbl&gt;, eta.ka &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, ka &lt;dbl&gt;, cl &lt;dbl&gt;, v &lt;dbl&gt;, tad &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   dosenum &lt;dbl&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit</span><span class="op">$</span><span class="va">eta</span>
 <span class="co">#&gt;    ID      eta.ka      eta.cl         eta.v</span>
-<span class="co">#&gt; 1   1  0.08494450 -0.47500405 -0.0912664603</span>
-<span class="co">#&gt; 2   2  0.19655133  0.14423321  0.0048689411</span>
-<span class="co">#&gt; 3   3  0.37029716  0.02805052  0.0527802069</span>
-<span class="co">#&gt; 4   4 -0.28332194 -0.01838272 -0.0132424956</span>
-<span class="co">#&gt; 5   5 -0.04411737 -0.15052012 -0.1435424887</span>
-<span class="co">#&gt; 6   6 -0.38823610  0.37269771  0.1928455751</span>
-<span class="co">#&gt; 7   7 -0.77368728  0.14627308  0.0547468171</span>
-<span class="co">#&gt; 8   8 -0.16961190  0.16479317  0.0931707991</span>
-<span class="co">#&gt; 9   9  1.36225402  0.04526357 -0.0003810245</span>
-<span class="co">#&gt; 10 10 -0.73379360 -0.38254680 -0.1717377405</span>
-<span class="co">#&gt; 11 11  0.75260454  0.28802886  0.1361334969</span>
-<span class="co">#&gt; 12 12 -0.52074473 -0.12576027 -0.2017091607</span></code></pre></div>
+<span class="co">#&gt; 1   1  0.08633989 -0.47406277 -9.110262e-02</span>
+<span class="co">#&gt; 2   2  0.19824403  0.14438007  5.214363e-03</span>
+<span class="co">#&gt; 3   3  0.37188038  0.02832174  5.310541e-02</span>
+<span class="co">#&gt; 4   4 -0.28167853 -0.01803295 -1.295651e-02</span>
+<span class="co">#&gt; 5   5 -0.04256582 -0.15001965 -1.433194e-01</span>
+<span class="co">#&gt; 6   6 -0.38597392  0.37218972  1.935431e-01</span>
+<span class="co">#&gt; 7   7 -0.77183271  0.14633531  5.515352e-02</span>
+<span class="co">#&gt; 8   8 -0.16778000  0.16482442  9.359308e-02</span>
+<span class="co">#&gt; 9   9  1.36338837  0.04551583 -6.709389e-05</span>
+<span class="co">#&gt; 10 10 -0.73251205 -0.38171082 -1.716858e-01</span>
+<span class="co">#&gt; 11 11  0.75433206  0.28790437  1.365735e-01</span>
+<span class="co">#&gt; 12 12 -0.51928526 -0.12524871 -2.015633e-01</span></code></pre></div>
 <p>Default trace plots can be generated using:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/traceplot.html">traceplot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
@@ -534,16 +525,16 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1.75</span>,<span class="fl">1.75</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Theophylline single-dose"</span>, subtitle<span class="op">=</span><span class="st">"IIV distributions"</span><span class="op">)</span></code></pre></div>
 <p><img src="running_nlmixr_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
-<div id="xpose" class="section level2">
-<h2 class="hasAnchor">
-<a href="#xpose" class="anchor" aria-hidden="true"></a>xpose</h2>
+<div class="section level2">
+<h2 id="xpose">xpose<a class="anchor" aria-label="anchor" href="#xpose"></a>
+</h2>
 <p>This is all very nice. But what we really want is a complete suite of model diagnostic tools, like those available in <a href="https://github.com/UUPharmacometrics/xpose" class="external-link">xpose</a>, right?</p>
 <p>Restart R, and install xpose from CRAN, if you haven’t already…</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## install.packages("xpose")</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/UUPharmacometrics/xpose" class="external-link">xpose</a></span><span class="op">)</span></code></pre></div>
 <p>Now install the extension for nlmixr:</p>
-<pre><code> devtools::install_github("nlmixrdevelopment/xpose.nlmixr")</code></pre>
+<pre><code><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"nlmixrdevelopment/xpose.nlmixr"</span><span class="op">)</span></code></pre>
 <p>… and convert your nlmixr fit object into an xpose fit object.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">xpose.nlmixr</span><span class="op">)</span>
@@ -569,13 +560,13 @@
 <p><img src="running_nlmixr_files/figure-html/unnamed-chunk-19-1.png" width="100%"> For more information about using xpose, see the Uppsala pharmacometrics group’s comprehensive site <a href="https://uupharmacometrics.github.io/xpose/" class="external-link">here</a>.</p>
 </div>
 </div>
-<div id="the-ui" class="section level1">
-<h1 class="hasAnchor">
-<a href="#the-ui" class="anchor" aria-hidden="true"></a>The UI</h1>
+<div class="section level1">
+<h1 id="the-ui">The UI<a class="anchor" aria-label="anchor" href="#the-ui"></a>
+</h1>
 <p>The nlmixr modeling dialect, inspired by R and NONMEM, can be used to fit models using all current and future estimation algorithms within nlmixr. Using these widely-used tools as inspiration has the advantage of delivering a model specification syntax that is instantly familiar to the majority of analysts working in pharmacometrics and related fields.</p>
-<div id="overall-model-structure" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overall-model-structure" class="anchor" aria-hidden="true"></a>Overall model structure</h2>
+<div class="section level2">
+<h2 id="overall-model-structure">Overall model structure<a class="anchor" aria-label="anchor" href="#overall-model-structure"></a>
+</h2>
 <p>Model specifications for nlmixr are written using functions containing <code>ini</code> and <code>model</code> blocks. These functions can be called anything, but must contain these two components. Let’s look at a very simple one-compartment model with no covariates.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
@@ -586,9 +577,9 @@
     <span class="co"># here</span>
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<div id="the-ini-block" class="section level3">
-<h3 class="hasAnchor">
-<a href="#the-ini-block" class="anchor" aria-hidden="true"></a>The ini block</h3>
+<div class="section level3">
+<h3 id="the-ini-block">The ini block<a class="anchor" aria-label="anchor" href="#the-ini-block"></a>
+</h3>
 <p>The <code>ini</code> block specifies initial conditions, including initial estimates and boundaries for those algorithms which support them (currently, the built-in <code>nlme</code> and <code>saem</code> methods do not). Nomenclature is similar to that used in NONMEM, Monolix and other similar packages. In the NONMEM world, the <code>ini</code> block is analogous to <code>$THETA</code>, <code>$OMEGA</code> and <code>$SIGMA</code> blocks.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span> <span class="co"># Note that arguments to the function are currently</span>
@@ -618,7 +609,7 @@
 <p>As shown in the above example:</p>
 <ul>
 <li>Simple parameter values are specified using an R-compatible assignment</li>
-<li>Boundaries my be specified by <code>c(lower, est, upper)</code>.</li>
+<li>Boundaries may be specified by <code>c(lower, est, upper)</code>.</li>
 <li>Like NONMEM, <code>c(lower,est)</code> is equivalent to <code>c(lower,est,Inf)</code>
 </li>
 <li>Also like NONMEM, <code>c(est)</code> does not specify a lower bound, and is equivalent to specifying the parameter without using R’s <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> function.</li>
@@ -667,9 +658,9 @@
 </ul>
 <p>Currently, comments inside the lower triangular matrix are not allowed.</p>
 </div>
-<div id="the-model-block" class="section level3">
-<h3 class="hasAnchor">
-<a href="#the-model-block" class="anchor" aria-hidden="true"></a>The model block</h3>
+<div class="section level3">
+<h3 id="the-model-block">The model block<a class="anchor" aria-label="anchor" href="#the-model-block"></a>
+</h3>
 <p>The <code>model</code> block specifies the model, and is analogous to the <code>$PK</code>, <code>$PRED</code> and <code>$ERROR</code> blocks in NONMEM.</p>
 <p>Once the initialization block has been defined, you can define a model in terms of the variables defined in the <code>ini</code> block. You can also mix RxODE blocks into the model if needed.</p>
 <p>The current method of defining a nlmixr model is to specify the parameters, and then any required RxODE lines. Continuing the annotated example:</p>
@@ -718,22 +709,22 @@
 </ul>
 </div>
 </div>
-<div id="running-models" class="section level2">
-<h2 class="hasAnchor">
-<a href="#running-models" class="anchor" aria-hidden="true"></a>Running models</h2>
+<div class="section level2">
+<h2 id="running-models">Running models<a class="anchor" aria-label="anchor" href="#running-models"></a>
+</h2>
 <p>Models can be fitted several ways, including via the [magrittr] forward-pipe operator.</p>
-<pre><code>fit &lt;- nlmixr(one.compartment) %&gt;% saem.fit(data=theo_sd)</code></pre>
-<pre><code>fit2 &lt;- nlmixr(one.compartment, data=theo_sd, est="saem")</code></pre>
-<pre><code>fit3 &lt;- one.compartment %&gt;% saem.fit(data=theo_sd)</code></pre>
+<pre><code><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/saem.fit.html">saem.fit</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">theo_sd</span><span class="op">)</span></code></pre>
+<pre><code><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment</span>, data<span class="op">=</span><span class="va">theo_sd</span>, est<span class="op">=</span><span class="st">"saem"</span><span class="op">)</span></code></pre>
+<pre><code><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="va">one.compartment</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/saem.fit.html">saem.fit</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">theo_sd</span><span class="op">)</span></code></pre>
 <p>Options to the estimation routines can be specified using nlmeControl for nlme estimation:</p>
-<pre><code>fit4 &lt;- nlmixr(one.compartment, theo_sd,est="nlme",control = nlmeControl(pnlsTol = .5))</code></pre>
+<pre><code><span class="va">fit4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment</span>, <span class="va">theo_sd</span>,est<span class="op">=</span><span class="st">"nlme"</span>,control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/nlmeControl.html" class="external-link">nlmeControl</a></span><span class="op">(</span>pnlsTol <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span><span class="op">)</span></code></pre>
 <p>where options are specified in the <code>nlme</code> documentation. Options for saem can be specified using <code>saemControl</code>:</p>
-<pre><code>fit5 &lt;- nlmixr(one.compartment,theo_sd,est="saem",control=saemControl(n.burn=250,n.em=350,print=50))</code></pre>
+<pre><code><span class="va">fit5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment</span>,<span class="va">theo_sd</span>,est<span class="op">=</span><span class="st">"saem"</span>,control<span class="op">=</span><span class="fu"><a href="../reference/saemControl.html">saemControl</a></span><span class="op">(</span>n.burn<span class="op">=</span><span class="fl">250</span>,n.em<span class="op">=</span><span class="fl">350</span>,print<span class="op">=</span><span class="fl">50</span><span class="op">)</span><span class="op">)</span></code></pre>
 <p>this example specifies 250 burn-in iterations, 350 em iterations and a print progress every 50 runs.</p>
 </div>
-<div id="model-syntax-for-solved-pk-systems" class="section level2">
-<h2 class="hasAnchor">
-<a href="#model-syntax-for-solved-pk-systems" class="anchor" aria-hidden="true"></a>Model Syntax for solved PK systems</h2>
+<div class="section level2">
+<h2 id="model-syntax-for-solved-pk-systems">Model Syntax for solved PK systems<a class="anchor" aria-label="anchor" href="#model-syntax-for-solved-pk-systems"></a>
+</h2>
 <p>Solved PK systems are also currently supported by nlmixr with the ‘linCmt()’ pseudo-function. An annotated example of a solved system is below:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
@@ -762,26 +753,26 @@
 <span class="op">}</span></code></pre></div>
 <p>A few things to keep in mind: * Currently the solved systems support either oral dosing, IV dosing or IV infusion dosing and does not allow mixing the dosing types. * While RxODE allows mixing of solved systems and ODEs, this has not been implemented in nlmixr yet. * The solved systems implemented are the one, two and three compartment models with or without first-order absorption. Each of the models support a lag time with a tlag parameter. * In general the linear compartment model figures out the model by the parameter names. nlmixr currently knows about numbered volumes, <code>Vc</code>/<code>Vp</code>, Clearances in terms of both <code>Cl</code> and <code>Q</code>/<code>CLD</code>. Additionally nlmixr knows about elimination micro-constants (ie <code>K12</code>). Mixing of these parameters for these models is currently not supported.</p>
 </div>
-<div id="checking-model-syntax" class="section level2">
-<h2 class="hasAnchor">
-<a href="#checking-model-syntax" class="anchor" aria-hidden="true"></a>Checking model syntax</h2>
+<div class="section level2">
+<h2 id="checking-model-syntax">Checking model syntax<a class="anchor" aria-label="anchor" href="#checking-model-syntax"></a>
+</h2>
 <p>After specifying the model syntax you can check that nlmixr is interpreting it correctly by using the nlmixr function on it. Using the above function we can get:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span>
 <span class="co">#&gt; ▂▂ RxODE-based 1-compartment model with first-order absorption ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂ </span>
-<span class="co">#&gt; ── Initialization: ───────────────────────────────────────────────────────────── </span>
-<span class="co">#&gt; Fixed Effects ($theta): </span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Initialization:</span> ───────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt; <span style="font-weight: bold;">Fixed Effects</span> (<span style="color: #0000BB; font-weight: bold;">$theta</span>): </span>
 <span class="co">#&gt;     lCl     lVc     lKA </span>
 <span class="co">#&gt; 1.60000 4.49981 0.10000 </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Omega ($omega): </span>
+<span class="co">#&gt; <span style="font-weight: bold;">Omega</span> (<span style="color: #0000BB; font-weight: bold;">$omega</span>): </span>
 <span class="co">#&gt;        eta.Cl eta.Vc eta.KA</span>
 <span class="co">#&gt; eta.Cl    0.1    0.0    0.0</span>
 <span class="co">#&gt; eta.Vc    0.0    0.1    0.0</span>
 <span class="co">#&gt; eta.KA    0.0    0.0    0.1</span>
-<span class="co">#&gt; ── μ-referencing ($muRefTable): ──────────────────────────────────────────────── </span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">μ-referencing</span> (<span style="color: #0000BB; font-weight: bold;">$muRefTable</span>): ──────────────────────────────────────────────── </span>
 <span class="co">#&gt;                              ┌─────────┬─────────┐</span>
-<span class="co">#&gt;                              │ theta   │ eta     │</span>
+<span class="co">#&gt;                              │ <span style="font-weight: bold;">theta  </span> │ <span style="font-weight: bold;">eta    </span> │</span>
 <span class="co">#&gt;                              ├─────────┼─────────┤</span>
 <span class="co">#&gt;                              │ lCl     │ eta.Cl  │</span>
 <span class="co">#&gt;                              ├─────────┼─────────┤</span>
@@ -790,7 +781,7 @@
 <span class="co">#&gt;                              │ lKA     │ eta.KA  │</span>
 <span class="co">#&gt;                              └─────────┴─────────┘</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Model: ────────────────────────────────────────────────────────────────────── </span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Model:</span> ────────────────────────────────────────────────────────────────────── </span>
 <span class="co">#&gt;     Cl &lt;- exp(lCl + eta.Cl)</span>
 <span class="co">#&gt;     Vc = exp(lVc + eta.Vc)</span>
 <span class="co">#&gt;     KA &lt;- exp(lKA + eta.KA)</span>
@@ -825,7 +816,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
 </div>
 
       </footer>

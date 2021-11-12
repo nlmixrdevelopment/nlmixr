@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
       </span>
     </div>
 
@@ -56,7 +56,8 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="divider">
-    <li class="dropdown-header">Getting started</li>
+    </li>
+<li class="dropdown-header">Getting started</li>
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
     </li>
@@ -64,7 +65,8 @@
       <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Going further</li>
+    </li>
+<li class="dropdown-header">Going further</li>
     <li>
       <a href="../articles/modelPiping.html">Model Piping</a>
     </li>
@@ -72,7 +74,8 @@
       <a href="../articles/broom.html">Sweeping models to tidy datasets (broom)</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/xgxr-nlmixr-ggpmx.html">Integrated development with xgxr/nlmixr/ggPMX</a>
     </li>
   </ul>
@@ -90,7 +93,8 @@
       <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
@@ -103,7 +107,7 @@
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
-    <span class="fas fa-scroll fa-lg"></span>
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
@@ -117,7 +121,7 @@
 </li>
 <li>
   <a href="../reference/index.html">
-    <span class="fas fa-file-code-o fa-lg"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -126,13 +130,13 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
-    <span class="fas fa-download"></span>
+    <span class="fa fa-download"></span>
      
   </a>
 </li>
@@ -151,9 +155,9 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Example Model: Phenobarbitol with correlations</h1>
             
-            <h4 data-toc-skip class="date">2021-06-06</h4>
+            <h4 data-toc-skip class="date">2021-11-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/addingCovariances.Rmd" class="external-link"><code>vignettes/addingCovariances.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/HEAD/vignettes/addingCovariances.Rmd" class="external-link"><code>vignettes/addingCovariances.Rmd</code></a></small>
       <div class="hidden name"><code>addingCovariances.Rmd</code></div>
 
     </div>
@@ -163,17 +167,17 @@
 <div class="figure">
 <img src="logo.png" alt=""><p class="caption">nlmixr</p>
 </div>
-<div id="adding-covariances-between-random-effects" class="section level1">
-<h1 class="hasAnchor">
-<a href="#adding-covariances-between-random-effects" class="anchor" aria-hidden="true"></a>Adding Covariances between random effects</h1>
+<div class="section level1">
+<h1 id="adding-covariances-between-random-effects">Adding Covariances between random effects<a class="anchor" aria-label="anchor" href="#adding-covariances-between-random-effects"></a>
+</h1>
 <p>You can simply add co-variances between two random effects by adding the effects together in the model specification block, that is <code>eta.cl+eta.v ~</code>. After that statement, you specify the lower triangular matrix of the fit with <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code>.</p>
 <p>An example of this is the phenobarbitol data:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Load phenobarbitol data</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span></code></pre></div>
-<div id="model-specification" class="section level2">
-<h2 class="hasAnchor">
-<a href="#model-specification" class="anchor" aria-hidden="true"></a>Model Specification</h2>
+<div class="section level2">
+<h2 id="model-specification">Model Specification<a class="anchor" aria-label="anchor" href="#model-specification"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">pheno</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
@@ -196,9 +200,9 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 </div>
-<div id="fit-with-saem" class="section level2">
-<h2 class="hasAnchor">
-<a href="#fit-with-saem" class="anchor" aria-hidden="true"></a>Fit with SAEM</h2>
+<div class="section level2">
+<h2 id="fit-with-saem">Fit with SAEM<a class="anchor" aria-label="anchor" href="#fit-with-saem"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pheno</span>, <span class="va">pheno_sd</span>, <span class="st">"saem"</span>,
               control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
@@ -216,51 +220,55 @@
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>
-<span class="co">#&gt; ── nlmixr SAEM(ODE); OBJF by FOCEi approximation fit ───────────────────────────</span>
+<span class="co">#&gt; ── <span style="color: #0000BB; font-weight: bold;">nlmix</span><span style="color: #BB0000; font-weight: bold;">r</span> <span style="color: #BBBB00; font-weight: bold;">SAEM</span>(<span style="font-style: italic;">ODE</span>); <span style="font-weight: 100; font-style: italic;">OBJF by FOCEi approximation</span> fit ───────────────────────────</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;           OBJF      AIC      BIC Log-likelihood Condition Number</span>
-<span class="co">#&gt; FOCEi 688.9716 985.8425 1004.103      -486.9213         6.319407</span>
+<span class="co">#&gt; FOCEi 689.2758 986.1467 1004.407      -487.0734         7.845486</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Time (sec $time): ───────────────────────────────────────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Time</span> (sec <span style="color: #0000BB; font-weight: bold;">$time</span>): ───────────────────────────────────────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;           saem    setup table cwres covariance    other</span>
-<span class="co">#&gt; elapsed 13.287 3.927566 1.278 5.242      0.027 0.961434</span>
+<span class="co">#&gt;          saem    setup table cwres covariance    other</span>
+<span class="co">#&gt; elapsed 8.393 3.239789 1.016 4.283      0.019 1.143211</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Population Parameters ($parFixed or $parFixedDf): ───────────────────────────</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Population Parameters</span> (<span style="color: #0000BB; font-weight: bold;">$parFixed</span> or <span style="color: #0000BB; font-weight: bold;">$parFixedDf</span>): ───────────────────────────</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;                          Parameter  Est.     SE %RSE    Back-transformed(95%CI)</span>
-<span class="co">#&gt; tcl     typical value of clearance -4.99 0.0729 1.46 0.00681 (0.00591, 0.00786)</span>
-<span class="co">#&gt; tv         typical value of volume 0.341  0.055 16.1          1.41 (1.26, 1.57)</span>
-<span class="co">#&gt; add.err       residual variability  2.79                                   2.79</span>
-<span class="co">#&gt;         BSV(CV%) Shrink(SD)%</span>
-<span class="co">#&gt; tcl         50.5      2.64% </span>
-<span class="co">#&gt; tv          42.0      1.42% </span>
-<span class="co">#&gt; add.err                     </span>
+<span class="co">#&gt;                          <span style="font-weight: bold;">Parameter</span>  <span style="font-weight: bold;">Est.</span>    <span style="font-weight: bold;">SE</span> <span style="font-weight: bold;">%RSE</span>    <span style="font-weight: bold;">Back-transformed(95%CI)</span></span>
+<span class="co">#&gt; <span style="font-weight: bold;">tcl</span>     typical value of clearance -5.01 0.077 1.54 0.00666 (0.00573, 0.00775)</span>
+<span class="co">#&gt; <span style="font-weight: bold;">tv</span>         typical value of volume 0.351 0.053 15.1          1.42 (1.28, 1.58)</span>
+<span class="co">#&gt; <span style="font-weight: bold;">add.err</span>       residual variability  2.84                                  2.84</span>
+<span class="co">#&gt;         <span style="font-weight: bold;">BSV(CV%)</span> <span style="font-weight: bold;">Shrink(SD)%</span></span>
+<span class="co">#&gt; <span style="font-weight: bold;">tcl</span>         54.7      1.78% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">tv</span>          40.3      1.21% </span>
+<span class="co">#&gt; <span style="font-weight: bold;">add.err</span>                     </span>
 <span class="co">#&gt;  </span>
-<span class="co">#&gt;   Covariance Type ($covMethod): linFim</span>
-<span class="co">#&gt;   Fixed parameter correlations in $cor</span>
+<span class="co">#&gt;   Covariance Type (<span style="color: #0000BB; font-weight: bold;">$covMethod</span>): <span style="font-weight: bold;">linFim</span></span>
+<span class="co">#&gt;   Some strong fixed parameter correlations exist (<span style="color: #0000BB; font-weight: bold;">$cor</span>) :</span>
+<span class="co">#&gt;     cor:tv,tcl </span>
+<span class="co">#&gt;     <span style="color: #BB0000; font-weight: bold;">0.735 </span> </span>
+<span class="co">#&gt;  </span>
+<span class="co">#&gt; </span>
 <span class="co">#&gt;   Correlations in between subject variability (BSV) matrix:</span>
 <span class="co">#&gt;     cor:eta.v,eta.cl </span>
-<span class="co">#&gt;           0.959  </span>
+<span class="co">#&gt;           <span style="color: #BB0000; font-weight: bold;">0.987 </span> </span>
 <span class="co">#&gt;  </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) </span>
-<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink </span>
+<span class="co">#&gt;   Full BSV covariance (<span style="color: #0000BB; font-weight: bold;">$omega</span>) or correlation (<span style="color: #0000BB; font-weight: bold;">$omegaR</span>; diagonals=SDs) </span>
+<span class="co">#&gt;   Distribution stats (mean/skewness/kurtosis/p-value) available in <span style="color: #0000BB; font-weight: bold;">$shrink</span> </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; ── Fit Data (object is a modified tibble): ─────────────────────────────────────</span>
-<span class="co">#&gt; # A tibble: 155 x 24</span>
+<span class="co">#&gt; ── <span style="font-weight: bold;">Fit Data</span> (object is a modified <span style="color: #0000BB;">tibble</span>): ─────────────────────────────────────</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 155 × 24</span></span>
 <span class="co">#&gt;   ID     TIME    DV EPRED  ERES   NPDE    NPD  PRED    RES    WRES IPRED  IRES</span>
-<span class="co">#&gt;   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 1        2   17.3  18.4 -1.12 -0.449 -0.449  17.6 -0.302 -0.0395  18.7 -1.35</span>
-<span class="co">#&gt; 2 1      112.  31    28.9  2.11  0.350  0.350  27.9  3.08   0.253   30.0  1.01</span>
-<span class="co">#&gt; 3 2        2    9.7  11.3 -1.55 -0.706 -0.706  10.6 -0.861 -0.169   12.5 -2.78</span>
-<span class="co">#&gt; # … with 152 more rows, and 12 more variables: IWRES &lt;dbl&gt;, CPRED &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, A1 &lt;dbl&gt;, cl &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   v &lt;dbl&gt;, ke &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1        2   17.3  18.7 -<span style="color: #BB0000;">1.43</span> -<span style="color: #BB0000;">0.403</span> -<span style="color: #BB0000;">0.403</span>  17.4 -<span style="color: #BB0000;">0.132</span> -<span style="color: #BB0000;">0.018</span><span style="color: #BB0000; text-decoration: underline;">0</span>  18.4 -<span style="color: #BB0000;">1.07</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1      112.  31    29.9  1.08  0.376  0.376  27.9  3.05   0.248   29.7  1.33</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2        2    9.7  10.8 -<span style="color: #BB0000;">1.12</span> -<span style="color: #BB0000;">1.01</span>  -<span style="color: #BB0000;">1.01</span>   10.5 -<span style="color: #BB0000;">0.759</span> -<span style="color: #BB0000;">0.153</span>   12.4 -<span style="color: #BB0000;">2.65</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 152 more rows, and 12 more variables: IWRES &lt;dbl&gt;, CPRED &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   CRES &lt;dbl&gt;, CWRES &lt;dbl&gt;, eta.cl &lt;dbl&gt;, eta.v &lt;dbl&gt;, A1 &lt;dbl&gt;, cl &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   v &lt;dbl&gt;, ke &lt;dbl&gt;, tad &lt;dbl&gt;, dosenum &lt;dbl&gt;</span></span></code></pre></div>
 </div>
-<div id="basic-goodness-of-fit-plots" class="section level2">
-<h2 class="hasAnchor">
-<a href="#basic-goodness-of-fit-plots" class="anchor" aria-hidden="true"></a>Basic Goodness of Fit Plots</h2>
+<div class="section level2">
+<h2 id="basic-goodness-of-fit-plots">Basic Goodness of Fit Plots<a class="anchor" aria-label="anchor" href="#basic-goodness-of-fit-plots"></a>
+</h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></code></pre></div>
 <p><img src="addingCovariances_files/figure-html/unnamed-chunk-5-1.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-2.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-3.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-4.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-5.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-6.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-7.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-8.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-9.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-10.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-11.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-12.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-13.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-14.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-15.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-16.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-17.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-18.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-19.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-20.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-21.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-22.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-23.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-24.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-25.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-26.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-27.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-28.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-29.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-30.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-31.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-32.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-33.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-34.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-35.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-36.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-37.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-38.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-39.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-40.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-41.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-42.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-43.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-44.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-45.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-46.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-47.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-48.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-49.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-50.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-51.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-52.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-53.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-54.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-55.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-56.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-57.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-58.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-59.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-60.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-61.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-62.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-63.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-64.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-65.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-66.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-67.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-68.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-69.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-70.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-5-71.png" width="100%"></p>
@@ -269,9 +277,9 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/augPred.html" class="external-link">augPred</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="addingCovariances_files/figure-html/unnamed-chunk-6-1.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-6-2.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-6-3.png" width="100%"><img src="addingCovariances_files/figure-html/unnamed-chunk-6-4.png" width="100%"></p>
 </div>
-<div id="two-types-of-vpcs" class="section level2">
-<h2 class="hasAnchor">
-<a href="#two-types-of-vpcs" class="anchor" aria-hidden="true"></a>Two types of VPCs</h2>
+<div class="section level2">
+<h2 id="two-types-of-vpcs">Two types of VPCs<a class="anchor" aria-label="anchor" href="#two-types-of-vpcs"></a>
+</h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 <span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu">nlmixr</span><span class="fu">::</span><span class="fu"><a href="../reference/vpc.html">vpc</a></span><span class="op">(</span><span class="va">fit</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>;
@@ -305,7 +313,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
 </div>
 
       </footer>

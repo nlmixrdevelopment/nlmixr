@@ -45,7 +45,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
       </span>
     </div>
 
@@ -61,7 +61,8 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="divider">
-    <li class="dropdown-header">Getting started</li>
+    </li>
+<li class="dropdown-header">Getting started</li>
     <li>
       <a href="articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
     </li>
@@ -69,7 +70,8 @@
       <a href="articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Going further</li>
+    </li>
+<li class="dropdown-header">Going further</li>
     <li>
       <a href="articles/modelPiping.html">Model Piping</a>
     </li>
@@ -77,7 +79,8 @@
       <a href="articles/broom.html">Sweeping models to tidy datasets (broom)</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="articles/xgxr-nlmixr-ggpmx.html">Integrated development with xgxr/nlmixr/ggPMX</a>
     </li>
   </ul>
@@ -95,7 +98,8 @@
       <a href="articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
@@ -107,14 +111,14 @@
   </ul>
 </li>
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf">
-    <span class="fas fa-scroll fa-lg"></span>
+  <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
 </li>
 <li>
-  <a href="https://doi.org/10.1002/psp4.12445">
+  <a href="https://doi.org/10.1002/psp4.12445" class="external-link">
     <span class="fas fa-life-ring"></span>
      
     Tutorial
@@ -122,7 +126,7 @@
 </li>
 <li>
   <a href="reference/index.html">
-    <span class="fas fa-file-code-o fa-lg"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -130,14 +134,14 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr">
-    <span class="fas fa-github fa-lg"></span>
+  <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="https://github.com/nlmixrdevelopment/nlmixr/releases">
-    <span class="fas fa-download"></span>
+  <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
+    <span class="fa fa-download"></span>
      
   </a>
 </li>
@@ -153,9 +157,9 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="nlmixr-an-r-package-for-population-pkpd-modeling" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#nlmixr-an-r-package-for-population-pkpd-modeling" class="anchor" aria-hidden="true"></a>nlmixr: an R package for population PKPD modeling</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="nlmixr-an-r-package-for-population-pkpd-modeling">nlmixr: an R package for population PKPD modeling<a class="anchor" aria-label="anchor" href="#nlmixr-an-r-package-for-population-pkpd-modeling"></a>
+</h1></div>
 <!-- badges: start -->
 
 <hr>
@@ -181,9 +185,9 @@
 <p>Documentation can be found at <a href="https://nlmixrdevelopment.github.io/nlmixr/" class="external-link uri">https://nlmixrdevelopment.github.io/nlmixr/</a>, and we maintain a comprehensive and ever-growing guide to using <code>nlmixr</code> at our <a href="https://nlmixrdevelopment.github.io/nlmixr_bookdown/index.html" class="external-link">bookdown site</a>.</p>
 <p>More examples and the associated data files are available at <a href="https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes" class="external-link uri">https://github.com/nlmixrdevelopment/nlmixr/tree/master/vignettes</a>.</p>
 <p>We recommend you have a look at <a href="https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-intro.html" class="external-link"><code>RxODE</code></a>, the engine upon which <code>nlmixr</code> depends, as well as <a href="https://github.com/nlmixrdevelopment/xpose.nlmixr" class="external-link"><code>xpose.nlmixr</code></a>, which provides a link to the seminal nonlinear mixed-effects model diagnostics package <a href="https://uupharmacometrics.github.io/xpose/" class="external-link"><code>xpose</code></a>, and <a href="https://github.com/RichardHooijmaijers/shinyMixR" class="external-link"><code>shinyMixR</code></a>, which provides a means to build a project-centric workflow around nlmixr from the R command line and from a streamlined <a href="https://shiny.rstudio.com/" class="external-link"><code>shiny</code></a> front-end application. Members of the nlmixr team also contribute to the <a href="https://github.com/ggPMXdevelopment/ggPMX" class="external-link"><code>ggPMX</code></a>, <a href="https://github.com/Novartis/xgxr" class="external-link"><code>xgxr</code></a> and <a href="https://github.com/kestrel99/pmxTools" class="external-link"><code>pmxTools</code></a> packages. For PKPD modeling (with ODE and dosing history) with <a href="http://mc-stan.org/" class="external-link">Stan</a>, check out Yuan Xiong’s package <a href="https://github.com/yxiong1/pmxstan" class="external-link"><code>PMXStan</code></a>.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>When on CRAN, you can install the released version of nlmixr from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"nlmixr"</span><span class="op">)</span></code></pre></div>
@@ -199,10 +203,8 @@
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=nlmixr">https://​cloud.r-project.org/​package=nlmixr</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/nlmixrdevelopment/nlmixr/">https://​github.com/​nlmixrdevelopment/​nlmixr/​</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=nlmixr" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/nlmixrdevelopment/nlmixr/" class="external-link">Browse source code</a></li>
 </ul>
 </div>
 
@@ -224,15 +226,15 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Matthew Fidler <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8538-6691" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Matthew Fidler <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8538-6691" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Yuan Xiong <br><small class="roles"> Author </small>  </li>
-<li>Rik Schoemaker <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7538-3005" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Justin Wilkins <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7099-9396" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Rik Schoemaker <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7538-3005" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Justin Wilkins <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7099-9396" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Wenping Wang <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Mason McComb <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9871-8616" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Mason McComb <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9871-8616" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Vipul Mann <br><small class="roles"> Author </small>  </li>
 <li>Richard Hooijmaijers <br><small class="roles"> Author </small>  </li>
-<li><a href="authors.html">More on authors...</a></li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
@@ -258,7 +260,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
 </div>
 
       </footer>

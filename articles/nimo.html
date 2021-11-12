@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
       </span>
     </div>
 
@@ -56,7 +56,8 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="divider">
-    <li class="dropdown-header">Getting started</li>
+    </li>
+<li class="dropdown-header">Getting started</li>
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
     </li>
@@ -64,7 +65,8 @@
       <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Going further</li>
+    </li>
+<li class="dropdown-header">Going further</li>
     <li>
       <a href="../articles/modelPiping.html">Model Piping</a>
     </li>
@@ -72,7 +74,8 @@
       <a href="../articles/broom.html">Sweeping models to tidy datasets (broom)</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/xgxr-nlmixr-ggpmx.html">Integrated development with xgxr/nlmixr/ggPMX</a>
     </li>
   </ul>
@@ -90,7 +93,8 @@
       <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
@@ -103,7 +107,7 @@
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
-    <span class="fas fa-scroll fa-lg"></span>
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
@@ -117,7 +121,7 @@
 </li>
 <li>
   <a href="../reference/index.html">
-    <span class="fas fa-file-code-o fa-lg"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -126,13 +130,13 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
-    <span class="fas fa-download"></span>
+    <span class="fa fa-download"></span>
      
   </a>
 </li>
@@ -152,9 +156,9 @@
       <h1 data-toc-skip>Nimotuzumab</h1>
                         <h4 data-toc-skip class="author">Mirjam Trame</h4>
             
-            <h4 data-toc-skip class="date">2021-06-06</h4>
+            <h4 data-toc-skip class="date">2021-11-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/nimo.Rmd" class="external-link"><code>vignettes/nimo.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/HEAD/vignettes/nimo.Rmd" class="external-link"><code>vignettes/nimo.Rmd</code></a></small>
       <div class="hidden name"><code>nimo.Rmd</code></div>
 
     </div>
@@ -169,9 +173,9 @@
 <div class="figure">
 <img src="nimo_fig1.PNG" alt=""><p class="caption">Model Schematic</p>
 </div>
-<div id="nlmixr-model" class="section level1">
-<h1 class="hasAnchor">
-<a href="#nlmixr-model" class="anchor" aria-hidden="true"></a>nlmixr model</h1>
+<div class="section level1">
+<h1 id="nlmixr-model">nlmixr model<a class="anchor" aria-label="anchor" href="#nlmixr-model"></a>
+</h1>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/UUPharmacometrics/xpose" class="external-link">xpose</a></span><span class="op">)</span>
@@ -226,26 +230,26 @@
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 </div>
-<div id="fit" class="section level1">
-<h1 class="hasAnchor">
-<a href="#fit" class="anchor" aria-hidden="true"></a>Fit</h1>
+<div class="section level1">
+<h1 id="fit">Fit<a class="anchor" aria-label="anchor" href="#fit"></a>
+</h1>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"nimoData.rda"</span><span class="op">)</span>
 <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">nimo</span>, <span class="va">nimoData</span>, est<span class="op">=</span><span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>,
               table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:04 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:03 </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:06 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:05 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span></code></pre></div>
 </div>
-<div id="goodness-of-fit-plots" class="section level1">
-<h1 class="hasAnchor">
-<a href="#goodness-of-fit-plots" class="anchor" aria-hidden="true"></a>Goodness of fit Plots</h1>
+<div class="section level1">
+<h1 id="goodness-of-fit-plots">Goodness of fit Plots<a class="anchor" aria-label="anchor" href="#goodness-of-fit-plots"></a>
+</h1>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Add cwres/npde after fit</span>
 <span class="va">fit</span>  <span class="op">&lt;-</span> <span class="va">fit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/addCwres.html">addCwres</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/addNpde.html">addNpde</a></span><span class="op">(</span><span class="op">)</span>;
@@ -361,7 +365,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
 </div>
 
       </footer>

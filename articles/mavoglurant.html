@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
       </span>
     </div>
 
@@ -56,7 +56,8 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="divider">
-    <li class="dropdown-header">Getting started</li>
+    </li>
+<li class="dropdown-header">Getting started</li>
     <li>
       <a href="../articles/running_nlmixr.html">Introduction to Running Nlmixr</a>
     </li>
@@ -64,7 +65,8 @@
       <a href="../articles/multiple-endpoints.html">Using Multiple Endpoints in Nlmixr</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Going further</li>
+    </li>
+<li class="dropdown-header">Going further</li>
     <li>
       <a href="../articles/modelPiping.html">Model Piping</a>
     </li>
@@ -72,7 +74,8 @@
       <a href="../articles/broom.html">Sweeping models to tidy datasets (broom)</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/xgxr-nlmixr-ggpmx.html">Integrated development with xgxr/nlmixr/ggPMX</a>
     </li>
   </ul>
@@ -90,7 +93,8 @@
       <a href="../articles/addingCovariances.html">Phenobarbatol with correlations</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/nimo.html">Nonlinear PK/PD -- Nimotuzumab</a>
     </li>
     <li>
@@ -103,7 +107,7 @@
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/raw/master/CheatSheet_nlmixr.pdf" class="external-link">
-    <span class="fas fa-scroll fa-lg"></span>
+    <span class="fa fa-scroll fa-lg"></span>
      
     Cheat Sheet
   </a>
@@ -117,7 +121,7 @@
 </li>
 <li>
   <a href="../reference/index.html">
-    <span class="fas fa-file-code-o fa-lg"></span>
+    <span class="fa fa-file-code-o fa-lg"></span>
      
     Functions
   </a>
@@ -126,13 +130,13 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://github.com/nlmixrdevelopment/nlmixr/releases" class="external-link">
-    <span class="fas fa-download"></span>
+    <span class="fa fa-download"></span>
      
   </a>
 </li>
@@ -152,9 +156,9 @@
       <h1 data-toc-skip>mavoglurant – Physiologically-based PK</h1>
                         <h4 data-toc-skip class="author">Wenping Wang</h4>
             
-            <h4 data-toc-skip class="date">2021-06-06</h4>
+            <h4 data-toc-skip class="date">2021-11-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/master/vignettes/mavoglurant.Rmd" class="external-link"><code>vignettes/mavoglurant.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nlmixrdevelopment/nlmixr/blob/HEAD/vignettes/mavoglurant.Rmd" class="external-link"><code>vignettes/mavoglurant.Rmd</code></a></small>
       <div class="hidden name"><code>mavoglurant.Rmd</code></div>
 
     </div>
@@ -168,9 +172,9 @@
 <div class="figure">
 <img src="pbpk.png" alt=""><p class="caption">Model Schematic</p>
 </div>
-<div id="nlmixr-model" class="section level1">
-<h1 class="hasAnchor">
-<a href="#nlmixr-model" class="anchor" aria-hidden="true"></a>nlmixr model</h1>
+<div class="section level1">
+<h1 id="nlmixr-model">nlmixr model<a class="anchor" aria-label="anchor" href="#nlmixr-model"></a>
+</h1>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nlmixrdevelopment/nlmixr" class="external-link">nlmixr</a></span><span class="op">)</span>
 
@@ -339,12 +343,12 @@
     <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">f2</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 </div>
-<div id="saem" class="section level1">
-<h1 class="hasAnchor">
-<a href="#saem" class="anchor" aria-hidden="true"></a>SAEM</h1>
-<div id="fit-addprop-saem" class="section level2">
-<h2 class="hasAnchor">
-<a href="#fit-addprop-saem" class="anchor" aria-hidden="true"></a>Fit add+prop SAEM</h2>
+<div class="section level1">
+<h1 id="saem">SAEM<a class="anchor" aria-label="anchor" href="#saem"></a>
+</h1>
+<div class="section level2">
+<h2 id="fit-addprop-saem">Fit add+prop SAEM<a class="anchor" aria-label="anchor" href="#fit-addprop-saem"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit.addProp.S</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">pbpk</span>, <span class="va">dat</span>, est<span class="op">=</span><span class="st">"saem"</span>, control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
                         table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
@@ -363,9 +367,9 @@
 <span class="fu">gofs</span><span class="op">(</span><span class="va">fit.addProp.S</span><span class="op">)</span>;</code></pre></div>
 <p><img src="mavoglurant_files/figure-html/unnamed-chunk-2-1.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-2.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-3.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-4.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-5.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-6.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-7.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-8.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-9.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-10.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-11.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-2-12.png" width="100%"></p>
 </div>
-<div id="change-error-to-lognormal" class="section level2">
-<h2 class="hasAnchor">
-<a href="#change-error-to-lognormal" class="anchor" aria-hidden="true"></a>Change error to lognormal</h2>
+<div class="section level2">
+<h2 id="change-error-to-lognormal">Change error to lognormal<a class="anchor" aria-label="anchor" href="#change-error-to-lognormal"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit.lnorm.S</span> <span class="op">&lt;-</span> <span class="va">pbpk</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
     <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="va">C15</span> <span class="op">~</span> <span class="fu">lnorm</span><span class="op">(</span><span class="va">lnorm.err</span><span class="op">)</span><span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co"># Change C15 to be log-normally distributed</span>
@@ -390,51 +394,128 @@
 <p><img src="mavoglurant_files/figure-html/unnamed-chunk-4-1.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-2.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-3.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-4.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-5.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-6.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-7.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-8.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-9.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-10.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-11.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-4-12.png" width="100%"></p>
 </div>
 </div>
-<div id="piping-to-focei" class="section level1">
-<h1 class="hasAnchor">
-<a href="#piping-to-focei" class="anchor" aria-hidden="true"></a>Piping to FOCEi</h1>
+<div class="section level1">
+<h1 id="piping-to-focei">Piping to FOCEi<a class="anchor" aria-label="anchor" href="#piping-to-focei"></a>
+</h1>
 <p>You can pipe models from different estimation methods to new estimation methods.</p>
-<div id="additive-proportional" class="section level2">
-<h2 class="hasAnchor">
-<a href="#additive-proportional" class="anchor" aria-hidden="true"></a>Additive + Proportional</h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit.addProp.F</span> <span class="op">&lt;-</span> <span class="va">fit.addProp.S</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-    <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span>est<span class="op">=</span><span class="st">"focei"</span>,
-           control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>print<span class="op">=</span><span class="fl">0</span><span class="op">)</span>, 
-           table<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cwres<span class="op">=</span><span class="cn">TRUE</span>, npde<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>;
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [1] "WT"</span>
-<span class="co">#&gt; calculating covariance matrix</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:01:57 </span>
-<span class="co">#&gt; done</span>
-<span class="co">## Since this was a model pipline, the data</span>
-<span class="co">## remains the same as the last fit.</span>
-
-<span class="fu">gofs</span><span class="op">(</span><span class="va">fit.addProp.F</span><span class="op">)</span>;</code></pre></div>
+<div class="section level2">
+<h2 id="additive-proportional">Additive + Proportional<a class="anchor" aria-label="anchor" href="#additive-proportional"></a>
+</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>fit.addProp.F &lt;-<span class="st"> </span>fit.addProp.S <span class="op">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="st">    </span><span class="kw">nlmixr</span>(<span class="dt">est=</span><span class="st">"focei"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3"></a>           <span class="dt">control=</span><span class="kw">list</span>(<span class="dt">print=</span><span class="dv">0</span>), </span>
+<span id="cb5-4"><a href="#cb5-4"></a>           <span class="dt">table=</span><span class="kw">list</span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>));</span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt; </span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; </span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; </span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt; </span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt; </span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; </span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; </span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; </span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; [1] "WT"</span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 1.04778e-05 and step size _rxC(h) = 7.51518e-13, the</span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt; calculating covariance matrix</span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 6.13981e-07 and step size _rxC(h) = 4.57452e-15, the</span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-35"><a href="#cb5-35"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 0 and step size _rxC(h) = 4.80994e-14, the</span></span>
+<span id="cb5-36"><a href="#cb5-36"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-37"><a href="#cb5-37"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-38"><a href="#cb5-38"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-39"><a href="#cb5-39"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 0 and step size _rxC(h) = 1.04899e-14, the</span></span>
+<span id="cb5-40"><a href="#cb5-40"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-41"><a href="#cb5-41"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-42"><a href="#cb5-42"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-43"><a href="#cb5-43"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 0 and step size _rxC(h) = 4.55175e-14, the</span></span>
+<span id="cb5-44"><a href="#cb5-44"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-45"><a href="#cb5-45"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-46"><a href="#cb5-46"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-47"><a href="#cb5-47"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 2.0466e-06 and step size _rxC(h) = 1.52484e-14, the</span></span>
+<span id="cb5-48"><a href="#cb5-48"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-49"><a href="#cb5-49"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-50"><a href="#cb5-50"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-51"><a href="#cb5-51"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 2.0466e-06 and step size _rxC(h) = 1.52484e-14, the</span></span>
+<span id="cb5-52"><a href="#cb5-52"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-53"><a href="#cb5-53"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-54"><a href="#cb5-54"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-55"><a href="#cb5-55"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 5.11651e-07 and step size _rxC(h) = 3.8121e-15, the</span></span>
+<span id="cb5-56"><a href="#cb5-56"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-57"><a href="#cb5-57"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-58"><a href="#cb5-58"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-59"><a href="#cb5-59"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 5.11651e-07 and step size _rxC(h) = 3.8121e-15, the</span></span>
+<span id="cb5-60"><a href="#cb5-60"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-61"><a href="#cb5-61"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-62"><a href="#cb5-62"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-63"><a href="#cb5-63"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 0 and step size _rxC(h) = 1.13562e-14, the</span></span>
+<span id="cb5-64"><a href="#cb5-64"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-65"><a href="#cb5-65"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-66"><a href="#cb5-66"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-67"><a href="#cb5-67"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 0 and step size _rxC(h) = 1.38136e-14, the</span></span>
+<span id="cb5-68"><a href="#cb5-68"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-69"><a href="#cb5-69"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-70"><a href="#cb5-70"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-71"><a href="#cb5-71"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 2.87722e-07 and step size _rxC(h) = 2.1437e-15, the</span></span>
+<span id="cb5-72"><a href="#cb5-72"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-73"><a href="#cb5-73"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-74"><a href="#cb5-74"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-75"><a href="#cb5-75"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 5.11651e-07 and step size _rxC(h) = 3.8121e-15, the</span></span>
+<span id="cb5-76"><a href="#cb5-76"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-77"><a href="#cb5-77"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-78"><a href="#cb5-78"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-79"><a href="#cb5-79"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 2.87722e-07 and step size _rxC(h) = 2.1437e-15, the</span></span>
+<span id="cb5-80"><a href="#cb5-80"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-81"><a href="#cb5-81"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-82"><a href="#cb5-82"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-83"><a href="#cb5-83"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 2.87722e-07 and step size _rxC(h) = 2.1437e-15, the</span></span>
+<span id="cb5-84"><a href="#cb5-84"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-85"><a href="#cb5-85"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-86"><a href="#cb5-86"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-87"><a href="#cb5-87"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 5.11651e-07 and step size _rxC(h) = 3.8121e-15, the</span></span>
+<span id="cb5-88"><a href="#cb5-88"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-89"><a href="#cb5-89"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-90"><a href="#cb5-90"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-91"><a href="#cb5-91"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 0 and step size _rxC(h) = 1.81544e-14, the</span></span>
+<span id="cb5-92"><a href="#cb5-92"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-93"><a href="#cb5-93"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-94"><a href="#cb5-94"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-95"><a href="#cb5-95"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 5.11651e-07 and step size _rxC(h) = 3.8121e-15, the</span></span>
+<span id="cb5-96"><a href="#cb5-96"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-97"><a href="#cb5-97"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-98"><a href="#cb5-98"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-99"><a href="#cb5-99"></a><span class="co">#&gt; unhandled error message: EE:lsoda -- at t = 0 and step size _rxC(h) = 1.54731e-14, the</span></span>
+<span id="cb5-100"><a href="#cb5-100"></a><span class="co">#&gt;  corrector convergence failed repeatedly or</span></span>
+<span id="cb5-101"><a href="#cb5-101"></a><span class="co">#&gt;  with fabs(_rxC(h)) = hmin</span></span>
+<span id="cb5-102"><a href="#cb5-102"></a><span class="co">#&gt;  @(lsoda.c:889</span></span>
+<span id="cb5-103"><a href="#cb5-103"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|</span></span>
+<span id="cb5-104"><a href="#cb5-104"></a>S matrix calculation failed; Switch to R<span class="op">-</span>matrix covariance.</span>
+<span id="cb5-105"><a href="#cb5-105"></a><span class="co">#&gt; ====] 0:00:20 </span></span>
+<span id="cb5-106"><a href="#cb5-106"></a><span class="co">#&gt; done</span></span>
+<span id="cb5-107"><a href="#cb5-107"></a><span class="co">## Since this was a model pipline, the data</span></span>
+<span id="cb5-108"><a href="#cb5-108"></a><span class="co">## remains the same as the last fit.</span></span>
+<span id="cb5-109"><a href="#cb5-109"></a></span>
+<span id="cb5-110"><a href="#cb5-110"></a><span class="kw">gofs</span>(fit.addProp.F);</span></code></pre></div>
 <p><img src="mavoglurant_files/figure-html/unnamed-chunk-5-1.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-2.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-3.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-4.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-5.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-6.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-7.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-8.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-9.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-10.png" width="100%"><img src="mavoglurant_files/figure-html/unnamed-chunk-5-11.png" width="100%"></p>
 </div>
-<div id="lognoral" class="section level2">
-<h2 class="hasAnchor">
-<a href="#lognoral" class="anchor" aria-hidden="true"></a>Lognoral</h2>
+<div class="section level2">
+<h2 id="lognoral">Lognoral<a class="anchor" aria-label="anchor" href="#lognoral"></a>
+</h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit.lnorm.F</span> <span class="op">&lt;-</span> <span class="va">fit.addProp.F</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
     <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="va">C15</span> <span class="op">~</span> <span class="fu">lnorm</span><span class="op">(</span><span class="va">lnorm.err</span><span class="op">)</span><span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
@@ -463,7 +544,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [1] "WT"</span>
 <span class="co">#&gt; calculating covariance matrix</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:30 </span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:23 </span>
 <span class="co">#&gt; done</span>
 <span class="co">## In this model pipline we are changing the fit method to focei.</span>
 
@@ -611,7 +692,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
 </div>
 
       </footer>
