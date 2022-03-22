@@ -40,14 +40,14 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.7</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-book"></span>
      
     Articles
@@ -81,7 +81,7 @@
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-chalkboard-teacher"></span>
      
     Example models
@@ -172,9 +172,9 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ggPMXdevelopment/ggPMX" class="external-link">ggPMX</a></span><span class="op">)</span></code></pre></div>
-<div class="section level1">
-<h1 id="load-the-data">Load the data<a class="anchor" aria-label="anchor" href="#load-the-data"></a>
-</h1>
+<div class="section level2">
+<h2 id="load-the-data">Load the data<a class="anchor" aria-label="anchor" href="#load-the-data"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pkpd_data</span> <span class="op">&lt;-</span> <span class="va">case1_pkpd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">DOSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
@@ -190,12 +190,12 @@
 <span class="va">pk_data_cycle1</span> <span class="op">&lt;-</span> <span class="va">pk_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">CYCLE</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="exploratory-analysis-using-ggplot-and-xgx-helper-functions">Exploratory analysis using ggplot and xgx helper functions<a class="anchor" aria-label="anchor" href="#exploratory-analysis-using-ggplot-and-xgx-helper-functions"></a>
-</h1>
 <div class="section level2">
-<h2 id="use-xgxr-for-simplified-concentration-over-time-colored-by-dose-mean---95-ci">Use xgxr for simplified concentration over time, colored by Dose, mean +/- 95% CI<a class="anchor" aria-label="anchor" href="#use-xgxr-for-simplified-concentration-over-time-colored-by-dose-mean---95-ci"></a>
+<h2 id="exploratory-analysis-using-ggplot-and-xgx-helper-functions">Exploratory analysis using ggplot and xgx helper functions<a class="anchor" aria-label="anchor" href="#exploratory-analysis-using-ggplot-and-xgx-helper-functions"></a>
 </h2>
+<div class="section level3">
+<h3 id="use-xgxr-for-simplified-concentration-over-time-colored-by-dose-mean---95-ci">Use xgxr for simplified concentration over time, colored by Dose, mean +/- 95% CI<a class="anchor" aria-label="anchor" href="#use-xgxr-for-simplified-concentration-over-time-colored-by-dose-mean---95-ci"></a>
+</h3>
 <p>Often in exploring data it is worthwhile to plot by dose by each nominal time and add the 95% confidence interval. This typical plot can be cumbersome and lack some nice features that <code>xgxr</code> can help with. Note the following helper functions:</p>
 <ul>
 <li><p><code><a href="https://rdrr.io/pkg/xgxr/man/xgx_theme_set.html" class="external-link">xgx_theme_set()</a></code> this sets the theme to black and white color theme and other best pratices in <code>xgxr</code>.</p></li>
@@ -239,9 +239,9 @@
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-3-1.png" width="100%"></p>
 <p>With this plot you see the mean concentrations confidence intervals stratified by dose</p>
 </div>
-<div class="section level2">
-<h2 id="concentration-over-time-faceted-by-dose-mean---95-ci-overlaid-on-gray-spaghetti-plots">Concentration over time, faceted by Dose, mean +/- 95% CI, overlaid on gray spaghetti plots<a class="anchor" aria-label="anchor" href="#concentration-over-time-faceted-by-dose-mean---95-ci-overlaid-on-gray-spaghetti-plots"></a>
-</h2>
+<div class="section level3">
+<h3 id="concentration-over-time-faceted-by-dose-mean---95-ci-overlaid-on-gray-spaghetti-plots">Concentration over time, faceted by Dose, mean +/- 95% CI, overlaid on gray spaghetti plots<a class="anchor" aria-label="anchor" href="#concentration-over-time-faceted-by-dose-mean---95-ci-overlaid-on-gray-spaghetti-plots"></a>
+</h3>
 <p>Not only is it useful to look at the mean concentrations, it is often useful to look at the mean concentrations and their relationship between actual individual profiles. Using <code>ggplot</code> coupled with the <code>xgxr</code> helper functions used above, we can easily create these plots as well:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">TIME</span>, y <span class="op">=</span> <span class="va">LIDV</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
@@ -257,9 +257,9 @@
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-4-1.png" width="100%"></p>
 <p>To me it appears the variability seems to be higher with higher doses and higher with later times.</p>
 </div>
-<div class="section level2">
-<h2 id="exploring-the-dose-linearity">Exploring the dose linearity<a class="anchor" aria-label="anchor" href="#exploring-the-dose-linearity"></a>
-</h2>
+<div class="section level3">
+<h3 id="exploring-the-dose-linearity">Exploring the dose linearity<a class="anchor" aria-label="anchor" href="#exploring-the-dose-linearity"></a>
+</h3>
 <p>A common way to explore the dose linearity is to normalize by the dose. If the confidence intervals overlap, often this is a dose linear example.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>,
@@ -290,9 +290,9 @@
 <p>Other ways to explore the data include by looking at normalized Cmax and AUC values (which we will skip in this vignette).</p>
 </div>
 </div>
-<div class="section level1">
-<h1 id="exploring-covariates-in-the-dataset">Exploring Covariates in the dataset<a class="anchor" aria-label="anchor" href="#exploring-covariates-in-the-dataset"></a>
-</h1>
+<div class="section level2">
+<h2 id="exploring-covariates-in-the-dataset">Exploring Covariates in the dataset<a class="anchor" aria-label="anchor" href="#exploring-covariates-in-the-dataset"></a>
+</h2>
 <p>Using the <code>xgx</code> helper functions to <code>ggplot</code> you can explore the effect of high baseline weight. This particular plot is shown below:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">pk_data_cycle1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">NOMTIME</span>,
@@ -306,15 +306,15 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">conc_label</span>, color <span class="op">=</span> <span class="va">w100_label</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://rdrr.io/pkg/xgxr/man/xgx_annotate_status.html" class="external-link">xgx_annotate_status</a></span><span class="op">(</span><span class="va">status</span><span class="op">)</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-7-1.png" width="100%"> It seems that the weight effect is not extreme for either dose group</p>
-<div class="section level2">
-<h2 id="summary-of-exploratory-analysis-findings">Summary of exploratory analysis findings<a class="anchor" aria-label="anchor" href="#summary-of-exploratory-analysis-findings"></a>
-</h2>
+<div class="section level3">
+<h3 id="summary-of-exploratory-analysis-findings">Summary of exploratory analysis findings<a class="anchor" aria-label="anchor" href="#summary-of-exploratory-analysis-findings"></a>
+</h3>
 <p>From the exploratory analysis we see: - The doses seem proportional - The PK seems to have a 2-compartment model - Censoring has a large effect on the PK data.</p>
 </div>
 </div>
-<div class="section level1">
-<h1 id="fitting-the-data-with-nlmixr">Fitting the data with nlmixr<a class="anchor" aria-label="anchor" href="#fitting-the-data-with-nlmixr"></a>
-</h1>
+<div class="section level2">
+<h2 id="fitting-the-data-with-nlmixr">Fitting the data with nlmixr<a class="anchor" aria-label="anchor" href="#fitting-the-data-with-nlmixr"></a>
+</h2>
 <p>First we need to subset to the PK only data and rename <code>LIDV</code> to <code>DV</code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">case1_pkpd</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
@@ -415,7 +415,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00</span></code></pre></div>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:01</span></code></pre></div>
 <p>Now that we have run 3 different estimation methods, we can compare the results side-by-side</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://hughjonesd.github.io/huxtable/" class="external-link">huxtable</a></span><span class="op">)</span>
@@ -587,9 +587,9 @@
 </table>
 <p>Note that the additive and proportional model has the additive component approach zero. When comparing the objective functions of log-normal and proportional models, the proportional model has the lowest objective function value. (Since we modeled log-normal without data transformation it is appropriate to compare the AIC/Objective function values)</p>
 </div>
-<div class="section level1">
-<h1 id="model-diagnostics-with-ggpmx">Model Diagnostics with ggPMX<a class="anchor" aria-label="anchor" href="#model-diagnostics-with-ggpmx"></a>
-</h1>
+<div class="section level2">
+<h2 id="model-diagnostics-with-ggpmx">Model Diagnostics with ggPMX<a class="anchor" aria-label="anchor" href="#model-diagnostics-with-ggpmx"></a>
+</h2>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## The controller then can be piped into a specific plot</span>
 <span class="va">ctr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ggPMX/man/pmx_nlmixr.html" class="external-link">pmx_nlmixr</a></span><span class="op">(</span><span class="va">cmt2fit.logn</span>, conts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WEIGHTB"</span><span class="op">)</span>, cats<span class="op">=</span><span class="st">"TRTACT"</span>, vpc<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
@@ -639,9 +639,9 @@
 <span class="va">ctr</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">pmx_plot_eta_matrix</span></code></pre></div>
 <p><img src="xgxr-nlmixr-ggpmx_files/figure-html/unnamed-chunk-24-1.png" width="100%"></p>
 </div>
-<div class="section level1">
-<h1 id="simulation-of-a-new-scenario-with-rxode">Simulation of a new scenario with RxODE<a class="anchor" aria-label="anchor" href="#simulation-of-a-new-scenario-with-rxode"></a>
-</h1>
+<div class="section level2">
+<h2 id="simulation-of-a-new-scenario-with-rxode">Simulation of a new scenario with RxODE<a class="anchor" aria-label="anchor" href="#simulation-of-a-new-scenario-with-rxode"></a>
+</h2>
 <p>By creating events you can simply simulate a new scenario. Perhaps your drug development team wants to explore the 100 mg dose 3 times a day dosing to see what happens with the PK. You can simply simulate from the nlmixr model using a <a href="https://nlmixrdevelopment.github.io/RxODE/articles/RxODE-event-table.html" class="external-link">new event table</a> created from RxODE.</p>
 <p>In this case we wish to simulate with some variability and see what happens at steady state:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -849,7 +849,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer>

@@ -18,13 +18,13 @@ and pharmacokinetic-pharmacodynamic (PKPD) models."><meta property="og:image" co
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.7</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-book"></span>
      
     Articles
@@ -53,7 +53,7 @@ and pharmacokinetic-pharmacodynamic (PKPD) models."><meta property="og:image" co
     </li>
   </ul></li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-chalkboard-teacher"></span>
      
     Example models
@@ -126,7 +126,8 @@ and pharmacokinetic-pharmacodynamic (PKPD) models."><meta property="og:image" co
 and pharmacokinetic-pharmacodynamic (PKPD) models.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">nlmixr</span><span class="op">(</span>
+    <div id="ref-usage">
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">nlmixr</span><span class="op">(</span>
   <span class="va">object</span>,
   <span class="va">data</span>,
   est <span class="op">=</span> <span class="cn">NULL</span>,
@@ -171,8 +172,8 @@ and pharmacokinetic-pharmacodynamic (PKPD) models.</p>
   save <span class="op">=</span> <span class="cn">NULL</span>,
   envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
+    </div>
 
-    <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>object</dt>
@@ -243,7 +244,7 @@ routines that support boundaries (note nlmixr's <code><a href="saem.fit.html">sa
 and <code><a href="https://rdrr.io/pkg/nlme/man/nlme.html" class="external-link">nlme</a></code> do not currently support parameter boundaries).</p>
 <p>To explain how these initial estimates are specified we will start
 with an annotated example:</p>
-<pre><code><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span> <span class="co">## Note the arguments to the function are currently</span>
+<div class="sourceCode"><pre><code><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span> <span class="co">## Note the arguments to the function are currently</span>
                  <span class="co">## ignored by nlmixr</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
         <span class="co">## Initial conditions for population parameters (sometimes</span>
@@ -260,7 +261,7 @@ with an annotated example:</p>
     <span class="op">}</span><span class="op">)</span>
     <span class="co">## The model block will be discussed later</span>
     <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="op">}</span><span class="op">)</span>
-<span class="op">}</span></code></pre>
+<span class="op">}</span></code></pre></div>
 
 <p>As shown in the above examples:</p><ul><li><p>Simple parameter values are specified as a R-compatible assignment</p></li>
 <li><p>Boundaries my be specified by <code>c(lower, est, upper)</code>.</p></li>
@@ -291,7 +292,7 @@ distinguish these estimates from the population and residual error
 parameters.</p>
 <p>Continuing the prior example, we can annotate the estimates for
 the between subject error distribution</p>
-<pre><code><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
+<div class="sourceCode"><pre><code><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
         <span class="va">lCl</span> <span class="op">&lt;-</span> <span class="fl">1.6</span>      <span class="co">#log Cl (L/hr)</span>
         <span class="va">lVc</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">90</span><span class="op">)</span>  <span class="co">#log V (L)</span>
@@ -313,7 +314,7 @@ the between subject error distribution</p>
     <span class="op">}</span><span class="op">)</span>
     <span class="co">## The model block will be discussed later</span>
     <span class="fu"><a href="../reference/model.html">model</a></span><span class="op">(</span><span class="op">{</span><span class="op">}</span><span class="op">)</span>
-<span class="op">}</span></code></pre>
+<span class="op">}</span></code></pre></div>
 
 <p>As shown in the above examples:</p>
 <ul><li><p>Simple variances are specified by the variable name  and the
@@ -331,7 +332,7 @@ also mix in RxODE blocks into the model.</p>
 <p>The current method of defining a nlmixr model is to specify the
 parameters, and then possibly the RxODE lines:</p>
 <p>Continuing describing the syntax with an annotated example:</p>
-<pre><code><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
+<div class="sourceCode"><pre><code><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
         <span class="va">lCl</span> <span class="op">&lt;-</span> <span class="fl">1.6</span>      <span class="co">#log Cl (L/hr)</span>
         <span class="va">lVc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">90</span><span class="op">)</span>   <span class="co">#log Vc (L)</span>
@@ -357,7 +358,7 @@ parameters, and then possibly the RxODE lines:</p>
         <span class="co">## a proportional error (estimated by the parameter prop.err)</span>
         <span class="va">cp</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.err</span><span class="op">)</span>
     <span class="op">}</span><span class="op">)</span>
-<span class="op">}</span></code></pre>
+<span class="op">}</span></code></pre></div>
 
 <p>A few points to note:</p>
 <ul><li><p>Parameters are defined before the differential equations.  Currently
@@ -381,7 +382,7 @@ parameters, and then possibly the RxODE lines:</p>
 <p>Solved PK systems are also currently supported by nlmixr with the
 `linCmt()` pseudo-function.  An annotated example of a solved
 system is below:</p>
-<p>##'</p><pre><code><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
+<p>##'</p><div class="sourceCode"><pre><code><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>
     <span class="fu"><a href="../reference/ini.html">ini</a></span><span class="op">(</span><span class="op">{</span>
         <span class="va">lCl</span> <span class="op">&lt;-</span> <span class="fl">1.6</span>      <span class="co">#log Cl (L/hr)</span>
         <span class="va">lVc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">90</span><span class="op">)</span>   <span class="co">#log Vc (L)</span>
@@ -404,7 +405,7 @@ system is below:</p>
         <span class="co">## absorption.</span>
         <span class="fu">linCmt</span><span class="op">(</span><span class="op">)</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.err</span><span class="op">)</span>
     <span class="op">}</span><span class="op">)</span>
-<span class="op">}</span></code></pre>
+<span class="op">}</span></code></pre></div>
 
 <p>A few things to keep in mind:</p>
 <ul><li><p>Currently the solved systems support either oral dosing, IV dosing
@@ -423,7 +424,7 @@ system is below:</p>
 interpreting it correctly by using the <code>nlmixr</code> function on
 it.</p>
 <p>Using the above function we can get:</p>
-<pre><code>
+<div class="sourceCode"><pre><code>
 &gt; nlmixr(f)
 ## 1-compartment model with first-order absorption in terms of Cl
 ## Initialization:
@@ -451,7 +452,7 @@ KA &lt;- exp(lKA + eta.KA)
 ## it knows that this is a one-compartment model with first-order
 ## absorption.
 linCmt() ~ prop(prop.err)
-</code></pre>
+</code></pre></div>
 
 <p>In general this gives you information about the model (what type
 of solved system/RxODE), initial estimates as well as the code for
@@ -466,19 +467,19 @@ convert these datasets to RxODE-compatible datasets with the
 doses are not supported by RxODE, and therefore not supported by
 the conversion function.</p>
 <p>As an example, you can use a simulated rich 1-compartment dataset.</p>
-<pre><code><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">Oral_1CPT</span>
+<div class="sourceCode"><pre><code><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">Oral_1CPT</span>
  <span class="va">d</span> <span class="op">&lt;-</span> <span class="va">d</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">!=</span> <span class="st">"SS"</span><span class="op">]</span>;
  <span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nmDataConvert.html">nmDataConvert</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span>;
-</code></pre>
+</code></pre></div>
 
 <p>Once the data has been converted to the appropriate format, you
 can use the <code>nlmixr</code> function to run the appropriate code.</p>
 <p>The method to estimate the model is:</p>
-<pre><code><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">model.function</span>, <span class="va">rxode.dataset</span>, est<span class="op">=</span><span class="st">"est"</span>,control<span class="op">=</span><span class="fu">estControl</span><span class="op">(</span><span class="va">options</span><span class="op">)</span><span class="op">)</span></code></pre>
+<div class="sourceCode"><pre><code><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">model.function</span>, <span class="va">rxode.dataset</span>, est<span class="op">=</span><span class="st">"est"</span>,control<span class="op">=</span><span class="fu">estControl</span><span class="op">(</span><span class="va">options</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 
 <p>Currently <code><a href="https://rdrr.io/pkg/nlme/man/nlme.html" class="external-link">nlme</a></code> and <code><a href="saem.fit.html">saem</a></code> are implemented.  For example, to run the
 above model with <code><a href="saem.fit.html">saem</a></code>, we could have the following:</p>
-<pre><code>
+<div class="sourceCode"><pre><code>
 &gt; f &lt;- function(){
     ini({
         lCl &lt;- 1.6      #log Cl (L/hr)
@@ -535,7 +536,7 @@ done.
 The model-based sensitivities have been calculated
 Calculating Table Variables...
 done
-</code></pre>
+</code></pre></div>
 
 <p>The options for <code><a href="saem.fit.html">saem</a></code> are controlled by <code><a href="saemControl.html">saemControl</a></code>.
 You may wish to make sure the minimization is complete in the case
@@ -548,7 +549,7 @@ Overall it is probably a semi-reasonable solution.</p>
 <p>In addition to unifying the modeling language sent to each of the
 estimation routines, the outputs currently have a unified structure.</p>
 <p>You can see the fit object by typing the object name:</p>
-<pre><code>
+<div class="sourceCode"><pre><code>
 &gt; fit.s
  -- nlmixr SAEM fit (ODE); OBJF calculated from FOCEi approximation -------------
       OBJF      AIC      BIC Log-likelihood Condition Number
@@ -583,7 +584,7 @@ estimation routines, the outputs currently have a unified structure.</p>
  3 1      0.75  389.  464. -74.5  -0.398   434. -45.2 -0.526  463. -73.9
  # ... with 6,944 more rows, and 11 more variables: CWRES &lt;dbl&gt;, eta.Cl &lt;dbl&gt;,
  #   eta.Vc &lt;dbl&gt;, eta.KA &lt;dbl&gt;, depot &lt;dbl&gt;, centr &lt;dbl&gt;, Cl &lt;dbl&gt;, Vc &lt;dbl&gt;,
-</code></pre>
+</code></pre></div>
 
 
 <p>This example shows what is typical printout of a nlmixr fit object.  The elements of the fit are:</p>
@@ -643,11 +644,10 @@ function.</p></li>
     <h2>Author</h2>
     <p>Matthew L. Fidler, Rik Schoemaker</p>
     </div>
-    </div>
 
-    <div id="examples">
+    <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
 <span class="r-in"><span class="co"># \donttest{</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">f_ode</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span></span>
@@ -761,12 +761,12 @@ function.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    fixed reStruct </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        0        0 </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -811,7 +811,7 @@ function.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Time</span> (sec <span style="color: #0000BB; font-weight: bold;">$time</span>): ───────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           nlme    setup table cwres    other</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed 42.795 4.789298 1.207 6.165 0.788702</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed 40.628 4.799963 1.119 6.063 0.733037</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Population Parameters</span> (<span style="color: #0000BB; font-weight: bold;">$parFixed</span> or <span style="color: #0000BB; font-weight: bold;">$parFixedDf</span>): ───────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -847,12 +847,12 @@ function.</p></li>
 <span class="r-in"><span class="va">fit_linCmt_focei</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">nlmixr</span><span class="op">(</span><span class="va">f_linCmt</span>, <span class="va">Oral_1CPT</span>, est<span class="op">=</span><span class="st">"focei"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -999,8 +999,8 @@ function.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Time</span> (sec <span style="color: #0000BB; font-weight: bold;">$time</span>): ───────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            setup optimize covariance table    other</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed 5.520918 7.000809   7.000818 0.772 8.207455</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           setup optimize covariance table    other</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed 5.57517 5.990976   5.990985 0.738 7.344869</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Population Parameters</span> (<span style="color: #0000BB; font-weight: bold;">$parFixed</span> or <span style="color: #0000BB; font-weight: bold;">$parFixedDf</span>): ───────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -1052,7 +1052,7 @@ function.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating covariance matrix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -1070,7 +1070,7 @@ function.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Time</span> (sec <span style="color: #0000BB; font-weight: bold;">$time</span>): ───────────────────────────────────────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            saem    setup table covariance    other</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed 363.515 1.730252 0.294      0.433 0.670748</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> elapsed 301.553 1.682703 0.261      0.384 0.613297</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Population Parameters</span> (<span style="color: #0000BB; font-weight: bold;">$parFixed</span> or <span style="color: #0000BB; font-weight: bold;">$parFixedDf</span>): ───────────────────────────</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -1117,7 +1117,7 @@ function.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer></div>

@@ -17,13 +17,13 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.7</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-book"></span>
      
     Articles
@@ -52,7 +52,7 @@
     </li>
   </ul></li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-chalkboard-teacher"></span>
      
     Example models
@@ -124,7 +124,8 @@
     <p>FOCEi fit</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">foceiFit</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span><span class="op">)</span>
+    <div id="ref-usage">
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">foceiFit</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="fu">focei.fit</span><span class="op">(</span><span class="va">data</span>, <span class="va">...</span><span class="op">)</span>
 
@@ -152,8 +153,8 @@
   keep <span class="op">=</span> <span class="cn">NULL</span>,
   drop <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
+    </div>
 
-    <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>data</dt>
@@ -211,11 +212,10 @@ FOCEi fit object</p>
     <h2>Author</h2>
     <p>Matthew L. Fidler and Wenping Wang</p>
     </div>
-    </div>
 
-    <div id="examples">
+    <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
 <span class="r-in"><span class="co"># \donttest{</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Comparison to Wang2007 objective functions</span></span>
@@ -248,12 +248,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fitPi</span> <span class="op">&lt;-</span> <span class="fu">foceiFit</span><span class="op">(</span><span class="va">w7</span>, <span class="va">inits</span>, <span class="va">mypar2</span>,<span class="va">mod</span>,<span class="va">pred</span>,<span class="va">errProp</span>,</span>
 <span class="r-in">     control<span class="op">=</span><span class="fu"><a href="foceiControl.html">foceiControl</a></span><span class="op">(</span>maxOuterIterations<span class="op">=</span><span class="fl">0</span>,covMethod<span class="op">=</span><span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -296,12 +296,12 @@ FOCEi fit object</p>
 <span class="r-in">     control<span class="op">=</span><span class="fu"><a href="foceiControl.html">foceiControl</a></span><span class="op">(</span>maxOuterIterations<span class="op">=</span><span class="fl">0</span>,covMethod<span class="op">=</span><span class="st">""</span>,</span>
 <span class="r-in">     interaction<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -367,12 +367,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fitA</span> <span class="op">&lt;-</span> <span class="fu">foceiFit</span><span class="op">(</span><span class="va">w7</span>, <span class="va">inits</span>, <span class="va">mypar2</span>,<span class="va">mod</span>,<span class="va">pred</span>,<span class="va">errAdd</span>,</span>
 <span class="r-in">     control<span class="op">=</span><span class="fu"><a href="foceiControl.html">foceiControl</a></span><span class="op">(</span>maxOuterIterations<span class="op">=</span><span class="fl">0</span>,covMethod<span class="op">=</span><span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -420,12 +420,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fitAP</span> <span class="op">&lt;-</span> <span class="fu">foceiFit</span><span class="op">(</span><span class="va">w7</span>, <span class="va">inits</span>, <span class="va">mypar2</span>,<span class="va">mod</span>,<span class="va">pred</span>,<span class="va">errAddProp</span>,</span>
 <span class="r-in">     control<span class="op">=</span><span class="fu"><a href="foceiControl.html">foceiControl</a></span><span class="op">(</span>maxOuterIterations<span class="op">=</span><span class="fl">0</span>,covMethod<span class="op">=</span><span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -471,12 +471,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fitLN</span> <span class="op">&lt;-</span> <span class="fu">foceiFit</span><span class="op">(</span><span class="va">w7</span>, <span class="va">inits</span>, <span class="va">mypar2</span>,<span class="va">mod</span>,<span class="va">pred</span>,<span class="va">errLogn</span>,</span>
 <span class="r-in">     control<span class="op">=</span><span class="fu"><a href="foceiControl.html">foceiControl</a></span><span class="op">(</span>maxOuterIterations<span class="op">=</span><span class="fl">0</span>,covMethod<span class="op">=</span><span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -518,12 +518,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fitLN2</span> <span class="op">&lt;-</span> <span class="fu">foceiFit</span><span class="op">(</span><span class="va">w72</span>, <span class="va">inits</span>, <span class="va">mypar2</span>,<span class="va">mod</span>,<span class="va">predL</span>,<span class="va">errAdd</span>,</span>
 <span class="r-in">     control<span class="op">=</span><span class="fu"><a href="foceiControl.html">foceiControl</a></span><span class="op">(</span>maxOuterIterations<span class="op">=</span><span class="fl">0</span>,covMethod<span class="op">=</span><span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -593,12 +593,12 @@ FOCEi fit object</p>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu">foceiFit</span><span class="op">(</span><span class="va">d</span>, <span class="va">inits</span>, <span class="va">mypar2</span>,<span class="va">mod</span>,<span class="va">pred</span>,<span class="va">err</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -859,12 +859,12 @@ FOCEi fit object</p>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu">foceiFit</span><span class="op">(</span><span class="va">d</span>, <span class="va">inits</span>, <span class="va">mypar2</span>,<span class="va">mod</span>,<span class="va">pred</span>,<span class="va">errl</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -1112,12 +1112,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fitIVp</span> <span class="op">&lt;-</span> <span class="fu"><a href="nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment.IV.model</span>, <span class="va">datr</span>, <span class="st">"focei"</span><span class="op">)</span>;</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -1457,12 +1457,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fitIVtbs</span> <span class="op">&lt;-</span> <span class="fu"><a href="nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment.IV.model</span>, <span class="va">datr</span>, <span class="st">"focei"</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -1947,12 +1947,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fitIVyj</span> <span class="op">&lt;-</span> <span class="fu"><a href="nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.compartment.IV.model</span>, <span class="va">datr</span>, <span class="st">"focei"</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -4236,12 +4236,12 @@ FOCEi fit object</p>
 <span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="nlmixr.html">nlmixr</a></span><span class="op">(</span><span class="va">one.cmt</span>, <span class="va">theo_sd</span>, <span class="st">"focei"</span>, <span class="fu"><a href="foceiControl.html">foceiControl</a></span><span class="op">(</span>outerOpt<span class="op">=</span><span class="st">"bobyqa"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -5490,7 +5490,7 @@ FOCEi fit object</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer></div>

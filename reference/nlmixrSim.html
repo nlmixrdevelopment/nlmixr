@@ -22,13 +22,13 @@ on the number of subjects and observations the model was based on."><meta proper
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.7</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-book"></span>
      
     Articles
@@ -57,7 +57,7 @@ on the number of subjects and observations the model was based on."><meta proper
     </li>
   </ul></li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-chalkboard-teacher"></span>
      
     Example models
@@ -134,7 +134,8 @@ simulated from the uncertainty in the Omega/Sigma matrices based
 on the number of subjects and observations the model was based on.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">nlmixrSim</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span>
+    <div id="ref-usage">
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">nlmixrSim</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S3 method for nlmixrFitData</span>
 <span class="fu"><a href="https://nlmixrdevelopment.github.io/RxODE/reference/rxSolve.html" class="external-link">rxSolve</a></span><span class="op">(</span>
@@ -240,8 +241,8 @@ on the number of subjects and observations the model was based on.</p>
 
 <span class="co"># S3 method for nlmixrFitData</span>
 <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    </div>
 
-    <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>object</dt>
@@ -417,7 +418,7 @@ supplied instead of an event table.  This is for importing the
 data as an RxODE event table.</p></dd>
 <dt>stiff</dt>
 <dd><p>a logical (<code>TRUE</code> by default) indicating whether
-the ODE system is stiff or not.</p><pre><code>For stiff ODE systems (`stiff = TRUE`), `RxODE` uses the
+the ODE system is stiff or not.</p><div class="sourceCode"><pre><code>For stiff ODE systems (`stiff = TRUE`), `RxODE` uses the
 LSODA (Livermore Solver for Ordinary Differential Equations)
 Fortran package, which implements an automatic method switching
 for stiff and non-stiff problems along the integration
@@ -429,7 +430,7 @@ Dormand and Prince as implemented in C by Hairer and Wanner
 (1993).
 
 If stiff is not specified, the `method` argument is used instead.
-</code></pre></dd>
+</code></pre></div></dd>
 <dt>theta</dt>
 <dd><p>A vector of parameters that will be named <code>THETA\[#\]</code> and
 added to parameters</p></dd>
@@ -743,7 +744,6 @@ named argument, this overwrites the output</p></dd>
     <h2>Value</h2>
     <p>A RxODE solved object</p>
     </div>
-    </div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -757,7 +757,7 @@ named argument, this overwrites the output</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer></div>

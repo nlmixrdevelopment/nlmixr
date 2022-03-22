@@ -17,13 +17,13 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.7</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-book"></span>
      
     Articles
@@ -52,7 +52,7 @@
     </li>
   </ul></li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-chalkboard-teacher"></span>
      
     Example models
@@ -124,7 +124,8 @@
     <p>Fit a non-population dynamic model</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">dynmodel</span><span class="op">(</span>
+    <div id="ref-usage">
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">dynmodel</span><span class="op">(</span>
   <span class="va">system</span>,
   <span class="va">model</span>,
   <span class="va">inits</span>,
@@ -134,8 +135,8 @@
   control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
+    </div>
 
-    <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>system</dt>
@@ -165,11 +166,10 @@ details. Default is NULL.</p></dd>
     <h2>Author</h2>
     <p>Wenping Wang, Mason McComb and Matt Fidler</p>
     </div>
-    </div>
 
-    <div id="examples">
+    <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
 <span class="r-in"><span class="co"># \donttest{</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># dynmodel example --------------------------------------------------------</span></span>
@@ -463,7 +463,7 @@ details. Default is NULL.</p></dd>
 <span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="nlmixr.html">nlmixr</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model_onecmt_bolus</span>, data <span class="op">=</span> <span class="va">Bolus_1CPT</span>, est <span class="op">=</span> <span class="st">"dynmodel"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> parameter labels from comments will be replaced by 'label()'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -2156,7 +2156,7 @@ details. Default is NULL.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |    U|     44833.256 |     3.643 |     83.74 |    0.4787 |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → creating full model...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (<span style="color: #262626; background-color: #DADADA;">`if`</span>/<span style="color: #262626; background-color: #DADADA;">`else`</span>)...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> → pruning branches (`if`/`else`)...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> → loading into <span style="color: #0000BB;">symengine</span> environment...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> done</span>
@@ -2785,7 +2785,7 @@ details. Default is NULL.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer></div>

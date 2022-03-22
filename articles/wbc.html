@@ -40,14 +40,14 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">nlmixr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.7</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-book"></span>
      
     Articles
@@ -81,7 +81,7 @@
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fas fa-chalkboard-teacher"></span>
      
     Example models
@@ -225,9 +225,9 @@
     <span class="va">CIRC</span> <span class="op">~</span> <span class="fu">prop</span><span class="op">(</span><span class="va">prop.err</span><span class="op">)</span>
   <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<div class="section level1">
-<h1 id="fit-model-using-saem">Fit model using saem<a class="anchor" aria-label="anchor" href="#fit-model-using-saem"></a>
-</h1>
+<div class="section level2">
+<h2 id="fit-model-using-saem">Fit model using saem<a class="anchor" aria-label="anchor" href="#fit-model-using-saem"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">d3</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"Simulated_WBC_pacl_ddmore_samePK_nlmixr.csv"</span>, na.string <span class="op">=</span> <span class="st">"."</span><span class="op">)</span>
 
@@ -302,7 +302,7 @@
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="../reference/vpc_ui.html">vpc.ui</a></span><span class="op">(</span><span class="va">fit.S</span>, n<span class="op">=</span><span class="fl">500</span>, n_bins <span class="op">=</span> <span class="fl">10</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, ylab <span class="op">=</span> <span class="st">"Neutrophil Count (10^9/L)"</span>, xlab <span class="op">=</span> <span class="st">"Time (h)"</span><span class="op">)</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:07</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:06</span>
 <span class="co">#&gt;   $rxsim = original simulated data</span>
 <span class="co">#&gt;   $sim = merge simulated data</span>
 <span class="co">#&gt;   $obs = observed data</span>
@@ -313,7 +313,7 @@
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="fu"><a href="../reference/vpc_ui.html">vpc.ui</a></span><span class="op">(</span><span class="va">fit.S</span>, n<span class="op">=</span><span class="fl">500</span>, bins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">170</span>,<span class="fl">300</span>,<span class="fl">350</span>,<span class="fl">500</span>,<span class="fl">600</span>,<span class="fl">900</span>,<span class="fl">3000</span>,<span class="fl">4580</span><span class="op">)</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, ylab <span class="op">=</span> <span class="st">"Neutrophil Count (10^9/L)"</span>, xlab <span class="op">=</span> <span class="st">"Time (h)"</span><span class="op">)</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:08</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:06</span>
 <span class="co">#&gt;   $rxsim = original simulated data</span>
 <span class="co">#&gt;   $sim = merge simulated data</span>
 <span class="co">#&gt;   $obs = observed data</span>
@@ -322,9 +322,9 @@
 <span class="co">#&gt; plotting the object now</span></code></pre></div>
 <p><img src="wbc_files/figure-html/saem-84.png" width="100%"></p>
 </div>
-<div class="section level1">
-<h1 id="fit-model-using-focei">Fit model using FOCEi<a class="anchor" aria-label="anchor" href="#fit-model-using-focei"></a>
-</h1>
+<div class="section level2">
+<h2 id="fit-model-using-focei">Fit model using FOCEi<a class="anchor" aria-label="anchor" href="#fit-model-using-focei"></a>
+</h2>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>fit.F &lt;-<span class="st"> </span><span class="kw">nlmixr</span>(wbc, d3, <span class="dt">est=</span><span class="st">"focei"</span>, <span class="kw">list</span>(<span class="dt">print=</span><span class="dv">0</span>), <span class="dt">table=</span><span class="kw">list</span>(<span class="dt">cwres=</span><span class="ot">TRUE</span>, <span class="dt">npde=</span><span class="ot">TRUE</span>))</span>
 <span id="cb15-2"><a href="#cb15-2"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:00 </span></span>
 <span id="cb15-3"><a href="#cb15-3"></a><span class="co">#&gt; </span></span>
@@ -352,12 +352,12 @@
 <span id="cb15-25"><a href="#cb15-25"></a><span class="co">#&gt; calculating covariance matrix</span></span>
 <span id="cb15-26"><a href="#cb15-26"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|===</span></span>
 <span id="cb15-27"><a href="#cb15-27"></a>S matrix calculation failed; Switch to R<span class="op">-</span>matrix covariance.</span>
-<span id="cb15-28"><a href="#cb15-28"></a><span class="co">#&gt; =|====] 0:00:39 </span></span>
+<span id="cb15-28"><a href="#cb15-28"></a><span class="co">#&gt; =|====] 0:00:30 </span></span>
 <span id="cb15-29"><a href="#cb15-29"></a><span class="co">#&gt; done</span></span>
 <span id="cb15-30"><a href="#cb15-30"></a><span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:03</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="focei-goodness-of-fit-plots">FOCEi Goodness of fit plots<a class="anchor" aria-label="anchor" href="#focei-goodness-of-fit-plots"></a>
-</h2>
+<div class="section level3">
+<h3 id="focei-goodness-of-fit-plots">FOCEi Goodness of fit plots<a class="anchor" aria-label="anchor" href="#focei-goodness-of-fit-plots"></a>
+</h3>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">xpdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/xpose.nlmixr/man/xpose_data_nlmixr.html" class="external-link">xpose_data_nlmixr</a></span><span class="op">(</span><span class="va">fit.F</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit.F</span><span class="op">)</span></code></pre></div>
@@ -414,7 +414,7 @@
 <span class="co">#vpc.ui(fit.S, n=500, show=list(obs_dv=T), ylab = "Neutrophil count (10^9/L)", xlab = "Time (h)")</span>
 <span class="co"># 10 bins is slightly better than auto bin</span>
 <span class="fu"><a href="../reference/vpc_ui.html">vpc.ui</a></span><span class="op">(</span><span class="va">fit.F</span>, n<span class="op">=</span><span class="fl">500</span>, n_bins <span class="op">=</span> <span class="fl">10</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, ylab <span class="op">=</span> <span class="st">"Neutrophil Count (10^9/L)"</span>, xlab <span class="op">=</span> <span class="st">"Time (h)"</span><span class="op">)</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:06</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:04</span>
 <span class="co">#&gt;   $rxsim = original simulated data</span>
 <span class="co">#&gt;   $sim = merge simulated data</span>
 <span class="co">#&gt;   $obs = observed data</span>
@@ -426,7 +426,7 @@
 <code class="sourceCode R">
 <span class="co"># specify bins</span>
 <span class="fu"><a href="../reference/vpc_ui.html">vpc.ui</a></span><span class="op">(</span><span class="va">fit.F</span>, n<span class="op">=</span><span class="fl">500</span>, bins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">170</span>,<span class="fl">300</span>,<span class="fl">350</span>,<span class="fl">500</span>,<span class="fl">600</span>,<span class="fl">900</span>,<span class="fl">3000</span>,<span class="fl">4580</span><span class="op">)</span>, show<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>obs_dv<span class="op">=</span><span class="cn">T</span><span class="op">)</span>, ylab <span class="op">=</span> <span class="st">"Neutrophil Count (10^9/L)"</span>, xlab <span class="op">=</span> <span class="st">"Time (h)"</span><span class="op">)</span>
-<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:06</span>
+<span class="co">#&gt; [====|====|====|====|====|====|====|====|====|====] 0:00:05</span>
 <span class="co">#&gt;   $rxsim = original simulated data</span>
 <span class="co">#&gt;   $sim = merge simulated data</span>
 <span class="co">#&gt;   $obs = observed data</span>
@@ -455,7 +455,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
 </div>
 
       </footer>
