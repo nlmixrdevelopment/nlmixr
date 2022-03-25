@@ -429,7 +429,7 @@ calc.COV <- function(fit0) {
     diag(m) <- g[ix]^2
     Vi <- DFi.i1 %*% omega %*% t(DFi.i1) + m
     VD <- try(eigen(Vi, symmetric = TRUE))
-    if (class(VD) == "try-error") stop("Spectral decom failure when computing FIM")
+    if (inhreits(VD, "try-error")) stop("Spectral decom failure when computing FIM")
     D <- Re(VD$values)
     V <- Re(VD$vectors)
     m <- diag(length(D))

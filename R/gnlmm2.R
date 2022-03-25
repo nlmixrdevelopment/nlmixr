@@ -102,10 +102,10 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
   if (is.null(system)) {
     stop("system must be an RxODE model or string")
   }
-  else if (class(system) == "RxODE") {
+  else if (inherits(system, "RxODE")) {
     system <- RxODE(system, calcSens = TRUE)
   }
-  else if (class(system) == "character") {
+  else if (inherits(system, "character")) {
     system <- RxODE(model = system, calcSens = TRUE)
   }
   else {
@@ -214,7 +214,7 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
         s1 <- c("Deriv::Deriv(~", s, pars[i], sprintf("}, \"ETA%d\")", j))
         a <- paste(s1, collapse = "\n")
         e <- eval(parse(text = a))
-        s <- if (class(e) == "call") {
+        s <- if (inherits(e, "call")) {
           s <- deparse(e)
           gsub(sprintf("\\bETA%d\\b", j), sprintf("ETA[%d]", j), s, perl = TRUE)
         } else {
@@ -235,14 +235,14 @@ gnlmm2 <- function(llik, data, inits, syspar = NULL,
 
     px <- as.list(env)
     madIx <- sapply(px, function(x) {
-      if (class(x) == "madness") TRUE else FALSE
+      if (inherits(x, "madness")) TRUE else FALSE
     })
     madVars <- names(px)[madIx]
 
     pars <- system$get.modelVars()$params
     px <- as.list(env)[pars]
     madIx <- sapply(px, function(x) {
-      if (class(x) == "madness") TRUE else FALSE
+      if (inherits(x, "madness")) TRUE else FALSE
     })
 
     pars <- pars[madIx]

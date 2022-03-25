@@ -810,7 +810,7 @@ fixef.saemFit <- function(object, ...) {
 focei.theta.saemFit <- function(object, uif, ...) {
   ## Get the thetas needed for FOCEi fit.
   this.env <- environment()
-  if (class(uif) == "function") {
+  if (inherits(uif, "function")) {
     uif <- nlmixr(uif)
   }
   n <- uif$focei.names
@@ -860,7 +860,7 @@ focei.theta.saemFit <- function(object, uif, ...) {
 }
 
 focei.eta.saemFit <- function(object, uif, ...) {
-  if (class(uif) == "function") {
+  if (inheirts(uif, "function")) {
     uif <- nlmixr(uif)
   }
   ## Reorder based on translation
@@ -912,7 +912,7 @@ as.focei.saemFit <- function(object, uif, pt = proc.time(), ..., data, calcResid
   if (is.null(calcResid)) calcResid <- FALSE
   .saemCfg <- attr(object, "saem.cfg")
   .saemTime <- proc.time() - pt
-  if (class(uif) == "function") {
+  if (inherits(uif, "function")) {
     uif <- nlmixr(uif)
   }
   .dist <- ""

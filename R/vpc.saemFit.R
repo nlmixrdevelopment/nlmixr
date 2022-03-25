@@ -21,7 +21,7 @@ rmvnorm <- function(n, mu, vmat) multi2(mu, vmat, n)
 ##' @author Wenping Wang
 ##' @export
 vpc_saemFit <- function(fit, dat, nsim = 100, by = NULL, ...) {
-  if (class(fit) == "nlmixr.ui.saem") fit <- as.saem(fit)
+  if (inherits(fit, "nlmixr.ui.saem")) fit <- as.saem(fit)
   saem.cfg <- attr(fit, "saem.cfg")
   dopred <- attr(fit, "dopred")
   resMat <- fit$resMat

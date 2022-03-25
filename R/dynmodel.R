@@ -814,7 +814,7 @@ dynmodel <- function(system, model, inits, data, fixPars = NULL, nlmixrObject = 
 
   # Error model  -------------------------------------------------------------
   modelList <-
-    if (class(model) == "formula") {
+    if (inherits(model, "formula")) {
       list(model)
     } else {
       model
@@ -1570,7 +1570,7 @@ genobj <- function(system, model, evTable, inits, data, fixPars = NULL,
                    squared = TRUE) {
 
   # Error model  -------------------------------------------------------------
-  if (class(model) == "formula") {
+  if (inherits(model, "formula")) {
     model <- list(model)
   }
   inits.err <- NULL

@@ -366,8 +366,8 @@ gnlmm <- function(llik, data, inits, syspar = NULL,
   ## model
   RxODE::rxReq("lbfgs")
   if (is.null(system)) {}
-  else if (class(system) == "RxODE") {}
-  else if (class(system) == "character") {
+  else if (inherits(system, "RxODE")) {}
+  else if (inherits(system, "character")) {
     system <- RxODE(model = system)
   }
   else {

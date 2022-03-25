@@ -273,7 +273,7 @@ sim.one <- function(zz, x) {
   else if (is(x$call$weights, "varPower")) {
     sd <- abs(pred)^as.double(coef(x$modelStruct$varStruct, allCoef = TRUE))
   }
-  else if (class(x$call$weights)[1] == "varConstPower") {
+  else if (inherits(x$call$weights, "varConstPower")) {
     sd <- exp(x$modelStruct$varStruct$const) + abs(pred)^x$modelStruct$varStruct$power
   } else {
     stop("residual model not implemented")

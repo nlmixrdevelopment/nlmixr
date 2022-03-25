@@ -927,7 +927,7 @@ print.nlmixrUI <- function(x, ...) {
     }
     cat("\n")
   }
-  cat(cli::rule(crayon::bold(sprintf("Model%s:", ifelse(class(x$rxode) == "RxODE", " (RxODE)", "")))), "\n")
+  cat(cli::rule(crayon::bold(sprintf("Model%s:", ifelse(inherits(x$rxode, "RxODE"), " (RxODE)", "")))), "\n")
   cat(x$fun.txt, "\n")
   cat(cli::rule(line = "bar2"), "\n")
   invisible(x)

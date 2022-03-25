@@ -35,7 +35,7 @@ nlmeModList <- function(x, value) {
   if (!missing(x) && !missing(value)) {
     return(assign(x, value, envir = getFromNamespace(".nlmeModListEnv", "nlmixr")))
   } else if (!missing(x) && missing(value)) {
-    if (class(x) == "environment") {
+    if (inherits(x, "environment")) {
       assignInMyNamespace(".nlmeModListEnv", x)
     } else {
       return(get(x, envir = getFromNamespace(".nlmeModListEnv", "nlmixr")))
@@ -451,9 +451,9 @@ nlme_ode <- function(dat.o, model, parModel, parTrans,
     .rm <- c(.rm, "mc.cores")
   }
   # prep ode
-  if (class(model) == "RxODE") {
+  if (inherits(model, "RxODE")) {
     nlmixr::nlmeModList("m1", model)
-  } else if (class(model) == "character") {
+  } else if (inherits(model, "character")) {
     nlmixr::nlmeModList("m1", RxODE(model = model))
   } else {
     stop("invalid model input")
@@ -685,20 +685,11 @@ anova.nlmixrNlme <- function(object, ...) {
   args <- lapply(
     list(object, ...),
     function(x) {
-      if (class(x)[1L] == "nlmixrNlme") {
+      if (inherits(x, "nlmixrNlme")) {
         tmp <- x
         class(tmp) <- class(tmp)[-1L]
         return(tmp)
-      } ## else if (is(x, "nlmixr.ui.nlme")){
-      ##     x <- as.nlme(x);
-      ##     if (class(x)[1L] == "nlmixrNlme"){
-      ##         tmp <- x;
-      ##         class(tmp) <- class(tmp)[-1L];
-      ##         return(tmp)
-      ##     } else {
-      ##         return(x)
-      ##     }
-      ## }
+      }
       else {
         return(x)
       }
@@ -730,7 +721,7 @@ focei.eta.nlmixrNlme <- function(object, ...) {
   })
   ome <- diag(est)
   ## Now fill in the diagionals
-  if (class(cor) == "matrix") {
+  if (inherits(cor, "matrix")) {
     stop("Haven't handled covariance translation for this model yet...")
   } else {
     ome[1, 2] <- ome[2, 1] <- cor[1] * sd[1] * sd[2]
@@ -753,7 +744,7 @@ focei.eta.nlmixrNlme <- function(object, ...) {
 
 ##' @rdname focei.theta
 focei.theta.nlmixrNlme <- function(object, uif, ...) {
-  if (class(uif) == "function") {
+  if (inherits(uif, "function")) {
     uif <- nlmixr(uif)
   }
   n <- uif$focei.names
@@ -806,7 +797,7 @@ as.focei.nlmixrNlme <- function(object, uif, pt = proc.time(), ..., data, calcRe
                                 keep=NULL, drop=NULL, table=tableControl(), IDlabel=NULL) {
   if (is.null(calcResid)) calcResid <- TRUE
   .nlmeTime <- proc.time() - pt
-  if (class(uif) == "function") {
+  if (inherits(uif, "function")) {
     uif <- nlmixr(uif)
   }
   uif.new <- uif
