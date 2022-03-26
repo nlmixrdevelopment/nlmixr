@@ -860,7 +860,7 @@ focei.theta.saemFit <- function(object, uif, ...) {
 }
 
 focei.eta.saemFit <- function(object, uif, ...) {
-  if (inheirts(uif, "function")) {
+  if (inherits(uif, "function")) {
     uif <- nlmixr(uif)
   }
   ## Reorder based on translation
