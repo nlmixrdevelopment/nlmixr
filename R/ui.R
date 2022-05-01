@@ -3153,10 +3153,12 @@ nlmixrUI.saem.eta.trans <- function(obj) {
 nlmixrUI.saem.model.omega <- function(obj) {
   dm <- sum(!is.na(.saemThetaTrans(obj)))
   et <- obj$saem.eta.trans
-  mat <- matrix(rep(0, dm * dm), dm)
+  mat <- matrix(data=0, nrow=dm, ncol=dm)
   etd <- which(!is.na(obj$neta1))
   for (i in etd) {
-    mat[et[obj$neta1[i]], et[obj$neta2[i]]] <- mat[et[obj$neta2[i]], et[obj$neta1[i]]] <- 1
+    eta1 <- et[obj$neta1[i]]
+    eta2 <- et[obj$neta2[i]]
+    mat[eta1, eta2] <- mat[eta2, eta1] <- 1
   }
   return(mat)
 }
