@@ -742,8 +742,7 @@ public:
 	vec d1_mu_phi1=Md1(ind_cov1);                              //CHK!! vec or mat
 	vec d1_mu_phi0=Md0(ind_cov0);                              //CHK!! vec or mat
 	vec d1_loggamma2_phi1=0.5*sdg1-0.5*N;
-	vec d1_logsigma2;
-	d1_logsigma2 << 0.5*resy(k)/sigma2[0]-0.5*ntotal;          //FIXME: sigma2[0], sigma2[b] instead?
+	vec d1_logsigma2({0.5*resy(k)/sigma2[0]-0.5*ntotal});      //FIXME: sigma2[0], sigma2[b] instead?
 	vec d1logk=join_cols(d1_mu_phi1, join_cols(d1_mu_phi0, join_cols(d1_loggamma2_phi1, d1_logsigma2)));
 	D1 = D1+d1logk;
 	D11= D11+d1logk*d1logk.t();
