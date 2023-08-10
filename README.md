@@ -1,12 +1,10 @@
----
-output: github_document
----
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 
 
 # nlmixr: an R package for population PKPD modeling
+
+**NOTE:** `nlmixr` is curently archived on CRAN.  You can also use `nlmixr2` which is on CRAN currenty.  See http://nlmixr2.org or https://github.com/nlmixr2/nlmixr2 
 
 <!-- badges: start -->
 [![R build status](https://github.com/nlmixrdevelopment/nlmixr/workflows/R-CMD-check/badge.svg)](https://github.com/nlmixrdevelopment/nlmixr/actions)
